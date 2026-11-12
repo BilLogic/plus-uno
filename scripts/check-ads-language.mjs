@@ -36,6 +36,16 @@
  *                    AI is unnamed and shows as AI (decision 1 of #1591). Prototypes keep
  *                    their own recorded copy.
  *
+ * AGENT-READ MARKDOWN. The `.md` docs agents learn from (`DOC_ROOTS`: the
+ * constitution, glossary and README, skills, agents, docs, the design-system
+ * guidelines) are held to one rule:
+ *   retired-name:<Name> lines naming a retired component, the same Not-here
+ *                    rows, as a word; the finding names the replacement.
+ * A table or paragraph that maps old names to new on purpose carries
+ * `<!-- retired-names-ok: why -->`, which covers the contiguous non-blank block
+ * it sits in. A generated file (a `GENERATED` banner in its first lines) is
+ * regenerated from its source, so it is skipped; the source is checked.
+ *
  * The old token names are `check:old-system`'s.
  *
  * EVERY RULE ALLOWS ZERO. A hit is a finding; there is no baseline to hold it
@@ -66,6 +76,21 @@ const ALLOWED_PATHS = [
  * content. Named, not globbed; a new record earns its own line here. None today.
  */
 const ATLASSIAN_RECORDS = [];
+/** The agent-read markdown: what uno, uno-bot and the review skills learn from. */
+export const DOC_ROOTS = ['AGENTS.md', 'GLOSSARY.md', 'README.md', 'skills', 'agents', 'docs', 'design-system/guidelines'];
+const DOC_FILE = /\.md$/;
+/**
+ * Plans are working notes, deleted once landed; eval scenarios are fixtures an
+ * eval hands to the agent under test, written in the old names on purpose. The
+ * archive and ADRs are history (ALLOWED_PATHS).
+ */
+const DOC_SKIPPED = /^docs\/(?:plans|evals\/scenarios)\//;
+/** A block that maps retired names to their replacements on purpose. */
+const RETIRED_OK = /<!--\s*retired-names-ok:\s*.+?-->/i;
+/** A generated file's banner, within its first lines. */
+const GENERATED = /\bGENERATED\b/;
+/** A retired name that is also an English verb, used as one: `Switch the set…`, `Collapse the panel`. */
+const VERB_USE = (name) => new RegExp(`\\b${name}\\s+(?:the|a|an|to|it|its|this|that|off|on|back|between)\\b`, 'g');
 const COMMENT_LINE = /^\s*(?:\/\/|\/\*|\*)/;
 /** A glossary line saying what not to say. */
 const ALLOWED_LINE = /^\s*_Avoid_:/;
@@ -162,6 +187,10 @@ export function measure(sources) {
   };
   for (const { path: file, text } of sources) {
     if (ALLOWED_PATHS.some((re) => re.test(file))) continue;
+    if (DOC_FILE.test(file)) {
+      measureDoc(file, text, add);
+      continue;
+    }
     const live = text.split('\n').map((l) => (ALLOWED_LINE.test(l) ? '' : l));
     for (const [rule, re] of LINE_RULES) {
       const hits = live.flatMap((l, i) => (re.test(l) && !(rule === 'prop:size' && typeScaleSize(live, i)) ? [i + 1] : []));
@@ -197,13 +226,42 @@ export function measure(sources) {
   return found;
 }
 
-/** Every tracked, searched file under the roots, read. */
+/**
+ * One agent-read markdown file: each retired name, counted per line, outside
+ * the blocks a `retired-names-ok` marker covers. A generated file is skipped.
+ */
+function measureDoc(file, text, add) {
+  const lines = text.split('\n');
+  if (GENERATED.test(lines.slice(0, 6).join('\n'))) return;
+  const exempt = new Set();
+  lines.forEach((line, i) => {
+    if (!RETIRED_OK.test(line)) return;
+    for (let j = i; j >= 0 && lines[j].trim(); j--) exempt.add(j);
+    for (let j = i; j < lines.length && lines[j].trim(); j++) exempt.add(j);
+  });
+  const live = lines.map((l, i) => (exempt.has(i) || ALLOWED_LINE.test(l) ? '' : l));
+  for (const name of LEGACY_COMPONENTS) {
+    const word = new RegExp(`\\b${name}\\b`);
+    const verb = VERB_USE(name);
+    const hits = live.flatMap((l, i) => (word.test(l.replace(verb, '')) ? [i + 1] : []));
+    add(`retired-name:${name}`, file, hits.length, hits[0]);
+  }
+}
+
+/** Every tracked, searched file under the roots, read: the code and MDX, then the agent-read markdown. */
 export function sourcesOf(repoRoot) {
-  return trackedSources(repoRoot, SEARCH_ROOTS, SEARCHED);
+  const docs = trackedSources(repoRoot, DOC_ROOTS, DOC_FILE).filter(({ path: p }) => !DOC_SKIPPED.test(p));
+  return [...trackedSources(repoRoot, SEARCH_ROOTS, SEARCHED), ...docs];
 }
 
 /** Per-rule reason, keyed by rule name; a rule without one gets the generic line. */
 const RULE_MESSAGE = new Map([
+  ...NOT_HERE.components
+    .filter((r) => r.retired)
+    .map((r) => [
+      `retired-name:${r.not}`,
+      `\`${r.not}\` is retired; write ${r.use.map((u) => `\`${u}\``).join(' or ')}${r.why ? ` (${r.why})` : ''}, or mark a table that maps old names to new with <!-- retired-names-ok: why -->`,
+    ]),
   ...Object.entries(RENAMED_NO_ALIAS).map(([oldName, newName]) => [
     `stale-name:${oldName}`,
     `${newName} was renamed with no alias; \`${oldName}\` may not survive in doc prose either`,

@@ -18,7 +18,7 @@ Element -> Card / Table -> Section / Modal -> Page
 
 | Level | What it is | Examples |
 |-------|-----------|----------|
-| **Element** | Smallest reusable unit | Button, Badge, Icon, Avatar, Tag |
+| **Element** | Smallest reusable unit | Button, StatusTag, Icon, Avatar, Tag |
 | **Card / Table** | Composed elements with data | StatCard, StudentCard, TutorRow, DataTable |
 | **Section / Modal** | Groups of cards/tables forming a page region | FilterSection, AttendanceModal, ReflectionPanel |
 | **Page** | Full page composition combining sections | HomePage, TutorPerformancePage, SessionsPage |

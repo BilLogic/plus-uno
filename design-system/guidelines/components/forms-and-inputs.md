@@ -11,11 +11,7 @@ Generated facts (props, defaults, coverage) are in
 together on a surface is `design-system/guidelines/composition/forms.md`; this
 file is about picking one.
 
-The group follows Atlassian's Forms and inputs category, so it holds the
-buttons too. Storybook titles components with Atlassian's display names,
-while the code export keeps its own: `TextField` is Text field, `TextArea`
-is Text area, `Switch` is Toggle, `Dropdown` is Dropdown menu, and
-`DateTimePicker` is Date time picker.
+The group holds the buttons too.
 
 ## Which input to use
 
@@ -30,18 +26,19 @@ importable from `@/components` today.
 | several picks, up to 5 options | A Checkbox group (`Fieldset` + `Checkbox`) |
 | one pick, 6 or more options | `Select` (searchable by default) |
 | several picks, 6 or more options | `Select isMulti` |
-| a list held on a server, too large to ship | `Select` with `loadOptions` |
+| a list held on a server, too large to ship | `Select` with `loadOptions` (a property, not a separate component) |
 | several picks, or values the user adds | `TagInput` |
 | a pick through a hierarchy | `Cascader` for one leaf along one path · `TreeSelect` to see the tree, pick a parent, or pick several — see below |
 | a rating on a scale | `RadioGroup orientation="inline"` with `leadingText` and `trailingText` for a numbered scale (Linear scale) · `Rating` for stars |
 | the same choice for several questions | `ChoiceGrid` |
-| narrowing a table or list from a bar | the tiers of the Filtering pattern |
+| one pick from a toolbar, applied at once | `PopupSelect` — its labeled trigger reads "Status: Upcoming" |
+| narrowing a table or list from a bar | the tiers of the Filtering pattern: `FilterButton`, `PopupSelect`, and `FilterMenu` for several categories held until Apply |
 | an action run from a button | `DropdownMenu` — a button, not a field |
 
 The rest of the group answers narrower shapes: `TextField type="number"` for a number with
 steppers, `RichTextEditor` for formatted prose, `elemBefore` and `elemAfter` on a
 `TextField` for text, an icon or a button inside the field, `Range` for a number in a continuous
-range, `Switch` for a setting that applies immediately, `Checkbox` for one
+range, `Toggle` for a setting that applies immediately, `Checkbox` for one
 independent yes/no saved with the form, `DateTimePicker` for a date or time,
 `FileUpload` for a file.
 
@@ -78,9 +75,10 @@ what the user sees and what they can pick.
 If the user should never stop part-way down, it is a `Cascader`. If stopping at
 a parent is a valid answer, or the answer is a set, it is a `TreeSelect`.
 
-### Dropdown is an action menu
+### DropdownMenu is an action menu
 
-The recurring mistake is `Dropdown` where `Select` was meant. `Dropdown` fires
+The recurring mistake is `DropdownMenu` where `Select` or `PopupSelect` was
+meant. `DropdownMenu` fires
 per-item handlers and stores nothing; `Select` holds the value, shows it in the
 trigger, and supports multi-select and search. If the trigger should still read
 "Sort by" after the user chooses, you have picked the wrong one.
@@ -98,6 +96,8 @@ both its row and its column.
 
 ### Names that look importable and are not the answer
 
+- Menu is the item primitive behind `DropdownMenu` and `PopupSelect`, not a
+  component: reach for one of those two.
 - The option list under a field (`Listbox`) and its row (`OptionRow`) are
   internal parts in `forms-and-inputs/_internal/`, not fields. Select and
   TagInput build on them; for several values from a known list, use
@@ -125,7 +125,7 @@ rule does not reach them.
 `errorMessage` — on `TextField`, `TextArea`, `FileUpload`,
 `DateTimePicker` and `TagInput` — sets `aria-invalid` and points `aria-describedby` at the
 message, appending to any `aria-describedby` the caller passed. The error belongs on the field,
-not in an `Alert` at the top of the form — see
+with a danger `SectionMessage` at the top of the form only as the summary — see
 `design-system/guidelines/components/messaging.md`.
 
 **`isRequired` means three different things.** On `TextField`, `TextArea`,
@@ -136,24 +136,14 @@ sets `aria-required` on the group and `required` on every radio; a Checkbox
 group cannot be enforced natively, so check it yourself. `Select`
 announces it through a visually hidden "Required" description on the trigger.
 
-**Popup placement.** Every popup that opens from a field or button follows one
-rule: `Select`, `TagInput`, `TreeSelect`, `Cascader`, `DatePicker`,
-`DateTimePicker` and the `Dropdown` menu.
+**Disabled is rare.** An action stays enabled and explains on press; a field
+disables only for a same-screen prerequisite, with the reason as visible text.
+The rule: `design-system/guidelines/composition/form-behavior.md` § Unavailable
+actions and fields.
 
-- **Gap:** `--stack-sm` (4px) between the trigger's edge and the
-  popup surface, as a token.
-  Every popup in the family decides its flip and alignment through one
-  module, `_internal/anchorPlacement.js`; a popup placed in CSS uses
-  `calc(100% + var(--stack-sm))`.
-- **Alignment:** the popup's left edge sits on the trigger's left edge. Near
-  the viewport's right edge it right-aligns instead.
-- **Width:** at least the trigger's width. Content grows it up to 320px, and
-  a trigger wider than that keeps its own width. A popup with columns
-  (`Cascader`, the calendar) grows past 320px. The `Dropdown` menu is never
-  under 200px.
-- **Flip:** with no room below, the popup opens above, keeping the same gap.
-- **Arrowed exception:** a `Popover` or `Tooltip` with an arrow keeps its 8px
-  gap, because the arrow fills it. They sit outside this family.
+**Popup placement** for every field, menu and button popup:
+`design-system/guidelines/components/overlays-and-layering.md` § Where a popup
+opens.
 
 ## Where the group is weakest
 
@@ -178,8 +168,8 @@ radio.
 **`Button`** for a single action. It is the only one of the two that carries a
 click handler, and it is what the rest of the system composes when it
 needs an action: `Modal` builds its footer from `primaryButton` /
-`secondaryButton`, `Jumbotron` takes Buttons in its `actions` slot, `Card` builds
-from `actionButton`, and `TextField`
+`secondaryButton`, `SectionMessage` builds link buttons from its `actions`, and
+`TextField`
 from a Button in `elemBefore` or `elemAfter`. Pass `href` when the
 action is really navigation — the component forwards it and renders an anchor,
 which keeps middle-click and open-in-new-tab working.
@@ -198,10 +188,10 @@ an action:
 | You want | Reach for | Not |
 |---|---|---|
 | A value the user picks | `Select`, `RadioGroup` | Buttons with `active` |
-| A menu of things to do | `Dropdown` | A Button that opens a div |
-| Switching between views | `NavTabs`, `NavPills` | A ButtonGroup of two |
-| A setting that applies now | `Switch` | A toggle Button |
-| A status on a row | `Status` | A tiny disabled Button |
+| A menu of things to do | `DropdownMenu` | A Button that opens a div |
+| Switching between views | `Tabs` | A ButtonGroup of two |
+| A setting that applies now | `Toggle` | A toggle Button |
+| A status on a row | `StatusTag` | A tiny disabled Button |
 
 `active` on a `Button` adds a CSS class and nothing else. A row of buttons where
 one is `active` looks like a segmented control and announces as three unrelated
@@ -214,7 +204,9 @@ button config's `props` object when you are inside a `ButtonGroup`.
 **Icon-only buttons are small.** With no `text` and no children, `Button`
 renders a square: 24×24 at `compact` spacing, 32×32 at default. Neither gets an
 accessible name on its own — a string `iconBefore` renders as an `aria-hidden`
-icon, so pass `aria-label`.
+icon, so reach for `IconButton`, which requires a `label`. Slot names
+(`iconBefore`, `elemAfter`, `icon`) follow `docs/engineering/coding.md` § Slot
+names.
 
 ## Related
 

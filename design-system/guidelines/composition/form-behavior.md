@@ -83,9 +83,8 @@ form's own check still enforces it.
 
 ## Unavailable actions and fields
 
-An action stays enabled and explains what is missing when it is pressed. A
-field or option disables only for something the person can fix on the same
-screen. Content people must read is read-only, and what a role can never use is
+An action stays enabled and explains on press what is missing. A field or
+option disables only for a prerequisite the person can fix on the same screen. Content people must read is read-only, and what a role can never use is
 hidden.
 
 | The control is | Do this | The person can |
@@ -114,7 +113,7 @@ After a submit that fails on permission, the form turns read-only and says
 why in a `SectionMessage`, keeping the values readable.
 
 The prop is spelled per component: `isReadOnly` on `TextField`, `TextArea`,
-`Checkbox`, `Radio`, `Switch`, `RadioGroup` and `ChoiceGrid`; `readonly` on
+`Checkbox`, `Radio`, `Toggle`, `RadioGroup` and `ChoiceGrid`; `readonly` on
 `Select` and `DateTimePicker`. `Select` treats
 `readonly` as disabled today. A read-only choice keeps its focus and contrast
 and ignores clicks and keys; put radios in a `RadioGroup`, since ARIA lets the
