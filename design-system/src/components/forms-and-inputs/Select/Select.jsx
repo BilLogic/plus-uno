@@ -24,8 +24,8 @@ const isEmpty = (value) => value === undefined || value === null || value === ''
  * internal `Listbox` under it.
  *
  * - **The field is the combobox.** Focus stays in it, and the highlighted row is
- *   its `aria-activedescendant`. A searchable field is a text input: typing in
- *   it filters the list. A plain one is a select-only combobox.
+ *   its `aria-activedescendant`. The field is a text input: typing in it
+ *   filters the list. With `isSearchable={false}` it is a select-only combobox.
  * - **Values are ids; options are objects.** `value` is an option's `value` (an
  *   array with `isMulti`), controlled or not.
  * - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which
@@ -43,7 +43,7 @@ const Select = ({
     value,
     defaultValue,
     placeholder = 'Select...',
-    isSearchable = false,
+    isSearchable = true,
     isCreatable = false,
     onCreate,
     createOption,
@@ -501,7 +501,7 @@ Select.propTypes = {
     defaultValue: PropTypes.oneOfType([valueType, PropTypes.arrayOf(valueType)]),
     /** The text shown when nothing is picked. It names the field when there is no label. */
     placeholder: PropTypes.string,
-    /** Typing in the field filters the list. */
+    /** Typing in the field filters the list. On by default; pass `false` for a short list, such as a filter menu's. */
     isSearchable: PropTypes.bool,
     /** Offers "Create *text*" when nothing matches exactly, ignoring case. Implies typing. */
     isCreatable: PropTypes.bool,

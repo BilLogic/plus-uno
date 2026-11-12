@@ -70,7 +70,7 @@ SingleCommitClosesTheMenu.play = async ({ canvasElement }) => {
     await userEvent.click(await page().findByRole('option', { name: 'North High' }));
 
     await expect(chosen).toHaveTextContent(/^north$/);
-    await expect(field).toHaveTextContent('North High');
+    await expect(field).toHaveValue('North High');
     await waitFor(() => expect(page().queryByRole('option', { name: 'South High' })).toBeNull());
 
     await userEvent.click(field);
@@ -114,12 +114,12 @@ KeyboardOpensAndPicks.play = async ({ canvasElement }) => {
 
 /* ------------------------------------------------------------- isSearchable */
 
-/** Searchable means typing in the field itself; there is no second search box. */
+/** Typing is on by default and happens in the field itself; there is no second search box. */
 export const TypingFiltersOptions = () => {
     const [value, setValue] = useState('');
     return (
         <div style={stack}>
-            <Select id="scommit-search" label="School" options={schools} placeholder="Select a school" isSearchable value={value} onChange={setValue} />
+            <Select id="scommit-search" label="School" options={schools} placeholder="Select a school" value={value} onChange={setValue} />
             <p data-testid="chosen">{value}</p>
         </div>
     );
@@ -147,6 +147,34 @@ TypingFiltersOptions.play = async ({ canvasElement }) => {
     await userEvent.keyboard('{Enter}');
     await expect(canvas.getByTestId('chosen')).toHaveTextContent(/^riverside$/);
     await expect(field).toHaveValue('Riverside Academy');
+};
+
+/** A short filter list opts out: the field is a trigger, typing filters nothing, and Space opens it. */
+export const OptOutOfTyping = () => {
+    const [value, setValue] = useState('');
+    return (
+        <div style={stack}>
+            <Select id="scommit-plain" label="School" options={schools} placeholder="Any school" isSearchable={false} value={value} onChange={setValue} />
+            <p data-testid="chosen">{value}</p>
+        </div>
+    );
+};
+
+OptOutOfTyping.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const field = canvas.getByRole('combobox', { name: 'School' });
+    await expect(field.tagName).not.toBe('INPUT');
+
+    await userEvent.tab();
+    await expect(field).toHaveFocus();
+    await userEvent.keyboard(' ');
+    await expect(field).toHaveAttribute('aria-expanded', 'true');
+    await userEvent.keyboard('river');
+    await expect(await page().findAllByRole('option')).toHaveLength(schools.length);
+
+    await userEvent.click(await page().findByRole('option', { name: 'South High' }));
+    await expect(canvas.getByTestId('chosen')).toHaveTextContent(/^south$/);
+    await expect(field).toHaveTextContent('South High');
 };
 
 /** "Create *text*" appears only when nothing matches exactly, ignoring case. */
@@ -277,7 +305,7 @@ export const SelectAllHiddenPast50 = () => {
     const [value, setValue] = useState([]);
     return (
         <div style={stack}>
-            <Select id="scommit-all" label="Tutors" isMulti isSearchable selectAll options={manyOptions} value={value} onChange={setValue} />
+            <Select id="scommit-all" label="Tutors" isMulti selectAll options={manyOptions} value={value} onChange={setValue} />
             <p data-testid="count">{value.length}</p>
         </div>
     );
@@ -413,7 +441,7 @@ ReadonlyIsNotDisabled.play = async ({ canvasElement }) => {
     await userEvent.click(readonly);
     await expect(page().queryByRole('option', { name: 'North High' })).toBeNull();
     await userEvent.keyboard('{Delete}');
-    await expect(readonly).toHaveTextContent('North High');
+    await expect(readonly).toHaveValue('North High');
 
     // Disabled is out of the tab order.
     await userEvent.tab();
@@ -579,7 +607,7 @@ ClearableDefaults.play = async ({ canvasElement }) => {
     const sort = canvas.getByRole('combobox', { name: 'Sort' });
     sort.focus();
     await userEvent.keyboard('{Delete}');
-    await expect(sort).toHaveTextContent('North High');
+    await expect(sort).toHaveValue('North High');
 };
 
 /* ------------------------------------------------------------- open state */
