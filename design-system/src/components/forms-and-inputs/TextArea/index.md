@@ -14,11 +14,21 @@ Also asked as: multi-line, multiline text, long text input, notes field, comment
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.mdx`
 
+**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a Text area for free text over several lines: session notes, feedback, a
 reason. Use a Text field for one short answer, and a Rich text editor only when
 the text needs formatting.
+
+## Motion
+
+TextArea reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Border color changes on focus and error. An error message makes room, then fades in; it fades, then the room closes, once the field is fixed. |
 
 ## Best practices
 

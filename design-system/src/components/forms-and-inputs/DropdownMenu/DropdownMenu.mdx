@@ -12,6 +12,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={DropdownMenuStories} />
 
@@ -61,6 +62,14 @@ A dropdown menu is a trigger that opens a menu of actions or navigation items.
 <ComponentExample of={DropdownMenuStories.Loading} title="Loading" description="One Loading options row, with a spinner, replaces the rows while the options are still being fetched." />
 
 <ComponentExample of={DropdownMenuStories.LoadFailed} title="Load failed" description="Couldn't load options, with a Retry row that asks again and leaves the menu open." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="DropdownMenu" />
 
 </div>
 

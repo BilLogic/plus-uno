@@ -14,6 +14,8 @@ Also asked as: field error, helper error, inline error, form validation.
 
 **Storybook page:** `design-system/src/components/messaging/InlineMessage/InlineMessage.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `InlineMessage` for a note that explains or qualifies something right
@@ -33,6 +35,15 @@ detail that most people will never need to open.
 | Warning | The note is cautionary: say what happens if they proceed. |
 | Danger | The note explains something that failed or is blocked. |
 | Success | The note confirms an outcome. |
+
+## Motion
+
+InlineMessage reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Makes room, then fades in. |
+| exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Fades, then the room closes. |
 
 ## Best practices
 

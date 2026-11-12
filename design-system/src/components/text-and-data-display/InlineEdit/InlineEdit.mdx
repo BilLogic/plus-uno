@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as InlineEditStories from './InlineEdit.stories.jsx';
 import { Button, InlineEdit, InlineEditableTextfield } from '@/components';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -78,6 +79,14 @@ any edit view; `InlineEditableTextfield` is the one built on `TextField`.
 <ComponentExample of={InlineEditStories.Validation} title="Refused value" description="validate returns a message to refuse a value; the field stays open, marked invalid, and typing clears it." />
 
 <ComponentExample of={InlineEditStories.FailedConfirm} title="Failed confirm" description="An onConfirm that throws or rejects shows its message the same way and keeps what was typed." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="InlineEdit" />
 
 </div>
 

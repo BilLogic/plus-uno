@@ -220,6 +220,57 @@ Durations and easings; reduced motion is handled at this layer.
 --motion-easing-standard
 ```
 
+## Motion Springs (`--ds-motion-`)
+How things move (ADR-041). Each semantic is an easing with its settle time beside it: `transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast)`. Spatial is for position and size, appearance for fades and color, `exit` for leaving, `loop` for work in progress. A component names its own enter, exit and change in the motion registry; read Foundations / Motion, then the component's Motion section.
+
+```css
+--ds-motion-appearance-default  /* A fade or color change at default weight. */
+--ds-motion-appearance-default-duration  /* The settle time of --ds-motion-appearance-default. A fade or color change at default weight. */
+--ds-motion-appearance-fast  /* The quickest fade and color change; also what every spatial token becomes in Reduced motion. */
+--ds-motion-appearance-fast-duration  /* The settle time of --ds-motion-appearance-fast. The quickest fade and color change; also what every spatial token becomes in Reduced motion. */
+--ds-motion-appearance-slow  /* A deliberate fade, such as a large surface appearing. */
+--ds-motion-appearance-slow-duration  /* The settle time of --ds-motion-appearance-slow. A deliberate fade, such as a large surface appearing. */
+--ds-motion-linear  /* Time and position that follow the work or the hand one to one: a progress fill, a spinner turn, a scroll-linked fade. No spring. */
+--ds-motion-loop  /* Work in progress: loading, thinking, typing. Alternating, one cycle every 1.2 s. */
+--ds-motion-loop-duration  /* The settle time of --ds-motion-loop. Work in progress: loading, thinking, typing. Alternating, one cycle every 1.2 s. */
+--ds-motion-spatial-default  /* Mid-size layers over short travel: a Modal, a Flag, the Sidebar opening, content changing in place. */
+--ds-motion-spatial-default-duration  /* The settle time of --ds-motion-spatial-default. Mid-size layers over short travel: a Modal, a Flag, the Sidebar opening, content changing in place. */
+--ds-motion-spatial-exit  /* A thing that is gone for good, leaving on the system's say, or thrown by the hand. */
+--ds-motion-spatial-exit-duration  /* The settle time of --ds-motion-spatial-exit. A thing that is gone for good, leaving on the system's say, or thrown by the hand. */
+--ds-motion-spatial-fast  /* Small things over short distances: a toggle thumb, a Popup, a row, a tab indicator. */
+--ds-motion-spatial-fast-duration  /* The settle time of --ds-motion-spatial-fast. Small things over short distances: a toggle thumb, a Popup, a row, a tab indicator. */
+--ds-motion-spatial-slow  /* Large layers and long travel: a Drawer, a docking Panel, a whole page that slides. */
+--ds-motion-spatial-slow-duration  /* The settle time of --ds-motion-spatial-slow. Large layers and long travel: a Drawer, a docking Panel, a whole page that slides. */
+```
+
+## Motion Spring Primitives
+The raw springs, named by stiffness (`-r<percent>` when the damping ratio is not 1). A semantic aliases one; never name a primitive in a component.
+
+```css
+--motion-spring-1600
+--motion-spring-1600-duration
+--motion-spring-190
+--motion-spring-190-duration
+--motion-spring-200-r80
+--motion-spring-200-r80-duration
+--motion-spring-25
+--motion-spring-25-duration
+--motion-spring-27-r0
+--motion-spring-27-r0-duration
+--motion-spring-380-r80
+--motion-spring-380-r80-duration
+--motion-spring-3800
+--motion-spring-3800-duration
+--motion-spring-440
+--motion-spring-440-duration
+--motion-spring-800
+--motion-spring-800-duration
+--motion-spring-800-r60
+--motion-spring-800-r60-duration
+--motion-spring-880
+--motion-spring-880-duration
+```
+
 ## Scale Tokens
 The Size and Border scales (spacing / foundations): heights, widths, and the Icon, Image, Item, Row, Label and Field sizes.
 

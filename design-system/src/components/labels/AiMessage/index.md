@@ -12,6 +12,8 @@ An assistant reply, marked as AI by the small AI icon at its start (named "AI" f
 
 **Storybook page:** `design-system/src/components/labels/AiMessage/AiMessage.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `AiMessage` for every reply an assistant writes: in the AI chat, in a panel,
@@ -26,6 +28,14 @@ sent until the first text arrives, `streaming` while text arrives, then
 | Thinking | From the moment a message is sent until the first text arrives. The typing indicator, with no text. |
 | Streaming | While text arrives. A caret follows the last character, and the message is busy for assistive technology. |
 | Complete | The default: a finished reply. Only a complete reply shows its sources and its thumbs. |
+
+## Motion
+
+AiMessage reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Load content | `--ds-motion-appearance-fast` | Sources fade in place 20 ms apart, each tied to real work; the answer streams in chunks with no fade. |
 
 ## Best practices
 

@@ -14,6 +14,8 @@ Also asked as: ask the assistant, prompt box, chat input.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `PromptInput` as the one place a person writes to the AI — a chat panel,
@@ -22,6 +24,14 @@ no AI behavior (no send-on-Enter, no loading state), use `TextArea` instead.
 
 `PromptInput` does not carry the fallibility line. `AiChat` shows it once
 under its input; any other consumer shows the same line under the field itself.
+
+## Motion
+
+PromptInput reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Send becomes Stop at once while the AI writes. |
 
 ## Best practices
 

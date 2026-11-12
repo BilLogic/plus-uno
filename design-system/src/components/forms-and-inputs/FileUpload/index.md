@@ -14,11 +14,22 @@ Also asked as: attach file, dropzone, drag and drop file.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.mdx`
 
+**Motion:** change `appearance.fast` · progress `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a file upload where a form needs a document from the user: a report, an avatar, a signed form. It is a real `input type="file"` with the platform picker behind a styled button; it does not drag and drop and it does not upload.
 
 `acceptedFormats` does two jobs from one array: it becomes the input's `accept` filter and, unless you pass your own `description`, the line of help text under the label. `onChange` is the file input's own change event, so the files are at `event.target.files`.
+
+## Motion
+
+FileUpload reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | The drag-over highlight. |
+| progress | Load content | `--ds-motion-linear` | Progress fills with the work. |
 
 ## Best practices
 

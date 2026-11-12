@@ -18,7 +18,7 @@
 import { buildPlan } from './color/build.mjs';
 import { dsName } from './color/emit.mjs';
 import { ACTIVE_PLAN } from './color/plans.mjs';
-import { TOKEN_LADDER } from './tokens/plan.mjs';
+import { MOTION_SEMANTICS, TOKEN_LADDER } from './tokens/plan.mjs';
 
 /** Reference wording -> PLUS wording, applied in order (the more specific phrase first). */
 const PLUS_TERMS = [
@@ -64,10 +64,22 @@ export function colorIntents() {
   return new Map([...named, ...opacity].map(([name, use]) => [name, toPlusTerms(use ?? '').trim()]));
 }
 
+/** `--ds-motion-*` name -> intent, for each motion semantic and the settle time beside it (ADR-041). */
+export function motionIntents() {
+  const out = [];
+  for (const { name, use } of MOTION_SEMANTICS) {
+    const css = `--ds-motion-${name.replaceAll('.', '-')}`;
+    out.push([css, use], [`${css}-duration`, `The settle time of ${css}. ${use}`]);
+  }
+  out.push(['--ds-motion-linear', 'Time and position that follow the work or the hand one to one: a progress fill, a spinner turn, a scroll-linked fade. No spring.']);
+  return out;
+}
+
 /** Every planned token name -> its intent (empty when the plan row has no `use` yet). Ladder first. */
 export function plannedIntents() {
   const map = new Map(TOKEN_LADDER.map((row) => [row.new, row.use ?? '']));
   for (const [name, intent] of colorIntents()) if (!map.has(name)) map.set(name, intent);
+  for (const [name, intent] of motionIntents()) if (!map.has(name)) map.set(name, intent);
   return map;
 }
 

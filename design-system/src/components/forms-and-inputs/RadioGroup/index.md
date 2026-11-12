@@ -14,11 +14,21 @@ Also asked as: single choice, radio buttons, single select, multiple choice, rad
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a radio group for one question with mutually exclusive answers, visible all at once: a handful of options someone picks by scanning, not searching. For a long list of options, use Select. For independent choices rather than one answer among several, use a group of Checkbox.
 
 The group owns the legend, the value and the error, so each option stays a plain radio.
+
+## Motion
+
+RadioGroup reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |
 
 ## Best practices
 

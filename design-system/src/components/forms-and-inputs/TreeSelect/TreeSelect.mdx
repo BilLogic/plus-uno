@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as TreeSelectStories from './TreeSelect.stories.jsx';
 import { TreeSelect } from '@/components';
 import { DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const topicOptions = [
     { label: 'Geometry', value: 'geometry', children: [
@@ -64,6 +65,14 @@ branches in place rather than drilling down one level at a time.
 <ComponentExample of={TreeSelectStories.FieldInvalid} title="Invalid" description="The danger edge with the message under the field." />
 
 <ComponentExample of={TreeSelectStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="TreeSelect" />
 
 </div>
 

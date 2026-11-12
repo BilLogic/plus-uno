@@ -12,12 +12,24 @@ Cascader: a field that picks one path through nested options, one level at a tim
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Cascader` when a choice is naturally made one level at a time, in
 sequence — a region, then a city, then a neighborhood. For a hierarchy where
 someone might pick or see several nodes at once rather than one path, use
 `TreeSelect` instead. For a flat list, use `Select`.
+
+## Motion
+
+Cascader reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
+| change | Expand and collapse | `--ds-motion-spatial-fast` | Columns and branches expand. |
 
 ## Best practices
 

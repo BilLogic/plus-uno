@@ -14,6 +14,8 @@ Also asked as: heading with buttons, header actions, page heading.
 
 **Storybook page:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.mdx`
 
+**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `PageHeader` once per page, at the top of the Page pattern's body, to
@@ -21,6 +23,14 @@ carry the page's title and the actions that apply to the page as a whole. For
 a heading inside a region of the page, use the
 Section
 pattern's own header instead — `PageHeader` is reserved for the page level.
+
+## Motion
+
+PageHeader reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Scroll to a spot on the page | `--ds-motion-linear` | The small title fades over 24 px of scroll; actions and tabs travel up and pin. It follows the scroll one to one. |
 
 ## Best practices
 

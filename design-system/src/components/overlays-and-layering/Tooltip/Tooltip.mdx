@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -80,6 +81,14 @@ A short label on a control whose purpose is not obvious from what you can see.
 <ComponentExample of={TooltipStories.Focused} title="Focused" description={<>The trigger shows the 2px focus ring and the tooltip opens with it.</>} />
 
 <ComponentExample of={TooltipStories.Disabled} title="Disabled" description={<>An empty <code>trigger</code> list turns the tooltip off.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Tooltip" />
 
 </div>
 

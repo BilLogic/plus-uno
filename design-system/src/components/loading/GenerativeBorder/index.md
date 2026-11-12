@@ -12,9 +12,20 @@ The border that shows the AI is generating content: a 2px rounded stroke in two 
 
 **Storybook page:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.mdx`
 
+**Motion:** change `linear` · pulse `loop`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `GenerativeBorder` only while the AI is generating into a piece of content, one ring per piece. It is never decoration, and two must not nest. For other waits, use `Spinner` or `Skeleton`.
+
+## Motion
+
+GenerativeBorder reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Load content | `--ds-motion-linear` | Its light travels while the AI drafts and stops when done. |
+| pulse | Load content | `--ds-motion-loop` | A pulse uses the loop. |
 
 ## Best practices
 

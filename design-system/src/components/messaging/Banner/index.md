@@ -14,6 +14,8 @@ Also asked as: announcement, top of page, system message, outage.
 
 **Storybook page:** `design-system/src/components/messaging/Banner/Banner.mdx`
 
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Banner` for a condition that applies to the whole page, for as long as it
@@ -31,6 +33,15 @@ happened and needs no reply, use `Flag`.
 | Warning | The default, cautionary form. Example: "Scheduled maintenance begins at 9:00 PM EST." |
 | Danger | Something that needs immediate attention, such as an outage. |
 | Announcement | A general notice with nothing wrong. No icon and no severity. |
+
+## Motion
+
+Banner reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Add or remove an item | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Pushes the page down, then fades in. |
+| exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Fades, then the page closes the gap. |
 
 ## Best practices
 

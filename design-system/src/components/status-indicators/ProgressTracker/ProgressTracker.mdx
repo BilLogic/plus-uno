@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={ProgressTrackerStories} />
 
@@ -64,6 +65,14 @@ A step's status drives its marker and whether it is reachable: `visited` shows a
 <ComponentExample of={ProgressTrackerStories.Focused} title="Focused" description="A step that can be opened shows the 2px ring inset in the step." />
 
 <ComponentExample of={ProgressTrackerStories.Disabled} title="Disabled" description="The step takes the disabled ink and is neither a link nor a button." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="ProgressTracker" />
 
 </div>
 

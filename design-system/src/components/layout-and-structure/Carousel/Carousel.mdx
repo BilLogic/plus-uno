@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const DemoSlide = ({ children }) => (
     <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-background-accent-blue-subtlest)', color: 'var(--ds-text-subtle)', font: 'var(--heading-xsmall)' }}>
@@ -70,6 +71,14 @@ A centered stage of slides in a flat row: the active one full size, a smaller, f
 <ComponentExample of={CarouselStories.FewSlides} title="Two slides" description="With two slides nothing wraps round, so one side of the stage stays open." />
 
 <ComponentExample of={CarouselStories.ReducedMotion} title="Reduced motion" description="When the viewer asks for less motion: no autoplay, no play button, arrows shown, and every move in one step." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Carousel" />
 
 </div>
 
