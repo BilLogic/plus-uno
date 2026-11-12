@@ -117,6 +117,8 @@ An icon button is a button with an icon and no visible label. Its required `labe
 
 <ComponentExample of={IconButtonStories.Loading} title="Loading" description="A spinner replaces the icon while the button is busy." />
 
+<ComponentExample of={IconButtonStories.FilterCount} title="Filter count" description="A filter trigger with filters on shows how many after the icon, on the selected fill. The button keeps its height and grows by the count." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -160,6 +162,7 @@ Use an icon button when space is limited and the glyph clearly matches the actio
 2. **Icon.** A Font Awesome Free glyph at 16. Use an existing system glyph; do not draw custom icons.
 3. **Label.** Not drawn. It is the accessible name and the tooltip on hover and focus.
 4. **Spinner** (loading only). Replaces the icon while the button is busy.
+5. **Count** (filter triggers only). `trailingMetric`, the number of filters applied, after the icon. The button keeps its height and the icon keeps its place; the count widens it.
 
 ### Appearance
 
@@ -192,6 +195,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 <tr><td>Selected</td><td>The selected role fill and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
 <tr><td>Disabled</td><td>The disabled fill and icon. Avoid disabling icon buttons.</td></tr>
 <tr><td>Loading</td><td>A spinner replaces the icon. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
+<tr><td>Count changes</td><td>The first count opens the button to its width; set at the end of a toolbar, the right edge stays put and it grows left. Each new count fades in; it never counts up. With reduced motion both are instant.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -207,7 +211,8 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 <tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-background-disabled</code>.</td></tr>
 <tr><td>Icon</td><td><code>--ds-icon-subtle</code> (default, subtle), <code>--ds-icon-inverse</code> (primary, discovery); the selected and disabled roles. 16, <code>--icon-md</code>.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
-<tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square.</td></tr>
+<tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square, except with a count.</td></tr>
+<tr><td>Count</td><td><code>--ds-text-subtlest</code>, or the selected text color when selected. <code>--inline-sm</code> after the icon. Motion: <code>--motion-duration-medium</code> to open, <code>--motion-duration-short</code> to fade in.</td></tr>
 <tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>. Circle 50%.</td></tr>
 </tbody>
 </DocsTable>
@@ -248,7 +253,18 @@ the difference shows only on hover, on focus and to a screen reader.
 
 Icon buttons stay 32 or 24 square, and round only in top navigation
 (`shape="circle"`). Icon button has no prop to fill its container; never
-stretch one to fill a row.
+stretch one to fill a row. The one exception is a filter trigger's count,
+which widens the button by the count alone.
+
+### Show the applied count on a filter trigger.
+
+When filters are on, pass their number as `trailingMetric` and set
+`isSelected`, so the count sits on the selected fill. Leave the count out
+when none is applied: `0` renders as a visible zero.
+
+```jsx
+<IconButton icon="filter" label="Filters" trailingMetric={applied || undefined} isSelected={applied > 0} />
+```
 
 ### Use primary sparingly.
 
@@ -303,6 +319,7 @@ Put related icon buttons in a Button group, and use `isSelected` for a choice be
 - `label` is required. It is the accessible name and the tooltip. A missing label fails `check:icon-button-name`.
 - Avoid `isDisabled`. A disabled button leaves the tab order and receives no events. Explain what is unavailable in nearby text instead, and never attach a tooltip to a disabled control.
 - Selected is not color alone: `isSelected` sets `aria-pressed`.
+- With `trailingMetric` the accessible name carries the count: "Filters, 2 applied". The drawn digits are hidden from assistive technology so the count is not read twice.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 - The glyph is decoration once the button has a name, so it is hidden from assistive technology.
 

@@ -45,4 +45,34 @@ describe('IconButton', () => {
         const button = screen.getByRole('button', { name: 'Delete session' });
         expect(button).not.toHaveAttribute('title');
     });
+
+    it('adds the applied count to the accessible name and drops the square', () => {
+        const { container } = render(<IconButton icon="filter" label="Filters" trailingMetric={2} isSelected />);
+        const button = screen.getByRole('button', { name: 'Filters, 2 applied' });
+        expect(button).toHaveAttribute('title', 'Filters');
+        expect(button).toHaveAttribute('aria-pressed', 'true');
+        expect(button).toHaveClass('plus-icon-btn--metric');
+        expect(button).not.toHaveClass('plus-btn--icon-only');
+        const metric = container.querySelector('.plus-icon-btn__metric');
+        expect(metric).toHaveAttribute('aria-hidden', 'true');
+        expect(metric).toHaveTextContent('2');
+    });
+
+    it('shows a count of 0 and hides the count when trailingMetric is left out', () => {
+        const { rerender } = render(<IconButton icon="filter" label="Filters" trailingMetric={0} />);
+        expect(screen.getByRole('button', { name: 'Filters, 0 applied' })).toHaveTextContent('0');
+        rerender(<IconButton icon="filter" label="Filters" />);
+        const button = screen.getByRole('button', { name: 'Filters' });
+        expect(button).toHaveClass('plus-btn--icon-only');
+        expect(button.querySelector('.plus-icon-btn__metric')).toBeNull();
+    });
+
+    it('swaps the drawn count for a new one when the count changes', () => {
+        const { container, rerender } = render(<IconButton icon="filter" label="Filters" trailingMetric={1} />);
+        const before = container.querySelector('.plus-icon-btn__metric-value');
+        rerender(<IconButton icon="filter" label="Filters" trailingMetric={2} />);
+        const after = container.querySelector('.plus-icon-btn__metric-value');
+        expect(after).not.toBe(before);
+        expect(after).toHaveTextContent('2');
+    });
 });

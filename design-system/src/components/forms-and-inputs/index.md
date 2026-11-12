@@ -21,7 +21,7 @@ authored half, counted rather than assumed.
 | [Fieldset](Fieldset.md) | 8 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload/index.md) | 17 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✅ | ✅ | ✅ |
-| [IconButton](IconButton/index.md) | 13 | ✅ | ✅ | ✅ |
+| [IconButton](IconButton/index.md) | 14 | ✅ | ✅ | ✅ |
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [LinkButton](LinkButton/index.md) | 13 | ✅ | ✅ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✅ | ✅ |
