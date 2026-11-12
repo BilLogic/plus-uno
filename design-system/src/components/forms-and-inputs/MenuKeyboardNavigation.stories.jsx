@@ -193,7 +193,7 @@ MultipleTogglesWithoutClosing.play = async ({ canvasElement }) => {
 
     // Space on a parent takes its subtree with it, and leaves the panel open.
     await userEvent.keyboard(' ');
-    await expect(readout()).toBe('maths,algebra,geometry');
+    await expect(readout()).toBe('middle-schools,lincoln-middle,roosevelt-k8');
     await expect(canvas.getByRole('tree')).toBeTruthy();
 
     // And off again.

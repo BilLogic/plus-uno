@@ -53,9 +53,9 @@ export default {
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: '560px' };
 
 const subjects = [
-    { value: 'lincoln', label: 'Lincoln Middle' },
-    { value: 'roosevelt', label: 'Roosevelt K-8' },
-    { value: 'north', label: 'North High' },
+    { value: 'math', label: 'Math' },
+    { value: 'reading', label: 'Reading' },
+    { value: 'science', label: 'Science' },
 ];
 
 const fivePoint = [1, 2, 3, 4, 5].map((n) => ({ value: n, label: String(n) }));
@@ -101,8 +101,8 @@ Overview.play = async ({ canvasElement }) => {
     await expect(names.size).toBe(1);
     await expect(new Set(radios.map((r) => r.id)).size).toBe(3);
 
-    await userEvent.click(canvas.getByRole('radio', { name: 'Roosevelt K-8' }));
-    await expect(canvas.getByRole('radio', { name: 'Roosevelt K-8' }).nextElementSibling.checked).toBe(true);
+    await userEvent.click(canvas.getByRole('radio', { name: 'Reading' }));
+    await expect(canvas.getByRole('radio', { name: 'Reading' }).nextElementSibling.checked).toBe(true);
     await expect(canvas.getByTestId('rg-overview-value').textContent).toBe('Answer: reading');
 };
 
@@ -113,11 +113,11 @@ export const Keyboard = () => (
 Keyboard.parameters = { docs: { disable: true } };
 Keyboard.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const math = canvas.getByRole('radio', { name: 'Lincoln Middle' });
-    const reading = canvas.getByRole('radio', { name: 'Roosevelt K-8' });
-    const science = canvas.getByRole('radio', { name: 'North High' });
+    const math = canvas.getByRole('radio', { name: 'Math' });
+    const reading = canvas.getByRole('radio', { name: 'Reading' });
+    const science = canvas.getByRole('radio', { name: 'Science' });
 
-    // Lincoln Middle starts answered, so it is the group's one tab stop.
+    // Math starts answered, so it is the group's one tab stop.
     await expect(math.getAttribute('tabindex')).toBe('0');
     await expect(reading.getAttribute('tabindex')).toBe('-1');
 
@@ -257,11 +257,11 @@ States.play = async ({ canvasElement }) => {
     // Read-only: announced, focusable, and the answer does not move.
     const readOnly = canvas.getByRole('radiogroup', { name: 'Read-only' });
     await expect(readOnly.getAttribute('aria-readonly')).toBe('true');
-    const science = within(readOnly).getByRole('radio', { name: 'North High' });
+    const science = within(readOnly).getByRole('radio', { name: 'Science' });
     await expect(science.nextElementSibling.disabled).toBe(false);
     await userEvent.click(science);
     await expect(science.nextElementSibling.checked).toBe(false);
-    await expect(within(readOnly).getByRole('radio', { name: 'Lincoln Middle' }).nextElementSibling.checked).toBe(true);
+    await expect(within(readOnly).getByRole('radio', { name: 'Math' }).nextElementSibling.checked).toBe(true);
 
     // Disabled: every choice is.
     const disabled = canvas.getByRole('radiogroup', { name: 'Disabled' });
