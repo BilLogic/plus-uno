@@ -91,7 +91,7 @@ Same group: `ProgressBar` · `Skeleton` · `Spinner`
 | --- | --- |
 | Segments | `--ds-border-brand` and `--ds-border-discovery`. |
 | Stroke | `--stroke-2`, through `--generative-border-width`. |
-| Corner | `--generative-border-radius`, set to the radius token named by `radius`: `--radius-025`, `--radius-050`, `--radius-075`, `--radius-100` or `--radius-full`. |
+| Corner | `--generative-border-radius`, set to the radius token named by `radius`: `--radius-025`, `--radius-050`, `--radius-075`, `--radius-100`, `--radius-full`, or a control radius (`--radius-control-sm`, `--radius-control-md`, `--radius-control-lg`) to follow a field. |
 | Turn | `--generative-border-angle`, from a rest of `--generative-border-rest`. |
 
 ## Content guidelines
@@ -112,7 +112,7 @@ Same group: `ProgressBar` · `Skeleton` · `Spinner`
 
 ## Variants
 
-**`radius`** — `radius-025` · `radius-050` · `radius-075` · `radius-100` · `radius-full`
+**`radius`** — `radius-025` · `radius-050` · `radius-075` · `radius-100` · `radius-full` · `radius-control-sm` · `radius-control-md` · `radius-control-lg`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

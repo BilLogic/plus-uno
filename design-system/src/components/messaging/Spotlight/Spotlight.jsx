@@ -2,7 +2,7 @@ import React, { createContext, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Popover } from '@base-ui/react/popover';
-import Icon from '../../images-and-icons/Icon';
+import { IconButton } from '../../forms-and-inputs/IconButton/IconButton';
 import './Spotlight.scss';
 
 export const SPOTLIGHT_PLACEMENTS = [
@@ -101,9 +101,14 @@ export const Spotlight = ({
     const [side, align] = PLACEMENT_TO_SIDE_ALIGN[placement] ?? PLACEMENT_TO_SIDE_ALIGN.bottom;
 
     const dismissControl = dismissible && (
-        <button type="button" className="plus-spotlight-dismiss-button" aria-label="Dismiss" onClick={onDismiss}>
-            <Icon name="xmark" />
-        </button>
+        <IconButton
+            icon="xmark"
+            label="Dismiss"
+            appearance="subtle"
+            isTooltipDisabled
+            className="plus-spotlight-dismiss-button"
+            onClick={onDismiss}
+        />
     );
 
     return (

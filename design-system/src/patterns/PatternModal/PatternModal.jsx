@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon, Tabs, Skeleton } from '@/components';
+import { Icon, IconButton, Tabs, Skeleton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { BACKDROP_HEIGHTS, BACKDROP_WIDTHS } from '../Backdrop';
 import './PatternModal.scss';
@@ -96,14 +96,14 @@ const PatternModal = ({
         <div className="plus-pattern-modal-header">
             {title && <h1 id={titleId} className="plus-pattern-modal-title">{title}</h1>}
             {onClose && (
-                <button
-                    type="button"
+                <IconButton
+                    icon="xmark"
+                    label="Close"
+                    appearance="subtle"
+                    isTooltipDisabled
                     className="plus-pattern-modal-close"
-                    aria-label="Close"
                     onClick={onClose}
-                >
-                    <Icon name="xmark" />
-                </button>
+                />
             )}
         </div>
     );

@@ -2,11 +2,11 @@ import React, { useId, useLayoutEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Dialog } from '@base-ui/react/dialog';
 import Button from '@/components/forms-and-inputs/Button';
+import { IconButton } from '@/components/forms-and-inputs/IconButton/IconButton';
 import Skeleton from '@/components/loading/Skeleton';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { useOverlaySlot, reportFocusLost } from '@/lib/overlay';
 import Backdrop from '@/patterns/Backdrop';
-import Icon from '../../images-and-icons/Icon';
 
 /** Safe CSS length / custom-property patterns for Modal width. */
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
@@ -220,14 +220,14 @@ const Modal = ({
                             )}
                             {headerActions && <div className="plus-modal-header-actions">{headerActions}</div>}
                             {showCloseButton && (
-                                <button
-                                    type="button"
+                                <IconButton
+                                    icon="xmark"
+                                    label="Close modal"
+                                    appearance="subtle"
+                                    isTooltipDisabled
                                     className="plus-modal-close-btn"
-                                    aria-label="Close modal"
                                     onClick={onClose}
-                                >
-                                    <Icon name="xmark" />
-                                </button>
+                                />
                             )}
                         </div>
                         {dividers && <div className="plus-modal-divider" />}

@@ -302,14 +302,6 @@ for (const [name, file, selector, ring] of [
   });
 }
 
-/* ─── PatternModal close ─────────────────────────────────────────────────── */
-
-test('PatternModal: the close button takes the neutral hovered and pressed steps', () => {
-  const file = 'patterns/PatternModal/PatternModal.scss';
-  expectRule(file, '.plus-pattern-modal-close:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
-  expectRule(file, '.plus-pattern-modal-close:active', { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
-});
-
 /* ─── Field ──────────────────────────────────────────────────────────────── */
 
 test('FieldBox: hover turns the border border.focused, subtle hover the neutral subtle step, focus a ring 2px off the box', () => {

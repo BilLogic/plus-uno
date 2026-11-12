@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { formatMonthYear, outOfBounds, parseDate, sameDay } from './dates';
-import Icon from '../../images-and-icons/Icon';
+import { IconButton } from '../IconButton/IconButton';
 import './Calendar.scss';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -95,13 +95,9 @@ const Calendar = ({
             {...props}
         >
             <div className="plus-calendar-header">
-                <button type="button" className="plus-calendar-nav" onClick={() => turn(-1)} aria-label="Previous month">
-                    <Icon name="chevron-left" />
-                </button>
+                <IconButton icon="chevron-left" label="Previous month" appearance="subtle" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(-1)} />
                 <div className="plus-calendar-month" aria-live="polite">{formatMonthYear(viewDate)}</div>
-                <button type="button" className="plus-calendar-nav" onClick={() => turn(1)} aria-label="Next month">
-                    <Icon name="chevron-right" />
-                </button>
+                <IconButton icon="chevron-right" label="Next month" appearance="subtle" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(1)} />
             </div>
             <div className="plus-calendar-weekdays" aria-hidden="true">
                 {WEEKDAYS.map((day) => <div key={day} className="plus-calendar-weekday">{day}</div>)}

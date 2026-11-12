@@ -5233,7 +5233,10 @@
             "radius-050",
             "radius-075",
             "radius-100",
-            "radius-full"
+            "radius-full",
+            "radius-control-sm",
+            "radius-control-md",
+            "radius-control-lg"
           ],
           "description": "The radius token the ring follows. Match the wrapped content.",
           "deprecated": null
@@ -7131,28 +7134,17 @@
       "tokens": [
         "--blanket-max-height-modal",
         "--body-default",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
         "--ds-border",
-        "--ds-border-focused",
-        "--ds-icon",
-        "--ds-icon-subtle",
-        "--ds-motion-appearance-fast",
-        "--ds-motion-appearance-fast-duration",
         "--ds-shadow-blocking",
         "--ds-surface-overlay",
         "--ds-text",
         "--ds-text-subtle",
-        "--focus-ring-width",
         "--heading-medium",
-        "--icon-md",
         "--inline-sm",
-        "--item-height-md",
         "--modal-inline-sm",
         "--modal-pad-x-default",
         "--modal-radius",
         "--modal-stack-md",
-        "--radius-md",
         "--stack-md",
         "--stack-sm",
         "--stroke-1"
@@ -8164,10 +8156,7 @@
       ],
       "tokens": [
         "--border-default",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
         "--ds-border",
-        "--ds-icon-subtle",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
@@ -8177,9 +8166,6 @@
         "--modal-radius",
         "--modal-stack-md",
         "--modal-stack-sm",
-        "--pad-x-sm",
-        "--radius-md",
-        "--space-025",
         "--stack-lg",
         "--stack-md"
       ]
@@ -9822,7 +9808,7 @@
       "import": "import { PromptInput } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.jsx",
-      "summary": "Where a person writes to the AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `Button` and `GenerativeBorder`.",
+      "summary": "Where a person writes to the AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `IconButton` and `GenerativeBorder`.",
       "props": [
         {
           "name": "id",
@@ -9974,6 +9960,9 @@
       ],
       "stories": [
         "Default",
+        "ButtonInside",
+        "ButtonStaysBottom",
+        "RingFollowsField",
         "EnterSends",
         "ShiftEnterStartsALine",
         "CannotSendWhenEmpty",
@@ -9985,10 +9974,14 @@
         "Interactive"
       ],
       "tokens": [
+        "--border-default",
         "--height-250",
+        "--item-height-md",
         "--line-height-125",
+        "--pad-x-md",
+        "--pad-x-xs",
+        "--pad-y-md",
         "--plus-prompt-input-max-height",
-        "--space-0375",
         "--stack-md",
         "--stack-sm"
       ]
@@ -11508,6 +11501,7 @@
         "Active",
         "Spacing",
         "Filled",
+        "ButtonInside",
         "Disabled",
         "Loading",
         "Async",
@@ -12824,8 +12818,6 @@
         "--heading-small",
         "--radius-050",
         "--radius-100",
-        "--radius-md",
-        "--space-025",
         "--space-050",
         "--space-075",
         "--space-100",

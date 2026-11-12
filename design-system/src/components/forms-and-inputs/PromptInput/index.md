@@ -2,7 +2,7 @@
 
 # PromptInput
 
-Where a person writes to the AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `Button` and `GenerativeBorder`.
+Where a person writes to the AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `IconButton` and `GenerativeBorder`.
 
 Also asked as: ask the assistant, prompt box, chat input.
 
@@ -10,7 +10,7 @@ Also asked as: ask the assistant, prompt box, chat input.
 
 **Source:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.stories.jsx` — Default, EnterSends, ShiftEnterStartsALine, CannotSendWhenEmpty, Loading, WithSlots, ComposingDoesNotSend, Focused, Disabled, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.stories.jsx` — Default, ButtonInside, ButtonStaysBottom, RingFollowsField, EnterSends, ShiftEnterStartsALine, CannotSendWhenEmpty, Loading, WithSlots, ComposingDoesNotSend, Focused, Disabled, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.mdx`
 
@@ -96,7 +96,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 2. **Start slot** (optional). One quiet control before the text, such as an attach button.
 3. **Text area.** Grows from one line to five, then scrolls. Named by `label`.
 4. **Actions** (optional). Extra controls beside the send button.
-5. **Send.** A compact primary icon button; while loading it becomes Stop.
+5. **Send.** A default (32) primary icon button, 4 from the edge on every side and on the last line as the text grows; while loading it becomes Stop.
 
 ### States
 
@@ -113,13 +113,13 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`, `--radius-0625`. |
+| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`, `--radius-control-lg`. |
 | Height | Starts at one line, `--height-250` (40, a single-line field), and grows to five lines: `--line-height-125` × 5 plus `--space-0375` top and bottom, then scrolls. |
 | Padding | `--pad-y-md` top and bottom, `--pad-x-md` either side. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Attachments | `--stack-md` between files and under the row. |
 | Actions and send | `--stack-sm` between them. |
-| Loading ring | GenerativeBorder at `radius-075`. |
+| Loading ring | GenerativeBorder at `radius-control-lg`, the field's own radius. |
 
 ## Content guidelines
 
@@ -157,7 +157,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--height-250` · `--line-height-125` · `--plus-prompt-input-max-height` · `--space-0375` · `--stack-md` · `--stack-sm`
+`--border-default` · `--height-250` · `--item-height-md` · `--line-height-125` · `--pad-x-md` · `--pad-x-xs` · `--pad-y-md` · `--plus-prompt-input-max-height` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss`. Override these through the token layer, never with a literal.
 
