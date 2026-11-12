@@ -75,10 +75,10 @@ Let the Blanket place the modal. Do not detach it to move things around: the pad
 
 ## Related
 
-- [Modal](?path=/docs/templates-overlays-modal--docs) is the layer a Blanket usually holds, centered, for one task that blocks the page.
-- [Drawer](?path=/docs/templates-overlays-panel--docs) is the layer held at an edge, for a task that needs the page in view.
+- [Modal](?path=/docs/templates-modal-modal--docs) is the layer a Blanket usually holds, centered, for one task that blocks the page.
+- [Drawer](?path=/docs/templates-panel-panel--docs) is the layer held at an edge, for a task that needs the page in view.
 - [Panel](?path=/docs/components-layout-and-structure-panel--docs) opens over a contained Blanket when its Frame is too narrow to dock it.
-- [Popups](?path=/docs/templates-popup--docs) covers the floating layers that never take a blanket.
+- [Popups](?path=/docs/templates-popup-popup--docs) covers the floating layers that never take a blanket.
 - [Frame](?path=/docs/templates-frame-frame--docs) shows the floating Sidebar, which takes a shadow and no blanket, and the overlay Panel on its contained Blanket.
 
 Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`

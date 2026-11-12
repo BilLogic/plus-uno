@@ -45,7 +45,7 @@ const InBlanket = ({ children, height = SCREEN.height }) => (
 const dialogs = (canvasElement) => within(canvasElement).getAllByRole('dialog');
 
 export default {
-    title: 'Templates/Overlays/Modal',
+    title: 'Templates/Modal/Modal',
     component: PatternModal,
     tags: ['!dev', '!autodocs'],
     argTypes: {

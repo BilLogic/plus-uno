@@ -35,7 +35,7 @@ const useModes = () => {
 
 /**
  * @param {object} props
- * @param {string} props.storyId  the story id, such as `templates-page-templates--dashboard`
+ * @param {string} props.storyId  the story id, such as `templates-overview--dashboard`
  * @param {number} props.width  the screen width the story is drawn at
  * @param {number} props.height  the screen height
  * @param {string} props.title  the accessible name of the frame

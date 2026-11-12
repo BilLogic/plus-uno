@@ -204,7 +204,7 @@ test('Templates and Patterns sit above Components, Templates first, and there is
 
 test('a template page and a pattern page in their own roots are green', () => {
   const root = fixture({
-    'design-system/src/patterns/Frame/Frame.stories.jsx': story('Templates/Frame'),
+    'design-system/src/patterns/Frame/Frame.stories.jsx': story('Templates/Frame/Frame'),
     'design-system/src/storybook-docs/templates/Overview.mdx': '<Meta title="Templates/Overview" />\n',
     'design-system/src/storybook-docs/patterns/Overview.mdx': '<Meta title="Patterns/Overview" />\n',
   });
@@ -245,4 +245,15 @@ test('a sidebar sort that lists Patterns before Templates goes red', () => {
     }),
   );
   assert.ok(messages(root).some((m) => m.includes('roots must lead with')));
+});
+
+test('the real Templates tree is flat: seven templates, no Overlays folder', () => {
+  const tax = JSON.parse(fs.readFileSync(new URL('../storybook.taxonomy.json', import.meta.url), 'utf8'));
+  const at = tax.storySortOrder.indexOf('Templates');
+  const order = tax.storySortOrder[at + 1];
+  assert.deepEqual(order.filter((x) => typeof x === 'string'), [
+    'Templates and patterns', 'Overview', 'Frame', 'Page', 'Section', 'Modal', 'Panel', 'Popup',
+  ]);
+  assert.ok(!order.includes('Overlays'));
+  assert.ok(!order.includes('Page templates'));
 });

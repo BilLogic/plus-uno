@@ -26,10 +26,10 @@ export const patterns = [
     ['Section', 'A span of the page grid that groups content under one heading, with a Section header.', 'A heading with content under it.', 'PatternSection', 'templates-section-section'],
     ['Card', 'The container for one object, raised at rest with no border.', 'One object with a shape agreed.', 'PatternCard', 'templates-section-card'],
     ['Table', 'Records in rows and columns, with its own header and pagination slots.', 'Many objects of the same shape.', 'PatternTable', 'templates-section-table'],
-    ['Blanket', 'The shared layer under a modal, a drawer or an overlay Panel.', 'Anything that blocks the page behind it.', 'Blanket', 'templates-overlays-blanket'],
-    ['Modal', 'Interrupts the page for one task, centered on the screen.', 'A step that must happen before the page continues.', 'PatternModal', 'templates-overlays-modal'],
-    ['Drawer', 'A full-height panel at the screen edge, over the blanket.', 'Details or a task that keeps the page in view.', 'PatternDrawer', 'templates-overlays-panel'],
-    ['Popups', 'The floating layers: Menu, Popup, Flag and Tooltip, with no blanket.', 'Something anchored to a trigger.', 'Popup (component)', 'templates-popup'],
+    ['Backdrop', 'The shared layer under a Modal or an overlay Panel.', 'Anything that blocks the page behind it.', 'Blanket', 'templates-modal-backdrop'],
+    ['Modal', 'Interrupts the page for one task, centered on the screen.', 'A step that must happen before the page continues.', 'PatternModal', 'templates-modal-modal'],
+    ['Panel', 'A full-height panel at the screen edge, over the blanket.', 'Details or a task that keeps the page in view.', 'PatternDrawer', 'templates-panel-panel'],
+    ['Popups', 'The floating layers: Menu, Popup, Flag and Tooltip, with no blanket.', 'Something anchored to a trigger.', 'Popup (component)', 'templates-popup-popup'],
 ];
 
 <Meta of={PageTemplatesStories} />
@@ -56,13 +56,13 @@ The examples on this page follow the toolbar's Color mode and Contrast switches.
 
 ## Appearance
 
-<ModeExample storyId="templates-page-templates--blank" width={1024} height={560} title="Blank" description="One empty slot: keep the slot wrapper and replace what is inside it with Sections." />
+<ModeExample storyId="templates-overview--blank" width={1024} height={560} title="Blank" description="One empty slot: keep the slot wrapper and replace what is inside it with Sections." />
 
-<ModeExample storyId="templates-page-templates--dashboard" width={1024} height={560} title="Dashboard" description="A page header, metric cards that reflow to the most per row that keeps their minimum width, and a Section." />
+<ModeExample storyId="templates-overview--dashboard" width={1024} height={560} title="Dashboard" description="A page header, metric cards that reflow to the most per row that keeps their minimum width, and a Section." />
 
-<ModeExample storyId="templates-page-templates--reading" width={1024} height={560} title="Reading" description="The content capped at --content-max-width-reading, 864, and centered." />
+<ModeExample storyId="templates-overview--reading" width={1024} height={560} title="Reading" description="The content capped at --content-max-width-reading, 864, and centered." />
 
-<ModeExample storyId="templates-page-templates--focused-still" width={1024} height={640} title="Focused" description={<>The focused frame: Back, the task's name and Close in the Page header row, the Sections at reading width and the actions at the foot of the Page.</>} />
+<ModeExample storyId="templates-overview--focused-still" width={1024} height={640} title="Focused" description={<>The focused frame: Back, the task's name and Close in the Page header row, the Sections at reading width and the actions at the foot of the Page.</>} />
 
 </div>
 
@@ -70,7 +70,7 @@ The examples on this page follow the toolbar's Color mode and Contrast switches.
 
 ## Browser
 
-<ModeExample storyId="templates-page-templates--in-browser" width={1440} height={720} title="In the browser" description="The dashboard template in the Chrome window. The window adds its own chrome around the Frame and leaves the Frame's width and left edge alone." />
+<ModeExample storyId="templates-overview--in-browser" width={1440} height={720} title="In the browser" description="The dashboard template in the Chrome window. The window adds its own chrome around the Frame and leaves the Frame's width and left edge alone." />
 
 </div>
 
@@ -78,9 +78,9 @@ The examples on this page follow the toolbar's Color mode and Contrast switches.
 
 ## Size and layout
 
-<ModeExample storyId="templates-page-templates--focused-still" width={768} height={640} title="Focused, 768" description="The reading column is the page less its pads, 720, and the actions line up with it." />
+<ModeExample storyId="templates-overview--focused-still" width={768} height={640} title="Focused, 768" description="The reading column is the page less its pads, 720, and the actions line up with it." />
 
-<ModeExample storyId="templates-page-templates--focused-still" width={1440} height={640} title="Focused, 1440" description="The column caps at 864 and is centered, and the actions cap with it." />
+<ModeExample storyId="templates-overview--focused-still" width={1440} height={640} title="Focused, 1440" description="The column caps at 864 and is centered, and the actions cap with it." />
 
 </div>
 
@@ -88,7 +88,7 @@ The examples on this page follow the toolbar's Color mode and Contrast switches.
 
 ## Behavior
 
-<ModeExample storyId="templates-page-templates--focused-read-only" width={1024} height={480} title="Focused, no actions" description="A read-only task, such as a report with nothing to submit, drops the actions, and Close alone leaves it when there is no way back." />
+<ModeExample storyId="templates-overview--focused-read-only" width={1024} height={480} title="Focused, no actions" description="A read-only task, such as a report with nothing to submit, drops the actions, and Close alone leaves it when there is no way back." />
 
 </div>
 
@@ -132,7 +132,7 @@ Start every page from a template. Pick the frame by the kind of work the page ho
 </tbody>
 </DocsTable>
 
-A confirmation, a rename or a few fields that keep the page behind them in view belong in a Modal; a form that scrolls for long or has sections is a focused page. The details of a row or a set of filters open in a Drawer over the template.
+A confirmation, a rename or a few fields that keep the page behind them in view belong in a Modal; a form that scrolls for long or has sections is a focused page. The details of a row or a set of filters open in a Panel over the template.
 
 The mode is the screen: Medium is 768 to 1023, Large 1024 to 1439 and X-Large 1440 and wider. Sections, Cards and Tables inherit it and never carry one of their own. The frame rules (no top bar, no seams, the content cap, the Sidebar and the Panel) are on <a href="?path=/docs/templates-frame-frame--docs">Frame</a>.
 
@@ -313,7 +313,7 @@ If Back and Close would go to the same place, keep Close only.
 
 ### Let the content pick the size.
 
-Choose the smallest step of a sized pattern (Card, Modal, Drawer) that holds the content without clipping. Never pick a size to make the content look a certain way.
+Choose the smallest step of a sized pattern (Card, Modal, Panel) that holds the content without clipping. Never pick a size to make the content look a certain way.
 
 ### No card in a card, no modal over a modal.
 
@@ -369,9 +369,9 @@ Spacing tokens set the structure. Where the eye needs a nudge, such as an icon b
 
 - [**Frame**](?path=/docs/templates-frame-frame--docs). Every Sidebar, Panel and overlay state, at each width.
 - [**Section**](?path=/docs/templates-section-section--docs). The page header and the regions that fill the page.
-- [**Modal**](?path=/docs/templates-overlays-modal--docs). A short decision over the page, instead of the focused frame.
-- [**Drawer**](?path=/docs/templates-overlays-panel--docs). A panel over the page that keeps it in view.
-- [**Blanket**](?path=/docs/templates-overlays-blanket--docs). The screen grid and the fill a drawer or a modal sits in.
+- [**Modal**](?path=/docs/templates-modal-modal--docs). A short decision over the page, instead of the focused frame.
+- [**Panel**](?path=/docs/templates-panel-panel--docs). A panel over the page that keeps it in view.
+- [**Backdrop**](?path=/docs/templates-modal-backdrop--docs). The screen grid and the fill a Panel or a Modal sits in.
 - [**Elevation**](?path=/docs/foundations-elevation--docs). The shadows of the floating sidebar, floating layers and a lifted clickable card.
 - [**Spacing**](?path=/docs/foundations-spacing--docs). The layout and pattern variables these patterns bind.
 - [**Grid**](?path=/docs/foundations-grid--docs). The 12-column grid and the content caps.

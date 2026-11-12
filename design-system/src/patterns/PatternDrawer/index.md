@@ -34,7 +34,7 @@ A Drawer takes the Modal width steps, never the page grid. The width grows with 
 | `md` | 507 | 677 | 848 | 8 columns + 2 × 16 |
 | `lg` | 629 | 843 | 1056 | 10 columns + 2 × 16 |
 
-A Drawer is placed in the [Blanket](?path=/docs/templates-overlays-blanket--docs) with an edge placement. The Blanket drops its pad and holds the Drawer at that edge, over the same blanket and layers a [Modal](?path=/docs/templates-overlays-modal--docs) takes.
+A Drawer is placed in the [Blanket](?path=/docs/templates-modal-backdrop--docs) with an edge placement. The Blanket drops its pad and holds the Drawer at that edge, over the same blanket and layers a [Modal](?path=/docs/templates-modal-modal--docs) takes.
 
 ## Best practices
 
@@ -69,8 +69,8 @@ Hold the Drawer full height at a screen edge, inside a Blanket. Never put it str
 
 ## Related
 
-- [Modal](?path=/docs/templates-overlays-modal--docs) is the centered layer for a task that blocks the page.
-- [Blanket](?path=/docs/templates-overlays-blanket--docs) places the Drawer at an edge and draws the fill.
+- [Modal](?path=/docs/templates-modal-modal--docs) is the centered layer for a task that blocks the page.
+- [Blanket](?path=/docs/templates-modal-backdrop--docs) places the Drawer at an edge and draws the fill.
 - [Section](?path=/docs/templates-section-section--docs) and [Card](?path=/docs/templates-section-card--docs) hold content that belongs on the page itself.
 - Frame shows a Drawer open over the app frame, and how it meets the Sidebar.
 

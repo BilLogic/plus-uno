@@ -193,7 +193,6 @@ const preview = {
           [
             "Templates and patterns",
             "Overview",
-            "Page templates",
             "Frame",
             "Page",
             [
@@ -206,13 +205,19 @@ const preview = {
               "Card",
               "Table"
             ],
-            "Overlays",
+            "Modal",
             [
-              "Blanket",
               "Modal",
+              "Backdrop"
+            ],
+            "Panel",
+            [
               "Panel"
             ],
-            "Popup"
+            "Popup",
+            [
+              "Popup"
+            ]
           ],
           "Patterns",
           [
