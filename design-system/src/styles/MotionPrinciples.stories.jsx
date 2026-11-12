@@ -5,10 +5,12 @@
  *
  * Run: npx vitest run --project=storybook design-system/src/styles/MotionPrinciples.stories.jsx
  */
-import { expect } from 'storybook/test';
+import React from 'react';
+import { expect, waitFor } from 'storybook/test';
 
 import { PRINCIPLE_DEMOS } from '@/storybook-docs/illustrations/motion-principles.jsx';
-import { reducedStory, story } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
+import { MotionDemo } from '@/storybook-docs/illustrations/motion.jsx';
+import { PASS, reducedStory, story } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
 
 export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
@@ -39,5 +41,16 @@ export const PairsAreSameScene = {
       // Arrows come before the move in both tiles, on the same path.
       await expect(a.arrows).toEqual(b.arrows);
     }
+  },
+};
+
+/** A cut still lands on the record: both tiles end on the same drawing, whichever way they got there. */
+export const CutLandsOnTheRecord = {
+  render: () => <MotionDemo {...PRINCIPLE_DEMOS.showWhatChanged} reduced />,
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector('[data-motion-demo]');
+    await waitFor(() => expect(root.dataset.phase).toBe('still'), PASS);
+    const count = (id) => canvasElement.querySelector(`[data-tile="${id}"] svg`).querySelectorAll('*').length;
+    await expect(count('show-dont')).toBe(count('show-do'));
   },
 };

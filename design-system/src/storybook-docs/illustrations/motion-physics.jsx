@@ -807,8 +807,8 @@ const drillScene = ({ id, title, caption, reduced }) => ({
   title,
   caption,
   viewBox: VIEW,
-  initial: { g: 0, list: 1, rec: 0 },
-  landing: { g: reduced ? 0 : 1, list: 0, rec: 1 },
+  initial: { g: reduced ? 1 : 0, list: 1, rec: 0 },
+  landing: { g: 1, list: 0, rec: 1 },
   arrows: reduced ? [] : [[[100, 51], [100, 70]]],
   draw: ({ g, list, rec }) => (
     <>
@@ -816,17 +816,19 @@ const drillScene = ({ id, title, caption, reduced }) => ({
       <g opacity={list}>
         <PageHeader x={16} y={24} w={128} />
         {[0, 1, 2, 3].map((i) => (
-          <Row key={i} x={16} y={44 + i * 14} w={128} accent={i === 0} />
+          <Row key={i} x={16} y={44 + i * 14} w={128} />
         ))}
       </g>
       {g > 0 && (
-        <CardBox
-          x={lerp(LIST_ROW.x, RECORD.x, g)}
-          y={lerp(LIST_ROW.y, RECORD.y, g)}
-          w={lerp(LIST_ROW.w, RECORD.w, g)}
-          h={lerp(LIST_ROW.h, RECORD.h, g)}
-          accent
-        />
+        <g opacity={reduced ? rec : 1}>
+          <CardBox
+            x={lerp(LIST_ROW.x, RECORD.x, g)}
+            y={lerp(LIST_ROW.y, RECORD.y, g)}
+            w={lerp(LIST_ROW.w, RECORD.w, g)}
+            h={lerp(LIST_ROW.h, RECORD.h, g)}
+            accent
+          />
+        </g>
       )}
       <g opacity={rec}>
         <Section x={26} y={36} w={108} h={46} rows={3} />
