@@ -16,6 +16,8 @@ export { SEARCH_FIRST_ABOVE };
 
 export const SELECT_SPACINGS = ['default', 'compact'];
 
+const LOAD_FAILED = "Couldn't load options";
+
 const isEmpty = (value) => value === undefined || value === null || value === ''
     || (Array.isArray(value) && value.length === 0);
 
@@ -232,6 +234,11 @@ const Select = ({
             clear();
             return;
         }
+        if (event.key === 'Enter' && paging.firstFailed) {
+            event.preventDefault();
+            paging.retry();
+            return;
+        }
         if (listRef.current) listRef.current.handleKeyDown(event);
     };
 
@@ -396,6 +403,8 @@ const Select = ({
     let footer = null;
     if (atLimit) {
         footer = <Listbox.Message kind="limit">{`You can pick up to ${maxSelections}`}</Listbox.Message>;
+    } else if (paging.failed && !paging.firstFailed) {
+        footer = <Listbox.Message kind="error" onRetry={paging.retry}>{LOAD_FAILED}</Listbox.Message>;
     } else if (paging.more) {
         footer = (
             <Listbox.Message kind={paging.busy ? 'loading' : 'count'}>
@@ -405,6 +414,8 @@ const Select = ({
     }
 
     const listLoading = isLoading || paging.firstPage;
+    // The first page failing leaves the list with nothing to show but the way to try again.
+    const listError = paging.firstFailed ? LOAD_FAILED : undefined;
 
     const wrapperClasses = [
         'plus-select-wrapper',
@@ -463,6 +474,9 @@ const Select = ({
                     header={header}
                     footer={footer}
                     loading={listLoading}
+                    error={listError}
+                    onRetry={paging.retry}
+                    reveal={Boolean(loadOptions)}
                     emptyMessage={waitingForSearch ? 'Type to search' : 'No results'}
                 />
             </div>

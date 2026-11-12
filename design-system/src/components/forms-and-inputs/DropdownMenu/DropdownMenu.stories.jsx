@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import Button from '@/components/forms-and-inputs/Button';
 import { ButtonItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
@@ -19,6 +19,8 @@ export default {
         },
     },
 };
+
+const onRetry = fn();
 
 const basicMenu = (
     <>
@@ -106,6 +108,26 @@ export const Loading = () => (
         <DropdownMenu trigger={<Button>Assignees</Button>} loading isOpen onOpenChange={() => {}} />
     </div>
 );
+
+Loading.play = async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(await body.findByText('Loading options')).toBeInTheDocument();
+    await expect(body.getByRole('menu', { hidden: true })).toHaveAttribute('aria-busy', 'true');
+};
+
+/** After a failed load the menu says so and offers Retry, which leaves the menu open. */
+export const LoadFailed = () => (
+    <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+        <DropdownMenu trigger={<Button>Assignees</Button>} hasError onRetry={onRetry} isOpen onOpenChange={() => {}} />
+    </div>
+);
+
+LoadFailed.play = async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(await body.findByText("Couldn't load options")).toBeInTheDocument();
+    await userEvent.click(body.getByRole('menuitem', { name: 'Retry' }));
+    await expect(onRetry).toHaveBeenCalledTimes(1);
+};
 
 /* ------------------------------------------------------------------ escape */
 

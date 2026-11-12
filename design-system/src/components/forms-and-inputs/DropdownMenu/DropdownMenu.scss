@@ -25,6 +25,8 @@
 .plus-dropdown-menu-loading {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: var(--space-200);
+    gap: var(--stack-md);
+    padding: var(--pad-y-md) var(--pad-x-md);
+    color: var(--ds-text-subtle);
+    font: var(--body-default);
 }

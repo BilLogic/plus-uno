@@ -104,6 +104,8 @@ const Listbox = ({
     marker = 'check',
     loading = false,
     error,
+    onRetry,
+    reveal = false,
     emptyMessage = 'No results',
     embedded = false,
     spacing = 'default',
@@ -310,13 +312,16 @@ const Listbox = ({
 
     /* ---------- live announcements ---------- */
     let announcement = '';
-    if (loading) announcement = 'Loading';
+    if (loading) announcement = 'Loading options';
     else if (error) announcement = typeof error === 'string' ? error : 'Failed to load';
     else if (query) announcement = `${shown.length} ${shown.length === 1 ? 'result' : 'results'}`;
 
     /* ---------- rendering ---------- */
+    // With `reveal`, each row fades in a step after the one before it.
+    let revealIndex = 0;
     const row = (option, extra = {}) => {
         const rowId = optionId(option);
+        const revealStyle = reveal ? { '--plus-listbox-reveal-index': revealIndex++ } : undefined;
         const selected = isSelected(option.value);
         const before = [];
         if (option.elemBefore) before.push(...React.Children.toArray(option.elemBefore));
@@ -338,6 +343,8 @@ const Listbox = ({
                 elemBefore={before.length ? before : undefined}
                 trailing={option.trailing}
                 spacing={spacing}
+                style={revealStyle}
+                className={reveal ? 'plus-listbox-reveal' : undefined}
                 onSelect={() => choose(option)}
                 onMouseMove={() => { if (!option.disabled && rowId !== resolvedActive) setActiveId(rowId); }}
                 {...extra}
@@ -348,9 +355,9 @@ const Listbox = ({
     let message = null;
     let rows = null;
     if (loading) {
-        message = <ListboxMessage kind="loading">Loading…</ListboxMessage>;
+        message = <ListboxMessage kind="loading">Loading options</ListboxMessage>;
     } else if (error) {
-        message = <ListboxMessage kind="error">{error}</ListboxMessage>;
+        message = <ListboxMessage kind="error" onRetry={onRetry}>{error}</ListboxMessage>;
     } else if (shown.length === 0) {
         message = <ListboxMessage kind="empty">{emptyMessage}</ListboxMessage>;
     } else if (virtual) {
@@ -477,19 +484,24 @@ const Listbox = ({
  *
  * @param {object} props
  * @param {'loading'|'empty'|'error'|'count'|'limit'} props.kind
+ * @param {() => void} [props.onRetry] an error row shows a Retry button that calls it
  * @param {React.ReactNode} props.children
  * @returns {JSX.Element}
  */
-export const ListboxMessage = ({ kind, children }) => (
+export const ListboxMessage = ({ kind, onRetry, children }) => (
     <div className={`plus-listbox-message plus-listbox-message--${kind}`} role="presentation">
         {kind === 'loading' && <Spinner size={16} label="" />}
         {kind === 'error' && <Icon name="circle-exclamation" />}
         <span>{children}</span>
+        {kind === 'error' && onRetry && (
+            <button type="button" className="plus-listbox-retry" tabIndex={-1} onClick={onRetry}>Retry</button>
+        )}
     </div>
 );
 
 ListboxMessage.propTypes = {
     kind: PropTypes.oneOf(['loading', 'empty', 'error', 'count', 'limit']).isRequired,
+    onRetry: PropTypes.func,
     children: PropTypes.node,
 };
 
@@ -554,6 +566,10 @@ Listbox.propTypes = {
     rowActionsIndex: PropTypes.number,
     loading: PropTypes.bool,
     error: PropTypes.node,
+    /** `()`: the error row shows a Retry button that calls it. */
+    onRetry: PropTypes.func,
+    /** Rows fade in one after another, 20 ms apart, as options arrive from a server. */
+    reveal: PropTypes.bool,
     emptyMessage: PropTypes.node,
     /** Draws no surface of its own, for a list inside another menu. */
     embedded: PropTypes.bool,

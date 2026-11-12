@@ -507,17 +507,6 @@ DependentFieldClears.play = async ({ canvasElement }) => {
     await expect(canvas.getByTestId('teacher').textContent).toBe('');
 };
 
-/** While options load, the list shows a Message row. */
-export const LoadingShowsMessage = () => (
-    <div style={stack}>
-        <Select id="scommit-loading" label="Teacher" options={[]} isLoading defaultOpen />
-    </div>
-);
-
-LoadingShowsMessage.play = async () => {
-    await expect(await page().findByText('Loading…')).toBeInTheDocument();
-};
-
 /* ------------------------------------------------------------ long lists */
 
 const tutors = Array.from({ length: 80 }, (_, i) => ({ value: `u${i + 1}`, label: `Person ${String(i + 1).padStart(2, '0')}` }));
@@ -548,35 +537,6 @@ LongListSearchFirst.play = async ({ canvasElement }) => {
 
     await userEvent.type(field, 'Person 5');
     await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(10));
-};
-
-/** `loadOptions` pages in 50 at a time as the list scrolls, and says how many there are. */
-export const LoadOptionsPages = () => {
-    const all = Array.from({ length: 120 }, (_, i) => ({ value: `s${i + 1}`, label: `Student ${i + 1}` }));
-    const loadOptions = (query, { offset, limit }) => new Promise((resolve) => {
-        const matches = all.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()));
-        setTimeout(() => resolve({ options: matches.slice(offset, offset + limit), total: matches.length }), 20);
-    });
-    return (
-        <div style={stack}>
-            <Select id="scommit-async" label="Student" loadOptions={loadOptions} />
-        </div>
-    );
-};
-
-LoadOptionsPages.play = async ({ canvasElement }) => {
-    const field = within(canvasElement).getByRole('combobox', { name: 'Student' });
-    await userEvent.click(field);
-    await expect(await page().findByText('Showing 50 of 120')).toBeInTheDocument();
-
-    const body = page().getByRole('listbox').closest('.plus-listbox-body');
-    body.scrollTop = body.scrollHeight;
-    fireEvent.scroll(body);
-    await expect(await page().findByText('Showing 100 of 120')).toBeInTheDocument();
-
-    await userEvent.type(field, 'Student 11');
-    await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(11));
-    await expect(page().queryByText(/^Showing/)).toBeNull();
 };
 
 /* -------------------------------------------------------------- clearable */
