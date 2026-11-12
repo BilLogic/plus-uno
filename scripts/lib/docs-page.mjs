@@ -31,7 +31,7 @@
  * `table`, `RefTable`) becomes one markdown row per line; a `TokenTable` one
  * line per token. A do/don't pair (`DoDontPair`, `DoDont` with `Do`/`Dont`)
  * keeps its captions as `Do:` and `Don't:` lines and drops the examples.
- * Layout wrappers (`DocsTabs`, `DocsTab`, `div`, fragments) give up their
+ * A `DocsLink` keeps its text. Layout wrappers (`DocsTabs`, `DocsTab`, `div`, fragments) give up their
  * children; a `Banner` keeps its text, since foundation pages state rules in
  * one; inline tags become markdown (`code` and `C` to backticks, `strong` to
  * bold). Every other element is dropped. Code fences and code spans are kept
