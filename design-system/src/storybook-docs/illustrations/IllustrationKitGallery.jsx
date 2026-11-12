@@ -1,0 +1,42 @@
+import React from 'react';
+import { Illustration, IllustrationFigure } from './Illustration.jsx';
+import {
+  AnatomyMarker, Backdrop, ButtonShape, Card, Field, Frame, Modal, Panel, PageHeader, Popup, Row, Section, Sidebar,
+} from './primitives.jsx';
+
+/**
+ * Every primitive, neutral then accented, at the one scale the compositions use.
+ * Later tickets draw with these and reference this page for what exists.
+ */
+const SETS = [
+  ['Frame', (a) => <Frame x={10} y={8} w={140} h={84} accent={a} />],
+  ['Sidebar', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Sidebar x={10} y={20} w={44} h={72} accent={a} /></>)],
+  ['Page header', (a) => <PageHeader x={16} y={38} w={128} accent={a} />],
+  ['Section', (a) => <Section x={16} y={22} w={128} h={56} accent={a} />],
+  ['Card', (a) => <Card x={46} y={16} w={68} h={68} accent={a} />],
+  ['Row', (a) => (<><Row x={16} y={30} w={128} /><Row x={16} y={44} w={128} accent={a} /><Row x={16} y={58} w={128} /></>)],
+  ['Field', (a) => (<><Field x={30} y={28} w={100} accent={a} /><Field x={30} y={54} w={100} /></>)],
+  ['Button', (a) => (<><ButtonShape x={38} y={44} w={40} /><ButtonShape x={82} y={44} w={40} appearance={a ? 'primary' : 'default'} /></>)],
+  ['Popup', (a) => (<><ButtonShape x={20} y={18} w={40} /><Popup x={20} y={34} w={80} h={48} accent={a} /></>)],
+  ['Panel', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Panel x={96} y={20} w={54} h={72} accent={a} /></>)],
+  ['Modal and backdrop', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Backdrop x={10} y={20} w={140} h={72} /><Modal x={34} y={32} w={92} h={52} accent={a} /></>)],
+  ['Anatomy marker', (a) => (<><Section x={44} y={22} w={100} h={56} /><AnatomyMarker x={20} y={50} tx={44} ty={34} accent={a} /></>)],
+];
+
+export const IllustrationKitGallery = () => (
+  <div
+    data-illustration-kit
+    style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, var(--card-min-width-sm)), 1fr))', gap: 'var(--stack-lg)' }}
+  >
+    {SETS.map(([name, draw]) => (
+      <IllustrationFigure key={name} caption={name}>
+        <Illustration width={160} height={200} capped={false} title={`${name}, neutral above and accented below`}>
+          <svg x={0} y={0} width={160} height={100} viewBox="0 0 160 100">{draw(false)}</svg>
+          <svg x={0} y={100} width={160} height={100} viewBox="0 0 160 100">{draw(true)}</svg>
+        </Illustration>
+      </IllustrationFigure>
+    ))}
+  </div>
+);
+
+export const PRIMITIVE_NAMES = SETS.map(([name]) => name);

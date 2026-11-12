@@ -257,3 +257,10 @@ test('the real Templates tree is flat: seven templates, no Overlays folder', () 
   assert.ok(!order.includes('Overlays'));
   assert.ok(!order.includes('Page templates'));
 });
+
+test('the illustration kit is a Get started page, not a Templates source', () => {
+  const tax = JSON.parse(fs.readFileSync(new URL('../storybook.taxonomy.json', import.meta.url), 'utf8'));
+  assert.ok(!tax.rootSources.Templates.some((dir) => dir.includes('/illustrations')));
+  const mdx = fs.readFileSync(new URL('../design-system/src/storybook-docs/illustrations/IllustrationKit.mdx', import.meta.url), 'utf8');
+  assert.equal(docsTitle(mdx), 'Get started/Illustration kit');
+});

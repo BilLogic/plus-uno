@@ -434,7 +434,28 @@ const CHROME_DIMENSION = /(?<![\w.#-])\d*\.?\d+(?:px|rem|em)\b/g;
 const CHROME_COLOR_FN = /\b(?:rgba?|hsla?|color-mix)\(/g;
 const DOCS_LITERAL = /docs-literal:/;
 
-export function chromeFindings(source, { css }) {
+// The illustration kit draws with SVG attributes, which carry no unit for the
+// dimension rule to see. Inside the kit a paint is a `--ds-*` token (or none /
+// currentColor), and a stroke width or corner radius is a token too.
+const KIT_PAINT = /\b(fill|stroke|stopColor|floodColor)\s*[=:]\s*\{?\s*(["'])([^"']*)\2/g;
+const KIT_GEOMETRY = /\b(strokeWidth|rx|ry)\s*[=:]\s*\{?\s*(?:(["'])([^"']*)\2|(-?\d*\.?\d+)\s*\})/g;
+const KIT_PAINT_OK = /^(?:var\(--ds-[\w-]+\)|none|transparent|currentColor|inherit)$/;
+const KIT_GEOMETRY_OK = /^var\(--[\w-]+\)$/;
+
+function kitFindings(text, lineOf) {
+  const found = [];
+  for (const m of text.matchAll(KIT_PAINT)) {
+    if (!KIT_PAINT_OK.test(m[3].trim())) found.push({ line: lineOf(m.index), literal: `${m[1]}=${m[3]}`, kind: 'kit' });
+  }
+  for (const m of text.matchAll(KIT_GEOMETRY)) {
+    if (m[4] !== undefined || !KIT_GEOMETRY_OK.test(m[3].trim())) {
+      found.push({ line: lineOf(m.index), literal: `${m[1]}=${m[3] ?? m[4]}`, kind: 'kit' });
+    }
+  }
+  return found;
+}
+
+export function chromeFindings(source, { css, kit = false }) {
   const text = blankProse(source);
   const found = [];
   const lineOf = (offset) => text.slice(0, offset).split('\n').length;
@@ -455,6 +476,7 @@ export function chromeFindings(source, { css }) {
   for (const m of text.matchAll(OLD_VOCABULARY)) {
     found.push({ line: lineOf(m.index), literal: m[1], kind: 'old-token' });
   }
+  if (kit) found.push(...kitFindings(text, lineOf));
   return found.sort((a, b) => a.line - b.line);
 }
 
@@ -547,7 +569,10 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     const isCss = file.endsWith('.css');
     // MDX prose says `#167`; its component styles are the .jsx beside it, where hex is scanned.
     const skipHex = file.endsWith('.mdx');
-    for (const f of chromeFindings(fs.readFileSync(file, 'utf8'), { css: isCss || file.endsWith('.html') })) {
+    for (const f of chromeFindings(fs.readFileSync(file, 'utf8'), {
+      css: isCss || file.endsWith('.html'),
+      kit: file.includes('/storybook-docs/illustrations/'),
+    })) {
       if (skipHex && f.kind === 'hex') continue;
       found.push({
         file: path.relative(repoRoot, file),
@@ -557,6 +582,8 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
             ? `raw hex ${f.literal}  -> a --ds-* color token`
             : f.kind === 'dimension'
               ? `raw size ${f.literal}  -> the token whose role fits (--page-*/--section-*/--card-*/--stack-* spacing, --border-*, --radius-*, --icon-*, a type token), or a docs-literal: comment saying why none does`
+              : f.kind === 'kit'
+                ? `kit drawing ${f.literal}  -> a var(--ds-*) paint, or a var(--stroke-*) / var(--radius-*) width and corner; the kit draws from tokens only`
               : f.kind === 'color-fn'
                 ? `color function ${f.literal}  -> a --ds-* color token (a tint is a token too: --ds-background-*-subtle, --ds-surface-*)`
                 : `retired token ${f.literal}  -> its current name (--ds-* color, --section-*/--stack-*/--pad-* spacing, --type-* type)`,
