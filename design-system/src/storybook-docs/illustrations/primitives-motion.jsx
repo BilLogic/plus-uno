@@ -1,5 +1,5 @@
 import React from 'react';
-import { PAINT, HAIRLINE } from './paint.js';
+import { PAINT, HAIRLINE, CORNER } from './paint.js';
 import { Rect } from './primitives.jsx';
 
 /**
@@ -60,8 +60,10 @@ export const ChartCurve = ({ x, y, w, h, values, scale = 0.8, upTo = 1, accent =
 /**
  * The path a thing travels, start to landing: a dot where it starts and an
  * arrowhead where it lands. A path that ends where it began draws one way only.
+ * `ghost` is the rectangle it lands in, outlined dashed so the landing is seen
+ * before anything moves.
  */
-export const Trail = ({ points, accent = false }) => {
+export const Trail = ({ points, ghost, accent = false }) => {
   const color = accent ? PAINT.accent : PAINT.trail;
   const [sx, sy] = points[0];
   const [ex, ey] = points[points.length - 1];
@@ -70,6 +72,19 @@ export const Trail = ({ points, accent = false }) => {
   const head = (a, r) => `${(ex - r * Math.cos(angle + a)).toFixed(1)},${(ey - r * Math.sin(angle + a)).toFixed(1)}`;
   return (
     <g data-trail>
+      {ghost && (
+        <rect
+          data-ghost
+          x={ghost.x}
+          y={ghost.y}
+          width={ghost.w}
+          height={ghost.h}
+          fill="none"
+          stroke={color}
+          strokeDasharray="3 2"
+          style={{ ...HAIRLINE, rx: `min(${CORNER.shape}, ${Math.min(ghost.w, ghost.h) / 2}px)` }}
+        />
+      )}
       <polyline
         points={points.map(([x, y]) => `${x},${y}`).join(' ')}
         fill="none"

@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, waitFor } from 'storybook/test';
 
 import { MotionDemo } from './motion.jsx';
+import { crossings } from './trails.js';
 
 /**
  * The play tests every motion page's stories share: wait for a demo's first
@@ -34,6 +35,10 @@ export const playsToItsLanding = (demo) => async ({ canvasElement }) => {
   await expect(everyPaintIsAToken(root)).toBe(true);
   // Words appear only on a real-fidelity subject; the captions sit outside the drawings.
   await expect(root.querySelectorAll('svg text:not([data-fidelity="real"] text)').length).toBe(0);
+  // Paths that move together never cross; only a scene that says so is the broken version.
+  for (const scene of demo.scenes) {
+    await expect(crossings(scene.arrows).length > 0).toBe(Boolean(scene.crossing));
+  }
   if (demo.scenes.some((s) => s.arrows?.length)) {
     await waitFor(() => expect(root.dataset.phase).toBe('arrows'), PASS);
     for (const scene of demo.scenes) {
