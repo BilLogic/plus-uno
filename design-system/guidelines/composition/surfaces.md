@@ -38,7 +38,7 @@ Use `<Table>` inside a `<PatternCard>`, or through `PatternTable`. Never write r
 </PatternCard>
 
 /* incorrect — `columns` and `data` are not Table props and render nothing.
-   Verified against design-system/src/.../Table/Table.jsx propTypes. */
+   Verified against design-system/src/components/text-and-data-display/Table/Table.jsx propTypes. */
 <Table columns={columns} data={data} />
 ```
 
