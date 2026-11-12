@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import Button, { BUTTON_APPEARANCES } from './Button';
+import SectionMessage from '../../messaging/SectionMessage/SectionMessage';
 
 const icons = {
     'none': null,
@@ -321,6 +322,31 @@ export const Loading = {
             await expect(spinner.getBoundingClientRect().width, `${name}: sized by the icon token`).toBe(icon);
             await expect(getComputedStyle(spinner).borderTopColor, `${name}: in the label color`).toBe(getComputedStyle(button).color);
         }
+    },
+};
+
+/** An enabled action that is not ready explains what is missing when it is pressed. */
+export const ExplainsOnPress = {
+    render: () => {
+        const Demo = () => {
+            const [pressed, setPressed] = React.useState(false);
+            return (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-md)', maxWidth: '360px' }}>
+                    <Button appearance="primary" text="Save notes" onClick={() => setPressed(true)} />
+                    {pressed && <SectionMessage appearance="warning">Add the session notes before saving.</SectionMessage>}
+                </div>
+            );
+        };
+        return <Demo />;
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const save = canvas.getByRole('button', { name: 'Save notes' });
+        await expect(save).toBeEnabled();
+        await expect(canvas.queryByText('Add the session notes before saving.')).toBeNull();
+        await userEvent.click(save);
+        await expect(await canvas.findByText('Add the session notes before saving.')).toBeVisible();
+        await expect(save).toBeEnabled();
     },
 };
 

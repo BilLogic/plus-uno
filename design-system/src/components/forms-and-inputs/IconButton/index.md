@@ -10,7 +10,7 @@ Also asked as: icon only button, icon action.
 
 **Source:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.stories.jsx` — Overview, Appearances, Spacing, Shapes, States, Default, Subtle, Primary, Discovery, Compact, Circle, Selected, Disabled, Loading, FilterCount, HoveredState, PressedState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.stories.jsx` — Overview, Appearances, Spacing, Shapes, States, Default, Subtle, Primary, Discovery, Compact, Circle, Selected, Disabled, DisabledWithReason, Loading, FilterCount, HoveredState, PressedState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.mdx`
 
@@ -81,7 +81,7 @@ Don't: The same two views as loose buttons read as unrelated actions.
 ## Accessibility
 
 - `label` is required. It is the accessible name and the tooltip. A missing label fails `check:icon-button-name`.
-- Avoid `isDisabled`. A disabled button leaves the tab order and receives no events. Explain what is unavailable in nearby text instead, and never attach a tooltip to a disabled control.
+- Leave an action enabled and explain what is missing when it is pressed; disable an icon button only while it is sending. A disabled icon button leaves the tab order, drops its tooltip and `title`, and takes no `aria-disabled` stand-in that keeps it focusable. Say why in visible text beside it.
 - Selected is not color alone: `isSelected` sets `aria-pressed`.
 - With `trailingMetric` the accessible name carries the count: "Filters, 2 applied". The drawn digits are hidden from assistive technology so the count is not read twice.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
@@ -161,7 +161,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 | `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24. |
 | `shape` | enum | `'default'` | Square by default; `circle` is for top navigation. |
 | `isSelected` | bool | — | Marks the button selected and sets `aria-pressed`. Use it for a toggle such as a list or grid view switch. |
-| `isDisabled` | bool | — | Prevents interaction. Avoid it where you can; say why the action is unavailable instead. |
+| `isDisabled` | bool | `false` | Prevents interaction and drops the tooltip and `title`. Leave an action enabled and explain what is missing when it is pressed; disable only while it is sending. |
 | `isLoading` | bool | — | Shows a spinner in place of the icon and blocks interaction. |
 | `onClick` | func | — | Called with the click event when the button is activated. It does not fire while `isDisabled` or `isLoading` is set. |
 | `className` | string | — | Extra class names added to the button element beside the component's own. |

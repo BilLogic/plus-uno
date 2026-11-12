@@ -115,6 +115,8 @@ An icon button is a button with an icon and no visible label. Its required `labe
 
 <ComponentExample of={IconButtonStories.Disabled} title="Disabled" description="A change of color, not of opacity. Avoid disabling icon buttons." />
 
+<ComponentExample of={IconButtonStories.DisabledWithReason} title="Disabled with a reason" description="A disabled icon button drops its tooltip. The reason is text beside it." />
+
 <ComponentExample of={IconButtonStories.Loading} title="Loading" description="A spinner replaces the icon while the button is busy." />
 
 <ComponentExample of={IconButtonStories.FilterCount} title="Filter count" description="A filter trigger with filters on shows how many after the icon, on the selected fill. The button keeps its height and grows by the count." />
@@ -317,7 +319,7 @@ Put related icon buttons in a Button group, and use `isSelected` for a choice be
 ## Accessibility
 
 - `label` is required. It is the accessible name and the tooltip. A missing label fails `check:icon-button-name`.
-- Avoid `isDisabled`. A disabled button leaves the tab order and receives no events. Explain what is unavailable in nearby text instead, and never attach a tooltip to a disabled control.
+- Leave an action enabled and explain what is missing when it is pressed; disable an icon button only while it is sending. A disabled icon button leaves the tab order, drops its tooltip and `title`, and takes no `aria-disabled` stand-in that keeps it focusable. Say why in visible text beside it.
 - Selected is not color alone: `isSelected` sets `aria-pressed`.
 - With `trailingMetric` the accessible name carries the count: "Filters, 2 applied". The drawn digits are hidden from assistive technology so the count is not read twice.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.

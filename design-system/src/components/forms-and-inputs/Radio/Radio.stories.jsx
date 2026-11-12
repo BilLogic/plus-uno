@@ -331,6 +331,19 @@ export const Disabled = {
     },
 };
 
+/** An option disabled for a prerequisite the person can fix here; its description says what to do. */
+export const DisabledWithReason = {
+    render: () => <Radio id="radio-ex-reason" name="radio-ex-reason" label="Text message" value="text" description="Add a phone number first." isDisabled />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const el = radioOf(canvasElement, 'Text message');
+        await expect(el).toHaveAttribute('data-disabled');
+        const reason = canvas.getByText('Add a phone number first.');
+        await expect(reason).toBeVisible();
+        await expect(getComputedStyle(reason.closest('.plus-field-caption')).opacity).toBe('1');
+    },
+};
+
 export const Required = {
     render: () => <Radio id="radio-ex-required" name="radio-ex-required" label="Weekly" value="weekly" isRequired />,
     play: async ({ canvasElement }) => {

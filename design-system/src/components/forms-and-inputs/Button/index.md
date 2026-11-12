@@ -10,7 +10,7 @@ Also asked as: cta, submit.
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Selected, Disabled, Loading, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref
+**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 
@@ -48,10 +48,14 @@ Don't: A second AI button competes with the first, and Save notes is not an AI a
 
 Default spacing for most places; compact for tables and tight spaces, such as a row of student sessions.
 
-### Keep a form's submit button pressable. {#keep-a-form-s-submit-button-pressable}
+### Keep an action enabled and explain on press. {#keep-an-action-enabled-and-explain-on-press}
 
-Do: Explain what is missing with validation text under the field.
+An action that is not ready stays enabled. When it is pressed, say what is missing: move focus to the first field that needs attention and show the reason as text there, or as a warning Section message above when it blocks the main action or several items. A button disables only while it is sending; `isLoading` does that and keeps the label. Never attach a tooltip to a disabled button.
+
+Do: Enabled, with the reason shown as text when the button is pressed.
 Don't: A disabled submit button gives no direction and leaves the tab order.
+
+Self-evident cases need no reason: a Back button on the first step can be disabled. A button for something a role can never do is left out.
 
 ### Align the primary button with its group. {#align-the-primary-button-with-its-group}
 
@@ -60,7 +64,7 @@ Right-align buttons in focused tasks and modal dialogs, with the primary on the 
 ## Accessibility
 
 - A button performs an action; a link navigates. Use the right element so screen readers announce the right role.
-- Avoid `isDisabled`. A disabled button leaves the tab order and receives no events. Use validation and on-screen directions instead, and never attach a tooltip to one.
+- Leave an action enabled and explain on press; disable a button only while it is sending. A disabled button leaves the tab order and receives no events, and it takes no `aria-disabled` stand-in that keeps it focusable. Never attach a tooltip to one; the reason is visible text beside it.
 - A button with no visible label is an Icon button, which requires a `label`.
 - Loading blocks interaction and sets `aria-busy`; the label stays in the tree for assistive technology.
 - Selected is not color alone: `isSelected` sets `aria-pressed`.
@@ -128,7 +132,7 @@ Most buttons need no icon. Add one where the glyph has a clear, established mean
 |------|------|---------|-------------|
 | `text` | string | — | The label. Children work too. |
 | `children` | node | — | The label, used when `text` is not given. Omit both for an icon-only button. |
-| `title` | string | — | The `title` attribute, a native tooltip on hover. |
+| `title` | string | — | The `title` attribute, a native tooltip on hover. It is left off while the button is disabled or loading. |
 | `appearance` | enum | `'default'` | The visual style. |
 | `spacing` | enum | `'default'` | Height and padding: `default` draws 32, `compact` draws 24. Compact is for tables and tight toolbars. |
 | `shouldFitContainer` | bool | `false` | Stretches the button to the width of its container. |

@@ -73,6 +73,8 @@ A toggle turns one setting on or off, and the change takes effect at once.
 
 <ComponentExample of={ToggleStories.ReadOnly} title="Read-only" description="Focusable, full contrast, and the setting does not change." />
 
+<ComponentExample of={ToggleStories.DisabledWithReason} title="Disabled with a reason" description="The reason is visible text beside the toggle, never a tooltip." />
+
 <ComponentExample of={ToggleStories.Disabled} title="Disabled" description="The disabled fill in both positions, with an icon.disabled thumb. The toggle leaves the tab order." />
 
 </div>
@@ -182,15 +184,15 @@ The switch and its label never disagree. A label that reads as a state, such as 
     dontCaption="Off, but the label says on."
 />
 
-### Disable instead of hiding.
+### Say why a toggle is disabled.
 
-A disabled toggle tells people the setting exists but is unavailable. Say why next to it.
+Disable a toggle only for something the person can fix on the same screen, and say why in text next to it. A setting a role can never use is hidden. Never put the reason in a tooltip on the disabled toggle.
 
 <DoDontPair
-    doExample={<div><Toggle label="Share notes" isDisabled /></div>}
-    doCaption="Visible but disabled."
-    dontExample={<div><Toggle label="Share notes" /></div>}
-    dontCaption="Enabled, though switching it does nothing."
+    doExample={<div><Toggle label="Share notes" isDisabled /><p style={{ margin: '8px 0 0' }}>Add a co-tutor to share notes.</p></div>}
+    doCaption="Disabled, with the reason beside it."
+    dontExample={<div><Toggle label="Share notes" isDisabled /></div>}
+    dontCaption="Disabled with no reason, so nothing says what to fix."
 />
 
 ### The change lands at once.
@@ -235,7 +237,7 @@ The native input is a checkbox with `role="switch"`, the markup the W3C switch p
 
 - **Label every toggle.** A visible `label` is better. Where the name sits elsewhere in the layout, pass `aria-label` so it still reaches assistive technology.
 - **Do not change the label with the state.** The label stays the same whether the toggle is on or off.
-- **Explain a disabled toggle.** Put the reason in text beside it, so a person who cannot reach it knows why.
+- **Explain a disabled toggle.** Put the reason in visible text beside it, so a person who cannot reach it knows why. A disabled toggle leaves the tab order, and a tooltip on it is unreachable.
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the track.** Space flips the toggle.
 
 </div>

@@ -10,7 +10,7 @@ Also asked as: multi-select, checklist, tick box.
 
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, Required, Description, Card
+**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx`
 
@@ -55,7 +55,7 @@ Don't: A disabled box cannot be tabbed to.
 
 ### Read-only is not disabled. {#read-only-is-not-disabled}
 
-`isReadOnly` shows an answer the person may read but not change: the box stays in the tab order at full contrast, says `aria-readonly`, and ignores clicks and Space. `isDisabled` takes it out of the tab order and grays it, for a box that does not apply right now.
+`isReadOnly` shows an answer the person may read but not change: the box stays in the tab order at full contrast, says `aria-readonly`, and ignores clicks and Space. `isDisabled` takes it out of the tab order and grays it, for a box that waits on something the person can fix on the same screen. Put the reason in `description`, which stays at full contrast, and never in a tooltip. When it blocks the main action or several boxes, add a warning Section message above that says how to turn them on.
 
 ### A description describes; the label names. {#a-description-describes-the-label-names}
 

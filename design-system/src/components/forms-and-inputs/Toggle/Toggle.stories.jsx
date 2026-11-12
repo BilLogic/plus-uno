@@ -268,3 +268,18 @@ export const Disabled = {
         await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
     },
 };
+
+/** A toggle disabled for a prerequisite the person can fix here; the reason is visible text beside it. */
+export const DisabledWithReason = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+            <Toggle id="toggle-ex-reason" label="Share notes" isDisabled />
+            <span>Add a co-tutor to share notes.</span>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(switchOf(canvasElement, 'Share notes')).toHaveAttribute('data-disabled');
+        await expect(canvas.getByText('Add a co-tutor to share notes.')).toBeVisible();
+    },
+};

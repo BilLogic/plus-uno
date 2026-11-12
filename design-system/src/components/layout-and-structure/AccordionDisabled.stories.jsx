@@ -10,12 +10,9 @@ import Accordion from './Accordion/Accordion';
  * `pointer-events: none`, which stops a mouse and nothing else — a button
  * under it is still tabbable and Enter still fires its click handler.
  *
- * Base UI's accordion trigger takes the current APG guidance instead: a
- * disabled trigger stays in the tab order (`aria-disabled`, not the native
- * attribute) so a keyboard or screen-reader user can discover that the
- * section exists and is unavailable, rather than having it vanish from the
- * page. Either way, the behavior that matters is the same: a press never
- * opens it.
+ * A disabled trigger is a real disabled button: it leaves the tab order and a
+ * press never opens it. The reason an item is unavailable is visible text in
+ * or beside it, never a tooltip on the disabled header.
  */
 
 export default {
@@ -52,14 +49,14 @@ DisabledSectionsStayShut.play = async ({ canvasElement }) => {
     const shut = canvas.getByRole('button', { name: 'Unavailable' });
 
     // The discriminator: a real attribute, not a class.
-    await expect(shut.getAttribute('aria-disabled')).toBe('true');
-    await expect(open.getAttribute('aria-disabled')).toBe('false');
+    await expect(shut).toBeDisabled();
+    await expect(open).not.toBeDisabled();
 
-    // The disabled trigger stays in the tab order so it can be discovered.
+    // The disabled trigger leaves the tab order.
     await userEvent.tab();
     await expect(document.activeElement).toBe(open);
     await userEvent.tab();
-    await expect(document.activeElement).toBe(shut);
+    await expect(document.activeElement).not.toBe(shut);
 
     // And it stays shut when pressed anyway.
     await userEvent.click(shut, { pointerEventsCheck: 0 });
