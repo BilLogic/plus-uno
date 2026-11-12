@@ -12,7 +12,7 @@ What the product says back, and where. A Flag at the top right for something tha
 
 Four components carry every message. Each component page holds its appearances; this pattern picks the carrier and the place. A Modal is the fifth, for the one message that must be answered first.
 
-- **Flag.** A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and danger stay.
+- **Flag.** A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and danger stay until acted on.
 - **Banner.** A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.
 - **SectionMessage.** Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.
 - **The Inbox.** Notifications that arrived over time, in a Panel. The Bell that carries its count, and the Panel growing out of the Sidebar, are Planned .
@@ -35,8 +35,8 @@ Use Notifications when the product needs to tell someone something: an action fi
 
 | The message is about… | Carrier | Where | Leaves |
 | --- | --- | --- | --- |
-| Something that already happened and needs no reply: saved, sent, copied | `Flag` | Top right | On its own after 8 s; warning and error on Dismiss |
-| A job that finished or failed after the person moved on | `Flag` with an action, `autohide={false}` | Top right | On Dismiss |
+| Something that already happened and needs no reply: saved, sent, copied | `Flag` | Top right | On its own after 8 s, or Dismiss on a default flag; a bold warning or error when its action resolves it |
+| A job that finished or failed after the person moved on | `Flag` with an action, `autohide={false}` | Top right | Dismiss, or the action |
 | Something to read or act on in this part of the page | `SectionMessage` | Top of the Section or form | Resolved or dismissed |
 | Guidance before a task that must not be missed | `SectionMessage`, dismiss off | By the action it informs | When it stops applying |
 | A condition that holds for everything in a Frame, page or Section | `Banner` at that tier | Top of the tier | When the condition ends |
@@ -65,7 +65,7 @@ Use Notifications when the product needs to tell someone something: an action fi
 - Warning and error Flags are alerts and interrupt; every other Flag is a polite status. Each is read as one message.
 - A `SectionMessage` announces assertively when it appears; one present at first paint is ordinary content.
 - A `Banner` is a status that never traps focus and sits in the reading order.
-- The timeout on a Flag is a timing limit; its Dismiss button satisfies it.
+- The timeout on a Flag is a timing limit; the dismiss × on a default Flag satisfies it (see the Flag page).
 - The appearance icon is decorative; the words carry the severity.
 
 ## Related
@@ -108,11 +108,11 @@ A Flag can be dismissed before it is read. A failure that needs a decision stays
 Do: A finished action as a success Flag: the event in the title, the next step below.
 Don't: A decision in a Flag, which is gone before it is answered.
 
-### Let routine Flags leave and keep warning and error until dismissed. {#let-routine-flags-leave-and-keep-warning-and-error-until-dismissed}
+### Let routine Flags leave and keep warning and error until acted on. {#let-routine-flags-leave-and-keep-warning-and-error-until-acted-on}
 
 **Checked:** Automatic
 
-Normal, information and success close after 8 s. Warning and error stay until dismissed. A Flag with an action keeps autohide only when the action is optional: set `autohide={false}` when the person must act.
+Normal, information and success close after 8 s. Warning and error never close themselves and offer a next action. A Flag with an action keeps autohide only when the action is optional: set `autohide={false}` when the person must act. The × and the rest of the dismiss rule are on the Flag page.
 
 ### Show one Banner at a time, one line, at the tier it concerns, for as long as the condition holds. {#show-one-banner-at-a-time-one-line-at-the-tier-it-concerns-for-as-long-as-the-condition-holds}
 
@@ -135,11 +135,11 @@ The fill and icon carry the appearance, with no border and no side stripe. A blo
 
 Success for a finished action, warning for a caution, danger only when something failed. The icon is hidden from screen readers, so the title says "saved", "couldn't", "due".
 
-### Keep the bold Flag for the one message that must be seen. {#keep-the-bold-flag-for-the-one-message-that-must-be-seen}
+### Keep routine news on the default Flag. {#keep-routine-news-on-the-default-flag}
 
 **Checked:** Review
 
-A bold fill competes with the page. Routine news stays quiet.
+A bold fill competes with the page; it is for what must be seen. Routine news stays on the default Flag, which the person can clear.
 
 ### Send what arrived over time to the Inbox. {#send-what-arrived-over-time-to-the-inbox}
 

@@ -85,7 +85,7 @@ export const BackgroundJob = () => (
             <Flag
                 appearance="error"
                 title="Couldn't save your session note"
-                autohide={false}
+                defaultExpanded
                 show
                 actions={[{ text: 'Try again', onClick: noop }]}
             >

@@ -205,7 +205,7 @@
         // bold fill that is nearly invisible. It takes the inverse partners the
         // × takes (CloseButton's inverse tone), glyph, steps and ring.
         .plus-flag-expand {
-            // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold --ds-background-information-bold
+            // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold
             color: var(--ds-text-inverse);
 
             .fa-solid {
@@ -230,7 +230,7 @@
         .plus-flag-body,
         .plus-flag-timestamp,
         .plus-flag-action {
-            // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold --ds-background-information-bold
+            // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold
             color: var(--ds-text-inverse);
         }
 
@@ -246,12 +246,8 @@
         }
     }
 
-    &.plus-flag--bold.plus-flag--normal {
-        background-color: var(--ds-background-neutral-bold);
-    }
-
     &.plus-flag--bold.plus-flag--information {
-        background-color: var(--ds-background-information-bold);
+        background-color: var(--ds-background-neutral-bold);
     }
 
     &.plus-flag--bold.plus-flag--success {

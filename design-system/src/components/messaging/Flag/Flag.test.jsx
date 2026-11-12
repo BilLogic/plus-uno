@@ -36,11 +36,20 @@ describe('Flag timing', () => {
         expect(onClose).not.toHaveBeenCalled();
     });
 
-    it('lets a caller override the timing', () => {
+    it('lets a caller set the wait on a flag that closes itself', () => {
+        const onClose = vi.fn();
+        render(<Flag appearance="success" title="Gone" show onDismiss={onClose} delay={9000}>x</Flag>);
+        act(() => { vi.advanceTimersByTime(8999); });
+        expect(onClose).not.toHaveBeenCalled();
+        act(() => { vi.advanceTimersByTime(1); });
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('never closes a warning or error flag itself, even with autohide', () => {
         const onClose = vi.fn();
         render(<Flag appearance="error" title="Gone" show onDismiss={onClose} autohide delay={3000}>x</Flag>);
-        act(() => { vi.advanceTimersByTime(3000); });
-        expect(onClose).toHaveBeenCalledTimes(1);
+        act(() => { vi.advanceTimersByTime(60000); });
+        expect(onClose).not.toHaveBeenCalled();
     });
 });
 
@@ -78,9 +87,13 @@ describe('Flag appearance', () => {
         expect(screen.getByTestId('flag')).toHaveAttribute('role', 'status');
     });
 
-    it('expands to the bold fill', () => {
-        render(<Flag appearance="success" bold title="T" autohide={false} data-testid="flag" />);
-        expect(screen.getByTestId('flag')).toHaveClass('plus-flag--bold');
+    it('is bold for every appearance but normal', () => {
+        const { rerender } = render(<Flag title="T" autohide={false} data-testid="flag" />);
+        expect(screen.getByTestId('flag')).not.toHaveClass('plus-flag--bold');
+        for (const appearance of ['information', 'warning', 'error', 'success']) {
+            rerender(<Flag appearance={appearance} title="T" autohide={false} data-testid="flag" />);
+            expect(screen.getByTestId('flag')).toHaveClass('plus-flag--bold');
+        }
     });
 
     it('needs only a title: the description is optional', () => {
@@ -109,15 +122,41 @@ describe('Flag actions and dismiss', () => {
         expect(onDismiss).toHaveBeenCalledTimes(1);
     });
 
-    it('has no dismiss control when dismissible is false', () => {
-        render(<Flag title="T" autohide={false} dismissible={false} />);
+    it.each(['information', 'warning', 'error', 'success'])('has no dismiss control on a bold %s flag', (appearance) => {
+        render(<Flag appearance={appearance} title="T" autohide={false} actions={[{ text: 'Go' }]}>Body.</Flag>);
         expect(screen.queryByRole('button', { name: 'Dismiss flag' })).not.toBeInTheDocument();
+    });
+
+    it('draws actions as links on a default flag and buttons on a bold one', () => {
+        const actions = [{ text: 'Open', href: '/open' }];
+        const { unmount } = render(<Flag title="T" autohide={false} actions={actions} />);
+        expect(screen.getByRole('link', { name: 'Open' })).toBeInTheDocument();
+        unmount();
+        render(<Flag appearance="information" defaultExpanded title="T" autohide={false} actions={actions} />);
+        expect(screen.queryByRole('link', { name: 'Open' })).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Open' })).toBeInTheDocument();
+    });
+});
+
+describe('Flag icon', () => {
+    it('shows the information icon by default and swaps for a status icon name or an element', () => {
+        const { container, rerender } = render(<Flag title="T" autohide={false} />);
+        expect(container.querySelector('.plus-flag-icon .fa-circle-info')).toBeInTheDocument();
+        rerender(<Flag title="T" autohide={false} icon="circle-check" />);
+        expect(container.querySelector('.plus-flag-icon .fa-circle-check')).toBeInTheDocument();
+        rerender(<Flag title="T" autohide={false} icon={<span data-testid="avatar" />} />);
+        expect(screen.getByTestId('avatar')).toBeInTheDocument();
+    });
+
+    it('ignores icon on a bold flag', () => {
+        const { container } = render(<Flag appearance="error" title="T" autohide={false} icon="circle-check" />);
+        expect(container.querySelector('.plus-flag-icon .fa-circle-exclamation')).toBeInTheDocument();
     });
 });
 
 describe('Flag expand on bold', () => {
     it('starts a bold flag collapsed and expands to the description and actions', () => {
-        render(<Flag appearance="error" bold title="T" autohide={false} actions={[{ text: 'Retry' }]}>Details here.</Flag>);
+        render(<Flag appearance="error" title="T" autohide={false} actions={[{ text: 'Retry' }]}>Details here.</Flag>);
         const toggle = screen.getByRole('button', { name: 'Expand' });
         expect(toggle).toHaveAttribute('aria-expanded', 'false');
         expect(screen.queryByText('Details here.')).not.toBeInTheDocument();
@@ -129,8 +168,13 @@ describe('Flag expand on bold', () => {
     });
 
     it('can start expanded', () => {
-        render(<Flag appearance="error" bold defaultExpanded title="T" autohide={false}>Details here.</Flag>);
+        render(<Flag appearance="error" defaultExpanded title="T" autohide={false}>Details here.</Flag>);
         expect(screen.getByText('Details here.')).toBeInTheDocument();
+    });
+
+    it('has no chevron on a bold flag with a title only', () => {
+        render(<Flag appearance="information" title="T" autohide={false} />);
+        expect(screen.queryByRole('button', { name: 'Expand' })).not.toBeInTheDocument();
     });
 
     it('has no toggle on a flag that is not bold', () => {

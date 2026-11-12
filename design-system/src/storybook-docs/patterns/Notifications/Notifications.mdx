@@ -27,7 +27,7 @@ What the product says back, and where. A Flag at the top right for something tha
 Four components carry every message. Each component page holds its appearances; this pattern picks the carrier and the place. A Modal is the fifth, for the one message that must be answered first.
 
 <TypeGrid>
-<TypeCard of={NotificationsStories.CarrierFlag} title="Flag" stage={PLACE_STAGE}>A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and danger stay.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierFlag} title="Flag" stage={PLACE_STAGE}>A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and danger stay until acted on.</TypeCard>
 <TypeCard of={NotificationsStories.CarrierBanner} title="Banner" stage={STAGE}>A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.</TypeCard>
 <TypeCard of={NotificationsStories.CarrierSectionMessage} title="SectionMessage" stage={PLACE_STAGE}>Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.</TypeCard>
 <TypeCard of={NotificationsStories.CarrierInbox} title="The Inbox" stage={FLOAT_STAGE}>Notifications that arrived over time, in a <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>. The Bell that carries its count, and the Panel growing out of the Sidebar, are Planned <PlannedTag />.</TypeCard>
@@ -61,7 +61,7 @@ One banner at a time, scrolling with its content. The Frame tier is system news 
 
 ## Key cases
 
-<ComponentExample of={NotificationsStories.KeyFlagStack} title="A stack of Flags" description="Newest on top, each one its own message. The bold fill is kept for the one message that must be seen." />
+<ComponentExample of={NotificationsStories.KeyFlagStack} title="A stack of Flags" description="Newest on top, each one its own message. A stack is all default flags, each with its ×." />
 
 <ComponentExample of={NotificationsStories.KeyFlagWithAction} title="A Flag with an action" description="Up to two verbs: Undo and View sessions. It keeps autohide only when the action is optional." />
 
@@ -100,8 +100,8 @@ Use Notifications when the product needs to tell someone something: an action fi
 <tr><th>The message is about…</th><th>Carrier</th><th>Where</th><th>Leaves</th></tr>
 </thead>
 <tbody>
-<tr><td>Something that already happened and needs no reply: saved, sent, copied</td><td>`Flag`</td><td>Top right</td><td>On its own after 8 s; warning and error on Dismiss</td></tr>
-<tr><td>A job that finished or failed after the person moved on</td><td>`Flag` with an action, `autohide={false}`</td><td>Top right</td><td>On Dismiss</td></tr>
+<tr><td>Something that already happened and needs no reply: saved, sent, copied</td><td>`Flag`</td><td>Top right</td><td>On its own after 8 s, or Dismiss on a default flag; a bold warning or error when its action resolves it</td></tr>
+<tr><td>A job that finished or failed after the person moved on</td><td>`Flag` with an action, `autohide={false}`</td><td>Top right</td><td>Dismiss, or the action</td></tr>
 <tr><td>Something to read or act on in this part of the page</td><td>`SectionMessage`</td><td>Top of the Section or form</td><td>Resolved or dismissed</td></tr>
 <tr><td>Guidance before a task that must not be missed</td><td>`SectionMessage`, dismiss off</td><td>By the action it informs</td><td>When it stops applying</td></tr>
 <tr><td>A condition that holds for everything in a Frame, page or Section</td><td>`Banner` at that tier</td><td>Top of the tier</td><td>When the condition ends</td></tr>
@@ -146,11 +146,11 @@ A Flag can be dismissed before it is read. A failure that needs a decision stays
     dontCaption="A decision in a Flag, which is gone before it is answered."
 />
 
-### Let routine Flags leave and keep warning and error until dismissed.
+### Let routine Flags leave and keep warning and error until acted on.
 
 <RuleTag kind="automatic" />
 
-Normal, information and success close after 8 s. Warning and error stay until dismissed. A Flag with an action keeps autohide only when the action is optional: set `autohide={false}` when the person must act.
+Normal, information and success close after 8 s. Warning and error never close themselves and offer a next action. A Flag with an action keeps autohide only when the action is optional: set `autohide={false}` when the person must act. The × and the rest of the dismiss rule are on the Flag page.
 
 ### Show one Banner at a time, one line, at the tier it concerns, for as long as the condition holds.
 
@@ -177,11 +177,11 @@ The fill and icon carry the appearance, with no border and no side stripe. A blo
 
 Success for a finished action, warning for a caution, danger only when something failed. The icon is hidden from screen readers, so the title says "saved", "couldn't", "due".
 
-### Keep the bold Flag for the one message that must be seen.
+### Keep routine news on the default Flag.
 
 <RuleTag kind="review" />
 
-A bold fill competes with the page. Routine news stays quiet.
+A bold fill competes with the page; it is for what must be seen. Routine news stays on the default Flag, which the person can clear.
 
 ### Send what arrived over time to the Inbox.
 
@@ -217,7 +217,7 @@ A Flag is for now; the Inbox is for later. The Inbox is the Panel's Notification
 - Warning and error Flags are alerts and interrupt; every other Flag is a polite status. Each is read as one message.
 - A `SectionMessage` announces assertively when it appears; one present at first paint is ordinary content.
 - A `Banner` is a status that never traps focus and sits in the reading order.
-- The timeout on a Flag is a timing limit; its Dismiss button satisfies it.
+- The timeout on a Flag is a timing limit; the dismiss × on a default Flag satisfies it (see the Flag page).
 - The appearance icon is decorative; the words carry the severity.
 
 </div>

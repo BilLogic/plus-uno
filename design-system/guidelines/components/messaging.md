@@ -41,7 +41,8 @@ message stays dismissed until it is remounted. Six `appearance` values: `primary
 `secondary`, `success`, `danger`, `warning`, `info`.
 
 **`Flag`** is fully controlled through `show` and `onDismiss`. `appearance` is
-`normal`, `information`, `warning`, `error` or `success`; `bold` fills it. `delay`
+`normal`, `information`, `warning`, `error` or `success`; it alone decides the kind (`normal` is
+the default flag; the rest are bold; the dismiss rule is on the Flag page). `delay`
 is 8000ms and `autohide` is on for the calm appearances, and autohide only applies
 while `delay` is above zero. `title` is required; the description and `actions`
 are optional. `FlagGroup` positions a stack.

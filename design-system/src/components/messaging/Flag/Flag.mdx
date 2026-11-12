@@ -49,19 +49,19 @@ reply. It appears over the page and goes away on its own or when dismissed.
 
 ## Appearance
 
-<ComponentExample of={FlagStories.Normal} title="Normal" description="The default: a neutral update in the subtle icon color." />
+<ComponentExample of={FlagStories.Normal} title="Normal" description="The default flag: the overlay surface, an icon that carries the meaning, always the dismiss ×, actions as links." />
 
-<ComponentExample of={FlagStories.Information} title="Information" description="Something worth knowing, with the information icon." />
+<ComponentExample of={FlagStories.Information} title="Information" description="Bold, on the dark neutral fill. It starts collapsed to its title; the chevron opens the description." />
 
-<ComponentExample of={FlagStories.Success} title="Success" description="A finished action, with the success icon." />
+<ComponentExample of={FlagStories.Success} title="Success" description="Bold, on the success fill. It closes itself after 8 seconds." />
 
-<ComponentExample of={FlagStories.Warning} title="Warning" description="Something to check before going on. It stays until dismissed." />
+<ComponentExample of={FlagStories.Warning} title="Warning" description="Bold, on the warning fill with its own dark text. It never closes itself and offers a next action." />
 
-<ComponentExample of={FlagStories.ErrorAppearance} title="Error" description="Something that failed. It stays until dismissed." />
+<ComponentExample of={FlagStories.ErrorAppearance} title="Error" description="Bold, on the danger fill. It never closes itself and offers a next action." />
 
-<ComponentExample of={FlagStories.BackgroundFailure} title="Background failure" description="Work that fails out of sight, such as a sync, stays until closed, with Try again." />
+<ComponentExample of={FlagStories.BackgroundFailure} title="Background failure" description="Work that fails out of sight, such as a sync, stays until Try again resolves it." />
 
-<ComponentExample of={FlagStories.Bold} title="Bold" description="bold fills the flag with the appearance's bold color and adds an expand toggle." />
+<ComponentExample of={FlagStories.Bold} title="Bold controls" description="The chevron takes the inverse icon and sits on the title's line; actions are buttons." />
 
 </div>
 
@@ -69,7 +69,7 @@ reply. It appears over the page and goes away on its own or when dismissed.
 
 ## Behavior
 
-<ComponentExample of={FlagStories.Dismiss} title="Dismiss" description="The shared CloseButton in its default tone, last in the flag's row." />
+<ComponentExample of={FlagStories.Dismiss} title="Dismiss" description="The shared CloseButton, last in a default flag's row. A bold flag has none." />
 
 </div>
 
@@ -127,6 +127,21 @@ Use `Flag` to confirm something that has already happened and needs no reply:
 saved, sent, copied. `show` and `onDismiss` are yours; the component holds no
 state. `FlagGroup` positions a stack of them.
 
+`appearance` alone decides the kind of flag and its controls. A **default flag**
+(`normal`) is for passive news a person can clear: the overlay surface, an `icon`
+that carries the meaning (a status icon name or an element such as an Avatar), the
+dismiss × and actions as links. A **bold flag** (`information`, `warning`, `error`,
+`success`) takes the appearance's bold fill, starts collapsed to its title, and
+opens its description and actions behind a chevron; its actions are buttons.
+
+### The dismiss rule
+
+- The × is on default flags only, never on bold.
+- A bold flag leaves when its action resolves it, or, for information and success,
+  when it times out. Warning and error never close themselves and offer a next action.
+- A `FlagGroup` never mixes dismissible and non-dismissible flags: a stack is all
+  default flags or all bold.
+
 ### Appearance guidance
 
 <DocsTable>
@@ -134,12 +149,11 @@ state. `FlagGroup` positions a stack of them.
 <tr><th>Appearance</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td>Normal</td><td>The default, for a neutral update. Example: "Notes copied".</td></tr>
-<tr><td>Information</td><td>Something worth knowing. Example: "Schedule updated".</td></tr>
-<tr><td>Success</td><td>A finished action. Example: "Plan saved".</td></tr>
-<tr><td>Warning</td><td>Something to check before going on. Stays until dismissed.</td></tr>
-<tr><td>Error</td><td>Something that failed. Stays until dismissed.</td></tr>
-<tr><td>Bold</td><td>Any appearance on its bold fill, for the one message that must be seen.</td></tr>
+<tr><td>Normal</td><td>The default flag, for passive news a person can clear. Example: "Notes copied". Set `icon` to a status icon or an Avatar.</td></tr>
+<tr><td>Information</td><td>Bold. Something worth knowing, on the dark neutral fill. Times out.</td></tr>
+<tr><td>Success</td><td>Bold. A finished action. Times out.</td></tr>
+<tr><td>Warning</td><td>Bold. Something to check before going on. Never closes itself; offers a next action.</td></tr>
+<tr><td>Error</td><td>Bold. Something that failed. Never closes itself; offers a next action.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -149,13 +163,13 @@ state. `FlagGroup` positions a stack of them.
 
 ## Parts
 
-1. **Icon.** The appearance glyph, decorative.
+1. **Icon.** On a default flag the `icon` (the information icon unless set); on a bold flag the appearance glyph. Decorative.
 2. **Title.** What happened, in a few words.
 3. **Timestamp.** Optional, subtle, after the title.
 4. **Description.** At most one line.
-5. **Actions.** Link buttons under the description.
-6. **Expand toggle.** Only on a bold flag, which starts collapsed to its title.
-7. **Dismiss.** The shared CloseButton, named "Dismiss flag".
+5. **Actions.** At most two, under the description: links on a default flag, buttons on a bold one.
+6. **Expand toggle.** Only on a bold flag that has a description or actions; it starts collapsed to its title.
+7. **Dismiss.** The shared CloseButton, named "Dismiss flag", on default flags only.
 
 ### States
 
@@ -170,7 +184,7 @@ state. `FlagGroup` positions a stack of them.
 <tr><td>Focused</td><td>Dismiss, the toggle and each action show the 2px ring; the ring is inverse on a bold fill.</td></tr>
 <tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Expanded</td><td>A bold flag shows its description and actions; collapsed, only the title.</td></tr>
-<tr><td>Autohide</td><td>Normal, information and success close after 8 seconds; warning and error stay.</td></tr>
+<tr><td>Autohide</td><td>Normal, information and success close after 8 seconds (keep any `delay` at 8000 or more); warning and error never close themselves.</td></tr>
 <tr><td>Dismissed</td><td>The flag leaves the stack.</td></tr>
 </tbody>
 </DocsTable>
@@ -185,7 +199,7 @@ state. `FlagGroup` positions a stack of them.
 <tr><td>Surface</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popup-radius</code>, <code>--popover-pad</code>, <code>--popover-width-flag</code></td></tr>
 <tr><td>Title, description</td><td><code>--heading-xsmall</code>, <code>--ds-text</code>; <code>--body-default</code>, <code>--ds-text-subtle</code></td></tr>
 <tr><td>Icon</td><td><code>--ds-icon-subtle</code>, <code>--ds-icon-information</code>, <code>--ds-icon-success</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-danger</code>, at <code>--icon-md</code></td></tr>
-<tr><td>Bold fill</td><td><code>--ds-background-neutral-bold</code>, <code>-information-bold</code>, <code>-success-bold</code>, <code>-warning-bold</code>, <code>-danger-bold</code>, with <code>--ds-text-inverse</code> (<code>--ds-text-warning-inverse</code> on warning)</td></tr>
+<tr><td>Bold fill</td><td><code>--ds-background-neutral-bold</code> (information), <code>-success-bold</code>, <code>-warning-bold</code>, <code>-danger-bold</code>, with <code>--ds-text-inverse</code> (<code>--ds-text-warning-inverse</code> on warning)</td></tr>
 <tr><td>Dismiss, toggle</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
 <tr><td>Gaps</td><td><code>--inline-lg</code> before Dismiss, <code>--inline-md</code>, <code>--stack-sm</code>; <code>--popover-stack-flag</code> between flags</td></tr>
 <tr><td>Group</td><td><code>--layer-flag</code>, <code>--popover-gap-screen</code></td></tr>
@@ -203,20 +217,20 @@ state. `FlagGroup` positions a stack of them.
 Success for a finished action; error only when something failed.
 
 <DoDontPair
-    doExample={<Flag appearance="success" title="Session saved" autohide={false}>Changes appear for everyone on the session.</Flag>}
+    doExample={<Flag appearance="success" defaultExpanded title="Session saved" autohide={false}>Changes appear for everyone on the session.</Flag>}
     doCaption="Success appearance for a saved session."
-    dontExample={<Flag appearance="error" title="Session saved" autohide={false}>Changes appear for everyone on the session.</Flag>}
+    dontExample={<Flag appearance="error" defaultExpanded title="Session saved" autohide={false}>Changes appear for everyone on the session.</Flag>}
     dontCaption="Error appearance on good news."
 />
 
-### Keep bold for the one message that must be seen.
+### Keep routine news on the default flag.
 
-A bold flag competes with the page; routine news stays quiet.
+A bold flag competes with the page; routine news stays quiet and can be cleared.
 
 <DoDontPair
-    doExample={<Flag appearance="information" defaultExpanded title="Notes synced" autohide={false}>Changes appear for everyone on the session.</Flag>}
-    doCaption="Quiet flag for routine news."
-    dontExample={<Flag appearance="information" bold defaultExpanded title="Notes synced" autohide={false}>Changes appear for everyone on the session.</Flag>}
+    doExample={<Flag title="Notes synced" autohide={false}>Changes appear for everyone on the session.</Flag>}
+    doCaption="Default flag for routine news."
+    dontExample={<Flag appearance="information" defaultExpanded title="Notes synced" autohide={false}>Changes appear for everyone on the session.</Flag>}
     dontCaption="Bold fill on a routine confirmation."
 />
 
@@ -225,7 +239,7 @@ A bold flag competes with the page; routine news stays quiet.
 A title names the event; the description gives the next step.
 
 <DoDontPair
-    doExample={<Flag appearance="error" title="Couldn't reschedule">Pick another time and try again.</Flag>}
+    doExample={<Flag appearance="error" defaultExpanded title="Couldn't reschedule" actions={[{ text: 'Pick a time' }]}>Pick another time and try again.</Flag>}
     doCaption="Event in the title, next step below."
     dontExample={<Flag appearance="error" title="Error" />}
     dontCaption="A bare title with no next step."
@@ -234,15 +248,15 @@ A title names the event; the description gives the next step.
 ### Show a background failure as an error Flag with Try again.
 
 When work fails out of sight, such as a sync or an autosave, use an error flag.
-It stays until closed and carries **Try again** as its action, so the person can
+It stays until the action resolves it and carries **Try again** as its action, so the person can
 retry without leaving what they are doing. A failure to load a view is not a
 flag: it takes the view's `EmptyState`.
 
 <DoDontPair
-    doExample={<Flag appearance="error" title="Couldn't sync notes" actions={[{ text: 'Try again' }]}>Your latest changes are saved on this device only.</Flag>}
-    doCaption="Error flag with Try again; it stays until closed."
-    dontExample={<Flag appearance="error" title="Couldn't sync notes" autohide delay={3000} />}
-    dontCaption="A failure that times out before it is read."
+    doExample={<Flag appearance="error" defaultExpanded title="Couldn't sync notes" actions={[{ text: 'Try again' }]}>Your latest changes are saved on this device only.</Flag>}
+    doCaption="Error flag with Try again; it stays until the action resolves it."
+    dontExample={<Flag appearance="error" title="Couldn't sync notes" />}
+    dontCaption="A failure with no next action."
 />
 
 ### Nothing important goes only in a flag.
@@ -253,12 +267,11 @@ at the top with an error on each field.
 
 ### Turn off autohide for anything the user might need to re-read.
 
-With `autohide={false}`, or `delay={0}`, the flag waits for its close button.
+With `autohide={false}`, or `delay={0}`, a default flag waits for its ×.
 
-### Keep dismissible on.
+### Do not mix dismissible and non-dismissible flags in one stack.
 
-It is on by default and is the only way to close a flag that is not timing out.
-Turning it off with `autohide={false}` leaves a flag that never goes away.
+The × is on default flags only, so a stack is all default flags or all bold.
 
 </div>
 
@@ -289,18 +302,18 @@ Turning it off with `autohide={false}` leaves a flag that never goes away.
   what it is saying. Every appearance is `aria-atomic`, so the flag is read as one
   message.
 - **The timeout is a timing limit.** Content that disappears on its own has to
-  be dismissible or extendable to satisfy WCAG's timing rule. The close button
-  is what does that here, which is why it is on by default.
+  be dismissible or extendable to satisfy WCAG's timing rule. The ×
+  is what does that on a default flag; a bold flag that times out is information or
+  success, and one that does not is warning or error, which offer an action.
 - **Announcement needs the region to already exist.** A flag mounted at the same
   moment as its container may not be announced at all. Render `FlagGroup`
   with the page and put flags into it.
-- **The dismiss button is the shared `CloseButton`** in its default tone on the
-  flag's surface, with an `aria-hidden` ×. The × and its focus ring are at least
+- **The dismiss button is the shared `CloseButton`** on a default flag's surface, with an `aria-hidden` ×. The × and its focus ring are at least
   3:1 on that surface.
 - **The appearance icon is decorative.** It is `aria-hidden`, so the title beside it
   carries the meaning; the color and icon should never carry it alone.
-- **Every flag is one surface.** The title and the description keep the same
-  text colors on every appearance, so no appearance needs a contrast exception.
+- **The chevron reports its state.** It sets `aria-expanded`, so a screen reader
+  hears whether a bold flag is expanded or collapsed.
 
 </div>
 

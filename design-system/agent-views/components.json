@@ -4613,7 +4613,7 @@
       "import": "import { Flag } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Flag/Flag.jsx",
-      "summary": "The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: a 16 icon in the appearance's icon color on the title's first line, the title and its optional description, actions, and the dismiss button. `bold` expands the surface to the appearance's bold fill.",
+      "summary": "The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: a 16 icon on the title's first line, the title and its optional description, actions, and the controls. `appearance` alone decides the kind: `normal` is the default flag (overlay surface, a status icon or an avatar, always the dismiss ×, actions as links); every other appearance is bold (its bold fill, no ×, collapsed to its title behind a chevron, actions as buttons).",
       "props": [
         {
           "name": "id",
@@ -4663,16 +4663,16 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": "Link-button actions under the description, in the order given. Avoid more than two.",
+          "description": "Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag still draws a button: put the navigation in `onClick`.",
           "deprecated": null
         },
         {
-          "name": "bold",
-          "type": "bool",
+          "name": "icon",
+          "type": "string or node",
           "required": false,
-          "default": "false",
+          "default": null,
           "values": null,
-          "description": "The appearance's bold fill. A bold flag starts collapsed to its title, with a toggle that expands the description and actions.",
+          "description": "The default flag's leading icon: a status icon name, or an element such as an Avatar. Unset, the information icon in the subtle icon color. Ignored on a bold flag, which shows its appearance's icon.",
           "deprecated": null
         },
         {
@@ -4682,15 +4682,6 @@
           "default": "false",
           "values": null,
           "description": "Whether a bold flag starts expanded.",
-          "deprecated": null
-        },
-        {
-          "name": "dismissible",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Shows the dismiss button. Defaults to true; set false to leave it out.",
           "deprecated": null
         },
         {
@@ -4717,7 +4708,7 @@
           "required": false,
           "default": "FLAG_AUTO_CLOSE_MS",
           "values": null,
-          "description": "How long it stays before closing itself, in ms. 8000 by default.",
+          "description": "How long it stays before closing itself, in ms. 8000 by default; keep it at 8000 or more so a slow reader is not cut off.",
           "deprecated": null
         },
         {
@@ -4726,7 +4717,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Close itself after `delay`. Defaults to true for normal, information and success, false for warning and error.",
+          "description": "Close itself after `delay`. Defaults to true for normal, information and success; warning and error never close themselves.",
           "deprecated": null
         },
         {
@@ -4810,7 +4801,6 @@
         "--body-small",
         "--border-default",
         "--ds-background-danger-bold",
-        "--ds-background-information-bold",
         "--ds-background-neutral-bold",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",

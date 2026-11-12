@@ -77,7 +77,7 @@ const SkeletonRows = ({ rows = 4, reduced }) => (
 /** The Flag that explains a wait past 10 s: held in the picture, not fixed to the screen. */
 const WaitFlag = ({ title, children }) => (
     <FlagGroup position="top-end" containerPosition="static">
-        <Flag appearance="information" title={title} autohide={false} dismissible={false} show>{children}</Flag>
+        <Flag appearance="information" title={title} autohide={false} defaultExpanded show>{children}</Flag>
     </FlagGroup>
 );
 
