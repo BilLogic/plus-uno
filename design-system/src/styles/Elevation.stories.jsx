@@ -201,8 +201,8 @@ const peek = (root, selector) => {
 
 const ACCOUNT = { id: 'elevation', name: 'Ana Ruiz', role: 'Tutor' };
 
-/** A Frame at a fixed height, with the real Sidebar and two Session cards on its Page. */
-const SessionsFrame = ({ edge, ...frameProps }) => {
+/** A Frame at a fixed height, with the real Sidebar and Session cards on its Page, in one or two columns. */
+const SessionsFrame = ({ edge, columns = 1, ...frameProps }) => {
     const ref = useRef(null);
     useEffect(() => { peek(ref.current, edge); }, [edge]);
     return (
@@ -214,8 +214,12 @@ const SessionsFrame = ({ edge, ...frameProps }) => {
                 panelStorageKey={null}
                 {...frameProps}
             >
-                <PatternCard title="Session 12" description="Thursday, 4:30 PM · Algebra I" />
-                <PatternCard title="Session 13" description="Monday, 4:30 PM · Geometry" />
+                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: 'var(--grid-gutter)' }}>
+                    <PatternCard title="Session 12" description="Thursday, 4:30 PM · Algebra I" />
+                    <PatternCard title="Session 13" description="Monday, 4:30 PM · Geometry" />
+                    {columns > 1 && <PatternCard title="Session 14" description="Tuesday, 5:00 PM · Reading" />}
+                    {columns > 1 && <PatternCard title="Session 15" description="Friday, 3:30 PM · Writing" />}
+                </div>
             </InAppFrame>
         </div>
     );
@@ -230,7 +234,7 @@ const expectOverlay = async (canvasElement, selector) => {
 
 /** The real Sidebar peeked from the left edge: it floats over the page with no Backdrop. */
 export const FloatingSidebar = {
-    render: () => <SessionsFrame edge=".plus-frame__edge" sidebarDocked={false} />,
+    render: () => <SessionsFrame edge=".plus-frame__edge" sidebarDocked={false} columns={2} />,
     play: async ({ canvasElement }) => {
         await expectOverlay(canvasElement, '.plus-frame__sidebar--raised');
         // The real Sidebar, with its rows: not a bare list.
@@ -455,8 +459,8 @@ export const AlwaysPair = () => (
 export const BlockingOnBackdrop = () => (
     <DoDont>
         <Do caption="The Modal on the Backdrop takes the blocking shadow.">
-            <Blanket inline screenWidth={480} screenHeight={240}>
-                <Modal show renderAs="inline" width="4-col" title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
+            <Blanket inline screenWidth={360} screenHeight={220}>
+                <Modal show renderAs="inline" width={280} title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
             </Blanket>
         </Do>
         <Dont caption="A Panel with the blocking shadow and no Backdrop. If it needs full attention, make it a Modal.">
