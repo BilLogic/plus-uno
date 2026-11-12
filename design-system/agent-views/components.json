@@ -15662,7 +15662,7 @@
         "--body-small",
         "--ds-background-neutral-bold",
         "--ds-text-inverse",
-        "--layer-popup",
+        "--layer-tooltip",
         "--pad-x-sm",
         "--popover-max-width-tooltip",
         "--popover-pad-y-tooltip",
