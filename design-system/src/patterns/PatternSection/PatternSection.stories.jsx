@@ -258,7 +258,7 @@ export const Levels = () => (
     </PatternSection>
 );
 
-const STUDENTS = [
+const SEARCH_STUDENTS = [
     { name: 'Maya Chen', active: true },
     { name: 'Marcus Lee', active: false },
     { name: 'Ana Ruiz', active: true },
@@ -275,7 +275,7 @@ const STUDENTS = [
 const SearchableStudents = () => {
     const [query, setQuery] = useState('');
     const [activeOnly, setActiveOnly] = useState(false);
-    const rows = STUDENTS.filter((student) => (!activeOnly || student.active)
+    const rows = SEARCH_STUDENTS.filter((student) => (!activeOnly || student.active)
         && student.name.toLowerCase().includes(query.trim().toLowerCase()));
     const narrowed = query !== '' || activeOnly;
     const reset = () => {
@@ -287,7 +287,7 @@ const SearchableStudents = () => {
             title="Students"
             toolbar={(
                 <PatternSection.Toolbar
-                    count={narrowed ? `${rows.length} of ${STUDENTS.length} students` : `${STUDENTS.length} students`}
+                    count={narrowed ? `${rows.length} of ${SEARCH_STUDENTS.length} students` : `${SEARCH_STUDENTS.length} students`}
                     filters={narrowed ? <Button text="Reset filters" appearance="subtle" spacing="compact" onClick={reset} /> : null}
                     actions={(
                         <>
