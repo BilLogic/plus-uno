@@ -2,7 +2,7 @@
 <!-- Load when: animating a component | Route: design-system/guidelines/overview.md -->
 # Motion · Library
 
-Every template's, pattern's and component's enter, exit and change motion, one line per event, grouped by tier: templates, then patterns, then components. Tokens are read as `--ds-motion-*`; the same rows sit in each page's Motion section. A page absent here does not move.
+Every template's, pattern's and component's enter, exit and change motion, one line per event, grouped by tier: templates, then patterns, then components. Tokens are read as `--ds-motion-*`; Sound names the sound an event plays (`sound.*`), when, and its condition, and is empty when silent. The same rows sit in each page's Motion section. A page absent here does not move.
 
 | Name | Tier | Event | Transition | Tokens | Sound |
 | --- | --- | --- | --- | --- | --- |
