@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { CIRCLES, CORNER_CENTERS, CONSTRUCTION_RADII, PLUS_BOX, PLUS_CENTER } from '../../assets/Logo/logoConstructionGeometry.js';
@@ -50,6 +51,20 @@ describe('stopAtEdge', () => {
   });
 });
 
+describe('stopAtEdge, other sides', () => {
+  const rect = { x: 40, y: 20, w: 20, h: 10 };
+  it('stops from the right and from below on the near edge', () => {
+    expect(stopAtEdge([100, 25], rect)).toEqual([60, 25]);
+    expect(stopAtEdge([50, 80], rect)).toEqual([50, 30]);
+  });
+  it('aims at the landing point, not the center', () => {
+    expect(stopAtEdge([0, 22], rect, [50, 22])).toEqual([40, 22]);
+  });
+  it('returns the start when the line never meets the rectangle', () => {
+    expect(stopAtEdge([0, 0], rect, [0, -10])).toEqual([0, 0]);
+  });
+});
+
 describe('pathGeometry', () => {
   it('points the head along the line, tip at the landing', () => {
     const g = pathGeometry([0, 0], [30, 0]);
@@ -70,6 +85,18 @@ describe('pathGeometry', () => {
     const g = pathGeometry([0, 0], [40, 0], { headLength: 5 });
     expect(g.lineEnd[0]).toBeLessThan(40);
     expect(g.lineEnd[0]).toBeGreaterThan(40 - 5);
+  });
+  it('points the head down a diagonal and spreads it evenly about the line', () => {
+    const g = pathGeometry([0, 0], [10, 10], { headLength: 5 });
+    expect(g.angle).toBeCloseTo(Math.PI / 4, 5);
+    const [l, r] = g.head.map(([x, y]) => Math.atan2(g.tip[1] - y, g.tip[0] - x) - g.angle);
+    expect(l).toBeCloseTo(-r, 5);
+  });
+  it('keeps parallel paths into one target parallel and uncrossed after the edge stop', () => {
+    const rect = { x: 104, y: 30, w: 36, h: 40 };
+    const gs = [40, 50, 60].map((y) => pathGeometry([22, y], [122, y], { rect }));
+    expect(gs.every((g) => g.angle === 0 && g.tip[0] === 104)).toBe(true);
+    expect(crossings(gs.map((g) => [g.start, g.tip]))).toEqual([]);
   });
   it('keeps paths that share a direction from crossing', () => {
     const arrows = [[[0, 0], [40, 10]], [[0, 12], [40, 22]], [[0, 24], [40, 34]]].map(([a, b]) => {
@@ -97,6 +124,13 @@ describe('waveHeights', () => {
 });
 
 describe('Logo construction geometry', () => {
+  it('is the one source: neither drawing types the circle numbers itself', () => {
+    for (const file of ['src/assets/Logo/LogoConstruction.jsx', 'src/storybook-docs/illustrations/shapes.jsx']) {
+      const src = readFileSync(file, 'utf8');
+      expect(src).toMatch(/logoConstructionGeometry/);
+      expect(src).not.toMatch(/r="(48|36|16)"|r=\{(48|36|16)\}/);
+    }
+  });
   it('has the circles the mark is built on: outer 48, inner 36, centered in the 96 box', () => {
     expect(CIRCLES).toEqual([
       { cx: 48, cy: 48, r: CONSTRUCTION_RADII.outer },

@@ -20,7 +20,6 @@ const W = 560;
 const H = 460;
 const UNIT = MARK / 96;
 
-
 /** Labels in the outer drawing (mark at 396, so 4.125 px per unit) so they stay readable. */
 const LABELS = [
     [288, 40, '2u'],

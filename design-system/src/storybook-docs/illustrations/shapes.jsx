@@ -27,7 +27,7 @@ export const Timeline = ({ x, y, w, h, accent = false, playhead = 0.55 }) => {
   const lane = (h - 8) / 2;
   const track = (ty) => <Rect x={x} y={ty} w={w} h={lane} fill={PAINT.frameSunken} corner="shape" />;
   const t1 = y + 4;
-  const t2 = y + 4 + lane + 0;
+  const t2 = y + 4 + lane;
   const px = x + w * playhead;
   const mark = accent ? PAINT.accent : PAINT.annotation;
   const keys = [0.18, 0.4, 0.55, 0.82];
@@ -178,7 +178,7 @@ export const Path = ({ from, to, rect, accent = false }) => {
   const g = pathGeometry(from, to, { rect });
   return (
     <g data-shape="path">
-      <line x1={g.start[0]} y1={g.start[1]} x2={g.lineEnd[0]} y2={g.lineEnd[1]} stroke={color} style={{ strokeWidth: 'var(--stroke-1)' }} />
+      <line x1={g.start[0]} y1={g.start[1]} x2={g.lineEnd[0]} y2={g.lineEnd[1]} stroke={color} style={HAIRLINE} />
       <circle cx={g.start[0]} cy={g.start[1]} r={2.5} fill={PAINT.pageSurface} stroke={color} style={HAIRLINE} />
       <polygon points={`${g.tip.join(',')} ${g.head.map((p) => p.join(',')).join(' ')}`} fill={color} />
     </g>
@@ -197,9 +197,9 @@ export const SHAPE_SETS = [
     (a) => (
       <>
         <Rect x={104} y={30} w={36} h={40} fill={PAINT.shape} corner="shape" />
-        <Path from={[22, 36]} to={[104, 44]} rect={{ x: 104, y: 30, w: 36, h: 40 }} accent={a} />
-        <Path from={[22, 50]} to={[104, 52]} rect={{ x: 104, y: 30, w: 36, h: 40 }} />
-        <Path from={[22, 64]} to={[104, 62]} rect={{ x: 104, y: 30, w: 36, h: 40 }} />
+        <Path from={[22, 40]} to={[122, 40]} rect={{ x: 104, y: 30, w: 36, h: 40 }} accent={a} />
+        <Path from={[22, 50]} to={[122, 50]} rect={{ x: 104, y: 30, w: 36, h: 40 }} />
+        <Path from={[22, 60]} to={[122, 60]} rect={{ x: 104, y: 30, w: 36, h: 40 }} />
       </>
     ),
   ],

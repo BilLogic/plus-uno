@@ -28,20 +28,21 @@ export const springStills = ({ n = 9, step = 0.08, from, to, z, w }) =>
 
 /**
  * Where a path stops when it lands in `rect`: the point on the rectangle's edge
- * where the line from `from` toward the rectangle's center enters it. A start
- * already inside the rectangle returns `from`.
+ * where the line from `from` toward `aim` (the landing point, the rectangle's
+ * center by default) enters it. A start already inside the rectangle returns
+ * `from`.
  */
-export const stopAtEdge = (from, rect) => {
-  const cx = rect.x + rect.w / 2;
-  const cy = rect.y + rect.h / 2;
-  const dx = cx - from[0];
-  const dy = cy - from[1];
-  if (from[0] >= rect.x && from[0] <= rect.x + rect.w && from[1] >= rect.y && from[1] <= rect.y + rect.h) return from;
-  // Fraction of the way to the center at which the line crosses each side.
+export const stopAtEdge = (from, rect, aim = [rect.x + rect.w / 2, rect.y + rect.h / 2]) => {
+  const dx = aim[0] - from[0];
+  const dy = aim[1] - from[1];
+  if (onRect(from[0], from[1], rect)) return from;
+  // Fractions of the way to `aim` at which the line crosses each side, kept to those that land on the rectangle.
   const ts = [];
   if (dx !== 0) ts.push((rect.x - from[0]) / dx, (rect.x + rect.w - from[0]) / dx);
   if (dy !== 0) ts.push((rect.y - from[1]) / dy, (rect.y + rect.h - from[1]) / dy);
-  const t = Math.min(...ts.filter((v) => v >= 0 && v <= 1 && onRect(from[0] + dx * v, from[1] + dy * v, rect)));
+  const hits = ts.filter((v) => v >= 0 && onRect(from[0] + dx * v, from[1] + dy * v, rect));
+  if (!hits.length) return from;
+  const t = Math.min(...hits);
   return [from[0] + dx * t, from[1] + dy * t];
 };
 
@@ -50,11 +51,11 @@ const onRect = (x, y, r) => x >= r.x - 1e-9 && x <= r.x + r.w + 1e-9 && y >= r.y
 /**
  * The geometry of one path: a ring at `start`, a line, and an arrowhead whose
  * tip is at `tip` and points along `angle`. With a target `rect` the tip stops
- * at its edge, not at its center. The line ends where the head's base begins
+ * at its edge, on the line toward `to`. The line ends where the head's base begins
  * (`headLength` back from the tip) so the stroke never pokes through the point.
  */
 export const pathGeometry = (from, to, { rect, headLength = 5, spread = 0.5 } = {}) => {
-  const tip = rect ? stopAtEdge(from, rect) : to;
+  const tip = rect ? stopAtEdge(from, rect, to) : to;
   const angle = Math.atan2(tip[1] - from[1], tip[0] - from[0]);
   const back = (a) => [tip[0] - headLength * Math.cos(angle + a), tip[1] - headLength * Math.sin(angle + a)];
   const base = [tip[0] - headLength * Math.cos(angle) * 0.8, tip[1] - headLength * Math.sin(angle) * 0.8];
