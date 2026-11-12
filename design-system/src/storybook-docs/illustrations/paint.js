@@ -18,6 +18,9 @@ export const PAINT = {
   blanket: ds('blanket'),
   accent: ds('background-brand-bold'),
   accentTint: ds('background-brand-subtlest'),
+  // Button labels: the same text tokens the real Button uses.
+  onAccent: ds('text-inverse'),
+  label: ds('text-subtlest'),
 };
 
 /** Corners, from the radius tokens (SVG reads them as user units). */

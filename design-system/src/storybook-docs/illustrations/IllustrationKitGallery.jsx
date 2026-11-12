@@ -16,7 +16,7 @@ const SETS = [
   ['Card', (a) => <Card x={46} y={16} w={68} h={68} accent={a} />],
   ['Row', (a) => (<><Row x={16} y={30} w={128} /><Row x={16} y={44} w={128} accent={a} /><Row x={16} y={58} w={128} /></>)],
   ['Field', (a) => (<><Field x={30} y={28} w={100} accent={a} /><Field x={30} y={54} w={100} /></>)],
-  ['Button', (a) => (<><ButtonShape x={38} y={44} w={40} /><ButtonShape x={82} y={44} w={40} accent={a} primary /></>)],
+  ['Button', (a) => (<><ButtonShape x={38} y={44} w={40} /><ButtonShape x={82} y={44} w={40} appearance={a ? 'primary' : 'default'} /></>)],
   ['Popup', (a) => (<><ButtonShape x={20} y={18} w={40} /><Popup x={20} y={34} w={80} h={48} accent={a} /></>)],
   ['Panel', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Panel x={96} y={20} w={54} h={72} accent={a} /></>)],
   ['Modal and backdrop', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Backdrop x={10} y={20} w={140} h={72} /><Modal x={34} y={32} w={92} h={52} accent={a} /></>)],

@@ -136,12 +136,21 @@ export const Field = ({ x, y, w, accent = false }) => (
   </g>
 );
 
-export const ButtonShape = ({ x, y, w, accent = false, primary = false }) => (
-  <g>
-    <Rect x={x} y={y} w={w} h={12} fill={primary ? (accent ? PAINT.accent : PAINT.ink) : PAINT.neutral} corner="sm" />
-    <SkeletonBar x={x + w * 0.25} y={y + 4} w={w * 0.5} tone={primary ? PAINT.surface : PAINT.skeleton} />
-  </g>
-);
+/**
+ * A Button, drawn only in appearances PLUS ships. `primary` is the brand fill,
+ * so it is the drawing's accent: draw it only on the subject. Every other
+ * button is `default` (neutral fill). The label is a thin bar in the real
+ * Button's text token, so it reads as a word rather than a block.
+ */
+export const ButtonShape = ({ x, y, w, appearance = 'default' }) => {
+  const primary = appearance === 'primary';
+  return (
+    <g>
+      <Rect x={x} y={y} w={w} h={12} fill={primary ? PAINT.accent : PAINT.neutral} corner="sm" />
+      <SkeletonBar x={x + w * 0.3} y={y + 5} w={w * 0.4} h={2} tone={primary ? PAINT.onAccent : PAINT.label} />
+    </g>
+  );
+};
 
 export const Popup = ({ x, y, w, h, accent = false }) => (
   <g>
@@ -175,7 +184,7 @@ export const Modal = ({ x, y, w, h, accent = false }) => {
     <SkeletonBar x={x + 10} y={y + 33} w={w * 0.6} />
     <Rule x1={x} x2={x + w} y1={y + h - 22} y2={y + h - 22} />
     <ButtonShape x={x + w - 14 - 2 * bw} y={y + h - 16} w={bw} />
-    <ButtonShape x={x + w - 10 - bw} y={y + h - 16} w={bw} accent={accent} primary />
+    <ButtonShape x={x + w - 10 - bw} y={y + h - 16} w={bw} appearance={accent ? 'primary' : 'default'} />
   </g>
   );
 };

@@ -14,17 +14,17 @@ export const ThreeLayers = ({
   title = 'The same primary button as a component, inside a Section template, and placed on a Frame by a pattern',
 }) => (
   <Illustration width={312} height={132} viewBox="12 14 312 132" title={title}>
-    <ButtonShape x={28} y={74} w={48} accent primary />
+    <ButtonShape x={28} y={74} w={48} appearance="primary" />
     <Link x1={92} x2={112} y={80} />
     <Section x={118} y={50} w={84} h={60} rows={2} />
     <ButtonShape x={130} y={94} w={28} />
-    <ButtonShape x={162} y={94} w={28} accent primary />
+    <ButtonShape x={162} y={94} w={28} appearance="primary" />
     <Link x1={214} x2={234} y={80} />
     <Rect x={236} y={30} w={72} h={100} fill={PAINT.sunken} stroke={PAINT.line} corner="md" />
     <Section x={242} y={38} w={60} h={40} rows={1} />
-    <ButtonShape x={270} y={64} w={26} accent primary />
+    <ButtonShape x={270} y={64} w={26} appearance="primary" />
     <Section x={242} y={84} w={60} h={40} rows={1} />
-    <ButtonShape x={270} y={110} w={26} primary />
+    <ButtonShape x={270} y={110} w={26} />
   </Illustration>
 );
 
