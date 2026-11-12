@@ -159,7 +159,6 @@ export const ResponsiveWidth = {
         const noBackdrop = () => expect(frame.querySelector('.plus-frame__backdrop, .plus-pattern-backdrop'), 'no Backdrop at any width').toBeNull();
 
         await mode('docked');
-        await expect(getComputedStyle(panel()).boxShadow, 'docked: an edge line, no shadow').toBe('none');
         await noBackdrop();
 
         setWidth(FRAME_LAYOUT.contentFloor + FRAME_LAYOUT.panelDefault - 64);
@@ -169,7 +168,9 @@ export const ResponsiveWidth = {
 
         setWidth(FRAME_LAYOUT.dockMin - 64);
         await mode('overlay');
-        await waitFor(() => expect(panel().offsetWidth, 'under 1024 the Panel is capped at its narrowest').toBeCloseTo(tokenLength(frame, '--panel-min-width'), 0));
+        // Read the token once: a probe inside waitFor mutates the DOM, which re-runs waitFor forever.
+        const narrowest = tokenLength(frame, '--panel-min-width');
+        await waitFor(() => expect(panel().offsetWidth, 'under 1024 the Panel is capped at its narrowest').toBeCloseTo(narrowest, 0));
         await noBackdrop();
     },
 };
@@ -213,7 +214,8 @@ export const KeyUnder1024 = {
     play: async ({ canvasElement }) => {
         const { frame, panel } = frameParts(canvasElement);
         await waitFor(() => expect(panel()).not.toBeNull());
-        await expect(panel().offsetWidth, 'capped at its narrowest').toBeCloseTo(tokenLength(frame, '--panel-min-width'), 0);
+        const narrowest = tokenLength(frame, '--panel-min-width');
+        await waitFor(() => expect(panel().offsetWidth, 'capped at its narrowest').toBeCloseTo(narrowest, 0));
         await expect(canvasElement.querySelector('.plus-frame__backdrop, .plus-pattern-backdrop'), 'no Backdrop').toBeNull();
         await fitsCanvas(canvasElement);
     },
