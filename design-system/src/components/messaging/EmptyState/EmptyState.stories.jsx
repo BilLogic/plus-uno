@@ -159,6 +159,64 @@ InATable.play = async ({ canvasElement }) => {
     await expect(canvas.getByRole('button', { name: 'Add student' })).toBeVisible();
 };
 
+/* ------------------------------------------------------------------- errors */
+
+/** Content that fails to load takes the slot with what happened and a filled Try again. */
+export const LoadFailure = () => (
+    <EmptyState
+        icon="circle-exclamation"
+        header="Couldn't load sessions"
+        description="Check your connection and try again."
+        primaryAction={<Button text="Try again" appearance="primary" />}
+    />
+);
+
+LoadFailure.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { name: "Couldn't load sessions" }), 'header says what failed').toBeVisible();
+    await expect(canvas.getAllByRole('button').map((b) => b.textContent.trim()), 'Try again is the one action').toEqual(['Try again']);
+    await expect(canvasElement.querySelector('.plus-empty-state__icon').getAttribute('aria-hidden'), 'icon is decorative').toBe('true');
+};
+
+/** No access uses the same slot: the plain reason and who can help, with no action to retry. */
+export const NoAccess = () => (
+    <EmptyState
+        icon="lock"
+        header="You don't have access to this view"
+        description="Only supervisors can see session notes. Ask your supervisor to add you."
+    />
+);
+
+NoAccess.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { name: "You don't have access to this view" })).toBeVisible();
+    await expect(canvas.getByText(/Ask your supervisor/), 'says who can help').toBeVisible();
+    await expect(canvas.queryByRole('button'), 'nothing to retry').toBeNull();
+};
+
+/** A table body that fails to load keeps its header row, like an empty one. */
+export const LoadFailureInATable = () => (
+    <Table
+        headers={['Student', 'Grade', 'Sessions']}
+        rows={[]}
+        emptyState={(
+            <EmptyState
+                spacing="compact"
+                icon="circle-exclamation"
+                header="Couldn't load students"
+                description="Check your connection and try again."
+                primaryAction={<Button text="Try again" appearance="primary" spacing="compact" />}
+            />
+        )}
+    />
+);
+
+LoadFailureInATable.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('columnheader', { name: 'Student' }), 'header stays').toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Try again' })).toBeVisible();
+};
+
 /* --------------------------------------------------------------- playground */
 
 export const Interactive = (args) => <EmptyState {...args} />;

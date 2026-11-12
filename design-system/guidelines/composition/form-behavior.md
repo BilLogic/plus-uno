@@ -48,15 +48,23 @@ const [submitFailed, setSubmitFailed] = useState(false);
 The submit button stays enabled. When a submit fails:
 
 1. Run every check, and show each error on its own field.
-2. Put an **error summary** at the top of the form: an `Alert` with
-   `style="danger"`, `dismissible={false}`, a title such as "Fix 2 fields to
+2. Put an **error summary** at the top of the form: a `SectionMessage` with
+   `appearance="danger"`, `dismissible={false}`, a title such as "Fix 2 fields to
    continue", and one link per error that moves focus to that field's `id`.
 3. Move focus to the **first invalid field**, and scroll it into view.
 
 The summary is a table of contents for the errors, and each field still
-carries its own message — `../components/messaging.md` explains why an `Alert`
-alone makes the person hunt. Focus does the announcing, so the errors need no
-live region.
+carries its own message — `../components/messaging.md` explains why a
+`SectionMessage` alone makes the person hunt. Focus does the announcing, so the
+errors need no live region.
+
+A submit the server rejects follows the same rule: the danger `SectionMessage`
+at the top of the form says what was refused, and each field the server names
+shows its own error. A failure the person did not cause, such as the request
+never arriving, is a danger `SectionMessage` with a Try again action, and the
+fields keep their values. A background failure outside the form is an error
+`Flag` that stays until closed, with Try again. A view that fails to load is an
+`EmptyState` with Try again, not a message above the form.
 
 While the submit is in flight, put `loading` on the submit `Button` and leave
 the fields as they are.
@@ -103,7 +111,7 @@ disabled and visible, never hidden.
 
 A permission split — an admin edits a profile, a tutor views it — is read-only.
 After a submit that fails on permission, the form turns read-only and says
-why in an `Alert`, keeping the values readable.
+why in a `SectionMessage`, keeping the values readable.
 
 The prop is spelled per component: `isReadOnly` on `TextField`, `TextArea`,
 `Checkbox`, `Radio`, `Switch`, `RadioGroup` and `ChoiceGrid`; `readonly` on
@@ -162,5 +170,5 @@ needs one of them stays standard throughout.
 
 - `forms.md` — how the fields compose on a surface
 - `../components/forms-and-inputs.md` — which component to reach for
-- `../components/messaging.md` — field errors vs an `Alert`
+- `../components/messaging.md` — field errors vs a `SectionMessage`
 - `../../src/styles/Accessibility.mdx` — the WCAG bar
