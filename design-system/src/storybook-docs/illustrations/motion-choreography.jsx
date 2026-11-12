@@ -397,7 +397,7 @@ const bpScene = ({ id, title, caption, lags }) => ({
   draw: ({ w, shown, blend }) => (
     <>
       <g opacity={blend}>
-        <ReflowScreen width={shown} />
+        <ReflowScreen width={shown} neutral />
       </g>
       <Pointer x={8 + w / 8} y={52} />
     </>

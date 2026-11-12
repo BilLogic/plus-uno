@@ -97,7 +97,7 @@ const REFLOW = {
  * side from 960 of its own width), not a restated copy.
  */
 /** The drawing inside the canvas, without its wrapper, so a motion scene can animate between widths. */
-export const ReflowScreen = ({ width = 1280 }) => {
+export const ReflowScreen = ({ width = 1280, neutral = false }) => {
   const { sidebar } = REFLOW[width];
   const box = { x: 8, y: 6, w: width / 8, h: 100 };
   const { content } = screenLayout({ ...box, sidebar });
@@ -106,8 +106,8 @@ export const ReflowScreen = ({ width = 1280 }) => {
   const split = sidebar === 'docked';
   const mainW = split ? body.w * 0.62 : body.w;
   return (
-    <Screen {...box} sidebar={sidebar} accentSidebar={sidebar === 'overlay'}>
-      <Section x={body.x} y={body.y} w={mainW} h={body.h} rows={2} accent={sidebar !== 'overlay'} />
+    <Screen {...box} sidebar={sidebar} accentSidebar={!neutral && sidebar === 'overlay'}>
+      <Section x={body.x} y={body.y} w={mainW} h={body.h} rows={2} accent={!neutral && sidebar !== 'overlay'} />
       {split && <Section x={body.x + mainW + 6} y={body.y} w={body.w - mainW - 6} h={body.h} rows={2} subtle />}
     </Screen>
   );
