@@ -34,6 +34,50 @@ export const MOTION_EASINGS = {
 };
 
 /**
+ * Motion springs (ADR-041). Primitives are raw springs, mass 1, named by
+ * stiffness with the damping ratio appended as `-r<percent>` only when it is
+ * not 1. Components never read a primitive; they read a semantic below. The
+ * numbers are the motion table in the motion docs, fixed.
+ *
+ * `kind: 'exit'` aims 3.8x past the edge and is cut where it reaches it;
+ * `kind: 'loop'` has no damping and alternates over half its period.
+ */
+export const SPRING_PRIMITIVES = [
+  { name: '880', stiffness: 880, ratio: 1 },
+  { name: '440', stiffness: 440, ratio: 1 },
+  { name: '190', stiffness: 190, ratio: 1 },
+  { name: '3800', stiffness: 3800, ratio: 1 },
+  { name: '1600', stiffness: 1600, ratio: 1 },
+  { name: '800', stiffness: 800, ratio: 1 },
+  { name: '800-r60', stiffness: 800, ratio: 0.6 },
+  { name: '380-r80', stiffness: 380, ratio: 0.8 },
+  { name: '200-r80', stiffness: 200, ratio: 0.8 },
+  { name: '25', stiffness: 25, ratio: 1, kind: 'exit', aim: 3.8 },
+  { name: '27-r0', stiffness: 27.4, ratio: 0, kind: 'loop' },
+];
+
+/**
+ * Motion semantics: `motion.<family>.<speed>`, written `--ds-motion-<family>-<speed>`
+ * (an easing) with `-duration` beside it (its settle time). `productive` and
+ * `expressive` name a primitive each; Expressive is re-declared under the
+ * `expressive` container attribute, and only where it differs. Reduced turns
+ * every spatial semantic into `appearance.fast` (`REDUCED_FADE`).
+ */
+export const MOTION_SEMANTICS = [
+  { name: 'spatial.fast', productive: '880', expressive: '800-r60', use: 'Small things over short distances: a toggle thumb, a Popup, a row, a tab indicator.' },
+  { name: 'spatial.default', productive: '440', expressive: '380-r80', use: 'Mid-size layers over short travel: a Modal, a Flag, the Sidebar opening, content changing in place.' },
+  { name: 'spatial.slow', productive: '190', expressive: '200-r80', use: 'Large layers and long travel: a Drawer, a docking Panel, a whole page that slides.' },
+  { name: 'appearance.fast', productive: '3800', use: 'The quickest fade and color change; also what every spatial token becomes in Reduced motion.' },
+  { name: 'appearance.default', productive: '1600', use: 'A fade or color change at default weight.' },
+  { name: 'appearance.slow', productive: '800', use: 'A deliberate fade, such as a large surface appearing.' },
+  { name: 'spatial.exit', productive: '25', use: 'A thing that is gone for good, leaving on the system\'s say, or thrown by the hand.' },
+  { name: 'loop', productive: '27-r0', use: 'Work in progress: loading, thinking, typing. Alternating, one cycle every 1.2 s.' },
+];
+
+/** The semantic every spatial token becomes under `prefers-reduced-motion`. */
+export const REDUCED_FADE = 'appearance.fast';
+
+/**
  * THE FOUR-TIER LADDER (#1756, Bill 2026-11-04: "clean up both token on figma
  * and in code and fully align the two"). One plan, one row per token, most
  * general tier to most specific: primitives -> semantics -> patterns ->

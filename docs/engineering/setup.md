@@ -10,7 +10,7 @@ Implementation requirements only. For design rules, load `design-system/guidelin
 
 ## Stack
 
-- React, built with Vite, documented in Storybook. No Bootstrap (ADR-041).
+- React, built with Vite, documented in Storybook. No Bootstrap (ADR-042).
 - SCSS with design tokens from `design-system/src/tokens/`.
 - Every interactive component's behavior is built on Base UI (`@base-ui/react`, headless), styled on `--ds-*` tokens — ADR-037, widening the AI-only scope ADR-036 set.
 - Versions live in `package.json` and nowhere else — read them there rather than from a doc that goes stale on the next bump.

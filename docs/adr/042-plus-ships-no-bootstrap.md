@@ -5,7 +5,7 @@ status: active
 verified: 2026-11-11
 ---
 
-# ADR-041: PLUS ships no Bootstrap (2026-11-11)
+# ADR-042: PLUS ships no Bootstrap (2026-11-11)
 
 **Decision.** PLUS uses no Bootstrap. `bootstrap` and `react-bootstrap` leave
 `package.json` and the design system's peer ranges; the Bootstrap CSS layer
