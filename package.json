@@ -22,6 +22,7 @@
     "generate:icon-lists": "node scripts/generate-icon-lists.mjs",
     "generate:brand-image": "node scripts/generate-brand-image.js",
     "generate:agent": "node scripts/generate-agent.js",
+    "generate:docs-agent-files": "node scripts/generate-docs-agent-files.mjs",
     "generate:agent-views": "node scripts/generate-cheat-sheet.js && node scripts/generate-knowledge-components.js",
     "generate:component-registry": "node scripts/generate-component-registry-from-storybook.js",
     "generate:figma-links": "node scripts/generate-figma-links-spreadsheet.js",
