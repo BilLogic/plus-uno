@@ -2,7 +2,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { FoundationHero, FoundationContents, FoundationSection } from '@/storybook-docs/foundation-page.jsx';
 import { IllustrationKitGallery } from '@/storybook-docs/illustrations/IllustrationKitGallery.jsx';
 import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
-import { ThreeLayers, OpeningARecord } from '@/storybook-docs/illustrations/compositions.jsx';
+import { ThreeLayers, OpeningARecord, ResponsiveReflow } from '@/storybook-docs/illustrations/compositions.jsx';
 
 <Meta title="Get started/Illustration kit" tags={['!dev']} />
 
@@ -16,7 +16,7 @@ import { ThreeLayers, OpeningARecord } from '@/storybook-docs/illustrations/comp
 
 <FoundationSection title="Drawing rules">
 
-- Paint with design-system tokens only: color, stroke and corner. The kit follows light and dark on its own.
+- Paint with design-system tokens only: color, stroke and corner. Each part uses the token its real component uses for that role, from the role map in `paint.js`. The kit follows light and dark on its own.
 - Pick each example's fidelity by what the lesson depends on. Remove every word in your head: if the lesson still holds, draw it abstract.
   - **Concrete:** the lesson is a component's look, states, behavior or wording, such as anatomy, states, content do's and don'ts, or an interaction. Use a live story with real content, not a drawing.
   - **Real subject:** the lesson is one element inside a screen, such as which action is primary, a label, or one piece's placement. Draw that element real, with its words, and keep everything around it blocked out.
@@ -31,7 +31,7 @@ import { ThreeLayers, OpeningARecord } from '@/storybook-docs/illustrations/comp
 
 <FoundationSection title="Primitives">
 
-Each primitive takes a position, a size and an `accent` flag. The top drawing is neutral and the bottom one is accented. Button shows its two fidelities instead: blocked out on top, real below.
+Each primitive takes a position, a size and an `accent` flag. Every part paints with the token its real component uses: a card with the raised surface and shadow, a text line with the Skeleton bar, a Flag with the overlay shadow. The top drawing is neutral and the bottom one is accented. Button shows its two fidelities instead: blocked out on top, real below. Screen is a Frame, a Sidebar and a Page, with the Sidebar docked, an overlay or none. Flag's `tone` is neutral, success, warning, danger or info (the accented drawing shows success). Tabs, Breadcrumb and Progress tracker take a `count`; Tabs also takes `selected` and Progress tracker `current`.
 
 <IllustrationKitGallery />
 
@@ -45,6 +45,18 @@ Each primitive takes a position, a size and an `accent` flag. The top drawing is
 
 <IllustrationFigure caption="Opening a record, lightest to heaviest: popup, panel, modal, page. Pick the lowest step that fits.">
     <OpeningARecord />
+</IllustrationFigure>
+
+<IllustrationFigure caption="Frame 1280 wide: the Sidebar is docked and the Section keeps its side column beside the body.">
+    <ResponsiveReflow width={1280} />
+</IllustrationFigure>
+
+<IllustrationFigure caption="Frame 960 wide: below 1024 the Sidebar collapses, and the Section is under 960 of its own width, so its side column drops out.">
+    <ResponsiveReflow width={960} />
+</IllustrationFigure>
+
+<IllustrationFigure caption="Frame 768 wide: a Sidebar opened by hand floats on a Backdrop over the same single column.">
+    <ResponsiveReflow width={768} />
 </IllustrationFigure>
 
 </FoundationSection>
