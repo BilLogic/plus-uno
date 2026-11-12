@@ -34,8 +34,7 @@ The picked row stays highlighted on the page while the Panel is open.
 Picking an item opens its page behind the Panel and marks it read. The Inbox stays open.
 
 1. **Header.** The title, a filter (Unread, All, Mentions), Archive all and Close.
-2. **Unread dot.** Paired with the word "unread" for a screen reader.
-3. **Items.** Avatar, who did what and where, a one-line excerpt and the time.
+2. **Items.** Avatar, who did what and where, a one-line excerpt and the time. An unread item ends in a dot, paired with the word "unread" for a screen reader.
 
 The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with the Sidebar and is Planned with the Inbox's placement.
 

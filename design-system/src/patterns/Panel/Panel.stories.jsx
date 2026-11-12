@@ -111,8 +111,7 @@ export const AnatomyDetails = {
 
 const ANATOMY_INBOX_PARTS = [
     { selector: '.plus-panel-header', label: 'Header', side: 'end', at: 'middle' },
-    { selector: '[data-probe="unread"]', label: 'Unread dot', side: 'end', at: 'start' },
-    { selector: '[data-probe="body"] ul', label: 'Items', side: 'end', at: 'end' },
+    { selector: '[data-probe="body"] ul', label: 'Items', side: 'end', at: 'middle' },
 ];
 
 export const AnatomyNotifications = {
