@@ -2,7 +2,7 @@
 
 # Backdrop
 
-The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). With `placement` `start` or `end` it drops the pad and holds its child full height at that edge of the screen, for a drawer. A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token; PatternDrawer brings its own focus handling.
+The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token.
 
 Also asked as: scrim.
 
@@ -10,7 +10,7 @@ Also asked as: scrim.
 
 **Source:** `design-system/src/patterns/Backdrop/Backdrop.jsx`
 
-**Stories:** `design-system/src/patterns/Backdrop/Backdrop.stories.jsx` — Inline, ConfirmOverPanel, Layers, Pads, ScreenGrid, Placements, PlacementCenter, PlacementEnd, PlacementStart, Interactive
+**Stories:** `design-system/src/patterns/Backdrop/Backdrop.stories.jsx` — Inline, ConfirmOverPanel, Layers, Pads, ScreenGrid, Interactive
 
 **Storybook page:** `design-system/src/patterns/Backdrop/Backdrop.mdx`
 
@@ -23,9 +23,8 @@ A Backdrop interrupts the page for one task. It dims everything behind it with o
 | Layer | When to use |
 | --- | --- |
 | Modal | One task blocks the page. The Backdrop centers it. |
-| Edge layer | A full-height layer the Backdrop holds at an edge. A Panel is the way forward: it floats with no Backdrop. |
 
-The Backdrop draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
+A task that keeps the page in view is a Panel, which floats with no Backdrop. The Backdrop draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
 
 ### Layers
 
@@ -90,7 +89,7 @@ Let the Backdrop place the modal. Do not detach it to move things around: the pa
 - [Popup](?path=/docs/templates-popup-popup--docs): use when the layer floats off a trigger and the page stays usable, with no Backdrop.
 - [Frame](?path=/docs/templates-frame-frame--docs) shows the floating Sidebar and the floating AI panel, which take a shadow and no backdrop.
 
-Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 
@@ -129,20 +128,13 @@ The Backdrop holds no text of its own. The words belong to the layer it holds.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `placement` | enum | `'center'` | `center` (default) for a modal; `start` or `end` holds the layer full height at that edge, with no pad. |
 | `inline` | bool | `false` | Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page. |
 | `screenWidth` | number | — | Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the overlay Panel's Backdrop over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones. |
 | `screenHeight` | number | — | Inline only: the screen height (px); a layer inside caps at it less Backdrop/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do. |
 | `onBackdropClick` | func | — | Called for a click on the backdrop, not on the layer it holds. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
-| `children` | node | — | The layer it holds: a PatternModal, a confirm over one, or a drawer at an edge. |
-
-## Variants
-
-**`placement`** — `center` · `start` · `end`
-
-The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
+| `children` | node | — | The layer it holds: a PatternModal, or a confirm over one. |
 
 ## Tokens touched
 

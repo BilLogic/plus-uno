@@ -13,8 +13,8 @@ import {
 } from './overlay';
 
 const opened = [];
-const open = (kind) => {
-    const handle = openOverlay(kind);
+const open = () => {
+    const handle = openOverlay();
     if (handle) opened.push(handle);
     return handle;
 };
@@ -25,84 +25,50 @@ afterEach(() => {
 });
 
 describe('openOverlay', () => {
-    it('stacks two overlays: a modal (or drawer) and the confirm it raises', () => {
-        expect(open()).not.toBeNull();
-        expect(open()).not.toBeNull();
-        expect(openOverlayCount()).toBe(2);
-    });
-
-    it('refuses a third and warns in development', () => {
-        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        open();
-        open();
-        expect(open()).toBeNull();
-        expect(openOverlayCount()).toBe(2);
-        expect(warn).toHaveBeenCalledTimes(1);
-        expect(warn.mock.calls[0][0]).toMatch(/At most 2 overlays stack/);
-    });
-
-    it('frees a place when one closes, and a release is idempotent', () => {
-        vi.spyOn(console, 'warn').mockImplementation(() => {});
-        open();
-        const second = open();
-        second.release();
-        second.release();
-        expect(openOverlayCount()).toBe(1);
-        expect(open()).not.toBeNull();
-        expect(openOverlayCount()).toBe(2);
-    });
-});
-
-describe('a Modal never opens on another Modal', () => {
     it('refuses a Modal while one is open, and warns in development', () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        expect(open('modal')).not.toBeNull();
-        expect(open('modal')).toBeNull();
+        expect(open()).not.toBeNull();
+        expect(open()).toBeNull();
         expect(openOverlayCount()).toBe(1);
+        expect(warn).toHaveBeenCalledTimes(1);
         expect(warn.mock.calls[0][0]).toMatch(/never opens on another Modal/);
     });
 
-    it('lets a confirm Modal open over a drawer, and over nothing else that holds a slot', () => {
-        expect(open('drawer')).not.toBeNull();
-        expect(open('modal')).not.toBeNull();
-        expect(openOverlayCount()).toBe(2);
-    });
-
-    it('lets a Modal open again once the first closes', () => {
-        const first = open('modal');
+    it('lets a Modal open again once the first closes, and a release is idempotent', () => {
+        const first = open();
         first.release();
-        expect(open('modal')).not.toBeNull();
+        first.release();
+        expect(openOverlayCount()).toBe(0);
+        expect(open()).not.toBeNull();
+        expect(openOverlayCount()).toBe(1);
     });
 
     it('refuses the second Modal through the hook and calls onRefused', () => {
         vi.spyOn(console, 'warn').mockImplementation(() => {});
-        open('modal');
+        open();
         const onRefused = vi.fn();
-        const { result } = renderHook(() => useOverlaySlot(true, onRefused, 'modal'));
+        const { result } = renderHook(() => useOverlaySlot(true, onRefused));
         expect(result.current[0]).toBe(false);
         expect(onRefused).toHaveBeenCalledTimes(1);
     });
 });
 
 describe('subscribeOverlays', () => {
-    it('tells a subscriber when an overlay opens and closes, with the count', () => {
+    it('tells a subscriber when a Modal opens and closes, with the count', () => {
         const events = [];
         const unsubscribe = subscribeOverlays((event) => events.push(event));
         const first = open();
-        open();
         first.release();
         unsubscribe();
         open();
         expect(events).toEqual([
             { type: 'open', count: 1 },
-            { type: 'open', count: 2 },
-            { type: 'close', count: 1 },
+            { type: 'close', count: 0 },
         ]);
     });
 
-    it('says nothing for a refused overlay', () => {
+    it('says nothing for a refused Modal', () => {
         vi.spyOn(console, 'warn').mockImplementation(() => {});
-        open();
         open();
         const events = [];
         const unsubscribe = subscribeOverlays((event) => events.push(event));
@@ -161,15 +127,14 @@ describe('useOverlaySlot', () => {
         expect(openOverlayCount()).toBe(0);
     });
 
-    it('refuses a third slot and calls onRefused, leaving the caller unplaced', () => {
+    it('refuses a second slot and calls onRefused, leaving the caller unplaced', () => {
         vi.spyOn(console, 'warn').mockImplementation(() => {});
-        open();
         open();
         const onRefused = vi.fn();
         const { result } = renderHook(() => useOverlaySlot(true, onRefused));
         expect(result.current[0]).toBe(false);
         expect(onRefused).toHaveBeenCalledTimes(1);
-        expect(openOverlayCount()).toBe(2);
+        expect(openOverlayCount()).toBe(1);
     });
 
     it('takes no slot while inactive', () => {

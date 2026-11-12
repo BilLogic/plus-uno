@@ -85,13 +85,12 @@ function useOverflows(el, loading) {
  * moves focus inside and keeps it there, the page behind is hidden from
  * assistive tech and stops scrolling, Escape and a press on the backdrop close
  * it, and closing returns focus to what had it. It takes a stack slot from the
- * shared overlay module (`@/lib/overlay`) alongside `PatternDrawer`: at most
- * two stack, a third stays closed and calls `onClose`.
+ * shared overlay module (`@/lib/overlay`): a second Modal stays closed and
+ * calls `onClose`.
  *
  * A follow-up about the dialog itself — "discard these edits?" — is best
  * shown in place: the caller swaps `title`, `body` and the footer buttons,
- * driven by its own state. A confirm raised as a second Modal is allowed too;
- * it is the most that stacks.
+ * driven by its own state. A Modal never opens on another Modal.
  */
 const Modal = ({
     id,
@@ -132,7 +131,7 @@ const Modal = ({
     const descriptionId = useId();
     const [bodyEl, setBodyEl] = useState(null);
 
-    const [placed, trigger] = useOverlaySlot(show && renderAs === 'modal', onClose, 'modal');
+    const [placed, trigger] = useOverlaySlot(show && renderAs === 'modal', onClose);
     const visible = renderAs === 'inline' ? show : show && placed;
 
     const hasFooter = showBottomButtons && Boolean(footer || primaryButton || secondaryButton);

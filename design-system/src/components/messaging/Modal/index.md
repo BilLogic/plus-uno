@@ -2,7 +2,7 @@
 
 # Modal
 
-Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Backdrop`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the backdrop close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `PatternDrawer`: at most two stack, a third stays closed and calls `onClose`. A follow-up about the dialog itself — "discard these edits?" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A confirm raised as a second Modal is allowed too; it is the most that stacks.
+Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Backdrop`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the backdrop close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`): a second Modal stays closed and calls `onClose`. A follow-up about the dialog itself — "discard these edits?" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A Modal never opens on another Modal.
 
 Also asked as: confirm, confirmation dialog, destructive confirm, popup window, modal dialog.
 
@@ -61,7 +61,7 @@ Modal reads these motion tokens and no literal duration or curve.
 
 - For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
 - For a task that takes more than a screen or has sections, use `Frame`: the focused template, with no sidebar.
-- For a task that keeps the page in view, use `PatternDrawer`: a row's details, filters, a short edit.
+- For a task that keeps the page in view, use `Panel`, floating: a row's details, filters, a short edit.
 - For a small aside anchored to a control, use `Popup`.
 - For a list of actions or a value to pick, use `DropdownMenu` or `Select`.
 

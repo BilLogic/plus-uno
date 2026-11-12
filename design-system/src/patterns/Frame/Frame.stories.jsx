@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Breadcrumb, Button, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, TextField } from '@/components';
-import { Frame, PANEL_STORAGE_KEY, PatternDrawer, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
+import { Frame, PANEL_STORAGE_KEY, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy, ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
@@ -1378,7 +1378,7 @@ export const SectionDetailSplitterKeepsSplitAt1440 = {
  * `act` does once, after mount, what a person does: hover the left edge
  * (`peek-sidebar`), press the toggle (`open-sidebar`) or hover the right edge
  * (`peek-panel`). The Panel is controlled open where a state needs it. A
- * modal or drawer opens after `act`, so it meets the Sidebar the act left.
+ * modal opens after `act`, so it meets the Sidebar the act left.
  */
 const STATE_PEEK = 'peek-sidebar';
 const STATE_OPEN = 'open-sidebar';
@@ -1415,11 +1415,6 @@ const FrameState = ({ act, overlay, ...args }) => {
                     primaryButton={{ text: 'Done', onClick: close }}
                     onClose={close}
                 />
-            ) : null}
-            {overlay === 'drawer' ? (
-                <PatternDrawer open={overlayOpen} width="sm" title="Session details" description="Thursday · 4:00–5:00 PM" onClose={close}>
-                    {slot('Drawer content')}
-                </PatternDrawer>
             ) : null}
         </div>
     );
@@ -1532,11 +1527,6 @@ export const StateWithModal = frameState(1440, { panel: statePanel, panelOpen: t
 export const StateModalClosesFloating = frameState(768, { act: STATE_OPEN, overlay: 'modal' }, async (p, { canvasElement }) => {
     await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
     await waitFor(() => expect(p.coveredSidebar(), 'the floating Sidebar closed').toBeNull());
-});
-
-/** A drawer over the Frame at 1024, on its own Backdrop. */
-export const StateWithDrawer = frameState(1024, { overlay: 'drawer' }, async (p, { canvasElement }) => {
-    await expect(await within(canvasElement.ownerDocument.body).findByRole('dialog', { name: 'Session details' })).toBeTruthy();
 });
 
 /** The Frame at each layout mode. */

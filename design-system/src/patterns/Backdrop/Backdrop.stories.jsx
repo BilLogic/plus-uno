@@ -1,8 +1,8 @@
 import React from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
-import Backdrop, { BACKDROP_PLACEMENTS } from '@/patterns/Backdrop';
+import Backdrop from '@/patterns/Backdrop';
 import PatternModal from '@/patterns/PatternModal';
-import PatternDrawer from '@/patterns/PatternDrawer';
+import { FloatingPanel } from './Backdrop.examples.jsx';
 import { Button } from '@/components';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -35,11 +35,6 @@ export default {
         onBackdropClick: { table: { disable: true } },
         inline: { table: { disable: true } },
         screenHeight: { table: { disable: true } },
-        placement: {
-            control: 'inline-radio',
-            options: BACKDROP_PLACEMENTS,
-            table: { category: 'Design' },
-        },
         screenWidth: {
             control: 'inline-radio',
             options: [768, 1024, 1440],
@@ -85,18 +80,7 @@ export const Inline = {
 export const ConfirmOverPanel = {
     render: () => (
         <div style={{ position: 'relative' }}>
-            <PatternDrawer
-                inline
-                screenWidth={1024}
-                screenHeight={520}
-                placement="end"
-                title="Session details"
-                description="Thursday · 4:00–5:00 PM"
-                onClose={() => {}}
-                footer={footer('Save changes')}
-            >
-                {body}
-            </PatternDrawer>
+            <FloatingPanel screenHeight={520} />
             <Backdrop inline screenWidth={1024} screenHeight={520} style={{ position: 'absolute', inset: 0 }}>
                 <PatternModal title="Discard changes?" onClose={() => {}} footer={footer('Discard')}>
                     <p style={{ margin: 0, font: 'var(--body-default)' }}>Your edits to this session are not saved.</p>
@@ -225,103 +209,13 @@ export const ScreenGrid = {
     },
 };
 
-const SCREEN_GRID = { width: 1024, height: 520 };
-
-/** `center` holds a modal; `start` and `end` hold a drawer full height at that edge, with no pad. */
-export const Placements = {
-    render: () => {
-        const drawer = (placement) => (
-            <PatternDrawer
-                inline
-                screenWidth={1024}
-                screenHeight={360}
-                placement={placement}
-                title="Session details"
-                description="Thursday · 4:00–5:00 PM"
-                onClose={() => {}}
-                footer={footer('Save changes')}
-            >
-                {body}
-            </PatternDrawer>
-        );
-        return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-                <Backdrop inline screenWidth={1024} screenHeight={360}>
-                    <PatternModal title="Move session" onClose={() => {}} footer={footer('Move session')}>
-                        {body}
-                    </PatternModal>
-                </Backdrop>
-                {drawer('end')}
-                {drawer('start')}
-            </div>
-        );
-    },
-    play: async ({ canvasElement }) => {
-        const overlays = canvasElement.querySelectorAll('.plus-pattern-backdrop');
-        const [modal, end, start] = within(canvasElement).getAllByRole('dialog');
-        await expect(getComputedStyle(overlays[0]).paddingTop, 'center keeps the pad').not.toBe('0px');
-        await expect(getComputedStyle(overlays[1]).paddingTop, 'an edge drops the pad').toBe('0px');
-        await expect(end.getBoundingClientRect().right).toBeCloseTo(overlays[1].getBoundingClientRect().right, 0);
-        await expect(start.getBoundingClientRect().left).toBeCloseTo(overlays[2].getBoundingClientRect().left, 0);
-        await expect(modal.getBoundingClientRect().width).toBeCloseTo(512, 0);
-    },
-};
-
-/** One placement per story, at the 1024 stand-in screen. */
-const drawerAt = (placement) => (
-    <PatternDrawer
-        inline
-        screenWidth={1024}
-        screenHeight={360}
-        placement={placement}
-        title="Session details"
-        description="Thursday · 4:00–5:00 PM"
-        onClose={() => {}}
-        footer={footer('Save changes')}
-    >
-        {body}
-    </PatternDrawer>
-);
-
-/** `center`: a modal, centered in the pads. */
-export const PlacementCenter = {
-    name: 'Center',
-    render: () => (
-        <Backdrop inline screenWidth={1024} screenHeight={360}>
+export const Interactive = {
+    args: { screenWidth: 1024 },
+    render: (args) => (
+        <Backdrop inline screenWidth={args.screenWidth} screenHeight={420}>
             <PatternModal title="Move session" onClose={() => {}} footer={footer('Move session')}>
                 {body}
             </PatternModal>
         </Backdrop>
-    ),
-};
-
-/** `end`: a drawer full height at the right edge, with no pad. */
-export const PlacementEnd = { name: 'End', render: () => drawerAt('end') };
-
-/** `start`: a drawer full height at the left edge, with no pad. */
-export const PlacementStart = { name: 'Start', render: () => drawerAt('start') };
-
-export const Interactive = {
-    args: { placement: 'center', screenWidth: 1024 },
-    render: (args) => (
-        args.placement === 'center' ? (
-            <Backdrop inline screenWidth={args.screenWidth} screenHeight={420} placement="center">
-                <PatternModal title="Move session" onClose={() => {}} footer={footer('Move session')}>
-                    {body}
-                </PatternModal>
-            </Backdrop>
-        ) : (
-            <PatternDrawer
-                inline
-                screenWidth={args.screenWidth}
-                screenHeight={420}
-                placement={args.placement}
-                title="Session details"
-                onClose={() => {}}
-                footer={footer('Save changes')}
-            >
-                {body}
-            </PatternDrawer>
-        )
     ),
 };

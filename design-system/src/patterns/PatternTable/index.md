@@ -87,7 +87,7 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 - Card: a table never sits inside a card.
 - Templates: the dashboard content shows a Students table in a Section at every breakpoint.
 
-Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar`
+Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar`
 
 ## Parts
 

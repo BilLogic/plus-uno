@@ -5,8 +5,7 @@
  * above and below (24 under 640 tall), its child centered. It sits on
  * --layer-blanket and the layer it holds on --layer-modal. One Modal at a
  * time: a follow-up step, such as a confirm, opens inside that Modal rather
- * than as a second Backdrop. With an edge placement it drops the pad and holds its
- * child full height at the start or end of the screen, for a drawer.
+ * than as a second Backdrop.
  */
 
 .plus-pattern-backdrop {
@@ -27,24 +26,6 @@
         position: relative;
         z-index: var(--layer-modal);
     }
-}
-
-/*
- * Edge placements, for a drawer: no pad, the layer full height at the start
- * (left in a left-to-right page) or the end (right).
- */
-.plus-pattern-backdrop-placement-start,
-.plus-pattern-backdrop-placement-end {
-    padding: 0;
-    align-items: stretch;
-}
-
-.plus-pattern-backdrop-placement-start {
-    justify-content: flex-start;
-}
-
-.plus-pattern-backdrop-placement-end {
-    justify-content: flex-end;
 }
 
 /*

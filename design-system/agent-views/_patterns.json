@@ -38,13 +38,8 @@
     },
     {
       "group": "Overlays",
-      "name": "PatternDrawer",
-      "use": "A full-height panel at the screen edge, for a task that needs the page in view: a row's details, filters, a short edit."
-    },
-    {
-      "group": "Overlays",
       "name": "Backdrop",
-      "use": "The full-screen layer under a modal or drawer. PatternModal and PatternDrawer bring their own; use it alone only for a new blocking layer."
+      "use": "The full-screen layer under a modal. PatternModal brings its own; use it alone only for a new blocking layer. A Panel floats with no Backdrop."
     },
     {
       "group": "Popups",

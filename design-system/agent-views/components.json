@@ -886,21 +886,8 @@
       "import": "import { Backdrop } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Backdrop/Backdrop.jsx",
-      "summary": "The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). With `placement` `start` or `end` it drops the pad and holds its child full height at that edge of the screen, for a drawer. A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token; PatternDrawer brings its own focus handling.",
+      "summary": "The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token.",
       "props": [
-        {
-          "name": "placement",
-          "type": "enum",
-          "required": false,
-          "default": "'center'",
-          "values": [
-            "center",
-            "start",
-            "end"
-          ],
-          "description": "`center` (default) for a modal; `start` or `end` holds the layer full height at that edge, with no pad.",
-          "deprecated": null
-        },
         {
           "name": "inline",
           "type": "bool",
@@ -961,7 +948,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The layer it holds: a PatternModal, a confirm over one, or a drawer at an edge.",
+          "description": "The layer it holds: a PatternModal, or a confirm over one.",
           "deprecated": null
         }
       ],
@@ -971,10 +958,6 @@
         "Layers",
         "Pads",
         "ScreenGrid",
-        "Placements",
-        "PlacementCenter",
-        "PlacementEnd",
-        "PlacementStart",
         "Interactive"
       ],
       "tokens": [
@@ -5153,7 +5136,6 @@
         "StatePanelOnBackdrop",
         "StateWithModal",
         "StateModalClosesFloating",
-        "StateWithDrawer",
         "StateAt768",
         "StateAt1024",
         "StateAt1440",
@@ -6880,7 +6862,7 @@
       "import": "import { Modal } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Modal/Modal.jsx",
-      "summary": "Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Backdrop`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the backdrop close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `PatternDrawer`: at most two stack, a third stays closed and calls `onClose`. A follow-up about the dialog itself — \"discard these edits?\" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A confirm raised as a second Modal is allowed too; it is the most that stacks.",
+      "summary": "Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Backdrop`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the backdrop close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`): a second Modal stays closed and calls `onClose`. A follow-up about the dialog itself — \"discard these edits?\" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A Modal never opens on another Modal.",
       "props": [
         {
           "name": "id",
@@ -7958,190 +7940,6 @@
         "--ds-text",
         "--ds-text-subtle",
         "--ds-utility-elevation-surface-current"
-      ]
-    },
-    {
-      "name": "PatternDrawer",
-      "kind": "pattern",
-      "import": "import { PatternDrawer } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/PatternDrawer/PatternDrawer.jsx",
-      "summary": "Drawer pattern for PLUS design system. A full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters, a short edit. It places itself in `Backdrop` at that edge, over the same backdrop a modal takes. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), the Modal width steps. The title, description and close button follow the Modal rules. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), Drawer/pad 16, Drawer/stack-md 16 and Drawer/inline-sm 8, no radius. Mirrors \"Pattern/Drawer\" in the Figma design system file. It is a real dialog: opening it moves focus inside and Tab cycles there, Escape, the close button and a click on the backdrop call `onClose`, and closing returns focus to what had it. An `inline` drawer, drawn in the page flow for docs, leaves focus where it is. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `Modal`: at most two stack (a drawer and the confirm it raises), a third stays closed and calls `onClose`, and opening either closes a floating sidebar. An `inline` drawer takes no slot.",
-      "props": [
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "open",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Whether the drawer shows. Closing it returns focus to what had it before it opened.",
-          "deprecated": null
-        },
-        {
-          "name": "title",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The title in the header row: the dialog's h1, at Heading/medium 20, and its name",
-          "deprecated": null
-        },
-        {
-          "name": "description",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "One line under the title, in the subtle text color; it describes the dialog",
-          "deprecated": null
-        },
-        {
-          "name": "onClose",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called by the close button, Escape and a click on the backdrop; renders the close button",
-          "deprecated": null
-        },
-        {
-          "name": "footer",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Footer slot, pinned to the bottom edge (typically action buttons, the primary last)",
-          "deprecated": null
-        },
-        {
-          "name": "width",
-          "type": "oneOf",
-          "required": false,
-          "default": "'sm'",
-          "values": [
-            "sm",
-            "md",
-            "lg"
-          ],
-          "description": "`sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the drawer pad (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440), the Modal width steps. Grows with the screen, never shrinks, ignores the sidebar.",
-          "deprecated": null
-        },
-        {
-          "name": "placement",
-          "type": "enum",
-          "required": false,
-          "default": "'end'",
-          "values": [
-            "end",
-            "start"
-          ],
-          "description": "`end` (default) holds it at the right edge of a left-to-right page; `start` at the left.",
-          "deprecated": null
-        },
-        {
-          "name": "inline",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Draw in the page flow at a stand-in screen, for docs and previews; focus stays where it is.",
-          "deprecated": null
-        },
-        {
-          "name": "screenWidth",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the stand-in screen width (px), such as 768, 1024 or 1440.",
-          "deprecated": null
-        },
-        {
-          "name": "screenHeight",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the stand-in screen height (px); the drawer runs its full height.",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "onKeyDown",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Runs before the drawer's own Escape and Tab handling; preventing the default on Escape keeps the drawer open.",
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Body content slot; it scrolls once it outgrows the screen",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "Widths",
-        "Placements",
-        "LongContent",
-        "Footer",
-        "KeyboardAndFocus",
-        "DrawerSharesTheTwoOverlayLimit",
-        "WidthSmall",
-        "WidthMedium",
-        "WidthLarge",
-        "PlacementEnd",
-        "PlacementStart",
-        "NoFooter",
-        "LongContentStill",
-        "OpenAndClose",
-        "Interactive"
-      ],
-      "tokens": [
-        "--body-default",
-        "--drawer-inline-sm",
-        "--drawer-pad",
-        "--drawer-stack-md",
-        "--ds-border-focused",
-        "--ds-shadow-overlay",
-        "--ds-surface-overlay",
-        "--ds-text",
-        "--ds-text-subtle",
-        "--focus-ring-width",
-        "--heading-medium",
-        "--stack-sm"
       ]
     },
     {

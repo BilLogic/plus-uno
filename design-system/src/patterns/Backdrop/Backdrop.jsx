@@ -12,31 +12,20 @@ export const BACKDROP_HEIGHTS = ['hug', 'fill'];
 export const BACKDROP_SPANS = Object.freeze({ sm: 6, md: 8, lg: 10 });
 
 /**
- * Where the layer sits: `center` for a modal, or `start` · `end` for a drawer
- * held full height at that edge, with no pad.
- */
-export const BACKDROP_PLACEMENTS = ['center', 'start', 'end'];
-
-/**
  * Backdrop pattern for PLUS design system.
  * The full-screen layer that holds the backdrop fill and a modal, so a modal
  * is placed, not drawn. It fills with the backdrop, pads 16 at the sides and
  * 64 above and below, centers its child, and sits on the backdrop layer (500)
  * with its child on the modal layer (510).
  *
- * With `placement` `start` or `end` it drops the pad and holds its child
- * full height at that edge of the screen, for a drawer.
- *
  * A Modal draws this Backdrop. A Panel never does: it floats on the overlay
  * fill and shadow.
  *
  * It draws the layer only: it does not trap focus, close on Escape or count
  * toward the two-overlay limit. For a real dialog, use the core Modal
- * component, which draws the same layers and backdrop token; PatternDrawer
- * brings its own focus handling.
+ * component, which draws the same layers and backdrop token.
  */
 const Backdrop = ({
-    placement = 'center',
     inline = false,
     screenWidth,
     screenHeight,
@@ -48,7 +37,6 @@ const Backdrop = ({
 }) => {
     const classes = [
         'plus-pattern-backdrop',
-        placement !== 'center' ? `plus-pattern-backdrop-placement-${placement}` : '',
         inline ? 'plus-pattern-backdrop-inline' : '',
         className,
     ].filter(Boolean).join(' ');
@@ -77,8 +65,6 @@ const Backdrop = ({
 };
 
 Backdrop.propTypes = {
-    /** `center` (default) for a modal; `start` or `end` holds the layer full height at that edge, with no pad. */
-    placement: PropTypes.oneOf(BACKDROP_PLACEMENTS),
     /** Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page. */
     inline: PropTypes.bool,
     /**
@@ -96,7 +82,7 @@ Backdrop.propTypes = {
     onBackdropClick: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** The layer it holds: a PatternModal, a confirm over one, or a drawer at an edge. */
+    /** The layer it holds: a PatternModal, or a confirm over one. */
     children: PropTypes.node,
 };
 

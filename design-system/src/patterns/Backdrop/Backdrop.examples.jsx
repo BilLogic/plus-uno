@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { Button, SectionMessage } from '@/components';
-import { Backdrop, PatternDrawer, PatternModal } from '@/patterns';
+import { Backdrop, PatternModal } from '@/patterns';
+import { DetailsPanel } from '../Panel/panelDemo.jsx';
 import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 
 /**
@@ -46,20 +47,41 @@ const settings = (
     </Backdrop>
 );
 
-const drawer = (
-    <PatternDrawer
-        inline
-        screenWidth={SCREEN.width}
-        screenHeight={SCREEN.height}
-        placement="end"
-        title="Session details"
-        description="Thursday · 4:00–5:00 PM"
-        onClose={() => {}}
-        footer={footer('Save changes')}
+/**
+ * A Details Panel floating over the right of the stand-in screen: on the
+ * overlay fill and shadow, with no Backdrop under it, which is how a Panel
+ * always floats. Docs geometry, px.
+ */
+export const FloatingPanel = ({ screenHeight = SCREEN.height }) => (
+    <div
+        style={{
+            position: 'relative',
+            width: SCREEN.width,
+            height: screenHeight,
+            background: 'var(--ds-surface)',
+            overflow: 'hidden',
+        }}
     >
-        {text('Ana and her tutor get an email when the time changes.')}
-    </PatternDrawer>
+        <div
+            data-floating-panel
+            style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: 400, // docs-literal
+                display: 'flex',
+                flexDirection: 'column',
+                background: 'var(--ds-surface-overlay)',
+                boxShadow: 'var(--ds-shadow-overlay)',
+            }}
+        >
+            <DetailsPanel />
+        </div>
+    </div>
 );
+
+const panel = <FloatingPanel />;
 
 const discard = (width = 'sm') => (
     <PatternModal title="Discard changes?" width={width} onClose={() => {}} footer={footer('Discard changes', 'danger')}>
@@ -73,18 +95,18 @@ const moveSession = (
     </PatternModal>
 );
 
-/** Do: a drawer and the confirm it raises, stacked over it. */
+/** Do: a Panel and the confirm it raises, stacked over it. */
 export const EdgeLayerWithConfirm = () => (
     <Stage>
-        {drawer}
+        {panel}
         <Over>{discard()}</Over>
     </Stage>
 );
 
-/** Don't: a modal for an unrelated task opened over a drawer. */
+/** Don't: a modal for an unrelated task opened over a Panel. */
 export const EdgeLayerWithUnrelatedModal = () => (
     <Stage>
-        {drawer}
+        {panel}
         <Over>{moveSession}</Over>
     </Stage>
 );

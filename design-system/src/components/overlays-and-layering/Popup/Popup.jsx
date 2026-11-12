@@ -108,7 +108,7 @@ const Popup = ({
 
     const handleOpenChange = (next, eventDetails) => {
         if (!next && !dismissible && DISMISS_REASONS.has(eventDetails?.reason)) return;
-        // A press inside a Modal or Drawer this popup sits outside of is not a click away from it.
+        // A press inside a Modal this popup sits outside of is not a click away from it.
         if (!next && eventDetails?.reason === 'outside-press'
             && isPressInRaisedOverlay(eventDetails.event?.target, triggerNodeRef.current)) return;
         // Escape and focus moving into the Modal belong to the Modal; the popup stays under it.

@@ -55,18 +55,6 @@ The Backdrop is the full-screen layer that holds the backdrop fill and the one l
 
 <div className="sb-ds-doc-section">
 
-## Behavior
-
-<ComponentExample of={BackdropStories.PlacementCenter} title="Center" description={<><code>placement="center"</code>, the default, centers a modal in the pads.</>} />
-
-<ComponentExample of={BackdropStories.PlacementEnd} title="End" description={<><code>placement="end"</code> holds a full-height layer at the right edge, with no pad.</>} />
-
-<ComponentExample of={BackdropStories.PlacementStart} title="Start" description={<><code>placement="start"</code> holds a full-height layer at the left edge, with no pad.</>} />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -109,11 +97,10 @@ A Backdrop interrupts the page for one task. It dims everything behind it with o
 </thead>
 <tbody>
 <tr><td>Modal</td><td>One task blocks the page. The Backdrop centers it.</td></tr>
-<tr><td>Edge layer</td><td>A full-height layer the Backdrop holds at an edge. A Panel is the way forward: it floats with no Backdrop.</td></tr>
 </tbody>
 </DocsTable>
 
-The Backdrop draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
+A task that keeps the page in view is a Panel, which floats with no Backdrop. The Backdrop draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
 
 ### Layers
 

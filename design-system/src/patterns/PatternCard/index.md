@@ -94,7 +94,7 @@ A card that holds actions that commit a change gets a footer, and its actions st
 - Page for a fill and an elevation with no slots.
 - Modal for something that must be decided before the page can continue.
 
-Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 

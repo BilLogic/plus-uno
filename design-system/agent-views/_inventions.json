@@ -180,9 +180,9 @@
     {
       "not": "Drawer",
       "use": [
-        "PatternDrawer"
+        "Panel"
       ],
-      "why": "a pattern, imported from @/patterns"
+      "why": "a floating Panel, imported from @/components"
     }
   ],
   "props": [

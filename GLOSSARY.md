@@ -149,7 +149,7 @@ The pattern for the layer that dims what sits behind it: full screen for a **Mod
 _Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
 
 **Modal**:
-The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, or opens as a second Modal stacked over it, up to the overlay limit `MAX_STACKED_OVERLAYS`. `Modal` is the component; `PatternModal` draws its shell inline.
+The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time. `Modal` is the component; `PatternModal` draws its shell inline.
 _Avoid_: "Modal dialog", "ModalDialog", "popup" for a blocking dialog
 
 **Drawer**:

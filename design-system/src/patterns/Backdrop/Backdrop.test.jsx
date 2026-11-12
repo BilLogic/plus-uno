@@ -1,11 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import Backdrop, { BACKDROP_HEIGHTS, BACKDROP_PLACEMENTS, BACKDROP_SPANS, BACKDROP_WIDTHS } from './Backdrop';
+import Backdrop, { BACKDROP_HEIGHTS, BACKDROP_SPANS, BACKDROP_WIDTHS } from './Backdrop';
 import PatternModal from '../PatternModal';
 
 /**
- * Backdrop is the full-screen layer a modal (and later a drawer) is placed in:
+ * Backdrop is the full-screen layer a modal is placed in:
  * the backdrop fill, the pads and the layer order. Its fill, pads and layers
  * are CSS; this file holds the structure and the shared size names.
  */
@@ -14,20 +14,11 @@ describe('Backdrop', () => {
         expect(BACKDROP_WIDTHS).toEqual(['sm', 'md', 'lg']);
         expect(BACKDROP_HEIGHTS).toEqual(['hug', 'fill']);
         expect(BACKDROP_SPANS).toEqual({ sm: 6, md: 8, lg: 10 });
-        expect(BACKDROP_PLACEMENTS).toEqual(['center', 'start', 'end']);
     });
 
-    it('centers by default, with no placement class', () => {
+    it('draws one class, with no placement', () => {
         render(<Backdrop data-testid="backdrop">x</Backdrop>);
         expect(screen.getByTestId('backdrop').className).toBe('plus-pattern-backdrop');
-    });
-
-    it('holds its layer at an edge for placement start or end', () => {
-        const { rerender } = render(<Backdrop data-testid="backdrop" placement="end">x</Backdrop>);
-        expect(screen.getByTestId('backdrop')).toHaveClass('plus-pattern-backdrop-placement-end');
-        rerender(<Backdrop data-testid="backdrop" placement="start">x</Backdrop>);
-        expect(screen.getByTestId('backdrop')).toHaveClass('plus-pattern-backdrop-placement-start');
-        expect(screen.getByTestId('backdrop')).not.toHaveClass('plus-pattern-backdrop-placement-end');
     });
 
     it('is fixed over the page by default, holding its child', () => {
