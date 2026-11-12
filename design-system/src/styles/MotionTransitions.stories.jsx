@@ -44,6 +44,54 @@ export const SwitchViewsReduced = reducedStory(TRANSITION_DEMOS.switch);
 export const Step = story(TRANSITION_DEMOS.step);
 export const StepReduced = reducedStory(TRANSITION_DEMOS.step);
 
+// ---------- Within a place ----------
+export const ScrollToSpot = story(TRANSITION_DEMOS.scroll);
+export const ScrollToSpotReduced = reducedStory(TRANSITION_DEMOS.scroll);
+export const SwapContent = story(TRANSITION_DEMOS.swap);
+export const SwapContentReduced = reducedStory(TRANSITION_DEMOS.swap);
+export const AddAnItem = story(TRANSITION_DEMOS.add);
+export const AddAnItemReduced = reducedStory(TRANSITION_DEMOS.add);
+export const RemoveAnItem = story(TRANSITION_DEMOS.remove);
+export const RemoveAnItemReduced = reducedStory(TRANSITION_DEMOS.remove);
+export const ReorderItems = story(TRANSITION_DEMOS.reorder);
+export const ReorderItemsReduced = reducedStory(TRANSITION_DEMOS.reorder);
+export const ExpandARow = story(TRANSITION_DEMOS.expand);
+export const ExpandARowReduced = reducedStory(TRANSITION_DEMOS.expand);
+export const CollapseARow = story(TRANSITION_DEMOS.collapse);
+export const CollapseARowReduced = reducedStory(TRANSITION_DEMOS.collapse);
+export const LoadContent = story(TRANSITION_DEMOS.load);
+export const LoadContentReduced = reducedStory(TRANSITION_DEMOS.load);
+
+// ---------- Above a place ----------
+export const ModalOpens = story(TRANSITION_DEMOS.modalOpen);
+export const ModalOpensReduced = reducedStory(TRANSITION_DEMOS.modalOpen);
+export const ModalCloses = story(TRANSITION_DEMOS.modalClose);
+export const ModalClosesReduced = reducedStory(TRANSITION_DEMOS.modalClose);
+export const DrawerOpens = story(TRANSITION_DEMOS.drawerOpen);
+export const DrawerOpensReduced = reducedStory(TRANSITION_DEMOS.drawerOpen);
+export const DrawerCloses = story(TRANSITION_DEMOS.drawerClose);
+export const DrawerClosesReduced = reducedStory(TRANSITION_DEMOS.drawerClose);
+export const FlagOpens = story(TRANSITION_DEMOS.flagOpen);
+export const FlagOpensReduced = reducedStory(TRANSITION_DEMOS.flagOpen);
+export const FlagCloses = story(TRANSITION_DEMOS.flagClose);
+export const FlagClosesReduced = reducedStory(TRANSITION_DEMOS.flagClose);
+export const ConfirmOrCancel = story(TRANSITION_DEMOS.confirm);
+export const ConfirmOrCancelReduced = reducedStory(TRANSITION_DEMOS.confirm);
+export const DockAPanel = story(TRANSITION_DEMOS.dock);
+export const DockAPanelReduced = reducedStory(TRANSITION_DEMOS.dock);
+
+// ---------- Feedback ----------
+export const UpdateAValue = story(TRANSITION_DEMOS.update);
+export const UpdateAValueReduced = reducedStory(TRANSITION_DEMOS.update);
+export const CallAttention = story(TRANSITION_DEMOS.attention);
+export const CallAttentionReduced = reducedStory(TRANSITION_DEMOS.attention);
+export const ErrorInAField = story(TRANSITION_DEMOS.errField);
+export const ErrorInAFieldReduced = reducedStory(TRANSITION_DEMOS.errField);
+export const ErrorInAModal = story(TRANSITION_DEMOS.errModal);
+export const ErrorInAModalReduced = reducedStory(TRANSITION_DEMOS.errModal);
+export const ErrorOnAPage = story(TRANSITION_DEMOS.errPage);
+export const ErrorOnAPageReduced = reducedStory(TRANSITION_DEMOS.errPage);
+
 /** The rulings the page carries, read off the scenes so a copy cannot drift from them. */
 export const Rulings = {
   render: () => null,
@@ -58,5 +106,24 @@ export const Rulings = {
     await expect(scene(TRANSITION_DEMOS.switch, 'switch-slide').landing).not.toHaveProperty('o');
     // Step states change in place: visited, current, unvisited.
     await expect(scene(TRANSITION_DEMOS.step, 'step-across').landing).toMatchObject({ cur: 1, p: 1 });
+    // Within a place: a swap leaves no half-faded overlap; the Don't cross-fades.
+    await expect(scene(TRANSITION_DEMOS.swap, 'swap-do').landing).toMatchObject({ f: 1, o: 0, n: 1 });
+    await expect(scene(TRANSITION_DEMOS.swap, 'swap-dont').landing).toMatchObject({ o: 0, n: 1 });
+    // A removed row fades, then the gap closes; an added row opens, then its content fades in.
+    await expect(scene(TRANSITION_DEMOS.remove, 'remove-row').landing).toMatchObject({ h: 0, c: 0 });
+    await expect(scene(TRANSITION_DEMOS.add, 'add-row').landing).toMatchObject({ h: 1, c: 1 });
+    // Load: the Skeleton is gone and every part has arrived; the Don't never showed one.
+    await expect(scene(TRANSITION_DEMOS.load, 'load-do').landing).toMatchObject({ sk: 0, ch: 1 });
+    await expect(scene(TRANSITION_DEMOS.load, 'load-dont').landing).toMatchObject({ sk: 0, ch: 1 });
+    // A docked Panel makes room for itself; a floating one leaves the page alone.
+    await expect(scene(TRANSITION_DEMOS.dock, 'dock-docked').landing).toMatchObject({ p: 1, c: 1 });
+    await expect(scene(TRANSITION_DEMOS.dock, 'dock-floating').landing).toMatchObject({ x: 0 });
+    await expect(scene(TRANSITION_DEMOS.dock, 'dock-floating').landing).not.toHaveProperty('p');
+    // Call attention plays once and ends unmarked; the shake is only the blocked Modal's.
+    await expect(scene(TRANSITION_DEMOS.attention, 'attention-once').landing).toMatchObject({ h: 0, seen: 1 });
+    await expect(scene(TRANSITION_DEMOS.errModal, 'err-modal-do').landing).toMatchObject({ h: 1, m: 1 });
+    await expect(scene(TRANSITION_DEMOS.errModal, 'err-modal-do').landing).not.toHaveProperty('shook');
+    await expect(scene(TRANSITION_DEMOS.errModal, 'err-modal-dont').landing).toMatchObject({ shook: 1 });
+    await expect(scene(TRANSITION_DEMOS.errPage, 'err-page-dont').landing).toMatchObject({ shook: 1 });
   },
 };

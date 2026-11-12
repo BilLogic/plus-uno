@@ -6,6 +6,7 @@ import {
 } from './primitives.jsx';
 import { TreeEdge, TreeNode } from './primitives-motion.jsx';
 import { Clip, Moved, VIEW, mix } from './motion-parts.jsx';
+import { ABOVE_DEMOS, FEEDBACK_DEMOS, WITHIN_DEMOS } from './motion-transitions-place.jsx';
 
 /**
  * The Transitions page's figures (Foundations/Motion/Transitions), Between places.
@@ -595,4 +596,7 @@ export const TRANSITION_DEMOS = {
       step({ id: 'step-down-wrong', title: 'Steps down a side: the body slides across', side: true, axis: 'x', caption: 'The list says down and the body says across: two axes for one move.' }),
     ],
   },
+  ...WITHIN_DEMOS,
+  ...ABOVE_DEMOS,
+  ...FEEDBACK_DEMOS,
 };

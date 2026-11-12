@@ -8,6 +8,7 @@ import {
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
 import * as TransitionStories from './MotionTransitions.stories.jsx';
+import * as PopupStories from '@/components/overlays-and-layering/Popup/Popup.stories.jsx';
 
 <Meta of={TransitionStories} />
 
@@ -185,6 +186,347 @@ Step states change in place, at the same moment the body starts: the step just l
 <Canvas of={TransitionStories.Step} sourceState="none" />
 
 **Used in:** Form steps, Table paging, Schedule weeks, Carousel, focused tasks.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Within a place">
+
+The person stays where they are. Something on the page changes.
+
+<FoundationSubsection title="Scroll to a spot on the page">
+
+**Tells the person:** you're still on this page; here is the spot.
+
+**When:** the destination is on the current page: a heading outline link, a link to one comment.
+
+**Not:** another page is Go to or Drill.
+
+**PLUS case:** the heading outline's "Escalation" link scrolls there and marks the heading.
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Page', 'scroll position', <C>spatial.slow</C>, '0'],
+        ['Destination', 'Call attention (below)', 'as Call attention', 'On arrival'],
+    ]}
+/>
+
+In Reduced mode the page does not travel: the content at the new position fades in on `appearance.fast`, and the destination is still marked. Never a cut.
+
+<Canvas of={TransitionStories.ScrollToSpot} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Swap content in place">
+
+**Tells the person:** the frame is the same; what's inside it changed.
+
+**When:** the container stays and its content changes as a whole: a view pill or the view dropdown, a filter that replaces most of a list, a confirm replacing a form inside a Modal, Previous and Next inside a Drawer.
+
+**Not:** if one item changes, it is Add or remove, or Update a value.
+
+**PLUS case:** Sessions, switching the filter from This week to Last month.
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Frame, headers, stable labels', 'stay still', '—', '—'],
+        ['Selected view pill fill', 'glides to the new pill', <C>spatial.fast</C>, '0'],
+        ['Old content', 'opacity out', <C>appearance.fast</C>, '0'],
+        ['New content', 'opacity in', <C>appearance.fast</C>, 'After the clean-fade gap'],
+    ]}
+/>
+
+The old content is gone before the new arrives, so one clean frame sits between them. A cross-fade shows both at half strength and reads as mud.
+
+<Canvas of={TransitionStories.SwapContent} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Add or remove an item">
+
+**Tells the person:** one thing joined or left, and the others made room.
+
+**When:** one item joins or leaves a list or grid in the page.
+
+**Not:** above the page it is Open an overlay. If most of the list changes, it is Swap content in place.
+
+**PLUS case:** adding a session to the list; opening Maya's record adds her to the Sidebar's open items; a late call-off warning appears in a form.
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Rows below', 'make room', <C>spatial.fast</C>, '0'],
+        ['New row', 'opens from the seam (height)', <C>spatial.fast</C>, '0'],
+        ['New row content', 'opacity in, in place, no scale', <C>appearance.fast</C>, 'Once there is room'],
+        ['Removed row', 'opacity out', <C>appearance.fast</C>, '0'],
+        ['Rows below a removed row', 'close the gap', <C>spatial.fast</C>, 'As it fades'],
+    ]}
+/>
+
+In a grid, the others slide along their row and wrap.
+
+<Canvas of={TransitionStories.AddAnItem} sourceState="none" />
+
+<Canvas of={TransitionStories.RemoveAnItem} sourceState="none" />
+
+**Used in:** Sidebar open items, SectionMessage, Banner (it pushes the page, so it lives on the page's layer), Table rows, Toolkit resource tiles.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Reorder items">
+
+**Tells the person:** the same items, in a new order.
+
+**When:** sorting, or dragging an item to a new place in the same set.
+
+**Not:** if items join or leave, it is Add or remove.
+
+**PLUS case:** sorting Students by last session; dragging a session to another time slot.
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Each item', 'moves to its new place: straight along the column in a list, x then y in a grid', <C>spatial.default</C>, 'Staggered: 20 ms apart, or 500 ms ÷ items if that is shorter'],
+    ]}
+/>
+
+A dragged item follows the pointer on linear, then settles on a spring that starts from the release velocity. The figure shows a sort; dragging itself is built with the drag work.
+
+<Canvas of={TransitionStories.ReorderItems} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Expand and collapse">
+
+**Tells the person:** more of the same thing, revealed from where it was hidden.
+
+**When:** something on the page grows to show more, or shrinks: a disclosure row, the Search icon opening into a field, the Filter button widening for its first count, the full-width toggle.
+
+**Not:** if new content arrives from elsewhere, it is Load content.
+
+**PLUS case:** "Escalate this session" reveals the reason field in a reflection.
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Container', 'height, from the seam', <><C>spatial.fast</C> for a row, <C>spatial.default</C> for a section</>, '0'],
+        ['Rows below', 'move down', 'Same as the container', '0'],
+        ['Revealed content', 'opacity in', <C>appearance.fast</C>, 'Once there is room'],
+        ['Chevron', 'rotates with the height', 'Same as the container', '0'],
+    ]}
+/>
+
+A row expanding and a Select opening are the same reveal; size sets the speed. Closing reverses it on the same token, with the detail fading first.
+
+<Canvas of={TransitionStories.ExpandARow} sourceState="none" />
+
+<Canvas of={TransitionStories.CollapseARow} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Load content">
+
+**Tells the person:** something is coming, and the page won't jump when it arrives.
+
+**When:** content is being fetched, then arrives. The wait and the arrival are one transition.
+
+**Not:** saving is not loading; nothing new arrives. That is Update a value or state.
+
+**PLUS case:** the Admin dashboard loading.
+
+Pick the signal by how long the wait is:
+
+<RefTable
+    head={['Wait', 'Signal']}
+    rows={[
+        ['Under 200 ms', 'Nothing'],
+        ['200 ms to 5 s', 'A Skeleton or Spinner, inside the thing that is loading'],
+        ['In a menu or Popup', 'Never a Skeleton: one "Loading options" row, then "Couldn\'t load options" with Retry. New options fade in 20 ms apart; the list grows on spatial.fast'],
+        ['Over 5 s', 'Progress with a number'],
+    ]}
+/>
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Skeleton', 'shimmer, top-left to bottom-right', <C>linear</C>, 'While waiting'],
+        ['Content', 'opacity in, in place, in load order', <C>appearance.default</C>, 'Staggered: 20 ms apart, or 500 ms ÷ items if shorter'],
+        ['Skeleton', 'opacity out under it', <C>appearance.fast</C>, 'As content arrives'],
+    ]}
+/>
+
+Load order: the frame and navigation, then headings and text, then data, then the primary action, then charts, which may wait until scrolled to. Content may fade in over the Skeleton; this is one of the few true crossfades. A button that starts a load keeps its width: its label fades out, a Spinner fades in, and the same button confirms when done.
+
+<Canvas of={TransitionStories.LoadContent} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Above a place">
+
+Something joins the page from above or beside it.
+
+<FoundationSubsection title="Open and close an overlay">
+
+**Tells the person:** this sits on top for now; the page underneath is untouched.
+
+**When:** a Modal, Popup, floating Panel, PatternDrawer, Flag or Tooltip appears.
+
+**Not:** if it takes space beside the page, it is Dock and undock. If it goes one level deeper and has its own Breadcrumb level, it is Drill.
+
+**PLUS case:** call-off. The confirm Modal opens; Cancel reverses its entrance, Confirm carries on.
+
+Each overlay moves by its layer; the full enter and exit for each is in the component's Motion section.
+
+<RefTable
+    head={['Component', 'Enter', 'Exit']}
+    rows={[
+        ['Modal', 'scales up from 96% and fades in; the Blanket dims', 'scales to 98% and fades'],
+        ['Popup, FilterMenu', 'clips open from the trigger\'s top-right corner along one axis', 'fades'],
+        ['Drawer', 'slides in from its edge; the Drawer itself never fades, only the Blanket dims', 'slides back to the same edge and stays there'],
+        ['Flag', 'slides in from the top-right corner', 'leaves the way it came, by the exit rules in Physics'],
+        ['Tooltip', 'fades in after a short wait', 'fades out shortly after the pointer leaves'],
+    ]}
+/>
+
+A Modal opens only from something the person did, never by itself. Focus moves to its first input as the motion starts and stays in the Modal until it closes. One Modal at a time: a confirm replaces its content in place (Swap content), never a second Modal. Scale is for floating layers only; nothing inside a page scales on entry.
+
+**Modal.**
+
+<Canvas of={TransitionStories.ModalOpens} sourceState="none" />
+
+<Canvas of={TransitionStories.ModalCloses} sourceState="none" />
+
+**Popup.** The component's own motion is its live story: click Details to open it, press Escape to close it.
+
+<Canvas of={PopupStories.OpensAndCloses} sourceState="none" />
+
+**Drawer.**
+
+<Canvas of={TransitionStories.DrawerOpens} sourceState="none" />
+
+<Canvas of={TransitionStories.DrawerCloses} sourceState="none" />
+
+**Flag.**
+
+<Canvas of={TransitionStories.FlagOpens} sourceState="none" />
+
+<Canvas of={TransitionStories.FlagCloses} sourceState="none" />
+
+**Cancel reverses, Confirm carries on.** Cancel plays the entrance backward, one speed faster, and nothing else changes. Confirm fades the Modal, recolors the row's status and brings a Flag in.
+
+<Canvas of={TransitionStories.ConfirmOrCancel} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Dock and undock a panel">
+
+**Tells the person:** this sits beside your work, and your work made room for it.
+
+**When:** a panel takes space beside the page: the AI Panel.
+
+**Not:** if it floats above the page, it is Open an overlay.
+
+**PLUS case:** the AI Panel docks on the right of Sessions and the table narrows.
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Page', 'width, making room', <C>spatial.slow</C>, '0'],
+        ['Panel', 'slides in from its edge', <C>spatial.slow</C>, '0'],
+        ['Panel content', 'opacity in', <C>appearance.fast</C>, 'When the page is about 90% done making room'],
+    ]}
+/>
+
+A panel on the page's layer pushes and resizes the page; one above it slides over and dims. Below the docking width the Panel slides over with a Blanket, like a Drawer. A quick look promoted to its record page grows from the floating Panel itself instead of closing first.
+
+<Canvas of={TransitionStories.DockAPanel} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Feedback">
+
+Nothing moves place. One element answers, or asks to be looked at.
+
+<FoundationSubsection title="Update a value or state">
+
+**Tells the person:** this value changed.
+
+**When:** a status, Saving to Saved, a count.
+
+**Not:** if the element joins or leaves, it is Add or remove.
+
+**PLUS case:** a shift swap is accepted and the session goes from Called off to Covered.
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Status', 'color', <C>appearance.default</C>, '0'],
+        ['Number, first view', 'rolls once', <C>spatial.fast</C>, '0'],
+        ['Number, later updates', 'fades to the new value', <C>appearance.fast</C>, '0'],
+    ]}
+/>
+
+A number never overshoots.
+
+<Canvas of={TransitionStories.UpdateAValue} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Call attention">
+
+**Tells the person:** look here.
+
+**When:** the row you just jumped to, a warning that appeared, a field that needs fixing.
+
+**PLUS case:** Scroll to "Escalation" marks the heading.
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Spot', 'highlight in', <C>appearance.fast</C>, '0'],
+        ['Spot', 'highlight out', <C>appearance.slow</C>, 'After a 500 ms hold'],
+    ]}
+/>
+
+It plays once. Repeating motion belongs to loading, never to attention. Color, icon and message always carry the meaning, so Reduced mode loses nothing.
+
+<Canvas of={TransitionStories.CallAttention} sourceState="none" />
+
+**Errors.** The one place PLUS shakes:
+
+<RefTable
+    head={['Case', 'When it shows', 'What moves', 'Shake']}
+    rows={[
+        ['Leaving a field', 'When focus leaves it; once red, it rechecks while typing', 'The message makes room, then fades in; it clears the moment the field is fixed', 'No'],
+        ['Typing', 'Never before the field is left; a code only when complete', 'Nothing', 'No'],
+        ['Submitting a Modal', 'On submit, for a required field never touched', 'The Modal stays open; the bad fields are marked; focus goes to the first', 'The Modal, once'],
+        ['A field with its own button', 'On submit, for a server-only check such as a join code', 'The field is marked, its message below', 'The field and button, once'],
+        ['Submitting a page', 'On submit', 'A one-line summary makes room at the top; focus goes to the first error', 'No'],
+        ['The system failed', 'After sending fails', 'A message makes room at the top of the form', 'No: the person did nothing wrong'],
+        ['Wrong again', 'Each submit', 'The same as the first time; after a few tries, the message offers help', 'The same shake, never bigger'],
+    ]}
+/>
+
+Prevent errors first: pickers, dropdowns, radios and number inputs with limits wherever the value has a fixed set or range. Keep submit enabled until the form is sent; let people act, then show exactly what to fix, rather than disabling the action. One shake, however many fields are wrong. It is one pattern, a spring and not a token, used by Modal, a field with its own button and InlineEdit; its numbers are on Physics. Errors make no sound. In Reduced mode there is no shake: color, icon, message, the focus move and a screen-reader announcement carry it.
+
+**A field.** The Do checks when focus leaves; the Don't flags the person while they type.
+
+<Canvas of={TransitionStories.ErrorInAField} sourceState="none" />
+
+**A Modal.** A failure that is the system's gets a message that makes room, never a shake.
+
+<Canvas of={TransitionStories.ErrorInAModal} sourceState="none" />
+
+**A page.** A page gets a summary at the top and focus on the first error, never a shake.
+
+<Canvas of={TransitionStories.ErrorOnAPage} sourceState="none" />
 
 </FoundationSubsection>
 
