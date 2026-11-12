@@ -1,3 +1,8 @@
+---
+disposition: rule
+disposition-target: design-system/guidelines/figma/mcp-guide.md
+---
+
 > Status 2026-11-12: read-only scan done. Items on Modal, Form, Popup, Panel and Page docs are **fixed by patterns** (run fig-2195-fix2): skip them. Fixes here wait for the Figma writer.
 
 # Core file clipping audit (read-only), 2026-11-12
@@ -181,3 +186,14 @@ Clean (no flags in any category): Panel 20630:44, AI button 21740:1279.
 - Matrix label cells (Row label, Label cell, Column label) are fixed by design in most variant matrices; treat category 2 as a tidy-up list, not a defect list.
 - Foundations pages (Overview, Accessibility, Motion, Typography, Spacing, Grid, Color, Elevation, Border, Radius) have no section-level layout defects beyond unbound spacing and Chip/Part hand-built frames.
 - Section padding check only measured SECTION nodes and top-2-level zone frames; deeper nesting not audited.
+
+# Fix outcome (2026-11-12)
+- Run 1 clipping + Do/Don't equal heights: Calendar, Heading, Vertical button, AI voice and tone fixed; about 45 pages of Do/Don't pairs equalized. Page header Actions sits in a Don't card (left); Popup select Bar, Elevation Plate are intentional.
+- Run 2 Sections: 35 pages hug content + 80, 200 between sections. Spot-checked Table, Card, Section, Elevation, Popup select.
+- Run 3/3b auto-layout: every absolute-positioned frame is a deliberate canvas; nothing converted.
+- Run 4/4b spacing: exact-value Space/* bindings on about 140 pages; non-matching values left as is.
+- Run 5 hand-built blocks: nothing swapped; no Docs part matches the Color Chip (swatch tile vs token chip) or the markers; all left.
+- No node counts dropped on any page.
+
+# Unverified
+Diagram readable text was not scanned, and runs 4b and 5 have no per-page screenshots.

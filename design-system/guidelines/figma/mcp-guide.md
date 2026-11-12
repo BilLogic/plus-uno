@@ -95,6 +95,11 @@ If a node is not in the registry, flag as a gap. Do not invent imports or props.
 - **Workaround**: If the user cannot open the desktop app, fall back to `get_screenshot` + `get_metadata` for structure, and repo-native token files for values
 - **Rate limiting**: MCP tools are rate-limited. Batch operations (e.g., 67+ `search_design_system` calls for drift analysis) should use `get_metadata` for bulk inventory first, then targeted searches
 
+### Bulk fix runs
+- Count a page's nodes before a bulk `use_figma` write and after every call. A small rise on re-walk is slots materializing; a drop is a deleted node, so stop and report.
+- Save before and after PNGs of every zone touched (`exportAsync` at scale 0.3 to 0.5); without them the change is unverified.
+- A "tool call limit" is the per-minute cap: wait 60 seconds and retry.
+
 ## MCP Fallback
 
 If Figma MCP is unavailable at runtime, state it explicitly and continue with:
