@@ -5533,7 +5533,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The count of filters applied, drawn after the icon; the accessible name becomes \"Filters, 2 applied\". `0` shows; leave it out to hide it.",
+          "description": "The count of filters applied, drawn after the icon; the accessible name becomes \"Filters, 2 applied\". Zero or absent draws no count, and a count above zero draws the selected fill by itself.",
           "deprecated": null
         },
         {
@@ -5578,9 +5578,9 @@
           "name": "isSelected",
           "type": "bool",
           "required": false,
-          "default": null,
+          "default": "false",
           "values": null,
-          "description": "Marks the button selected and sets `aria-pressed`. Use it for a toggle such as a list or grid view switch.",
+          "description": "Marks the button selected and sets `aria-pressed`, except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch.",
           "deprecated": null
         },
         {
@@ -9400,7 +9400,7 @@
       "import": "import { PopupSelect } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx",
-      "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start`; one at the end opens `bottom-end` (the default). - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker=\"check\"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
+      "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker=\"check\"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
       "props": [
         {
           "name": "options",
@@ -9460,12 +9460,12 @@
           "name": "placement",
           "type": "enum",
           "required": false,
-          "default": "'bottom-end'",
+          "default": "'bottom-start'",
           "values": [
             "bottom-start",
             "bottom-end"
           ],
-          "description": "`bottom-start` for a trigger at the start of a bar, `bottom-end` (default) for one at its end.",
+          "description": "`bottom-start` (default) for a trigger at the start of a bar, `bottom-end` for one at its end.",
           "deprecated": null
         },
         {

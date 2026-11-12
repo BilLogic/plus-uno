@@ -2,7 +2,7 @@
 
 # PopupSelect
 
-Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads "Status: Upcoming" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start`; one at the end opens `bottom-end` (the default). - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker="check"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.
+Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads "Status: Upcoming" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker="check"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.
 
 **Import:** `import { PopupSelect } from '@/components';`
 
@@ -67,8 +67,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Trigger | `placement` |
 | --- | --- |
-| At the start of a bar, or alone | `bottom-start`: the menu's start edge meets the trigger's. |
-| At the end of a bar | `bottom-end` (default): the menu's end edge meets the trigger's. |
+| At the start of a bar, or alone | `bottom-start` (default): the menu's start edge meets the trigger's. |
+| At the end of a bar | `bottom-end`: the menu's end edge meets the trigger's. |
 
 ### States
 
@@ -106,7 +106,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `onChange` | func | — | `(value, option)`, called the moment a row is picked. |
 | `label` | string | — | What is being picked, such as "Status". Names the menu, and with no `trigger` it heads the labeled trigger: "Status: Upcoming". |
 | `trigger` | node or func | — | A trigger of your own, or `({ isOpen, option }) => node`. Without it the labeled trigger is drawn. |
-| `placement` | enum | `'bottom-end'` | `bottom-start` for a trigger at the start of a bar, `bottom-end` (default) for one at its end. |
+| `placement` | enum | `'bottom-start'` | `bottom-start` (default) for a trigger at the start of a bar, `bottom-end` for one at its end. |
 | `isSearchable` | bool | `true` | A search field above the list. Turn it off for a short list. |
 | `searchPlaceholder` | string | `'Search'` | The search field's placeholder. |
 | `open` | bool | — | Whether the menu is open. Leave it out to let the trigger open and close it. |

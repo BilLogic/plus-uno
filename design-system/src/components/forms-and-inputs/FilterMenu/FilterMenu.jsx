@@ -102,8 +102,7 @@ const FilterMenu = ({
             <IconButton
                 icon="filter"
                 label={label}
-                trailingMetric={count > 0 ? count : undefined}
-                isSelected={count > 0}
+                trailingMetric={count}
                 spacing={spacing}
                 className="plus-filter-menu__trigger"
             />

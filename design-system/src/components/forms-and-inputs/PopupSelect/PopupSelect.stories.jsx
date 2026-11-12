@@ -202,7 +202,6 @@ export const Searchable = {
                         options={SUBJECTS}
                         value={subject}
                         onChange={setSubject}
-                        placement="bottom-start"
                     />
                 </div>
             );

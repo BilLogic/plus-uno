@@ -57,7 +57,7 @@ icon button whose menu stacks the filters, and give it the total applied as
 its count.
 
 ```jsx
-<IconButton icon="filter" label="Filters" trailingMetric={applied || undefined} isSelected={applied > 0} />
+<IconButton icon="filter" label="Filters" trailingMetric={applied} />
 ```
 
 ### Use the filter's name as the label. {#use-the-filter-s-name-as-the-label}

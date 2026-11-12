@@ -67,13 +67,29 @@ describe('IconButton', () => {
         expect(metric).toHaveTextContent('2');
     });
 
-    it('shows a count of 0 and hides the count when trailingMetric is left out', () => {
+    it('draws no count and no count in the name for zero or absent', () => {
         const { rerender } = render(<IconButton icon="filter" label="Filters" trailingMetric={0} />);
-        expect(screen.getByRole('button', { name: 'Filters, 0 applied' })).toHaveTextContent('0');
-        rerender(<IconButton icon="filter" label="Filters" />);
-        const button = screen.getByRole('button', { name: 'Filters' });
+        let button = screen.getByRole('button', { name: 'Filters' });
         expect(button).toHaveClass('plus-btn--icon-only');
         expect(button.querySelector('.plus-icon-btn__metric')).toBeNull();
+        expect(button).not.toHaveAttribute('aria-pressed', 'true');
+        rerender(<IconButton icon="filter" label="Filters" />);
+        button = screen.getByRole('button', { name: 'Filters' });
+        expect(button.querySelector('.plus-icon-btn__metric')).toBeNull();
+    });
+
+    it('draws the selected fill by itself for a count above zero', () => {
+        render(<IconButton icon="filter" label="Filters" trailingMetric={3} />);
+        const button = screen.getByRole('button', { name: 'Filters, 3 applied' });
+        expect(button).toHaveClass('plus-btn--selected');
+    });
+
+    it('reports aria-expanded only on a menu trigger, keeping the selected fill', () => {
+        render(<IconButton icon="filter" label="Filters" trailingMetric={2} aria-expanded="false" aria-haspopup="dialog" />);
+        const button = screen.getByRole('button', { name: 'Filters, 2 applied' });
+        expect(button).toHaveAttribute('aria-expanded', 'false');
+        expect(button).not.toHaveAttribute('aria-pressed');
+        expect(button).toHaveClass('plus-btn--selected');
     });
 
     it('swaps the drawn count for a new one when the count changes', () => {

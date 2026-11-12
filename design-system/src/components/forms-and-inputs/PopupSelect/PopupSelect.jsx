@@ -29,7 +29,7 @@ const optionInfo = (option) => {
  *   tabs. Pass `trigger` for anything else, such as a filter button in a
  *   section's view bar; a function gets `{ isOpen, option }`.
  * - **Placement follows the trigger's side.** A trigger at the start of a bar
- *   opens `bottom-start`; one at the end opens `bottom-end` (the default).
+ *   opens `bottom-start` (the default); one at the end opens `bottom-end`.
  * - **Width** is Popup's `auto`: at least the trigger, 160 to 320.
  * - **Marker** is a radio before the label: one choice among several. `marker="check"` puts a check at the row's end.
  * - **Search** sits above the list and filters it. Short lists turn it off
@@ -44,7 +44,7 @@ const PopupSelect = ({
     onChange,
     label,
     trigger,
-    placement = 'bottom-end',
+    placement = 'bottom-start',
     isSearchable = true,
     searchPlaceholder = 'Search',
     open,
@@ -177,7 +177,7 @@ PopupSelect.propTypes = {
     label: PropTypes.string,
     /** A trigger of your own, or `({ isOpen, option }) => node`. Without it the labeled trigger is drawn. */
     trigger: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-    /** `bottom-start` for a trigger at the start of a bar, `bottom-end` (default) for one at its end. */
+    /** `bottom-start` (default) for a trigger at the start of a bar, `bottom-end` for one at its end. */
     placement: PropTypes.oneOf(POPUP_SELECT_PLACEMENTS),
     /** A search field above the list. Turn it off for a short list. */
     isSearchable: PropTypes.bool,

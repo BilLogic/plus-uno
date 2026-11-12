@@ -260,12 +260,11 @@ which widens the button by the count alone.
 
 ### Show the applied count on a filter trigger.
 
-When filters are on, pass their number as `trailingMetric` and set
-`isSelected`, so the count sits on the selected fill. Leave the count out
-when none is applied: `0` renders as a visible zero.
+When filters are on, pass their number as `trailingMetric`. A count above zero draws the
+selected fill by itself; zero or absent draws no count and no fill.
 
 ```jsx
-<IconButton icon="filter" label="Filters" trailingMetric={applied || undefined} isSelected={applied > 0} />
+<IconButton icon="filter" label="Filters" trailingMetric={applied} />
 ```
 
 ### Use primary sparingly.
@@ -320,8 +319,8 @@ Put related icon buttons in a Button group, and use `isSelected` for a choice be
 
 - `label` is required. It is the accessible name and the tooltip. A missing label fails `check:icon-button-name`.
 - Leave an action enabled and explain what is missing when it is pressed; disable an icon button only while it is sending. A disabled icon button leaves the tab order, drops its tooltip and `title`, and takes no `aria-disabled` stand-in that keeps it focusable. Say why in visible text beside it.
-- Selected is not color alone: `isSelected` sets `aria-pressed`.
-- With `trailingMetric` the accessible name carries the count: "Filters, 2 applied". The drawn digits are hidden from assistive technology so the count is not read twice.
+- Selected is not color alone: `isSelected` sets `aria-pressed`. A menu trigger reports `aria-expanded` only, so it never carries `aria-pressed`.
+- With `trailingMetric` the accessible name carries the count: "Filters, 2 applied". A count of zero adds nothing to the name. The drawn digits are hidden from assistive technology so the count is not read twice.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 - The glyph is decoration once the button has a name, so it is hidden from assistive technology.
 

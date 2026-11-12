@@ -193,8 +193,8 @@ export const FilterCount = {
     render: () => (
         <div style={{ ...row, justifyContent: 'flex-end' }}>
             <IconButton icon="filter" label="Filters" />
-            <IconButton icon="filter" label="Filters" trailingMetric={2} isSelected />
-            <IconButton icon="filter" label="Filters" trailingMetric={2} isSelected spacing="compact" />
+            <IconButton icon="filter" label="Filters" trailingMetric={2} />
+            <IconButton icon="filter" label="Filters" trailingMetric={2} spacing="compact" />
         </div>
     ),
     play: async ({ canvasElement }) => {

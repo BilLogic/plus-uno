@@ -51,12 +51,11 @@ which widens the button by the count alone.
 
 ### Show the applied count on a filter trigger. {#show-the-applied-count-on-a-filter-trigger}
 
-When filters are on, pass their number as `trailingMetric` and set
-`isSelected`, so the count sits on the selected fill. Leave the count out
-when none is applied: `0` renders as a visible zero.
+When filters are on, pass their number as `trailingMetric`. A count above zero draws the
+selected fill by itself; zero or absent draws no count and no fill.
 
 ```jsx
-<IconButton icon="filter" label="Filters" trailingMetric={applied || undefined} isSelected={applied > 0} />
+<IconButton icon="filter" label="Filters" trailingMetric={applied} />
 ```
 
 ### Use primary sparingly. {#use-primary-sparingly}
@@ -82,8 +81,8 @@ Don't: The same two views as loose buttons read as unrelated actions.
 
 - `label` is required. It is the accessible name and the tooltip. A missing label fails `check:icon-button-name`.
 - Leave an action enabled and explain what is missing when it is pressed; disable an icon button only while it is sending. A disabled icon button leaves the tab order, drops its tooltip and `title`, and takes no `aria-disabled` stand-in that keeps it focusable. Say why in visible text beside it.
-- Selected is not color alone: `isSelected` sets `aria-pressed`.
-- With `trailingMetric` the accessible name carries the count: "Filters, 2 applied". The drawn digits are hidden from assistive technology so the count is not read twice.
+- Selected is not color alone: `isSelected` sets `aria-pressed`. A menu trigger reports `aria-expanded` only, so it never carries `aria-pressed`.
+- With `trailingMetric` the accessible name carries the count: "Filters, 2 applied". A count of zero adds nothing to the name. The drawn digits are hidden from assistive technology so the count is not read twice.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 - The glyph is decoration once the button has a name, so it is hidden from assistive technology.
 
@@ -156,11 +155,11 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 |------|------|---------|-------------|
 | `icon` | string or node | — | A Font Awesome Free glyph name (`trash`) or a node. |
 | `label` | string (required) | — | The accessible name and tooltip. Sentence case; name the object acted on ("Edit page"). |
-| `trailingMetric` | number or string | — | The count of filters applied, drawn after the icon; the accessible name becomes "Filters, 2 applied". `0` shows; leave it out to hide it. |
+| `trailingMetric` | number or string | — | The count of filters applied, drawn after the icon; the accessible name becomes "Filters, 2 applied". Zero or absent draws no count, and a count above zero draws the selected fill by itself. |
 | `appearance` | enum | `'default'` | The visual style. `default` suits most actions, `subtle` low-emphasis toolbar actions, `primary` the main action and `discovery` something new. |
 | `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24. |
 | `shape` | enum | `'default'` | Square by default; `circle` is for top navigation. |
-| `isSelected` | bool | — | Marks the button selected and sets `aria-pressed`. Use it for a toggle such as a list or grid view switch. |
+| `isSelected` | bool | `false` | Marks the button selected and sets `aria-pressed`, except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch. |
 | `isDisabled` | bool | `false` | Prevents interaction and drops the tooltip and `title`. Leave an action enabled and explain what is missing when it is pressed; disable only while it is sending. |
 | `isLoading` | bool | — | Shows a spinner in place of the icon and blocks interaction. |
 | `onClick` | func | — | Called with the click event when the button is activated. It does not fire while `isDisabled` or `isLoading` is set. |
