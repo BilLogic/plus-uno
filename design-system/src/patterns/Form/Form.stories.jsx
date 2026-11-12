@@ -53,7 +53,7 @@ export const TypePanel = {
 
 export const TypeModal = {
     name: 'Type: In a Modal',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal /></div>,
+    render: () => <div style={{ inlineSize: STAGE }}><FormInModal height="fill" stageHeight={680} /></div>, // docs-literal
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -195,7 +195,7 @@ export const KeyDisabledReason = {
 /** A blocked submit keeps the Modal open, marks the field, and the footer never moves. */
 export const KeyBlockedSubmit = {
     name: 'Key state: Blocked submit',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal /></div>,
+    render: () => <div style={{ inlineSize: STAGE }}><FormInModal height="fill" stageHeight={680} /></div>, // docs-literal
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');

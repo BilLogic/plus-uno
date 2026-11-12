@@ -241,9 +241,21 @@ export const BulkBar = {
 
 /* -------------------------------------------------------------- key states */
 
-/** Sending: the button swaps its label for a spinner in place; Cancel stays live. */
+/** The page's picture: the state after the press, drawn from an initial prop because the docs page does not run plays. */
+export const SendingShown = {
+    name: 'Key state: Sending (shown)',
+    render: () => staged(<Sending sending />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('button', { name: 'Save session' }), 'the spinner button disables').toBeDisabled();
+        await expect(canvas.getByRole('button', { name: 'Cancel' }), 'Cancel stays live').not.toBeDisabled();
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** Sending, tested from a clean start: the button swaps its label for a spinner in place; Cancel stays live. */
 export const SendingKeepsWidth = {
-    name: 'Key state: Sending',
+    name: 'Test: Sending',
     render: () => staged(<Sending />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);

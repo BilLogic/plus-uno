@@ -153,8 +153,8 @@ export const ManyRows = () => (
 );
 
 /** Sending: only the pressed button disables, swapping its label for a spinner in place at the same width. */
-export const Sending = () => {
-    const [sending, setSending] = useState(false);
+export const Sending = ({ sending: started = false }) => {
+    const [sending, setSending] = useState(started);
     return (
         <ModalStage
             title="Log a session"

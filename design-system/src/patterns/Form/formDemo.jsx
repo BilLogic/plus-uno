@@ -55,6 +55,8 @@ export const FormFields = ({ values, onChange, errors = {}, onBlurField, subject
             value={values.subject}
             onChange={(v) => onChange({ ...values, subject: v })}
             isDisabled={subjectWaits}
+            isInvalid={Boolean(errors.subject)}
+            errorMessage={errors.subject}
             caption={subjectWaits ? 'Choose a student first.' : undefined}
         />
         <TextField
@@ -68,8 +70,18 @@ export const FormFields = ({ values, onChange, errors = {}, onBlurField, subject
 export const EMPTY = { student: '', subject: '', notes: '' };
 export const FILLED = { student: 'Ana Ruiz', subject: 'algebra', notes: '' };
 
-/** The first required field the form is missing, as `{ field: message }`. */
-export const missing = (values) => (values.student.trim() ? {} : { student: 'Enter the student’s name.' });
+/** Every required field the form is missing, as `{ field: message }`. */
+export const missing = (values) => ({
+    ...(values.student.trim() ? {} : { student: 'Enter the student’s name.' }),
+    ...(values.subject ? {} : { subject: 'Choose a subject.' }),
+});
+
+/** A docs picture's after-state: the missing fields, all of them or only those named. */
+const marksFor = (values, marked) => {
+    const found = missing(values);
+    if (marked === true) return found;
+    return Object.fromEntries(Object.entries(found).filter(([name]) => [].concat(marked).includes(name)));
+};
 
 /** A server's refusal, shown at the top of the form. */
 export const SERVER_MESSAGE = 'The session was not saved. Ana Ruiz already has a session at 4:00 PM on Thursday. Pick another time.';
@@ -109,10 +121,11 @@ const Behind = () => (
 );
 
 /** The fields' state, with the blur, submit and server rules each host shares. */
-const useFormState = ({ initial = EMPTY, sendingForever = false, server = false } = {}) => {
+const useFormState = ({ initial = EMPTY, sendingForever = false, server = false, marked = false, sending: sendingNow = false } = {}) => {
     const [values, setValues] = useState(initial);
-    const [errors, setErrors] = useState({});
-    const [sending, setSending] = useState(false);
+    // `marked` draws the state after a press or a blur, for a docs picture that cannot run a play.
+    const [errors, setErrors] = useState(() => (marked ? marksFor(initial, marked) : {}));
+    const [sending, setSending] = useState(sendingNow);
     const [serverError, setServerError] = useState(server);
     const refs = useRef({});
     const setRef = (name) => (el) => { refs.current[name] = el; };
@@ -129,8 +142,8 @@ const useFormState = ({ initial = EMPTY, sendingForever = false, server = false 
 };
 
 /** A form in a page: in a Section with the subtle fill, buttons left under the fields. */
-export const FormInPage = ({ initial, server, subjectWaits, sendingForever }) => {
-    const f = useFormState({ initial, server, sendingForever });
+export const FormInPage = ({ initial, server, subjectWaits, sendingForever, marked, sending }) => {
+    const f = useFormState({ initial, server, sendingForever, marked, sending });
     return (
         <BrowserWindow address="app.plus.org/settings/sessions" height={PAGE_HEIGHT}>
             <InAppFrame height="100%" panelStorageKey={null}>
@@ -170,13 +183,13 @@ export const FormInPanel = () => {
  * A blocked submit keeps it open, a server refusal puts a danger message at the
  * top of the body, and Close with edits asks first in the same Modal.
  */
-export const FormInModal = ({ initial, server, sendingForever, height = 'hug', screenHeight = SCREEN.height }) => {
-    const f = useFormState({ initial, server, sendingForever });
+export const FormInModal = ({ initial, server, sendingForever, marked, sending, height = 'hug', stageHeight = SCREEN.height, screenHeight = stageHeight }) => {
+    const f = useFormState({ initial, server, sendingForever, marked, sending });
     const [confirming, setConfirming] = useState(false);
     const dirty = f.values.student !== '' || f.values.notes !== '';
     const close = () => { if (dirty) setConfirming(true); };
     return (
-        <BrowserWindow address="app.plus.org/students" height={SCREEN.height}>
+        <BrowserWindow address="app.plus.org/students" height={stageHeight}>
             <Backdrop inline screenWidth={SCREEN.width} screenHeight={screenHeight}>
                 {confirming ? (
                     <PatternModal

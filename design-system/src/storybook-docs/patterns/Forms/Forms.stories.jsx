@@ -5,7 +5,7 @@ import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps } from '../../../patterns/Form/formDemo.jsx';
+import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps } from '../../../patterns/Form/formDemo.jsx';
 import { BoundInputs, Marks, STAGE } from './formsDemo.jsx';
 
 /**
@@ -26,6 +26,9 @@ export default {
 };
 
 const rect = (el) => el.getBoundingClientRect();
+/** Stage heights that hold the whole form: the server message and the field errors each add a block above the pinned footer. */
+const SERVER_HEIGHT = 720; // docs-literal
+const MARKED_HEIGHT = 680; // docs-literal
 const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
 
 /* ------------------------------------------------------------------- hosts */
@@ -90,9 +93,63 @@ export const RequiredMarks = {
 
 /* ------------------------------------------------------------- validation */
 
+/* The four pictures below draw the state their heading names, from initial-state props: the docs page does not run plays.
+   The stories after them test the same interaction from a clean start. */
+
+/** Student was touched and left empty: its error is showing; Subject was not touched, so it is not marked. */
+export const ShownOnBlur = {
+    name: 'Validation: On blur (shown)',
+    render: () => staged(<FormInPage initial={EMPTY} marked="student" />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByLabelText(/Student/), 'touched and empty').toHaveAttribute('aria-invalid', 'true');
+        await expect(canvas.getByText('Enter the student’s name.'), 'the error says what to fix').toBeInTheDocument();
+        await expect(canvas.queryByText('Choose a subject.'), 'an untouched field is not marked').toBeNull();
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** After the press: the Primary is still enabled and every missing field is marked. */
+export const ShownSubmitStaysEnabled = {
+    name: 'Validation: Submit stays enabled (shown)',
+    render: () => staged(<FormInPage initial={EMPTY} marked />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByLabelText(/Student/)).toHaveAttribute('aria-invalid', 'true');
+        await expect(canvas.getByText('Choose a subject.'), 'every missing field is marked').toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Save session' }), 'still enabled').not.toBeDisabled();
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** The Modal after a blocked press, at rest after its shake: open, the fields marked, one dialog. */
+export const ShownBlockedSubmit = {
+    name: 'Validation: Blocked submit in a Modal (shown)',
+    render: () => staged(<FormInModal initial={EMPTY} marked height="fill" stageHeight={MARKED_HEIGHT} />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryAllByRole('dialog'), 'one dialog').toHaveLength(1);
+        await expect(canvas.getByLabelText(/Student/)).toHaveAttribute('aria-invalid', 'true');
+        await expect(canvas.getByText('Choose a subject.')).toBeInTheDocument();
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** Sending: the Primary shows its spinner at its own width; Cancel is live. */
+export const ShownSending = {
+    name: 'Validation: Sending (shown)',
+    render: () => staged(<FormInModal initial={FILLED} sending />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('button', { name: 'Save session' }), 'the spinner button is the one that disables').toBeDisabled();
+        await expect(canvas.getByRole('button', { name: 'Cancel' }), 'Cancel stays live').not.toBeDisabled();
+        await fitsCanvas(canvasElement);
+    },
+};
+
 /** A field checks itself when it loses focus, and clears once the rule is met. */
 export const OnBlur = {
-    name: 'Validation: On blur',
+    name: 'Test: On blur',
     render: () => staged(<FormInPage />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -111,7 +168,7 @@ export const OnBlur = {
 
 /** The submit stays enabled with a field missing; pressing it marks the field and moves focus there. */
 export const SubmitStaysEnabled = {
-    name: 'Validation: Submit stays enabled',
+    name: 'Test: Submit stays enabled',
     render: () => staged(<FormInPage />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -128,8 +185,9 @@ export const SubmitStaysEnabled = {
 
 /** A blocked submit keeps the Modal open, marks the field and never raises a second dialog; the footer holds still. */
 export const BlockedSubmit = {
-    name: 'Validation: Blocked submit in a Modal',
-    render: () => staged(<FormInModal />),
+    name: 'Test: Blocked submit in a Modal',
+    // A filled Modal keeps its size when the errors appear, so the footer holds still; a hugging one grows from the middle.
+    render: () => staged(<FormInModal height="fill" stageHeight={MARKED_HEIGHT} />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -147,10 +205,12 @@ export const BlockedSubmit = {
 /** The server says no: a danger message at the top of the body, announced, and nothing shakes. */
 export const ServerRefuses = {
     name: 'Validation: Rejected by the server',
-    render: () => staged(<FormInModal server initial={FILLED} />),
+    render: () => staged(<FormInModal server initial={FILLED} height="fill" stageHeight={SERVER_HEIGHT} />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const message = canvasElement.querySelector('[data-probe="message"]');
+        const body = canvasElement.querySelector('[data-probe="body"], .plus-pattern-modal-body');
+        if (body) await expect(body.scrollHeight, 'the whole form shows: the body does not scroll').toBeLessThanOrEqual(body.clientHeight + 1);
         await expect(within(message).getByRole('alert'), 'announced when it appears').toBeInTheDocument();
         await expect(rect(message).top, 'at the top of the body').toBeLessThanOrEqual(rect(canvas.getByLabelText(/Student/)).top);
         await fitsCanvas(canvasElement);
@@ -159,7 +219,7 @@ export const ServerRefuses = {
 
 /** Sending: the one time a button disables; it keeps its width and Cancel stays live. */
 export const Sending = {
-    name: 'Validation: Sending',
+    name: 'Test: Sending',
     render: () => staged(<FormInModal initial={FILLED} sendingForever />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);

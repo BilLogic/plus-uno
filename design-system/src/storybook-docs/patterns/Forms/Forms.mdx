@@ -51,15 +51,15 @@ A form lives in one of four hosts. The <a target="_top" href="./?path=/docs/temp
 
 ## Validation
 
-<ComponentExample of={FormsStories.OnBlur} title="On blur" description="Click into Student and tab away. The field checks itself when it loses focus; the error says what to fix and clears once the rule is met." />
+<ComponentExample of={FormsStories.ShownOnBlur} title="On blur" description="Student was clicked into and left empty. The field checks itself when it loses focus; the error says what to fix and clears once the rule is met. Subject was not touched, so it is not marked." />
 
-<ComponentExample of={FormsStories.SubmitStaysEnabled} title="Submit stays enabled" description="The Primary is pressable with fields missing. Press it: each missing field is marked and focus moves to the first." />
+<ComponentExample of={FormsStories.ShownSubmitStaysEnabled} title="Submit stays enabled" description="The Primary is pressable with fields missing. After the press every missing field is marked and focus moves to the first." />
 
-<ComponentExample of={FormsStories.BlockedSubmit} title="Blocked submit in a Modal" description="The Modal stays open, marks the field, says what to fix inline, scrolls the body to it and shakes once. Never a second dialog." />
+<ComponentExample of={FormsStories.ShownBlockedSubmit} title="Blocked submit in a Modal" description="The Modal stays open, marks the field, says what to fix inline, scrolls the body to it and shakes once. Never a second dialog." />
 
 <ComponentExample of={FormsStories.ServerRefuses} title="Rejected by the server" description="A danger SectionMessage at the top of the form, scrolled into view, plus the field errors it names. Nothing shakes." />
 
-<ComponentExample of={FormsStories.Sending} title="Sending" description="Press Save session. The button swaps its label for a spinner in place and keeps its width. Only that button disables; Cancel stays live." />
+<ComponentExample of={FormsStories.ShownSending} title="Sending" description="After Save session is pressed the button swaps its label for a spinner in place and keeps its width. Only that button disables; Cancel stays live." />
 
 </div>
 
