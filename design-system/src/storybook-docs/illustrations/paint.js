@@ -46,6 +46,9 @@ const ROLES = {
   // Overlays
   popupSurface: ['--ds-surface-overlay', 'components/overlays-and-layering/Popup/Popup.scss'],
   popupShadow: ['--ds-shadow-overlay', 'components/overlays-and-layering/Popup/Popup.scss'],
+  // Tooltip: a flat label, no shadow, the fill and text flip with the mode
+  tooltipSurface: ['--ds-background-neutral-bold', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
+  tooltipText: ['--ds-text-inverse', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
   panelSurface: ['--ds-surface-overlay', 'components/layout-and-structure/Panel/Panel.scss'],
   panelEdge: ['--ds-border', 'components/layout-and-structure/Panel/Panel.scss'],
   // A floating Panel (peek or overlay) takes Frame's overlay shadow; a docked one has none.
@@ -138,6 +141,7 @@ const CORNERS = {
   section: ['--section-radius', 'patterns/PatternSection/PatternSection.scss'],
   popup: ['--popover-radius', 'components/overlays-and-layering/Popup/Popup.scss'],
   flag: ['--popover-radius', 'components/messaging/Flag/Flag.scss'],
+  tooltip: ['--popover-radius-tooltip', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
   modal: ['--modal-radius', 'components/messaging/Modal/Modal.scss'],
   field: ['--radius-0625', 'components/forms-and-inputs/_internal/FieldBox.scss'],
   sidebarRow: ['--frame-sidebar-row-radius', 'patterns/Sidebar/Sidebar.scss'],
