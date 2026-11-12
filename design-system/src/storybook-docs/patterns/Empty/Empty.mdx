@@ -1,0 +1,246 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as EmptyStories from './Empty.stories.jsx';
+import { STAGE, SMALL_STAGE, TYPE_STAGE } from './emptyDemo.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    BareString,
+    HeaderOverNothing,
+    ReplacedTable,
+    WhatBelongsHere,
+} from '@/storybook-docs/illustrations/empty.jsx';
+
+<Meta title="Patterns/States/Empty" tags={['!dev', 'manifest']} />
+
+<Title>Empty</Title>
+What a view shows when it has nothing to show. It says what belongs here, why it is empty, and what to do next; it never leaves a blank area and never apologizes.
+
+<DocsTabs of={EmptyStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## The types
+
+Every empty state is one of four. The type decides the words and whether there is an action. The <a target="_top" href="./?path=/docs/components-messaging-empty-state--docs">Empty state</a> page holds the props; these are the situations.
+
+<TypeGrid>
+<TypeCard of={EmptyStories.TypeFirstUse} title="First use" stage={TYPE_STAGE}>Nothing has been added yet. Say what will appear and give the one action that adds it, if this person can.</TypeCard>
+<TypeCard of={EmptyStories.TypeNoMatches} title="No matches" stage={TYPE_STAGE}>A search or filter matched nothing. Name what is active and offer "Reset filters".</TypeCard>
+<TypeCard of={EmptyStories.TypeAllDone} title="All done" stage={TYPE_STAGE}>The person finished everything. Say so, and when more arrives. No action.</TypeCard>
+<TypeCard of={EmptyStories.TypeCantShow} title="Can't show" stage={TYPE_STAGE}>The data could not load, or this person has no access. Say why and give a way forward: Try again, or who can help.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Where it sits
+
+The place sets the spacing and the alignment. The words stay the same.
+
+<TypeGrid>
+<TypeCard of={EmptyStories.PlaceFullPage} title="A full page" stage={STAGE}>The block lines up with the page title, left-aligned with no wide margin, the picture above the text. <PlannedTag /> The block is centered today.</TypeCard>
+<TypeCard of={EmptyStories.PlaceTable} title="In a table" stage={STAGE}>The empty state replaces the whole table: no column headers, no footer. The block is centered and its text stays left-aligned. <PlannedTag /> The Table keeps its header row today.</TypeCard>
+<TypeCard of={EmptyStories.PlaceCard} title="In a card" stage={SMALL_STAGE}>Compact: a smaller picture and heading, the block centered in the card, the text left-aligned. Several cards at once drop their pictures and use Subtle actions.</TypeCard>
+<TypeCard of={EmptyStories.PlacePanel} title="In a Panel" stage={SMALL_STAGE}>The Details Panel when its record was removed: the block at the top of the body, with a way back.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key cases
+
+<ComponentExample of={EmptyStories.KeyNoMatchesInTable} title="No matches in a table" description="The view bar stays so the person can change the view, search or reset; the table is gone. &quot;Reset filters&quot; is a Default button, and it also clears the search." />
+
+<ComponentExample of={EmptyStories.KeyLoadFailure} title="A load failure" description="Content that fails to load shows its error in the empty-state slot, with Try again. The words belong to the Errors pattern." />
+
+<ComponentExample of={EmptyStories.TypeNoAccess} title="No access" description="The same slot says why and who can help. There is no button for an action this person cannot take." />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Empty when a list, table, card, Panel or page has no records to show, a search or filter returns nothing, a queue is finished, or the content exists but cannot be shown to this person. Show <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a> instead while content is on its way, and leave one blank field blank.
+
+<DocsTable>
+<thead>
+<tr><th>Type</th><th>The view is empty because</th><th>Say</th><th>Action</th></tr>
+</thead>
+<tbody>
+<tr><td>First use</td><td>Nothing has been added yet: a new group with no students</td><td>What will appear here and how it gets here</td><td>One Primary, if this person can add something; otherwise none</td></tr>
+<tr><td>No matches</td><td>A search or filter matched nothing</td><td>Which search or filters are active</td><td>"Reset filters" as a Default button; it also clears the search</td></tr>
+<tr><td>All done</td><td>The person finished everything: every reflection is reviewed</td><td>That they are done, and when more arrives</td><td>None</td></tr>
+<tr><td>Can't show</td><td>No access, or the data could not load</td><td>Why, in plain words</td><td>Try again, or who can help; never an action they cannot take</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For content still on its way, follow <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a>: a skeleton, not an empty state.
+- For a save or request that failed while the view still has content, use `SectionMessage`; the Errors pattern says where each failure shows.
+- For one blank value in a record, show a dash, not an empty state.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Show an `EmptyState` in any view that has no records.
+
+<RuleTag kind="review" />
+
+Never a blank area or a bare "No results": a blank reads as broken or still loading.
+
+<DoDontPair
+    doExample={<WhatBelongsHere />}
+    doCaption="Say what belongs here and give the one action that fills it."
+    dontExample={<BareString />}
+    dontCaption="A bare string in an empty box: broken, loading or empty, nobody can tell."
+/>
+
+### Lay the text out as a left-aligned block.
+
+<RuleTag kind="review" />
+
+The picture above, then the heading, one line and the action, all on one left edge. On a full page the block lines up with the page title; inside a table or a card the block is centered and its text stays left-aligned. The text column never runs wide. <PlannedTag /> `EmptyState` centers its text today.
+
+### Replace the whole table with the empty state.
+
+<RuleTag kind="review" />
+
+No column headers and no footer while the table is empty; the view bar above stays, so the person can change the view, search or reset. A "No matches" state offers "Reset filters". <PlannedTag /> The Table keeps its header row in its `emptyState` slot today.
+
+<DoDontPair
+    doExample={<ReplacedTable />}
+    doCaption="The whole table replaced; the view bar stays."
+    dontExample={<HeaderOverNothing />}
+    dontCaption="Column headers and a footer over nothing, with a centered paragraph."
+/>
+
+### Give at most one Primary action.
+
+<RuleTag kind="review" />
+
+The second action is Default and never stands alone. When two or more empty states can show on one screen, none of them uses a Primary; their actions are Subtle.
+
+### Offer only an action this person can take.
+
+<RuleTag kind="review" />
+
+If they cannot add anything, show no button. A button that leads to "You don't have permission" is a dead end.
+
+### Write the heading as what belongs here.
+
+<RuleTag kind="review" />
+
+"No students in this group yet". The view is empty, not wrong, so the heading carries no "Sorry", no "Oops" and no code.
+
+### Mark the picture as decorative.
+
+<RuleTag kind="automatic" />
+
+Screen readers skip it and read the heading first; the words carry the meaning. The `EmptyState` hides its picture and icon from assistive technology, and its heading sits one level below the section that holds it.
+
+### Name the active search or filters in a No matches state.
+
+<RuleTag kind="review" />
+
+The person may not remember a filter set last week. "No students match these filters" with "Reset filters" is the way out.
+
+### Use an illustration once and an icon where it repeats.
+
+<RuleTag kind="review" />
+
+An illustration for a full view a person meets once, such as a new tutor's first day; an icon on anything that repeats, such as a card on a home page. Illustrations arrive with the character work <PlannedTag />.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Heading: "No students in this group yet".</td><td>"No data", "Nothing here", "Oops!".</td></tr>
+<tr><td>One line: "Add students to schedule sessions and track their progress."</td><td>A paragraph about the feature.</td></tr>
+<tr><td>Action names the next step: "Add students".</td><td>"Get started", "Continue".</td></tr>
+<tr><td>No matches: "No students match these filters." with "Reset filters".</td><td>"Clear filters", "Clear all".</td></tr>
+<tr><td>All done: "Every reflection is reviewed. New ones arrive after Friday's sessions."</td><td>"All caught up! 🎉"</td></tr>
+<tr><td>Warmer for students, plainer for admins: "Your tutor will add notes after your session." and "No notes for this group."</td><td>One voice for everyone.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- The heading is one level below the section that holds it, so it joins the page outline.
+- The picture is decorative: an empty alt, or `aria-hidden` on an icon.
+- When a filter or search empties a list, the result count is announced in a polite live region ("0 students").
+- Focus stays where it was. Never move it to the empty state's button.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Component</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>The block</td><td><a target="_top" href="./?path=/docs/components-messaging-empty-state--docs">Empty state</a></td><td>Picture or icon, header, one line and the action; `spacing` is `default` for a view and `compact` for a table body or card.</td></tr>
+<tr><td>The action</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-button--docs">Button</a></td><td>`primaryAction` takes one Button; a No matches action is Default.</td></tr>
+<tr><td>Table slot</td><td>Table</td><td>`emptyState` takes the block. <PlannedTag /> It replaces the whole table, header and footer included.</td></tr>
+<tr><td>In a Panel</td><td><a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a></td><td>The record-gone state at the top of the body.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a>: use before you know the view is empty.
+- Errors: use for the words in a Can't show state.
+- <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>: use for where No matches comes from, and the "Reset filters" wording.
+- Search: use for a search that matches nothing.
+- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use for the view bar that stays above a replaced table.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
