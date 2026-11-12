@@ -126,7 +126,7 @@ its spacing in two places.
 - For a labeled field where the person picks, creates and removes tags, use `TagInput`.
 - For a long set that needs paging rather than an overflow count, use `Pagination`.
 
-Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag`
+Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag`
 
 ## Parts
 

@@ -81,7 +81,7 @@ Don't: A finished answer with no way to rate it.
 - `PromptInput`, which sends the message.
 - AI sources and AI feedback, which sit under a finished reply.
 
-Same group: `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

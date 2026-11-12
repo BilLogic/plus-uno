@@ -76,7 +76,7 @@ spelling; the aliases exist for content written before it changed.
 - For a category outside the five SMART subjects, use `Tag` directly.
 - For a group of tags, including smart tags, use `TagGroup`.
 
-Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

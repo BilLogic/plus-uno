@@ -161,7 +161,7 @@ and every tag inside follows:
 - For a labeled field where the person picks, creates and removes tags, use `TagInput`.
 - For a state, use `StatusTag`.
 
-Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `TagGroup`
+Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `TagGroup`
 
 ## Parts
 

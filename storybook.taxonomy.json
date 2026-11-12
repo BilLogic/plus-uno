@@ -59,6 +59,7 @@
       "Tile"
     ],
     "Labels": [
+      "Change tag",
       "Count tag",
       "Date tag",
       "Status tag",
@@ -250,6 +251,7 @@
       ],
       "Labels",
       [
+        "Change tag",
         "Count tag",
         "Date tag",
         "Status tag",
