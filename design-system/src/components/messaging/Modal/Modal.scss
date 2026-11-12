@@ -38,11 +38,11 @@
     width: calc(var(--plus-modal-span) * var(--plus-modal-column) + (var(--plus-modal-span) - 1) * var(--grid-gutter) + 2 * var(--modal-pad-x-default));
     flex-shrink: 0;
     box-sizing: border-box;
-    /* The overlay pair, as every floating layer: the blanket under the modal sets it apart from a menu. */
+    /* The overlay fill, with the blocking shadow: the Modal is the one surface on a blanket, so it lifts higher than a menu or Select list (those keep the overlay shadow). The shadow reaches about 80px below; the Modal has no clip-path open or close, so nothing cuts it. */
     background-color: var(--ds-surface-overlay);
     color: var(--ds-text);
     border-radius: var(--modal-radius);
-    box-shadow: var(--ds-shadow-overlay);
+    box-shadow: var(--ds-shadow-blocking);
     display: flex;
     flex-direction: column;
     gap: var(--modal-stack-md);
