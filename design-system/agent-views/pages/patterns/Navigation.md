@@ -56,7 +56,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 | --- | --- |
 | Views as short parallel nouns: "Upcoming", "Past". | "Show upcoming sessions", "History". |
 | Page tabs name views of one subject: "Overview", "Sessions", "Notes". | Counts or status in the tab label. |
-| The view Select is labeled: "Status: Upcoming". | A bare "Upcoming". |
+| The view Select is labeled: "Status: Upcoming" . | A bare "Upcoming". |
 | Breadcrumb levels by the page's own title. | "Back", "Home" as a level. |
 | Open item: "4:00 PM · Ms. Ortiz". | "Session #1028". |
 
@@ -95,7 +95,7 @@ Navigation reads these motion tokens and no literal duration or curve.
 
 **Checked:** Automatic
 
-Never on an area page or a focused task. It sits above the title in the page header and shows the record's place: parents only, never history. Folding five or more items into "…" is Planned .
+Never on an area page or a focused task. It sits above the title in the page header and shows the record's place: parents only, never history. It never wraps. Folding five or more items into "…" is Planned .
 
 Do: A breadcrumb on the record page, parents only.
 Don't: A breadcrumb on an area page: there is nothing to climb out of.

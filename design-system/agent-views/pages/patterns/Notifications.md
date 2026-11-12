@@ -42,7 +42,7 @@ Use Notifications when the product needs to tell someone something: an action fi
 | A condition that holds for everything in a Frame, page or Section | `Banner` at that tier | Top of the tier | When the condition ends |
 | A note beside one thing that most people never need | `InlineMessage` | Beside the field or value | On close |
 | Something that must be answered before going on | `Modal`, Acknowledge or Active | Centered over a Backdrop | On the button |
-| What arrived over time | The Inbox, a Panel of the Notifications type | A Panel beside the page | When read |
+| What arrived over time | The Inbox, a Panel of the Notifications type | A floating Panel, no Backdrop | When read |
 
 ## Alternatives
 
@@ -114,7 +114,7 @@ Don't: A decision in a Flag, which is gone before it is answered.
 
 Normal, information and success close after 8 s. Warning and error stay until dismissed. A Flag with an action keeps autohide only when the action is optional.
 
-### Show one Banner per tier, one line, for as long as the condition holds. {#show-one-banner-per-tier-one-line-for-as-long-as-the-condition-holds}
+### Show one Banner at a time, one line, at the tier it concerns, for as long as the condition holds. {#show-one-banner-at-a-time-one-line-at-the-tier-it-concerns-for-as-long-as-the-condition-holds}
 
 **Checked:** Automatic
 
