@@ -341,13 +341,13 @@ InsideAModal.play = async ({ canvasElement }) => {
     await expect(surface.width).toBeGreaterThanOrEqual(Math.floor(field.width));
     await expect(surface.height).toBeLessThanOrEqual(320);
 
-    const physics = within(listbox).getByRole('option', { name: 'Physics' });
-    physics.scrollIntoView({ block: 'nearest' });
-    const box = physics.getBoundingClientRect();
-    await expect(doc.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2).closest('[role="option"]')).toBe(physics);
+    const lastSite = within(listbox).getByRole('option', { name: 'Washington Middle' });
+    lastSite.scrollIntoView({ block: 'nearest' });
+    const box = lastSite.getBoundingClientRect();
+    await expect(doc.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2).closest('[role="option"]')).toBe(lastSite);
 
-    await userEvent.click(physics);
-    await expect(within(dialog).getByTestId('value').textContent).toBe('Physics');
+    await userEvent.click(lastSite);
+    await expect(within(dialog).getByTestId('value').textContent).toBe('Washington Middle');
 };
 
 /** Without room below the field, the list opens above it. */

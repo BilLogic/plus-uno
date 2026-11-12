@@ -5,30 +5,30 @@ import OptionRow from './OptionRow';
 
 describe('OptionRow', () => {
     it('is an option named by its label, with its selection state', () => {
-        render(<OptionRow label="Maths" selected />);
-        const row = screen.getByRole('option', { name: 'Maths' });
+        render(<OptionRow label="Lincoln Middle" selected />);
+        const row = screen.getByRole('option', { name: 'Lincoln Middle' });
         expect(row).toHaveAttribute('aria-selected', 'true');
     });
 
     it('keeps tabbable off the DOM and is a tab stop only when it holds the cursor', () => {
-        const { rerender } = render(<OptionRow label="Maths" tabbable />);
+        const { rerender } = render(<OptionRow label="Lincoln Middle" tabbable />);
         const row = screen.getByRole('option');
         expect(row).not.toHaveAttribute('tabbable');
         expect(row).toHaveAttribute('tabindex', '0');
 
-        rerender(<OptionRow label="Maths" tabbable={false} />);
+        rerender(<OptionRow label="Lincoln Middle" tabbable={false} />);
         expect(row).toHaveAttribute('tabindex', '-1');
 
         // In a listbox that keeps focus itself (aria-activedescendant), the row
         // takes no tab stop at all.
-        rerender(<OptionRow label="Maths" />);
+        rerender(<OptionRow label="Lincoln Middle" />);
         expect(row).not.toHaveAttribute('tabindex');
     });
 
     it('selects with a click, Enter or Space, and not when disabled', async () => {
         const user = userEvent.setup();
         const onSelect = vi.fn();
-        const { rerender } = render(<OptionRow label="Maths" value="maths" tabbable onSelect={onSelect} />);
+        const { rerender } = render(<OptionRow label="Lincoln Middle" value="maths" tabbable onSelect={onSelect} />);
         const row = screen.getByRole('option');
 
         await user.click(row);
@@ -36,10 +36,10 @@ describe('OptionRow', () => {
         await user.keyboard('{Enter}');
         await user.keyboard(' ');
         expect(onSelect).toHaveBeenCalledTimes(3);
-        expect(onSelect).toHaveBeenLastCalledWith('maths');
+        expect(onSelect).toHaveBeenLastCalledWith('lincoln-middle');
 
         onSelect.mockClear();
-        rerender(<OptionRow label="Maths" value="maths" tabbable disabled onSelect={onSelect} />);
+        rerender(<OptionRow label="Lincoln Middle" value="maths" tabbable disabled onSelect={onSelect} />);
         expect(row).toHaveAttribute('aria-disabled', 'true');
         await user.click(row);
         await user.keyboard('{Enter}');
@@ -79,9 +79,9 @@ describe('OptionRow', () => {
     });
 
     it('marks a selected single-select row with a check, unless told not to', () => {
-        const { container, rerender } = render(<OptionRow label="Maths" selected />);
+        const { container, rerender } = render(<OptionRow label="Lincoln Middle" selected />);
         expect(container.querySelector('.plus-option-row-selected-mark')).not.toBeNull();
-        rerender(<OptionRow label="Maths" selected check={false} />);
+        rerender(<OptionRow label="Lincoln Middle" selected check={false} />);
         expect(container.querySelector('.plus-option-row-selected-mark')).toBeNull();
     });
 
@@ -124,12 +124,12 @@ describe('OptionRow', () => {
     });
 
     it('draws the dragging state and a drop line on either edge', () => {
-        const { rerender } = render(<OptionRow label="Maths" dragging dropIndicator="before" />);
+        const { rerender } = render(<OptionRow label="Lincoln Middle" dragging dropIndicator="before" />);
         const row = screen.getByRole('option');
         expect(row).toHaveClass('is-dragging', 'has-drop-indicator');
         expect(row).not.toHaveClass('has-drop-indicator-after');
 
-        rerender(<OptionRow label="Maths" dropIndicator="after" />);
+        rerender(<OptionRow label="Lincoln Middle" dropIndicator="after" />);
         expect(row).toHaveClass('has-drop-indicator-after');
         expect(row).not.toHaveClass('is-dragging', 'has-drop-indicator');
     });

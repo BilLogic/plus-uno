@@ -37,7 +37,7 @@ describe('TreeSelect', () => {
 
     it('opens a flat list of option rows, each a treeitem', async () => {
         const user = userEvent.setup();
-        render(<Harness initial="algebra" />);
+        render(<Harness initial="lincoln-middle" />);
         const tree = await open(user);
 
         const items = within(tree).getAllByRole('treeitem');
@@ -52,7 +52,7 @@ describe('TreeSelect', () => {
 
     it('puts the indent, then the toggle, in the row\'s Leading slot', async () => {
         const user = userEvent.setup();
-        render(<Harness initial="algebra" />);
+        render(<Harness initial="lincoln-middle" />);
         const tree = await open(user);
         const [maths, algebra] = within(tree).getAllByRole('treeitem');
 
@@ -68,7 +68,7 @@ describe('TreeSelect', () => {
 
     it('marks the chosen node selected in single mode', async () => {
         const user = userEvent.setup();
-        render(<Harness initial="science" />);
+        render(<Harness initial="high-schools" />);
         const tree = await open(user);
         const science = within(tree).getByRole('treeitem', { name: 'High schools' });
         expect(science).toHaveAttribute('aria-selected', 'true');
@@ -146,7 +146,7 @@ describe('TreeSelect', () => {
             render(<Harness initial="" />);
             const trigger = screen.getByRole('combobox', { name: 'Site' });
             await user.click(trigger);
-            const branch = screen.getByRole('treeitem', { name: /Mathematics/ });
+            const branch = screen.getByRole('treeitem', { name: /Middle schools/ });
             branch.focus();
             await user.keyboard('{ArrowRight}');
             expect(branch).toHaveAttribute('aria-expanded', 'true');
@@ -163,7 +163,7 @@ describe('TreeSelect', () => {
             render(<Harness initial="" />);
             const trigger = screen.getByRole('combobox', { name: 'Site' });
             await user.click(trigger);
-            screen.getByRole('treeitem', { name: /Science/ }).focus();
+            screen.getByRole('treeitem', { name: /High schools/ }).focus();
             await user.keyboard('{Enter}');
             expect(trigger).toHaveValue('High schools');
             await user.click(trigger);
