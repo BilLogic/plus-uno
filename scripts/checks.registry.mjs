@@ -493,6 +493,14 @@ export const CHECKS = [
     guards: 'the generated token ladder files in design-system/src/tokens/ladder/ against scripts/lib/tokens/plan.mjs; drift means a hand edit or an unregenerated plan.',
   },
   {
+    name: 'check:sound-spec',
+    script: 'node scripts/generate-sound-spec.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-sound-spec.mjs',
+    guards: 'the generated sound-spec module design-system/src/sound/spec.generated.js against scripts/lib/tokens/sound-plan.mjs; drift means a hand edit or an unregenerated plan.',
+  },
+  {
     name: 'check:ds-usage',
     script: 'node scripts/check-ds-usage.mjs',
     pkg: 'root',
