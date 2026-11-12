@@ -3,10 +3,10 @@ import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { PAINT } from './paint.js';
 import {
-  Backdrop, ButtonShape, Flag, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule, Section, SkeletonBar,
+  Backdrop, ButtonShape, CardBox, Flag, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule, Section, SkeletonBar,
 } from './primitives.jsx';
 import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
-import { BEAT, LOOP_PERIOD, measure, ratioOf, springFor, springWithRatio, stepOf } from './motion.jsx';
+import { BEAT, LOOP_PERIOD, measure, projectedRest, ratioOf, resisted, springFor, springWithRatio, stepOf } from './motion.jsx';
 
 /**
  * The Physics page's figures (Foundations/Motion/Physics). Each is a principle,
@@ -522,6 +522,344 @@ const dampScenes = RATIOS.map(([ratio, title, caption]) => {
   return plotted({ id: `damping-${String(ratio).replace('.', '')}`, title, caption, config, seconds: DAMP_SECONDS });
 });
 
+// ---------- Velocity ----------
+
+const round2 = (v) => Math.round(v * 100) / 100;
+const HAND = [[110, 56], [150, 56]];
+
+/** The Panel docked at the right, with the hand's pointer on its left edge while it holds it. */
+const PanelAndHand = ({ x, hand, dim = 1 }) => (
+  <>
+    <Screen rows={3} />
+    <g opacity={dim}>
+      <DockedPanel x={x} />
+    </g>
+    {hand > 0 && (
+      <g opacity={hand}>
+        <Pointer x={PANEL.x + x + 6} y={56} />
+      </g>
+    )}
+  </>
+);
+
+// A short, fast pull. The hand's speed is that distance over that time.
+const THROW_PULL = 16;
+const THROW_BEATS = 0.25;
+const speedOf = (pull, beats) => pull / (beats * BEAT);
+const THROW_V = Math.round(speedOf(THROW_PULL, THROW_BEATS));
+
+/** The same throw twice: only whether the spring is handed the hand's speed changes. */
+const throwScene = ({ id, title, caption, keeps }) => ({
+  id,
+  title,
+  caption,
+  viewBox: VIEW,
+  initial: { x: 0, hand: 0, vel: 0 },
+  landing: { x: PANEL.w, vel: keeps ? THROW_V : 0 },
+  arrows: [HAND],
+  draw: ({ x, hand }) => <PanelAndHand x={x} hand={hand} />,
+  play: async (ctx) => {
+    await ctx.spring('hand', 1, 'appearance.fast');
+    await ctx.linear('x', THROW_PULL, THROW_BEATS);
+    if (keeps) {
+      ctx.set({ vel: THROW_V });
+      await Promise.all([ctx.exit('x', PANEL.w, { velocity: speedOf(THROW_PULL, THROW_BEATS) }), ctx.spring('hand', 0, 'appearance.fast')]);
+    } else {
+      // The hand lets go and the speed is lost: it waits, then leaves from rest.
+      await ctx.spring('hand', 0, 'appearance.fast');
+      await ctx.hold(1);
+      await ctx.exit('x', PANEL.w);
+    }
+  },
+});
+
+const throwKeeps = throwScene({
+  id: 'throw-keeps',
+  title: 'It leaves at the speed it was thrown',
+  caption: 'On release the spring starts from the hand’s velocity, so nothing jumps.',
+  keeps: true,
+});
+const throwDrops = throwScene({
+  id: 'throw-drops',
+  title: 'It stops, then leaves from rest',
+  caption: 'The hand’s speed is dropped: the Panel pauses and starts again from nothing.',
+  keeps: false,
+});
+
+/** A throw is decided by where it would land: a short fast flick leaves, a long slow drag returns. */
+const decisionScene = ({ id, title, caption, pull, beats, gone }) => ({
+  id,
+  title,
+  caption,
+  viewBox: VIEW,
+  initial: { x: 0, hand: 0, armed: 0, pull: 0, gone: 0 },
+  landing: { x: gone ? PANEL.w : 0, armed: 0, pull, gone: gone ? 1 : 0 },
+  arrows: [HAND],
+  draw: ({ x, hand, armed }) => <PanelAndHand x={x} hand={hand} dim={1 - armed * 0.35} />,
+  play: async (ctx) => {
+    const velocity = speedOf(pull, beats);
+    const leaves = projectedRest(pull, velocity) > PANEL.w / 2;
+    await ctx.spring('hand', 1, 'appearance.fast');
+    await ctx.linear('x', pull, beats);
+    ctx.set({ pull });
+    if (leaves) {
+      // The decision shows before release, as an armed state, so it can still be taken back.
+      await ctx.spring('armed', 1, 'appearance.fast');
+      await ctx.hold(1);
+    }
+    ctx.set({ armed: 0, gone: leaves ? 1 : 0 });
+    await Promise.all([
+      leaves ? ctx.exit('x', PANEL.w, { velocity }) : ctx.spring('x', 0, 'spatial.fast', { velocity }),
+      ctx.spring('hand', 0, 'appearance.fast'),
+    ]);
+  },
+});
+
+const decideFlick = decisionScene({
+  id: 'decide-flick',
+  title: 'A short, fast flick leaves',
+  caption: 'Where it would land is past halfway, so it dims as armed, and leaves when let go.',
+  pull: 16,
+  beats: 0.25,
+  gone: true,
+});
+const decideDrag = decisionScene({
+  id: 'decide-drag',
+  title: 'A long, slow drag returns',
+  caption: 'Let go farther along, but it would land short of halfway, so it springs back.',
+  pull: 18,
+  beats: 3,
+  gone: false,
+});
+
+/** Closing mid-open: the second press wins at once. Both end closed; one turned back in flight. */
+const interruptScene = ({ id, title, caption, turns }) => ({
+  id,
+  title,
+  caption,
+  viewBox: VIEW,
+  initial: { x: PANEL.w, turned: 0 },
+  landing: { x: PANEL.w, turned: turns ? 1 : 0 },
+  arrows: [[[150, 36], [100, 36]], [[100, 76], [150, 76]]],
+  draw: ({ x }) => (
+    <>
+      <Screen rows={3} />
+      <DockedPanel x={x} />
+    </>
+  ),
+  play: async (ctx) => {
+    await ctx.tap(...HEADER_BUTTON);
+    const opening = ctx.begin('x', 0, 'spatial.slow');
+    await ctx.hold(0.5);
+    await ctx.tap(104, 24);
+    if (turns) {
+      const { velocity } = opening.halt();
+      ctx.set({ turned: 1 });
+      await ctx.spring('x', PANEL.w, 'spatial.fast', { velocity });
+    } else {
+      await opening.done;
+      await ctx.hold(1);
+      await ctx.spring('x', PANEL.w, 'spatial.fast');
+    }
+  },
+});
+
+const interruptTurns = interruptScene({
+  id: 'interrupt-turns',
+  title: 'Closed mid-open: it turns back from where it is',
+  caption: 'A spring can be reversed at any moment; the second press wins at once.',
+  turns: true,
+});
+const interruptWaits = interruptScene({
+  id: 'interrupt-waits',
+  title: 'Closed mid-open: it finishes opening first',
+  caption: 'The person waits for an animation to end before anything answers.',
+  turns: false,
+});
+
+// ---------- Weight ----------
+
+const CARRY = { from: [40, 65], to: [118, 54] };
+const carryScene = ({ id, title, caption, token, card }) => ({
+  id,
+  title,
+  caption,
+  viewBox: VIEW,
+  initial: { px: CARRY.from[0], py: CARRY.from[1], ix: CARRY.from[0], iy: CARRY.from[1], po: 0, lag: 0 },
+  landing: { px: CARRY.to[0], py: CARRY.to[1], ix: CARRY.to[0], iy: CARRY.to[1], po: 0 },
+  arrows: [[CARRY.from, [80, 40], CARRY.to]],
+  draw: ({ px, py, ix, iy, po }) => (
+    <>
+      <Frame x={8} y={6} w={144} h={88} />
+      {[0, 1, 2, 3].map((i) => (
+        <Row key={i} x={16} y={44 + i * 14 - 14} w={72} />
+      ))}
+      <Section x={96} y={20} w={48} h={68} subtle rows={0} />
+      {card ? (
+        <CardBox x={ix - 20} y={iy - 10} w={40} h={20} accent />
+      ) : (
+        <Rect x={ix - 10} y={iy - 4} w={20} h={8} fill={PAINT.accent} corner="shape" />
+      )}
+      {po > 0 && (
+        <g opacity={po}>
+          <Pointer x={px} y={py} />
+        </g>
+      )}
+    </>
+  ),
+  play: async (ctx) => {
+    const [ex, ey] = CARRY.to;
+    const [sx, sy] = CARRY.from;
+    await ctx.spring('po', 1, 'appearance.fast');
+    await ctx.tap(sx, sy);
+    // The hand's own path is a sweep: linear in time along a gentle arc.
+    const arc = (px) => ({ py: sy + ((ey - sy) * (px - sx)) / (ex - sx) - Math.sin((Math.PI * (px - sx)) / (ex - sx)) * 14 });
+    await Promise.all([
+      ctx.linear('px', ex, 2, { derive: arc }),
+      ctx.chase(['ix', 'iy'], ['px', 'py'], token, 3),
+    ]);
+    await ctx.spring('po', 0, 'appearance.fast');
+  },
+});
+
+const carryChip = carryScene({
+  id: 'carry-chip',
+  title: 'A chip keeps close on fast',
+  caption: 'A tag or a name is light: it stays right under the pointer on spatial.fast.',
+  token: 'spatial.fast',
+});
+const carryCard = carryScene({
+  id: 'carry-card',
+  title: 'A whole card trails on default',
+  caption: 'A card carries a record, so it lags the pointer a touch on spatial.default. It still never bounces.',
+  token: 'spatial.default',
+  card: true,
+});
+
+// ---------- Damping at a limit ----------
+
+// The Panel's resting width, the distance past it that is allowed, and how far the hand pulls.
+const BASE_W = PANEL.w;
+const EXTRA = 25;
+const LIMIT = BASE_W + EXTRA;
+const REACH = 40;
+const widthAt = (d, stretch) => BASE_W + Math.min(d, EXTRA) + (stretch ? resisted(d - EXTRA) : 0);
+const PEAK = round2(widthAt(REACH, true));
+const PULL_RATE = REACH / (2 * BEAT);
+// How fast the panel is still widening at release, from the pull's own speed through the resistance.
+const STRETCH_V = ((widthAt(REACH, true) - widthAt(REACH - 0.5, true)) / 0.5) * PULL_RATE;
+
+const limitScene = ({ id, title, caption, stretch }) => ({
+  id,
+  title,
+  caption,
+  viewBox: VIEW,
+  initial: { d: 0, w: BASE_W, hand: 0, peak: BASE_W, limit: LIMIT },
+  landing: { d: REACH, w: LIMIT, peak: stretch ? PEAK : LIMIT, limit: LIMIT },
+  arrows: [[[FRAME_RIGHT - BASE_W - 2, 56], [FRAME_RIGHT - BASE_W - REACH, 56]]],
+  draw: ({ d, w, hand }) => (
+    <>
+      <Screen rows={3} />
+      <Clip x={8} y={18} w={FRAME_RIGHT - 8 - 1} h={76}>
+        <Panel x={FRAME_RIGHT - w} y={PANEL.y} w={w} h={PANEL.h} accent />
+      </Clip>
+      <Rule x1={FRAME_RIGHT - LIMIT} x2={FRAME_RIGHT - LIMIT} y1={18} y2={94} stroke={PAINT.target} dash="3 3" />
+      {hand > 0 && (
+        <g opacity={hand}>
+          <Pointer x={FRAME_RIGHT - BASE_W - d} y={56} />
+        </g>
+      )}
+    </>
+  ),
+  play: async (ctx) => {
+    await ctx.spring('hand', 1, 'appearance.fast');
+    await ctx.linear('d', REACH, 2, { derive: (d) => ({ w: widthAt(d, stretch) }) });
+    ctx.set({ peak: stretch ? PEAK : LIMIT });
+    await ctx.hold(1);
+    await Promise.all([
+      stretch ? ctx.spring('w', LIMIT, 'spatial.fast', { velocity: STRETCH_V }) : Promise.resolve(),
+      ctx.spring('hand', 0, 'appearance.fast'),
+    ]);
+  },
+});
+
+const limitResists = limitScene({
+  id: 'limit-resists',
+  title: 'Past its limit, it resists and returns',
+  caption: 'Past the dashed line the Panel follows less and less; on release it springs back with the hand’s speed.',
+  stretch: true,
+});
+const limitWall = limitScene({
+  id: 'limit-wall',
+  title: 'Past its limit, it hits a wall',
+  caption: 'A hard stop drops the hand’s speed and hides where the limit is.',
+  stretch: false,
+});
+
+// ---------- Reduced motion ----------
+
+const LIST_ROW = { x: 16, y: 44, w: 128, h: 14 };
+const RECORD = { x: 16, y: 26, w: 128, h: 62 };
+const lerp = (a, b, t) => a + (b - a) * t;
+
+const drillScene = ({ id, title, caption, reduced }) => ({
+  id,
+  title,
+  caption,
+  viewBox: VIEW,
+  initial: { g: 0, list: 1, rec: 0 },
+  landing: { g: reduced ? 0 : 1, list: 0, rec: 1 },
+  arrows: reduced ? [] : [[[100, 51], [100, 70]]],
+  draw: ({ g, list, rec }) => (
+    <>
+      <Frame x={8} y={6} w={144} h={88} />
+      <g opacity={list}>
+        <PageHeader x={16} y={24} w={128} />
+        {[0, 1, 2, 3].map((i) => (
+          <Row key={i} x={16} y={44 + i * 14} w={128} accent={i === 0} />
+        ))}
+      </g>
+      {g > 0 && (
+        <CardBox
+          x={lerp(LIST_ROW.x, RECORD.x, g)}
+          y={lerp(LIST_ROW.y, RECORD.y, g)}
+          w={lerp(LIST_ROW.w, RECORD.w, g)}
+          h={lerp(LIST_ROW.h, RECORD.h, g)}
+          accent
+        />
+      )}
+      <g opacity={rec}>
+        <Section x={26} y={36} w={108} h={46} rows={3} />
+      </g>
+    </>
+  ),
+  play: async (ctx) => {
+    await ctx.tap(100, 51);
+    if (reduced) {
+      // One short fade in the final place and size. Never a cut.
+      await Promise.all([ctx.spring('list', 0, 'appearance.fast'), ctx.spring('rec', 1, 'appearance.fast')]);
+    } else {
+      await Promise.all([
+        ctx.spring('g', 1, 'spatial.default'),
+        ctx.spring('list', 0, 'appearance.fast'),
+        ctx.spring('rec', 1, 'appearance.default'),
+      ]);
+    }
+  },
+});
+
+const drillProductive = drillScene({
+  id: 'reduced-productive',
+  title: 'Productive',
+  caption: 'The row grows into the record on spatial.default.',
+});
+const drillReduced = drillScene({
+  id: 'reduced-reduced',
+  title: 'Reduced',
+  caption: 'The same change as one appearance.fast fade in the final place. Never a cut.',
+  reduced: true,
+});
+
 // ---------- The demos, in page order ----------
 
 export const PHYSICS_DEMOS = {
@@ -531,6 +869,12 @@ export const PHYSICS_DEMOS = {
   exits: { title: 'Four ways to leave', scenes: [exitReverse, exitSystem, exitClick, exitFlick] },
   loops: { title: 'A loop and its reduced fallback', scenes: [loopThinking, loopReduced] },
   damping: { title: 'One stiffness, four ratios', scenes: dampScenes },
+  throw: { title: 'A throw keeps the hand’s speed', scenes: [throwKeeps, throwDrops] },
+  decision: { title: 'Where it would land decides', scenes: [decideFlick, decideDrag] },
+  interruption: { title: 'Interrupted mid-motion', scenes: [interruptTurns, interruptWaits] },
+  carry: { title: 'What you carry', scenes: [carryChip, carryCard] },
+  limit: { title: 'Dragged past a limit', scenes: [limitResists, limitWall] },
+  reducedMotion: { title: 'Reduced motion is a fade, never a cut', scenes: [drillProductive, drillReduced] },
 };
 
 // ---------- The token table ----------
@@ -576,3 +920,36 @@ const tokenRows = () => {
 export const SpringTokenTable = () => (
   <RefTable head={['Token', 'Mode', 'Stiffness', 'Ratio', '90%', 'Settled', 'Overshoot']} rows={tokenRows()} />
 );
+
+// ---------- One spring, five ways ----------
+
+const FIGMA_TOKENS = ['spatial.fast', 'spatial.default', 'spatial.slow', 'appearance.fast', 'appearance.default', 'appearance.slow'];
+const trim = (n) => +n.toFixed(2);
+
+/** `motion.spatial.default` in every target, and every token's Figma proxy, read from the generated config. */
+export const OneSpringFiveWays = () => {
+  const c = springFor('spatial.default');
+  const mass = c.mass ?? 1;
+  const response = (2 * Math.PI) / Math.sqrt(c.stiffness / mass);
+  return (
+    <>
+      <RefTable
+        head={['Target', <C>motion.spatial.default</C>]}
+        rows={[
+          ['CSS', <><C>--ds-motion-spatial-default</C>: a generated <C>linear()</C> easing over its settle time</>],
+          ['Motion (React)', <><C>{`{ type: 'spring', stiffness: ${c.stiffness}, damping: ${trim(c.damping)}, mass: ${mass} }`}</C>, for drag and interruption</>],
+          ['Figma', 'Nearest spring, prototype proxy only. Figma holds no motion tokens'],
+          ['SwiftUI', <C>{`.spring(response: ${response.toFixed(2)}, dampingFraction: ${ratioOf(c).toFixed(1)})`}</C>],
+          ['Native web animation', <>The same generated <C>linear()</C></>],
+        ]}
+      />
+      <RefTable
+        head={['Token', 'Figma spring (stiffness / damping, mass 1)']}
+        rows={FIGMA_TOKENS.map((t) => {
+          const f = springFor(t);
+          return [<C>{`motion.${t}`}</C>, `${f.stiffness} / ${trim(f.damping)}`];
+        })}
+      />
+    </>
+  );
+};
