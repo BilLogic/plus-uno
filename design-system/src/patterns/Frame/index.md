@@ -30,10 +30,9 @@ Docked, the panel meets the Page at a hairline. Its splitter resizes it from 320
 
 ## Alternatives
 
-- For a Frame with the PLUS Sidebar and breadcrumb already filled in, start from a template page.
 - For a bare fill and elevation, use `Page`.
 - For a region inside the content, use `PatternSection`.
-- For work that keeps the page in view, use `Panel`, `Modal` or `Popup`: a focused Frame is for a task that blocks the page until it is done, or has five or more steps. The chooser is on the Modal page.
+- For a short task that keeps the page in view behind it, use `PatternModal`. A focused Frame is for a task that blocks the page until it is done, or has five or more steps.
 
 ## Best practices
 
@@ -50,7 +49,7 @@ Don't: The Sidebar left docked beside a focused task, one click from leaving it.
 
 **Checked:** Review
 
-The bottom bar is 48 high and fixed. Cancel (Subtle) is at the start; Back and Next sit together at the end, Next last and Primary. Back on the first step is disabled and needs no reason.
+The bottom bar is fixed along the bottom, one row high (`--space-300`). Cancel (Subtle) is at the start; Back and Next sit together at the end, Next last and Primary. Back on the first step is disabled and needs no reason.
 
 Do: Cancel alone at the start, then Back and the primary Next together at the end.
 Don't: Cancel between Back and Next: one run of three buttons, with the way out beside the way on.
@@ -59,7 +58,7 @@ Don't: Cancel between Back and Next: one run of three buttons, with the way out 
 
 **Checked:** Automatic
 
-The AI panel is a region of the Frame, never a floating layer, so it stays put as a person moves between pages. The Page makes room for it; under 1024 it opens over a Backdrop.
+The AI panel is a region of the Frame, never a floating layer, so it stays put as a person moves between pages. The Page makes room for it; below `FRAME_LAYOUT.dockMin` it opens over a Backdrop.
 
 Do: The panel docked at the right edge, the Page narrowing beside it.
 Don't: The panel floating over the Page, hiding the rows beneath it.
@@ -77,13 +76,13 @@ Don't: The Sidebar beside a sign-in: navigation for a person who has not signed 
 
 **Checked:** Review
 
-Five or more go down a left side, 256 wide (320 for long labels). Four or fewer run across the top.
+Five or more go down a left side sized to the longest label. Four or fewer run across the top.
 
 ### Pass sectionDetail for a list and its detail. {#pass-sectiondetail-for-a-list-and-its-detail}
 
 **Checked:** Review
 
-With `sectionDetail` and the panel open at 1440, the Sidebar collapses and the list keeps its detail beside it. Without it, both dock and the detail replaces the list.
+With `sectionDetail` and the panel open on a wide Frame, the Sidebar collapses and the list keeps its detail beside it. Without it, both dock and the detail replaces the list.
 
 ### Put the place in the header as a breadcrumb. {#put-the-place-in-the-header-as-a-breadcrumb}
 
@@ -98,7 +97,7 @@ Elevation and fills follow Elevation.
 - The Page is the `main` landmark, and the `nav` inside the Sidebar is the navigation landmark. Pass `contentAs="div"` when the page supplies its own `main`.
 - The toggle is a button. Open, it ends the Sidebar's logo row as "Close sidebar"; closed, it sits at the Page's top left as "Open sidebar". It reports whether the Sidebar is showing and announces its shortcut, Ctrl+[ (Cmd+[ on a Mac).
 - A peeking or floating Sidebar closes on Escape, and focus returns to the toggle.
-- Docked, the AI panel is a complementary landmark named by `panelLabel`, after the Page in reading order. Below 1024 it is a modal dialog: focus moves to its first control, Tab stays inside it, the Page and the Sidebar under the Backdrop are inert, and closing returns focus to what opened it.
+- Docked, the AI panel is a complementary landmark named by `panelLabel`, after the Page in reading order. Below `FRAME_LAYOUT.dockMin` it is a Modal-style layer: focus moves to its first control, Tab stays inside it, the Page and the Sidebar under the Backdrop are inert, and closing returns focus to what opened it.
 - The splitter is a vertical separator named "Resize panel" that reports its width. The left arrow widens the panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
 - A focused task's steps are a navigation named "Steps"; the current step is marked, and the bar's buttons follow the body in the tab order.
 
@@ -106,10 +105,10 @@ Elevation and fills follow Elevation.
 
 - Page: use when you need the bare fill-and-elevation the content box is built on.
 - Sidebar: use when choosing what the Frame places beside the Page.
-- Section: use for a region inside the content.
+- Section: use when the content needs a region under its own heading.
 - Modal: use when the task is short and the page should stay in view behind it.
 - Panel: use when the work should float beside the page, not replace it.
-- Grid: use for the column math the Frame is sized by.
+- Grid: use when you need the column math the Frame is sized by.
 
 Same group: `AiChat` · `Blanket` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
