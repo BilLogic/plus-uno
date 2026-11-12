@@ -217,6 +217,10 @@ _Avoid_: "chip"
 A set of **Tag**s laid out together.
 _Avoid_: "tag list"
 
+**Change tag**:
+A label for change over time, such as "+3 vs last week": the arrow follows the sign, and which way is good sets the tone.
+_Avoid_: "delta tag", "trend indicator"
+
 **Date tag**:
 A label that shows a date or due date, colored by how close it is.
 _Avoid_: "date pill"

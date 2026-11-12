@@ -1949,6 +1949,140 @@
       ]
     },
     {
+      "name": "ChangeTag",
+      "kind": "component",
+      "import": "import { ChangeTag } from '@/components';",
+      "group": "labels",
+      "source": "design-system/src/components/labels/ChangeTag/ChangeTag.jsx",
+      "summary": "A small label for change over time, such as \"+3 vs last week\". The sign sets the arrow, `goodDirection` sets the tone, and the change is spoken in words. It is never a button.",
+      "props": [
+        {
+          "name": "value",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The signed change. Above zero is up, below is down, zero is flat; `null` shows an em dash and reads \"No change data\".",
+          "deprecated": null
+        },
+        {
+          "name": "format",
+          "type": "enum",
+          "required": false,
+          "default": "'number'",
+          "values": [
+            "number",
+            "percent",
+            "points"
+          ],
+          "description": "`number` (+3), `percent` (+12%) or `points` (+3 pts). Always signed.",
+          "deprecated": null
+        },
+        {
+          "name": "goodDirection",
+          "type": "enum",
+          "required": false,
+          "default": "'none'",
+          "values": [
+            "up",
+            "down",
+            "none"
+          ],
+          "description": "Which way is good: `up` or `down` turn the tag success or danger; `none` keeps it neutral for a change with no value judgment.",
+          "deprecated": null
+        },
+        {
+          "name": "comparison",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "What the change is measured against, such as \"vs last week\", in subtle text after the tag.",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "`default` (20) in cards and headers; `compact` (16) in table cells.",
+          "deprecated": null
+        },
+        {
+          "name": "iconBefore",
+          "type": "string or node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Replaces the direction arrow: a Font Awesome Free name (`arrow-trend-up`) or a node. Decorative; the words carry the direction.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the tag element beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The `id` attribute of the tag element.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Styles",
+        "Formats",
+        "CustomIcon",
+        "ValueChange",
+        "NeverAButton",
+        "UnknownValuesFallBack",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-small",
+        "--border-default",
+        "--ds-background-danger",
+        "--ds-background-danger-pressed",
+        "--ds-background-neutral",
+        "--ds-background-neutral-pressed",
+        "--ds-background-success",
+        "--ds-background-success-pressed",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-subtle",
+        "--ds-text-success",
+        "--icon-sm",
+        "--inline-sm",
+        "--motion-duration-medium",
+        "--motion-easing-entrance",
+        "--motion-easing-standard",
+        "--pad-x-xs",
+        "--plus-change-tag-edge",
+        "--plus-change-tag-fill",
+        "--plus-change-tag-height",
+        "--plus-change-tag-ink",
+        "--radius-md",
+        "--tag-gap-compact"
+      ]
+    },
+    {
       "name": "Checkbox",
       "kind": "component",
       "import": "import { Checkbox } from '@/components';",

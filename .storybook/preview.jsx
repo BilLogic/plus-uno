@@ -275,6 +275,7 @@ const preview = {
             ],
             "Labels",
             [
+              "Change tag",
               "Count tag",
               "Date tag",
               "Status tag",
