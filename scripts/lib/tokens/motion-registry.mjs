@@ -192,6 +192,9 @@ export const MOTION_REGISTRY = [
     tier: 'pattern',
     events: {
       change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'No motion; the state is color.' },
+    },
+  },
+  {
     name: 'Empty',
     tier: 'pattern',
     events: {
