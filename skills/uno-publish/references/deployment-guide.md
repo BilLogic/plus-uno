@@ -7,10 +7,7 @@ summary: PLUS Uno production (plus-uno.netlify.app) ships
 
 # Deployment Guide
 
-PLUS Uno production (`plus-uno.netlify.app`) ships:
-
-1. **Storybook** at `/storybook/` (site landing)
-2. **Tutor revamp** at `/prototypes/tutor-revamp/`
+PLUS Uno production (`plus-uno.netlify.app`) ships **Storybook** at `/storybook/` (site landing).
 
 The old Vibe app (`/home`, `/app`) and Full Demo Walkthrough (`/demo`) are on the `archive/legacy-ds` branch; their URLs redirect to Storybook.
 

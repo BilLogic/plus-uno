@@ -41,7 +41,6 @@ Netlify hosts the site, configured in `netlify.toml`. A PR gets a deploy preview
 | Target | URL | Built from |
 |--------|-----|------------|
 | **Storybook** | https://plus-uno.netlify.app/storybook/ (also the site root) | `npm run build:all` → `dist/storybook/` |
-| **Tutor revamp** | https://plus-uno.netlify.app/prototypes/tutor-revamp/ | `prototypes/tutor-revamp/` |
 | **Hosted DS MCP** | https://plus-uno.netlify.app/mcp/ds (team key) | `netlify/functions/ds-mcp/` |
 | **PLUS Uno Blueprint** (the blueprint app) | https://plus-uno.netlify.app/blueprint/ | Its own Netlify site (`plus-uno-blueprint`), proxied by a forced rewrite in `netlify.toml` |
 | **Experiments** | Deploy previews or standalone Netlify sites | Feature branches; cataloged in the Notion Prototype Marketplace |
