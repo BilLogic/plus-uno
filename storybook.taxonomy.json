@@ -181,6 +181,8 @@
       "Motion",
       [
         "Physics",
+        "Choreography",
+        "Playground",
         "Durations and easings"
       ],
       "Iconography",
