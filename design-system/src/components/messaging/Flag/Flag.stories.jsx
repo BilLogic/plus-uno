@@ -203,7 +203,7 @@ const FLAG_STYLE_LIST = FLAG_APPEARANCES;
  * differs per story (test id, visibility, body); `children` follows the stack.
  */
 const FlagPerStyle = ({ flagProps, children }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', alignItems: 'flex-start' }}>
         {FLAG_STYLE_LIST.map((style) => (
             <Flag
                 key={style}
@@ -227,7 +227,7 @@ const FlagPerStyle = ({ flagProps, children }) => (
 export const Dismiss = () => {
     const [closed, setClosed] = useState(false);
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', alignItems: 'flex-start' }}>
             <Flag
                 title="Notes copied"
                 timestamp="Just now"
