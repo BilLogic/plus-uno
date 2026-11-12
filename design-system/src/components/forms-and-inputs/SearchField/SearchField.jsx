@@ -1,21 +1,37 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import TextField from '../TextField/TextField';
 import Select from '../Select/Select';
 import { IconButton } from '../IconButton/IconButton';
+import Icon from '../../images-and-icons/Icon';
 import Spinner from '../../loading/Spinner/Spinner';
+import Popup from '../../overlays-and-layering/Popup/Popup';
+import OptionRow from '../_internal/OptionRow';
 import { iconClass } from '../../../lib/icon';
 import './SearchField.scss';
 
 export const SEARCH_FIELD_SPACINGS = ['default', 'compact'];
-export const SEARCH_FIELD_MODES = ['active'];
+export const SEARCH_FIELD_MODES = ['active', 'basic', 'focused'];
 /** How long typing pauses before `loadResults` is asked, in ms. A typing pause, not a motion value. */
 export const SEARCH_DEBOUNCE_MS = 250;
 /** `loadResults` asks for this many results at a time. */
 const PAGE_SIZE = 50;
 
 const ALL = 'all';
+
+/**
+ * The focused panel's last row, an action such as "Create student". Pass it as
+ * a child of `SearchField`: it carries `onSelect` and its children are the row's
+ * text; the field draws the row and puts it in the keyboard order.
+ */
+export const SearchFieldAction = () => null;
+SearchFieldAction.propTypes = {
+    /** Called when the row is chosen. */
+    onSelect: PropTypes.func,
+    /** The row's text, such as `Create student "Ada"`. */
+    children: PropTypes.node,
+};
 
 /**
  * Search field: find a record by typing. It is a TextField with a search icon
@@ -33,6 +49,14 @@ const ALL = 'all';
  * field and returns focus to the icon.
  *
  * `scopes` puts a scope filter before the field, with "All" first and selected.
+ *
+ * `mode="basic"` runs `onSearch(text)` on Enter and does no work per keystroke.
+ *
+ * `mode="focused"` opens a panel (a Popup) under the field. On focus with no
+ * text it lists `recent` searches; while typing it lists matches grouped by
+ * type, then a last "See all" row that acts as a basic search. Arrow keys move
+ * through the rows, Enter chooses, Esc closes the panel. A `SearchFieldAction`
+ * child is the optional last row.
  */
 const SearchField = ({
     placeholder,
@@ -43,6 +67,11 @@ const SearchField = ({
     onValueChange,
     loadResults,
     onResults,
+    onSearch,
+    results,
+    recent,
+    onSelect,
+    children,
     isLoading = false,
     isCollapsible = false,
     defaultOpen = false,
@@ -53,6 +82,7 @@ const SearchField = ({
     spacing = 'default',
     isDisabled = false,
     clearLabel = 'Clear search',
+    panelLabel = 'Suggestions',
     scopeLabel = 'Search scope',
     inputRef: inputRefProp,
     className = '',
@@ -117,7 +147,87 @@ const SearchField = ({
         if (isCollapsible && cleared && !rootRef.current?.contains(document.activeElement)) collapse();
     }, [hasText]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    /* ---------- the focused panel ---------- */
+    const focusedMode = mode === 'focused';
+    const trimmed = value.trim();
+    const [panelOpen, setPanelOpen] = useState(false);
+    const [cursor, setCursor] = useState(-1);
+    const listId = useId();
+    const actions = React.Children.toArray(children).filter((child) => child?.type === SearchFieldAction);
+    const groups = (results || []).filter((group) => group.items?.length > 0);
+    const rows = [];
+    if (focusedMode) {
+        if (!trimmed) {
+            (recent || []).forEach((text) => rows.push({ kind: 'recent', text }));
+        } else {
+            groups.forEach((group) => group.items.forEach((item) => rows.push({ kind: 'result', group, item })));
+            rows.push({ kind: 'seeAll' });
+            actions.forEach((action) => rows.push({ kind: 'action', action }));
+        }
+    }
+    const panelShown = focusedMode && panelOpen && !isDisabled && (trimmed ? true : rows.length > 0);
+    const rowId = (index) => `${listId}-row-${index}`;
+    const activeId = panelShown && cursor >= 0 && cursor < rows.length ? rowId(cursor) : undefined;
+
+    const closePanel = () => {
+        setPanelOpen(false);
+        setCursor(-1);
+    };
+    const runSearch = () => {
+        if (onSearch) onSearch(value);
+        closePanel();
+    };
+    const choose = (row) => {
+        if (row.kind === 'recent') {
+            setValue(row.text);
+            setCursor(-1);
+            inputRef.current?.focus();
+            return;
+        }
+        if (row.kind === 'result' && onSelect) onSelect(row.item, row.group);
+        if (row.kind === 'seeAll') {
+            runSearch();
+            return;
+        }
+        if (row.kind === 'action' && row.action.props.onSelect) row.action.props.onSelect(value);
+        closePanel();
+    };
+
     const handleKeyDown = (event) => {
+        if (mode === 'basic' && event.key === 'Enter') {
+            event.preventDefault();
+            if (onSearch) onSearch(value);
+            return;
+        }
+        if (focusedMode) {
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                if (!panelShown) {
+                    setPanelOpen(true);
+                    return;
+                }
+                const step = event.key === 'ArrowDown' ? 1 : -1;
+                setCursor((now) => (rows.length === 0 ? -1 : (now + step + rows.length + (now < 0 && step < 0 ? 1 : 0)) % rows.length));
+                return;
+            }
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                if (!panelShown) {
+                    if (trimmed) runSearch();
+                    return;
+                }
+                if (cursor >= 0 && rows[cursor]) choose(rows[cursor]);
+                else if (trimmed) runSearch();
+                return;
+            }
+            // Esc closes the open panel first; the next one clears, as in active mode.
+            if (event.key === 'Escape' && panelShown) {
+                event.preventDefault();
+                event.stopPropagation();
+                closePanel();
+                return;
+            }
+        }
         if (event.key !== 'Escape') return;
         // The browser's own Esc on a search input would clear without telling us.
         event.preventDefault();
@@ -131,6 +241,8 @@ const SearchField = ({
     };
 
     const handleBlur = (event) => {
+        if (event.relatedTarget?.closest?.('.plus-search-field__panel')) return;
+        if (focusedMode && !rootRef.current?.contains(event.relatedTarget)) closePanel();
         if (hasText || !isCollapsible) return;
         if (rootRef.current?.contains(event.relatedTarget)) return;
         // The scope list renders in a popup layer outside the root; focus inside it is not leaving.
@@ -189,6 +301,53 @@ const SearchField = ({
     // "All" leads, wherever the caller put it.
     if (scopeOptions) scopeOptions.sort((a, b) => (b.value === ALL) - (a.value === ALL));
 
+    const renderRows = () => {
+        let index = -1;
+        const rowFor = (row, props) => {
+            index += 1;
+            const at = index;
+            return (
+                <OptionRow
+                    key={at}
+                    id={rowId(at)}
+                    highlighted={cursor === at}
+                    spacing="compact"
+                    onMouseEnter={() => setCursor(at)}
+                    onSelect={() => choose(row)}
+                    {...props}
+                />
+            );
+        };
+        if (!trimmed) {
+            return [
+                <OptionRow key="head" kind="group" label="Recent searches" />,
+                ...rows.map((row) => rowFor(row, { label: row.text, elemBefore: <Icon name="clock-rotate-left" /> })),
+            ];
+        }
+        const out = [];
+        if (groups.length === 0) {
+            out.push(<div key="none" className="plus-search-field__none">{`No matches for \u201C${trimmed}\u201D`}</div>);
+        }
+        groups.forEach((group) => {
+            out.push(
+                <OptionRow
+                    key={`g-${group.value}`}
+                    kind="group"
+                    label={group.count === undefined ? group.label : `${group.label} (${group.count})`}
+                />,
+            );
+            group.items.forEach((item) => {
+                out.push(rowFor(
+                    { kind: 'result', group, item },
+                    { label: item.label, description: item.description, elemBefore: item.icon ? <Icon name={item.icon} /> : undefined },
+                ));
+            });
+        });
+        out.push(rowFor({ kind: 'seeAll' }, { label: `See all results for \u201C${trimmed}\u201D`, elemBefore: <Icon name="magnifying-glass" /> }));
+        actions.forEach((action) => out.push(rowFor({ kind: 'action', action }, { label: action.props.children })));
+        return out;
+    };
+
     const field = (
         <TextField
             label={name}
@@ -204,8 +363,23 @@ const SearchField = ({
                 else if (inputRefProp) inputRefProp.current = node;
             }}
             value={value}
-            onChange={(event) => setValue(event.target.value)}
+            onChange={(event) => {
+                setValue(event.target.value);
+                if (focusedMode) {
+                    setPanelOpen(true);
+                    setCursor(-1);
+                }
+            }}
+            onFocus={focusedMode ? () => setPanelOpen(true) : undefined}
             onKeyDown={handleKeyDown}
+            {...(focusedMode ? {
+                role: 'combobox',
+                'aria-expanded': panelShown,
+                'aria-controls': panelShown ? listId : undefined,
+                'aria-activedescendant': activeId,
+                'aria-autocomplete': 'list',
+                autoComplete: 'off',
+            } : {})}
             testId={testId}
             elemBeforeInput={loading
                 ? <Spinner size={16} label="Searching" className="plus-search-field__spinner" />
@@ -233,7 +407,7 @@ const SearchField = ({
                 motion && `plus-search-field--${motion}`,
                 className,
             )}
-            onBlur={open && isCollapsible ? handleBlur : undefined}
+            onBlur={open && (isCollapsible || focusedMode) ? handleBlur : undefined}
             data-mode={mode}
             {...props}
         >
@@ -255,6 +429,27 @@ const SearchField = ({
                         />
                     )}
                     {field}
+                    {focusedMode && (
+                        <Popup
+                            anchor={rootRef}
+                            show={panelShown}
+                            triggerType="manual"
+                            placement="bottom-start"
+                            label={panelLabel}
+                            initialFocus={false}
+                            className="plus-search-field__popup"
+                        >
+                            <div
+                                id={listId}
+                                role="listbox"
+                                aria-label={panelLabel}
+                                className="plus-search-field__panel"
+                                onMouseDown={(event) => event.preventDefault()}
+                            >
+                                {renderRows()}
+                            </div>
+                        </Popup>
+                    )}
                 </>
             ) : (
                 <span ref={iconRef} className="plus-search-field__icon">
@@ -277,7 +472,7 @@ SearchField.propTypes = {
     placeholder: PropTypes.string.isRequired,
     /** The accessible name, when it should differ from the placeholder. */
     label: PropTypes.string,
-    /** `active` filters on each keystroke through `onValueChange`. */
+    /** `active` filters on each keystroke through `onValueChange`. `basic` runs `onSearch` on Enter and nothing per keystroke. `focused` adds the results panel. */
     mode: PropTypes.oneOf(SEARCH_FIELD_MODES),
     /** The search text, when the caller holds it. Pair with `onValueChange`. */
     value: PropTypes.string,
@@ -289,6 +484,21 @@ SearchField.propTypes = {
     loadResults: PropTypes.func,
     /** `({ results, total })`: called with each answer of `loadResults`. */
     onResults: PropTypes.func,
+    /** `(text)`: the search to run. Called on Enter in `basic`, and on Enter or the "See all" row in `focused`. */
+    onSearch: PropTypes.func,
+    /** `focused` panel: groups of matches, `{ value, label, count?, items: [{ value, label, description?, icon? }] }`. Feed it from `onResults`, or filter your own rows. */
+    results: PropTypes.arrayOf(PropTypes.shape({
+        value: PropTypes.string,
+        label: PropTypes.string,
+        count: PropTypes.number,
+        items: PropTypes.arrayOf(PropTypes.object),
+    })),
+    /** `focused` panel: recent searches shown when the field is focused and empty. */
+    recent: PropTypes.arrayOf(PropTypes.string),
+    /** `focused` panel: `(item, group)` called when a match is chosen. */
+    onSelect: PropTypes.func,
+    /** `focused` panel: the optional last row, as `<SearchFieldAction onSelect>`. It is a slot, not a prop. */
+    children: PropTypes.node,
     /** A search is running. A Spinner takes the search icon's place. `loadResults` sets this by itself. */
     isLoading: PropTypes.bool,
     /** Starts as an icon button that grows into the field and collapses when left empty. */
@@ -313,6 +523,8 @@ SearchField.propTypes = {
     isDisabled: PropTypes.bool,
     /** The clear button's name. */
     clearLabel: PropTypes.string,
+    /** The focused panel's accessible name. */
+    panelLabel: PropTypes.string,
     /** The scope filter's accessible name. */
     scopeLabel: PropTypes.string,
     /** Ref to the underlying `<input>`. */
