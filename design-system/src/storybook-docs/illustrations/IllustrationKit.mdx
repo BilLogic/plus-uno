@@ -1,0 +1,45 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection } from '@/storybook-docs/foundation-page.jsx';
+import { IllustrationKitGallery } from '@/storybook-docs/illustrations/IllustrationKitGallery.jsx';
+import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
+import { ThreeLayers, OpeningARecord } from '@/storybook-docs/illustrations/compositions.jsx';
+
+<Meta title="Templates/Illustration kit" tags={['!dev']} />
+
+<FoundationHero
+    kind="Guide"
+    title="Illustration kit"
+    summary="The building blocks every Templates and Patterns drawing is made from."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Drawing rules">
+
+- Paint with design-system tokens only: color, stroke and corner. The kit follows light and dark on its own.
+- Draw skeleton bars where text would sit. Put the words in the caption beside the drawing.
+- Keep one scale per set and equal margins around every drawing, balanced by eye.
+- Give each drawing one accent, and place it on the subject.
+- A drawing shows a concept no component can render. A screen a component can render is a live story.
+
+</FoundationSection>
+
+<FoundationSection title="Primitives">
+
+Each primitive takes a position, a size and an `accent` flag. The top drawing is neutral and the bottom one is accented.
+
+<IllustrationKitGallery />
+
+</FoundationSection>
+
+<FoundationSection title="Compositions">
+
+<IllustrationFigure caption="Three layers: the accent follows one button from a component, into a template, onto a pattern's frame.">
+    <ThreeLayers />
+</IllustrationFigure>
+
+<IllustrationFigure caption="Opening a record, lightest to heaviest: popup, panel, modal, page. Pick the lowest step that fits.">
+    <OpeningARecord />
+</IllustrationFigure>
+
+</FoundationSection>
