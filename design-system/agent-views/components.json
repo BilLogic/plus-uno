@@ -11449,6 +11449,24 @@
           "deprecated": null
         },
         {
+          "name": "defaultPanelOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "`focused` panel: starts open without focus, for a picture of the open panel.",
+          "deprecated": null
+        },
+        {
+          "name": "panelContainer",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`focused` panel: the element the panel mounts in instead of the page, so a picture keeps it inside its frame.",
+          "deprecated": null
+        },
+        {
           "name": "scopeLabel",
           "type": "string",
           "required": false,

@@ -33,7 +33,7 @@ authored half, counted rather than assumed.
 | [Range](Range/index.md) | 14 | ✅ | ✅ | ✅ |
 | [Rating](Rating/index.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
-| [SearchField](SearchField/index.md) | 31 | ✅ | ✅ | ✅ |
+| [SearchField](SearchField/index.md) | 33 | ✅ | ✅ | ✅ |
 | [Select](Select/index.md) | 44 | ✅ | ✅ | ✅ |
 | [SplitButton](SplitButton/index.md) | 3 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput/index.md) | 27 | ✅ | ✅ | ✅ |

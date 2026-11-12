@@ -143,6 +143,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `recentLabel` | string | `'Recent searches'` | The group heading over recent searches. |
 | `noMatchesLabel` | string | `'No matches for'` | Starts the empty-results line; the typed text follows in quotes. |
 | `seeAllLabel` | string | `'See all results for'` | Starts the last row's label; the typed text follows in quotes. |
+| `defaultPanelOpen` | bool | `false` | `focused` panel: starts open without focus, for a picture of the open panel. |
+| `panelContainer` | object | — | `focused` panel: the element the panel mounts in instead of the page, so a picture keeps it inside its frame. |
 | `scopeLabel` | string | `'Search scope'` | The scope filter's accessible name. |
 | `inputRef` | func or shape or any | — | Ref to the underlying `<input>`. |
 | `className` | string | `''` | Extra class on the outer wrapper. |
