@@ -8,13 +8,49 @@ Code-free guidance for a situation, shown on templates used as they are or tweak
 
 **Storybook page:** `design-system/src/storybook-docs/patterns/PatternsOverview.mdx`
 
-## What a pattern is
+## The thirteen patterns
 
-A pattern holds a rule that applies across two or more templates: when to use a choice, which choice fits, and the words to use. Templates and patterns says how the layers fit together.
+Four groups. Each pattern is one page: its situations first, then the key cases drawn on templates, then the usage spine. Reach for one when you are unsure of a choice or challenging it; Templates and patterns says how the layers fit together.
 
-## Coming next
+- **Actions and input.** What a person does to a page: which button, where it sits, and how a form takes and checks what they type. Common actions · Forms
+- **States.** What a view shows when it has nothing, is still working, has failed, has too much, or cannot be changed right now. Empty · Loading · Errors · Overflow · Disabled · Read-only
+- **Notifications and indicators.** What the product says back: passing notices, page conditions, the Inbox, and the tags that carry state, counts and change. Notifications · Indicators
+- **Finding things.** Moving between areas and records, and narrowing a collection to the rows that matter. Navigation · Search · Filtering
 
-- Actions and input: Common actions and Forms.
-- States: Empty, Loading, Errors, Overflow, Disabled and Read-only.
-- Notifications and indicators: Notifications and Indicators.
-- Finding things: Navigation, Search and Filtering.
+## Which pattern for which situation
+
+Start from what is happening on the page. Each row names the pattern that answers it and the ones to read beside it.
+
+| The situation | Pattern | Also read |
+| --- | --- | --- |
+| Choosing a button's look, words or place | Common actions | Forms |
+| Acting on several rows at once | Common actions · the bulk bar | None |
+| Taking and checking what someone types | Forms | Errors · Disabled |
+| A view with nothing to show | Empty | Search · Filtering · Errors |
+| Something is still fetching or saving | Loading | Notifications |
+| Something failed | Errors | Forms · Notifications · Empty |
+| Text or a list is longer than its room | Overflow | Navigation |
+| A control cannot be used yet, or by this person | Disabled | Read-only · Forms |
+| A value this person may see but not change | Read-only | Disabled |
+| Telling someone what happened or what is wrong | Notifications | Errors |
+| Showing a state, a number or a change on something | Indicators | Notifications |
+| Moving between areas, views and records | Navigation | Overflow |
+| Finding rows by what they are called | Search | Filtering · Empty |
+| Narrowing rows by their attributes | Filtering | Search · Empty |
+
+## Which state is it?
+
+The six states told apart by what the view is doing. A filled dot means the pattern is built for it.
+
+| The view… | Empty | Loading | Errors | Overflow | Disabled | Read-only |
+| --- | --- | --- | --- | --- | --- | --- |
+| has no records to show | Yes | No | No | No | No | No |
+| is still fetching or saving | No | Yes | No | No | No | No |
+| could not load its content | Yes | No | Yes | No | No | No |
+| could not save | No | No | Yes | No | No | No |
+| has more than fits | No | No | No | Yes | No | No |
+| has a control that waits on something the person can fix here | No | No | No | No | Yes | No |
+| shows a value this person cannot change right now | No | No | No | No | No | Yes |
+| hides what this role can never use | No | No | No | No | Yes | No |
+
+A load failure fills two dots: Errors owns its words, and Empty owns the slot they show in. To choose a layer for a task, use the chooser on the Templates overview.

@@ -22,7 +22,7 @@ Broadest first. Each page opens with its types, then the anatomy and key states 
 
 ## Which template for which job
 
-A suggested starting point for each scenario, with the patterns to consult and the components it is built from. Never "always use". The patterns are named in words until their pages land; Patterns lists them.
+A suggested starting point for each scenario, with the patterns to consult and the components it is built from. Never "always use". To start from the situation instead, use the Patterns overview.
 
 | Scenario | Template | Patterns | Components |
 | --- | --- | --- | --- |
@@ -60,7 +60,7 @@ A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or
 
 ## Opening a record
 
-Least room to most. Pick the lowest step that fits; navigation rules are in the Navigation pattern.
+Least room to most. Pick the lowest step that fits; Navigation holds the rule.
 
 1. **Expand the row.** A few more lines, links at most.
 2. **Section detail.** On a queue page, the record opens beside its list.
@@ -68,4 +68,4 @@ Least room to most. Pick the lowest step that fits; navigation rules are in the 
 4. **Modal.** A rare, critical task with fewer than five fields.
 5. **Its own page.** Complex or stepped work, or anything worth a URL.
 
-Where a message sits, in a Frame, Page or Section banner, a Flag or a SectionMessage, is the Notifications pattern.
+Where a message sits, in a Frame, Page or Section banner, a Flag or a SectionMessage, is Notifications.
