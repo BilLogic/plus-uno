@@ -31,7 +31,7 @@ To look a name, prop, token or rule up without reading files, ask the `ds` comma
 
 | Folder | Holds | Start at |
 |--------|-------|----------|
-| [`foundations/`](foundations/overview.md) | The fourteen foundations — tokens, color, type, spacing, grid, elevation, iconography, accessibility, content, and the five not yet authored | `foundations/overview.md` |
+| [`foundations/`](foundations/overview.md) | The fifteen foundations — tokens, color, type, spacing, grid, elevation, motion, sound, iconography, accessibility, content, and the five not yet authored | `foundations/overview.md` |
 | [`components/`](components/overview.md) | Per-component guidance: when to use, correct and incorrect, accessibility | `components/overview.md` |
 | [`composition/`](composition/overview.md) | How components combine — layout, hierarchy, surfaces, forms | `composition/overview.md` |
 | [`figma/`](figma/overview.md) | Design-to-code: registries, the load gate, token mapping, MCP workflows | `figma/overview.md` |

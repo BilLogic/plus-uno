@@ -16,7 +16,7 @@ export default {
   // The Sounds page's figures: `!dev` keeps them out of the sidebar. The page
   // itself is Foundations/Sound/Sounds (SoundSounds.mdx).
   title: 'Foundations/Sound/Sounds',
-  tags: ['!dev', '!autodocs'],
+  tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };
 

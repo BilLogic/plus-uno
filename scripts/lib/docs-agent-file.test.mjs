@@ -154,6 +154,21 @@ test('on the real repo every Foundations · Motion page is served, and a compone
   assert.match(popup, /--ds-motion-spatial-fast/);
 });
 
+test('a Foundations · Sound page without the manifest tag is named', () => {
+  const root = fixture({
+    'design-system/src/styles/SoundOverview.mdx': MOTION_MDX('Overview').replace('Motion', 'Sound').replace(", 'manifest'", ''),
+    'design-system/src/styles/SoundSettings.mdx': MOTION_MDX('Settings').replace('Motion', 'Sound'),
+  });
+  assert.deepEqual(pagesMissingManifestTag(root), ['design-system/src/styles/SoundOverview.mdx']);
+});
+
+test('on the real repo every Foundations · Sound page is served, and a component with a sound cell carries it in its Motion section', () => {
+  const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+  assert.deepEqual(pagesMissingManifestTag(root), []);
+  const flag = fs.readdirSync(path.join(root, 'design-system/src/components'), { recursive: true }).find((f) => String(f).endsWith('Flag/index.md'));
+  assert.match(fs.readFileSync(path.join(root, 'design-system/src/components', String(flag)), 'utf8'), /`sound\.notify` on land/);
+});
+
 test('a Best practices section that opens straight on its first rule prints that rule once, with its id', () => {
   const text = renderDocsAgentFile(PAGE, { file: PAGE_PATH, kind: 'Pattern' });
   const best = text.slice(text.indexOf('## Best practices'));

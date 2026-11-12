@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **124,517 chars from 9 files**, against an assembled budget of 175,500 (50,983 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 104,133 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **126,007 chars from 9 files**, against an assembled budget of 175,500 (49,493 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,623 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,284 (−8,563 ide-only) | 10,284 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 35,531 | 45,844 | 20,000 (constitution) ⚠️ **over by 15,531** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 67,327 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 68,973 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 70,221 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 75,915 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 87,701 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 108,662 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 112,130 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 118,688 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 123,661 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 124,517 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,284 (−8,789 ide-only) | 10,284 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 37,021 | 47,334 | 20,000 (constitution) ⚠️ **over by 17,021** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 68,817 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 70,463 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 71,711 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 77,405 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 89,191 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 110,152 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 113,620 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 120,178 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 125,151 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 126,007 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -587,6 +587,44 @@ _Avoid_: "flash"
 **Call attention**:
 The transition that draws the eye to something the person did not ask for: a shake for an error, a pulse for new content.
 _Avoid_: "alert animation"
+
+### Design system: sound
+
+**Notify sound**:
+`sound.notify`, G4 then C5 + E5: something arrived that the person has not seen, such as a Flag outside a session.
+_Avoid_: "ping", "ding"
+
+**Prompt sound**:
+`sound.prompt`, C5 E5 D5 then A5 over C5: something asks the person to act now, such as a session link ready.
+_Avoid_: "alert sound"
+
+**Roster sound**:
+`sound.roster`, A4 + E5 struck twice: the tutor's student list changed, such as a new student or a lead assigned.
+_Avoid_: "assignment ding"
+
+**Goal sound**:
+`sound.goal`, G4 and G5 gliding to C5 then C6: a goal was reached, heard by the tutor and the student together.
+_Avoid_: "win sound", "achievement"
+
+**Commit sound**:
+`sound.commit`, C5 then G5: the person committed to something, such as a completed signup or a submitted form.
+_Avoid_: "save sound"
+
+**Done sent**:
+`sound.done.sent`, a soft C6 dot: a message or small action went out.
+_Avoid_: "send whoosh"
+
+**Done step**:
+`sound.done.step`, C5 E5 G5: a step, lesson or reflection finished. The Expressive Finish plays it.
+_Avoid_: "success sound"
+
+**Done milestone**:
+`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a term start or end. The Expressive Milestone plays it, and a Badge is a Milestone.
+_Avoid_: "fanfare", "celebration sound"
+
+**Concern sound**:
+`sound.error`, E5 then D5: something needs a second look, such as a rejected form or a failed save.
+_Avoid_: "error buzz", "failure sound"
 
 ### Design work
 
