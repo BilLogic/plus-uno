@@ -41,8 +41,8 @@
  *
  * EXPRESSIONS. A string literal is its text (`{' '}` is a space). A constant
  * the page imports from design-system source, when its export is a literal,
- * is its value: `` `MAX_STACKED_OVERLAYS`{` (${MAX_STACKED_OVERLAYS})`} `` reads
- * "`MAX_STACKED_OVERLAYS` (2)", an array joined with ` · `. The reference
+ * is its value: `` `MAX_STACKED`{` (${MAX_STACKED})`} `` reads
+ * "`MAX_STACKED` (2)", an array joined with ` · `. The reference
  * grammar is a name, member steps and one `.join()`, read statically; nothing on
  * the page is evaluated. Constants resolve only when the caller passes `root`
  * and `file`; `check:ds-writing` passes neither, so a number shown through a

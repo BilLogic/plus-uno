@@ -2,7 +2,7 @@
 
 # Backdrop
 
-The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token.
+The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token.
 
 Also asked as: scrim.
 
@@ -24,7 +24,7 @@ A Backdrop interrupts the page for one task. It dims everything behind it with o
 | --- | --- |
 | Modal | One task blocks the page. The Backdrop centers it. |
 
-A task that keeps the page in view is a Panel, which floats with no Backdrop. The Backdrop draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
+A task that keeps the page in view is a Panel, which floats with no Backdrop. The Backdrop draws the layer only. It does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
 
 ### Layers
 
@@ -52,10 +52,10 @@ Backdrop reads these motion tokens and no literal duration or curve.
 
 ### Stack only a confirm over a Panel, a Popup or a focused task. {#stack-only-a-confirm-over-a-panel-a-popup-or-a-focused-task}
 
-A confirm raised from a Panel or a focused task is a second Backdrop over the first. A Modal for another task waits until the first one closes.
+A confirm raised from a Panel or a focused task puts one Backdrop over the page and the Panel. A Modal for another task waits until the first one closes.
 
-Do: An edge layer and the confirm it raises, stacked over it.
-Don't: A modal for an unrelated task opened over an edge layer.
+Do: A Panel and the confirm it raises, over it.
+Don't: A modal for an unrelated task opened over a Panel.
 
 ### Never a Modal on a Modal. {#never-a-modal-on-a-modal}
 
@@ -129,7 +129,7 @@ The Backdrop holds no text of its own. The words belong to the layer it holds.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `inline` | bool | `false` | Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page. |
-| `screenWidth` | number | — | Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the overlay Panel's Backdrop over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones. |
+| `screenWidth` | number | — | Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440. |
 | `screenHeight` | number | — | Inline only: the screen height (px); a layer inside caps at it less Backdrop/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do. |
 | `onBackdropClick` | func | — | Called for a click on the backdrop, not on the layer it holds. |
 | `className` | string | `''` | — |

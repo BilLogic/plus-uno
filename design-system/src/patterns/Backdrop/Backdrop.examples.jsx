@@ -11,7 +11,7 @@ import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
  * docs geometry, not design values.
  *
  * The stacking rule follows `lib/overlay.js`: a confirm Modal may open over a
- * Panel, a Popup or a focused task, with its own Backdrop, and a Modal never
+ * Panel, a Popup or a focused task, with its own Backdrop (a Panel floats with none), and a Modal never
  * opens on another Modal. The `ConfirmOverPanel` story draws it.
  */
 
@@ -96,7 +96,7 @@ const moveSession = (
 );
 
 /** Do: a Panel and the confirm it raises, stacked over it. */
-export const EdgeLayerWithConfirm = () => (
+export const PanelWithConfirm = () => (
     <Stage>
         {panel}
         <Over>{discard()}</Over>
@@ -104,7 +104,7 @@ export const EdgeLayerWithConfirm = () => (
 );
 
 /** Don't: a modal for an unrelated task opened over a Panel. */
-export const EdgeLayerWithUnrelatedModal = () => (
+export const PanelWithUnrelatedModal = () => (
     <Stage>
         {panel}
         <Over>{moveSession}</Over>

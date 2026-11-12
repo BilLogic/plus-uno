@@ -4,7 +4,7 @@
 
 PanelContainer: the panel's own surface, at a fixed or the provider's width.
 
-Also asked as: right panel, detail panel, side pane, slide-over, sheet, side sheet, off-canvas, right sidebar, inspector.
+Also asked as: right panel, detail panel, side pane, slide-over, sheet, side sheet, off-canvas, right sidebar, side panel, inspector.
 
 > Implemented as `PanelContainer` in the source and exported as `Panel`. Import the exported name; read the source under the implementation name.
 

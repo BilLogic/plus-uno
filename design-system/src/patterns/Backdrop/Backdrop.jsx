@@ -21,8 +21,8 @@ export const BACKDROP_SPANS = Object.freeze({ sm: 6, md: 8, lg: 10 });
  * A Modal draws this Backdrop. A Panel never does: it floats on the overlay
  * fill and shadow.
  *
- * It draws the layer only: it does not trap focus, close on Escape or count
- * toward the two-overlay limit. For a real dialog, use the core Modal
+ * It draws the layer only: it does not trap focus, close on Escape or take
+ * the Modal slot. For a real dialog, use the core Modal
  * component, which draws the same layers and backdrop token.
  */
 const Backdrop = ({
@@ -67,10 +67,6 @@ const Backdrop = ({
 Backdrop.propTypes = {
     /** Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page. */
     inline: PropTypes.bool,
-    /**
-     * Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the
-     * overlay Panel's Backdrop over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones.
-     */
     /** Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440. */
     screenWidth: PropTypes.number,
     /**

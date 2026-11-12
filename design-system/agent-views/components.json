@@ -886,7 +886,7 @@
       "import": "import { Backdrop } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Backdrop/Backdrop.jsx",
-      "summary": "The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token.",
+      "summary": "The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token.",
       "props": [
         {
           "name": "inline",
@@ -903,7 +903,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the overlay Panel's Backdrop over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones.",
+          "description": "Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440.",
           "deprecated": null
         },
         {
