@@ -65,6 +65,7 @@ const FilterMenu = ({
     defaultOpen = false,
     onOpenChange,
     spacing = 'default',
+    container,
     className = '',
     id,
 }) => {
@@ -136,6 +137,7 @@ const FilterMenu = ({
             show={isOpen}
             onToggle={setOpen}
             width={resolvedWidth}
+            container={container}
             className={['plus-filter-menu', `plus-filter-menu--${resolvedLayout}`, className].filter(Boolean).join(' ')}
             id={id}
         >
@@ -171,6 +173,8 @@ const FilterMenu = ({
 };
 
 FilterMenu.propTypes = {
+    /** Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. */
+    container: PropTypes.object,
     /** The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, disabled }`. Each category is a list of checkboxes; pick as many as apply. */
     categories: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string.isRequired,
