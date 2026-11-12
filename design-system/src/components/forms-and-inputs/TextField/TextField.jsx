@@ -222,7 +222,7 @@ const TextField = ({
                 readOnly={isReadOnly}
                 {...toneProps(tone).field}
                 busy={edit.enabled && edit.saving}
-                leading={renderFieldElem(elemBeforeInput)}
+                elemBefore={renderFieldElem(elemBeforeInput)}
                 trailing={(after || steppers) ? <>{after}{steppers}</> : null}
             >
                 <input

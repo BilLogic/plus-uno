@@ -315,24 +315,6 @@
         "LinkIconButton target": {
           "count": 1
         },
-        "MenuGroup children": {
-          "count": 1
-        },
-        "MenuGroup className": {
-          "count": 1
-        },
-        "MenuGroup maxHeight": {
-          "count": 1
-        },
-        "MenuGroup maxWidth": {
-          "count": 1
-        },
-        "MenuGroup minWidth": {
-          "count": 1
-        },
-        "MenuGroup testId": {
-          "count": 1
-        },
         "Object className": {
           "count": 1
         },

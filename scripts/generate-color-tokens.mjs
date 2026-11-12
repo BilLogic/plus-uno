@@ -14,11 +14,10 @@
  *
  * WHAT IT WRITES. The active plan (`ACTIVE_PLAN`, Plan A) into
  * `design-system/src/tokens/color/`: `_palette.scss`, `_semantic.scss`,
- * `_elevation.scss`, `_bootstrap-bridge.scss` and `figma-spec.json`.
- * `design-system/src/styles/main.scss` loads the four SCSS files. The token
- * checks read the palette, semantic and elevation files as definitions
- * (`COLOR_TOKEN_FILES` in `tokens-node.mjs`); the bridge only consumes
- * `--ds-*`, so they leave it out.
+ * `_elevation.scss` and `figma-spec.json`.
+ * `design-system/src/styles/main.scss` loads the three SCSS files, and the
+ * token checks read them as definitions (`COLOR_TOKEN_FILES` in
+ * `tokens-node.mjs`).
  *
  * It refuses to write when any color check or plan parity fails
  * (`check:color-system` runs the same checks), so a plan that breaks a

@@ -189,8 +189,8 @@ body,
 /*
  * Code blocks.
  *
- * The COLOR is not cosmetic. Bootstrap's default `code` color is `#d63384`,
- * which measures 4.28:1 against this docs ground (`--ds-surface`) —
+ * The COLOR is not cosmetic. The pink `code` color docs pages used to inherit,
+ * `#d63384`, measures 4.28:1 against this docs ground (`--ds-surface`) —
  * under AA's 4.5:1 for body text, on every inline `<code>` in every docs page.
  * It surfaced when a new Foundations story put ten `<code>` labels on one page
  * and `check:storybook`'s a11y pass failed it; the defect was on all 48 pages
@@ -615,15 +615,6 @@ a.sbdocs-a {
   content: '';
   display: block;
   height: var(--docs-toc-end-space);
-}
-
-/* 
- * FIX: Tailwind and Bootstrap Class Collision for '.collapse'
- * Tailwind's `collapse` utility sets `visibility: collapse`, which hides 
- * Bootstrap components like Accordion when they expand but keep the `.collapse` class.
- */
-.collapse.show {
-    visibility: visible !important;
 }
 
 /* 

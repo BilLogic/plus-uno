@@ -8,7 +8,7 @@ import { overlayMountOf } from '@/lib/overlay';
  * (menu, popup, tooltip, flag) follows.
  *
  * - **Offset:** `--popover-offset` (4px) between the field's edge and the
- *   popup, never Bootstrap's 2px menu spacer.
+ *   popup.
  * - **Alignment:** the popup's left edge meets the field's, and it is at least
  *   as wide. `center` and `right` are for callers that ask (DatePicker's
  *   `calendarAlign`). A popup that would run off the right of the viewport

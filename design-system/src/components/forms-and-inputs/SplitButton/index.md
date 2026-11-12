@@ -57,7 +57,7 @@ Don't: The two halves disagree on appearance, so they read as two controls.
 ### Open the menu from the chevron's own click handler. {#open-the-menu-from-the-chevron-s-own-click-handler}
 
 `SplitButton` has no menu logic itself — wire the chevron's `onClick` to open
-a `Popup` or `MenuGroup` positioned under it.
+a `Popup` or `DropdownMenu` positioned under it.
 
 ## Accessibility
 
@@ -71,9 +71,9 @@ a `Popup` or `MenuGroup` positioned under it.
 ## Related
 
 - For actions with no clear primary, use `ButtonGroup`.
-- For the menu the chevron opens, see `Popup` and `MenuGroup`.
+- For the menu the chevron opens, see `Popup` and `DropdownMenu`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 

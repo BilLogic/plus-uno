@@ -86,7 +86,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Selection and the bulk bar
 
-<ComponentExample of={DynamicTableStories.Selection} title="Selection" description={<>A checkbox column as wide as the row is tall, with select-all in the head. While rows are selected, <code>TableBulkActions</code> replaces the Section toolbar with the count, up to three actions, an overflow menu and Clear selection.</>} />
+<ComponentExample of={DynamicTableStories.Selection} title="Selection" description={<>A checkbox column as wide as the row is tall, with select-all in the head. While rows are selected, the head row becomes the bulk bar: select-all, mixed while only some rows are selected, then the count and up to three <code>bulkActions</code> at the start, with an overflow menu for the rest. There is no Clear; the checkboxes clear the selection and the head row comes back. The Section toolbar stays put.</>} />
 
 </div>
 
@@ -166,7 +166,7 @@ rows, select some for a bulk action, or page through a long result. Use
 4. **Footer.** States the range on a table that pages.
 5. **Message row.** The empty, no results, loading and error states, spanning every column.
 6. **Checkbox column.** With `isSelectable`: as wide as the row is tall, select-all in the head.
-7. **Bulk bar.** `TableBulkActions`, in the Section header's toolbar while rows are selected.
+7. **Bulk bar.** While rows are selected, the head row itself: select-all in its cell, then the count and `bulkActions` in one cell across the columns. The labels cross-fade in place and the row keeps its height.
 8. **Frozen column.** With `isFrozen`: an opaque first column with a stronger divider while scrolled sideways.
 
 ### States
@@ -181,6 +181,7 @@ rows, select some for a bulk action, or page through a long result. Use
 <tr><td>Pressed</td><td>A sortable head cell takes the subtle pressed ground.</td></tr>
 <tr><td>Focused</td><td>The sort button shows the 2px ring inset; focus is never a fill.</td></tr>
 <tr><td>Disabled</td><td>A row takes the disabled ink and ignores the pointer; there is no disabled sort.</td></tr>
+<tr><td>Rows selected</td><td>The head row becomes the bulk bar, at the same height; selected rows keep the selected ground.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -269,7 +270,7 @@ With `totalRows`, `rows` is the current page only, and the footer counts against
 - **Focus is a ring.** The ring is inset in the cell and is at least 3:1 on the surface; focus never changes the fill.
 - **The arrow is decorative.** The sort state is in `aria-sort`, so color and the arrow never carry it alone.
 - **A disabled row is announced.** It is `aria-disabled` and takes no pointer events.
-- **Row selection is named and announced.** Each checkbox is "Select row N" and the head's is "Select all rows", mixed when only some rows are selected; a status says how many are selected, from the first one.
+- **Row selection is named and announced.** Each checkbox is "Select row N" and the head's is "Select all rows", mixed when only some rows are selected; a status says how many are selected, from the first one. The bulk bar's count is not announced a second time.
 
 </div>
 
@@ -280,7 +281,7 @@ With `totalRows`, `rows` is the current page only, and the footer counts against
 - For a grid people only read, use the Static table.
 - For records that nest, use the Tree table.
 - For splitting a long result set across pages, use `Pagination`.
-- For the bar that acts on selected rows, use `TableBulkActions` in the Section header.
+- For search, filters and actions above the table, use the Section toolbar. Selected rows never change it.
 
 </div>
 

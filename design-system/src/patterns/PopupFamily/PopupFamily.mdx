@@ -21,7 +21,7 @@ import {
 <Meta of={PopupFamilyStories} />
 
 <Title />
-The Popups pattern is the set of floating layers that never block the page: Menu, Popup, Flag and Tooltip. They float with no blanket. A Menu and a Popup close on an outside click or Escape. A Flag closes on its timer or its Close button, and a Tooltip closes when hover or focus leaves its trigger. Each takes a fixed width tier. The examples on this page follow the toolbar's Color mode switch.
+The Popups pattern is the set of floating layers that never block the page: Menu, Popup, Flag and Tooltip. They float with no blanket. A Menu and a Popup close on an outside click or Escape. A Flag closes on its timer or its Close button, and a Tooltip closes when hover or focus leaves its trigger. A Popup hugs its content or spans a column step of the screen grid; a Flag and a Tooltip take a fixed width. The examples on this page follow the toolbar's Color mode switch.
 
 <DocsTabs of={PopupFamilyStories}>
 
@@ -54,11 +54,11 @@ The Popups pattern is the set of floating layers that never block the page: Menu
 
 ## Size and layout
 
-<ComponentExample of={PopupFamilyStories.PopupSmall} title="Popup small" description={<><code>width="sm"</code>, the default: 320, padded 16 and rounded 12.</>} />
+<ComponentExample of={PopupFamilyStories.PopupAuto} title="Popup auto" description={<><code>width="auto"</code>, the default: one list hugs its content, at least the trigger and 160 to 320, padded 16 and rounded 12.</>} />
 
-<ComponentExample of={PopupFamilyStories.PopupMedium} title="Popup medium" description={<><code>width="md"</code>: 400.</>} />
+<ComponentExample of={PopupFamilyStories.Popup3Col} title="Popup 3-col" description={<><code>width="3-col"</code>: a menu of several categories spans 3 screen-grid columns plus the pad, the same rule as a Modal's widths.</>} />
 
-<ComponentExample of={PopupFamilyStories.PopupLarge} title="Popup large" description={<><code>width="lg"</code>: 480.</>} />
+<ComponentExample of={PopupFamilyStories.Popup4Col} title="Popup 4-col" description={<><code>width="4-col"</code>: 4 columns, the widest a Popup gets.</>} />
 
 <ComponentExample of={PopupFamilyStories.TooltipOneLine} title="Tooltip" description="Body/small 12/16 in the inverse text on the bold neutral background, 24 tall on one line." />
 
@@ -114,7 +114,7 @@ For a decision that must be made before going on, use a [Modal](?path=/docs/temp
 
 ### Placement
 
-Every layer stays at least 8 from the screen edge and flips when there is no room. It sits 4 from its trigger. Width hugs content inside its tier, and height hugs up to the room left, then scrolls. A Menu hugs its rows up to 320 wide and 320 tall, then scrolls.
+Every layer stays at least 8 from the screen edge and flips when there is no room. It sits 4 from its trigger. A Popup opens by clipping out from the trigger's corner on its side and closes with a fade; its width never animates, and a keyboard open is instant. Width hugs content inside its limits, and height hugs up to the room left, then scrolls. A Menu hugs its rows up to 320 wide and 320 tall, then scrolls.
 
 ### Layers
 
@@ -155,7 +155,7 @@ Each layer is open or closed. Normal, information and success Flags close after 
 </thead>
 <tbody>
 <tr><td><code>--popover-pad</code></td><td>16</td><td>Pad of a Popup and a Flag.</td></tr>
-<tr><td><code>--popover-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>320, 400, 480</td><td>The Popup width tiers.</td></tr>
+<tr><td><code>--popup-min-width</code>, <code>--popup-max-width</code></td><td>160, 320</td><td>The narrowest and widest an auto-width Popup gets, unless its trigger is wider.</td></tr>
 <tr><td><code>--popover-width-flag</code></td><td>400</td><td>The width of a Flag.</td></tr>
 <tr><td><code>--popover-stack-flag</code></td><td>16</td><td>Space between stacked Flags.</td></tr>
 <tr><td><code>--popover-radius</code></td><td>12</td><td>Corner radius of a Popup and a Flag.</td></tr>

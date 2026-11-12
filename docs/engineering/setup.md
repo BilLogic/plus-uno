@@ -10,9 +10,9 @@ Implementation requirements only. For design rules, load `design-system/guidelin
 
 ## Stack
 
-- React + React-Bootstrap on Bootstrap, built with Vite, documented in Storybook.
+- React, built with Vite, documented in Storybook. No Bootstrap (ADR-042).
 - SCSS with design tokens from `design-system/src/tokens/`.
-- Every interactive component's behavior is built on Base UI (`@base-ui/react`, headless), styled on `--ds-*` tokens — ADR-037, widening the AI-only scope ADR-036 set. Bootstrap stays the framework for non-interactive product UI.
+- Every interactive component's behavior is built on Base UI (`@base-ui/react`, headless), styled on `--ds-*` tokens — ADR-037, widening the AI-only scope ADR-036 set.
 - Versions live in `package.json` and nowhere else — read them there rather than from a doc that goes stale on the next bump.
 
 ## Import Aliases
@@ -56,7 +56,7 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 - Each prototype has its own `vite.config.js` with `@` → `../../design-system/src`
 - Register in **Notion Marketplace** with the Deploy Preview / standalone URL — do **not** add numeric SPA routes on `main`
 - Optional local script: `"dev:{project-name}": "vite --config prototypes/{project-name}/vite.config.js"` (branch only)
-- **Production on `main`:** Storybook + the tutor revamp (`/prototypes/tutor-revamp/`). The Vibe app and the Full Demo Walkthrough are on the `archive/legacy-ds` branch; `/home`, `/app` and `/demo` redirect to Storybook
+- **Production on `main`:** Storybook only. The Vibe app and the Full Demo Walkthrough are on the `archive/legacy-ds` branch; `/home`, `/app` and `/demo` redirect to Storybook
 
 **The scaffold writes:**
 
@@ -71,7 +71,7 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 `https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css`.
 That is the host and path that serve FA 7's `all.min.css`; the cdnjs path most
 agents reach for by habit is laid out differently for FA 7 and the icons come up
-blank. Copy the `<link>` from `prototypes/tutor-revamp/index.html` rather than typing
+blank. Copy the `<link>` from `skills/uno-prototype/scripts/scaffold-prototype.sh` rather than typing
 it. Icons themselves are FA Free — `fa-solid`, `fa-regular`, `fa-brands`
 (AGENTS.md § Hard rules 3).
 
@@ -89,10 +89,10 @@ prototypes/{project-name}/
 
 When mirroring existing code: nearest `*.stories.jsx` → `prototypes/**`.
 
-## Bootstrap & Providers
+## Styles & Providers
 
-- Use PLUS components first — not raw Bootstrap markup for DS surfaces. An interactive PLUS component's behavior comes from Base UI, not Bootstrap (ADR-037); Bootstrap markup covers non-interactive layout.
-- Load `main.scss` for token variables
+- Use PLUS components first. An interactive PLUS component's behavior comes from Base UI (ADR-037); layout is PLUS components and `--ds-*` tokens.
+- Load `main.scss` for token variables and the element baseline (`_base.scss`)
 - Prototype Vite configs must set `@` alias or imports fail
 
 ## Token Workflow
@@ -432,7 +432,6 @@ Tests: `npm run test:scripts`.
 
 ```bash
 npm run storybook          # http://127.0.0.1:4200
-npm run dev:tutor-revamp   # the tutor revamp prototype
 ```
 
 ## File Naming

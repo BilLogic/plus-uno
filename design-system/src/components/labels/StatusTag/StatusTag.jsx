@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { devWarn } from '../../../lib/devWarn';
 
 import CountTag, { COUNT_TAG_APPEARANCES, formatCount } from '../CountTag/CountTag';
-import Tooltip from '../../overlays-and-layering/Tooltip';
-import { useIsTruncated } from '../../../lib/useIsTruncated';
+import { ClippedTooltip } from '../../../lib/ClippedTooltip';
 import Icon from '../../images-and-icons/Icon';
 import './StatusTag.scss';
 
@@ -16,7 +16,7 @@ import './StatusTag.scss';
  * set it. Otherwise, Tag (or SmartTag for a SMART subject). A Status tag is
  * filled (a meaning); Tag is outlined (a category).
  *
- * THE NAMES FOLLOW THE LIBRARY. `appearance`, `spacing`, `leadingVisual` and
+ * THE NAMES FOLLOW THE LIBRARY. `appearance`, `spacing`, `iconBefore` and
  * `trailingMetric` take the same words Button and Count tag use, and the same
  * values as the Status tag set in Figma, so handoff needs no translation.
  *
@@ -30,24 +30,14 @@ import './StatusTag.scss';
 export const STATUS_TAG_APPEARANCES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery'];
 export const STATUS_TAG_SPACINGS = ['default', 'spacious'];
 
-const warn = (message) => {
-    if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.warn(`[StatusTag] ${message}`);
-    }
-};
-
-/** A string is a Font Awesome Free icon name, as Button takes it; anything else renders as given. */
-const renderVisual = (visual) => (typeof visual === 'string'
-    ? <Icon name={visual} />
-    : visual);
+const warn = devWarn('StatusTag');
 
 /** A filled label for the condition something is in, such as "Needs review" or "Overdue". It is never a button; its appearance carries the meaning. */
 export const StatusTag = ({
     children,
     appearance = 'neutral',
     spacing = 'default',
-    leadingVisual,
+    iconBefore,
     trailingMetric,
     trailingMetricAppearance,
     maxWidth = 200,
@@ -81,22 +71,12 @@ export const StatusTag = ({
         effectiveSpacing = 'default';
     }
 
-    const visual = leadingVisual;
     const wantsMetric = trailingMetric !== undefined && trailingMetric !== null && formatCount(trailingMetric) !== null;
     let metricAppearance = effectiveAppearance;
     if (trailingMetricAppearance !== undefined) {
         if (COUNT_TAG_APPEARANCES.includes(trailingMetricAppearance)) metricAppearance = trailingMetricAppearance;
         else warn(`trailingMetricAppearance="${trailingMetricAppearance}" is not one of ${COUNT_TAG_APPEARANCES.join(', ')}; it follows appearance.`);
     }
-
-    /*
-     * A node visual is a new object every render; keying the measurement on it
-     * would rebuild the ResizeObserver each time. Its presence is what changes
-     * the label's width.
-     */
-    const visualKey = typeof visual === 'string' ? visual : Boolean(visual);
-    const labelRef = useRef(null);
-    const truncated = useIsTruncated(labelRef, [children, effectiveSpacing, maxWidth, visualKey, wantsMetric]);
 
     const classes = [
         'plus-status',
@@ -116,34 +96,39 @@ export const StatusTag = ({
      * when the page resizes.
      */
     return (
-        <Tooltip text={children} trigger={truncated ? ['hover', 'focus'] : []}>
-            <span
-                id={id}
-                className={classes}
-                style={{ '--plus-status-max': typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth }}
-                {...rest}
-                tabIndex={truncated ? 0 : undefined}
-            >
-                <span className="plus-status__content">
-                    {visual && (
-                        <span className="plus-status__visual" aria-hidden="true">{renderVisual(visual)}</span>
-                    )}
-                    <span
-                        ref={labelRef}
-                        className="plus-status__label"
-                    >
-                        {children}
+        <ClippedTooltip
+            text={children}
+            deps={[effectiveSpacing, maxWidth, iconBefore, wantsMetric]}
+        >
+            {({ measureRef, truncated }) => (
+                <span
+                    id={id}
+                    className={classes}
+                    style={{ '--plus-status-max': typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth }}
+                    {...rest}
+                    tabIndex={truncated ? 0 : undefined}
+                >
+                    <span className="plus-status__content">
+                        {iconBefore && (
+                            <span className="plus-status__visual" aria-hidden="true"><Icon name={iconBefore} /></span>
+                        )}
+                        <span
+                            ref={measureRef}
+                            className="plus-status__label"
+                        >
+                            {children}
+                        </span>
                     </span>
+                    {wantsMetric && (
+                        <CountTag
+                            value={trailingMetric}
+                            appearance={metricAppearance}
+                            spacing={effectiveSpacing === 'spacious' ? 'default' : 'compact'}
+                        />
+                    )}
                 </span>
-                {wantsMetric && (
-                    <CountTag
-                        value={trailingMetric}
-                        appearance={metricAppearance}
-                        spacing={effectiveSpacing === 'spacious' ? 'default' : 'compact'}
-                    />
-                )}
-            </span>
-        </Tooltip>
+            )}
+        </ClippedTooltip>
     );
 };
 
@@ -154,8 +139,8 @@ StatusTag.propTypes = {
     appearance: PropTypes.oneOf(STATUS_TAG_APPEARANCES),
     /** `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. */
     spacing: PropTypes.oneOf(STATUS_TAG_SPACINGS),
-    /** One icon before the label: a Font Awesome Free name (`circle-check`) or a node. */
-    leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    /** One icon before the label: a Font Awesome Free name (`circle-check`). */
+    iconBefore: PropTypes.string,
     /** A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** The Count tag's appearance. Defaults to the Status tag's own. */

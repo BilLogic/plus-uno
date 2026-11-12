@@ -32,8 +32,9 @@ export const joinedSubjects = [
 
 <Title />
 Picks one value, or several, from a list. The field itself is the combobox:
-focus stays in it, and a searchable field is a text input that filters the
-list as you type.
+focus stays in it, and the field is a text input that filters the list as you
+type. A short list, such as a filter menu's, turns typing off with
+`isSearchable={false}`.
 
 <DocsTabs of={SelectStories}>
 
@@ -61,13 +62,23 @@ list as you type.
 
 <ComponentExample of={SelectStories.Multi} title="Multi" description="isMulti shows picks as Tags that collapse into a count." />
 
-<ComponentExample of={SelectStories.Searchable} title="Searchable" description="isSearchable filters the list as you type in the field." />
+<ComponentExample of={SelectStories.Searchable} title="Searchable" description="Typing in the field filters the list. This is the default." />
+
+<ComponentExample of={SelectStories.NotSearchable} title="Not searchable" description="isSearchable={false} makes the field a plain trigger, for a short list in a filter menu." />
 
 <ComponentExample of={SelectStories.Creatable} title="Creatable" description="isCreatable implies searchable and offers a Create row when nothing matches." />
 
 <ComponentExample of={SelectStories.DependentFields} title="Dependent fields" description="The child field waits, disabled with a reason, until its parent is answered, and clears when the parent changes." />
 
 <ComponentExample of={SelectStories.LongList} title="Long list" description="Past 50 options, Recent and Suggested come first and typing searches the rest." />
+
+<ComponentExample of={SelectStories.Async} title="Async" description="loadOptions fetches 50 at a time as the list opens, as you type and as you scroll, and the list says how many there are." />
+
+<ComponentExample of={SelectStories.AsyncCreatable} title="Async and creatable" description="isCreatable works over loaded options: text nothing matches can be created." />
+
+<ComponentExample of={SelectStories.AsyncLoading} title="Loading options" description="Until the first page arrives the list shows one Loading options row, never skeleton rows." />
+
+<ComponentExample of={SelectStories.AsyncFailed} title="Couldn't load options" description="When a request fails the list says so with a Retry button, which asks for the same page again." />
 
 </div>
 
@@ -121,10 +132,31 @@ list as you type.
 
 ## Usage
 
-Use `Select` for a list too long to show all at once, or when typing to
-filter helps more than scanning — a tutor roster, a list of schools. For a
-handful of options visible all at once, use `RadioGroup` instead. For
-options arranged in a hierarchy, use `TreeSelect` or `Cascader`.
+Use `Select` for a list of six or more options, where typing to filter
+helps more than scanning — a tutor roster, a list of schools. Up to five
+options belong in view as a `RadioGroup` (one pick) or a Checkbox group
+(several). Pick the control by the shape of the answer.
+
+<DocsTable>
+<thead>
+<tr><th>The choice is</th><th>Reach for</th></tr>
+</thead>
+<tbody>
+<tr><td>One pick, up to 5 options</td><td><code>RadioGroup</code></td></tr>
+<tr><td>Several picks, up to 5 options</td><td>A Checkbox group (<code>Fieldset</code> with <code>Checkbox</code>)</td></tr>
+<tr><td>6 or more options</td><td><code>Select</code>, searchable by default</td></tr>
+<tr><td>A list held on a server, too large to ship</td><td><code>Select</code> with <code>loadOptions</code></td></tr>
+<tr><td>Options in a hierarchy</td><td><code>Cascader</code> or <code>TreeSelect</code></td></tr>
+<tr><td>Narrowing a table from a bar</td><td>The tiers of the Filtering pattern</td></tr>
+<tr><td>An action run from a button</td><td><code>DropdownMenu</code></td></tr>
+</tbody>
+</DocsTable>
+
+### Turn typing off for a short set of choices.
+
+Typing is on because most lists are long enough to need it. A menu that
+holds a few choices, applied as you pick, has nothing to search: pass
+`isSearchable={false}` so the field stays a plain trigger and Space opens it.
 
 </div>
 
@@ -151,7 +183,7 @@ options arranged in a hierarchy, use `TreeSelect` or `Cascader`.
 <tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code> and leaves the tab order.</td></tr>
 <tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
 <tr><td>Valid</td><td>With <code>isValid</code>, the edge takes <code>--ds-border-success</code> and <code>successMessage</code> shows under the field.</td></tr>
-<tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill. The value can be read, selected and copied.</td></tr>
+<tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill, full contrast, no hover. The chevron is not drawn, a press opens nothing, and a long value wraps instead of clipping. The value can be read, selected and copied.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -216,7 +248,11 @@ Mark the field with `isInvalid` so the message reads as an error; the same words
 
 ### Pick the mode by the answer.
 
-`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. `isSearchable` filters by typing, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
+`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. Typing filters the list unless you pass `isSearchable={false}`, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
+
+### Mark a single pick with a check or a radio.
+
+A single Select marks its pick with a check at the end of the row. Pass `marker="radio"` to draw a radio before the label instead, when the list reads as a set of alternatives to choose between, as in a view switch or a filter menu. Several picks always use checkboxes, so `marker` has no effect with `isMulti`. The marker changes color on selection; it does not move.
 
 ### Show picks as text when Tags crowd the field.
 
@@ -251,9 +287,40 @@ where firing once, on close, avoids re-querying on every checkbox click.
 `recent` and `suggested` only change the order past 50 static options;
 `loadOptions` is for a list too large to ship as a static array at all.
 
+`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`.
+The first page loads as the list opens and again whenever the typed text
+changes; the next page loads as the list scrolls near its end, 50 at a time,
+and an older answer never overwrites a newer one. `isCreatable` works with it.
+
+```jsx
+<Select
+    label="Student"
+    isCreatable
+    loadOptions={(text, { offset, limit }) => fetchStudents(text, offset, limit)}
+/>
+```
+
+While a page is on its way the list shows one "Loading options" row; a Select
+never draws skeleton rows. If the request fails the list shows "Couldn't load
+options" with a Retry button, and Enter in the field retries too. A later page
+that fails keeps the rows already loaded and puts the same message in the
+footer. Options fade in one after another, 20 ms apart, the wait capped at
+500 ms; reduced motion shows them at once.
+
 </div>
 
 <div className="sb-ds-doc-section">
+
+### Read-only is not disabled.
+
+`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+
+<DoDontPair
+    doExample={<div style={{ width: 'var(--width-2000)' }}><Select label="Session length" options={lengths} defaultValue="45" isReadOnly caption="Set by your supervisor." /></div>}
+    doCaption="Read-only keeps the value readable, and the caption says why."
+    dontExample={<div style={{ width: 'var(--width-2000)' }}><Select label="Session length" options={lengths} defaultValue="45" isDisabled caption="Set by your supervisor." /></div>}
+    dontCaption="Disabled fades a value people need to read."
+/>
 
 ## Content guidelines
 

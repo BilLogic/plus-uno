@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DocsContainer } from '@storybook/addon-docs/blocks';
 import { themes } from 'storybook/theming';
+import { COLOR_SCHEME_QUERY, resolveColorScheme } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
 /**
  * The "On this page" rail's four page-side fixes, applied from the docs container.
@@ -157,19 +158,26 @@ function TocEnhancer() {
 }
 
 /**
- * The resolved color mode, light or dark, read from `data-bs-theme` on <html>.
- * The Color mode toolbar writes it through `applyColorModes` (auto resolves to
- * the OS preference there), so following the attribute follows every mode.
+ * The resolved color mode, light or dark, from `data-color-mode` on <html>.
+ * The Color mode toolbar writes it through `applyColorModes`; under auto it
+ * resolves to the OS preference, so the hook also follows the OS.
  */
 function useResolvedColorMode() {
-  const read = () => (typeof document !== 'undefined'
-    && document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light');
+  const read = () => (typeof document === 'undefined'
+    ? 'light'
+    : resolveColorScheme(document.documentElement.getAttribute('data-color-mode')));
   const [mode, setMode] = useState(read);
   useEffect(() => {
-    const observer = new MutationObserver(() => setMode(read()));
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
-    setMode(read());
-    return () => observer.disconnect();
+    const update = () => setMode(read());
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-color-mode'] });
+    const query = window.matchMedia?.(COLOR_SCHEME_QUERY);
+    query?.addEventListener('change', update);
+    update();
+    return () => {
+      observer.disconnect();
+      query?.removeEventListener('change', update);
+    };
   }, []);
   return mode;
 }

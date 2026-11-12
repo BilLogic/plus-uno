@@ -21,7 +21,6 @@ npm run dev          # Storybook (4200)
 | Where | What you get |
 |-------|--------------|
 | [localhost:4200](http://localhost:4200) | Storybook — the design system, and the source of truth for what a component does |
-| `npm run dev:<slug>` | A single prototype, e.g. `dev:tutor-revamp` |
 
 Every command lives in `package.json`. It is the only place a command or a
 version is stated — if a doc lists one, the doc is wrong.

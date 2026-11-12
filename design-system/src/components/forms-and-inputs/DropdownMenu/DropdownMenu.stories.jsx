@@ -1,7 +1,7 @@
 import React from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import Button from '@/components/forms-and-inputs/Button';
-import { ButtonItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
+import { ButtonItem, LinkItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
@@ -19,6 +19,8 @@ export default {
         },
     },
 };
+
+const onRetry = fn();
 
 const basicMenu = (
     <>
@@ -106,6 +108,26 @@ export const Loading = () => (
         <DropdownMenu trigger={<Button>Assignees</Button>} loading isOpen onOpenChange={() => {}} />
     </div>
 );
+
+Loading.play = async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(await body.findByText('Loading options')).toBeInTheDocument();
+    await expect(body.getByRole('menu', { hidden: true })).toHaveAttribute('aria-busy', 'true');
+};
+
+/** After a failed load the menu says so and offers Retry, which leaves the menu open. */
+export const LoadFailed = () => (
+    <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+        <DropdownMenu trigger={<Button>Assignees</Button>} hasError onRetry={onRetry} isOpen onOpenChange={() => {}} />
+    </div>
+);
+
+LoadFailed.play = async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(await body.findByText("Couldn't load options")).toBeInTheDocument();
+    await userEvent.click(body.getByRole('menuitem', { name: 'Retry' }));
+    await expect(onRetry).toHaveBeenCalledTimes(1);
+};
 
 /* ------------------------------------------------------------------ escape */
 
@@ -251,6 +273,24 @@ export const DisabledRow = {
         const row = await body(canvasElement).findByRole('menuitem', { name: 'Archive' });
         await expect(row).toHaveAttribute('aria-disabled', 'true');
         await expect(getComputedStyle(row).color).toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+    },
+};
+
+/** A row disabled for a prerequisite the person can fix here; its description says what to do. */
+export const DisabledRowWithReason = {
+    render: () => (
+        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+            <DropdownMenu trigger={<Button text="Manage" />} isOpen onOpenChange={noop}>
+                <ButtonItem onClick={noop}>Rename</ButtonItem>
+                <ButtonItem onClick={noop} isDisabled description="End the open session first">Archive</ButtonItem>
+            </DropdownMenu>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const page = body(canvasElement);
+        const row = await page.findByRole('menuitem', { name: /Archive/ });
+        await expect(row).toHaveAttribute('aria-disabled', 'true');
+        await expect(page.getByText('End the open session first')).toBeVisible();
     },
 };
 

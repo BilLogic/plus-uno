@@ -347,62 +347,14 @@ test('the code-only frame tokens resolve, unchanged', () => {
   }
 });
 
-/*
- * Modal.scss works the modal width out from the screen width with one
- * continuous formula, which is right between breakpoints too. At the three
- * mode widths it has to land on what Figma draws: 6 · 8 · 10 screen columns,
- * the gutters between them, and the modal pad on each side.
- */
-const MODAL_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.scss'), 'utf8');
-
 // `--modal-pad-x-default` (ADR-038, tokens/ladder, outside this file's corpus) is
-// non-responsive, same 16px the old `--modal-pad` held at every mode.
+// non-responsive, same 16px the old `--modal-pad` held at every mode. `--popover-pad` is 16 too.
 const MODAL_PAD_PX = 16;
 
-/** The width Modal.scss computes for a span on a screen `width` wide, its tokens read at `mode`. */
-function modalWidth(span, width, mode) {
-  const block = MODAL_SCSS.match(/\n\.plus-modal \{([\s\S]*?)\n\}/)?.[1];
-  assert.ok(block, 'Modal.scss has no .plus-modal block');
-  const local = Object.fromEntries([...block.matchAll(tokenDeclarationPattern('--plus-modal-'))].map(([, n, v]) => [n, v.trim()]));
-  local['--plus-modal-span'] = String(span);
-  // ADR-038, tokens/ladder, outside this file's corpus: inject it like a local.
-  local['--modal-pad-x-default'] = String(MODAL_PAD_PX);
-  const formula = block.match(/\n\s*width:\s*([^;]+);/)?.[1];
-  assert.ok(formula, '.plus-modal declares no width');
-  const resolve = (expr, depth = 0) => {
-    assert.ok(depth < 10, `${expr} does not resolve`);
-    return expr
-      .replace(/var\(--plus-modal-screen,\s*100vw\)/g, String(width))
-      .replace(/var\((--[a-z0-9-]+)\)/g, (_, name) => {
-        if (name in local) return `(${resolve(local[name], depth + 1)})`;
-        return String(parseFloat(atMode(name, mode)));
-      });
-  };
-  const clamp = (lo, value, hi) => Math.max(lo, Math.min(value, hi));
-  const calc = (n) => n;
-  return new Function('clamp', 'calc', `return ${resolve(formula)};`)(clamp, calc);
-}
-
-test('Modal.scss widths at 768, 1024 and 1440 are 6 · 8 · 10 screen columns, their gutters and the modal pad', () => {
-  assert.match(MODAL_SCSS, /\.plus-modal-width-8-col \{\s*--plus-modal-span: 8;/);
-  assert.match(MODAL_SCSS, /\.plus-modal-width-10-col \{\s*--plus-modal-span: 10;/);
-  const num = (name, mode) => parseFloat(atMode(name, mode));
-  for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
-    for (const span of [6, 8, 10]) {
-      const expected = span * num('--grid-width-column-screen', mode)
-        + (span - 1) * num('--grid-gutter', mode)
-        + 2 * MODAL_PAD_PX;
-      // The token holds the column to two decimals, so ten columns drift by under a tenth of a pixel.
-      const actual = modalWidth(span, width, mode);
-      assert.ok(Math.abs(actual - expected) < 0.1, `${span} columns at ${mode}: Modal.scss ${actual}, Figma ${expected}`);
-    }
-  }
-});
-
 /*
- * The patterns' screen grid (`styles/_screen-grid.scss`) is the same rule for
- * any layer placed in an Overlay — PatternModal now, a drawer later. At the
- * three mode widths it has to land on Figma's Modal/width-modal-* too.
+ * The screen grid (`styles/_screen-grid.scss`) is the one rule every
+ * floating layer takes its column steps from: Modal, the Blanket patterns and
+ * Popup. At the three mode widths it has to land on Figma's Modal/width-modal-*.
  */
 const SCREEN_GRID_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/styles/_screen-grid.scss'), 'utf8');
 
@@ -440,6 +392,33 @@ test('the Overlay screen grid lands on Modal/width-modal-* at 768, 1024 and 1440
       // The column is held to two decimals, so ten columns land within half a pixel of the whole-pixel token.
       assert.ok(Math.abs(actual - expected) < 0.5, `${size} at ${mode}: _screen-grid.scss ${actual}, Figma ${expected}`);
     }
+  }
+});
+
+const MODAL_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.scss'), 'utf8');
+const POPUP_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Popup/Popup.scss'), 'utf8');
+
+test('Modal takes its 6 · 8 · 10 column widths from the shared screen grid', () => {
+  assert.match(MODAL_SCSS, /@use '[./]*styles\/screen-grid' as \*;/);
+  const block = MODAL_SCSS.match(/\n\.plus-modal \{([\s\S]*?)\n\}/)?.[1];
+  assert.ok(block, 'Modal.scss has no .plus-modal block');
+  assert.match(block, /@include screen-grid-width\(var\(--modal-pad-x-default\)\);/);
+  assert.match(block, /--plus-overlay-span: 6;/);
+  assert.match(MODAL_SCSS, /\.plus-modal-width-8-col \{\s*--plus-overlay-span: 8;/);
+  assert.match(MODAL_SCSS, /\.plus-modal-width-10-col \{\s*--plus-overlay-span: 10;/);
+  assert.doesNotMatch(MODAL_SCSS, /--plus-modal-(grid|column|span|screen)/, 'Modal keeps no column math of its own');
+});
+
+test('Popup\'s 3-col and 4-col take the same screen grid, and POPUP_WIDTH_PX is that rule at 768 · 1024 · 1280', () => {
+  assert.match(POPUP_SCSS, /@use '[./]*styles\/screen-grid' as \*;/);
+  assert.match(POPUP_SCSS, /@include screen-grid-width\(var\(--popover-pad\)\);/);
+  assert.match(POPUP_SCSS, /&\.plus-popup--3-col \{\s*--plus-overlay-span: 3;/);
+  assert.match(POPUP_SCSS, /&\.plus-popup--4-col \{\s*--plus-overlay-span: 4;/);
+  const px = exportedValue(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Popup/Popup.jsx', 'POPUP_WIDTH_PX');
+  const screens = exportedValue(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.jsx', 'MODAL_WIDTH_SCREENS');
+  const mode = Object.keys(LAYOUT_MODES)[0];
+  for (const [step, span] of [['3-col', 3], ['4-col', 4]]) {
+    assert.deepEqual(px[step], screens.map((screen) => Math.round(screenGridWidth(span, screen, mode))), step);
   }
 });
 

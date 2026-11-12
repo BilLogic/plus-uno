@@ -14,7 +14,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'A fixed grid people read. Headers and rows accept either plain values or per-cell objects ({ content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }), so a cell can hold any node — a Badge, formatted currency. Rows rest or are highlighted; nothing in a Static table hovers, sorts, selects, pages or expands — see the Dynamic table for that.'
+                    'A fixed grid people read. Headers and rows accept either plain values or per-cell objects ({ content, align, emphasis, overflow, secondary, elemBefore, state, loading, colSpan, className }), so a cell can hold any node — a Badge, formatted currency. Rows rest or are highlighted; nothing in a Static table hovers, sorts, selects, pages or expands — see the Dynamic table for that.'
             }
         }
     },
@@ -29,7 +29,7 @@ export default {
         },
         rows: {
             control: 'object',
-            description: 'Row data — each row is an array of cells; a cell is a node or { content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }',
+            description: 'Row data — each row is an array of cells; a cell is a node or { content, align, emphasis, overflow, secondary, elemBefore, state, loading, colSpan, className }',
             table: { category: 'Content' }
         },
         titleColumn: {
@@ -162,7 +162,7 @@ export const FramedAndLines = {
 };
 
 export const Cells = {
-    parameters: { docs: { description: { story: 'A cell is text or a slot. Text cells add a muted second line, wrap, take the title emphasis, align as text, number or icon, and take a leading slot. A name that does not fit ends in an ellipsis and shows its full text in a tooltip.' } } },
+    parameters: { docs: { description: { story: 'A cell is text or a slot. Text cells add a muted second line, wrap, take the title emphasis, align as text, number or icon, and take an `elemBefore` slot. A name that does not fit ends in an ellipsis and shows its full text in a tooltip.' } } },
     render: () => (
         <Table
             headers={[
@@ -173,7 +173,7 @@ export const Cells = {
             ]}
             rows={[
                 [
-                    { content: 'Ava Thompson', emphasis: 'title', secondary: 'Grade 7 · Lincoln Middle', leading: <i className="fa-regular fa-circle-user" aria-hidden="true" /> },
+                    { content: 'Ava Thompson', emphasis: 'title', secondary: 'Grade 7 · Lincoln Middle', elemBefore: <i className="fa-regular fa-circle-user" aria-hidden="true" /> },
                     { content: 'Rescheduled from Oct 22 because of a school assembly', overflow: 'wrap' },
                     { content: '1,240', align: 'number' },
                     { content: <i className={iconClass('flag')} role="img" aria-label="Flagged" />, align: 'icon' }
@@ -201,6 +201,18 @@ export const Cells = {
         await userEvent.hover(note);
         await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(/A very long single-line note/));
         await userEvent.unhover(note);
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull());
+        await expect(note, 'no title attribute').not.toHaveAttribute('title');
+
+        // A clipped cell is a tab stop and shows the same tooltip on focus; a
+        // cell that fits is neither.
+        await expect(canvas.getByText('Marcus Lee'), 'a name that fits is not a tab stop').not.toHaveAttribute('tabindex');
+        await expect(note).toHaveAttribute('tabindex', '0');
+        note.focus();
+        await expect(note).toHaveFocus();
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(/A very long single-line note/));
+        note.blur();
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull());
         await expect(getComputedStyle(canvas.getByText('1,240').closest('td')).textAlign).toBe('right');
     }
 };
@@ -276,6 +288,18 @@ export const HeadCells = {
         await userEvent.hover(long);
         await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(/far too long/));
         await userEvent.unhover(long);
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull());
+        await expect(long, 'no title attribute').not.toHaveAttribute('title');
+
+        // The clipped header is a tab stop and shows its name on focus; a header
+        // that fits is not.
+        const clippedHead = long.closest('.plus-table-head-cell-inner');
+        await expect(canvas.getByText('Student').closest('.plus-table-head-cell-inner'), 'a name that fits is not a tab stop').not.toHaveAttribute('tabindex');
+        await expect(clippedHead).toHaveAttribute('tabindex', '0');
+        clippedHead.focus();
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(/far too long/));
+        clippedHead.blur();
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull());
         await expect(canvas.getByRole('columnheader', { name: 'Flagged' })).toBeVisible();
         await expect(canvasElement.querySelector('.plus-table-head-cell-type.fa-flag')).toBeVisible();
         await expect(canvas.getByText('Sessions').closest('th')).toHaveClass('plus-table-cell--align-number');

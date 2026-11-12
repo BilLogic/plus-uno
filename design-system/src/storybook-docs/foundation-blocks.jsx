@@ -153,7 +153,7 @@ const Verdict = ({ tone, caption, children }) => {
                 }}
             >
                 <span>
-                    <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} leadingVisual={isDo ? 'circle-check' : 'circle-xmark'}>
+                    <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} iconBefore={isDo ? 'circle-check' : 'circle-xmark'}>
                         {isDo ? 'Do' : 'Don’t'}
                     </StatusTag>
                 </span>
@@ -249,7 +249,6 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
                     <div
                         key={p}
                         data-color-mode={p}
-                        data-bs-theme={p}
                         {...(contrast ? { 'data-contrast-mode': contrast } : {})}
                         style={{
                             display: 'flex',

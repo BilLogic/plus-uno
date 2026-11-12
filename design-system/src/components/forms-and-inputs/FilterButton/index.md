@@ -50,6 +50,16 @@ Keep the natural width, so the chevron stays right after the name. Filter
 button has no prop to fill its container; don't stretch it across a wide row
 with your own styles.
 
+### Fold into one menu below 768. {#fold-into-one-menu-below-768}
+
+Below 768 a row of filter buttons does not fit. Fold them into one filter
+icon button whose menu stacks the filters, and give it the total applied as
+its count.
+
+```jsx
+<IconButton icon="filter" label="Filters" trailingMetric={applied} />
+```
+
 ### Use the filter's name as the label. {#use-the-filter-s-name-as-the-label}
 
 Do: The label is the filter's name.
@@ -73,7 +83,7 @@ toggles directly on click, with nothing to open.
 - For the applied value once chosen, use `Tag`.
 - For a single action that isn't a filter, use `Button`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 

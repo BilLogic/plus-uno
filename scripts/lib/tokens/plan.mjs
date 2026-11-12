@@ -420,11 +420,16 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Flag', new: '--flag-min-height', old: null, ref: 'calc(var(--size-1000) + var(--size-750))', use: 'Minimum height of a Flag.' },
   { tier: 'components', group: 'Flag', new: '--flag-pad', old: null, ref: 'var(--space-125)', use: 'Padding inside a Flag.' },
   { tier: 'components', group: 'Flag', new: '--flag-offset', old: null, ref: 'var(--space-125)', use: 'Distance between a Flag and the edge of the screen.' },
+  { tier: 'components', group: 'Spotlight', new: '--spotlight-width', old: null, ref: 'var(--width-2500)', use: 'Width of a Spotlight.' },
   { tier: 'components', group: 'Spotlight', new: '--spotlight-media-height', old: null, ref: 'calc(var(--size-750) + var(--space-150))', use: 'Height of the media area in a Spotlight.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-min-width', old: null, ref: 'var(--size-1400)', use: 'Minimum width of a menu group.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-pad-x', old: null, ref: 'var(--space-150)', use: 'Horizontal padding of a menu group.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-gap', old: null, ref: 'var(--space-100)', use: 'Vertical gap between groups in a menu.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-item-pad-y', old: null, ref: 'var(--space-0625)', use: 'Vertical padding of an item in a menu group.' },
+  { tier: 'components', group: 'Popup', new: '--popup-min-width', old: null, ref: 'var(--width-1000)', use: 'Narrowest an auto-width Popup gets, unless its trigger is wider.' },
+  { tier: 'components', group: 'Popup', new: '--popup-max-width', old: null, ref: 'var(--width-2000)', use: 'Widest an auto-width Popup grows to fit its content, unless its trigger is wider.' },
+  { tier: 'components', group: 'Popup', new: '--popup-clip-reach', old: null, ref: 'var(--space-300)', use: 'How far past its edges a Popup\'s opening clip stays, so the overlay shadow is never cut.' },
+  { tier: 'components', group: 'AI chat', new: '--ai-chat-width', old: null, ref: 'var(--width-2500)', use: 'Width of the AI chat when it opens as a popup or floats beside the page.' },
   { tier: 'components', group: 'Popup', new: '--popup-pad', old: null, ref: 'var(--space-125)', use: 'Padding inside a Popup.' },
   { tier: 'components', group: 'Table', new: '--table-cell-max-width', old: null, ref: 'var(--size-300)', use: 'Maximum width of a table cell before its text truncates.' },
   { tier: 'components', group: 'Avatar', new: '--avatar-size-96', old: null, ref: 'calc(var(--space-300) * 2)', use: 'Size of an extra-large UserAvatar, such as in a profile header.' },
@@ -437,9 +442,9 @@ export const TOKEN_LADDER = [
   // ─── Components / Spinner, Progress bar (Bill 2026-11-04: one component
   // each, so they move out of SIZE_ROLES in generate-all-tokens.js straight to
   // this tier, not through Semantics' size roles) ───────────────────────
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--space-100', use: 'Size of a small Spinner, such as one inside a Button.' },
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--space-150', use: 'Size of a default Spinner.' },
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--space-300', use: 'Size of a large Spinner, such as one loading a whole section.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--size-100', use: 'Size of a small Spinner, such as one inside a Button.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--size-150', use: 'Size of a default Spinner.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--size-300', use: 'Size of a large Spinner, such as one loading a whole section.' },
   { tier: 'components', group: 'Progress bar', new: '--progress-bar-height', old: null, value: '--space-050', use: 'Height of a ProgressBar track.' },
 
   // ─── Layers (own non-spacing family, code only) ───────────────────────

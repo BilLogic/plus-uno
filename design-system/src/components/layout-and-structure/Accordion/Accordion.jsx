@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
-import { Button as BaseButton } from '@base-ui/react/button';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './Accordion.scss';
 
@@ -105,12 +104,8 @@ const AccordionItem = ({
             <BaseAccordion.Header
                 render={<Heading className="plus-accordion-header" />}
             >
-                {/* A disabled trigger stays in the tab order (aria-disabled, not
-                    the native `disabled`), so it can still be discovered.
-                    Base UI's Button carries that through `focusableWhenDisabled`. */}
                 <BaseAccordion.Trigger
                     className="plus-accordion-trigger"
-                    render={<BaseButton focusableWhenDisabled />}
                 >
                     {header}
                 </BaseAccordion.Trigger>

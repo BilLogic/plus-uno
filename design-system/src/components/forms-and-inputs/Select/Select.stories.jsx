@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
@@ -7,7 +7,8 @@ import Select from './Select';
 
 /**
  * Select — pick one value, or several, from a list. The field is `_Field`
- * and the list is the internal Listbox; isSearchable means typing in the field.
+ * and the list is the internal Listbox; typing in the field filters it, and
+ * isSearchable={false} turns that off for a short list.
  */
 export default {
     title: 'Components/Forms and inputs/Select',
@@ -26,6 +27,11 @@ export default {
         style: { table: { disable: true } },
         isMulti: {
             control: 'boolean',
+            table: { category: 'Design' }
+        },
+        marker: {
+            control: { type: 'inline-radio' },
+            options: ['check', 'radio'],
             table: { category: 'Design' }
         },
         spacing: {
@@ -143,7 +149,47 @@ export const Multi = {
 };
 
 export const Searchable = {
-    render: () => <div style={field}><Select label="Subject" isSearchable options={sampleOptions} placeholder="Type to search" /></div>,
+    render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Type to search" /></div>,
+};
+
+/** A single pick is marked with a check by default; `marker="radio"` draws a radio before the label. Several picks always use checkboxes. */
+export const Marker = {
+    render: () => (
+        <div style={{ ...grid, pointerEvents: 'auto' }}>
+            <Select label="Check" options={sampleOptions} defaultValue="option-1" />
+            <Select label="Radio" marker="radio" options={sampleOptions} defaultValue="option-1" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const picked = async (name) => {
+            await userEvent.click(canvas.getByRole('combobox', { name }));
+            const body = within(canvasElement.ownerDocument.body);
+            const option = await waitFor(() => {
+                const found = body.getAllByRole('option').find((row) => row.getAttribute('aria-selected') === 'true');
+                expect(found).toBeTruthy();
+                return found;
+            });
+            const marks = {
+                radio: option.querySelector('.plus-option-row-check--radio'),
+                check: option.querySelector('.plus-option-row-selected-mark'),
+            };
+            await userEvent.keyboard('{Escape}');
+            return marks;
+        };
+        const check = await picked('Check');
+        await expect(check.check).not.toBeNull();
+        await expect(check.radio).toBeNull();
+        const radio = await picked('Radio');
+        await expect(radio.radio).not.toBeNull();
+        await expect(radio.radio).toHaveClass('is-checked');
+        await expect(radio.check).toBeNull();
+    },
+};
+
+/** A short list in a filter menu opts out: the field is a plain trigger that opens the list. */
+export const NotSearchable = {
+    render: () => <div style={field}><Select label="Status" isSearchable={false} options={sampleOptions.slice(0, 3)} placeholder="Any status" /></div>,
 };
 
 export const Creatable = {
@@ -213,6 +259,96 @@ export const LongList = {
     )
 };
 
+/** Rows live in a portal on `document.body`, so they are looked up on the whole page. */
+const page = () => within(document.body);
+
+const students = Array.from({ length: 120 }, (_, i) => ({ value: `s${i + 1}`, label: `Student ${i + 1}` }));
+
+/** A server stand-in: filters by the typed text and answers a page after a short wait. */
+const loadStudents = (query, { offset, limit }) => new Promise((resolve) => {
+    const matches = students.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()));
+    setTimeout(() => resolve({ options: matches.slice(offset, offset + limit), total: matches.length }), 20);
+});
+
+/**
+ * Async — `loadOptions` pages in 50 at a time as the list opens, as you type and
+ * as you scroll, and the list says how many there are. Typing is on with it.
+ */
+export const Async = {
+    render: () => (
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+            <Select label="Student" loadOptions={loadStudents} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const field = within(canvasElement).getByRole('combobox', { name: 'Student' });
+        await userEvent.click(field);
+        await expect(await page().findByText('Showing 50 of 120')).toBeInTheDocument();
+
+        const body = page().getByRole('listbox').closest('.plus-listbox-body');
+        body.scrollTop = body.scrollHeight;
+        fireEvent.scroll(body);
+        await expect(await page().findByText('Showing 100 of 120')).toBeInTheDocument();
+
+        await userEvent.type(field, 'Student 11');
+        await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(11));
+        await expect(page().queryByText(/^Showing/)).toBeNull();
+    },
+};
+
+/** AsyncCreatable — `isCreatable` works over loaded options: what nothing matches can be created. */
+export const AsyncCreatable = {
+    render: () => (
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+            <Select label="Student" isCreatable loadOptions={loadStudents} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const field = within(canvasElement).getByRole('combobox', { name: 'Student' });
+        await userEvent.click(field);
+        await userEvent.type(field, 'Zoe Park');
+        await userEvent.click(await page().findByRole('option', { name: /Create\s+Zoe Park/ }));
+        await waitFor(() => expect(field).toHaveValue('Zoe Park'));
+    },
+};
+
+/** Until the first page arrives, the list shows one "Loading options" row. Never skeleton rows. */
+export const AsyncLoading = {
+    render: () => (
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+            <Select label="Teacher" options={[]} isLoading defaultOpen />
+        </div>
+    ),
+    play: async () => {
+        // The list also announces it, so the row is found by its own class.
+        await waitFor(() => expect(document.querySelector('.plus-listbox-message--loading')).toHaveTextContent('Loading options'));
+    },
+};
+
+/** When a request fails, the list says "Couldn't load options" with Retry, which asks for the same page again. */
+export const AsyncFailed = {
+    render: () => {
+        const calls = React.useRef(0);
+        const loadOptions = (query, paging) => {
+            calls.current += 1;
+            return calls.current === 1 ? Promise.reject(new Error('offline')) : loadStudents(query, paging);
+        };
+        return (
+            <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+                <Select label="Student" loadOptions={loadOptions} />
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const field = within(canvasElement).getByRole('combobox', { name: 'Student' });
+        await userEvent.click(field);
+        await waitFor(() => expect(document.querySelector('.plus-listbox-message--error')).toHaveTextContent("Couldn't load options"));
+        await userEvent.click(page().getByRole('button', { name: 'Retry' }));
+        await expect(await page().findByText('Showing 50 of 120')).toBeInTheDocument();
+        await expect(document.querySelector('.plus-listbox-message--error')).toBeNull();
+    },
+};
+
 /** Overview — Single-select default for docs landing. */
 export const Overview = {
     render: () => (
@@ -264,7 +400,7 @@ export const Interactive = {
         label: 'Option',
         placeholder: 'Select...',
         caption: '',
-        isSearchable: false,
+        isSearchable: true,
         isCreatable: false,
         displayMode: 'tags',
         spacing: 'default',
@@ -297,7 +433,7 @@ export const Colors = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const placeholder = canvasElement.querySelector('.plus-select-placeholder');
+        const subject = canvas.getByRole('combobox', { name: 'Subject' });
         const caret = canvasElement.querySelector('.plus-select-caret');
         await userEvent.click(canvas.getByRole('combobox', { name: 'Subjects' }));
         const all = await waitFor(() => {
@@ -308,7 +444,7 @@ export const Colors = {
         const mark = all.querySelector('.plus-select-all-mark');
         const picked = document.querySelector('.plus-option-row.is-selected');
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
-            await expect(getComputedStyle(placeholder).color, `${mode}: placeholder`).toBe(token('--ds-text-subtlest'));
+            await expect(getComputedStyle(subject, '::placeholder').color, `${mode}: placeholder`).toBe(token('--ds-text-subtlest'));
             await expect(getComputedStyle(caret).color, `${mode}: caret`).toBe(token('--ds-icon-subtle'));
             await expect(getComputedStyle(mark).borderTopColor, `${mode}: select-all mark edge`).toBe(token('--ds-border-input'));
             await expect(getComputedStyle(mark).backgroundColor, `${mode}: select-all mark fill`).toBe(token('--ds-background-input'));
@@ -358,5 +494,33 @@ export const FieldInvalid = {
 
 export const FieldReadOnly = {
     render: () => <div style={wrap}><Select id="select-ex-readonly" label="Option" options={sampleOptions} placeholder="Please select" isReadOnly /></div>,
-    play: async ({ canvasElement }) => expectReadOnly(canvasElement, controlOf(canvasElement)),
+    play: async ({ canvasElement }) => {
+        await expectReadOnly(canvasElement, controlOf(canvasElement));
+        // Nothing to open: the chevron is not drawn, and a press or Enter leaves the list shut.
+        await expect(canvasElement.querySelector('.plus-select-caret')).toBeNull();
+        await expect(controlOf(canvasElement)).toHaveAttribute('aria-readonly', 'true');
+        await userEvent.click(controlOf(canvasElement));
+        await userEvent.keyboard('{Enter}');
+        await expect(controlOf(canvasElement)).toHaveAttribute('aria-expanded', 'false');
+    },
+};
+
+/** A read-only value is shown whole: it wraps, and is never clipped to one line. */
+export const FieldReadOnlyLongValue = {
+    render: () => (
+        <div style={{ ...wrap, maxWidth: '200px' }}>
+            <Select
+                id="select-ex-readonly-long"
+                label="Option"
+                isReadOnly
+                value="long"
+                options={[{ value: 'long', label: 'Introduction to organic chemistry for first-year students' }]}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const text = canvasElement.querySelector('.plus-select-text');
+        await expect(text.scrollWidth).toBeLessThanOrEqual(text.clientWidth);
+        await expect(getComputedStyle(text).textOverflow).toBe('clip');
+    },
 };

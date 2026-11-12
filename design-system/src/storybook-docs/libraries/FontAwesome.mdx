@@ -1,0 +1,33 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="Libraries/Font Awesome" tags={['!dev']} />
+
+<FoundationHero
+    title="Font Awesome"
+    summary="The icon glyphs. PLUS uses Font Awesome Free 7 and nothing else."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="What it is for">
+
+Every icon in PLUS is a Font Awesome Free glyph, drawn from its name in three families: `fa-solid`, `fa-regular` and `fa-brands`. The brand glyphs, such as `fa-brands fa-slack`, are part of Free. The stylesheet loads once for the whole app.
+
+</FoundationSection>
+
+<FoundationSection title="What wraps it">
+
+The <DocsLink id="components-images-and-icons-icon">Icon</DocsLink> component draws one glyph from its name, at one of three sizes and in one of the icon color roles. Components that show an icon, such as Button and Tag, take an icon name and draw it through Icon. The rules every icon follows are on <DocsLink id="foundations-iconography">Iconography</DocsLink>.
+
+</FoundationSection>
+
+<FoundationSection title="What not to do">
+
+- Do not use a Pro family or a Pro-only name: `fa-light`, `fa-thin`, `fa-sharp` and `fa-duotone` are not licensed here and render as blanks.
+- Do not write `<i class="fa-solid ...">` by hand. Use Icon, so size and color come from tokens.
+- Do not set an icon's size or color with a literal. Use `size` 12, 16 or 24 and a color role.
+- Do not draw an icon from another set, or import an SVG as an icon.
+- Do not use an icon alone to carry meaning. Pair it with a label or give it an accessible name.
+
+</FoundationSection>

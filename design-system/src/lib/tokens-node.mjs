@@ -129,17 +129,12 @@ export const TOKEN_DIR = 'design-system/src/tokens';
 
 /**
  * Where the generated color tokens live (ADR-035): the `--palette-*` ramps, the
- * `--ds-*` semantic and elevation tokens in four modes, the Bootstrap bridge and
- * the Figma spec, all written by `npm run generate:color-tokens`.
+ * `--ds-*` semantic and elevation tokens in four modes and the Figma spec, all
+ * written by `npm run generate:color-tokens`.
  */
 export const COLOR_TOKEN_DIR = `${TOKEN_DIR}/color`;
 
-/**
- * The stylesheets in `COLOR_TOKEN_DIR` that DEFINE tokens. The Bootstrap bridge
- * is not one: it points Bootstrap's own `--bs-*` properties at `--ds-*`, which
- * makes it a consumer of the tokens, and reading it as a definition would mint
- * a `--bs-` family nobody styles with.
- */
+/** The stylesheets in `COLOR_TOKEN_DIR` that define tokens. */
 export const COLOR_PALETTE_FILE = '_palette.scss';
 export const COLOR_SEMANTIC_FILE = '_semantic.scss';
 export const COLOR_ELEVATION_FILE = '_elevation.scss';
@@ -356,6 +351,7 @@ export const FAMILIES = [
   { family: 'skeleton', prefix: '--skeleton-', what: 'Skeleton preset heights and widths' },
   { family: 'flag', prefix: '--flag-', what: 'the Flag minimum height, pad and offset' },
   { family: 'spotlight', prefix: '--spotlight-', what: 'the Spotlight media height' },
+  { family: 'ai-chat', prefix: '--ai-chat-', what: 'the AI chat width' },
   { family: 'menu-group', prefix: '--menu-group-', what: 'Menu group minimum width, pad and gap' },
   { family: 'popup', prefix: '--popup-', what: 'the Popup pad' },
   { family: 'avatar', prefix: '--avatar-', what: 'the two largest Avatar sizes, 96 and 128' },

@@ -139,9 +139,7 @@ test('every check that scopes consumer code composes its roots from the facts mo
   assert.deepEqual(SOURCE_ROOTS, [LIBRARY_ROOT, ...consumer]);
   const roots = async (file, name) => (await import(`../${file}`))[name];
   assert.equal(await roots('check-ds-usage.mjs', 'SCOPE'), consumer);
-  for (const file of ['check-ads-language.mjs', 'check-react-bootstrap-imports.mjs']) {
-    assert.equal(await roots(file, 'SEARCH_ROOTS'), SOURCE_ROOTS, file);
-  }
+  assert.equal(await roots('check-ads-language.mjs', 'SEARCH_ROOTS'), SOURCE_ROOTS);
   // The old-system ban reads the source roots and the docs that teach the system.
   const oldSystem = await import('../check-old-system.mjs');
   assert.deepEqual(oldSystem.SEARCH_ROOTS, [...SOURCE_ROOTS, ...oldSystem.DOC_ROOTS]);

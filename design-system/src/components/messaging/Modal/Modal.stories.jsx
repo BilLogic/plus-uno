@@ -242,7 +242,7 @@ function ModalLayoutDemos() {
 
 /** One grid width, drawn at the 1024 screen. */
 const widthStory = (size) => () => (
-    <div style={{ '--plus-modal-screen': '1024px', width: '100%' }}>
+    <div style={{ '--plus-overlay-screen': '1024px', width: '100%' }}>
         <Modal
             show
             renderAs="inline"

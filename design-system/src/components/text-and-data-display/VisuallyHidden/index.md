@@ -2,7 +2,7 @@
 
 # VisuallyHidden
 
-Text that assistive technology reads and nobody sees: a one-pixel, clipped span taken out of the flow. It is Bootstrap's `.visually-hidden` helper, which the rest of the system already uses by class name, given a component so the caller never types the class. It paints nothing, so it takes no tokens.
+Text that assistive technology reads and nobody sees: a one-pixel, clipped span taken out of the flow. It is the `.visually-hidden` class `main.scss` defines, which the rest of the system already uses by class name, given a component so the caller never types the class. It paints nothing, so it takes no tokens.
 
 Also asked as: screen reader only, sr-only, assistive text, screen reader text.
 
@@ -21,7 +21,7 @@ sighted person needs: the name of an icon-only button, the title of a table
 column that holds only checkboxes, the count in a status message, a table
 caption the layout already explains.
 
-It renders Bootstrap's `.visually-hidden` on a `span`, which is one pixel
+It renders the `.visually-hidden` class on a `span`, which is one pixel
 square, clipped, out of the flow and kept in the accessibility tree. Existing
 markup that writes `className="visually-hidden"` is the same thing and can move
 to the component as it is touched.

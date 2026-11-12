@@ -116,9 +116,10 @@ const FileUpload = ({
                 <div className="plus-file-upload-button-container">
                     {/*
                      * Read-only shows the field and its files with nothing to
-                     * choose: the input stays for the label and its description,
-                     * and the button goes, since a file input has no native
-                     * read-only state.
+                     * choose: the button goes, and the input stays in the tab
+                     * order for the label and its description. A file input has
+                     * no native read-only state, so a press or Enter or Space on
+                     * it does not open the picker.
                      */}
                     <input
                         ref={fileInputRef}
@@ -130,6 +131,8 @@ const FileUpload = ({
                         onChange={handleFileChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
+                        onClick={isReadOnly ? (event) => event.preventDefault() : undefined}
+                        onKeyDown={isReadOnly ? (event) => { if (event.key === 'Enter' || event.key === ' ') event.preventDefault(); } : undefined}
                         className="plus-file-upload-input"
                         aria-label={label || 'File upload'}
                         {...props}
@@ -140,7 +143,6 @@ const FileUpload = ({
                         ].filter(Boolean).join(' ') || undefined}
                         aria-invalid={state === 'invalid' || undefined}
                         aria-readonly={isReadOnly || undefined}
-                        tabIndex={isReadOnly ? -1 : props.tabIndex}
                     />
                     {!isReadOnly && (<Button
                         text={buttonText}

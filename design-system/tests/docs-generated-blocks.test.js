@@ -65,7 +65,6 @@ const MESSAGING = ['Banner', 'EmptyState', 'Flag', 'InlineMessage', 'Modal', 'Se
 const NAVIGATION = [
   ['Breadcrumb', 'Breadcrumb'],
   ['Link', 'Link'],
-  ['MenuGroup', 'MenuGroup'],
   ['Pagination', 'Pagination'],
   ['Tabs', 'Tabs'],
 ].map(([dir, name]) => `design-system/src/components/navigation/${dir}/${name}.mdx`);

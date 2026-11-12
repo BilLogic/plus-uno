@@ -26,16 +26,17 @@ importable from `@/components` today.
 |---|---|
 | free text, one line | `TextField` |
 | free text, several lines | `TextArea`, sized with `rows` |
-| one pick, fewer than 5 options | `RadioGroup` |
-| one pick, 5–15 options | `Select` |
-| one pick, more than 15 options | `Select searchable` |
-| several picks, fewer than 5 options | A Checkbox group (`Fieldset` + `Checkbox`) |
-| several picks from a longer, fixed list | `Select mode="multi"` |
+| one pick, up to 5 options | `RadioGroup` |
+| several picks, up to 5 options | A Checkbox group (`Fieldset` + `Checkbox`) |
+| one pick, 6 or more options | `Select` (searchable by default) |
+| several picks, 6 or more options | `Select isMulti` |
+| a list held on a server, too large to ship | `Select` with `loadOptions` |
 | several picks, or values the user adds | `TagInput` |
 | a pick through a hierarchy | `Cascader` for one leaf along one path · `TreeSelect` to see the tree, pick a parent, or pick several — see below |
 | a rating on a scale | `RadioGroup orientation="inline"` with `leadingText` and `trailingText` for a numbered scale (Linear scale) · `Rating` for stars |
 | the same choice for several questions | `ChoiceGrid` |
-| an action run from a button | `Dropdown` — a button, not a field |
+| narrowing a table or list from a bar | the tiers of the Filtering pattern |
+| an action run from a button | `DropdownMenu` — a button, not a field |
 
 The rest of the group answers narrower shapes: `TextField type="number"` for a number with
 steppers, `RichTextEditor` for formatted prose, `elemBefore` and `elemAfter` on a
@@ -44,6 +45,12 @@ range, `Switch` for a setting that applies immediately, `Checkbox` for one
 independent yes/no saved with the form, `DateTimePicker` for a date or time,
 `FileUpload` for a file.
 
+### Typing is on by default
+
+`Select` filters as you type unless you pass `isSearchable={false}`. Turn it
+off for one short list in a filter menu, applied as you pick, where there is
+nothing to search.
+
 ### A default, or every option in view
 
 The counts above are a starting point; two things move them. When there is a
@@ -51,7 +58,7 @@ good default, a `Select` suits even a short list: it shows the default and
 keeps the alternatives quiet. When people must compare every option to answer,
 or no default stands out, keep the options in view with `RadioGroup`, even
 past 5. Several picks go through a Checkbox group in view (`Fieldset` +
-`Checkbox`) or `Select mode="multi"`, which keeps the picks visible as
+`Checkbox`) or `Select isMulti`, which keeps the picks visible as
 tags in the field; never through a single-pick `Select`.
 
 ### Cascader or TreeSelect
@@ -134,7 +141,7 @@ rule: `Select`, `TagInput`, `TreeSelect`, `Cascader`, `DatePicker`,
 `DateTimePicker` and the `Dropdown` menu.
 
 - **Gap:** `--stack-sm` (4px) between the trigger's edge and the
-  popup surface, as a token, with Bootstrap's spacer margin reset to zero.
+  popup surface, as a token.
   Every popup in the family decides its flip and alignment through one
   module, `_internal/anchorPlacement.js`; a popup placed in CSS uses
   `calc(100% + var(--stack-sm))`.

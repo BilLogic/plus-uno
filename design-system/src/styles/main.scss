@@ -7,12 +7,14 @@
 
 @use "sass:meta";
 
-// CSS cascade layers: declares precedence once, so precedence is
-// explicit and Bootstrap's CSS can later be deleted as a layer. The
-// `bootstrap` layer is populated by `bootstrap-layer.scss`, which every entry
-// point imports before this file. Unlayered rules (inline styles, stray
-// `!important`) still win over every layer, same as before this change.
-@layer bootstrap, tokens, components;
+// CSS cascade layers: declares precedence once. The element baseline is
+// lowest, the token and type rules next, component styles on top. Unlayered
+// rules (inline styles, stray `!important`) still win over every layer.
+@layer base, tokens, components;
+
+@layer base {
+  @include meta.load-css("base");
+}
 
 @layer tokens {
   // Design Tokens
@@ -25,15 +27,11 @@
   // The generated color tokens (palette ramps, `--ds-*` roles, elevation pairs).
   // Each mode is a selector
   // on <html>: `data-color-mode` (light, dark, auto) and `data-contrast-mode`
-  // (more, no-preference, auto); no attribute is light at standard contrast. The
-  // Bootstrap bridge points Bootstrap's root `--bs-*` variables at these roles, so
-  // react-bootstrap follows the mode; it overrides Bootstrap's own `:root` block,
-  // so every entry imports Bootstrap's compiled CSS before this file. Regenerate,
-  // never edit: `npm run generate:color-tokens`.
+  // (more, no-preference, auto); no attribute is light at standard contrast.
+  // Regenerate, never edit: `npm run generate:color-tokens`.
   @include meta.load-css("../tokens/color/palette");
   @include meta.load-css("../tokens/color/semantic");
   @include meta.load-css("../tokens/color/elevation");
-  @include meta.load-css("../tokens/color/bootstrap-bridge");
   // The token ladder and motion (ADR-038, #1756): generated from
   // scripts/lib/tokens/plan.mjs, never from Figma. Each tier declares its own
   // values. Regenerate,
@@ -197,49 +195,20 @@ time {
     border-radius: 2px;
 }
 
-// Table Overrides - Match Admin/Training Figma Specs
-// Remove Bootstrap's default table chrome (background colors and row divider lines)
-// This ensures all tables match PLUS design system patterns by default
-.table {
-    // Remove default table background
-    --bs-table-bg: transparent;
-    --bs-table-border-color: transparent;
-    border-color: transparent;
-
-    // Target th & td - remove borders and backgrounds
-    > :not(caption)>*>* {
-        background-color: transparent !important;
-        border-bottom-width: 0 !important;
-        border-top-width: 0 !important;
-    }
-
-    // Remove header background
-    >thead {
-        background-color: transparent !important;
-
-        >tr {
-            background-color: transparent !important;
-
-            >th {
-                background-color: transparent !important;
-                border-bottom-width: 0 !important;
-            }
-        }
-    }
-
-    // Remove row backgrounds and borders
-    >tbody {
-        >tr {
-            background-color: transparent !important;
-            border-bottom-width: 0 !important;
-
-            >td {
-                background-color: transparent !important;
-                border-bottom-width: 0 !important;
-                border-top-width: 0 !important;
-            }
-        }
-    }
+// Visually hidden: read by assistive technology, never seen. A one-pixel,
+// clipped box out of the flow; `VisuallyHidden` renders it, and components
+// that announce status text use the class directly. It paints nothing, so it
+// takes no tokens; `!important` keeps a component's own box from showing it.
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
 }
 
 // Image Placeholder Utility
@@ -252,36 +221,6 @@ time {
     color: var(--ds-text-subtle);
     font: var(--body-small);
     box-sizing: border-box;
-}
-
-// Bootstrap's layers, on the layer scale
-// Bootstrap's own numbers (dropdown 1000, sticky 1020, fixed 1030, toast 1090,
-// popover 1070, tooltip 1080) sit above a modal's blanket (500). Each moves to
-// the layer for what it is: a popover is a popup (400), and one opened
-// from a modal mounts inside it and so takes the modal's layer (510). Modal
-// and Flag draw their own overlay/blanket layers directly, with no Bootstrap
-// class to override.
-.dropdown-menu {
-    --bs-dropdown-zindex: var(--layer-popup);
-}
-
-.popover {
-    --bs-popover-zindex: var(--layer-popup);
-}
-
-.tooltip {
-    --bs-tooltip-zindex: var(--layer-tooltip);
-}
-
-// A sticky header is a card (100); a fixed bar is navigation (200).
-.sticky-top,
-.sticky-bottom {
-    z-index: var(--layer-card);
-}
-
-.fixed-top,
-.fixed-bottom {
-    z-index: var(--layer-navigation);
 }
 
 // A Font Awesome glyph's box is its font size: Free 7 draws every icon 1.25em

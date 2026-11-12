@@ -141,7 +141,7 @@ to do but wait: a submit in flight, a panel fetching on open. It says
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>The ring turns at 0.75s. Under reduced motion it slows to 1.5s rather than stopping.</td></tr>
+<tr><td>Rest</td><td>The ring turns once every 0.75s. Under reduced motion it holds still, and the hidden label still names the wait.</td></tr>
 <tr><td>Hovered</td><td>None. It is not a control.</td></tr>
 <tr><td>Pressed</td><td>None.</td></tr>
 <tr><td>Focused</td><td>None. It is not in the tab order.</td></tr>
@@ -157,7 +157,7 @@ to do but wait: a submit in flight, a panel fetching on open. It says
 </thead>
 <tbody>
 <tr><td>Ring</td><td><code>currentColor</code>; <code>--ds-icon-inverse</code> for <code>invert</code>.</td></tr>
-<tr><td>Size</td><td><code>--spinner-size-sm</code> (16), <code>--spinner-size-md</code> (24), <code>--spinner-size-lg</code> (48), read through <code>--plus-spinner-size</code>.</td></tr>
+<tr><td>Size</td><td><code>--spinner-size-sm</code> (16), <code>--spinner-size-md</code> (24), <code>--spinner-size-lg</code> (48), on the size scale (<code>--size-100</code>, <code>--size-150</code>, <code>--size-300</code>), read through <code>--plus-spinner-size</code>.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -258,7 +258,7 @@ Several spinners on one view compete for attention; show one for the whole load.
   it holds the shape and does not flash. A spinner is for when there is no
   shape yet.
 - For a result once the wait ends, use `SectionMessage` or `Flag`.
-- For a button that is busy, set its `isLoading`; the `Button` draws its own spinner.
+- For a button that is busy, set its `isLoading`; the `Button` renders this Spinner at 16, the button icon size, in both spacings.
 - For a wait under about 300ms, show nothing. The spinner appears and
   vanishes as a flicker, which reads as a glitch rather than as work.
 

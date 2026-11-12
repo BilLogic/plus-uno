@@ -67,7 +67,7 @@ export default {
 };
 
 export const Overview = () => (
-    <FlagGroup className="p-3" containerPosition="static">
+    <FlagGroup style={{ padding: 'var(--card-pad-compact)' }} containerPosition="static">
         <Flag title="Normal flag" timestamp="Just now" autohide={false}>
             This is a normal flag (default).
         </Flag>
@@ -101,6 +101,26 @@ export const Warning = appearanceStory('warning', 'Connection is slow', 'Some ch
 /** Named so the export does not shadow the global `Error`. */
 export const ErrorAppearance = appearanceStory('error', 'Upload failed', 'The file was larger than 10 MB.', { actions: [{ text: 'Try again' }] });
 ErrorAppearance.storyName = 'Error';
+/**
+ * A failure in the background (a sync that did not finish) is an error Flag with
+ * Try again. It sets no `autohide`, because error never closes itself: it stays
+ * until closed.
+ */
+export const BackgroundFailure = () => (
+    <FlagGroup containerPosition="static">
+        <Flag appearance="error" title="Couldn't sync notes" timestamp="Just now" actions={[{ text: 'Try again' }]}>
+            Your latest changes are saved on this device only.
+        </Flag>
+    </FlagGroup>
+);
+BackgroundFailure.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const flag = canvasElement.querySelector('.plus-flag');
+    await expect(flag.getAttribute('role'), 'a failure interrupts').toBe('alert');
+    await expect(canvas.getByRole('button', { name: 'Try again' }), 'retry in the flag').toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Dismiss flag' }), 'closable').toBeVisible();
+};
+
 export const Bold = appearanceStory('success', 'Plan saved', 'Your session plan is saved for Monday.', { bold: true, defaultExpanded: true });
 /** On the bold fill the chevron takes the inverse icon, as the × does, and both sit on the title's line. */
 Bold.play = async ({ canvasElement }) => {
@@ -128,7 +148,7 @@ const FlagInteractiveWrapper = ({ appearance, bold, position, title, children, s
 
     return (
         <div className="plus-flag-interactive-demo">
-            <FlagGroup position={position} className="p-3">
+            <FlagGroup position={position} style={{ padding: 'var(--card-pad-compact)' }}>
                 <Flag
                     show={isOpen}
                     onDismiss={() => setIsOpen(false)}
