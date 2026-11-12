@@ -289,6 +289,10 @@ const load = ({ id, title, caption, skeleton }) =>
     caption,
     initial: { sk: skeleton ? 1 : 0, sh: 0, hd: 0, r1: 0, r2: 0, r3: 0, pri: 0, ch: 0 },
     landing: { sk: 0, hd: 1, r1: 1, r2: 1, r3: 1, pri: 1, ch: 1 },
+    // With no Skeleton, the three rows are pushed down together when the header arrives.
+    arrows: skeleton
+      ? []
+      : LOAD_ROWS.map((y, i) => travel({ x: 60, y, w: 83, h: 14 }, 0, -12, { lane: { x: 80 + i * 30 } })),
     draw: ({ sk, sh, hd, r1, r2, r3, pri, ch }) => {
       // With no Skeleton to hold the room, the rows sit high until the header arrives and push them down.
       const rise = skeleton ? 0 : 12 * (1 - hd);
@@ -679,6 +683,8 @@ const errField = ({ id, title, caption, early }) =>
     caption,
     initial: { f1: 0, f2: 0, b: 0, h: 0, m: 0 },
     landing: { f1: 0, f2: 1, b: 1, h: 1, m: 1 },
+    // The message makes room: the second field moves down to land below it.
+    arrows: [travel({ x: 60, y: 64, w: FIELD_W, h: 20 }, 0, -8)],
     draw: ({ f1, f2, b, h, m }) => (
       <>
         <Base header={false} />
@@ -750,6 +756,10 @@ const errPage = ({ id, title, caption, shakes }) =>
     caption,
     initial: shakes ? { b: 0, sx: 0, shook: 0 } : { b: 0, h: 0, m: 0, f1: 0 },
     landing: shakes ? { b: 1, sx: 0, shook: 1 } : { b: 1, h: 1, m: 1, f1: 1 },
+    // The summary makes room: both fields move down together, in two lanes.
+    arrows: shakes
+      ? []
+      : [travel({ x: 60, y: 33, w: 58, h: 20 }, 0, -9, { lane: { x: 80 } }), travel({ x: 60, y: 64, w: 58, h: 20 }, 0, -9, { lane: { x: 105 } })],
     draw: ({ b, sx = 0, h = 0, m = 0, f1 = 0 }) => (
       <Moved x={sx}>
         <Base header={false} />
