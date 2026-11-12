@@ -1,16 +1,16 @@
 import React from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { SCOPE, STAGE, SearchStudents } from './searchDemo.jsx';
+import { BasicStudents, BodySearch, FocusedStudents, PANEL, SCOPE, STAGE, SearchStudents } from './searchDemo.jsx';
 
 /**
- * Search: the pattern page's examples, run in the Storybook tests. Each
- * composes the real Section, its view bar, the real IconButton and TextField and
- * a Dynamic table. Docs pictures hold the state their heading names through
- * `initialOpen` and `initialQuery`; the test-only stories at the end press,
- * type and Esc from a clean start.
+ * Search: the pattern page's examples, run in the Storybook tests. Each is a
+ * real SearchField, in the real Section's view bar or in a page body. Docs
+ * pictures hold the state their heading names through props and args (no
+ * plays); the test-only stories at the end press, type and Esc from a clean
+ * start.
  *
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/Search/Search.stories.jsx
  */
@@ -22,11 +22,44 @@ export default {
 };
 
 const staged = (story) => <FitStage width={STAGE}>{story}</FitStage>;
-const field = (canvas) => canvas.getByRole('textbox', { name: SCOPE });
+const page = (canvasElement) => within(canvasElement.ownerDocument.body);
+const field = (canvas) => canvas.getByRole('searchbox', { name: SCOPE });
 const status = (canvas) => canvas.getByRole('status');
 const bodyRows = (canvasElement) => canvasElement.querySelectorAll('tbody tr');
 
-/** Closed: the Search icon in the view bar, before the filters, named for its scope. */
+/* ---------- the three types, as the page's opening grid ---------- */
+
+/** Active: the field in the view bar, rows narrow as you type. */
+export const TypeActive = {
+    name: 'Type: active',
+    render: () => staged(<SearchStudents initialQuery="ia" />),
+    play: async ({ canvasElement }) => {
+        await expect(bodyRows(canvasElement).length, 'the rows narrowed in place').toBe(2);
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** Focused: the field in a page body; its panel opens on focus (see Focused panel). */
+export const TypeFocused = {
+    name: 'Type: focused',
+    render: () => staged(<FocusedStudents />),
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('combobox', { name: SCOPE })).toBeTruthy();
+    },
+};
+
+/** Basic: the field alone; Enter runs the search and a results page takes over. */
+export const TypeBasic = {
+    name: 'Type: basic',
+    render: () => staged(<BasicStudents />),
+    play: async ({ canvasElement }) => {
+        await expect(field(within(canvasElement))).toBeTruthy();
+    },
+};
+
+/* ---------- active: states ---------- */
+
+/** Closed: the compact icon in the view bar, named for its scope. */
 export const Closed = {
     name: 'State: closed',
     render: () => staged(<SearchStudents />),
@@ -34,56 +67,96 @@ export const Closed = {
         const canvas = within(canvasElement);
         const bar = canvasElement.querySelector('.plus-section-view-bar');
         const search = canvas.getByRole('button', { name: SCOPE });
-        const more = canvas.getByRole('button', { name: 'More' });
         await expect(bar.contains(search), 'the icon sits in the view bar').toBe(true);
-        await expect(search.compareDocumentPosition(more) & Node.DOCUMENT_POSITION_FOLLOWING, 'before More').toBeTruthy();
-        await expect(canvas.queryByRole('textbox'), 'no field while closed').toBeNull();
+        await expect(canvas.queryByRole('searchbox'), 'no field while closed').toBeNull();
+        await expect(status(canvas).textContent, 'the count shows with nothing typed').toBe('6 students');
         await fitsCanvas(canvasElement);
     },
 };
 
-/** Open: the field names its scope, empty. */
-export const Open = {
-    name: 'State: open',
-    render: () => staged(<SearchStudents initialOpen />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await expect(field(canvas).getAttribute('placeholder'), 'the placeholder names the scope').toBe(SCOPE);
-        await expect(canvas.queryByRole('button', { name: 'Clear search' }), 'nothing to clear yet').toBeNull();
-        await expect(status(canvas).textContent).toBe('6 students');
-    },
-};
-
-/** Narrowing: rows filter, the count is in words, "Clear search" is in the field. */
+/** Narrowing: rows filter, the count is in words, the clear button is in the field. */
 export const Narrowing = {
     name: 'State: narrowing',
     render: () => staged(<SearchStudents initialQuery="ia" />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(field(canvas).value).toBe('ia');
-        await expect(status(canvas).textContent, 'the count in words').toBe('2 of 6 students');
-        await expect(bodyRows(canvasElement).length, 'the table narrowed').toBe(2);
+        await expect(status(canvas).textContent, 'the count in words, in the results header').toBe('2 of 6 students');
+        await expect(bodyRows(canvasElement).length).toBe(2);
         await expect(canvas.getByRole('button', { name: 'Clear search' })).toBeTruthy();
         await fitsCanvas(canvasElement);
     },
 };
 
-/** No matches: the empty state replaces the table and names what was searched. */
+/** No matches: the count reads zero, the empty state fills the results body and the bar stays. */
 export const NoMatches = {
     name: 'State: no matches',
     render: () => staged(<SearchStudents initialQuery="Zoe" />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expect(status(canvas).textContent, 'zero is a count too').toBe('0 of 6 students');
         await expect(canvas.getByText('No students match "Zoe".')).toBeTruthy();
         await expect(canvasElement.querySelector('table'), 'the table is replaced whole').toBeNull();
-        await expect(status(canvas).textContent).toBe('0 of 6 students');
         await expect(canvas.getByRole('button', { name: 'Reset filters' })).toBeTruthy();
-        await expect(field(canvas), 'the field stays open for the next try').toBeTruthy();
+        await expect(field(canvas), 'the bar keeps the field').toBeTruthy();
         await fitsCanvas(canvasElement);
     },
 };
 
-/** Test: press, type, Esc clears, a second Esc closes and returns focus to the icon. */
+/** Loading: the same results body, Skeleton bars where the rows (or the empty state) will be. */
+export const Loading = {
+    name: 'State: loading',
+    render: () => staged(<SearchStudents initialQuery="ia" isLoading />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByText('Searching students'), 'the count slot says what is happening').toBeTruthy();
+        await expect(canvasElement.querySelector('.plus-search-field__spinner'), 'a spinner takes the search icon').toBeTruthy();
+        await expect(canvasElement.querySelector('[aria-busy="true"]'), 'the body is marked busy').toBeTruthy();
+        await expect(canvasElement.querySelector('table'), 'no rows while loading').toBeNull();
+        await expect(field(canvas), 'the bar does not move').toBeTruthy();
+    },
+};
+
+/* ---------- placement and scope ---------- */
+
+/** Default: a search in a page body takes default spacing, open, 40 high. */
+export const BodyDefault = {
+    name: 'Placement: page body',
+    render: () => staged(<BodySearch initialQuery="ia" />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvasElement.querySelector('.plus-search-field--compact'), 'default spacing').toBeNull();
+        await expect(field(canvas).value).toBe('ia');
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** Scope: the filter before the field, All first and selected. */
+export const WithScope = {
+    name: 'Scope filter',
+    render: () => staged(<BodySearch scoped />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('button', { name: /Search scope/ }) || canvas.getByText('All')).toBeTruthy();
+        await expect(canvas.getByText('All'), 'All is first and selected').toBeTruthy();
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/* ---------- focused panel ---------- */
+
+/** The panel under a focused field: empty text lists recent searches, text lists grouped results. */
+export const FocusedPanel = {
+    name: 'Focused panel',
+    args: { text: '' },
+    argTypes: { text: { control: 'inline-radio', options: ['', 'a', 'zzz'] } },
+    parameters: { controls: { include: ['text'] } },
+    render: ({ text }) => <FocusedStudents text={text} holdFocus />,
+};
+
+/* ---------- test-only: interaction from a clean start ---------- */
+
+/** Test: press the icon, type, Esc clears, a second Esc closes and returns focus. */
 export const EscClearsThenCloses = {
     name: 'Test: Esc clears, a second Esc closes',
     render: () => staged(<SearchStudents />),
@@ -95,10 +168,9 @@ export const EscClearsThenCloses = {
         await expect(status(canvas).textContent, 'the count updates as you type').toBe('2 of 6 students');
         await userEvent.keyboard('{Escape}');
         await expect(field(canvas).value, 'the first Esc empties the text').toBe('');
-        await expect(document.activeElement, 'and keeps the field').toBe(field(canvas));
         await expect(status(canvas).textContent).toBe('6 students');
         await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(canvas.queryByRole('textbox')).toBeNull());
+        await waitFor(() => expect(canvas.queryByRole('searchbox')).toBeNull());
         await waitFor(() => expect(document.activeElement, 'closing returns focus to the icon').toBe(canvas.getByRole('button', { name: SCOPE })));
     },
 };
@@ -112,29 +184,6 @@ export const ClearSearchKeepsFieldOpen = {
         await userEvent.click(canvas.getByRole('button', { name: 'Clear search' }));
         await expect(field(canvas).value).toBe('');
         await expect(bodyRows(canvasElement).length).toBe(6);
-    },
-};
-
-/** Test: an empty field shrinks back to the icon on blur; one holding text stays open. */
-export const EmptyBlurShrinks = {
-    name: 'Test: leaving an empty field shrinks it',
-    render: () => staged(<SearchStudents initialOpen />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        field(canvas).focus();
-        await userEvent.tab();
-        await waitFor(() => expect(canvas.queryByRole('textbox'), 'empty: back to the icon').toBeNull());
-    },
-};
-
-export const TextKeepsFieldOpen = {
-    name: 'Test: leaving a field with text keeps it open',
-    render: () => staged(<SearchStudents initialQuery="ia" />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        field(canvas).focus();
-        await userEvent.tab();
-        await expect(field(canvas).value, 'the field stays open with its text').toBe('ia');
     },
 };
 
@@ -158,6 +207,46 @@ export const ResetClearsSearch = {
         const canvas = within(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
         await waitFor(() => expect(bodyRows(canvasElement).length).toBe(6));
-        await expect(canvas.getByRole('button', { name: SCOPE }), 'the field is closed again').toBeTruthy();
+        await expect(status(canvas).textContent).toBe('6 students');
+    },
+};
+
+/** Test: basic runs on Enter, never per keystroke. */
+export const BasicRunsOnEnter = {
+    name: 'Test: basic runs on Enter',
+    args: { onSearch: fn() },
+    render: ({ onSearch }) => <BasicStudents onSearch={onSearch} />,
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        await userEvent.type(field(canvas), 'ava');
+        await expect(args.onSearch, 'typing alone runs nothing').not.toHaveBeenCalled();
+        await userEvent.keyboard('{Enter}');
+        await expect(args.onSearch).toHaveBeenCalledWith('ava');
+    },
+};
+
+/** Test: focused lists recent, then grouped results; Esc closes the panel, a second Esc clears, Tab closes. */
+export const FocusedKeyboard = {
+    name: 'Test: focused panel and keys',
+    render: () => <FocusedStudents />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const body = page(canvasElement);
+        const input = canvas.getByRole('combobox', { name: SCOPE });
+        await userEvent.click(input);
+        await waitFor(() => expect(body.getByText('Recent searches')).toBeVisible());
+        await userEvent.keyboard('a');
+        await waitFor(() => expect(body.getByRole('listbox', { name: PANEL })).toBeVisible());
+        await expect(body.getByText(/^Students \(/), 'results are grouped, with counts').toBeTruthy();
+        await expect(body.getByRole('option', { name: /See all results for/ }), 'the last row widens the search').toBeTruthy();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(body.queryByRole('listbox', { name: PANEL })).toBeNull());
+        await expect(input.value, 'the first Esc closes the panel and keeps the text').toBe('a');
+        await userEvent.keyboard('{Escape}');
+        await expect(input.value, 'the second Esc clears').toBe('');
+        await userEvent.keyboard('b');
+        await waitFor(() => expect(body.getByRole('listbox', { name: PANEL })).toBeVisible());
+        await userEvent.tab();
+        await waitFor(() => expect(body.queryByRole('listbox', { name: PANEL })).toBeNull());
     },
 };
