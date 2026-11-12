@@ -25,12 +25,14 @@ export const IconButton = ({
     tooltip,
     isTooltipDisabled = false,
     isDisabled = false,
-    isSelected = false,
+    isSelected,
     ...props
 }) => {
     // Zero or absent draws no count; a count above zero is itself the selected state.
     const hasMetric = Number.parseInt(trailingMetric, 10) > 0;
-    const selected = isSelected || hasMetric;
+    const selected = Boolean(isSelected) || hasMetric;
+    // A button given no `isSelected` and no count is not a toggle, so it reports no aria-pressed.
+    const isToggle = isSelected !== undefined || hasMetric;
     // A menu trigger reports aria-expanded only; the selected fill stays, aria-pressed goes.
     const isMenuTrigger = props['aria-expanded'] !== undefined || props['aria-haspopup'] !== undefined;
     const button = (
@@ -46,7 +48,7 @@ export const IconButton = ({
                 'plus-btn--selected': selected && isMenuTrigger,
             }, className)}
             isDisabled={isDisabled}
-            isSelected={isMenuTrigger ? undefined : selected}
+            isSelected={isMenuTrigger || !isToggle ? undefined : selected}
             {...props}
         >
             {hasMetric && (
@@ -76,7 +78,7 @@ IconButton.propTypes = {
     spacing: PropTypes.oneOf(['default', 'compact']),
     /** Square by default; `circle` is for top navigation. */
     shape: PropTypes.oneOf(ICON_BUTTON_SHAPES),
-    /** Marks the button selected and sets `aria-pressed`, except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch. */
+    /** Marks the button selected and sets `aria-pressed` (leave it unset and the button reports none), except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch. */
     isSelected: PropTypes.bool,
     /** Prevents interaction and drops the tooltip and `title`. Leave an action enabled and explain what is missing when it is pressed; disable only while it is sending. */
     isDisabled: PropTypes.bool,

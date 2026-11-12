@@ -159,7 +159,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 | `appearance` | enum | `'default'` | The visual style. `default` suits most actions, `subtle` low-emphasis toolbar actions, `primary` the main action and `discovery` something new. |
 | `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24. |
 | `shape` | enum | `'default'` | Square by default; `circle` is for top navigation. |
-| `isSelected` | bool | `false` | Marks the button selected and sets `aria-pressed`, except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch. |
+| `isSelected` | bool | — | Marks the button selected and sets `aria-pressed` (leave it unset and the button reports none), except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch. |
 | `isDisabled` | bool | `false` | Prevents interaction and drops the tooltip and `title`. Leave an action enabled and explain what is missing when it is pressed; disable only while it is sending. |
 | `isLoading` | bool | — | Shows a spinner in place of the icon and blocks interaction. |
 | `onClick` | func | — | Called with the click event when the button is activated. It does not fire while `isDisabled` or `isLoading` is set. |

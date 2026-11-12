@@ -5578,9 +5578,9 @@
           "name": "isSelected",
           "type": "bool",
           "required": false,
-          "default": "false",
+          "default": null,
           "values": null,
-          "description": "Marks the button selected and sets `aria-pressed`, except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch.",
+          "description": "Marks the button selected and sets `aria-pressed` (leave it unset and the button reports none), except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch.",
           "deprecated": null
         },
         {

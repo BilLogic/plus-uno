@@ -67,6 +67,13 @@ describe('IconButton', () => {
         expect(metric).toHaveTextContent('2');
     });
 
+    it('reports aria-pressed only when it is a toggle', () => {
+        const { rerender } = render(<IconButton icon="trash" label="Delete" />);
+        expect(screen.getByRole('button', { name: 'Delete' })).not.toHaveAttribute('aria-pressed');
+        rerender(<IconButton icon="trash" label="Delete" isSelected={false} />);
+        expect(screen.getByRole('button', { name: 'Delete' })).toHaveAttribute('aria-pressed', 'false');
+    });
+
     it('draws no count and no count in the name for zero or absent', () => {
         const { rerender } = render(<IconButton icon="filter" label="Filters" trailingMetric={0} />);
         let button = screen.getByRole('button', { name: 'Filters' });

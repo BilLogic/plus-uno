@@ -64,8 +64,9 @@ Don't: A finished answer with no way to rate it.
   beside the message.
 - **Sources are a named list.** The list is named by its "Sources" heading,
   and the toggle past three says how many more and carries `aria-expanded`.
-- **Thumbs are toggle buttons.** They sit in a group named "Rate this answer",
-  carry `aria-pressed`, and a polite status names each rating ("Thanks. Marked
+- **Thumbs are buttons, not toggles.** They sit in a group named "Rate this answer".
+  Thumbs down opens a popup, so neither thumb carries `aria-pressed`; the chosen one
+  is described as "Selected". A polite status names each rating ("Thanks. Marked
   as a good answer."), so a change of mind is heard too. No animation.
 - **Busy while arriving.** A streaming message is marked `aria-busy`, so a
   screen reader waits for the finished text. A typed-out reply carries its full

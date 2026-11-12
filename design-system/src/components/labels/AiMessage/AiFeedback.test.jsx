@@ -7,11 +7,13 @@ const up = () => screen.getByRole('button', { name: 'Good answer' });
 const down = () => screen.getByRole('button', { name: 'Bad answer' });
 
 describe('AiFeedback', () => {
-    it('is a named group of two toggle buttons, neither pressed at first', () => {
+    it('is a named group of two buttons, neither chosen at first', () => {
         render(<AiFeedback onFeedback={() => {}} />);
         expect(screen.getByRole('group', { name: 'Rate this answer' })).toBeInTheDocument();
-        expect(up()).toHaveAttribute('aria-pressed', 'false');
-        expect(down()).toHaveAttribute('aria-pressed', 'false');
+        expect(up()).not.toHaveAccessibleDescription('Selected');
+        expect(down()).not.toHaveAccessibleDescription('Selected');
+        expect(up()).not.toHaveAttribute('aria-pressed');
+        expect(down()).not.toHaveAttribute('aria-pressed');
     });
 
     it('keeps one selected at a time, reports it, and clears on a second press', () => {
@@ -19,14 +21,14 @@ describe('AiFeedback', () => {
         render(<AiFeedback onFeedback={onFeedback} />);
         fireEvent.click(up());
         expect(onFeedback).toHaveBeenLastCalledWith({ rating: 'up' });
-        expect(up()).toHaveAttribute('aria-pressed', 'true');
+        expect(up()).toHaveAccessibleDescription('Selected');
         fireEvent.click(down());
         expect(onFeedback).toHaveBeenLastCalledWith({ rating: 'down' });
-        expect(up()).toHaveAttribute('aria-pressed', 'false');
-        expect(down()).toHaveAttribute('aria-pressed', 'true');
+        expect(up()).not.toHaveAccessibleDescription('Selected');
+        expect(down()).toHaveAccessibleDescription('Selected');
         fireEvent.click(down());
         expect(onFeedback).toHaveBeenLastCalledWith({ rating: null });
-        expect(down()).toHaveAttribute('aria-pressed', 'false');
+        expect(down()).not.toHaveAccessibleDescription('Selected');
     });
 
     it('announces a calm thanks once rated', () => {
@@ -55,12 +57,12 @@ describe('AiFeedback', () => {
         fireEvent.click(await screen.findByRole('button', { name: 'Skip' }));
         await waitFor(() => expect(screen.queryByRole('textbox', { name: /What went wrong/ })).toBeNull());
         expect(onFeedback).toHaveBeenCalledTimes(1);
-        expect(down()).toHaveAttribute('aria-pressed', 'true');
+        expect(down()).toHaveAccessibleDescription('Selected');
     });
 
     it('follows a controlled value', () => {
         render(<AiFeedback value="up" onFeedback={() => {}} />);
-        expect(up()).toHaveAttribute('aria-pressed', 'true');
+        expect(up()).toHaveAccessibleDescription('Selected');
     });
 });
 

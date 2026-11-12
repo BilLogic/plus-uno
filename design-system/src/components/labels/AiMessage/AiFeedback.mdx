@@ -35,9 +35,9 @@ Thumbs up and down on an AI answer. A press reports the rating, a second press o
 
 ## State
 
-<ComponentExample of={AiFeedbackStories.RatedUp} title="Rated up" description="The pressed thumb fills in." />
+<ComponentExample of={AiFeedbackStories.RatedUp} title="Rated up" description="The chosen thumb fills in." />
 
-<ComponentExample of={AiFeedbackStories.RatedDown} title="Rated down" description="At most one thumb is pressed." />
+<ComponentExample of={AiFeedbackStories.RatedDown} title="Rated down" description="At most one thumb is chosen." />
 
 </div>
 
@@ -77,7 +77,7 @@ Place `AiFeedback` under a finished AI message. Leave `value` unset to let it ho
 
 ## Accessibility
 
-- The two thumbs are toggle buttons named "Good answer" and "Bad answer" that report whether they are pressed.
+- The two thumbs are buttons named "Good answer" and "Bad answer". Thumbs down is a popup trigger, so it reports `aria-expanded` and never `aria-pressed`; neither thumb does, so the two read alike. The chosen thumb is described as "Selected".
 - A rating, and a change of rating, is confirmed in a status message a screen reader hears.
 
 </div>

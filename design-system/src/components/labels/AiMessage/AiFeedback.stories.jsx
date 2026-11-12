@@ -22,14 +22,14 @@ export default {
     },
 };
 
-/** Two toggle buttons in a group named "Rate this answer". */
+/** Two buttons in a group named "Rate this answer". */
 export const Overview = {
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('group', { name: 'Rate this answer' })).toBeTruthy();
         await userEvent.click(canvas.getByRole('button', { name: 'Good answer' }));
         await expect(args.onFeedback).toHaveBeenCalledWith({ rating: 'up' });
-        await expect(canvas.getByRole('button', { name: 'Good answer' }).getAttribute('aria-pressed')).toBe('true');
+        await expect(canvas.getByRole('button', { name: 'Good answer' })).toHaveAccessibleDescription('Selected');
     },
 };
 
