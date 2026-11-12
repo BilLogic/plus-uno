@@ -432,6 +432,44 @@ _Avoid_: "flash"
 The transition that draws the eye to something the person did not ask for: a shake for an error, a pulse for new content.
 _Avoid_: "alert animation"
 
+### Design system: sound
+
+**Notify sound**:
+`sound.notify`, G4 then C5 + E5: something arrived that the person has not seen, such as a Flag outside a session.
+_Avoid_: "ping", "ding"
+
+**Prompt sound**:
+`sound.prompt`, C5 E5 D5 then A5 over C5: something asks the person to act now, such as a session link ready.
+_Avoid_: "alert sound"
+
+**Roster sound**:
+`sound.roster`, A4 + E5 struck twice: the tutor's student list changed, such as a new student or a lead assigned.
+_Avoid_: "assignment ding"
+
+**Goal sound**:
+`sound.goal`, G4 and G5 gliding to C5 then C6: a goal was reached, heard by the tutor and the student together.
+_Avoid_: "win sound", "achievement"
+
+**Commit sound**:
+`sound.commit`, C5 then G5: the person committed to something, such as a completed signup or a submitted form.
+_Avoid_: "save sound"
+
+**Done sent**:
+`sound.done.sent`, a soft C6 dot: a message or small action went out.
+_Avoid_: "send whoosh"
+
+**Done step**:
+`sound.done.step`, C5 E5 G5: a step, lesson or reflection finished. An Expressive finish plays it.
+_Avoid_: "success sound"
+
+**Done milestone**:
+`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a term start or end. An Expressive milestone plays it.
+_Avoid_: "fanfare", "celebration sound"
+
+**Concern sound**:
+`sound.error`, E5 then D5: something needs a second look, such as a rejected form or a failed save.
+_Avoid_: "error buzz", "failure sound"
+
 ### Design work
 
 **PRD**:
