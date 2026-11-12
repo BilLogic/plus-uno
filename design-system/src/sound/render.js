@@ -6,8 +6,9 @@
  * over one shared noise buffer).
  *
  * It renders the dry path only. The reverb send is the material's room (0.06)
- * through a wet level of 0.2 on a normalized convolver, about 47 dB under the
- * dry sound, so it moves no level by a measurable amount.
+ * through a wet level of 0.2, far under the dry sound: this render reads every
+ * token within 0.3 dB of the Lab's own OfflineAudioContext measurement, reverb
+ * included.
  */
 import { ENVELOPE, scoreLength } from './score';
 

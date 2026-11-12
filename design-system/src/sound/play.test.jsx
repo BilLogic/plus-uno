@@ -118,7 +118,7 @@ describe('the setting', () => {
   });
 });
 
-function Switch() {
+function SoundToggle() {
   const { enabled, setEnabled, play } = useSound();
   return (
     <>
@@ -131,7 +131,7 @@ function Switch() {
 describe('SoundProvider and useSound', () => {
   it('unlocks audio on the first gesture, and the switch turns all sound off', async () => {
     const user = userEvent.setup();
-    render(<SoundProvider><Switch /></SoundProvider>);
+    render(<SoundProvider><SoundToggle /></SoundProvider>);
     expect(audio.made).toHaveLength(0);
     await user.click(screen.getByRole('button', { name: 'Play' }));
     expect(audio.made).toHaveLength(1);
@@ -145,7 +145,7 @@ describe('SoundProvider and useSound', () => {
   });
 
   it('reflects a change made outside React', () => {
-    render(<SoundProvider><Switch /></SoundProvider>);
+    render(<SoundProvider><SoundToggle /></SoundProvider>);
     act(() => setSoundEnabled(false));
     expect(screen.getByRole('button', { name: 'Sound off' })).toBeInTheDocument();
   });

@@ -498,7 +498,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/generate-sound-spec.mjs',
-    guards: 'the generated sound-spec module design-system/src/sound/spec.generated.js against scripts/lib/tokens/sound-plan.mjs; drift means a hand edit or an unregenerated plan.',
+    guards: 'design-system/src/sound/spec.generated.js against scripts/lib/tokens/sound-plan.mjs; drift is a hand edit or an unregenerated plan.',
   },
   {
     name: 'check:ds-usage',
