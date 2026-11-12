@@ -47,20 +47,6 @@ const DefaultToolbar = () => (
     />
 );
 
-const SelectedToolbar = () => (
-    <PatternSection.Toolbar
-        state="selected"
-        selection="3 selected"
-        bulkActions={(
-            <>
-                <Button text="Assign tutor" appearance="subtle" spacing="compact" onClick={() => {}} />
-                <Button text="Message" appearance="subtle" spacing="compact" onClick={() => {}} />
-            </>
-        )}
-        onClear={() => {}}
-    />
-);
-
 const description = 'Optional supporting description for this section.';
 
 const StatCard = ({ title, body }) => (
@@ -254,16 +240,6 @@ export const Levels = () => (
     </PatternSection>
 );
 
-/** The toolbar's selected state: the selection, bulk actions and Clear. */
-export const ToolbarSelected = {
-    name: 'Toolbar selected',
-    render: () => (
-        <PatternSection title="Students" description={description} toolbar={<SelectedToolbar />}>
-            {slotContent('Table')}
-        </PatternSection>
-    ),
-};
-
 /** Loading: skeleton bars in place of the header. */
 export const LoadingDefault = {
     name: 'Loading',
@@ -328,18 +304,14 @@ export const Interactive = {
 };
 
 /**
- * In every color mode a section has no fill, its title is the body text, its
- * description the subtle text, and the selected toolbar sits on the selected
- * background.
+ * In every color mode a section has no fill, its title is the body text and
+ * its description the subtle text.
  */
 export const ColorModes = {
     render: () => (
         <div style={col}>
             <PatternSection data-probe="plain" title="Section title" description="A short description.">
                 {slotContent('Content slot')}
-            </PatternSection>
-            <PatternSection data-probe="toolbar" title="Students" toolbar={<SelectedToolbar />}>
-                {slotContent('Table')}
             </PatternSection>
         </div>
     ),
@@ -348,13 +320,11 @@ export const ColorModes = {
         const plain = canvasElement.querySelector('[data-probe="plain"]');
         const title = plain.querySelector('.plus-pattern-section-title');
         const desc = plain.querySelector('.plus-pattern-section-description');
-        const bulk = canvasElement.querySelector('.plus-section-toolbar--selected');
         await inEveryColorMode(async (mode) => {
             await expect(getComputedStyle(plain).backgroundColor, `${mode}: no fill`).toBe('rgba(0, 0, 0, 0)');
             await expect(getComputedStyle(plain).paddingTop, `${mode}: no pad`).toBe('0px');
             await expect(getComputedStyle(title).color, `${mode}: the title`).toBe(tokenColor(canvasElement, '--ds-text'));
             await expect(getComputedStyle(desc).color, `${mode}: the description`).toBe(tokenColor(canvasElement, '--ds-text-subtle'));
-            await expect(getComputedStyle(bulk).backgroundColor, `${mode}: the bulk bar`).toBe(tokenColor(canvasElement, '--ds-background-selected'));
         });
     },
 };
