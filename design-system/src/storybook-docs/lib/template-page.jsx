@@ -205,3 +205,43 @@ LiveAnatomy.propTypes = {
 
 /** Marks a slot or prop the template does not build yet, in a Code tab's Slots table. */
 export const PlannedTag = () => <Tag text="Planned" color="gray" />;
+
+/**
+ * A browser window around a live example: a title bar with the window's
+ * controls and the address, over a body of fixed height that the example
+ * fills. The Frame's types sit in one, so the reader sees the app in a window
+ * and not a bare rectangle. Chrome only; it paints with `--ds-*` tokens.
+ */
+export const BrowserWindow = ({ address = 'app.plus.org', height, children }) => (
+    <div
+        className="not-prose"
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            border: 'var(--border-default) solid var(--ds-border)',
+            borderRadius: 'var(--radius-md)',
+            overflow: 'hidden',
+            background: 'var(--ds-surface-sunken)',
+        }}
+    >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)', padding: 'var(--space-050) var(--space-100)', borderBottom: 'var(--border-default) solid var(--ds-border)' }}>
+            <span aria-hidden="true" style={{ display: 'flex', gap: 'var(--space-050)' }}>
+                {[0, 1, 2].map((i) => (
+                    <span key={i} style={{ inlineSize: 'var(--space-075)', blockSize: 'var(--space-075)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)' }} />
+                ))}
+            </span>
+            <span style={{ flex: '1 1 auto', padding: 'var(--space-025) var(--space-100)', borderRadius: 'var(--radius-full)', background: 'var(--ds-surface)', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                {address}
+            </span>
+        </div>
+        <div style={{ blockSize: height, minBlockSize: 0, position: 'relative', overflow: 'hidden' }}>{children}</div>
+    </div>
+);
+
+BrowserWindow.propTypes = {
+    /** The address in the bar. */
+    address: PropTypes.string,
+    /** The body's height: docs geometry, in px. */
+    height: PropTypes.number.isRequired,
+    children: PropTypes.node,
+};

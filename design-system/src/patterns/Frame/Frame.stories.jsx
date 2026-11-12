@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Button, IconButton, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sidebar } from '@/components';
-import { Frame, PANEL_STORAGE_KEY, PatternDrawer, usePanelControl, useSidebarControl } from '@/patterns';
+import { Breadcrumb, Button, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, TextField } from '@/components';
+import { Frame, PANEL_STORAGE_KEY, PatternDrawer, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
+import { FRAME_LAYOUT } from './frameLayout';
+import { BrowserWindow, ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -1541,3 +1543,313 @@ export const StateWithDrawer = frameState(1024, { overlay: 'drawer' }, async (p,
 export const StateAt768 = frameState(768, {}, async (p) => sidebarIs(p, 'closed'));
 export const StateAt1024 = frameState(1024, {}, async (p) => sidebarIs(p, 'docked'));
 export const StateAt1440 = frameState(1440, {}, async (p) => sidebarIs(p, 'docked'));
+
+
+/* ------------------------------------------------------------------ types
+ * The docs page's examples: the three Frame types, each live in a browser
+ * window, then the pieces a type adds. They compose real Frame, Sidebar,
+ * Section, ProgressTracker and Button; nothing here is redrawn.
+ */
+
+/** The browser body's height on the docs page: docs geometry, in px. */
+const WINDOW_HEIGHT = 440; // docs-literal
+/** The focused type's step rail, 256 wide (320 for long labels): the Section side's width. */
+const STEPS_RAIL = 256; // docs-literal
+/** The focused bottom bar's height in the ledger: the 32 button plus 16 of padding, `--space-300`. */
+const BAR_TOKEN = '--space-300';
+/** Four or fewer steps run across the top; five or more go down the left. */
+const STEPS_ACROSS_MAX = 4;
+
+/** A page body made of placeholder bars, so the Frame's own structure is what reads. */
+const SkeletonSection = ({ title }) => (
+    <PatternSection title={title}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-100)' }}>
+            <Skeleton preset="text" lines={3} />
+        </div>
+    </PatternSection>
+);
+
+/** The default type: the Sidebar, the Page, and the AI panel as its own region. */
+const DefaultType = ({ withPanel = false, ...args }) => (
+    <BrowserWindow address="app.plus.org/dashboard" height={WINDOW_HEIGHT}>
+        <InAppFrame
+            height="100%"
+            panelLabel="AI chat"
+            panelStorageKey={null}
+            {...(withPanel ? { panel: <ChatPanel />, panelOpen: true } : {})}
+            {...args}
+        >
+            <SkeletonSection title="Upcoming sessions" />
+            <SkeletonSection title="Students" />
+        </InAppFrame>
+    </BrowserWindow>
+);
+
+/** Default: Sidebar, Page and the AI panel region (closed here). */
+export const TypeDefault = {
+    name: 'Type: Default',
+    parameters: { layout: 'padded' },
+    render: () => <DefaultType panel={<ChatPanel />} />,
+    play: async ({ canvasElement }) => {
+        const p = parts(canvasElement);
+        await waitFor(() => expect(p.sidebar(), 'the Sidebar docks').not.toBeNull());
+        await expect(p.frame.querySelector('.plus-frame__panel'), 'the AI panel region starts closed').toBeNull();
+    },
+};
+
+const TASK_STEPS = ['Student', 'Schedule', 'Goals', 'Materials', 'Review'];
+
+/** One step list for the focused type: visited steps come back, the rest wait. */
+const stepItems = (labels, at, go) => labels.map((label, i) => ({
+    id: label.toLowerCase(),
+    label,
+    status: i < at ? 'visited' : i === at ? 'current' : 'unvisited',
+    ...(i < at ? { onClick: () => go(i) } : {}),
+}));
+
+/**
+ * The focused type: one task in the whole window. Close leads the title row
+ * beside the task's name, there is no Sidebar and no breadcrumb. Five steps or
+ * more go down a left side 256 wide; four or fewer run across the top. The bar
+ * along the bottom is Cancel at the start, then Back and Next at the end.
+ */
+const FocusedTask = ({ count = 5, start = 1 }) => {
+    const labels = TASK_STEPS.slice(0, count);
+    const [at, setAt] = useState(start);
+    const down = count > STEPS_ACROSS_MAX;
+    const last = at === labels.length - 1;
+    const tracker = (
+        <ProgressTracker
+            label="Steps"
+            orientation={down ? 'vertical' : 'horizontal'}
+            items={stepItems(labels, at, setAt)}
+        />
+    );
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%' }}>
+            <Frame
+                header={(
+                    <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--space-100)', minInlineSize: 0 }}>
+                        <IconButton appearance="subtle" icon="xmark" label="Close" onClick={() => {}} />
+                        <h1 style={{ margin: 0, font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Plan a tutoring term</h1>
+                    </div>
+                )}
+                width="reading"
+                style={{ flex: '1 1 auto', minBlockSize: 0 }}
+            >
+                <div data-probe="steps-layout" data-steps={down ? 'down' : 'across'} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--space-200)' }}>
+                    <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>{tracker}</div>
+                    <div style={{ flex: '1 1 auto', minInlineSize: 0 }}>
+                        <Skeleton preset="text" lines={4} />
+                    </div>
+                </div>
+            </Frame>
+            <div
+                role="group"
+                aria-label="Task actions"
+                data-probe="bar"
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    blockSize: `var(${BAR_TOKEN})`,
+                    flex: '0 0 auto',
+                    background: 'var(--ds-surface)',
+                    borderBlockStart: 'var(--border-default) solid var(--ds-border)',
+                }}
+            >
+                <Button text="Cancel" appearance="subtle" onClick={() => {}} />
+                <div style={{ display: 'flex' }}>
+                    <Button text="Back" isDisabled={at === 0} onClick={() => setAt(at - 1)} />
+                    <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => setAt(Math.min(at + 1, labels.length - 1))} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const FocusedType = (props) => (
+    <BrowserWindow address="app.plus.org/terms/new" height={WINDOW_HEIGHT}>
+        <FocusedTask {...props} />
+    </BrowserWindow>
+);
+
+/** Focused: five steps down the left, the bottom bar, no Sidebar. */
+export const TypeFocused = {
+    name: 'Type: Focused',
+    parameters: { layout: 'padded' },
+    render: () => <FocusedType count={5} />,
+};
+
+/** Bare: sign-in, errors and welcome: one centered column, no Sidebar and no header row. */
+export const TypeBare = {
+    name: 'Type: Bare',
+    parameters: { layout: 'padded' },
+    render: () => (
+        <BrowserWindow address="app.plus.org/sign-in" height={WINDOW_HEIGHT}>
+            <Frame surfaceDirect>
+                <div data-probe="bare-column" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--space-150)', maxInlineSize: 'var(--panel-min-width)', marginInline: 'auto', paddingBlock: 'var(--space-300)' }}>
+                    <Logo />
+                    <TextField label="Email" type="email" value="" onChange={() => {}} />
+                    <Button text="Sign in" appearance="primary" onClick={() => {}} />
+                </div>
+            </Frame>
+        </BrowserWindow>
+    ),
+    play: async ({ canvasElement }) => {
+        const p = parts(canvasElement);
+        await expect(p.sidebar(), 'no Sidebar').toBeNull();
+        await expect(p.toggle, 'so no toggle').toBeNull();
+        const column = canvasElement.querySelector('[data-probe="bare-column"]');
+        const page = rect(p.surface);
+        await expect(rect(column).left - page.left, 'one column, centered in the Page').toBeCloseTo(page.right - rect(column).right, 0);
+    },
+};
+
+/** Anatomy: the default type at 1440 with the AI panel docked. */
+export const AnatomyDefault = {
+    name: 'Anatomy: Default',
+    parameters: { layout: 'padded' },
+    render: () => (
+        <div data-anatomy-root style={{ inlineSize: 1440 /* docs-literal: the X-Large stage */ }}>
+            <DefaultType withPanel />
+        </div>
+    ),
+};
+
+/** Anatomy: the focused type, five steps. */
+export const AnatomyFocused = {
+    name: 'Anatomy: Focused',
+    parameters: { layout: 'padded' },
+    render: () => (
+        <div data-anatomy-root style={{ inlineSize: 1024 /* docs-literal: the Large stage */ }}>
+            <FocusedType count={5} />
+        </div>
+    ),
+};
+
+/** Steps down the left: five or more, a rail 256 wide, the bar at 48 with Cancel, Back and Next. */
+export const FocusedStepsDown = {
+    name: 'Focused: five steps, down the left',
+    parameters: { layout: 'padded' },
+    render: () => <FocusedType count={5} start={0} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const layout = canvasElement.querySelector('[data-probe="steps-layout"]');
+        const steps = canvasElement.querySelector('[data-probe="steps"]');
+        const body = steps.nextElementSibling;
+        await expect(layout, 'five steps run down the left').toHaveAttribute('data-steps', 'down');
+        await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'a vertical tracker').toHaveClass('plus-progress-tracker--vertical');
+        await expect(rect(steps).right, 'the rail sits before the body').toBeLessThanOrEqual(rect(body).left);
+        await expect(rect(steps).width, 'the rail is 256 wide').toBeCloseTo(STEPS_RAIL, 0);
+
+        const bar = canvasElement.querySelector('[data-probe="bar"]');
+        await expect(rect(bar).height, 'the bar is 48 high').toBeCloseTo(tokenLength(bar, BAR_TOKEN), 0);
+        const cancel = canvas.getByRole('button', { name: 'Cancel' });
+        const back = canvas.getByRole('button', { name: 'Back' });
+        const next = canvas.getByRole('button', { name: 'Next' });
+        await expect(rect(cancel).left, 'Cancel leads the bar').toBeLessThan(rect(back).left);
+        await expect(rect(back).right, 'Back comes before Next').toBeLessThanOrEqual(rect(next).left);
+        await expect(back, 'Back is disabled on the first step').toHaveAttribute('aria-disabled', 'true');
+        await expect(canvas.getByRole('button', { name: 'Close' }), 'Close leads the title row').toBeInTheDocument();
+        await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no Sidebar').toBeNull();
+        await userEvent.click(next);
+        await expect(back, 'Back works from the second step').not.toHaveAttribute('aria-disabled');
+    },
+};
+
+/** Steps across the top: four or fewer, a horizontal tracker above the body. */
+export const FocusedStepsAcross = {
+    name: 'Focused: four steps, across the top',
+    parameters: { layout: 'padded' },
+    render: () => <FocusedType count={4} start={0} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const layout = canvasElement.querySelector('[data-probe="steps-layout"]');
+        const steps = canvasElement.querySelector('[data-probe="steps"]');
+        const body = steps.nextElementSibling;
+        await expect(layout, 'four steps run across the top').toHaveAttribute('data-steps', 'across');
+        await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'a horizontal tracker').toHaveClass('plus-progress-tracker--horizontal');
+        await expect(rect(steps).bottom, 'the steps sit above the body').toBeLessThanOrEqual(rect(body).top);
+        await expect(canvas.getByRole('button', { name: 'Back' })).toHaveAttribute('aria-disabled', 'true');
+    },
+};
+
+/** A stage whose own width the control sets, with the AI panel open. */
+const WidthStage = ({ width, ...args }) => (
+    <div style={{ overflowX: 'auto' }}>
+        <div data-probe="stage" style={{ inlineSize: width, blockSize: WINDOW_HEIGHT }}>
+            <InAppFrame height="100%" panel={<ChatPanel />} panelLabel="AI chat" panelStorageKey={null} defaultPanelOpen {...args}>
+                <SkeletonSection title="Upcoming sessions" />
+            </InAppFrame>
+        </div>
+    </div>
+);
+
+/** Width behavior: drag through 1408, 1168, 1024 and 768 and the Sidebar and the AI panel dock, collapse or float. */
+export const ResponsiveWidth = {
+    name: 'Width behavior',
+    args: { width: 1440 },
+    parameters: { layout: 'padded', controls: { include: ['width'] } },
+    argTypes: {
+        width: { control: { type: 'range', min: 600, max: 1600, step: 8 }, description: 'The Frame\'s own width, in px.', table: { category: 'Docs' } },
+    },
+    render: WidthStage,
+    play: async ({ canvasElement }) => {
+        const p = panelParts(canvasElement);
+        const stage = canvasElement.querySelector('[data-probe="stage"]');
+        const setWidth = (px) => { stage.style.inlineSize = `${px}px`; };
+        const L = FRAME_LAYOUT;
+
+        await sidebarIs(p, 'docked');
+        await panelIs(p, 'docked');
+
+        setWidth(L.sidebarWidth + L.panelDefault + L.contentFloor - 8);
+        await sidebarIs(p, 'closed');
+        await panelIs(p, 'docked');
+
+        setWidth(L.contentFloor + L.panelDefault - 64);
+        await panelIs(p, 'overlay');
+
+        setWidth(L.dockMin - 64);
+        await panelIs(p, 'overlay');
+        await expect(p.sidebar(), 'under 1024 the Sidebar never docks').toBeNull();
+
+        setWidth(L.sidebarWidth + L.panelDefault + L.contentFloor + 64);
+        await sidebarIs(p, 'docked');
+        await panelIs(p, 'docked');
+    },
+};
+
+/** A key state drawn at its own width, scaled to the docs column. */
+const AtWidth = ({ width }) => (
+    <ScaledStory width={width}>
+        <WidthStage width={width} />
+    </ScaledStory>
+);
+
+/** The AI panel opens on a Frame too narrow for the Sidebar, the panel and 720 of content: the Sidebar collapses. */
+export const KeyPanelCollapsesSidebar = {
+    name: 'Key state: Panel collapses the Sidebar',
+    parameters: { layout: 'padded' },
+    render: () => <AtWidth width={1200 /* docs-literal: between the docked-alone and docked-both widths */} />,
+    play: async ({ canvasElement }) => {
+        const p = panelParts(canvasElement);
+        await sidebarIs(p, 'closed');
+        await panelIs(p, 'docked');
+        await expect(p.frame.querySelector('.plus-frame__toggle'), 'the toggle moves to the Page\'s top left').not.toBeNull();
+    },
+};
+
+/** Under 1024 the Sidebar never docks and the AI panel opens over the Page, on a Backdrop. */
+export const KeyUnder1024 = {
+    name: 'Key state: Under 1024',
+    parameters: { layout: 'padded' },
+    render: () => <AtWidth width={FRAME_LAYOUT.dockMin - 124} />,
+    play: async ({ canvasElement }) => {
+        const p = panelParts(canvasElement);
+        await panelIs(p, 'overlay');
+        await expect(p.sidebar(), 'the Sidebar is not docked').toBeNull();
+        await expect(blanketShows(p), 'the panel opens over a Backdrop').not.toBeNull();
+    },
+};
