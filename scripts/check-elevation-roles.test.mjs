@@ -143,7 +143,7 @@ test('Tooltip.scss sits on --layer-tooltip, above a Modal, and keeps an outline 
   const source = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss'), 'utf8');
   const start = source.indexOf('.plus-tooltip {');
   const block = source.slice(start, source.indexOf('}', start));
-  assert.match(block, /z-index:\s*var\(--layer-tooltip\)\s*;/, 'Tooltip is on --layer-tooltip (800) so it opens over a Modal (--layer-modal 510)');
+  assert.match(block, /z-index:\s*var\(--layer-tooltip\)\s*;/, 'Tooltip is on --layer-tooltip so it opens over a Modal (--layer-modal)');
   const forced = /@media\s*\(forced-colors:\s*active\)\s*\{[^@]*?\.plus-tooltip\s*\{([^}]*)\}/.exec(source);
   assert.ok(forced, 'Tooltip.scss has no forced-colors rule for .plus-tooltip');
   assert.match(forced[1], /outline:\s*\S+/, 'the chip keeps a visible edge in forced colors');
