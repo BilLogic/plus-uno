@@ -34,9 +34,31 @@ export const ClippedCellOpensText = ({ title = 'A table row whose clipped cell e
   <Canvas title={title}>
     <SkeletonBar x={X} y={16} w={36} h={5} heading />
     <Row x={X} y={30} w={W - 2 * X} />
-    <SkeletonBar x={X + 16} y={52} w={44} accent />
-    <Ellipsis x={X + 62} y={53} tone={PAINT.accent} />
-    <Popup x={X + 10} y={58} w={72} h={26} accent />
+    <SkeletonBar x={X + 16} y={45} w={44} accent />
+    <Ellipsis x={X + 62} y={46} tone={PAINT.accent} />
+    <Popup x={X + 10} y={51} w={72} h={44} accent />
+  </Canvas>
+);
+
+/** Don't: a clipped cell with no way to read the rest of its text. */
+export const ClippedCellNoText = ({ title = 'A table row whose clipped cell ends in an ellipsis with nothing opening its full text' }) => (
+  <Canvas title={title}>
+    <SkeletonBar x={X} y={16} w={36} h={5} heading />
+    <Row x={X} y={30} w={W - 2 * X} />
+    <SkeletonBar x={X + 16} y={50} w={44} accent />
+    <Ellipsis x={X + 62} y={51} tone={PAINT.accent} />
+    <Row x={X} y={62} w={W - 2 * X} />
+  </Canvas>
+);
+
+/** Do: a long Section title takes a second line, and its rows stay where they were. */
+export const WrappedSectionTitle = ({ title = 'A Section whose long title runs to a second line above its rows' }) => (
+  <Canvas title={title}>
+    <SkeletonBar x={X} y={16} w={W - 2 * X - 20} h={5} accent heading />
+    <SkeletonBar x={X} y={25} w={36} h={5} accent heading />
+    <Row x={X} y={38} w={W - 2 * X} />
+    <Row x={X} y={54} w={W - 2 * X} />
+    <Row x={X} y={70} w={W - 2 * X} />
   </Canvas>
 );
 

@@ -53,8 +53,8 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 
 - A tag is read as its text; nothing suggests it can be pressed. A clipped tag becomes a tab stop so the Tooltip opens on focus.
 - A count's meaning is in the label it sits on: "Inbox, 3 unread". A bare number announces nothing useful.
-- A Change tag's visible chip is hidden from assistive technology and its words read the direction and the comparison.
-- Every tag keeps a 1 inside border, so a pale fill stays visible on any background and in forced colors.
+- A Change tag's arrow and value are hidden from assistive technology and its words read the direction and the comparison.
+- A Status tag, Tag and Change tag keep an inside border, so a pale fill stays visible on any background and in forced colors.
 
 ## Parts
 
@@ -79,7 +79,6 @@ Indicators reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | status | Update a value or state | `--ds-motion-appearance-default` | A status that changes fades to its new word and fill on appearance.default; nothing bounces. |
 | count-first | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A count rolls once on first view, downward, and then fades to later values on appearance.fast. |
-| progress | Update a value or state | `--ds-motion-linear` | A progress fill moves on linear with the work, never ahead of it. |
 
 ## Best practices
 
@@ -93,7 +92,7 @@ The words say the state; the fill repeats it. A state that must be told apart at
 
 **Checked:** Review
 
-Neutral is not started, information is in progress, success is done, warning needs attention, danger failed or missed, discovery is new. Success never labels a problem. There is no color prop; a category with a color is a Tag.
+Neutral is not started, info is in progress, success is done, warning needs attention, danger failed or missed, discovery is new. Success never labels a problem. There is no color prop; a category with a color is a Tag.
 
 Do: Danger on a missed session: the word and the fill agree.
 Don't: Success on a missed session: the fill says good about bad news.
@@ -120,7 +119,7 @@ Subtle neutral is the default. Bold asks for action now, so at most one bold cou
 
 **Checked:** Automatic
 
-The sign gives the direction; the good direction gives the tone: up, down or none. Absences rising is danger; hours tutored rising is success; a change with no judgment stays neutral. The value is always signed.
+The sign gives the direction; the good direction gives the tone: up, down or none. Absences rising is danger; sessions held rising is success; a change with no judgment stays neutral. The value is always signed.
 
 Do: A rise in absences in danger: the good direction is down.
 Don't: A rise in absences in success: the color says good about bad news.
@@ -129,7 +128,7 @@ Don't: A rise in absences in success: the color says good about bad news.
 
 **Checked:** Review
 
-A Status tag never opens a menu. Where a status can be changed, the field around it becomes an inline Select whose options are grouped by appearance.
+A Status tag never opens a menu. Where a status can be changed, the field around it becomes an inline Select.
 
 ### Nest a count in a status instead of placing one beside it. {#nest-a-count-in-a-status-instead-of-placing-one-beside-it}
 

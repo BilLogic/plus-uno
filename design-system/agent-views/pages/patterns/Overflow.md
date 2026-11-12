@@ -32,11 +32,12 @@ Use Overflow whenever a value may be longer than the space it has. The answer fo
 | Element | Answer | Full text |
 | --- | --- | --- |
 | Page title, Section title | Wrap | Always visible |
-| Field error, Section message | Wrap | Always visible |
+| Field error, Section message, Flag, Banner | Wrap | Always visible |
+| Column header | Planned: wrap | Always visible |
 | Table cell | Truncate at the end, one line | Tooltip on hover and focus when clipped |
 | Tag (180), Status tag (200) | Truncate at the end | Tooltip when clipped; the tag becomes focusable |
 | Tags in a group | Fold into +n | The +n menu lists the hidden tags |
-| A table | Page | The pager in the footer |
+| A table | Page | The range and the pager in the footer |
 | Breadcrumb with five or more levels | Planned: fold the middle into "…" | The "…" opens a menu of the hidden levels |
 | Open item in the Sidebar | Planned: truncate at the end | Tooltip with the school |
 | Auto-width Popup row | Planned: truncate at the end at 320 | Tooltip when clipped |
@@ -47,6 +48,8 @@ Use Overflow whenever a value may be longer than the space it has. The answer fo
 
 - For a long paragraph, let it wrap; a paragraph is read, not scanned.
 - For a trail too long to show, follow Navigation; the Breadcrumb's fold is described there.
+- For more views than fit a row of pills, fold the extra pills into "More"; Navigation describes the views.
+- For more controls than fit a bar, the extras go into the More icon button, five controls at most.
 - For narrowing a long list of rows instead of folding it, follow Filtering.
 
 ## Content guidelines
@@ -74,6 +77,7 @@ Use Overflow whenever a value may be longer than the space it has. The answer fo
 | Label | Tag, Status tag | `maxWidth` caps the tag; a clipped label ends in an ellipsis. |
 | Folded tags | Tag group | `overflow="collapse"` keeps one line and folds the rest into +n. |
 | Cell | Dynamic table | A cell's `overflow` is `truncate` by default; `wrap` takes more lines. |
+| Trail | Breadcrumb | The fold is Planned ; the component never folds its middle yet. |
 | Pager | Pagination | Fills the Section's footer slot, aligned to the end. |
 
 ## Related
@@ -88,8 +92,8 @@ Overflow reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| more-open | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The More menu is a Popup: it enters on spatial.fast with a fade on appearance.fast. |
-| more-close | Open and close an overlay | `--ds-motion-spatial-exit` | The More menu leaves on spatial.exit. |
+| fold-open | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The +n menu is a Popup: it enters on spatial.fast with a fade on appearance.fast. |
+| fold-close | Open and close an overlay | `--ds-motion-spatial-exit` | The +n menu leaves on spatial.exit. |
 | truncate | Update a value or state | `--ds-motion-appearance-fast` | A clipped value's Tooltip opens on hover and focus; nothing about the clip itself animates. |
 
 ## Best practices
@@ -100,7 +104,7 @@ Overflow reads these motion tokens and no literal duration or curve.
 
 They must be read whole, so they take more lines. Nothing that tells a person what something is, or what went wrong, is ever clipped.
 
-Do: A clipped cell opens its full text in a Tooltip.
+Do: A long Section title takes a second line.
 Don't: A clipped Section title: the one thing that names the content is the one thing cut.
 
 ### Truncate cells, tags and names at the end, on one line. {#truncate-cells-tags-and-names-at-the-end-on-one-line}
@@ -114,6 +118,9 @@ An ellipsis stands for three or more characters. A cell stays one line. Mid-line
 **Checked:** Automatic
 
 The Tooltip opens on hover and on focus, and the clipped element becomes a tab stop only while it is clipped. Never the browser's `title` attribute. An unclipped value has no Tooltip.
+
+Do: A clipped cell opens its full text in a Tooltip.
+Don't: A clipped cell with nothing to open: the rest of the text cannot be read.
 
 ### Make a bare ellipsis open a menu. {#make-a-bare-ellipsis-open-a-menu}
 

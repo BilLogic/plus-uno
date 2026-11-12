@@ -5,6 +5,7 @@ import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import {
     ClippedCell,
+    FOLD_STAGE,
     FoldedTags,
     LONG_ERROR,
     LONG_NOTE,
@@ -79,6 +80,7 @@ export const TruncatedCell = {
         await expect(getComputedStyle(clipped).textOverflow, 'the cell ends in an ellipsis').toBe('ellipsis');
         await expect(getComputedStyle(clipped).whiteSpace, 'on one line').toBe('nowrap');
         await expect(isClipped(clipped), 'the note is cut').toBe(true);
+        await expect(clipped.closest('[title]'), 'never the browser title attribute').toBeNull();
         await expect(clipped.closest('[tabindex="0"]') ?? clipped.getAttribute('tabindex') !== null, 'a clipped cell is a tab stop').toBeTruthy();
         const fits = textOf(canvasElement, 'On track');
         await expect(isClipped(fits), 'a short note is not cut').toBe(false);
@@ -108,6 +110,7 @@ export const UnclippedCellNoTooltip = {
         const short = textOf(canvasElement, 'Starts with number lines');
         await expect(isClipped(short)).toBe(false);
         await expect(short.getAttribute('tabindex'), 'not a tab stop').toBeNull();
+        await expect(short.closest('[title]'), 'no title attribute either').toBeNull();
         await userEvent.hover(short);
         await new Promise((resolve) => setTimeout(resolve, 400));
         await expect(within(document.body).queryAllByRole('tooltip').some((tip) => tip.textContent === 'Starts with number lines'), 'no Tooltip for a value that fits').toBe(false);
@@ -136,7 +139,7 @@ export const TruncatedTags = {
 /** A TagGroup that collapses keeps one line and folds the rest behind +n. */
 export const FoldedTagGroup = {
     name: 'Fold: a TagGroup',
-    render: () => staged(<FoldedTags />, 280),
+    render: () => staged(<FoldedTags />, FOLD_STAGE),
     play: async ({ canvasElement }) => {
         const list = within(canvasElement).getByRole('list', { name: 'Subjects' });
         const fold = () => within(list).queryByRole('button', { name: /more tags?$/ });

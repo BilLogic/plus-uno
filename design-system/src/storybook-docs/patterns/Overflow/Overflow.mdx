@@ -3,15 +3,17 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as OverflowStories from './Overflow.stories.jsx';
-import { NARROW, TABLE_STAGE } from './overflowDemo.jsx';
+import { FOLD_STAGE, NARROW, TABLE_STAGE } from './overflowDemo.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
+    ClippedCellNoText,
     ClippedCellOpensText,
     ClippedSectionTitle,
     FadedList,
     ShowMoreWithCount,
+    WrappedSectionTitle,
 } from '@/storybook-docs/illustrations/overflow.jsx';
 
 <Meta title="Patterns/States/Overflow" tags={['!dev', 'manifest']} />
@@ -34,7 +36,7 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 <TypeGrid>
 <TypeCard of={OverflowStories.WrapTitlesAndErrors} title="Wrap" stage={NARROW}>Titles, headers, labels, errors and notifications take more lines. They never end in an ellipsis.</TypeCard>
 <TypeCard of={OverflowStories.TruncatedCell} title="Truncate with a Tooltip" stage={TABLE_STAGE}>A cell ends in an ellipsis on one line. Its full text opens on hover and focus, only while it is clipped.</TypeCard>
-<TypeCard of={OverflowStories.FoldedTagGroup} title="Fold a list" stage={280}>A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are Planned <PlannedTag />.</TypeCard>
+<TypeCard of={OverflowStories.FoldedTagGroup} title="Fold a list" stage={FOLD_STAGE}>A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are Planned <PlannedTag />.</TypeCard>
 <TypeCard of={OverflowStories.PagedInFooter} title="Page a table" stage={TABLE_STAGE}>A table pages instead of growing: the pager sits at the end of the Section footer.</TypeCard>
 </TypeGrid>
 
@@ -84,11 +86,12 @@ Use Overflow whenever a value may be longer than the space it has. The answer fo
 </thead>
 <tbody>
 <tr><td>Page title, Section title</td><td>Wrap</td><td>Always visible</td></tr>
-<tr><td>Field error, Section message</td><td>Wrap</td><td>Always visible</td></tr>
+<tr><td>Field error, Section message, Flag, Banner</td><td>Wrap</td><td>Always visible</td></tr>
+<tr><td>Column header <PlannedTag /></td><td>Planned: wrap</td><td>Always visible</td></tr>
 <tr><td>Table cell</td><td>Truncate at the end, one line</td><td>Tooltip on hover and focus when clipped</td></tr>
 <tr><td>Tag (180), Status tag (200)</td><td>Truncate at the end</td><td>Tooltip when clipped; the tag becomes focusable</td></tr>
 <tr><td>Tags in a group</td><td>Fold into +n</td><td>The +n menu lists the hidden tags</td></tr>
-<tr><td>A table</td><td>Page</td><td>The pager in the footer</td></tr>
+<tr><td>A table</td><td>Page</td><td>The range and the pager in the footer</td></tr>
 <tr><td>Breadcrumb with five or more levels <PlannedTag /></td><td>Planned: fold the middle into "…"</td><td>The "…" opens a menu of the hidden levels</td></tr>
 <tr><td>Open item in the Sidebar <PlannedTag /></td><td>Planned: truncate at the end</td><td>Tooltip with the school</td></tr>
 <tr><td>Auto-width Popup row <PlannedTag /></td><td>Planned: truncate at the end at 320</td><td>Tooltip when clipped</td></tr>
@@ -105,6 +108,8 @@ Use Overflow whenever a value may be longer than the space it has. The answer fo
 
 - For a long paragraph, let it wrap; a paragraph is read, not scanned.
 - For a trail too long to show, follow Navigation; the Breadcrumb's fold is described there.
+- For more views than fit a row of pills, fold the extra pills into "More"; Navigation describes the views.
+- For more controls than fit a bar, the extras go into the More icon button, five controls at most.
 - For narrowing a long list of rows instead of folding it, follow <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>.
 
 </div>
@@ -120,8 +125,8 @@ Use Overflow whenever a value may be longer than the space it has. The answer fo
 They must be read whole, so they take more lines. Nothing that tells a person what something is, or what went wrong, is ever clipped.
 
 <DoDontPair
-    doExample={<ClippedCellOpensText />}
-    doCaption="A clipped cell opens its full text in a Tooltip."
+    doExample={<WrappedSectionTitle />}
+    doCaption="A long Section title takes a second line."
     dontExample={<ClippedSectionTitle />}
     dontCaption="A clipped Section title: the one thing that names the content is the one thing cut."
 />
@@ -137,6 +142,13 @@ An ellipsis stands for three or more characters. A cell stays one line. Mid-line
 <RuleTag kind="automatic" />
 
 The Tooltip opens on hover and on focus, and the clipped element becomes a tab stop only while it is clipped. Never the browser's `title` attribute. An unclipped value has no Tooltip.
+
+<DoDontPair
+    doExample={<ClippedCellOpensText />}
+    doCaption="A clipped cell opens its full text in a Tooltip."
+    dontExample={<ClippedCellNoText />}
+    dontCaption="A clipped cell with nothing to open: the rest of the text cannot be read."
+/>
 
 ### Make a bare ellipsis open a menu.
 
@@ -202,6 +214,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 <tr><td>Label</td><td><a target="_top" href="./?path=/docs/components-labels-tag--docs">Tag</a>, <a target="_top" href="./?path=/docs/components-labels-status-tag--docs">Status tag</a></td><td>`maxWidth` caps the tag; a clipped label ends in an ellipsis.</td></tr>
 <tr><td>Folded tags</td><td><a target="_top" href="./?path=/docs/components-labels-tag-group--docs">Tag group</a></td><td>`overflow="collapse"` keeps one line and folds the rest into +n.</td></tr>
 <tr><td>Cell</td><td><a target="_top" href="./?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a></td><td>A cell's `overflow` is `truncate` by default; `wrap` takes more lines.</td></tr>
+<tr><td>Trail</td><td><a target="_top" href="./?path=/docs/components-navigation-breadcrumbs--docs">Breadcrumb</a></td><td>The fold is Planned <PlannedTag />; the component never folds its middle yet.</td></tr>
 <tr><td>Pager</td><td><a target="_top" href="./?path=/docs/components-navigation-pagination--docs">Pagination</a></td><td>Fills the Section's footer slot, aligned to the end.</td></tr>
 </tbody>
 </DocsTable>

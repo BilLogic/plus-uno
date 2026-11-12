@@ -3,7 +3,7 @@ import { expect, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { BesideTitle, InARow, NotColorOnly, OnNavigation, RollUp, STAGE, STATUSES, Tags, UpIsBad } from './indicatorsDemo.jsx';
+import { BesideTitle, InARow, NARROW, NotColorOnly, OnNavigation, ROLL_UP_STAGE, RollUp, STAGE, STATUSES, Tags, UpIsBad } from './indicatorsDemo.jsx';
 
 /**
  * Indicators: the pattern page's examples, run in the Storybook tests. Each
@@ -78,7 +78,7 @@ export const StatusBesideHeading = {
 /** Counts on items: quiet, one bold, nothing at zero, a cap past max. */
 export const CountsOnNavigation = {
     name: 'Counts on navigation',
-    render: () => staged(<OnNavigation />, 320),
+    render: () => staged(<OnNavigation />, NARROW),
     play: async ({ canvasElement }) => {
         const item = (name) => canvasElement.querySelector(`[data-nav-item="${name}"]`);
         await expect(within(item('Inbox')).getByText('3'), 'a quiet count').toBeInTheDocument();
@@ -93,7 +93,7 @@ export const CountsOnNavigation = {
 /** A status told apart at a glance adds a leading icon to its color. */
 export const WhereColorIsNotEnough = {
     name: 'Where color is not enough',
-    render: () => staged(<NotColorOnly />, 320),
+    render: () => staged(<NotColorOnly />, NARROW),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const missed = tagOf(canvas.getByText('Missed'));
@@ -106,7 +106,7 @@ export const WhereColorIsNotEnough = {
 /** Absences rose by 3: the value is up, the tone is danger. */
 export const ChangeWhereUpIsBad = {
     name: 'Change where up is bad',
-    render: () => staged(<UpIsBad />, 320),
+    render: () => staged(<UpIsBad />, NARROW),
     play: async ({ canvasElement }) => {
         const tag = canvasElement.querySelector('.plus-change-tag');
         await expect(tag.textContent, 'the value is signed').toContain('+3');
@@ -119,7 +119,7 @@ export const ChangeWhereUpIsBad = {
 /** A group shows the worst state among its children. */
 export const RollUpShowsWorst = {
     name: 'A roll-up',
-    render: () => staged(<RollUp />, 480),
+    render: () => staged(<RollUp />, ROLL_UP_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const group = tagOf(canvas.getAllByText('Missed')[0]);

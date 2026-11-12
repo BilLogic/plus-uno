@@ -3,7 +3,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as IndicatorsStories from './Indicators.stories.jsx';
-import { STAGE } from './indicatorsDemo.jsx';
+import { NARROW, ROLL_UP_STAGE, STAGE } from './indicatorsDemo.jsx';
 import { ChangeTag, StatusTag } from '@/components';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
@@ -37,10 +37,10 @@ Three jobs, three components. A category with a color is a Tag, not an indicator
 <TypeGrid>
 <TypeCard of={IndicatorsStories.StatusInARow} title="Status in a row" stage={STAGE}>Default spacing in a table cell. One status per object; the label is one or two words.</TypeCard>
 <TypeCard of={IndicatorsStories.StatusBesideHeading} title="Status beside a heading" stage={STAGE}>Spacious beside the page title, after the text.</TypeCard>
-<TypeCard of={IndicatorsStories.CountsOnNavigation} title="Counts on navigation" stage={320}>A count beside an item's name. At zero the component renders nothing; bold asks for action now, at most one per area.</TypeCard>
-<TypeCard of={IndicatorsStories.WhereColorIsNotEnough} title="Where color is not enough" stage={320}>A leading icon joins the color on a status that must be told apart at a glance, such as Missed.</TypeCard>
-<TypeCard of={IndicatorsStories.ChangeWhereUpIsBad} title="Change where up is bad" stage={320}>Absences rose by 3: the value is up and the tone is danger, because the good direction is down.</TypeCard>
-<TypeCard of={IndicatorsStories.RollUpShowsWorst} title="A roll-up" stage={480}>A group's status shows the worst state among its children: danger over warning over information.</TypeCard>
+<TypeCard of={IndicatorsStories.CountsOnNavigation} title="Counts on navigation" stage={NARROW}>A count beside an item's name. At zero the component renders nothing; bold asks for action now, at most one per area.</TypeCard>
+<TypeCard of={IndicatorsStories.WhereColorIsNotEnough} title="Where color is not enough" stage={NARROW}>A leading icon joins the color on a status that must be told apart at a glance, such as Missed.</TypeCard>
+<TypeCard of={IndicatorsStories.ChangeWhereUpIsBad} title="Change where up is bad" stage={NARROW}>Absences rose by 3: the value is up and the tone is danger, because the good direction is down.</TypeCard>
+<TypeCard of={IndicatorsStories.RollUpShowsWorst} title="A roll-up" stage={ROLL_UP_STAGE}>A group's status shows the worst state among its children: danger over warning over information.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -107,7 +107,7 @@ The words say the state; the fill repeats it. A state that must be told apart at
 
 <RuleTag kind="review" />
 
-Neutral is not started, information is in progress, success is done, warning needs attention, danger failed or missed, discovery is new. Success never labels a problem. There is no color prop; a category with a color is a Tag.
+Neutral is not started, info is in progress, success is done, warning needs attention, danger failed or missed, discovery is new. Success never labels a problem. There is no color prop; a category with a color is a Tag.
 
 <DoDontPair
     doExample={<StatusTag appearance="danger">Missed</StatusTag>}
@@ -138,7 +138,7 @@ Subtle neutral is the default. Bold asks for action now, so at most one bold cou
 
 <RuleTag kind="automatic" />
 
-The sign gives the direction; the good direction gives the tone: up, down or none. Absences rising is danger; hours tutored rising is success; a change with no judgment stays neutral. The value is always signed.
+The sign gives the direction; the good direction gives the tone: up, down or none. Absences rising is danger; sessions held rising is success; a change with no judgment stays neutral. The value is always signed.
 
 <DoDontPair
     doExample={<ChangeTag value={3} goodDirection="down" comparison="vs last week" />}
@@ -151,7 +151,7 @@ The sign gives the direction; the good direction gives the tone: up, down or non
 
 <RuleTag kind="review" />
 
-A Status tag never opens a menu. Where a status can be changed, the field around it becomes an inline Select whose options are grouped by appearance.
+A Status tag never opens a menu. Where a status can be changed, the field around it becomes an inline Select.
 
 ### Nest a count in a status instead of placing one beside it.
 
@@ -185,8 +185,8 @@ A Status tag never opens a menu. Where a status can be changed, the field around
 
 - A tag is read as its text; nothing suggests it can be pressed. A clipped tag becomes a tab stop so the Tooltip opens on focus.
 - A count's meaning is in the label it sits on: "Inbox, 3 unread". A bare number announces nothing useful.
-- A Change tag's visible chip is hidden from assistive technology and its words read the direction and the comparison.
-- Every tag keeps a 1 inside border, so a pale fill stays visible on any background and in forced colors.
+- A Change tag's arrow and value are hidden from assistive technology and its words read the direction and the comparison.
+- A Status tag, Tag and Change tag keep an inside border, so a pale fill stays visible on any background and in forced colors.
 
 </div>
 

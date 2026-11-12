@@ -214,8 +214,8 @@ export const MOTION_REGISTRY = [
     name: 'Overflow',
     tier: 'pattern',
     events: {
-      'more-open': { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'The More menu is a Popup: it enters on spatial.fast with a fade on appearance.fast.' },
-      'more-close': { transition: 'Open and close an overlay', spatial: 'spatial.exit', note: 'The More menu leaves on spatial.exit.' },
+      'fold-open': { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'The +n menu is a Popup: it enters on spatial.fast with a fade on appearance.fast.' },
+      'fold-close': { transition: 'Open and close an overlay', spatial: 'spatial.exit', note: 'The +n menu leaves on spatial.exit.' },
       truncate: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A clipped value\'s Tooltip opens on hover and focus; nothing about the clip itself animates.' },
     },
   },
@@ -225,7 +225,6 @@ export const MOTION_REGISTRY = [
     events: {
       status: { transition: 'Update a value or state', appearance: 'appearance.default', note: 'A status that changes fades to its new word and fill on appearance.default; nothing bounces.' },
       'count-first': { transition: 'Update a value or state', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A count rolls once on first view, downward, and then fades to later values on appearance.fast.' },
-      progress: { transition: 'Update a value or state', appearance: 'linear', note: 'A progress fill moves on linear with the work, never ahead of it.' },
     },
   },
   {

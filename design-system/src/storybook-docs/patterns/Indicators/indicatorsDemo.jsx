@@ -18,6 +18,12 @@ import { ChangeTag, CountTag, DynamicTable, Heading, StatusTag } from '@/compone
 /** The width a picture lays out at, in px: docs geometry. */
 export const STAGE = 640; // docs-literal
 
+/** The width the narrow pictures lay out at, in px: docs geometry. */
+export const NARROW = 320; // docs-literal
+
+/** The width the roll-up picture lays out at, in px: docs geometry. */
+export const ROLL_UP_STAGE = 480; // docs-literal
+
 const frame = { padding: 'var(--page-pad)' };
 const line = { display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', flexWrap: 'wrap' };
 const text = { font: 'var(--body-default)', color: 'var(--ds-text)' };

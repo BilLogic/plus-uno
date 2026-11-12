@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { DynamicTable, Heading, Pagination, SectionMessage, StatusTag, Tag, TagGroup } from '@/components';
+import { DynamicTable, Pagination, SectionMessage, StatusTag, Tag, TagGroup } from '@/components';
 import { PatternSection } from '@/patterns';
-import { STUDENTS, STUDENT_HEAD, StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
+import { STUDENTS, StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Overflow pattern's examples: real parts holding text longer than their
@@ -21,6 +21,9 @@ export const NARROW = 360; // docs-literal
 
 /** The width a table picture lays out at, in px: docs geometry. */
 export const TABLE_STAGE = 800; // docs-literal
+
+/** The width the folded Tag group's picture lays out at, in px: docs geometry. */
+export const FOLD_STAGE = 280; // docs-literal
 
 export const LONG_TITLE = 'Fractions, decimals and percentages: weekly review for the seventh grade group';
 export const LONG_ERROR = 'We could not save the session because Ms. Ortiz is already booked from 4:00 PM to 5:00 PM on Thursday.';
@@ -74,9 +77,9 @@ export const FoldedTags = () => (
 
 /** A table that pages in its Section's footer instead of growing. */
 export const PagedTable = ({ page = 1 }) => (
-    <PatternSection title="Students" footer={<Pagination currentPage={page} totalPages={8} onPageChange={() => {}} />}>
-        <StudentsTable count={4} />
-    </PatternSection>
+    <div style={frame}>
+        <PatternSection title="Students" footer={<Pagination currentPage={page} totalPages={8} onPageChange={() => {}} />}>
+            <StudentsTable count={4} />
+        </PatternSection>
+    </div>
 );
-
-export { STUDENT_HEAD };
