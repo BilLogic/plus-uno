@@ -14,9 +14,11 @@
  *     components that show and never respond or move (text, glyphs, images).
  *   - Each is a registry row or on the allow-list. A component in neither
  *     fails, so a new component cannot arrive without a row.
- *   - Each row's `enter` / `exit` / `change` is a semantic token from
- *     `MOTION_SEMANTICS` in the plan, or `linear`.
- *   - A row for a component the index does not list fails.
+ *   - Each event's `spatial` and `appearance` (each optional, at least one
+ *     required) is a semantic token from `MOTION_SEMANTICS` in the plan, or
+ *     `linear`. `transition`, `note` and `sound` are not read here.
+ *   - A `tier: 'component'` row for a component the index does not list fails;
+ *     `pattern` and `template` rows skip that rule; an unknown tier fails.
  *
  * THE ALLOW-LIST. `scripts/baselines/motion-registry.json`, through
  * `scripts/lib/ratchet.mjs`: the components not yet in the registry. It may
@@ -47,7 +49,8 @@ export const STATIC = new Set([
   'Logo', 'Object', 'VisuallyHidden',
 ]);
 
-const ROW_TOKENS = ['enter', 'exit', 'change'];
+const TIERS = ['component', 'pattern', 'template'];
+const EVENT_TOKENS = ['spatial', 'appearance'];
 
 /** Semantic token names a row may use. */
 export const validTokens = () => new Set([...MOTION_SEMANTICS.map((s) => s.name), 'linear']);
@@ -61,7 +64,7 @@ export function interactiveComponents(index) {
 const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
 const asRecord = (names) => Object.fromEntries([...names].sort().map((n) => [n, 1]));
 const unregistered = (components, registry) => {
-  const rows = new Set(registry.map((r) => r.component));
+  const rows = new Set(registry.filter((r) => r.tier === 'component').map((r) => r.name));
   return components.filter((c) => !rows.has(c));
 };
 
@@ -77,12 +80,20 @@ export function run({ repoRoot = REPO_ROOT, index, registry = MOTION_REGISTRY } 
   const findings = [];
   const valid = validTokens();
   for (const row of registry) {
-    if (!components.includes(row.component)) {
-      findings.push({ message: `motion registry row "${row.component}" is not an interactive component in ${INDEX}` });
+    if (!TIERS.includes(row.tier)) {
+      findings.push({ message: `motion registry row "${row.name}" has tier "${row.tier}", which is not one of ${TIERS.join(', ')}` });
+    } else if (row.tier === 'component' && !components.includes(row.name)) {
+      findings.push({ message: `motion registry row "${row.name}" is not an interactive component in ${INDEX}` });
     }
-    for (const key of ROW_TOKENS) {
-      if (row[key] !== undefined && !valid.has(row[key])) {
-        findings.push({ message: `motion registry row "${row.component}" ${key} names "${row[key]}", which is not a motion token (${[...valid].join(', ')})` });
+    // \`sound\`, \`note\` and \`transition\` are not read here; check:sound-registry owns \`sound\`.
+    for (const [event, spec] of Object.entries(row.events ?? {})) {
+      if (!EVENT_TOKENS.some((k) => spec?.[k] !== undefined)) {
+        findings.push({ message: `motion registry row "${row.name}" event "${event}" names neither spatial nor appearance` });
+      }
+      for (const key of EVENT_TOKENS) {
+        if (spec?.[key] !== undefined && !valid.has(spec[key])) {
+          findings.push({ message: `motion registry row "${row.name}" event "${event}" ${key} names "${spec[key]}", which is not a motion token (${[...valid].join(', ')})` });
+        }
       }
     }
   }
