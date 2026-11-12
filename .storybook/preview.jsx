@@ -181,6 +181,8 @@ const preview = {
             "Motion",
             [
               "Physics",
+              "Choreography",
+              "Playground",
               "Durations and easings"
             ],
             "Iconography",
