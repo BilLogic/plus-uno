@@ -47,7 +47,9 @@
     width: max-content;
     min-width: max(var(--popup-min-width), var(--anchor-width, 0px));
     max-width: max(var(--popup-max-width), var(--anchor-width, 0px));
-    padding: var(--popover-pad);
+    // The transparent border below is part of the pad, so content (and the
+    // full-bleed rows that reach back by the pad) sit where they always did.
+    padding: calc(var(--popover-pad) - var(--border-default));
     box-sizing: border-box;
     z-index: var(--layer-popup);
 
