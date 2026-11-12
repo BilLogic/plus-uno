@@ -229,7 +229,32 @@
     ],
     "Patterns",
     [
-      "Overview"
+      "Overview",
+      "Actions and input",
+      [
+        "Common actions",
+        "Forms"
+      ],
+      "States",
+      [
+        "Empty",
+        "Loading",
+        "Errors",
+        "Overflow",
+        "Disabled",
+        "Read-only"
+      ],
+      "Notifications and indicators",
+      [
+        "Notifications",
+        "Indicators"
+      ],
+      "Finding things",
+      [
+        "Navigation",
+        "Search",
+        "Filtering"
+      ]
     ],
     "Components",
     [

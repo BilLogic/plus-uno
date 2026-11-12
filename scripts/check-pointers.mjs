@@ -21,6 +21,11 @@
  *      The trigger cell of every § Progressive loading row must lead with a
  *      word that carries the branch.
  *
+ * Third, the docs pages' CROSS-LINKS: a pattern page that points at the exact
+ * rule a template page owns (`?path=/docs/<id>--docs#<rule>`) dies silently when
+ * the page moves or the rule is renamed. Every link into the Templates and
+ * Patterns roots is resolved, page and heading, from the MDX alone.
+ *
  * SUBJECTS are the always-loaded router and the agent files it routes into;
  * the sweep is by structure, not by a list of pointers, so a pointer added
  * tomorrow is swept tomorrow and an agent file added tomorrow is swept too.
@@ -32,6 +37,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents, GENERATED_BUNDLE } from './lib/corpus.mjs';
+import { deadCrossLinks } from './lib/docs-cross-links.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -207,7 +213,11 @@ export function sweep(root = REPO_ROOT, subjects = SUBJECTS) {
       }
     }
   }
-  return { failures, pointers, triggers };
+  // 3. The docs pages' cross-links: a link into a template or pattern page, and
+  //    the rule heading it names, both still exist (scripts/lib/docs-cross-links.mjs).
+  const cross = deadCrossLinks(root);
+  failures.push(...cross.failures);
+  return { failures, pointers, triggers, crossLinks: cross.count };
 }
 
 /** One sweep of the routers, shared by the findings and the green line. */
@@ -220,8 +230,8 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 
 /** The green line, which carries how much of the router was actually swept. */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
-  const { pointers, triggers } = swept(repoRoot);
-  return `${pointers} pointers resolve, ${triggers} triggers lead with their word (${SUBJECTS.join(', ')})`;
+  const { pointers, triggers, crossLinks } = swept(repoRoot);
+  return `${pointers} pointers resolve, ${triggers} triggers lead with their word (${SUBJECTS.join(', ')}); ${crossLinks} docs cross-links into Templates and Patterns land`;
 }
 
 main(import.meta.url, 'check:pointers', { run, summary, remedy: REMEDY });
