@@ -160,6 +160,10 @@ A docs page groups its content the way a PLUS page does, on the app's Page and S
 
 A heading is a real heading: a sub-topic is a `FoundationSubsection` or an `###`, never a bold paragraph, so it takes the subsection gap and appears in the page outline. Demos render inside their canvas (Modal `renderAs="inline"`, `FlagGroup containerPosition="static"`, or a frame); the Storybook tests fail a docs story whose demo covers the page.
 
+## The landing
+
+A covered Foundations, Templates or Patterns page opens with `<DocsLanding page eyebrow title purpose links />` (`design-system/src/storybook-docs/docs-landing/`), in this order: eyebrow, the page's one `h1`, its purpose, one row of quick links, then the hero. The hero is chosen by `page` from the hero registry (`hero-registry.jsx`), which also holds the sentence that is its accessible name; a hero draws no text. `npm run check:docs-landing` fails a covered page with no landing or no registry hero, and a later page joins by adding itself to `PAGES` in that script.
+
 ## Related
 
 - `overview.md` — where design knowledge lives

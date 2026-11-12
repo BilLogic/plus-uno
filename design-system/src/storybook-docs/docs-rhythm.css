@@ -131,3 +131,98 @@
 .sbdocs .sb-ds-resources.sb-docs-section {
     margin-block-end: var(--page-stack-lg) !important;
 }
+
+/*
+ * The landing (DocsLanding, docs-landing/): eyebrow, title and purpose sit
+ * stack-sm apart through the header rule above; the quick links and the hero
+ * each sit section-stack-md below what precedes them; the next section's own
+ * page-stack-lg margin is the gap after the hero.
+ */
+.sbdocs .sb-docs-landing {
+    display: flex;
+    flex-direction: column;
+}
+
+.sbdocs .sb-docs-landing > * {
+    margin-block: 0 !important;
+}
+
+.sbdocs .sb-docs-landing > * + * {
+    margin-block-start: var(--section-stack-md) !important;
+}
+
+/* One row: the label, then a link per item, current page in bold. */
+.sbdocs .sb-docs-landing__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--stack-sm) var(--inline-lg);
+    font: var(--body-default);
+}
+
+.sbdocs .sb-docs-landing__links-label {
+    font: var(--heading-xxsmall);
+    color: var(--ds-text-subtle);
+}
+
+.sbdocs .sb-docs-landing__link--current {
+    font-weight: var(--type-weight-semibold);
+    color: var(--ds-text);
+}
+
+/* The hero frame: full column at 5:2, sunken, on a dot ground (one dot per
+   Stack/md step, 16px). Its drawing is composed on a centered stage
+   (HeroDrawing.jsx). A split hero lays two panes, each its own color mode,
+   over the one frame. */
+.sbdocs .sb-docs-hero,
+.sbdocs .sb-docs-hero__pane {
+    background-color: var(--ds-surface-sunken);
+    background-image: radial-gradient(circle, var(--ds-border) var(--stroke-1), transparent calc(var(--stroke-1) * 1.5));
+    background-size: var(--stack-md) var(--stack-md);
+}
+
+.sbdocs .sb-docs-hero {
+    position: relative;
+    container-type: inline-size;
+    box-sizing: border-box;
+    inline-size: 100%;
+    aspect-ratio: 5 / 2;
+    overflow: hidden;
+    border-radius: var(--card-radius);
+}
+
+.sbdocs .sb-docs-hero > svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+}
+
+.sbdocs .sb-docs-hero__pane {
+    position: absolute;
+    inset-block: 0;
+    inline-size: 50%;
+    overflow: hidden;
+}
+
+.sbdocs .sb-docs-hero__pane--light {
+    inset-inline-start: 0;
+}
+
+.sbdocs .sb-docs-hero__pane--dark {
+    inset-inline-start: 50%;
+    background-position: calc(-50cqw) 0;
+}
+
+/* A pane draws the whole frame; the dark one shifts it so each shows its half. */
+.sbdocs .sb-docs-hero__pane > svg {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: 200%;
+    block-size: 100%;
+}
+
+.sbdocs .sb-docs-hero__pane--dark > svg {
+    inset-inline-start: -100%;
+}
