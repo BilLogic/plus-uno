@@ -1,7 +1,7 @@
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
 
-import { dampingFor, linearEasing, measureSpring, sampleLinear, sineEasing, springStep } from './spring.js';
+import { dampingFor, figmaBounce, linearEasing, measureSpring, sampleLinear, sineEasing, springStep } from './spring.js';
 
 const near = (actual, expected, tolerance, label) =>
   assert.ok(Math.abs(actual - expected) <= tolerance, `${label}: ${actual} is not within ${tolerance} of ${expected}`);
@@ -61,4 +61,10 @@ test('sineEasing is one half cycle, 0 to 1, with a modest point count', () => {
   assert.deepEqual(points[0], { x: 0, y: 0 });
   assert.deepEqual(points.at(-1), { x: 1, y: 1 });
   for (const { x, y } of points) near(y, (1 - Math.cos(Math.PI * x)) / 2, 0.001, `point at ${x}`);
+});
+
+test('figmaBounce: critical damping is 0 and ratio 0.6 is 0.4 (the Core probe values)', () => {
+  assert.equal(figmaBounce(1), 0);
+  assert.equal(figmaBounce(1.5), 0);
+  assert.ok(Math.abs(figmaBounce(0.6) - 0.4) < 1e-9);
 });

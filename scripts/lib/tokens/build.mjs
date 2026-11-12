@@ -7,26 +7,27 @@
  */
 
 import { MOTION_SEMANTICS, REDUCED_FADE, SPRING_PRIMITIVES, TOKEN_LADDER } from './plan.mjs';
-import { dampingFor, linearEasing, measureSpring, sampleLinear, sineEasing, springStep } from '../../../design-system/src/tokens/spring.js';
+import { dampingFor, figmaBounce, linearEasing, measureSpring, sampleLinear, sineEasing, springStep } from '../../../design-system/src/tokens/spring.js';
 
 /** `spatial.fast` -> `spatial-fast`. */
 const slug = (name) => name.replace(/\./g, '-');
 const msText = (seconds) => `${Math.round(seconds * 1000)}ms`;
+const msOf = (seconds) => Math.round(seconds * 1000);
 const round2 = (n) => Number(n.toFixed(2));
 
 /** One primitive's easing text and duration in ms, sampled from its spring. */
 function springEasing(primitive) {
-  if (primitive.kind === 'loop') return { easing: linearEasing(sineEasing()), duration: msText(Math.PI / Math.sqrt(primitive.stiffness)) };
+  if (primitive.kind === 'loop') return { easing: linearEasing(sineEasing()), duration: msText(Math.PI / Math.sqrt(primitive.stiffness)), durationMs: msOf(Math.PI / Math.sqrt(primitive.stiffness)) };
   const y = springStep(primitive);
   if (primitive.kind === 'exit') {
     // Reaches 1 / aim of its travel at the edge: scale to 1 and cut there.
     const edge = 1 / primitive.aim;
     let t = 0;
     while (y(t) < edge) t += 0.0001;
-    return { easing: linearEasing(sampleLinear((x) => y(x * t) * primitive.aim)), duration: msText(t) };
+    return { easing: linearEasing(sampleLinear((x) => y(x * t) * primitive.aim)), duration: msText(t), durationMs: msOf(t) };
   }
   const { settle } = measureSpring(primitive);
-  return { easing: linearEasing(sampleLinear((x) => y(x * settle))), duration: msText(settle) };
+  return { easing: linearEasing(sampleLinear((x) => y(x * settle))), duration: msText(settle), durationMs: msOf(settle) };
 }
 
 /** @returns {string} `_springs.scss`: primitives, semantics, Expressive and Reduced. */
@@ -183,7 +184,7 @@ function tierFigmaVariables(tier) {
     .map((row) => toVariable(row.new, row.type));
 }
 
-/** @returns {object} the combined Figma variables payload: every ladder tier (motion has no Figma variables). */
+/** @returns {object} the combined Figma variables payload: every ladder tier (motion has its own, `motion-payload.json`). */
 export function variablesPayload() {
   const collections = LADDER_TIERS.map(({ tier, collection }) => ({ name: collection, variables: tierFigmaVariables(tier) }));
   return {
@@ -193,6 +194,69 @@ export function variablesPayload() {
       'See architecture/token-tiers-name-map.md for every token this payload implements.',
     collectionRenames: COLLECTION_RENAMES,
     collections,
+  };
+}
+
+/** The Figma modes of the motion collection; Expressive falls back to Productive where a semantic has no override. */
+export const MOTION_MODES = ['Productive', 'Expressive'];
+const SPRING_PROPERTIES = ['stiffness', 'damping', 'mass'];
+/** Semantics with no Figma animation style: no Figma equivalent for an alternating loop. */
+const NO_STYLE = { loop: 'loop alternates a sine half cycle, which has no Figma easing' };
+
+/** `spatial.default` -> `spatial/default`. */
+const styleName = (semantic) => semantic.replace(/\./g, '/');
+const primitiveVariable = (name, property) => `Spring/${name}/${property}`;
+
+/**
+ * @returns {object} `motion-payload.json`: the Figma `motion` collection (spring
+ * primitives hidden from pickers, semantics aliased per mode) and one animation
+ * style per spatial or appearance role and mode. Code stays the source of truth.
+ */
+export function motionPayload() {
+  const byName = new Map(SPRING_PRIMITIVES.map((p) => [p.name, p]));
+  const primitiveValue = (p, property) => (property === 'damping' ? round2(dampingFor(p)) : property === 'mass' ? (p.mass ?? 1) : p.stiffness);
+  const primitives = SPRING_PRIMITIVES.flatMap((p) =>
+    SPRING_PROPERTIES.map((property) => ({
+      name: primitiveVariable(p.name, property),
+      resolvedType: 'FLOAT',
+      scopes: [],
+      codeSyntax: { WEB: `var(--motion-spring-${p.name})` },
+      values: Object.fromEntries(MOTION_MODES.map((mode) => [mode, primitiveValue(p, property)])),
+    })),
+  );
+  const semantics = MOTION_SEMANTICS.flatMap((s) =>
+    SPRING_PROPERTIES.map((property) => ({
+      name: `${styleName(s.name)}/${property}`,
+      resolvedType: 'FLOAT',
+      scopes: [],
+      codeSyntax: { WEB: `var(--ds-motion-${slug(s.name)})` },
+      aliases: { Productive: primitiveVariable(s.productive, property), Expressive: primitiveVariable(s.expressive ?? s.productive, property) },
+    })),
+  );
+  const animationStyles = [];
+  const skipped = [{ semantic: 'linear', reason: 'linear has no spring and no Figma equivalent' }];
+  for (const s of MOTION_SEMANTICS) {
+    if (NO_STYLE[s.name]) {
+      skipped.push({ semantic: s.name, reason: NO_STYLE[s.name] });
+      continue;
+    }
+    const styleId = s.name.startsWith('spatial.') ? 'Position' : 'Opacity';
+    for (const [mode, primitiveName] of [['Productive', s.productive], ...(s.expressive ? [['Expressive', s.expressive]] : [])]) {
+      const p = byName.get(primitiveName);
+      animationStyles.push({
+        name: mode === 'Productive' ? styleName(s.name) : `${styleName(s.name)} (${mode})`,
+        entries: [{ styleId, props: { duration: springEasing(p).durationMs / 1000, easing: { type: 'CUSTOM_SPRING', easingFunctionSpring: { bounce: figmaBounce(p.ratio) } } } }],
+      });
+    }
+  }
+  return {
+    note:
+      'Generated by scripts/generate-design-tokens.mjs (ADR-041) from scripts/lib/tokens/plan.mjs. Never hand-edit. ' +
+      'Applied unchanged by the Figma writer; code stays the timing source of truth. Reduced motion stays code-only.',
+    delete: ['motion'],
+    collection: { name: 'motion', modes: MOTION_MODES, variables: [...primitives, ...semantics] },
+    animationStyles,
+    skipped,
   };
 }
 
@@ -239,6 +303,7 @@ export function artifacts() {
     'ladder/_springs.scss': springsScss(),
     'ladder/springs.generated.js': springsJs(),
     ...tierFiles,
+    '../../figma/motion-payload.json': `${JSON.stringify(motionPayload(), null, 2)}\n`,
     '../../figma/variables-payload.json': `${JSON.stringify(variablesPayload(), null, 2)}\n`,
     '../../../architecture/token-tiers-name-map.md': nameMapMarkdown(),
   };
