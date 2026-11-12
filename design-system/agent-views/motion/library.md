@@ -47,7 +47,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Common actions | pattern | confirm | Open and close an overlay | `--ds-motion-appearance-fast` |
 | Common actions | pattern | cancel | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
 | Common actions | pattern | undo | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
-| Empty | pattern | appear | Swap content in place | `--ds-motion-appearance-fast` |
+| Empty | pattern | appear | Go to another area | `--ds-motion-appearance-default` |
 | Empty | pattern | filled | Swap content in place | `--ds-motion-appearance-fast` |
 | Filtering | pattern | menu-open | Open and close an overlay | `--ds-motion-spatial-fast` |
 | Filtering | pattern | menu-close | Open and close an overlay | `--ds-motion-appearance-fast` |
@@ -64,7 +64,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Forms | pattern | failed | Call attention | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
 | Forms | pattern | steps | Step to the next or previous | `--ds-motion-appearance-fast` |
 | Forms | pattern | saving | Update a value or state | `--ds-motion-appearance-fast` |
-| Loading | pattern | load | Load content | `--ds-motion-appearance-fast` |
+| Loading | pattern | load | Load content | `--ds-motion-linear` · `--ds-motion-appearance-fast` |
 | Loading | pattern | action | Update a value or state | `--ds-motion-appearance-fast` |
 | Accordion | component | change | Expand and collapse | `--ds-motion-spatial-fast` |
 | AiMessage | component | change | Load content | `--ds-motion-appearance-fast` |
