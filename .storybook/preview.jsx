@@ -387,6 +387,14 @@ const preview = {
             "Part-to-whole",
             "Temporal"
           ],
+          "Libraries",
+          [
+            "Overview",
+            "Base UI",
+            "Font Awesome",
+            "Highcharts",
+            "Motion"
+          ],
           "*"
         ],
         /* IA-SORT-END */

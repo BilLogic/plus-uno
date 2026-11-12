@@ -8,7 +8,8 @@
     "Patterns/",
     "Components/",
     "AI UI/",
-    "Data visualizations/"
+    "Data visualizations/",
+  "Libraries/"
   ],
   "componentGroups": {
     "Forms and inputs": [
@@ -362,6 +363,14 @@
       "Flow & relationships",
       "Part-to-whole",
       "Temporal"
+    ],
+    "Libraries",
+    [
+      "Overview",
+      "Base UI",
+      "Font Awesome",
+      "Highcharts",
+      "Motion"
     ],
     "*"
   ],
