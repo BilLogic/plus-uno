@@ -10,7 +10,7 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Source:** `design-system/src/patterns/PatternSection/PatternSection.jsx`
 
-**Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, FillSubtle, Footer, Anatomy, Levels, ToolbarSelected, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, DetailWithPanel, DetailWithPanelNoSectionDetail, DetailSplitAt1440, DetailSplitHoldsWithPanelAt1440, DetailReplacesListBelow960, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, HeaderTypeTitle, HeaderTypeTitleAndActions, HeaderTypeViewBarOneView, HeaderTypeViewBarSeveralViews, HeaderTypeFormatSwitch, HeaderTypeViewBarAlone, HeaderTypeUnderPageTabs, HeaderTypeSubsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, RowsSelected, EmptyInTable, AnatomyQueue
+**Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, FillSubtle, Footer, Anatomy, Levels, ToolbarSearch, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, DetailWithPanel, DetailWithPanelNoSectionDetail, DetailSplitAt1440, DetailSplitHoldsWithPanelAt1440, DetailReplacesListBelow960, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, HeaderTypeTitle, HeaderTypeTitleAndActions, HeaderTypeViewBarOneView, HeaderTypeViewBarSeveralViews, HeaderTypeFormatSwitch, HeaderTypeViewBarAlone, HeaderTypeUnderPageTabs, HeaderTypeSubsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, RowsSelected, EmptyInTable, AnatomyQueue
 
 **Storybook page:** `design-system/src/patterns/PatternSection/PatternSection.mdx`
 
@@ -262,20 +262,19 @@ Implemented as `SectionToolbar`.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `state` | enum | — | `default`: search, filters, count and actions. `selected`: the selection, bulk actions and Clear. |
 | `search` | node | — | Search field slot, at the start |
 | `filters` | node | — | Filters slot: dropdown buttons |
-| `count` | node | — | Count, such as "48 students"; truncates first |
+| `count` | node | — | Count in words, such as "12 of 48 students"; truncates first, and is announced politely when it changes |
 | `actions` | node | — | Actions slot, at the end |
-| `selection` | node | — | Selected state: the selection, such as "3 selected" |
-| `bulkActions` | node | — | Selected state: bulk action buttons |
-| `onClear` | func | — | Selected state: shows Clear, and runs when it is pressed |
-| `clearLabel` | string | — | Selected state: the Clear button's label |
 | `className` | string | — | — |
+
+### `PatternSection.Search`
+
+Implemented as `SectionSearch`.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-selected` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--radius-lg` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--table-pad-x-cell` · `--width-3000`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--field-width-md` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--motion-duration-medium` · `--motion-easing-standard` · `--radius-h32` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
 
 From `design-system/src/patterns/PatternSection/PatternSection.scss`. Override these through the token layer, never with a literal.
 
