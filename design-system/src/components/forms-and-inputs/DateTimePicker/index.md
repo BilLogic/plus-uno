@@ -81,7 +81,7 @@ Don't: A bare 'Invalid' does not say what to change.
 - For a date with no time, use Date picker.
 - For a time with no date, use Time picker.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -100,7 +100,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the focused half. |
 | Invalid | Both borders take `--ds-border-danger`; the caption shows the error message. |
 | Valid | Both borders take `--ds-border-success`; the caption shows the success message. |
-| Read-only | Both boxes take `--ds-background-neutral`. |
+| Read-only | Both boxes take `--ds-background-neutral`, at full contrast with no hover. The calendar icon and the chevron are not drawn. |
 | Disabled | Both boxes fade to `--ds-opacity-disabled` and leave the tab order. |
 
 ### Tokens

@@ -1,15 +1,15 @@
 ---
-summary: Alert, Flag or Modal — choosing by how long the message lives and whether it blocks
+summary: SectionMessage, Flag or Modal — choosing by how long the message lives and whether it blocks
 ---
 
 <!-- Tier: 2 | Load when: choosing a component from the messaging group -->
 
 # Messaging — which component to reach for
 
-Five components: `Alert`, `Flag`, `Modal`, `Banner`, `InlineMessage`. Storybook
-titles `Alert` with Atlassian's name, Section message. Generated
-facts are in `design-system/src/components/messaging/index.md`. The choice
-between `Alert`, `Flag` and `Modal` is not about severity — all three carry the
+Seven components: `SectionMessage`, `Flag`, `Modal`, `Banner`, `InlineMessage`,
+`EmptyState` and `Spotlight`. Generated facts are in
+`design-system/src/components/messaging/index.md`. The choice
+between `SectionMessage`, `Flag` and `Modal` is not about severity — all three carry the
 same semantic palette — it is about how long the message lives and whether the
 user can keep working.
 
@@ -18,23 +18,26 @@ user can keep working.
 | The message… | Reach for | Because |
 |---|---|---|
 | is a prominent notice at the top of the whole page | `Banner` | full width, no dismiss, three appearances (warning, danger, announcement) |
-| belongs to the page and stays until resolved | `Alert` | renders in the flow, dismissible by default |
+| belongs to the page and stays until resolved | `SectionMessage` | renders in the flow, dismissible by default |
 | confirms something and should fade | `Flag` | auto-hides after 5000ms by default |
 | must be answered before anything else | `Modal` | takes focus, blocks the page behind a backdrop |
 | is extra detail behind an icon, not shown by default | `InlineMessage` | opens a Popup on demand, so it never pushes layout |
 | is about one form field | none of these | the field's own error state |
+| is a view that failed to load, or one the person may not open | `EmptyState` | the view's own slot, with Try again or who can help |
+| is a failed background action, such as a sync | `Flag` (error) | stays until closed, with Try again |
+| is a rejected form submit | `SectionMessage` (danger), with each field's own error | a danger summary at the form top points to the fields |
 
 That last row is the one that matters most. `TextField`, `TextArea`, `FileUpload`
 and `DateTimePicker` all take `isInvalid` plus `errorMessage`,
-which renders the message directly beneath the control with a matching icon. An
-`Alert` at the top of a form makes the user hunt for which field is wrong.
+which renders the message directly beneath the control with a matching icon. A
+`SectionMessage` alone at the top of a form makes the user hunt for which field is wrong.
 
 ## What each one actually does
 
-**`Alert`** is dismissible by default — `dismissible` defaults to `true`, so
-every alert grows a close button unless you say otherwise. Dismissal is held in
+**`SectionMessage`** is dismissible by default — `dismissible` defaults to `true`, so
+every message grows a close button unless you say otherwise. Dismissal is held in
 the component's own state and the render returns `null` on it, so a dismissed
-alert stays dismissed until it is remounted. Six `style` values: `primary`,
+message stays dismissed until it is remounted. Six `appearance` values: `primary`,
 `secondary`, `success`, `danger`, `warning`, `info`.
 
 **`Flag`** is fully controlled through `show` and `onDismiss`. `appearance` is
@@ -54,7 +57,7 @@ pages, never for a live dialog.
 
 ## Announcement, and why it is easy to overdo
 
-`Alert` renders `role="alert"`. An `error` or `warning` `Flag` renders
+`SectionMessage` renders `role="alert"`. An `error` or `warning` `Flag` renders
 `role="alert"` with `aria-live="assertive"` and `aria-atomic="true"`; every other
 `Flag` appearance is `role="status"` with `aria-live="polite"` and waits its turn.
 Interrupting is right for something that just went wrong and heavy-handed for
@@ -66,12 +69,12 @@ Live regions announce *changes*. A message present in the first paint may not be
 announced at all, so anything rendered on mount has to read correctly as plain
 content too.
 
-Every close control in the group has a hard-coded label: `Close alert` on
-`Alert`, `Dismiss flag` on `Flag`, `Close modal` on `Modal`. None of them can be
+Every close control in the group has a hard-coded label: `Dismiss message` on
+`SectionMessage`, `Dismiss flag` on `Flag`, `Close modal` on `Modal`. None of them can be
 renamed, so several dismissible messages on one screen expose several
 identically named buttons. `CloseButton`, the shared 24×24 dismiss control that
-`Alert` and `Flag` use, takes `what` for a "Dismiss {what}" name; `Alert` passes
-its established label instead, and `Flag` is named "Dismiss flag".
+`SectionMessage` and `Flag` use, takes `what` for a "Dismiss {what}" name; each
+of the two passes its own fixed label instead.
 
 ## Related
 

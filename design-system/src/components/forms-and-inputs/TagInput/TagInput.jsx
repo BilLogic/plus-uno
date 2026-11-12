@@ -219,7 +219,7 @@ const TagInput = ({
             ),
             source: option.source,
             // The handle, drawn on every option row; the one under the pointer is a button.
-            leading: canReorder && option.index !== undefined
+            elemBefore: canReorder && option.index !== undefined
                 ? (
                     <Icon
                         name="grip-vertical"
@@ -387,13 +387,14 @@ const TagInput = ({
             rows.push({
                 value: DELETE,
                 label: 'Delete',
-                leading: <Icon name="trash" />,
+                elemBefore: <Icon name="trash" />,
             });
         }
         if (onColorChange) {
             TAG_COLORS.forEach((color) => rows.push({
                 value: color,
-                label: <Tag color={color}>{COLOR_NAMES[color]}</Tag>,
+                // The color is the whole point of a color row, so the swatch is on.
+                label: <Tag color={color} swatchBefore>{COLOR_NAMES[color]}</Tag>,
                 group: 'Color',
             }));
         }
@@ -752,6 +753,7 @@ const TagInput = ({
                             maxLength={maxLength}
                             disabled={disabled}
                             readOnly={readOnly}
+                            aria-readonly={readOnly || undefined}
                             onChange={(event) => { setFilter(event.target.value); setOpen(true); }}
                             onClick={() => { if (editable) setOpen(true); }}
                             onKeyDown={handleKeyDown}

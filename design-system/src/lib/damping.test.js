@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { dampedStretch, dampedPosition, springBackValue, springBack } from './damping';
+import { dampedStretch, dampedPosition, springBackValue, springBack, settleMsOf } from './damping';
+import { SPRINGS } from '../tokens/ladder/springs.generated.js';
 
 const opts = { limit: 640, stiffness: 0.5, maxStretch: 48 };
 
@@ -144,5 +145,26 @@ describe('springBack', () => {
         env.step(16);
         expect(onUpdate).not.toHaveBeenCalled();
         expect(onDone).not.toHaveBeenCalled();
+    });
+});
+
+describe('settleMsOf', () => {
+    it('reads a critically damped spring token: settle = 8 / omega', () => {
+        // omega = sqrt(k / m) = 40 rad/s, so 8 / 0.04 per ms = 200 ms.
+        expect(settleMsOf({ stiffness: 1600, damping: 80, mass: 1 })).toBeCloseTo(200, 5);
+    });
+
+    it('resolves every appearance spring token', () => {
+        for (const name of ['appearance.fast', 'appearance.default', 'appearance.slow']) {
+            expect(settleMsOf(SPRINGS[name].productive)).toBeGreaterThan(0);
+        }
+    });
+
+    it('a stiffer spring settles sooner', () => {
+        expect(settleMsOf(SPRINGS['appearance.fast'].productive)).toBeLessThan(settleMsOf(SPRINGS['appearance.slow'].productive));
+    });
+
+    it('refuses a spring that is not critically damped, which springBack cannot follow', () => {
+        expect(() => settleMsOf(SPRINGS['spatial.fast'].expressive)).toThrow(/critically damped/);
     });
 });

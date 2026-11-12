@@ -6,7 +6,7 @@
 #   bash skills/uno-review/scripts/run-review-checks.sh <target-dir>
 #
 # Example:
-#   bash skills/uno-review/scripts/run-review-checks.sh prototypes/tutor-revamp/src
+#   bash skills/uno-review/scripts/run-review-checks.sh prototypes/onboarding-flow/src
 #
 # Output: PASS / WARN / FAIL for each check.
 
@@ -32,8 +32,8 @@ echo "PLUS Review Checks: $TARGET"
 echo "==="
 
 # 1. Escapes from the design system: raw literals, deep imports, unknown
-#    components, props and tokens, primitive reads, Font Awesome Pro, and
-#    react-bootstrap where a PLUS component exists. One checker owns the
+#    components, props and tokens, primitive reads, Font Awesome Pro and
+#    retired names. One checker owns the
 #    definition (ADR-039); rules: docs/engineering/ds-usage-rules.md.
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 if ESCAPES=$(node "$REPO_ROOT/scripts/check-ds-usage.mjs" "$(cd "$TARGET" && pwd)" 2>&1); then

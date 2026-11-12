@@ -1,7 +1,4 @@
 import React, { useEffect } from 'react';
-// Cascade layers (bootstrap, tokens, components): Bootstrap's CSS goes first,
-// in the lowest-precedence layer.
-import '../design-system/src/styles/bootstrap-layer.css';
 // Design system: tokens, .plus-modal, and other globals for stories that import @/ components
 import '../design-system/src/styles/main.scss';
 import './storybook-overrides.css';
@@ -255,7 +252,9 @@ const preview = {
               "Dropdown menu",
               "Fieldset",
               "File upload",
+              "Filter menu",
               "Form",
+              "Popup select",
               "Radio",
               [
                 "Radio",
@@ -289,6 +288,7 @@ const preview = {
             ],
             "Labels",
             [
+              "Change tag",
               "Count tag",
               "Date tag",
               "Status tag",
@@ -327,7 +327,6 @@ const preview = {
             [
               "Breadcrumbs",
               "Link",
-              "Menu",
               "Navigation system",
               [
                 "Navigation system",
@@ -403,6 +402,14 @@ const preview = {
             "Flow & relationships",
             "Part-to-whole",
             "Temporal"
+          ],
+          "Libraries",
+          [
+            "Overview",
+            "Base UI",
+            "Font Awesome",
+            "Highcharts",
+            "Motion"
           ],
           "*"
         ],

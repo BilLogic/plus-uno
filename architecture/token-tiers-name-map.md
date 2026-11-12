@@ -273,11 +273,16 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Flag | `--flag-min-height` |  |
 | Flag | `--flag-pad` |  |
 | Flag | `--flag-offset` |  |
+| Spotlight | `--spotlight-width` |  |
 | Spotlight | `--spotlight-media-height` |  |
 | Menu group | `--menu-group-min-width` |  |
 | Menu group | `--menu-group-pad-x` |  |
 | Menu group | `--menu-group-gap` |  |
 | Menu group | `--menu-group-item-pad-y` |  |
+| Popup | `--popup-min-width` |  |
+| Popup | `--popup-max-width` |  |
+| Popup | `--popup-clip-reach` |  |
+| AI chat | `--ai-chat-width` |  |
 | Popup | `--popup-pad` |  |
 | Table | `--table-cell-max-width` |  |
 | Avatar | `--avatar-size-96` |  |

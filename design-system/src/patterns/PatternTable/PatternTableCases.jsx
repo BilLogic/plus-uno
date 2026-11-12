@@ -1,7 +1,7 @@
 import React from 'react';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import { DynamicTable, Icon, TableBulkActions, TreeTable } from '@/components';
+import { DynamicTable, Icon, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -55,17 +55,8 @@ const rosterRows = roster.map(([student, tutor, last, sessions, attendance]) => 
 
 const RosterSection = () => {
     const [selected, setSelected] = React.useState(['Ava Thompson', 'Marcus Lee']);
-    const toolbar = selected.length > 0 ? (
-        <TableBulkActions
-            count={selected.length}
-            actions={['Message', 'Export', 'Remove'].map((label) => ({ label, onClick: () => {} }))}
-            onClear={() => setSelected([])}
-        />
-    ) : (
-        <PatternSection.Toolbar count="340 students" />
-    );
     return (
-        <PatternSection title="Students" toolbar={toolbar}>
+        <PatternSection title="Students" toolbar={<PatternSection.Toolbar count="340 students" />}>
             <DynamicTable
                 head={rosterHead}
                 rows={rosterRows}
@@ -74,6 +65,7 @@ const RosterSection = () => {
                 isSelectable
                 selectedRowKeys={selected}
                 onSelectionChange={setSelected}
+                bulkActions={['Message', 'Export', 'Remove'].map((label) => ({ label, onClick: () => {} }))}
                 rowsPerPage={25}
                 totalRows={340}
             />
@@ -83,7 +75,7 @@ const RosterSection = () => {
 
 /**
  * A roster people act on, as a `DynamicTable`: sortable heads, checkboxes, a
- * pager, and `TableBulkActions` in the Section header. It sits inside a docs section, so its title
+ * pager, and the bulk bar in the head row while rows are selected. It sits inside a docs section, so its title
  * stays out of the page outline.
  */
 const DynamicRosterCase = () => (
@@ -209,7 +201,7 @@ const countToolbar = <PatternSection.Toolbar count="340 students" />;
 
 const InSection = ({ children, toolbar = countToolbar }) => (
     <HeadingLevelContext.Provider value={5}>
-        <PatternSection title="Students" toolbar={toolbar}>{children}</PatternSection>
+        <PatternSection title="Students" toolbar={<PatternSection.Toolbar count="340 students" />}>{children}</PatternSection>
     </HeadingLevelContext.Provider>
 );
 

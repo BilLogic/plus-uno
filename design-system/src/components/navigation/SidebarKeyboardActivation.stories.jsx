@@ -60,7 +60,7 @@ export const EnterAndSpaceActivate = () => {
                 <SidebarTab
                     key={s.key}
                     text={s.text}
-                    icon="list"
+                    iconBefore="list"
                     state={section === s.key ? 'selected' : 'enabled'}
                     onClick={() => setSection(s.key)}
                 />
@@ -95,9 +95,9 @@ EnterAndSpaceActivate.play = async ({ canvasElement }) => {
  */
 export const SelectedIsAnnounced = () => (
     <div style={stack}>
-        <SidebarTab text="Sessions" icon="list" state="enabled" onClick={() => {}} />
-        <SidebarTab text="Students" icon="user" state="selected" onClick={() => {}} />
-        <SidebarTab text="Reports" icon="chart-simple" state="disabled" onClick={() => {}} />
+        <SidebarTab text="Sessions" iconBefore="list" state="enabled" onClick={() => {}} />
+        <SidebarTab text="Students" iconBefore="user" state="selected" onClick={() => {}} />
+        <SidebarTab text="Reports" iconBefore="chart-simple" state="disabled" onClick={() => {}} />
     </div>
 );
 

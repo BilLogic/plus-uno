@@ -107,6 +107,7 @@ Space owned by a pattern: page, section, card, table, modal, drawer, popover. In
 Tokens one component owns, named for it.
 
 ```css
+--ai-chat-width  /* Width of the AI chat when it opens as a popup or floats beside the page. */
 --avatar-size-128  /* Size of the largest UserAvatar, such as on a profile page. */
 --avatar-size-96  /* Size of an extra-large UserAvatar, such as in a profile header. */
 --button-radius-compact  /* Corner rounding of a Button with compact spacing. */
@@ -146,6 +147,9 @@ Tokens one component owns, named for it.
 --option-row-control-gap  /* Horizontal gap between an option row's control and its label. */
 --option-row-dot-size  /* Size of the dot in an option row, such as a radio's selected mark. */
 --option-row-indent-step  /* Indent added for each level of a nested option row. */
+--popup-clip-reach  /* How far past its edges a Popup's opening clip stays, so the overlay shadow is never cut. */
+--popup-max-width  /* Widest an auto-width Popup grows to fit its content, unless its trigger is wider. */
+--popup-min-width  /* Narrowest an auto-width Popup gets, unless its trigger is wider. */
 --popup-pad  /* Padding inside a Popup. */
 --progress-bar-height  /* Height of a ProgressBar track. */
 --progress-indicator-dot-size-12  /* Dot size of a ProgressIndicator with size 12. */
@@ -175,6 +179,7 @@ Tokens one component owns, named for it.
 --spinner-size-md  /* Size of a default Spinner. */
 --spinner-size-sm  /* Size of a small Spinner, such as one inside a Button. */
 --spotlight-media-height  /* Height of the media area in a Spotlight. */
+--spotlight-width  /* Width of a Spotlight. */
 --table-cell-max-width  /* Maximum width of a table cell before its text truncates. */
 --tag-dot-size  /* Size of the dot in a Tag. */
 --tag-gap  /* Horizontal gap between a Tag's parts with default spacing. */
@@ -942,17 +947,17 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 ```
 
 ## Elevation and Opacity Tokens (`--ds-`)
-Shadows pair with the surface of the same level (`--ds-shadow-raised` with `--ds-surface-raised`); opacity dims a whole element.
+Pick the level by what the surface does (Foundations/Elevation § Choose by behavior). Each shadow is edge + key + ambient and pairs with its level's surface (`--ds-shadow-raised` with `--ds-surface-raised`); a Tooltip takes none. Opacity dims a whole element.
 
 ```css
 --ds-opacity-disabled  /* Images and whole elements in a disabled state. */
 --ds-opacity-loading  /* Content under a loading spinner. */
---ds-shadow-blocking  /* Box shadow of a modal that blocks the page behind a Backdrop. Pair with --ds-surface-overlay. */
---ds-shadow-overflow  /* Shadow where content scrolls under other content, such as a table's sticky column. */
+--ds-shadow-blocking  /* Box shadow of the Modal on its Backdrop, the one surface that blocks the page. Pair with --ds-surface-overlay. */
+--ds-shadow-overflow  /* Shadow where content scrolls under a part that stays put, such as a table's sticky header or column. A border marks the cut first. */
 --ds-shadow-overflow-perimeter  /* Fallback for overflow when a box shadow is not feasible; pair with .spread. */
 --ds-shadow-overflow-spread  /* Fallback for overflow when a box shadow is not feasible; pair with .perimeter. */
---ds-shadow-overlay  /* Box shadow of anything over the UI: menus, popups, tooltips, flags, modals, dragged items. Pair with --ds-surface-overlay. */
---ds-shadow-raised  /* Box shadow of a raised card. Pair with --ds-surface-raised. */
+--ds-shadow-overlay  /* Box shadow of a layer that floats while the page stays usable: a Popup, a Select list, a floating Sidebar or Panel, a Flag, a dragged Card. Pair with --ds-surface-overlay. */
+--ds-shadow-raised  /* Box shadow of a Card: one object a person can act on. Pair with --ds-surface-raised. */
 ```
 
 ## Color Primitives (`--palette-`)

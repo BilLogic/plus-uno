@@ -9,8 +9,8 @@
 // THE LOGOS are PNG images Slack fetches by URL — a card's `icon` takes an
 // image element, and Slack does not render an SVG one. Ours are served from
 // the plus-uno site (`public/uno-bot/logos/`): PLUS from the brand guide's
-// brandmark, uno-blueprint from its site icon, GitHub and Slack drawn from the
-// Bootstrap Icons glyphs the repo already carries. Storybook is our own design
+// brandmark, uno-blueprint from its site icon, GitHub and Slack from the glyph PNGs
+// committed beside them. Storybook is our own design
 // system's, so it carries the PLUS mark. Figma and Notion have no glyph in the
 // repo that we may redistribute, so they take the favicon Google serves for
 // their domain, which Slack renders. A link on no estate's host carries the

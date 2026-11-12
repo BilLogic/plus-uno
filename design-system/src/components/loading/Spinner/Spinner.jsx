@@ -17,13 +17,13 @@ const Spinner = ({
     label = 'Loading',
     className = '',
 }) => (
-    <div
+    <span
         className={['plus-spinner', `plus-spinner--${appearance}`, className].filter(Boolean).join(' ')}
         data-size={size}
         role="status"
     >
         <span className="visually-hidden">{label}</span>
-    </div>
+    </span>
 );
 
 Spinner.propTypes = {

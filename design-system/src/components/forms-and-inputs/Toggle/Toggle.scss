@@ -69,7 +69,7 @@
             hovered: (background-color: var(--ds-background-neutral-bold-hovered)),
             disabled: (background-color: var(--ds-background-disabled)),
         ),
-        $hovered-selector: '&:hover:not([data-disabled]):not([data-checked])',
+        $hovered-selector: '&:hover:not([data-disabled]):not([data-readonly]):not([data-checked])',
         $disabled-selector: '&[data-disabled]'
     );
 
@@ -78,7 +78,7 @@
             hovered: (background-color: var(--ds-background-selected-bold-hovered)),
         ),
         $ring: false,
-        $hovered-selector: '&[data-checked]:hover:not([data-disabled])'
+        $hovered-selector: '&[data-checked]:hover:not([data-disabled]):not([data-readonly])'
     );
 }
 
@@ -118,6 +118,14 @@
     .plus-toggle-label {
         cursor: not-allowed;
         opacity: var(--ds-opacity-disabled);
+    }
+}
+
+// Read-only keeps full contrast, has no hover and drops the pointer affordance.
+.plus-choice-readonly {
+    .plus-toggle,
+    .plus-toggle-label {
+        cursor: default;
     }
 }
 

@@ -10,26 +10,27 @@ What each component is for, when to reach for it, and how it composes.
 
 PLUS components first. An interactive component's behavior — open/closed
 state, focus management, keyboard handling — is built on Base UI
-(`@base-ui/react`, headless), styled on `--ds-*` tokens; React-Bootstrap is no
-longer the fallback for that behavior (ADR-037).
+(`@base-ui/react`, headless), styled on `--ds-*` tokens (ADR-037).
+
+Two rules reach every group, each stated once:
+
+- **Disabled states** (explain on press):
+  `design-system/guidelines/composition/form-behavior.md` § Unavailable actions
+  and fields.
+- **Slot names:** `docs/engineering/coding.md` § Slot names.
 
 ## Start here — the group overviews
 
-Groups follow Atlassian's component categories, in Atlassian's order, and
-"which component do I reach for" is answered per group, not in one list:
+"Which component do I reach for" is answered per group, not in one list:
 
-- [Forms and inputs](forms-and-inputs.md) — fields sorted by the shape of the answer, then `Button`, `ButtonGroup` and `CloseButton`
+- [Forms and inputs](forms-and-inputs.md) — fields sorted by the shape of the answer, the select family (`Select`, `PopupSelect`, `FilterMenu`), then the buttons
 - Images and icons — `Tile` alone, so its docs page is the whole guidance
-- [Labels](labels.md) — `StatusTag`, `CountTag`, `Tag`, `TagGroup` and `Suggestion`
-- [Layout and structure](layout-and-structure.md) — nine containers
-- [Loading](loading.md) — `Progress`, `Skeleton`, `Spinner`
-- [Messaging](messaging.md) — `Alert`, `Flag`, `Modal`, `Banner`, `InlineMessage`
-- [Navigation](navigation.md) — six, sorted by what the user moves between
-- [Overlays and layering](overlays-and-layering.md) — `Tooltip`, `Popover`
-
-Storybook titles components with Atlassian's display names (Text field,
-Toggle, Section message, Popup); code exports keep theirs. Each group
-overview names its own pairs.
+- [Labels](labels.md) — `StatusTag`, `DateTag`, `CountTag`, `ChangeTag`, `Tag`, `SmartTag`, `TagGroup` and `Suggestion`
+- [Layout and structure](layout-and-structure.md) — the containers
+- [Loading](loading.md) — `ProgressBar`, `Skeleton`, `Spinner`, `GenerativeBorder`
+- [Messaging](messaging.md) — `SectionMessage`, `Flag`, `Modal`, `Banner`, `InlineMessage`, `EmptyState`, `Spotlight`
+- [Navigation](navigation.md) — sorted by what the user moves between
+- [Overlays and layering](overlays-and-layering.md) — `Tooltip`, `Popup`, and where every popup opens
 
 ## Name map
 
@@ -37,6 +38,7 @@ Where PLUS names a thing differently from atlassian.design, the row says why.
 Confirmed rows only; the terms are defined in `GLOSSARY.md`. Atlassian is the
 benchmark for every page, so a name that matches it needs no row.
 
+<!-- retired-names-ok: maps PLUS names to the benchmark's names, which include retired ones -->
 | Our name | ADS name | Why different |
 | :--- | :--- | :--- |
 | Frame (pattern) | Root | The app's outer shell, the layout's root area that holds the rest |
@@ -74,12 +76,8 @@ coverage columns detect it.
 **The top of the list was measured, not guessed.** Ranking every public
 component by the number of files under the Specs code and `prototypes/` that
 imported it from the design system and rendered it (measured before the Specs
-code left `main`), the leaders
-are: `Button` (139 files), `Badge` (60), `Modal` (29), `Select` (24),
-`Dropdown` (17), `ButtonGroup` (17), `Card` (14), `Pagination` (14),
-`NavTabs` (11), `Alert` (11), `TextField` (10), `TextArea` (9), `Checkbox` (9),
-`Tooltip` (8), `Switch` (7). Those fifteen were written first, in #166. Twenty
-of the 48 public components are rendered nowhere in either corpus.
+code left `main`), the fifteen most-rendered were written first, in #166. Twenty
+of the 48 public components were rendered nowhere in either corpus.
 
 **Earned thereafter.** Every other component gets its authored half the first
 time an agent gets it wrong — not on a schedule, and not by working down the

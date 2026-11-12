@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import Button, { BUTTON_APPEARANCES } from './Button';
+import SectionMessage from '../../messaging/SectionMessage/SectionMessage';
 
 const icons = {
     'none': null,
@@ -267,7 +268,9 @@ export const States = {
         await expect(loading).toHaveAttribute('aria-busy', 'true');
         await expect(getComputedStyle(loading).backgroundColor, 'loading keeps its ground').toBe(tokenColor(canvasElement, PAINT.primary.ground));
         await expect(getComputedStyle(loading.querySelector('.plus-btn-text')).opacity, 'label is hidden').toBe('0');
-        await expect(getComputedStyle(loading, '::after').content, 'spinner').not.toBe('none');
+        const spinner = loading.querySelector('.plus-spinner');
+        await expect(spinner, 'the Spinner component draws the wait').not.toBeNull();
+        await expect(spinner.parentElement).toHaveAttribute('aria-hidden', 'true');
     },
 };
 
@@ -301,8 +304,51 @@ export const Selected = { render: () => <Button text="Selected" isSelected /> };
 /** Disabled is a change of color, not of opacity. */
 export const Disabled = { render: () => <Button appearance="primary" text="Disabled" isDisabled /> };
 
-/** Loading swaps the label for a spinner and blocks interaction. */
-export const Loading = { render: () => <Button appearance="primary" text="Loading" isLoading /> };
+/** Loading swaps the label for a 16 Spinner, in both spacings, and blocks interaction. */
+export const Loading = {
+    render: () => (
+        <div style={row}>
+            <Button appearance="primary" text="Loading" isLoading />
+            <Button appearance="primary" spacing="compact" text="Compact loading" isLoading />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const icon = tokenLength(canvasElement, '--icon-md');
+        for (const name of ['Loading', 'Compact loading']) {
+            const button = canvas.getByRole('button', { name });
+            const spinner = button.querySelector('.plus-spinner');
+            await expect(spinner, `${name}: renders the Spinner`).not.toBeNull();
+            await expect(spinner.getBoundingClientRect().width, `${name}: sized by the icon token`).toBe(icon);
+            await expect(getComputedStyle(spinner).borderTopColor, `${name}: in the label color`).toBe(getComputedStyle(button).color);
+        }
+    },
+};
+
+/** An enabled action that is not ready explains what is missing when it is pressed. */
+export const ExplainsOnPress = {
+    render: () => {
+        const Demo = () => {
+            const [pressed, setPressed] = React.useState(false);
+            return (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-md)', maxWidth: '360px' }}>
+                    <Button appearance="primary" text="Save notes" onClick={() => setPressed(true)} />
+                    {pressed && <SectionMessage appearance="warning">Add the session notes before saving.</SectionMessage>}
+                </div>
+            );
+        };
+        return <Demo />;
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const save = canvas.getByRole('button', { name: 'Save notes' });
+        await expect(save).toBeEnabled();
+        await expect(canvas.queryByText('Add the session notes before saving.')).toBeNull();
+        await userEvent.click(save);
+        await expect(await canvas.findByText('Add the session notes before saving.')).toBeVisible();
+        await expect(save).toBeEnabled();
+    },
+};
 
 /** Fills the width of its container. */
 export const FitContainer = {

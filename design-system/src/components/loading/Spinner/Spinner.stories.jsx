@@ -2,6 +2,8 @@ import React from 'react';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import Spinner, { SPINNER_APPEARANCES, SPINNER_SIZES } from './Spinner';
 
 export default {
@@ -28,11 +30,22 @@ Overview.parameters = {
     docs: { source: { language: 'jsx', code: webAppSourceSnippets.spinner } },
 };
 
-export const Sizes = () => (
-    <div style={row}>
-        {SPINNER_SIZES.map((size) => <Spinner key={size} size={size} />)}
-    </div>
-);
+export const Sizes = {
+    render: () => (
+        <div style={row}>
+            {SPINNER_SIZES.map((size) => <Spinner key={size} size={size} />)}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        // Each size reads a size-scale token and keeps its pixel value.
+        const scale = { 16: '--size-100', 24: '--size-150', 48: '--size-300' };
+        for (const el of canvasElement.querySelectorAll('.plus-spinner')) {
+            const size = Number(el.dataset.size);
+            await expect(el.getBoundingClientRect().width, `size ${size}`).toBe(size);
+            await expect(tokenLength(canvasElement, scale[size]), `size ${size} token`).toBe(size);
+        }
+    },
+};
 
 /** One story per `size` value. */
 export const Size16 = () => <Spinner size={16} />;
@@ -97,4 +110,18 @@ export const Focused = {
     play: async ({ canvasElement }) => {
         await expectNotAControl(root(canvasElement), 'spinner');
     },
+};
+
+/** Reduced motion: the ring holds still and the label still names the wait. */
+export const ReducedMotion = () => <Spinner />;
+// Only this story touches the motion preference; the cleanup restores it even when the play fails.
+ReducedMotion.beforeEach = async () => async () => {
+    await emulateReducedMotion(null);
+};
+ReducedMotion.play = async ({ canvasElement }) => {
+    const spinner = within(canvasElement).getByRole('status');
+    await expect(getComputedStyle(spinner).animationName, 'turns at rest').toBe('plus-spinner-rotate');
+    if (!(await emulateReducedMotion('reduce'))) return;
+    await expect(getComputedStyle(spinner).animationName, 'still under reduced motion').toBe('none');
+    await expect(spinner).toHaveTextContent('Loading');
 };

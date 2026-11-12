@@ -48,15 +48,23 @@ const [submitFailed, setSubmitFailed] = useState(false);
 The submit button stays enabled. When a submit fails:
 
 1. Run every check, and show each error on its own field.
-2. Put an **error summary** at the top of the form: an `Alert` with
-   `style="danger"`, `dismissible={false}`, a title such as "Fix 2 fields to
+2. Put an **error summary** at the top of the form: a `SectionMessage` with
+   `appearance="danger"`, `dismissible={false}`, a title such as "Fix 2 fields to
    continue", and one link per error that moves focus to that field's `id`.
 3. Move focus to the **first invalid field**, and scroll it into view.
 
 The summary is a table of contents for the errors, and each field still
-carries its own message — `../components/messaging.md` explains why an `Alert`
-alone makes the person hunt. Focus does the announcing, so the errors need no
-live region.
+carries its own message — `../components/messaging.md` explains why a
+`SectionMessage` alone makes the person hunt. Focus does the announcing, so the
+errors need no live region.
+
+A submit the server rejects follows the same rule: the danger `SectionMessage`
+at the top of the form says what was refused, and each field the server names
+shows its own error. A failure the person did not cause, such as the request
+never arriving, is a danger `SectionMessage` with a Try again action, and the
+fields keep their values. A background failure outside the form is an error
+`Flag` that stays until closed, with Try again. A view that fails to load is an
+`EmptyState` with Try again, not a message above the form.
 
 While the submit is in flight, put `loading` on the submit `Button` and leave
 the fields as they are.
@@ -73,19 +81,40 @@ each `Checkbox` and `Radio` in it.
 `isRequired`/`required` draws the mark and nothing more on most fields, so the
 form's own check still enforces it.
 
-## Disabled vs read-only
+## Unavailable actions and fields
 
-| The field is | Use | The person can |
+An action stays enabled and explains on press what is missing. A field or
+option disables only for a prerequisite the person can fix on the same
+screen. Content people must read is read-only, and what a role can never use is
+hidden.
+
+| The control is | Do this | The person can |
 |---|---|---|
-| unavailable right now (its parent is empty, a feature is off) | `disabled` | skip it; it leaves the tab order |
-| a real value this person may see but not change | read-only | focus it, read it, copy it |
+| an action that is not ready (a required field is empty) | leave it enabled; on press, focus the first problem and say what is missing | press it and learn what to do |
+| an action that is sending | `isLoading` on the `Button`, the one time a button disables | wait; the label stays |
+| a field or option waiting on a same-screen prerequisite (its parent is empty) | `disabled`, with the reason as visible caption or description text | read why, then fix the parent |
+| a value this person may see but not change | read-only | focus it, read it, copy it |
+| a feature this role can never use | hidden | nothing; there is nothing to explain |
+
+Say why in text where the cause is: the field's caption ("Choose a school
+first") or the option's description line. When the unavailable thing blocks the
+main action, or several items are unavailable at once, put a warning
+`SectionMessage` above them that says how to turn it on. Never put the reason
+in a tooltip on a disabled control: a disabled control takes no hover or focus,
+so a tooltip there is unreachable, and touch has no hover at all.
+
+A disabled control leaves the tab order, with no `aria-disabled` stand-in that
+keeps it focusable. Menu items and select options are not tab stops, so they
+keep their arrow-key navigation. A self-evident case needs no reason: Back on
+step one. A locked area, such as the Sidebar Toolkit during onboarding, is
+disabled and visible, never hidden.
 
 A permission split — an admin edits a profile, a tutor views it — is read-only.
 After a submit that fails on permission, the form turns read-only and says
-why in an `Alert`, keeping the values readable.
+why in a `SectionMessage`, keeping the values readable.
 
 The prop is spelled per component: `isReadOnly` on `TextField`, `TextArea`,
-`Checkbox`, `Radio`, `Switch`, `RadioGroup` and `ChoiceGrid`; `readonly` on
+`Checkbox`, `Radio`, `Toggle`, `RadioGroup` and `ChoiceGrid`; `readonly` on
 `Select` and `DateTimePicker`. `Select` treats
 `readonly` as disabled today. A read-only choice keeps its focus and contrast
 and ignores clicks and keys; put radios in a `RadioGroup`, since ARIA lets the
@@ -113,7 +142,8 @@ When one field's options or limits come from another — an institution, then
 its access code; a start time, then an end time:
 
 - The child is `disabled` until the parent has a value, with a caption under
-  it naming the parent: "Pick an institution first."
+  it naming the parent: "Pick an institution first." The caption stays at
+  full contrast, since it is the reason.
 - The child clears when the parent changes.
 - While the child's options load, it stays disabled and the caption says so.
 - A rule between two fields (end after start) is re-checked on the child when
@@ -140,5 +170,5 @@ needs one of them stays standard throughout.
 
 - `forms.md` — how the fields compose on a surface
 - `../components/forms-and-inputs.md` — which component to reach for
-- `../components/messaging.md` — field errors vs an `Alert`
+- `../components/messaging.md` — field errors vs a `SectionMessage`
 - `../../src/styles/Accessibility.mdx` — the WCAG bar

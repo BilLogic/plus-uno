@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu/DropdownMenu';
-import { ButtonItem } from '@/components/navigation/MenuGroup';
+import { ButtonItem } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import './RichTextEditor.scss';
@@ -298,7 +298,10 @@ const RichTextEditor = ({
                     role="textbox"
                     aria-multiline="true"
                     aria-labelledby={labelId}
-                    aria-readonly={readOnly || disabled || undefined}
+                    aria-readonly={readOnly || undefined}
+                    aria-disabled={disabled || undefined}
+                    // Read-only is a value to read: it stays in the tab order. Disabled leaves it.
+                    tabIndex={readOnly && !disabled ? 0 : undefined}
                     data-placeholder={placeholder}
                     style={{ minHeight: minHeight ? `${minHeight}px` : undefined }}
                     onInput={handleInput}

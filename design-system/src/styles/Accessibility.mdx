@@ -144,9 +144,13 @@ Every interactive element can be reached and operated from the keyboard.
 
 <FoundationSection title="Disabled">
 
-A disabled component is dimmed as a whole to `--ds-opacity-disabled` (0.4),
-rather than recoloring its parts. Disabled elements are not focus targets, and
-they keep their label, so people can still tell what is unavailable.
+A disabled component is dimmed to `--ds-opacity-disabled` (0.4), and it keeps
+its label so people can still tell what is unavailable. Disabled elements are
+not focus targets, and none stands in with `aria-disabled` to stay focusable.
+The reason a field or option is disabled is visible text beside it, at full
+contrast, and never a tooltip on the disabled control. An action stays enabled
+and explains what is missing when it is pressed; a button disables only while
+it is sending.
 
 </FoundationSection>
 

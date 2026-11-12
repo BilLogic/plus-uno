@@ -1,7 +1,7 @@
 import React from 'react';
-import { expect, waitFor, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
-import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Popup from './Popup';
 import Button from '@/components/forms-and-inputs/Button/Button';
@@ -294,10 +294,117 @@ export const PlacementBottom = { render: () => <OpenPopup placement="bottom" tit
 export const PlacementLeft = { render: () => <OpenPopup placement="left" title="Session 12" /> };
 export const PlacementRight = { render: () => <OpenPopup placement="right" title="Session 12" /> };
 
-/** The width tiers: sm 320 (the default), md 400 and lg 480. */
-export const WidthSmall = { render: () => <OpenPopup width="sm" title="Session 12" /> };
-export const WidthMedium = { render: () => <OpenPopup width="md" title="Session 12" /> };
-export const WidthLarge = { render: () => <OpenPopup width="lg" title="Session 12" /> };
+/** The popup a held-open width story draws, found in the document it portals to. */
+const openedPopup = async (canvasElement, id) => waitFor(() => {
+    const node = canvasElement.ownerDocument.getElementById(id);
+    if (!node) throw new Error(`${id} not open`);
+    return node;
+});
+
+const longBody = 'Ran 45 minutes over. The tutor stayed on to finish the practice set and wrote up what the student still needs.';
+
+/** Auto, the default: it hugs a short body, never narrower than its trigger or 160. */
+export const WidthAuto = {
+    render: () => <OpenPopup title="Session 12"><span id="popup-width-auto-body">Ran over.</span></OpenPopup>,
+    play: async ({ canvasElement }) => {
+        const body = await openedPopup(canvasElement, 'popup-width-auto-body');
+        const popup = body.closest('.plus-popup');
+        const trigger = within(canvasElement).getByRole('button', { name: 'Details' });
+        const width = popup.getBoundingClientRect().width;
+        await expect(width, 'at least --popup-min-width').toBeGreaterThanOrEqual(tokenLength(canvasElement, '--popup-min-width'));
+        await expect(width, 'at least the trigger').toBeGreaterThanOrEqual(trigger.getBoundingClientRect().width);
+        await expect(width, 'hugs a short body').toBeLessThan(tokenLength(canvasElement, '--popup-max-width'));
+    },
+};
+
+/** Auto with a long body: it grows with its content and stops at 320, then wraps. */
+export const WidthAutoCaps = {
+    render: () => <OpenPopup title="Session 12"><span id="popup-width-auto-long">{longBody}</span></OpenPopup>,
+    play: async ({ canvasElement }) => {
+        const popup = (await openedPopup(canvasElement, 'popup-width-auto-long')).closest('.plus-popup');
+        await expect(popup.getBoundingClientRect().width, 'stops at --popup-max-width')
+            .toBeCloseTo(tokenLength(canvasElement, '--popup-max-width'), 0);
+    },
+};
+
+/**
+ * The column steps, for a menu of several categories: 3 and 4 screen-grid
+ * columns plus the popup pad, worked out by the same rule as Modal's widths.
+ * One more column adds one column and one gutter, whatever the screen.
+ */
+export const WidthColumns = {
+    render: () => (
+        <div style={{ padding: 'calc(var(--space-400) * 4) var(--space-400)', display: 'flex', gap: 'var(--space-400)', justifyContent: 'center' }}>
+            {['3-col', '4-col'].map((width) => (
+                <Popup
+                    key={width}
+                    id={`popup-width-${width}`}
+                    trigger={<Button appearance="primary" text={width} />}
+                    title="Filters"
+                    placement="bottom"
+                    width={width}
+                    triggerType="manual"
+                    show
+                >
+                    Subject, grade and tutor.
+                </Popup>
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const three = (await openedPopup(canvasElement, 'popup-width-3-col')).getBoundingClientRect().width;
+        const four = (await openedPopup(canvasElement, 'popup-width-4-col')).getBoundingClientRect().width;
+        const gutter = tokenLength(canvasElement, '--grid-gutter');
+        const pad = px(getComputedStyle(canvasElement.ownerDocument.getElementById('popup-width-3-col')).paddingLeft);
+        const column = (three - 2 * gutter - 2 * pad) / 3;
+        await expect(four - three, 'one more column and its gutter').toBeCloseTo(column + gutter, 0);
+    },
+};
+
+/** Opened by a pointer, it clips out from the trigger's corner; only clip-path and opacity move, never the width. */
+export const OpensWithAClip = {
+    render: () => (
+        <div style={{ padding: 'calc(var(--space-400) * 4) var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+            <Popup id="popup-motion-pointer" trigger={<Button appearance="primary" text="Details" />} title="Session 12" placement="bottom-start">
+                Ran 45 minutes over.
+            </Popup>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Details' }));
+        const popup = await openedPopup(canvasElement, 'popup-motion-pointer');
+        const style = getComputedStyle(popup);
+        await expect(style.animationName, 'opens with the clip').toBe('plus-popup-clip-open');
+        // The width never animates: no transition that covers it runs for any time.
+        const properties = style.transitionProperty.split(',').map((p) => p.trim());
+        const durations = style.transitionDuration.split(',').map((d) => parseFloat(d));
+        const widthMoves = properties.some((p, i) => /^(all|width|min-width|max-width)$/.test(p) && durations[i % durations.length] > 0);
+        await expect(widthMoves, 'the width never animates').toBe(false);
+        await expect(style.getPropertyValue('--plus-popup-clip-bottom').trim(), 'collapsed onto the edge facing the trigger').toBe('100%');
+        await expect(style.getPropertyValue('--plus-popup-clip-right').trim(), 'at the start corner').toBe('100%');
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(canvasElement.ownerDocument.getElementById('popup-motion-pointer')).toBeNull());
+    },
+};
+
+/** Opened from the keyboard, it appears at once. */
+export const KeyboardOpenIsInstant = {
+    render: () => (
+        <div style={{ padding: 'calc(var(--space-400) * 4) var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+            <Popup id="popup-motion-keyboard" trigger={<Button appearance="primary" text="Details" />} title="Session 12" placement="bottom-start">
+                Ran 45 minutes over.
+            </Popup>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        within(canvasElement).getByRole('button', { name: 'Details' }).focus();
+        await userEvent.keyboard('{Enter}');
+        const popup = await openedPopup(canvasElement, 'popup-motion-keyboard');
+        await expect(popup).toHaveAttribute('data-instant', 'click');
+        await expect(getComputedStyle(popup).animationName, 'no clip from the keyboard').toBe('none');
+        await userEvent.keyboard('{Escape}');
+    },
+};
 
 /** Without a title the body stands alone. */
 export const BodyOnly = { render: () => <OpenPopup>Ran 45 minutes over.</OpenPopup> };

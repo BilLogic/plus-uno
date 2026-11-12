@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import IconButton from '@/components/forms-and-inputs/IconButton';
 import Button from '@/components/forms-and-inputs/Button';
@@ -12,10 +12,12 @@ const thumb = (direction, selected) => (
 );
 
 /**
- * Thumbs up and down on an AI answer. Two toggle buttons, at most one
- * pressed: a press reports `{ rating }` through `onFeedback`, a second press
+ * Thumbs up and down on an AI answer. Two buttons, at most one chosen: a press reports `{ rating }` through `onFeedback`, a second press
  * on the same thumb clears it (`rating: null`). Thumbs down also opens a
  * popup for an optional comment, sent as `{ rating: 'down', comment }`.
+ * Both thumbs are plain toggle buttons and report `aria-pressed`, true on the
+ * chosen one. Thumbs down is not the popup's trigger: the popup opens after the
+ * pick, anchored to the thumb, takes focus, and hands it back to the thumb on close.
  * A rating is confirmed quietly, in words a screen reader hears, and a
  * change of rating is announced as well.
  */
@@ -25,6 +27,23 @@ export const AiFeedback = ({ value, defaultValue = null, onFeedback, className =
     const rating = controlled ? value : own;
     const [asking, setAsking] = useState(false);
     const [comment, setComment] = useState('');
+    const downRef = useRef(null);
+    const returnFocus = useRef(false);
+
+    // Every way the popup closes (Skip, Send, Escape, an outside press) hands focus back
+    // to Bad answer, unless it has already moved to another control on purpose.
+    useEffect(() => {
+        if (asking || !returnFocus.current) return;
+        returnFocus.current = false;
+        const active = document.activeElement;
+        const parked = !active || active === document.body || active.closest?.('.plus-ai-feedback__ask');
+        if (parked) downRef.current?.focus();
+    }, [asking]);
+
+    const close = () => {
+        returnFocus.current = true;
+        setAsking(false);
+    };
 
     const rate = (next) => {
         const chosen = rating === next ? null : next;
@@ -37,7 +56,7 @@ export const AiFeedback = ({ value, defaultValue = null, onFeedback, className =
     const send = () => {
         const text = comment.trim();
         if (text) onFeedback?.({ rating: 'down', comment: text });
-        setAsking(false);
+        close();
     };
 
     return (
@@ -51,22 +70,23 @@ export const AiFeedback = ({ value, defaultValue = null, onFeedback, className =
                     isSelected={rating === 'up'}
                     onClick={() => rate('up')}
                 />
+                <IconButton
+                    ref={downRef}
+                    icon={thumb('down', rating === 'down')}
+                    label="Bad answer"
+                    appearance="subtle"
+                    spacing="compact"
+                    isSelected={rating === 'down'}
+                    onClick={() => rate('down')}
+                />
                 <Popup
                     triggerType="manual"
                     show={asking}
-                    onToggle={(open) => { if (!open) setAsking(false); }}
+                    onToggle={(open) => { if (!open) close(); }}
                     placement="bottom-start"
                     title="What went wrong?"
-                    trigger={(
-                        <IconButton
-                            icon={thumb('down', rating === 'down')}
-                            label="Bad answer"
-                            appearance="subtle"
-                            spacing="compact"
-                            isSelected={rating === 'down'}
-                            onClick={() => rate('down')}
-                        />
-                    )}
+                    anchor={downRef}
+                    rootClose
                 >
                     <div className="plus-ai-feedback__ask">
                         <TextArea
@@ -78,7 +98,7 @@ export const AiFeedback = ({ value, defaultValue = null, onFeedback, className =
                             onChange={(event) => setComment(event.target.value)}
                         />
                         <div className="plus-ai-feedback__actions">
-                            <Button text="Skip" appearance="subtle" spacing="compact" onClick={() => setAsking(false)} />
+                            <Button text="Skip" appearance="subtle" spacing="compact" onClick={close} />
                             <Button text="Send" appearance="primary" spacing="compact" onClick={send} />
                         </div>
                     </div>

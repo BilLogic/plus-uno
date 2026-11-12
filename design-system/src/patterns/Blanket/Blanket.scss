@@ -2,10 +2,10 @@
  * Blanket pattern (Patterns/Blanket)
  * The full-screen layer a modal is placed in: the blanket fill (color.blanket,
  * 32% Light · 60% Dark), Overlay/pad-x 16 at the sides and Overlay/pad-y 64
- * above and below (24 under 640 tall), its child centered. On Atlassian's
- * layers: the blanket at 500 and the layer it holds at 510. A confirm raised
- * from a modal is a second Blanket later in the page, so it reuses 500 / 510
- * and covers the first. With an edge placement it drops the pad and holds its
+ * above and below (24 under 640 tall), its child centered. It sits on
+ * --layer-blanket and the layer it holds on --layer-modal. One Modal at a
+ * time: a follow-up step, such as a confirm, opens inside that Modal rather
+ * than as a second Backdrop. With an edge placement it drops the pad and holds its
  * child full height at the start or end of the screen, for a drawer.
  */
 

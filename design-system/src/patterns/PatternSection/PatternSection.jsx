@@ -5,6 +5,7 @@ import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingL
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useSplitHolds } from '../Frame/SplitContext';
 import { useOwnWidth } from '../Frame/useOwnWidth';
+import SectionSearch from './SectionSearch';
 import './PatternSection.scss';
 
 /**
@@ -117,44 +118,27 @@ HeaderSkeleton.propTypes = {
 
 /**
  * `_Section toolbar`: the row a section header carries above a table or a
- * list. `state="default"` holds search, filters and a count at the start and
- * actions at the end; the count truncates first. `state="selected"` swaps it
- * for the bulk bar: the selection ("3 selected", announced politely), bulk
- * actions and Clear, on the selected background.
+ * list. Search, filters and a count at the start, actions at the end; the
+ * count truncates first. Selected rows never change it: a Dynamic table's
+ * bulk bar is its own head row.
  */
 export const SectionToolbar = ({
-    state = 'default',
     search,
     filters,
     count,
     actions,
-    selection,
-    bulkActions,
-    onClear,
-    clearLabel = 'Clear',
     className = '',
     ...props
 }) => {
-    const classes = ['plus-section-toolbar', `plus-section-toolbar--${state}`, className].filter(Boolean).join(' ');
-
-    if (state === 'selected') {
-        return (
-            <div className={classes} {...props}>
-                <div className="plus-section-toolbar__start">
-                    <span className="plus-section-toolbar__selection" aria-live="polite">{selection}</span>
-                    {bulkActions && <div className="plus-section-toolbar__slot">{bulkActions}</div>}
-                    {onClear && <Button text={clearLabel} appearance="subtle" spacing="compact" onClick={onClear} />}
-                </div>
-            </div>
-        );
-    }
+    const classes = ['plus-section-toolbar', className].filter(Boolean).join(' ');
 
     return (
         <div className={classes} {...props}>
             <div className="plus-section-toolbar__start">
                 {search && <div className="plus-section-toolbar__search">{search}</div>}
                 {filters && <div className="plus-section-toolbar__slot">{filters}</div>}
-                {count && <span className="plus-section-toolbar__count">{count}</span>}
+                {/* A polite live region: the count changes as search and filters narrow the rows. */}
+                {count && <span className="plus-section-toolbar__count" role="status">{count}</span>}
             </div>
             {actions && <div className="plus-section-toolbar__slot plus-section-toolbar__actions">{actions}</div>}
         </div>
@@ -162,24 +146,14 @@ export const SectionToolbar = ({
 };
 
 SectionToolbar.propTypes = {
-    /** `default`: search, filters, count and actions. `selected`: the selection, bulk actions and Clear. */
-    state: PropTypes.oneOf(['default', 'selected']),
     /** Search field slot, at the start */
     search: PropTypes.node,
     /** Filters slot: dropdown buttons */
     filters: PropTypes.node,
-    /** Count, such as "48 students"; truncates first */
+    /** Count in words, such as "12 of 48 students"; truncates first, and is announced politely when it changes */
     count: PropTypes.node,
     /** Actions slot, at the end */
     actions: PropTypes.node,
-    /** Selected state: the selection, such as "3 selected" */
-    selection: PropTypes.node,
-    /** Selected state: bulk action buttons */
-    bulkActions: PropTypes.node,
-    /** Selected state: shows Clear, and runs when it is pressed */
-    onClear: PropTypes.func,
-    /** Selected state: the Clear button's label */
-    clearLabel: PropTypes.string,
     className: PropTypes.string,
 };
 
@@ -425,5 +399,8 @@ PatternSection.propTypes = {
 };
 
 PatternSection.Toolbar = SectionToolbar;
+PatternSection.Search = SectionSearch;
+
+export { SectionSearch };
 
 export default PatternSection;

@@ -410,7 +410,7 @@ const TreeSelect = ({
     const renderRow = ({ value: optionValue, option, depth, hasChildren, isExpanded }) => {
         const nodeDisabled = isDisabled || isOptionDisabled(option);
         const { checked, indeterminate } = getNodeCheckState(option);
-        const leading = [
+        const elemBefore = [
             <OptionRow.Indent key="indent" level={depth} />,
             <OptionRow.Toggle
                 key="toggle"
@@ -419,7 +419,7 @@ const TreeSelect = ({
             />,
         ];
         if (isMulti) {
-            leading.push(<OptionRow.Checkbox key="check" checked={checked} indeterminate={indeterminate} />);
+            elemBefore.push(<OptionRow.Checkbox key="check" checked={checked} indeterminate={indeterminate} />);
         }
 
         return (
@@ -432,7 +432,7 @@ const TreeSelect = ({
                 selected={isMulti ? checked : selectedSet.has(optionValue)}
                 disabled={nodeDisabled}
                 check={!isMulti}
-                leading={leading}
+                elemBefore={elemBefore}
                 spacing={spacing}
                 aria-expanded={hasChildren ? isExpanded : undefined}
                 aria-level={depth + 1}

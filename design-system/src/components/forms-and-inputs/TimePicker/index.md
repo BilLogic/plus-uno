@@ -64,7 +64,7 @@ Don't: The same time disabled, faded as if it did not apply.
 - For a date alone, use Date picker.
 - For a date and a time together, use Date time picker.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -79,7 +79,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Hovered | The border takes `--ds-border-focused`. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the box. |
 | Invalid | The border takes `--ds-border-danger`. |
-| Read-only | The box takes `--ds-background-neutral`. |
+| Read-only | The box takes `--ds-background-neutral`, at full contrast with no hover. The chevron is not drawn and a press opens no list. |
 | Disabled | The box fades to `--ds-opacity-disabled` and leaves the tab order. |
 
 ### Tokens

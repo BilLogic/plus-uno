@@ -162,11 +162,10 @@ describe('the corpus — where tokens live, answered once and read through the o
     }
   });
 
-  it('reads the generated color tokens, and not the Bootstrap bridge that consumes them', () => {
+  it('reads the generated color tokens', () => {
     const files = tokenSources().map((s) => s.file);
     expect(files).toContain('color/_semantic.scss');
     expect(files).toContain('color/_palette.scss');
-    expect(files).not.toContain('color/_bootstrap-bridge.scss');
 
     const corpus = tokenCorpus({ prefix: COLOR_PREFIXES });
     // A `--ds-` token is an alias of a ramp step, followed to its hex.
@@ -174,7 +173,6 @@ describe('the corpus — where tokens live, answered once and read through the o
     expect(corpus.get('--ds-border-focused').value).toMatch(/^#[0-9a-f]{6}$/);
     expect(corpus.get('--ds-border-focused').file).toBe('color/_semantic.scss');
     expect([...corpus.keys()].every((name) => name.startsWith('--ds-'))).toBe(true);
-    expect([...corpus.keys()].some((name) => name.startsWith('--bs-'))).toBe(false);
     expect(tokenCorpus({ prefix: '--palette-' }).values().next().value.primitive).toBe(true);
   });
 
@@ -183,7 +181,8 @@ describe('the corpus — where tokens live, answered once and read through the o
     mkdirSync(join(root, COLOR_TOKEN_DIR), { recursive: true });
     writeFileSync(join(root, COLOR_TOKEN_DIR, '_palette.scss'), ':root { --palette-teal-700: #147d6a; }');
     writeFileSync(join(root, COLOR_TOKEN_DIR, '_semantic.scss'), ':root { --ds-text-brand: var(--palette-teal-700); }');
-    writeFileSync(join(root, COLOR_TOKEN_DIR, '_bootstrap-bridge.scss'), ':root { --bs-primary: var(--ds-text-brand); }');
+    // A sheet that is not one of the listed color files is not read.
+    writeFileSync(join(root, COLOR_TOKEN_DIR, '_unlisted.scss'), ':root { --ds-unlisted: var(--ds-text-brand); }');
 
     expect(tokenSources({ root }).map((s) => s.file)).toEqual(['color/_palette.scss', 'color/_semantic.scss']);
     expect(tokenCorpus({ root }).get('--ds-text-brand').value).toBe('#147d6a');

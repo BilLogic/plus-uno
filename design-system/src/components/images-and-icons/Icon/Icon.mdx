@@ -50,7 +50,7 @@ One Font Awesome Free glyph, drawn from its name at an icon size and in an icon 
 
 ## Style
 
-<ComponentExample of={IconStories.Styles} title="Regular or solid" description={<><code>iconStyle</code> is <code>regular</code> or <code>solid</code>. Unset, the glyph is regular where Font Awesome Free has a regular and solid where it does not. <code>solid</code> always draws solid, for a selected or filled mark. <code>regular</code> falls back to solid where Free has no regular. The <code>fa-brands</code> family is not a style: it rides in the name (<code>fa-brands fa-figma</code>), and such a name ignores <code>iconStyle</code>.</>} />
+<ComponentExample of={IconStories.Styles} title="Regular or solid" description={<><code>iconStyle</code> is <code>regular</code> or <code>solid</code>. Unset, the glyph is regular where Font Awesome Free has a regular and solid where it does not. <code>solid</code> always draws solid, for a mark that is itself a filled glyph. A navigation row's selected state is a fill behind an outlined icon, never a solid icon. <code>regular</code> falls back to solid where Free has no regular. The <code>fa-brands</code> family is not a style: it rides in the name (<code>fa-brands fa-figma</code>), and such a name ignores <code>iconStyle</code>.</>} />
 
 </div>
 
@@ -110,7 +110,7 @@ import { Icon } from '@/components';
 <Icon name="circle-check" size={16} color="success" label="Approved" />
 ```
 
-Pass a plain name and set `iconStyle` when a glyph must be solid; never write `fa-solid` or `fa-regular` into the name. Use a glyph's current name: an alias is not in the regular list, so it draws solid. A `fa-brands` name carries its family: `fa-brands fa-figma`.
+Navigation icons are always outlined: a selected row shows a fill, not a filled icon, and brand marks (`fa-brands`) are the only exception. Pass a plain name and set `iconStyle` only when a glyph must be solid outside navigation; never write `fa-solid` or `fa-regular` into the name. Use a glyph's current name: an alias is not in the regular list, so it draws solid. A `fa-brands` name carries its family: `fa-brands fa-figma`.
 
 </div>
 

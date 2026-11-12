@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 
 /**
  * Text that assistive technology reads and nobody sees: a one-pixel, clipped
- * span taken out of the flow. It is Bootstrap's `.visually-hidden` helper, which
- * the rest of the system already uses by class name, given a component so the
- * caller never types the class. It paints nothing, so it takes no tokens.
+ * span taken out of the flow. It is the `.visually-hidden` class `main.scss`
+ * defines, which the rest of the system already uses by class name, given a
+ * component so the caller never types the class. It paints nothing, so it takes no tokens.
  */
 const VisuallyHidden = ({ children, id, role }) => (
     <span className="visually-hidden" id={id} role={role}>

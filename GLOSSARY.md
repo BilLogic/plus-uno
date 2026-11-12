@@ -191,7 +191,7 @@ A floating layer anchored to its trigger, closed by clicking outside: one member
 _Avoid_: "popover", "inline dialog"
 
 **Menu**:
-The building blocks for a list of actions or links: a menu group, **Menu section**s and items, placed inline or inside a **Popup**.
+The item primitive behind **Dropdown menu** and **Popup select**: menu groups, **Menu section**s and items. Reach for those two; Menu is not a component of its own.
 _Avoid_: "dropdown" for a menu, "list group"
 
 **Menu section**:
@@ -199,12 +199,20 @@ A titled or separated group of items inside a **Menu**.
 _Avoid_: bare "section"
 
 **Dropdown menu**:
-A button trigger that opens a **Menu** of actions or options in a **Popup**.
+A button trigger that opens a **Menu** of actions in a **Popup**.
 _Avoid_: bare "dropdown"
 
+**Popup select**:
+One list in a **Popup**, applied the moment a row is picked; its labeled trigger ("Status: Upcoming") is the toolbar filter for a second-level view.
+_Avoid_: a second tab strip
+
+**Filter menu**:
+Several filter categories in a **Popup**, held until Apply. `FilterMenu` in code.
+_Avoid_: "filter dropdown"
+
 **Select**:
-A form field for picking a value from a list of options.
-_Avoid_: "dropdown", "Dropdown menu" for a value picker
+A form field for picking a value from a list of options. A list loaded from a server is the `loadOptions` property of Select.
+_Avoid_: "dropdown", "Dropdown menu" for a value picker, "async select"
 
 **Close / Dismiss**:
 Close ends a blocking layer (**Modal**, **Drawer**); Dismiss removes a message (Flag, Banner, Section message).
@@ -230,12 +238,16 @@ A label that shows a number.
 _Avoid_: "counter", "badge"
 
 **Tag**:
-A label a person can attach, filter by or remove: it names a category rather than a state.
+A label a person can attach, filter by or remove: it names a category rather than a state. No color square unless `swatchBefore` opts in; `elemBefore` is its leading slot.
 _Avoid_: "chip"
 
 **Tag group**:
 A set of **Tag**s laid out together.
 _Avoid_: "tag list"
+
+**Change tag**:
+A label for change over time, such as "+3 vs last week": the arrow follows the sign, and which way is good sets the tone.
+_Avoid_: "delta tag", "trend indicator"
 
 **Date tag**:
 A label that shows a date or due date, colored by how close it is.
@@ -282,8 +294,8 @@ A boolean state prop such as `isDisabled`, `isSelected` or `isLoading`.
 _Avoid_: bare `disabled`, `selected` or `loading` props
 
 **Base UI**:
-The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close), decided in ADR-037; Bootstrap stays the CSS framework for non-interactive markup.
-_Avoid_: "react-bootstrap" as a precedent
+The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close), decided in ADR-037.
+_Avoid_: Bootstrap or React-Bootstrap as a precedent; PLUS ships neither (ADR-042)
 
 **FieldBox / FieldFrame**:
 FieldBox is an input's box (leading and trailing slots, density, radius); FieldFrame carries its label, caption and error, and is the only piece choice controls share.

@@ -1,0 +1,106 @@
+/*
+ * Change tag — change over time: a filled chip (arrow + signed value) and an
+ * optional comparison in subtle text after it.
+ *
+ * THE BOX. Default is 20 tall, compact 16 for table cells, from
+ * `_label-heights.scss`. The value is body.small 12/16 and the arrow 12 in
+ * both, so compact only drops the ground's breathing room.
+ *
+ * THE CHIP IS FILLED, LIKE A STATUS TAG. The tone (neutral, success, danger)
+ * is a meaning, so it takes Status tag's fill, text and 1px inside border (an
+ * inset shadow, so the height stays exact). The comparison sits outside the
+ * fill, on the page's own ground, so subtle text keeps its contrast.
+ *
+ * MOTION. A new value fades in on the entrance easing while the chip's colors
+ * move on the standard one. Both read the motion duration tokens, which drop
+ * to 0ms under reduced motion.
+ */
+@use '../label-heights' as label;
+
+.plus-change-tag {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    gap: var(--inline-sm);
+    margin: 0;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.plus-change-tag__chip {
+    --plus-change-tag-height: #{label.$change-height};
+
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    height: var(--plus-change-tag-height);
+    padding: 0 var(--pad-x-xs);
+    gap: var(--tag-gap-compact);
+    border-radius: var(--radius-md);
+    background-color: var(--plus-change-tag-fill);
+    color: var(--plus-change-tag-ink);
+    box-shadow: inset 0 0 0 var(--border-default) var(--plus-change-tag-edge);
+    transition-property: background-color, color, box-shadow;
+    transition-duration: var(--motion-duration-medium);
+    transition-timing-function: var(--motion-easing-standard);
+}
+
+.plus-change-tag--compact .plus-change-tag__chip {
+    --plus-change-tag-height: #{label.$change-height-compact};
+}
+
+.plus-change-tag__visual {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+
+    > i {
+        font-size: var(--icon-sm);
+        line-height: 1;
+    }
+}
+
+.plus-change-tag__value {
+    font: var(--body-small);
+    font-variant-numeric: tabular-nums;
+}
+
+.plus-change-tag__value--entering {
+    animation: plus-change-tag-value-in var(--motion-duration-medium) var(--motion-easing-entrance) both;
+}
+
+@keyframes plus-change-tag-value-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.plus-change-tag__comparison {
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+/*
+ * The color map: [fill, text, inside border] per tone, the same mapping
+ * Status tag uses for neutral, success and danger.
+ */
+$change-tone: (
+    'neutral': (var(--ds-background-neutral), var(--ds-text), var(--ds-background-neutral-pressed)),
+    'success': (var(--ds-background-success), var(--ds-text-success), var(--ds-background-success-pressed)),
+    'danger': (var(--ds-background-danger), var(--ds-text-danger), var(--ds-background-danger-pressed)),
+);
+
+@each $name, $look in $change-tone {
+    .plus-change-tag--#{$name} {
+        --plus-change-tag-fill: #{nth($look, 1)};
+        --plus-change-tag-ink: #{nth($look, 2)};
+        --plus-change-tag-edge: #{nth($look, 3)};
+    }
+}
+
+/* Forced colors drop box-shadows; a real border keeps the edge. */
+@media (forced-colors: active) {
+    .plus-change-tag__chip {
+        border: var(--border-default) solid CanvasText;
+    }
+}

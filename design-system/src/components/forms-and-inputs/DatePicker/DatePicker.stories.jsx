@@ -324,6 +324,11 @@ export const ReadOnly = {
     render: () => <div style={wrap}><DatePicker aria-label="Session date" isReadOnly value="2026-10-25" /></div>,
     play: async ({ canvasElement }) => {
         await expectFieldReadOnly(canvasElement, fieldBox(canvasElement), 'date picker');
+        // Nothing to open: the calendar icon is not drawn, and a press leaves the calendar shut.
+        await expect(canvasElement.querySelector('.plus-date-picker__icon')).toBeNull();
+        await expect(field(canvasElement)).toHaveAttribute('aria-readonly', 'true');
+        await userEvent.click(field(canvasElement));
+        await expect(field(canvasElement)).toHaveAttribute('aria-expanded', 'false');
     },
 };
 

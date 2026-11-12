@@ -62,12 +62,6 @@ Read the semantic, pattern or component token that holds the value; the fix list
 
 Use `fa-solid`, `fa-regular` or `fa-brands` with an icon Free ships. The Free names are the committed lists `design-system/src/lib/icon-regular.generated.js` and `icon-free.generated.js` (solid and brands), so every run checks all three families, the hosted `ds_check` included.
 
-## ds/prefer-plus-component
-
-**warn.** A `react-bootstrap` import of a component the design system also exports (`Button`, `Modal`…).
-
-Import the PLUS component from `@/components`.
-
 ## ds/no-retired-name
 
 **warn.** A prop the manifest marks deprecated, or a retired token name that is still declared somewhere.

@@ -159,6 +159,41 @@
     }
 }
 
+// Retry sits at the row's end; the field keeps focus, so it is not a tab stop.
+.plus-listbox-retry {
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ds-link);
+    font: var(--body-default);
+    cursor: pointer;
+
+    @include plus-state(
+        $states: (
+            hovered: (text-decoration: underline),
+        ),
+        $ring: false
+    );
+}
+
+// Options that arrive from a server fade in one after another, 20 ms apart,
+// the last wait capped at 500 ms. Reduced motion shows them at once.
+.plus-listbox-reveal {
+    animation: plus-listbox-reveal var(--motion-duration-medium) var(--motion-easing-entrance) both;
+    animation-delay: min(calc(var(--plus-listbox-reveal-index, 0) * 20ms), 500ms);
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+    }
+}
+
+@keyframes plus-listbox-reveal {
+    from {
+        opacity: 0;
+    }
+}
+
 @media (forced-colors: active) {
     .plus-listbox-options:focus-visible {
         @include plus-ring($ring-offset: calc(-1 * var(--focus-ring-width)), $ring-token: Highlight, $ring-width: var(--focus-ring-width));

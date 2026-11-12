@@ -63,7 +63,7 @@ export const LeadingAndTrailing = () => (
         <OptionRow
             label="Algebra"
             check={false}
-            leading={[
+            elemBefore={[
                 <OptionRow.Indent key="i" level={0} />,
                 <OptionRow.Toggle key="t" state="expanded" />,
                 <OptionRow.Checkbox key="c" checked={false} indeterminate />,
@@ -73,20 +73,20 @@ export const LeadingAndTrailing = () => (
             label="Linear equations"
             check={false}
             selected
-            leading={[
+            elemBefore={[
                 <OptionRow.Indent key="i" level={1} />,
                 <OptionRow.Toggle key="t" state="leaf" />,
                 <OptionRow.Checkbox key="c" checked />,
             ]}
         />
-        <OptionRow label="Tuesday" leading={<OptionRow.Radio checked={false} />} />
+        <OptionRow label="Tuesday" elemBefore={<OptionRow.Radio checked={false} />} />
         <OptionRow
             label="Decision recall"
-            leading={<i className={iconClass('grip-vertical')} aria-hidden="true" />}
-            trailing={<i className={iconClass('ellipsis')} aria-hidden="true" />}
+            elemBefore={<i className={iconClass('grip-vertical')} aria-hidden="true" />}
+            elemAfter={<i className={iconClass('ellipsis')} aria-hidden="true" />}
         />
-        <OptionRow label="Unread" leading={<i className={iconClass('inbox')} aria-hidden="true" />} trailing={<CountTag value={12} />} />
-        <OptionRow label="Pennsylvania" trailing={<OptionRow.Chevron />} />
+        <OptionRow label="Unread" elemBefore={<i className={iconClass('inbox')} aria-hidden="true" />} elemAfter={<CountTag value={12} />} />
+        <OptionRow label="Pennsylvania" elemAfter={<OptionRow.Chevron />} />
         <OptionRow label="Maria Lopez" description="Grade 7 · Brookfield Middle School" />
     </div>
 );
@@ -101,7 +101,11 @@ LeadingAndTrailing.play = async ({ canvasElement }) => {
     await expect(step).toBe(parseFloat(getComputedStyle(child).getPropertyValue('--plus-option-row-indent-step')) || 20);
 };
 
-/** A long label truncates to one line, and hovering shows it whole. */
+/**
+ * A long label truncates to one line. Its full text is a tooltip on hover, on
+ * the row's keyboard focus and on its keyboard cursor, and only while it is
+ * clipped; the row stays the one tab stop and no `title` is used.
+ */
 export const LongLabelsTruncate = () => {
     const [chosen, setChosen] = useState(null);
     return (
@@ -111,22 +115,43 @@ export const LongLabelsTruncate = () => {
                 label="Eagle Ridge Intermediate School of the Arts and Sciences"
                 selected={chosen === 'eagle'}
                 onSelect={setChosen}
+                tabbable
             />
+            <OptionRow value="short" label="Lincoln" tabbable={false} />
+            <OptionRow value="cursor" label="Westview Preparatory Academy for the Performing Arts" highlighted tabbable={false} />
         </div>
     );
 };
 
 LongLabelsTruncate.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const row = canvas.getByRole('option');
+    const body = within(canvasElement.ownerDocument.body);
+    const row = canvas.getByRole('option', { name: /Eagle Ridge/ });
     const label = row.querySelector('.plus-option-row-label');
-    await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+    await waitFor(() => expect(label.scrollWidth).toBeGreaterThan(label.clientWidth));
+    await expect(label, 'no title attribute').not.toHaveAttribute('title');
+    await expect(row, 'no title attribute on the row').not.toHaveAttribute('title');
 
-    await userEvent.hover(label);
-    const tip = await within(canvasElement.ownerDocument.body).findByRole('tooltip');
-    await expect(tip).toHaveTextContent('Eagle Ridge Intermediate School of the Arts and Sciences');
-    await userEvent.unhover(label);
-    await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull());
+    // The keyboard cursor row is clipped and highlighted: its tooltip is already up.
+    await expect(await body.findByRole('tooltip')).toHaveTextContent('Westview Preparatory Academy for the Performing Arts');
+
+    await userEvent.hover(row);
+    await waitFor(() => expect(body.getAllByRole('tooltip').some((tip) => /Eagle Ridge Intermediate/.test(tip.textContent))).toBe(true));
+    await userEvent.unhover(row);
+    await waitFor(() => expect(body.queryAllByRole('tooltip').some((tip) => /Eagle Ridge Intermediate/.test(tip.textContent))).toBe(false));
+
+    // Keyboard: the row holds focus and shows its text.
+    row.focus();
+    await waitFor(() => expect(body.getAllByRole('tooltip').some((tip) => /Eagle Ridge Intermediate/.test(tip.textContent))).toBe(true));
+    row.blur();
+    await waitFor(() => expect(body.queryAllByRole('tooltip').some((tip) => /Eagle Ridge Intermediate/.test(tip.textContent))).toBe(false));
+
+    // A row that fits shows nothing, hovered or focused.
+    const fits = canvas.getByRole('option', { name: 'Lincoln' });
+    await userEvent.hover(fits);
+    await new Promise((resolve) => { setTimeout(resolve, 600); });
+    await expect(body.queryAllByRole('tooltip').some((tip) => tip.textContent === 'Lincoln')).toBe(false);
+    await userEvent.unhover(fits);
 };
 
 /**
@@ -139,7 +164,7 @@ export const Colors = () => (
         <OptionRow label="Algebra" />
         <OptionRow label="Biology" highlighted />
         <OptionRow label="Chemistry" selected description="Grade 9" />
-        <OptionRow label="Physics" check={false} selected leading={<OptionRow.Checkbox checked />} />
+        <OptionRow label="Physics" check={false} selected elemBefore={<OptionRow.Checkbox checked />} />
         <OptionRow label="Geometry" dragging />
         <OptionRow label="History" dropIndicator="before" />
     </div>

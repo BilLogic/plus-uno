@@ -10,9 +10,9 @@ Implementation requirements only. For design rules, load `design-system/guidelin
 
 ## Stack
 
-- React + React-Bootstrap on Bootstrap, built with Vite, documented in Storybook.
+- React, built with Vite, documented in Storybook. No Bootstrap (ADR-042).
 - SCSS with design tokens from `design-system/src/tokens/`.
-- Every interactive component's behavior is built on Base UI (`@base-ui/react`, headless), styled on `--ds-*` tokens — ADR-037, widening the AI-only scope ADR-036 set. Bootstrap stays the framework for non-interactive product UI.
+- Every interactive component's behavior is built on Base UI (`@base-ui/react`, headless), styled on `--ds-*` tokens — ADR-037, widening the AI-only scope ADR-036 set.
 - Versions live in `package.json` and nowhere else — read them there rather than from a doc that goes stale on the next bump.
 
 ## Import Aliases
@@ -25,7 +25,7 @@ Implementation requirements only. For design rules, load `design-system/guidelin
 **Barrel exports — always import from index:**
 
 ```js
-import { Button, Alert, Modal, Input, Select, Checkbox } from '@/components';
+import { Button, SectionMessage, Modal, TextField, Select, Checkbox } from '@/components';
 import '@/styles/main.scss';
 ```
 
@@ -56,7 +56,7 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 - Each prototype has its own `vite.config.js` with `@` → `../../design-system/src`
 - Register in **Notion Marketplace** with the Deploy Preview / standalone URL — do **not** add numeric SPA routes on `main`
 - Optional local script: `"dev:{project-name}": "vite --config prototypes/{project-name}/vite.config.js"` (branch only)
-- **Production on `main`:** Storybook + the tutor revamp (`/prototypes/tutor-revamp/`). The Vibe app and the Full Demo Walkthrough are on the `archive/legacy-ds` branch; `/home`, `/app` and `/demo` redirect to Storybook
+- **Production on `main`:** Storybook only. The Vibe app and the Full Demo Walkthrough are on the `archive/legacy-ds` branch; `/home`, `/app` and `/demo` redirect to Storybook
 
 **The scaffold writes:**
 
@@ -71,7 +71,7 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 `https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css`.
 That is the host and path that serve FA 7's `all.min.css`; the cdnjs path most
 agents reach for by habit is laid out differently for FA 7 and the icons come up
-blank. Copy the `<link>` from `prototypes/tutor-revamp/index.html` rather than typing
+blank. Copy the `<link>` from `skills/uno-prototype/scripts/scaffold-prototype.sh` rather than typing
 it. Icons themselves are FA Free — `fa-solid`, `fa-regular`, `fa-brands`
 (AGENTS.md § Hard rules 3).
 
@@ -89,10 +89,10 @@ prototypes/{project-name}/
 
 When mirroring existing code: nearest `*.stories.jsx` → `prototypes/**`.
 
-## Bootstrap & Providers
+## Styles & Providers
 
-- Use PLUS components first — not raw Bootstrap markup for DS surfaces. An interactive PLUS component's behavior comes from Base UI, not Bootstrap (ADR-037); Bootstrap markup covers non-interactive layout.
-- Load `main.scss` for token variables
+- Use PLUS components first. An interactive PLUS component's behavior comes from Base UI (ADR-037); layout is PLUS components and `--ds-*` tokens.
+- Load `main.scss` for token variables and the element baseline (`_base.scss`)
 - Prototype Vite configs must set `@` alias or imports fail
 
 ## Token Workflow
@@ -375,21 +375,17 @@ Two kinds of failure, two mechanisms:
 **Which components carry `play` blocks, and why not all of them.** A `play`
 block costs runtime on every PR, so the set is chosen rather than grown: a
 component earns one when its behavior *is* the product and its usage is high
-enough that a break is expensive. Usage is #166's measurement, recorded in
-`design-system/guidelines/components/overview.md`: files under the Specs code
+enough that a break is expensive. Usage is #166's measurement: files under the Specs code
 and `prototypes/` that imported a component and rendered it, measured before the
 Specs code left `main`. Ranked that way, #209 took `Modal` (33 files), `Select` (24),
 `Pagination` (13) and `Tabs` (11) — the four highest-usage components that
 are pure state machines and had no interaction cover.
 
-The absences are as deliberate as the set. `Button` (138) and `Alert` (11) are
-behavioral and already have unit tests beside their source, so a second
-assertion in a browser buys nothing. `Badge` (62) does one thing, dismiss, and
-`SelectCommit` exercises it where it actually matters. `Dropdown` (21) and
-`Switch` (7) are covered by `DeclaredApi` (#207). `Table` (19), `ButtonGroup`
-(17) and `Card` (14) render and do not act. Below that the ranking falls away
-fast — `Accordion` is 2 files and `TagInput` is 0, so behavior alone does not
-earn a slot. Adding to the set is fine; adding without a usage number and a
+The absences are as deliberate as the set. `Button` has unit tests beside its
+source, so a second assertion in a browser buys nothing; `DropdownMenu` and
+`Toggle` are covered by `DeclaredApi` (#207); `Table` and `ButtonGroup` render
+and do not act. Below the top of the ranking usage falls away fast, so behavior
+alone does not earn a slot. Adding to the set is fine; adding without a usage number and a
 sentence saying what breaks is how a four-minute gate becomes a ten-minute one.
 
 Fixing the inherited violations is tracked separately at #153 — the ratchet
@@ -432,7 +428,6 @@ Tests: `npm run test:scripts`.
 
 ```bash
 npm run storybook          # http://127.0.0.1:4200
-npm run dev:tutor-revamp   # the tutor revamp prototype
 ```
 
 ## File Naming

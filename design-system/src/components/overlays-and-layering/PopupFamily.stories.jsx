@@ -13,7 +13,7 @@ import Tooltip from './Tooltip/Tooltip';
  * Menu family's own tokens rather than this page's older Popover numbers.
  *
  * Floating layers behave the same everywhere, and these stories hold them to
- * the Popups pattern page: popups 320 · 400 · 480 padded 16,
+ * the Popups pattern page: popups auto 160 to 320 or a column step, padded 16,
  * tooltips 4 · 8 up to 240, flags 400 wide stacking 16 apart bottom-left, and
  * every one of them at least 8 from the screen edge, 4 from its trigger.
  *
@@ -56,7 +56,7 @@ function useOpenAfterMount() {
 // Popup
 // ---------------------------------------------------------------------------
 
-const popupIds = { sm: 'pf-popup-sm', md: 'pf-popup-md', lg: 'pf-popup-lg' };
+const popupIds = { auto: 'pf-popup-auto', '3-col': 'pf-popup-3-col', '4-col': 'pf-popup-4-col' };
 
 export const PopupWidths = () => {
     const open = useOpenAfterMount();
@@ -82,30 +82,35 @@ export const PopupWidths = () => {
 
 PopupWidths.play = async ({ canvasElement }) => {
     const doc = documentOf(canvasElement);
-    const expected = { sm: 320, md: 400, lg: 480 };
+    const widths = {};
     for (const [width, id] of Object.entries(popupIds)) {
         const popup = await waitFor(() => {
             const node = doc.getElementById(id);
             if (!node) throw new Error(`${id} not open`);
             return node;
         });
-        await expect(popup.getBoundingClientRect().width).toBe(expected[width]);
+        widths[width] = popup.getBoundingClientRect().width;
         const style = getComputedStyle(popup);
         await expect(px(style.paddingTop)).toBe(16);
         await expect(px(style.paddingLeft)).toBe(16);
         await expect(px(style.borderTopLeftRadius)).toBe(12);
     }
 
+    // Auto hugs one list inside 160 to 320; a column step is wider by a column.
+    await expect(widths.auto).toBeGreaterThanOrEqual(160);
+    await expect(widths.auto).toBeLessThanOrEqual(320);
+    await expect(widths['4-col']).toBeGreaterThan(widths['3-col']);
+
     // One surface: the title is heading.xsmall 14/20 on the popup's own fill,
     // not a dark header bar.
-    const popup = doc.getElementById(popupIds.sm);
+    const popup = doc.getElementById(popupIds.auto);
     const title = within(popup).getByText('Session notes');
     await expect(getComputedStyle(title).fontSize).toBe('14px');
     await expect(getComputedStyle(title).lineHeight).toBe('20px');
     await expect(getComputedStyle(title).backgroundColor).toBe('rgba(0, 0, 0, 0)');
 
     // 4 from its trigger.
-    const trigger = within(canvasElement).getByRole('button', { name: 'Popup sm' });
+    const trigger = within(canvasElement).getByRole('button', { name: 'Popup auto' });
     await waitFor(() => expect(
         Math.round(popup.getBoundingClientRect().top - trigger.getBoundingClientRect().bottom),
     ).toBe(4));
@@ -163,7 +168,7 @@ export const PopupKeepsOffTheScreenEdge = () => {
         <div style={{ position: 'fixed', top: '16px', left: 0 }}>
             <Popup
                 id="pf-popup-edge"
-                width="lg"
+                width="4-col"
                 triggerType="manual"
                 show={open}
                 placement="bottom"
