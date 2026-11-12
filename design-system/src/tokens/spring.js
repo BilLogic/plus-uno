@@ -87,3 +87,10 @@ export function linearEasing(points) {
 
 /** The sine half cycle, 0 to 1, that a loop alternates over. */
 export const sineEasing = () => sampleLinear((x) => (1 - Math.cos(Math.PI * x)) / 2);
+
+/**
+ * Figma's `bounce` (0..1) for a damping ratio: 0 at critical damping and above,
+ * rising as the spring gets springier. Figma's own conversion gives 0.0000561
+ * for stiffness 440 at ratio 1 (zero within rounding) and 0.4 for ratio 0.6.
+ */
+export const figmaBounce = (ratio) => Math.max(0, 1 - ratio);
