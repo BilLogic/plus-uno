@@ -74,7 +74,7 @@ export const Inline = {
 
 /**
  * A confirm Modal may open over a Panel, a Popup or a focused task, and brings
- * its own Backdrop: a second Backdrop later in the page that covers the first.
+ * its own Backdrop: the Panel floats with none, so the confirm's is the only one.
  * A confirm is sm. A Modal never opens on another Modal.
  */
 export const ConfirmOverPanel = {
@@ -94,7 +94,7 @@ export const ConfirmOverPanel = {
         const { left, top, width, height } = confirm.getBoundingClientRect();
         const hit = document.elementFromPoint(left + width / 2, top + height / 2);
         await expect(confirm.contains(hit), 'the confirm is on top').toBe(true);
-        await expect(canvasElement.querySelectorAll('.plus-pattern-backdrop').length, 'the confirm brings its own Backdrop').toBe(2);
+        await expect(canvasElement.querySelectorAll('.plus-pattern-backdrop').length, 'only the confirm has a Backdrop: the Panel floats without one').toBe(1);
     },
 };
 
@@ -166,6 +166,8 @@ export const Pads = {
         await expect(top.getBoundingClientRect().height, 'the shaded band is the pad').toBeCloseTo(tokenLength(canvasElement, '--blanket-pad-y'), 0);
     },
 };
+
+const SCREEN_GRID = { width: 1024, height: 520 };
 
 /** The screen grid the modal widths come from: 12 columns, centered and capped at 1232. */
 export const ScreenGrid = {
