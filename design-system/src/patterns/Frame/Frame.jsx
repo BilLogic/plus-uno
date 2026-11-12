@@ -7,7 +7,6 @@ import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
 import { SplitContext } from './SplitContext';
 import PanelSplitter from './PanelSplitter';
-import Backdrop from '../Backdrop';
 import { useOwnWidth } from './useOwnWidth';
 import { FRAME_LAYOUT, clamp, dockedPanelMax, resolveFrameLayout } from './frameLayout';
 import './Frame.scss';
@@ -76,11 +75,11 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  * - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks
  *   it beside the Page at a hairline when the content keeps 720, collapsing a
  *   default Sidebar first (and restoring it when the Panel closes); otherwise
- *   it opens over the Page on a Backdrop that covers the Page and the Sidebar,
+ *   it floats over the Page on the overlay fill and shadow, with no Backdrop,
  *   and a press outside or Escape closes it. Under 1024 it is an overlay
  *   capped at 320, and only one overlay is open at a time; under 768 it is
  *   full width. As an overlay the Panel is modal: focus moves into it and
- *   stays there, the Page and the Sidebar under the Backdrop are inert, and
+ *   stays there, the Page and the Sidebar under it are inert, and
  *   closing it hands focus back to what opened it. Docked or peeking it is not
  *   modal and leaves focus where it is. Its open state, dismissal and focus
  *   run on Base UI's `Dialog`, portaled into the Frame's row so a dock or
@@ -186,7 +185,7 @@ const Frame = ({
 
     const narrow = frameWidth < FRAME_LAYOUT.dockMin;
     const panelState = layout.panel;
-    const panelOverlay = layout.backdrop;
+    const panelOverlay = layout.panel === 'overlay';
 
     const docked = hasSidebar && layout.sidebar === 'docked';
     const peeking = hasSidebar && layout.sidebar === 'peeking';
@@ -217,7 +216,7 @@ const Frame = ({
 
     const peekSidebar = useCallback(() => {
         cancelLeave();
-        // Under an open modal the Sidebar stays put, and under an overlay Panel's Backdrop too.
+        // Under an open modal the Sidebar stays put, and under an overlay Panel too.
         if (openOverlayCount() > 0 || panelStateRef.current === 'overlay') return;
         setPeek(true);
     }, [cancelLeave]);
@@ -585,8 +584,6 @@ const Frame = ({
                 ) : null}
                 {raised ? sidebarPanel(true) : null}
 
-                {/* Covers the Page and the Sidebar. A press on it closes the Panel. */}
-                {panelShown && layout.backdrop ? <Backdrop contained className="plus-frame__backdrop" aria-hidden="true" /> : null}
                 {hasPanel && panelPeek && !panelOpen && !panelPeekShown ? (
                     <div className="plus-frame__panel-edge" aria-hidden="true" onPointerEnter={peekPanel} />
                 ) : null}
