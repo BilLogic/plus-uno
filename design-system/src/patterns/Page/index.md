@@ -51,7 +51,7 @@ Don't: Sections standing in for the page title: two page-title-sized headings an
 
 **Checked:** Review
 
-When it shows and what it holds: the Navigation pattern, listed in Patterns.
+When it shows and what it holds: the Navigation pattern.
 
 Do: An area page: the title alone.
 Don't: A breadcrumb on a top-level area page, repeating the Sidebar's place.
@@ -93,7 +93,7 @@ The breadcrumb with the title at its end, then the page actions; page tabs stick
 
 **Checked:** Review
 
-Which tier a message belongs to: the Notifications pattern, listed in Patterns.
+Which tier a message belongs to: the Notifications pattern.
 
 ## Accessibility
 

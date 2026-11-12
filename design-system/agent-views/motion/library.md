@@ -74,6 +74,18 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Indicators | pattern | progress | Update a value or state | `--ds-motion-linear` |
 | Loading | pattern | load | Load content | `--ds-motion-linear` · `--ds-motion-appearance-fast` |
 | Loading | pattern | action | Update a value or state | `--ds-motion-appearance-fast` |
+| Navigation | pattern | area | Go to another area | `--ds-motion-spatial-fast` · `--ds-motion-appearance-default` |
+| Navigation | pattern | open-item | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
+| Navigation | pattern | view | Switch views | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
+| Navigation | pattern | swap | Swap content in place | `--ds-motion-appearance-fast` |
+| Navigation | pattern | drill | Drill into and climb back out | `--ds-motion-spatial-default` |
+| Navigation | pattern | climb | Drill into and climb back out | `--ds-motion-spatial-fast` |
+| Notifications | pattern | flag-enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |
+| Notifications | pattern | flag-timeout | Open and close an overlay | `--ds-motion-spatial-exit` |
+| Notifications | pattern | flag-dismiss | Open and close an overlay | `--ds-motion-appearance-fast` |
+| Notifications | pattern | stack | Add or remove an item | `--ds-motion-spatial-default` |
+| Notifications | pattern | message | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
+| Notifications | pattern | banner | Add or remove an item | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` |
 | Overflow | pattern | fold-open | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
 | Overflow | pattern | fold-close | Open and close an overlay | `--ds-motion-spatial-exit` |
 | Overflow | pattern | truncate | Update a value or state | `--ds-motion-appearance-fast` |
