@@ -38,7 +38,7 @@ const ROLES = {
   sidebarSelected: ['--ds-background-selected', 'patterns/Sidebar/Sidebar.scss'],
   sidebarIcon: ['--ds-icon-subtle', 'patterns/Sidebar/Sidebar.scss'],
   // Section and Card
-  // Only the `fill="subtle"` variant has a surface; the default Section draws none.
+  // Only the subtle variant has a surface; the default Section draws none.
   sectionSubtleSurface: ['--ds-surface-sunken', 'patterns/PatternSection/PatternSection.scss'],
   cardSurface: ['--ds-surface-raised', 'patterns/PatternCard/PatternCard.scss'],
   cardShadow: ['--ds-shadow-raised', 'patterns/PatternCard/PatternCard.scss'],

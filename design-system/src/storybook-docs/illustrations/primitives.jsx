@@ -203,11 +203,10 @@ export const PageHeader = ({ x, y, w, accent = false }) => (
 /**
  * A Section. By default it has no fill, no pad and no box: the real
  * PatternSection draws only its parts, so the drawing is a heading and rows on
- * whatever surface it sits on. `fill="subtle"` is the one variant with a box
+ * whatever surface it sits on. `subtle` is the one variant with a box
  * (the sunken surface, padded and rounded), for a section beside a list.
  */
-export const Section = ({ x, y, w, h, accent = false, rows = 3, fill = 'none' }) => {
-  const subtle = fill === 'subtle';
+export const Section = ({ x, y, w, h, accent = false, rows = 3, subtle = false }) => {
   const pad = subtle ? 8 : 0;
   return (
     <g data-part="section">
