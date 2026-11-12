@@ -68,7 +68,7 @@ const spatialShape = {
     <>
       <Rule x1={24} x2={136} y1={50} y2={50} />
       <Scaled cx={32 + x} cy={50} s={s}>
-        <Rect x={24 + x} y={42} w={16} h={16} fill={PAINT.accent} corner="sm" />
+        <Rect x={24 + x} y={42} w={16} h={16} fill={PAINT.accent} corner="shape" />
       </Scaled>
     </>
   ),
@@ -119,8 +119,8 @@ const appearanceShape = {
   landing: { o: 1, c: 1 },
   draw: ({ o, c }) => (
     <g opacity={o}>
-      <Rect x={68} y={38} w={24} h={24} fill={PAINT.neutral} corner="sm" />
-      <Rect x={68} y={38} w={24} h={24} fill={PAINT.accent} corner="sm" opacity={c} />
+      <Rect x={68} y={38} w={24} h={24} fill={PAINT.shape} corner="shape" />
+      <Rect x={68} y={38} w={24} h={24} fill={PAINT.accent} corner="shape" opacity={c} />
     </g>
   ),
   play: async (ctx) => {
@@ -163,8 +163,8 @@ const linearShape = {
   draw: ({ p }) => (
     <>
       <Rule x1={24} x2={136} y1={40} y2={40} />
-      <Rect x={24 + 96 * p} y={32} w={16} h={16} fill={PAINT.accent} corner="sm" />
-      <SkeletonBar x={24} y={66} w={112} tone={PAINT.neutral} />
+      <Rect x={24 + 96 * p} y={32} w={16} h={16} fill={PAINT.accent} corner="shape" />
+      <SkeletonBar x={24} y={66} w={112} tone={PAINT.shape} />
       <SkeletonBar x={24} y={66} w={112 * p} accent />
     </>
   ),
@@ -182,7 +182,7 @@ const linearApp = {
     <>
       <Frame x={8} y={6} w={144} h={88} />
       <Section x={16} y={24} w={128} h={44} rows={1} />
-      <SkeletonBar x={24} y={52} w={112} tone={PAINT.neutral} />
+      <SkeletonBar x={24} y={52} w={112} tone={PAINT.shape} />
       <SkeletonBar x={24} y={52} w={112 * p} accent />
       <Row x={16} y={74} w={128} />
     </>
@@ -212,7 +212,7 @@ const plotted = ({ id, title, caption, config, seconds }) => {
       <>
         <Rule x1={24} x2={136} y1={18} y2={18} />
         <Rule x1={130} x2={130} y1={4} y2={32} stroke={MOTION_PAINT.target} dash="3 3" />
-        <Rect x={24 + 100 * x} y={12} w={12} h={12} fill={PAINT.accent} corner="sm" />
+        <Rect x={24 + 100 * x} y={12} w={12} h={12} fill={PAINT.accent} corner="shape" />
         <ChartAxis x={24} y={36} w={112} h={54} />
         <ChartCurve x={24} y={36} w={112} h={54} values={values} upTo={Math.max(0.02, t)} accent />
       </>
@@ -469,9 +469,9 @@ const loopScene = ({ id, title, caption, still }) => ({
       {[0, 1, 2, 3].map((i) => (
         <Row key={i} x={16} y={24 + i * 14} w={74} />
       ))}
-      <Rect x={98} y={18} w={54} h={76} fill={PAINT.raised} corner="none" />
+      <Rect x={98} y={18} w={54} h={76} fill={PAINT.panelSurface} corner="none" />
       <Rule x1={98} x2={98} y1={18} y2={94} />
-      <SkeletonBar x={106} y={26} w={26} h={5} tone={PAINT.ink} />
+      <SkeletonBar x={106} y={26} w={26} h={5} tone={PAINT.placeholderHeading} />
       <g opacity={s.dots}>
         {DOTS.map((i) => (
           <circle key={i} cx={110 + i * 8} cy={46 - s[`d${i}`]} r={2} fill={PAINT.accent} />

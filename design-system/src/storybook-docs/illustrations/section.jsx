@@ -1,7 +1,6 @@
 import React from 'react';
-import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { ButtonShape, Field, Rect, Row, Rule, SkeletonBar } from './primitives.jsx';
+import { ButtonShape, CardBox, Field, Row, SkeletonBar, Tabs } from './primitives.jsx';
 
 /**
  * The Section template's do and don't drawings. Each lesson is about where a
@@ -24,22 +23,16 @@ const Canvas = ({ title, children }) => (
 /** A title row: the title bar and a one-line description under it. */
 const TitleRow = ({ y, accent = false, w = 48 }) => (
   <g>
-    <SkeletonBar x={X} y={y} w={w} h={6} tone={accent ? PAINT.accent : PAINT.ink} />
+    <SkeletonBar x={X} y={y} w={w} h={6} accent={accent} heading />
     <SkeletonBar x={X} y={y + 10} w={w * 1.5} />
   </g>
 );
 
-/** Pill views: hugging pills at the start of the bar, the first selected. */
-const Pills = ({ x = X, y, count = 2 }) => (
-  <g>
-    {Array.from({ length: count }, (_, i) => (
-      <Rect key={i} x={x + i * 26} y={y} w={22} h={8} fill={i === 0 ? PAINT.neutral : PAINT.sunken} corner="full" />
-    ))}
-  </g>
-);
+/** The view bar: Tabs hugging the start, the first selected. `y` is the bar's top edge. */
+const Pills = ({ x = X, y, count = 2 }) => <Tabs x={x} y={y - 4} w={count * 24} count={count} />;
 
-/** An icon button in a bar: a square strip. */
-const IconStrip = ({ x, y }) => <Rect x={x} y={y} w={8} h={8} fill={PAINT.neutral} corner="xs" />;
+/** An icon button in a bar: a square default button strip. */
+const IconStrip = ({ x, y }) => <ButtonShape x={x} y={y} w={8} />;
 
 /** Table rows under the bar. */
 const Rows = ({ y, count = 3 }) => (
@@ -61,7 +54,7 @@ export const TitleRowAboveViewBar = ({ title = 'A Section with its title row on 
 /** The title pushed into the view bar, fighting the pills for the start. */
 export const TitleInViewBar = ({ title = 'A Section whose title sits inside the view bar, crowding the pills, with no room for a description' }) => (
   <Canvas title={title}>
-    <SkeletonBar x={X} y={10} w={36} h={6} tone={PAINT.accent} />
+    <SkeletonBar x={X} y={10} w={36} h={6} accent heading />
     <Pills x={X + 42} y={9} />
     <ButtonShape x={W - X - 28} y={9} w={28} />
     <Rows y={26} count={4} />
@@ -73,8 +66,8 @@ export const RightSideInOrder = ({ title = 'A view bar whose right side runs for
   <Canvas title={title}>
     <TitleRow y={8} />
     <Pills y={30} />
-    <Rect x={70} y={30} w={20} h={8} fill={PAINT.neutral} corner="xs" />
-    <Rule x1={80} x2={80} y1={30} y2={38} stroke={PAINT.surface} />
+    <ButtonShape x={70} y={30} w={9} />
+    <ButtonShape x={81} y={30} w={9} />
     {[0, 1, 2].map((i) => <IconStrip key={i} x={94 + i * 11} y={30} />)}
     <ButtonShape x={W - X - 26} y={30} w={26} appearance="primary" />
     <Rows y={46} />
@@ -90,7 +83,7 @@ export const RightSideCrowded = ({ title = 'A view bar with six controls in no o
     <IconStrip x={64} y={30} />
     <ButtonShape x={76} y={30} w={24} />
     <IconStrip x={104} y={30} />
-    <Rect x={116} y={30} w={20} h={8} fill={PAINT.neutral} corner="xs" />
+    <ButtonShape x={116} y={30} w={20} />
     <IconStrip x={140} y={30} />
     <Rows y={46} />
   </Canvas>
@@ -100,12 +93,12 @@ export const RightSideCrowded = ({ title = 'A view bar with six controls in no o
 export const CardOwnsSave = ({ title = 'A form card with its own buttons at its bottom, and the Section footer holding only a link to more' }) => (
   <Canvas title={title}>
     <TitleRow y={8} />
-    <Rect x={X} y={28} w={INNER} h={56} fill={PAINT.raised} stroke={PAINT.line} corner="sm" />
+    <CardBox x={X} y={28} w={INNER} h={56} />
     <Field x={X + 8} y={34} w={INNER / 2 - 12} />
     <Field x={X + INNER / 2 + 4} y={34} w={INNER / 2 - 12} />
     <ButtonShape x={X + 8} y={68} w={24} appearance="primary" />
     <ButtonShape x={X + 36} y={68} w={24} />
-    <SkeletonBar x={W - X - 24} y={92} w={24} tone={PAINT.neutral} />
+    <SkeletonBar x={W - X - 24} y={92} w={24} />
   </Canvas>
 );
 
@@ -113,7 +106,7 @@ export const CardOwnsSave = ({ title = 'A form card with its own buttons at its 
 export const FooterCommits = ({ title = 'A form card with no buttons, its Cancel and Save down in the Section footer, away from the fields' }) => (
   <Canvas title={title}>
     <TitleRow y={8} />
-    <Rect x={X} y={28} w={INNER} h={44} fill={PAINT.raised} stroke={PAINT.line} corner="sm" />
+    <CardBox x={X} y={28} w={INNER} h={44} />
     <Field x={X + 8} y={34} w={INNER / 2 - 12} />
     <Field x={X + INNER / 2 + 4} y={34} w={INNER / 2 - 12} />
     <ButtonShape x={W - X - 52} y={88} w={24} />
@@ -124,8 +117,8 @@ export const FooterCommits = ({ title = 'A form card with no buttons, its Cancel
 /** A card with its own title stands on its own in the page. */
 export const CardStandsAlone = ({ title = 'One card with its own title, standing on its own with no Section heading above it' }) => (
   <Canvas title={title}>
-    <Rect x={X} y={16} w={INNER} h={72} fill={PAINT.raised} stroke={PAINT.line} corner="sm" />
-    <SkeletonBar x={X + 8} y={24} w={48} h={6} tone={PAINT.accent} />
+    <CardBox x={X} y={16} w={INNER} h={72} />
+    <SkeletonBar x={X + 8} y={24} w={48} h={6} accent heading />
     <SkeletonBar x={X + 8} y={36} w={INNER * 0.6} />
     <SkeletonBar x={X + 8} y={46} w={INNER * 0.5} />
     <SkeletonBar x={X + 8} y={56} w={INNER * 0.55} />
@@ -135,9 +128,9 @@ export const CardStandsAlone = ({ title = 'One card with its own title, standing
 /** A Section whose heading repeats its only card's title: two headings for one thing. */
 export const SectionRepeatsCard = ({ title = 'A Section heading above one card that repeats the same title, so one thing has two headings' }) => (
   <Canvas title={title}>
-    <SkeletonBar x={X} y={8} w={48} h={6} tone={PAINT.accent} />
-    <Rect x={X} y={22} w={INNER} h={72} fill={PAINT.raised} stroke={PAINT.line} corner="sm" />
-    <SkeletonBar x={X + 8} y={30} w={48} h={6} tone={PAINT.accent} />
+    <SkeletonBar x={X} y={8} w={48} h={6} accent heading />
+    <CardBox x={X} y={22} w={INNER} h={72} />
+    <SkeletonBar x={X + 8} y={30} w={48} h={6} accent heading />
     <SkeletonBar x={X + 8} y={42} w={INNER * 0.6} />
     <SkeletonBar x={X + 8} y={52} w={INNER * 0.5} />
     <SkeletonBar x={X + 8} y={62} w={INNER * 0.55} />

@@ -141,7 +141,7 @@ export const MOTION_SETS = [
     'Trail',
     (a) => (
       <>
-        <Rect x={22} y={44} w={12} h={12} fill={PAINT.neutral} corner="sm" />
+        <Rect x={22} y={44} w={12} h={12} fill={PAINT.shape} corner="shape" />
         <Trail points={[[34, 50], [80, 34], [126, 50]]} accent={a} />
       </>
     ),
@@ -150,7 +150,7 @@ export const MOTION_SETS = [
     'Tap ring',
     (a) => (
       <>
-        <Rect x={54} y={42} w={52} h={16} fill={PAINT.neutral} corner="sm" />
+        <Rect x={54} y={42} w={52} h={16} fill={PAINT.shape} corner="shape" />
         <TapRing x={80} y={50} r={9} accent={a} />
       </>
     ),
