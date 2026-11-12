@@ -34,11 +34,11 @@ const RADIUS = {
   '--radius-control-md': [8, 'var(--radius-050)'],
   '--radius-control-lg': [10, 'var(--radius-0625)'],
   '--section-radius': [16, 'var(--radius-xxl)'],
-  '--modal-radius': [12, 'var(--radius-xl)'], // reads xxl (16) once the template-values ticket lands
+  '--modal-radius': [16, 'var(--radius-xxl)'],
   '--card-radius': [16, 'var(--radius-xxl)'],
   '--card-radius-compact': [12, 'var(--radius-xl)'],
   '--popup-radius': [12, 'var(--radius-xl)'],
-  '--table-radius': [8, 'var(--radius-lg)'],
+  '--table-radius': [12, 'var(--radius-xl)'],
   '--frame-sidebar-row-radius': [6, 'var(--radius-control-sm)'],
 };
 
