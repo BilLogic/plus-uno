@@ -23,7 +23,7 @@ import { Icon } from '@/components';
 <Icon name="circle-check" size={16} color="success" label="Approved" />
 ```
 
-Pass a plain name and set `iconStyle` when a glyph must be solid; never write `fa-solid` or `fa-regular` into the name. Use a glyph's current name: an alias is not in the regular list, so it draws solid. A `fa-brands` name carries its family: `fa-brands fa-figma`.
+Navigation icons are always outlined: a selected row shows a fill, not a filled icon, and brand marks (`fa-brands`) are the only exception. Pass a plain name and set `iconStyle` only when a glyph must be solid outside navigation; never write `fa-solid` or `fa-regular` into the name. Use a glyph's current name: an alias is not in the regular list, so it draws solid. A `fa-brands` name carries its family: `fa-brands fa-figma`.
 
 ## Best practices
 

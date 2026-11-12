@@ -74,6 +74,10 @@ const writeCollapsed = (key, value) => {
  *   icon slot turns into a collapse angle and its trailing slot into Close all.
  *   Exactly one row is selected: a selected tab takes the fill and its row goes
  *   to ink; collapsed, the row takes the fill and shows the tab count.
+ * - **Icons**: every row icon is outlined (Font Awesome Free regular) in the
+ *   one subtle icon color. A selected row shows the fill and the selected icon
+ *   color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only
+ *   exception.
  * - **Account row**: `SidebarAccount`, under a divider.
  *
  * Content is data. The pattern draws what it is given and never changes the
@@ -494,7 +498,7 @@ const itemShape = PropTypes.shape({
     /** Unique id; `activeId`, `onSelect` and `tabs` use it */
     id: PropTypes.string.isRequired,
     text: PropTypes.string.isRequired,
-    /** Font Awesome Free name for the 16 icon (`house`), drawn by Icon; a brand logo carries its family (`fa-brands fa-slack`) */
+    /** Font Awesome Free name for the 16 icon (`house`), drawn by Icon; a brand logo carries its family (`fa-brands fa-slack`); every other icon is outlined, selected or not */
     icon: PropTypes.string,
     /** Makes the row a link */
     href: PropTypes.string,

@@ -187,6 +187,10 @@ The Sidebar's width, 240, belongs to the Frame: see <a href="?path=/docs/pattern
 
 The Sidebar marks one current page. `activeId` takes one id, so exactly one row or tab carries the selected fill and `aria-current="page"`.
 
+### Every icon is outlined.
+
+Rows draw regular-style icons in the one subtle icon color, and a selected row shows its fill with the selected icon color, never a solid icon. A brand mark such as Slack is the only exception: it keeps its brand glyph.
+
 ### The ancestor marks the parent.
 
 A parent of the current page shows it without competing: when one of a row's tabs is selected, the tab takes the fill and the row goes to ink without it.
