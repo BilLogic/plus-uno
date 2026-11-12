@@ -142,6 +142,26 @@ Loading, errors and the search field follow their patterns and components: Loadi
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Used for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--section-stack-sm</code></td><td>Title row to view bar.</td></tr>
+<tr><td><code>--section-stack-md</code></td><td>Header to body; body to footer.</td></tr>
+<tr><td><code>--section-stack-lg</code></td><td>Between subsections.</td></tr>
+<tr><td><code>--section-min-width-main</code>, <code>--section-min-width-side</code></td><td>The main and side columns of a split.</td></tr>
+<tr><td><code>--section-radius</code>, <code>--section-pad-x-default</code>, <code>--section-pad-y-default</code></td><td>A Section with <code>fill="subtle"</code>, on <code>--ds-surface-sunken</code>.</td></tr>
+<tr><td><code>--heading-medium</code>, <code>--heading-small</code></td><td>A Section title and a subsection title.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
 </div>
 
 </DocsTab>
@@ -314,6 +334,24 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 
 <div className="sb-ds-doc-section">
 
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title the Section with what it holds, in sentence case: "Upcoming sessions".</td><td>A title that repeats the only card inside it.</td></tr>
+<tr><td>Keep the description to one line: "Algebra B · 24 students".</td><td>A paragraph under the title.</td></tr>
+<tr><td>Name views by the rows they show: "All students", "Needs follow-up".</td><td>Views of different things in one strip.</td></tr>
+<tr><td>Name the scope in Search: "Search students".</td><td>A bare "Search".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Accessibility
 
 - The title is a heading whose level follows nesting: h2 for a Section, h3 for a subsection. With the view bar alone the title stays in the page, hidden from sight.
@@ -333,44 +371,6 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 - <a target="_top" href="./?path=/docs/templates-popup-popup--docs">Popup</a>: use when choosing the menu the view Select or the Filter icon opens.
 - <a target="_top" href="./?path=/docs/templates-section-table--docs">Table</a>: use when the body is rows and columns.
 - <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when picking a filter tier (Filtering), the search field's behavior (Search) or an empty body (Empty).
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsTable>
-<thead>
-<tr><th>Token</th><th>Used for</th></tr>
-</thead>
-<tbody>
-<tr><td><code>--section-stack-sm</code></td><td>Title row to view bar.</td></tr>
-<tr><td><code>--section-stack-md</code></td><td>Header to body; body to footer.</td></tr>
-<tr><td><code>--section-stack-lg</code></td><td>Between subsections.</td></tr>
-<tr><td><code>--section-min-width-main</code>, <code>--section-min-width-side</code></td><td>The main and side columns of a split.</td></tr>
-<tr><td><code>--section-radius</code>, <code>--section-pad-x-default</code>, <code>--section-pad-y-default</code></td><td>A Section with <code>fill="subtle"</code>, on <code>--ds-surface-sunken</code>.</td></tr>
-<tr><td><code>--heading-medium</code>, <code>--heading-small</code></td><td>A Section title and a subsection title.</td></tr>
-</tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content guidelines
-
-<DocsTable>
-<thead>
-<tr><th>Do</th><th>Don't</th></tr>
-</thead>
-<tbody>
-<tr><td>Title the Section with what it holds, in sentence case: "Upcoming sessions".</td><td>A title that repeats the only card inside it.</td></tr>
-<tr><td>Keep the description to one line: "Algebra B · 24 students".</td><td>A paragraph under the title.</td></tr>
-<tr><td>Name views by the rows they show: "All students", "Needs follow-up".</td><td>Views of different things in one strip.</td></tr>
-<tr><td>Name the scope in Search: "Search students".</td><td>A bare "Search".</td></tr>
-</tbody>
-</DocsTable>
 
 </div>
 
