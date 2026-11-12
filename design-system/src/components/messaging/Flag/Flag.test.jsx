@@ -1,4 +1,5 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { useState } from 'react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Flag, FlagGroup, FLAG_AUTO_CLOSE_MS, FLAG_APPEARANCES } from './Flag';
 
@@ -146,5 +147,41 @@ describe('FlagGroup', () => {
     it('takes a logical position as given', () => {
         render(<FlagGroup data-testid="flags" position="top-end"><span>flag</span></FlagGroup>);
         expect(screen.getByTestId('flags')).toHaveAttribute('data-position', 'top-end');
+    });
+});
+
+describe('Flag exit', () => {
+    afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
+
+    const Controlled = ({ delay }) => {
+        const [shown, setShown] = useState(true);
+        return <Flag title="Saved" show={shown} delay={delay} onDismiss={() => setShown(false)}>Done.</Flag>;
+    };
+    const flagEl = () => screen.getByText('Saved').closest('.plus-flag');
+
+    it('flies out when it times out, then is gone', async () => {
+        vi.useFakeTimers({ shouldAdvanceTime: true });
+        render(<Controlled delay={1000} />);
+        act(() => { vi.advanceTimersByTime(1000); });
+        expect(flagEl()).toHaveAttribute('data-leaving', 'timeout');
+        fireEvent.animationEnd(flagEl());
+        await waitFor(() => expect(screen.queryByText('Saved')).toBeNull());
+    });
+
+    it('fades in place when closed by hand, then is gone', async () => {
+        render(<Controlled />);
+        fireEvent.click(screen.getByRole('button', { name: 'Dismiss flag' }));
+        expect(flagEl()).toHaveAttribute('data-leaving', 'hand');
+        fireEvent.animationEnd(flagEl());
+        await waitFor(() => expect(screen.queryByText('Saved')).toBeNull());
+    });
+
+    it('under reduced motion it is still there right after the trigger, then gone after the fade', async () => {
+        vi.stubGlobal('matchMedia', (query) => ({ matches: query.includes('reduce'), addEventListener() {}, removeEventListener() {} }));
+        render(<Controlled />);
+        fireEvent.click(screen.getByRole('button', { name: 'Dismiss flag' }));
+        expect(screen.getByText('Saved')).toBeInTheDocument();
+        fireEvent.animationEnd(flagEl());
+        await waitFor(() => expect(screen.queryByText('Saved')).toBeNull());
     });
 });

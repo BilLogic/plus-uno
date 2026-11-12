@@ -11,6 +11,14 @@
 @use '../../../styles/icon-glyph' as *;
 @use '../../../styles/state' as *;
 
+@keyframes plus-flag-fade {
+    to { opacity: 0; }
+}
+
+@keyframes plus-flag-exit {
+    to { transform: translate(calc(100% + var(--popover-gap-screen)), calc(-100% - var(--popover-gap-screen))); }
+}
+
 .plus-flag {
     display: flex;
     align-items: flex-start;
@@ -22,6 +30,27 @@
     background-color: var(--ds-surface-overlay);
     border-radius: var(--popover-radius);
     box-shadow: var(--ds-shadow-overlay);
+
+    // Leaves the way it came, toward the top-right corner, on `spatial.exit`.
+    &[data-leaving] {
+        pointer-events: none;
+    }
+
+    &[data-leaving='timeout'] {
+        animation: plus-flag-exit var(--ds-motion-spatial-exit-duration) var(--ds-motion-spatial-exit) forwards;
+    }
+
+    // Closed by hand: a quick fade in place.
+    &[data-leaving='hand'] {
+        animation: plus-flag-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+    }
+
+    // Reduced motion: never a cut, never a move. Both exits are the quick fade.
+    @media (prefers-reduced-motion: reduce) {
+        &[data-leaving] {
+            animation: plus-flag-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+        }
+    }
 
     // --- ICON: 16, in a box one title line tall ---
     .plus-flag-icon {
