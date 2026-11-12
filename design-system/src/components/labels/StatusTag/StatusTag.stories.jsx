@@ -228,13 +228,6 @@ export const IconBefore = () => (
         <StatusTag appearance="success" iconBefore="circle-check" data-testid="default">Completed</StatusTag>
         <StatusTag appearance="warning" iconBefore="triangle-exclamation" data-testid="warning">Needs review</StatusTag>
         <StatusTag appearance="success" spacing="spacious" iconBefore="circle-check" data-testid="spacious">Completed</StatusTag>
-        <StatusTag
-            appearance="info"
-            iconBefore={<svg width="12" height="12" data-testid="node-visual"><circle cx="6" cy="6" r="6" fill="currentColor" /></svg>}
-            data-testid="node"
-        >
-            Syncing
-        </StatusTag>
     </div>
 );
 IconBefore.play = async ({ canvasElement }) => {
@@ -252,10 +245,6 @@ IconBefore.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(iconIn(canvas.getByTestId('warning')), '::before').content)
         .toBe(glyphOf(canvasElement, 'fa-triangle-exclamation'));
 
-    // A node visual is hidden too: the wrapper, not the caller, owns that.
-    const node = canvas.getByTestId('node-visual');
-    await expect(node.closest('[aria-hidden="true"]'), 'a node visual is hidden from assistive technology').not.toBeNull();
-    await expect(canvas.getByTestId('node')).toHaveTextContent('Syncing');
 };
 
 /**

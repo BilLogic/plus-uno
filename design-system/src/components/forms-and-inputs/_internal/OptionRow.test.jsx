@@ -51,7 +51,7 @@ describe('OptionRow', () => {
         expect(screen.getByRole('option', { name: /Maria Lopez/ })).toHaveTextContent('Grade 7 · Brookfield');
     });
 
-    it('holds up to four leading items and one trailing item', () => {
+    it('holds up to four leading items and one after item', () => {
         render(
             <OptionRow
                 label="Linear equations"
@@ -60,7 +60,7 @@ describe('OptionRow', () => {
                     <OptionRow.Toggle key="toggle" state="collapsed" />,
                     <OptionRow.Checkbox key="check" checked={false} indeterminate />,
                 ]}
-                trailing={<span data-testid="count">12</span>}
+                elemAfter={<span data-testid="count">12</span>}
             />
         );
         const row = screen.getByRole('option');
@@ -68,7 +68,7 @@ describe('OptionRow', () => {
         expect(leading.children).toHaveLength(3);
         expect(leading.querySelector('.plus-option-row-indent')).toHaveStyle({ '--plus-option-row-level': '2' });
         expect(leading.querySelector('.plus-option-row-check')).toHaveClass('is-indeterminate');
-        expect(row.querySelector('.plus-option-row-trailing')).toContainElement(screen.getByTestId('count'));
+        expect(row.querySelector('.plus-option-row-elem-after')).toContainElement(screen.getByTestId('count'));
     });
 
     it('warns when more than four leading items are passed', () => {

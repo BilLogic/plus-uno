@@ -36,11 +36,6 @@ const warn = (message) => {
     }
 };
 
-/** A string is a Font Awesome Free icon name, as Button takes it; anything else renders as given. */
-const renderVisual = (visual) => (typeof visual === 'string'
-    ? <Icon name={visual} />
-    : visual);
-
 /** A filled label for the condition something is in, such as "Needs review" or "Overdue". It is never a button; its appearance carries the meaning. */
 export const StatusTag = ({
     children,
@@ -80,20 +75,12 @@ export const StatusTag = ({
         effectiveSpacing = 'default';
     }
 
-    const visual = iconBefore;
     const wantsMetric = trailingMetric !== undefined && trailingMetric !== null && formatCount(trailingMetric) !== null;
     let metricAppearance = effectiveAppearance;
     if (trailingMetricAppearance !== undefined) {
         if (COUNT_TAG_APPEARANCES.includes(trailingMetricAppearance)) metricAppearance = trailingMetricAppearance;
         else warn(`trailingMetricAppearance="${trailingMetricAppearance}" is not one of ${COUNT_TAG_APPEARANCES.join(', ')}; it follows appearance.`);
     }
-
-    /*
-     * A node visual is a new object every render; keying the measurement on it
-     * would rebuild the ResizeObserver each time. Its presence is what changes
-     * the label's width.
-     */
-    const visualKey = typeof visual === 'string' ? visual : Boolean(visual);
 
     const classes = [
         'plus-status',
@@ -115,7 +102,7 @@ export const StatusTag = ({
     return (
         <ClippedTooltip
             text={children}
-            deps={[effectiveSpacing, maxWidth, visualKey, wantsMetric]}
+            deps={[effectiveSpacing, maxWidth, iconBefore, wantsMetric]}
         >
             {({ measureRef, truncated }) => (
                 <span
@@ -126,8 +113,8 @@ export const StatusTag = ({
                     tabIndex={truncated ? 0 : undefined}
                 >
                     <span className="plus-status__content">
-                        {visual && (
-                            <span className="plus-status__visual" aria-hidden="true">{renderVisual(visual)}</span>
+                        {iconBefore && (
+                            <span className="plus-status__visual" aria-hidden="true"><Icon name={iconBefore} /></span>
                         )}
                         <span
                             ref={measureRef}
@@ -156,8 +143,8 @@ StatusTag.propTypes = {
     appearance: PropTypes.oneOf(STATUS_TAG_APPEARANCES),
     /** `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. */
     spacing: PropTypes.oneOf(STATUS_TAG_SPACINGS),
-    /** One icon before the label: a Font Awesome Free name (`circle-check`) or a node. */
-    iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    /** One icon before the label: a Font Awesome Free name (`circle-check`). */
+    iconBefore: PropTypes.string,
     /** A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** The Count tag's appearance. Defaults to the Status tag's own. */

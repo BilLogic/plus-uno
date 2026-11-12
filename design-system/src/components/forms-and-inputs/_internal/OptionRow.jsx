@@ -148,7 +148,7 @@ const OptionRow = ({
     dragging = false,
     dropIndicator,
     elemBefore,
-    trailing,
+    elemAfter,
     tabbable,
     role,
     spacing = 'default',
@@ -265,9 +265,9 @@ const OptionRow = ({
                 </Tooltip>
                 {description && <span className="plus-option-row-description">{description}</span>}
             </span>
-            {(trailing || (kind === 'option' && selected && check)) && (
-                <span className="plus-option-row-trailing">
-                    {trailing}
+            {(elemAfter || (kind === 'option' && selected && check)) && (
+                <span className="plus-option-row-elem-after">
+                    {elemAfter}
                     {kind === 'option' && selected && check && (
                         <Icon name="check" className="plus-option-row-selected-mark" />
                     )}
@@ -304,7 +304,7 @@ OptionRow.propTypes = {
     /** Up to 4 items: `OptionRow.Indent`, `.Toggle`, `.Checkbox`, `.Radio`, an icon, an avatar or a drag handle. */
     elemBefore: PropTypes.node,
     /** One item: a Count, a "…" menu, or `OptionRow.Chevron`. */
-    trailing: PropTypes.node,
+    elemAfter: PropTypes.node,
     /** Roving tab stop: true on the row at the cursor, false on the rest. Unset under `aria-activedescendant`. */
     tabbable: PropTypes.bool,
     /** `option` by default; `treeitem` inside a tree. */
