@@ -459,11 +459,11 @@ _Avoid_: "save sound"
 _Avoid_: "send whoosh"
 
 **Done step**:
-`sound.done.step`, C5 E5 G5: a step, lesson or reflection finished. The Expressive Finish plays it.
+`sound.done.step`, C5 E5 G5: a step, lesson or reflection finished. An Expressive finish plays it.
 _Avoid_: "success sound"
 
 **Done milestone**:
-`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a term start or end. The Expressive Milestone plays it.
+`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a term start or end. An Expressive milestone plays it.
 _Avoid_: "fanfare", "celebration sound"
 
 **Concern sound**:

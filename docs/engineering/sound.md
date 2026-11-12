@@ -7,7 +7,7 @@ summary: How code adds a sound — a cell on the motion registry, played through
 
 <!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · applied by every agent adding or changing a sound · decision trail: ADR-043. -->
 
-Sound is the fifteenth foundation, built on the motion registry. Read Foundations · Sound first (`design-system/src/styles/SoundOverview.mdx`, then `SoundWhenToPlay.mdx`); this page is the code half.
+Sound is the fifteenth foundation, built on the motion registry. Read Foundations · Sound first (the AGENTS.md loading row names it); this page is the code half.
 
 ## Add a sound to a moment
 

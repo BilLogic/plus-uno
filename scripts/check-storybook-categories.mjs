@@ -43,7 +43,7 @@
  *      Foundations > Motion, Library among them: a page titled
  *      `Foundations/Motion/<name>` is listed, and a listed name has a page.
  *      This is where the first-pass "Durations and easings" page was caught.
- *      Foundations · Sound follows the same rule, without a required page.
+ *      Foundations · Sound follows the same rule, with no required Library page.
  *
  * An AI component (Icon, Prompt input) is listed in the taxonomy's
  * `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays
