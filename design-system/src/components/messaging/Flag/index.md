@@ -10,7 +10,7 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused, LandsWithNotify
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
@@ -188,6 +188,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | `bodyClass` | string | `''` | Extra class on the description container. |
 | `timestamp` | node | — | Small text beside the title, such as "11 mins ago". |
 | `sound` | bool | `true` | Plays Notify as the flag lands, through the app's sound setting. Defaults to true; the app passes false when a flag should stay quiet, such as during a session or for all but the first of several that arrive together. |
+| `reducedMotion` | bool | — | Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting. |
 
 ## Variants
 

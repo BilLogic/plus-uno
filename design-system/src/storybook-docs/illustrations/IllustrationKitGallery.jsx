@@ -2,7 +2,7 @@ import React from 'react';
 import { Illustration, IllustrationFigure } from './Illustration.jsx';
 import {
   AnatomyMarker, Backdrop, Breadcrumb, ButtonShape, Card, CountTag, Field, Flag, Frame, Modal, Page, PageHeader, Panel, Popup,
-  ProgressTracker, Row, Screen, Section, Sidebar, Tabs, Tooltip,
+  ProgressTracker, Row, Screen, Section, Sidebar, StickyHeader, Tabs, Tooltip,
 } from './primitives.jsx';
 import { MOTION_SETS } from './primitives-motion.jsx';
 
@@ -23,6 +23,7 @@ const SETS = [
     : <><ButtonShape x={38} y={46} w={40} /><ButtonShape x={82} y={46} w={40} /></>)],
   ['Popup', (a) => (<><ButtonShape x={20} y={18} w={40} /><Popup x={20} y={34} w={80} h={48} accent={a} /></>)],
   ['Tooltip', (a) => (<><Tooltip x={20} y={14} w={72} accent={a} /><ButtonShape x={20} y={34} w={40} /></>)],
+  ['Sticky header (overflow)', (a) => <StickyHeader x={20} y={14} w={120} accent={a} />],
   ['Panel', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Panel x={96} y={20} w={54} h={72} accent={a} /></>)],
   ['Modal and backdrop', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Backdrop x={10} y={20} w={140} h={72} /><Modal x={34} y={32} w={92} h={52} accent={a} /></>)],
   ['Page', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Page x={14} y={22} w={132} h={68} header accent={a}><Section x={22} y={52} w={116} h={32} rows={1} /></Page></>)],

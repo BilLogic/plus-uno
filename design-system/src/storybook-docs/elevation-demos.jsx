@@ -6,7 +6,7 @@ import { C } from '@/storybook-docs/foundation-blocks.jsx';
 import { settleMsOf, springBack } from '@/lib/damping';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
-import { Backdrop, Card, Frame as FrameShape, Modal as ModalShape, Page as PageShape, PageHeader, Popup as PopupShape, Sidebar as SidebarShape, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
+import { Backdrop, Card, Frame as FrameShape, Modal as ModalShape, Page as PageShape, PageHeader, Popup as PopupShape, Sidebar as SidebarShape, SkeletonBar, Tooltip as TooltipShape } from '@/storybook-docs/illustrations/primitives.jsx';
 import { composeShadow, groundDarkness, ink, parseShadow, shadowReach, slotted } from '@/storybook-docs/lib/shadow-anatomy';
 
 /**
@@ -215,8 +215,7 @@ const STAGE = { w: 320, h: 200 };
  * The plates of the stack, bottom to top, each drawn from the illustration kit
  * with no words: the lesson holds without them, so the names and the
  * `--layer-*` values sit in the numbered legend. `at` is where the plate's
- * number pins, in stage units. The kit has no Tooltip shape yet, so the
- * Tooltip's layer is in the Layering list below and not drawn here.
+ * number pins, in stage units.
  */
 const PLATES = [
     {
@@ -237,6 +236,7 @@ const PLATES = [
     { id: 'popup', title: 'Popup', level: 'overlay', layer: '--layer-popup', at: [196, 92], draw: <PopupShape x={196} y={92} w={96} h={50} /> },
     { id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-blanket', at: [0, 0], draw: <Backdrop x={0} y={0} w={STAGE.w} h={STAGE.h} /> },
     { id: 'modal', title: 'Modal', level: 'blocking', layer: '--layer-modal', at: [90, 46], draw: <ModalShape x={90} y={46} w={140} h={104} accent /> },
+    { id: 'tooltip', title: 'Tooltip', level: null, layer: '--layer-tooltip', at: [236, 126], draw: <TooltipShape x={236} y={126} w={56} /> },
 ];
 
 const badge = {
@@ -252,7 +252,7 @@ const badge = {
 
 /**
  * One screen taken apart into its layers: the Frame, the Page, a Card, a
- * Popup, the Backdrop and the Modal. Collapsed it is the screen; exploded each
+ * Popup, the Backdrop, the Modal and a Tooltip. Collapsed it is the screen; exploded each
  * plate lifts by its place in the stack, on `--ds-motion-appearance-slow`.
  */
 export const ExplodedStack = () => {
@@ -310,7 +310,7 @@ export const ExplodedStack = () => {
                             <span aria-hidden="true" style={badge}>{i + 1}</span>
                             <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
                                 <strong>{plate.title}</strong>
-                                <span style={{ color: 'var(--ds-text-subtle)' }}>{levelOf(plate.level).name.toLowerCase()}</span>
+                                <span style={{ color: 'var(--ds-text-subtle)' }}>{plate.level ? levelOf(plate.level).name.toLowerCase() : 'label, no shadow'}</span>
                                 <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : 'no layer'}</code>
                             </span>
                         </li>

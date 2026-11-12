@@ -1,0 +1,210 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+import * as SearchStories from './Search.stories.jsx';
+import { SCOPE } from './searchDemo.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import { Button, TextField } from '@/components';
+
+<Meta title="Patterns/Finding things/Search" tags={['!dev', 'manifest']} />
+
+<Title>Search</Title>
+One kind of search: narrowing as you type inside one Section. There is no global search and no results page. The field lives in the view bar, names its scope, and the count updates in words.
+
+<DocsTabs of={SearchStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## The states
+
+Four, in order. The <a target="_top" href="./?path=/docs/components-forms-and-inputs-text-field--docs">Text field</a> and <a target="_top" href="./?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a> pages hold their own states; these are the search field's. A Search component is Planned <PlannedTag />; today each picture composes the real Icon button, Text field and Dynamic table.
+
+<ComponentExample of={SearchStories.Closed} title="Closed" description="The Search icon button in the view bar, before the filters, with a Tooltip." />
+
+<ComponentExample of={SearchStories.Open} title="Open" description={`The icon is replaced by a field whose placeholder names the scope: "${SCOPE}". The animated grow is Planned.`} />
+
+<ComponentExample of={SearchStories.Narrowing} title="Narrowing" description={'Rows filter as you type; the count updates in words; "Clear search" appears in the field.'} />
+
+<ComponentExample of={SearchStories.NoMatches} title="No matches" description={'The empty state replaces the table and names what was searched; "Reset filters" clears the search too.'} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## The field, live
+
+Grow, narrow, Esc, Esc. Press the icon and type: the count updates as you go. Esc clears the text; a second Esc closes the field. The field stays open while it holds text, and switching views keeps it. The picture below shows the field narrowing; the behavior runs in the Storybook tests (`Esc clears, a second Esc closes`, `switching views keeps the search`).
+
+<ComponentExample of={SearchStories.Narrowing} title="Narrowing, in the view bar" description="Open with the text “ia”: two of six students." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Search" tier="pattern" />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Search when a person is looking for rows by what they are called, inside the Section they are looking at. Search narrows as you type; it is not a filter, so it keeps its own icon before the filters and never shares a count with them. Server-backed lists narrow the same way through the Select's `loadOptions`, 50 at a time.
+
+<DocsTable>
+<thead>
+<tr><th>Key or action</th><th>With text</th><th>Empty</th></tr>
+</thead>
+<tbody>
+<tr><td>Press the Search icon</td><td>Not shown</td><td>Opens the field and focuses it</td></tr>
+<tr><td>Type</td><td>Rows narrow; the count updates in words and is announced politely</td><td>Rows narrow; the count updates in words and is announced politely</td></tr>
+<tr><td>Esc</td><td>Clears the text</td><td>Closes the field and returns focus to the icon</td></tr>
+<tr><td>"Clear search"</td><td>Clears the text; the field stays open</td><td>Not shown</td></tr>
+<tr><td>Leave the field</td><td>Stays open with its text</td><td>Shrinks back to the icon</td></tr>
+<tr><td>Switch views</td><td>The search is kept</td><td>Nothing to keep</td></tr>
+<tr><td>"Reset filters"</td><td>Clears the search and every filter</td><td>Nothing to clear</td></tr>
+<tr><td>Leave the page <PlannedTag /></td><td>Planned: the search is cleared</td><td>Nothing to clear</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For narrowing by an attribute, follow <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>.
+- For picking one value from a long list, use a Select with its own search.
+- For moving to another area, follow <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a>; there is no global search.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Narrow the rows as the person types.
+
+<RuleTag kind="review" />
+
+No submit, no results page. The table under the bar narrows and the count updates in words: "2 of 6 students". Loading, empty and no-match states happen inside the table, so the view bar stays usable.
+
+### Grow the Search icon into the field and shrink it back when empty.
+
+<RuleTag kind="review" />
+
+The field stays open while it holds text. Leaving an empty field shrinks it back to the icon. The icon sits before the filters, at the height every bar control shares. The animated grow and shrink are Planned <PlannedTag />.
+
+### Clear on Esc and close on a second Esc.
+
+<RuleTag kind="review" />
+
+The first Esc empties the text and keeps the field; the second closes it and returns focus to the icon. The in-field button is named "Clear search".
+
+### Name the scope in the placeholder and the accessible name.
+
+<RuleTag kind="review" />
+
+"Search students", never "Search…". There is no visible label; the icon and the placeholder say what is searched.
+
+<DoDontPair
+    doExample={<TextField label="Search students" isLabelHidden placeholder="Search students" spacing="compact" />}
+    doCaption="The placeholder names the scope."
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)', alignItems: 'center' }}><TextField label="Search" isLabelHidden placeholder="Search…" spacing="compact" /><Button text="Go" spacing="compact" /></div>}
+    dontCaption={'"Search…" with a Go button: the scope is unnamed and the rows wait for a press.'}
+/>
+
+### Keep the search across views.
+
+<RuleTag kind="review" />
+
+Switching pills keeps the text, so a person can compare views on one name. "Reset filters" clears the search too. Leaving the page clears it <PlannedTag />.
+
+### Name what was searched when nothing matches.
+
+<RuleTag kind="review" />
+
+The empty state replaces the table whole and says what matched nothing. See <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Placeholder names the scope: "Search students".</td><td>"Search…", "Type to search".</td></tr>
+<tr><td>Count in words: "2 of 6 students", "0 of 6 students".</td><td>"2", "2 results".</td></tr>
+<tr><td>Clear button: "Clear search".</td><td>"×", "Reset".</td></tr>
+<tr><td>No matches: 'No students match "Zoe".' with "Reset filters".</td><td>"No results found."</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- The icon button is named "Search students"; the field takes the same name, so a screen reader hears the scope either way.
+- The count is a polite live region that announces "2 of 6 students" as the rows narrow.
+- Tab enters the field; Esc clears, then closes; closing returns focus to the icon.
+- Focus stays in the field when the list empties; it never jumps to the empty state.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Component</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>Closed</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a></td><td>Named "Search students"; subtle appearance, in the view bar before the filters.</td></tr>
+<tr><td>Field</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-text-field--docs">Text field</a></td><td>Compact, label hidden, a search icon before the text and "Clear search" after it.</td></tr>
+<tr><td>Rows</td><td><a target="_top" href="./?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a></td><td>Narrows as the text changes.</td></tr>
+<tr><td>No matches</td><td><a target="_top" href="./?path=/docs/components-messaging-empty-state--docs">Empty state</a></td><td>Replaces the table; offers "Reset filters".</td></tr>
+<tr><td>Search component <PlannedTag /></td><td>None yet</td><td>Planned: one part that owns the grow, Esc and clear behavior the pictures compose.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>: use for narrowing by attributes; its Reset clears the search.
+- <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a>: use for the No matches state.
+- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use for where the bar sits.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

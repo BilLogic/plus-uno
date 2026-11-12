@@ -51,7 +51,7 @@ Don't: Sections standing in for the page title: two page-title-sized headings an
 
 **Checked:** Review
 
-When it shows and what it holds: the Navigation pattern, listed in Patterns.
+When it shows and what it holds: the Navigation pattern.
 
 Do: An area page: the title alone.
 Don't: A breadcrumb on a top-level area page, repeating the Sidebar's place.
@@ -93,7 +93,7 @@ The breadcrumb with the title at its end, then the page actions; page tabs stick
 
 **Checked:** Review
 
-Which tier a message belongs to: the Notifications pattern, listed in Patterns.
+Which tier a message belongs to: the Notifications pattern.
 
 ## Accessibility
 
@@ -112,7 +112,7 @@ Which tier a message belongs to: the Notifications pattern, listed in Patterns.
 - Elevation: use when picking which shadow goes with which level.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
-Same group: `AiChat` · `Backdrop` · `Frame` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Backdrop` · `Frame` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Types
 

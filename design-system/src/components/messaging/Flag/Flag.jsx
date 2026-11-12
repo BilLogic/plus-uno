@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { animate, motion, useReducedMotion } from 'motion/react';
+import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import { MESSAGE_APPEARANCE_ICONS } from '../messageAppearance';
@@ -16,10 +18,17 @@ export const FLAG_AUTO_CLOSE_MS = 8000;
 /** Longest an exiting flag stays mounted if `animationend` never fires. */
 const FLAG_EXIT_FALLBACK_MS = 800;
 
+/** Where the flags that stay go when one leaves: `spatial.default`, read from the generated springs. */
+const CLOSE_UP = SPRINGS['spatial.default'].productive;
+/** Under reduced motion they fade into their new places on `appearance.fast` instead. */
+const CLOSE_UP_FADE = SPRINGS['appearance.fast'].productive;
+
+/** The group's reduced-motion setting, for the flags inside it. */
+const FlagGroupContext = createContext(undefined);
+
 /** The five appearances, as the Figma Flag set names them. */
 export const FLAG_APPEARANCES = ['normal', 'information', 'warning', 'error', 'success'];
 
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 /**
  * Flag's enter, from its motion registry row: it lands on `spatial.default` and
@@ -27,9 +36,7 @@ const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
  * Notify's pickup. Under reduced motion the flag fades in on the reduced spring
  * and the sound still plays, on that landing.
  */
-function playNotifyOnLand() {
-    const reduced = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-        && window.matchMedia(REDUCED_MOTION_QUERY).matches;
+function playNotifyOnLand(reduced) {
     playSound('notify', { at: soundStartFor('spatial.default', 'notify', { mode: reduced ? 'reduced' : 'productive' }) });
 }
 
@@ -60,6 +67,7 @@ export const Flag = ({
     bodyClass = '',
     timestamp, // '11 mins ago' etc
     sound = true,
+    reducedMotion,
     ...props
 }) => {
     // An appearance outside the list falls back to the default, normal.
@@ -135,20 +143,50 @@ export const Flag = ({
     }, [show]);
 
     /*
+     * The stack closes up. A leaving flag drops out of the flow at once, held where it stood,
+     * so the gap closes as it goes. The flags that stay glide to their new places on
+     * `spatial.default` (a layout animation); under reduced motion they stay put in time and
+     * fade into the new place on `appearance.fast`, never a cut.
+     */
+    const group = useContext(FlagGroupContext);
+    const osReduced = useReducedMotion();
+    const reduced = reducedMotion ?? group ?? osReduced;
+    const surface = useRef(null);
+    const lastTop = useRef(null);
+
+    useLayoutEffect(() => {
+        const el = surface.current;
+        if (!el) return;
+        if (!show) {
+            Object.assign(el.style, { position: 'absolute', top: `${el.offsetTop}px`, left: `${el.offsetLeft}px`, margin: '0' });
+            lastTop.current = null;
+            return;
+        }
+        Object.assign(el.style, { position: '', top: '', left: '', margin: '' });
+        if (reduced && lastTop.current !== null && lastTop.current !== el.offsetTop) {
+            animate(el, { opacity: [0, 1] }, CLOSE_UP_FADE);
+        }
+        lastTop.current = el.offsetTop;
+    });
+
+    /*
      * Notify plays once as the flag lands, when it is shown, through the one
      * sound setting (off plays nothing). When a flag should stay quiet, such
      * as during a session or after the first of several that arrive together,
      * is the app's call: it passes `sound={false}`.
      */
     useEffect(() => {
-        if (show && sound) playNotifyOnLand();
+        if (show && sound) playNotifyOnLand(reduced);
         // Only `show` re-runs it: a flag's arrival sounds, never another prop change.
     }, [show]);
 
     if (!show && !leaving) return null;
 
     return (
-        <div
+        <motion.div
+            ref={surface}
+            layout={show && !reduced ? 'position' : false}
+            transition={CLOSE_UP}
             id={id}
             data-leaving={!show ? exitKind.current : undefined}
             onAnimationEnd={!show ? () => setLeaving(false) : undefined}
@@ -223,7 +261,7 @@ export const Flag = ({
                     {dismissible && <CloseButton label="Dismiss flag" spacing="compact" tone={bold ? 'inverse' : 'default'} onClick={dismissByHand} />}
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 };
 
@@ -266,7 +304,9 @@ Flag.propTypes = {
     /** Small text beside the title, such as "11 mins ago". */
     timestamp: PropTypes.node,
     /** Plays Notify as the flag lands, through the app's sound setting. Defaults to true; the app passes false when a flag should stay quiet, such as during a session or for all but the first of several that arrive together. */
-    sound: PropTypes.bool
+    sound: PropTypes.bool,
+    /** Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting. */
+    reducedMotion: PropTypes.bool
 };
 
 /**
@@ -277,23 +317,28 @@ export const FlagGroup = ({
     position = 'bottom-start', // 'top-start', 'top-center', 'top-end', 'middle-start', etc.
     containerPosition = 'fixed',
     className = '',
+    reducedMotion,
     children,
     ...props
 }) => (
-    <div
-        data-position={position}
-        data-container-position={containerPosition}
-        className={`plus-flag-container ${className}`}
-        {...props}
-    >
-        {children}
-    </div>
+    <FlagGroupContext.Provider value={reducedMotion}>
+        <div
+            data-position={position}
+            data-container-position={containerPosition}
+            className={`plus-flag-container ${className}`}
+            {...props}
+        >
+            {children}
+        </div>
+    </FlagGroupContext.Provider>
 );
 
 FlagGroup.propTypes = {
     position: PropTypes.string,
     /** `fixed` (default) holds the stack to the screen; `absolute` or `static` to a parent. */
     containerPosition: PropTypes.string,
+    /** Hold reduced motion on or off for every flag inside. Unset, flags follow the person's setting. */
+    reducedMotion: PropTypes.bool,
     className: PropTypes.string,
     children: PropTypes.node
 };

@@ -97,14 +97,6 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'PatternDrawer',
-    tier: 'template',
-    events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'Slides from its edge; only the Blanket fades, the Drawer itself never does.' },
-      exit: { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'Slides back to the same edge and stays there.' },
-    },
-  },
-  {
     name: 'Panel',
     tier: 'template',
     events: {
@@ -112,7 +104,7 @@ export const MOTION_REGISTRY = [
       'docked-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Reverses and stays at the edge.' },
       'floating-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself.' },
       'floating-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'Reverses.' },
-      'narrow-enter': { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'At narrow widths it slides over with a Blanket, like an edge layer.' },
+      'narrow-enter': { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'At narrow widths it slides over with a Blanket.' },
       'narrow-exit': { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'The same way back.' },
     },
   },
@@ -227,6 +219,39 @@ export const MOTION_REGISTRY = [
       status: { transition: 'Update a value or state', appearance: 'appearance.default', note: 'A status that changes fades to its new word and fill on appearance.default; nothing bounces.' },
       'count-first': { transition: 'Update a value or state', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A count rolls once on first view, downward, and then fades to later values on appearance.fast.' },
       progress: { transition: 'Update a value or state', spatial: 'linear', note: 'Progress fills on linear with the work, never ahead. Nothing bounces.' },
+    },
+  },
+  {
+    name: 'Notifications',
+    tier: 'pattern',
+    events: {
+      'flag-enter': { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'A Flag enters from the top right.' },
+      'flag-timeout': { transition: 'Open and close an overlay', spatial: 'spatial.exit', note: 'A Flag that times out exits the way it came.' },
+      'flag-dismiss': { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'A Flag closed by hand does a quick fade in place.' },
+      stack: { transition: 'Add or remove an item', spatial: 'spatial.default', note: 'The stack closes up when a Flag leaves.' },
+      message: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A SectionMessage or InlineMessage makes room on spatial.fast, then fades in; it reverses on exit.' },
+      banner: { transition: 'Add or remove an item', spatial: 'spatial.default', appearance: 'appearance.fast', note: 'A Banner pushes the page down on spatial.default, then fades in.' },
+    },
+  },
+  {
+    name: 'Navigation',
+    tier: 'pattern',
+    events: {
+      area: { transition: 'Go to another area', spatial: 'spatial.fast', appearance: 'appearance.default', note: 'The Sidebar highlight glides on spatial.fast; the page fades through on appearance.default.' },
+      'open-item': { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opening a record adds an open item to the Sidebar; closing one removes it. Picking one is Go to another area.' },
+      view: { transition: 'Switch views', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Only the selected indicator glides; the content swaps in place.' },
+      swap: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'Filters swap the content in place.' },
+      drill: { transition: 'Drill into and climb back out', spatial: 'spatial.default', note: 'Drilling into a record moves on spatial.default.' },
+      climb: { transition: 'Drill into and climb back out', spatial: 'spatial.fast', note: 'Climbing out moves on spatial.fast. The Breadcrumb never animates on its own.' },
+    },
+  },
+  {
+    name: 'Search',
+    tier: 'pattern',
+    events: {
+      grow: { transition: 'Swap content in place', spatial: 'spatial.fast', note: 'The Search icon grows into a field to the left on spatial.fast, its right edge fixed.' },
+      narrow: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'Typing swaps the rows in place as they narrow.' },
+      shrink: { transition: 'Swap content in place', spatial: 'spatial.fast', note: 'Escape, or an empty blur, shrinks the field back to the icon on spatial.fast.' },
     },
   },
   {

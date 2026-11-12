@@ -40,10 +40,10 @@ export const Stack = {
         const root = canvasElement.querySelector('[data-testid="exploded-stack"]');
         const canvas = within(canvasElement);
         await expect(root).toHaveAttribute('data-state', 'exploded');
-        // Six plates, each drawn from the illustration kit, with no words inside the figure:
+        // Seven plates, each drawn from the illustration kit, with no words inside the figure:
         // the names and the --layer-* values live in the numbered legend beside it.
         const plates = root.querySelectorAll('[data-plate]');
-        await expect(plates).toHaveLength(6);
+        await expect(plates).toHaveLength(7);
         for (const plate of plates) {
             await expect(plate.querySelector('svg'), `${plate.dataset.plate} is a kit drawing`).not.toBeNull();
             await expect(plate.querySelector('svg text'), `${plate.dataset.plate} draws no words`).toBeNull();
@@ -51,6 +51,9 @@ export const Stack = {
         const legend = within(root.querySelector('[data-testid="stack-legend"]'));
         await waitFor(() => expect(legend.getByText(/--layer-modal \d+/)).toBeInTheDocument());
         await expect(legend.getByText('Backdrop')).toBeInTheDocument();
+        await waitFor(() => expect(legend.getByText(/--layer-tooltip \d+/)).toBeInTheDocument());
+        await expect(legend.getByText('label, no shadow')).toBeInTheDocument();
+        await expect(legend.getAllByRole('listitem')).toHaveLength(7);
         // Card is raised with no layer: --layer-card belongs to sticky headers and columns.
         const cardRow = legend.getByText('Card').parentElement;
         await expect(cardRow).toHaveTextContent(/raised\s*no layer/);

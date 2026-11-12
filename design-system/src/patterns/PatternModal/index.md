@@ -107,7 +107,7 @@ Footer buttons, Cancel and Close, and which destructive tier, including type the
 - Backdrop: use when you need the dimmed ground, the pads and the screen grid under the Modal.
 - Patterns: use when you need the rules across Modals: Common actions, Forms, Errors, Loading.
 
-Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Types
 

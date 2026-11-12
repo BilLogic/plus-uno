@@ -386,40 +386,6 @@ const modalScene = ({ id, title, caption, closing }) =>
   });
 
 const DRAWER = { x: 100, y: 6, w: 52, h: 88 };
-const drawerScene = ({ id, title, caption, closing }) =>
-  scene({
-    id,
-    title,
-    caption,
-    initial: closing ? { x: 0, d: 1 } : { x: 1, d: 0 },
-    landing: closing ? { x: 1, d: 0 } : { x: 0, d: 1 },
-    arrows: [closing ? [[110, 50], [148, 50]] : [[148, 50], [110, 50]]],
-    draw: ({ x, d }) => (
-      <>
-        <UnderPage />
-        <g opacity={d}>
-          <Backdrop {...FRAME} />
-        </g>
-        <Clip {...FRAME}>
-          <Moved x={x * (DRAWER.w + 6)}>
-            <Panel {...DRAWER} floating accent />
-          </Moved>
-        </Clip>
-      </>
-    ),
-    play: async (ctx) => {
-      await ctx.hold(1);
-      if (closing) {
-        await ctx.tap(60, 70);
-        // The Drawer goes back to the same edge and never fades; only the Blanket does.
-        await Promise.all([ctx.spring('x', 1, 'spatial.default'), ctx.spring('d', 0, 'appearance.fast')]);
-        return;
-      }
-      await ctx.tap(...HEADER_BUTTON);
-      await Promise.all([ctx.spring('x', 0, 'spatial.slow'), ctx.spring('d', 1, 'appearance.default')]);
-    },
-  });
-
 const FLAG = { x: 94, y: 10, w: 54, h: 26 };
 const FLAG_EDGE = 60;
 const flagScene = ({ id, title, caption, closing }) =>
@@ -798,8 +764,6 @@ export const WITHIN_DEMOS = {
 export const ABOVE_DEMOS = {
   modalOpen: { title: 'Modal opens', scenes: [modalScene({ id: 'modal-open', title: 'Scales up from 96% and fades in', caption: 'The Blanket dims on the same clock. Scale is for floating layers only.' })] },
   modalClose: { title: 'Modal closes', scenes: [modalScene({ id: 'modal-close', title: 'Scales to 98% and fades', closing: true, caption: 'Leaves one speed faster than it arrived, on spatial.fast.' })] },
-  drawerOpen: { title: 'Drawer opens', scenes: [drawerScene({ id: 'drawer-open', title: 'Slides in from its edge', caption: 'On spatial.slow; only the Blanket dims. The Drawer itself never fades.' })] },
-  drawerClose: { title: 'Drawer closes', scenes: [drawerScene({ id: 'drawer-close', title: 'Slides back to the same edge', closing: true, caption: 'On spatial.default, and the Drawer stays at its edge.' })] },
   flagOpen: { title: 'Flag appears', scenes: [flagScene({ id: 'flag-open', title: 'Slides in from the top right', caption: 'On spatial.default with an appearance.default fade.' })] },
   flagClose: { title: 'Flag leaves', scenes: [flagScene({ id: 'flag-close', title: 'Leaves the way it came', closing: true, caption: 'A timeout leaves on spatial.exit; it is still speeding up as it crosses the edge.' })] },
   confirm: {

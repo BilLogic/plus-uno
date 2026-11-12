@@ -81,7 +81,8 @@ export function patternPages(repoRoot = REPO_ROOT) {
         for (const m of fs.readFileSync(full, 'utf8').matchAll(/title[:=]\s*['"]Patterns\/([^'"]+)['"]/g)) {
           const parts = m[1].split('/');
           const page = parts.length > 1 ? parts[1] : parts[0];
-          if (!NOT_PAGES.has(page)) names.add(page);
+          // The Overview and its test harnesses (`Patterns/Overview/...`) are not a pattern page.
+          if (!NOT_PAGES.has(parts[0]) && !NOT_PAGES.has(page)) names.add(page);
         }
       }
     }

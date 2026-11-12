@@ -9,6 +9,9 @@
  * variables payload for all of the above — written, never pushed; pushing it
  * is a separate, one-writer-queue step, out of scope here.
  *
+ * `design-system/figma/motion-payload.json` is the Figma motion collection and
+ * animation styles (#2281), applied unchanged by the Figma writer.
+ *
  * Primitives (`--space-*`, `--radius-*`) are NOT written here: they already
  * exist, already on PLUS ×16 numbering, and nothing reads this generator for
  * them. See the header of `scripts/lib/tokens/plan.mjs`.
