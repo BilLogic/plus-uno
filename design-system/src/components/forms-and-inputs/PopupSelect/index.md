@@ -94,7 +94,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Surface | Those of `Popup`: `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popover-radius`. |
+| Surface | Those of `Popup`: `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`. |
 | Inset of the rows | 4: `--popover-pad-menu`. |
 | Width | `--popup-min-width` to `--popup-max-width`, and at least the trigger. |
 | Height of the list | Scrolls past 320: `--popover-max-height-menu`. |

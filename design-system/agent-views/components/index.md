@@ -62,7 +62,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `--space-100 (16px)` | `--pad-x-lg`, `--section-stack-md`, `--modal-pad` |
 | `--space-150 (24px)` | `--page-stack-md`, `--page-pad`, `--section-stack-lg` |
 | `--space-200 (32px) and up` | `--page-stack-lg` (space this large belongs to a page; it is rarely right inside a component) |
-| `--radius-<n>` | `--radius-sm`, `--radius-md`, `--radius-lg`, `--card-radius` |
+| `--radius-<n>` | `--radius-md`, `--radius-xl` (read the semantic step for the role: --radius-sm to --radius-xxl, or --radius-control-sm, -md, -lg for a control by height) |
 | `--stack-xl` | `--stack-lg`, `--section-stack-lg` |
 | `--ds-on-surface` | `--ds-text`, `--ds-text-subtle` |
 | `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` (retired; these are the commonest replacements, and check:ds-usage names the exact one for each old name) |

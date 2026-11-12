@@ -159,7 +159,6 @@ row with the sidebar and the Page.
         { token: '--frame-topbar-height', figma: 'Topbar/height-topbar', value: '32 · 32 · 32' },
         { token: '--frame-sidebar-width', figma: 'Sidebar/width-sidebar', value: '240 · 240 · 240' },
         { token: '--page-pad', figma: 'Page/pad', value: '24 · 24 · 24' },
-        { token: '--page-radius', figma: 'Page/radius', value: '8 · 8 · 8' },
         { token: '--panel-min-width', value: '320 · 320 · 320', use: 'The narrowest the splitter allows a Panel' },
         { token: '--panel-width-default', value: '400 · 400 · 400', use: 'The width a Panel opens at' },
         { token: '--panel-max-width', value: '640 · 640 · 640', use: 'The widest the splitter allows a Panel' },
@@ -332,7 +331,7 @@ Minimum and maximum sizes the patterns carry. Frame and modal sizes are under Th
 <Do caption="A form at 40 and 32: the field is 40 (compact 32), the button 32 (compact 24).">
 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)' }}>
     <span style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 'var(--row-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)', font: 'var(--body-default)', color: 'var(--ds-text-subtlest)' }}>Search students</span>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
 </div>
 </Do>
 <Dont caption="A compact 24 button beside a 40 field. Compact is for table rows and inline toolbars only.">
@@ -417,14 +416,14 @@ Every box either hugs its content or fills the space it is given. The container 
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
     <span style={{ flex: 1, fontWeight: 'var(--type-weight-medium)' }}>Maya Chen</span>
     <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
-    <span style={{ padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center' }}>View</span>
+    <span style={{ padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center' }}>View</span>
 </div>
 </Do>
 <Dont caption="The button fills the leftover space, so an action becomes a wide bar and the name crowds the edge.">
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
     <span style={{ fontWeight: 'var(--type-weight-medium)' }}>Maya Chen</span>
     <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
-    <span style={{ flex: 1, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View</span>
+    <span style={{ flex: 1, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View</span>
 </div>
 </Dont>
 </DoDont>

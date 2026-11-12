@@ -122,10 +122,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
 | Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
-| Tree panel | `--ds-surface-overlay` with a `--ds-border` edge, `--popover-radius-menu-md` and `--ds-shadow-overlay`. |
+| Tree panel | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | Row | `--item-height-md` high; hovered `--ds-background-neutral-subtle-hovered`, picked `--ds-background-selected` with `--ds-text-selected`; the expand toggle `--ds-icon-subtle`. |
 
 ## Content guidelines

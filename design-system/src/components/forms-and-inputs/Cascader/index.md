@@ -98,11 +98,11 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
 | Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
 | Side padding | `--pad-x-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
-| Menu | `--ds-surface-overlay` with a `--ds-border` edge, `--popover-radius-menu-md` and `--ds-shadow-overlay`. |
+| Menu | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | Column rule | `--border-default` in `--ds-border` between columns. |
 | Option | `--item-height-md` high; hovered `--ds-background-neutral-subtle-hovered`, chosen `--ds-background-selected` with `--ds-text-selected`. |
 

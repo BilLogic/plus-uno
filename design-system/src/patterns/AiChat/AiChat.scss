@@ -46,7 +46,7 @@
     height: calc(var(--height-2000) * 2);
     max-height: calc(100vh - var(--height-300) - var(--page-pad) * 3);
     overflow: hidden;
-    border-radius: var(--popover-radius);
+    border-radius: var(--popup-radius);
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
 }

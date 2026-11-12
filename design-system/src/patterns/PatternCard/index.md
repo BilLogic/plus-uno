@@ -122,7 +122,7 @@ The image sits above a padded frame, and the header, body and footer sit inside 
 | Token | Value | Used for |
 | --- | --- | --- |
 | `--card-pad-compact`, `-default`, `-spacious` | 16 · 20 · 24 | The pad of a small, medium and large card. |
-| `--card-radius-sm` | 12 | The radius of a small card. |
+| `--card-radius-compact` | 12 | The radius of a small card. |
 | `--card-radius` | 16 | The radius of medium and large cards. |
 | `--card-stack-sm`, `-md`, `-lg` | 4 · 8 · 12 | Title to description; header to body, set by `gap`; body to footer. |
 | `--card-inline-md` | 8 | Items on a row, such as actions in the header. |
@@ -173,7 +173,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-sm` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current`
+`--body-default` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-compact` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current`
 
 From `design-system/src/patterns/PatternCard/PatternCard.scss`. Override these through the token layer, never with a literal.
 

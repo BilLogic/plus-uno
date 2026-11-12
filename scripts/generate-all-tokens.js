@@ -5,8 +5,12 @@ import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { compare, refusals } from './token-generation.mjs';
 import { FRAME_LAYER_COLLECTIONS, frameLayerFile, frameLayerFolder, frameLayerToken } from './lib/frame-layer-collections.mjs';
-import { dropRetired } from './lib/tokens/retire.mjs';
+import { dropRetired, planOwnedTokens } from './lib/tokens/retire.mjs';
+import { RETIRED_TOKENS } from './lib/tokens/plan.mjs';
 import { TYPOGRAPHY_FILE, TYPOGRAPHY_FOLDERS, typographyFolder, typographyToken } from './lib/typography-collection.mjs';
+
+/** Names dropped from the SCSS the Figma exports write: retired ones, and the ones the token plan now owns. */
+const DROPPED = new Set([...RETIRED_TOKENS, ...planOwnedTokens()]);
 
 /**
  * The Figma exports the SCSS is generated FROM, and where the SCSS lands.
@@ -510,8 +514,8 @@ const OUT_DIR = TOKEN_DIR;
 let generated;
 try {
     generated = [
-        { file: '_scales.scss', generated: dropRetired(generateScalesSCSS()) },
-        { file: '_frame_layers.scss', generated: dropRetired(generateFrameLayersSCSS()) },
+        { file: '_scales.scss', generated: dropRetired(generateScalesSCSS(), DROPPED) },
+        { file: '_frame_layers.scss', generated: dropRetired(generateFrameLayersSCSS(), DROPPED) },
         { file: '_type.scss', generated: generateTypeSCSS() },
     ];
 } catch (error) {

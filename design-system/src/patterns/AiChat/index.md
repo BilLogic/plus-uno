@@ -113,7 +113,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 | --- | --- |
 | Button | `--height-300` square, `--page-pad` from the Page's bottom and right edges, `--ds-shadow-overlay`. |
 | Popup | Twice `--height-2000` wide and high; without the button it floats `--stack-md` above where the button would be. |
-| Floating popup fill | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popover-radius`. |
+| Floating popup fill | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`. |
 | Full screen | `--ds-surface`, on `--layer-dialog`; the conversation is capped at `--content-max-width-reading`. |
 | Conversation | `--stack-md` between messages, `--body-default` in `--ds-text`. |
 | The person's message | `--ds-surface-sunken`, `--pad-y-sm` by `--pad-x-md`, `--radius-md`. |
@@ -160,7 +160,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ai-chat-width` · `--body-default` · `--body-small` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popover-radius` · `--radius-md` · `--stack-lg` · `--stack-md` · `--stack-sm`
+`--ai-chat-width` · `--body-default` · `--body-small` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popup-radius` · `--radius-md` · `--stack-lg` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/patterns/AiChat/AiChat.scss`. Override these through the token layer, never with a literal.
 

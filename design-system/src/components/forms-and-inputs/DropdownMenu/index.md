@@ -171,7 +171,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text-subtle` · `--layer-popup` · `--pad-x-md` · `--pad-y-md` · `--popover-max-height-menu` · `--popover-max-width-menu` · `--popover-radius-menu-md` · `--stack-md`
+`--body-default` · `--border-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text-subtle` · `--layer-popup` · `--pad-x-md` · `--pad-y-md` · `--popover-max-height-menu` · `--popover-max-width-menu` · `--popup-radius` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss`. Override these through the token layer, never with a literal.
 

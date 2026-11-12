@@ -160,7 +160,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text-subtle` · `--field-width-md` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--pad-y-md` · `--popover-max-height-menu` · `--popover-pad-menu` · `--radius-h32`
+`--body-default` · `--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text-subtle` · `--field-width-md` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--pad-y-md` · `--popover-max-height-menu` · `--popover-pad-menu` · `--radius-control-md`
 
 From `design-system/src/components/forms-and-inputs/SearchField/SearchField.scss`. Override these through the token layer, never with a literal.
 

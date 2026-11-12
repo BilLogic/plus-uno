@@ -73,7 +73,8 @@ export const REDUCED_FADE = 'appearance.fast';
  * replaced (null for a net-new token); `type` is the Figma variable type when
  * it is not FLOAT, `codeOnly` keeps a row out of the Figma payload, and
  * `primitive` keeps it out of the SCSS (its code name is a primitive).
- * `use` is the row's intent: one line naming the place or situation the
+ * `figma` names the Figma variable when its folder is deeper than the code
+ * name implies (`Radius/Control/sm`); `use` is the row's intent: one line naming the place or situation the
  * token is for, in the component language. The token agent views carry it
  * (`tokens.json`, `tokens.md`) and `check:token-intent` fails a row without one.
  *
@@ -84,9 +85,6 @@ export const REDUCED_FADE = 'appearance.fast';
  * generation below (declaring a name twice is a no-op).
  *
  * SCOPE CALLS RECORDED HERE, so a family PR doesn't have to re-derive them:
- *  - `--focus-ring-radius` has no single existing source (nothing in the repo
- *    binds a radius to a focus ring today); seeded at `--radius-sm` as a first
- *    pass, same as ADR-038 left Motion's curves for Adrija to refine.
  *  - Only `--control-*` is added to the size roles: `_scales.scss` already
  *    carries Icon, Image, Item, Label, Row and Field.
  *  - `color / foundations` -> `color / semantics` and `opacity` -> `color /
@@ -117,13 +115,17 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Inline', new: '--inline-lg', old: '--element-inline-lg', ref: 'var(--space-075)', use: 'Horizontal gap between loosely related items in a row.' },
 
   // ─── Semantics / Radius (non-control, + control-by-height) ───────────
-  { tier: 'semantics', group: 'Radius', new: '--radius-sm', old: '--element-radius-sm', ref: 'var(--radius-0125)', use: 'Corner rounding for small marks: a checkbox, a focus ring, a small tag.' },
+  { tier: 'semantics', group: 'Radius', new: '--radius-sm', old: '--element-radius-sm', ref: 'var(--radius-0125)', use: 'Corner rounding for small marks: a checkbox, a small tag.' },
   { tier: 'semantics', group: 'Radius', new: '--radius-md', old: '--element-radius-md', ref: 'var(--radius-025)', use: 'Corner rounding for controls and small containers.' },
   { tier: 'semantics', group: 'Radius', new: '--radius-lg', old: '--element-radius-lg', ref: 'var(--radius-050)', use: 'Corner rounding for larger containers that are not a pattern, such as a tile or image.' },
+  { tier: 'semantics', group: 'Radius', new: '--radius-xl', old: null, ref: 'var(--radius-075)', use: 'Corner rounding for a floating or compact surface, such as a Popup or a compact card.' },
+  { tier: 'semantics', group: 'Radius', new: '--radius-xxl', old: null, ref: 'var(--radius-100)', use: 'Corner rounding for a top-level surface, such as a Section or a card.' },
   { tier: 'semantics', group: 'Radius', new: '--radius-full', old: '--element-radius-full', ref: 'var(--radius-full)', primitive: true, note: 'Figma Radius/full; the code name is the --radius-full primitive, so no second declaration', use: 'Fully rounded ends: an avatar, a pill-shaped tag, a toggle track.' },
-  { tier: 'semantics', group: 'Radius', new: '--radius-h24', old: '--element-radius-item-sm', ref: 'var(--radius-0375)', note: 'control height 24; 24÷4 = 6', use: 'Corner rounding for a control 24px high.' },
-  { tier: 'semantics', group: 'Radius', new: '--radius-h32', old: '--element-radius-item-md', ref: 'var(--radius-050)', note: 'control height 32; 32÷4 = 8', use: 'Corner rounding for a control 32px high.' },
-  { tier: 'semantics', group: 'Radius', new: '--radius-h40', old: null, value: '--radius-0625', note: 'new step; control height 40; 40÷4 = 10', use: 'Corner rounding for a control 40px high.' },
+
+  // ─── Semantics / Radius / Control (radius = control height ÷ 4) ──────
+  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-sm', old: '--element-radius-item-sm', figma: 'Radius/Control/sm', ref: 'var(--radius-0375)', note: 'pairs with --control-sm; height 24, 24÷4 = 6', use: 'Corner rounding for a control 24px high: a compact field, a Tooltip, a Sidebar row.' },
+  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-md', old: '--element-radius-item-md', figma: 'Radius/Control/md', ref: 'var(--radius-050)', note: 'pairs with --control-md; height 32, 32÷4 = 8', use: 'Corner rounding for a control 32px high: a compact field, a tab, a menu row.' },
+  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-lg', old: null, figma: 'Radius/Control/lg', ref: 'var(--radius-0625)', note: 'pairs with --control-lg; height 40, 40÷4 = 10', use: 'Corner rounding for a control 40px high: a default field.' },
 
   // ─── Semantics / Border (reclassified, unchanged names) ──────────────
   { tier: 'semantics', group: 'Border', new: '--border-default', old: '--border-default', use: 'Width of an ordinary border or divider line.' },
@@ -133,7 +135,6 @@ export const TOKEN_LADDER = [
   // ─── Semantics / Focus (net new) ──────────────────────────────────────
   { tier: 'semantics', group: 'Focus', new: '--focus-ring-width', old: '--size-element-stroke-lg', ref: 'var(--stroke-2)', note: 'matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive', use: 'Width of the keyboard focus ring; also its offset unless the offset must differ.' },
   { tier: 'semantics', group: 'Focus', new: '--focus-ring-offset', old: '--size-element-stroke-lg', ref: 'var(--stroke-2)', note: 'defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both', use: 'Gap between an element and its focus ring, when it must differ from the ring width.' },
-  { tier: 'semantics', group: 'Focus', new: '--focus-ring-radius', old: null, value: '--radius-sm', note: 'first pass, no existing source; a family PR refines it', use: 'Corner rounding of the keyboard focus ring.' },
 
   // ─── Semantics / Grid (dissolved from spacing / layout) ──────────────
   { tier: 'semantics', group: 'Grid', new: '--grid-gutter', old: '--layout-gutter', ref: 'var(--space-100)', use: 'Gap between columns of the page grid.' },
@@ -189,7 +190,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-pad', old: null, value: '--space-075', note: 'the Sidebar pads 12 on every side', use: 'Padding on every side inside the Sidebar.' },
   { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart', use: 'Vertical gap between two rows in the Sidebar.' },
   { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-group-gap', old: null, value: '--space-100', note: 'two Sidebar groups sit 16 apart', use: 'Vertical gap between two groups of rows in the Sidebar.' },
-  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-0375)', note: 'the rounding of a Sidebar row (6)', use: 'Corner rounding of a Sidebar row.' },
+  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-control-sm)', note: 'the rounding of a Sidebar row (6)', use: 'Corner rounding of a Sidebar row.' },
 
   // ─── Patterns / Page ──────────────────────────────────────────────────
   { tier: 'patterns', group: 'Page', new: '--page-pad', old: '--page-pad', use: 'Padding around a Page\'s content at the current breakpoint.' },
@@ -202,7 +203,6 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Page', new: '--page-stack-sm', old: '--page-stack-sm', use: 'Vertical gap between closely related blocks on a Page, such as a header and its subtitle.' },
   { tier: 'patterns', group: 'Page', new: '--page-stack-md', old: '--page-stack-md', use: 'Vertical gap between sections on a Page.' },
   { tier: 'patterns', group: 'Page', new: '--page-stack-lg', old: '--page-stack-lg', use: 'Vertical gap between major regions of a Page.' },
-  { tier: 'patterns', group: 'Page', new: '--page-radius', old: '--page-radius', use: 'Corner rounding of a Page inside the Frame.' },
 
   // ─── Patterns / Panel (the Frame's right-hand area) ──────────────────
   { tier: 'patterns', group: 'Panel', new: '--panel-min-width', old: null, ref: 'var(--width-2000)', note: 'the narrowest the splitter allows (320)', use: 'Narrowest the Panel may be dragged.' },
@@ -216,7 +216,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Section', new: '--section-pad-y-compact', old: null, value: '--space-100', use: 'Vertical padding of a PatternSection with compact spacing.' },
   { tier: 'patterns', group: 'Section', new: '--section-pad-y-default', old: null, value: '--space-150', use: 'Vertical padding of a PatternSection with default spacing.' },
   { tier: 'patterns', group: 'Section', new: '--section-pad-y-spacious', old: null, value: '--space-200', use: 'Vertical padding of a PatternSection with spacious spacing.' },
-  { tier: 'patterns', group: 'Section', new: '--section-radius', old: null, ref: 'var(--radius-100)', note: 'the rounding of a Section with a fill', use: 'Corner rounding of a PatternSection that has a fill.' },
+  { tier: 'patterns', group: 'Section', new: '--section-radius', old: null, ref: 'var(--radius-xxl)', note: 'the rounding of a Section with a fill', use: 'Corner rounding of a PatternSection that has a fill.' },
   { tier: 'patterns', group: 'Section', new: '--section-stack-sm', old: '--section-stack-sm', use: 'Vertical gap between a section header and its content.' },
   { tier: 'patterns', group: 'Section', new: '--section-stack-md', old: '--section-stack-md', use: 'Vertical gap between blocks inside a PatternSection.' },
   { tier: 'patterns', group: 'Section', new: '--section-stack-lg', old: '--section-stack-lg', use: 'Vertical gap between groups of blocks inside a PatternSection.' },
@@ -236,8 +236,8 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Card', new: '--card-min-width-sm', old: '--card-min-width-sm', use: 'Narrowest a small PatternCard may shrink in a grid.' },
   { tier: 'patterns', group: 'Card', new: '--card-min-width-md', old: '--card-min-width-md', use: 'Narrowest a default PatternCard may shrink in a grid.' },
   { tier: 'patterns', group: 'Card', new: '--card-min-width-lg', old: '--card-min-width-lg', use: 'Narrowest a large PatternCard may shrink in a grid.' },
-  { tier: 'patterns', group: 'Card', new: '--card-radius', old: '--card-radius', use: 'Corner rounding of a PatternCard.' },
-  { tier: 'patterns', group: 'Card', new: '--card-radius-sm', old: '--card-radius-sm', use: 'Corner rounding of a small PatternCard or a card nested in another container.' },
+  { tier: 'patterns', group: 'Card', new: '--card-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a PatternCard.' },
+  { tier: 'patterns', group: 'Card', new: '--card-radius-compact', old: '--card-radius-sm', ref: 'var(--radius-xl)', use: 'Corner rounding of a compact PatternCard or a card nested in another surface.' },
   { tier: 'patterns', group: 'Card', new: '--card-max-height-sm', old: '--card-max-height-sm', use: 'Tallest a short scrolling PatternCard may grow.' },
   { tier: 'patterns', group: 'Card', new: '--card-max-height-md', old: '--card-max-height-md', use: 'Tallest a default scrolling PatternCard may grow.' },
   { tier: 'patterns', group: 'Card', new: '--card-max-height-lg', old: '--card-max-height-lg', use: 'Tallest a tall scrolling PatternCard may grow.' },
@@ -246,7 +246,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Table', new: '--table-pad-x-cell', old: '--table-pad-x-cell', use: 'Horizontal padding inside a PatternTable cell.' },
   { tier: 'patterns', group: 'Table', new: '--table-pad-y-cell', old: '--table-pad-y-cell', use: 'Vertical padding inside a PatternTable cell.' },
   { tier: 'patterns', group: 'Table', new: '--table-indent', old: '--table-indent', use: 'Indent of each nested level in a tree table.' },
-  { tier: 'patterns', group: 'Table', new: '--table-radius', old: '--table-radius', use: 'Corner rounding of a PatternTable.' },
+  { tier: 'patterns', group: 'Table', new: '--table-radius', old: null, ref: 'var(--radius-lg)', use: 'Corner rounding of a PatternTable.' },
   { tier: 'patterns', group: 'Table', new: '--table-stack', old: '--table-stack', use: 'Vertical gap between a PatternTable and its toolbar or footer.' },
   { tier: 'patterns', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a PatternTable footer, such as its Pagination row.' },
   { tier: 'patterns', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
@@ -271,11 +271,10 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Modal', new: '--modal-inline-sm', old: '--modal-inline-sm', use: 'Horizontal gap between small items in a Modal row.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-inline-md', old: '--modal-inline-md', use: 'Horizontal gap between the actions in a Modal footer.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-inline-lg', old: '--modal-inline-lg', use: 'Horizontal gap between columns in a Modal.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-radius', old: '--modal-radius', use: 'Corner rounding of a Modal.' },
+  { tier: 'patterns', group: 'Modal', new: '--modal-radius', old: null, ref: 'var(--radius-xl)', note: 'reads xl (12) until the template-values ticket moves it to xxl (16)', use: 'Corner rounding of a Modal.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the pattern’s pad/stack tokens', use: 'Width of a small Modal, such as a confirmation.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-md', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' }, use: 'Width of a default Modal, such as a short form.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
-  { tier: 'patterns', group: 'Page', new: '--page-radius-md', old: null, ref: 'var(--radius-075)', use: 'Corner rounding of a Page frame.' },
   { tier: 'patterns', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)', use: 'Width of the edge drawn around a Page frame.' },
   { tier: 'patterns', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a PatternTable lets a row\'s overflow, such as a focus ring, reach past its clip.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--space-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
@@ -287,16 +286,13 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Popover', new: '--popover-width-lg', old: '--popover-width-lg', use: 'Width of a large Popup.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-width-flag', old: '--popover-width-flag', use: 'Width of a Flag.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-stack-flag', old: '--popover-stack-flag', use: 'Vertical gap between stacked Flags.' },
-  { tier: 'patterns', group: 'Popover', new: '--popover-radius', old: '--popover-radius', use: 'Corner rounding of a Popup.' },
+  { tier: 'patterns', group: 'Popover', new: '--popup-radius', old: '--popover-radius', ref: 'var(--radius-xl)', use: 'Corner rounding of a Popup.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-pad-menu', old: '--popover-pad-menu', use: 'Padding inside a DropdownMenu or listbox.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-min-width-menu', old: '--popover-min-width-menu', use: 'Narrowest a DropdownMenu or listbox may shrink.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-max-width-menu', old: '--popover-max-width-menu', use: 'Widest a DropdownMenu or listbox may grow.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-max-height-menu', old: '--popover-max-height-menu', use: 'Tallest a DropdownMenu or listbox may grow before it scrolls.' },
-  { tier: 'patterns', group: 'Popover', new: '--popover-radius-menu-sm', old: '--popover-radius-menu-sm', use: 'Corner rounding of a compact DropdownMenu.' },
-  { tier: 'patterns', group: 'Popover', new: '--popover-radius-menu-md', old: '--popover-radius-menu-md', use: 'Corner rounding of a default DropdownMenu.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-pad-y-tooltip', old: '--popover-pad-y-tooltip', use: 'Vertical padding inside a Tooltip.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-max-width-tooltip', old: '--popover-max-width-tooltip', use: 'Widest a Tooltip may grow before its text wraps.' },
-  { tier: 'patterns', group: 'Popover', new: '--popover-radius-tooltip', old: '--popover-radius-tooltip', use: 'Corner rounding of a Tooltip.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-gap-screen', old: '--popover-gap-screen', use: 'Space a floating layer keeps from the screen edge, such as a Flag or a listbox.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-offset', old: '--popover-offset', use: 'Gap between a Popup, menu or Tooltip and the element that opened it.' },
 
@@ -310,8 +306,8 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Focused page', new: '--focused-page-inline-md', old: '--focused-page-inline-md', use: 'Horizontal gap between the actions on a focused page.' },
 
   // ─── Components / Button ──────────────────────────────────────────────
-  { tier: 'components', group: 'Button', new: '--button-radius-default', old: '--element-radius-item-sm', ref: 'var(--radius-0375)', note: '32-high control, radius 6', use: 'Corner rounding of a Button with default spacing.' },
-  { tier: 'components', group: 'Button', new: '--button-radius-compact', old: '--element-radius-md', ref: 'var(--radius-025)', note: '24-high control, radius 4', use: 'Corner rounding of a Button with compact spacing.' },
+  { tier: 'components', group: 'Button', new: '--button-radius-default', old: '--element-radius-item-sm', ref: 'calc(var(--radius-control-lg) - var(--pad-x-xs))', note: 'nests in a 40-high field: its radius 10 minus the 4 slot inset = 6', use: 'Corner rounding of a Button with default spacing.' },
+  { tier: 'components', group: 'Button', new: '--button-radius-compact', old: '--element-radius-md', ref: 'calc(var(--radius-control-md) - var(--pad-x-xs))', note: 'nests in a 32-high field: its radius 8 minus the 4 slot inset = 4', use: 'Corner rounding of a Button with compact spacing.' },
 
   // ─── Components / Calendar ────────────────────────────────────────────
   { tier: 'components', group: 'Calendar', new: '--calendar-day-sm', old: '--layout-calendar-day-sm', ref: '28px', use: 'Size of a day cell in a compact Calendar.' },
@@ -406,8 +402,6 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Avatar', new: '--avatar-size-128', old: null, ref: 'calc(var(--space-400) * 2)', use: 'Size of the largest UserAvatar, such as on a profile page.' },
 
   // ─── Components / Tile (reclassified, unchanged names) ───────────────
-  { tier: 'components', group: 'Tile', new: '--tile-radius-sm', old: '--tile-radius-sm', use: 'Corner rounding of a small Tile.' },
-  { tier: 'components', group: 'Tile', new: '--tile-radius-lg', old: '--tile-radius-lg', use: 'Corner rounding of a large Tile.' },
 
   // ─── Components / Spinner, Progress bar (Bill 2026-11-04: one component
   // each, so they move out of SIZE_ROLES in generate-all-tokens.js straight to
@@ -469,6 +463,19 @@ export const RETIRED_RENAMES = {
   '--element-gap-compact': '--stack-sm',
   '--element-radius-default': '--radius-md',
   '--element-radius-compact': '--radius-sm',
+  '--radius-03125': '--radius-md',
+  '--radius-0875': '--radius-xl',
+  '--radius-h24': '--radius-control-sm',
+  '--radius-h32': '--radius-control-md',
+  '--radius-h40': '--radius-control-lg',
+  '--focus-ring-radius': '--radius-sm',
+  '--popover-radius-menu-sm': '--popup-radius',
+  '--popover-radius-menu-md': '--popup-radius',
+  '--popover-radius-tooltip': '--radius-control-sm',
+  '--page-radius': '--radius-lg',
+  '--page-radius-md': '--radius-xl',
+  '--tile-radius-sm': '--radius-0375',
+  '--tile-radius-lg': '--radius-control-lg',
   '--card-pad-sm': '--card-pad-compact',
   '--card-pad-md': '--card-pad-default',
   '--card-pad-lg': '--card-pad-spacious',

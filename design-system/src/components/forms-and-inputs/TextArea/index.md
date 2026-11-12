@@ -127,7 +127,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
 | Height | At least `--field-min-height-sm` (80). |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
 | Padding | `--pad-y-md` top and bottom, `--pad-x-md` either side. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`; the count `--ds-text-subtle`, over the limit `--ds-text-danger`. |

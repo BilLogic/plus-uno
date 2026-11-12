@@ -38,7 +38,7 @@
     max-width: calc(100vw - 2 * var(--popover-gap-screen));
     padding: var(--popover-pad);
     background-color: var(--ds-surface-overlay);
-    border-radius: var(--popover-radius);
+    border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
 
     // Enters from the top-right corner on `spatial.default` while it fades in on

@@ -279,11 +279,10 @@
     {
       "not": "--radius-<n>",
       "use": [
-        "--radius-sm",
         "--radius-md",
-        "--radius-lg",
-        "--card-radius"
-      ]
+        "--radius-xl"
+      ],
+      "why": "read the semantic step for the role: --radius-sm to --radius-xxl, or --radius-control-sm, -md, -lg for a control by height"
     },
     {
       "not": "--stack-xl",

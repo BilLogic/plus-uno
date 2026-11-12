@@ -66,7 +66,7 @@ export const SKELETON_RADII = {
     'element-radius-md': 'var(--radius-md)',
     'element-radius-lg': 'var(--radius-lg)',
     'element-radius-full': 'var(--radius-full)',
-    'card-radius-sm': 'var(--card-radius-sm)',
+    'card-radius-sm': 'var(--card-radius-compact)',
     'card-radius-md': 'var(--card-radius)',
     'section-radius-sm': 'var(--section-radius)',
     'section-radius-md': 'var(--section-radius)',

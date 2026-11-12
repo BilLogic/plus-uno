@@ -181,7 +181,7 @@ function toVariable(token, resolvedType = 'FLOAT') {
 function tierFigmaVariables(tier) {
   return movedRows()
     .filter((r) => r.tier === tier && !r.codeOnly)
-    .map((row) => toVariable(row.new, row.type));
+    .map((row) => ({ ...toVariable(row.new, row.type), ...(row.figma ? { name: row.figma } : {}) }));
 }
 
 /** @returns {object} the combined Figma variables payload: every ladder tier (motion has its own, `motion-payload.json`). */

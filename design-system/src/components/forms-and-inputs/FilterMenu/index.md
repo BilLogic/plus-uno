@@ -92,7 +92,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Surface | Those of `Popup`: `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popover-radius`. |
+| Surface | Those of `Popup`: `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`. |
 | Pad, and the gap above the footer | 16: `--popover-pad`. |
 | Gap between categories | `--inline-lg` across, `--stack-lg` down. |
 | Height of the categories | Scroll past 320: `--popover-max-height-menu`. |

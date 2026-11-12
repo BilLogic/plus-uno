@@ -29,7 +29,7 @@ export const Control = ({ height, radius, children, ring }) => (
 );
 
 export const Menu = ({ rowRadius }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', width: 'var(--popover-min-width-menu)', padding: 'var(--popover-pad-menu)', borderRadius: 'var(--popover-radius-menu-md)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', width: 'var(--popover-min-width-menu)', padding: 'var(--popover-pad-menu)', borderRadius: 'var(--popup-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)' }}>
         {['Rename', 'Duplicate', 'Move to…'].map((t, i) => (
             <span key={t} style={{ display: 'flex', alignItems: 'center', minHeight: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: rowRadius, background: i === 0 ? 'var(--ds-background-neutral-subtle-hovered)' : 'transparent', font: 'var(--body-default)', color: 'var(--ds-text)' }}>{t}</span>
         ))}
@@ -49,7 +49,7 @@ export const Menu = ({ rowRadius }) => (
 
 Radius tokens keep corners consistent across the tutor and student apps. A control's radius is a quarter of its height, so a 24 high control takes 6, a 32 high one takes 8 and a 40 high one takes 10. Buttons are the exception: 6 default and 4 compact. Containers take the step their pattern names, and pair every radius with a focus ring that is 2 larger.
 
-Code reads `--radius-0125` to `--radius-100` and `--radius-full` as primitives, and `--element-radius-*`, `--card-radius`, `--modal-radius`, `--popover-radius-*`, `--tile-radius-*` and `--page-radius` as semantic tokens. Figma holds the primitives in `spacing / primitives`, and the semantic tokens in `spacing / foundations`, `spacing / layout` (Page/radius) and `spacing / patterns`.
+Code reads `--radius-0125` to `--radius-100` and `--radius-full` as primitives, and `--radius-sm` to `--radius-xxl`, the `--radius-control-*` group, `--card-radius`, `--modal-radius`, `--popup-radius` and the other pattern tokens as semantic tokens. Figma holds the primitives in `spacing / primitives`, the semantic tokens in `spacing / semantics` (the control group is `Radius/Control`) and `spacing / patterns`.
 
 </FoundationSection>
 
@@ -65,19 +65,22 @@ Use the token for the role, not the one that matches a pixel value. Values are r
 
 <Banner appearance="announcement">
 <strong>How PLUS rounds</strong><br />
-Controls round at a quarter of their height, so a 32 high field takes 8 and a 40 high field takes 10. Buttons are the exception at 6 and 4. Cards and the Page round at 16, because containers own their tokens: Table 8, Modal and Popup 12, Menu 10, 12 or 14, Tooltip 6.
+Controls round at a quarter of their height, so a 32 high field takes 8 and a 40 high field takes 10. Buttons are the exception at 6 and 4. Cards and Sections round at 16, because each template owns its token: Table 8, Modal and Popup 12, Menu 12, Tooltip 6.
 </Banner>
 
 <FoundationSubsection title="Controls and elements">
 
 <TokenTable
     rows={[
-        { token: '--radius-sm', figma: 'Element/radius-sm', use: 'Small detail elements: checkboxes, Count tags, keyboard shortcuts.' },
-        { token: '--radius-md', figma: 'Element/radius-md', use: 'Supporting elements: Status tags, Tags, session-time chips, 16 high controls.' },
-        { token: '--radius-h24', figma: 'Element/radius-item-sm', use: '24 high controls and items: filter chips, table-row actions.' },
-        { token: '--radius-lg', figma: 'Element/radius-lg', use: 'Interactive elements, 32 high: tabs, navigation items, and fields in the compact density.' },
-        { token: '--radius-h32', figma: 'Element/radius-item-md', use: 'Items, 32 high: the same 8 as radius-lg.' },
-        { token: '--radius-full', figma: 'Element/radius-full', use: 'Circular, people-related elements: avatars, pills, toggles.' },
+        { token: '--radius-sm', figma: 'Radius/sm', use: 'Small detail elements: checkboxes, Count tags, keyboard shortcuts.' },
+        { token: '--radius-md', figma: 'Radius/md', use: 'Supporting elements: Status tags, Tags, session-time chips, 16 high controls.' },
+        { token: '--radius-lg', figma: 'Radius/lg', use: 'Surfaces that are not a pattern: a table, a menu group, an inline link.' },
+        { token: '--radius-xl', figma: 'Radius/xl', use: 'Floating and compact surfaces: a Popup, a compact card.' },
+        { token: '--radius-xxl', figma: 'Radius/xxl', use: 'Top-level surfaces: a Section, a card.' },
+        { token: '--radius-control-sm', figma: 'Radius/Control/sm', use: '24 high controls: filter chips, a Tooltip, a Sidebar row.' },
+        { token: '--radius-control-md', figma: 'Radius/Control/md', use: '32 high controls: tabs, navigation items, and fields in the compact density.' },
+        { token: '--radius-control-lg', figma: 'Radius/Control/lg', use: '40 high controls: a field at the default density.' },
+        { token: '--radius-full', figma: 'Radius/full', use: 'Circular, people-related elements: avatars, pills, toggles.' },
     ]}
 />
 
@@ -85,7 +88,7 @@ Controls round at a quarter of their height, so a 32 high field takes 8 and a 40
 
 <FoundationSubsection title="Buttons">
 
-Every button rounds the same way: 6 at the default height of 32 and 4 compact at 24. Their focus rings draw at 8 and 6. This is not the height ÷ 4 rule. Element/radius-lg (8) is for fields, tabs and navigation, not for buttons.
+Every button rounds the same way: 6 at the default height of 32 and 4 compact at 24. Their focus rings draw at 8 and 6. This is not the height ÷ 4 rule. `--radius-control-md` (8) is for fields, tabs and navigation, not for buttons.
 
 </FoundationSubsection>
 
@@ -94,16 +97,12 @@ Every button rounds the same way: 6 at the default height of 32 and 4 compact at
 <TokenTable
     rows={[
         { token: '--card-radius', figma: 'Card/radius', use: 'Large page elements: cards.' },
-        { token: '--page-radius', figma: 'Page/radius', use: 'Large page elements: the Page.' },
-        { token: '--card-radius-sm', figma: 'Card/radius-sm', use: 'Compact cards.' },
+        { token: '--card-radius-compact', figma: 'Card/radius-compact', use: 'Compact cards.' },
         { token: '--modal-radius', figma: 'Modal/radius', use: 'Modals.' },
-        { token: '--popover-radius', figma: 'Popup and flag/radius', use: 'Popups and flags.' },
-        { token: '--popover-radius-menu-sm', figma: 'Menu/radius-menu-sm', use: 'Menus whose rows are 24 high.' },
-        { token: '--popover-radius-menu-md', figma: 'Menu/radius-menu-md', use: 'Menus whose rows are 32 high.' },
-        { token: '--popover-radius-tooltip', figma: 'Tooltip/radius-tooltip', use: 'Tooltips.' },
+        { token: '--popup-radius', figma: 'Popup/radius', use: 'Popups, flags and menus.' },
         { token: '--table-radius', figma: 'Table/radius', use: 'Tables.' },
-        { token: '--tile-radius-sm', figma: 'Tile/radius-sm', use: 'The Tile component only: 25% of the tile size (20 → 5).' },
-        { token: '--tile-radius-lg', figma: 'Tile/radius-lg', use: 'The Tile component only (40 → 10).' },
+        { token: '--section-radius', figma: 'Section/radius', use: 'Sections with a fill.' },
+        { token: '--frame-sidebar-row-radius', figma: 'Frame/sidebar-row-radius', use: 'A Sidebar row.' },
     ]}
 />
 
@@ -117,10 +116,10 @@ Every control except a button takes a radius of its height ÷ 4. The same quarte
 
 <FoundationExample caption="Each control takes the radius of its height divided by four. Buttons are the exception: 6 default, 4 compact.">
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)' }}>
-    <Control height="--item-height-sm" radius="--radius-h24">24 · radius 6</Control>
-    <Control height="--item-height-md" radius="--radius-lg">32 · radius 8</Control>
+    <Control height="--item-height-sm" radius="--radius-control-sm">24 · radius 6</Control>
+    <Control height="--item-height-md" radius="--radius-control-md">32 · radius 8</Control>
     <Control height="--row-height-md" radius="calc(var(--row-height-md) / 4)">40 · radius 10</Control>
-    <Control height="--item-height-md" radius="--radius-h24">Button 32 · radius 6</Control>
+    <Control height="--item-height-md" radius="--radius-control-sm">Button 32 · radius 6</Control>
     <Control height="--item-height-sm" radius="--radius-md">Compact button 24 · radius 4</Control>
 </div>
 </FoundationExample>
@@ -130,14 +129,14 @@ Every control except a button takes a radius of its height ÷ 4. The same quarte
     rows={[
         ['8', '2', <C>--radius-sm</C>],
         ['16', '4', <C>--radius-md</C>],
-        ['24', '6', <C>--radius-h24</C>],
-        ['32', '8', <><C>--radius-lg</C> · <C>--radius-h32</C></>],
-        ['40', '10', <>the 0625 step, <C>--radius-0625</C></>],
-        ['Menu with 24 or 32 high rows', '10 or 12', <><C>--popover-radius-menu-sm</C> · <C>--popover-radius-menu-md</C></>],
+        ['24', '6', <C>--radius-control-sm</C>],
+        ['32', '8', <C>--radius-control-md</C>],
+        ['40', '10', <C>--radius-control-lg</C>],
+        ['Menu', '12', <C>--popup-radius</C>],
     ]}
 />
 
-A menu's radius is its item radius plus its padding: 24 high rows round at 6 and the menu at 10, 32 high rows at 8 and the menu at 12, 40 high rows at 10 and the menu at 14. Pills and avatars use `--radius-full`.
+A menu takes the Popup radius, 12. Pills and avatars use `--radius-full`.
 
 Flush parts are clipped, not rounded: a part that touches its parent's edge, such as a table's head row or a card's image, takes no radius of its own. The parent's radius clips it.
 
@@ -161,16 +160,13 @@ Components bind the semantic token, never the primitive. This is what the code a
 <RefTable
     head={['Pattern', 'Code token']}
     rows={[
-        ['Page (content box)', <C>--page-radius</C>],
         ['Card', <C>--card-radius</C>],
-        ['Card, small', <C>--card-radius-sm</C>],
+        ['Card, compact', <C>--card-radius-compact</C>],
         ['Modal', <C>--modal-radius</C>],
-        ['Popup and flag', <C>--popover-radius</C>],
-        ['Menu, 24 and 32 high rows', <><C>--popover-radius-menu-sm</C> · <C>--popover-radius-menu-md</C></>],
-        ['Tooltip', <C>--popover-radius-tooltip</C>],
+        ['Popup, flag and menu', <C>--popup-radius</C>],
+        ['Tooltip', <C>--radius-control-sm</C>],
         ['Table', <C>--table-radius</C>],
-        ['Tile, small and large', <><C>--tile-radius-sm</C> · <C>--tile-radius-lg</C></>],
-        ['Controls', <><C>--radius-sm</C> · <C>-md</C> · <C>-item-sm</C> · <C>-lg</C> · <C>-item-md</C></>],
+        ['Controls', <><C>--radius-control-sm</C> · <C>-md</C> · <C>-lg</C></>],
     ]}
 />
 
@@ -199,8 +195,8 @@ A component's focus state is critical for accessibility. The corner radius of th
 
 <FoundationExample caption="The ring is drawn 2 outside each control and rounds to its radius plus 2.">
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)', padding: 'var(--pad-x-md)' }}>
-    <Control height="--item-height-md" radius="--radius-lg" ring>32 · ring 10</Control>
-    <Control height="--item-height-sm" radius="--radius-h24" ring>24 · ring 8</Control>
+    <Control height="--item-height-md" radius="--radius-control-md" ring>32 · ring 10</Control>
+    <Control height="--item-height-sm" radius="--radius-control-sm" ring>24 · ring 8</Control>
 </div>
 </FoundationExample>
 
@@ -212,9 +208,9 @@ A Tile rounds at 25% of its size. Every part keeps the radius of its own compone
 
 <FoundationExample>
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--section-stack-md)' }}>
-    {[['20', 20, '--tile-radius-sm', 5], ['24', 24, '--radius-h24', 6], ['32', 32, '--radius-lg', 8], ['40', 40, '--tile-radius-lg', 10], ['48', 48, '--card-radius-sm', 12]].map(([label, size, token, r]) => (
+    {[['20', 20, 5], ['24', 24, 6], ['32', 32, 8], ['40', 40, 10], ['48', 48, 12]].map(([label, size, r]) => (
         <span key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', alignItems: 'center', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
-            <span aria-hidden="true" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, borderRadius: `var(${token})`, background: 'var(--ds-background-accent-blue-subtler)', color: 'var(--ds-icon-accent-blue)' }}><i className="fa-solid fa-book-open" /></span>
+            <span aria-hidden="true" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, borderRadius: `calc(${size}px / 4)`, background: 'var(--ds-background-accent-blue-subtler)', color: 'var(--ds-icon-accent-blue)' }}><i className="fa-solid fa-book-open" /></span>
             {label} · radius {r}
         </span>
     ))}
@@ -251,10 +247,10 @@ An inner shape inside a padded container rounds at the container's radius minus 
 
 <DoDont>
 <Do caption="Rows inset 4 inside a 12 menu take 8, so the gap between the two curves stays even.">
-<Menu rowRadius="var(--radius-h32)" />
+<Menu rowRadius="var(--radius-control-md)" />
 </Do>
 <Dont caption="Rows at the menu's own 12. Their corners bulge toward the menu's edge, and the inset looks uneven.">
-<Menu rowRadius="var(--popover-radius-menu-md)" />
+<Menu rowRadius="var(--popup-radius)" />
 </Dont>
 </DoDont>
 
@@ -266,7 +262,7 @@ Take the radius from the height of the control, not from the nearest look.
 
 <DoDont>
 <Do caption="24 high takes 6.">
-<Control height="--item-height-sm" radius="--radius-h24">24 high, radius 6</Control>
+<Control height="--item-height-sm" radius="--radius-control-sm">24 high, radius 6</Control>
 </Do>
 <Dont caption="8 belongs to a 32 high control; on a 24 high one it looks inconsistent beside its siblings.">
 <Control height="--item-height-sm" radius="--radius-lg">24 high, radius 8</Control>

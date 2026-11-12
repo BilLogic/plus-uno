@@ -27,7 +27,7 @@
 
 // ===== MAIN CONTAINER =====
 // The Popups pattern's Popup (Figma Pattern/Popup): one surface, no overlay
-// backdrop and no arrow. Pad 16 (`--popover-pad`), radius 12 (`--popover-radius`).
+// backdrop and no arrow. Pad 16 (`--popover-pad`), radius 12 (`--popup-radius`).
 // The title and body stack Element/stack-md 8 apart on the popup's own fill.
 //
 // WIDTH. `auto` hugs one list: at least the trigger (Base UI's
@@ -56,7 +56,7 @@
     // transparent one keeps an edge in forced colors, where shadows are dropped.
     background-color: var(--ds-surface-overlay);
     border: var(--border-default) solid transparent;
-    border-radius: var(--popover-radius);
+    border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
 
     &.plus-popup--3-col,

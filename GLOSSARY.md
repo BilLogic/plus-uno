@@ -334,7 +334,7 @@ A raw value on the PLUS ×16 ladder, where `space-100` is 16px.
 _Avoid_: "base token", "core token"
 
 **Semantic**:
-A token named by its job, the safety net every value falls back to: Pad, Stack, Inline and Radius sit directly in `spacing / semantics`, named by steps (xs to lg, plus full) with no density words.
+A token named by its job, the safety net every value falls back to: Pad, Stack, Inline and Radius sit directly in `spacing / semantics`, named by steps (Radius reads sm to xxl, plus full) with no density words; Radius / Control is a group beside them, sm, md and lg, one per control height (radius = height ÷ 4).
 _Avoid_: "element token", "foundation token"
 
 **Pattern token**:
