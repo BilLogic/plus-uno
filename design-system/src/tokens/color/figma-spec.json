@@ -18539,7 +18539,7 @@
         "r": 0.1137,
         "g": 0.1059,
         "b": 0.0863,
-        "a": 0.0196
+        "a": 0.1608
        }
       },
       "Dark": {
@@ -18555,7 +18555,7 @@
         "r": 0.1137,
         "g": 0.1059,
         "b": 0.0863,
-        "a": 0.0196
+        "a": 0.1608
        }
       },
       "Dark IC": {
@@ -18603,13 +18603,13 @@
      "description": "offsetY of layer 2 of elevation.shadow.raised.",
      "values": {
       "Light": {
-       "value": 12
+       "value": 1
       },
       "Dark": {
        "value": 1
       },
       "Light IC": {
-       "value": 12
+       "value": 1
       },
       "Dark IC": {
        "value": 1
@@ -18627,13 +18627,13 @@
      "description": "radius of layer 2 of elevation.shadow.raised.",
      "values": {
       "Light": {
-       "value": 32
+       "value": 2
       },
       "Dark": {
        "value": 1
       },
       "Light IC": {
-       "value": 32
+       "value": 2
       },
       "Dark IC": {
        "value": 1
@@ -18675,10 +18675,10 @@
      "values": {
       "Light": {
        "value": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 0
+        "r": 0.1137,
+        "g": 0.1059,
+        "b": 0.0863,
+        "a": 0.0196
        }
       },
       "Dark": {
@@ -18691,10 +18691,10 @@
       },
       "Light IC": {
        "value": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 0
+        "r": 0.1137,
+        "g": 0.1059,
+        "b": 0.0863,
+        "a": 0.0196
        }
       },
       "Dark IC": {
@@ -18742,13 +18742,13 @@
      "description": "offsetY of layer 3 of elevation.shadow.raised.",
      "values": {
       "Light": {
-       "value": 0
+       "value": 12
       },
       "Dark": {
        "value": 0
       },
       "Light IC": {
-       "value": 0
+       "value": 12
       },
       "Dark IC": {
        "value": 0
@@ -18766,13 +18766,13 @@
      "description": "radius of layer 3 of elevation.shadow.raised.",
      "values": {
       "Light": {
-       "value": 0
+       "value": 32
       },
       "Dark": {
        "value": 1
       },
       "Light IC": {
-       "value": 0
+       "value": 32
       },
       "Dark IC": {
        "value": 1
@@ -19221,6 +19221,423 @@
      }
     },
     {
+     "name": "elevation/shadow/blocking/layer-1",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Layer 1 color of elevation.shadow.blocking; literal per mode, bound into the effect style.",
+     "values": {
+      "Light": {
+       "value": {
+        "r": 0.1137,
+        "g": 0.1059,
+        "b": 0.0863,
+        "a": 0.0706
+       }
+      },
+      "Dark": {
+       "value": {
+        "r": 0.9686,
+        "g": 0.9647,
+        "b": 0.9608,
+        "a": 0.1216
+       }
+      },
+      "Light IC": {
+       "value": {
+        "r": 0.1137,
+        "g": 0.1059,
+        "b": 0.0863,
+        "a": 0.4902
+       }
+      },
+      "Dark IC": {
+       "value": {
+        "r": 0.9686,
+        "g": 0.9647,
+        "b": 0.9608,
+        "a": 0.502
+       }
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-1/offsetX",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "offsetX of layer 1 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 0
+      },
+      "Dark": {
+       "value": 0
+      },
+      "Light IC": {
+       "value": 0
+      },
+      "Dark IC": {
+       "value": 0
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-1/offsetY",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "offsetY of layer 1 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 0
+      },
+      "Dark": {
+       "value": 0
+      },
+      "Light IC": {
+       "value": 0
+      },
+      "Dark IC": {
+       "value": 0
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-1/radius",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "radius of layer 1 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 0
+      },
+      "Dark": {
+       "value": 0
+      },
+      "Light IC": {
+       "value": 0
+      },
+      "Dark IC": {
+       "value": 0
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-1/spread",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "spread of layer 1 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 1
+      },
+      "Dark": {
+       "value": 1
+      },
+      "Light IC": {
+       "value": 1
+      },
+      "Dark IC": {
+       "value": 1
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-2",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Layer 2 color of elevation.shadow.blocking; literal per mode, bound into the effect style.",
+     "values": {
+      "Light": {
+       "value": {
+        "r": 0.1137,
+        "g": 0.1059,
+        "b": 0.0863,
+        "a": 0.0706
+       }
+      },
+      "Dark": {
+       "value": {
+        "r": 0.0784,
+        "g": 0.0784,
+        "b": 0.0745,
+        "a": 0.3608
+       }
+      },
+      "Light IC": {
+       "value": {
+        "r": 0.1137,
+        "g": 0.1059,
+        "b": 0.0863,
+        "a": 0.0706
+       }
+      },
+      "Dark IC": {
+       "value": {
+        "r": 0.0784,
+        "g": 0.0784,
+        "b": 0.0745,
+        "a": 0.3608
+       }
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-2/offsetX",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "offsetX of layer 2 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 0
+      },
+      "Dark": {
+       "value": 0
+      },
+      "Light IC": {
+       "value": 0
+      },
+      "Dark IC": {
+       "value": 0
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-2/offsetY",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "offsetY of layer 2 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 8
+      },
+      "Dark": {
+       "value": 8
+      },
+      "Light IC": {
+       "value": 8
+      },
+      "Dark IC": {
+       "value": 8
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-2/radius",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "radius of layer 2 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 16
+      },
+      "Dark": {
+       "value": 12
+      },
+      "Light IC": {
+       "value": 16
+      },
+      "Dark IC": {
+       "value": 12
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-2/spread",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "spread of layer 2 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 0
+      },
+      "Dark": {
+       "value": 0
+      },
+      "Light IC": {
+       "value": 0
+      },
+      "Dark IC": {
+       "value": 0
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-3",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Layer 3 color of elevation.shadow.blocking; literal per mode, bound into the effect style.",
+     "values": {
+      "Light": {
+       "value": {
+        "r": 0.1137,
+        "g": 0.1059,
+        "b": 0.0863,
+        "a": 0.1608
+       }
+      },
+      "Dark": {
+       "value": {
+        "r": 0.0784,
+        "g": 0.0784,
+        "b": 0.0745,
+        "a": 0.502
+       }
+      },
+      "Light IC": {
+       "value": {
+        "r": 0.1137,
+        "g": 0.1059,
+        "b": 0.0863,
+        "a": 0.1608
+       }
+      },
+      "Dark IC": {
+       "value": {
+        "r": 0.0784,
+        "g": 0.0784,
+        "b": 0.0745,
+        "a": 0.502
+       }
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-3/offsetX",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "offsetX of layer 3 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 0
+      },
+      "Dark": {
+       "value": 0
+      },
+      "Light IC": {
+       "value": 0
+      },
+      "Dark IC": {
+       "value": 0
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-3/offsetY",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "offsetY of layer 3 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 24
+      },
+      "Dark": {
+       "value": 0
+      },
+      "Light IC": {
+       "value": 24
+      },
+      "Dark IC": {
+       "value": 0
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-3/radius",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "radius of layer 3 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 56
+      },
+      "Dark": {
+       "value": 1
+      },
+      "Light IC": {
+       "value": 56
+      },
+      "Dark IC": {
+       "value": 1
+      }
+     }
+    },
+    {
+     "name": "elevation/shadow/blocking/layer-3/spread",
+     "type": "FLOAT",
+     "codeSyntax": {},
+     "scopes": [
+      "EFFECT_FLOAT"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "spread of layer 3 of elevation.shadow.blocking.",
+     "values": {
+      "Light": {
+       "value": 0
+      },
+      "Dark": {
+       "value": 1
+      },
+      "Light IC": {
+       "value": 0
+      },
+      "Dark IC": {
+       "value": 1
+      }
+     }
+    },
+    {
      "name": "elevation/shadow/overflow/layer-1",
      "codeSyntax": {},
      "scopes": [
@@ -19599,6 +20016,45 @@
       "offsetY": "elevation/shadow/overlay/layer-3/offsetY",
       "radius": "elevation/shadow/overlay/layer-3/radius",
       "spread": "elevation/shadow/overlay/layer-3/spread"
+     },
+     "geometryDiffersByMode": true
+    }
+   ]
+  },
+  {
+   "name": "elevation/shadow/blocking",
+   "description": "Box shadow of a modal that blocks the page behind a Backdrop. Pair with elevation.surface.overlay.",
+   "layers": [
+    {
+     "type": "DROP_SHADOW",
+     "bind": {
+      "color": "elevation/shadow/blocking/layer-1",
+      "offsetX": "elevation/shadow/blocking/layer-1/offsetX",
+      "offsetY": "elevation/shadow/blocking/layer-1/offsetY",
+      "radius": "elevation/shadow/blocking/layer-1/radius",
+      "spread": "elevation/shadow/blocking/layer-1/spread"
+     },
+     "geometryDiffersByMode": false
+    },
+    {
+     "type": "DROP_SHADOW",
+     "bind": {
+      "color": "elevation/shadow/blocking/layer-2",
+      "offsetX": "elevation/shadow/blocking/layer-2/offsetX",
+      "offsetY": "elevation/shadow/blocking/layer-2/offsetY",
+      "radius": "elevation/shadow/blocking/layer-2/radius",
+      "spread": "elevation/shadow/blocking/layer-2/spread"
+     },
+     "geometryDiffersByMode": true
+    },
+    {
+     "type": "DROP_SHADOW",
+     "bind": {
+      "color": "elevation/shadow/blocking/layer-3",
+      "offsetX": "elevation/shadow/blocking/layer-3/offsetX",
+      "offsetY": "elevation/shadow/blocking/layer-3/offsetY",
+      "radius": "elevation/shadow/blocking/layer-3/radius",
+      "spread": "elevation/shadow/blocking/layer-3/spread"
      },
      "geometryDiffersByMode": true
     }

@@ -5,7 +5,7 @@
 // Point COLOR_REFERENCE_DIR at the folder that holds `generator/` and `out/` to
 // run it from another checkout.
 //
-// Six departures from the reference are deliberate, and the comparison is
+// Seven departures from the reference are deliberate, and the comparison is
 // shaped around them:
 // - PLUS adds tokens the reference never had: `color.background.smart.<subject>.subtle`,
 //   the mid-strength SMART fill for illustration bodies. They are dropped from
@@ -26,6 +26,10 @@
 //   and steps, the SMART chart series, and the gray chart mark in dark
 //   increased contrast (`semantics.mjs` § charts). Those tokens are left out
 //   of every comparison; `check:color-system` holds them instead.
+// - Elevation 2.0 moved after the reference was cut: light `shadow.raised` gained a key
+//   layer, `shadow.blocking` is new, and the plan names its layers edge/key/ambient
+//   (arrays in the reference). Both shadows are left out of every comparison, and the
+//   plans' overlay is compared in the reference's array form; `emit.test.mjs` holds them.
 // - Lagoon was retuned toward Notion's teal after the reference was cut (plan-a.json
 //   `accents`). The reference's Lagoon hexes are swapped for ours, step for step,
 //   before any comparison, so every other value is still held to the reference.
@@ -65,6 +69,16 @@ const keptSpec = (spec) => ({
     variables: c.variables.filter((v) => !isDeparture(v.name.replace(/\/default$/, '').replaceAll('/', '.'))),
   })),
 });
+/** Elevation 2.0 shadows, held by `emit.test.mjs` instead. */
+const ELEVATION_2 = /shadow[./-](raised|blocking)\b/;
+const slotsToArray = (spec) => (Array.isArray(spec) ? spec : [spec.edge, spec.key, spec.ambient]);
+/** Our palette with the plan's named shadow slots in the reference's array form, and the departed shadows dropped. */
+const refShape = (palette) => ({
+  ...palette,
+  shadow: { overlay: slotsToArray(palette.shadow.overlay) },
+});
+const withoutElevation2 = (rows) => rows.filter((r) => !ELEVATION_2.test(r.name));
+const withoutElevation2Lines = (css) => css.split('\n').filter((l) => !ELEVATION_2.test(l)).join('\n');
 /** A stylesheet without the departed declarations. */
 const keptCss = (css) => css.split('\n').filter((l) => !/--ds-chart-(categorical|smart)-|--ds-chart-(neutral|gray-bold):/.test(l)).join('\n');
 /** Rewrites the reference's Lagoon values (hex, bare hex and rgb triplets) to ours, for the plan's retuned steps. */
@@ -98,8 +112,10 @@ for (const key of ['A', 'B']) {
     const { semantics } = buildPlan(key);
     const ref = json(`generator/palette_${key}.json`).palette;
     ref.lagoon = semantics.palette.lagoon; // retuned on purpose, see the header
-    assert.deepEqual(semantics.palette, ref);
-    assert.deepEqual(Object.keys(semantics.palette), Object.keys(ref));
+    delete ref.shadow.raised; // Elevation 2.0, see the header
+    const ours = refShape(semantics.palette);
+    assert.deepEqual(ours, ref);
+    assert.deepEqual(Object.keys(ours), Object.keys(ref));
   });
 
   test(`Plan ${key}: every reference token but the chart departures matches, names, refs and hex, in every mode`, { skip }, () => {
@@ -108,13 +124,18 @@ for (const key of ['A', 'B']) {
     const rows = semantics.rows.filter((r) => !PLUS_ONLY_TOKEN.test(r.name));
     assert.equal(ref.rows.length, 518);
     assert.deepEqual(values(keptRows(rows)), values(keptRows(ref.rows)));
-    assert.deepEqual(withoutProse(semantics.shadows), withoutProse(ref.shadows));
+    assert.deepEqual(withoutProse(withoutElevation2(semantics.shadows)), withoutProse(withoutElevation2(ref.shadows)));
     assert.deepEqual(withoutProse(semantics.opacity), withoutProse(ref.opacity));
   });
 
   test(`Plan ${key}: the Figma spec matches the reference, descriptions aside`, { skip }, () => {
     const { semantics } = buildPlan(key);
-    assert.deepEqual(withoutProse(keptSpec(withoutPlusOnly(figmaSpec(key, semantics)))), withoutProse(keptSpec(swapJson(lagoonSwap(key), json(`out/${key}/figma-spec.json`)))));
+    const noElevation2 = (spec) => ({
+      ...spec,
+      effectStyles: spec.effectStyles.filter((e) => !ELEVATION_2.test(e.name)),
+      collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !ELEVATION_2.test(v.name)) })),
+    });
+    assert.deepEqual(withoutProse(noElevation2(keptSpec(withoutPlusOnly(figmaSpec(key, semantics))))), withoutProse(noElevation2(keptSpec(swapJson(lagoonSwap(key), json(`out/${key}/figma-spec.json`))))));
   });
 
   test(`Plan ${key}: palette and semantic SCSS match byte for byte below the header`, { skip }, () => {
@@ -126,8 +147,8 @@ for (const key of ['A', 'B']) {
 
   test(`Plan ${key}: elevation and bridge SCSS keep every reference block`, { skip }, () => {
     const files = renderPlan(key, 'scripts/generate-color-tokens.mjs');
-    const ours = blocks(body(files['_elevation.scss']));
-    for (const b of blocks(body(readFileSync(join(REF, `out/${key}/_elevation.scss`), 'utf8')))) assert.ok(ours.includes(b), `_elevation.scss: ${b.split('\n')[0]}`);
+    const ours = blocks(withoutElevation2Lines(body(files['_elevation.scss'])));
+    for (const b of blocks(withoutElevation2Lines(body(readFileSync(join(REF, `out/${key}/_elevation.scss`), 'utf8'))))) assert.ok(ours.includes(b), `_elevation.scss: ${b.split('\n')[0]}`);
 
     const decls = (b) => (b.match(/--bs-[^\n;]+/g) ?? []).map((d) => d.replace(/(-rgb: )(\d+)[ ,]+(\d+)[ ,]+(\d+)/, '$1$2,$3,$4'));
     const bySelector = (css) => new Map(blocks(css).map((b) => [b.slice(0, b.indexOf('{')).trim(), decls(b)]));
