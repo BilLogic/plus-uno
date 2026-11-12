@@ -28,8 +28,8 @@ export const STAGE = 1024; // docs-literal
 /** The width the small pictures lay out at, so their words stay legible at card size. Docs geometry, in px. */
 export const PLACE_STAGE = 600; // docs-literal
 
-/** Docs geometry, in px: the window height of a page picture. */
-const WINDOW = 420; // docs-literal
+/** Docs geometry, in px: the window height of the picture whose Flag sits over the page; the others hug their content. */
+const WINDOW = 260; // docs-literal
 
 const noop = () => {};
 const pad = { padding: 'var(--page-pad)', boxSizing: 'border-box' };
@@ -103,7 +103,7 @@ export const SeverityRow = () => (
 
 /** The Frame tier: system news across the whole width, above the page. The Frame's own banner slot is Planned, so the picture sets the Banner above the Frame's content. */
 export const TierFrame = () => (
-    <BrowserWindow address="app.plus.org/sessions" height={WINDOW}>
+    <BrowserWindow address="app.plus.org/sessions">
         <Banner appearance="announcement">Scheduled maintenance Saturday 2–4 AM ET.</Banner>
         <div style={pad}>
             <DemoPageHeader title="Sessions" description="This week" />
@@ -113,7 +113,7 @@ export const TierFrame = () => (
 
 /** The Page tier: under the page header, about this page. */
 export const TierPage = () => (
-    <BrowserWindow address="app.plus.org/sessions" height={WINDOW}>
+    <BrowserWindow address="app.plus.org/sessions">
         <div style={pad}>
             <DemoPageHeader title="Sessions" description="This week" />
             <Banner appearance="warning">Tutoring sessions move to the new calendar on Friday.</Banner>
@@ -123,7 +123,7 @@ export const TierPage = () => (
 
 /** The Section tier: at the top of one collection, about that collection. */
 export const TierSection = () => (
-    <BrowserWindow address="app.plus.org/students" height={WINDOW}>
+    <BrowserWindow address="app.plus.org/students">
         <div style={pad}>
             <DemoPageHeader title="Students" description="Algebra B" />
             <PatternSection title="Students" tabs={<ViewBar views={['All students']} filters={null} primary={null} />}>

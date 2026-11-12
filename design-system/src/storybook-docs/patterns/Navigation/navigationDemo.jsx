@@ -1,9 +1,10 @@
 import React from 'react';
 
+import { DynamicTable } from '@/components';
 import { PatternSection } from '@/patterns';
 import { CardsSection, DemoPageHeader, PageActions, PageTabs, ViewSelect } from '../../../patterns/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
+import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
 import { NamesDo, TabLabelDo, TabLabelDont } from '../../../patterns/Sidebar/Sidebar.examples.jsx';
 
 /**
@@ -33,8 +34,23 @@ export const SMALL_STAGE = 640; // docs-literal
 /** The width of a Sidebar picture's box. Docs geometry, in px. */
 export const SIDEBAR_STAGE = 320; // docs-literal
 
-/** Docs geometry, in px: the window height of a page picture. */
-const WINDOW = 420; // docs-literal
+const SESSION_HEAD = { cells: ['Time', 'Tutor', 'Subject'].map((content) => ({ key: content, content })) };
+const SESSIONS = [
+    ['Thu 4:00 PM', 'Ms. Ortiz', 'Algebra B'],
+    ['Thu 5:30 PM', 'Mr. Patel', 'Reading circle'],
+    ['Fri 3:30 PM', 'Ms. Ortiz', 'Geometry A'],
+    ['Sat 10:00 AM', 'Ms. Kim', 'Algebra B'],
+];
+
+/** A Dynamic table of upcoming sessions: real rows, so the picture needs no stage taller than its content. */
+const SessionsTable = () => (
+    <DynamicTable
+        head={SESSION_HEAD}
+        rows={SESSIONS.map((cells) => ({ key: cells.join(), cells: cells.map((content) => ({ key: content, content })) }))}
+        label="Sessions"
+        isFixedSize
+    />
+);
 
 const pad = { padding: 'var(--page-pad)', boxSizing: 'border-box' };
 
@@ -72,7 +88,7 @@ export const ViewsPicture = () => (
 
 /** Tier 2: page tabs at the bottom of a record's page header. */
 export const PageTabsPicture = () => (
-    <BrowserWindow address="app.plus.org/students/maya-rodriguez" height={WINDOW}>
+    <BrowserWindow address="app.plus.org/students/maya-rodriguez">
         <div style={pad}>
             <DemoPageHeader breadcrumb={RECORD_CRUMBS} title="Maya Rodriguez" description="Grade 8 · Math" actions={<PageActions />} tabs={<PageTabs active="sessions" />} />
         </div>
@@ -81,7 +97,7 @@ export const PageTabsPicture = () => (
 
 /** Tier 3: the record page after a drill-in. The breadcrumb is the record's place, parents only. */
 export const DrillPicture = () => (
-    <BrowserWindow address="app.plus.org/students/maya-rodriguez" height={WINDOW}>
+    <BrowserWindow address="app.plus.org/students/maya-rodriguez">
         <div style={pad}>
             <DemoPageHeader breadcrumb={RECORD_CRUMBS} title="Maya Rodriguez" description="Grade 8 · Math" actions={<PageActions />} />
             <CardsSection title="Upcoming sessions" />
@@ -91,11 +107,11 @@ export const DrillPicture = () => (
 
 /** An area page: the title alone, no breadcrumb, the collection's Primary at the end of its view bar. */
 export const AreaPagePicture = () => (
-    <BrowserWindow address="app.plus.org/students" height={WINDOW}>
+    <BrowserWindow address="app.plus.org/students">
         <div style={pad}>
             <DemoPageHeader title="Students" />
             <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students']} filters={null} primary="Add student" more={false} />}>
-                <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Students table</p>
+                <StudentsTable count={4} />
             </PatternSection>
         </div>
     </BrowserWindow>
@@ -103,11 +119,11 @@ export const AreaPagePicture = () => (
 
 /** One tab system: page tabs under the title, and the Section's views as one Select. */
 export const TabsUnderPicture = () => (
-    <BrowserWindow address="app.plus.org/students/maya-rodriguez" height={WINDOW}>
+    <BrowserWindow address="app.plus.org/students/maya-rodriguez">
         <div style={pad}>
             <DemoPageHeader breadcrumb={RECORD_CRUMBS} title="Maya Rodriguez" description="Grade 8 · Math" tabs={<PageTabs active="sessions" />} />
             <PatternSection title="Sessions" type="tabs-only" tabs={<ViewSelect />}>
-                <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Sessions table</p>
+                <SessionsTable />
             </PatternSection>
         </div>
     </BrowserWindow>
