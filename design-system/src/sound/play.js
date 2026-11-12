@@ -160,10 +160,10 @@ function scheduleKnock({ ctx, dry, send, noise: buffer }, e, start) {
  * Plays a sound token. Its pickup starts `at` seconds from now, so its first
  * note lands one pickup later; pass `soundStartFor(...)` to land it with its
  * motion. Reduced motion does not mute it; only the setting does.
- * @param {string} token a sound token without the `sound.` prefix, e.g. `notify`
- * @param {{at?: number}} [options]
  * A token that plays again inside the plan's burst window is dropped, so a burst of
  * the same sound plays once.
+ * @param {string} token a sound token without the `sound.` prefix, e.g. `notify`
+ * @param {{at?: number}} [options]
  * @returns {boolean} whether it was scheduled
  */
 export function playSound(token, { at = 0 } = {}) {

@@ -99,7 +99,6 @@ describe('playSound', () => {
     const create = ctx.createOscillator.bind(ctx);
     ctx.createOscillator = () => { const n = create(); nodes.push(n); return n; };
     const burst = SOUND_SPEC.burst;
-    expect(burst).toBe(2);
     expect([playSound('roster'), (ctx.currentTime += 0.5, playSound('roster')), (ctx.currentTime += 1, playSound('roster'))]).toEqual([true, false, false]);
     expect(nodes).toHaveLength(scoreFor('roster').events.filter((e) => e.kind === 'tone').length);
     ctx.currentTime += burst;

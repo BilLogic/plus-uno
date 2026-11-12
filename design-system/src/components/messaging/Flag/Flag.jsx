@@ -181,7 +181,7 @@ export const Flag = ({
      * never another prop change.
      */
     const landing = useRef({});
-    landing.current = { sound: sound === undefined || sound === true ? defaultSound(flagAppearance) : sound, reduced };
+    landing.current = { sound: sound ?? defaultSound(flagAppearance), reduced };
     useEffect(() => {
         const { sound: token, reduced: isReduced } = landing.current;
         if (show && token) playOnLand(token, isReduced);
