@@ -5,8 +5,7 @@ import PatternSection, { SectionToolbar } from './PatternSection';
 /**
  * The Section pattern follows the Figma Section: no fill and no pad of its
  * own, a `_Section header` of five types, a body laid out single, split or
- * as subsections, an optional footer, a toolbar with a default and a selected
- * state, and a loading header. Sizes and colors are asserted in the browser,
+ * as subsections, an optional footer, a toolbar, and a loading header. Sizes and colors are asserted in the browser,
  * in the `Patterns/Section/Section` stories; this file holds structure.
  */
 const section = (container) => container.querySelector('section');
@@ -144,7 +143,7 @@ describe('PatternSection', () => {
 });
 
 describe('SectionToolbar', () => {
-    it('default state: search, filters, count, then actions at the end', () => {
+    it('search, filters, count, then actions at the end', () => {
         const { container } = render(
             <SectionToolbar
                 search={<input aria-label="Search students" />}
@@ -154,34 +153,11 @@ describe('SectionToolbar', () => {
             />,
         );
         const toolbar = container.firstChild;
-        expect(toolbar.className).toContain('plus-section-toolbar--default');
         const start = toolbar.querySelector('.plus-section-toolbar__start');
         expect(within(start).getByRole('textbox', { name: 'Search students' })).toBeInTheDocument();
         expect(within(start).getByRole('button', { name: 'Status' })).toBeInTheDocument();
         expect(within(start).getByText('48 students')).toBeInTheDocument();
         expect(within(toolbar.querySelector('.plus-section-toolbar__actions')).getByRole('button', { name: 'Export' })).toBeInTheDocument();
-    });
-
-    it('selected state: the selection, bulk actions and Clear, announced politely', () => {
-        const onClear = vi.fn();
-        const { container } = render(
-            <SectionToolbar
-                state="selected"
-                selection="3 selected"
-                bulkActions={<button type="button">Assign tutor</button>}
-                actions={<button type="button">Export</button>}
-                search={<input aria-label="Search" />}
-                onClear={onClear}
-            />,
-        );
-        expect(container.firstChild.className).toContain('plus-section-toolbar--selected');
-        expect(screen.getByText('3 selected')).toHaveAttribute('aria-live', 'polite');
-        expect(screen.getByRole('button', { name: 'Assign tutor' })).toBeInTheDocument();
-        // The default state's parts give way to the bulk bar.
-        expect(screen.queryByRole('button', { name: 'Export' })).toBeNull();
-        expect(screen.queryByRole('textbox')).toBeNull();
-        screen.getByRole('button', { name: 'Clear' }).click();
-        expect(onClear).toHaveBeenCalledOnce();
     });
 
     it('is reachable as PatternSection.Toolbar', () => {

@@ -87,8 +87,6 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## State
 
-<ComponentExample of={PatternSectionStories.ToolbarSelected} title="Toolbar selected" description={<>With rows selected, the toolbar shows the selection, bulk actions and Clear on <code>--ds-background-selected</code>.</>} />
-
 <ComponentExample of={PatternSectionStories.LoadingDefault} title="Loading" description={<><code>loading</code> swaps the header for a title bar and a description bar, and marks the section busy.</>} />
 
 <ComponentExample of={PatternSectionStories.LoadingToolbar} title="Loading, toolbar" description="A toolbar header adds a bar for its row." />
@@ -164,7 +162,7 @@ The Page around a section supplies the pad; for a region with a fill of its own,
 4. **Footer** (optional). A slot at the end, for "View all" or paging.
 5. **Detail** (optional). A subtle-fill region on the right with its own title, description, Previous and Next, and footer.
 
-The **toolbar** is its own part, `PatternSection.Toolbar`: search, filters and a count that truncates first, then actions. In its selected state it shows the selection, bulk actions and Clear.
+The **toolbar** is its own part, `PatternSection.Toolbar`: search, filters and a count that truncates first, then actions. Selecting rows never changes it: a Dynamic table's bulk bar is the table's own head row, so the toolbar stays put.
 
 ### States
 
@@ -176,7 +174,6 @@ A section has no interactive states: it does not respond to hover, press or focu
 </thead>
 <tbody>
 <tr><td>Loading</td><td>Skeleton bars replace the header, and the section is marked busy. The body is the content's to load.</td></tr>
-<tr><td>Toolbar selected</td><td>The toolbar row swaps to the selection, bulk actions and Clear on <code>--ds-background-selected</code>.</td></tr>
 <tr><td>Detail open</td><td>A record shows in the detail region; below 960 it replaces the list.</td></tr>
 </tbody>
 </DocsTable>
@@ -199,7 +196,6 @@ A section has no interactive states: it does not respond to hover, press or focu
 <tr><td><code>--heading-large</code>, <code>-medium</code>, <code>-small</code></td><td>24/28, 20/24, 16/20</td><td>A page title, a section title and a subsection title.</td></tr>
 <tr><td><code>--body-default</code></td><td>14/20</td><td>The description, at every level.</td></tr>
 <tr><td><code>--ds-text</code>, <code>--ds-text-subtle</code></td><td>color</td><td>The title and the description.</td></tr>
-<tr><td><code>--ds-background-selected</code></td><td>color</td><td>The bulk bar of the selected toolbar.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -267,7 +263,7 @@ Put Previous and Next in the detail header, and keep one detail per Section.
 <tr><td>Title the section with what it holds, in sentence case: "Upcoming sessions".</td><td>A title that repeats the only card inside it.</td></tr>
 <tr><td>Keep the description to one line: "Next 7 days".</td><td>A paragraph under the title.</td></tr>
 <tr><td>View labels of one or two words: "Active", "Paused".</td><td>Long labels, or views of different things.</td></tr>
-<tr><td>A count in words: "48 students", "3 selected".</td><td>A bare number.</td></tr>
+<tr><td>A count in words: "48 students", "12 open flags".</td><td>A bare number.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -282,7 +278,6 @@ Put Previous and Next in the detail header, and keep one detail per Section.
 - In the custom and tabs-only types the title is hidden from sight but stays in the page, so the section keeps its name. Always give those sections a title.
 - `named` makes the section a region named by its title, for a section that stands apart as a landmark. The detail region is named by `detailTitle`.
 - A loading section is marked busy, and the skeleton bars are hidden from assistive technology.
-- The selected toolbar announces its selection, such as "3 selected", politely. Selection is never color alone: the count and Clear say it in words.
 - Give the tabs row a label that says what the tabs switch, such as "Views".
 
 </div>

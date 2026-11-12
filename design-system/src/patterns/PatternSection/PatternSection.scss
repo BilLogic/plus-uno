@@ -202,9 +202,8 @@
 }
 
 /*
- * `_Section toolbar`. Default: search, filters and count at the start,
- * actions at the end, wrapping Section/stack-sm under each other on a narrow
- * section. Selected: the bulk bar on the selected background.
+ * `_Section toolbar`: search, filters and count at the start, actions at the
+ * end, wrapping Section/stack-sm under each other on a narrow section.
  */
 .plus-section-toolbar {
     display: flex;
@@ -248,14 +247,3 @@
     white-space: nowrap;
 }
 
-.plus-section-toolbar--selected {
-    padding: 0 var(--table-pad-x-cell);
-    border-radius: var(--radius-lg);
-    background-color: var(--ds-background-selected);
-}
-
-.plus-section-toolbar__selection {
-    font: var(--body-small);
-    color: var(--ds-text);
-    white-space: nowrap;
-}

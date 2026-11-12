@@ -8431,7 +8431,6 @@
         "Footer",
         "Anatomy",
         "Levels",
-        "ToolbarSelected",
         "LoadingDefault",
         "LoadingToolbar",
         "LoadingTabsOnly",
@@ -8449,7 +8448,6 @@
       "tokens": [
         "--body-default",
         "--body-small",
-        "--ds-background-selected",
         "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
@@ -8462,7 +8460,6 @@
         "--inline-md",
         "--inline-sm",
         "--item-height-md",
-        "--radius-lg",
         "--section-min-width-main",
         "--section-min-width-side",
         "--section-pad-x-default",
@@ -8473,7 +8470,6 @@
         "--section-stack-sm",
         "--size-300",
         "--stack-sm",
-        "--table-pad-x-cell",
         "--width-3000"
       ],
       "subComponents": [
@@ -8481,13 +8477,6 @@
           "name": "Toolbar",
           "impl": "SectionToolbar",
           "props": [
-            {
-              "name": "state",
-              "type": "enum",
-              "required": false,
-              "default": null,
-              "description": "`default`: search, filters, count and actions. `selected`: the selection, bulk actions and Clear."
-            },
             {
               "name": "search",
               "type": "node",
@@ -8515,34 +8504,6 @@
               "required": false,
               "default": null,
               "description": "Actions slot, at the end"
-            },
-            {
-              "name": "selection",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Selected state: the selection, such as \"3 selected\""
-            },
-            {
-              "name": "bulkActions",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Selected state: bulk action buttons"
-            },
-            {
-              "name": "onClear",
-              "type": "func",
-              "required": false,
-              "default": null,
-              "description": "Selected state: shows Clear, and runs when it is pressed"
-            },
-            {
-              "name": "clearLabel",
-              "type": "string",
-              "required": false,
-              "default": null,
-              "description": "Selected state: the Clear button's label"
             },
             {
               "name": "className",
