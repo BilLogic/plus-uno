@@ -115,7 +115,7 @@ const appearanceShape = {
   title: 'Appearance, as a shape',
   caption: 'How it looks: the shape fades in, then changes color. It never moves or changes size.',
   viewBox: VIEW,
-  initial: { o: 0.15, c: 0 },
+  initial: { o: 0.6, c: 0 },
   landing: { o: 1, c: 1 },
   draw: ({ o, c }) => (
     <g opacity={o}>
