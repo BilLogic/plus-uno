@@ -28,13 +28,9 @@
     order: 1;
 }
 
-.plus-spotlight-dismiss-button {
-    background: none;
-    border: none;
+// An IconButton on the inverse ground: only its colors change, never its size or radius.
+.plus-btn.plus-spotlight-dismiss-button {
     color: var(--ds-icon-inverse);
-    cursor: pointer;
-    padding: var(--space-025);
-    border-radius: var(--radius-md);
 
     @include plus-state((
         hovered: (background-color: var(--ds-interaction-inverse-hovered)),

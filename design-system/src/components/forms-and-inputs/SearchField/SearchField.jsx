@@ -408,7 +408,7 @@ const SearchField = ({
                     icon="xmark"
                     label={clearLabel}
                     appearance="subtle"
-                    spacing="compact"
+                    spacing={spacing}
                     className="plus-search-field__clear"
                     onClick={clear}
                 />

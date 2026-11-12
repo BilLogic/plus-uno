@@ -60,25 +60,9 @@
     min-width: 0;
 }
 
+// The close button is an IconButton; the header only pushes it to the end.
 .plus-pattern-modal-close {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-025) var(--pad-x-sm);
     margin-left: auto;
-    background: transparent;
-    border: none;
-    border-radius: var(--radius-md);
-    color: var(--ds-icon-subtle);
-    cursor: pointer;
-
-    @include plus-state(
-        (
-            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
-            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
-        ),
-        $ring: false
-    );
 }
 
 /* Body: takes what the header and footer leave and scrolls past the cap */

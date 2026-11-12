@@ -51,6 +51,61 @@ Default.play = async ({ canvasElement }) => {
     await expect(send, 'empty field cannot send').toBeDisabled();
 };
 
+/* ------------------------------------------------------------ button inside */
+
+const insets = (button, box) => {
+    const b = button.getBoundingClientRect();
+    const f = box.getBoundingClientRect();
+    return { top: b.top - f.top, bottom: f.bottom - b.bottom, end: f.right - b.right };
+};
+
+/** One line is 40 high; Send is a default (32, radius 6) button 4 from the edge on every side. */
+export const ButtonInside = () => (
+    <div style={wrap}>
+        <PromptInput label="Message to AI chat" placeholder="Ask anything" onSubmit={fn()} />
+    </div>
+);
+
+ButtonInside.play = async ({ canvasElement }) => {
+    const box = canvasElement.querySelector('.plus-field');
+    const send = within(canvasElement).getByRole('button', { name: 'Send' });
+    await expect(box.getBoundingClientRect().height).toBe(40);
+    await expect(send.getBoundingClientRect().height).toBe(32);
+    await expect(getComputedStyle(send).borderTopLeftRadius).toBe('6px');
+    await expect(insets(send, box)).toEqual({ top: 4, bottom: 4, end: 4 });
+};
+
+/** As the text grows Send stays on the last line, 4 above the bottom edge. */
+export const ButtonStaysBottom = () => (
+    <div style={wrap}>
+        <PromptInput label="Message to AI chat" defaultValue={'one\ntwo\nthree'} onSubmit={fn()} />
+    </div>
+);
+
+ButtonStaysBottom.play = async ({ canvasElement }) => {
+    const box = canvasElement.querySelector('.plus-field');
+    const send = within(canvasElement).getByRole('button', { name: 'Send' });
+    await expect(box.getBoundingClientRect().height).toBeGreaterThan(40);
+    await expect(insets(send, box).bottom).toBe(4);
+    await expect(insets(send, box).end).toBe(4);
+};
+
+/** The loading ring follows the field's radius, `--radius-control-lg`. */
+export const RingFollowsField = () => (
+    <div style={wrap}>
+        <PromptInput label="Message to AI chat" isLoading onStop={fn()} />
+    </div>
+);
+
+RingFollowsField.play = async ({ canvasElement }) => {
+    const ring = canvasElement.querySelector('.plus-generative-border');
+    await expect(ring.style.getPropertyValue('--generative-border-radius')).toBe('var(--radius-control-lg)');
+    const box = canvasElement.querySelector('.plus-field');
+    await expect(getComputedStyle(box).borderTopLeftRadius).toBe('10px');
+    const stop = within(canvasElement).getByRole('button', { name: 'Stop generating' });
+    await expect(getComputedStyle(stop).borderTopLeftRadius).toBe('6px');
+};
+
 /* --------------------------------------------------------------- enter-sends */
 
 export const EnterSends = () => {

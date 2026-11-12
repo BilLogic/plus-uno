@@ -102,40 +102,9 @@
     flex-shrink: 0;
 }
 
-/* Close button 32 (Item/height-md) holding a 16 icon. */
+/* The close button is an IconButton (32); the header only keeps it from shrinking. */
 .plus-modal-close-btn {
     flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--item-height-md);
-    height: var(--item-height-md);
-    padding: 0;
-    border: none;
-    border-radius: var(--radius-md);
-    background-color: transparent;
-    color: var(--ds-icon-subtle);
-    font-size: var(--icon-md);
-    cursor: pointer;
-    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
-}
-
-.plus-modal-close-btn {
-    @include plus-state((
-        hovered: (
-            background-color: var(--ds-background-neutral-subtle-hovered),
-            color: var(--ds-icon),
-        ),
-        pressed: (
-            background-color: var(--ds-background-neutral-subtle-pressed),
-            color: var(--ds-icon),
-        ),
-    ), $ring: false);
-}
-
-.plus-modal-close-btn:focus-visible {
-    outline: var(--focus-ring-width) solid var(--ds-border-focused);
-    outline-offset: var(--focus-ring-width);
 }
 
 .plus-modal-divider {

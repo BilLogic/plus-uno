@@ -226,7 +226,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-blocking` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--radius-md` · `--stack-md` · `--stack-sm` · `--stroke-1`
+`--blanket-max-height-modal` · `--body-default` · `--ds-border` · `--ds-shadow-blocking` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-medium` · `--inline-sm` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--stack-md` · `--stack-sm` · `--stroke-1`
 
 From `design-system/src/components/messaging/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

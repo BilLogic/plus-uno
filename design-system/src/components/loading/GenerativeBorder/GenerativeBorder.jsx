@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './GenerativeBorder.scss';
 
 /** The radius tokens a ring can follow: the radius the wrapped content already uses. */
-export const GENERATIVE_BORDER_RADII = ['radius-025', 'radius-050', 'radius-075', 'radius-100', 'radius-full'];
+export const GENERATIVE_BORDER_RADII = ['radius-025', 'radius-050', 'radius-075', 'radius-100', 'radius-full', 'radius-control-sm', 'radius-control-md', 'radius-control-lg'];
 
 /**
  * The border that shows the AI is generating content: a 2px rounded stroke in

@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as SpotlightStories from './Spotlight.stories.jsx';
-import { SpotlightAction } from '@/components';
+import { IconButton, SpotlightAction } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -31,10 +31,7 @@ export const StaticSpotlight = ({ headline, children, stepCount, primaryAction, 
     <div className="plus-spotlight" inert aria-hidden="true">
         <div className="plus-spotlight-header">
             <div className="plus-spotlight-dismiss">
-                {/* raw-button: mirrors the markup Spotlight.jsx renders for its own dismiss control; this copy is inert */}
-                <button type="button" className="plus-spotlight-dismiss-button" aria-label="Dismiss">
-                    <i className="fa-solid fa-xmark" aria-hidden="true" />
-                </button>
+                <IconButton icon="xmark" label="Dismiss" appearance="subtle" isTooltipDisabled className="plus-spotlight-dismiss-button" />
             </div>
             <div className="plus-spotlight-headline">{headline}</div>
         </div>

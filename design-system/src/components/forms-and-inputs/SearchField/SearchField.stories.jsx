@@ -79,6 +79,41 @@ export const Filled = {
     },
 };
 
+/** Offsets of a button from each edge of the field's border box. */
+const insets = (button, box) => {
+    const b = button.getBoundingClientRect();
+    const f = box.getBoundingClientRect();
+    return { top: b.top - f.top, bottom: f.bottom - b.bottom, end: f.right - b.right };
+};
+
+/**
+ * A button inside a field nests: 4 from the edge on every side, and its radius
+ * is the field's minus that 4: 6 in a 40 field, 4 in a 32 field.
+ */
+export const ButtonInside = {
+    render: () => (
+        <div style={stack}>
+            <SearchField placeholder="Search students" spacing="default" defaultValue="Ada" />
+            <SearchField placeholder="Search students" spacing="compact" defaultValue="Ada" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const boxes = [...canvasElement.querySelectorAll('.plus-field')];
+        const expected = [
+            { field: 40, button: 32, radius: '6px' },
+            { field: 32, button: 24, radius: '4px' },
+        ];
+        for (const [i, want] of expected.entries()) {
+            const box = boxes[i];
+            const clear = box.querySelector('.plus-search-field__clear');
+            await expect(box.getBoundingClientRect().height).toBe(want.field);
+            await expect(clear.getBoundingClientRect().height).toBe(want.button);
+            await expect(getComputedStyle(clear).borderTopLeftRadius).toBe(want.radius);
+            await expect(insets(clear, box)).toEqual({ top: 4, bottom: 4, end: 4 });
+        }
+    },
+};
+
 export const Disabled = {
     render: () => <SearchField placeholder="Search students" isDisabled />,
     play: async ({ canvasElement }) => {

@@ -432,7 +432,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-focus-ring.mjs',
-    floors: { MIN_FILES: 100, MIN_RULES: 33 },
+    floors: { MIN_FILES: 100, MIN_RULES: 32 },
     baseline: 'scripts/baselines/focus-ring.json',
     guards: "every focus rule in the design system drawing an affordance that reaches WCAG 1.4.11's 3:1; recorded exceptions carry a reason.",
   },

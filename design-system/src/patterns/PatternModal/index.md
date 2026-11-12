@@ -201,7 +201,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-medium` · `--modal-body-min-height` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--modal-stack-sm` · `--pad-x-sm` · `--radius-md` · `--space-025` · `--stack-lg` · `--stack-md`
+`--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-medium` · `--modal-body-min-height` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--modal-stack-sm` · `--stack-lg` · `--stack-md`
 
 From `design-system/src/patterns/PatternModal/PatternModal.scss`. Override these through the token layer, never with a literal.
 
