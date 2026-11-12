@@ -2,6 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
 
 import * as PanelStories from './Panel.stories.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -118,6 +119,14 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 </DocsTable>
 
 The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of content beside it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Panel" tier="template" />
 
 </div>
 

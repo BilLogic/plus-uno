@@ -14,6 +14,8 @@ Also asked as: scrim.
 
 **Storybook page:** `design-system/src/patterns/Backdrop/Backdrop.mdx`
 
+**Motion:** enter `appearance.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 A Backdrop interrupts the page for one task. It dims everything behind it with one fill, so the person sees only the layer on top. It never draws content of its own.
@@ -37,6 +39,15 @@ Figma has no z-index, so the order is written here and lives in code.
 | Modal | 510 | `--layer-modal` | A Modal. |
 | Flag | 600 | `--layer-flag` | Flags, above a modal. |
 | Tooltip | 800 | `--layer-tooltip` | Tooltips, above everything. |
+
+## Motion
+
+Backdrop reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-appearance-default` | The Blanket dims on the same fade as the layer it sits under. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | It fades with the layer; a docked Panel never has one. |
 
 ## Best practices
 

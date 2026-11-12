@@ -2,6 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
 
 import * as PageStories from './Page.stories.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -141,6 +142,14 @@ A Page used alone is a tokenized container: a level is a fill and its shadow tog
 <tr><td><code>--ds-surface-sunken</code>, <code>--ds-surface</code>, <code>--ds-surface-raised</code>, <code>--ds-surface-overlay</code></td><td>The four levels' fills, each with its shadow from <a target="_top" href="./?path=/docs/foundations-elevation--docs">Elevation</a>.</td></tr>
 </tbody>
 </DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Page" tier="template" />
 
 </div>
 

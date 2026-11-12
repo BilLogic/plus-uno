@@ -2,6 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
 
 import * as FrameStories from './Frame.stories.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -192,6 +193,14 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
         ))}
     </tbody>
 </DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Frame" tier="template" />
 
 </div>
 

@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as FormsStories from './Forms.stories.jsx';
 import { STAGE } from './formsDemo.jsx';
@@ -76,6 +77,14 @@ A form lives in one of four hosts. The <a target="_top" href="./?path=/docs/temp
 ## Bound inputs
 
 <ComponentExample of={FormsStories.BoundInput} title="A control that cannot be wrong" description="Radios for up to five choices, a Select for six or more, a date picker for a date, a number with min and max. A radio group starts unanswered." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Forms" tier="pattern" />
 
 </div>
 

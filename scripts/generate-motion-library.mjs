@@ -27,7 +27,7 @@ export function renderLibrary() {
     '<!-- Load when: animating a component | Route: design-system/guidelines/overview.md -->',
     '# Motion · Library',
     '',
-    "Every component's enter, exit and change motion, one line per event. Tokens are read as `--ds-motion-*`; the same rows sit in each component's Motion section. A component absent here does not move.",
+    "Every template's, pattern's and component's enter, exit and change motion, one line per event, grouped by tier: templates, then patterns, then components. Tokens are read as `--ds-motion-*`; the same rows sit in each page's Motion section. A page absent here does not move.",
     '',
     motionLibraryTableOf(),
   ].join('\n');

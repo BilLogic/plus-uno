@@ -2,6 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
 
 import * as FormStories from './Form.stories.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -119,6 +120,14 @@ Each state shows how the form behaves in its host. Every field's own states live
 <tr><td><code>--space-200</code></td><td>24</td><td>The Panel body's pad from every edge, and the stack between groups.</td></tr>
 </tbody>
 </DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Form" tier="template" />
 
 </div>
 

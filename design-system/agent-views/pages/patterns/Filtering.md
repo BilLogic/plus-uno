@@ -88,6 +88,22 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 - Filter menu: use when building a tier 2b or 2c menu.
 - Patterns: use when you need Search for finding by name, Empty for No matches, or Navigation for views.
 
+## Motion
+
+Filtering reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| menu-open | Open and close an overlay | `--ds-motion-spatial-fast` | A filter menu clips open from the Filter icon's top-right corner; its right edge stays on the icon's. |
+| menu-close | Open and close an overlay | `--ds-motion-appearance-fast` | A filter menu fades closed. |
+| count-first | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The first filter widens the Filter button to the left, right edge fixed, and the count fades in. A quick FilterButton's count hugs the label the same way. Below 960 a filter side hides with no animation: the Filter icon is back with its count in the same frame. |
+| count-change | Update a value or state | `--ds-motion-appearance-fast` | The Filter count grows to the left; a changed number fades to its new value. |
+| reset | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The count fades out, then the icon narrows back. |
+| search | Update a value or state | `--ds-motion-spatial-fast` | Search grows to the left, right edge fixed, so the pills and the primary never move. Escape, or an empty blur, shrinks it back the same way; fast stays fast on exit. |
+| chip | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A chip being added or removed is Add or remove. |
+| results | Swap content in place | `--ds-motion-appearance-fast` | The results swap in place, a clean fade, once per Apply. Typing in Search filters the list the same way. |
+| results-load | Load content | `--ds-motion-appearance-fast` | When the fetch is slow, the results are Load. |
+
 ## Best practices
 
 ### Use one tier per bar. {#use-one-tier-per-bar}

@@ -14,6 +14,8 @@ Also asked as: page template, page shell, page layout, full page, new page, surf
 
 **Storybook page:** `design-system/src/patterns/Frame/Frame.mdx`
 
+**Motion:** sidebar-open `spatial.default` · sidebar-close `spatial.fast` · panel-dock `spatial.slow` + `appearance.fast` · panel-undock `spatial.default` · focused-open `appearance.default` · focused-close `appearance.fast` · step `spatial.default` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use Frame for every page of the app. It owns the frame sizes and the Sidebar's behavior, so a page only supplies its Sidebar, its breadcrumb and its content.
@@ -27,6 +29,20 @@ The Frame decides what docks from its own width, not the window's, through one l
 - **Modals.** Opening a Modal closes a peeking or floating Sidebar, and a docked Sidebar stays. While a Modal is open the Sidebar does not peek, and Escape closes the Modal only. A Modal leaves the panel open under its Backdrop.
 
 Docked, the panel meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar. The width and whether the panel is open are kept for the tab.
+
+## Motion
+
+Frame reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| sidebar-open | Dock and undock a panel | `--ds-motion-spatial-default` | The Sidebar opens on spatial.default while the Page narrows on the same clock. The Sidebar never moves when the Page changes. |
+| sidebar-close | Dock and undock a panel | `--ds-motion-spatial-fast` | It closes on spatial.fast to its edge and leaves nothing behind: no rail. |
+| panel-dock | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | The AI Panel docks on the right and the Page makes room; its content fades in once the page is about 90% done. |
+| panel-undock | Dock and undock a panel | `--ds-motion-spatial-default` | It reverses and stays at the edge. |
+| focused-open | Drill into and climb back out | `--ds-motion-appearance-default` | Focused opens as a change of frame: the page and the Sidebar fade out together on appearance.fast, then the task fades in, in place. A focused task fades; it does not grow or slide. Bare frames, such as sign-in, do not move. |
+| focused-close | Drill into and climb back out | `--ds-motion-appearance-fast` | Close and Cancel reverse the entrance one speed faster: the task fades out, then the page and Sidebar fade back in, asking first in a Modal if anything is unsaved. |
+| step | Step to the next or previous | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` | The body slides on the same axis as the step list: up with the steps down the left, across with four or fewer across the top. Step states change in place. Placement is set once, when the task opens, by the longest path the flow can take. |
 
 ## Alternatives
 

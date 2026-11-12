@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as CommonActionsStories from './CommonActions.stories.jsx';
 import { STAGE } from './commonActionsDemo.jsx';
@@ -91,6 +92,14 @@ Three tiers, picked by whether the change can be undone. No danger-outline combi
 ## Key cases
 
 <ComponentExample of={CommonActionsStories.SendingShown} title="Sending" description="After Save session is pressed the button swaps its label for a spinner in place and keeps its width; Cancel stays live and the footer does not move." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Common actions" tier="pattern" />
 
 </div>
 

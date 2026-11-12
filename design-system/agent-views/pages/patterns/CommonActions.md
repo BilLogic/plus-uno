@@ -98,6 +98,17 @@ Use Common actions when a page needs a button and the choice is about the look, 
 - Modal: use for the confirm a destructive action raises.
 - Patterns: use when you need Disabled for an action that cannot run yet.
 
+## Motion
+
+Common actions reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| selection | Update a value or state | `--ds-motion-appearance-fast` | Ticking a row turns the table's head row into the bulk bar: the labels cross-fade, same row, same height, nothing slides. The selected rows take the selected fill and the count fades to each new value. Clearing the rows, or the select-all checkbox, reverses it. The view bar above never moves. |
+| confirm | Open and close an overlay | `--ds-motion-appearance-fast` | A destructive action opens a Modal. Confirm fades it and carries on: the row's status changes color, and a Flag confirms. |
+| cancel | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Cancel reverses the Modal's entrance one speed faster. |
+| undo | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Keep and Undo sit beside the change, tinted, until the person moves on. Undo reverses the Add or remove that made the change. |
+
 ## Best practices
 
 ### Give an area one Primary button. {#give-an-area-one-primary-button}

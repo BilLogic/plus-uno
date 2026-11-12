@@ -79,6 +79,19 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 - Form: use for how a form sits in each host.
 - Patterns: use when you need Loading, Disabled or Errors.
 
+## Motion
+
+Forms reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| focus | Update a value or state | `--ds-motion-appearance-fast` | Border color on appearance.fast. The focus ring never animates. |
+| error | Call attention | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | An error on leaving a field makes room on spatial.fast, then fades in; it fades and the room closes once the field is fixed. |
+| blocked | Call attention | `--ds-motion-spatial-fast` | A blocked submit shakes the Modal, or the field with its own button, once. Never bigger on repeat; never in Reduced mode. |
+| failed | Call attention | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | When the system failed, a message makes room at the top of the Modal or form, then fades in. No shake: the person did nothing wrong. A page-level error is a one-line summary that makes room at the top; focus goes to the first error. |
+| steps | Step to the next or previous | `--ds-motion-appearance-fast` | Step states change in place. |
+| saving | Update a value or state | `--ds-motion-appearance-fast` | The button keeps its width: its label fades out, a Spinner fades in, and the same button confirms when done. |
+
 ## Best practices
 
 ### Validate a field when it loses focus and clear the error once the rule is met. {#validate-a-field-when-it-loses-focus-and-clear-the-error-once-the-rule-is-met}
