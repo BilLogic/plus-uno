@@ -121,13 +121,6 @@ Use a Popup for content anchored to a trigger that leaves on an outside click or
 
 ## Best practices
 
-### Hang a Popup 4 below its trigger, aligned to the trigger's edge on the side where it sits.
-
-A trigger at the start of a bar, such as the view picker under page tabs, gets a layer aligned to its start edge; a trigger at the end, such as Filter or More, gets one aligned to its end edge. So it grows into the page and stays on it. It flips above when there is no room below and stays 8 from the screen edge.
-
-Do: More sits at the end of the bar, so its menu aligns to its end edge and grows into the page.
-Don't: An end trigger with a start-aligned menu: it runs off the edge of the page.
-
 ### Hang a Popup 4 below its trigger, aligned to the trigger's edge on the side where it sits. {#hang-a-popup-4-below-its-trigger-aligned-to-the-trigger-s-edge-on-the-side-where-it-sits}
 
 **Checked:** Automatic
