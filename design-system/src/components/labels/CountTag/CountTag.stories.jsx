@@ -139,7 +139,7 @@ Spacings.play = async ({ canvasElement }) => {
         await expect(pill.getBoundingClientRect().width, 'one digit is 24 wide').toBe(24);
         await expect(px(s.paddingLeft), 'padding is the Element xs token, not 8').toBe(4);
         await expect(px(s.paddingRight)).toBe(4);
-        await expect(px(s.borderRadius), 'corner is radius-0125').toBe(2);
+        await expect(px(s.borderRadius), 'corner is radius-md').toBe(4);
         await expect(px(getComputedStyle(canvas.getByText(text)).fontSize), 'B3 12').toBe(12);
     }
 

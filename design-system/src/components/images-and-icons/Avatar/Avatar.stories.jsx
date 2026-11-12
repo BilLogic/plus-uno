@@ -101,14 +101,17 @@ export const Shapes = () => (
     <div style={row}>
         <Avatar size={40} name="Jane Park" data-testid="circle" />
         <Avatar size={40} shape="square" icon="robot" label="Study bot" data-testid="square" />
+        <Avatar size={128} shape="square" icon="robot" label="Big bot" data-testid="square-128" />
     </div>
 );
 
-/** A square (a team or an agent) takes a quarter of its size as its radius. */
+/** A square (a team or an agent) takes a quarter of its size as its radius, capped at radius-xxl. */
 Shapes.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(px(getComputedStyle(canvas.getByTestId('square')).borderTopLeftRadius)).toBe(10);
     await expect(px(getComputedStyle(canvas.getByTestId('circle')).borderTopLeftRadius)).toBeGreaterThanOrEqual(20);
+    // A large square stops at radius-xxl (16) instead of a quarter of 128.
+    await expect(px(getComputedStyle(canvas.getByTestId('square-128')).borderTopLeftRadius)).toBe(16);
 };
 
 /* ---------------------------------------------------------------- fallbacks */

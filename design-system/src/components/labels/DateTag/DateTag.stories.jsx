@@ -112,7 +112,7 @@ Styles.play = async ({ canvasElement }) => {
             const el = canvas.getByTestId(name);
             const s = getComputedStyle(el);
             await expect(el.getBoundingClientRect().height, `${name} height`).toBe(SIZE[size]);
-            await expect(px(s.borderRadius), `${name} radius`).toBe(size === 'spacious' ? 6 : 4);
+            await expect(px(s.borderRadius), `${name} radius`).toBe(size === 'spacious' ? 8 : 4);
             await expect(alpha(s.backgroundColor), `${name} has no fill`).toBe(0);
             await expect(innerBorder(el), `${name} border`).toBe(token(edge));
             await expect(s.color, `${name} text`).toBe(token(ink));

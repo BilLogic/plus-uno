@@ -10,7 +10,7 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Source:** `design-system/src/components/navigation/Tabs/Tabs.jsx`
 
-**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled
+**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, UnderlineRadius, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled
 
 **Storybook page:** `design-system/src/components/navigation/Tabs/Tabs.mdx`
 
@@ -220,7 +220,7 @@ Implemented as `Panel`.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--border-selected` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--inline-lg` · `--item-height-md` · `--item-height-sm` · `--pad-x-lg` · `--pad-x-md` · `--radius-full` · `--radius-md` · `--section-stack-sm` · `--stack-md` · `--type-weight-medium`
+`--body-default` · `--border-default` · `--border-selected` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--inline-lg` · `--item-height-md` · `--item-height-sm` · `--pad-x-lg` · `--pad-x-md` · `--radius-control-md` · `--radius-control-sm` · `--radius-full` · `--section-stack-sm` · `--stack-md` · `--tab-radius` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/Tabs/Tabs.scss`. Override these through the token layer, never with a literal.
 
