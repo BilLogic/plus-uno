@@ -61,7 +61,8 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  *   it never docks.
  * - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on
  *   its Page-facing edge. Floating (a peek, or opened by hand under 1024) it
- *   lies over the Page with `--ds-shadow-overlay` and no Blanket.
+ *   lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay`
+ *   and no Blanket.
  * - Hovering the left edge peeks a closed Sidebar. An outside press, Escape,
  *   or the pointer leaving closes the peek.
  * - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and
