@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { animate } from 'motion';
 import { useReducedMotion } from 'motion/react';
 
+import { Button, IconButton } from '@/components';
+
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { measureSpring, springStep } from '../../../../scripts/lib/tokens/spring.mjs';
 import { Illustration } from './Illustration.jsx';
@@ -208,17 +210,6 @@ function useTracker() {
   return { track, setSpeed, setPaused, stopAll };
 }
 
-const TOOL_BUTTON = {
-  minInlineSize: 'var(--item-height-md)',
-  blockSize: 'var(--item-height-md)',
-  paddingInline: 'var(--space-100)',
-  border: 'none',
-  borderRadius: 'var(--radius-md)',
-  background: 'var(--ds-background-neutral)',
-  color: 'var(--ds-text)',
-  font: 'var(--body-small)',
-  cursor: 'pointer',
-};
 
 /** One tile: a scene's drawing, its arrows layer, the tap ring and its caption. */
 const Tile = ({ scene, state, arrows, dim, showArrows }) => {
@@ -393,17 +384,19 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced }) => {
             {title}
           </span>
         )}
-        <button type="button" style={TOOL_BUTTON} onClick={cycleSpeed} aria-label={`Playback speed: ${SPEED_LABELS[speedIndex]}`}>
+        <Button appearance="subtle" spacing="compact" onClick={cycleSpeed} aria-label={`Playback speed: ${SPEED_LABELS[speedIndex]}`}>
           {SPEED_LABELS[speedIndex]}
-        </button>
+        </Button>
         {reduced ? (
-          <button type="button" style={TOOL_BUTTON} onClick={() => setReplay((n) => n + 1)} aria-label="Play this demo once">
-            <i className="fa-solid fa-play" aria-hidden="true" />
-          </button>
+          <IconButton appearance="subtle" spacing="compact" icon="play" label="Play this demo once" onClick={() => setReplay((n) => n + 1)} />
         ) : (
-          <button type="button" style={TOOL_BUTTON} onClick={togglePause} aria-label={paused ? 'Play this demo' : 'Pause this demo'}>
-            <i className={`fa-solid ${paused ? 'fa-play' : 'fa-pause'}`} aria-hidden="true" />
-          </button>
+          <IconButton
+            appearance="subtle"
+            spacing="compact"
+            icon={paused ? 'play' : 'pause'}
+            label={paused ? 'Play this demo' : 'Pause this demo'}
+            onClick={togglePause}
+          />
         )}
       </div>
       <div
