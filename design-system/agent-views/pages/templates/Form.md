@@ -127,36 +127,12 @@ When to validate, what a blocked submit does, required and optional marks, and l
 
 ## Best practices
 
-Most of the rules for a form live in Patterns, Forms. This page keeps only how a form sits in each container.
+The rules for a form live in the pattern pages. This page keeps only how a form sits in each container.
 
-- Where the buttons sit, and in which look: Patterns, Common actions.
-- When to validate, the enabled submit, a blocked submit, bound inputs and leaving with edits: Patterns, Forms.
+- Where the buttons sit and in which look, full bleed and 48 high, and the footer that stays put: Common actions.
+- When to validate, the enabled submit, a blocked submit and a rejected one, bound inputs and leaving with edits: Forms.
 - The sending button: Patterns, Loading.
 - A field that waits on another, and where its reason goes: Patterns, Disabled.
-
-### Left-align the buttons under a page form. {#left-align-the-buttons-under-a-page-form}
-
-**Checked:** Review
-
-On its own page a form's buttons sit at the start, under the fields they save, Primary first and Cancel Subtle. A page is not a dialog: the far end of the page is a long way from the last field.
-
-Do: Primary first, then Cancel, left-aligned under the fields.
-Don't: The buttons at the far end of the page, away from the fields, with the primary last.
-
-### Go full bleed in a Modal footer and keep it 48 high. {#go-full-bleed-in-a-modal-footer-and-keep-it-48-high}
-
-**Checked:** Automatic
-
-A Modal's footer is two fixed cells, `--space-300` high, each button filling its half, Primary furthest right. The same height as a regular footer means switching to full bleed never changes the Modal's height.
-
-Do: Two buttons filling the footer edge to edge.
-Don't: Small buttons inset at the end, with spare footer around them.
-
-### Keep the footer where it is. {#keep-the-footer-where-it-is}
-
-**Checked:** Automatic
-
-Header and footer stay pinned while the body scrolls. A blocked submit, a server message and a sending button all change the body or a button, never the footer's size or place.
 
 ### Keep a short edit beside the page. {#keep-a-short-edit-beside-the-page}
 
@@ -166,12 +142,6 @@ Editing a row opens a Panel so the person keeps the page in view. A Modal is for
 
 Do: A short edit in a Panel, the rows still in view.
 Don't: The same short edit in a Modal that covers the rows.
-
-### Show a rejected submit as a danger SectionMessage at the top of the form. {#show-a-rejected-submit-as-a-danger-sectionmessage-at-the-top-of-the-form}
-
-**Checked:** Automatic
-
-Scrolled into view and announced, with the field errors it names on their fields. It says what happened and what to do, and it cannot be dismissed while it blocks.
 
 ### Keep a form to one column. {#keep-a-form-to-one-column}
 

@@ -162,6 +162,8 @@ export const FilterCount = {
     play: async ({ canvasElement, step }) => {
         const p = parts(canvasElement);
         const menu = () => within(p.popup());
+        // The filters wait for the picture's element, so a menu the press opens mounts inside it.
+        await waitFor(() => expect(p.filterIcon()).not.toBeNull());
 
         await step('With nothing on, the icon is named "Filters" and shows no count', async () => {
             await expect(p.filterIcon()).toHaveAccessibleName('Filters');
@@ -228,6 +230,7 @@ export const NarrowWidth = {
         await waitFor(() => expect(quick(), 'from 768, a FilterButton per category').not.toBeNull());
         await expect(p.filterIcon()).toBeNull();
 
+
         setWidth(FRAME_LAYOUT.fullWidthBelow - 64);
         await waitFor(() => expect(quick(), 'below 768 the quick filters fold').toBeNull());
         await expect(p.filterIcon(), 'into the Filter icon, which carries their count').toHaveAccessibleName('Filters, 2 applied');
@@ -247,6 +250,7 @@ export const NoMatches = {
     render: () => staged(<FilteredStudents tier="2b" categories={['grade', 'subject']} initial={{ grade: ['Grade 6'], subject: ['Math'] }} />),
     play: async ({ canvasElement }) => {
         const p = parts(canvasElement);
+        await waitFor(() => expect(p.filterIcon()).not.toBeNull());
         await expect(p.canvas.queryByRole('table'), 'the empty state replaces the whole table').toBeNull();
         await expect(p.canvas.getByText(/Grade 6 and Math/), 'it names the filters that are on').toBeInTheDocument();
         await expect(p.filterIcon(), 'the count stays on the icon').toHaveAccessibleName('Filters, 2 applied');
