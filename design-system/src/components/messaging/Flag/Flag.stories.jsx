@@ -144,7 +144,17 @@ Bold.play = async ({ canvasElement }) => {
         const offset = Math.abs((box.top + box.bottom) / 2 - (title.top + title.bottom) / 2);
         await expect(offset, `${name} is centered on the title line`).toBeLessThanOrEqual(1);
     }
-    await waitFor(() => expect(within(flag).getByRole('button', { name: 'Try again' }), 'bold actions are buttons').toBeVisible());
+    const action = await waitFor(() => {
+        const found = within(flag).getByRole('button', { name: 'Try again' });
+        expect(found, 'bold actions are buttons').toBeVisible();
+        return found;
+    });
+    await expect(action.classList.contains('plus-btn'), 'a bold action is the PLUS Button').toBe(true);
+    await expect(getComputedStyle(action).textDecorationLine, 'a bold action is not an underlined link').toBe('none');
+    await expect(Math.round(action.getBoundingClientRect().height), 'a bold action is compact').toBe(24);
+    const label = getComputedStyle(action).color;
+    const labelRatio = contrastRatio(label, ground);
+    await expect(labelRatio, `action label on the bold fill is ${labelRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
 };
 
 const FlagInteractiveWrapper = ({ appearance, position, title, children, show, autohide, delay }) => {
@@ -354,6 +364,24 @@ const StateFlag = ({ actions }) => (
 const flagRoot = (canvasElement) => within(canvasElement).getByRole('status');
 const dismissOf = (canvasElement) => within(canvasElement).getByRole('button', { name: 'Dismiss flag' });
 const actionsList = [{ text: 'View plan', onClick: () => {} }];
+
+/** A normal flag's actions are links; a bold flag's are buttons, an `href` one a link-styled button that navigates. */
+export const ActionKinds = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', alignItems: 'flex-start' }}>
+            <Flag title="Plan saved" autohide={false} actions={[{ text: 'View plan', href: '/plan' }]} />
+            <Flag appearance="information" defaultExpanded title="Plan updated" autohide={false} actions={[{ text: 'View plan', href: '/plan' }, { text: 'Undo', onClick: () => {} }]} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const [normal, bold] = canvasElement.querySelectorAll('.plus-flag');
+        const link = await waitFor(() => within(normal).getByRole('link', { name: 'View plan' }));
+        await expect(link.classList.contains('plus-btn'), 'a normal action stays a plain link').toBe(false);
+        const buttons = within(bold).getAllByRole('button').filter((el) => el.classList.contains('plus-flag-action'));
+        await expect(buttons.map((el) => el.textContent), 'bold actions are buttons, in order').toEqual(['View plan', 'Undo']);
+        await expect(buttons[0].getAttribute('href'), 'an href action navigates').toBe('/plan');
+    },
+};
 
 /** Rest: the flag on the overlay surface, its title in the default text token. */
 export const Rest = {

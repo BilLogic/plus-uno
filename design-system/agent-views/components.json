@@ -4663,7 +4663,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": "Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag still draws a button: put the navigation in `onClick`.",
+          "description": "Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag draws a button that navigates.",
           "deprecated": null
         },
         {
@@ -4788,6 +4788,7 @@
         "Dismiss",
         "FlagContent",
         "UnknownAppearance",
+        "ActionKinds",
         "Rest",
         "Hovered",
         "Pressed",
