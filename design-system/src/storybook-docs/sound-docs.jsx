@@ -79,7 +79,7 @@ SoundPlayers.propTypes = {
 /** The sound sheet: family, notes, level and length per token, with a player. */
 export const SoundSheetTable = ({ ai = false }) => (
     <RefTable
-        head={['Token', 'Family', 'Notes', 'Level', 'Length', '']}
+        head={['Token', 'Family', 'Notes', 'Level', 'Length', 'Hear it']}
         rows={soundSheetOf()
             .filter((r) => r.ai === ai)
             .map((r) => [
