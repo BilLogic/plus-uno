@@ -1,5 +1,5 @@
 /**
- * Plays a sound token in the browser with Web Audio (ADR-042), ported from the
+ * Plays a sound token in the browser with Web Audio (ADR-043), ported from the
  * Sound Lab's Detent `playCue` path: the token's score (`score.js`) scheduled
  * on one shared AudioContext, dry and into a short room, through the Lab's
  * output stage. No audio files, no packages.

@@ -1,5 +1,5 @@
 /**
- * The one sound setting (ADR-042): on or off, on by default, kept across
+ * The one sound setting (ADR-043): on or off, on by default, kept across
  * visits. Storage can be absent or throw (private modes, blocked cookies); the
  * setting then lives for the page and sound still works. Reduced motion is not
  * an input here: it never mutes sound.

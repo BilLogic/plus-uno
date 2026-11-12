@@ -5,7 +5,7 @@ status: active
 verified: 2026-11-12 (#2231)
 ---
 
-# ADR-042: Sound is synthesized on the motion registry (2026-11-12)
+# ADR-043: Sound is synthesized on the motion registry (2026-11-12)
 
 **Decision.** PLUS sound is synthesized in the browser with Web Audio from a plan
 this repo owns, and it plays where motion lands. There are no audio files and no

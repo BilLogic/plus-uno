@@ -1,5 +1,5 @@
 /**
- * When a sound starts against its motion (ADR-042): a sound lands when its
+ * When a sound starts against its motion (ADR-043): a sound lands when its
  * motion lands, so it starts at the spring's 90% time minus the sound's
  * pickup. The springs are the generated motion configs (ADR-041).
  */

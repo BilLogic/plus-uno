@@ -1,5 +1,5 @@
 /**
- * The sound plan (ADR-042): sound's primitives and its twelve semantic
+ * The sound plan (ADR-043): sound's primitives and its twelve semantic
  * tokens, as one file this repo owns, beside the token plan (`plan.mjs`) and
  * in its style. `scripts/generate-sound-spec.mjs` renders it into the
  * design system's sound-spec module; nothing here reads the network.
