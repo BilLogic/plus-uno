@@ -73,6 +73,7 @@ const bodyStack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-
 /** Details: the title names the record, its status sits under it, then Up, Down, More and Close. */
 export const DetailsPanel = ({ editing = false, onEdit, onClose = () => {}, onSave, onCancel, picked = 'Ben Okafor' }) => (
     <PanelContainer>
+        <div data-probe="head" style={{ flex: 'none' }}>
         <PanelHeader
             title={`${picked} · Thu 5:00 PM`}
             actions={(
@@ -85,6 +86,7 @@ export const DetailsPanel = ({ editing = false, onEdit, onClose = () => {}, onSa
             )}
         />
         <PanelSubheader><StatusTag appearance="warning">Needs a tutor</StatusTag></PanelSubheader>
+        </div>
         <PanelBody data-probe="body">
             {editing ? (
                 <div style={bodyStack}>

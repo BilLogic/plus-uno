@@ -92,7 +92,7 @@ export const TypeNotifications = {
 
 const ANATOMY_DETAILS_PARTS = [
     { selector: '.plus-frame__splitter', label: 'Splitter', side: 'top', at: 'start' },
-    { selector: '.plus-panel-header', label: 'Header', side: 'end', at: 'middle' },
+    { selector: '[data-probe="head"]', label: 'Header', side: 'end', at: 'middle' },
     { selector: '[data-probe="body"]', label: 'Body', side: 'end', at: 'middle' },
 ];
 
@@ -129,18 +129,53 @@ export const AnatomyNotifications = {
 
 /* ------------------------------------------------------------ width story */
 
-/** A stage whose own width the control sets, with Details open. */
+/** The docs canvas is narrower than a desktop Frame, so the stage is laid out at `width` and drawn to fit: the Panel is always in view. Details is open on Ben Okafor's row. */
 const WidthStage = ({ width }) => (
-    <div style={{ overflowX: 'auto' }}>
-        <div data-probe="stage" style={{ inlineSize: width, blockSize: WINDOW_HEIGHT }}>
+    <FitStage width={width}>
+        <div data-probe="stage" style={{ inlineSize: '100%', blockSize: WINDOW_HEIGHT }}>
             <InAppFrame height="100%" panel={<DetailsPanel />} panelLabel="Session details" panelStorageKey={null} panelOpen>
                 <SessionsBehind />
             </InAppFrame>
         </div>
-    </div>
+    </FitStage>
 );
 
-/** Width behavior: from 1168 up the Panel docks at an edge line; under it it floats on the overlay pair; never a Backdrop. */
+/** Lay the stage out at `px`: the Frame measures its own box, so resizing the holder is what a width drag does. */
+const setStageWidth = (canvasElement, px) => {
+    canvasElement.querySelector('[data-fit-stage] > div').style.inlineSize = `${px}px`;
+};
+
+const panelMode = (canvasElement, mode) => waitFor(() => expect(
+    canvasElement.querySelector('.plus-frame__panel')?.className ?? '',
+    `the Panel is ${mode}`,
+).toContain(`plus-frame__panel--${mode}`));
+
+const expectNoBackdrop = (canvasElement) => expect(
+    canvasElement.querySelector('.plus-frame__backdrop, .plus-pattern-backdrop'),
+    'no Backdrop at any width',
+).toBeNull();
+
+/** Docked: an edge line, the Page's own fill and no shadow. */
+const expectDocked = async (canvasElement) => {
+    const { frame, panel } = frameParts(canvasElement);
+    await panelMode(canvasElement, 'docked');
+    await expect(getComputedStyle(panel()).boxShadow, 'docked: no shadow').toBe('none');
+    await expect(parseFloat(getComputedStyle(panel()).borderInlineStartWidth), 'docked: an edge line').toBeGreaterThan(0);
+    await expect(getComputedStyle(panel()).position, 'beside the Page, not over it').not.toBe('absolute');
+    await expect(frame.querySelector('tbody tr:nth-child(2)').className, 'Ben Okafor\'s row is the picked one').toMatch(/highlighted/);
+    await expectNoBackdrop(canvasElement);
+};
+
+/** Floating: over the Page on the overlay fill and shadow. */
+const expectOverlay = async (canvasElement) => {
+    const { frame, panel } = frameParts(canvasElement);
+    await panelMode(canvasElement, 'overlay');
+    await expect(getComputedStyle(panel()).boxShadow, 'floating: the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
+    await expect(getComputedStyle(panel()).backgroundColor, 'floating: the overlay fill').toBe(tokenColor(frame, '--ds-surface-overlay'));
+    await expectNoBackdrop(canvasElement);
+};
+
+/** Width behavior: Details is open; from 1168 up the Panel docks at an edge line, under it it floats on the overlay pair; never a Backdrop. */
 export const ResponsiveWidth = {
     name: 'Width behavior',
     args: { width: 1440 },
@@ -150,26 +185,40 @@ export const ResponsiveWidth = {
     },
     render: WidthStage,
     play: async ({ canvasElement }) => {
-        const { frame, panel } = frameParts(canvasElement);
-        const stage = canvasElement.querySelector('[data-probe="stage"]');
-        const setWidth = (px) => { stage.style.inlineSize = `${px}px`; };
-        const mode = (m) => waitFor(() => expect(panel()?.className ?? '', `the Panel is ${m}`).toContain(`plus-frame__panel--${m}`));
-        const noBackdrop = () => expect(frame.querySelector('.plus-frame__backdrop, .plus-pattern-backdrop'), 'no Backdrop at any width').toBeNull();
+        const { frame } = frameParts(canvasElement);
+        await expectDocked(canvasElement);
 
-        await mode('docked');
-        await noBackdrop();
+        setStageWidth(canvasElement, FRAME_LAYOUT.contentFloor + FRAME_LAYOUT.panelDefault - 64);
+        await expectOverlay(canvasElement);
 
-        setWidth(FRAME_LAYOUT.contentFloor + FRAME_LAYOUT.panelDefault - 64);
-        await mode('overlay');
-        await expect(getComputedStyle(panel()).boxShadow, 'floating: the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
-        await noBackdrop();
-
-        setWidth(FRAME_LAYOUT.dockMin - 64);
-        await mode('overlay');
+        setStageWidth(canvasElement, FRAME_LAYOUT.dockMin - 64);
+        await panelMode(canvasElement, 'overlay');
         // Read the token once: a probe inside waitFor mutates the DOM, which re-runs waitFor forever.
         const narrowest = tokenLength(frame, '--panel-min-width');
-        await waitFor(() => expect(panel().offsetWidth, 'under 1024 the Panel is capped at its narrowest').toBeCloseTo(narrowest, 0));
-        await noBackdrop();
+        await waitFor(() => expect(frameParts(canvasElement).panel().offsetWidth, 'under 1024 the Panel is capped at its narrowest').toBeCloseTo(narrowest, 0));
+        await expectNoBackdrop(canvasElement);
+    },
+};
+
+/** At 1440 the Panel is docked: an edge line and no shadow. */
+export const WidthDocked = {
+    name: 'Width: 1440',
+    args: { width: 1440 },
+    render: WidthStage,
+    play: async ({ canvasElement }) => {
+        setStageWidth(canvasElement, 1440); // docs-literal
+        await expectDocked(canvasElement);
+    },
+};
+
+/** At 1000 the Panel floats on the overlay fill and shadow, with no Backdrop. */
+export const WidthFloating = {
+    name: 'Width: 1000',
+    args: { width: 1000 },
+    render: WidthStage,
+    play: async ({ canvasElement }) => {
+        setStageWidth(canvasElement, 1000); // docs-literal
+        await expectOverlay(canvasElement);
     },
 };
 
