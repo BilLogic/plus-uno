@@ -484,7 +484,7 @@ const TreeSelect = ({
                     className="plus-tree-select-field"
                     {...tones.field}
                     onClick={handleInputClick}
-                    trailing={(
+                    elemAfter={(
                         <Icon name="caret-down" className={`plus-tree-select-arrow ${isOpen ? 'plus-tree-select-arrow-open' : ''}`} />
                     )}
                 >
