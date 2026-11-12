@@ -1395,6 +1395,7 @@
         "--pad-x-sm",
         "--pad-x-xs",
         "--pad-y-sm",
+        "--radius-full",
         "--type-weight-medium"
       ]
     },
@@ -2294,8 +2295,8 @@
         "--item-height-sm",
         "--pad-x-md",
         "--plus-choice-indent",
-        "--radius-025",
         "--radius-lg",
+        "--radius-md",
         "--space-025",
         "--space-0375",
         "--space-050",
@@ -6087,7 +6088,7 @@
         "--height-250",
         "--item-height-md",
         "--pad-x-md",
-        "--radius-0625",
+        "--radius-control-lg",
         "--radius-md",
         "--stack-sm"
       ]
@@ -10835,6 +10836,7 @@
         "--icon-lg",
         "--icon-md",
         "--item-height-md",
+        "--radius-full",
         "--space-0625",
         "--stack-md",
         "--stack-sm",
@@ -11090,7 +11092,7 @@
         "--pad-x-xs",
         "--pad-y-lg",
         "--pad-y-md",
-        "--radius-0625",
+        "--radius-xl",
         "--rte-content-pad-x",
         "--rte-content-pad-y",
         "--stack-md",
@@ -12601,6 +12603,7 @@
       "tokens": [
         "--ds-icon-inverse",
         "--plus-spinner-size",
+        "--radius-full",
         "--spinner-size-lg",
         "--spinner-size-md",
         "--spinner-size-sm"

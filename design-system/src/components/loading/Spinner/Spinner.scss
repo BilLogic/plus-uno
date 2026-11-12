@@ -23,7 +23,7 @@
     display: inline-block;
     width: var(--plus-spinner-size);
     height: var(--plus-spinner-size);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: calc(var(--plus-spinner-size) / 8) solid currentColor;
     border-right-color: transparent;
     color: inherit;

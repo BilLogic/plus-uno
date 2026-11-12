@@ -172,7 +172,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--button-radius-compact` · `--button-radius-default` · `--button-vertical-size` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--item-height-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-sm` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--border-default` · `--button-radius-compact` · `--button-radius-default` · `--button-vertical-size` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--item-height-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-sm` · `--radius-full` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 

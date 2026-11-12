@@ -177,7 +177,7 @@ Implemented as `RatingItem`.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-danger` · `--icon-lg` · `--icon-md` · `--item-height-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-danger` · `--icon-lg` · `--icon-md` · `--item-height-md` · `--radius-full` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Rating/Rating.scss`. Override these through the token layer, never with a literal.
 

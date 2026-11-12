@@ -84,7 +84,7 @@ export const Shapes = {
     ),
     play: async ({ canvasElement }) => {
         const circle = within(canvasElement).getByRole('button', { name: 'Circle menu' });
-        await expect(getComputedStyle(circle).borderTopLeftRadius).toBe('50%');
+        await expect(px(getComputedStyle(circle).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--radius-full'));
     },
 };
 
@@ -146,7 +146,7 @@ export const Compact = {
 export const Circle = {
     render: () => <IconButton icon="bars" label="Open menu" shape="circle" />,
     play: async ({ canvasElement }) => {
-        await expect(getComputedStyle(within(canvasElement).getByRole('button', { name: 'Open menu' })).borderTopLeftRadius).toBe('50%');
+        await expect(px(getComputedStyle(within(canvasElement).getByRole('button', { name: 'Open menu' })).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--radius-full'));
     },
 };
 

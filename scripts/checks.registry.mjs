@@ -408,6 +408,15 @@ export const CHECKS = [
     guards: 'no component, pattern or shared style setting a raw font size; text takes a text style and an icon glyph an icon size.',
   },
   {
+    name: 'check:radius-literals',
+    script: 'node scripts/check-radius-literals.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-radius-literals.mjs',
+    floors: { MIN_FILES: 150 },
+    guards: 'no component or pattern rounding a corner with a px length, a %, a primitive radius step or a literal fallback; radius is a token.',
+  },
+  {
     name: 'check:figma-scopes',
     script: 'node scripts/check-figma-scopes.mjs',
     pkg: 'root',

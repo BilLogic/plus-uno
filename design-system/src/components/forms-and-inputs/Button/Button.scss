@@ -105,7 +105,7 @@ $btn-appearances: (
 
     // Icon button `shape="circle"`: a round icon button for top navigation.
     &.plus-btn--circle {
-        border-radius: 50%;
+        border-radius: var(--radius-full);
     }
 
     // The label is Body/default at the medium weight; icons draw at 16. A
