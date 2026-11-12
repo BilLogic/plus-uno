@@ -211,7 +211,7 @@ const plotted = ({ id, title, caption, config, seconds }) => {
     draw: ({ x, t }) => (
       <>
         <Rule x1={24} x2={136} y1={18} y2={18} />
-        <Rule x1={130} x2={130} y1={10} y2={26} stroke={MOTION_PAINT.target} dash="3 3" />
+        <Rule x1={130} x2={130} y1={4} y2={32} stroke={MOTION_PAINT.target} dash="3 3" />
         <Rect x={24 + 100 * x} y={12} w={12} h={12} fill={PAINT.accent} corner="sm" />
         <ChartAxis x={24} y={36} w={112} h={54} />
         <ChartCurve x={24} y={36} w={112} h={54} values={values} upTo={Math.max(0.02, t)} accent />
@@ -243,7 +243,7 @@ const plotExpressive = plotted({
 /** A Flag-sized floating layer at the top right of a blocked-out screen. */
 const FLAG = { x: 88, y: 22, w: 56, h: 48 };
 const FlagLayer = ({ x = 0, opacity = 1 }) => (
-  <Clip x={8} y={6} w={FRAME_RIGHT - 8} h={88}>
+  <Clip x={8} y={6} w={FRAME_RIGHT - 8 - 1} h={88}>
     <Moved x={x} opacity={opacity}>
       <Popup {...FLAG} accent />
     </Moved>
@@ -327,7 +327,7 @@ const sizeDefault = {
 
 const PANEL = { x: 98, y: 18, w: 54, h: 76 };
 const DockedPanel = ({ x }) => (
-  <Clip x={8} y={18} w={FRAME_RIGHT - 8} h={76}>
+  <Clip x={8} y={18} w={FRAME_RIGHT - 8 - 1} h={76}>
     <Moved x={x}>
       <Panel {...PANEL} accent />
     </Moved>

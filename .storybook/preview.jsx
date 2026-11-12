@@ -182,6 +182,10 @@ const preview = {
             "Color",
             "Typography",
             "Motion",
+            [
+              "Physics",
+              "Durations and easings"
+            ],
             "Iconography",
             "Illustrations",
             "Logos",

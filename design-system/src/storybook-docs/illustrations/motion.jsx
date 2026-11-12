@@ -226,7 +226,9 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
     <figure
       data-tile={scene.id}
       data-state={JSON.stringify(roundState(state))}
-      style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minInlineSize: 0 }}
+      // Title, drawing and caption share rows across tiles, so drawings line up
+      // when a title wraps.
+      style={{ margin: 0, display: 'grid', gridTemplateRows: 'subgrid', gridRow: 'span 3', gap: 'var(--stack-sm)', minInlineSize: 0 }}
     >
       <div style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text)' }}>{scene.title}</div>
       <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)' }}>
@@ -246,7 +248,9 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
           )}
         </Illustration>
       </div>
-      <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{scene.caption}</figcaption>
+      <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)', marginBlockEnd: 'var(--stack-md)' }}>
+        {scene.caption}
+      </figcaption>
     </figure>
   );
 };
@@ -406,7 +410,9 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced }) => {
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))`,
-          gap: 'var(--grid-gutter)',
+          columnGap: 'var(--grid-gutter)',
+          rowGap: 'var(--stack-sm)',
+          alignItems: 'start',
         }}
       >
         {scenes.map((scene) => (
