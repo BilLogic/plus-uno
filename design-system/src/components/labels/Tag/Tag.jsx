@@ -15,14 +15,20 @@ import './Tag.scss';
  *
  * OUTLINED, SO IT NEVER READS AS A STATUS. A Status tag is filled because its color
  * is a meaning; a Tag is outlined because its color is only a category. The text
- * stays neutral, and the hue sits on the border and on a 10px swatch. One size,
- * 22 tall, for every behavior.
+ * stays neutral, and the hue sits on the border. One size, 22 tall, for every
+ * behavior.
  *
- * FOUR TYPES. A plain tag leads with the swatch. A person, an agent or a team
- * leads with a 16 avatar in its place, shaped so the three never read as one
+ * TWO OPT-IN LEADS. A plain tag leads with nothing. `swatchBefore` adds a 10
+ * color square for a tag that uses color to find its way around, such as a chart
+ * legend entry: `true` takes the tag's own color, and a background color token
+ * names another. `elemBefore` adds an icon in front of the text, for when the
+ * icon carries meaning. Both can sit on one tag, the swatch first.
+ *
+ * FOUR TYPES. A plain tag is the default. A person, an agent or a team leads
+ * with a 16 avatar, shaped so the three never read as one
  * another: a person is round (and so is the whole tag, and its ×), an agent is
  * a hexagon, a team is a square with radius-2 corners. The tag stays 22 tall and pads
- * 4 on the avatar side, as a plain tag does on its swatch side.
+ * 4 on the avatar side, as a plain tag does on its leading side.
  *
  * ON AN IMAGE. `isElevated` lifts a read-only or link tag onto a photo or a
  * video: a solid surface fill, no border, the Elevation 2 shadow, neutral text,
@@ -60,8 +66,7 @@ export const TAG_TYPES = ['plain', ...AVATAR_TAG_TYPES];
 
 /**
  * Each SMART subject, by its token name, and the accent its SMART tokens alias:
- * the Tag color a SMART subject draws, and the hue a SMART area's
- * swatch falls back to. The SMART layer (`color.*.smart.{subject}`) holds the
+ * the Tag color a SMART subject draws. The SMART layer (`color.*.smart.{subject}`) holds the
  * same pairing in the tokens; `SmartTag` reads it through this map, so the
  * two must name the same accent.
  */
@@ -93,6 +98,18 @@ export const TagContext = createContext({ isDisabled: false });
 
 /** What the containing field says about its tags. */
 export const useTagContext = () => useContext(TagContext);
+
+/**
+ * A swatch color is a token, never a raw color: a background (or chart) color
+ * token, written `background-accent-blue-bolder` or with its `--ds-` prefix.
+ * Returns the custom property name, or null when the value is not one.
+ */
+const SWATCH_TOKEN = /^(?:--ds-)?((?:background|chart)-[a-z0-9]+(?:-[a-z0-9]+)*)$/;
+const swatchTokenOf = (value) => {
+    if (typeof value !== 'string') return null;
+    const match = SWATCH_TOKEN.exec(value.trim());
+    return match ? `--ds-${match[1]}` : null;
+};
 
 const warn = (message) => {
     if (process.env.NODE_ENV === 'production') return;
@@ -213,10 +230,14 @@ export const Tag = ({
 
     const hasAvatar = AVATAR_TAG_TYPES.includes(type);
     if (!hasAvatar && avatar) {
-        warn('[Tag] `avatar` is only shown on type="person", "agent" or "team"; a plain tag leads with its swatch.');
+        warn('[Tag] `avatar` is only shown on type="person", "agent" or "team"; a plain tag has no avatar.');
     }
     if (hasAvatar && elemBefore) {
         warn(`[Tag] \`elemBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
+    }
+    const swatchToken = swatchTokenOf(swatchBefore);
+    if (swatchBefore && swatchBefore !== true && !swatchToken) {
+        warn('[Tag] `swatchBefore` takes `true` or a background color token such as "background-accent-blue-bolder", not a raw color; the swatch uses the tag\'s own color.');
     }
     if (hasAvatar && swatchBefore) {
         warn(`[Tag] \`swatchBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
@@ -273,24 +294,27 @@ export const Tag = ({
         ? { '--plus-tag-max': typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth, ...styleProp }
         : styleProp;
 
-    // Saving swaps the swatch or avatar for a spinner in the same box, so the
-    // tag keeps its width. The overflow `+n` is a count of hidden tags, not a
-    // category, so it carries no swatch.
+    // Saving swaps the swatch, icon or avatar for a spinner in the same box, so
+    // a tag that leads with something keeps its width. The overflow `+n` is a
+    // count of hidden tags, not a category, so it carries no swatch.
     let lead = null;
     if (hasAvatar) {
         lead = <TagAvatar type={type} avatar={avatar} label={label} isLoading={isLoading} />;
     } else if (isLoading) {
         lead = <span className="plus-tag__spinner" aria-hidden="true" />;
-    } else if (elemBefore) {
-        lead = <span className="plus-tag__elem-before">{elemBefore}</span>;
-    } else {
+    } else if (swatchBefore || elemBefore) {
         lead = (
-            <span
-                className={['plus-tag__swatch', swatchBefore ? 'plus-tag__swatch--custom' : ''].filter(Boolean).join(' ')}
-                style={swatchBefore ? { backgroundColor: swatchBefore } : undefined}
-                // Decorative: the swatch repeats what the words already say.
-                aria-hidden="true"
-            />
+            <>
+                {swatchBefore && (
+                    <span
+                        className={['plus-tag__swatch', swatchToken ? 'plus-tag__swatch--custom' : ''].filter(Boolean).join(' ')}
+                        style={swatchToken ? { '--plus-tag-swatch': `var(${swatchToken})` } : undefined}
+                        // Decorative: the swatch repeats what the words already say.
+                        aria-hidden="true"
+                    />
+                )}
+                {elemBefore && <span className="plus-tag__elem-before">{elemBefore}</span>}
+            </>
         );
     }
 
@@ -457,18 +481,18 @@ Tag.propTypes = {
     text: PropTypes.string,
     /** The label (takes precedence over `text`). */
     children: PropTypes.node,
-    /** A category color: an accent family, on the border and swatch. Never a status. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue. */
+    /** A category color: an accent family, on the border (and on the swatch when `swatchBefore` is on). Never a status. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue. */
     color: PropTypes.oneOf(TAG_COLORS),
-    /** What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. */
+    /** What the tag names. `plain` leads with nothing unless `swatchBefore` or `elemBefore` is set; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. */
     type: PropTypes.oneOf(TAG_TYPES),
     /** The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. */
     avatar: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** Selectable tags only: a compact neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** Leading content in place of the swatch, such as an icon. Plain tags only: an avatar type leads with its avatar. */
+    /** The leading icon slot, empty by default: an icon in front of the text, for when the icon carries meaning. Plain tags only: an avatar type leads with its avatar. Sits after `swatchBefore` when both are set. */
     elemBefore: PropTypes.node,
-    /** Overrides the swatch color, for a tag acting as a chart legend entry. Any CSS color. */
-    swatchBefore: PropTypes.string,
+    /** A 10 color square in front of the text, off by default, for a tag that uses color for wayfinding such as a chart legend entry. `true` draws it in the tag's own color; a background color token (`background-accent-blue-bolder`, or `--ds-background-accent-blue-bolder`) draws a custom one. Never a raw CSS color. Plain tags only. */
+    swatchBefore: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     /** Caps the whole tag (default 180). A clipped label ellipsizes and shows its full text as a tooltip. */
     maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** Makes the tag a link to this address. */
@@ -481,9 +505,9 @@ Tag.propTypes = {
     isRemovable: PropTypes.bool,
     /** Disables this tag. A field disables all of its tags through `TagContext`. */
     isDisabled: PropTypes.bool,
-    /** Saving: a spinner replaces the swatch or avatar and the tag ignores presses until it is done. */
+    /** Saving: a spinner replaces the swatch, icon or avatar and the tag ignores presses until it is done. */
     isLoading: PropTypes.bool,
-    /** For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. Read-only and link tags only; ignored with a warning on removable and selectable ones. */
+    /** For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch, when there is one, or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. Read-only and link tags only; ignored with a warning on removable and selectable ones. */
     isElevated: PropTypes.bool,
     /** Fires on a selectable tag and on a link. */
     onClick: PropTypes.func,

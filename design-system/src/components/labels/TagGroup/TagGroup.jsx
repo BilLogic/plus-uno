@@ -262,8 +262,8 @@ export const TagGroup = ({
     const menuIsOpen = menuOpen && !isDisabled;
 
     /*
-     * The `+n` is the Figma set's: a gray selectable tag with no swatch (the
-     * swatch is hidden in TagGroup.scss). It opens something rather than
+     * The `+n` is the Figma set's: a gray selectable tag with no swatch
+     * (a tag has none unless `swatchBefore` asks). It opens something rather than
      * toggling, so it reports `aria-expanded`, which is also what keeps Tag
      * from announcing it as a toggle.
      */

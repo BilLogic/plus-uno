@@ -82,7 +82,7 @@ Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `Statu
 
 1. **Subject icon.** Fixed per subject: a heart, a book, a bullhorn, a handshake, a laptop. It is decoration.
 2. **Label.** The subject's own name unless the context needs other words.
-3. **Edge and ground.** The subject's hue on the border and the swatch, with neutral text, exactly as Tag draws a color.
+3. **Edge and ground.** The subject's hue on the border, with neutral text, exactly as Tag draws a color.
 
 ### States
 

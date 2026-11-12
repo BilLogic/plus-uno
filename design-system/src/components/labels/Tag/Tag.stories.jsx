@@ -12,8 +12,9 @@ import { expectFocusRing as expectRing } from '@/storybook-docs/lib/button-state
 import { iconClass } from '../../../lib/icon';
 
 /**
- * `Tag` — a category, outlined: color on the border and swatch, neutral text,
- * one size (22), selectable, removable and link.
+ * `Tag` — a category, outlined: color on the border, neutral text, one size
+ * (22), selectable, removable and link. A color swatch and a leading icon are
+ * opt-in.
  *
  * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
  * in a real browser. A good assertion here is one a person could make by using
@@ -38,7 +39,7 @@ export default {
                 component:
                     'Is it a number? Count. Is it the condition something is in, and can that '
                     + 'condition change? Status. Otherwise, Tag: a subject, a focus area, a person, '
-                    + 'a category. Outlined, with neutral text and the color on the border and swatch.',
+                    + 'a category. Outlined, with neutral text and the color on the border.',
             },
         },
     },
@@ -56,7 +57,7 @@ const CLEAR = 'rgba(0, 0, 0, 0)';
 
 /* ----------------------------------------------------------------- stories */
 
-/** Every color. The hue is on the border and the swatch; the words stay neutral. */
+/** Every color. The hue is on the border; the words stay neutral and nothing leads the text. */
 export const Colors = () => (
     <div style={row}>
         {TAG_COLORS.map((color) => (
@@ -66,9 +67,9 @@ export const Colors = () => (
 );
 
 /**
- * A color name paints the accent it names, on the border and the swatch, and
- * on nothing else. The border is the accent's subtle border, the swatch its
- * icon color, and the text is the same neutral on every color.
+ * A color name paints the accent it names, on the border and on nothing else:
+ * a plain tag has no swatch. The border is the accent's subtle border, and the
+ * text is the same neutral on every color.
  */
 Colors.play = async ({ canvasElement }) => {
     await inEveryColorMode(async () => {
@@ -77,7 +78,6 @@ Colors.play = async ({ canvasElement }) => {
 
         for (const color of TAG_COLORS) {
             const tag = canvas.getByTestId(color);
-            const swatch = tag.querySelector('[aria-hidden="true"]');
             const s = getComputedStyle(tag);
 
             await expect(px(s.height), `${color} is 22 tall`).toBe(22);
@@ -87,18 +87,89 @@ Colors.play = async ({ canvasElement }) => {
             await expect(s.borderTopColor, `${color} border`)
                 .toBe(tokenColor(canvasElement, `--ds-border-accent-${color}-subtle`));
 
-            const hue = tokenColor(canvasElement, `--ds-icon-accent-${color}`);
-            await expect(getComputedStyle(swatch).backgroundColor, `${color} swatch`).toBe(hue);
-            await expect(px(getComputedStyle(swatch).width)).toBe(10);
-            await expect(px(getComputedStyle(swatch).borderTopLeftRadius)).toBe(2);
+            await expect(tag.querySelector('[aria-hidden="true"]'), `${color} has no swatch by default`).toBeNull();
         }
 
         // Gray is the one name that is not a hue: a default that drifted into a
         // color would have every uncolored tag claiming a category nobody gave it.
-        const graySwatch = canvas.getByTestId('gray').querySelector('[aria-hidden="true"]');
-        const [r, g, b] = getComputedStyle(graySwatch).backgroundColor.match(/\d+/g).map(Number);
+        const [r, g, b] = getComputedStyle(canvas.getByTestId('gray')).borderTopColor.match(/\d+/g).map(Number);
         await expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(12);
     });
+};
+
+/**
+ * The two opt-in leads. A plain tag leads with nothing. `swatchBefore` adds the
+ * 10 color square for wayfinding: `true` is the tag's own color, a background
+ * color token another. `elemBefore` adds an icon that carries meaning, and sits
+ * after a swatch when both are set.
+ */
+export const LeadingSwatchAndIcon = () => (
+    <div style={row}>
+        <Tag color="blue" data-testid="default">Default</Tag>
+        <Tag color="blue" swatchBefore data-testid="swatch">Swatch</Tag>
+        <Tag color="blue" swatchBefore="background-accent-orange-bolder" data-testid="token">Token</Tag>
+        <Tag color="blue" elemBefore={<i className={iconClass('star')} />} data-testid="icon">Icon</Tag>
+        <Tag color="blue" swatchBefore elemBefore={<i className={iconClass('star')} />} data-testid="both">Both</Tag>
+    </div>
+);
+
+LeadingSwatchAndIcon.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await inEveryColorMode(async () => {
+            const swatchOf = (id) => canvas.getByTestId(id).querySelector('.plus-tag__swatch');
+
+            await expect(canvas.getByTestId('default').querySelector('[aria-hidden="true"]'), 'no swatch by default').toBeNull();
+            await expect(canvas.getByTestId('default').querySelector('i'), 'no icon by default').toBeNull();
+
+            const swatch = swatchOf('swatch');
+            await expect(getComputedStyle(swatch).backgroundColor, 'true takes the tag color')
+                .toBe(tokenColor(canvasElement, '--ds-icon-accent-blue'));
+            await expect(px(getComputedStyle(swatch).width)).toBe(10);
+            await expect(px(getComputedStyle(swatch).borderTopLeftRadius)).toBe(2);
+            await expect(swatch).toHaveAttribute('aria-hidden', 'true');
+
+            await expect(getComputedStyle(swatchOf('token')).backgroundColor, 'a token names another color')
+                .toBe(tokenColor(canvasElement, '--ds-background-accent-orange-bolder'));
+
+            await expect(canvas.getByTestId('icon').querySelector('.fa-star'), 'the icon slot').not.toBeNull();
+            await expect(swatchOf('icon'), 'an icon does not add a swatch').toBeNull();
+
+            const both = canvas.getByTestId('both');
+            await expect(
+                swatchOf('both').compareDocumentPosition(both.querySelector('.fa-star')) & Node.DOCUMENT_POSITION_FOLLOWING,
+                'the swatch comes first',
+            ).toBeTruthy();
+    });
+};
+
+/**
+ * A raw CSS color is not a color token: `swatchBefore` refuses it with a
+ * warning in development, and the swatch keeps the tag's own color.
+ */
+export const SwatchRefusesRawColor = {
+    render: () => {
+        const [mounted, setMounted] = useState(false);
+        return (
+            <div style={row}>
+                <Button onClick={() => setMounted(true)}>Mount the tag</Button>
+                {mounted && <Tag color="green" swatchBefore="#ff0000" data-testid="raw">Legend</Tag>}
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            await userEvent.click(canvas.getByRole('button', { name: 'Mount the tag' }));
+            const swatch = canvas.getByTestId('raw').querySelector('.plus-tag__swatch');
+            await expect(swatch, 'the swatch still draws').not.toBeNull();
+            await expect(getComputedStyle(swatch).backgroundColor, 'in the tag color, not red')
+                .toBe(tokenColor(canvasElement, '--ds-icon-accent-green'));
+            await expect(warn.mock.calls.some(([m]) => String(m).includes('not a raw color'))).toBe(true);
+        } finally {
+            warn.mockRestore();
+        }
+    },
 };
 
 /** The three colors added to the palette: plain, selected, and as an agent with initials. */
@@ -473,7 +544,7 @@ export const AvatarEdgeCases = {
                         <Tag type="person" data-testid="node"><em>Rosa Chen</em></Tag>
                         <Tag type="person" avatar={PHOTO} data-testid="node-with-avatar"><em>Kai Brooks</em></Tag>
                         <Tag type="team" elemBefore={<i className={iconClass('star')} />} data-testid="elem">Math team</Tag>
-                        <Tag type="team" swatchBefore="#ff0000" data-testid="swatch">Science team</Tag>
+                        <Tag type="team" swatchBefore data-testid="swatch">Science team</Tag>
                         <TagContext.Provider value={{ isDisabled: true }}>
                             <Tag type="person" isLoading data-testid="disabled-saving">Rosa Chen</Tag>
                         </TagContext.Provider>
@@ -501,7 +572,7 @@ export const AvatarEdgeCases = {
             await expect(messages.some((m) => m.includes('`elemBefore`'))).toBe(true);
             await expect(messages.some((m) => m.includes('`swatchBefore`'))).toBe(true);
 
-            // The team keeps its avatar, not the star or the red swatch.
+            // The team keeps its avatar, not the star or the swatch.
             await expect(canvas.getByTestId('elem').querySelector('.fa-star')).toBeNull();
             await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('swatch'))).width)).toBe(16);
 
@@ -960,9 +1031,10 @@ export const CountOnSelectable = {
 /* ------------------------------------------------------------------ saving */
 
 /**
- * Saving swaps the swatch for a spinner of the same size, so the tag does not
- * move, and says so once, through a status beside the tag rather than inside
- * its name. The × and a link stay in place but do nothing until the save lands.
+ * Saving swaps a leading swatch for a spinner of the same size, so the tag does
+ * not move (a tag with no lead gains the spinner's own box), and says so once,
+ * through a status beside the tag rather than inside its name. The × and a link
+ * stay in place but do nothing until the save lands.
  */
 export const Saving = {
     args: { onRemoveSpy: fn(), onFollowSpy: fn(), onToggleSpy: fn() },
@@ -972,7 +1044,7 @@ export const Saving = {
             return (
                 <div style={row}>
                     <span data-testid="removable-wrap">
-                        <Tag isRemovable color="yellow" isLoading={saving} onAfterRemoveAction={onRemoveSpy} data-testid="removable">Geometry</Tag>
+                        <Tag isRemovable color="yellow" swatchBefore isLoading={saving} onAfterRemoveAction={onRemoveSpy} data-testid="removable">Geometry</Tag>
                     </span>
                     <Tag isSelected={false} color="yellow" isLoading={saving} onClick={onToggleSpy}>Statistics</Tag>
                     <Tag
@@ -1140,7 +1212,7 @@ export const OnImages = () => (
     <div style={thumbnail}>
         <div style={picture} aria-hidden="true" />
         <div style={onPicture}>
-            <Tag color="blue" isElevated data-testid="read-only">Algebra</Tag>
+            <Tag color="blue" swatchBefore isElevated data-testid="read-only">Algebra</Tag>
             <Tag color="green" isElevated>Advocacy</Tag>
             <Tag color="gray" href="#video" isElevated>Video</Tag>
             <Tag type="person" color="blue" isElevated data-testid="person">Rosa Chen</Tag>
@@ -1311,12 +1383,12 @@ export const ElevatedDisabled = () => (
         <div style={onPicture}>
             <TagContext.Provider value={{ isDisabled: true }}>
                 {TAG_COLORS.map((color) => (
-                    <Tag key={color} color={color} isElevated data-testid={`read-only-${color}`}>
+                    <Tag key={color} color={color} swatchBefore isElevated data-testid={`read-only-${color}`}>
                         {color}
                     </Tag>
                 ))}
                 {TAG_COLORS.map((color) => (
-                    <Tag key={color} color={color} href="#tag" isElevated data-testid={`link-${color}`}>
+                    <Tag key={color} color={color} href="#tag" swatchBefore isElevated data-testid={`link-${color}`}>
                         {`${color} link`}
                     </Tag>
                 ))}
