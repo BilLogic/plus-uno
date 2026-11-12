@@ -151,7 +151,8 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
     // Below 768 quick filters fold into a stacked menu behind the Filter icon; below 960 a filter side hides and the Filter icon returns.
     const folded = tier === '1' && width < FRAME_LAYOUT.fullWidthBelow;
     const sideFits = width >= SECTION_DETAIL_FLOOR;
-    const held = (id) => openMenu === id;
+    // A held-open menu waits for the picture's element: opened on the first render it would mount on the page, and stay there.
+    const held = (id) => mount !== null && openMenu === id;
 
     let filters = null;
     if (tier === '1' && !folded) {
@@ -251,7 +252,7 @@ export const ViewPicker = ({ open = false, mount }) => (
         defaultValue="All students"
         isSearchable={false}
         placement="bottom-start"
-        {...(open ? { open: true, onOpenChange: noop } : {})}
+        {...(open && mount ? { open: true, onOpenChange: noop } : {})}
         container={mount ?? undefined}
     />
 );
