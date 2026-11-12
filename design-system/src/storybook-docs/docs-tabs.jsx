@@ -160,7 +160,11 @@ function GeneratedTabBody({ children }) {
  * deliberately NOT inlined: it would put every component file into the docs
  * bundle to duplicate something GitHub already renders better, with history.
  */
-function CodeTabPanel({ of, importName, importFrom }) {
+/**
+ * The Code tab: the import line, then what the page authored for it (a
+ * template's Slots table, with its planned slots marked), then the props table.
+ */
+function CodeTabPanel({ of, importName, importFrom, children }) {
   const importLine = importLineFor(importName, importFrom);
   return (
     <GeneratedTabBody>
@@ -172,6 +176,7 @@ function CodeTabPanel({ of, importName, importFrom }) {
           </pre>
         </>
       ) : null}
+      {children}
       <h2>Props</h2>
       <ArgTypes of={of} />
     </GeneratedTabBody>
@@ -276,7 +281,9 @@ function AgentViewPanel({ entry }) {
  *   "Examples"); Code, Usage and Agent view mean the same thing on every page
  *   and are not renameable.
  * @param {React.ReactNode} props.children One `<DocsTab tab="examples">` and, when
- *   the page has usage content, one `<DocsTab tab="usage">`.
+ *   the page has usage content, one `<DocsTab tab="usage">`. A template page adds
+ *   one `<DocsTab tab="code">` for its Slots table, drawn between the import line
+ *   and the props table.
  */
 export function DocsTabs({ of, examplesTitle, children }) {
   const authored = useMemo(() => {
@@ -423,7 +430,9 @@ export function DocsTabs({ of, examplesTitle, children }) {
             of={of}
             importName={resolved?.preparedMeta?.component?.displayName ?? resolved?.preparedMeta?.component?.name}
             importFrom={importSourceFor({ importPath }, Boolean(agentEntry))}
-          />
+          >
+            {authored.code?.props.children ?? null}
+          </CodeTabPanel>
         ) : activeTab.key === 'agent' ? (
           <AgentViewPanel entry={agentEntry} />
         ) : (

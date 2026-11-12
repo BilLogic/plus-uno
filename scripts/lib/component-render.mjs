@@ -48,6 +48,8 @@ export const SECTION_ALIASES = { examples: 'practices' };
 
 /** The authored sections a page's Usage tab holds beside the spine, rendered after it in this order. */
 const BESIDE_SPINE = ['Parts', 'Slots', 'Content guidelines'];
+/** A template page's type grid sections: `Types`, or a named kind such as `Header types`. */
+const TYPE_SECTION = /^(?:[A-Z][a-z]+ )?types$/i;
 
 /**
  * A manifest record with `related`, the other records of its kind filed in its
@@ -114,6 +116,8 @@ function usageTab(page, relatedFacts) {
     if (related.length) d += `${related.map((r) => `- ${r}`).join('\n')}\n\n`;
     if (relatedFacts?.length) d += `Same group: ${relatedFacts.map(code).join(' · ')}\n\n`;
   }
+  // A template page's type grids (`## Types`, `## Header types`) come first: the family before its parts.
+  for (const s of page?.sections ?? []) if (TYPE_SECTION.test(s.title)) section(s.title);
   for (const title of BESIDE_SPINE) section(title);
   return d;
 }

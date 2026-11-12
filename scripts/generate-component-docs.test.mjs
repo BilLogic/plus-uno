@@ -168,6 +168,14 @@ test('a template page\'s Slots table follows Parts, so an agent sees which slots
   assert.match(text, /## Slots\n\n\| Slot \| Holds \|/);
 });
 
+test('a template page\'s type grids carry as one line per type, before Parts', () => {
+  const page = readDocsPage(`## Types\n\n<TypeGrid>\n<TypeCard of={S.List} title="List">The view bar alone, one table.</TypeCard>\n<TypeCard of={S.Queue} title="Queue">A list with a detail.</TypeCard>\n</TypeGrid>\n\n## Header types\n\n<TypeGrid>\n<TypeCard of={S.Title} title="Title">A title, nothing to act on.</TypeCard>\n</TypeGrid>\n\n## Anatomy\n\nPicture.\n\n## Usage\n\nUse it.\n\n## Parts\n\n1. **Box.**\n`);
+  const text = renderComponent(componentFacts(FIXTURE_MANIFEST, 'Widget'), { path: 'w.mdx', page });
+  const order = [...text.matchAll(/^## (.*)$/gm)].map((m) => m[1]);
+  assert.deepEqual(order.filter((t) => ['Types', 'Header types', 'Parts', 'Anatomy'].includes(t)), ['Types', 'Header types', 'Parts']);
+  assert.match(text, /## Types\n\n- \*\*List\.\*\* The view bar alone, one table\.\n- \*\*Queue\.\*\* A list with a detail\./);
+});
+
 test('a component with no page says its guidance is unwritten, and a pattern is not its sibling', () => {
   const text = renderComponent(componentFacts(FIXTURE_MANIFEST, 'Gadget'), null);
   assert.match(text, /No authored guidance yet/);
