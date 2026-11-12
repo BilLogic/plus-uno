@@ -185,16 +185,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Popover | `--popover-radius-tooltip` (declared elsewhere) |  |
 | Popover | `--popover-gap-screen` (declared elsewhere) |  |
 | Popover | `--popover-offset` (declared elsewhere) |  |
-| Drawer | `--drawer-pad` (declared elsewhere) |  |
-| Drawer | `--drawer-stack-sm` (declared elsewhere) |  |
-| Drawer | `--drawer-stack-md` (declared elsewhere) |  |
-| Drawer | `--drawer-stack-lg` (declared elsewhere) |  |
-| Drawer | `--drawer-inline-sm` (declared elsewhere) |  |
-| Drawer | `--drawer-inline-md` (declared elsewhere) |  |
-| Drawer | `--drawer-inline-lg` (declared elsewhere) |  |
-| Drawer | `--drawer-width-sm` |  |
-| Drawer | `--drawer-width-md` |  |
-| Drawer | `--drawer-width-lg` |  |
 | Focused page | `--focused-page-pad-x` (declared elsewhere) |  |
 | Focused page | `--focused-page-pad-y` (declared elsewhere) |  |
 | Focused page | `--focused-page-stack-sm` (declared elsewhere) |  |
