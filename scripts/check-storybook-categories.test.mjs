@@ -264,3 +264,39 @@ test('the illustration kit is a Get started page, not a Templates source', () =>
   const mdx = fs.readFileSync(new URL('../design-system/src/storybook-docs/illustrations/IllustrationKit.mdx', import.meta.url), 'utf8');
   assert.equal(docsTitle(mdx), 'Get started/Illustration kit');
 });
+
+/** Lists the Foundations · Motion pages in the fixture's sidebar sort. */
+function listMotion(root, entries) {
+  const file = path.join(root, 'storybook.taxonomy.json');
+  const taxonomy = JSON.parse(fs.readFileSync(file, 'utf8'));
+  taxonomy.storySortOrder.splice(2, 0, 'Foundations', ['Motion', entries]);
+  taxonomy.storySortOrder.splice(1, 1);
+  fs.writeFileSync(file, JSON.stringify(taxonomy));
+}
+const motionPage = (name) => `<Meta title="Foundations/Motion/${name}" />\n`;
+const motionFiles = (...names) =>
+  Object.fromEntries(names.map((n) => [`design-system/src/styles/Motion${n.replace(/ /g, '')}.mdx`, motionPage(n)]));
+
+test('Foundations · Motion pages that the sort lists, Library among them, are green', () => {
+  const root = fixture(motionFiles('Physics', 'Library'));
+  listMotion(root, ['Physics', 'Library']);
+  assert.deepEqual(messages(root), []);
+});
+
+test('a Foundations · Motion page the sort does not list goes red', () => {
+  const root = fixture(motionFiles('Physics', 'Library', 'Durations and easings'));
+  listMotion(root, ['Physics', 'Library']);
+  assert.match(messages(root).join('\n'), /Durations and easings/);
+});
+
+test('a Foundations · Motion entry in the sort with no page, Library included, goes red', () => {
+  const root = fixture(motionFiles('Physics'));
+  listMotion(root, ['Physics', 'Library']);
+  assert.match(messages(root).join('\n'), /Library/);
+});
+
+test('a Foundations · Motion list without Library goes red', () => {
+  const root = fixture(motionFiles('Physics'));
+  listMotion(root, ['Physics']);
+  assert.match(messages(root).join('\n'), /Library/);
+});

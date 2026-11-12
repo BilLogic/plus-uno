@@ -121,7 +121,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 | Neighbors | Faded under `--ds-surface` at 45%, `--section-stack-lg` apart (`--inline-lg` on a narrow stage). |
 | Ring | `--control-lg` across, `--border-selected` wide. Track `--ds-border`; progress `--ds-background-brand-bold`. |
 | Progress indicator | The default `ProgressIndicator`: dots `--progress-indicator-dot-size-8`, the bar `--control-md` long, each dot a `--control-sm` target. |
-| Motion | A move takes `--motion-duration-long` on `--motion-easing-standard`. The caption lifts out over `--motion-duration-short` and rises in over `--motion-duration-medium`. |
+| Motion | A move takes `--ds-motion-spatial-default`, fading on `--ds-motion-appearance-slow`. The caption lifts out over `--ds-motion-appearance-fast` and rises in over `--ds-motion-appearance-default`. |
 | Caption | `Heading` size small; line in `--body-default` and `--ds-text-subtle`; at most `--content-max-width-reading` wide. |
 | Spacing | `--section-stack-md` between the stage, the controls and the caption; `--inline-md` between controls. |
 
@@ -142,7 +142,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 
 ## Tokens touched
 
-`--body-default` · `--border-selected` · `--card-radius` · `--carousel-aspect` · `--carousel-edge-fade` · `--carousel-neighbor-dim` · `--carousel-neighbor-gap` · `--carousel-neighbor-scale` · `--carousel-offset` · `--carousel-progress` · `--carousel-ring-size` · `--carousel-ring-stroke` · `--carousel-slide-max` · `--carousel-slide-share` · `--carousel-slide-share-md` · `--carousel-slide-share-sm` · `--carousel-slide-width` · `--carousel-step` · `--content-max-width-reading` · `--control-lg` · `--ds-background-brand-bold` · `--ds-border` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-raised` · `--ds-text` · `--ds-text-subtle` · `--inline-lg` · `--inline-md` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-duration-short` · `--motion-easing-entrance` · `--motion-easing-exit` · `--motion-easing-standard` · `--page-stack-md` · `--section-stack-lg` · `--section-stack-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--border-selected` · `--card-radius` · `--carousel-aspect` · `--carousel-edge-fade` · `--carousel-neighbor-dim` · `--carousel-neighbor-gap` · `--carousel-neighbor-scale` · `--carousel-offset` · `--carousel-progress` · `--carousel-ring-size` · `--carousel-ring-stroke` · `--carousel-slide-max` · `--carousel-slide-share` · `--carousel-slide-share-md` · `--carousel-slide-share-sm` · `--carousel-slide-width` · `--carousel-step` · `--content-max-width-reading` · `--control-lg` · `--ds-background-brand-bold` · `--ds-border` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-appearance-slow` · `--ds-motion-appearance-slow-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-raised` · `--ds-text` · `--ds-text-subtle` · `--inline-lg` · `--inline-md` · `--page-stack-md` · `--section-stack-lg` · `--section-stack-md` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/layout-and-structure/Carousel/Carousel.scss`. Override these through the token layer, never with a literal.
 

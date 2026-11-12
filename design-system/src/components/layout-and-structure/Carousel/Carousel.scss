@@ -94,8 +94,8 @@
     transform-origin: 50% 50%;
     cursor: pointer;
     transition:
-        transform var(--motion-duration-long) var(--motion-easing-standard),
-        opacity var(--motion-duration-long) var(--motion-easing-standard);
+        transform var(--ds-motion-spatial-default-duration) var(--ds-motion-spatial-default),
+        opacity var(--ds-motion-appearance-slow-duration) var(--ds-motion-appearance-slow);
 
     &--active {
         z-index: 1;
@@ -109,9 +109,9 @@
         opacity: 0;
         visibility: hidden;
         transition:
-            transform var(--motion-duration-long) var(--motion-easing-standard),
-            opacity var(--motion-duration-long) var(--motion-easing-standard),
-            visibility 0s linear var(--motion-duration-long);
+            transform var(--ds-motion-spatial-default-duration) var(--ds-motion-spatial-default),
+            opacity var(--ds-motion-appearance-slow-duration) var(--ds-motion-appearance-slow),
+            visibility 0s linear var(--ds-motion-appearance-slow-duration);
     }
 }
 
@@ -136,7 +136,7 @@
         background-color: var(--ds-surface);
         opacity: var(--carousel-neighbor-dim);
         pointer-events: none;
-        transition: opacity var(--motion-duration-long) var(--motion-easing-standard);
+        transition: opacity var(--ds-motion-appearance-slow-duration) var(--ds-motion-appearance-slow);
     }
 }
 
@@ -212,14 +212,14 @@
 
 .plus-carousel-caption-inner {
     transition:
-        opacity var(--motion-duration-medium) var(--motion-easing-entrance),
-        transform var(--motion-duration-medium) var(--motion-easing-entrance);
+        opacity var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default),
+        transform var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
 
     &--out {
         opacity: 0;
         transform: translateY(calc(-1 * var(--stack-sm)));
-        transition-duration: var(--motion-duration-short);
-        transition-timing-function: var(--motion-easing-exit);
+        transition-duration: var(--ds-motion-appearance-fast-duration);
+        transition-timing-function: var(--ds-motion-appearance-fast);
     }
 
     &--pre {

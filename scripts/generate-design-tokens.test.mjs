@@ -42,20 +42,10 @@ test('no ladder token is declared twice', () => {
   assert.ok(names.size > 0);
 });
 
-test('motion durations are zeroed under reduced motion, exactly the set declared at :root', () => {
-  const { content: motion } = artifacts().find(({ path }) => path.endsWith('_motion.scss'));
-  const [rootBlock, reducedBlock] = motion.split('@media (prefers-reduced-motion: reduce)');
-  const rootDurations = [...rootBlock.matchAll(/--motion-duration-[a-z]+(?=:)/g)].map((m) => m[0]);
-  const reducedDurations = [...reducedBlock.matchAll(/--motion-duration-[a-z]+(?=:)/g)].map((m) => m[0]);
-  assert.ok(rootDurations.length > 0);
-  assert.deepEqual([...reducedDurations].sort(), [...rootDurations].sort());
-  assert.match(reducedBlock, /0ms/);
-});
-
-test('the payload has exactly the collections the ladder names, motion among them', () => {
+test('the payload has exactly the collections the ladder names, and no motion', () => {
   assert.deepEqual(
     variablesPayload().collections.map((c) => c.name),
-    ['spacing / semantics', 'spacing / patterns', 'spacing / components', 'layers', 'motion'],
+    ['spacing / semantics', 'spacing / patterns', 'spacing / components', 'layers'],
   );
 });
 
@@ -248,8 +238,9 @@ test('the springs add no variable to the Figma payload', () => {
   assert.doesNotMatch(payload, /spring|spatial|appearance/);
 });
 
-test('the old motion duration and easing tokens are untouched', () => {
-  const { content } = artifacts().find(({ path }) => path.endsWith('ladder/_motion.scss'));
-  assert.match(content, /--motion-duration-short: 100ms/);
-  assert.match(content, /--motion-easing-standard: cubic-bezier/);
+test('the first-pass duration and easing tokens are gone from every artifact', () => {
+  assert.ok(!artifacts().some(({ path }) => path.endsWith('ladder/_motion.scss')), 'no _motion.scss');
+  for (const { path, content } of artifacts()) {
+    assert.doesNotMatch(content, /--motion-(duration|easing)/, path);
+  }
 });

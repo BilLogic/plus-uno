@@ -1263,53 +1263,6 @@
           }
         }
       ]
-    },
-    {
-      "name": "motion",
-      "variables": [
-        {
-          "name": "Motion/duration-short",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--motion-duration-short)"
-          }
-        },
-        {
-          "name": "Motion/duration-medium",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--motion-duration-medium)"
-          }
-        },
-        {
-          "name": "Motion/duration-long",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--motion-duration-long)"
-          }
-        },
-        {
-          "name": "Motion/easing-standard",
-          "resolvedType": "STRING",
-          "codeSyntax": {
-            "WEB": "var(--motion-easing-standard)"
-          }
-        },
-        {
-          "name": "Motion/easing-entrance",
-          "resolvedType": "STRING",
-          "codeSyntax": {
-            "WEB": "var(--motion-easing-entrance)"
-          }
-        },
-        {
-          "name": "Motion/easing-exit",
-          "resolvedType": "STRING",
-          "codeSyntax": {
-            "WEB": "var(--motion-easing-exit)"
-          }
-        }
-      ]
     }
   ]
 }

@@ -185,8 +185,7 @@ const preview = {
               "Choreography",
               "Playground",
               "Transitions",
-              "Library",
-              "Durations and easings"
+              "Library"
             ],
             "Iconography",
             "Illustrations",

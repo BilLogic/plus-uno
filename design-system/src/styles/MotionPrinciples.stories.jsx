@@ -16,7 +16,7 @@ export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
   // The page itself is Foundations/Motion/Principles (MotionPrinciples.mdx).
   title: 'Foundations/Motion/Principles',
-  tags: ['!dev', '!autodocs'],
+  tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };
 

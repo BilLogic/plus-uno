@@ -365,6 +365,73 @@ _Avoid_: "state layer", "08/12/16"
 The surface and shadow pair that lifts a layer: `--ds-surface-*` with its shadow. The only place the word "surface" belongs.
 _Avoid_: "surface" for a layout box
 
+### Design system: motion
+
+**Productive**:
+The default motion mode: springs at damping ratio 1 everywhere, so nothing overshoots. Controls, fields and anything done dozens of times a day stay Productive.
+_Avoid_: "Standard" motion, "normal" motion
+
+**Expressive**:
+The motion mode one container opts into with `data-motion="expressive"`, for the end of something worth finishing: a completed reflection or a milestone. Only the spatial tokens change, with a small overshoot; page transitions and data marks stay **Productive**.
+_Avoid_: "Playful" motion, "bouncy" for the mode
+
+**Go to**:
+The transition between unrelated areas, such as Toolkit to Admin: nothing on the new Page relates to where the person was.
+_Avoid_: "navigate" for any move
+
+**Drill in**:
+The transition that makes the Breadcrumb longer: a list item or card grows into its detail.
+_Avoid_: "open" for a deeper level
+
+**Climb out**:
+The transition that makes the Breadcrumb shorter: the detail returns to the place it came from, the reverse of **Drill in**.
+_Avoid_: "go back", "close"
+
+<!-- retired-names-ok: the Switch transition is a motion name; the retired Switch component is Toggle -->
+**Switch**:
+The transition between Tabs or views of one place, with the Breadcrumb unchanged.
+_Avoid_: "toggle" for a view change
+
+**Step**:
+The transition to the next or previous item of an ordered set, such as a ProgressTracker step; the Breadcrumb keeps its length.
+_Avoid_: "next page" for the transition
+
+**Swap**:
+The transition that replaces content in place, with the container unchanged.
+_Avoid_: "crossfade" for any replacement
+
+**Add or remove**:
+The transition for one item entering or leaving a collection, with its neighbors making or closing the gap.
+_Avoid_: "insert", "delete" for the motion
+
+**Reorder**:
+The transition for items changing position, by drag or keyboard: the carried item follows the hand and its neighbors move aside.
+_Avoid_: "sort animation"
+
+**Expand**:
+The transition that opens and closes content in place, such as an accordion panel or a row's detail.
+_Avoid_: "collapse" as a separate transition
+
+**Load**:
+The transition for content that arrives after a wait: a placeholder, then the content.
+_Avoid_: "spinner" for the transition
+
+**Open**:
+The transition of an overlay appearing and leaving: Popup, Modal, Drawer or Flag.
+_Avoid_: "show", "hide" for the motion
+
+**Dock**:
+The transition of a Panel attaching to or detaching from the **Frame**.
+_Avoid_: "slide in" for a Panel
+
+**Update**:
+The transition that marks a value or state changing in place, such as a count, a ChangeTag or a validation state.
+_Avoid_: "flash"
+
+**Call attention**:
+The transition that draws the eye to something the person did not ask for: a shake for an error, a pulse for new content.
+_Avoid_: "alert animation"
+
 ### Design work
 
 **PRD**:

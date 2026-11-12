@@ -36,7 +36,6 @@
   // scripts/lib/tokens/plan.mjs, never from Figma. Each tier declares its own
   // values. Regenerate,
   // never edit: `npm run generate:design-tokens`.
-  @include meta.load-css("../tokens/ladder/motion");
   @include meta.load-css("../tokens/ladder/springs");
   @include meta.load-css("../tokens/ladder/semantics");
   @include meta.load-css("../tokens/ladder/patterns");

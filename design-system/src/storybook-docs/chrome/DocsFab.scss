@@ -23,10 +23,10 @@
     &:active { background-color: var(--ds-surface-raised-pressed); }
 }
 
-// Reduced motion needs no branch here: the --motion-duration-* tokens collapse to 0ms under it.
+// Reduced motion needs no branch here: the --ds-motion-* tokens already fall back to a fade under it.
 // The trigger's glyph turns from a plus into a cross while the menu is open.
 .plus-docs-fab__trigger .plus-btn-visual {
-    transition: transform var(--motion-duration-short) var(--motion-easing-standard);
+    transition: transform var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 }
 
 .plus-docs-fab__trigger[data-popup-open] .plus-btn-visual {
@@ -45,8 +45,8 @@
     gap: var(--stack-sm);
     outline: none;
     transition:
-        opacity var(--motion-duration-short) var(--motion-easing-entrance),
-        transform var(--motion-duration-short) var(--motion-easing-entrance);
+        opacity var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast),
+        transform var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     &[data-starting-style],
     &[data-ending-style] {

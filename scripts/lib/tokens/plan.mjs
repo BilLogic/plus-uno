@@ -16,24 +16,6 @@
  */
 
 /**
- * Motion: duration and easing roles. First pass — ADS-shaped round numbers,
- * not benchmarked live (architecture ticket, not a family rebuild). Adrija
- * refines the actual curves; this plan only has to give every component one
- * place to read a duration and an easing from, per #1698's user story 7.
- */
-export const MOTION_DURATIONS = {
-  short: '100ms',
-  medium: '200ms',
-  long: '300ms',
-};
-
-export const MOTION_EASINGS = {
-  standard: 'cubic-bezier(0.2, 0, 0, 1)',
-  entrance: 'cubic-bezier(0, 0, 0.2, 1)',
-  exit: 'cubic-bezier(0.4, 0, 1, 1)',
-};
-
-/**
  * Motion springs (ADR-041). Primitives are raw springs, mass 1, named by
  * stiffness with the damping ratio appended as `-r<percent>` only when it is
  * not 1. Components never read a primitive; they read a semantic below. The

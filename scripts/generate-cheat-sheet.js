@@ -61,7 +61,6 @@ function tokenSections() {
         { group: 'Ladder Patterns', tier: 'pattern', tokens: l('_patterns.scss') },
         { group: 'Ladder Components', tier: 'component', tokens: l('_components.scss') },
         { group: 'Layers', tier: 'semantic', tokens: l('_layers.scss') },
-        { group: 'Motion', tier: 'semantic', tokens: l('_motion.scss') },
         { group: 'Motion Springs (--ds-motion-)', tier: 'semantic', tokens: springs.filter((d) => d.name.startsWith('--ds-motion-')) },
         { group: 'Motion Spring Primitives', tier: 'primitive', tokens: springs.filter((d) => d.name.startsWith('--motion-spring-')) },
         { group: 'Scale Tokens', tier: 'semantic', tokens: scales.filter((d) => !isScalePrimitive(d.name)) },
@@ -112,7 +111,6 @@ function renderTokensDoc() {
     const ladderPatterns = lines['Ladder Patterns'];
     const ladderComponents = lines['Ladder Components'];
     const layerTokens = lines['Layers'];
-    const motionTokens = lines['Motion'];
     const springTokens = lines['Motion Springs (--ds-motion-)'];
     const springPrimitives = lines['Motion Spring Primitives'];
     const scaleFoundations = lines['Scale Tokens'];
@@ -145,10 +143,6 @@ function renderTokensDoc() {
     tokensDoc += `## Layers\n`;
     tokensDoc += `Stacking order: \`z-index: var(--layer-modal)\`.\n\n`;
     tokensDoc += "```css\n" + layerTokens + "\n```\n\n";
-
-    tokensDoc += `## Motion\n`;
-    tokensDoc += `Durations and easings; reduced motion is handled at this layer.\n\n`;
-    tokensDoc += "```css\n" + motionTokens + "\n```\n\n";
 
     tokensDoc += `## Motion Springs (\`--ds-motion-\`)\n`;
     tokensDoc += `How things move (ADR-041). Each semantic is an easing with its settle time beside it: \`transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast)\`. Spatial is for position and size, appearance for fades and color, \`exit\` for leaving, \`loop\` for work in progress. A component names its own enter, exit and change in the motion registry; read Foundations / Motion, then the component's Motion section.\n\n`;

@@ -211,7 +211,7 @@
     box-sizing: border-box;
     border: var(--border-default) solid var(--ds-border-input);
     background-color: var(--ds-background-input);
-    transition: background-color var(--motion-duration-short) var(--motion-easing-standard), border-color var(--motion-duration-short) var(--motion-easing-standard);
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     &--checkbox {
         border-radius: var(--radius-md);
