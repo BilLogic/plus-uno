@@ -247,10 +247,21 @@ export const Focused = {
         await userEvent.click(input);
         // Focus with no text lists recent searches.
         await waitFor(() => expect(page.getByText('Recent searches')).toBeVisible());
+        await expect(input).toHaveAttribute('aria-expanded', 'true');
         await userEvent.click(page.getByRole('option', { name: 'Ada' }));
         await expect(input).toHaveValue('Ada');
         // Typing: groups with counts, then See all, then the action row.
         await waitFor(() => expect(page.getByText('Students (1)')).toBeVisible());
+        // A click on the See all row runs a basic search and closes the panel.
+        await userEvent.click(page.getByRole('option', { name: /See all results for/ }));
+        await expect(canvas.getByTestId('log')).toHaveTextContent('search:Ada');
+        await waitFor(() => expect(page.queryByRole('listbox', { name: 'Suggestions' })).toBeNull());
+        await expect(input).toHaveAttribute('aria-expanded', 'false');
+        // Clicking the focused field opens it again; Tab away closes it.
+        await userEvent.click(input);
+        await waitFor(() => expect(page.getByRole('listbox', { name: 'Suggestions' })).toBeVisible());
+        await userEvent.tab();
+        await waitFor(() => expect(page.queryByRole('listbox', { name: 'Suggestions' })).toBeNull());
         // A group with nothing in it is not drawn.
         await expect(page.queryByText('Sessions (0)')).toBeNull();
     },

@@ -169,6 +169,14 @@ const SearchField = ({
     const rowId = (index) => `${listId}-row-${index}`;
     const activeId = panelShown && cursor >= 0 && cursor < rows.length ? rowId(cursor) : undefined;
 
+    // The rows change under the cursor (a later answer arrives): the cursor starts over.
+    const rowKey = rows.map((row) => row.text ?? row.item?.value ?? row.kind).join('\u0000');
+    useEffect(() => { setCursor(-1); }, [rowKey]);
+    // The row under the cursor stays in view in a long panel.
+    useEffect(() => {
+        if (activeId) document.getElementById(activeId)?.scrollIntoView({ block: 'nearest' });
+    }, [activeId]);
+
     const closePanel = () => {
         setPanelOpen(false);
         setCursor(-1);
@@ -200,6 +208,11 @@ const SearchField = ({
             return;
         }
         if (focusedMode) {
+            // Tab leaves the field: the panel is not a stop in the order, so it closes.
+            if (event.key === 'Tab') {
+                closePanel();
+                return;
+            }
             if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                 event.preventDefault();
                 if (!panelShown) {
@@ -371,6 +384,7 @@ const SearchField = ({
                 }
             }}
             onFocus={focusedMode ? () => setPanelOpen(true) : undefined}
+            onClick={focusedMode ? () => setPanelOpen(true) : undefined}
             onKeyDown={handleKeyDown}
             {...(focusedMode ? {
                 role: 'combobox',
