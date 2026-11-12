@@ -199,30 +199,30 @@ export const SOUND_SPEC = {
     "goal": {
       "family": "Goal",
       "level": "soft",
-      "trim": -2.4,
-      "summary": "G4 and G5 glide to C5, then C6 (shared)",
+      "trim": -2.3,
+      "summary": "C5 and E5 rise to meet on G5, then C6 (shared)",
       "notes": [
         {
-          "r": 0.75,
-          "to": 1,
+          "r": 1,
+          "to": 1.5,
           "t": 0,
-          "d": 0.62,
+          "d": 0.6,
           "g": 0.6,
-          "gl": 0.22
+          "gl": 0.2
         },
         {
-          "r": 1.5,
-          "to": 1,
+          "r": 1.25,
+          "to": 1.5,
           "t": 0,
-          "d": 0.62,
+          "d": 0.6,
           "g": 0.5,
-          "gl": 0.22
+          "gl": 0.2
         },
         {
           "r": 2,
-          "t": 0.27,
+          "t": 0.26,
           "d": 0.5,
-          "g": 0.38
+          "g": 0.4
         }
       ],
       "base": 523.25
