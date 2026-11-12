@@ -164,7 +164,7 @@ export const TreeEdge = ({ x1, y1, x2, y2, progress = 0, accent = false }) => {
   const py = y1 + (y2 - y1) * progress;
   return (
     <g data-part="tree-edge">
-      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={MOTION_PAINT.trail} style={HAIRLINE} />
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={PAINT.trail} style={HAIRLINE} />
       {progress > 0 && <line x1={x1} y1={y1} x2={px} y2={py} stroke={PAINT.accent} style={SERIES} />}
       {accent && progress >= 0.999 && <polygon points={`${x2},${y2} ${head(0.5)} ${head(-0.5)}`} fill={PAINT.accent} />}
     </g>
