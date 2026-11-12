@@ -1,0 +1,62 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import { LandRuleFigure } from '@/storybook-docs/illustrations/sound.jsx';
+import * as FlagStories from '../components/messaging/Flag/Flag.stories.jsx';
+
+<Meta title="Foundations/Sound/With motion" tags={['!dev']} />
+
+<FoundationHero
+    title="With motion"
+    summary="A sound lands when its motion lands."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="The land rule">
+
+A sound starts at its motion token's 90% time minus its pickup, so its first note lands as the motion reads as arrived. Under reduced motion it lands with the reduced motion instead.
+
+<LandRuleFigure caption="Top: a Flag's spatial.default spring. Bottom: Notify, its pickup notches, then its notes. The darker dashed line is the spring's 90%; the lighter one is where the sound starts." />
+
+</FoundationSection>
+
+<FoundationSection title="On a Flag">
+
+A Flag slides in from the top right and Notify lands with it.
+
+<Canvas of={FlagStories.LandsWithNotify} sourceState="none" />
+
+</FoundationSection>
+
+<FoundationSection title="Expressive moments">
+
+Sound follows motion's Expressive moments and adds none. Step plays on every Finish, and Milestone on every Milestone. The list of those moments lives in Motion · Physics.
+
+</FoundationSection>
+
+<FoundationSection title="In code">
+
+```js
+import { playSound, soundStartFor } from '@/components';
+
+playSound('notify', { at: soundStartFor('spatial.default', 'notify') });
+```
+
+Call it when the motion starts. Pass `{ mode: 'reduced' }` or `{ mode: 'expressive' }` to time it to that mode's spring.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Physics', description: 'The springs, their 90% times and the Expressive moments.', href: '?path=/docs/foundations-motion-physics--docs' },
+    ]}
+/>
+
+</FoundationSection>
