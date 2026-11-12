@@ -86,7 +86,9 @@ Each layer is a `--layer-*` z-index token, set in code only. Components name the
 
 <Canvas of={ElevationStories.Layers} sourceState="none" />
 
-- **One Modal at a time.** A follow-up step opens inside it, never as a second Modal.
+- **A confirm Modal may open over a Panel, a Popup or a focused task,** with its own Backdrop.
+- **Never a Modal on a Modal.** A Modal confirms inside itself, with a warning SectionMessage and the danger button.
+- **A Panel never has a Backdrop.** It floats beside a usable page.
 - **Popups and Tooltips open over a Modal.** A Popup opened inside a Modal portals into it.
 - **A Flag sits above all of it**, so a message is never hidden.
 - **`--layer-dialog`** holds a view that replaces the page: Frame · focused and AiChat full screen.

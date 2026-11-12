@@ -44,7 +44,7 @@ const SLOT_WHY = {
 export const BEHAVIORS = [
     { id: 'holds', behavior: 'Holds the work', level: 'sunken', layer: null, uses: 'Frame topbar, docked Sidebar' },
     { id: 'flow', behavior: 'In the flow', level: 'default', layer: null, uses: 'Page, Section (sunken for a subtle one), Table, docked AI panel' },
-    { id: 'marks', behavior: 'Marks one object', level: 'raised', layer: '--layer-card', uses: 'Card, Carousel slide, Range thumb' },
+    { id: 'marks', behavior: 'Marks one object', level: 'raised', layer: null, uses: 'Card, Carousel slide, Range thumb' },
     { id: 'stays', behavior: 'Stays put while content scrolls', level: 'overflow', layer: '--layer-card', uses: 'Sticky table header and column, with a border first' },
     { id: 'floats', behavior: 'Floats, page usable', level: 'overlay', layer: ['--layer-navigation', '--layer-popup', '--layer-flag', '--layer-spotlight'], uses: 'Floating Sidebar, floating Panel, Popup types (Popup, DropdownMenu, a Select list), Inline edit, Flag, Spotlight, a dragged Card' },
     { id: 'blocks', behavior: 'Blocks the page', level: 'blocking', layer: '--layer-modal', uses: 'Modal only, on the Backdrop (--layer-blanket)' },
@@ -59,7 +59,7 @@ export const LAYERS = [
     { token: '--layer-dialog', who: 'A page that replaces the page: Frame · focused, AiChat full screen' },
     { token: '--layer-popup', who: 'Popups, menus, a Select list' },
     { token: '--layer-blanket', who: 'The Backdrop' },
-    { token: '--layer-modal', who: 'The one Modal' },
+    { token: '--layer-modal', who: 'The Modal, above its Backdrop' },
     { token: '--layer-flag', who: 'Flags, above a Modal' },
     { token: '--layer-spotlight', who: 'Onboarding spotlights' },
     { token: '--layer-tooltip', who: 'Tooltips, above everything' },
@@ -234,7 +234,7 @@ const PLATES = [
             </>
         ),
     },
-    { id: 'card', title: 'Card', level: 'raised', layer: '--layer-card', at: [80, 104], draw: <Card x={80} y={104} w={100} h={72} /> },
+    { id: 'card', title: 'Card', level: 'raised', layer: null, layerNote: 'raised, no layer', at: [80, 104], draw: <Card x={80} y={104} w={100} h={72} /> },
     { id: 'popup', title: 'Popup', level: 'overlay', layer: '--layer-popup', at: [196, 92], draw: <PopupShape x={196} y={92} w={96} h={50} /> },
     { id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-blanket', at: [0, 0], draw: <Backdrop x={0} y={0} w={STAGE.w} h={STAGE.h} /> },
     { id: 'modal', title: 'Modal', level: 'blocking', layer: '--layer-modal', at: [90, 46], draw: <ModalShape x={90} y={46} w={140} h={104} accent /> },
@@ -312,7 +312,7 @@ export const ExplodedStack = () => {
                             <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
                                 <strong>{plate.title}</strong>
                                 <span style={{ color: 'var(--ds-text-subtle)' }}>{levelOf(plate.level).name.toLowerCase()}</span>
-                                <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : 'no layer'}</code>
+                                <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : (plate.layerNote ?? 'no layer')}</code>
                             </span>
                         </li>
                     ))}
@@ -744,7 +744,7 @@ export const LayerStack = () => {
     const values = useVarsOn(ref, LAYERS.map((l) => l.token));
     const notes = {
         '--layer-popup': 'Opened inside a Modal, a Popup portals into it and sits over it.',
-        '--layer-modal': 'One Modal at a time. A follow-up step opens inside it.',
+        '--layer-modal': 'A confirm Modal may open over a Panel, a Popup or a focused task, with its own Backdrop. Never a Modal on a Modal.',
         '--layer-flag': 'A Flag stays in view over the Modal.',
     };
     return (
