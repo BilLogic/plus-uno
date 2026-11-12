@@ -70,6 +70,7 @@ export const AiFeedback = ({ value, defaultValue = null, onFeedback, className =
                     placement="bottom-start"
                     title="What went wrong?"
                     anchor={downRef}
+                    rootClose
                 >
                     <div className="plus-ai-feedback__ask">
                         <TextArea
