@@ -11,22 +11,11 @@ const classes = (...names) => names.filter(Boolean).join(' ');
 /** What a press asks for next: ascending, then descending, then no sort. */
 const NEXT_SORT = { none: 'ascending', ascending: 'descending', descending: 'none' };
 
-const SORT_GLYPH = {
-    none: 'sort',
-    ascending: 'sort-up',
-    descending: 'sort-down',
-};
-
-const SORT_STATE_TEXT = {
-    none: 'not sorted',
-    ascending: 'sorted ascending',
-    descending: 'sorted descending',
-};
-
-const SORT_ACTION_TEXT = {
-    ascending: 'Sort ascending',
-    descending: 'Sort descending',
-    none: 'Remove sort',
+/** Per sort state: the glyph, what a screen reader hears, and the sort button's tooltip. */
+const SORTS = {
+    none: { glyph: 'sort', state: 'not sorted', action: 'Remove sort' },
+    ascending: { glyph: 'sort-up', state: 'sorted ascending', action: 'Sort ascending' },
+    descending: { glyph: 'sort-down', state: 'sorted descending', action: 'Sort descending' },
 };
 
 /**
@@ -65,7 +54,7 @@ const HeadCell = ({
     style,
     ...props
 }) => {
-    const sortState = SORT_GLYPH[sort] ? sort : 'none';
+    const sortState = SORTS[sort] ? sort : 'none';
     const showLabel = !isIconOnlyHeader;
     const truncate = shouldTruncate && showLabel;
 
@@ -90,7 +79,7 @@ const HeadCell = ({
 
     // The tooltip goes on whatever takes focus: the sort button, or, on a
     // header with nothing to press, the label's own box while it is clipped.
-    const action = SORT_ACTION_TEXT[NEXT_SORT[sortState]];
+    const action = SORTS[NEXT_SORT[sortState]].action;
     const clippedText = truncate ? label : '';
 
     const inner = (
@@ -115,8 +104,8 @@ const HeadCell = ({
                         )}
                         {isSortable && (
                             <>
-                                <Icon name={SORT_GLYPH[sortState]} className="plus-table-head-cell-sort" />
-                                <VisuallyHidden>{`, ${SORT_STATE_TEXT[sortState]}`}</VisuallyHidden>
+                                <Icon name={SORTS[sortState].glyph} className="plus-table-head-cell-sort" />
+                                <VisuallyHidden>{`, ${SORTS[sortState].state}`}</VisuallyHidden>
                             </>
                         )}
                     </>

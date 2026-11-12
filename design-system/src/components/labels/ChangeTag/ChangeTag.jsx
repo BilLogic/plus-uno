@@ -1,6 +1,8 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
+import { devWarn } from '../../../lib/devWarn';
 
+import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
 import Icon from '../../images-and-icons/Icon';
 import './ChangeTag.scss';
 
@@ -41,12 +43,7 @@ const EM_DASH = '—';
 
 const numberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
-const warn = (message) => {
-    if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.warn(`[ChangeTag] ${message}`);
-    }
-};
+const warn = devWarn('ChangeTag');
 
 /**
  * What the tag shows and says for a value. `direction` is `up`, `down`,
@@ -159,10 +156,10 @@ export const ChangeTag = ({
             {comparison !== undefined && comparison !== null && comparison !== '' && (
                 <span className="plus-change-tag__comparison" aria-hidden="true">{comparison}</span>
             )}
-            <span className="plus-change-tag__spoken">
+            <VisuallyHidden>
                 {spoken}
                 {comparison !== undefined && comparison !== null && comparison !== '' && <> {comparison}</>}
-            </span>
+            </VisuallyHidden>
         </span>
     );
 };

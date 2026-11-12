@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { devWarn } from '../../../lib/devWarn';
 
 import CountTag, { COUNT_TAG_APPEARANCES, formatCount } from '../CountTag/CountTag';
 import { ClippedTooltip } from '../../../lib/ClippedTooltip';
@@ -29,12 +30,7 @@ import './StatusTag.scss';
 export const STATUS_TAG_APPEARANCES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery'];
 export const STATUS_TAG_SPACINGS = ['default', 'spacious'];
 
-const warn = (message) => {
-    if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.warn(`[StatusTag] ${message}`);
-    }
-};
+const warn = devWarn('StatusTag');
 
 /** A filled label for the condition something is in, such as "Needs review" or "Overdue". It is never a button; its appearance carries the meaning. */
 export const StatusTag = ({

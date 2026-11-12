@@ -80,19 +80,6 @@
     color: var(--ds-text-subtle);
 }
 
-/* Read, not seen: the change in words, for a screen reader. */
-.plus-change-tag__spoken {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
 /*
  * The color map: [fill, text, inside border] per tone, the same mapping
  * Status tag uses for neutral, success and danger.

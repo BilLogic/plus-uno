@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { devWarn } from '../../../lib/devWarn';
 import CountTag from '../CountTag';
 import Tooltip from '../../overlays-and-layering/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
@@ -21,8 +22,8 @@ import './Tag.scss';
  * TWO OPT-IN LEADS. A plain tag leads with nothing. `swatchBefore` adds a 10
  * color square for a tag that uses color to find its way around, such as a chart
  * legend entry: `true` takes the tag's own color, and a background color token
- * names another. `elemBefore` adds an icon in front of the text, for when the
- * icon carries meaning. Both can sit on one tag, the swatch first.
+ * names another. `elemBefore` adds any element in front of the text, for when it
+ * carries meaning. Both can sit on one tag, the swatch first.
  *
  * FOUR TYPES. A plain tag is the default. A person, an agent or a team leads
  * with a 16 avatar, shaped so the three never read as one
@@ -111,11 +112,7 @@ const swatchTokenOf = (value) => {
     return match ? `--ds-${match[1]}` : null;
 };
 
-const warn = (message) => {
-    if (process.env.NODE_ENV === 'production') return;
-    // eslint-disable-next-line no-console
-    console.warn(message);
-};
+const warn = devWarn('Tag');
 
 /**
  * What stands in for a missing avatar. A person gets the first letters of the
@@ -230,22 +227,22 @@ export const Tag = ({
 
     const hasAvatar = AVATAR_TAG_TYPES.includes(type);
     if (!hasAvatar && avatar) {
-        warn('[Tag] `avatar` is only shown on type="person", "agent" or "team"; a plain tag has no avatar.');
+        warn('`avatar` is only shown on type="person", "agent" or "team"; a plain tag has no avatar.');
     }
     if (hasAvatar && elemBefore) {
-        warn(`[Tag] \`elemBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
+        warn(`\`elemBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
     }
     const swatchToken = swatchTokenOf(swatchBefore);
     if (swatchBefore && swatchBefore !== true && !swatchToken) {
-        warn('[Tag] `swatchBefore` takes `true` or a background color token such as "background-accent-blue-bolder", not a raw color; the swatch uses the tag\'s own color.');
+        warn('`swatchBefore` takes `true` or a background color token such as "background-accent-blue-bolder", not a raw color; the swatch uses the tag\'s own color.');
     }
     if (hasAvatar && swatchBefore) {
-        warn(`[Tag] \`swatchBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
+        warn(`\`swatchBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
     }
     // Initials come from the words, so a label that is not text leaves the
     // avatar blank.
     if (hasAvatar && !avatar && typeof label !== 'string') {
-        warn(`[Tag] the label is not text, so a type="${type}" tag has no initials to fall back on. Pass \`avatar\`.`);
+        warn(`the label is not text, so a type="${type}" tag has no initials to fall back on. Pass \`avatar\`.`);
     }
 
     const isSelectable = resolved === 'selectable';
@@ -255,7 +252,7 @@ export const Tag = ({
     // a removable tag it would crowd the ×; elsewhere it would read as a Count tag
     // sitting beside a tag rather than part of it.
     if (trailingMetric !== undefined && trailingMetric !== null && !isSelectable) {
-        warn(`[Tag] \`trailingMetric\` is only shown on a selectable tag; it is ignored on "${resolved}".`);
+        warn(`\`trailingMetric\` is only shown on a selectable tag; it is ignored on "${resolved}".`);
     }
     const showCount = isSelectable && trailingMetric !== undefined && trailingMetric !== null;
 
@@ -263,7 +260,7 @@ export const Tag = ({
     // followed: a value is edited off the image, where the outline reads.
     const canElevate = resolved === 'read-only' || isLink;
     if (isElevated && !canElevate) {
-        warn(`[Tag] \`isElevated\` is only for a read-only tag or a link; it is ignored on "${resolved}".`);
+        warn(`\`isElevated\` is only for a read-only tag or a link; it is ignored on "${resolved}".`);
     }
 
     // The × renders for removable, and for a link with `isRemovable`. Never in a
@@ -272,7 +269,7 @@ export const Tag = ({
 
     // A × named only "Remove" is one of a row of identical controls.
     if (hasRemove && !removeButtonLabel && typeof label !== 'string') {
-        warn('[Tag] the label is not text, so the × is named only "Remove". Pass `removeButtonLabel` to say what it removes.');
+        warn('the label is not text, so the × is named only "Remove". Pass `removeButtonLabel` to say what it removes.');
     }
 
     // A disabled tag drops its behavior class, so no hover, press or underline

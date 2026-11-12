@@ -29,6 +29,7 @@ export const labelOf = (option) => (typeof option.label === 'string' ? option.la
  */
 export default function useOptionSource({ options, loadOptions, filter, shown, listId }) {
     const [created, setCreated] = useState([]);
+    // `failed` is `null`, or `{ offset }`: where the request that failed started (0 is the first page).
     const [loaded, setLoaded] = useState({ query: null, options: [], total: 0, busy: false, failed: null });
     const known = useRef(new Map());
     const all = useMemo(
@@ -66,7 +67,7 @@ export default function useOptionSource({ options, loadOptions, filter, shown, l
                 failed: null,
             }));
         }, () => {
-            if (ticket === request.current) setLoaded((prev) => ({ ...prev, busy: false, failed: offset }));
+            if (ticket === request.current) setLoaded((prev) => ({ ...prev, busy: false, failed: { offset } }));
         });
     }, []);
 
@@ -77,11 +78,11 @@ export default function useOptionSource({ options, loadOptions, filter, shown, l
     const more = hasLoader && loaded.options.length < loaded.total;
     const loadMore = () => {
         // A failed page waits for Retry rather than asking again on every scroll.
-        if (more && !loaded.busy && loaded.failed === null) load(filter, loaded.options.length);
+        if (more && !loaded.busy && !loaded.failed) load(filter, loaded.options.length);
     };
     // Retry asks again for the page that failed: the first, or the next.
     const retry = () => {
-        if (!loaded.busy && loaded.failed !== null) load(filter, loaded.failed);
+        if (!loaded.busy && loaded.failed) load(filter, loaded.failed.offset);
     };
 
     /* ---------- the next page on scroll ---------- */
@@ -110,8 +111,8 @@ export default function useOptionSource({ options, loadOptions, filter, shown, l
             busy: loaded.busy,
             more,
             /** The last request failed: on the first page of a search, or on a later one. `retry` asks for it again. */
-            failed: loaded.failed !== null,
-            firstFailed: loaded.failed === 0,
+            failed: Boolean(loaded.failed),
+            firstFailed: loaded.failed?.offset === 0,
             retry,
             /** The first page is on its way and the list has nothing to show yet. */
             firstPage: hasLoader && loaded.busy && loaded.options.length === 0,
