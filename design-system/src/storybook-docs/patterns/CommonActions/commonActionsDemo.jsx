@@ -67,7 +67,6 @@ export const FocusedBar = () => <FocusedType start={1} />;
 export const CardAction = () => (
     <div style={{ display: 'flex', padding: 'var(--page-pad)' }}>
         <PatternCard
-            size="md"
             title="Next session"
             description="Thursday, 4:00 PM with Ana Ruiz"
             footer={<Button text="Open session" appearance="subtle" onClick={() => {}} />}
