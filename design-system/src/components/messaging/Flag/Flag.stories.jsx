@@ -7,6 +7,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Flag, { FlagGroup, FLAG_APPEARANCES } from './Flag';
 import Button from '@/components/forms-and-inputs/Button/Button';
+import { SoundProvider, useSound } from '@/sound';
 
 export default {
     title: 'Components/Messaging/Flag',
@@ -117,7 +118,8 @@ BackgroundFailure.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const flag = canvasElement.querySelector('.plus-flag');
     await expect(flag.getAttribute('role'), 'a failure interrupts').toBe('alert');
-    await expect(canvas.getByRole('button', { name: 'Try again' }), 'retry in the flag').toBeVisible();
+    // Read once the enter fade has begun: at its first frame the flag is still at opacity 0.
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Try again' }), 'retry in the flag').toBeVisible());
     await expect(canvas.getByRole('button', { name: 'Dismiss flag' }), 'closable').toBeVisible();
 };
 
@@ -339,7 +341,7 @@ const actionsList = [{ text: 'View plan', onClick: () => {} }];
 export const Rest = {
     render: () => <StateFlag />,
     play: async ({ canvasElement }) => {
-        await expect(within(canvasElement).getByText('Plan saved')).toBeVisible();
+        await waitFor(() => expect(within(canvasElement).getByText('Plan saved')).toBeVisible());
         await expect(dismissOf(canvasElement)).toBeVisible();
     },
 };
@@ -372,5 +374,49 @@ export const Focused = {
         await expect(style.outlineStyle).toBe('solid');
         await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
         action.blur();
+    },
+};
+
+const LandsWithNotifyStory = () => {
+    const [shown, setShown] = useState(false);
+    const { enabled, setEnabled } = useSound();
+    return (
+        <SoundProvider>
+            <div style={{ position: 'relative', minHeight: 'calc(var(--space-500) * 3)', padding: 'var(--space-150)', display: 'flex', alignItems: 'flex-start', gap: 'var(--inline-md)' }}>
+                <Button appearance="primary" text="Show flag" onClick={() => setShown(true)} />
+                <Button appearance="default" text={enabled ? 'Sound on' : 'Sound off'} onClick={() => setEnabled(!enabled)} />
+                <FlagGroup position="top-end" containerPosition="absolute">
+                    <Flag id="flag-lands-with-notify" show={shown} onDismiss={() => setShown(false)} appearance="success" title="Plan saved">
+                        Your session plan is saved for Monday.
+                    </Flag>
+                </FlagGroup>
+            </div>
+        </SoundProvider>
+    );
+};
+
+/**
+ * Flag's enter, live: it slides in from the top-right corner on the
+ * `spatial.default` spring and fades in on `appearance.default`, and Notify
+ * sounds as it lands. The switch beside it is the app's one sound setting.
+ */
+export const LandsWithNotify = {
+    render: () => <LandsWithNotifyStory />,
+    parameters: { layout: 'fullscreen' },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Show flag' }));
+        const flag = await waitFor(() => {
+            const el = canvasElement.ownerDocument.getElementById('flag-lands-with-notify');
+            if (!el) throw new Error('the flag has not entered');
+            return el;
+        });
+        const style = getComputedStyle(flag);
+        const root = getComputedStyle(canvasElement.ownerDocument.documentElement);
+        const raw = root.getPropertyValue('--ds-motion-spatial-default-duration').trim();
+        const seconds = parseFloat(raw) / (raw.endsWith('ms') ? 1000 : 1);
+        await expect(style.animationName, 'slides in on spatial.default').toContain('plus-flag-slide-in');
+        await expect(parseFloat(style.animationDuration)).toBeCloseTo(seconds, 3);
+        await waitFor(() => expect(flag).toBeVisible());
     },
 };

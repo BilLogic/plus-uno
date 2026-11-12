@@ -10,9 +10,11 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused, LandsWithNotify
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
+
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.exit` + `appearance.fast` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -30,6 +32,16 @@ state. `FlagGroup` positions a stack of them.
 | Warning | Something to check before going on. Stays until dismissed. |
 | Error | Something that failed. Stays until dismissed. |
 | Bold | Any appearance on its bold fill, for the one message that must be seen. |
+
+## Motion
+
+Flag reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Slides in from the top-right corner while it fades in. Under reduced motion it is the fade alone. |
+| exit | Close | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Leaves the way it came, by the exit rules. |
+| change | Add or remove an item | `--ds-motion-spatial-default` | The stack closes up when one leaves. |
 
 ## Best practices
 
@@ -171,6 +183,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | `headerClass` | string | `''` | Extra class on the header row that holds the title and timestamp. |
 | `bodyClass` | string | `''` | Extra class on the description container. |
 | `timestamp` | node | — | Small text beside the title, such as "11 mins ago". |
+| `sound` | bool | `true` | Plays Notify as the flag lands, through the app's sound setting. Defaults to true; the app passes false when a flag should stay quiet, such as during a session or for all but the first of several that arrive together. |
 
 ## Variants
 
@@ -180,7 +193,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-information-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-focused-inverse` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--flag-min-height` · `--flag-offset` · `--flag-pad` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--radius-md` · `--stack-sm` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-information-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-focused-inverse` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--flag-min-height` · `--flag-offset` · `--flag-pad` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--radius-md` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Flag/Flag.scss`. Override these through the token layer, never with a literal.
 
