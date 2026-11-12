@@ -5170,7 +5170,7 @@
       "import": "import { IconButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/IconButton/IconButton.jsx",
-      "summary": "Icon button: a button that is an icon and nothing else. `label` is required because it is the button's accessible name and its tooltip..",
+      "summary": "Icon button: a button that is an icon and nothing else. `label` is required because it is the button's accessible name and its tooltip. A filter trigger can add `trailingMetric`, the count of filters applied, drawn after the icon.",
       "props": [
         {
           "name": "icon",
@@ -5188,6 +5188,15 @@
           "default": null,
           "values": null,
           "description": "The accessible name and tooltip. Sentence case; name the object acted on (\"Edit page\").",
+          "deprecated": null
+        },
+        {
+          "name": "trailingMetric",
+          "type": "number or string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The count of filters applied, drawn after the icon; the accessible name becomes \"Filters, 2 applied\". `0` shows; leave it out to hide it.",
           "deprecated": null
         },
         {
@@ -5316,10 +5325,23 @@
         "Selected",
         "Disabled",
         "Loading",
+        "FilterCount",
         "HoveredState",
         "PressedState",
         "KeyboardFocus",
         "Interactive"
+      ],
+      "tokens": [
+        "--border-default",
+        "--ds-text-subtlest",
+        "--icon-md",
+        "--inline-sm",
+        "--item-height-md",
+        "--item-height-sm",
+        "--motion-duration-medium",
+        "--motion-duration-short",
+        "--motion-easing-entrance",
+        "--motion-easing-standard"
       ]
     },
     {

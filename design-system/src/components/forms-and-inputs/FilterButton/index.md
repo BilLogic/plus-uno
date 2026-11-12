@@ -50,6 +50,16 @@ Keep the natural width, so the chevron stays right after the name. Filter
 button has no prop to fill its container; don't stretch it across a wide row
 with your own styles.
 
+### Fold into one menu below 768. {#fold-into-one-menu-below-768}
+
+Below 768 a row of filter buttons does not fit. Fold them into one filter
+icon button whose menu stacks the filters, and give it the total applied as
+its count.
+
+```jsx
+<IconButton icon="filter" label="Filters" trailingMetric={applied || undefined} isSelected={applied > 0} />
+```
+
 ### Use the filter's name as the label. {#use-the-filter-s-name-as-the-label}
 
 Do: The label is the filter's name.
