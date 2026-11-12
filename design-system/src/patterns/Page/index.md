@@ -14,9 +14,21 @@ Also asked as: surface.
 
 **Storybook page:** `design-system/src/patterns/Page/Page.mdx`
 
+**Motion:** title `linear` · anchor `linear` · tabs-shadow `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at its content width; full width is the only fluid option and is for a page that fills it.
+
+## Motion
+
+Page reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| title | Scroll to a spot on the page | `--ds-motion-linear` | The header is scroll-linked: the small title fades in at the end of the Breadcrumb row, its opacity mapped to the next 24 px of scroll. No spring, no timer, no snap when scrolling stops. |
+| anchor | Scroll to a spot on the page | `--ds-motion-linear` | The actions and the tabs ride up with the page and anchor: the actions at the end of the Breadcrumb row, the tabs under it. One copy of every control. A focused task header just sticks. |
+| tabs-shadow | Update a value or state | `--ds-motion-appearance-fast` | The tabs' shadow appears when they stick, a single moment. In Reduced mode nothing changes: every movement is the person's own scroll. |
 
 ## Alternatives
 

@@ -14,6 +14,17 @@ Also asked as: slide-over, sheet, side sheet, off-canvas.
 
 **Storybook page:** `design-system/src/patterns/PatternDrawer/PatternDrawer.mdx`
 
+**Motion:** enter `spatial.slow` · exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
+## Motion
+
+PatternDrawer reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-slow` | Slides from its edge; only the Blanket fades, the Drawer itself never does. |
+| exit | Open and close an overlay | `--ds-motion-spatial-default` | Slides back to the same edge and stays there. |
+
 ## Related
 
 Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`

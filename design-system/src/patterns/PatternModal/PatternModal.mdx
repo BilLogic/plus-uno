@@ -2,6 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternModalStories from './PatternModal.stories.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 import * as FormStories from '../Form/Form.stories.jsx';
 import {
     ComponentExample,
@@ -175,6 +176,14 @@ A confirm Modal may open over a Panel, a Popup or a focused task, and brings its
 </DocsTable>
 
 The Modal's maximum height is the screen less `--space-400` above and below.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="PatternModal" tier="template" />
 
 </div>
 

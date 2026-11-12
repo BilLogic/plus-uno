@@ -14,11 +14,26 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Storybook page:** `design-system/src/patterns/PatternSection/PatternSection.mdx`
 
+**Motion:** view-bar `spatial.fast` + `appearance.fast` · side-open `spatial.default` · side-close `spatial.default` · detail `spatial.default` + `appearance.default` · body `spatial.fast` + `appearance.fast` · footer `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
 A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. Below 960 a side or a detail takes over the body, with a way back.
+
+## Motion
+
+PatternSection reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| view-bar | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Title row: nothing moves. The selected pill's fill and the format switch's indicator glide while the content swaps in place. Search and the Filter count grow to the left. |
+| side-open | Expand and collapse | `--ds-motion-spatial-default` | The side opens and collapses as a section. Below 960 it hides with no animation. |
+| side-close | Expand and collapse | `--ds-motion-spatial-default` | Collapses back the same way. Below 960 the side is gone in the same frame, with no animation. |
+| detail | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A quick look is an overlay; promoted to its record page it grows from the Panel itself. |
+| body | Load content | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Content loads on arrival; add or remove, reorder and swap content as it changes. |
+| footer | Step to the next or previous | `--ds-motion-spatial-default` | Paging is Step. |
 
 ## Alternatives
 

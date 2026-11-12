@@ -6,10 +6,11 @@ import { DocsTable } from './ds-docs-layout.jsx';
 /**
  * The Motion section of a component's Usage, rendered from its row in the
  * motion registry (`scripts/lib/tokens/motion-registry.mjs`). It renders
- * nothing for a component with no row.
+ * nothing for a component with no row. A template page passes `tier="template"`,
+ * since a template and a component can share a name (Panel, Popup).
  */
-const MotionSection = ({ component }) => {
-    const row = motionRowOf(component);
+const MotionSection = ({ component, tier }) => {
+    const row = motionRowOf(component, undefined, tier);
     if (!row) return null;
     return (
         <DocsTable>
@@ -33,6 +34,8 @@ const MotionSection = ({ component }) => {
 MotionSection.propTypes = {
     /** The component's name, as its registry row names it. */
     component: PropTypes.string.isRequired,
+    /** The row's tier, when a template or pattern shares its name with a component. */
+    tier: PropTypes.oneOf(['template', 'pattern', 'component']),
 };
 
 export default MotionSection;

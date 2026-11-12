@@ -114,6 +114,19 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 - Form: use when the Panel edits a record.
 - Patterns: use when you need the rules around a Panel: Navigation, Empty, Notifications.
 
+## Motion
+
+Panel reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| docked-enter | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | The AI Panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked Panel never has a Backdrop. |
+| docked-exit | Dock and undock a panel | `--ds-motion-spatial-default` | Reverses and stays at the edge. |
+| floating-enter | Dock and undock a panel | `--ds-motion-spatial-default` | Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself. |
+| floating-exit | Dock and undock a panel | `--ds-motion-spatial-fast` | Reverses. |
+| narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` | At narrow widths it slides over with a Blanket, like an edge layer. |
+| narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` | The same way back. |
+
 ## Best practices
 
 ### Float a Panel with no Backdrop.

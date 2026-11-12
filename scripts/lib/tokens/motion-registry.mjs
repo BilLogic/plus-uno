@@ -27,6 +27,111 @@
  * @type {{name: string, tier: 'component' | 'pattern' | 'template', events: Record<string, MotionEvent>}[]}
  */
 export const MOTION_REGISTRY = [
+  // Templates: the page-level moves, from 07-templates. A template page and a component can share a name
+  // (Panel, Popup); the page names its tier in `<MotionSection tier="template">`.
+  {
+    name: 'Frame',
+    tier: 'template',
+    events: {
+      'sidebar-open': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'The Sidebar opens on spatial.default while the Page narrows on the same clock. The Sidebar never moves when the Page changes.' },
+      'sidebar-close': { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'It closes on spatial.fast to its edge and leaves nothing behind: no rail.' },
+      'panel-dock': { transition: 'Dock and undock a panel', spatial: 'spatial.slow', appearance: 'appearance.fast', note: 'The AI Panel docks on the right and the Page makes room; its content fades in once the page is about 90% done.' },
+      'panel-undock': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'It reverses and stays at the edge.' },
+      'focused-open': { transition: 'Drill into and climb back out', appearance: 'appearance.default', note: 'Focused opens as a change of frame: the page and the Sidebar fade out together on appearance.fast, then the task fades in, in place. A focused task fades; it does not grow or slide. Bare frames, such as sign-in, do not move.' },
+      'focused-close': { transition: 'Drill into and climb back out', appearance: 'appearance.fast', note: 'Close and Cancel reverse the entrance one speed faster: the task fades out, then the page and Sidebar fade back in, asking first in a Modal if anything is unsaved.' },
+      step: { transition: 'Step to the next or previous', spatial: 'spatial.default', appearance: 'appearance.fast', note: 'The body slides on the same axis as the step list: up with the steps down the left, across with four or fewer across the top. Step states change in place. Placement is set once, when the task opens, by the longest path the flow can take.' },
+    },
+  },
+  {
+    name: 'Page',
+    tier: 'template',
+    events: {
+      title: { transition: 'Scroll to a spot on the page', appearance: 'linear', note: 'The header is scroll-linked: the small title fades in at the end of the Breadcrumb row, its opacity mapped to the next 24 px of scroll. No spring, no timer, no snap when scrolling stops.' },
+      anchor: { transition: 'Scroll to a spot on the page', appearance: 'linear', note: 'The actions and the tabs ride up with the page and anchor: the actions at the end of the Breadcrumb row, the tabs under it. One copy of every control. A focused task header just sticks.' },
+      'tabs-shadow': { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The tabs\' shadow appears when they stick, a single moment. In Reduced mode nothing changes: every movement is the person\'s own scroll.' },
+    },
+  },
+  {
+    name: 'PatternSection',
+    tier: 'template',
+    events: {
+      'view-bar': { transition: 'Swap content in place', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Title row: nothing moves. The selected pill\'s fill and the format switch\'s indicator glide while the content swaps in place. Search and the Filter count grow to the left.' },
+      'side-open': { transition: 'Expand and collapse', spatial: 'spatial.default', note: 'The side opens and collapses as a section. Below 960 it hides with no animation.' },
+      'side-close': { transition: 'Expand and collapse', spatial: 'spatial.default', note: 'Collapses back the same way. Below 960 the side is gone in the same frame, with no animation.' },
+      detail: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'A quick look is an overlay; promoted to its record page it grows from the Panel itself.' },
+      body: { transition: 'Load content', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Content loads on arrival; add or remove, reorder and swap content as it changes.' },
+      footer: { transition: 'Step to the next or previous', spatial: 'spatial.default', note: 'Paging is Step.' },
+    },
+  },
+  {
+    name: 'PatternCard',
+    tier: 'template',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'It changes color on hover and press like a Button. Opening a clickable card is Drill.' },
+      milestone: { transition: 'Opening a page', spatial: 'spatial.default', note: 'The one card in a milestone page entrance is Expressive and leaves by the exit rules.' },
+    },
+  },
+  {
+    name: 'PatternTable',
+    tier: 'template',
+    events: {
+      selection: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Ticking a row turns the head row into the bulk bar: labels cross-fade, same row, same height, nothing slides. Selected rows take the selected fill. The view bar above never moves.' },
+    },
+  },
+  {
+    name: 'PatternModal',
+    tier: 'template',
+    events: {
+      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% and fades in; the Blanket dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts.' },
+      exit: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Leaves at 98%, fading.' },
+      swap: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'One Modal at a time: a confirm replaces the content in place, never a second Modal.' },
+      rejected: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes it once; never in reduced motion.' },
+    },
+  },
+  {
+    name: 'Backdrop',
+    tier: 'template',
+    events: {
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.default', note: 'The Blanket dims on the same fade as the layer it sits under.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'It fades with the layer; a docked Panel never has one.' },
+    },
+  },
+  {
+    name: 'PatternDrawer',
+    tier: 'template',
+    events: {
+      enter: { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'Slides from its edge; only the Blanket fades, the Drawer itself never does.' },
+      exit: { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'Slides back to the same edge and stays there.' },
+    },
+  },
+  {
+    name: 'Panel',
+    tier: 'template',
+    events: {
+      'docked-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.slow', appearance: 'appearance.fast', note: 'The AI Panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked Panel never has a Backdrop.' },
+      'docked-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Reverses and stays at the edge.' },
+      'floating-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself.' },
+      'floating-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'Reverses.' },
+      'narrow-enter': { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'At narrow widths it slides over with a Blanket, like an edge layer.' },
+      'narrow-exit': { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'The same way back.' },
+    },
+  },
+  {
+    name: 'Popup',
+    tier: 'template',
+    events: {
+      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Clips open from the trigger\'s corner on the side it is aligned to. From the keyboard it opens with no animation.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
+    },
+  },
+  {
+    name: 'Form',
+    tier: 'template',
+    events: {
+      focus: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A form in a page, a Panel or a Modal moves by its container; a form in steps is Frame, focused. A field\'s border changes color on focus; the focus ring never animates. Field motion is in Patterns, Forms.' },
+      error: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'An error on leaving a field makes room, then fades in; it fades and the room closes once the field is fixed.' },
+    },
+  },
   {
     name: 'Popup',
     tier: 'component',

@@ -125,6 +125,15 @@ When to validate, what a blocked submit does, required and optional marks, and l
 - Panel: use for a short edit with the page still in view.
 - Patterns: use for the rules across forms: Forms, Common actions, Loading, Disabled, Errors.
 
+## Motion
+
+Form reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| focus | Update a value or state | `--ds-motion-appearance-fast` | A form in a page, a Panel or a Modal moves by its container; a form in steps is Frame, focused. A field's border changes color on focus; the focus ring never animates. Field motion is in Patterns, Forms. |
+| error | Call attention | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | An error on leaving a field makes room, then fades in; it fades and the room closes once the field is fixed. |
+
 ## Best practices
 
 Most of the rules for a form live in Patterns, Forms. This page keeps only how a form sits in each container.
