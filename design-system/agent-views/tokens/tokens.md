@@ -947,6 +947,7 @@ Shadows pair with the surface of the same level (`--ds-shadow-raised` with `--ds
 ```css
 --ds-opacity-disabled  /* Images and whole elements in a disabled state. */
 --ds-opacity-loading  /* Content under a loading spinner. */
+--ds-shadow-blocking  /* Box shadow of a modal that blocks the page behind a Backdrop. Pair with --ds-surface-overlay. */
 --ds-shadow-overflow  /* Shadow where content scrolls under other content, such as a table's sticky column. */
 --ds-shadow-overflow-perimeter  /* Fallback for overflow when a box shadow is not feasible; pair with .spread. */
 --ds-shadow-overflow-spread  /* Fallback for overflow when a box shadow is not feasible; pair with .perimeter. */

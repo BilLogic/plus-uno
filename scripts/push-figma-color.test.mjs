@@ -90,7 +90,8 @@ test('a full push into an empty file matches the spec exactly', async () => {
   assert.deepEqual(results.flatMap((r) => r.errors), []);
   assert.deepEqual(collections.map((c) => [c.name, c.modes.map((m) => m.name), c.hiddenFromPublishing]),
     SPEC.collections.map((c) => [c.name, c.modes, !!c.hiddenFromPublishing]));
-  assert.equal(styles.length, 3);
+  assert.equal(styles.length, SPEC.effectStyles.length);
+  assert.equal(SPEC.effectStyles.length, 4); // raised, overlay, blocking, overflow
   const probe = await run(figma, probeScript(SPEC));
   assert.deepEqual(probe.differs, []);
   for (const c of SPEC.collections) {

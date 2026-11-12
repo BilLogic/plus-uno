@@ -6,7 +6,7 @@
   "notes": {
     "neutral": "Fitted role by role to Notion's own grays (read live 2026-10-25) and placed on Atlassian's steps by the role each step serves: 100 sunken, 200 neutral fill, 300 border, 500 input border (>= 3:1), 600 bold border, 700 subtlest text (>= 4.5:1), 800 subtle text, 1000 text. Dark: 0 sunken, 100 surface, 200 raised and input, 250 overlay, 600 input border, 700 subtlest, 800 subtle, 1000 text. Where Notion falls below AA, the step takes the nearest value that passes.",
     "alpha": "Percent of ink (light) or paper (dark) behind each alpha slot. Slot 300 is the line (color.border): Notion draws dividers and table grids at about 7% warm ink.",
-    "shadow": "Light geometry per layer: [x, y, blur, spread, ink %]. Raised is Notion's card (a 5% ring and a very wide 2% blur); overlay is Notion's popover.",
+    "shadow": "Light geometry per layer, named by the part it plays (edge: the 1px ring, key: the tight contact shadow, ambient: the wide soft one): [x, y, blur, spread, ink %]. Raised is Notion's card (a 5% ring and a very wide 2% blur); overlay is Notion's popover.",
     "accents": "Notion's chroma ladder (app stylesheet, 2026-10-25) is the same for every hue; each family scales it by [tints <= 300, mid 400-700, dark 800+]. Lagoon (202) is the brand; teal is a mint (176) kept apart from Lagoon and green; yellow's warning.bold reads amber, not khaki. Lagoon's dark-mode states (250-400) come from the brand ramp, so dark hover brightens instead of draining. Lagoon follows Notion's teal: lower chroma, a near-white tint, and a soft pastel at 250-400 (lowered contrast targets on those three steps only)."
   },
   "neutral": {
@@ -27,8 +27,9 @@
   },
   "blackAlpha": { "60": 60 },
   "shadow": {
-    "raised": [[0, 0, 0, 1, 5], [0, 12, 32, 0, 2], [0, 0, 0, 0, 0]],
-    "overlay": [[0, 0, 0, 1, 7], [0, 5, 8, 0, 3], [0, 20, 24, 0, 5]]
+    "raised": { "edge": [0, 0, 0, 1, 5], "key": [0, 1, 2, 0, 16], "ambient": [0, 12, 32, 0, 2] },
+    "overlay": { "edge": [0, 0, 0, 1, 7], "key": [0, 5, 8, 0, 3], "ambient": [0, 20, 24, 0, 5] },
+    "blocking": { "edge": [0, 0, 0, 1, 7], "key": [0, 8, 16, 0, 7], "ambient": [0, 24, 56, 0, 16] }
   },
   "accents": {
     "recipe": "ladder",
