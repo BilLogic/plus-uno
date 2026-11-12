@@ -8,7 +8,8 @@
  *       title         a foundation page's FoundationHero title, or the page's `#` heading, or null
  *       sections      [{title, level, text, subsections: [{title, level, text}]}]
  *       alternatives  [{text, routesTo}]  the lines under Alternatives, each with the component it names
- *       rules         [{id, sentence, text}]  one per `###` under Best practices, id from the slug
+ *       rules         [{id, sentence, text, tag}]  one per `###` under Best practices, id from the slug,
+ *                     tag the `<RuleTag kind>` under its heading (`automatic` or `review`), or null
  *       related       the lines under Related
  *       aliases       the page's `export const aliases = [...]`, or []
  *       figmaMeta     the page's `export const figmaMeta = {...}`, parsed, or null
@@ -31,7 +32,7 @@
  * `table`, `RefTable`) becomes one markdown row per line; a `TokenTable` one
  * line per token. A do/don't pair (`DoDontPair`, `DoDont` with `Do`/`Dont`)
  * keeps its captions as `Do:` and `Don't:` lines and drops the examples.
- * A `DocsLink` keeps its text. Layout wrappers (`DocsTabs`, `DocsTab`, `div`, fragments) give up their
+ * A `DocsLink` keeps its text; a template's `TypeCard` becomes `- **Title.** line`. Layout wrappers (`DocsTabs`, `DocsTab`, `div`, fragments) give up their
  * children; a `Banner` keeps its text, since foundation pages state rules in
  * one; inline tags become markdown (`code` and `C` to backticks, `strong` to
  * bold). Every other element is dropped. Code fences and code spans are kept
@@ -462,6 +463,10 @@ function elementText(el) {
       return `*${inline(kids())}*`;
     case 'DocsLink':
       return kids();
+    case 'TypeCard':
+      return `- **${valueText(attrs.title)}.** ${inline(kids())}`;
+    case 'TypeGrid':
+      return block(kids());
     case 'br':
       return '\n';
     case 'li':
@@ -583,6 +588,27 @@ export const slugOf = (title) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
+/**
+ * Each rule's tag by its id: the `<RuleTag kind="automatic|review" />` under a
+ * `###` heading, until the next heading. A component tag, so the text drops it;
+ * read from the source instead.
+ */
+export function ruleTags(source) {
+  const tags = {};
+  let current = null;
+  for (const line of String(source ?? '').split('\n')) {
+    const heading = line.match(/^###\s+(.*?)\s*$/);
+    if (heading) {
+      current = slugOf(heading[1]);
+      continue;
+    }
+    if (/^#{1,2}\s/.test(line)) current = null;
+    const tag = current && line.match(/<RuleTag\b[^>]*?\bkind=["'](automatic|review)["']/);
+    if (tag) tags[current] = tag[1];
+  }
+  return tags;
+}
+
 /** The first component name a line names in backticks (`Flag`, not `width`). */
 const routeOf = (line) => line.match(/`([A-Z][A-Za-z0-9]*)`/)?.[1] ?? null;
 
@@ -625,13 +651,14 @@ export function readDocsPage(source, { kind, root, file } = {}) {
   const { before, parts } = splitAt(md, top);
   const sections = parts.map((p) => ({ ...p, subsections: splitAt(p.text, top + 1).parts }));
   const best = sectionNamed(sections, 'Best practices');
+  const tags = ruleTags(src);
   return {
     kind: pageKind,
     title: src.match(/<FoundationHero\b[^>]*?\btitle=["']([^"']*)["']/)?.[1] ?? heads.find((h) => h.level === 1)?.title ?? null,
     intro: before.split(/\n\s*\n/).map((p) => p.trim()).filter((p) => p && !p.startsWith('#')).join('\n\n'),
     sections,
     alternatives: linesOf(sectionNamed(sections, 'Alternatives')?.text).map((text) => ({ text, routesTo: routeOf(text) })),
-    rules: (best?.subsections ?? []).map((r) => ({ id: slugOf(r.title), sentence: r.title, text: r.text })),
+    rules: (best?.subsections ?? []).map((r) => ({ id: slugOf(r.title), sentence: r.title, text: r.text, tag: tags[slugOf(r.title)] ?? null })),
     related: linesOf(sectionNamed(sections, 'Related')?.text),
     aliases: aliasesOf(src),
     figmaMeta: figmaMetaOf(src),

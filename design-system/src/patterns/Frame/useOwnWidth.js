@@ -16,7 +16,10 @@ const SERVER_RENDER_WIDTH = 1440;
 export const useOwnWidth = (ref, fallback = SERVER_RENDER_WIDTH) => {
     const [width, setWidth] = useState(() => (typeof window === 'undefined' ? fallback : window.innerWidth));
     useLayoutEffect(() => {
-        const read = () => setWidth((last) => ref.current?.getBoundingClientRect().width || last);
+        // Layout width first: a transform (a docs picture scaled to fit) leaves it alone,
+        // so the box decides as it would at full size. The rect is the fallback where
+        // there is no layout (jsdom).
+        const read = () => setWidth((last) => ref.current?.offsetWidth || ref.current?.getBoundingClientRect().width || last);
         read();
         const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(read);
         if (ref.current) ro?.observe(ref.current);

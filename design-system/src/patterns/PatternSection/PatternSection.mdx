@@ -1,5 +1,5 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternSectionStories from './PatternSection.stories.jsx';
 import {
@@ -9,24 +9,25 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { ModeExample } from '@/storybook-docs/lib/mode-frame.jsx';
+import { LiveAnatomy, PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
-    SectionOfTwoCards,
-    SectionRepeatingCardTitle,
-    CardOwnsCommit,
-    SectionFooterCommits,
-    TabsInSectionHeader,
-    TabsAboveSectionHeader,
-    DetailBesideList,
-    DetailAsModal,
-} from './PatternSectionCases.jsx';
+    ActionsInTitleRow,
+    ActionsInTwoHomes,
+    CardOwnsSave,
+    CardStandsAlone,
+    FooterCommits,
+    RightSideCrowded,
+    RightSideInOrder,
+    SectionRepeatsCard,
+    TitleInViewBar,
+    TitleRowAboveViewBar,
+} from '@/storybook-docs/illustrations/section.jsx';
 
 <Meta of={PatternSectionStories} />
 
 <Title />
-A section is a span of the page grid that groups content under one heading. It has no fill, no pad and no size options by default: the Page around it supplies the pad, so a section draws no box of its own. Set `fill="subtle"` for a section that stands apart from the one beside it, such as the `detail` region. The Section header comes first, then the body, then an optional footer.
-
-The examples on this page follow the toolbar's Color mode switch.
+A span of the page grid under one heading: a header, a body, and an optional side, detail and footer. The header owns the title row and the view bar.
 
 <DocsTabs of={PatternSectionStories}>
 
@@ -41,75 +42,156 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <div className="sb-ds-doc-section">
 
-## Appearance
+## Types
 
-<ComponentExample of={PatternSectionStories.Overview} title="Section" description="A title, a description, an actions slot and a content slot, with no fill and no pad." />
+Common starting types of the one Section, not new components. Each is a header type, a body, and sometimes a side or a detail.
 
-<ComponentExample of={PatternSectionStories.FillSubtle} title="Subtle fill" description={<><code>fill="subtle"</code> sets the section on the sunken surface with a pad and a radius.</>} />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Size and layout
-
-<ComponentExample of={PatternSectionStories.LayoutSingle} title="Single" description={<><code>layout="single"</code>, the default: the content slot alone.</>} />
-
-<ComponentExample of={PatternSectionStories.LayoutSplit} title="Split" description={<><code>layout="split"</code>: the content at span 8, min 480, beside <code>side</code> at span 4, min 224; they stack when a column would drop below its minimum.</>} />
-
-<ComponentExample of={PatternSectionStories.LayoutSubsections} title="Subsections" description={<><code>layout="subsections"</code> stacks named groups <code>--section-stack-lg</code> apart under one heading.</>} />
-
-<ComponentExample of={PatternSectionStories.Levels} title="Levels" description={<>A <code>level="page"</code> title, a section inside it and a subsection inside that: h1, h2 and h3, each one size smaller.</>} />
-
-<ModeExample storyId="templates-section-section--detail" width={1440} height={640} title="Detail" description="A Compliance queue at 1440: the list at 7 columns beside the selected flag at 5." />
+<TypeGrid>
+<TypeCard of={PatternSectionStories.TypeList} title="List">The view bar alone, one table, paging. The default for an area page.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeQueue} title="Queue">A list with a detail, for working through records one by one.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeCards} title="Cards">Title and actions over a grid of cards, three or four across.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeStats} title="Stats">A row of cards, each one number and its label, four at most.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeDetails} title="Details">Label and value pairs in two columns, with Edit in the title row.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeMainAndSide} title="Main and side">A split with the side at the end and no fill: facts beside the main content.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeForm} title="Form">Fields in a card, with the card's own Save and Cancel at its bottom.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeSubsections} title="Subsections">Sections nested one level, each an h3, for a long settings page.</TypeCard>
+</TypeGrid>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Behavior
+## Anatomy
 
-<ComponentExample of={PatternSectionStories.HeaderDefault} title="Default header" description="The title row: a title, a description and an actions slot." />
+A queue Section with a view bar, a detail and a footer. The title, the first pill and the first column share one left edge.
 
-<ComponentExample of={PatternSectionStories.HeaderTabs} title="Tabs header" description={<>A tabs row <code>--section-stack-sm</code> under the title row; <code>onAddView</code> adds "Add view" at its end.</>} />
+<LiveAnatomy
+    width={1024}
+    title="A queue Section with its parts numbered"
+    parts={[
+        { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-pattern-section-title-row', label: 'Title row' },
+        { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-pattern-section-tabs', label: 'View bar' },
+        { selector: '.plus-pattern-section-list', label: 'Body' },
+        { selector: '.plus-pattern-section-detail', label: 'Detail' },
+        { selector: '[data-anatomy-root] > .plus-pattern-section-footer', label: 'Footer' },
+    ]}
+>
+    <Story of={PatternSectionStories.AnatomyQueue} inline />
+</LiveAnatomy>
 
-<ComponentExample of={PatternSectionStories.HeaderToolbar} title="Toolbar header" description={<>A <code>PatternSection.Toolbar</code> row with search, filters, the count and actions.</>} />
-
-<ComponentExample of={PatternSectionStories.ToolbarSearch} title="Search" description={<>The Search icon, <code>PatternSection.Search</code>, grows left into a field. Esc clears it, a second Esc closes it, and it stays open while it holds text. Reset filters clears it too.</>} />
-
-<ComponentExample of={PatternSectionStories.HeaderCustom} title="Custom header" description={<><code>header</code> replaces the title and description; the title stays in the page, visually hidden.</>} />
-
-<ComponentExample of={PatternSectionStories.HeaderTabsOnly} title="Tabs only header" description={<><code>type="tabs-only"</code> shows only the tabs row, for a page whose title already names the view.</>} />
-
-<ComponentExample of={PatternSectionStories.Footer} title="Footer" description={<>A "View all" button in the footer, <code>--section-stack-md</code> under the content.</>} />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## State
-
-<ComponentExample of={PatternSectionStories.LoadingDefault} title="Loading" description={<><code>loading</code> swaps the header for a title bar and a description bar, and marks the section busy.</>} />
-
-<ComponentExample of={PatternSectionStories.LoadingToolbar} title="Loading, toolbar" description="A toolbar header adds a bar for its row." />
-
-<ComponentExample of={PatternSectionStories.LoadingTabsOnly} title="Loading, tabs only" description="A tabs-only header draws just the row bar." />
+1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
+2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.
+3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the bar with nothing between.
+4. **Detail** (optional). The picked record beside the list, 5 of 12 columns, with Previous and Next and its own footer.
+5. **Footer** (optional). Paging or "View all".
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Header types
 
-<DocsInteractivePlayground
-    of={PatternSectionStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
+A starting set, picked by what the Section holds. Every control state lives on its component: <a target="_top" href="./?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a>, <a target="_top" href="./?path=/docs/components-forms-and-inputs-button-filter-button--docs">Filter button</a> and <a target="_top" href="./?path=/docs/components-navigation-tabs--docs">Tabs</a>. How the search field behaves and which filters the bar takes are the Search and Filtering patterns, listed in <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>.
+
+<TypeGrid>
+<TypeCard of={PatternSectionStories.HeaderTypeTitle} title="Title">A title and a description, nothing to act on. Most Sections that hold cards or a form.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeTitleAndActions} title="Title and actions">Section actions in the title row, only when there is no view bar. One Primary and two others at most.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeViewBarOneView} title="View bar, one view">One pill names the rows and stays, so nothing moves when a second view arrives.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeViewBarSeveralViews} title="View bar, several views">Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeFormatSwitch} title="Format switch">When the rows show as a table or a calendar, equal-width segments sit first at the end.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeViewBarAlone} title="View bar alone">The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeUnderPageTabs} title="Under page tabs">One tab system per page: the views become one labeled Select at the start of the bar. It picks a view, not a filter.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeSubsection} title="Subsection">Any type nests once. The title drops to an h3; the view bar keeps its size.</TypeCard>
+</TypeGrid>
+
+<ComponentExample of={PatternSectionStories.ToolbarSearch} title="Search" description={<>The Search icon, <code>PatternSection.Search</code>, grows left into a field. Esc clears it, a second Esc closes it, and it stays open while it holds text.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Side and detail
+
+<ComponentExample of={PatternSectionStories.SideAtEnd} title="Side at the end" description="A summary beside the body with no fill. The header spans the full width; body and side split under it." />
+
+<ComponentExample of={PatternSectionStories.FilterSideAtStart} title="Filter side at the start" description={'When filtering is the main job: "Reset filters" at the top and a count beside each category. The bar has no Filter icon while the side shows. The tiers are the Filtering pattern.'} />
+
+<ComponentExample of={PatternSectionStories.TypeQueue} title="Detail" description="The picked record beside the list, with Previous and Next in its header and its own footer. Heavy work opens on its own page from the detail footer." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Width behavior
+
+Drag the width through 960 and 768. From 960 the filter side sits at the start. Below it the side hides and the Filter icon returns with its count, read "Filters, 2 applied"; pressing it gives the filters the Section's whole width, and "Show results" goes back. Below 768 the Primary keeps only its icon. The title row and the view bar stay two rows at every width.
+
+<DocsInteractivePlayground of={PatternSectionStories.ResponsiveWidth} description="The width control sets the Section's own width." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key states
+
+<ComponentExample of={PatternSectionStories.RowsSelected} title="Rows selected" description={'The Dynamic table\'s head row becomes the bulk bar: the part-ticked select-all, "2 selected", then the actions, at the start. The checkboxes clear it, so it has no Cancel. Which actions go in the bar, and their words, are the Common actions pattern.'} />
+
+<ComponentExample of={PatternSectionStories.EmptyInTable} title="Empty, in a table" description={'The empty state replaces the whole table, column headers and footer too, and offers "Reset filters". The rule is the Empty pattern\'s.'} />
+
+Loading, errors and the search field follow their patterns and components: Loading, Errors and Search, listed in <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Used for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--section-stack-sm</code></td><td>Title row to view bar.</td></tr>
+<tr><td><code>--section-stack-md</code></td><td>Header to body; body to footer.</td></tr>
+<tr><td><code>--section-stack-lg</code></td><td>Between subsections.</td></tr>
+<tr><td><code>--section-min-width-main</code>, <code>--section-min-width-side</code></td><td>The main and side columns of a split.</td></tr>
+<tr><td><code>--section-radius</code>, <code>--section-pad-x-default</code>, <code>--section-pad-y-default</code></td><td>A Section with <code>fill="subtle"</code>, on <code>--ds-surface-sunken</code>.</td></tr>
+<tr><td><code>--heading-medium</code>, <code>--heading-small</code></td><td>A Section title and a subsection title.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="code">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Slots
+
+<DocsTable>
+<thead>
+<tr><th>Slot or prop</th><th>Holds</th></tr>
+</thead>
+<tbody>
+<tr><td><code>title</code> · <code>description</code> · <code>actions</code></td><td>The title row. Actions only when there is no view bar.</td></tr>
+<tr><td><code>viewBar</code> <PlannedTag /></td><td>Planned. Pill Tabs at the start; at the end the format switch, Search, the filters, More and the labeled Primary. Today the view bar goes in <code>tabs</code>.</td></tr>
+<tr><td><code>tabs</code> · <code>type="tabs-only"</code></td><td>The row under the title row; <code>tabs-only</code> hides the title row from sight when the page title names the collection.</td></tr>
+<tr><td><code>fill</code></td><td><code>none</code> or <code>subtle</code>, for the Section; the detail always takes <code>subtle</code>.</td></tr>
+<tr><td><code>children</code></td><td>The body: a Table, a card grid, a list, a form or subsections.</td></tr>
+<tr><td><code>layout="split"</code> · <code>side</code></td><td>A second column at the end, for a summary.</td></tr>
+<tr><td><code>sidePlacement</code> <PlannedTag /></td><td>Planned. <code>start</code> puts the side first, for a filter side or a step rail.</td></tr>
+<tr><td><code>detail</code> · <code>detailTitle</code> · <code>detailFooter</code></td><td>The picked record beside the list, with Previous and Next.</td></tr>
+<tr><td><code>footer</code></td><td>Paging or "View all".</td></tr>
+</tbody>
+</DocsTable>
+
+The bulk bar lives in the Dynamic table's head row, through its <code>bulkActions</code>, and the Section holds nothing for it: <a target="_top" href="./?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a>.
 
 </div>
 
@@ -125,92 +207,19 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Usage
 
-Make a section when the content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid. Otherwise the content is part of the section above it. A section holds cards, tables, rows, forms or subsections. A subsection is a section inside a section; use two levels at most.
+Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-### Header type guidance
-
-The type is read from the slots you fill: `header` makes it custom, `toolbar` makes it toolbar and `tabs` makes it tabs. Pass `type="tabs-only"` to show only the tabs row.
-
-<DocsTable>
-<thead>
-<tr><th>Type</th><th>When to use</th></tr>
-</thead>
-<tbody>
-<tr><td>Default</td><td>Most sections: a title, a description and actions.</td></tr>
-<tr><td>Tabs</td><td>Views of the same thing, such as saved views over a table. Keep each label to one or two words.</td></tr>
-<tr><td>Toolbar</td><td>Search, filters, the record count and actions for the table under it.</td></tr>
-<tr><td>Custom</td><td>A header the default row cannot hold.</td></tr>
-<tr><td>Tabs only</td><td>The page title already names the view.</td></tr>
-</tbody>
-</DocsTable>
-
-### Detail
-
-Use `detail` for a queue a person works through, such as Admin › Compliance or Admin › Reflections. The detail is for a decision that takes a glance or a short form. Heavy work, such as the recording review, gets its own page: put "Open full review" in `detailFooter`.
-
-The section holds the split from 960 of its own width. Below that, the detail replaces the list and a back link returns to it; with no record open, the list fills the row. Inside a Frame, pass `sectionDetail` and the Frame keeps the split instead, as <a href="?path=/docs/templates-frame-frame--docs">Frame</a> shows.
-
-The Page around a section supplies the pad; for a region with a fill of its own, use a Page or a Card.
+A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. Below 960 a side or a detail takes over the body, with a way back.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Parts
+## Alternatives
 
-1. **Section header.** A part of its own: a title, a description and an actions slot, and an optional bottom row for tabs or a toolbar. Its level sets the heading size.
-2. **Content.** A slot for cards, tables, rows or forms.
-3. **Side** (optional). A second content slot, used only by `layout="split"`.
-4. **Footer** (optional). A slot at the end, for "View all" or paging.
-5. **Detail** (optional). A subtle-fill region on the right with its own title, description, Previous and Next, and footer.
-
-The **toolbar** is its own part, `PatternSection.Toolbar`: search, filters and a count that truncates first, then actions. Selecting rows never changes it: a Dynamic table's bulk bar is the table's own head row, so the toolbar stays put.
-
-**Search** is a part too, `PatternSection.Search`: an icon button that grows left into a compact Text field and shrinks back into the icon. It narrows the rows of its own section as you type; there is no results page. `label` names the scope ("Search students"): it is the icon's name, the field's label and its placeholder.
-
-- Press the icon and the field opens with focus in it. Set `defaultOpen` when search is the main way into a large collection.
-- Esc clears the text. A second Esc closes the field and returns focus to the icon.
-- The field stays open while it holds text. Empty, it closes when focus leaves it.
-- "Clear search" empties the field and keeps focus in it.
-- Hold the text yourself (`value`, `onValueChange`) so Reset filters clears the search with the filters. Switching views keeps the search; leaving the page clears it.
-
-### States
-
-A section has no interactive states: it does not respond to hover, press or focus, and it is never disabled. Those belong to the controls inside it.
-
-<DocsTable>
-<thead>
-<tr><th>State</th><th>What changes</th></tr>
-</thead>
-<tbody>
-<tr><td>Loading</td><td>Skeleton bars replace the header, and the section is marked busy. The body is the content's to load.</td></tr>
-<tr><td>Detail open</td><td>A record shows in the detail region; below 960 it replaces the list.</td></tr>
-<tr><td>Search open</td><td>The Search icon is a field on <code>--field-width-md</code>, until it is cleared and closed.</td></tr>
-</tbody>
-</DocsTable>
-
-### Tokens
-
-<DocsTable>
-<thead>
-<tr><th>Token</th><th>Value</th><th>Used for</th></tr>
-</thead>
-<tbody>
-<tr><td><code>--section-stack-sm</code></td><td>8</td><td>The title row to the tabs or toolbar row.</td></tr>
-<tr><td><code>--section-stack-md</code></td><td>16</td><td>The header to the body, and the body to the footer.</td></tr>
-<tr><td><code>--section-stack-lg</code></td><td>24</td><td>Between subsections.</td></tr>
-<tr><td><code>--section-min-width-main</code>, <code>-side</code></td><td>480, 224</td><td>The main and side columns of a split.</td></tr>
-<tr><td><code>--section-radius</code>, <code>--section-pad-x-default</code>, <code>--section-pad-y-default</code></td><td>radius, pad</td><td>A section with <code>fill="subtle"</code>.</td></tr>
-<tr><td><code>--ds-surface-sunken</code></td><td>color</td><td>The subtle fill.</td></tr>
-<tr><td><code>--stack-sm</code></td><td>4</td><td>The title to the description.</td></tr>
-<tr><td><code>--inline-md</code></td><td>8</td><td>Items in the title row and the tabs row.</td></tr>
-<tr><td><code>--heading-large</code>, <code>-medium</code>, <code>-small</code></td><td>24/28, 20/24, 16/20</td><td>A page title, a section title and a subsection title.</td></tr>
-<tr><td><code>--body-default</code></td><td>14/20</td><td>The description, at every level.</td></tr>
-<tr><td><code>--ds-text</code>, <code>--ds-text-subtle</code></td><td>color</td><td>The title and the description.</td></tr>
-<tr><td><code>--field-width-md</code>, <code>--item-height-md</code></td><td>240, 32</td><td>The open Search field, and the icon it grows from.</td></tr>
-<tr><td><code>--motion-duration-medium</code>, <code>--motion-easing-standard</code></td><td>200 ms, standard</td><td>Search growing into a field and shrinking back. Reduced motion makes it instant.</td></tr>
-</tbody>
-</DocsTable>
+- For one object with an agreed shape, use `PatternCard` inside a Section.
+- For a quick look at a row from a table on any page, use `Panel`.
+- For the page's own title, use `PageHeader`; a Section stands under it.
 
 </div>
 
@@ -218,49 +227,108 @@ A section has no interactive states: it does not respond to hover, press or focu
 
 ## Best practices
 
-### Make a section only when it earns one.
+### Make a Section only when it earns one.
 
-A section gives a group of content its own heading, its own actions and its own place in the grid. If none of those apply, the content belongs to the section above.
+<RuleTag kind="review" />
 
-<DoDontPair
-    doExample={<SectionOfTwoCards />}
-    doCaption={'Two cards share one heading, so they form a section: "Upcoming sessions".'}
-    dontExample={<SectionRepeatingCardTitle />}
-    dontCaption="One card gets a section whose heading repeats its own title. Drop the section; the card stands on its own."
-/>
-
-### Keep the footer for "View all"; commit in the card.
-
-The section footer leads somewhere else: View all, or paging. Actions that commit changes belong in a card with a footer.
+A Section earns its own heading, its own actions or its own place in the grid. When its heading would repeat its only card's title, drop the Section and let the card stand on its own.
 
 <DoDontPair
-    doExample={<CardOwnsCommit />}
-    doCaption={'The card owns its commit action in its footer. The section footer stays free for "View all".'}
-    dontExample={<SectionFooterCommits />}
-    dontCaption="A commit action in the section footer sits far from what it saves, and the footer no longer leads to more."
+    doExample={<CardStandsAlone />}
+    doCaption="A card with its own title stands on its own in the page."
+    dontExample={<SectionRepeatsCard />}
+    dontCaption="A Section whose heading repeats its only card's title: two headings for one thing."
 />
 
-### Put views in the section header.
+### Put the title row first and the view bar under it.
 
-A tab group is part of the section, not a pattern of its own. The views are the bottom row of the section header, and each tab's content is the section body. Use views only for views of the same thing.
+<RuleTag kind="automatic" />
+
+The title row sits `--section-stack-sm` above the view bar, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. At every width the two stay separate rows: below the narrow width the description truncates first, then Search collapses, the format switch shows icons, extra pills fold and the Primary keeps only its icon.
 
 <DoDontPair
-    doExample={<TabsInSectionHeader />}
-    doCaption="The views sit under the section title, in the header, and the body belongs to the selected tab."
-    dontExample={<TabsAboveSectionHeader />}
-    dontCaption="Views placed above a section header make two competing headings, and the views no longer belong to the section."
+    doExample={<TitleRowAboveViewBar />}
+    doCaption="The title row first, the view bar under it, sharing one left edge."
+    dontExample={<TitleInViewBar />}
+    dontCaption="The title pushed into the view bar: the heading and the pills fight for the start, and the description has nowhere to go."
 />
 
-### Open a record beside its list.
+### Put actions in the title row only when there is no view bar.
 
-Put Previous and Next in the detail header, and keep one detail per Section.
+<RuleTag kind="review" />
+
+Each action has one home. With a view bar, every action sits at its end.
 
 <DoDontPair
-    doExample={<DetailBesideList />}
-    doCaption="The list stays visible beside the detail on wide screens: pick a row and the record opens next to it."
-    dontExample={<DetailAsModal />}
-    dontCaption="Don't open the detail as a modal over the list: it hides the queue behind a blanket and the person loses their place."
+    doExample={<ActionsInTitleRow />}
+    doCaption="No view bar, so the actions sit at the end of the title row."
+    dontExample={<ActionsInTwoHomes />}
+    dontCaption="Actions in the title row and again in the view bar: one action, two homes."
 />
+
+### Keep views at the start as pills that hug their labels.
+
+<RuleTag kind="review" />
+
+Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled Select, so the page keeps one tab system.
+
+### Order the end of the bar: format switch, Search, filters, More, Primary.
+
+<RuleTag kind="review" />
+
+Search, Filter and More are icon buttons with Tooltips; the Primary is labeled and last. Keep five controls at most and fold extras into More. Search, Filter and the Primary stay in the bar. Every control is a default button, or compact in a compact bar.
+
+<DoDontPair
+    doExample={<RightSideInOrder />}
+    doCaption="Format switch, Search, Filter, More, then the labeled Primary last."
+    dontExample={<RightSideCrowded />}
+    dontCaption="Six controls in no order, the Primary first and a second labeled button: fold extras into More."
+/>
+
+### Turn the head row into the bulk bar when rows are selected.
+
+<RuleTag kind="automatic" />
+
+The part-ticked select-all, the count of selected rows, then the actions, all at the start. The checkboxes clear the selection, so the bar carries no Cancel. Selected rows take the selected fill and the view bar stays put. Only the Dynamic table selects rows.
+
+### Drop the Filter icon while a filter side shows.
+
+<RuleTag kind="review" />
+
+Each control has one home. The icon returns with its count once the side hides, below `SECTION_DETAIL_FLOOR`.
+
+### Open a queue's record in the Section detail.
+
+<RuleTag kind="review" />
+
+Previous and Next sit in the detail header, one detail per Section, and heavy work opens on its own page from the detail footer. The list stays in view beside the record.
+
+### Keep the footer for paging and "View all".
+
+<RuleTag kind="review" />
+
+Actions that commit changes belong in the card or form that holds the fields.
+
+<DoDontPair
+    doExample={<CardOwnsSave />}
+    doCaption={'The form card holds its own Save; the Section footer is for paging and "View all".'}
+    dontExample={<FooterCommits />}
+    dontCaption="Cancel and Save in the Section footer, away from the fields they commit."
+/>
+
+### Use the subtle fill only to stand apart.
+
+<RuleTag kind="review" />
+
+The subtle fill sets a part apart from its neighbor, such as a detail or a filter side. Plain Sections take no fill.
+
+### Nest a Section once at most.
+
+<RuleTag kind="review" />
+
+A subsection is an h3. A Section that already has a view bar holds subsections without one.
+
+The table's empty state replaces the whole table, by the Empty pattern; elevation and fills follow <a target="_top" href="./?path=/docs/foundations-elevation--docs">Elevation</a>.
 
 </div>
 
@@ -273,12 +341,10 @@ Put Previous and Next in the detail header, and keep one detail per Section.
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Title the section with what it holds, in sentence case: "Upcoming sessions".</td><td>A title that repeats the only card inside it.</td></tr>
-<tr><td>Keep the description to one line: "Next 7 days".</td><td>A paragraph under the title.</td></tr>
-<tr><td>View labels of one or two words: "Active", "Paused".</td><td>Long labels, or views of different things.</td></tr>
-<tr><td>A count in words: "48 students", "12 open flags".</td><td>A bare number.</td></tr>
-<tr><td>Name the search's scope: "Search students".</td><td>A bare "Search", which says nothing of what it searches.</td></tr>
-<tr><td>A narrowed count against the whole: "12 of 48 students".</td><td>A count that drops without saying what it is out of.</td></tr>
+<tr><td>Title the Section with what it holds, in sentence case: "Upcoming sessions".</td><td>A title that repeats the only card inside it.</td></tr>
+<tr><td>Keep the description to one line: "Algebra B · 24 students".</td><td>A paragraph under the title.</td></tr>
+<tr><td>Name views by the rows they show: "All students", "Needs follow-up".</td><td>Views of different things in one strip.</td></tr>
+<tr><td>Name the scope in Search: "Search students".</td><td>A bare "Search".</td></tr>
 </tbody>
 </DocsTable>
 
@@ -288,14 +354,11 @@ Put Previous and Next in the detail header, and keep one detail per Section.
 
 ## Accessibility
 
-- The title is a heading, and its level follows nesting: one h1 per page, h2 for a section, h3 for a subsection. Nest sections instead of choosing a tag.
-- A section with no title is a wrapper. What it holds keeps the parent's heading level.
-- In the custom and tabs-only types the title is hidden from sight but stays in the page, so the section keeps its name. Always give those sections a title.
-- `named` makes the section a region named by its title, for a section that stands apart as a landmark. The detail region is named by `detailTitle`.
-- A loading section is marked busy, and the skeleton bars are hidden from assistive technology.
-- Give the tabs row a label that says what the tabs switch, such as "Views".
-- The toolbar count is a polite live region, so a screen reader hears "12 of 48 students" as search and filters narrow the rows.
-- Search's icon, label and placeholder all name its scope. Its clear button is "Clear search". Esc clears, then closes and returns focus to the icon.
+- The title is a heading whose level follows nesting: h2 for a Section, h3 for a subsection. With the view bar alone the title stays in the page, hidden from sight.
+- The pill views are a tablist; the selected tab says which rows the body shows. Views swap in place.
+- Search, Filter and More carry their names: "Search students", "Filters, 2 applied", "More". The Filter count is in the name as well as on the button.
+- The table announces a selection politely, "2 selected", and the bulk bar's actions follow the select-all checkbox in the tab order.
+- The detail is a region named by its title. Below 960 its back link returns to the list.
 
 </div>
 
@@ -303,10 +366,11 @@ Put Previous and Next in the detail header, and keep one detail per Section.
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/templates-section-card--docs">Card</a> for one object rather than a region.
-- <a target="_top" href="./?path=/docs/templates-page-page--docs">Page</a> for a region that needs a fill or an edge. A section is transparent.
-- <a target="_top" href="./?path=/docs/templates-section-table--docs">Table</a>: the section header above a table carries its toolbar and tabs.
-- <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a> sets the pad a section sits in; its `sectionDetail` prop keeps 960 of content for a detail.
+- <a target="_top" href="./?path=/docs/templates-page-page--docs">Page</a>: use when the heading is the page's own.
+- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use when the record should float over the Page instead of sitting beside the list.
+- <a target="_top" href="./?path=/docs/templates-popup-popup--docs">Popup</a>: use when choosing the menu the view Select or the Filter icon opens.
+- <a target="_top" href="./?path=/docs/templates-section-table--docs">Table</a>: use when the body is rows and columns.
+- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when picking a filter tier (Filtering), the search field's behavior (Search) or an empty body (Empty).
 
 </div>
 

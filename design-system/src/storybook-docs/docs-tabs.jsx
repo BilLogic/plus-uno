@@ -153,14 +153,15 @@ function GeneratedTabBody({ children }) {
 }
 
 /**
- * The Code tab. Generated, never authored.
+ * The Code tab: the import line, then a template page's authored Slots table
+ * (its planned slots marked), then the props table. The rest is generated.
  *
  * `ArgTypes` derives the props table from the story meta, so it cannot drift
  * from the component the way a hand-written table does. The full source is
  * deliberately NOT inlined: it would put every component file into the docs
  * bundle to duplicate something GitHub already renders better, with history.
  */
-function CodeTabPanel({ of, importName, importFrom }) {
+function CodeTabPanel({ of, importName, importFrom, children }) {
   const importLine = importLineFor(importName, importFrom);
   return (
     <GeneratedTabBody>
@@ -172,6 +173,7 @@ function CodeTabPanel({ of, importName, importFrom }) {
           </pre>
         </>
       ) : null}
+      {children}
       <h2>Props</h2>
       <ArgTypes of={of} />
     </GeneratedTabBody>
@@ -276,7 +278,9 @@ function AgentViewPanel({ entry }) {
  *   "Examples"); Code, Usage and Agent view mean the same thing on every page
  *   and are not renameable.
  * @param {React.ReactNode} props.children One `<DocsTab tab="examples">` and, when
- *   the page has usage content, one `<DocsTab tab="usage">`.
+ *   the page has usage content, one `<DocsTab tab="usage">`. A template page adds
+ *   one `<DocsTab tab="code">` for its Slots table, drawn between the import line
+ *   and the props table.
  */
 export function DocsTabs({ of, examplesTitle, children }) {
   const authored = useMemo(() => {
@@ -423,7 +427,9 @@ export function DocsTabs({ of, examplesTitle, children }) {
             of={of}
             importName={resolved?.preparedMeta?.component?.displayName ?? resolved?.preparedMeta?.component?.name}
             importFrom={importSourceFor({ importPath }, Boolean(agentEntry))}
-          />
+          >
+            {authored.code?.props.children ?? null}
+          </CodeTabPanel>
         ) : activeTab.key === 'agent' ? (
           <AgentViewPanel entry={agentEntry} />
         ) : (

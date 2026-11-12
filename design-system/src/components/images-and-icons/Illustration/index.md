@@ -64,6 +64,19 @@ Don't: Clipping the box cuts off the limbs.
 
 Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Image` · `Object` · `Tile`
 
+## Anatomy
+
+- **Frame.** A 1000 × 1000 square in Figma, scaled to `size` in code. It is the
+  layout box: what sits next to a character lines up with the frame.
+- **Body.** The textured shape, in the body token. The stipple texture is part
+  of the art, so the body reads as soft at every size.
+- **Face, arms and legs.** Line work in `--ds-icon-subtle`. Most characters
+  reach past the frame with their limbs.
+
+`character` picks one of the twelve. The galleries, and which character goes
+with which SMART area, are on
+Illustrations.
+
 ## Parts
 
 1. **Frame.** The square layout box, `size` wide and high. The limbs reach past it and are never clipped.
