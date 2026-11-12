@@ -205,7 +205,7 @@ const DatePicker = ({
                 className={['plus-date-picker', open && 'plus-date-picker--open', className].filter(Boolean).join(' ')}
                 style={style}
                 // A read-only value cannot be changed, so the calendar icon is not drawn.
-                trailing={isReadOnly ? null : (
+                elemAfter={isReadOnly ? null : (
                     <span
                         className="plus-date-picker__icon"
                         aria-hidden="true"

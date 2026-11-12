@@ -3,6 +3,7 @@ import { Illustration, IllustrationFigure } from './Illustration.jsx';
 import {
   AnatomyMarker, Backdrop, ButtonShape, Card, Field, Frame, Modal, Panel, PageHeader, Popup, Row, Section, Sidebar,
 } from './primitives.jsx';
+import { MOTION_SETS } from './primitives-motion.jsx';
 
 /**
  * Every primitive, neutral then accented, at the one scale the compositions use.
@@ -23,6 +24,8 @@ const SETS = [
   ['Panel', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Panel x={96} y={20} w={54} h={72} accent={a} /></>)],
   ['Modal and backdrop', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Backdrop x={10} y={20} w={140} h={72} /><Modal x={34} y={32} w={92} h={52} accent={a} /></>)],
   ['Anatomy marker', (a) => (<><Section x={44} y={22} w={100} h={56} /><AnatomyMarker x={20} y={50} tx={44} ty={34} accent={a} /></>)],
+  // Motion's own primitives: chart axis and curve, trail, tap ring, pointer.
+  ...MOTION_SETS,
 ];
 
 export const IllustrationKitGallery = () => (

@@ -258,7 +258,10 @@ A page is done when a read-only scan of it finds:
   HTML entities, issue numbers and legacy template frames;
 - every Docs frame gap and padding bound to a variable, and every text node on
   a text style;
-- every set and standalone component with a description.
+- every set and standalone component with a description;
+- every example and drawing made per `documentation-ia.md` § Examples: the
+  real component where the lesson is its look, states or wording, and
+  illustration-kit shapes with no words where it is not.
 
 Then screenshot the page and the Docs frame for the sign-off comment. The
 library stays unpublished until Bill signs off.

@@ -223,7 +223,7 @@ const TextField = ({
                 {...toneProps(tone).field}
                 busy={edit.enabled && edit.saving}
                 elemBefore={renderFieldElem(elemBeforeInput)}
-                trailing={(after || steppers) ? <>{after}{steppers}</> : null}
+                elemAfter={(after || steppers) ? <>{after}{steppers}</> : null}
             >
                 <input
                     id={fieldId}

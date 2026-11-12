@@ -106,7 +106,7 @@ function fixtureRepo({ glossary = GLOSSARY, pages }) {
 }
 
 test('run: a strict page lists its finding, the others roll up, and nothing fails while the words are warnings', () => {
-  assert.deepEqual(STRICT_PAGES, ['Modal']);
+  assert.deepEqual(STRICT_PAGES, ['Modal', 'PatternSection']);
   const root = fixtureRepo({ pages: { Modal: '## Usage\n\nNot a toast.\n', Popup: '## Usage\n\nLike a toast or a snackbar.\n' } });
   const found = run({ repoRoot: root, enforceStrict: false });
   assert.ok(found.every((f) => f.severity === 'warning'), JSON.stringify(found));

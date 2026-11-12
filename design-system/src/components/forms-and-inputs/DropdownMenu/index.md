@@ -10,7 +10,7 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 **Source:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, DisabledRowWithReason, HoveredState, KeyboardFocus
+**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, DisabledRowWithReason, HoveredState, KeyboardFocus, OpenMenuEdge
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.mdx`
 
@@ -160,7 +160,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text-subtle` · `--layer-popup` · `--pad-x-md` · `--pad-y-md` · `--popover-max-height-menu` · `--popover-max-width-menu` · `--popover-radius-menu-md` · `--stack-md`
+`--body-default` · `--border-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text-subtle` · `--layer-popup` · `--pad-x-md` · `--pad-y-md` · `--popover-max-height-menu` · `--popover-max-width-menu` · `--popover-radius-menu-md` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss`. Override these through the token layer, never with a literal.
 

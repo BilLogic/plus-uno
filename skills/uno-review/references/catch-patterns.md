@@ -19,7 +19,7 @@ Sample output: `../examples/review-output-example.md`.
 npm run check:ds-usage -- <dir> --json
 ```
 
-One checker owns every escape (ADR-039): unknown components, deep imports, unknown props and enum values, raw colors, sizes and fonts, unknown and primitive tokens, Font Awesome Pro, react-bootstrap where PLUS has the component, retired names. Each finding names its rule ID and what to write instead; the rules, and what each one passes (a `var()` fallback, `0`, unitless numbers), are `docs/engineering/ds-usage-rules.md`.
+One checker owns every escape (ADR-039): unknown components, deep imports, unknown props and enum values, raw colors, sizes and fonts, unknown and primitive tokens, Font Awesome Pro, retired names. Each finding names its rule ID and what to write instead; the rules, and what each one passes (a `var()` fallback, `0`, unitless numbers), are `docs/engineering/ds-usage-rules.md`.
 
 ## Raw HTML controls where DS components exist (the PLUS-components-first rule)
 
@@ -36,3 +36,13 @@ grep -rn '\.map(' --include="*.jsx" -A 3 <dir> | grep -B 1 '<' | grep -v 'key='
 ```
 
 Every element returned from `.map()` needs a unique `key`.
+
+## Disabled states and slot names
+
+```bash
+grep -rnE 'isDisabled|disabled[=}]|trailing=|leading=' --include="*.jsx" <dir>
+```
+
+A hit is evidence for judgement against
+`design-system/guidelines/composition/form-behavior.md` § Unavailable actions
+and fields (explain on press) and `docs/engineering/coding.md` § Slot names.

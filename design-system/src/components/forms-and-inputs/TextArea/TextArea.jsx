@@ -122,7 +122,7 @@ const TextArea = ({
                 readOnly={isReadOnly}
                 {...toneProps(tone).field}
                 busy={edit.enabled && edit.saving}
-                trailing={edit.enabled && edit.saving
+                elemAfter={edit.enabled && edit.saving
                     ? <span className="plus-field-saving" role="status">saving…</span>
                     : null}
             >
