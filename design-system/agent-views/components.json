@@ -4823,6 +4823,8 @@
         "--ds-icon-warning-inverse",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--ds-motion-spatial-exit",
         "--ds-motion-spatial-exit-duration",
         "--ds-shadow-overlay",

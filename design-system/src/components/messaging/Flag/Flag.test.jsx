@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Flag, FlagGroup, FLAG_AUTO_CLOSE_MS, FLAG_APPEARANCES } from './Flag';
@@ -150,21 +151,37 @@ describe('FlagGroup', () => {
 });
 
 describe('Flag exit', () => {
-    afterEach(() => { vi.unstubAllGlobals(); });
+    afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
 
-    it('is gone after dismiss, once its exit ends', async () => {
-        const { rerender } = render(<Flag title="Saved" show onDismiss={() => {}}>Done.</Flag>);
-        rerender(<Flag title="Saved" show={false} onDismiss={() => {}}>Done.</Flag>);
-        const flag = screen.getByText('Saved').closest('.plus-flag');
-        expect(flag).toHaveAttribute('data-leaving');
-        fireEvent.animationEnd(flag);
+    const Controlled = ({ delay }) => {
+        const [shown, setShown] = useState(true);
+        return <Flag title="Saved" show={shown} delay={delay} onDismiss={() => setShown(false)}>Done.</Flag>;
+    };
+    const flagEl = () => screen.getByText('Saved').closest('.plus-flag');
+
+    it('flies out when it times out, then is gone', async () => {
+        vi.useFakeTimers({ shouldAdvanceTime: true });
+        render(<Controlled delay={1000} />);
+        act(() => { vi.advanceTimersByTime(1000); });
+        expect(flagEl()).toHaveAttribute('data-leaving', 'timeout');
+        fireEvent.animationEnd(flagEl());
         await waitFor(() => expect(screen.queryByText('Saved')).toBeNull());
     });
 
-    it('is gone at once under reduced motion', () => {
+    it('fades in place when closed by hand, then is gone', async () => {
+        render(<Controlled />);
+        fireEvent.click(screen.getByRole('button', { name: 'Dismiss flag' }));
+        expect(flagEl()).toHaveAttribute('data-leaving', 'hand');
+        fireEvent.animationEnd(flagEl());
+        await waitFor(() => expect(screen.queryByText('Saved')).toBeNull());
+    });
+
+    it('under reduced motion it is still there right after the trigger, then gone after the fade', async () => {
         vi.stubGlobal('matchMedia', (query) => ({ matches: query.includes('reduce'), addEventListener() {}, removeEventListener() {} }));
-        const { rerender } = render(<Flag title="Saved" show onDismiss={() => {}}>Done.</Flag>);
-        rerender(<Flag title="Saved" show={false} onDismiss={() => {}}>Done.</Flag>);
-        expect(screen.queryByText('Saved')).toBeNull();
+        render(<Controlled />);
+        fireEvent.click(screen.getByRole('button', { name: 'Dismiss flag' }));
+        expect(screen.getByText('Saved')).toBeInTheDocument();
+        fireEvent.animationEnd(flagEl());
+        await waitFor(() => expect(screen.queryByText('Saved')).toBeNull());
     });
 });
