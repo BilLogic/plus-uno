@@ -11,7 +11,12 @@ const silent = [
 ];
 const row = (name, events, tier = 'component') => ({ name, tier, events });
 const ev = (sound) => ({ enter: { spatial: 'spatial.fast', sound } });
-const go = (registry, sources = []) => run({ registry, silent, tokens, sources });
+// The rows the silent list names, so it points at real rows in every fixture.
+const base = [row('Banner', { enter: { spatial: 'spatial.fast' } }), row('FieldBox', { error: { spatial: 'spatial.fast' } })];
+const go = (registry, sources = []) => {
+  const names = new Set(registry.map((r) => r.name));
+  return run({ registry: [...base.filter((r) => !names.has(r.name)), ...registry], silent, tokens, sources });
+};
 
 test('a row whose sound names a real token passes', () => {
   assert.deepEqual(go([row('Flag', ev({ token: 'notify', at: 'land' }))]), []);
@@ -48,6 +53,19 @@ test('a silent row with no sound cell passes', () => {
 test('a silent entry must have a reason', () => {
   const f = run({ registry: [], silent: [{ row: 'X' }], tokens, sources: [] });
   assert.match(f[0].message, /why/);
+});
+
+test('a silent entry naming a row the registry does not hold fails', () => {
+  const f = run({ registry: [], silent: [{ row: 'Ghost', why: 'guessed' }], tokens, sources: [] });
+  assert.equal(f.length, 1);
+  assert.match(f[0].message, /Ghost/);
+  assert.match(f[0].message, /no registry row/);
+});
+
+test('a silent entry naming an event its row does not have fails', () => {
+  const f = run({ registry: [row('Banner', { enter: { spatial: 'spatial.fast' } })], silent: [{ row: 'Banner', event: 'shout', why: 'guessed' }], tokens, sources: [] });
+  assert.equal(f.length, 1);
+  assert.match(f[0].message, /Banner.*shout/);
 });
 
 test('AudioContext outside the sound runtime fails', () => {
