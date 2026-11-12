@@ -153,7 +153,7 @@ const StateTooltip = () => (
     </div>
 );
 
-/** Rest: the inverse neutral fill with inverse text, lifted by the overlay shadow. */
+/** Rest: the inverse neutral fill with inverse text, no shadow. */
 export const Rest = {
     render: () => <StateTooltip />,
     play: async ({ canvasElement }) => {
@@ -161,7 +161,7 @@ export const Rest = {
         const style = getComputedStyle(tip);
         await expect(style.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral-bold'));
         await expect(style.color).toBe(tokenColor(canvasElement, '--ds-text-inverse'));
-        await expect(style.boxShadow).not.toBe('none');
+        await expect(style.boxShadow).toBe('none');
     },
 };
 
