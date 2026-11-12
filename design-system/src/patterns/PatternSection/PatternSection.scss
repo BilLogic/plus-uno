@@ -247,3 +247,82 @@
     white-space: nowrap;
 }
 
+
+/*
+ * `_Section search`: the view bar's Search icon grows left into a field, a
+ * compact Text field on Field/width-md, and shrinks back into the icon. Both
+ * run on motion/duration-medium with the standard easing, the pair for what
+ * resizes in place. Under reduced motion the duration is 0: it opens and
+ * closes at once.
+ */
+.plus-section-search {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.plus-section-search--open {
+    flex-shrink: 1;
+    width: var(--field-width-md);
+    max-width: 100%;
+}
+
+.plus-section-search__field {
+    width: 100%;
+}
+
+// The field draws its own "Clear search"; the browser's cancel button would be a second one.
+.plus-section-search input[type='search']::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+// Grows from the icon's width, its end edge fixed, so it opens to the left.
+.plus-section-search--open.plus-section-search--grow {
+    animation: plus-section-search-grow var(--motion-duration-medium) var(--motion-easing-standard);
+}
+
+@keyframes plus-section-search-grow {
+    from {
+        width: var(--item-height-md);
+        overflow: hidden;
+    }
+
+    to {
+        width: var(--field-width-md);
+        overflow: hidden;
+    }
+}
+
+// Closing: the field's outline narrows into the icon and fades as it goes.
+.plus-section-search__icon {
+    position: relative;
+}
+
+.plus-section-search--shrink::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    box-sizing: border-box;
+    border: var(--border-default) solid var(--ds-border-input);
+    border-radius: var(--radius-h32);
+    background-color: var(--ds-background-input);
+    pointer-events: none;
+    opacity: 0;
+    animation: plus-section-search-shrink var(--motion-duration-medium) var(--motion-easing-standard);
+}
+
+@keyframes plus-section-search-shrink {
+    from {
+        width: var(--field-width-md);
+        opacity: 1;
+    }
+
+    to {
+        width: var(--item-height-md);
+        opacity: 0;
+    }
+}

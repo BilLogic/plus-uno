@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import PatternSection, { SectionToolbar } from './PatternSection';
+import PatternSection, { SectionSearch, SectionToolbar } from './PatternSection';
 
 /**
  * The Section pattern follows the Figma Section: no fill and no pad of its
@@ -162,6 +162,29 @@ describe('SectionToolbar', () => {
 
     it('is reachable as PatternSection.Toolbar', () => {
         expect(PatternSection.Toolbar).toBe(SectionToolbar);
+    });
+
+    it('announces the count politely', () => {
+        render(<SectionToolbar count="12 of 48 students" />);
+        expect(screen.getByRole('status')).toHaveTextContent('12 of 48 students');
+    });
+});
+
+describe('SectionSearch', () => {
+    it('is reachable as PatternSection.Search, an icon named for its scope', () => {
+        expect(PatternSection.Search).toBe(SectionSearch);
+        render(<SectionSearch label="Search students" />);
+        expect(screen.getByRole('button', { name: 'Search students' })).toBeInTheDocument();
+        expect(screen.queryByRole('searchbox')).toBeNull();
+    });
+
+    it('starts open with `defaultOpen`, and stays open while it holds text', () => {
+        const { unmount } = render(<SectionSearch label="Search students" defaultOpen />);
+        expect(screen.getByRole('searchbox', { name: 'Search students' })).toHaveAttribute('placeholder', 'Search students');
+        unmount();
+        render(<SectionSearch label="Search students" value="maya" onValueChange={() => {}} />);
+        expect(screen.getByRole('searchbox')).toHaveValue('maya');
+        expect(screen.getByRole('button', { name: 'Clear search' })).toBeInTheDocument();
     });
 });
 
