@@ -165,13 +165,15 @@ const expectNoTopbar = async (frame) => {
     await expect(frame.querySelector('.plus-frame__topbar'), 'no top bar').toBeNull();
 };
 
-/** A peeked sidebar floats: shadow, over the page, and no Blanket under it. */
+/** A floating sidebar (peek or under 1024): overlay fill and shadow, over the page, and no Blanket under it. */
 const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     await expect(getComputedStyle(aside).position).toBe('absolute');
     await expect(getComputedStyle(aside).boxShadow, 'floating sidebar shadow')
         .toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(aside).width, 'sidebar width').toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
-    await expect(getComputedStyle(aside).backgroundColor, 'on the sunken fill').toBe(tokenColor(frame, '--ds-surface-sunken'));
+    await inEveryColorMode(async (mode) => {
+        await expect(getComputedStyle(aside).backgroundColor, `${mode}: on the overlay fill`).toBe(tokenColor(frame, '--ds-surface-overlay'));
+    });
     await expect(rect(aside).top, 'the raised sidebar runs from the top').toBeCloseTo(rect(frame).top, 0);
     await expect(rect(aside).bottom, 'the raised sidebar runs to the foot').toBeCloseTo(rect(frame).bottom, 0);
     await expect(rect(surface).left, 'the surface did not move').toBeCloseTo(surfaceLeftBefore, 0);
@@ -239,6 +241,7 @@ export const ColorModes = {
             await expect(surfaceStyle.backgroundColor, `${mode}: the surface`).toBe(tokenColor(canvasElement, '--ds-surface'));
             await expect(surfaceStyle.boxShadow, `${mode}: the surface edge`)
                 .toBe(computedShadow(canvasElement, PAGE_EDGE));
+            await expect(asideStyle.backgroundColor, `${mode}: the docked sidebar stays sunken`).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
             await expect(asideStyle.boxShadow, `${mode}: the docked sidebar's 1px edge in the border color`)
                 .toBe(computedShadow(canvasElement, edgeLine));
             if (mode.startsWith('dark')) {

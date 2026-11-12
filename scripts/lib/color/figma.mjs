@@ -8,7 +8,7 @@
  *   color / foundations  Light, Dark, Light IC, Dark IC; every value an alias to a primitive except
  *                        shadow layer colors and transparent, which are literal
  *   opacity              one mode
- * Effect styles: elevation/shadow/{raised,overlay,overflow}. Every field of every layer is bound to a
+ * Effect styles: elevation/shadow/{raised,overlay,blocking,overflow}. Every field of every layer is bound to a
  * foundations variable (COLOR for the color, FLOAT for offsets, radius and spread), so shadows switch
  * with the mode.
  */

@@ -68,8 +68,8 @@ test('modals and every floating layer take the overlay pair', () => {
  * The Elevation page assigns the levels by pattern. The floating
  * layers on the new color tokens (menus and dropdowns, Listbox, Popover,
  * Tooltip, Toast) and modals take the overlay pair, `--ds-surface-overlay`
- * with `--ds-shadow-overlay`; the Frame's floating sidebar takes the overlay
- * shadow on the nav's sunken fill. A card is on the
+ * with `--ds-shadow-overlay`; the Frame's floating sidebar floats too, so it
+ * takes the overlay pair. A card is on the
  * raised pair or lifts while a clickable card is hovered or dragged. Each row
  * is one surface and the shadow its rule must name; a rule that names another
  * level, or a literal shadow, fails.
@@ -79,8 +79,8 @@ const SURFACES = [
   { file: 'design-system/src/components/overlays-and-layering/Popup/Popup.scss', rule: '.plus-popup {', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss', rule: '.plus-tooltip {', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/components/messaging/Flag/Flag.scss', rule: '.plus-flag', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
-  // The floating Sidebar keeps the nav's sunken fill under the overlay shadow, so docked and floating read differently.
-  { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__sidebar--raised {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-sunken' },
+  // The floating Sidebar floats, so it takes the overlay pair; the docked one stays on the sunken fill.
+  { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__sidebar--raised {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   { file: 'design-system/src/components/messaging/Modal/Modal.scss', rule: '.plus-modal', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   { file: 'design-system/src/patterns/PatternModal/PatternModal.scss', rule: '.plus-pattern-modal {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   { file: 'design-system/src/components/forms-and-inputs/_internal/Listbox.scss', rule: '', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
