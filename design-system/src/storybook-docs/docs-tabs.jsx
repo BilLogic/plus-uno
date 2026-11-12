@@ -153,16 +153,13 @@ function GeneratedTabBody({ children }) {
 }
 
 /**
- * The Code tab. Generated, never authored.
+ * The Code tab: the import line, then a template page's authored Slots table
+ * (its planned slots marked), then the props table. The rest is generated.
  *
  * `ArgTypes` derives the props table from the story meta, so it cannot drift
  * from the component the way a hand-written table does. The full source is
  * deliberately NOT inlined: it would put every component file into the docs
  * bundle to duplicate something GitHub already renders better, with history.
- */
-/**
- * The Code tab: the import line, then what the page authored for it (a
- * template's Slots table, with its planned slots marked), then the props table.
  */
 function CodeTabPanel({ of, importName, importFrom, children }) {
   const importLine = importLineFor(importName, importFrom);

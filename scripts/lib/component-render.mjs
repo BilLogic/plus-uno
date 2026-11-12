@@ -22,9 +22,10 @@
  * the page's Usage tab as designers read it, less its pictures: the Usage spine
  * (Usage, Alternatives, Best practices as one `###` rule each with its id,
  * Accessibility, Related with the same-group siblings), then a template page's
- * type grids and Anatomy, Parts, its Slots and Sizes, and Content guidelines. Then the facts derived from source: props, variants,
- * sub-components, tokens touched, the Figma set and node. No raw Figma URL and
- * no hint about which tool to call next: an adapter that wants a hint adds it.
+ * type grids and Anatomy, Parts, its Slots and Sizes, and Content guidelines.
+ * Then the facts derived from source: props, variants, sub-components, tokens
+ * touched, the Figma set and node. No raw Figma URL and no hint about which
+ * tool to call next: an adapter that wants a hint adds it.
  */
 
 import path from 'node:path';
@@ -116,7 +117,7 @@ function usageTab(page, relatedFacts) {
     if (related.length) d += `${related.map((r) => `- ${r}`).join('\n')}\n\n`;
     if (relatedFacts?.length) d += `Same group: ${relatedFacts.map(code).join(' · ')}\n\n`;
   }
-  // A template page's type grids (`## Types`, `## Header types`) come first: the family before its parts.
+  // A template page's type grids (`## Types`, `## Header types`) lead the beside-spine sections: the family before its parts.
   for (const s of page?.sections ?? []) if (TYPE_SECTION.test(s.title)) section(s.title);
   for (const title of BESIDE_SPINE) section(title);
   return d;
