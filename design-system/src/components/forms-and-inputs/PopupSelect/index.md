@@ -23,7 +23,7 @@ Use `PopupSelect` when one pick from one list changes what the page shows:
 
 The pick applies at once and the menu closes, so there is no Apply and no
 Reset. A menu of several filter categories, staged and applied together, is
-not a Popup select. A value that belongs to a form is a `Select` field; a list of
+a `FilterMenu`. A value that belongs to a form is a `Select` field; a list of
 actions, not values, is a `DropdownMenu`.
 
 ## Best practices
@@ -52,8 +52,9 @@ actions, not values, is a `DropdownMenu`.
 
 - For a value in a form, use `Select`.
 - For a menu of actions, use `DropdownMenu`.
+- For several filter categories applied together, use `FilterMenu`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 

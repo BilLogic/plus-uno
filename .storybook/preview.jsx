@@ -240,6 +240,7 @@ const preview = {
               "Dropdown menu",
               "Fieldset",
               "File upload",
+              "Filter menu",
               "Form",
               "Popup select",
               "Radio",

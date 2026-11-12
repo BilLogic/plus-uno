@@ -1,0 +1,204 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as FilterMenuStories from './FilterMenu.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={FilterMenuStories} />
+
+<Title />
+Several filter categories in a popup from the Filter icon, held until Apply.
+Two or three categories sit side by side; four or more stack.
+
+<DocsTabs of={FilterMenuStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/FilterMenu"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<ComponentExample of={FilterMenuStories.Overview} title="Side by side" description="Three categories in columns at 3-col. Ticks wait for Apply; Apply closes the menu and the sessions under it swap in place once." />
+
+<ComponentExample of={FilterMenuStories.Stacked} title="Stacked" description="Four or more categories, or a few with long lists, stack one under another at 3-col, or 4-col when the options need it." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Layout
+
+<ComponentExample of={FilterMenuStories.Placement} title="Placement" description="The menu opens 4 under the Filter icon at the end of the bar, its end edge on the trigger's. Reset and Apply span the bottom, half each." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+<ComponentExample of={FilterMenuStories.Staging} title="Reset and Apply" description="Escape or a click away drops what was ticked. Reset clears the boxes without applying; Apply applies what the menu shows, even nothing." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={FilterMenuStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `FilterMenu` when a section's content takes two or more filter
+categories applied together, and the view bar has room for one Filter icon
+rather than a button per category.
+
+- **Two or three categories with short lists:** side by side.
+- **Four or more, or long lists:** stacked. Set `layout="stacked"` for a few
+  long ones.
+
+One category in a menu, applied as you pick, is a `PopupSelect`. One to
+three short categories with room in the bar are a `FilterButton` each. A bar
+holds one or the other, never quick filters and a filter menu together.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Trigger.** The Filter `IconButton`. Once any value is applied it shows the count on the selected fill and reads "Filters, 2 applied".
+2. **Popup.** A `Popup` at a column step: `3-col` side by side; `3-col` or `4-col` stacked.
+3. **Categories.** A `Fieldset` per category, its label the legend, its options `Checkbox`es. Pick as many as apply.
+4. **Footer.** Reset (default) and Apply (primary), half each, full bleed across the bottom.
+
+### Placement
+
+<DocsTable>
+<thead>
+<tr><th>Trigger</th><th><code>placement</code></th></tr>
+</thead>
+<tbody>
+<tr><td>At the end of a bar, where filters sit</td><td><code>bottom-end</code> (default): the menu's end edge meets the trigger's.</td></tr>
+<tr><td>At the start of a bar</td><td><code>bottom-start</code>: the menu's start edge meets the trigger's.</td></tr>
+</tbody>
+</DocsTable>
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Open</td><td>The menu clips open from the trigger's corner, on the values applied. A keyboard open is instant.</td></tr>
+<tr><td>Ticked</td><td>The box changes color. The content behind does not change.</td></tr>
+<tr><td>Reset</td><td>Every box clears with the same color change. Nothing is applied yet.</td></tr>
+<tr><td>Applied</td><td>The menu fades, the content behind swaps in place once, and the trigger's count changes. Nothing slides.</td></tr>
+<tr><td>Dismissed</td><td>Escape or a click away closes it and drops the ticks; the next open starts from what is applied.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Surface</td><td>Those of <code>Popup</code>: <code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popover-radius</code>.</td></tr>
+<tr><td>Pad, and the gap above the footer</td><td>16: <code>--popover-pad</code>.</td></tr>
+<tr><td>Gap between categories</td><td><code>--inline-lg</code> across, <code>--stack-lg</code> down.</td></tr>
+<tr><td>Height of the categories</td><td>Scroll past 320: <code>--popover-max-height-menu</code>.</td></tr>
+<tr><td>Gap to the trigger</td><td>4: <code>--popover-offset</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+- **Show the count on the trigger.** It is the only place the applied
+  filters show; never add a row of chips under the bar.
+- **Apply once.** The content changes on Apply, not on each tick, so it
+  does not jump while someone is still choosing.
+- **Keep the categories short.** Long lists stack, so each keeps its full
+  width.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>"Reset" in the menu.</td><td>"Reset filters" or "Clear all" in the menu. "Reset filters" is for everywhere else, such as a No matches state.</td></tr>
+<tr><td>Name a category by what it holds: "Status", "Subject".</td><td>A verb phrase such as "Filter by status".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The trigger is a real button** that says a popup opens and whether it is
+  open. Its name carries the count: "Filters, 2 applied".
+- **The popup is named** by `label`, and each category is a group named by
+  its legend.
+- **Focus moves into the menu** on open and **returns to the trigger** after
+  Apply or Escape.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For one category applied as you pick, use `PopupSelect`.
+- For quick filters in the bar, use `FilterButton`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

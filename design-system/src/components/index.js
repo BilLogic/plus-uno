@@ -17,6 +17,7 @@ export { default as DropdownMenu } from '@/components/forms-and-inputs/DropdownM
 export { default as Fieldset } from '@/components/forms-and-inputs/Fieldset';
 export { default as FileUpload } from '@/components/forms-and-inputs/FileUpload';
 export { default as FilterButton, FILTER_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/FilterButton';
+export { default as FilterMenu, FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WIDTHS } from '@/components/forms-and-inputs/FilterMenu';
 export { default as IconButton, ICON_BUTTON_APPEARANCES, ICON_BUTTON_SHAPES } from '@/components/forms-and-inputs/IconButton';
 export { default as InlineEditableTextfield } from '@/components/forms-and-inputs/InlineEditableTextfield';
 export { default as LinkButton } from '@/components/forms-and-inputs/LinkButton';

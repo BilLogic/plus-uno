@@ -4311,6 +4311,178 @@
       ]
     },
     {
+      "name": "FilterMenu",
+      "kind": "component",
+      "import": "import { FilterMenu } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.jsx",
+      "summary": "Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Reset** clears every box in the menu without applying. Apply then applies the empty set. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.",
+      "props": [
+        {
+          "name": "categories",
+          "type": "arrayOf",
+          "required": true,
+          "default": "[]",
+          "values": null,
+          "description": "The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, disabled }`. Each category is a list of checkboxes; pick as many as apply.",
+          "deprecated": null
+        },
+        {
+          "name": "value",
+          "type": "objectOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The applied values, `{ [categoryId]: value[] }`. Leave it out to let the menu keep its own.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "objectOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The values applied at first, when `value` is left out.",
+          "deprecated": null
+        },
+        {
+          "name": "onApply",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(value)`, called on Apply with every category, an empty list for a category with nothing picked. Nothing is called while boxes are ticked.",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": "'Filters'",
+          "values": null,
+          "description": "Names the menu and the Filter icon button: \"Filters\", read \"Filters, 2 applied\" once two are.",
+          "deprecated": null
+        },
+        {
+          "name": "trigger",
+          "type": "node or func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A trigger of your own, or `({ isOpen, count }) => node`. Without it the Filter icon button is drawn.",
+          "deprecated": null
+        },
+        {
+          "name": "placement",
+          "type": "enum",
+          "required": false,
+          "default": "'bottom-end'",
+          "values": [
+            "bottom-start",
+            "bottom-end"
+          ],
+          "description": "`bottom-end` (default) for a trigger at the end of a bar, `bottom-start` for one at its start.",
+          "deprecated": null
+        },
+        {
+          "name": "layout",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "side-by-side",
+            "stacked"
+          ],
+          "description": "Leave it out to follow the count: two or three categories side by side, four or more stacked. Set `stacked` for a few categories with long lists.",
+          "deprecated": null
+        },
+        {
+          "name": "width",
+          "type": "enum",
+          "required": false,
+          "default": "'3-col'",
+          "values": [
+            "3-col",
+            "4-col"
+          ],
+          "description": "The column step of a stacked menu, `3-col` (default) or `4-col`. A side-by-side menu is always `3-col`.",
+          "deprecated": null
+        },
+        {
+          "name": "open",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Whether the menu is open. Leave it out to let the trigger open and close it.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Opens the menu on first render, when `open` is left out.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(open)`.",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "The Filter icon button's spacing: `default` draws 32, `compact` 24.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra classes on the popup.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The popup's id.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Staging",
+        "Stacked",
+        "Placement",
+        "Interactive"
+      ],
+      "tokens": [
+        "--heading-xsmall",
+        "--inline-lg",
+        "--plus-filter-menu-columns",
+        "--popover-max-height-menu",
+        "--popover-pad",
+        "--stack-lg"
+      ]
+    },
+    {
       "name": "Flag",
       "kind": "component",
       "import": "import { Flag } from '@/components';",

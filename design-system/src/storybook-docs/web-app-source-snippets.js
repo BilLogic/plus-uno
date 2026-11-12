@@ -65,6 +65,17 @@ export const webAppSourceSnippets = {
         '  isSearchable={false}',
         '/>'
     ]),
+    filterMenu: snippet([
+        '<FilterMenu',
+        '  categories={[',
+        '    { id: "status", label: "Status", options: ["Upcoming", "Completed", "Canceled"] },',
+        '    { id: "subject", label: "Subject", options: ["Math", "Reading", "Science"] },',
+        '    { id: "format", label: "Format", options: ["Online", "In person"] },',
+        '  ]}',
+        '  value={applied}',
+        '  onApply={setApplied}',
+        '/>'
+    ]),
     verticalButton: snippet([
         '<VerticalButton',
         '  icon="user-gear"',
