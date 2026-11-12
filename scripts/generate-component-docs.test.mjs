@@ -148,6 +148,26 @@ test('the render follows the Usage spine, then Parts and Content guidelines, the
   assert.doesNotMatch(text, /not listed is not a valid value/);
 });
 
+test('once a page tags a rule, every rule carries its Checked line, untagged ones reading Review', () => {
+  const page = readDocsPage(`## Usage\n\nUse it.\n\n## Best practices\n\n### Keep it short.\n\n<RuleTag kind="automatic" />\n\nOne line.\n\n### Say why.\n\nOne reason.\n`);
+  const text = renderComponent(componentFacts(FIXTURE_MANIFEST, 'Widget'), { path: 'w.mdx', page });
+  assert.match(text, /### Keep it short\. \{#keep-it-short\}\n\n\*\*Checked:\*\* Automatic\n\nOne line\./);
+  assert.match(text, /### Say why\. \{#say-why\}\n\n\*\*Checked:\*\* Review\n\nOne reason\./);
+});
+
+test('a page with no rule tags renders its rules without Checked lines', () => {
+  const text = renderComponent(componentFacts(FIXTURE_MANIFEST, 'Widget'), { path: 'w.mdx', page: readDocsPage(FIXTURE_PAGE) });
+  assert.doesNotMatch(text, /\*\*Checked:\*\*/);
+});
+
+test('a template page\'s Slots table follows Parts, so an agent sees which slots are planned', () => {
+  const page = readDocsPage(`## Usage\n\nUse it.\n\n## Slots\n\n| Slot | Holds |\n| --- | --- |\n| \`side\` Planned | A second column. |\n\n## Parts\n\n1. **Box.**\n`);
+  const text = renderComponent(componentFacts(FIXTURE_MANIFEST, 'Widget'), { path: 'w.mdx', page });
+  const order = [...text.matchAll(/^## (.*)$/gm)].map((m) => m[1]);
+  assert.deepEqual(order.filter((t) => ['Usage', 'Parts', 'Slots'].includes(t)), ['Usage', 'Parts', 'Slots']);
+  assert.match(text, /## Slots\n\n\| Slot \| Holds \|/);
+});
+
 test('a component with no page says its guidance is unwritten, and a pattern is not its sibling', () => {
   const text = renderComponent(componentFacts(FIXTURE_MANIFEST, 'Gadget'), null);
   assert.match(text, /No authored guidance yet/);
