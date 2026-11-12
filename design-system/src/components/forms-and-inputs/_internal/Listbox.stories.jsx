@@ -399,7 +399,7 @@ AThousandOptions.play = async ({ canvasElement }) => {
 };
 
 /**
- * The list's surface is the overlay pair with a `color.border` edge, its
+ * The list's surface is the overlay pair, its edge the shadow's ring, its
  * header rule `color.border`, a failed load `text.danger`. A field in the
  * header keeps its 2px-off focus ring inside the list's clip: the header's
  * own padding is the ring's room.
@@ -427,7 +427,7 @@ Colors.play = async ({ canvasElement }) => {
     const error = within(canvas.getByRole('listbox', { name: 'Failed' }).closest('.plus-listbox')).getByText(/Couldn't load schools/).closest('.plus-listbox-message');
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         await expect(getComputedStyle(surface).backgroundColor, `${mode}: surface`).toBe(token('--ds-surface-overlay'));
-        await expect(getComputedStyle(surface).borderTopColor, `${mode}: edge`).toBe(token('--ds-border'));
+        await expect(getComputedStyle(surface).borderTopColor, `${mode}: no painted edge`).toBe('rgba(0, 0, 0, 0)');
         await expect(getComputedStyle(header).borderBottomColor, `${mode}: header rule`).toBe(token('--ds-border'));
         await expect(getComputedStyle(error).color, `${mode}: failed load`).toBe(token('--ds-text-danger'));
     });

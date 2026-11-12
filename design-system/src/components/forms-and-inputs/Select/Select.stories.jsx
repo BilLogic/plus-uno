@@ -3,6 +3,7 @@ import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
+import { computedShadow } from '@/storybook-docs/lib/style-probes.js';
 import Select from './Select';
 
 /**
@@ -522,5 +523,23 @@ export const FieldReadOnlyLongValue = {
         const text = canvasElement.querySelector('.plus-select-text');
         await expect(text.scrollWidth).toBeLessThanOrEqual(text.clientWidth);
         await expect(getComputedStyle(text).textOverflow).toBe('clip');
+    },
+};
+
+/** The open list has one edge, the shadow's ring: no painted border (a transparent one stays for forced colors). */
+export const OpenListEdge = {
+    parameters: { docs: { disable: true } },
+    render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Select a subject" /></div>,
+    play: async ({ canvasElement }) => {
+        await userEvent.click(within(canvasElement).getByRole('combobox', { name: 'Subject' }));
+        const list = await waitFor(() => {
+            const el = document.querySelector('.plus-listbox');
+            if (!el) throw new Error('the list has not opened');
+            return el;
+        });
+        const style = getComputedStyle(list);
+        await expect(style.borderTopColor, 'no painted border').toBe('rgba(0, 0, 0, 0)');
+        await expect(style.boxShadow, 'the overlay shadow is the edge').toBe(computedShadow(canvasElement, 'var(--ds-shadow-overlay)'));
+        await userEvent.keyboard('{Escape}');
     },
 };

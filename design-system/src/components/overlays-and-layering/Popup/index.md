@@ -186,7 +186,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--anchor-width` · `--body-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--motion-duration-medium` · `--motion-duration-short` · `--motion-easing-entrance` · `--motion-easing-exit` · `--plus-popup-clip-bottom` · `--plus-popup-clip-left` · `--plus-popup-clip-right` · `--plus-popup-clip-top` · `--plus-popup-reach` · `--popover-offset` · `--popover-pad` · `--popover-radius` · `--popup-clip-reach` · `--popup-max-width` · `--popup-min-width` · `--popup-pad` · `--stack-md`
+`--anchor-width` · `--body-default` · `--border-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--motion-duration-medium` · `--motion-duration-short` · `--motion-easing-entrance` · `--motion-easing-exit` · `--plus-popup-clip-bottom` · `--plus-popup-clip-left` · `--plus-popup-clip-right` · `--plus-popup-clip-top` · `--plus-popup-reach` · `--popover-offset` · `--popover-pad` · `--popover-radius` · `--popup-clip-reach` · `--popup-max-width` · `--popup-min-width` · `--popup-pad` · `--stack-md`
 
 From `design-system/src/components/overlays-and-layering/Popup/Popup.scss`. Override these through the token layer, never with a literal.
 
