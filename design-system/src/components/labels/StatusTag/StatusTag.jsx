@@ -1,9 +1,8 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import CountTag, { COUNT_TAG_APPEARANCES, formatCount } from '../CountTag/CountTag';
-import Tooltip from '../../overlays-and-layering/Tooltip';
-import { useIsTruncated } from '../../../lib/useIsTruncated';
+import { ClippedTooltip } from '../../../lib/ClippedTooltip';
 import Icon from '../../images-and-icons/Icon';
 import './StatusTag.scss';
 
@@ -95,8 +94,6 @@ export const StatusTag = ({
      * the label's width.
      */
     const visualKey = typeof visual === 'string' ? visual : Boolean(visual);
-    const labelRef = useRef(null);
-    const truncated = useIsTruncated(labelRef, [children, effectiveSpacing, maxWidth, visualKey, wantsMetric]);
 
     const classes = [
         'plus-status',
@@ -116,34 +113,39 @@ export const StatusTag = ({
      * when the page resizes.
      */
     return (
-        <Tooltip text={children} trigger={truncated ? ['hover', 'focus'] : []}>
-            <span
-                id={id}
-                className={classes}
-                style={{ '--plus-status-max': typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth }}
-                {...rest}
-                tabIndex={truncated ? 0 : undefined}
-            >
-                <span className="plus-status__content">
-                    {visual && (
-                        <span className="plus-status__visual" aria-hidden="true">{renderVisual(visual)}</span>
-                    )}
-                    <span
-                        ref={labelRef}
-                        className="plus-status__label"
-                    >
-                        {children}
+        <ClippedTooltip
+            text={children}
+            deps={[effectiveSpacing, maxWidth, visualKey, wantsMetric]}
+        >
+            {({ measureRef, truncated }) => (
+                <span
+                    id={id}
+                    className={classes}
+                    style={{ '--plus-status-max': typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth }}
+                    {...rest}
+                    tabIndex={truncated ? 0 : undefined}
+                >
+                    <span className="plus-status__content">
+                        {visual && (
+                            <span className="plus-status__visual" aria-hidden="true">{renderVisual(visual)}</span>
+                        )}
+                        <span
+                            ref={measureRef}
+                            className="plus-status__label"
+                        >
+                            {children}
+                        </span>
                     </span>
+                    {wantsMetric && (
+                        <CountTag
+                            value={trailingMetric}
+                            appearance={metricAppearance}
+                            spacing={effectiveSpacing === 'spacious' ? 'default' : 'compact'}
+                        />
+                    )}
                 </span>
-                {wantsMetric && (
-                    <CountTag
-                        value={trailingMetric}
-                        appearance={metricAppearance}
-                        spacing={effectiveSpacing === 'spacious' ? 'default' : 'compact'}
-                    />
-                )}
-            </span>
-        </Tooltip>
+            )}
+        </ClippedTooltip>
     );
 };
 

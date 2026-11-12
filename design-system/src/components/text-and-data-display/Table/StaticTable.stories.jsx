@@ -201,6 +201,18 @@ export const Cells = {
         await userEvent.hover(note);
         await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(/A very long single-line note/));
         await userEvent.unhover(note);
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull());
+        await expect(note, 'no title attribute').not.toHaveAttribute('title');
+
+        // A clipped cell is a tab stop and shows the same tooltip on focus; a
+        // cell that fits is neither.
+        await expect(canvas.getByText('Marcus Lee'), 'a name that fits is not a tab stop').not.toHaveAttribute('tabindex');
+        await expect(note).toHaveAttribute('tabindex', '0');
+        note.focus();
+        await expect(note).toHaveFocus();
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(/A very long single-line note/));
+        note.blur();
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull());
         await expect(getComputedStyle(canvas.getByText('1,240').closest('td')).textAlign).toBe('right');
     }
 };
@@ -276,6 +288,18 @@ export const HeadCells = {
         await userEvent.hover(long);
         await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(/far too long/));
         await userEvent.unhover(long);
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull());
+        await expect(long, 'no title attribute').not.toHaveAttribute('title');
+
+        // The clipped header is a tab stop and shows its name on focus; a header
+        // that fits is not.
+        const clippedHead = long.closest('.plus-table-head-cell-inner');
+        await expect(canvas.getByText('Student').closest('.plus-table-head-cell-inner'), 'a name that fits is not a tab stop').not.toHaveAttribute('tabindex');
+        await expect(clippedHead).toHaveAttribute('tabindex', '0');
+        clippedHead.focus();
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(/far too long/));
+        clippedHead.blur();
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull());
         await expect(canvas.getByRole('columnheader', { name: 'Flagged' })).toBeVisible();
         await expect(canvasElement.querySelector('.plus-table-head-cell-type.fa-flag')).toBeVisible();
         await expect(canvas.getByText('Sessions').closest('th')).toHaveClass('plus-table-cell--align-number');

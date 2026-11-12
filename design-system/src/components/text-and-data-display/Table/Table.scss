@@ -124,6 +124,12 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+
+        // A clipped cell is a tab stop, so the full text is reachable by
+        // keyboard. The ring sits inside the box, where the cell cannot clip it.
+        &:focus-visible {
+            @include plus-ring(calc(-1 * var(--focus-ring-width)), --ds-border-focused, false, var(--focus-ring-width));
+        }
     }
 }
 
@@ -321,6 +327,12 @@
     gap: var(--inline-md);
     min-width: 0;
     width: 100%;
+}
+
+// A clipped header with nothing to press is a tab stop, so its full name is
+// reachable by keyboard; the ring sits inside the cell.
+.plus-table-head-cell-inner:focus-visible {
+    @include plus-ring(calc(-1 * var(--focus-ring-width)), --ds-border-focused, false, var(--focus-ring-width));
 }
 
 .plus-table-head-cell-type,

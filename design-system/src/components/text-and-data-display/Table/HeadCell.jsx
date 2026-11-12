@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Tooltip from '@/components/overlays-and-layering/Tooltip';
+import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
-import { alignName, useClipped } from './TableParts';
+import { alignName } from './TableParts';
 import Icon from '../../images-and-icons/Icon';
 import './Table.scss';
 
@@ -65,7 +65,6 @@ const HeadCell = ({
     style,
     ...props
 }) => {
-    const { ref, clipped, measure } = useClipped(label);
     const sortState = SORT_GLYPH[sort] ? sort : 'none';
     const showLabel = !isIconOnlyHeader;
     const truncate = shouldTruncate && showLabel;
@@ -81,31 +80,6 @@ const HeadCell = ({
         <Icon name={icon} className="plus-table-head-cell-type" />
     ) : null;
 
-    const labelNode = showLabel ? (
-        <span
-            ref={ref}
-            className={classes('plus-table-head-cell-label', truncate && 'plus-table-head-cell-label--truncate')}
-            onMouseEnter={measure}
-        >
-            {label}
-        </span>
-    ) : (
-        <VisuallyHidden>{label}</VisuallyHidden>
-    );
-
-    const body = (
-        <>
-            {typeIcon}
-            {labelNode}
-            {isSortable && (
-                <>
-                    <Icon name={SORT_GLYPH[sortState]} className="plus-table-head-cell-sort" />
-                    <VisuallyHidden>{`, ${SORT_STATE_TEXT[sortState]}`}</VisuallyHidden>
-                </>
-            )}
-        </>
-    );
-
     const cellClass = classes(
         'plus-table-head-cell',
         `plus-table-cell--align-${alignName(align)}`,
@@ -114,30 +88,61 @@ const HeadCell = ({
         className
     );
 
-    let inner;
-    if (isSortable) {
-        const action = SORT_ACTION_TEXT[NEXT_SORT[sortState]];
-        const tooltip = clipped && showLabel ? `${label}. ${action}` : action;
-        inner = (
-            <Tooltip text={tooltip}>
-                <button
-                    type="button"
-                    className={classes(
-                        'plus-table-head-cell-button',
-                        sortState !== 'none' && 'plus-table-head-cell-button--sorted'
-                    )}
-                    onClick={() => onSort && onSort(NEXT_SORT[sortState])}
-                >
-                    {body}
-                </button>
-            </Tooltip>
-        );
-    } else {
-        const wrapped = <div className="plus-table-head-cell-inner">{body}</div>;
-        inner = clipped && showLabel && typeof label === 'string'
-            ? <Tooltip text={label}>{wrapped}</Tooltip>
-            : wrapped;
-    }
+    // The tooltip goes on whatever takes focus: the sort button, or, on a
+    // header with nothing to press, the label's own box while it is clipped.
+    const action = SORT_ACTION_TEXT[NEXT_SORT[sortState]];
+    const clippedText = truncate ? label : '';
+
+    const inner = (
+        <ClippedTooltip
+            text={isSortable && clippedText ? `${label}. ${action}` : clippedText}
+            textWhenFits={isSortable ? action : undefined}
+            deps={[truncate]}
+        >
+            {({ measureRef, truncated }) => {
+                const body = (
+                    <>
+                        {typeIcon}
+                        {showLabel ? (
+                            <span
+                                ref={measureRef}
+                                className={classes('plus-table-head-cell-label', truncate && 'plus-table-head-cell-label--truncate')}
+                            >
+                                {label}
+                            </span>
+                        ) : (
+                            <VisuallyHidden>{label}</VisuallyHidden>
+                        )}
+                        {isSortable && (
+                            <>
+                                <Icon name={SORT_GLYPH[sortState]} className="plus-table-head-cell-sort" />
+                                <VisuallyHidden>{`, ${SORT_STATE_TEXT[sortState]}`}</VisuallyHidden>
+                            </>
+                        )}
+                    </>
+                );
+                if (isSortable) {
+                    return (
+                        <button
+                            type="button"
+                            className={classes(
+                                'plus-table-head-cell-button',
+                                sortState !== 'none' && 'plus-table-head-cell-button--sorted'
+                            )}
+                            onClick={() => onSort && onSort(NEXT_SORT[sortState])}
+                        >
+                            {body}
+                        </button>
+                    );
+                }
+                return (
+                    <div className="plus-table-head-cell-inner" tabIndex={truncated ? 0 : undefined}>
+                        {body}
+                    </div>
+                );
+            }}
+        </ClippedTooltip>
+    );
 
     return (
         <th

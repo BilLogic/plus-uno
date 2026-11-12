@@ -1,6 +1,6 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import Tooltip from '@/components/overlays-and-layering/Tooltip';
+import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import './Table.scss';
 
 /**
@@ -21,44 +21,21 @@ export const alignName = (align) => {
 const classes = (...names) => names.filter(Boolean).join(' ');
 
 /**
- * Whether a single line of text is cut off. Re-measures when the element is
- * resized and when the pointer arrives, so a tooltip is offered only while
- * there is something to read.
- */
-export const useClipped = (deps) => {
-    const ref = useRef(null);
-    const [clipped, setClipped] = useState(false);
-    const measure = useCallback(() => {
-        const el = ref.current;
-        if (el) setClipped(el.scrollWidth > el.clientWidth + 1);
-    }, []);
-
-    useLayoutEffect(() => {
-        measure();
-        const el = ref.current;
-        if (!el || typeof ResizeObserver === 'undefined') return undefined;
-        const observer = new ResizeObserver(measure);
-        observer.observe(el);
-        return () => observer.disconnect();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [measure, deps]);
-
-    return { ref, clipped, measure };
-};
-
-/**
  * Single-line text that ends in an ellipsis. The full text rides in a tooltip,
- * and only while it is clipped, so a name that fits never shows one.
+ * and only while it is clipped, so a name that fits never shows one. A clipped
+ * cell takes a tab stop, so the tooltip is reachable by keyboard.
  */
 const ClippedText = ({ children, className }) => {
-    const { ref, clipped, measure } = useClipped(children);
-    const text = (
-        <span ref={ref} className={className} onMouseEnter={measure}>
-            {children}
-        </span>
-    );
     const readable = typeof children === 'string' || typeof children === 'number';
-    return clipped && readable ? <Tooltip text={String(children)}>{text}</Tooltip> : text;
+    return (
+        <ClippedTooltip text={readable ? String(children) : ''}>
+            {({ measureRef, truncated }) => (
+                <span ref={measureRef} className={className} tabIndex={truncated ? 0 : undefined}>
+                    {children}
+                </span>
+            )}
+        </ClippedTooltip>
+    );
 };
 
 ClippedText.propTypes = {
@@ -71,7 +48,7 @@ ClippedText.propTypes = {
  *
  * - `align`: `text` | `number` | `icon`
  * - `emphasis`: `default` | `title`, the one column that names the record
- * - `overflow`: `truncate` (one line, ellipsis and tooltip) | `wrap`
+ * - `overflow`: `truncate` (one line, ellipsis, and a tooltip and a tab stop only while clipped) | `wrap`
  * - `secondary`: a muted second line under the text (the `lines=2` cell)
  * - `elemBefore`: a slot before the text, for an avatar, an icon or a Status
  * - `state`: `rest` | `error`; `loading` draws a placeholder bar
