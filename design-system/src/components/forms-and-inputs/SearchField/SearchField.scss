@@ -1,0 +1,95 @@
+// Search field: scope filter, then the field. Collapsed it is one icon button.
+//
+// Opening grows the field from the icon's width, its end edge fixed, so it
+// opens to the left; closing narrows an outline back into the icon. Both run
+// on the fast spatial and appearance motion tokens. Under reduced motion the
+// duration is 0: it opens and closes at once.
+.plus-search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--inline-sm);
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.plus-search-field--open {
+    flex-shrink: 1;
+    width: var(--field-width-md);
+    max-width: 100%;
+}
+
+.plus-search-field__field {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.plus-search-field__scope {
+    flex: 0 0 auto;
+    width: auto;
+}
+
+// The field draws its own clear button; the browser's cancel button would be a second one.
+.plus-search-field input[type='search']::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+// A Spinner stands where the search icon stood, so the field never jumps.
+.plus-search-field__spinner {
+    display: inline-flex;
+}
+
+.plus-search-field--open.plus-search-field--grow {
+    animation: plus-search-field-grow var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
+}
+
+@keyframes plus-search-field-grow {
+    from {
+        width: var(--item-height-md);
+        overflow: hidden;
+    }
+
+    to {
+        width: var(--field-width-md);
+        overflow: hidden;
+    }
+}
+
+.plus-search-field__icon {
+    position: relative;
+}
+
+.plus-search-field--closed.plus-search-field--shrink::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    box-sizing: border-box;
+    border: var(--border-default) solid var(--ds-border-input);
+    border-radius: var(--radius-h32);
+    background-color: var(--ds-background-input);
+    pointer-events: none;
+    opacity: 0;
+    animation: plus-search-field-shrink var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+}
+
+@keyframes plus-search-field-shrink {
+    from {
+        width: var(--field-width-md);
+        opacity: 1;
+    }
+
+    to {
+        width: var(--item-height-md);
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-search-field--open.plus-search-field--grow,
+    .plus-search-field--closed.plus-search-field--shrink::before {
+        animation: none;
+    }
+}
