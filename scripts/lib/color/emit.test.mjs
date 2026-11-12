@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { renderPlan } from './build.mjs';
+import { buildPlan, renderPlan } from './build.mjs';
 import { dsName, paletteVar } from './emit.mjs';
 
 const files = renderPlan('A', 'scripts/generate-color-tokens.mjs');
@@ -62,3 +62,50 @@ test('_elevation.scss follows the same switches as _semantic.scss', () => {
   assert.deepEqual(selectors(files['_elevation.scss']), MODE_SELECTORS);
 });
 
+// ---- elevation: raised carries a key layer, blocking is its own token ----
+const elevation = files['_elevation.scss'];
+const decl = (css, name) => [...css.matchAll(new RegExp(`^ +${name}: ([^;]+);`, 'gm'))].map((m) => m[1]);
+const RAISED_LIGHT = '0px 0px 0px 1px rgb(29 27 22 / 0.051), 0px 1px 2px rgb(29 27 22 / 0.161), 0px 12px 32px rgb(29 27 22 / 0.02)';
+const BLOCKING_LIGHT = '0px 0px 0px 1px rgb(29 27 22 / 0.071), 0px 8px 16px rgb(29 27 22 / 0.071), 0px 24px 56px rgb(29 27 22 / 0.161)';
+
+test('light raised has edge, key (16%) and ambient layers', () => {
+  assert.equal(decl(elevation, '--ds-shadow-raised')[0], RAISED_LIGHT);
+});
+
+test('--ds-shadow-blocking exists in all four modes; light matches the proposal', () => {
+  const [light, dark, autoDark, ...rest] = decl(elevation, '--ds-shadow-blocking');
+  assert.equal(light, BLOCKING_LIGHT);
+  assert.ok(dark && autoDark && rest.length >= 4, 'dark, auto-dark and increased-contrast blocks each declare it');
+});
+
+test('dark blocking equals dark overlay, in dark and dark increased contrast', () => {
+  const pairs = (name) => decl(elevation, name);
+  const blocking = pairs('--ds-shadow-blocking');
+  const overlay = pairs('--ds-shadow-overlay');
+  assert.equal(blocking.length, overlay.length);
+  const darkIdx = overlay.map((v, i) => (v.includes('247 246 245') ? i : -1)).filter((i) => i >= 0);
+  assert.ok(darkIdx.length >= 2);
+  for (const i of darkIdx) assert.equal(blocking[i], overlay[i]);
+});
+
+test('increased-contrast rings: 49% light, 50% dark, on raised and blocking', () => {
+  for (const name of ['--ds-shadow-raised', '--ds-shadow-blocking']) {
+    const v = decl(elevation, name);
+    assert.ok(v.some((s) => s.startsWith('0px 0px 0px 1px rgb(29 27 22 / 0.49)')), `${name} light ic ring`);
+    assert.ok(v.some((s) => s.startsWith('0px 0px 0px 1px rgb(247 246 245 / 0.502)')), `${name} dark ic ring`);
+  }
+});
+
+test('raised light keeps its ring at 49% under increased contrast and dark raised is unchanged', () => {
+  const v = decl(elevation, '--ds-shadow-raised');
+  assert.ok(v.includes('0px 0px 0px 1px rgb(29 27 22 / 0.49), 0px 1px 2px rgb(29 27 22 / 0.161), 0px 12px 32px rgb(29 27 22 / 0.02)'));
+  assert.ok(v.includes('0px 0px 0px 1px rgb(247 246 245 / 0.102), 0px 1px 1px rgb(20 20 19 / 0.502), 0px 0px 1px rgb(20 20 19 / 0.502)'));
+});
+
+test('plans name every shadow layer edge, key, ambient', () => {
+  for (const key of ['A', 'B']) {
+    const { semantics } = buildPlan(key);
+    const sh = semantics.palette.shadow;
+    for (const level of ['raised', 'overlay', 'blocking']) assert.deepEqual(Object.keys(sh[level]), ['edge', 'key', 'ambient'], `${key} ${level}`);
+  }
+});

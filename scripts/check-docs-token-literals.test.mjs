@@ -349,3 +349,50 @@ test('chrome 7. media conditions, prose and a docs-literal: reason pass', () => 
   assert.deepEqual(chromeFindings('.a {\n  /* docs-literal: the manager has no tokens. */\n  border-radius: 0.375rem;\n}', { css: true }), []);
   assert.deepEqual(chromeFindings("const s = 'var(--x)'; // tokens only", { css: false }), []);
 });
+
+// ── the illustration kit ────────────────────────────────────────────────────
+
+test('kit 1. a paint, stroke width or corner radius that is not a token is caught in the kit', () => {
+  const jsx = [
+    '<rect fill="red" />',
+    '<rect fill="#fff" />',
+    '<rect stroke="rgb(0 0 0)" />',
+    '<rect strokeWidth={2} rx="4" />',
+    "<rect style={{ rx: '4px' }} />",
+  ].join('\n');
+  const kinds = chromeFindings(jsx, { css: false, kit: true })
+    .filter((f) => f.kind === 'kit')
+    .map((f) => f.line);
+  assert.deepEqual(kinds, [1, 2, 3, 4, 4, 5], 'every untokened paint, width and corner in the kit');
+  const all = chromeFindings(jsx, { css: false, kit: true }).map((f) => [f.line, f.kind]);
+  assert.ok(all.some(([l, k]) => l === 3 && k === 'color-fn'));
+  assert.ok(all.some(([l, k]) => l === 5 && k === 'dimension'));
+});
+
+test('kit 1b. green twin: tokens, none and currentColor pass in the kit', () => {
+  const jsx = [
+    '<rect fill="var(--ds-surface)" stroke="var(--ds-border)" style={{ rx: "var(--radius-025)" }} />',
+    '<rect fill="none" stroke="var(--ds-border-bold)" strokeWidth="var(--stroke-1)" />',
+    '<path fill={fill} stroke={stroke} />',
+  ].join('\n');
+  assert.deepEqual(chromeFindings(jsx, { css: false, kit: true }), []);
+});
+
+test('kit 1c. the kit rule is the kit\'s own: the same attribute elsewhere in the docs is not a kit finding', () => {
+  assert.deepEqual(chromeFindings('<rect fill="red" />', { css: false }), []);
+});
+
+test('kit 2. run() reports a raw paint planted in the kit folder and not one beside it', () => {
+  const { root, done } = policyTree({
+    'design-system/src/tokens/color/_semantic.scss': tokenSheet(),
+    '.storybook/storybook-overrides.css': '.a { color: var(--ds-border); }\n',
+    'design-system/src/storybook-docs/illustrations/Bad.jsx': 'export const Bad = () => <rect fill="teal" />;\n',
+    'design-system/src/storybook-docs/Beside.jsx': 'export const Beside = () => <rect fill="teal" />;\n',
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.equal(found.filter((m) => /kit drawing fill=teal/.test(m)).length, 1, found.join('\n'));
+  } finally {
+    done();
+  }
+});

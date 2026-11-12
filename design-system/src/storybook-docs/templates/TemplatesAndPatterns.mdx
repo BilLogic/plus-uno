@@ -1,7 +1,9 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
+import { ThreeLayers, OpeningARecord } from '@/storybook-docs/illustrations/compositions.jsx';
 import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
-<Meta title="Templates/Templates and patterns" tags={['!dev']} />
+<Meta title="Templates/Templates and patterns" tags={['!dev', 'manifest']} />
 
 <FoundationHero
     kind="Guide"
@@ -19,11 +21,19 @@ Grab a template, fill the slots, and open a pattern when you are lost or want to
 - **Templates** are arrangements of components with slots. They hold key scenarios and key states, and link to components for detail. The question is "Are the slots filled right?" Anatomy is the numbered slots.
 - **Patterns** are code-free guidance for a situation, shown on annotated templates used as they are or tweaked. The question is "Is this the right approach?" A pattern has no anatomy and no code.
 
+<IllustrationFigure caption="One primary button across the layers: on its own as a component, inside a Section template, and placed on a Frame by a pattern.">
+    <ThreeLayers />
+</IllustrationFigure>
+
 </FoundationSection>
 
 <FoundationSection title="The tie-break">
 
 Behavior splits out into a component, and a template that only redraws one component stays a component. One component's behavior goes on the component page. How pieces sit in one template goes on that template's page. Anything that holds across two or more templates is a pattern.
+
+<IllustrationFigure caption="Opening a record, lightest to heaviest: popup, panel, modal, page. Pick the lowest step that fits.">
+    <OpeningARecord />
+</IllustrationFigure>
 
 A rule lives in one place. A template page that needs a pattern's rule links to it and keeps its own words for the slots.
 
