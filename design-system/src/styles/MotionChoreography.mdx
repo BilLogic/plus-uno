@@ -30,7 +30,7 @@ Before a move plays, the screen dims and the path each part takes is drawn from 
 
 <FoundationSubsection title="Unify direction">
 
-When several parts move together, they move along one axis. What cannot share that axis fades in place instead of traveling. Indicators that track position are exempt: a tab indicator tracks the place while the content makes its own move. Step indicators don't travel at all: they change state in place.
+When several parts move together, they move along one axis: each goes from where it is to where it lands, all heading the same general way, so no path crosses another and none scatters. What cannot share that axis fades in place instead of traveling. Indicators that track position are exempt: a tab indicator tracks the place while the content makes its own move. Step indicators don't travel at all: they change state in place.
 
 <Canvas of={ChoreographyStories.Direction} sourceState="none" />
 
