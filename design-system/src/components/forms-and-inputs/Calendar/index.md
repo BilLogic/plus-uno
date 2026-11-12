@@ -12,9 +12,21 @@ Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a calendar directly only when a date grid needs to be visible on the page without a field or a popup around it: a scheduling view, an embedded picker. For a single date field, use Date picker; for a date and time together, use Date time picker. Both already use this same grid.
+
+## Motion
+
+Calendar reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
+| change | Step to the next or previous | `--ds-motion-spatial-default` | A month change slides the grid flat. |
 
 ## Best practices
 

@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={FilterButtonStories} />
 
@@ -56,6 +57,14 @@ what is applied, and a chevron when it opens a menu.
 <ComponentExample of={FilterButtonStories.Disabled} title="Disabled" description="A change of color, not of opacity." />
 
 <ComponentExample of={FilterButtonStories.Loading} title="Loading" description="A spinner replaces the label while the button is busy." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="FilterButton" />
 
 </div>
 

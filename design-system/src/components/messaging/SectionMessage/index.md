@@ -14,6 +14,8 @@ Also asked as: callout, inline alert, warning box.
 
 **Storybook page:** `design-system/src/components/messaging/SectionMessage/SectionMessage.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `SectionMessage` for a message that belongs to the page and stays there
@@ -37,6 +39,15 @@ stripe: the fill and the icon carry the style.
 | Danger | Something failed and needs attention. | `circle-exclamation` |
 | Warning | A caution before something goes wrong. | `triangle-exclamation` |
 | Info | Something worth knowing. | `circle-info` |
+
+## Motion
+
+SectionMessage reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Makes room, then fades in. |
+| exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Fades, then the room closes. |
 
 ## Best practices
 

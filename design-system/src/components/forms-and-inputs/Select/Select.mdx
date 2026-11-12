@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as SelectStories from './Select.stories.jsx';
 import { Select } from '@/components';
 import { DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const lengths = [
     { value: '30', label: '30 minutes' },
@@ -101,6 +102,14 @@ type. A short list, such as a filter menu's, turns typing off with
 <ComponentExample of={SelectStories.FieldReadOnly} title="Read-only" description="The read-only fill; the value can be read, selected and copied." />
 
 <ComponentExample of={SelectStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Select" />
 
 </div>
 

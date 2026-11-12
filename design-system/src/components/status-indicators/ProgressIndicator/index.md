@@ -14,6 +14,8 @@ Also asked as: dots, carousel dots, step dots, slide marker.
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `ProgressIndicator` for a short sequence where position matters more than
@@ -22,6 +24,14 @@ each step has its own label people need to see, use `ProgressTracker` instead.
 
 When each step lasts a set time and moves on by itself, pass `progress` so the
 current dot shows how much of its time is left.
+
+## Motion
+
+ProgressIndicator reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Step states change in place: the step left becomes visited, the next current. |
 
 ## Best practices
 

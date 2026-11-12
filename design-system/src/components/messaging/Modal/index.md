@@ -14,6 +14,8 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window, 
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Modal` when the next step has to happen before anything else can: a
@@ -44,6 +46,16 @@ than a menu. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
 height hugs its content up to the cap the Backdrop sets
 (`--blanket-max-height-modal`); `height="fill"` sits at that cap.
+
+## Motion
+
+Modal reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Scales from 96% while it fades in; the Backdrop dims on the same fade. |
+| exit | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Scales to 98% while it fades. |
+| rejected | Call attention | `--ds-motion-spatial-fast` | A blocked submit shakes it once; never in reduced motion. |
 
 ## Alternatives
 

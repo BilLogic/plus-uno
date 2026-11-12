@@ -14,12 +14,22 @@ Also asked as: steps, stepper, wizard, multi-step, checkout steps.
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `ProgressTracker` when each step of a journey has its own name people
 need to see and, often, jump back to — a multi-page form, a setup flow, a
 reflection with named sections. When position alone is enough and the steps
 have no names to show, use `ProgressIndicator` instead.
+
+## Motion
+
+ProgressTracker reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Step states change in place: the step left becomes visited, the next current. |
 
 ## Best practices
 

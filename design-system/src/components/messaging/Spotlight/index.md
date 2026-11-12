@@ -14,6 +14,8 @@ Also asked as: onboarding, feature tour, coach mark, new feature highlight, walk
 
 **Storybook page:** `design-system/src/components/messaging/Spotlight/Spotlight.mdx`
 
+**Motion:** enter `spatial.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Spotlight` to call out one feature the first time someone can use it:
@@ -23,6 +25,15 @@ short, explicit sequence with a `stepCount`, not an ongoing help system.
 For a message that stays on the page until resolved, use `SectionMessage` or
 `Banner` instead. For a short note tied to one field or value, use
 `InlineMessage`.
+
+## Motion
+
+Spotlight reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-default` | Each coachmark step is Step. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 
 ## Best practices
 

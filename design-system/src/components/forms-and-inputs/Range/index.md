@@ -14,11 +14,21 @@ Also asked as: slider, range slider.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Range/Range.mdx`
 
+**Motion:** change `spatial.fast` + `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a range in a form to let a person choose a value within a minimum and a maximum, when an approximate value is enough: a zoom level, a volume, a rough rating of effort.
 
 Do not use a range when choosing a specific value matters. A slider is less precise than typing a number or picking an option from a list. Do not use it for values that are not numeric, such as weekdays, or for spans that are extremely large (over 100 steps) or very small (1 to 3).
+
+## Motion
+
+Range reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-linear` | The thumb follows the pointer; on release it settles on a spring that starts from the hand's speed. |
 
 ## Best practices
 

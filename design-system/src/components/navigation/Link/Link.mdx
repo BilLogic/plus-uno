@@ -3,6 +3,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as LinkStories from './Link.stories.jsx';
 import { Link } from '@/components';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -63,6 +64,14 @@ sentence of UI copy.
 <ComponentExample of={LinkStories.Pressed} title="Pressed" description="Default and subtle take the pressed link ink." />
 
 <ComponentExample of={LinkStories.Focused} title="Focused" description="The 2px ring, 2px off the link; inverse draws the inverse ring color." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Link" />
 
 </div>
 

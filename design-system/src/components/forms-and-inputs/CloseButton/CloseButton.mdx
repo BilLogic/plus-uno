@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const surface = { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--inline-md)', padding: 'var(--pad-y-md) var(--pad-x-md)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)', background: 'var(--ds-surface)' };
 export const surfaceStacked = { ...surface, flexDirection: 'column', justifyContent: 'flex-start' };
@@ -46,6 +47,14 @@ The one dismiss control for a surface that closes as a whole — a Modal, a Sect
 ## Tone
 
 <ComponentExample of={CloseButtonStories.Tones} title="Tones" description="Default for neutral surfaces; inverse for the declared colored and dark grounds." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="CloseButton" />
 
 </div>
 

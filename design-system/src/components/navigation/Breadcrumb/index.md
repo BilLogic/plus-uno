@@ -14,6 +14,8 @@ Also asked as: path, navigation trail.
 
 **Storybook page:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.mdx`
 
+**Motion:** enter `spatial.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Breadcrumb` when a page sits inside a hierarchy the user needs to see and
@@ -23,6 +25,15 @@ answers two questions at once: where am I, and what is one level up.
 It takes a single `items` array, ordered root first. Each item is `{ text, href,
 onClick }`. The last item is the current page and is rendered as plain text; every
 item before it is a link.
+
+## Motion
+
+Breadcrumb reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Drill into and climb back out | `--ds-motion-spatial-fast` | Arrives with its page, one level longer; its row opens from its seam once, at Drill depth 1. |
+| exit | Drill into and climb back out | `--ds-motion-appearance-fast` | Leaves with its page. |
 
 ## Best practices
 

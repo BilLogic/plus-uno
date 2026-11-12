@@ -14,6 +14,8 @@ Also asked as: hover hint, hover text.
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx`
 
+**Motion:** enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Tooltip` for a short label on a control whose purpose is not obvious from
@@ -25,6 +27,15 @@ It is the Popups pattern's Tooltip: body.small 12/16 in `--ds-text-inverse` on
 `--ds-background-neutral-bold`, so it flips with the color mode,
 padded 4 · 8, wrapping past 240, with no arrow. It opens 4 from its trigger
 and never comes nearer than 8 to the screen's edge.
+
+## Motion
+
+Tooltip reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fade only, after 250 ms. A second Tooltip soon after shows at once. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades 100 ms after the pointer leaves. |
 
 ## Best practices
 

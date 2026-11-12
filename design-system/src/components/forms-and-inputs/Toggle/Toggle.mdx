@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as ToggleStories from './Toggle.stories.jsx';
 import { Toggle } from '@/components';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -76,6 +77,14 @@ A toggle turns one setting on or off, and the change takes effect at once.
 <ComponentExample of={ToggleStories.DisabledWithReason} title="Disabled with a reason" description="The reason is visible text beside the toggle, never a tooltip." />
 
 <ComponentExample of={ToggleStories.Disabled} title="Disabled" description="The disabled fill in both positions, with an icon.disabled thumb. The toggle leaves the tab order." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Toggle" />
 
 </div>
 

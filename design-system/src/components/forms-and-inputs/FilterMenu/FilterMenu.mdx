@@ -8,6 +8,7 @@ import {
     DocsTable,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={FilterMenuStories} />
 
@@ -48,6 +49,14 @@ Two or three categories sit side by side; four or more stack.
 ## Behavior
 
 <ComponentExample of={FilterMenuStories.Staging} title="Reset and Apply" description="Escape or a click away drops what was ticked. Reset clears the boxes without applying; Apply applies what the menu shows, even nothing." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="FilterMenu" />
 
 </div>
 
