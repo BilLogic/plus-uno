@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import SearchField from './SearchField';
 
 const stack = { display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-start' };
@@ -97,19 +97,20 @@ export const Loading = {
 export const Async = {
     render: () => {
         const [summary, setSummary] = useState('');
-        const calls = React.useRef(fn());
+        const [calls, setCalls] = useState(0);
         return (
             <div style={stack}>
                 <SearchField
                     placeholder="Search students"
-                    loadResults={async (text, options) => {
-                        calls.current(text, options);
+                    loadResults={async (text) => {
+                        setCalls((n) => n + 1);
                         await new Promise((resolve) => setTimeout(resolve, 100));
                         return { results: text ? [text] : [], total: text.length };
                     }}
                     onResults={({ total }) => setSummary(`${total} found`)}
                 />
                 <output data-testid="summary">{summary}</output>
+                <output data-testid="calls">{calls}</output>
             </div>
         );
     },
@@ -120,6 +121,8 @@ export const Async = {
         // One debounced request for the whole word, with the spinner while it runs.
         await waitFor(() => expect(canvas.getByText('Searching')).toBeVisible());
         await waitFor(() => expect(canvas.getByTestId('summary')).toHaveTextContent('3 found'), { timeout: 3000 });
+        // Mount plus one debounced request for the whole word, not one per key.
+        await expect(canvas.getByTestId('calls')).toHaveTextContent('2');
         await expect(canvas.queryByText('Searching')).toBeNull();
     },
 };

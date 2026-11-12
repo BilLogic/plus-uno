@@ -111,7 +111,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `value` | string | — | The search text, when the caller holds it. Pair with `onValueChange`. |
 | `defaultValue` | string | `''` | Starting text when the field holds its own. |
 | `onValueChange` | func | — | `(text)`: called on every edit, on Esc and on the clear button. |
-| `loadResults` | func | — | `(text, { offset, limit, scope })` → `Promise<{ results, total }>`. Asked on first render and after a short pause in typing; an older answer never replaces a newer one. `scope` is sent when `scopes` is set. |
+| `loadResults` | func | — | `(text, { offset, limit, scope })` → `Promise<{ results, total }>`. Asked on first render (so `onResults` fires without typing) and after a short pause in typing; an older answer never replaces a newer one. `scope` is sent when `scopes` is set. |
 | `onResults` | func | — | `({ results, total })`: called with each answer of `loadResults`. |
 | `isLoading` | bool | `false` | A search is running. A Spinner takes the search icon's place. `loadResults` sets this by itself. |
 | `isCollapsible` | bool | `false` | Starts as an icon button that grows into the field and collapses when left empty. |

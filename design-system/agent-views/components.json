@@ -11258,7 +11258,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "`(text, { offset, limit, scope })` → `Promise<{ results, total }>`. Asked on first render and after a short pause in typing; an older answer never replaces a newer one. `scope` is sent when `scopes` is set.",
+          "description": "`(text, { offset, limit, scope })` → `Promise<{ results, total }>`. Asked on first render (so `onResults` fires without typing) and after a short pause in typing; an older answer never replaces a newer one. `scope` is sent when `scopes` is set.",
           "deprecated": null
         },
         {

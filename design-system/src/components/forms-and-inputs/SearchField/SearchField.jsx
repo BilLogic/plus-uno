@@ -10,7 +10,7 @@ import './SearchField.scss';
 
 export const SEARCH_FIELD_SPACINGS = ['default', 'compact'];
 export const SEARCH_FIELD_MODES = ['active'];
-/** How long typing pauses before `loadResults` is asked. */
+/** How long typing pauses before `loadResults` is asked, in ms. A typing pause, not a motion value. */
 export const SEARCH_DEBOUNCE_MS = 250;
 /** `loadResults` asks for this many results at a time. */
 const PAGE_SIZE = 50;
@@ -133,6 +133,8 @@ const SearchField = ({
     const handleBlur = (event) => {
         if (hasText || !isCollapsible) return;
         if (rootRef.current?.contains(event.relatedTarget)) return;
+        // The scope list renders in a popup layer outside the root; focus inside it is not leaving.
+        if (event.relatedTarget?.closest?.('.plus-listbox')) return;
         collapse();
     };
 
@@ -150,8 +152,9 @@ const SearchField = ({
         // The first request goes at once; later ones wait for a pause in typing.
         const wait = first.current ? 0 : SEARCH_DEBOUNCE_MS;
         first.current = false;
+        // A new keystroke retires any request still in flight.
+        const ticket = ++request.current;
         const timer = setTimeout(() => {
-            const ticket = ++request.current;
             setBusy(true);
             const options = { offset: 0, limit: PAGE_SIZE, ...(scopes ? { scope } : {}) };
             Promise.resolve(loadRef.current(value, options)).then((result) => {
@@ -162,7 +165,11 @@ const SearchField = ({
                 if (ticket === request.current) setBusy(false);
             });
         }, wait);
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+            // Unmount: a late answer must not set state or call `onResults`.
+            request.current += 1;
+        };
     }, [value, scope, hasLoader, Boolean(scopes)]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const loading = isLoading || busy;
@@ -256,7 +263,7 @@ const SearchField = ({
                         label={name}
                         tooltip={name}
                         appearance="subtle"
-                                                isDisabled={isDisabled}
+                        isDisabled={isDisabled}
                         onClick={openField}
                     />
                 </span>
@@ -278,7 +285,7 @@ SearchField.propTypes = {
     defaultValue: PropTypes.string,
     /** `(text)`: called on every edit, on Esc and on the clear button. */
     onValueChange: PropTypes.func,
-    /** `(text, { offset, limit, scope })` → `Promise<{ results, total }>`. Asked on first render and after a short pause in typing; an older answer never replaces a newer one. `scope` is sent when `scopes` is set. */
+    /** `(text, { offset, limit, scope })` → `Promise<{ results, total }>`. Asked on first render (so `onResults` fires without typing) and after a short pause in typing; an older answer never replaces a newer one. `scope` is sent when `scopes` is set. */
     loadResults: PropTypes.func,
     /** `({ results, total })`: called with each answer of `loadResults`. */
     onResults: PropTypes.func,
