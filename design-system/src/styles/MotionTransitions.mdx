@@ -293,9 +293,19 @@ In a grid, the others slide along their row and wrap.
     ]}
 />
 
-A dragged item follows the pointer on linear, then settles on a spring that starts from the release velocity. The figure shows a sort; dragging itself is built with the drag work.
+A dragged item follows the pointer by weight: a chip on `spatial.fast`, a card on `spatial.default`, never bouncing. On drop it settles on `spatial.fast`, started from the release velocity, while its neighbors close up on `spatial.default`. Under Reduced motion nothing travels: what moved fades in place on `appearance.fast`, in the same order.
+
+The first figure is a sort.
 
 <Canvas of={TransitionStories.ReorderItems} sourceState="none" />
+
+Drag a card to another place in the list, or use its grab handle: Space picks it up, the arrow keys move it, Space drops it and Escape puts it back. A live region says where it is.
+
+<Canvas of={TransitionStories.ReorderDragDemo} sourceState="none" />
+
+Between two lists the dropped item takes the place it lands on, and both lists close up. The arrow keys cross from one list to the other.
+
+<Canvas of={TransitionStories.DragBetweenListsDemo} sourceState="none" />
 
 </FoundationSubsection>
 
