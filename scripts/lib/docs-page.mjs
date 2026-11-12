@@ -460,6 +460,8 @@ function elementText(el) {
       return `**${inline(kids())}**`;
     case 'em':
       return `*${inline(kids())}*`;
+    case 'DocsLink':
+      return kids();
     case 'br':
       return '\n';
     case 'li':
