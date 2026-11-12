@@ -206,6 +206,7 @@ const preview = {
               "Card",
               "Table"
             ],
+            "Form",
             "Modal",
             [
               "Modal",

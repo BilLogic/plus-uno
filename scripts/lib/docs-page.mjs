@@ -654,7 +654,7 @@ export function readDocsPage(source, { kind, root, file } = {}) {
   const tags = ruleTags(src);
   return {
     kind: pageKind,
-    title: src.match(/<FoundationHero\b[^>]*?\btitle=["']([^"']*)["']/)?.[1] ?? heads.find((h) => h.level === 1)?.title ?? null,
+    title: src.match(/<FoundationHero\b[^>]*?\btitle=["']([^"']*)["']/)?.[1] ?? src.match(/<Title>([^<]+)<\/Title>/)?.[1].trim() ?? heads.find((h) => h.level === 1)?.title ?? null,
     intro: before.split(/\n\s*\n/).map((p) => p.trim()).filter((p) => p && !p.startsWith('#')).join('\n\n'),
     sections,
     alternatives: linesOf(sectionNamed(sections, 'Alternatives')?.text).map((text) => ({ text, routesTo: routeOf(text) })),

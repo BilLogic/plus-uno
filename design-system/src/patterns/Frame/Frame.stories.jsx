@@ -5,6 +5,8 @@ import { Breadcrumb, Button, IconButton, Logo, Modal, PanelBody, PanelCloseActio
 import { Frame, PANEL_STORAGE_KEY, PatternDrawer, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy, ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
+import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
+import { BAR_TOKEN, FocusedType, STEPS_RAIL, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -1551,14 +1553,6 @@ export const StateAt1440 = frameState(1440, {}, async (p) => sidebarIs(p, 'docke
  * Section, ProgressTracker and Button; nothing here is redrawn.
  */
 
-/** The browser body's height on the docs page: docs geometry, in px. */
-const WINDOW_HEIGHT = 440; // docs-literal
-/** The focused type's step rail, 256 wide (320 for long labels): the Section side's width. */
-const STEPS_RAIL = 256; // docs-literal
-/** The focused bottom bar's height in the ledger: the 32 button plus 16 of padding, `--space-300`. */
-const BAR_TOKEN = '--space-300';
-/** Four or fewer steps run across the top; five or more go down the left. */
-const STEPS_ACROSS_MAX = 4;
 
 /** A page body made of placeholder bars, so the Frame's own structure is what reads. */
 const SkeletonSection = ({ title }) => (
@@ -1597,82 +1591,6 @@ export const TypeDefault = {
     },
 };
 
-const TASK_STEPS = ['Student', 'Schedule', 'Goals', 'Materials', 'Review'];
-
-/** One step list for the focused type: visited steps come back, the rest wait. */
-const stepItems = (labels, at, go) => labels.map((label, i) => ({
-    id: label.toLowerCase(),
-    label,
-    status: i < at ? 'visited' : i === at ? 'current' : 'unvisited',
-    ...(i < at ? { onClick: () => go(i) } : {}),
-}));
-
-/**
- * The focused type: one task in the whole window. Close leads the title row
- * beside the task's name, there is no Sidebar and no breadcrumb. Five steps or
- * more go down a left side 256 wide; four or fewer run across the top. The bar
- * along the bottom is Cancel at the start, then Back and Next at the end.
- */
-const FocusedTask = ({ count = 5, start = 1 }) => {
-    const labels = TASK_STEPS.slice(0, count);
-    const [at, setAt] = useState(start);
-    const down = count > STEPS_ACROSS_MAX;
-    const last = at === labels.length - 1;
-    const tracker = (
-        <ProgressTracker
-            label="Steps"
-            orientation={down ? 'vertical' : 'horizontal'}
-            items={stepItems(labels, at, setAt)}
-        />
-    );
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%' }}>
-            <Frame
-                header={(
-                    <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--space-100)', minInlineSize: 0 }}>
-                        <IconButton appearance="subtle" icon="xmark" label="Close" onClick={() => {}} />
-                        <h1 style={{ margin: 0, font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Plan a tutoring term</h1>
-                    </div>
-                )}
-                width="reading"
-                style={{ flex: '1 1 auto', minBlockSize: 0 }}
-            >
-                <div data-probe="steps-layout" data-steps={down ? 'down' : 'across'} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--space-200)' }}>
-                    <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>{tracker}</div>
-                    <div style={{ flex: '1 1 auto', minInlineSize: 0 }}>
-                        <Skeleton preset="text" lines={4} />
-                    </div>
-                </div>
-            </Frame>
-            <div
-                role="group"
-                aria-label="Task actions"
-                data-probe="bar"
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    blockSize: `var(${BAR_TOKEN})`,
-                    flex: '0 0 auto',
-                    background: 'var(--ds-surface)',
-                    borderBlockStart: 'var(--border-default) solid var(--ds-border)',
-                }}
-            >
-                <Button text="Cancel" appearance="subtle" onClick={() => {}} />
-                <div style={{ display: 'flex' }}>
-                    <Button text="Back" isDisabled={at === 0} onClick={() => setAt(at - 1)} />
-                    <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => setAt(Math.min(at + 1, labels.length - 1))} />
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const FocusedType = (props) => (
-    <BrowserWindow address="app.plus.org/terms/new" height={WINDOW_HEIGHT}>
-        <FocusedTask {...props} />
-    </BrowserWindow>
-);
 
 /** Focused: five steps down the left, the bottom bar, no Sidebar. */
 export const TypeFocused = {
@@ -1721,39 +1639,6 @@ const ANATOMY_FOCUSED_PARTS = [
     { selector: '.plus-frame__content', label: 'Body', at: 'end' },
     { selector: '[data-probe="bar"]', label: 'Bar' },
 ];
-
-/** Every marker's part exists and the marker sits level with it (above it for a top marker): its center within the part's top and bottom. */
-const markersLevelWithParts = async (canvasElement, parts) => {
-    await waitFor(() => expect(canvasElement.querySelectorAll('[data-anatomy-marker]'), 'a marker for each part').toHaveLength(parts.length));
-    parts.forEach(({ selector, label, side }, i) => {
-        const target = canvasElement.querySelector(selector);
-        expect(target, `${label}: its element exists`).not.toBeNull();
-        const marker = canvasElement.querySelector(`[data-anatomy-marker="${i + 1}"]`);
-        const box = rect(target);
-        if (side === 'top') {
-            expect(rect(marker).bottom, `marker ${i + 1} (${label}) sits above its part`).toBeLessThanOrEqual(box.top);
-            return;
-        }
-        const middle = rect(marker).top + rect(marker).height / 2;
-        expect(middle, `marker ${i + 1} (${label}) sits level with its part`).toBeGreaterThanOrEqual(box.top - 1);
-        expect(middle, `marker ${i + 1} (${label}) sits level with its part`).toBeLessThanOrEqual(box.bottom + 1);
-    });
-};
-
-/** No leader line passes through a part other than its own: the line's box against every other part's box, ignoring a 1px touch. */
-const leadersCrossNoOtherPart = (canvasElement, parts) => {
-    parts.forEach(({ label }, i) => {
-        const leader = canvasElement.querySelector(`[data-anatomy-leader="${i + 1}"]`);
-        expect(leader, `${label}: its leader exists`).not.toBeNull();
-        const line = rect(leader);
-        parts.forEach((other, j) => {
-            if (j === i) return;
-            const box = rect(canvasElement.querySelector(other.selector));
-            const inside = line.right > box.left + 1 && line.left < box.right - 1 && line.bottom > box.top + 1 && line.top < box.bottom - 1;
-            expect(inside, `leader ${i + 1} (${label}) does not cross ${other.label}`).toBe(false);
-        });
-    });
-};
 
 /** Anatomy: the default type at 1440 with the AI panel docked, a marker on each part. */
 export const AnatomyDefault = {

@@ -120,6 +120,7 @@
   "$rootSourcesComment": "Source folders (or file prefixes) of each shared root. A page titled under one of these roots sits in one of its sources, and a page in a source is titled under that root (check:storybook-categories).",
   "rootSources": {
     "Templates": [
+      "design-system/src/patterns/Form/",
       "design-system/src/patterns/Frame/",
       "design-system/src/patterns/Page/",
       "design-system/src/patterns/PageTemplates/",
@@ -205,6 +206,7 @@
         "Card",
         "Table"
       ],
+      "Form",
       "Modal",
       [
         "Modal",
