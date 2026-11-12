@@ -75,6 +75,10 @@ Don't: An icon in the children, beside the default one.
 An error about one input belongs to that input's own error state, such as
 `TextField`'s `isInvalid` and `errorMessage`, not in a section message above it.
 
+A rejected submit is the exception that proves the rule: a danger section
+message at the top of the form says what was refused, and each field named
+still shows its own error.
+
 ### Dismissal is one-way. {#dismissal-is-one-way}
 
 The component keeps its own dismissed state, and `show` is not a prop. To bring

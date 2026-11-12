@@ -10,7 +10,7 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
@@ -54,11 +54,21 @@ A title names the event; the description gives the next step.
 Do: Event in the title, next step below.
 Don't: A bare title with no next step.
 
+### Show a background failure as an error Flag with Try again. {#show-a-background-failure-as-an-error-flag-with-try-again}
+
+When work fails out of sight, such as a sync or an autosave, use an error flag.
+It stays until closed and carries **Try again** as its action, so the person can
+retry without leaving what they are doing. A failure to load a view is not a
+flag: it takes the view's `EmptyState`.
+
+Do: Error flag with Try again; it stays until closed.
+Don't: A failure that times out before it is read.
+
 ### Nothing important goes only in a flag. {#nothing-important-goes-only-in-a-flag}
 
 The user can dismiss a flag before reading it, and that takes the only copy
-with it. A failure that needs a decision stays on the page, in a
-`SectionMessage`.
+with it. A rejected form submit stays on the form, in a danger `SectionMessage`
+at the top with an error on each field.
 
 ### Turn off autohide for anything the user might need to re-read. {#turn-off-autohide-for-anything-the-user-might-need-to-re-read}
 
