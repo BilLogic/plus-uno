@@ -11189,6 +11189,244 @@
       ]
     },
     {
+      "name": "SearchField",
+      "kind": "component",
+      "import": "import { SearchField } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/SearchField/SearchField.jsx",
+      "summary": "Search field: find a record by typing. It is a TextField with a search icon before the text and a clear button after it, and its label is hidden: the placeholder names the scope (\"Search students\"). `mode=\"active\"` reports the text on every keystroke through `onValueChange`. Hold the rows yourself and filter them (sync), or give `loadResults` for a list on a server (async): it is asked after a short pause, and what it returns goes to `onResults`. Results show in the results area, never under the field. While results load, a Spinner takes the search icon's place. `isCollapsible` starts as an icon button that grows into the field and collapses when left empty. Esc clears the text; a second Esc closes the field and returns focus to the icon. `scopes` puts a scope filter before the field, with \"All\" first and selected.",
+      "props": [
+        {
+          "name": "placeholder",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Names the scope (\"Search students\"). Required: the label is hidden, so this is what a sighted person reads, and it names the collapsed icon and its tooltip.",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The accessible name, when it should differ from the placeholder.",
+          "deprecated": null
+        },
+        {
+          "name": "mode",
+          "type": "enum",
+          "required": false,
+          "default": "'active'",
+          "values": [
+            "active"
+          ],
+          "description": "`active` filters on each keystroke through `onValueChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The search text, when the caller holds it. Pair with `onValueChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Starting text when the field holds its own.",
+          "deprecated": null
+        },
+        {
+          "name": "onValueChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(text)`: called on every edit, on Esc and on the clear button.",
+          "deprecated": null
+        },
+        {
+          "name": "loadResults",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(text, { offset, limit, scope })` → `Promise<{ results, total }>`. Asked on first render and after a short pause in typing; an older answer never replaces a newer one. `scope` is sent when `scopes` is set.",
+          "deprecated": null
+        },
+        {
+          "name": "onResults",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`({ results, total })`: called with each answer of `loadResults`.",
+          "deprecated": null
+        },
+        {
+          "name": "isLoading",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A search is running. A Spinner takes the search icon's place. `loadResults` sets this by itself.",
+          "deprecated": null
+        },
+        {
+          "name": "isCollapsible",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Starts as an icon button that grows into the field and collapses when left empty.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "With `isCollapsible`, starts open.",
+          "deprecated": null
+        },
+        {
+          "name": "scopes",
+          "type": "arrayOf",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Scope filter before the field: `{ value, label, count? }`. \"All\" is added first and selected unless given.",
+          "deprecated": null
+        },
+        {
+          "name": "scope",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The chosen scope value, when the caller holds it. Pair with `onScopeChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultScope",
+          "type": "string",
+          "required": false,
+          "default": "ALL",
+          "values": null,
+          "description": "Starting scope when the field holds its own. `all` by default.",
+          "deprecated": null
+        },
+        {
+          "name": "onScopeChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(value)`: called when another scope is chosen.",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "`default` draws 40; `compact` draws 32. Bars pass `compact`.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Dims the field and blocks typing.",
+          "deprecated": null
+        },
+        {
+          "name": "clearLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Clear search'",
+          "values": null,
+          "description": "The clear button's name.",
+          "deprecated": null
+        },
+        {
+          "name": "scopeLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Search scope'",
+          "values": null,
+          "description": "The scope filter's accessible name.",
+          "deprecated": null
+        },
+        {
+          "name": "inputRef",
+          "type": "func or shape or any",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Ref to the underlying `<input>`.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class on the outer wrapper.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid` on the input.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Active",
+        "Spacing",
+        "Filled",
+        "Disabled",
+        "Loading",
+        "Async",
+        "Collapsible",
+        "Scopes",
+        "Interactive"
+      ],
+      "tokens": [
+        "--border-default",
+        "--ds-background-input",
+        "--ds-border-input",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
+        "--field-width-md",
+        "--inline-sm",
+        "--item-height-md",
+        "--radius-h32"
+      ]
+    },
+    {
       "name": "SectionMessage",
       "kind": "component",
       "import": "import { SectionMessage } from '@/components';",

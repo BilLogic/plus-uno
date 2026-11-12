@@ -158,6 +158,8 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | RadioGroup | component | change | Update a value or state | `--ds-motion-appearance-fast` |
 | Range | component | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-linear` |
 | Rating | component | change | Update a value or state | `--ds-motion-appearance-fast` |
+| SearchField | component | enter | Update a value or state | `--ds-motion-spatial-fast` |
+| SearchField | component | exit | Update a value or state | `--ds-motion-appearance-fast` |
 | SectionMessage | component | enter | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
 | SectionMessage | component | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
 | Select | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |

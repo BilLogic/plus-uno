@@ -1,0 +1,228 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import { SearchField } from '@/components';
+import * as SearchFieldStories from './SearchField.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+<Meta of={SearchFieldStories} />
+
+<Title />
+Finds a record by typing. It is a text field with a search icon before the
+text and a clear button after it; its label is hidden, and the placeholder names
+what is searched.
+
+<DocsTabs of={SearchFieldStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/SearchField"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<ComponentExample of={SearchFieldStories.Overview} title="Rest" description="The placeholder names the scope. The label is hidden but still names the field." />
+
+<ComponentExample of={SearchFieldStories.Active} title="Active" description="The text is reported on every keystroke; the caller filters its rows." />
+
+<ComponentExample of={SearchFieldStories.Scopes} title="Scopes" description="An optional scope filter before the field. All is first and selected; each scope can carry a count." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Spacing
+
+<ComponentExample of={SearchFieldStories.Spacing} title="Spacing" description="Default draws 40; compact draws 32, for bars." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={SearchFieldStories.Collapsible} title="Collapsed" description="An icon button with a tooltip. It grows into the field, and collapses when left empty." />
+
+<ComponentExample of={SearchFieldStories.Filled} title="Filled" description="A clear button empties the field and keeps focus." />
+
+<ComponentExample of={SearchFieldStories.Loading} title="Loading" description="A spinner takes the search icon's place, so the field never jumps." />
+
+<ComponentExample of={SearchFieldStories.Async} title="Async" description="loadResults is asked after a short pause in typing; the answer goes to onResults." />
+
+<ComponentExample of={SearchFieldStories.Disabled} title="Disabled" description="A change of color, not of opacity." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="SearchField" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SearchFieldStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `SearchField` to find a record in a list by typing. To pick a value, use
+`Select`; to narrow by a category, use `FilterButton`.
+
+Results show in the results area, never under the field: the count in the table
+or results header, and the no-matches message in the table body.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Scope filter** (optional). A compact select before the field, with All first and selected.
+2. **Field.** A text field, 40 at default spacing and 32 at compact.
+3. **Search icon.** Before the text; a spinner takes its place while results load.
+4. **Clear button.** After the text once it holds any.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Collapsed</td><td>An icon button named by the placeholder, with a tooltip. Only with <code>isCollapsible</code>.</td></tr>
+<tr><td>Rest</td><td>The placeholder shows.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, for keyboard focus only.</td></tr>
+<tr><td>Filled</td><td>The clear button appears after the text.</td></tr>
+<tr><td>Loading</td><td>A spinner replaces the search icon.</td></tr>
+<tr><td>Disabled</td><td>The disabled fill and text: a change of color, not of opacity.</td></tr>
+</tbody>
+</DocsTable>
+
+### Keyboard
+
+<DocsTable>
+<thead>
+<tr><th>Key</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td>Esc</td><td>Clears the text. When already empty and starting as an icon, closes the field and returns focus to the icon.</td></tr>
+<tr><td>Arrow and Enter</td><td>Inside the scope list, move and choose.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Field</td><td>Those of the text field.</td></tr>
+<tr><td>Gap between scope and field</td><td><code>--inline-sm</code>.</td></tr>
+<tr><td>Width open</td><td><code>--field-width-md</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Name the scope in the placeholder.
+
+<DoDontPair
+    doExample={<SearchField placeholder="Search students" />}
+    doCaption="The placeholder says what is searched."
+    dontExample={<SearchField placeholder="Search" />}
+    dontCaption="A bare verb leaves the scope unsaid, and the label is hidden."
+/>
+
+### Pass compact in a bar.
+
+A view bar or top bar holds 32-high controls, so pass `spacing="compact"`.
+
+### Collapse only where the bar is tight.
+
+Use `isCollapsible` when the bar keeps quiet until search is needed. Elsewhere
+leave the field open.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Start with a verb and name the scope: "Search students".</td><td>"Search…" or "Type here".</td></tr>
+<tr><td>Use sentence case.</td><td>Title case: "Search Students".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The hidden label still names the field.** The accessible name is the placeholder, or `label` when given.
+- **The collapsed icon button is named** by the same words, and its tooltip shows them.
+- **The scope filter has its own name**, "Search scope" unless `scopeLabel` says otherwise.
+- **Loading is announced** through the spinner's status text.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- To pick a value, use `Select`.
+- To narrow by a category, use `FilterButton`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

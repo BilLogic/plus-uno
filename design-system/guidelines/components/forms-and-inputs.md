@@ -32,6 +32,7 @@ importable from `@/components` today.
 | a rating on a scale | `RadioGroup orientation="inline"` with `leadingText` and `trailingText` for a numbered scale (Linear scale) · `Rating` for stars |
 | the same choice for several questions | `ChoiceGrid` |
 | one pick from a toolbar, applied at once | `PopupSelect` — its labeled trigger reads "Status: Upcoming" |
+| finding or filtering by typing | `SearchField` — `Select`'s search picks a value; `SearchField` finds or filters a list |
 | narrowing a table or list from a bar | the tiers of the Filtering pattern: `FilterButton`, `PopupSelect`, and `FilterMenu` for several categories held until Apply |
 | an action run from a button | `DropdownMenu` — a button, not a field |
 

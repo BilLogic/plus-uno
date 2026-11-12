@@ -266,7 +266,8 @@
  {
   "q": "search text field",
   "want": [
-   "TextField"
+   "TextField",
+   "SearchField"
   ],
   "kind": "real-intent",
   "source": "ledger"
@@ -274,7 +275,8 @@
  {
   "q": "search field text input",
   "want": [
-   "TextField"
+   "TextField",
+   "SearchField"
   ],
   "kind": "real-intent",
   "source": "ledger"
@@ -283,6 +285,7 @@
   "q": "search text field, select dropdown, page header title with action button",
   "want": [
    "TextField",
+   "SearchField",
    "Select",
    "PageHeader"
   ],
@@ -293,6 +296,7 @@
   "q": "search field, pagination, primary button",
   "want": [
    "TextField",
+   "SearchField",
    "Pagination",
    "Button"
   ],

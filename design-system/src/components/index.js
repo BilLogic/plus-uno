@@ -29,6 +29,7 @@ export { default as RadioGroup } from '@/components/forms-and-inputs/RadioGroup'
 export { default as Range } from '@/components/forms-and-inputs/Range';
 export { default as Rating } from '@/components/forms-and-inputs/Rating';
 export { default as RichTextEditor } from '@/components/forms-and-inputs/RichTextEditor';
+export { default as SearchField, SEARCH_DEBOUNCE_MS, SEARCH_FIELD_MODES, SEARCH_FIELD_SPACINGS } from '@/components/forms-and-inputs/SearchField';
 export { default as Select, SEARCH_FIRST_ABOVE, SELECT_SPACINGS } from '@/components/forms-and-inputs/Select';
 export { default as SplitButton } from '@/components/forms-and-inputs/SplitButton';
 export { default as TagInput } from '@/components/forms-and-inputs/TagInput';
