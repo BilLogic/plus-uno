@@ -56,7 +56,7 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 - Each prototype has its own `vite.config.js` with `@` → `../../design-system/src`
 - Register in **Notion Marketplace** with the Deploy Preview / standalone URL — do **not** add numeric SPA routes on `main`
 - Optional local script: `"dev:{project-name}": "vite --config prototypes/{project-name}/vite.config.js"` (branch only)
-- **Production on `main`:** Storybook + the tutor revamp (`/prototypes/tutor-revamp/`). The Vibe app and the Full Demo Walkthrough are on the `archive/legacy-ds` branch; `/home`, `/app` and `/demo` redirect to Storybook
+- **Production on `main`:** Storybook only. The Vibe app and the Full Demo Walkthrough are on the `archive/legacy-ds` branch; `/home`, `/app` and `/demo` redirect to Storybook
 
 **The scaffold writes:**
 
@@ -71,7 +71,7 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 `https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css`.
 That is the host and path that serve FA 7's `all.min.css`; the cdnjs path most
 agents reach for by habit is laid out differently for FA 7 and the icons come up
-blank. Copy the `<link>` from `prototypes/tutor-revamp/index.html` rather than typing
+blank. Copy the `<link>` from `skills/uno-prototype/scripts/scaffold-prototype.sh` rather than typing
 it. Icons themselves are FA Free — `fa-solid`, `fa-regular`, `fa-brands`
 (AGENTS.md § Hard rules 3).
 
@@ -432,7 +432,6 @@ Tests: `npm run test:scripts`.
 
 ```bash
 npm run storybook          # http://127.0.0.1:4200
-npm run dev:tutor-revamp   # the tutor revamp prototype
 ```
 
 ## File Naming

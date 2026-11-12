@@ -45,7 +45,7 @@ test('the whole scope passes against the recorded baseline, in under five second
 });
 
 test('scope: consumer code only, tests and stories skipped', () => {
-  assert.ok(inScope('prototypes/tutor-revamp/src/App.jsx'));
+  assert.ok(inScope('prototypes/x/src/main.jsx'));
   assert.ok(inScope('prototypes/x/src/App.scss'));
   assert.ok(!inScope('src/App.jsx'));
   assert.ok(!inScope('design-system/src/components/x/X.jsx'));
