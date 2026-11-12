@@ -253,6 +253,15 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'Search',
+    tier: 'pattern',
+    events: {
+      grow: { transition: 'Swap content in place', spatial: 'spatial.fast', note: 'The Search icon grows into a field to the left on spatial.fast, its right edge fixed.' },
+      narrow: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'Typing swaps the rows in place as they narrow.' },
+      shrink: { transition: 'Swap content in place', spatial: 'spatial.fast', note: 'Escape, or an empty blur, shrinks the field back to the icon on spatial.fast.' },
+    },
+  },
+  {
     name: 'Popup',
     tier: 'component',
     events: {
