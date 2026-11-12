@@ -22,16 +22,17 @@ import { useIsTruncated } from './useIsTruncated';
  * @param {React.ReactNode} props.text - the full text, shown while clipped; an empty string leaves the tooltip off
  * @param {React.ReactNode} [props.textWhenFits] - shown even while the text fits, for a control that has a tooltip of its own, such as a sort action
  * @param {'top'|'bottom'|'left'|'right'} [props.placement]
+ * @param {boolean} [props.show] - holds the tooltip open, for a docs picture of the open state; leave it out to open on hover and focus
  * @param {unknown[]} [props.deps] - what changes the text's width besides a resize
  * @param {(state: { measureRef: React.RefObject<Element>, truncated: boolean }) => React.ReactElement} props.children
  * @returns {JSX.Element}
  */
-export const ClippedTooltip = ({ text, textWhenFits, placement, deps = [], children }) => {
+export const ClippedTooltip = ({ text, textWhenFits, placement, show, deps = [], children }) => {
     const measureRef = useRef(null);
     const truncated = useIsTruncated(measureRef, [text, ...deps]);
     const shown = truncated ? text : textWhenFits;
     return (
-        <Tooltip text={shown || ' '} placement={placement} trigger={shown ? ['hover', 'focus'] : []}>
+        <Tooltip text={shown || ' '} placement={placement} show={show} trigger={shown ? ['hover', 'focus'] : []}>
             {children({ measureRef, truncated: Boolean(truncated && text) })}
         </Tooltip>
     );
@@ -41,6 +42,7 @@ ClippedTooltip.propTypes = {
     text: PropTypes.node,
     textWhenFits: PropTypes.node,
     placement: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
+    show: PropTypes.bool,
     deps: PropTypes.array,
     children: PropTypes.func.isRequired,
 };

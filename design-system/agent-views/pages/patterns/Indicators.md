@@ -79,6 +79,7 @@ Indicators reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | status | Update a value or state | `--ds-motion-appearance-default` | A status that changes fades to its new word and fill on appearance.default; nothing bounces. |
 | count-first | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A count rolls once on first view, downward, and then fades to later values on appearance.fast. |
+| progress | Update a value or state | `--ds-motion-linear` | Progress fills on linear with the work, never ahead. Nothing bounces. |
 
 ## Best practices
 

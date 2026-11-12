@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { ClippedTooltip } from '@/lib/ClippedTooltip';
+import { useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 import { DynamicTable, Pagination, SectionMessage, StatusTag, Tag, TagGroup } from '@/components';
 import { PatternSection } from '@/patterns';
 import { STUDENTS, StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
@@ -42,19 +44,38 @@ export const Wrap = () => (
     </div>
 );
 
-/** A table whose note cell is longer than its column: one line, an ellipsis. */
-export const ClippedCell = ({ note = LONG_NOTE }) => (
-    <div style={frame}>
-        <DynamicTable
-            label="Session notes"
-            head={{ cells: [{ key: 'name', content: 'Student', width: '30%' }, { key: 'note', content: 'Note', width: '70%' }] }}
-            rows={STUDENTS.slice(0, 3).map(([name], i) => ({
-                key: name,
-                cells: [{ key: `${name}-n`, content: name }, { key: `${name}-t`, content: i === 0 ? note : 'On track' }],
-            }))}
-        />
-    </div>
+/** The note cell's text: the same clipped Tooltip a table cell carries, held open when `held`. */
+const HeldNote = ({ note, held }) => (
+    <ClippedTooltip text={note} placement="top" show={held || undefined}>
+        {({ measureRef, truncated }) => (
+            <span ref={measureRef} className="plus-table-cell-text" tabIndex={truncated ? 0 : undefined}>{note}</span>
+        )}
+    </ClippedTooltip>
 );
+
+/**
+ * A table whose note cell is longer than its column: one line, an ellipsis.
+ * `held` opens the clipped cell's Tooltip for a docs picture, and only once the
+ * picture's own element exists, so the Tooltip measures the laid-out cell.
+ */
+export const ClippedCell = ({ note = LONG_NOTE, held = false }) => {
+    const [mountRef, mount] = useLayerMount();
+    return (
+        <div ref={mountRef} style={{ ...frame, paddingBlockStart: held ? 'calc(var(--page-pad) * 3)' : frame.padding }}>
+            <DynamicTable
+                label="Session notes"
+                head={{ cells: [{ key: 'name', content: 'Student', width: '30%' }, { key: 'note', content: 'Note', width: '70%' }] }}
+                rows={STUDENTS.slice(0, 3).map(([name], i) => ({
+                    key: name,
+                    cells: [
+                        { key: `${name}-n`, content: name },
+                        { key: `${name}-t`, content: i === 0 ? <HeldNote note={note} held={held && Boolean(mount)} /> : 'On track' },
+                    ],
+                }))}
+            />
+        </div>
+    );
+};
 
 /** A Tag and a StatusTag past their widths: each ends in an ellipsis. */
 export const LongTags = ({ tag = LONG_TAG, status = LONG_STATUS }) => (

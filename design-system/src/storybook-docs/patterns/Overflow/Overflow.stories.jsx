@@ -71,11 +71,12 @@ export const WrapTitlesAndErrors = {
 
 /* --------------------------------------------------------------- truncate */
 
-/** A cell longer than its column ends in an ellipsis on one line, and is a tab stop only while clipped. */
+/** A cell longer than its column ends in an ellipsis on one line, and is a tab stop only while clipped. The picture holds its Tooltip open, as the heading says. */
 export const TruncatedCell = {
     name: 'Truncate: a cell',
-    render: () => staged(<ClippedCell />, TABLE_STAGE),
+    render: () => staged(<ClippedCell held />, TABLE_STAGE),
     play: async ({ canvasElement }) => {
+        await waitFor(() => expect(within(document.body).getAllByRole('tooltip').some((tip) => tip.textContent === LONG_NOTE), 'the picture shows the full note in its Tooltip').toBe(true));
         const clipped = textOf(canvasElement, LONG_NOTE);
         await expect(getComputedStyle(clipped).textOverflow, 'the cell ends in an ellipsis').toBe('ellipsis');
         await expect(getComputedStyle(clipped).whiteSpace, 'on one line').toBe('nowrap');
