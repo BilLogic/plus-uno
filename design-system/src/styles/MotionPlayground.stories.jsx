@@ -8,8 +8,7 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { MotionDemo } from '@/storybook-docs/illustrations/motion.jsx';
-import { springFor } from '@/storybook-docs/illustrations/motion.jsx';
+import { MotionDemo, springFor } from '@/storybook-docs/illustrations/motion.jsx';
 import { PLAYGROUND_DEMOS, SpringPlayground, playgroundConfig } from '@/storybook-docs/illustrations/motion-playground.jsx';
 
 export default {
