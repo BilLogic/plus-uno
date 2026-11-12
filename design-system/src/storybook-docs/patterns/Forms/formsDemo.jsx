@@ -17,7 +17,7 @@ import { FormFields, FILLED } from '../../../patterns/Form/formDemo.jsx';
 /** The width a picture lays out at, in px: docs geometry. */
 export const STAGE = 1024; // docs-literal
 
-/** The fields as the person meets them: Student and Subject are required, Notes says it is optional. */
+/** The fields as the person meets them: Student and Site are required, Notes says it is optional. */
 export const Marks = () => {
     const [values, setValues] = useState(FILLED);
     return (

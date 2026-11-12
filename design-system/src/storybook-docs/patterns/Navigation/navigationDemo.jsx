@@ -36,10 +36,10 @@ export const SIDEBAR_STAGE = 320; // docs-literal
 
 const SESSION_HEAD = { cells: ['Time', 'Tutor', 'Subject'].map((content) => ({ key: content, content })) };
 const SESSIONS = [
-    ['Thu 4:00 PM', 'Ms. Ortiz', 'Algebra B'],
-    ['Thu 5:30 PM', 'Mr. Patel', 'Reading circle'],
-    ['Fri 3:30 PM', 'Ms. Ortiz', 'Geometry A'],
-    ['Sat 10:00 AM', 'Ms. Kim', 'Algebra B'],
+    ['Thu 4:00 PM', 'Ms. Ortiz', 'Lincoln Middle'],
+    ['Thu 5:30 PM', 'Mr. Patel', 'Roosevelt K-8'],
+    ['Fri 3:30 PM', 'Ms. Ortiz', 'North High'],
+    ['Sat 10:00 AM', 'Ms. Kim', 'Lincoln Middle'],
 ];
 
 /** A Dynamic table of upcoming sessions: real rows, so the picture needs no stage taller than its content. */

@@ -69,10 +69,10 @@ const day = 24 * 36e5;
 const scheduleData = {
     categories: ['Tutor A', 'Tutor B', 'Tutor C'],
     data: [
-        { start: now, end: now + day, y: 0, name: 'Math Session' },
-        { start: now + day * 2, end: now + day * 3, y: 0, name: 'Physics Session' },
-        { start: now, end: now + day * 2, y: 1, name: 'Chemistry Lab' },
-        { start: now + day, end: now + day * 4, y: 2, name: 'English Class' }
+        { start: now, end: now + day, y: 0, name: 'Lincoln Middle Session' },
+        { start: now + day * 2, end: now + day * 3, y: 0, name: 'Roosevelt K-8 Session' },
+        { start: now, end: now + day * 2, y: 1, name: 'North High Session' },
+        { start: now + day, end: now + day * 4, y: 2, name: 'South High Session' }
     ]
 };
 

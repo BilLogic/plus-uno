@@ -6,7 +6,7 @@ import FilterMenu, { FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WI
 
 const SIDE_BY_SIDE = [
     { id: 'status', label: 'Status', options: ['Upcoming', 'Completed', 'Canceled'] },
-    { id: 'subject', label: 'Subject', options: ['Math', 'Reading', 'Science'] },
+    { id: 'site', label: 'Site', options: ['Lincoln Middle', 'North High', 'Riverside Academy'] },
     { id: 'format', label: 'Format', options: ['Online', 'In person'] },
 ];
 
@@ -17,10 +17,10 @@ const STACKED = [
 ];
 
 const SESSIONS = [
-    { name: 'Algebra I with Maya', status: 'Upcoming', subject: 'Math', format: 'Online' },
-    { name: 'Geometry with Leo', status: 'Upcoming', subject: 'Math', format: 'In person' },
-    { name: 'Reading with Ava', status: 'Completed', subject: 'Reading', format: 'Online' },
-    { name: 'Biology with Sam', status: 'Canceled', subject: 'Science', format: 'In person' },
+    { name: 'Lincoln Middle with Maya', status: 'Upcoming', site: 'Lincoln Middle', format: 'Online' },
+    { name: 'Lincoln Middle with Leo', status: 'Upcoming', site: 'Lincoln Middle', format: 'In person' },
+    { name: 'Riverside Academy with Ava', status: 'Completed', site: 'Riverside Academy', format: 'Online' },
+    { name: 'North High with Sam', status: 'Canceled', site: 'North High', format: 'In person' },
 ];
 
 const pad = { padding: 'var(--space-300)', minHeight: 'calc(var(--space-400) * 10)' };
@@ -111,7 +111,7 @@ export const Overview = {
         await userEvent.click(within(menu).getByRole('button', { name: 'Apply' }));
         await menuClosed(canvasElement);
         await expect(canvas.getAllByRole('listitem')).toHaveLength(1);
-        await expect(canvas.getByText('Algebra I with Maya')).toBeInTheDocument();
+        await expect(canvas.getByText('Lincoln Middle with Maya')).toBeInTheDocument();
         const counted = canvas.getByRole('button', { name: 'Filters, 2 applied' });
         await waitFor(() => expect(counted).toHaveFocus());
     },
@@ -124,25 +124,25 @@ export const Staging = {
         const canvas = within(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Filters' }));
         let menu = await openMenu(canvasElement);
-        await userEvent.click(within(menu).getByRole('checkbox', { name: 'Math' }));
+        await userEvent.click(within(menu).getByRole('checkbox', { name: 'Lincoln Middle' }));
         await userEvent.keyboard('{Escape}');
         await menuClosed(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Filters' }), 'nothing applied').toBeInTheDocument();
 
         await userEvent.click(canvas.getByRole('button', { name: 'Filters' }));
         menu = await openMenu(canvasElement);
-        await expect(within(menu).getByRole('checkbox', { name: 'Math' }), 'the next open starts from what is applied')
+        await expect(within(menu).getByRole('checkbox', { name: 'Lincoln Middle' }), 'the next open starts from what is applied')
             .not.toBeChecked();
-        await userEvent.click(within(menu).getByRole('checkbox', { name: 'Math' }));
+        await userEvent.click(within(menu).getByRole('checkbox', { name: 'Lincoln Middle' }));
         await userEvent.click(within(menu).getByRole('button', { name: 'Apply' }));
         await menuClosed(canvasElement);
         await expect(canvas.getAllByRole('listitem')).toHaveLength(2);
 
         await userEvent.click(canvas.getByRole('button', { name: 'Filters, 1 applied' }));
         menu = await openMenu(canvasElement);
-        await expect(within(menu).getByRole('checkbox', { name: 'Math' })).toBeChecked();
+        await expect(within(menu).getByRole('checkbox', { name: 'Lincoln Middle' })).toBeChecked();
         await userEvent.click(within(menu).getByRole('button', { name: 'Reset' }));
-        await expect(within(menu).getByRole('checkbox', { name: 'Math' })).not.toBeChecked();
+        await expect(within(menu).getByRole('checkbox', { name: 'Lincoln Middle' })).not.toBeChecked();
         await expect(canvas.getAllByRole('listitem'), 'Reset does not apply').toHaveLength(2);
         await userEvent.click(within(menu).getByRole('button', { name: 'Apply' }));
         await menuClosed(canvasElement);

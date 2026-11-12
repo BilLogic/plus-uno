@@ -192,7 +192,7 @@ const sessionTabs = [
     {
         key: 'students',
         label: 'Students',
-        content: fields(STUDENTS.map((name, i) => [name, `Algebra I · session ${i + 1} · attended, notes filed`])),
+        content: fields(STUDENTS.map((name, i) => [name, `Lincoln Middle · session ${i + 1} · attended, notes filed`])),
     },
     { key: 'notes', label: 'Notes', content: bodyCopy },
 ];

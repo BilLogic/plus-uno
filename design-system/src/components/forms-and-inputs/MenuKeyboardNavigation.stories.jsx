@@ -34,20 +34,20 @@ import TreeSelect from './TreeSelect';
 
 const stack = { display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '420px' };
 
-const SUBJECTS = [
+const SITES = [
     {
-        label: 'Mathematics',
-        value: 'maths',
+        label: 'Middle schools',
+        value: 'middle-schools',
         children: [
-            { label: 'Algebra', value: 'algebra' },
-            { label: 'Geometry', value: 'geometry' },
+            { label: 'Lincoln Middle', value: 'lincoln-middle' },
+            { label: 'Roosevelt K-8', value: 'roosevelt-k8' },
         ],
     },
     {
-        label: 'Science',
-        value: 'science',
+        label: 'High schools',
+        value: 'high-schools',
         children: [
-            { label: 'Biology', value: 'biology' },
+            { label: 'North High', value: 'north-high' },
         ],
     },
 ];
@@ -76,8 +76,8 @@ export const OpensAndSelectsFromTheKeyboard = () => {
     const [subject, setSubject] = useState(undefined);
     return (
         <div style={stack}>
-            <label htmlFor="mkn-single">Subject</label>
-            <TreeSelect id="mkn-single" options={SUBJECTS} value={subject} onChange={setSubject} />
+            <label htmlFor="mkn-single">Site</label>
+            <TreeSelect id="mkn-single" options={SITES} value={subject} onChange={setSubject} />
             <p data-testid="mkn-single-value">{subject || 'none'}</p>
         </div>
     );
@@ -85,7 +85,7 @@ export const OpensAndSelectsFromTheKeyboard = () => {
 
 OpensAndSelectsFromTheKeyboard.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('combobox', { name: 'Subject' });
+    const trigger = canvas.getByRole('combobox', { name: 'Site' });
     const readout = () => canvas.getByTestId('mkn-single-value').textContent;
 
     // The label resolves to the input — `id` used to land on the wrapper.
@@ -99,20 +99,20 @@ OpensAndSelectsFromTheKeyboard.play = async ({ canvasElement }) => {
 
     // Focus is IN the tree, on its first row.
     await waitFor(() => expect(tree.contains(document.activeElement)).toBe(true));
-    await expect(document.activeElement.textContent).toContain('Mathematics');
+    await expect(document.activeElement.textContent).toContain('Middle schools');
 
     // Right opens the branch, Right again steps into it.
     await userEvent.keyboard('{ArrowRight}');
     await expect(document.activeElement.getAttribute('aria-expanded')).toBe('true');
     await userEvent.keyboard('{ArrowRight}');
-    await expect(document.activeElement.textContent).toContain('Algebra');
+    await expect(document.activeElement.textContent).toContain('Lincoln Middle');
 
     // Down within the branch, then choose.
     await userEvent.keyboard('{ArrowDown}');
-    await expect(document.activeElement.textContent).toContain('Geometry');
+    await expect(document.activeElement.textContent).toContain('Roosevelt K-8');
     await userEvent.keyboard('{Enter}');
 
-    await expect(readout()).toBe('geometry');
+    await expect(readout()).toBe('roosevelt-k8');
     // Choosing closes the panel and hands focus back to the trigger.
     await waitFor(() => expect(canvas.queryByRole('tree')).toBeNull());
     await expect(document.activeElement).toBe(trigger);
@@ -125,18 +125,18 @@ OpensAndSelectsFromTheKeyboard.play = async ({ canvasElement }) => {
  * failure than the one this file exists for.
  */
 export const CollapsesAndEscapes = () => {
-    const [subject, setSubject] = useState('algebra');
+    const [subject, setSubject] = useState('lincoln-middle');
     return (
         <div style={stack}>
-            <label htmlFor="mkn-escape">Subject</label>
-            <TreeSelect id="mkn-escape" options={SUBJECTS} value={subject} onChange={setSubject} />
+            <label htmlFor="mkn-escape">Site</label>
+            <TreeSelect id="mkn-escape" options={SITES} value={subject} onChange={setSubject} />
         </div>
     );
 };
 
 CollapsesAndEscapes.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('combobox', { name: 'Subject' });
+    const trigger = canvas.getByRole('combobox', { name: 'Site' });
 
     trigger.focus();
     await userEvent.keyboard('{Enter}');
@@ -145,20 +145,20 @@ CollapsesAndEscapes.play = async ({ canvasElement }) => {
 
     // Opening reveals the selection's branch and starts on the selected node.
     await waitFor(() => expect(tree.contains(document.activeElement)).toBe(true));
-    await expect(document.activeElement.textContent).toContain('Algebra');
+    await expect(document.activeElement.textContent).toContain('Lincoln Middle');
 
     // Left from a leaf steps out to its parent.
     await userEvent.keyboard('{ArrowLeft}');
-    await expect(document.activeElement.textContent).toContain('Mathematics');
+    await expect(document.activeElement.textContent).toContain('Middle schools');
 
     // Left again collapses the branch it is on.
     await userEvent.keyboard('{ArrowLeft}');
     await expect(document.activeElement.getAttribute('aria-expanded')).toBe('false');
 
-    // End reaches the last visible row — which is Science, now that Mathematics
+    // End reaches the last visible row — which is High schools, now that Middle schools
     // is shut. Movement follows what is on screen, not what is in the data.
     await userEvent.keyboard('{End}');
-    await expect(document.activeElement.textContent).toContain('Science');
+    await expect(document.activeElement.textContent).toContain('High schools');
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(canvas.queryByRole('tree')).toBeNull());
@@ -172,8 +172,8 @@ export const MultipleTogglesWithoutClosing = () => {
     const [subjects, setSubjects] = useState([]);
     return (
         <div style={stack}>
-            <label htmlFor="mkn-multi">Subjects</label>
-            <TreeSelect id="mkn-multi" isMulti options={SUBJECTS} value={subjects} onChange={setSubjects} />
+            <label htmlFor="mkn-multi">Sites</label>
+            <TreeSelect id="mkn-multi" isMulti options={SITES} value={subjects} onChange={setSubjects} />
             <p data-testid="mkn-multi-value">{subjects.join(',') || 'none'}</p>
         </div>
     );
@@ -181,7 +181,7 @@ export const MultipleTogglesWithoutClosing = () => {
 
 MultipleTogglesWithoutClosing.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('combobox', { name: 'Subjects' });
+    const trigger = canvas.getByRole('combobox', { name: 'Sites' });
     const readout = () => canvas.getByTestId('mkn-multi-value').textContent;
 
     trigger.focus();
@@ -193,7 +193,7 @@ MultipleTogglesWithoutClosing.play = async ({ canvasElement }) => {
 
     // Space on a parent takes its subtree with it, and leaves the panel open.
     await userEvent.keyboard(' ');
-    await expect(readout()).toBe('maths,algebra,geometry');
+    await expect(readout()).toBe('middle-schools,lincoln-middle,roosevelt-k8');
     await expect(canvas.getByRole('tree')).toBeTruthy();
 
     // And off again.

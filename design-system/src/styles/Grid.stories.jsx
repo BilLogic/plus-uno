@@ -70,12 +70,12 @@ export const SpanWholeColumns = () => (
     <DoDont>
         <Do caption="Three cards, four columns each. Every edge lands on a column edge.">
             <div style={{ ...ground, ...grid12 }}>
-                {['Algebra', 'Geometry', 'Ratios'].map((t) => <div key={t} style={{ gridColumn: 'span 4' }}><PatternCard title={t} padding="sm" /></div>)}
+                {['Lincoln Middle', 'Roosevelt K-8', 'Riverside Academy'].map((t) => <div key={t} style={{ gridColumn: 'span 4' }}><PatternCard title={t} padding="sm" /></div>)}
             </div>
         </Do>
         <Dont caption="Cards sized by hand. Their edges fall mid-gutter and mid-column, so nothing lines up with the rows above and below.">
             <div style={{ ...ground, display: 'flex', gap: 'var(--space-0625)' }}>
-                {[['Algebra', '41%'], ['Geometry', '23%'], ['Ratios', '30%']].map(([t, w]) => <div key={t} style={{ width: w }}><PatternCard title={t} padding="sm" /></div>)}
+                {[['Lincoln Middle', '41%'], ['Roosevelt K-8', '23%'], ['Riverside Academy', '30%']].map(([t, w]) => <div key={t} style={{ width: w }}><PatternCard title={t} padding="sm" /></div>)}
             </div>
         </Dont>
     </DoDont>

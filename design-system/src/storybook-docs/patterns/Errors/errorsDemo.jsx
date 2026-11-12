@@ -67,7 +67,7 @@ export const LoadFailure = ({ onRetry = noop }) => (
 /** No access: the same slot names who can help and offers no action the person cannot take. */
 export const NoAccess = () => (
     <div style={pad}>
-        <PatternSection title="Session notes" description="Algebra B" tabs={<ViewBar views={['All notes']} filters={null} primary={null} />}>
+        <PatternSection title="Session notes" description="Lincoln Middle" tabs={<ViewBar views={['All notes']} filters={null} primary={null} />}>
             <EmptyState
                 spacing="compact"
                 icon="lock"
@@ -127,7 +127,7 @@ export const MenuError = () => {
 export const InPage = () => (
     <BrowserWindow address="app.plus.org/groups/algebra-b" height={WINDOW}>
         <div style={pad}>
-            <DemoPageHeader title="Algebra B" description="Tuesdays and Thursdays, 4:00 PM" />
+            <DemoPageHeader title="Lincoln Middle" description="Tuesdays and Thursdays, 4:00 PM" />
             <LoadFailure />
         </div>
     </BrowserWindow>
@@ -137,7 +137,7 @@ export const InPage = () => (
 export const FlagOnPage = () => (
     <BrowserWindow address="app.plus.org/students" height={WINDOW}>
         <div style={pad}>
-            <DemoPageHeader title="Students" description="Algebra B" />
+            <DemoPageHeader title="Students" description="Lincoln Middle" />
             <BackgroundJob />
         </div>
     </BrowserWindow>

@@ -107,12 +107,12 @@ export default {
  */
 export const SelectTriggerShowsFocus = () => (
     <div style={stack}>
-        <Select aria-label="Subject" options={[{ value: 'maths', label: 'Maths' }]} />
+        <Select aria-label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} />
     </div>
 );
 
 SelectTriggerShowsFocus.play = async ({ canvasElement }) => {
-    const trigger = within(canvasElement).getByRole('combobox', { name: 'Subject' });
+    const trigger = within(canvasElement).getByRole('combobox', { name: 'Site' });
     const box = trigger.closest('.plus-field');
     const resting = getComputedStyle(box).outlineStyle;
 
@@ -133,7 +133,7 @@ export const ForcedColorsKeepFocusAndSelection = () => (
         <TextField type="number" id="fv-hours" label="Hours" />
         <TextField id="fv-amount" label="Amount" elemBeforeInput="£" />
         <DatePicker id="fv-date" aria-label="Date" />
-        <Select aria-label="Subject" options={[{ value: 'maths', label: 'Maths' }]} />
+        <Select aria-label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} />
         <Listbox aria-label="Day" options={['Monday', 'Tuesday']} defaultValue="Tuesday" />
         <Listbox aria-label="Days" mode="multi" options={['Monday', 'Tuesday']} defaultValue={['Tuesday']} />
     </div>
@@ -151,7 +151,7 @@ ForcedColorsKeepFocusAndSelection.play = async ({ canvasElement }) => {
         canvas.getByLabelText(/Hours/),
         canvas.getByRole('textbox', { name: 'Amount' }),
         canvas.getByRole('combobox', { name: 'Date' }),
-        canvas.getByRole('combobox', { name: 'Subject' }),
+        canvas.getByRole('combobox', { name: 'Site' }),
         canvas.getByRole('listbox', { name: 'Day' }),
     ];
     for (const field of fields) {

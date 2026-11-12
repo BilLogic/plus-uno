@@ -30,7 +30,7 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 | The condition something is in, and it can change | Status tag | Fill by meaning: neutral not started, information in progress, success done, warning needs attention, danger failed or missed, discovery new | "Needs review" |
 | How many | Count tag | Subtle neutral; bold for action now; nothing at 0; a cap past `max` with "+" | "12", "99+" |
 | How much it moved | Change tag | Signed value, arrow, tone from the good direction; neutral when there is no judgment | "+3 vs last week" |
-| A category, a subject, a person | Tag | Outline and text; a leading visual is optional | "Algebra" |
+| A category, a subject, a person | Tag | Outline and text; a leading visual is optional | "Lincoln Middle" |
 | The shape of a trend | Sparkline (Planned) | A word-sized line beside the number | Attendance over eight weeks |
 
 ## Alternatives

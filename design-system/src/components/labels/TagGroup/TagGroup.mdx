@@ -196,9 +196,9 @@ A single tag standing alone does not need it.
 Collapse keeps one line and puts the rest behind `+n`; wrapping grows the row.
 
 <DoDontPair
-    doExample={<div style={{ width: 'var(--size-1500)' }}><TagGroup label="Skills" overflow="collapse"><Tag color="blue">Algebra</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Geometry</Tag></TagGroup></div>}
+    doExample={<div style={{ width: 'var(--size-1500)' }}><TagGroup label="Skills" overflow="collapse"><Tag color="blue">Lincoln Middle</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Roosevelt K-8</Tag></TagGroup></div>}
     doCaption="Collapse in a tight row."
-    dontExample={<div style={{ width: 'var(--size-1500)' }}><TagGroup label="Skills"><Tag color="blue">Algebra</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Geometry</Tag></TagGroup></div>}
+    dontExample={<div style={{ width: 'var(--size-1500)' }}><TagGroup label="Skills"><Tag color="blue">Lincoln Middle</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Roosevelt K-8</Tag></TagGroup></div>}
     dontCaption="Wrap pushes the row taller."
 />
 
@@ -237,9 +237,9 @@ menu.
 End alignment is for a right-aligned column; elsewhere it drifts from the text. `alignment="end"` belongs in a table column whose other cells are right-aligned. Everywhere else, tags read from the start.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><span>Skills</span><TagGroup label="Skills"><Tag color="blue">Algebra</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Geometry</Tag></TagGroup></div>}
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><span>Skills</span><TagGroup label="Skills"><Tag color="blue">Lincoln Middle</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Roosevelt K-8</Tag></TagGroup></div>}
     doCaption="Start beside left-aligned text."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><span>Skills</span><TagGroup label="Skills" alignment="end"><Tag color="blue">Algebra</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Geometry</Tag></TagGroup></div>}
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><span>Skills</span><TagGroup label="Skills" alignment="end"><Tag color="blue">Lincoln Middle</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Roosevelt K-8</Tag></TagGroup></div>}
     dontCaption="End beside left-aligned text."
 />
 
@@ -248,9 +248,9 @@ End alignment is for a right-aligned column; elsewhere it drifts from the text. 
 A group disables as a unit, the way a disabled field does. Say so once on the group with `isDisabled`, and every Tag and Suggestion in it follows; never disable one tag and leave its neighbors live.
 
 <DoDontPair
-    doExample={<TagGroup label="Focus areas" isDisabled><Tag color="blue" isRemovable onAfterRemoveAction={() => {}}>Algebra</Tag><Tag color="lime" isRemovable onAfterRemoveAction={() => {}}>Advocacy</Tag><Tag color="purple" isRemovable onAfterRemoveAction={() => {}}>Fractions</Tag><Tag color="magenta" isRemovable onAfterRemoveAction={() => {}}>Relationships</Tag><Tag color="teal" isRemovable onAfterRemoveAction={() => {}}>Geometry</Tag></TagGroup>}
+    doExample={<TagGroup label="Focus areas" isDisabled><Tag color="blue" isRemovable onAfterRemoveAction={() => {}}>Lincoln Middle</Tag><Tag color="lime" isRemovable onAfterRemoveAction={() => {}}>Advocacy</Tag><Tag color="purple" isRemovable onAfterRemoveAction={() => {}}>Fractions</Tag><Tag color="magenta" isRemovable onAfterRemoveAction={() => {}}>Relationships</Tag><Tag color="teal" isRemovable onAfterRemoveAction={() => {}}>Roosevelt K-8</Tag></TagGroup>}
     doCaption="The whole group disabled."
-    dontExample={<TagGroup label="Focus areas"><Tag color="blue" isRemovable onAfterRemoveAction={() => {}}>Algebra</Tag><Tag color="lime" isRemovable onAfterRemoveAction={() => {}}>Advocacy</Tag><Tag color="purple" isRemovable onAfterRemoveAction={() => {}}>Fractions</Tag><Tag color="magenta" isRemovable onAfterRemoveAction={() => {}}>Relationships</Tag><Tag color="teal" isRemovable onAfterRemoveAction={() => {}}>Geometry</Tag></TagGroup>}
+    dontExample={<TagGroup label="Focus areas"><Tag color="blue" isRemovable onAfterRemoveAction={() => {}}>Lincoln Middle</Tag><Tag color="lime" isRemovable onAfterRemoveAction={() => {}}>Advocacy</Tag><Tag color="purple" isRemovable onAfterRemoveAction={() => {}}>Fractions</Tag><Tag color="magenta" isRemovable onAfterRemoveAction={() => {}}>Relationships</Tag><Tag color="teal" isRemovable onAfterRemoveAction={() => {}}>Roosevelt K-8</Tag></TagGroup>}
     dontCaption="A read-only group that looks editable."
 />
 

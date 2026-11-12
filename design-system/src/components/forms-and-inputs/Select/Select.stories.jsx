@@ -138,19 +138,19 @@ const field = { maxWidth: 'var(--width-2500)' };
 
 /** One story per value, for the Examples tab. */
 export const Empty = {
-    render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Select a subject" /></div>,
+    render: () => <div style={field}><Select label="Site" options={sampleOptions} placeholder="Select a site" /></div>,
 };
 
 export const Filled = {
-    render: () => <div style={field}><Select label="Subject" defaultValue="option-1" options={sampleOptions} placeholder="Select a subject" /></div>,
+    render: () => <div style={field}><Select label="Site" defaultValue="option-1" options={sampleOptions} placeholder="Select a site" /></div>,
 };
 
 export const Multi = {
-    render: () => <div style={field}><Select label="Subjects" isMulti options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select subjects" /></div>,
+    render: () => <div style={field}><Select label="Sites" isMulti options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select sites" /></div>,
 };
 
 export const Searchable = {
-    render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Type to search" /></div>,
+    render: () => <div style={field}><Select label="Site" options={sampleOptions} placeholder="Type to search" /></div>,
 };
 
 /** A single pick is marked with a check by default; `marker="radio"` draws a radio before the label. Several picks always use checkboxes. */
@@ -194,15 +194,15 @@ export const NotSearchable = {
 };
 
 export const Creatable = {
-    render: () => <div style={field}><Select label="Subjects" isMulti isCreatable options={sampleOptions} placeholder="Type to search or create" /></div>,
+    render: () => <div style={field}><Select label="Sites" isMulti isCreatable options={sampleOptions} placeholder="Type to search or create" /></div>,
 };
 
 export const SpacingDefault = {
-    render: () => <div style={field}><Select label="Subject" spacing="default" options={sampleOptions} placeholder="Select a subject" /></div>,
+    render: () => <div style={field}><Select label="Site" spacing="default" options={sampleOptions} placeholder="Select a site" /></div>,
 };
 
 export const SpacingCompact = {
-    render: () => <div style={field}><Select label="Subject" spacing="compact" options={sampleOptions} placeholder="Select a subject" /></div>,
+    render: () => <div style={field}><Select label="Site" spacing="compact" options={sampleOptions} placeholder="Select a site" /></div>,
 };
 
 /** Spacing — default (40) and compact (32). */
@@ -414,9 +414,9 @@ export const Interactive = {
 };
 
 const COLOR_OPTIONS = [
-    { value: 'algebra', label: 'Algebra' },
-    { value: 'biology', label: 'Biology' },
-    { value: 'chemistry', label: 'Chemistry' },
+    { value: 'lincoln-middle', label: 'Lincoln Middle' },
+    { value: 'north-high', label: 'North High' },
+    { value: 'south-high', label: 'South High' },
 ];
 
 /**
@@ -428,15 +428,15 @@ export const Colors = {
     parameters: { docs: { disable: true } },
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '320px' }}>
-            <Select label="Subject" options={COLOR_OPTIONS} placeholder="Pick a subject" />
-            <Select label="Subjects" isMulti selectAll options={COLOR_OPTIONS} defaultValue={['algebra']} />
+            <Select label="Site" options={COLOR_OPTIONS} placeholder="Pick a site" />
+            <Select label="Sites" isMulti selectAll options={COLOR_OPTIONS} defaultValue={['lincoln-middle']} />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const subject = canvas.getByRole('combobox', { name: 'Subject' });
+        const subject = canvas.getByRole('combobox', { name: 'Site' });
         const caret = canvasElement.querySelector('.plus-select-caret');
-        await userEvent.click(canvas.getByRole('combobox', { name: 'Subjects' }));
+        await userEvent.click(canvas.getByRole('combobox', { name: 'Sites' }));
         const all = await waitFor(() => {
             const el = document.querySelector('.plus-select-all');
             if (!el) throw new Error('the list has not opened');
@@ -529,9 +529,9 @@ export const FieldReadOnlyLongValue = {
 /** The open list has one edge, the shadow's ring: no painted border (a transparent one stays for forced colors). */
 export const OpenListEdge = {
     parameters: { docs: { disable: true } },
-    render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Select a subject" /></div>,
+    render: () => <div style={field}><Select label="Site" options={sampleOptions} placeholder="Select a site" /></div>,
     play: async ({ canvasElement }) => {
-        await userEvent.click(within(canvasElement).getByRole('combobox', { name: 'Subject' }));
+        await userEvent.click(within(canvasElement).getByRole('combobox', { name: 'Site' }));
         const list = await waitFor(() => {
             const el = document.querySelector('.plus-listbox');
             if (!el) throw new Error('the list has not opened');

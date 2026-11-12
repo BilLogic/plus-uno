@@ -225,24 +225,24 @@ Backdrop.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(dialog).zIndex).toBe('510');
 };
 
-const OPTIONS = ['Algebra', 'Geometry', 'Statistics', 'Calculus'].map((label) => ({ value: label.toLowerCase(), label }));
+const OPTIONS = ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High'].map((label) => ({ value: label.toLowerCase(), label }));
 
 export const MenuInsideModal = () => (
-    <Modal show title="Pick a subject" showBottomButtons={false} onClose={() => {}}>
-        <Select label="Subject" options={OPTIONS} />
+    <Modal show title="Pick a site" showBottomButtons={false} onClose={() => {}}>
+        <Select label="Site" options={OPTIONS} />
     </Modal>
 );
 
 MenuInsideModal.play = async ({ canvasElement }) => {
     const doc = documentOf(canvasElement);
-    await doc.findByText('Pick a subject');
-    await userEvent.click(doc.getByRole('combobox', { name: 'Subject' }));
+    await doc.findByText('Pick a site');
+    await userEvent.click(doc.getByRole('combobox', { name: 'Site' }));
     const listbox = await doc.findByRole('listbox');
-    const option = within(listbox).getByRole('option', { name: 'Statistics' });
+    const option = within(listbox).getByRole('option', { name: 'South High' });
     // A menu is on the popup layer (400), under a modal (510). Opened from a
     // field inside one, it takes the modal's backdrop: it mounts in the
     // modal's overlay, after the dialog.
-    const overlay = doc.getByText('Pick a subject').closest('.plus-pattern-backdrop');
+    const overlay = doc.getByText('Pick a site').closest('.plus-pattern-backdrop');
     await expect(listbox.closest('.plus-pattern-backdrop')).toBe(overlay);
     await expect(getComputedStyle(listbox.closest('.plus-listbox')).zIndex).toBe('400');
     // The menu is drawn above the modal it opened from: the topmost element

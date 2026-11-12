@@ -230,9 +230,9 @@ so a reader tells a category from a meaning without reading the words.
 A color names a category; changing it inside one category reads as a different one.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">Algebra</Tag><Tag color="blue">Geometry</Tag><Tag color="blue">Fractions</Tag></div>}
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">Lincoln Middle</Tag><Tag color="blue">Roosevelt K-8</Tag><Tag color="blue">Fractions</Tag></div>}
     doCaption="One color for one category."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">Algebra</Tag><Tag color="green">Geometry</Tag><Tag color="orange">Fractions</Tag></div>}
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">Lincoln Middle</Tag><Tag color="green">Roosevelt K-8</Tag><Tag color="orange">Fractions</Tag></div>}
     dontCaption="Rainbow inside one category."
 />
 
@@ -241,7 +241,7 @@ A color names a category; changing it inside one category reads as a different o
 Pick a color per category and keep it stable, or leave every tag gray. A condition that can change is a Status tag.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">Biology</Tag><Tag color="blue">Chemistry</Tag></div>}
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">North High</Tag><Tag color="blue">South High</Tag></div>}
     doCaption="A stable color for a category."
     dontExample={<Tag color="green">Passed</Tag>}
     dontCaption={'Green reads as "went well" beside anything red.'}
@@ -252,9 +252,9 @@ Pick a color per category and keep it stable, or leave every tag gray. A conditi
 Selection is a state of the tag, never a new color.
 
 <DoDontPair
-    doExample={<Tag isSelected onClick={() => {}}>Algebra</Tag>}
+    doExample={<Tag isSelected onClick={() => {}}>Lincoln Middle</Tag>}
     doCaption="Selected state."
-    dontExample={<Tag color="green">Algebra</Tag>}
+    dontExample={<Tag color="green">Lincoln Middle</Tag>}
     dontCaption="A new color for selected."
 />
 
@@ -263,8 +263,8 @@ Selection is a state of the tag, never a new color.
 A plain tag is its outline and neutral words. Turn on `swatchBefore` for a tag that is a legend entry or a color-coded filter, where the reader matches the square to a chart or a key. An icon in `elemBefore` is for when the icon carries meaning of its own.
 
 ```jsx
-<Tag color="blue">Algebra</Tag>                                  {/* plain: outline only */}
-<Tag color="blue" swatchBefore>Algebra</Tag>                       {/* the tag's own color */}
+<Tag color="blue">Lincoln Middle</Tag>                                  {/* plain: outline only */}
+<Tag color="blue" swatchBefore>Lincoln Middle</Tag>                       {/* the tag's own color */}
 <Tag swatchBefore="background-accent-orange-bolder">Week 3</Tag>   {/* a background color token */}
 <Tag elemBefore={<Icon name="star" />}>Starred</Tag>                {/* an icon that means something */}
 ```
@@ -282,8 +282,8 @@ A plain tag is its outline and neutral words. Turn on `swatchBefore` for a tag t
 <Tag isSelected={on} onClick={toggle} trailingMetric={12}>Science</Tag>
 
 // Link, and a link with a separate ×.
-<Tag href="/subjects/algebra">Algebra</Tag>
-<Tag href="/subjects/algebra" isRemovable onAfterRemoveAction={drop}>Algebra</Tag>
+<Tag href="/sites/lincoln-middle">Lincoln Middle</Tag>
+<Tag href="/sites/lincoln-middle" isRemovable onAfterRemoveAction={drop}>Lincoln Middle</Tag>
 ```
 
 `isSelected` is a boolean on purpose: `false` is an unselected toggle, and
@@ -309,7 +309,7 @@ warning.
 
 ```jsx
 // A subject on a lesson thumbnail, 8 from the corner.
-<Tag color="blue" isElevated>Algebra</Tag>
+<Tag color="blue" isElevated>Lincoln Middle</Tag>
 <Tag href="/lessons/42" color="magenta" isElevated>Open lesson</Tag>
 ```
 

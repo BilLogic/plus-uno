@@ -714,9 +714,9 @@ const FiltersButton = ({ applied, onClick }) => (
 
 
 const SESSIONS = [
-    ['Algebra B', 'Tue 4:30 PM · 6 students'],
-    ['Reading circle', 'Wed 3:00 PM · 4 students'],
-    ['Geometry A', 'Thu 5:00 PM · 5 students'],
+    ['Lincoln Middle', 'Tue 4:30 PM · 6 students'],
+    ['Roosevelt K-8', 'Wed 3:00 PM · 4 students'],
+    ['North High', 'Thu 5:00 PM · 5 students'],
 ];
 const SessionCards = () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
@@ -815,7 +815,7 @@ export const TypeDetails = {
 export const TypeMainAndSide = {
     name: 'Type: Main and side',
     render: () => (
-        <PatternSection title="Algebra B" description="Tuesdays at 4:30 PM" layout="split" side={<Facts pairs={STUDENT_FACTS.slice(0, 3)} columns={1} />}>
+        <PatternSection title="Lincoln Middle" description="Tuesdays at 4:30 PM" layout="split" side={<Facts pairs={STUDENT_FACTS.slice(0, 3)} columns={1} />}>
             <StudentsTable count={4} />
         </PatternSection>
     ),
@@ -876,7 +876,7 @@ export const HeaderTypeTitleAndActions = {
     render: () => (
         <PatternSection
             title="Students"
-            description="Algebra B · 24 students"
+            description="Lincoln Middle · 24 students"
             actions={(
                 <>
                     <Button text="Export" iconBefore="download" onClick={() => {}} />
@@ -893,7 +893,7 @@ export const HeaderTypeTitleAndActions = {
 export const HeaderTypeViewBarOneView = {
     name: 'Header: View bar, one view',
     render: () => (
-        <PatternSection title="Students" description="Algebra B · 24 students" tabs={<ViewBar views={['All students']} />}>
+        <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students']} />}>
             <StudentsTable count={3} />
         </PatternSection>
     ),
@@ -903,7 +903,7 @@ export const HeaderTypeViewBarOneView = {
 export const HeaderTypeViewBarSeveralViews = {
     name: 'Header: View bar, several views',
     render: () => (
-        <PatternSection title="Students" description="Algebra B · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up', 'Paused']} />}>
+        <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up', 'Paused']} />}>
             <StudentsTable count={3} />
         </PatternSection>
     ),
@@ -969,7 +969,7 @@ export const HeaderTypeUnderPageTabs = {
 export const HeaderTypeSubsection = {
     name: 'Header: Subsection',
     render: () => (
-        <PatternSection title="Algebra B">
+        <PatternSection title="Lincoln Middle">
             <PatternSection title="Students" tabs={<ViewBar views={['All students']} />}>
                 <StudentsTable count={3} />
             </PatternSection>
@@ -984,7 +984,7 @@ export const SideAtEnd = {
     name: 'Side at the end',
     render: () => (
         <PatternSection
-            title="Algebra B"
+            title="Lincoln Middle"
             tabs={<ViewBar views={['All students']} />}
             layout="split"
             side={<Facts pairs={[['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['Room', 'Library 2']]} columns={1} />}
@@ -1031,7 +1031,7 @@ const FilterSideSection = () => {
         <div ref={ref}>
             <PatternSection
                 title="Students"
-                description="Algebra B · 24 students"
+                description="Lincoln Middle · 24 students"
                 tabs={(
                     <ViewBar
                         views={['All students']}
@@ -1103,7 +1103,7 @@ export const ResponsiveWidth = {
 export const RowsSelected = {
     name: 'Rows selected',
     render: () => (
-        <PatternSection title="Students" description="Algebra B · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
+        <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
             <StudentsTable
                 count={4}
                 isSelectable
@@ -1131,7 +1131,7 @@ export const RowsSelected = {
 export const EmptyInTable = {
     name: 'Empty, in a table',
     render: () => (
-        <PatternSection title="Students" description="Algebra B · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
+        <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
             <EmptyState
                 spacing="compact"
                 icon="user-group"

@@ -56,7 +56,7 @@ export const Page = () => (
 /** A Modal's footer: full bleed, Cancel (Default) left and the action right; Close sits in the header. */
 export const ModalFooter = () => (
     <ModalStage title="Log a session" footer={<TwoCells action="Save session" />}>
-        {text('Ana Ruiz, Thursday at 4:00 PM, Algebra I.')}
+        {text('Ana Ruiz, Thursday at 4:00 PM, Lincoln Middle.')}
     </ModalStage>
 );
 
@@ -106,7 +106,7 @@ export const Copy = ({ held = false }) => {
 
 /** One value, edited in place: the read view is one button, a pencil appears on hover and focus. */
 export const EditOne = () => {
-    const [name, setName] = useState('Algebra B');
+    const [name, setName] = useState('Lincoln Middle');
     return (
         <div style={{ padding: 'var(--page-pad)', maxInlineSize: 'calc(var(--card-min-width-md))' }}>
             <InlineEdit
@@ -142,7 +142,7 @@ export const EditRecord = ({ held = false }) => {
 
 /** Rows selected: the head row becomes the bulk bar, so the actions sit with the rows they act on. */
 export const ManyRows = () => (
-    <PatternSection title="Students" description="Algebra B · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
+    <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
         <StudentsTable
             count={4}
             isSelectable
@@ -165,7 +165,7 @@ export const Sending = ({ sending: started = false }) => {
                 </FooterCells>
             )}
         >
-            {text('Ana Ruiz, Thursday at 4:00 PM, Algebra I.')}
+            {text('Ana Ruiz, Thursday at 4:00 PM, Lincoln Middle.')}
         </ModalStage>
     );
 };

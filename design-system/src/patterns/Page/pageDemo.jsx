@@ -79,7 +79,7 @@ export const PageActions = () => (
 /** A Section's body: three session cards. */
 export const SessionCards = () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
-        {[['Algebra B', 'Tue 4:30 PM · 6 students'], ['Reading circle', 'Wed 3:00 PM · 4 students'], ['Geometry A', 'Thu 5:00 PM · 5 students']].map(([t, d]) => (
+        {[['Lincoln Middle', 'Tue 4:30 PM · 6 students'], ['Roosevelt K-8', 'Wed 3:00 PM · 4 students'], ['North High', 'Thu 5:00 PM · 5 students']].map(([t, d]) => (
             <PatternCard key={t} title={t} description={d} />
         ))}
     </div>

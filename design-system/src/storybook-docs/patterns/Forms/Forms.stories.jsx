@@ -96,7 +96,7 @@ export const RequiredMarks = {
 /* The four pictures below draw the state their heading names, from initial-state props: the docs page does not run plays.
    The stories after them test the same interaction from a clean start. */
 
-/** Student was touched and left empty: its error is showing; Subject was not touched, so it is not marked. */
+/** Student was touched and left empty: its error is showing; Site was not touched, so it is not marked. */
 export const ShownOnBlur = {
     name: 'Validation: On blur (shown)',
     render: () => staged(<FormInPage initial={EMPTY} marked="student" />),
@@ -104,7 +104,7 @@ export const ShownOnBlur = {
         const canvas = within(canvasElement);
         await expect(canvas.getByLabelText(/Student/), 'touched and empty').toHaveAttribute('aria-invalid', 'true');
         await expect(canvas.getByText('Enter the student’s name.'), 'the error says what to fix').toBeInTheDocument();
-        await expect(canvas.queryByText('Choose a subject.'), 'an untouched field is not marked').toBeNull();
+        await expect(canvas.queryByText('Choose a site.'), 'an untouched field is not marked').toBeNull();
         await fitsCanvas(canvasElement);
     },
 };
@@ -116,7 +116,7 @@ export const ShownSubmitStaysEnabled = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByLabelText(/Student/)).toHaveAttribute('aria-invalid', 'true');
-        await expect(canvas.getByText('Choose a subject.'), 'every missing field is marked').toBeInTheDocument();
+        await expect(canvas.getByText('Choose a site.'), 'every missing field is marked').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'still enabled').not.toBeDisabled();
         await fitsCanvas(canvasElement);
     },
@@ -130,7 +130,7 @@ export const ShownBlockedSubmit = {
         const canvas = within(canvasElement);
         await expect(canvas.queryAllByRole('dialog'), 'one dialog').toHaveLength(1);
         await expect(canvas.getByLabelText(/Student/)).toHaveAttribute('aria-invalid', 'true');
-        await expect(canvas.getByText('Choose a subject.')).toBeInTheDocument();
+        await expect(canvas.getByText('Choose a site.')).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };

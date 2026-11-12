@@ -74,15 +74,15 @@ A network graph shows **relationships and connections** between entities as node
 
 const conceptMapData = {
     data: [
-        ['Math', 'Algebra'],
-        ['Math', 'Geometry'],
-        ['Math', 'Statistics'],
-        ['Algebra', 'Equations'],
-        ['Algebra', 'Functions'],
-        ['Geometry', 'Shapes'],
-        ['Geometry', 'Proofs'],
-        ['Statistics', 'Probability'],
-        ['Statistics', 'Data Analysis']
+        ['CMU', 'Lincoln Middle'],
+        ['CMU', 'Roosevelt K-8'],
+        ['CMU', 'North High'],
+        ['Lincoln Middle', 'Tuesday Zoom'],
+        ['Lincoln Middle', 'Thursday Zoom'],
+        ['Roosevelt K-8', 'Monday Pencil'],
+        ['Roosevelt K-8', 'Wednesday Pencil'],
+        ['North High', 'Friday Zoom'],
+        ['North High', 'Friday Pencil']
     ]
 };
 

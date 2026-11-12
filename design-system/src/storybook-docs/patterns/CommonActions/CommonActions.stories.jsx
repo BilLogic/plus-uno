@@ -160,11 +160,11 @@ export const EditValue = {
     render: () => staged(<EditOne />, 480),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await userEvent.click(canvas.getByRole('button', { name: /Algebra B/ }));
+        await userEvent.click(canvas.getByRole('button', { name: /Lincoln Middle/ }));
         const field = await canvas.findByRole('textbox');
         await userEvent.clear(field);
-        await userEvent.type(field, 'Algebra C{Enter}');
-        await expect(await canvas.findByRole('button', { name: /Algebra C/ }), 'Enter saves it in place').toBeInTheDocument();
+        await userEvent.type(field, 'Riverside Academy{Enter}');
+        await expect(await canvas.findByRole('button', { name: /Riverside Academy/ }), 'Enter saves it in place').toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };

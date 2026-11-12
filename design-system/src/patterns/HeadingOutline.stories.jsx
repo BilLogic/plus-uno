@@ -65,9 +65,9 @@ PageSectionSubsection.play = async ({ canvasElement }) => {
 export const CardTitles = () => (
     <Page title="Sessions">
         <PatternSection title="This week">
-            <PatternCard title="Algebra I" description="Two students" />
+            <PatternCard title="Lincoln Middle" description="Two students" />
             <PatternSection title="Monday">
-                <PatternCard title="Chemistry" description="Three students" />
+                <PatternCard title="South High" description="Three students" />
             </PatternSection>
         </PatternSection>
     </Page>
@@ -75,8 +75,8 @@ export const CardTitles = () => (
 
 CardTitles.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expectStyle(headingNamed(canvas, 3, 'Algebra I'), 'card in a section', HEADING_XSMALL);
-    await expectStyle(headingNamed(canvas, 4, 'Chemistry'), 'pattern card in a subsection', HEADING_XSMALL);
+    await expectStyle(headingNamed(canvas, 3, 'Lincoln Middle'), 'card in a section', HEADING_XSMALL);
+    await expectStyle(headingNamed(canvas, 4, 'South High'), 'pattern card in a subsection', HEADING_XSMALL);
     await expectStyle(canvas.getByText('Three students'), 'pattern card description', BODY_DEFAULT);
     await expectStyle(canvas.getByText('Two students'), 'card description', BODY_DEFAULT);
 };

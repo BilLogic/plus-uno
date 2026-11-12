@@ -200,7 +200,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Do | Don't |
 | --- | --- |
-| Write each option as the thing itself: "Algebra I". | A sentence or an instruction: "Choose this for algebra". |
+| Write each option as the thing itself: "Lincoln Middle". | A sentence or an instruction: "Choose this for algebra". |
 | Order options by how often they are picked, or alphabetically for a long list. | A random order that makes people scan. |
 | Use a placeholder that names the action: "Select a school". | The label repeated as the placeholder. |
 | Say what to do in an error: "Select a school". | "Required" or "Invalid". |

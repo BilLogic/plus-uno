@@ -54,7 +54,7 @@ export const WaitsOnField = ({ school = null }) => (
         <Select label="School" options={SCHOOLS} value={school} onChange={noop} />
         <Select
             label="Group"
-            options={[{ value: 'algebra', label: 'Algebra B' }]}
+            options={[{ value: 'algebra', label: 'Lincoln Middle' }]}
             value={null}
             onChange={noop}
             dependsOn={{ value: school, label: 'a school' }}

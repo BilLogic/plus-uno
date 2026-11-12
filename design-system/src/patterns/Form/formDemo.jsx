@@ -29,9 +29,9 @@ const PAGE_HEIGHT = 540; // docs-literal
 export const SCREEN = { width: 1024, height: 580 }; // docs-literal
 
 const SUBJECTS = [
-    { value: 'algebra', label: 'Algebra I' },
-    { value: 'geometry', label: 'Geometry' },
-    { value: 'reading', label: 'Reading' },
+    { value: 'lincoln', label: 'Lincoln Middle' },
+    { value: 'roosevelt', label: 'Roosevelt K-8' },
+    { value: 'north', label: 'North High' },
 ];
 
 /** The form's fields, the same in every host. `errors` marks a field; `values` and `onChange` make it live. */
@@ -49,7 +49,7 @@ export const FormFields = ({ values, onChange, errors = {}, onBlurField, subject
             inputRef={setRef?.('student')}
         />
         <Select
-            label="Subject"
+            label="Site"
             isRequired
             options={SUBJECTS}
             value={values.subject}
@@ -68,12 +68,12 @@ export const FormFields = ({ values, onChange, errors = {}, onBlurField, subject
 );
 
 export const EMPTY = { student: '', subject: '', notes: '' };
-export const FILLED = { student: 'Ana Ruiz', subject: 'algebra', notes: '' };
+export const FILLED = { student: 'Ana Ruiz', subject: 'lincoln', notes: '' };
 
 /** Every required field the form is missing, as `{ field: message }`. */
 export const missing = (values) => ({
     ...(values.student.trim() ? {} : { student: 'Enter the student’s name.' }),
-    ...(values.subject ? {} : { subject: 'Choose a subject.' }),
+    ...(values.subject ? {} : { subject: 'Choose a site.' }),
 });
 
 /** A docs picture's after-state: the missing fields, all of them or only those named. */

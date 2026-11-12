@@ -66,27 +66,27 @@ Shows **grouped bubbles** where size represents quantity and color represents ca
 const enrollmentData = {
     data: [
         {
-            name: 'Math',
+            name: 'CMU',
             data: [
-                { name: 'Algebra', value: 250 },
-                { name: 'Geometry', value: 180 },
-                { name: 'Calculus', value: 120 }
+                { name: 'Lincoln Middle', value: 250 },
+                { name: 'Roosevelt K-8', value: 180 },
+                { name: 'Riverside Academy', value: 120 }
             ]
         },
         {
-            name: 'Science',
+            name: 'Pitt',
             data: [
-                { name: 'Physics', value: 200 },
-                { name: 'Chemistry', value: 175 },
-                { name: 'Biology', value: 220 }
+                { name: 'North High', value: 200 },
+                { name: 'South High', value: 175 },
+                { name: 'Oakwood', value: 220 }
             ]
         },
         {
-            name: 'Languages',
+            name: 'Duquesne',
             data: [
-                { name: 'English', value: 300 },
-                { name: 'Spanish', value: 150 },
-                { name: 'French', value: 80 }
+                { name: 'Jefferson Elementary', value: 300 },
+                { name: 'Washington Middle', value: 150 },
+                { name: 'Eastside', value: 80 }
             ]
         }
     ]
@@ -95,7 +95,7 @@ const enrollmentData = {
 export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
-            <h3 style={{ marginBottom: '16px' }}>Student Enrollment by Subject</h3>
+            <h3 style={{ marginBottom: '16px' }}>Tutors by University and School Site</h3>
             <PackedBubbleChart {...enrollmentData} />
         </section>
     </div>
