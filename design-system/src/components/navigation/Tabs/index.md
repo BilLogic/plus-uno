@@ -82,6 +82,19 @@ A label names a view. A count or status in it changes the name and breaks the pa
 Do: The label names the view.
 Don't: Counts and status in the label.
 
+### Pill views are a fixed set, and a page has one tab system. {#pill-views-are-a-fixed-set-and-a-page-has-one-tab-system}
+
+A `pill` strip is a view switch: a fixed set of views of one subject, such as Overview, Sessions and Progress. The set is decided when the page is designed, so the strip has no add-view control and people cannot create, rename, reorder or remove a tab. A strip that must grow with the data is a list or a `Select`, not tabs.
+
+A page has one tab system. The underline strip under the page header switches the page's sections, and a pill strip inside a card switches that card's views, but a page does not stack a second strip of the same kind beside or under the first. For a second-level choice inside a view, use the labeled trigger of `PopupSelect` ("Status: Upcoming") in the view's toolbar. It reads the label and the current value, and a pick swaps the content under it in place.
+
+Do: One strip for the sections; a labeled dropdown for the choice inside one.
+Don't: A second strip under the first, so two tab systems compete.
+
+### Switching is near-instant and happens in place. {#switching-is-near-instant-and-happens-in-place}
+
+Switching tabs is a frequent action. The selected marker changes on the short duration and standard easing, and the content under the strip swaps in place with no slide or fade-through. Reduced motion removes the transition and the marker changes at once.
+
 ## Accessibility
 
 - **A real tab widget, always.** `role="tablist"` on the strip, `role="tab"`
@@ -102,6 +115,7 @@ Don't: Counts and status in the label.
 
 - For navigating to a different page, use the Top bar pattern or `Breadcrumb` — tabs imply the content stays in place.
 - For more tabs than fit the width, use `Select` — the strip is `flex-wrap: wrap`, so the overflow becomes a second row of tabs rather than a scroll or an overflow menu, and the row the reader is on stops being obvious.
+- For a second-level choice inside a view, use the labeled trigger of `PopupSelect`, which reads "Label: Value" and swaps the content in place; a page keeps one tab system.
 - For filtering a list rather than switching between views, use `Select` or `RadioGroup` — filters combine, tabs do not.
 
 Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
