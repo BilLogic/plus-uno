@@ -43,6 +43,16 @@ export const SOUND_MATERIAL = {
   ratchet: { at: [-0.06, -0.04, -0.02], rise: 0.06, gain: 0.32, gainStep: 0.08 },
 };
 
+/**
+ * The output stage the Lab played through: its default volume (0.8 x 1.6) into
+ * a gentle compressor. Levels are measured before it, at unity gain.
+ */
+export const SOUND_OUTPUT = {
+  gain: 1.28,
+  compressor: { threshold: -10, knee: 6, ratio: 8, attack: 0.003, release: 0.15 },
+  reverb: { seconds: 1.8, decay: 3.2 },
+};
+
 /** Level tiers: the loudest 50 ms of a sound, rendered offline, in dBFS. */
 export const SOUND_LEVELS = {
   soft: -26,

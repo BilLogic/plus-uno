@@ -5,8 +5,8 @@
  *
  * WHAT IT WRITES. `design-system/src/sound/spec.generated.js`: one `SOUND_SPEC`
  * object holding the key, the Detent material, the level tiers, the pickup,
- * the AI count and the twelve sound tokens, keyed by name without the
- * `sound.` prefix. The runtime in `design-system/src/sound/` reads nothing
+ * the AI count, the output stage and the twelve sound tokens, keyed by name
+ * without the `sound.` prefix. The runtime in `design-system/src/sound/` reads nothing
  * else.
  *
  * Usage:
@@ -19,7 +19,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { isEntry, main } from './lib/findings.mjs';
-import { SOUND_AI_COUNT, SOUND_KEY, SOUND_LEVELS, SOUND_MATERIAL, SOUND_PICKUP, SOUND_SEMANTICS } from './lib/tokens/sound-plan.mjs';
+import { SOUND_AI_COUNT, SOUND_KEY, SOUND_LEVELS, SOUND_MATERIAL, SOUND_OUTPUT, SOUND_PICKUP, SOUND_SEMANTICS } from './lib/tokens/sound-plan.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -32,7 +32,7 @@ export function soundSpec() {
   const tokens = Object.fromEntries(
     SOUND_SEMANTICS.map(({ name, base, ...token }) => [name, { ...token, base: SOUND_KEY[base].hz }]),
   );
-  return { key: SOUND_KEY, material: SOUND_MATERIAL, levels: SOUND_LEVELS, pickup: SOUND_PICKUP, aiCount: SOUND_AI_COUNT, tokens };
+  return { key: SOUND_KEY, material: SOUND_MATERIAL, levels: SOUND_LEVELS, pickup: SOUND_PICKUP, aiCount: SOUND_AI_COUNT, output: SOUND_OUTPUT, tokens };
 }
 
 /** @returns {string} the generated module's text */

@@ -79,6 +79,20 @@ export const SOUND_SPEC = {
     "gain": 0.18,
     "gainStep": 0.06
   },
+  "output": {
+    "gain": 1.28,
+    "compressor": {
+      "threshold": -10,
+      "knee": 6,
+      "ratio": 8,
+      "attack": 0.003,
+      "release": 0.15
+    },
+    "reverb": {
+      "seconds": 1.8,
+      "decay": 3.2
+    }
+  },
   "tokens": {
     "notify": {
       "family": "Notify",

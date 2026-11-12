@@ -10,6 +10,15 @@
 import { SOUND_SPEC } from './spec.generated';
 
 const FLOOR = 0.0001;
+
+/**
+ * The envelope timings both the runtime and the offline render follow, from
+ * the Lab: the gain floor every ramp starts and ends on, a knock's rise and
+ * the tail it keeps sounding after its decay, a tone's tail, and how long a
+ * glide holds its first pitch.
+ */
+export const ENVELOPE = { floor: FLOOR, knockRise: 0.001, knockTail: 0.03, toneTail: 0.05, glideHold: 0.02 };
+
 const MIN_PEAK = 0.0002;
 const MAX_KNOCK_HZ = 12000;
 // The Lab's per-strike and per-partial gain scales, and the shortest partial.
@@ -25,8 +34,6 @@ const SUPPORT_GAIN = 0.9;
  *   band-passed noise centered on `hz`, gone after `decay` seconds
  * @typedef {{token: string, pickup: number, room: number, wet: number, events: (Tone|Knock)[]}} Score
  */
-
-export const SOUND_FLOOR = FLOOR;
 
 const knock = (hz, at, gain, { q, g, d }) => ({
   kind: 'knock',

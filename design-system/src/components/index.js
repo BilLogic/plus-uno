@@ -96,5 +96,6 @@ export { default as InlineEdit } from '@/components/text-and-data-display/Inline
 export { default as Table, DynamicTable, HeadCell, StaticTable, TableBulkActions, TableCell, TableFooter, TableMessageRow, TableRow, TableSummaryRow, TreeTable } from '@/components/text-and-data-display/Table';
 export { default as VisuallyHidden } from '@/components/text-and-data-display/VisuallyHidden';
 
-// A sibling of components/, not a group inside it.
+// Siblings of components/, not groups inside it.
 export * from '@/dataviz';
+export * from '@/sound';

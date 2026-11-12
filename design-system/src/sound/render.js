@@ -9,14 +9,11 @@
  * through a wet level of 0.2 on a normalized convolver, about 47 dB under the
  * dry sound, so it moves no level by a measurable amount.
  */
-import { SOUND_FLOOR, scoreLength } from './score';
+import { ENVELOPE, scoreLength } from './score';
 
 const RATE = 44100;
 const NOISE_SECONDS = 0.2;
-const KNOCK_RISE = 0.001;
-const KNOCK_TAIL = 0.03;
-const TONE_TAIL = 0.05;
-const GLIDE_HOLD = 0.02;
+const { floor: FLOOR, knockRise: KNOCK_RISE, knockTail: KNOCK_TAIL, toneTail: TONE_TAIL, glideHold: GLIDE_HOLD } = ENVELOPE;
 const WINDOW = 0.05;
 
 /** A ramp from `from` to `to` over `span`, read `x` seconds in: Web Audio's exponentialRampToValueAtTime. */
@@ -42,9 +39,9 @@ function addTone(out, rate, e) {
     const x = i / rate - e.at;
     let hz = e.hz;
     if (e.toHz && x > GLIDE_HOLD) hz = x >= e.glide ? e.toHz : expRamp(e.hz, e.toHz, e.glide - GLIDE_HOLD, x - GLIDE_HOLD);
-    let gain = SOUND_FLOOR;
-    if (x < e.attack) gain = expRamp(SOUND_FLOOR, e.peak, e.attack, x);
-    else if (x < e.end) gain = expRamp(e.peak, SOUND_FLOOR, e.end - e.attack, x - e.attack);
+    let gain = FLOOR;
+    if (x < e.attack) gain = expRamp(FLOOR, e.peak, e.attack, x);
+    else if (x < e.end) gain = expRamp(e.peak, FLOOR, e.end - e.attack, x - e.attack);
     out[i] += Math.sin(phase) * gain;
     phase += (2 * Math.PI * hz) / rate;
   }
@@ -68,9 +65,9 @@ function addKnock(out, rate, e, noise) {
     const y0 = b0 * x0 + b2 * x2 - a1 * y1 - a2 * y2;
     [x2, x1, y2, y1] = [x1, x0, y1, y0];
     const x = i / rate - e.at;
-    let gain = SOUND_FLOOR;
-    if (x < KNOCK_RISE) gain = expRamp(SOUND_FLOOR, e.peak, KNOCK_RISE, x);
-    else if (x < e.decay) gain = expRamp(e.peak, SOUND_FLOOR, e.decay - KNOCK_RISE, x - KNOCK_RISE);
+    let gain = FLOOR;
+    if (x < KNOCK_RISE) gain = expRamp(FLOOR, e.peak, KNOCK_RISE, x);
+    else if (x < e.decay) gain = expRamp(e.peak, FLOOR, e.decay - KNOCK_RISE, x - KNOCK_RISE);
     out[i] += y0 * gain;
   }
 }
