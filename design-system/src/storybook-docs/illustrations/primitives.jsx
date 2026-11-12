@@ -304,6 +304,15 @@ export const Popup = ({ x, y, w, h, accent = false }) => (
   </g>
 );
 
+/** A Tooltip: a flat label, no shadow, offset 4 from its trigger. Its text is a bar in the inverse text color. */
+export const Tooltip = ({ x, y, w, h = 16, accent = false }) => (
+  <g>
+    <Rect x={x} y={y} w={w} h={h} fill={PAINT.tooltipSurface} corner="tooltip" />
+    {accent && <AccentRing x={x} y={y} w={w} h={h} corner="tooltip" />}
+    <SkeletonBar x={x + 6} y={y + h / 2 - 1.5} w={w * 0.55} h={3} tone={PAINT.tooltipText} />
+  </g>
+);
+
 export const Panel = ({ x, y, w, h, accent = false, floating = false }) => (
   <g>
     {floating ? (
