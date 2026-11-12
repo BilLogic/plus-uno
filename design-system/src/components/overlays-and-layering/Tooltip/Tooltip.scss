@@ -18,7 +18,7 @@
     color: var(--ds-text-inverse);
     font: var(--body-small);
     text-align: left;
-    z-index: var(--layer-popup);
+    z-index: var(--layer-tooltip);
 }
 
 @media (forced-colors: active) {

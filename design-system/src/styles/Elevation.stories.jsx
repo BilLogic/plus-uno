@@ -48,6 +48,9 @@ export const Stack = {
             await expect(plate.querySelector('svg'), `${plate.dataset.plate} is a kit drawing`).not.toBeNull();
             await expect(plate.querySelector('svg text'), `${plate.dataset.plate} draws no words`).toBeNull();
         }
+        // The top plate is the Tooltip, and it is a label: its drawing carries no shadow filter.
+        await expect(plates[6].dataset.plate).toBe('tooltip');
+        await expect(plates[6].querySelector('svg [filter], svg filter')).toBeNull();
         const legend = within(root.querySelector('[data-testid="stack-legend"]'));
         await waitFor(() => expect(legend.getByText(/--layer-modal \d+/)).toBeInTheDocument());
         await expect(legend.getByText('Backdrop')).toBeInTheDocument();
@@ -502,7 +505,7 @@ export const TooltipFlat = () => (
     <DoDont>
         <Do caption="Dark fill, inverse text, no shadow.">
             <div style={{ ...ground, display: 'flex', justifyContent: 'center' }}>
-                <span className="plus-tooltip" style={{ position: 'relative', boxShadow: 'none' }}>Reschedule this session</span>
+                <span className="plus-tooltip" style={{ position: 'relative' }}>Reschedule this session</span>
             </div>
         </Do>
         <Dont caption="The overlay pair makes it look like a menu, so people try to click it.">
