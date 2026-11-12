@@ -4,6 +4,8 @@
 
 Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Reset** clears every box in the menu without applying. Apply then applies the empty set. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.
 
+Also asked as: filter dropdown.
+
 **Import:** `import { FilterMenu } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.jsx`

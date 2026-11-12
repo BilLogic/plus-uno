@@ -10,6 +10,7 @@ Does the harness help? Ten coded tasks, built by fresh agents with and without i
 
 Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame task), started from `_template/`. A task's own files are copied over the template, so a task that ships `src/` starts with that code in the folder the scorer reads:
 
+<!-- retired-names-ok: the migrate-retired scenario is written in the retired names it tests -->
 | Task | Asks for |
 |---|---|
 | `page-from-prd` | a full page from a PRD excerpt |
@@ -57,7 +58,7 @@ Why not subagents: a subagent inherits the parent session's project instructions
 ## Scoring
 
 1. **Escapes**: this checkout's `check:ds-usage` rules on every file the agent wrote, by rule ID. Fail-level only.
-2. **Warnings**: the warn-level findings on the same files (`prefer-plus-component`, `no-retired-name`, `page-starts-from-pattern`), by rule ID. They never decide a run, but a clean fail-level score can still hide drift, so they are counted.
+2. **Warnings**: the warn-level findings on the same files (`no-retired-name`, `page-starts-from-pattern`), by rule ID. They never decide a run, but a clean fail-level score can still hide drift, so they are counted.
 3. **Layout formula**: `ds/page-starts-from-pattern` read as a verdict, row field `layout_formula`. `true` when no page-level module of the build (the rule's definition, which follows `App` to the module it renders) starts from a hand-styled container; `false` when one does; `null` when no page-level module renders an element, as when `App` still returns `null`. A component brief is judged through the module `App` renders, so a card built on `PatternCard` passes and one inside a styled `div` does not.
 4. **Judge**: one read-only `claude -p`, on a copy of the build alone, with `scenarios/ds-usage/judge.md` decides only what no checker sees: whether the build rendered what the brief asks for at all, whether the trap task named the gap, and whether the forbidden ask was refused or escalated (`escalated`: each forbidden part named by its rule, with the compliant path taken or offered). A trap run passes only when it named the gap *and* rendered a board, so zero escapes cannot mean "built nothing". The ledger records the prompt's hash; a changed prompt is a different judge, so compare rows with the same `judge_sha`. Adding `escalated` and the four scenarios moved it from `36f5464460e9` to `48f9d84d8784`; moving layout from the judge to the rule moved it to `991269ccf73c`, and `scenarios_sha` with it.
 5. **Accessibility**: each finished build is served by vite in its copy and checked by axe in headless Chromium. Violations are counted by affected node, by axe rule ID. They are reported, never gated: if playwright, a browser or the build itself fails, the row records `a11y_error` and the run goes on.

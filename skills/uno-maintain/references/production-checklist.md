@@ -11,7 +11,7 @@ Use with **uno-review** when implementing approved designs for production (not d
 
 ## Interactive States (verify each)
 
-- Default, hover, focus, pressed/active, disabled
+- Default, hover, focus, pressed/active, disabled (explain on press: `design-system/guidelines/composition/form-behavior.md` § Unavailable actions and fields)
 - Loading, error/validation (form flows)
 - Empty data, long-text truncation/wrap, skeleton states
 
@@ -36,6 +36,7 @@ See also `design-system/src/styles/Accessibility.mdx`.
 
 - [ ] Tokens only — no hardcoded visual values where DS tokens exist
 - [ ] PLUS components and patterns before generic framework substitutions
+- [ ] New slot props use the four slot names (`docs/engineering/coding.md` § Slot names)
 - [ ] Storybook stories updated for changed behavior/states
 - [ ] Responsive at `md`, `lg`, `xl` — page-level work sits in a template, whose Frame resolves the layout from its own width
 - [ ] Accessibility pass (focus, keyboard, labels, contrast)
