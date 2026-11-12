@@ -154,7 +154,7 @@ export const ConfirmInside = ({ start = 'details' }) => {
                 : <TwoCells cancel="Close" action="Delete session" appearance="danger" onAction={() => setConfirming(true)} />}
         >
             {confirming
-                ? <SectionMessage appearance="warning">This removes Thursday’s session for Ana and her tutor. This cannot be undone.</SectionMessage>
+                ? <SectionMessage appearance="warning" dismissible={false}>This removes Thursday’s session for Ana and her tutor. This cannot be undone.</SectionMessage>
                 : text('Thursday · 4:00–5:00 PM with Ana Ruiz.')}
         </ModalStage>
     );
