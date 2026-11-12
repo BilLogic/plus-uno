@@ -133,7 +133,7 @@ export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => {
               opacity={accent ? 0.25 : 1}
             />
           )}
-          <Rect x={x + 8} y={ry + 4} w={8} h={8} fill={PAINT.sidebarIcon} corner="tab" />
+          <Rect x={x + 8} y={ry + 4} w={8} h={8} fill={PAINT.sidebarIcon} corner="icon" />
           <SkeletonBar x={x + 20} y={ry + SIDEBAR_ROW_H / 2 - 2} w={w - 32} />
         </React.Fragment>
       );
@@ -242,7 +242,7 @@ export const Row = ({ x, y, w, accent = false }) => (
   <g>
     {accent && <Rect x={x} y={y} w={w} h={14} fill={PAINT.rowSelected} />}
     <Rule x1={x} x2={x + w} y1={y + 14} y2={y + 14} stroke={PAINT.rowDivider} />
-    <Rect x={x + 4} y={y + 4} w={6} h={6} fill={accent ? PAINT.accent : PAINT.placeholderText} corner="tab" />
+    <Rect x={x + 4} y={y + 4} w={6} h={6} fill={accent ? PAINT.accent : PAINT.placeholderText} corner="icon" />
     <SkeletonBar x={x + 16} y={y + 5} w={w * 0.3} accent={accent} />
     <SkeletonBar x={x + w * 0.5} y={y + 5} w={w * 0.2} />
     <SkeletonBar x={x + w * 0.8} y={y + 5} w={w * 0.12} />

@@ -2,7 +2,7 @@
  * Date tag — a due or event date, outlined with a fixed icon.
  *
  * THE BOX. Shares Status tag's heights: default 20 tall (B3 12, icon 12,
- * radius 4), spacious 32 (B2 14, icon 16, radius 6), from
+ * radius 4), spacious 32 (B2 14, icon 16, radius 8), from
  * `_label-heights.scss`.
  *
  * THE PADDING, AS FIGMA BUILDS IT. The label and icon sit in an inner wrapper
@@ -51,7 +51,7 @@
 
     padding: 0 var(--tag-pad-end) 0 var(--pad-x-md);
     gap: 0;
-    border-radius: var(--radius-control-sm);
+    border-radius: var(--radius-lg);
 
     .plus-date-tag__content {
         padding-right: var(--tag-pad-end);

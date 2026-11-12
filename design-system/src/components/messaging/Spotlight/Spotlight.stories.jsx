@@ -117,6 +117,8 @@ const actionStory = (appearance, label) => ({
     ),
     play: async ({ canvasElement }) => {
         await expect(canvasElement.querySelector('.plus-spotlight-action')).toHaveClass(`plus-spotlight-action--${appearance}`);
+        // A real Button: it takes Button's own 6 corners, no override.
+        await expect(getComputedStyle(canvasElement.querySelector('.plus-spotlight-action')).borderTopLeftRadius).toBe('6px');
     },
 });
 

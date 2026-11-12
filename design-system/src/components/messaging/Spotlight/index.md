@@ -167,7 +167,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-brand-bold` · `--ds-icon-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-small` · `--radius-lg` · `--radius-xl` · `--space-050` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width`
+`--body-default` · `--body-small` · `--ds-background-brand-bold` · `--ds-icon-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-small` · `--radius-lg` · `--radius-xl` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width`
 
 From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override these through the token layer, never with a literal.
 

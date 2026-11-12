@@ -51,7 +51,8 @@ $avatar-colors: (
 }
 
 .plus-avatar--square {
-    border-radius: calc(var(--avatar-size, var(--image-md)) / 4);
+    // A quarter of the size, capped so a large square stops at radius-xxl.
+    border-radius: min(calc(var(--avatar-size, var(--image-md)) / 4), var(--radius-xxl));
 }
 
 @each $size, $values in $avatar-sizes {

@@ -78,23 +78,26 @@
 }
 
 .plus-spotlight-action {
-    border-radius: var(--radius-lg);
-    padding: var(--space-050) var(--space-100);
-    font: var(--body-default);
-    cursor: pointer;
-    border: none;
-    text-decoration: none;
-
-    @include plus-state((), $ring-token: --ds-border-focused-inverse);
-
-    &--primary {
-        background: var(--ds-surface-overlay);
-        color: var(--ds-text);
+    // A Button on the inverse ground: only its colors change, never its size or radius.
+    &.plus-btn--default,
+    &.plus-btn--subtle {
+        @include plus-state((), $ring-token: --ds-border-focused-inverse);
     }
 
-    &--secondary {
-        background: none;
+    &--primary.plus-btn {
+        background-color: var(--ds-surface-overlay);
+        color: var(--ds-text);
+        --_button-fg: var(--ds-text);
+    }
+
+    &--secondary.plus-btn {
+        border-color: var(--ds-text-inverse);
         color: var(--ds-text-inverse);
-        border: var(--border-default) solid var(--ds-text-inverse);
+        --_button-fg: var(--ds-text-inverse);
+
+        @include plus-state((
+            hovered: (background-color: var(--ds-interaction-inverse-hovered)),
+            pressed: (background-color: var(--ds-interaction-inverse-pressed)),
+        ), $ring: false);
     }
 }
