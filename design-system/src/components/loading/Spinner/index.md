@@ -10,7 +10,7 @@ Also asked as: loading, busy indicator, wait indicator, loading indicator.
 
 **Source:** `design-system/src/components/loading/Spinner/Spinner.jsx`
 
-**Stories:** `design-system/src/components/loading/Spinner/Spinner.stories.jsx` — Overview, Sizes, Size16, Size24, Size48, Invert, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/loading/Spinner/Spinner.stories.jsx` — Overview, Sizes, Size16, Size24, Size48, Invert, Interactive, Rest, Hovered, Pressed, Focused, ReducedMotion
 
 **Storybook page:** `design-system/src/components/loading/Spinner/Spinner.mdx`
 
@@ -77,7 +77,7 @@ Don't: A loose spinner beside a button that can still be pressed.
 - For a wait whose length is known, use `ProgressBar`. A determinate bar answers "how much longer", which a spinner never can.
 - For content loading into a layout that already has a shape, use `Skeleton`: it holds the shape and does not flash. A spinner is for when there is no shape yet.
 - For a result once the wait ends, use `SectionMessage` or `Flag`.
-- For a button that is busy, set its `isLoading`; the `Button` draws its own spinner.
+- For a button that is busy, set its `isLoading`; the `Button` renders this Spinner at 16, the button icon size, in both spacings.
 - For a wait under about 300ms, show nothing. The spinner appears and vanishes as a flicker, which reads as a glitch rather than as work.
 
 Same group: `GenerativeBorder` · `ProgressBar` · `Skeleton`
@@ -91,7 +91,7 @@ Same group: `GenerativeBorder` · `ProgressBar` · `Skeleton`
 
 | State | What changes |
 | --- | --- |
-| Rest | The ring turns at 0.75s. Under reduced motion it slows to 1.5s rather than stopping. |
+| Rest | The ring turns once every 0.75s. Under reduced motion it holds still, and the hidden label still names the wait. |
 | Hovered | None. It is not a control. |
 | Pressed | None. |
 | Focused | None. It is not in the tab order. |
@@ -102,7 +102,7 @@ Same group: `GenerativeBorder` · `ProgressBar` · `Skeleton`
 | Part | Token |
 | --- | --- |
 | Ring | `currentColor`; `--ds-icon-inverse` for `invert`. |
-| Size | `--spinner-size-sm` (16), `--spinner-size-md` (24), `--spinner-size-lg` (48), read through `--plus-spinner-size`. |
+| Size | `--spinner-size-sm` (16), `--spinner-size-md` (24), `--spinner-size-lg` (48), on the size scale (`--size-100`, `--size-150`, `--size-300`), read through `--plus-spinner-size`. |
 
 ## Content guidelines
 

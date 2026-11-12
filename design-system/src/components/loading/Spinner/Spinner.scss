@@ -10,6 +10,11 @@
  * colored label or a disabled control matches its surroundings. `invert`
  * takes `icon.inverse`, the icon color for a bold or
  * colored fill.
+ *
+ * THE MOTION. One linear turn every 0.75s, the only rotation period in the
+ * system: a loading Button renders this component rather than a ring of its
+ * own. Under reduced motion the ring holds still; the hidden label still
+ * names the wait.
  */
 
 .plus-spinner {
@@ -43,6 +48,6 @@
 
 @media (prefers-reduced-motion: reduce) {
     .plus-spinner {
-        animation-duration: 1.5s;
+        animation: none;
     }
 }

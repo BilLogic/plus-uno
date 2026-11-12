@@ -193,7 +193,7 @@ Use a button for an action on the current page: submit a form, mark attendance, 
 2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
 3. **Label.** Body/default at the medium weight. It says what the action does.
 4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
-5. **Spinner** (loading only). Replaces the label and the icons while the button is busy.
+5. **Spinner** (loading only). The `Spinner` component at 16, the icon size, in both spacings. It replaces the label and the icons while the button is busy, in the label color.
 
 Most buttons need no icon. Add one where the glyph has a clear, established meaning, such as `plus` for add.
 
@@ -209,7 +209,7 @@ Most buttons need no icon. Add one where the glyph has a clear, established mean
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
 <tr><td>Selected</td><td>The selected role fill, label and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
 <tr><td>Disabled</td><td>The disabled fill, label and icon: a change of color, not of opacity. Subtle stays transparent.</td></tr>
-<tr><td>Loading</td><td>A spinner replaces the label and icons. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
+<tr><td>Loading</td><td>A 16 <code>Spinner</code> replaces the label and icons, in both spacings. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
 </tbody>
 </DocsTable>
 

@@ -129,9 +129,9 @@
     --avatar-size-128: calc(var(--space-400) * 2);
 
     /* Spinner */
-    --spinner-size-sm: var(--space-100);
-    --spinner-size-md: var(--space-150);
-    --spinner-size-lg: var(--space-300);
+    --spinner-size-sm: var(--size-100);
+    --spinner-size-md: var(--size-150);
+    --spinner-size-lg: var(--size-300);
 
     /* Progress bar */
     --progress-bar-height: var(--space-050);

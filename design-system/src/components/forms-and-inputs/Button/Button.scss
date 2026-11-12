@@ -190,7 +190,8 @@ $btn-appearances: (
 
     // --- LOADING ---
     // The label and icons stay in the tree for assistive technology and are
-    // hidden visually; a spinner draws in their place in the label color.
+    // hidden visually. The Spinner component draws in their place, centered,
+    // at the icon size in both spacings and in the label color.
     &--loading {
         pointer-events: none;
 
@@ -198,18 +199,18 @@ $btn-appearances: (
         .plus-btn-visual {
             opacity: 0;
         }
+    }
 
-        &::after {
-            content: "";
-            position: absolute;
-            width: 1em;
-            height: 1em;
-            top: calc(50% - 0.5em);
-            left: calc(50% - 0.5em);
-            border: 2px solid var(--_button-fg);
-            border-right-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.75s linear infinite;
+    .plus-btn-spinner {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--_button-fg);
+
+        .plus-spinner {
+            --plus-spinner-size: var(--icon-md);
         }
     }
 
@@ -226,11 +227,5 @@ $btn-appearances: (
             font: var(--body-small);
             font-weight: var(--type-weight-medium);
         }
-    }
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
     }
 }

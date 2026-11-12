@@ -393,9 +393,9 @@ export const TOKEN_LADDER = [
   // ─── Components / Spinner, Progress bar (Bill 2026-11-04: one component
   // each, so they move out of SIZE_ROLES in generate-all-tokens.js straight to
   // this tier, not through Semantics' size roles) ───────────────────────
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--space-100', use: 'Size of a small Spinner, such as one inside a Button.' },
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--space-150', use: 'Size of a default Spinner.' },
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--space-300', use: 'Size of a large Spinner, such as one loading a whole section.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--size-100', use: 'Size of a small Spinner, such as one inside a Button.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--size-150', use: 'Size of a default Spinner.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--size-300', use: 'Size of a large Spinner, such as one loading a whole section.' },
   { tier: 'components', group: 'Progress bar', new: '--progress-bar-height', old: null, value: '--space-050', use: 'Height of a ProgressBar track.' },
 
   // ─── Layers (own non-spacing family, code only) ───────────────────────
