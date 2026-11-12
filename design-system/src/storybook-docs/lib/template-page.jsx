@@ -43,7 +43,7 @@ export const ScaledStory = ({ width, children }) => {
     }, []);
     return (
         // `docs-story` puts the picture's headings on Tocbot's ignore list, so "On this page" lists the page's own.
-        <div ref={ref} className="docs-story not-prose sb-unstyled" inert aria-hidden="true" style={{ width: '100%', height: height * scale, overflow: 'hidden' }}>
+        <div ref={ref} className="docs-story not-prose sb-unstyled" inert aria-hidden="true" style={{ width: '100%', height: height * scale, flexShrink: 0, overflow: 'hidden' }}>
             <div ref={inner} style={{ width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
                 {children}
             </div>
@@ -89,7 +89,7 @@ export const TypeCard = ({ of, title, stage = TYPE_STAGE, children }) => (
         <ScaledStory width={stage}>
             <Story of={of} inline />
         </ScaledStory>
-        <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)' }}>
+        <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)', marginBlockStart: 'auto' }}>
             <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{title}</span>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{children}</span>
         </figcaption>

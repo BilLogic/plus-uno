@@ -99,3 +99,10 @@ test('a template or pattern page without the manifest tag is named, since the MC
   const root = fixture({ [PAGE_PATH]: PAGE.replace(", 'manifest'", ''), 'design-system/src/storybook-docs/patterns/Ok.mdx': PAGE });
   assert.deepEqual(pagesMissingManifestTag(root), [PAGE_PATH]);
 });
+
+test('a page titled by a <Title> block keeps its name, and the pointer that opens Best practices reaches the file', () => {
+  const page = PAGE.replace('# Disabled', '<Title>Disabled</Title>').replace('## Best practices\n', '## Best practices\n\nThe rules live in Patterns, Forms.\n');
+  const text = renderDocsAgentFile(page, { file: PAGE_PATH, kind: 'Pattern' });
+  assert.match(text, /^# Disabled$/m);
+  assert.match(text, /## Best practices\n\nThe rules live in Patterns, Forms\.\n\n### Give every/);
+});
