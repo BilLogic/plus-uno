@@ -35,9 +35,14 @@ function fixture(files) {
   const taxonomy = {
     componentGroups: { 'Forms and inputs': [], Labels: [] },
     aiComponents: ['AI message'],
+    rootSources: {
+      Templates: ['design-system/src/patterns/Frame', 'design-system/src/storybook-docs/templates/'],
+      Patterns: ['design-system/src/storybook-docs/patterns/'],
+    },
     storySortOrder: [
       'Get started',
       'Foundations',
+      'Templates',
       'Patterns',
       'Components',
       ['Forms and inputs', [], 'Labels', []],
@@ -125,7 +130,7 @@ test('a group that is not an Atlassian category, and a sort that disagrees, go r
     path.join(root, 'storybook.taxonomy.json'),
     JSON.stringify({
       componentGroups: { 'Forms and inputs': [], Actions: [], Labels: [] },
-      storySortOrder: [...SITE_SECTIONS.slice(0, 4), ['Forms and inputs', [], 'Labels', []], ...SITE_SECTIONS.slice(4)],
+      storySortOrder: [...SITE_SECTIONS.slice(0, 5), ['Forms and inputs', [], 'Labels', []], ...SITE_SECTIONS.slice(5)],
     }),
   );
   const found = messages(root);
@@ -167,11 +172,11 @@ test('a docs page under a root the sidebar does not list goes red', () => {
   const root = fixture({
     'design-system/src/storybook-docs/Intro.mdx': '<Meta title="Getting started/Introduction" />\n',
     'design-system/src/patterns/Frame.stories.jsx': story('Foundations/Patterns/Frame'),
-    'design-system/src/patterns/Page.stories.jsx': story('Patterns/Page'),
+    'design-system/src/storybook-docs/patterns/Filtering.stories.jsx': story('Patterns/Filtering'),
   });
   const found = messages(root);
   assert.ok(found.some((m) => m.includes('Intro.mdx') && m.includes('"Getting started"')));
-  assert.ok(!found.some((m) => m.includes('Page.stories.jsx')));
+  assert.ok(!found.some((m) => m.includes('Filtering.stories.jsx')));
 });
 
 test('a component story under Patterns goes red: components are titled under their category', () => {
@@ -191,7 +196,64 @@ test('an AI component may sit under AI UI, and only one the taxonomy names', () 
   assert.ok(found.some((m) => m.includes('Tag.stories.jsx')));
 });
 
-test('Patterns sit above Components, and there is no Tools section', () => {
+test('Templates and Patterns sit above Components, Templates first, and there is no Tools section', () => {
+  assert.ok(SITE_SECTIONS.indexOf('Templates') < SITE_SECTIONS.indexOf('Patterns'));
   assert.ok(SITE_SECTIONS.indexOf('Patterns') < SITE_SECTIONS.indexOf('Components'));
   assert.ok(!SITE_SECTIONS.includes('Tools'));
+});
+
+test('a template page and a pattern page in their own roots are green', () => {
+  const root = fixture({
+    'design-system/src/patterns/Frame/Frame.stories.jsx': story('Templates/Frame/Frame'),
+    'design-system/src/storybook-docs/templates/Overview.mdx': '<Meta title="Templates/Overview" />\n',
+    'design-system/src/storybook-docs/patterns/Overview.mdx': '<Meta title="Patterns/Overview" />\n',
+  });
+  assert.deepEqual(messages(root), []);
+});
+
+test('a template page titled under Patterns, or a pattern page under Templates, goes red', () => {
+  const root = fixture({
+    'design-system/src/patterns/Frame/Frame.stories.jsx': story('Patterns/Frame'),
+    'design-system/src/storybook-docs/patterns/Filtering.mdx': '<Meta title="Templates/Filtering" />\n',
+  });
+  const found = messages(root);
+  assert.ok(found.some((m) => m.includes('Frame.stories.jsx') && m.includes('belongs under "Templates"')));
+  assert.ok(found.some((m) => m.includes('Filtering.mdx') && m.includes('belongs under "Patterns"')));
+});
+
+test('a page under a root with no source folder listed for it goes red', () => {
+  const root = fixture({
+    'design-system/src/somewhere/Loose.mdx': '<Meta title="Templates/Loose" />\n',
+  });
+  assert.ok(messages(root).some((m) => m.includes('Loose.mdx') && m.includes('not under a source folder listed for "Templates"')));
+});
+
+test('a page in a template source folder titled outside Templates goes red', () => {
+  const root = fixture({
+    'design-system/src/storybook-docs/templates/Stray.mdx': '<Meta title="Foundations/Stray" />\n',
+  });
+  assert.ok(messages(root).some((m) => m.includes('Stray.mdx') && m.includes('belongs under "Templates"')));
+});
+
+test('a sidebar sort that lists Patterns before Templates goes red', () => {
+  const root = fixture({});
+  fs.writeFileSync(
+    path.join(root, 'storybook.taxonomy.json'),
+    JSON.stringify({
+      componentGroups: { 'Forms and inputs': [], Labels: [] },
+      storySortOrder: ['Get started', 'Foundations', 'Patterns', 'Templates', 'Components', ['Forms and inputs', [], 'Labels', []], 'AI UI'],
+    }),
+  );
+  assert.ok(messages(root).some((m) => m.includes('roots must lead with')));
+});
+
+test('the real Templates tree is flat: seven templates, no Overlays folder', () => {
+  const tax = JSON.parse(fs.readFileSync(new URL('../storybook.taxonomy.json', import.meta.url), 'utf8'));
+  const at = tax.storySortOrder.indexOf('Templates');
+  const order = tax.storySortOrder[at + 1];
+  assert.deepEqual(order.filter((x) => typeof x === 'string'), [
+    'Templates and patterns', 'Overview', 'Frame', 'Page', 'Section', 'Modal', 'Panel', 'Popup',
+  ]);
+  assert.ok(!order.includes('Overlays'));
+  assert.ok(!order.includes('Page templates'));
 });

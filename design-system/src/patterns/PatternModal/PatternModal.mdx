@@ -135,7 +135,7 @@ Width is a step of the screen grid. It grows with the screen, never shrinks, and
 <tr><th>Height</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td><code>hug</code></td><td>Most modals. It grows with the content to the cap the <a href="?path=/docs/patterns-overlays-blanket--docs">Blanket</a> sets, screen height less 2 × 64, then the body scrolls.</td></tr>
+<tr><td><code>hug</code></td><td>Most modals. It grows with the content to the cap the <a href="?path=/docs/templates-modal-backdrop--docs">Blanket</a> sets, screen height less 2 × 64, then the body scrolls.</td></tr>
 <tr><td><code>fill</code></td><td>A settings or editor Modal, or tabs whose views differ in length, so switching never resizes it.</td></tr>
 </tbody>
 </DocsTable>
@@ -287,7 +287,7 @@ Pair a control with the field it controls, and group the fields that describe on
 - With tabs, the tab group is a tablist. Left and Right move between tabs, Home and End jump to the ends, and Tab moves from the strip into the panel. The panel is named by its tab.
 - A loading body is marked `aria-busy`.
 - The Close button's accessible name is "Close".
-- The pattern has no focus trap or Escape handling. The core Modal adds them and returns focus to the trigger on close. How an open modal meets the Sidebar is on <a href="?path=/docs/patterns-frame-frame--docs">Frame</a>.
+- The pattern has no focus trap or Escape handling. The core Modal adds them and returns focus to the trigger on close. How an open modal meets the Sidebar is on <a href="?path=/docs/templates-frame-frame--docs">Frame</a>.
 
 </div>
 
@@ -295,10 +295,10 @@ Pair a control with the field it controls, and group the fields that describe on
 
 ## Related
 
-- [Blanket](?path=/docs/patterns-overlays-blanket--docs) places the Modal and carries the dimmed ground, the pads and the screen grid.
-- [Drawer](?path=/docs/patterns-overlays-drawer--docs) takes the same width steps at a screen edge, for a task that needs the page in view.
-- [Popups](?path=/docs/patterns-popups--docs) holds the floating layers that never block the page, such as a Tooltip for one line of help.
-- [Section](?path=/docs/patterns-section-section--docs) and [Card](?path=/docs/patterns-section-card--docs) hold content that belongs on the page itself.
+- [Blanket](?path=/docs/templates-modal-backdrop--docs) places the Modal and carries the dimmed ground, the pads and the screen grid.
+- [Drawer](?path=/docs/templates-panel-panel--docs) takes the same width steps at a screen edge, for a task that needs the page in view.
+- [Popups](?path=/docs/templates-popup-popup--docs) holds the floating layers that never block the page, such as a Tooltip for one line of help.
+- [Section](?path=/docs/templates-section-section--docs) and [Card](?path=/docs/templates-section-card--docs) hold content that belongs on the page itself.
 
 </div>
 

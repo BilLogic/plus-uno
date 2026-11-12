@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **119,607 chars from 9 files**, against an assembled budget of 175,500 (55,893 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 99,223 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **121,201 chars from 9 files**, against an assembled budget of 175,500 (54,299 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 100,817 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,284 (−7,862 ide-only) | 10,284 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 30,621 | 40,934 | 20,000 (constitution) ⚠️ **over by 10,621** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 62,417 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 64,063 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 65,311 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 71,005 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 82,791 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 103,752 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 107,220 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 113,778 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 118,751 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 119,607 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 32,215 | 42,528 | 20,000 (constitution) ⚠️ **over by 12,215** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 64,011 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 65,657 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 66,905 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 72,599 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 84,385 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 105,346 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 108,814 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 115,372 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 120,345 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 121,201 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -237,16 +237,36 @@ A Zoom sub-room for one-on-one tutoring.
 ### Design system: structure
 
 **Pattern**:
-A reusable layout of components with named slots, which the patterns overview in Storybook lists. A component is one control in a **Category**; a pattern arranges components.
-_Avoid_: "layout component"
+Code-free guidance for a situation, shown on annotated **Template**s used as they are or tweaked: when to use a choice, which choice fits, and the words. A pattern holds a rule that applies across two or more templates and has no anatomy and no code. A **Component** is one piece with props; a **Template** arranges components; a pattern guides.
+_Avoid_: "layout component", "practice"
 
 **Template**:
-The page every screen starts from, and the container the app is dropped into: the browser window with the **Frame** inside it, its content already filled (blank, dashboard or reading; default or focused). The browser belongs to the Template.
-_Avoid_: "page template" for the Frame alone, "browser frame" as a pattern
+An arrangement of components with named **Slot**s, holding its key scenarios and key states and linking to each component for the rest: **Frame**, **Page**, **Section**, Form, Modal, Panel and Popup. The tie-break: behavior splits out into a component, and a template that only redraws one component stays a component. How pieces sit in one template goes on that template's page; a rule that holds across two or more templates is a **Pattern**.
+_Avoid_: "container", "starter", "page template" for the **Frame** alone
 
 **Frame**:
-The pattern for the app's outer shell: the **Sidebar** and **Panel** that stay put while the **Page** inside changes. The **Template** adds the browser around it. "App shell" is an informal alias for talk; code and docs say Frame.
+The template for the app's outer shell: the **Sidebar** and **Panel** that stay put while the **Page** inside changes. Frame has three types: **Frame default**, **Frame focused** and **Frame bare**. The browser window is drawn around it in examples only. "App shell" is an informal alias for talk; code and docs say Frame.
 _Avoid_: "surface container", bare "shell"
+
+**Frame default**:
+The **Frame** type for pages people move among: the **Sidebar**, the **Page** and the slot for the AI **Panel**.
+_Avoid_: "main frame"
+
+**Frame focused**:
+The **Frame** type for one task: no **Sidebar**, a Close button at the start of the title row, steps down a left **Section** side when there are five or more and across the top when there are four or fewer, and a bottom bar with Cancel on the left and Back and Next on the right.
+_Avoid_: "wizard page", "full-screen modal"
+
+**Frame bare**:
+The **Frame** type with no **Sidebar** and one centered column, such as sign-in.
+_Avoid_: "blank frame"
+
+**Screen**:
+A **Frame** with its **Slot**s filled for one page. The empty Frame is the **Template**; a filled Frame is a Screen. Screens are documented under Flows in Figma, and stay apart from the templates.
+_Avoid_: "page" for the whole filled Frame, "mockup"
+
+**Flow**:
+A sequence of **Screen**s that fulfills one user story. Flows are documented under Flows in Figma, and stay apart from the templates.
+_Avoid_: "journey" for a Flow (the blueprint's journey is a different thing), "wizard"
 
 **Sidebar**:
 The full-height area at the left of the **Frame**, holding navigation. From 1024 it is **docked**; below it is collapsed, where a hover **peek**s it and the toggle opens it as an **overlay**. A peek and an overlay look the same; they differ in how they open and close.
@@ -269,11 +289,11 @@ The draggable edge of the docked **Panel**, a vertical separator that resizes it
 _Avoid_: "resize handle", "drag bar"
 
 **Page**:
-The pattern for the main content area inside a **Frame**: it carries the page title and a body.
+The template for the main content area inside a **Frame**: it carries the page title and a body.
 _Avoid_: "surface" as a name
 
 **Section**:
-The pattern for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail` region on its right that shows one record of its content: the body takes 7 of the **Page**'s 12 columns and the detail, a Section with a subtle fill, takes 5; the split holds from 960 and below that the detail replaces the list under a back link. A bare "Section" always means this pattern.
+The template for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail` region on its right that shows one record of its content: the body takes 7 of the **Page**'s 12 columns and the detail, a Section with a subtle fill, takes 5; the split holds from 960 and below that the detail replaces the list under a back link. A bare "Section" always means this template.
 _Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section** or a **Menu section**
 
 **Card**:

@@ -40,8 +40,8 @@ function PageLevelsDemo() {
 }
 
 export default {
-    title: 'Patterns/Page/Page',
-    id: 'patterns-page-page',
+    title: 'Templates/Page/Page',
+    id: 'templates-page-page',
     component: Page,
     tags: ['!dev', '!autodocs'],
     argTypes: {
