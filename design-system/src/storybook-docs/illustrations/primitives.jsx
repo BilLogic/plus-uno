@@ -230,6 +230,14 @@ export const Card = ({ x, y, w, h, accent = false }) => (
   </g>
 );
 
+/** A bare Card box: the raised surface and its shadow, no contents. */
+export const CardBox = ({ x, y, w, h, accent = false }) => (
+  <g>
+    <Layer x={x} y={y} w={w} h={h} fill={PAINT.cardSurface} shadow={PAINT.cardShadow} corner="card" />
+    {accent && <AccentRing x={x} y={y} w={w} h={h} corner="card" />}
+  </g>
+);
+
 export const Row = ({ x, y, w, accent = false }) => (
   <g>
     {accent && <Rect x={x} y={y} w={w} h={14} fill={PAINT.rowSelected} />}
