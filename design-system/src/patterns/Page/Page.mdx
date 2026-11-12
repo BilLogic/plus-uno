@@ -1,10 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
 
 import * as PageStories from './Page.stories.jsx';
-import { Page, PatternCard } from '@/patterns';
-import { HeadingLevelContext } from '@/lib/headingLevel';
-import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -12,16 +9,26 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { TypeCard } from './pageDemo.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    AddInViewBar,
+    AddTwice,
+    AreaPageTitleAlone,
+    BreadcrumbOnAreaPage,
+    HeaderIsTheH1,
+    OneLineDescription,
+    OneTabSystem,
+    ParagraphUnderTitle,
+    SectionsAsTitles,
+    TwoTabSystems,
+} from '@/storybook-docs/illustrations/page.jsx';
 
 <Meta of={PageStories} />
 
-export const backdrop = { padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' };
-export const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' };
-
 <Title>Page</Title>
-Page is a tokenized container with a fill, an elevation, a pad and a radius, and a slot for your content. A level is a fill and its shadow together, so a Page never wears one without the other. The frame draws its own content box the same way, and you can also use Page alone for any block that needs a level.
-
-The examples on this page follow the **Color mode** switch in the toolbar. In dark, a level gets lighter as it rises.
+The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width.
 
 <DocsTabs of={PageStories}>
 
@@ -36,57 +43,134 @@ The examples on this page follow the **Color mode** switch in the toolbar. In da
 
 <div className="sb-ds-doc-section">
 
-## Appearance
+## Types
 
-<ComponentExample of={PageStories.Sunken} title="Sunken" description="The frame's backdrop: --ds-surface-sunken, with no shadow." />
+"Fluid" means only the full-width type; everything else adapts inside the cap.
 
-<ComponentExample of={PageStories.DefaultLevel} title="Default" description="The page: --ds-surface, with no shadow, edged by --ds-border-surface." />
-
-<ComponentExample of={PageStories.Raised} title="Raised" description="A card: --ds-surface-raised with --ds-shadow-raised." />
-
-<ComponentExample of={PageStories.Overlay} title="Overlay" description="Anything over the UI, such as a floating sidebar or a modal: --ds-surface-overlay with --ds-shadow-overlay." />
-
-<ComponentExample of={PageStories.Bordered} title="Bordered" description={<><code>border</code> draws a bold 2px border in <code>--ds-border-bold</code>, in place of the default level's edge ring.</>} />
+<TypeGrid>
+<TypeCard of={PageStories.TypeDefault} title="Default">The content grid, centered and capped at its content width. Nearly every page.</TypeCard>
+<TypeCard of={PageStories.TypeFullWidth} title="Full width">The content runs to the pad with no cap, for a page that fills it, such as chat or a board.</TypeCard>
+</TypeGrid>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Size and layout
+## Anatomy
 
-<ComponentExample of={PageStories.StepNone} title="None" description="No padding and no radius: the content runs to the edge." />
+A record page, one level down, with everything the header can carry. Each marker sits in the gutter beside its part.
 
-<ComponentExample of={PageStories.StepSmall} title="Small" description="Padding 16 on every side and radius 8." />
+<Story of={PageStories.AnatomyRecord} inline />
 
-<ComponentExample of={PageStories.StepMedium} title="Medium" description="The frame's own pad, 24 on every side, and radius 12." />
-
-<ComponentExample of={PageStories.StepLarge} title="Large" description="Padding 36 on every side and radius 16." />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Behavior
-
-<ComponentExample of={PageStories.WithTitle} title="Title" description={<><code>title</code> renders the page's one h1 above the content, for a Page that holds a whole page.</>} />
-
-A Page has no interactive states. Hover, pressed and selected belong to the controls placed on it.
+1. **Breadcrumb** (optional). The record's parents on their own row, above the title.
+2. **Title.** The page's one h1, with its StatusTag after the text when the page is one record.
+3. **Description** (optional). One line under the title.
+4. **Page actions** (optional). At the end of the title row, about the page only.
+5. **Page tabs** (optional). At the bottom of the header; they switch the whole page.
+6. **Banner** (optional). Under the header, one at a time.
+7. **Content.** Sections on the grid, under the header.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Key scenarios
 
-<DocsInteractivePlayground
-    of={PageStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
+<ComponentExample of={PageStories.ScenarioArea} title="Area page, one collection" description={'Title only. The collection\'s "Add student" ends its view bar, and the only Section shows that view bar alone. Where the add action goes is the Navigation pattern\'s rule.'} />
+
+<ComponentExample of={PageStories.ScenarioSeveralSections} title="Area page, several Sections" description="Each Section takes a title and its own actions, since the page holds one Primary at most." />
+
+<ComponentExample of={PageStories.ScenarioRecordTabs} title="Record page under page tabs" description="One tab system per page: under page tabs a Section's views become one labeled Select at the start of its bar." />
+
+<ComponentExample of={PageStories.ScenarioTwoLevels} title="Two levels down" description="Every parent in order, each a link. With no page tabs the Sections take titles." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Width behavior
+
+Drag the width through the content cap. Past it the content stops at the cap and centers; under it the content takes the width. The header keeps one h1 at every width.
+
+<DocsInteractivePlayground of={PageStories.ResponsiveWidth} description="The width control sets the page's own width." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key states
+
+<ComponentExample of={PageStories.KeyBanner} title="Page banner" description="A message about this page sits under the page header and scrolls with the content. Which tier a message belongs to is the Notifications pattern, listed in the Patterns overview." />
+
+Scrolled is planned: once the title scrolls away the header shrinks to one sticky row, with the page tabs under it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Levels
+
+A Page used alone is a tokenized container: a level is a fill and its shadow together, so a Page never wears one without the other. The frame draws its own content box the same way.
+
+<ComponentExample of={PageStories.Sunken} title="Sunken" description="The frame's backdrop, with no shadow." />
+
+<ComponentExample of={PageStories.DefaultLevel} title="Default" description="The page, edged by its surface border." />
+
+<ComponentExample of={PageStories.Raised} title="Raised" description="A card, with the raised shadow." />
+
+<ComponentExample of={PageStories.Overlay} title="Overlay" description="Anything over the UI, with the overlay shadow." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Used for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--stack-sm</code></td><td>Breadcrumb to title; title to description.</td></tr>
+<tr><td><code>--section-stack-sm</code></td><td>Header to page tabs.</td></tr>
+<tr><td><code>--page-stack-md</code></td><td>Header to the first Section; between Sections.</td></tr>
+<tr><td><code>--page-stack-sm</code></td><td>Between related Sections.</td></tr>
+<tr><td><code>--heading-large</code>, <code>--body-default</code>, <code>--body-small</code></td><td>The title, the description, the breadcrumb.</td></tr>
+<tr><td><code>--content-max-width</code>, <code>--content-min-width</code></td><td>The cap and the floor of the content grid.</td></tr>
+<tr><td><code>--grid-columns</code>, <code>--grid-gutter</code>, <code>--page-pad</code></td><td>The 12-column grid, its gutter and the pad.</td></tr>
+<tr><td><code>--ds-surface-sunken</code>, <code>--ds-surface</code>, <code>--ds-surface-raised</code>, <code>--ds-surface-overlay</code></td><td>The four levels' fills, each with its shadow from <a target="_top" href="./?path=/docs/foundations-elevation--docs">Elevation</a>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="code">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Slots
+
+<DocsTable>
+<thead>
+<tr><th>Slot or prop</th><th>Holds</th></tr>
+</thead>
+<tbody>
+<tr><td><code>title</code></td><td>The page's one h1, at the heading-large size, above the content.</td></tr>
+<tr><td><code>children</code></td><td>The page header, the banner and the Sections, in order. Today the <code>PageHeader</code> goes first in <code>children</code>.</td></tr>
+<tr><td><code>header</code> <PlannedTag /></td><td>Planned. One <code>PageHeader</code>: the h1 with <code>breadcrumbs</code> after a drill-in, <code>actions</code> and page tabs in <code>bottomBar</code>.</td></tr>
+<tr><td><code>description</code> · <code>status</code> <PlannedTag /></td><td>Planned. <code>PageHeader</code> has neither slot; the title block holds them.</td></tr>
+<tr><td><code>banner</code> <PlannedTag /></td><td>Planned. The page banner, one at a time. Today it goes in <code>children</code> under the header.</td></tr>
+<tr><td><code>width</code> <PlannedTag /></td><td>Planned. <code>default</code> or <code>full</code>; today the Frame's <code>width</code> sets <code>content</code> or <code>reading</code>.</td></tr>
+<tr><td>Scrolled header <PlannedTag /></td><td>Planned. The sticky one-row header.</td></tr>
+<tr><td><code>level</code> · <code>padding</code> · <code>radius</code> · <code>border</code> · <code>as</code></td><td>The container: its fill and shadow as a pair, its pad and corner, and its element.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -102,55 +186,17 @@ A Page has no interactive states. Hover, pressed and selected belong to the cont
 
 ## Usage
 
-Use Page for a block that needs a fill at one of the four levels. The frame draws its own content box with the same fill and edge, so a page does not place a Page inside it. For the page frame, use <a href="?path=/docs/templates-frame-frame--docs">Frame</a>.
-
-### Level guidance
-
-<DocsTable>
-<thead>
-<tr><th>Level</th><th>When to use</th></tr>
-</thead>
-<tbody>
-<tr><td>Sunken</td><td>The frame's backdrop, behind everything else.</td></tr>
-<tr><td>Default</td><td>The page.</td></tr>
-<tr><td>Raised</td><td>A card. For one object with a shape agreed, use Card itself.</td></tr>
-<tr><td>Overlay</td><td>Anything over the UI: a floating sidebar, a modal.</td></tr>
-</tbody>
-</DocsTable>
+Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at its content width; full width is the only fluid option and is for a page that fills it.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Parts
+## Alternatives
 
-1. **Page.** The container. It carries the level's fill and shadow, the pad and the radius.
-2. **Title** (optional). A Page that holds a whole page can carry the page's one h1, at Heading/large 24, above the content.
-3. **Content.** The slot. Sections go here.
-
-In the frame, the content box is a 12-column grid with a 16 gutter, capped at 1232 (reading 864) and never under 720. In Figma the Page part has one property, width, with the values content and reading; code sets it on the Frame.
-
-### States
-
-A Page has no states of its own: it does not respond to hover, press or focus, and it is never disabled.
-
-### Tokens
-
-<DocsTable>
-<thead>
-<tr><th>Part</th><th>Token</th></tr>
-</thead>
-<tbody>
-<tr><td>Fill and shadow: sunken</td><td><code>--ds-surface-sunken</code>, no shadow.</td></tr>
-<tr><td>Fill and edge: default</td><td><code>--ds-surface</code>, edged by <code>--ds-border-surface</code> at <code>--stroke-2</code>.</td></tr>
-<tr><td>Fill and shadow: raised</td><td><code>--ds-surface-raised</code>, <code>--ds-shadow-raised</code>.</td></tr>
-<tr><td>Fill and shadow: overlay</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>.</td></tr>
-<tr><td>Text</td><td><code>--ds-text</code> at every level.</td></tr>
-<tr><td>Padding</td><td>sm: <code>--page-pad-y-compact</code> and <code>--page-pad-x-compact</code> (16 by 24). md: <code>--page-pad</code> (24). lg: <code>--page-pad-y-spacious</code> and <code>--page-pad-x-spacious</code> (32 by 40).</td></tr>
-<tr><td>Radius</td><td>sm: <code>--radius-lg</code> (8). md: <code>--radius-075</code> (12). lg: <code>--section-radius</code> (16).</td></tr>
-<tr><td>Border</td><td><code>--stroke-2</code> (2) in <code>--ds-border-bold</code>.</td></tr>
-</tbody>
-</DocsTable>
+- For one task that takes the whole window, use `Frame` in its focused type.
+- For a region of the page with its own heading, use `PatternSection`.
+- For one object with an agreed shape, use `PatternCard` inside a Section.
 
 </div>
 
@@ -158,40 +204,82 @@ A Page has no states of its own: it does not respond to hover, press or focus, a
 
 ## Best practices
 
-### Keep the Page pad on every side.
+### Make the page header the page's one h1.
 
-Content stays 24 from the edge, so nothing touches the chrome.
+<RuleTag kind="automatic" />
 
-<DoDontPair
-    doExample={<div style={backdrop}><Page padding="md">{slotContent('Section')}</Page></div>}
-    doCaption="Keep the Page pad on all sides."
-    dontExample={<div style={backdrop}><Page padding="none">{slotContent('Section')}</Page></div>}
-    dontCaption="Run content to the Page edge."
-/>
-
-### Put sections in the content column.
-
-Sections stack inside the column and share its width.
+A Section never stands in for it. Sections inside open at h2.
 
 <DoDontPair
-    doExample={<div style={backdrop}><Page padding="md"><div style={stack}>{slotContent('Section')}{slotContent('Section')}</div></Page></div>}
-    doCaption="Stack sections in one column."
-    dontExample={<div style={backdrop}><Page padding="md"><Page padding="md" border>{slotContent('Section')}</Page></Page></div>}
-    dontCaption="Nest a Page inside a Page."
+    doExample={<HeaderIsTheH1 />}
+    doCaption="The page header is the one h1; the Section under it opens at h2."
+    dontExample={<SectionsAsTitles />}
+    dontCaption="Sections standing in for the page title: two page-title-sized headings and no page header."
 />
 
-### Match the width to the content.
+### Show the breadcrumb by the Navigation pattern.
 
-Use the reading width for prose and the content width for grids and tables. A Page takes its width from where it sits, so set it on the Frame: `width="reading"`.
+<RuleTag kind="review" />
 
-### Use Card for one object.
+When it shows and what it holds: the Navigation pattern, listed in <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>.
 
 <DoDontPair
-    doExample={<div style={backdrop}><HeadingLevelContext.Provider value={4}><PatternCard title="Next session" padding="sm">{slotContent('Thursday · 4:30 PM')}</PatternCard></HeadingLevelContext.Provider></div>}
-    doCaption="A Card, raised and ready to fill, with its title in the header."
-    dontExample={<div style={backdrop}><Page level="raised" padding="sm" radius="md"><p style={{ margin: 0, font: 'var(--body-default)' }}>Next session</p>{slotContent('Thursday · 4:30 PM')}</Page></div>}
-    dontCaption="A raised Page with a hand-made title drifts from the Card pattern."
+    doExample={<AreaPageTitleAlone />}
+    doCaption="An area page: the title alone."
+    dontExample={<BreadcrumbOnAreaPage />}
+    dontCaption="A breadcrumb on a top-level area page, repeating the Sidebar's place."
 />
+
+### Place page actions and the add action by the Navigation pattern.
+
+<RuleTag kind="review" />
+
+Page actions sit at the end of the title row and are about the page only. Where an add action goes: the Navigation pattern.
+
+<DoDontPair
+    doExample={<AddInViewBar />}
+    doCaption={'"Add" ends the collection\'s view bar; the header carries only page actions.'}
+    dontExample={<AddTwice />}
+    dontCaption="The same Primary twice: in the page header and in the Section's view bar."
+/>
+
+### Keep the description to one line.
+
+<RuleTag kind="review" />
+
+Anything longer moves into the first Section.
+
+<DoDontPair
+    doExample={<OneLineDescription />}
+    doCaption="One detail line under the title."
+    dontExample={<ParagraphUnderTitle />}
+    dontCaption="A paragraph under the title pushes the first Section down."
+/>
+
+### Keep one tab system per page.
+
+<RuleTag kind="review" />
+
+The rule and its reasons: the Navigation pattern. Page tabs name views of one subject; the Section's views become one labeled Select.
+
+<DoDontPair
+    doExample={<OneTabSystem />}
+    doCaption="Under page tabs the Section's views are one labeled Select at the start of its bar."
+    dontExample={<TwoTabSystems />}
+    dontCaption="Pill views under page tabs: two tab systems on one page."
+/>
+
+### Shrink the scrolled header to one sticky row.
+
+<RuleTag kind="review" />
+
+The breadcrumb with the title at its end, then the page actions; page tabs stick under it. The Section view bar scrolls away. This state is planned.
+
+### Show one banner at a time, scrolling with the content.
+
+<RuleTag kind="review" />
+
+Which tier a message belongs to: the Notifications pattern, listed in <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>.
 
 </div>
 
@@ -204,8 +292,10 @@ Use the reading width for prose and the content width for grids and tables. A Pa
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Title a whole page with what it holds, in sentence case: "Sessions".</td><td>Title case, or a title on a Page that is only a block.</td></tr>
-<tr><td>Fill the content slot with Sections.</td><td>Loose text and controls straight in the Page.</td></tr>
+<tr><td>Title an area with what it holds, in sentence case: "Sessions".</td><td>Title case, or a title that repeats the breadcrumb.</td></tr>
+<tr><td>Title a record with its name: "Maya Rodriguez".</td><td>"Student details".</td></tr>
+<tr><td>One detail line: "Grade 8 · Math · Lincoln Middle School".</td><td>A paragraph under the title.</td></tr>
+<tr><td>Page tab labels of one or two words: "Overview", "Sessions".</td><td>Numbered tabs, or tabs that wrap.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -215,10 +305,12 @@ Use the reading width for prose and the content width for grids and tables. A Pa
 
 ## Accessibility
 
-- A Page has no role of its own. Use `as="main"` for the page's content box and `as="section"` for a labeled block.
-- Pass `title` on the page's own Page only. It renders the page's one h1, and Sections inside it open at h2.
+- The Page is the `main` landmark. Its header's title is the one h1; Sections open at h2.
+- The breadcrumb is a `nav` named "Breadcrumb".
+- Page tabs are a tablist; the selected tab names its panel. Views swap in place and are announced.
+- The StatusTag is text, never color alone.
+- A title that truncates keeps its full text in a Tooltip on hover and focus.
 - Text on a Page uses `--ds-text` at every level, in every color mode.
-- In light increased contrast the default Page draws its edge ring, so it stays distinct from the frame behind it.
 
 </div>
 
@@ -226,10 +318,11 @@ Use the reading width for prose and the content width for grids and tables. A Pa
 
 ## Related
 
-- <a href="?path=/docs/templates-section-card--docs">Card</a> for a content box with a shape already agreed: pad, radius and slots.
-- <a href="?path=/docs/foundations-elevation--docs">Elevation</a> for which shadow goes with which level.
-- <a href="?path=/docs/foundations-color--docs">Color</a> for which fill to reach for, under surface roles.
-- <a href="?path=/docs/templates-frame-frame--docs">Frame</a> for the page frame, the 12-column grid and the content pad.
+- <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a>: use when deciding which type the page sits in.
+- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use when a region needs its own heading, view bar or detail.
+- <a target="_top" href="./?path=/docs/templates-section-card--docs">Card</a>: use when one object has a shape already agreed.
+- <a target="_top" href="./?path=/docs/foundations-elevation--docs">Elevation</a>: use when picking which shadow goes with which level.
+- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
 </div>
 

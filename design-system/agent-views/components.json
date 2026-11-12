@@ -7339,7 +7339,16 @@
         "WithTitle",
         "ColorModes",
         "MediumPad",
-        "Interactive"
+        "Interactive",
+        "TypeDefault",
+        "TypeFullWidth",
+        "AnatomyRecord",
+        "ScenarioArea",
+        "ScenarioSeveralSections",
+        "ScenarioRecordTabs",
+        "ScenarioTwoLevels",
+        "KeyBanner",
+        "ResponsiveWidth"
       ],
       "tokens": [
         "--ds-border-bold",
