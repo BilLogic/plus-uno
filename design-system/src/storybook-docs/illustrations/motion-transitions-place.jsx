@@ -385,7 +385,7 @@ const modalScene = ({ id, title, caption, closing }) =>
     },
   });
 
-const DRAWER = { x: 100, y: 6, w: 52, h: 88 };
+const FLOATING_PANEL = { x: 100, y: 6, w: 52, h: 88 };
 const FLAG = { x: 94, y: 10, w: 54, h: 26 };
 const FLAG_EDGE = 60;
 const flagScene = ({ id, title, caption, closing }) =>
@@ -531,7 +531,7 @@ const floatScene = scene({
     <>
       <UnderPage />
       <Clip {...FRAME}>
-        <Moved x={x * (DRAWER.w + 6)}>
+        <Moved x={x * (FLOATING_PANEL.w + 6)}>
           <Panel x={104} y={14} w={44} h={74} floating accent />
         </Moved>
       </Clip>
