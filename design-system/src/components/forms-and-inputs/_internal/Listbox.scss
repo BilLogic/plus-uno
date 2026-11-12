@@ -1,7 +1,7 @@
 /*
  * Listbox — the internal option list (Figma _Listbox), a Popups Menu.
  * `elevation.surface.overlay` and its shadow (as every floating layer
- * without a blanket; the shadow's ring is the edge) and
+ * without a backdrop; the shadow's ring is the edge) and
  * Popover/radius-menu-md, with its options inset Popover/pad-menu 4.
  */
 @use '../../../styles/state' as *;

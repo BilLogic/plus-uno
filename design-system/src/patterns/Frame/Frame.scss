@@ -55,9 +55,9 @@
 }
 
 // Floating (a peek, or an overlay under 1024): over the Page, full height, on
-// the overlay fill with the overlay shadow and no Blanket, like the floating
+// the overlay fill with the overlay shadow and no Backdrop, like the floating
 // Panels. The shadow is what tells it from the docked, sunken Sidebar. It is on the navigation layer (200), under
-// popups (400) and a modal's Blanket (500); the hover edge sits one below it.
+// popups (400) and a modal's Backdrop (500); the hover edge sits one below it.
 .plus-frame__sidebar--raised {
     position: absolute;
     top: 0;
@@ -179,7 +179,7 @@
 }
 
 // Overlay and peek: over the Page, full height, with the overlay
-// role's fill and shadow. The overlay sits on its Blanket; a peek has none.
+// role's fill and shadow. The overlay sits on its Backdrop; a peek has none.
 .plus-frame__panel--overlay,
 .plus-frame__panel--peek {
     position: absolute;
@@ -196,9 +196,9 @@
     }
 }
 
-// The overlay Panel's Blanket: the shared Blanket, contained to the Frame so it
+// The overlay Panel's Backdrop: the shared Backdrop, contained to the Frame so it
 // covers the Page and the Sidebar. The Frame only picks its layer.
-.plus-frame__blanket {
+.plus-frame__backdrop {
     --blanket-contained-layer: var(--frame-layer-blanket);
 }
 

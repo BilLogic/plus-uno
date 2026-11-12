@@ -21,7 +21,7 @@ import {
 <Meta of={PopupFamilyStories} />
 
 <Title />
-The Popups pattern is the set of floating layers that never block the page: Menu, Popup, Flag and Tooltip. They float with no blanket. A Menu and a Popup close on an outside click or Escape. A Flag closes on its timer or its Close button, and a Tooltip closes when hover or focus leaves its trigger. A Popup hugs its content or spans a column step of the screen grid; a Flag and a Tooltip take a fixed width. The examples on this page follow the toolbar's Color mode switch.
+The Popups pattern is the set of floating layers that never block the page: Menu, Popup, Flag and Tooltip. They float with no backdrop. A Menu and a Popup close on an outside click or Escape. A Flag closes on its timer or its Close button, and a Tooltip closes when hover or focus leaves its trigger. A Popup hugs its content or spans a column step of the screen grid; a Flag and a Tooltip take a fixed width. The examples on this page follow the toolbar's Color mode switch.
 
 <DocsTabs of={PopupFamilyStories}>
 
@@ -110,7 +110,7 @@ The four layers are built from existing components, and each component's page ho
 </tbody>
 </DocsTable>
 
-For a decision that must be made before going on, use a [Modal](?path=/docs/templates-modal-modal--docs), which takes a Blanket. For a task that needs the page in view, use a [Drawer](?path=/docs/templates-panel-panel--docs).
+For a decision that must be made before going on, use a [Modal](?path=/docs/templates-modal-modal--docs), which takes a Backdrop. For a task that needs the page in view, use a [Drawer](?path=/docs/templates-panel-panel--docs).
 
 ### Placement
 
@@ -118,7 +118,7 @@ Every layer stays at least 8 from the screen edge and flips when there is no roo
 
 ### Layers
 
-The layer numbers are shared with the [Blanket](?path=/docs/templates-modal-backdrop--docs) page.
+The layer numbers are shared with the [Backdrop](?path=/docs/templates-modal-backdrop--docs) page.
 
 <DocsTable>
 <thead>
@@ -206,9 +206,9 @@ Anything with inputs, steps or a long scroll belongs in a Modal or a Drawer. Nev
     dontCaption="A tooltip that wraps into a paragraph hides what the person needed to read. Use a popup."
 />
 
-### Never bring a blanket.
+### Never bring a backdrop.
 
-A Popups-family layer never takes a blanket and never blocks the page.
+A Popups-family layer never takes a backdrop and never blocks the page.
 
 </div>
 
@@ -250,7 +250,7 @@ A Popups-family layer never takes a blanket and never blocks the page.
 - [Tooltip](?path=/docs/components-overlays-and-layering-tooltip--docs) is the component page for the Tooltip.
 - [Flag](?path=/docs/components-messaging-flag--docs) is the component page for the Flag.
 - [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) is the component page for the Menu.
-- [Blanket](?path=/docs/templates-modal-backdrop--docs) holds the dimmed ground a Modal needs and a Popups-family layer never takes.
+- [Backdrop](?path=/docs/templates-modal-backdrop--docs) holds the dimmed ground a Modal needs and a Popups-family layer never takes.
 - [Modal](?path=/docs/templates-modal-modal--docs) is the layer for a decision that blocks the page.
 
 </div>

@@ -33,7 +33,7 @@ replacement the index's Not-here table gives.
 | Status indicators | ProgressIndicator, ProgressTracker |
 | Text and data display | Code, CodeBlock, Heading, InlineEdit, Table, VisuallyHidden |
 
-Patterns (Frame, Page, Section, Card, Table, Modal, Drawer, Blanket, Popups,
+Patterns (Frame, Page, Section, Card, Table, Modal, Drawer, Backdrop, Popups,
 Sidebar, AI chat) take the same page template from `design-system/src/patterns/`.
 **Libraries** (Overview, Base UI, Font Awesome, Highcharts, Motion) is its own
 section: one short page per library PLUS builds on, from

@@ -84,7 +84,7 @@ Pick the duration by how often the motion happens and how much of the screen it 
     rows={[
         [<C>--motion-duration-short</C>, '100 ms', 'Frequent interactions: button hover and press, list item and table row, tab, checkbox, input and field states, tooltip.'],
         [<C>--motion-duration-medium</C>, '200 ms', 'Things that appear or change in place: popup, menu, flag, accordion panel, content swaps, a skeleton fading to content, chart transitions.'],
-        [<C>--motion-duration-long</C>, '300 ms', 'Large surfaces: modal, blanket and drawer. The ceiling for anything a tutor meets mid-task.'],
+        [<C>--motion-duration-long</C>, '300 ms', 'Large surfaces: modal, backdrop and drawer. The ceiling for anything a tutor meets mid-task.'],
     ]}
 />
 
@@ -102,7 +102,7 @@ The curve follows direction. Arriving elements use entrance, leaving elements us
     head={['Token', 'cubic-bezier', 'Use']}
     rows={[
         [<C>--motion-easing-standard</C>, '0.2, 0, 0, 1', 'Default. Hover and press color, state changes, elements that reposition or resize in place, accordion and progress.'],
-        [<C>--motion-easing-entrance</C>, '0, 0, 0.2, 1', 'Anything arriving: popup, menu, tooltip, flag, modal, blanket, drawer. A fast start and a soft landing.'],
+        [<C>--motion-easing-entrance</C>, '0, 0, 0.2, 1', 'Anything arriving: popup, menu, tooltip, flag, modal, backdrop, drawer. A fast start and a soft landing.'],
         [<C>--motion-easing-exit</C>, '0.4, 0, 1, 1', 'Anything leaving. Starts slowly and accelerates away.'],
     ]}
 />
@@ -125,7 +125,7 @@ Entrances and exits are not symmetrical: entrances orient people, exits confirm 
         ['Hover, press, focus', 'short, standard', 'short, standard', 'Settle color and nothing else.'],
         ['Popup and Menu', 'medium, entrance', 'short, exit', 'Fade with a short slide from the trigger side.'],
         ['Tooltip', 'short, entrance', 'short, exit', 'Fade only, never moves. Keyboard focus shows it as hover does. Hides 100 ms after the pointer leaves.'],
-        ['Modal on a Blanket', 'long, entrance, together', 'medium, exit, together', 'Move focus into the Modal as the enter starts, not when it ends.'],
+        ['Modal on a Backdrop', 'long, entrance, together', 'medium, exit, together', 'Move focus into the Modal as the enter starts, not when it ends.'],
         ['Drawer', 'long, entrance', 'medium, exit', 'Slides from its edge. A narrow-width sidebar, if one is specified, takes the Drawer motion.'],
         ['Flag', 'medium, entrance', 'short, exit', 'Travel is a short fixed distance, not half of the flag’s width. Announce errors at once.'],
         ['Accordion and Progress', 'medium, standard', 'medium, standard', 'Animate size and are documented exceptions to the transform-and-opacity rule. A Progress fill carries a label, so scaling it would distort the text.'],

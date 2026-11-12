@@ -100,8 +100,8 @@
     --frame-layer-edge: calc(var(--layer-navigation) - 1); /* the hover strips that peek a closed Sidebar or Panel */
     --frame-layer-sidebar: var(--layer-navigation); /* the raised Sidebar */
     --frame-layer-topbar-start: calc(var(--layer-navigation) + 1); /* the Topbar start, above a raised Sidebar */
-    --frame-layer-blanket: calc(var(--layer-navigation) + 2); /* the overlay Panel's Blanket */
-    --frame-layer-panel-peek: calc(var(--layer-navigation) + 3); /* a peeking or overlay Panel, above its Blanket */
+    --frame-layer-blanket: calc(var(--layer-navigation) + 2); /* the overlay Panel's Backdrop */
+    --frame-layer-panel-peek: calc(var(--layer-navigation) + 3); /* a peeking or overlay Panel, above its Backdrop */
     --frame-layer-splitter: 1; /* local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip */
     --frame-layer-docked-edge: 1; /* local to the Frame's row, not a step on the navigation scale: lifts a docked Sidebar so its 1px edge lies over the Page's first pixel */
 }

@@ -3,7 +3,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternDrawerStories from './PatternDrawer.stories.jsx';
 import { MediumDrawer, WideDrawer, DecisionInModal, DecisionInDrawer } from './PatternDrawer.examples.jsx';
-import { DrawerWithConfirm, DrawerWithUnrelatedModal } from '../Blanket/Blanket.examples.jsx';
+import { DrawerWithConfirm, DrawerWithUnrelatedModal } from '../Backdrop/Backdrop.examples.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -15,7 +15,7 @@ import {
 <Meta of={PatternDrawerStories} />
 
 <Title />
-The Drawer is a full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters or a short edit. It sits in a Blanket at the right edge or the left edge, over the same blanket a Modal takes. It carries a title, a description, a body and a footer, like a Modal. The examples on this page follow the toolbar's Color mode switch.
+The Drawer is a full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters or a short edit. It sits in a Backdrop at the right edge or the left edge, over the same backdrop a Modal takes. It carries a title, a description, a body and a footer, like a Modal. The examples on this page follow the toolbar's Color mode switch.
 
 <DocsTabs of={PatternDrawerStories}>
 
@@ -60,7 +60,7 @@ The Drawer is a full-height panel at the edge of the screen, for a task that nee
 
 <ComponentExample of={PatternDrawerStories.NoFooter} title="No footer" description={<>Leave out <code>footer</code> for read-only details, and the Drawer ends at the body.</>} />
 
-<ComponentExample of={PatternDrawerStories.OpenAndClose} title="Open and close" description="Press the button: focus moves to the first control, Tab cycles inside, and Escape, Close or a blanket click send it back to the button." />
+<ComponentExample of={PatternDrawerStories.OpenAndClose} title="Open and close" description="Press the button: focus moves to the first control, Tab cycles inside, and Escape, Close or a backdrop click send it back to the button." />
 
 </div>
 
@@ -92,7 +92,7 @@ The Drawer is a full-height panel at the edge of the screen, for a task that nee
 
 ## Usage
 
-Use a Drawer to open a panel beside the page, so a person can work on one thing while the page stays in view. It dims the page with the blanket but does not hide it.
+Use a Drawer to open a panel beside the page, so a person can work on one thing while the page stays in view. It dims the page with the backdrop but does not hide it.
 
 <DocsTable>
 <thead>
@@ -120,7 +120,7 @@ A Drawer takes the Modal width steps, never the page grid. The width grows with 
 </tbody>
 </DocsTable>
 
-A Drawer is placed in the [Blanket](?path=/docs/templates-modal-backdrop--docs) with an edge placement. The Blanket drops its pad and holds the Drawer at that edge, over the same blanket and layers a [Modal](?path=/docs/templates-modal-modal--docs) takes.
+A Drawer is placed in the [Backdrop](?path=/docs/templates-modal-backdrop--docs) with an edge placement. The Backdrop drops its pad and holds the Drawer at that edge, over the same backdrop and layers a [Modal](?path=/docs/templates-modal-modal--docs) takes.
 
 </div>
 
@@ -154,7 +154,7 @@ A Drawer is open or closed. Closing it returns focus to what had it before it op
 <tr><td><code>--heading-medium</code></td><td>20/24</td><td>The title.</td></tr>
 <tr><td><code>--body-default</code>, <code>--ds-text-subtle</code></td><td>14/20</td><td>The description.</td></tr>
 <tr><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td><td>focus ring</td><td>The ring when the Drawer itself holds focus.</td></tr>
-<tr><td><code>--ds-blanket</code></td><td>32% in Light, 60% in Dark</td><td>The fill the Blanket draws behind it.</td></tr>
+<tr><td><code>--ds-blanket</code></td><td>32% in Light, 60% in Dark</td><td>The fill the Backdrop draws behind it.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -195,9 +195,9 @@ At most two overlays: a modal or drawer, and the confirm it raises. Never two un
     dontCaption="A drawer for a short decision."
 />
 
-### Place the Drawer in a Blanket.
+### Place the Drawer in a Backdrop.
 
-Hold the Drawer full height at a screen edge, inside a Blanket. Never put it straight on the page, and never center it: a centered layer is a Modal.
+Hold the Drawer full height at a screen edge, inside a Backdrop. Never put it straight on the page, and never center it: a centered layer is a Modal.
 
 </div>
 
@@ -224,7 +224,7 @@ Hold the Drawer full height at a screen edge, inside a Blanket. Never put it str
 
 - The Drawer is a dialog with `aria-modal` set to true. The title is its h1 and names it through `aria-labelledby`, and the description is linked through `aria-describedby`.
 - Opening moves focus to the first control inside and traps it there. Tab and Shift+Tab cycle inside.
-- Escape, the Close button and a click on the blanket call `onClose`, and focus returns to the control that opened it. An inner control that handles Escape keeps it.
+- Escape, the Close button and a click on the backdrop call `onClose`, and focus returns to the control that opened it. An inner control that handles Escape keeps it.
 - A body that scrolls is a tab stop, so a keyboard can reach it.
 - An `inline` Drawer, drawn in the page flow for docs, sets `aria-modal` to false and leaves focus where it is.
 
@@ -235,7 +235,7 @@ Hold the Drawer full height at a screen edge, inside a Blanket. Never put it str
 ## Related
 
 - [Modal](?path=/docs/templates-modal-modal--docs) is the centered layer for a task that blocks the page.
-- [Blanket](?path=/docs/templates-modal-backdrop--docs) places the Drawer at an edge and draws the fill.
+- [Backdrop](?path=/docs/templates-modal-backdrop--docs) places the Drawer at an edge and draws the fill.
 - [Section](?path=/docs/templates-section-section--docs) and [Card](?path=/docs/templates-section-card--docs) hold content that belongs on the page itself.
 - <a href="?path=/docs/templates-frame-frame--docs">Frame</a> shows a Drawer open over the app frame, and how it meets the Sidebar.
 

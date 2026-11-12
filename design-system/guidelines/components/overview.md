@@ -50,8 +50,8 @@ benchmark for every page, so a name that matches it needs no row.
 | Docked | Inline (side nav mode) | We say docked for a Sidebar or Panel that sits beside the Page and moves it |
 | Peek | Flyout (side nav mode) | We say peek for a closed Sidebar, or a closed Panel with `panelPeek`, shown over the Page, which does not move |
 | Splitter | Splitter | Same name; the draggable edge that resizes the docked Panel |
-| Blanket (pattern) | Blanket | Same name; here it also sets the width of what sits on it, in screen-grid columns |
-| Modal (pattern) | none | The pattern is the blanket plus a layer; ADS has only the dialog component |
+| Backdrop (pattern) | Backdrop | Same name; here it also sets the width of what sits on it, in screen-grid columns |
+| Modal (pattern) | none | The pattern is the backdrop plus a layer; ADS has only the dialog component |
 | Modal (component) | Modal dialog | Built on the Modal pattern |
 | Status tag | Lozenge | Named for what it shows, a state, in the label family |
 | Count tag | Badge | Named for what it shows, a number, in the label family |

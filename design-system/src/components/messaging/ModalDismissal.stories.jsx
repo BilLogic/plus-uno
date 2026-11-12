@@ -11,12 +11,12 @@ import Modal from './Modal';
  * it is controlled: the caller owns `show` and the component only reports
  * that a dismissal happened, through `onClose`. Every dismissal path is
  * therefore a callback that has to fire, and each one is a separate wire:
- * the header's close button, Escape (via `keyboard`), the blanket (via
+ * the header's close button, Escape (via `keyboard`), the backdrop (via
  * `backdrop`), and the caller's own footer buttons.
  *
  * None of that was exercised. Every story in `Modal.stories.jsx` renders
  * `renderAs="inline"`, which returns the panel markup and never places it in
- * a `Blanket` at all — so the overlay, the blanket, the Escape handler and
+ * a `Backdrop` at all — so the overlay, the backdrop, the Escape handler and
  * the focus behavior had no coverage of any kind, and a render assertion
  * cannot reach them: an inline panel renders identically whether or not the
  * overlay it stands in for can be closed.
@@ -166,9 +166,9 @@ StaticBackdropRefusesToClose.play = async ({ canvasElement }) => {
     await expect(closes).toHaveTextContent('0');
     await expect(doc.getByText('Uploading transcript')).toBeInTheDocument();
 
-    // So is a click on the blanket beside the dialog — dispatched on the
-    // blanket itself, since a click landing on the dialog is not one.
-    const backdrop = canvasElement.ownerDocument.querySelector('.plus-pattern-blanket');
+    // So is a click on the backdrop beside the dialog — dispatched on the
+    // backdrop itself, since a click landing on the dialog is not one.
+    const backdrop = canvasElement.ownerDocument.querySelector('.plus-pattern-backdrop');
     await expect(backdrop).not.toBeNull();
     backdrop.click();
     await expect(closes).toHaveTextContent('0');

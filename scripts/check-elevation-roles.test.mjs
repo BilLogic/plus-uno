@@ -18,7 +18,7 @@
  *     this passes happily. It checks agreement, not judgment.
  *  2. COMPONENTS THAT USE A LEVEL DIRECTLY. The layers moved to the new color
  *     tokens name `--ds-shadow-overlay` with `--ds-surface-overlay` themselves;
- *     a modal takes that overlay pair too, since the blanket under it is what
+ *     a modal takes that overlay pair too, since the backdrop under it is what
  *     sets it apart from a menu. The surfaces listed below are pinned one by
  *     one; auditing every `box-shadow` against the table is a different check
  *     with a much larger corpus.

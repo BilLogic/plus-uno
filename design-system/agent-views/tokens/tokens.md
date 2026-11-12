@@ -201,7 +201,7 @@ Stacking order: `z-index: var(--layer-modal)`.
 --layer-card  /* Stacking order of a card raised above page content, such as a sticky table part. */
 --layer-dialog  /* Stacking order of a non-modal dialog over the page, below popups. */
 --layer-flag  /* Stacking order of a Flag, above any Modal. */
---layer-modal  /* Stacking order of a Modal, above its Blanket. */
+--layer-modal  /* Stacking order of a Modal, above its Backdrop. */
 --layer-navigation  /* Stacking order of the Frame's top bar and Sidebar. */
 --layer-popup  /* Stacking order of a Popup, DropdownMenu or listbox. */
 --layer-spotlight  /* Stacking order of a Spotlight, above Flags. */

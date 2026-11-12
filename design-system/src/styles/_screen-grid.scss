@@ -1,6 +1,6 @@
 /**
  * The screen grid a floating layer takes its width from: the one place the
- * column steps are worked out, for Modal, the Blanket patterns and Popup.
+ * column steps are worked out, for Modal, the Backdrop patterns and Popup.
  *
  * Figma: 12 columns, gutter 16, inside the screen pad, never under 720 and
  * capped at 1232 like content. A layer spans `--plus-overlay-span` of those
@@ -10,13 +10,13 @@
  * scripts/frame-layer-tokens.test.mjs holds it to those tokens.
  *
  * The screen is `--plus-overlay-screen` when an ancestor sets it (an inline
- * Blanket, or a docs frame drawn at a mode's width), and the viewport
+ * Backdrop, or a docs frame drawn at a mode's width), and the viewport
  * otherwise. The screen pad is Screen/pad-x-screen below 1440, 24; from 1440
  * the grid is already at its 1232 cap with either pad, so one value serves.
  *
  * A layer includes this and sets `--plus-overlay-span` from its width step:
  * Modal's `6-col` · `8-col` · `10-col`, Popup's `3-col` · `4-col`, and the
- * Blanket patterns' sm · md · lg (6 · 8 · 10) through `screen-grid-width-steps`.
+ * Backdrop patterns' sm · md · lg (6 · 8 · 10) through `screen-grid-width-steps`.
  *
  * @param $pad the layer's own pad, added on each side of the columns
  */
@@ -36,7 +36,7 @@
 
 /**
  * The width steps: `&-width-sm` · `-md` · `-lg` set the span to 6 · 8 · 10.
- * The numbers match BLANKET_SPANS in patterns/Blanket/Blanket.jsx.
+ * The numbers match BACKDROP_SPANS in patterns/Backdrop/Backdrop.jsx.
  */
 @mixin screen-grid-width-steps {
     &-width-sm { --plus-overlay-span: 6; }
@@ -46,7 +46,7 @@
 
 /**
  * The tallest a layer gets: the screen less Overlay/pad-y above and below.
- * An inline Blanket sets `--plus-overlay-max-height` from its stand-in screen;
+ * An inline Backdrop sets `--plus-overlay-max-height` from its stand-in screen;
  * otherwise it is the viewport's (`--blanket-max-height-modal`).
  */
 $overlay-max-height: var(--plus-overlay-max-height, var(--blanket-max-height-modal));
