@@ -96,8 +96,8 @@ export const CountOnIcon = ({ title = 'A view bar whose filter icon button is wi
   </Canvas>
 );
 
-/** A row of chips under the bar, repeating what is on. */
-export const ChipRow = ({ title = 'A view bar with a plain filter icon button and a row of chips under the bar repeating each filter that is on' }) => (
+/** A row of tags under the bar, repeating what is on. */
+export const TagRow = ({ title = 'A view bar with a plain filter icon button and a row of tags under the bar repeating each filter that is on' }) => (
   <Canvas title={title}>
     <TitleRow />
     <Views />

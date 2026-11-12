@@ -21,12 +21,12 @@ authored half, counted rather than assumed.
 | [Fieldset](Fieldset.md) | 8 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload/index.md) | 17 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✅ | ✅ | ✅ |
-| [FilterMenu](FilterMenu/index.md) | 15 | ✅ | ✕ | ✅ |
+| [FilterMenu](FilterMenu/index.md) | 16 | ✅ | ✕ | ✅ |
 | [IconButton](IconButton/index.md) | 14 | ✅ | ✅ | ✅ |
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [LinkButton](LinkButton/index.md) | 13 | ✅ | ✅ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✅ | ✅ |
-| [PopupSelect](PopupSelect/index.md) | 17 | ✅ | ✕ | ✅ |
+| [PopupSelect](PopupSelect/index.md) | 18 | ✅ | ✕ | ✅ |
 | [PromptInput](PromptInput/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Radio](Radio/index.md) | 20 | ✅ | ✅ | ✅ |
 | [RadioGroup](RadioGroup/index.md) | 19 | ✅ | ✅ | ✅ |

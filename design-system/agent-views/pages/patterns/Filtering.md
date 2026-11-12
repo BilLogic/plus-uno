@@ -20,7 +20,7 @@ Pick by how many categories there are and how long their lists run. When a Secti
 
 ## What is on
 
-The control that holds a filter shows it: the FilterButton's count, or the Filter icon's own count on the selected fill. No chip row.
+The control that holds a filter shows it: the FilterButton's count, or the Filter icon's own count on the selected fill. No row of tags under the bar.
 
 ## Key cases
 
@@ -46,9 +46,9 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 
 ## Alternatives
 
-- For finding rows by name, use `Search`: it keeps its own icon before the filters.
+- For finding rows by name, use the Search pattern: its icon sits before the filters.
 - For switching between fixed views of the rows, use `Tabs` as pill views.
-- For sorting, use the `DynamicTable` column header: sorting is not a filter.
+- For sorting, use the `Table` column header: sorting is not a filter.
 
 ## Content guidelines
 
@@ -74,7 +74,7 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 | Part | Component | Notes |
 | --- | --- | --- |
 | Quick filter | Filter button | A count only when a value is on; it hugs its label and opens its list at bottom-end. |
-| Filter icon | Icon button | The filter glyph, tooltip "Filters"; its `trailingMetric` draws the count on the selected fill. |
+| Filter icon | Icon button | The `filter` icon, tooltip "Filters"; its `trailingMetric` draws the count on the selected fill. |
 | One list (tier 1 lists, 2a) | Popup select | Applies as you pick, radios for one. Checkboxes for several are Planned. |
 | Filter menu (2b, 2c) | Filter menu | Holds values until Apply; columns side by side or stacked; Reset and Apply full bleed. |
 | Placement and width | Popup | bottom-end at the end of a bar, bottom-start at its start; 4 from the trigger. |
@@ -112,10 +112,10 @@ Don't: The filters squeezed in beside the views.
 
 **Checked:** Automatic
 
-A FilterButton's count, the Filter icon's count on the selected fill, or a count beside each category in a side. No separate count tag, and no chip row under the bar.
+A FilterButton's count, the Filter icon's count on the selected fill, or a count beside each category in a side. No separate count tag, and no row of tags under the bar.
 
 Do: The count on the Filter icon, on the selected fill.
-Don't: A row of chips under the bar, repeating what is on.
+Don't: A row of tags under the bar, repeating what is on.
 
 ### Apply one list as you pick and several categories on Apply. {#apply-one-list-as-you-pick-and-several-categories-on-apply}
 

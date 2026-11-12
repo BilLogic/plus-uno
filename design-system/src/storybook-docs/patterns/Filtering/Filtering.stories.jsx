@@ -192,8 +192,8 @@ export const FilterCount = {
             await expect(p.canvas.getAllByRole('row'), 'the header row and the one match').toHaveLength(2);
         });
 
-        await step('No chip row repeats what is on', async () => {
-            await expect(canvasElement.querySelector('.plus-section-view-bar ~ * .plus-tag, .plus-tag-group'), 'no chips under the bar').toBeNull();
+        await step('No row of tags repeats what is on', async () => {
+            await expect(canvasElement.querySelector('.plus-section-view-bar ~ * .plus-tag, .plus-tag-group'), 'no tags under the bar').toBeNull();
         });
 
         await step('Reset clears the menu; Apply clears the count', async () => {

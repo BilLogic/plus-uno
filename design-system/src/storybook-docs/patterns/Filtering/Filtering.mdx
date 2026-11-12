@@ -7,7 +7,7 @@ import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair } fr
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
-    ChipRow,
+    TagRow,
     CountOnIcon,
     FiltersAmongViews,
     FiltersAtEnd,
@@ -46,7 +46,7 @@ Pick by how many categories there are and how long their lists run. When a Secti
 
 ## What is on
 
-The control that holds a filter shows it: the FilterButton's count, or the Filter icon's own count on the selected fill. No chip row.
+The control that holds a filter shows it: the FilterButton's count, or the Filter icon's own count on the selected fill. No row of tags under the bar.
 
 <ComponentExample of={FilteringStories.FilterCount} title="The Filter icon's count" description="Open the menu, tick two and press Apply. The button widens and the count fades in on the selected fill, and the icon reads &quot;Filters, 2 applied&quot;. The result count above the rows narrows in words. Reset in the menu clears the ticks; Apply then clears the count." />
 
@@ -105,9 +105,9 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 
 ## Alternatives
 
-- For finding rows by name, use `Search`: it keeps its own icon before the filters.
+- For finding rows by name, use the Search pattern: its icon sits before the filters.
 - For switching between fixed views of the rows, use `Tabs` as pill views.
-- For sorting, use the `DynamicTable` column header: sorting is not a filter.
+- For sorting, use the `Table` column header: sorting is not a filter.
 
 </div>
 
@@ -145,13 +145,13 @@ The start of the bar is for views. The filters come after Search and before More
 
 <RuleTag kind="automatic" />
 
-A FilterButton's count, the Filter icon's count on the selected fill, or a count beside each category in a side. No separate count tag, and no chip row under the bar.
+A FilterButton's count, the Filter icon's count on the selected fill, or a count beside each category in a side. No separate count tag, and no row of tags under the bar.
 
 <DoDontPair
     doExample={<CountOnIcon />}
     doCaption="The count on the Filter icon, on the selected fill."
-    dontExample={<ChipRow />}
-    dontCaption="A row of chips under the bar, repeating what is on."
+    dontExample={<TagRow />}
+    dontCaption="A row of tags under the bar, repeating what is on."
 />
 
 ### Apply one list as you pick and several categories on Apply.
@@ -216,7 +216,7 @@ Below 960 the side hides and the Filter icon returns with its count; pressing it
 </thead>
 <tbody>
 <tr><td>Quick filter</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-filter-button--docs">Filter button</a></td><td>A count only when a value is on; it hugs its label and opens its list at bottom-end.</td></tr>
-<tr><td>Filter icon</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a></td><td>The filter glyph, tooltip "Filters"; its `trailingMetric` draws the count on the selected fill.</td></tr>
+<tr><td>Filter icon</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a></td><td>The `filter` icon, tooltip "Filters"; its `trailingMetric` draws the count on the selected fill.</td></tr>
 <tr><td>One list (tier 1 lists, 2a)</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-popup-select--docs">Popup select</a></td><td>Applies as you pick, radios for one. <PlannedTag /> Checkboxes for several are Planned.</td></tr>
 <tr><td>Filter menu (2b, 2c)</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-filter-menu--docs">Filter menu</a></td><td>Holds values until Apply; columns side by side or stacked; Reset and Apply full bleed.</td></tr>
 <tr><td>Placement and width</td><td><a target="_top" href="./?path=/docs/templates-popup-popup--docs">Popup</a></td><td>bottom-end at the end of a bar, bottom-start at its start; 4 from the trigger.</td></tr>

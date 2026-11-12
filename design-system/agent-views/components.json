@@ -4450,6 +4450,15 @@
       "summary": "Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Reset** clears every box in the menu without applying. Apply then applies the empty set. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.",
       "props": [
         {
+          "name": "container",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region.",
+          "deprecated": null
+        },
+        {
           "name": "categories",
           "type": "arrayOf",
           "required": true,
@@ -9469,6 +9478,15 @@
       "source": "design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx",
       "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker=\"check\"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
       "props": [
+        {
+          "name": "container",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region.",
+          "deprecated": null
+        },
         {
           "name": "options",
           "type": "arrayOf",
