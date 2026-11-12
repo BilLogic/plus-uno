@@ -140,6 +140,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `isDisabled` | bool | `false` | Dims the field and blocks typing. |
 | `clearLabel` | string | `'Clear search'` | The clear button's name. |
 | `panelLabel` | string | `'Suggestions'` | The focused panel's accessible name. |
+| `defaultPanelOpen` | bool | `false` | `focused` panel: starts open without focus, for a picture of the open panel. |
+| `panelContainer` | object | — | `focused` panel: the element the panel mounts in instead of the page, so a picture keeps it inside its frame. |
 | `scopeLabel` | string | `'Search scope'` | The scope filter's accessible name. |
 | `inputRef` | func or shape or any | — | Ref to the underlying `<input>`. |
 | `className` | string | `''` | Extra class on the outer wrapper. |

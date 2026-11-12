@@ -2,72 +2,98 @@
 
 # Search
 
-One kind of search: narrowing as you type inside one Section. There is no global search and no results page. The field lives in the view bar, names its scope, and the count updates in words.
+How a person finds a record by typing. Every search is a Search field in one of three modes, picked by where the answer lands: active filters the rows in place, focused opens a panel of matches, basic runs on Enter.
 
 **Kind:** Pattern
 
 **Storybook page:** `design-system/src/storybook-docs/patterns/Search/Search.mdx`
 
-## The states
+## Choosing a type
 
-Four, in order. The Text field and Icon button pages hold their own states; these are the search field's. A Search component is Planned ; today each picture composes the real Icon button, Text field and Dynamic table.
+Three modes, one field. Pick by how much data there is and how costly it is to search.
 
-## The field, live
+- **Active.** Small or on-screen data. The rows narrow in place as the person types.
+- **Focused.** A person's own work, found from anywhere. A panel under the field lists recent searches, then matches grouped by type, and widens with "See all results".
+- **Basic.** Large or costly data. Nothing runs while typing; Enter takes the person to a results page.
 
-Grow, narrow, Esc, Esc. Press the icon and type: the count updates as you go. Esc clears the text; a second Esc closes the field. The field stays open while it holds text, and switching views keeps it. The picture below shows the field narrowing; the behavior runs in the Storybook tests (`Esc clears, a second Esc closes`, `switching views keeps the search`).
+## Active search
+
+The field sits in the Section's view bar, compact, and collapses to an icon until it is needed. The results area under the bar holds the count, the rows and the states; the bar never moves.
+
+## Focused search
+
+Focus in the field opens the panel. With no text it lists recent searches; while typing it lists matches grouped by type, then a last "See all results" row that runs a basic search. An optional action row, such as "Add student", closes the panel.
+
+## Basic search
+
+The field alone. Typing runs nothing; Enter runs the search and a results page takes over. That page is its own template, outside this pattern.
+
+## Scope filter and placement
 
 ## Usage
 
-Use Search when a person is looking for rows by what they are called, inside the Section they are looking at. Search narrows as you type; it is not a filter, so it keeps its own icon before the filters and never shares a count with them. Server-backed lists narrow the same way through the Select's `loadOptions`, 50 at a time.
+Use Search when a person knows what a record is called. Search finds by name; Filtering narrows by attribute, so the two keep separate controls and separate counts.
+
+| Mode | Use when | Where the answer lands |
+| --- | --- | --- |
+| Active | The data is small or already on screen. | The rows in place, as you type. |
+| Focused | A person finds their own work from anywhere. | A panel under the field; "See all results" widens it. |
+| Basic | The data is large or costly to search. | A results page, after Enter. |
 
 | Key or action | With text | Empty |
 | --- | --- | --- |
-| Press the Search icon | Not shown | Opens the field and focuses it |
-| Type | Rows narrow; the count updates in words and is announced politely | Rows narrow; the count updates in words and is announced politely |
-| Esc | Clears the text | Closes the field and returns focus to the icon |
-| "Clear search" | Clears the text; the field stays open | Not shown |
-| Leave the field | Stays open with its text | Shrinks back to the icon |
-| Switch views | The search is kept | Nothing to keep |
-| "Reset filters" | Clears the search and every filter | Nothing to clear |
-| Leave the page | Planned: the search is cleared | Nothing to clear |
+| Type | Active: rows narrow and the count updates. Focused: the panel lists matches. | Focused: the panel lists recent searches. |
+| Enter | Basic: runs the search. Focused: chooses the row under the cursor, or runs the search when none is. | Nothing to run. |
+| Esc | Focused with the panel open: closes the panel and keeps the text. Otherwise clears the text. | A collapsible field closes and returns focus to the icon. |
+| Arrow keys | Focused: move through the panel's rows. | Focused: move through recent searches. |
+| Tab | Focused: closes the panel and moves on. | Moves on. |
+| "Clear search" | Clears the text; the field stays open. | Not shown. |
+| Leave the field | Stays open with its text. | A collapsible field shrinks back to the icon. |
+| Switch views | The search is kept. | Nothing to keep. |
+| "Reset filters" | Clears the search and every filter. | Nothing to clear. |
 
 ## Alternatives
 
 - For narrowing by an attribute, follow Filtering.
 - For picking one value from a long list, use a Select with its own search.
-- For moving to another area, follow Navigation; there is no global search.
+- For moving to another area, follow Navigation.
 
 ## Content guidelines
 
 | Do | Don't |
 | --- | --- |
-| Placeholder names the scope: "Search students". | "Search…", "Type to search". |
+| Placeholder starts with a verb and names the scope: "Search students". | "Search…", "Type to search". |
 | Count in words: "2 of 6 students", "0 of 6 students". | "2", "2 results". |
 | Clear button: "Clear search". | "×", "Reset". |
 | No matches: 'No students match "Zoe".' with "Reset filters". | "No results found." |
+| Scope filter: "All" first, then the kinds: "Students", "Sessions". | "Everything", "Any". |
+| Last panel row: "See all results for Ava". | "More", "Search". |
 
 ## Accessibility
 
-- The icon button is named "Search students"; the field takes the same name, so a screen reader hears the scope either way.
-- The count is a polite live region that announces "2 of 6 students" as the rows narrow.
-- Tab enters the field; Esc clears, then closes; closing returns focus to the icon.
-- Focus stays in the field when the list empties; it never jumps to the empty state.
+- The hidden label still names the field: the collapsed icon and the field share the placeholder's words.
+- The scope filter has its own name, "Search scope".
+- In focused, the input is the combobox: focus stays in it, the highlighted row is its active descendant and the panel is a named listbox.
+- The count in the results header is a polite live region, so "2 of 6 students" is announced as the rows narrow.
+- Focus stays in the field when the results empty; it never jumps to the empty state.
+- Loading is announced through the Spinner's status text.
 
 ## Parts
 
 | Part | Component | Notes |
 | --- | --- | --- |
-| Closed | Icon button | Named "Search students"; subtle appearance, in the view bar before the filters. |
-| Field | Text field | Compact, label hidden, a search icon before the text and "Clear search" after it. |
+| Field | Search field | Mode `active`, `focused` or `basic`; compact in a bar, default in a page body. |
+| Panel | Popup | Focused only: recent searches, grouped matches, "See all results" and an optional action row. |
 | Rows | Dynamic table | Narrows as the text changes. |
-| No matches | Empty state | Replaces the table; offers "Reset filters". |
-| Search component | None yet | Planned: one part that owns the grow, Esc and clear behavior the pictures compose. |
+| No matches | Empty state | Fills the results body; offers "Reset filters". |
+| Loading | Skeleton | Takes the results body; a Spinner takes the search icon. |
 
 ## Related
 
 - Filtering: use for narrowing by attributes; its Reset clears the search.
 - Empty: use for the No matches state.
-- Section: use for where the bar sits.
+- Loading: use for the wait while results load.
+- Section: use for where the view bar sits.
 
 ## Motion
 
@@ -78,44 +104,60 @@ Search reads these motion tokens and no literal duration or curve.
 | grow | Swap content in place | `--ds-motion-spatial-fast` | The Search icon grows into a field to the left on spatial.fast, its right edge fixed. |
 | narrow | Swap content in place | `--ds-motion-appearance-fast` | Typing swaps the rows in place as they narrow. |
 | shrink | Swap content in place | `--ds-motion-spatial-fast` | Escape, or an empty blur, shrinks the field back to the icon on spatial.fast. |
+| panel | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A focused search opens its panel the way a Popup opens: it clips open under the field, and closing is the fade. |
 
 ## Best practices
 
-### Narrow the rows as the person types. {#narrow-the-rows-as-the-person-types}
+### Pick the mode by where the answer lands. {#pick-the-mode-by-where-the-answer-lands}
 
 **Checked:** Review
 
-No submit, no results page. The table under the bar narrows and the count updates in words: "2 of 6 students". Loading, empty and no-match states happen inside the table, so the view bar stays usable.
+Active when the rows are in hand and few, focused when the person jumps to a record from anywhere, basic when the search is heavy enough to wait for Enter. One mode per field.
 
-### Grow the Search icon into the field and shrink it back when empty. {#grow-the-search-icon-into-the-field-and-shrink-it-back-when-empty}
-
-**Checked:** Review
-
-The field stays open while it holds text. Leaving an empty field shrinks it back to the icon. The icon sits before the filters, at the height every bar control shares. The animated grow and shrink are Planned .
-
-### Clear on Esc and close on a second Esc. {#clear-on-esc-and-close-on-a-second-esc}
+### Name the scope in the placeholder. {#name-the-scope-in-the-placeholder}
 
 **Checked:** Review
 
-The first Esc empties the text and keeps the field; the second closes it and returns focus to the icon. The in-field button is named "Clear search".
+"Search students". The label is hidden, so the placeholder is what a person reads and what names the collapsed icon.
 
-### Name the scope in the placeholder and the accessible name. {#name-the-scope-in-the-placeholder-and-the-accessible-name}
-
-**Checked:** Review
-
-"Search students", never "Search…". There is no visible label; the icon and the placeholder say what is searched.
-
-Do: The placeholder names the scope.
-Don't: "Search…" with a Go button: the scope is unnamed and the rows wait for a press.
-
-### Keep the search across views. {#keep-the-search-across-views}
+### Add a scope filter when the search covers more than one kind of record. {#add-a-scope-filter-when-the-search-covers-more-than-one-kind-of-record}
 
 **Checked:** Review
 
-Switching pills keeps the text, so a person can compare views on one name. "Reset filters" clears the search too. Leaving the page clears it .
+The filter sits before the field with "All" first and selected, and each scope carries its count. A search over one kind of record has no scope filter.
 
-### Name what was searched when nothing matches. {#name-what-was-searched-when-nothing-matches}
+### Show the count in the results header, zero included. {#show-the-count-in-the-results-header-zero-included}
 
 **Checked:** Review
 
-The empty state replaces the table whole and says what matched nothing. See Empty.
+"2 of 6 students", "0 of 6 students". The count lives in the results header, in words, and updates as the rows narrow.
+
+### Answer no matches in the results body. {#answer-no-matches-in-the-results-body}
+
+**Checked:** Review
+
+An Empty state fills the results body, names what was searched and offers a next action: "Reset filters". The field stays where it is.
+
+### Let loading mirror empty. {#let-loading-mirror-empty}
+
+**Checked:** Review
+
+While results load, Skeleton bars take the results body, a Spinner takes the search icon's place and the count slot says what is happening. See Loading.
+
+### Keep the bar still. {#keep-the-bar-still}
+
+**Checked:** Review
+
+The field, the scope filter and the other bar controls hold their place in every state: typing, loading, no matches. Only the results area changes.
+
+### Clear in two steps. {#clear-in-two-steps}
+
+**Checked:** Review
+
+Esc empties the text and keeps the field. In focused, the first Esc closes the panel and keeps the text, and the next clears it. A collapsible field closes on the Esc after that and returns focus to the icon. "Clear search" empties the text and leaves the field open. Switching views keeps the search; "Reset filters" clears it.
+
+### Place by context: compact in a bar, default in a page body. {#place-by-context-compact-in-a-bar-default-in-a-page-body}
+
+**Checked:** Review
+
+The view bar and the top bar hold controls of one height, so the field takes `spacing="compact"` there. A search in a page body takes the default spacing and stays open.

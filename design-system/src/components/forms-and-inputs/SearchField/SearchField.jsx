@@ -83,6 +83,8 @@ const SearchField = ({
     isDisabled = false,
     clearLabel = 'Clear search',
     panelLabel = 'Suggestions',
+    defaultPanelOpen = false,
+    panelContainer,
     scopeLabel = 'Search scope',
     inputRef: inputRefProp,
     className = '',
@@ -150,7 +152,7 @@ const SearchField = ({
     /* ---------- the focused panel ---------- */
     const focusedMode = mode === 'focused';
     const trimmed = value.trim();
-    const [panelOpen, setPanelOpen] = useState(false);
+    const [panelOpen, setPanelOpen] = useState(defaultPanelOpen);
     const [cursor, setCursor] = useState(-1);
     const listId = useId();
     const actions = React.Children.toArray(children).filter((child) => child?.type === SearchFieldAction);
@@ -451,6 +453,7 @@ const SearchField = ({
                             placement="bottom-start"
                             label={panelLabel}
                             initialFocus={false}
+                            container={panelContainer}
                             className="plus-search-field__popup"
                         >
                             <div
@@ -539,6 +542,10 @@ SearchField.propTypes = {
     clearLabel: PropTypes.string,
     /** The focused panel's accessible name. */
     panelLabel: PropTypes.string,
+    /** `focused` panel: starts open without focus, for a picture of the open panel. */
+    defaultPanelOpen: PropTypes.bool,
+    /** `focused` panel: the element the panel mounts in instead of the page, so a picture keeps it inside its frame. */
+    panelContainer: PropTypes.object,
     /** The scope filter's accessible name. */
     scopeLabel: PropTypes.string,
     /** Ref to the underlying `<input>`. */
