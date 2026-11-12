@@ -3,9 +3,8 @@
  *
  * The generated color tokens key every mode off `data-color-mode` (light,
  * dark, auto) and `data-contrast-mode` (more, no-preference, auto); no
- * attribute is light at standard contrast. Bootstrap keys its own light and
- * dark off `data-bs-theme`, which has no `auto`, so under auto it follows the
- * OS's `prefers-color-scheme` as read when this runs.
+ * attribute is light at standard contrast. Under `auto` the page follows the
+ * OS's `prefers-color-scheme`; `resolveColorScheme` says which one that is now.
  *
  * The Storybook decorator in `.storybook/preview.jsx` calls this with the
  * toolbar's globals, and the Foundations/Color modes story tests it.
@@ -16,11 +15,11 @@ import { tokenColor } from './style-probes.js';
 export const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 
 /**
- * The Bootstrap theme a color mode resolves to now.
- * @param {string} colorMode light | dark | auto
+ * The scheme a color mode resolves to now: `auto` reads the OS preference.
+ * @param {string | null} colorMode light | dark | auto
  * @returns {'light' | 'dark'}
  */
-export const resolveBsTheme = (colorMode) => {
+export const resolveColorScheme = (colorMode) => {
     if (colorMode !== 'auto') return colorMode === 'dark' ? 'dark' : 'light';
     const osDark = typeof window !== 'undefined' && window.matchMedia
         ? window.matchMedia(COLOR_SCHEME_QUERY).matches
@@ -38,7 +37,6 @@ export const applyColorModes = (colorMode, contrastMode) => {
     const root = document.documentElement;
     root.setAttribute('data-color-mode', colorMode);
     root.setAttribute('data-contrast-mode', contrastMode);
-    root.setAttribute('data-bs-theme', resolveBsTheme(colorMode));
 };
 
 /**
@@ -62,7 +60,7 @@ export const COLOR_MODES = [
  */
 export const inEveryColorMode = async (check) => {
     const root = document.documentElement;
-    const saved = ['data-color-mode', 'data-contrast-mode', 'data-bs-theme'].map((name) => [name, root.getAttribute(name)]);
+    const saved = ['data-color-mode', 'data-contrast-mode'].map((name) => [name, root.getAttribute(name)]);
     try {
         for (const [colorMode, contrastMode] of COLOR_MODES) {
             applyColorModes(colorMode, contrastMode);

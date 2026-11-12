@@ -2,7 +2,7 @@
 
 # EmptyState
 
-What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional outlined one after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.
+What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. It also fills the slot when content cannot be shown: a load failure ("Couldn't load sessions" with Try again) or no access (the plain reason and who can help). Those are the same parts with different words, so they need no props of their own. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional outlined one after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.
 
 Also asked as: no data, zero state, blank slate.
 
@@ -10,7 +10,7 @@ Also asked as: no data, zero state, blank slate.
 
 **Source:** `design-system/src/components/messaging/EmptyState/EmptyState.jsx`
 
-**Stories:** `design-system/src/components/messaging/EmptyState/EmptyState.stories.jsx` — Overview, WithIcon, Default, Compact, InATable, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/EmptyState/EmptyState.stories.jsx` — Overview, WithIcon, Default, Compact, InATable, LoadFailure, NoAccess, LoadFailureInATable, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/EmptyState/EmptyState.mdx`
 
@@ -20,7 +20,19 @@ Use `EmptyState` when a view, panel, card or table has no content yet, in place
 of a blank area or a bare "No results". It carries a picture, a header, one line
 and one primary action.
 
-Use a `SectionMessage`, not an `EmptyState`, for a failure.
+Use `EmptyState` too when content cannot be shown. A view, panel or table that
+fails to load shows the failure in the same slot, with a filled **Try again**.
+A view the person may not open says so plainly and names who can help. A
+rejected form submit is not one of these: a danger `SectionMessage` at the top
+of the form summarizes it. A failure in the background is a `Flag`.
+
+### Kind guidance
+
+| The view is | The slot says |
+| --- | --- |
+| Empty | What goes here and the action that fills it. Example: "No students yet", Add student. |
+| Failed to load | What failed and a filled Try again. Example: "Couldn't load sessions". |
+| No access | The plain reason and who can help, with no action. Example: "Only supervisors can see session notes. Ask your supervisor to add you." |
 
 ### Spacing guidance
 
@@ -52,6 +64,14 @@ Say what goes here and what to do, in a warm voice. Never apologize.
 Do: What goes here and what to do.
 Don't: A cold label with no way forward.
 
+### Show a load failure in the slot, with Try again. {#show-a-load-failure-in-the-slot-with-try-again}
+
+State what failed and offer the retry. Never leave the view blank or send the
+person to a message above it.
+
+Do: What failed, with Try again.
+Don't: An empty-view invitation when the load failed.
+
 ### Fill a Table with it, not around it. {#fill-a-table-with-it-not-around-it}
 
 The Table keeps its header row and the EmptyState takes the body.
@@ -74,7 +94,8 @@ Don't: An EmptyState under a Table with an empty body.
 
 - `Table`, whose `emptyState` slot takes it.
 - `Illustration`, for the image slot.
-- `SectionMessage`, for a failure rather than an empty view.
+- `Flag`, for a failure in the background that stays until closed.
+- `SectionMessage`, for a rejected form submit at the top of the form.
 
 Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
 
@@ -113,6 +134,8 @@ Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage`
 | Use the description for context that helps someone decide what to do. | Repeat the header in the description. |
 | Make the primary action name the next step: "Add student". | Use a generic label such as "Continue". |
 | Add a secondary action only for a real alternative, such as importing. | Add a second action just to fill space. |
+| For a failure, say what happened in plain words and offer Try again. | Show an error code or "Something went wrong" with no next step. |
+| For no access, give the reason and who can help. | Offer an action the person is not allowed to take. |
 
 ## Props
 

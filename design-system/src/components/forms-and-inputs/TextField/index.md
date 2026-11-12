@@ -82,6 +82,13 @@ Use `default` in forms and `compact` in toolbars, filter bars and table rows.
 
 Such as seats. For an ID, a phone number or a ZIP code, use `type="text"` with `inputMode`.
 
+### Read-only is not disabled. {#read-only-is-not-disabled}
+
+`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+
+Do: Read-only keeps the value readable, and the caption says why.
+Don't: Disabled fades a value people need to read.
+
 ## Accessibility
 
 - **The label is associated whether you pass `id` or not.** One id is derived
@@ -111,7 +118,7 @@ Such as seats. For an ID, a phone number or a ZIP code, use `type="text"` with `
 - For dates, see Date picker and Date time picker.
 - For the label and caption conventions, see Form.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -132,7 +139,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Disabled | The whole field fades to `--ds-opacity-disabled` and leaves the tab order. |
 | Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
 | Warning, success | The edge takes `--ds-border-warning` or `--ds-border-success`, with the message in the matching text color. |
-| Read-only | The `--ds-background-neutral` fill. |
+| Read-only | The `--ds-background-neutral` fill, full contrast, no hover. The value can be read, selected and copied; number steppers are not drawn. |
 
 ### Tokens
 

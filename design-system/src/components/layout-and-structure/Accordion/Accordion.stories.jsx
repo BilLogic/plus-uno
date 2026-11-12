@@ -304,12 +304,12 @@ export const Expanded = {
     },
 };
 
-/** Disabled: dimmed to the disabled opacity, announced as disabled, never opens. */
+/** Disabled: dimmed to the disabled opacity, out of the tab order, never opens. */
 export const Disabled = {
     render: () => <Sections disabled />,
     play: async ({ canvasElement }) => {
         const el = trigger(canvasElement);
-        await expect(el).toHaveAttribute('aria-disabled', 'true');
+        await expect(el).toBeDisabled();
         const item = el.closest('.plus-accordion-item');
         await expect(getComputedStyle(item).opacity).toBe(probe(canvasElement, 'opacity', 'var(--ds-opacity-disabled)'));
         await userEvent.click(el, { pointerEventsCheck: 0 });

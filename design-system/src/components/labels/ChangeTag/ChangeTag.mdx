@@ -1,0 +1,249 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as ChangeTagStories from './ChangeTag.stories.jsx';
+import { ChangeTag } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={ChangeTagStories} />
+
+<Title />
+Change over time, such as "+3 vs last week": the arrow follows the sign, the
+tone follows which way is good, and the change is spoken in words.
+
+<DocsTabs of={ChangeTagStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/ChangeTag"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<ComponentExample of={ChangeTagStories.Overview} title="Direction and tone" description={<>The sign sets the arrow; <code>goodDirection</code> sets the tone. Sessions held going up is success, no-shows going up is danger, hours tutored stays neutral.</>} />
+
+<ComponentExample of={ChangeTagStories.Formats} title="Formats" description="A count, a percent or points, always signed." />
+
+<ComponentExample of={ChangeTagStories.CustomIcon} title="Custom icon" description={<>Pass <code>iconBefore</code> to replace the direction arrow. It stays decorative: the words carry the direction.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size and layout
+
+<ComponentExample of={ChangeTagStories.Styles} title="Spacing" description="Every tone at default (20) and compact (16) spacing. The comparison sits after the chip, outside its fill." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+<ComponentExample of={ChangeTagStories.ValueChange} title="A new value" description="A new value fades in while the chip's color moves to its new tone. Reduced motion makes both instant." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={ChangeTagStories.Rest} title="Rest" description="The only state: a filled chip with an arrow and a signed value." />
+
+<ComponentExample of={ChangeTagStories.Hovered} title="Hovered" description="No change: a change tag is not a control." />
+
+<ComponentExample of={ChangeTagStories.Pressed} title="Pressed" description="No change." />
+
+<ComponentExample of={ChangeTagStories.Focused} title="Focused" description="Not in the tab order." />
+
+<ComponentExample of={ChangeTagStories.Disabled} title="Disabled" description="Never dimmed." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ChangeTagStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `ChangeTag` beside a number to say how it moved since the last period: in
+a card header, a table cell or a chart tooltip. For the number itself, use
+plain text; for a count on a tab or button, use `CountTag`; for the shape of
+a trend, use `Sparkline`.
+
+### Good direction
+
+`goodDirection` says which way is good for this metric. The tone follows from
+it, never from the arrow alone.
+
+<DocsTable>
+<thead>
+<tr><th>Good direction</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Up</td><td>More is better: sessions held, reflections completed. Up is success, down is danger.</td></tr>
+<tr><td>Down</td><td>Less is better: no-shows, absences, missed reflections. Down is success, up is danger.</td></tr>
+<tr><td>None</td><td>The change has no value judgment: hours tutored, students assigned. Neutral either way.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Arrow.** Up, down or flat, from the sign of `value`. `iconBefore` replaces it. It is decoration; the value and the spoken text say the direction.
+2. **Value.** Signed: "+3", "−12%", "+4.5 pts". An em dash when there is nothing to compare.
+3. **Chip.** A filled ground in the tone, with a 1 inside border, so the height stays exact.
+4. **Comparison.** Optional, such as "vs last week", in subtle text after the chip.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. The tone (neutral, success, danger) comes from the sign and `goodDirection`.</td></tr>
+<tr><td>Hovered, pressed</td><td>None. It is a label, not a control.</td></tr>
+<tr><td>Focused</td><td>None. It is not in the tab order.</td></tr>
+<tr><td>Disabled</td><td>None. A label is never dimmed.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Height</td><td><code>--label-height-md</code> (20), or <code>--label-height-sm</code> (16) when compact.</td></tr>
+<tr><td>Padding and gap</td><td><code>--pad-x-xs</code> on both sides, 2 between arrow and value, <code>--inline-sm</code> before the comparison.</td></tr>
+<tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
+<tr><td>Neutral</td><td><code>--ds-background-neutral</code> fill, <code>--ds-text</code> words, <code>--ds-background-neutral-pressed</code> edge.</td></tr>
+<tr><td>Success</td><td><code>--ds-background-success</code> fill, <code>--ds-text-success</code> words, <code>--ds-background-success-pressed</code> edge.</td></tr>
+<tr><td>Danger</td><td><code>--ds-background-danger</code> fill, <code>--ds-text-danger</code> words, <code>--ds-background-danger-pressed</code> edge.</td></tr>
+<tr><td>Comparison</td><td><code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Motion</td><td><code>--motion-duration-medium</code>, with <code>--motion-easing-entrance</code> for the value and <code>--motion-easing-standard</code> for the color.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+Pass the signed change as a number and let the tag format it. Set `goodDirection` once per metric, not per value.
+
+### Set the tone from the metric, not the arrow.
+
+When less is better, up is bad: say so with `goodDirection="down"`.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>No-shows</span><ChangeTag value={2} goodDirection="down" comparison="vs last week" /></div>}
+    doCaption="More no-shows reads as danger."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>No-shows</span><ChangeTag value={2} goodDirection="up" comparison="vs last week" /></div>}
+    dontCaption="More no-shows reads as success."
+/>
+
+### Keep a change with no value judgment neutral.
+
+Not every change is good or bad. Leave `goodDirection` at `none` for those.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Hours tutored</span><ChangeTag value={6} comparison="vs last week" /></div>}
+    doCaption="Neutral: more hours is neither good nor bad."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Hours tutored</span><ChangeTag value={6} goodDirection="up" comparison="vs last week" /></div>}
+    dontCaption="Success implies a judgment nobody made."
+/>
+
+### Never make a change tag a button.
+
+It renders a `span` with no role and no click handler: `onClick`, `role` and
+`tabIndex` are dropped with a console warning in development.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the period: "vs last week", "vs last term".</td><td>Leave a change with no baseline when the period is not clear from the page.</td></tr>
+<tr><td>Pass the raw signed number: <code>value={'{-12}'}</code> with <code>format="percent"</code>.</td><td>Pass a formatted string such as "-12%".</td></tr>
+<tr><td>Use <code>null</code> when there is nothing to compare.</td><td>Show 0 for a missing comparison: 0 means no change.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The change is spoken in words.** A screen reader hears "Up 3 vs last
+  week" or "Down 12% vs last month"; the visible chip and comparison are
+  `aria-hidden`, so nothing is read twice.
+- **Color never carries it alone.** The arrow and the sign say the direction;
+  the tone only reinforces it.
+- **Not a control.** No role, no tab stop, no click handler.
+- **Reduced motion.** The fade and the color change read the motion duration
+  tokens, which drop to 0ms when reduced motion is on.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a count on its own, use `CountTag`.
+- For the condition something is in, use `StatusTag`.
+- For the shape of a trend beside a number, use `Sparkline`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

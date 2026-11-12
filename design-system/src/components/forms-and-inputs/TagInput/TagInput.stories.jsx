@@ -410,6 +410,8 @@ ReadOnly.play = async ({ canvasElement }) => {
     const body = bodyOf(canvasElement);
     const input = canvas.getByRole('combobox', { name: 'Topics' });
     await expect(input).toHaveAttribute('readonly');
+    await expect(input).toHaveAttribute('aria-readonly', 'true');
+    await expect(input.tabIndex).toBeGreaterThanOrEqual(0);
     await expect(canvas.queryAllByRole('button', { name: /^Remove/ })).toHaveLength(0);
 
     await userEvent.click(input);

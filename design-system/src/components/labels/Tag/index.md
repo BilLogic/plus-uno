@@ -10,7 +10,7 @@ Also asked as: label, keyword.
 
 **Source:** `design-system/src/components/labels/Tag/Tag.jsx`
 
-**Stories:** `design-system/src/components/labels/Tag/Tag.stories.jsx` — Colors, NewColorsContrast, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, AnswerChips, IsDisabled, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/labels/Tag/Tag.stories.jsx` — Colors, LeadingSwatchAndIcon, SwatchRefusesRawColor, NewColorsContrast, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, AnswerChips, IsDisabled, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/Tag/Tag.mdx`
 
@@ -45,6 +45,17 @@ Selection is a state of the tag, never a new color.
 
 Do: Selected state.
 Don't: A new color for selected.
+
+### Add a swatch only when color is the way to find the tag. {#add-a-swatch-only-when-color-is-the-way-to-find-the-tag}
+
+A plain tag is its outline and neutral words. Turn on `swatchBefore` for a tag that is a legend entry or a color-coded filter, where the reader matches the square to a chart or a key. An icon in `elemBefore` is for when the icon carries meaning of its own.
+
+```jsx
+<Tag color="blue">Algebra</Tag>                                  {/* plain: outline only */}
+<Tag color="blue" swatchBefore>Algebra</Tag>                       {/* the tag's own color */}
+<Tag swatchBefore="background-accent-orange-bolder">Week 3</Tag>   {/* a background color token */}
+<Tag elemBefore={<Icon name="star" />}>Starred</Tag>                {/* an icon that means something */}
+```
 
 ### Let the props pick the kind of tag. {#let-the-props-pick-the-kind-of-tag}
 
@@ -150,11 +161,11 @@ and every tag inside follows:
 - For a labeled field where the person picks, creates and removes tags, use `TagInput`.
 - For a state, use `StatusTag`.
 
-Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `TagGroup`
+Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `TagGroup`
 
 ## Parts
 
-1. **Swatch or avatar.** A 10 swatch in the hue, or a 16 avatar for a person, an agent or a team.
+1. **Lead, optional.** Nothing by default. A 10 swatch (`swatchBefore`), an icon (`elemBefore`), or for a person, an agent or a team a 16 avatar.
 2. **Label.** Neutral text; the hue never colors the words.
 3. **Trailing metric.** Optional on a selectable tag: a compact Count tag, such as a filter's result count.
 4. **Remove button.** Optional, with the 2px focus ring on the button itself and a name that says what it removes.
@@ -195,20 +206,20 @@ Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 |------|------|---------|-------------|
 | `text` | string | — | The label (alternative to children). |
 | `children` | node | — | The label (takes precedence over `text`). |
-| `color` | enum | `'gray'` | A category color: an accent family, on the border and swatch. Never a status. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue. |
-| `type` | oneOf | `'plain'` | What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. |
+| `color` | enum | `'gray'` | A category color: an accent family, on the border (and on the swatch when `swatchBefore` is on). Never a status. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue. |
+| `type` | oneOf | `'plain'` | What the tag names. `plain` leads with nothing unless `swatchBefore` or `elemBefore` is set; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. |
 | `avatar` | string or node | — | The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. |
 | `trailingMetric` | number or string | — | Selectable tags only: a compact neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere. |
-| `elemBefore` | node | — | Leading content in place of the swatch, such as an icon. Plain tags only: an avatar type leads with its avatar. |
-| `swatchBefore` | string | — | Overrides the swatch color, for a tag acting as a chart legend entry. Any CSS color. |
+| `elemBefore` | node | — | The leading icon slot, empty by default: an icon in front of the text, for when the icon carries meaning. Plain tags only: an avatar type leads with its avatar. Sits after `swatchBefore` when both are set. |
+| `swatchBefore` | bool or string | — | A 10 color square in front of the text, off by default, for a tag that uses color for wayfinding such as a chart legend entry. `true` draws it in the tag's own color; a background color token (`background-accent-blue-bolder`, or `--ds-background-accent-blue-bolder`) draws a custom one. Never a raw CSS color. Plain tags only. |
 | `maxWidth` | number or string | `180` | Caps the whole tag (default 180). A clipped label ellipsizes and shows its full text as a tooltip. |
 | `href` | string | — | Makes the tag a link to this address. |
 | `linkComponent` | elementType | — | Router link to render instead of `<a>` for a link tag. |
 | `isSelected` | bool | — | Makes the tag a toggle, true or false: it publishes `aria-pressed` and fires `onClick`. Leave it out for a tag that is not selectable. |
 | `isRemovable` | bool | `false` | Adds a Remove button, with the 2px focus ring on the button itself. Not shown while the tag is disabled. |
 | `isDisabled` | bool | — | Disables this tag. A field disables all of its tags through `TagContext`. |
-| `isLoading` | bool | `false` | Saving: a spinner replaces the swatch or avatar and the tag ignores presses until it is done. |
-| `isElevated` | bool | `false` | For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. Read-only and link tags only; ignored with a warning on removable and selectable ones. |
+| `isLoading` | bool | `false` | Saving: a spinner replaces the swatch, icon or avatar and the tag ignores presses until it is done. |
+| `isElevated` | bool | `false` | For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch, when there is one, or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. Read-only and link tags only; ignored with a warning on removable and selectable ones. |
 | `onClick` | func | — | Fires on a selectable tag and on a link. |
 | `onAfterRemoveAction` | func | — | Called with the tag's text and the event after the Remove button is pressed. The caller removes the tag. |
 | `removeButtonLabel` | string | — | Overrides the Remove button's accessible name. Defaults to `Remove <label>`. |
@@ -226,7 +237,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--border-default` · `--ds-background-accent-blue-subtler` · `--ds-background-accent-blue-subtlest` · `--ds-background-accent-blue-subtlest-pressed` · `--ds-background-accent-brown-subtler` · `--ds-background-accent-brown-subtlest` · `--ds-background-accent-brown-subtlest-pressed` · `--ds-background-accent-gray-subtler` · `--ds-background-accent-gray-subtlest` · `--ds-background-accent-gray-subtlest-pressed` · `--ds-background-accent-green-subtler` · `--ds-background-accent-green-subtlest` · `--ds-background-accent-green-subtlest-pressed` · `--ds-background-accent-lime-subtler` · `--ds-background-accent-lime-subtlest` · `--ds-background-accent-lime-subtlest-pressed` · `--ds-background-accent-magenta-subtler` · `--ds-background-accent-magenta-subtlest` · `--ds-background-accent-magenta-subtlest-pressed` · `--ds-background-accent-orange-subtler` · `--ds-background-accent-orange-subtlest` · `--ds-background-accent-orange-subtlest-pressed` · `--ds-background-accent-purple-subtler` · `--ds-background-accent-purple-subtlest` · `--ds-background-accent-purple-subtlest-pressed` · `--ds-background-accent-teal-subtler` · `--ds-background-accent-teal-subtlest` · `--ds-background-accent-teal-subtlest-pressed` · `--ds-background-accent-yellow-subtler` · `--ds-background-accent-yellow-subtlest` · `--ds-background-accent-yellow-subtlest-pressed` · `--ds-background-disabled` · `--ds-background-discovery-subtler` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-accent-blue` · `--ds-border-accent-blue-subtle` · `--ds-border-accent-brown` · `--ds-border-accent-brown-subtle` · `--ds-border-accent-gray` · `--ds-border-accent-gray-subtle` · `--ds-border-accent-green` · `--ds-border-accent-green-subtle` · `--ds-border-accent-lime` · `--ds-border-accent-lime-subtle` · `--ds-border-accent-magenta` · `--ds-border-accent-magenta-subtle` · `--ds-border-accent-orange` · `--ds-border-accent-orange-subtle` · `--ds-border-accent-purple` · `--ds-border-accent-purple-subtle` · `--ds-border-accent-teal` · `--ds-border-accent-teal-subtle` · `--ds-border-accent-yellow` · `--ds-border-accent-yellow-subtle` · `--ds-border-bold` · `--ds-border-focused` · `--ds-icon-accent-blue` · `--ds-icon-accent-brown` · `--ds-icon-accent-gray` · `--ds-icon-accent-green` · `--ds-icon-accent-lime` · `--ds-icon-accent-magenta` · `--ds-icon-accent-orange` · `--ds-icon-accent-purple` · `--ds-icon-accent-teal` · `--ds-icon-accent-yellow` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-accent-blue` · `--ds-text-accent-brown` · `--ds-text-accent-gray` · `--ds-text-accent-green` · `--ds-text-accent-lime` · `--ds-text-accent-magenta` · `--ds-text-accent-orange` · `--ds-text-accent-purple` · `--ds-text-accent-teal` · `--ds-text-accent-yellow` · `--ds-text-disabled` · `--ds-text-discovery` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--image-xxs` · `--pad-x-xs` · `--plus-tag-avatar` · `--plus-tag-avatar-ink` · `--plus-tag-border-rest` · `--plus-tag-border-selected` · `--plus-tag-height` · `--plus-tag-hovered` · `--plus-tag-hue` · `--plus-tag-max` · `--plus-tag-pressed` · `--plus-tag-selected` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-sm` · `--stroke-2` · `--tag-dot-size` · `--type-family-heading` · `--type-weight-semibold`
+`--body-small` · `--border-default` · `--ds-background-accent-blue-subtler` · `--ds-background-accent-blue-subtlest` · `--ds-background-accent-blue-subtlest-pressed` · `--ds-background-accent-brown-subtler` · `--ds-background-accent-brown-subtlest` · `--ds-background-accent-brown-subtlest-pressed` · `--ds-background-accent-gray-subtler` · `--ds-background-accent-gray-subtlest` · `--ds-background-accent-gray-subtlest-pressed` · `--ds-background-accent-green-subtler` · `--ds-background-accent-green-subtlest` · `--ds-background-accent-green-subtlest-pressed` · `--ds-background-accent-lime-subtler` · `--ds-background-accent-lime-subtlest` · `--ds-background-accent-lime-subtlest-pressed` · `--ds-background-accent-magenta-subtler` · `--ds-background-accent-magenta-subtlest` · `--ds-background-accent-magenta-subtlest-pressed` · `--ds-background-accent-orange-subtler` · `--ds-background-accent-orange-subtlest` · `--ds-background-accent-orange-subtlest-pressed` · `--ds-background-accent-purple-subtler` · `--ds-background-accent-purple-subtlest` · `--ds-background-accent-purple-subtlest-pressed` · `--ds-background-accent-teal-subtler` · `--ds-background-accent-teal-subtlest` · `--ds-background-accent-teal-subtlest-pressed` · `--ds-background-accent-yellow-subtler` · `--ds-background-accent-yellow-subtlest` · `--ds-background-accent-yellow-subtlest-pressed` · `--ds-background-disabled` · `--ds-background-discovery-subtler` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-accent-blue` · `--ds-border-accent-blue-subtle` · `--ds-border-accent-brown` · `--ds-border-accent-brown-subtle` · `--ds-border-accent-gray` · `--ds-border-accent-gray-subtle` · `--ds-border-accent-green` · `--ds-border-accent-green-subtle` · `--ds-border-accent-lime` · `--ds-border-accent-lime-subtle` · `--ds-border-accent-magenta` · `--ds-border-accent-magenta-subtle` · `--ds-border-accent-orange` · `--ds-border-accent-orange-subtle` · `--ds-border-accent-purple` · `--ds-border-accent-purple-subtle` · `--ds-border-accent-teal` · `--ds-border-accent-teal-subtle` · `--ds-border-accent-yellow` · `--ds-border-accent-yellow-subtle` · `--ds-border-bold` · `--ds-border-focused` · `--ds-icon-accent-blue` · `--ds-icon-accent-brown` · `--ds-icon-accent-gray` · `--ds-icon-accent-green` · `--ds-icon-accent-lime` · `--ds-icon-accent-magenta` · `--ds-icon-accent-orange` · `--ds-icon-accent-purple` · `--ds-icon-accent-teal` · `--ds-icon-accent-yellow` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-accent-blue` · `--ds-text-accent-brown` · `--ds-text-accent-gray` · `--ds-text-accent-green` · `--ds-text-accent-lime` · `--ds-text-accent-magenta` · `--ds-text-accent-orange` · `--ds-text-accent-purple` · `--ds-text-accent-teal` · `--ds-text-accent-yellow` · `--ds-text-disabled` · `--ds-text-discovery` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--image-xxs` · `--pad-x-xs` · `--plus-tag-avatar` · `--plus-tag-avatar-ink` · `--plus-tag-border-rest` · `--plus-tag-border-selected` · `--plus-tag-height` · `--plus-tag-hovered` · `--plus-tag-hue` · `--plus-tag-max` · `--plus-tag-pressed` · `--plus-tag-selected` · `--plus-tag-swatch` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-sm` · `--stroke-2` · `--tag-dot-size` · `--type-family-heading` · `--type-weight-semibold`
 
 From `design-system/src/components/labels/Tag/Tag.scss`. Override these through the token layer, never with a literal.
 

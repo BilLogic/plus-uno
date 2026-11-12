@@ -20,7 +20,7 @@
    },
    "real-intent": {
     "hit1": 29,
-    "hit3": 31,
+    "hit3": 32,
     "mrr": 0.95
    },
    "real-token": {

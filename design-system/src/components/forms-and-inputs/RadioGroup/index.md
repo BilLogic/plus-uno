@@ -81,7 +81,7 @@ When choosing one option should show an extra field, such as "Other, please spec
 - For independent choices instead of one answer among several, use Checkbox.
 - For the legend-and-fields shell this builds on, see Fieldset.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -100,7 +100,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Pressed | No step of its own. The hovered look holds while the pointer is down. |
 | Focused | A 2px ring in `--ds-border-focused` on the one tab stop. |
 | Invalid | Every unselected option takes `--ds-border-danger`, with one message for the group. |
-| Read-only | Full contrast, focusable, `aria-readonly` on the group; the answer does not change. |
+| Read-only | Full contrast, focusable, no hover, `aria-readonly` on the group; unchecked radios take the `--ds-background-neutral` fill and the answer does not change. |
 | Disabled | Every option takes the disabled fill and edge and leaves the tab order. |
 
 ### Tokens

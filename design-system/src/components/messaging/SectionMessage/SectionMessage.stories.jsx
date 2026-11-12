@@ -47,7 +47,7 @@ picks by default.
             control: 'text',
             table: { category: 'Content' },
         },
-        leadingVisual: {
+        icon: {
             control: 'select',
             options: [true, false, 'bell', 'circle-question'],
             table: { category: 'Content', defaultValue: { summary: 'true' } },
@@ -189,7 +189,7 @@ export const Interactive = (args) => (
 Interactive.args = {
     title: 'Interactive message',
     appearance: 'info',
-    leadingVisual: true,
+    icon: true,
     dismissible: true,
 };
 
@@ -256,7 +256,7 @@ DismissPlacement.play = async ({ canvasElement }) => {
  * The leading icon. Every style has a default icon on the first line of text,
  * like the ×: success circle-check, danger circle-exclamation, warning
  * triangle-exclamation, and circle-info for primary, secondary and info. A
- * passed `leadingVisual` replaces it and `false` removes it. The icon is
+ * passed `icon` replaces it and `false` removes it. The icon is
  * decorative: the message's role and its text already say what it is.
  */
 export const LeadingIcon = () => (
@@ -273,13 +273,13 @@ export const LeadingIcon = () => (
         <SectionMessage appearance="success" title="A title long enough to wrap onto a second line" data-testid="icon-wrap">
             Short body.
         </SectionMessage>
-        <SectionMessage appearance="info" title="Replaced by name" leadingVisual="bell" data-testid="icon-named">
+        <SectionMessage appearance="info" title="Replaced by name" icon="bell" data-testid="icon-named">
             A Font Awesome solid name replaces the default icon.
         </SectionMessage>
-        <SectionMessage appearance="info" leadingVisual={<i className={iconClass('star')} />} data-testid="icon-node">
+        <SectionMessage appearance="info" icon={<i className={iconClass('star')} />} data-testid="icon-node">
             A node replaces it too.
         </SectionMessage>
-        <SectionMessage appearance="warning" leadingVisual={false} data-testid="icon-none">
+        <SectionMessage appearance="warning" icon={false} data-testid="icon-none">
             Sign-in didn&apos;t complete. Please try again.
         </SectionMessage>
     </div>

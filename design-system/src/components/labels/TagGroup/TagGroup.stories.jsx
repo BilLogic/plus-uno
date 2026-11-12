@@ -183,7 +183,7 @@ Collapse.play = async ({ canvasElement }) => {
     await waitFor(() => expectFits(canvasElement));
 
     // Narrower than one tag and +n: the first tag still shows, and truncates.
-    frame.style.width = '90px';
+    frame.style.width = '70px';
     await waitFor(() => {
         const { shown, more, list } = readCollapse(canvasElement);
         expect(shown).toEqual(['Science']);

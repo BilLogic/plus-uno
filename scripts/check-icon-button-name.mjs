@@ -20,7 +20,7 @@
  * TWO OF THE 20 WERE NOT ABOUT NAMES AT ALL. `LessonsSpec.jsx` and
  * `OnboardingSpec.jsx` call `<Button btnStyle=… btnFill=… label="Start Lesson"
  * icon="chevron-right">`, and Button has none of those props: it takes `style`,
- * `fill`, `text` and `leadingVisual`. Those buttons were rendering EMPTY — no
+ * `fill`, `text` and `iconBefore`. Those buttons were rendering EMPTY — no
  * icon, no label, nothing but a box — and the missing accessible name was the
  * symptom that surfaced it.
  *

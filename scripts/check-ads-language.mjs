@@ -20,8 +20,8 @@
  *   state-step       lines naming a `--*-state-NN` custom property, NN being 08, 12 or 16.
  *   component:<Name> JSX tags `<Name` plus import statements binding `Name`,
  *                    for the retired names: the Not-here rows marked `retired`
- *                    (`design-system/agent-views/_inventions.json`). `Overlay` and `Surface` count only
- *                    where they are the pattern, not React-Bootstrap's Overlay.
+ *                    (`design-system/agent-views/_inventions.json`), plus the retired
+ *                    `Overlay` and `Surface` pattern names.
  *   prop:style|fill|size   lines with the retired prop values: `style="primary"`
  *                    (a bare identifier, which no inline CSS is), `fill="filled"`,
  *                    `size="small|medium|large|sm|md|lg"`. A `<Heading>`'s size is the type
@@ -75,7 +75,7 @@ const NOT_HERE = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'design-system/
 
 /** The retired component names: the Not-here rows marked `retired`. Retire one there, not here. */
 export const LEGACY_COMPONENTS = retiredComponents(NOT_HERE);
-/** Patterns whose old names collide with React-Bootstrap's: counted only when not imported from it. */
+/** Retired pattern names, counted the same way as the retired components. */
 const PATTERN_COMPONENTS = ['Overlay', 'Surface'];
 
 /** A component renamed with no alias (ADR-037 "clean replace"), the Not-here rows marked `inProse`: the old name may not survive in doc prose either. */
@@ -129,15 +129,9 @@ const importOf = (name) =>
 
 const tagCount = (text, name) => (text.match(new RegExp(`<${name}(?=[\\s>/]|$)`, 'gm')) ?? []).length;
 
-/** Count one component's tags and imports; a React-Bootstrap `Overlay` is not the pattern. */
-function componentCount(text, name, { pattern }) {
-  let imports = 0;
-  let foreign = false;
-  for (const match of text.matchAll(importOf(name))) {
-    if (pattern && /react-bootstrap/.test(match[1])) foreign = true;
-    else imports += 1;
-  }
-  if (pattern && foreign && imports === 0) return 0;
+/** Count one component's tags and imports. */
+function componentCount(text, name) {
+  const imports = [...text.matchAll(importOf(name))].length;
   return tagCount(text, name) + imports;
 }
 
@@ -196,11 +190,8 @@ export function measure(sources) {
     }
     const body = live.join('\n');
     const where = (name) => Math.max(1, live.findIndex((l) => l.includes(name)) + 1);
-    for (const name of LEGACY_COMPONENTS) {
-      add(`component:${name}`, file, componentCount(body, name, { pattern: false }), where(name));
-    }
-    for (const name of PATTERN_COMPONENTS) {
-      add(`component:${name}`, file, componentCount(body, name, { pattern: true }), where(name));
+    for (const name of [...LEGACY_COMPONENTS, ...PATTERN_COMPONENTS]) {
+      add(`component:${name}`, file, componentCount(body, name), where(name));
     }
   }
   return found;

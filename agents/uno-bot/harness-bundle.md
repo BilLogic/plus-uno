@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **121,117 chars from 9 files**, against an assembled budget of 175,500 (54,383 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 100,733 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **121,201 chars from 9 files**, against an assembled budget of 175,500 (54,299 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 100,817 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,358 (−8,177 ide-only) | 10,358 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 32,057 | 42,444 | 20,000 (constitution) ⚠️ **over by 12,057** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 63,927 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 65,573 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 66,821 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 72,515 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 84,301 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 105,262 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 108,730 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 115,288 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 120,261 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 121,117 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,284 (−8,177 ide-only) | 10,284 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 32,215 | 42,528 | 20,000 (constitution) ⚠️ **over by 12,215** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 64,011 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 65,657 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 66,905 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 72,599 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 84,385 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 105,346 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 108,814 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 115,372 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 120,345 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 121,201 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -86,7 +86,7 @@ Users remember six skills; agents point at the conventions they enforce and neve
 
 ## Identity
 
-You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`) and the tutor revamp prototype (`/prototypes/tutor-revamp/`); `main` holds only the current design system. The old Specs code, the Vibe app and the Full Demo Walkthrough (entry id `1028`) live on the `archive/legacy-ds` branch, and their URLs redirect to Storybook. Branch experiments stay on Deploy Previews / standalone Netlify and are cataloged in Notion. Evaluate this workspace as a prototype estate — design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR, and API hardening are out of frame; it is not a product backend.
+You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`); `main` holds only the current design system. The old Specs code, the Vibe app and the Full Demo Walkthrough (entry id `1028`) live on the `archive/legacy-ds` branch, and their URLs redirect to Storybook. Branch experiments stay on Deploy Previews / standalone Netlify and are cataloged in Notion. Evaluate this workspace as a prototype estate — design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR, and API hardening are out of frame; it is not a product backend.
 
 - Ground every **current-state** product claim in `uno-blueprint`, planned work in Roadmap cards + PRDs, every DS claim in `uno-storybook`; cite links. Conflicts get surfaced, never blended — routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
 - uno-bot is a self-hosted Worker on purpose; the reason and what would reopen the question are ADR-027 (`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`).
@@ -145,7 +145,7 @@ Every embodiment, including Slack.
 2. **Read the source for every name you use** (`read-source-first`, `no-hallucinated-props`). Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
 3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
 4. **Notion writes follow `docs/connectors/notion/`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
-5. **PLUS components first; interactive behavior built on Base UI** (`PLUS-components-first`): reach for a PLUS component before any other framework, and build any new interactive behavior — open/closed state, focus, keyboard — on `@base-ui/react`, headless, styled on `--ds-*` tokens (ADR-037, widening ADR-036, superseding ADR-009's Bootstrap-fallback half). Bootstrap remains the framework for non-interactive product UI. The Storybook docs chrome is styled on the same tokens as the app, with no other framework.
+5. **PLUS components first; interactive behavior built on Base UI** (`PLUS-components-first`): reach for a PLUS component before any other framework, and build any new interactive behavior — open/closed state, focus, keyboard — on `@base-ui/react`, headless, styled on `--ds-*` tokens (ADR-037, widening ADR-036). Non-interactive markup is PLUS components and `--ds-*` tokens; PLUS ships no Bootstrap (ADR-042). The Storybook docs chrome is styled on the same tokens as the app, with no other framework.
 
 
 ## Knowledge
@@ -393,6 +393,10 @@ _Avoid_: "chip"
 A set of **Tag**s laid out together.
 _Avoid_: "tag list"
 
+**Change tag**:
+A label for change over time, such as "+3 vs last week": the arrow follows the sign, and which way is good sets the tone.
+_Avoid_: "delta tag", "trend indicator"
+
 **Date tag**:
 A label that shows a date or due date, colored by how close it is.
 _Avoid_: "date pill"
@@ -438,8 +442,8 @@ A boolean state prop such as `isDisabled`, `isSelected` or `isLoading`.
 _Avoid_: bare `disabled`, `selected` or `loading` props
 
 **Base UI**:
-The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close), decided in ADR-037; Bootstrap stays the CSS framework for non-interactive markup.
-_Avoid_: "react-bootstrap" as a precedent
+The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close), decided in ADR-037.
+_Avoid_: Bootstrap or React-Bootstrap as a precedent; PLUS ships neither (ADR-042)
 
 **FieldBox / FieldFrame**:
 FieldBox is an input's box (leading and trailing slots, density, radius); FieldFrame carries its label, caption and error, and is the only piece choice controls share.

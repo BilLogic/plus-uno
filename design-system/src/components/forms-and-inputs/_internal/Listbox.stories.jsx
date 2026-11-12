@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import Modal from '@/components/messaging/Modal/Modal';
 import TextField from '../TextField/TextField';
@@ -228,10 +228,12 @@ GroupHeadings.play = async ({ canvasElement }) => {
 };
 
 /** Loading, failed and empty lists say so in a message row, and announce it. */
+const onRetry = fn();
+
 export const MessageRows = () => (
     <div style={stack}>
         <Listbox aria-label="Loading" options={[]} loading />
-        <Listbox aria-label="Failed" options={[]} error="Couldn't load schools. Try again." />
+        <Listbox aria-label="Failed" options={[]} error="Couldn't load schools." onRetry={onRetry} />
         <Listbox aria-label="Empty" options={[]} />
     </div>
 );
@@ -240,8 +242,10 @@ MessageRows.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const surface = (name) => within(canvas.getByRole('listbox', { name }).closest('.plus-listbox'));
     await expect(canvas.getByRole('listbox', { name: 'Loading' })).toHaveAttribute('aria-busy', 'true');
-    await expect(surface('Loading').getByText('Loading…')).toBeInTheDocument();
+    await expect(surface('Loading').getByText('Loading options')).toBeInTheDocument();
     await expect(surface('Failed').getByText(/Couldn't load schools/)).toBeInTheDocument();
+    await userEvent.click(surface('Failed').getByRole('button', { name: 'Retry' }));
+    await expect(onRetry).toHaveBeenCalledTimes(1);
     await expect(surface('Empty').getByText('No results')).toBeInTheDocument();
 };
 
@@ -412,7 +416,7 @@ export const Colors = () => (
                 </div>
             )}
         />
-        <Listbox aria-label="Failed" options={[]} error="Couldn't load schools. Try again." />
+        <Listbox aria-label="Failed" options={[]} error="Couldn't load schools." onRetry={onRetry} />
     </div>
 );
 Colors.parameters = { docs: { disable: true } };

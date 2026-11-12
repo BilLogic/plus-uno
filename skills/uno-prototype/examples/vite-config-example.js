@@ -68,7 +68,7 @@ export default defineConfig({
                 /**
                  * modern-compiler API avoids deprecation warnings in newer Sass.
                  * silenceDeprecations suppresses known harmless warnings from
-                 * Bootstrap's use of @import and legacy JS API.
+                 * `@import` and the legacy JS API.
                  */
                 api: 'modern-compiler',
                 silenceDeprecations: ['import', 'legacy-js-api'],

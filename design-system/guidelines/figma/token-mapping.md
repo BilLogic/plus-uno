@@ -102,7 +102,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | Raised surface (cards) | `var(--ds-surface-raised)` |
 | Raised shadow (cards; a clickable card lifts to the overlay shadow on hover or drag) | `var(--ds-shadow-raised)` |
 | Overlay surface (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar) | `var(--ds-surface-overlay)` |
-| Overlay shadow (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar) | `var(--ds-shadow-overlay)` |
+| Overlay shadow (modals, menus, listboxes, popovers, toasts, the floating sidebar) | `var(--ds-shadow-overlay)` |
 
 ## Layout Tokens
 
@@ -124,4 +124,4 @@ When encoding rules via `create_design_system_rules`, include these conventions:
 2. **Color by role** — `--ds-background-*` for fills, `--ds-surface-*` for grounds, `--ds-text-*`, `--ds-icon-*` and `--ds-border-*` for the rest
 3. **Semantic context** — choose token by context (card → `--card-*`, element → the semantics `--pad-*`, `--stack-*`, `--inline-*`, `--radius-*`)
 4. **Font Awesome Free only** — `fa-solid`, `fa-regular`, `fa-brands`. No Pro icons
-5. **React-Bootstrap base** — components extend Bootstrap 5.3, not alternative frameworks
+5. **PLUS components first** — interactive behavior on Base UI, styled on `--ds-*` tokens; no other UI framework

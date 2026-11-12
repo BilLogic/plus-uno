@@ -6,7 +6,7 @@ import './FieldBox.scss';
  * FieldBox — the one box behind every text-like input.
  *
  * It owns the height, the border, the fill and the state. A host (Text field,
- * Text area) decides only what goes in its three slots: `leading` (an icon, an affix, an addon), the content (`children`,
+ * Text area) decides only what goes in its three slots: `elemBefore` (an icon, an affix, an addon), the content (`children`,
  * normally the control itself) and `trailing` (an icon, a caret, steppers,
  * "saving…").
  *
@@ -30,7 +30,7 @@ const FieldBox = ({
     multiline = false,
     grow = false,
     state,
-    leading,
+    elemBefore,
     trailing,
     children,
     className = '',
@@ -77,7 +77,7 @@ const FieldBox = ({
             onMouseDown={handleMouseDown}
             {...props}
         >
-            {leading && <span className="plus-field__leading">{leading}</span>}
+            {elemBefore && <span className="plus-field__leading">{elemBefore}</span>}
             <span className="plus-field__content">{children}</span>
             {trailing && <span className="plus-field__trailing">{trailing}</span>}
         </div>
@@ -102,7 +102,7 @@ FieldBox.propTypes = {
     grow: PropTypes.bool,
     /** Draws a live state still, for documentation. Live hover and focus need nothing. */
     state: PropTypes.oneOf(['default', 'hover', 'focus']),
-    leading: PropTypes.node,
+    elemBefore: PropTypes.node,
     trailing: PropTypes.node,
     children: PropTypes.node,
     className: PropTypes.string,

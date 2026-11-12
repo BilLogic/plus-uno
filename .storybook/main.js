@@ -14,9 +14,6 @@ const config = {
   stories: [
     '../design-system/src/**/*.mdx',
     '../design-system/src/**/*.stories.{js,jsx,ts,tsx}',
-
-    // Playground prototypes selectively included in Storybook
-    '../prototypes/tutor-revamp/src/**/*.stories.{js,jsx}',
   ],
 
   addons: [

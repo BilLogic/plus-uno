@@ -96,9 +96,9 @@ Tutors are time-pressured during live sessions. Every pixel earns its place. Pre
 
 Show what matters now; reveal detail on demand. Default views answer the immediate question. Expandable sections, tooltips, and drill-downs serve deeper exploration without cluttering the primary flow.
 
-### Bootstrap-First
+### PLUS-First
 
-Use design system components built on Bootstrap before anything custom. Never introduce non-Bootstrap UI frameworks (no Material UI, no Ant Design, no Tailwind). When Bootstrap lacks a pattern, extend it — don't replace it.
+Use PLUS components and `--ds-*` tokens before anything custom. Interactive behavior is built on Base UI (`@base-ui/react`, headless); PLUS adds no other UI framework. When PLUS lacks a pattern, extend a PLUS component or propose a new one.
 
 ### Compound Designing
 
@@ -132,7 +132,7 @@ product decisions.
 
 ### Implementation
 
-- **PLUS components first** — fall back to generic React-Bootstrap only where no PLUS equivalent exists.
+- **PLUS components first** — where no PLUS equivalent exists, propose one rather than reaching for another library.
 - **Barrel imports** — public components (forms and dataviz included) are named exports from `@/components`; patterns from `@/patterns`.
 - **Figma registries are law** — for design-to-code, load `design-system/figma/component-registry.json` and `token-registry.json` before mapping nodes or tokens.
 - **No hallucinated props or layouts** — use the skeletons in `composition/layout.md` and read the source for prop names.

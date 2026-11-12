@@ -47,9 +47,48 @@ export const expectFieldDisabled = async (box, name = 'field') => {
     await expect(parseFloat(getComputedStyle(box).opacity), `${name} disabled opacity`).toBeLessThan(1);
 };
 
-/** Read-only takes the neutral fill. */
+/**
+ * Read-only, whole: the control stays in the tab order, at full contrast, and
+ * says so (`readonly` or `aria-readonly`); the box takes the neutral fill and
+ * the border does not answer a hover. Never the disabled look.
+ */
 export const expectFieldReadOnly = async (host, box, name = 'field') => {
     box.style.transition = 'none';
     await expect(box).toHaveClass('plus-field--readonly');
+    await expect(box).not.toHaveClass('plus-field--disabled');
     await expect(getComputedStyle(box).backgroundColor, `${name} read-only fill`).toBe(tokenColor(host, '--ds-background-neutral'));
+    await expect(parseFloat(getComputedStyle(box).opacity), `${name} read-only contrast`).toBe(1);
+
+    const control = box.querySelector('input:not([type="hidden"]), textarea, [role="combobox"]');
+    await expect(control, `${name} read-only control`).toBeTruthy();
+    await expect(control.disabled, `${name} read-only is not disabled`).toBeFalsy();
+    await expect(control.tabIndex, `${name} read-only stays in the tab order`).toBeGreaterThanOrEqual(0);
+    await expect(control.readOnly || control.getAttribute('aria-readonly') === 'true', `${name} says it is read-only`).toBe(true);
+
+    const rest = getComputedStyle(box).borderTopColor;
+    const hovered = withForcedPseudo(box, ':hover', () => getComputedStyle(box).borderTopColor);
+    await expect(hovered, `${name} read-only has no hover`).toBe(rest);
+};
+
+/**
+ * Read-only on a choice control (the box of a Checkbox or Radio, the track of a
+ * Toggle): at full contrast, in the tab order, no hover, and, unchecked, the
+ * neutral fill. A checked control keeps its selected fill.
+ */
+export const expectChoiceReadOnly = async (host, control, name = 'choice') => {
+    control.style.transition = 'none';
+    await expect(control.hasAttribute('data-readonly'), `${name} is read-only`).toBe(true);
+    await expect(control.hasAttribute('data-disabled'), `${name} is not disabled`).toBe(false);
+    await expect(control.tabIndex, `${name} stays in the tab order`).toBeGreaterThanOrEqual(0);
+    await expect(parseFloat(getComputedStyle(control).opacity), `${name} contrast`).toBe(1);
+    const rest = getComputedStyle(control);
+    const [fill, edge] = [rest.backgroundColor, rest.borderTopColor];
+    const hovered = withForcedPseudo(control, ':hover', () => {
+        const style = getComputedStyle(control);
+        return [style.backgroundColor, style.borderTopColor];
+    });
+    await expect(hovered, `${name} has no hover`).toEqual([fill, edge]);
+    if (!control.hasAttribute('data-checked') && !control.hasAttribute('data-indeterminate') && !control.classList.contains('plus-toggle')) {
+        await expect(fill, `${name} read-only fill`).toBe(tokenColor(host, '--ds-background-neutral'));
+    }
 };

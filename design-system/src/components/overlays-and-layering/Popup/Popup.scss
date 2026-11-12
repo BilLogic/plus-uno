@@ -1,3 +1,5 @@
+@use '../../../styles/screen-grid' as *;
+
 /*
  * Popup Component Styles: the Popups pattern's Popup.
  *
@@ -25,15 +27,26 @@
 
 // ===== MAIN CONTAINER =====
 // The Popups pattern's Popup (Figma Pattern/Popup): one surface, no overlay
-// backdrop and no arrow. Pad 16 (`--popover-pad`), radius 12 (`--popover-radius`), and a fixed width
-// tier, width-sm · md · lg (320 · 400 · 480, `--popover-width-*`). The title and body stack
-// Element/stack-md 8 apart on the popup's own fill.
+// backdrop and no arrow. Pad 16 (`--popover-pad`), radius 12 (`--popover-radius`).
+// The title and body stack Element/stack-md 8 apart on the popup's own fill.
+//
+// WIDTH. `auto` hugs one list: at least the trigger (Base UI's
+// `--anchor-width`), and 160 to 320 (`--popup-min-width`, `--popup-max-width`)
+// unless the trigger is wider still. The column steps span 3 or 4 screen-grid
+// columns plus the pad, worked out by the same mixin as Modal's widths.
+//
+// MOTION. It opens by clipping out from the trigger's corner on the side it
+// opens on (`data-side` + `data-align`), and closes with a fade. Only
+// clip-path and opacity move; the width never animates. A keyboard open
+// (`data-instant="click"`) is instant, and reduced motion zeroes every
+// duration in the token layer.
 .plus-popup {
     display: flex;
     flex-direction: column;
     gap: var(--stack-md);
-    width: var(--popover-width-sm);
-    max-width: none;
+    width: max-content;
+    min-width: max(var(--popup-min-width), var(--anchor-width, 0px));
+    max-width: max(var(--popup-max-width), var(--anchor-width, 0px));
     padding: var(--popover-pad);
     box-sizing: border-box;
     z-index: var(--layer-popup);
@@ -45,12 +58,60 @@
     border-radius: var(--popover-radius);
     box-shadow: var(--ds-shadow-overlay);
 
-    &.plus-popup--md {
-        width: var(--popover-width-md);
+    &.plus-popup--3-col,
+    &.plus-popup--4-col {
+        @include screen-grid-width(var(--popover-pad));
+        min-width: 0;
+        max-width: none;
     }
 
-    &.plus-popup--lg {
-        width: var(--popover-width-lg);
+    &.plus-popup--3-col {
+        --plus-overlay-span: 3;
+    }
+
+    &.plus-popup--4-col {
+        --plus-overlay-span: 4;
+    }
+
+    // ----- Motion -----
+    // The clip starts collapsed onto the edge that faces the trigger, at the
+    // corner the popup is aligned to (the middle of that edge when centered).
+    // The edges that stay put sit out past the shadow, so the shadow is
+    // never cut while the clip opens.
+    --plus-popup-reach: calc(-1 * var(--popup-clip-reach));
+    --plus-popup-clip-top: var(--plus-popup-reach);
+    --plus-popup-clip-right: var(--plus-popup-reach);
+    --plus-popup-clip-bottom: var(--plus-popup-reach);
+    --plus-popup-clip-left: var(--plus-popup-reach);
+
+    &[data-side='bottom'] { --plus-popup-clip-bottom: 100%; }
+    &[data-side='top'] { --plus-popup-clip-top: 100%; }
+    &[data-side='right'] { --plus-popup-clip-right: 100%; }
+    &[data-side='left'] { --plus-popup-clip-left: 100%; }
+
+    &:is([data-side='top'], [data-side='bottom']) {
+        &[data-align='start'] { --plus-popup-clip-right: 100%; }
+        &[data-align='end'] { --plus-popup-clip-left: 100%; }
+        &[data-align='center'] { --plus-popup-clip-left: 50%; --plus-popup-clip-right: 50%; }
+    }
+
+    &:is([data-side='left'], [data-side='right']) {
+        &[data-align='start'] { --plus-popup-clip-bottom: 100%; }
+        &[data-align='end'] { --plus-popup-clip-top: 100%; }
+        &[data-align='center'] { --plus-popup-clip-top: 50%; --plus-popup-clip-bottom: 50%; }
+    }
+
+    &[data-open] {
+        animation: plus-popup-clip-open var(--motion-duration-medium) var(--motion-easing-entrance);
+    }
+
+    &[data-open][data-instant='click'] {
+        animation: none;
+    }
+
+    &[data-ending-style] {
+        opacity: 0;
+        transition: opacity var(--motion-duration-short) var(--motion-easing-exit);
     }
 
     // ===== TITLE: heading.xsmall 14/20, on the popup's surface =====
@@ -63,6 +124,19 @@
     .plus-popup-body {
         color: var(--ds-text);
         font: var(--body-default);
+    }
+}
+
+@keyframes plus-popup-clip-open {
+    from {
+        clip-path: inset(
+            var(--plus-popup-clip-top) var(--plus-popup-clip-right)
+            var(--plus-popup-clip-bottom) var(--plus-popup-clip-left)
+        );
+    }
+
+    to {
+        clip-path: inset(var(--plus-popup-reach));
     }
 }
 

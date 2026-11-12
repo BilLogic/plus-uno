@@ -16,7 +16,7 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 ## Usage
 
-A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters, the record count and the bulk bar use the toolbar type, and saved views use the tabs type. Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable. Paging stays under the rows, inside the same Section.
+A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters and the record count use the toolbar type, and saved views use the tabs type. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the toolbar stays put. Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable. Paging stays under the rows, inside the same Section.
 
 ### Type guidance
 
@@ -51,7 +51,7 @@ Don't: Two tables share one Section and one header. The toolbar no longer says w
 
 ### Use a Dynamic table for rows people act on. {#use-a-dynamic-table-for-rows-people-act-on}
 
-Do: A roster people act on as a Dynamic table: sortable heads, checkboxes, a pager, and bulk actions in the Section header.
+Do: A roster people act on as a Dynamic table: sortable heads, checkboxes, a pager, and bulk actions in the head row while rows are selected.
 Don't: A roster people act on as a Static table. With no sort, selection or paging, 340 students become one long scroll.
 
 ### Use a Tree table for a hierarchy. {#use-a-tree-table-for-a-hierarchy}
@@ -64,7 +64,7 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 - Name every column with a head cell. Head cells are labels for a column, so they use Heading/xxsmall rather than a heading level.
 - Mark the sorted column with `aria-sort`, and give every icon-only control a name, such as "Actions for Ava Thompson".
 - Mark a selected row with `aria-selected="true"`. That attribute belongs to a row of a table with `role="grid"`.
-- Selection is never color alone. The row's checkbox is checked, and the toolbar says "2 selected".
+- Selection is never color alone. The row's checkbox is checked, and the head row says "2 selected".
 - A region that scrolls takes keyboard focus, so people can scroll it without a pointer. That covers a region with `maxHeight` and one with a sticky column.
 - The empty message is a row of the table, so assistive technology reads it with the columns it replaces.
 - Name the table through `tableProps`, such as `aria-label`, when no caption names it.

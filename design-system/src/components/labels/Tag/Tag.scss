@@ -287,16 +287,19 @@ $tag-colors: (
     color: inherit;
 }
 
-/* The swatch: 10 square, radius 2, in the hue. */
+/*
+ * The swatch, opt-in through `swatchBefore`: 10 square, radius 2, in the hue
+ * unless a color token is set on it.
+ */
 .plus-tag__swatch {
     flex: none;
     width: var(--tag-dot-size);
     height: var(--tag-dot-size);
     border-radius: var(--radius-sm);
-    background-color: var(--plus-tag-hue);
+    background-color: var(--plus-tag-swatch, var(--plus-tag-hue));
 }
 
-/* A legend swatch carries any series color, which may sit near the ground. */
+/* A token swatch can carry any series color, which may sit near the ground. */
 .plus-tag__swatch--custom {
     box-shadow: inset 0 0 0 var(--border-default) var(--ds-border);
 }
