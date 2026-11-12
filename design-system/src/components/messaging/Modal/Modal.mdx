@@ -155,6 +155,10 @@ many columns of the screen grid plus the modal pad.
 </tbody>
 </DocsTable>
 
+The Modal draws `--ds-surface-overlay` with `--ds-shadow-blocking`, in every
+type and width: it is the one surface that sits on a Blanket, so it lifts higher
+than a menu. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
+
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
 height hugs its content up to the cap the Blanket sets
 (`--blanket-max-height-modal`); `height="fill"` sits at that cap.
