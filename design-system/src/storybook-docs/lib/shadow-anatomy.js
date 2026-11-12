@@ -70,6 +70,7 @@ export const parseShadow = (value) => {
 export const slotted = (layers) => layers.map((layer, i) => ({ ...layer, slot: SLOTS[i] ?? `extra-${i}` }));
 
 /** `rgb(r g b / a)` for one layer's ink. */
+// docs-literal: writes back an ink read from a --ds-shadow-* token, so it has no token of its own.
 export const ink = ({ r, g, b, a }) => `rgb(${r} ${g} ${b} / ${Math.round(a * 1000) / 1000})`;
 
 const layerCss = (l) => `${l.inset ? 'inset ' : ''}${l.x}px ${l.y}px ${l.blur}px ${l.spread}px ${ink(l.color)}`;

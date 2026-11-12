@@ -30,7 +30,7 @@ export const LEVELS = [
 export const SLOTTED_LEVELS = LEVELS.filter((l) => ['raised', 'overlay', 'blocking'].includes(l.id));
 
 const SLOT_WHY = {
-    edge: 'The border. A 1px ring that turns into a 3:1 line under increased contrast.',
+    edge: 'The border. A one-pixel ring that turns into a 3:1 line under increased contrast.',
     key: 'Contact. A short, dark shadow where the surface meets the ground.',
     ambient: 'Height. The wider and softer it is, the higher the surface reads.',
 };
@@ -41,7 +41,7 @@ export const BEHAVIORS = [
     { id: 'flow', behavior: 'In the flow', level: 'default', layer: null, uses: 'Page, Section (sunken for a subtle one), Table, docked AI panel' },
     { id: 'marks', behavior: 'Marks one object', level: 'raised', layer: '--layer-card', uses: 'Card, Carousel slide, Range thumb' },
     { id: 'stays', behavior: 'Stays put while content scrolls', level: 'overflow', layer: '--layer-card', uses: 'Sticky table header and column, with a border first' },
-    { id: 'floats', behavior: 'Floats, page usable', level: 'overlay', layer: '--layer-popup', uses: 'Floating Sidebar, floating Panel, Popup types, Inline edit, Flag, Spotlight, a dragged Card' },
+    { id: 'floats', behavior: 'Floats, page usable', level: 'overlay', layer: ['--layer-navigation', '--layer-popup', '--layer-flag', '--layer-spotlight'], uses: 'Floating Sidebar, floating Panel, Popup types, Inline edit, Flag, Spotlight, a dragged Card' },
     { id: 'blocks', behavior: 'Blocks the page', level: 'blocking', layer: '--layer-modal', uses: 'Modal only, on the Backdrop (--layer-blanket)' },
     { id: 'replaces', behavior: 'Replaces the page', level: 'default', layer: '--layer-dialog', uses: 'Frame · focused, AiChat full screen' },
     { id: 'labels', behavior: 'Labels a control', level: null, layer: '--layer-tooltip', uses: 'Tooltip, with no shadow' },
@@ -139,6 +139,15 @@ const usePageContrast = () => {
     return contrast;
 };
 
+/** The page's color mode now, `light` or `dark`, for a block's starting mode. */
+const pageMode = () => {
+    if (typeof document === 'undefined') return 'light';
+    const attr = document.documentElement.getAttribute('data-color-mode');
+    if (attr === 'dark') return 'dark';
+    if (attr === 'auto' && window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark';
+    return 'light';
+};
+
 /** A hidden element in one color mode, for reading what the tokens resolve to there. */
 const Probe = React.forwardRef(({ mode }, ref) => {
     const contrast = usePageContrast();
@@ -208,10 +217,10 @@ export const ExplodedStack = () => {
     const plates = [
         { id: 'frame', title: 'Frame', level: 'sunken', layer: null, inset: '0%', body: <div style={{ ...fill, borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-sunken)' }} /> },
         { id: 'page', title: 'Page', level: 'default', layer: null, inset: '5% 3% 5% 20%', body: <Page level="default" radius="md" padding="none" style={fill} /> },
-        { id: 'card', title: 'Card', level: 'raised', layer: '--layer-card', inset: '14% 50% 48% 25%', body: <PatternCard title="Session 12" description="Thursday, 4:30 PM" padding="sm" style={fill} /> },
-        { id: 'popup', title: 'Popup', level: 'overlay', layer: '--layer-popup', inset: '44% 26% 18% 48%', body: <div className="plus-popup" style={{ ...fill, width: 'auto' }}><div className="plus-popup-title">Details</div><div className="plus-popup-body">Ran 45 minutes over.</div></div> },
+        { id: 'card', title: 'Card', level: 'raised', layer: '--layer-card', inset: '10% 46% 40% 24%', body: <PatternCard title="Session 12" description="Thursday" padding="sm" style={fill} /> },
+        { id: 'popup', title: 'Popup', level: 'overlay', layer: '--layer-popup', inset: '44% 26% 18% 48%', body: <div className="plus-popup" style={{ ...fill, width: 'auto' }}><div className="plus-popup-title">Details</div><div className="plus-popup-body">45 min over</div></div> },
         { id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-blanket', inset: '0%', body: <div style={{ ...fill, borderRadius: 'var(--card-radius)', background: 'var(--ds-blanket)' }} /> },
-        { id: 'modal', title: 'Modal', level: 'blocking', layer: '--layer-modal', inset: '20% 26% 22% 28%', body: <div style={{ ...fill, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--modal-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-blocking)', color: 'var(--ds-text)' }}><strong style={{ font: 'var(--heading-small)' }}>Move session</strong><span style={{ font: 'var(--body-default)' }}>Move Thursday’s session to 4:30 PM?</span></div> },
+        { id: 'modal', title: 'Modal', level: 'blocking', layer: '--layer-modal', inset: '20% 26% 22% 28%', body: <div style={{ ...fill, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--modal-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-blocking)', color: 'var(--ds-text)' }}><strong style={{ font: 'var(--heading-small)' }}>Move session</strong><span style={{ font: 'var(--body-default)' }}>To 4:30 PM?</span></div> },
         { id: 'tooltip', title: 'Tooltip', level: null, layer: '--layer-tooltip', inset: '10% 36% 80% 46%', body: <div className="plus-tooltip" style={{ ...fill, maxWidth: 'none', display: 'grid', placeItems: 'center' }}>Reschedule</div> },
     ];
 
@@ -221,57 +230,76 @@ export const ExplodedStack = () => {
                 <Button text={exploded ? 'Collapse' : 'Explode'} spacing="compact" isSelected={exploded} onClick={() => setExploded((e) => !e)} />
                 <span style={small}>{exploded ? 'Each layer lifted by its place in the stack.' : 'The screen as a person sees it.'}</span>
             </div>
-            <div ref={stage} style={{ ...well, overflow: 'hidden', perspective: 'calc(var(--image-xl) * 12)' }}>
-                <div
-                    role="img"
-                    aria-label="A screen taken apart into seven layers, bottom to top: Frame, Page, Card, Popup, Backdrop, Modal and Tooltip."
-                    style={{
-                        position: 'relative',
-                        aspectRatio: '16 / 9',
-                        margin: '0 auto',
-                        width: `calc(100% - ${p} * var(--card-min-width-sm))`,
-                        transformStyle: 'preserve-3d',
-                        transform: `translateY(calc(${p} * var(--image-md))) rotateX(${p * 50}deg) rotateZ(${p * -28}deg)`,
-                    }}
-                >
-                    {plates.map((plate, i) => (
-                        <div
-                            key={plate.id}
-                            data-plate={plate.id}
-                            style={{
-                                position: 'absolute',
-                                inset: plate.inset,
-                                transform: `translateZ(calc(${p * i} * var(--image-sm)))`,
-                                transformStyle: 'preserve-3d',
-                            }}
-                        >
-                            {plate.body}
-                            <span
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
+                <div ref={stage} style={{ ...well, perspective: 'calc(var(--image-xl) * 14)', paddingBlockStart: `calc(var(--card-pad-spacious) + ${p} * var(--image-xl) * 2)`, paddingBlockEnd: `calc(var(--card-pad-spacious) + ${p} * var(--image-xl) / 2)` }}>
+                    <div
+                        role="img"
+                        aria-label="A screen taken apart into seven layers, bottom to top: Frame, Page, Card, Popup, Backdrop, Modal and Tooltip."
+                        style={{
+                            position: 'relative',
+                            aspectRatio: '16 / 10',
+                            margin: '0 auto',
+                            width: `calc(100% - ${p} * var(--card-min-width-sm) / 2)`,
+                            transformStyle: 'preserve-3d',
+                            transform: `rotateX(${p * 58}deg) rotateZ(${p * -38}deg)`,
+                        }}
+                    >
+                        {plates.map((plate, i) => (
+                            <div
+                                key={plate.id}
+                                data-plate={plate.id}
                                 style={{
                                     position: 'absolute',
-                                    insetInlineStart: plate.id === 'tooltip' ? '100%' : 'var(--pad-x-sm)',
-                                    insetBlockEnd: plate.id === 'frame' || plate.id === 'backdrop' ? 'var(--pad-y-sm)' : undefined,
-                                    insetBlockStart: plate.id === 'frame' || plate.id === 'backdrop' ? undefined : plate.id === 'tooltip' ? 0 : 'calc(-1 * var(--item-height-sm))',
-                                    marginInlineStart: plate.id === 'tooltip' ? 'var(--inline-md)' : undefined,
-                                    display: 'inline-flex',
-                                    gap: 'var(--inline-sm)',
-                                    padding: 'var(--pad-y-sm) var(--pad-x-sm)',
-                                    borderRadius: 'var(--radius-sm)',
-                                    background: 'var(--ds-surface-overlay)',
-                                    color: 'var(--ds-text)',
-                                    font: 'var(--body-small)',
-                                    whiteSpace: 'nowrap',
-                                    opacity: p,
-                                    boxShadow: 'var(--ds-shadow-raised)',
+                                    inset: plate.inset,
+                                    transform: `translateZ(calc(${p * i} * var(--image-md)))`,
+                                    transformStyle: 'preserve-3d',
+                                    borderRadius: 'var(--card-radius)',
+                                    // docs-literal: the dashed outline fades in with the explode spring.
+                                    outline: `var(--border-default) dashed color-mix(in srgb, var(--ds-border-bold) ${Math.round(p * 100)}%, transparent)`,
+                                    outlineOffset: 'var(--border-default)',
                                 }}
                             >
-                                <strong>{plate.title}</strong>
-                                {plate.level && <span style={{ color: 'var(--ds-text-subtle)' }}>{levelOf(plate.level).name.toLowerCase()}</span>}
-                                {plate.layer && <code style={{ font: 'var(--code)' }}>{plate.layer.replace('--layer-', '')} {layers[plate.layer]}</code>}
-                            </span>
-                        </div>
-                    ))}
+                                {plate.body}
+                                <span
+                                    aria-hidden="true"
+                                    style={{
+                                        position: 'absolute',
+                                        insetInlineStart: 'calc(-1 * var(--image-xxs) / 2)',
+                                        insetBlockStart: 'calc(-1 * var(--image-xxs) / 2)',
+                                        display: 'grid',
+                                        placeItems: 'center',
+                                        width: 'var(--image-xs)',
+                                        height: 'var(--image-xs)',
+                                        borderRadius: 'var(--radius-full)',
+                                        background: 'var(--ds-background-brand-bold)',
+                                        color: 'var(--ds-text-inverse)',
+                                        font: 'var(--heading-xsmall)',
+                                        opacity: p,
+                                    }}
+                                >
+                                    {i + 1}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
+                <ol aria-label="Layers, top first" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column-reverse', gap: 'var(--stack-md)' }}>
+                    {plates.map((plate, i) => (
+                        <li key={plate.id} data-legend={plate.id} style={{ display: 'grid', gridTemplateColumns: 'var(--image-xs) 1fr', columnGap: 'var(--inline-md)', alignItems: 'center' }}>
+                            <span
+                                aria-hidden="true"
+                                style={{ display: 'grid', placeItems: 'center', width: 'var(--image-xs)', height: 'var(--image-xs)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--heading-xsmall)' }}
+                            >
+                                {i + 1}
+                            </span>
+                            <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                                <strong>{plate.title}</strong>
+                                <span style={{ color: 'var(--ds-text-subtle)' }}>{plate.level ? levelOf(plate.level).name.toLowerCase() : 'no level'}</span>
+                                <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : 'no layer'}</code>
+                            </span>
+                        </li>
+                    ))}
+                </ol>
             </div>
         </div>
     );
@@ -281,7 +309,7 @@ export const ExplodedStack = () => {
 
 /** One tile per level: its surface with its shadow, on the ground it sits on. */
 export const LevelTiles = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(calc(var(--image-xl) * 2), 1fr))', gap: 'var(--grid-gutter)' }}>
         {LEVELS.map((l) => {
             const onBackdrop = l.id === 'blocking';
             return (
@@ -291,7 +319,7 @@ export const LevelTiles = () => (
                     style={{
                         padding: 'var(--card-pad-compact)',
                         borderRadius: 'var(--card-radius)',
-                        background: onBackdrop ? 'var(--ds-blanket)' : l.id === 'sunken' ? 'var(--ds-surface)' : 'var(--ds-surface-sunken)',
+                        background: onBackdrop ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : l.id === 'sunken' ? 'var(--ds-surface)' : 'var(--ds-surface-sunken)',
                     }}
                 >
                     <div
@@ -308,6 +336,7 @@ export const LevelTiles = () => (
                         }}
                     >
                         <strong style={{ font: 'var(--heading-xsmall)' }}>{l.name}</strong>
+                        <span style={{ font: 'var(--body-small)' }}>{l.use}</span>
                         <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{l.surface ?? 'no surface'}</code>
                         <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{l.shadow ?? 'no shadow'}</code>
                     </div>
@@ -406,8 +435,12 @@ export const BehaviorGuide = () => {
                             >
                                 <th scope="row" style={{ font: 'var(--heading-xsmall)' }}>{b.behavior}</th>
                                 <td>{level ? level.name : 'none'}</td>
-                                <td>{level?.shadow ? <C>{level.shadow}</C> : 'none'}</td>
-                                <td>{b.layer ? <C>{b.layer}</C> : 'none'}</td>
+                                <td>{level?.shadow ? <code style={{ ...codeText, whiteSpace: 'nowrap' }}>{level.shadow}</code> : 'none'}</td>
+                                <td>
+                                    {b.layer
+                                        ? [b.layer].flat().map((t) => <code key={t} style={{ ...codeText, display: 'block', whiteSpace: 'nowrap' }}>{t}</code>)
+                                        : 'none'}
+                                </td>
                                 <td>{b.uses}</td>
                             </tr>
                         );
@@ -433,6 +466,7 @@ const SlotValues = ({ layer }) => (
                     width: 'var(--image-xxs)',
                     height: 'var(--image-xxs)',
                     borderRadius: 'var(--radius-sm)',
+                    // docs-literal: the swatch shows an ink read from a --ds-shadow-* token.
                     background: `rgb(${layer.color.r} ${layer.color.g} ${layer.color.b})`,
                     boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)',
                 }}
@@ -448,7 +482,7 @@ const SlotValues = ({ layer }) => (
  */
 export const ShadowComposer = () => {
     const [levelId, setLevelId] = useState('blocking');
-    const [mode, setMode] = useState('light');
+    const [mode, setMode] = useState(pageMode);
     const [enabled, setEnabled] = useState({ edge: true, key: true, ambient: true });
     const contrast = usePageContrast();
     const ground = useRef(null);
@@ -469,7 +503,7 @@ export const ShadowComposer = () => {
                     ref={ground}
                     data-color-mode={mode}
                     {...(contrast ? { 'data-contrast-mode': contrast } : {})}
-                    style={{ ...well, display: 'grid', placeItems: 'center', minHeight: 'calc(var(--image-xl) * 2.5)', background: levelId === 'blocking' ? 'var(--ds-blanket)' : 'var(--ds-surface)' }}
+                    style={{ ...well, display: 'grid', placeItems: 'center', minHeight: 'calc(var(--image-xl) * 3.5)', background: levelId === 'blocking' ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : 'var(--ds-surface)' }}
                 >
                     <div
                         data-testid="composer-surface"
@@ -518,7 +552,7 @@ const CHART_TONES = {
  * computed from the shadow tokens as the page resolves them.
  */
 export const CrossSection = () => {
-    const [mode, setMode] = useState('light');
+    const [mode, setMode] = useState(pageMode);
     const contrast = usePageContrast();
     const ref = useRef(null);
     const values = useVarsOn(ref, SLOTTED_LEVELS.map((l) => l.shadow));
@@ -532,16 +566,26 @@ export const CrossSection = () => {
         return [d, groundDarkness(layers, d)];
     });
     const peak = Math.max(0.01, ...series.flatMap((s) => samples(s.layers).filter(([d]) => d >= 1).map(([, v]) => v)));
-    const W = 400;
-    const H = 180;
-    const L = 40;
-    const B = 28;
+    const W = 760;
+    const H = 260;
+    const L = 44;
+    const B = 32;
     const x = (d) => L + (d / span) * (W - L - 8);
     const y = (v) => H - B - (Math.min(v, peak) / peak) * (H - B - 12);
 
     return (
         <div style={stack} data-testid="cross-section">
-            <Choice name="Color mode" options={MODE_OPTIONS} value={mode} onChange={setMode} />
+            <div style={{ ...row, justifyContent: 'space-between' }}>
+                <ul aria-label="Levels" style={{ ...row, margin: 0, padding: 0, listStyle: 'none' }}>
+                    {series.map((s) => (
+                        <li key={s.level.id} style={{ ...row, gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                            <span aria-hidden="true" style={{ width: 'var(--image-xs)', height: 'calc(var(--border-default) * 2)', background: CHART_TONES[s.level.id] }} />
+                            {s.level.name} <span style={small}>reaches {Math.round(s.reach)}</span>
+                        </li>
+                    ))}
+                </ul>
+                <Choice name="Color mode" options={MODE_OPTIONS} value={mode} onChange={setMode} />
+            </div>
             <div ref={ref} data-color-mode={mode} {...(contrast ? { 'data-contrast-mode': contrast } : {})} style={well}>
                 <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="elevation-cross-title" style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}>
                     <title id="elevation-cross-title">
@@ -562,14 +606,10 @@ export const CrossSection = () => {
                     <text x={W - 8} y={H - 2} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-small)' }}>px below the edge</text>
                     {series.map((s) => {
                         const pts = samples(s.layers).filter(([d]) => d >= 1);
-                        const end = pts.find(([, v]) => v < peak * 0.02) ?? pts[pts.length - 1];
                         return (
                             <g key={s.level.id} data-series={s.level.id}>
                                 <polyline fill="none" stroke={CHART_TONES[s.level.id]} strokeWidth="2" strokeLinejoin="round" points={pts.map(([d, v]) => `${x(d)},${y(v)}`).join(' ')} />
                                 <line x1={x(s.reach)} y1={H - B} x2={x(s.reach)} y2={H - B - 6} stroke={CHART_TONES[s.level.id]} strokeWidth="2" />
-                                <text x={x(Math.min(end[0], span * 0.82))} y={y(samples(s.layers).find(([d]) => d >= Math.min(end[0], span * 0.82))?.[1] ?? 0) - 8} fill="var(--ds-text)" style={{ font: 'var(--body-small)' }}>
-                                    {s.level.name}
-                                </text>
                             </g>
                         );
                     })}
@@ -762,7 +802,8 @@ export const LiftDemo = () => {
                     aria-pressed={lifted}
                     onClick={() => setLifted((v) => !v)}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setLifted((v) => !v); } }}
-                    style={{ boxShadow: shadow, transition: 'none' }}
+                    // docs-literal: the fill springs from raised to overlay, a mix of the two tokens.
+                    style={{ boxShadow: shadow, background: `color-mix(in srgb, var(--ds-surface-overlay) ${Math.round(t * 100)}%, var(--ds-surface-raised))`, transition: 'none' }}
                 />
             </div>
         </div>
@@ -830,7 +871,7 @@ export const ScrollShadowDemo = () => {
                 tabIndex={0}
                 aria-label="Scrolling list of sessions"
                 onScroll={(e) => setScroll(e.currentTarget.scrollTop)}
-                style={{ maxHeight: 'calc(var(--image-xl) * 2)', overflowY: 'auto', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}
+                style={{ maxHeight: 'calc(var(--image-xl) * 3)', overflowY: 'auto', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}
             >
                 <div data-header style={{ position: 'sticky', top: 0, zIndex: 'var(--layer-card)', padding: 'var(--pad-y-md) var(--pad-x-md)', background: 'var(--ds-surface)', font: 'var(--heading-xsmall)', boxShadow: shadow, color: 'var(--ds-text)' }}>
                     Sessions
@@ -851,7 +892,7 @@ export const ScrollShadowDemo = () => {
 /** A Card and a Popup with increased contrast on and off: the ring becomes a 3:1 line. */
 export const ContrastDemo = () => {
     const [more, setMore] = useState(false);
-    const [mode, setMode] = useState('light');
+    const [mode, setMode] = useState(pageMode);
     return (
         <div style={stack} data-testid="contrast-demo">
             <div style={{ ...row, justifyContent: 'space-between' }}>

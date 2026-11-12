@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { Select } from '@/components';
-import { Frame, PatternCard, PatternSection, PatternTable } from '@/patterns';
+import { Button, Popup, Select, Tooltip } from '@/components';
+import { Blanket, Frame, PatternCard, PatternModal, PatternSection, PatternTable } from '@/patterns';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import {
     BehaviorGuide,
@@ -40,7 +40,7 @@ export const Stack = {
         const canvas = within(canvasElement);
         await expect(root).toHaveAttribute('data-state', 'exploded');
         await expect(root.querySelectorAll('[data-plate]')).toHaveLength(7);
-        await waitFor(() => expect(within(root).getByText(/tooltip \d+/)).toBeInTheDocument());
+        await waitFor(() => expect(within(root).getByText(/--layer-tooltip \d+/)).toBeInTheDocument());
         await userEvent.click(canvas.getByRole('button', { name: 'Collapse' }));
         await expect(root).toHaveAttribute('data-state', 'collapsed');
         await waitFor(() => expect(root).toHaveAttribute('data-progress', '0'));
@@ -166,6 +166,79 @@ export const CardLevels = {
 
 const options = ['Algebra I', 'Geometry', 'Reading', 'Writing'].map((label) => ({ value: label.toLowerCase(), label }));
 
+/** A Popup held open beside its trigger. */
+export const OpenPopup = {
+    render: () => (
+        <div style={{ minHeight: 'calc(var(--image-xl) * 2)', display: 'flex', alignItems: 'flex-start', padding: 'var(--card-pad-compact)' }}>
+            <Popup trigger={<Button text="Details" />} title="Session 12" placement="right-start" triggerType="manual" show>
+                Ran 45 minutes over.
+            </Popup>
+        </div>
+    ),
+    play: async () => {
+        await waitFor(() => expect(document.querySelector('.plus-popup')).not.toBeNull());
+    },
+};
+
+/** Opens a closed Frame edge by resting a pointer on it, as a person would. */
+const peek = (root, selector) => {
+    root?.querySelector(selector)?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
+};
+
+const navRows = ['Home', 'Sessions', 'Students', 'Reports'];
+
+/** The Sidebar peeked from the left edge: it floats over the page with no Backdrop. */
+export const FloatingSidebar = {
+    render: () => {
+        const Demo = () => {
+            const ref = useRef(null);
+            useEffect(() => { peek(ref.current, '.plus-frame__edge'); }, []);
+            return (
+                <div ref={ref} style={{ height: 'calc(var(--image-xl) * 4)' }}>
+                    <Frame
+                        header={<strong>Sessions</strong>}
+                        sidebar={<nav aria-label="Main" style={{ padding: 'var(--frame-sidebar-pad)', display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', font: 'var(--body-default)' }}>{navRows.map((r) => <span key={r}>{r}</span>)}</nav>}
+                        sidebarDocked={false}
+                        style={{ height: '100%' }}
+                    >
+                        <PatternCard title="Session 12" description="Thursday, 4:30 PM" />
+                    </Frame>
+                </div>
+            );
+        };
+        return <Demo />;
+    },
+};
+
+/** The Modal on its Backdrop. */
+export const ModalOnBackdrop = {
+    render: () => (
+        <Blanket inline screenWidth={768} screenHeight={420}>
+            <PatternModal
+                title="Move session"
+                onClose={() => {}}
+                footer={<><Button text="Cancel" spacing="compact" onClick={() => {}} /><Button text="Move session" appearance="primary" spacing="compact" onClick={() => {}} /></>}
+            >
+                <p style={{ margin: 0, font: 'var(--body-default)' }}>Move Thursday’s session with Ana Ruiz to 4:30 PM?</p>
+            </PatternModal>
+        </Blanket>
+    ),
+};
+
+/** A Tooltip held open on its trigger. */
+export const OpenTooltip = {
+    render: () => (
+        <div style={{ padding: 'var(--card-pad-spacious)', display: 'flex', justifyContent: 'center' }}>
+            <Tooltip text="Reschedule this session" show>
+                <Button text="Reschedule" />
+            </Tooltip>
+        </div>
+    ),
+    play: async () => {
+        await waitFor(() => expect(document.querySelector('.plus-tooltip')).not.toBeNull());
+    },
+};
+
 /** A Select open on the page: its list floats on the overlay pair. */
 export const OpenSelect = {
     render: () => (
@@ -184,8 +257,7 @@ export const FloatingPanel = {
         const Demo = () => {
             const ref = useRef(null);
             useEffect(() => {
-                const edge = ref.current?.querySelector('.plus-frame__panel-edge');
-                edge?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
+                peek(ref.current, '.plus-frame__panel-edge');
             }, []);
             return (
                 <div ref={ref} style={{ height: 'calc(var(--image-xl) * 4)' }}>

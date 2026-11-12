@@ -9,10 +9,6 @@ import {
 } from '@/storybook-docs/foundation-page.jsx';
 import { LevelTiles } from '@/storybook-docs/elevation-demos.jsx';
 import * as ElevationStories from './Elevation.stories.jsx';
-import * as PopupStories from '@/components/overlays-and-layering/Popup/Popup.stories.jsx';
-import * as TooltipStories from '@/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx';
-import * as FrameStories from '@/patterns/Frame/Frame.stories.jsx';
-import * as BackdropStories from '@/patterns/Blanket/Blanket.stories.jsx';
 
 
 <Meta of={ElevationStories} />
@@ -39,16 +35,9 @@ box-shadow: var(--ds-shadow-raised);
 
 <FoundationSection title="The levels">
 
-Six levels, lowest first. A surface and its shadow always travel together; overflow is a shadow only.
+Six levels, lowest first. A surface and its shadow always travel together.
 
 <ModeCompare>{() => <LevelTiles />}</ModeCompare>
-
-- **Sunken** holds the work: the frame, or a subtle Section. It never floats.
-- **Default** is the page and everything in its flow.
-- **Raised** marks one object a person can act on.
-- **Overlay** floats while the page stays usable.
-- **Blocking** is the Modal on its Backdrop, and nothing else.
-- **Overflow** shows where content runs under a part that stays put.
 
 Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked. `--ds-surface-container` is a translucent well inside a surface, and it is not a level.
 
@@ -78,7 +67,7 @@ How dark the ground is at each px below a surface's edge, computed from the toke
 
 <FoundationSubsection title="Every slot">
 
-Each value reads offset x and y, blur, spread, then ink opacity.
+Each value reads offset x and y, blur, spread, then ink opacity. In dark the ambient is a tight dark halo: a wide soft shadow does not show on a dark ground.
 
 <Canvas of={ElevationStories.SlotTable} sourceState="none" />
 
@@ -121,7 +110,7 @@ Raised at rest; a clickable Card lifts to overlay on hover and while dragged.
 
 <FoundationSubsection title="Popup and an open Select">
 
-<Canvas of={PopupStories.Open} sourceState="none" />
+<Canvas of={ElevationStories.OpenPopup} sourceState="none" />
 
 <Canvas of={ElevationStories.OpenSelect} sourceState="none" />
 
@@ -131,7 +120,7 @@ Raised at rest; a clickable Card lifts to overlay on hover and while dragged.
 
 Both take the overlay pair, with no Backdrop: the page beside them stays usable.
 
-<Canvas of={FrameStories.Floating} sourceState="none" />
+<Canvas of={ElevationStories.FloatingSidebar} sourceState="none" />
 
 <Canvas of={ElevationStories.FloatingPanel} sourceState="none" />
 
@@ -139,7 +128,7 @@ Both take the overlay pair, with no Backdrop: the page beside them stays usable.
 
 <FoundationSubsection title="Modal over its Backdrop">
 
-<Canvas of={BackdropStories.Inline} sourceState="none" />
+<Canvas of={ElevationStories.ModalOnBackdrop} sourceState="none" />
 
 </FoundationSubsection>
 
@@ -155,7 +144,7 @@ A border marks the cut first; the overflow shadow is for where a border would be
 
 A label, so it has no shadow: the dark fill sets it apart.
 
-<Canvas of={TooltipStories.Rest} sourceState="none" />
+<Canvas of={ElevationStories.OpenTooltip} sourceState="none" />
 
 </FoundationSubsection>
 
