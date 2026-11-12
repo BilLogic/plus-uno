@@ -67,7 +67,8 @@ const stillAtItsLanding = (demo) => async ({ canvasElement }) => {
 };
 
 const story = (demo) => ({
-  render: () => <MotionDemo {...demo} />,
+  // Pinned to the animated pass whatever the device's reduced-motion setting says.
+  render: () => <MotionDemo {...demo} reduced={false} />,
   play: playsToItsLanding(demo),
 });
 const reducedStory = (demo) => ({
@@ -109,7 +110,7 @@ const settled = async (canvasElement) => {
 
 /** A throw keeps the hand's speed; the same throw with the speed dropped starts from rest. */
 export const ThrowKeepsTheHandsSpeed = {
-  render: () => <MotionDemo {...PHYSICS_DEMOS.throw} />,
+  render: () => <MotionDemo {...PHYSICS_DEMOS.throw} reduced={false} />,
   play: async ({ canvasElement }) => {
     await settled(canvasElement);
     const keeps = stateOf(canvasElement, 'throw-keeps');
@@ -123,7 +124,7 @@ export const ThrowKeepsTheHandsSpeed = {
 
 /** Where it would land decides a throw: a short fast flick leaves, a long slow drag returns. */
 export const ThrowIsDecidedByProjectedRest = {
-  render: () => <MotionDemo {...PHYSICS_DEMOS.decision} />,
+  render: () => <MotionDemo {...PHYSICS_DEMOS.decision} reduced={false} />,
   play: async ({ canvasElement }) => {
     await settled(canvasElement);
     const flick = stateOf(canvasElement, 'decide-flick');
@@ -138,7 +139,7 @@ export const ThrowIsDecidedByProjectedRest = {
 
 /** A second press turns it back from where it is; the other waits, then closes. Both rest closed. */
 export const InterruptionRestsClosed = {
-  render: () => <MotionDemo {...PHYSICS_DEMOS.interruption} />,
+  render: () => <MotionDemo {...PHYSICS_DEMOS.interruption} reduced={false} />,
   play: async ({ canvasElement }) => {
     await settled(canvasElement);
     const turns = stateOf(canvasElement, 'interrupt-turns');
@@ -151,7 +152,7 @@ export const InterruptionRestsClosed = {
 
 /** What is carried lags by how much it holds: a chip stays closer than a card, and neither strays far. */
 export const CarryLagsByWeight = {
-  render: () => <MotionDemo {...PHYSICS_DEMOS.carry} />,
+  render: () => <MotionDemo {...PHYSICS_DEMOS.carry} reduced={false} />,
   play: async ({ canvasElement }) => {
     await settled(canvasElement);
     const chip = stateOf(canvasElement, 'carry-chip');
@@ -166,7 +167,7 @@ export const CarryLagsByWeight = {
 
 /** Past its limit it stretches by √extra × 4 px, then springs back to the limit; a wall never stretches. */
 export const LimitStretchesAndReturns = {
-  render: () => <MotionDemo {...PHYSICS_DEMOS.limit} />,
+  render: () => <MotionDemo {...PHYSICS_DEMOS.limit} reduced={false} />,
   play: async ({ canvasElement }) => {
     await settled(canvasElement);
     const resists = stateOf(canvasElement, 'limit-resists');
@@ -207,7 +208,7 @@ export const OneSpringTable = {
 
 /** The speed control steps 1×, ½×, ¼× and back, for the whole demo at once. */
 export const SpeedControl = {
-  render: () => <MotionDemo {...PHYSICS_DEMOS.damping} />,
+  render: () => <MotionDemo {...PHYSICS_DEMOS.damping} reduced={false} />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-motion-demo]');
     const button = within(root).getByRole('button', { name: /playback speed/i });
