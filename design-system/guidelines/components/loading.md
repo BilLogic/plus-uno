@@ -36,10 +36,9 @@ sits on a bold or colored background. It renders `role="status"` with its
 A busy button is `Button isLoading`, never a `Spinner` placed by hand. The
 spinner takes the button's icon size, 16 in both spacings, on the icon-size
 token (`--icon-md`, which is `--size-100`), and replaces the label and icons in
-the label color, so the button keeps its width and height while it sends. This
-is the one time a button disables: the rule is
-`design-system/guidelines/composition/form-behavior.md` § Unavailable actions
-and fields.
+the label color, so the button keeps its width and height while it sends.
+Disabled states: `design-system/guidelines/composition/form-behavior.md`
+§ Unavailable actions and fields.
 
 ## Announcing change
 

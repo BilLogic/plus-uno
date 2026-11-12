@@ -69,17 +69,16 @@ One case is not a violation: a component importing its own siblings inside
 
 ## Slot names
 
-A component names a before or after slot by what the slot accepts, so the right prop is predictable. Every new slot prop takes one of four names:
-`iconBefore` / `iconAfter` take an icon only, `elemBefore` / `elemAfter` take any element, `icon` is the single icon of an icon-led component, and `trailingMetric` is the count.
+A component names a before or after slot by what the slot accepts, so the right prop is predictable. Every new slot prop takes one of the four names below.
 
 | Name | Accepts | Used by |
 |---|---|---|
 | `iconBefore` / `iconAfter` | an icon only | Button, Link button, Status tag, Date tag, Change tag, Sidebar tab |
 | `elemBefore` / `elemAfter` | any element: an avatar, a count, a tag | Tag, Smart tag, menu items, Sidebar tab end slot, Table cells, the field box, listbox and option row |
-| `icon` | the single icon of a component built around one | Icon button, Banner, Section message, Empty state, Tile, Modal, Rating |
+| `icon` | the single icon of an icon-led component | Icon button, Banner, Section message, Empty state, Tile, Modal, Rating |
 | `trailingMetric` | the count after a label | Tag, Status tag, Filter button |
 
-`leadingVisual`, `trailingVisual` and a bare `leading` slot are retired; `npm run check:slot-names` fails on them. One known leftover: the internal field box (`forms-and-inputs/_internal/FieldBox.jsx`) still takes `trailing` for its end slot, until it is renamed to `elemAfter`.
+`leadingVisual`, `trailingVisual` and a bare `leading` slot are retired; `npm run check:slot-names` fails on them. One known exception: the internal field box (`forms-and-inputs/_internal/FieldBox.jsx`) still takes `trailing` for its end slot, which every field built on it passes, until it is renamed to `elemAfter`.
 
 ## Token usage
 

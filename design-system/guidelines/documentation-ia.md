@@ -141,8 +141,8 @@ specific, is drawn from the shared illustration kit
 Storybook). A shape the kit lacks is added to the kit the way its Contributing
 section says — reuse or extend a primitive first, each part painted by its
 real component's role token, one accent, correct in light and dark, with a
-gallery entry and its story test green — in its own PR, which the kit's owner
-(the templates and patterns work) reviews before merge. A figure on a page is
+gallery entry and its story test green — in its own PR, which the templates and
+patterns session, the kit's owner, reviews before merge. A figure on a page is
 always a kit composition, so one-off SVGs and hand-drawn figures have no home.
 
 ## Spacing

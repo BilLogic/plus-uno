@@ -43,8 +43,6 @@ Every element returned from `.map()` needs a unique `key`.
 grep -rnE 'isDisabled|disabled[=}]|trailing=|leading=' --include="*.jsx" <dir>
 ```
 
-A hit is evidence for judgement. A disabled action waiting on input, a reason
-in a tooltip, or a slot prop outside the four names is a finding; the rules are
+A hit is evidence for judgement against
 `design-system/guidelines/composition/form-behavior.md` § Unavailable actions
-and fields (explain on press; disable only for a same-screen prerequisite or
-while sending) and `docs/engineering/coding.md` § Slot names.
+and fields (explain on press) and `docs/engineering/coding.md` § Slot names.

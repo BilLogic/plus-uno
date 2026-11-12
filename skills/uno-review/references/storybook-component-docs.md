@@ -49,10 +49,9 @@ section: one short page per library PLUS builds on, from
 - **Usage spine:** Usage, Alternatives, Best practices, Accessibility,
   Related, then Parts and Content guidelines; `npm run check:ds-writing` holds
   the shape.
-- **Disabled and slot names:** an example that greys out a waiting action, or a
-  prop outside the four slot names, is a finding — rules in
-  `design-system/guidelines/composition/form-behavior.md` § Unavailable actions
-  and fields and `docs/engineering/coding.md` § Slot names.
+- **Disabled and slot names:** an example's disabled states and slot props
+  follow `design-system/guidelines/composition/form-behavior.md` § Unavailable
+  actions and fields and `docs/engineering/coding.md` § Slot names.
 - **Names:** every component named on the page is in the index; Alternatives
   and Related route to live components.
 

@@ -84,7 +84,8 @@ form's own check still enforces it.
 ## Unavailable actions and fields
 
 An action stays enabled and explains on press what is missing. A field or
-option disables only for a prerequisite the person can fix on the same screen. Content people must read is read-only, and what a role can never use is
+option disables only for a prerequisite the person can fix on the same
+screen. Content people must read is read-only, and what a role can never use is
 hidden.
 
 | The control is | Do this | The person can |

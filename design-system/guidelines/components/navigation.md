@@ -25,12 +25,12 @@ switches the page's sections; a `pill` strip inside a card switches that card's
 views. Pill views are a fixed set decided at design time, with no add, rename
 or reorder. A second-level choice inside a view is a toolbar filter: the
 labeled trigger of `PopupSelect` ("Status: Upcoming"), which swaps the content
-in place. Rule and examples: the Tabs page's best practices.
+in place. Rule and examples: `design-system/src/components/navigation/Tabs/index.md`.
 
 **Sidebar icons are outlined.** Every row icon is Font Awesome Free regular in
 the one subtle icon color; the selected row is marked by its fill, never a
-solid icon. A brand mark (`fa-brands fa-slack`) is the one exception. The
-Sidebar pattern's docs hold the row grid.
+solid icon. A brand mark (`fa-brands fa-slack`) is the one exception. The row
+grid: `design-system/src/patterns/Sidebar/index.md`.
 
 **`Pagination` is fully controlled.** `currentPage` and `totalPages` are
 required, and every click calls `preventDefault` before `onPageChange`, so
@@ -48,7 +48,7 @@ when it is last **or** has no `href`, so a middle crumb without an href also get
 `aria-current="page"` — give every non-final crumb a real destination.
 
 **`Tabs` is a real tab widget.** Every strip is `role="tablist"` on Base UI,
-with a roving tabindex and arrow keys, and each panel is labelled by its tab.
+with a roving tabindex and arrow keys, and each panel is labeled by its tab.
 
 **Name every navigation landmark.** `Pagination` defaults to
 `ariaLabel="Page navigation"`, so two paginated tables on a page produce two

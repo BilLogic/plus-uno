@@ -136,10 +136,9 @@ sets `aria-required` on the group and `required` on every radio; a Checkbox
 group cannot be enforced natively, so check it yourself. `Select`
 announces it through a visually hidden "Required" description on the trigger.
 
-**Disabled is rare.** An action stays enabled and explains on press; a field
-disables only for a same-screen prerequisite, with the reason as visible text.
-The rule: `design-system/guidelines/composition/form-behavior.md` § Unavailable
-actions and fields.
+**Disabled states** (explain on press):
+`design-system/guidelines/composition/form-behavior.md` § Unavailable actions
+and fields.
 
 **Popup placement** for every field, menu and button popup:
 `design-system/guidelines/components/overlays-and-layering.md` § Where a popup

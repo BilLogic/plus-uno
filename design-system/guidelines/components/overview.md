@@ -14,12 +14,10 @@ state, focus management, keyboard handling — is built on Base UI
 
 Two rules reach every group, each stated once:
 
-- **Disabled is rare.** An action stays enabled and explains on press; a field
-  disables only for a same-screen prerequisite —
+- **Disabled states** (explain on press):
   `design-system/guidelines/composition/form-behavior.md` § Unavailable actions
   and fields.
-- **Slot names** follow what the slot accepts (`iconBefore`, `elemBefore`,
-  `icon`, `trailingMetric`) — `docs/engineering/coding.md` § Slot names.
+- **Slot names:** `docs/engineering/coding.md` § Slot names.
 
 ## Start here — the group overviews
 
@@ -30,7 +28,7 @@ Two rules reach every group, each stated once:
 - [Labels](labels.md) — `StatusTag`, `DateTag`, `CountTag`, `ChangeTag`, `Tag`, `SmartTag`, `TagGroup` and `Suggestion`
 - [Layout and structure](layout-and-structure.md) — the containers
 - [Loading](loading.md) — `ProgressBar`, `Skeleton`, `Spinner`, `GenerativeBorder`
-- [Messaging](messaging.md) — `SectionMessage`, `Flag`, `Modal`, `Banner`, `InlineMessage`, `EmptyState`
+- [Messaging](messaging.md) — `SectionMessage`, `Flag`, `Modal`, `Banner`, `InlineMessage`, `EmptyState`, `Spotlight`
 - [Navigation](navigation.md) — sorted by what the user moves between
 - [Overlays and layering](overlays-and-layering.md) — `Tooltip`, `Popup`, and where every popup opens
 

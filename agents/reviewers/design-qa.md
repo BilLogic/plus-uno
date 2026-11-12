@@ -18,7 +18,7 @@ Catches spec-vs-implementation drift before ship: walks the QA site against the 
 ## Workflow
 
 1. Resolve the Roadmap card → the Figma file whose title lists its number (`Card <n> & <m>`) → the pages under its 📐 Specs divider (per `docs/connectors/figma/overview.md`).
-2. Walk the QA build against the spec: layout, tokens, states, behaviors, content; run the H7 checklist (Notion Templates). A disabled control is checked against `design-system/guidelines/composition/form-behavior.md` § Unavailable actions and fields: an unready action stays enabled and explains on press.
+2. Walk the QA build against the spec: layout, tokens, states, behaviors, content; run the H7 checklist (Notion Templates). A disabled control is checked against `design-system/guidelines/composition/form-behavior.md` § Unavailable actions and fields (explain on press); a slot prop against `docs/engineering/coding.md` § Slot names.
 3. Post findings with severity (blocker / major / minor — the review method's vocabulary) + screenshots/links.
 
 ## Conventions it obeys

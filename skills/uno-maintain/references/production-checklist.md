@@ -11,7 +11,7 @@ Use with **uno-review** when implementing approved designs for production (not d
 
 ## Interactive States (verify each)
 
-- Default, hover, focus, pressed/active, disabled — disabled only for a same-screen prerequisite or while sending; an unready action stays enabled and explains on press (`design-system/guidelines/composition/form-behavior.md` § Unavailable actions and fields)
+- Default, hover, focus, pressed/active, disabled (explain on press: `design-system/guidelines/composition/form-behavior.md` § Unavailable actions and fields)
 - Loading, error/validation (form flows)
 - Empty data, long-text truncation/wrap, skeleton states
 
