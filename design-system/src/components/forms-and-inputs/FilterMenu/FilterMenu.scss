@@ -43,12 +43,13 @@
     font: var(--heading-xsmall);
 }
 
-// Full bleed: out past the popup pad on the sides and the bottom, two
+// Full bleed: out past the popup pad and its 1px edge on the sides and the bottom, two
 // buttons half each with no gap and no radius of their own.
 .plus-filter-menu__footer {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    margin: 0 calc(-1 * var(--popover-pad)) calc(-1 * var(--popover-pad));
+    --plus-filter-menu-bleed: calc(var(--popover-pad) + var(--border-default));
+    margin: 0 calc(-1 * var(--plus-filter-menu-bleed)) calc(-1 * var(--plus-filter-menu-bleed));
 
     .plus-btn {
         border-radius: 0;
