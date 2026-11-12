@@ -98,7 +98,7 @@ Overview.parameters = {
 
 export const Content = () => (
     <div style={{ maxWidth: 'var(--size-5400)' }}>
-        <p className="body-default mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
+        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
             Label, required asterisk, accepted formats, and button copy.
         </p>
         <FileUpload
@@ -178,7 +178,7 @@ export const InteractionStates = () => (
 
 export const ReadOnly = () => (
     <div style={{ maxWidth: 'var(--size-4000)' }}>
-        <p className="body-default mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
+        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
             Read-only shows the field and the files already chosen, with no button to choose another.
         </p>
         <FileUpload
@@ -206,7 +206,7 @@ export const ReadOnly = () => (
 
 export const WithFiles = () => (
     <div style={{ maxWidth: 'var(--size-4000)' }}>
-        <p className="body-default mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
+        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
             Pass the chosen files as children. They sit below the button, outside the frame, as on the post-session recording upload.
         </p>
         <FileUpload

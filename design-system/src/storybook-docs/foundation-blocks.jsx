@@ -249,7 +249,6 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
                     <div
                         key={p}
                         data-color-mode={p}
-                        data-bs-theme={p}
                         {...(contrast ? { 'data-contrast-mode': contrast } : {})}
                         style={{
                             display: 'flex',

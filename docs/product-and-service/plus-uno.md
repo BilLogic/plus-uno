@@ -18,7 +18,7 @@ plus-uno is the PLUS design team's agentic design-ops workspace: the design syst
 
 ## Tech stack
 
-React on Bootstrap, built with Vite, documented in Storybook, styled with SCSS and design tokens. New interactive behavior is built on Base UI (`@base-ui/react`, ADR-037). Highcharts draws the data visualizations and Motion the animation. uno-bot is TypeScript on Cloudflare Workers.
+React, built with Vite, documented in Storybook, styled with SCSS and design tokens. New interactive behavior is built on Base UI (`@base-ui/react`, ADR-037). Highcharts draws the data visualizations and Motion the animation. uno-bot is TypeScript on Cloudflare Workers.
 
 **Versions live in `package.json`.** They are not restated here: a mirrored table is correct only until the next bump, and nothing makes it fail when it stops being correct.
 

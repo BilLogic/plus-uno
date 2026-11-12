@@ -1,7 +1,4 @@
 import React, { useEffect } from 'react';
-// Cascade layers (bootstrap, tokens, components): Bootstrap's CSS goes first,
-// in the lowest-precedence layer.
-import '../design-system/src/styles/bootstrap-layer.css';
 // Design system: tokens, .plus-modal, and other globals for stories that import @/ components
 import '../design-system/src/styles/main.scss';
 import './storybook-overrides.css';

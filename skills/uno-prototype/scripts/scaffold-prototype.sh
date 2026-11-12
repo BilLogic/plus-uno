@@ -93,7 +93,6 @@ EOF
 cat > "$dest/src/main.jsx" <<'EOF'
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import '@/styles/bootstrap-layer.css';
 import '@/styles/main.scss';
 import App from './App';
 import './index.css';

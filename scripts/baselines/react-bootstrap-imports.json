@@ -1,8 +1,0 @@
-{
-  "why": "react-bootstrap import statements, per file, in design-system/src, prototypes and src. Base UI is the single behavior layer (ADR-037, #1687); a count may fall and never rise, a file that reaches zero leaves the record, and a new file starts at zero. At a baseline of zero the final sweep removes the dependency and this check becomes a hard ban. Regenerate with `npm run check:react-bootstrap-imports -- --update`; never edit by hand.",
-  "sets": {
-    "main": {
-      "entries": {}
-    }
-  }
-}

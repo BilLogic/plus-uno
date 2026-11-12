@@ -287,16 +287,6 @@ export const CHECKS = [
     guards: 'literal values inside `style={{...}}` in components, counted per file; a count may fall and never rise, and a new file starts at zero.',
   },
   {
-    name: 'check:react-bootstrap-imports',
-    script: 'node scripts/check-react-bootstrap-imports.mjs',
-    pkg: 'root',
-    trigger: 'pull_request',
-    module: 'scripts/check-react-bootstrap-imports.mjs',
-    baseline: 'scripts/baselines/react-bootstrap-imports.json',
-    update: 'node scripts/check-react-bootstrap-imports.mjs --update',
-    guards: 'imports of react-bootstrap in design-system/src, prototypes and src, counted per file; a count may fall and never rise.',
-  },
-  {
     name: 'check:raw-buttons',
     script: 'node scripts/check-raw-buttons.mjs',
     pkg: 'root',

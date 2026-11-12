@@ -520,7 +520,7 @@ const ComplianceQueue = ({ withPanel = false, ...frameArgs }) => {
     const select = (i) => { setIndex(i); setOpen(true); };
 
     const list = (
-            <ul className="list-unstyled m-0" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', listStyle: 'none', paddingLeft: 0, margin: 0 }}>
                 {FLAGS.map((f, i) => (
                     <li key={f.id}>
                         <Button
@@ -549,7 +549,7 @@ const ComplianceQueue = ({ withPanel = false, ...frameArgs }) => {
                 detail={(
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                         <StatusTag appearance={flag.status === 'Open' ? 'warning' : 'info'}>{flag.status}</StatusTag>
-                        <p className="m-0">{flag.reason}. Review the session notes, then decide.</p>
+                        <p style={{ margin: 0 }}>{flag.reason}. Review the session notes, then decide.</p>
                     </div>
                 )}
                 detailTitle={`Flag: ${flag.tutor}`}

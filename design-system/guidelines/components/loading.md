@@ -23,11 +23,10 @@ clamps the percentage, and renders `role="progressbar"` with `aria-valuenow`,
 `aria-valuemin` and `aria-valuemax`. There is no indeterminate mode; that case is
 `Spinner`.
 
-`Spinner` has five animation variants — `border` and `grow` come from the
-underlying spinner, while `growing`, `rotating` and `stacking` are rendered as
-blocks in a div. `size` accepts only `sm`. It defaults to `role="status"` and
-supplies its own "Loading" text, either as an `aria-label` on the custom
-variants or as visually hidden text on the others.
+`Spinner` is one animated ring. `size` is a pixel diameter, 16, 24 (default)
+or 48; `appearance="inherit"` takes the surrounding text color and `"invert"`
+sits on a bold or colored background. It renders `role="status"` with its
+`label` ("Loading" by default) as visually hidden text.
 
 `Skeleton`'s rules — composed to the real content's dimensions, with
 `aria-busy` on the loading region — are on its docs page and in

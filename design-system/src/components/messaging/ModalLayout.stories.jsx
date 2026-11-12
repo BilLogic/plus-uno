@@ -253,11 +253,18 @@ MenuInsideModal.play = async ({ canvasElement }) => {
 };
 
 /**
- * Page chrome sits under the blanket: a sticky table header (Bootstrap's
- * `.sticky-top`, on the card layer) and a floating control on the navigation
- * layer, as an app's floating nav sits. Bootstrap had them at 1020 and 1100,
- * above a modal at 510.
+ * Page chrome sits under the blanket: a sticky table header on the card layer
+ * and a floating control on the navigation layer, as an app's floating nav
+ * sits. Both stay below a modal at 510.
  */
+
+/** A table header that sticks to the top of its scroll box, on the card layer. */
+const STICKY_HEAD = {
+    position: 'sticky',
+    top: 0,
+    zIndex: 'var(--layer-card)',
+    background: 'var(--ds-surface-sunken)',
+};
 
 /** A floating control pinned to the corner of the screen, on the navigation layer. */
 const FLOATING_NAV = {
@@ -272,9 +279,8 @@ const FLOATING_NAV = {
 export const ChromeUnderTheBlanket = () => (
     <div>
         <div style={{ height: 'var(--size-2000)', overflow: 'auto' }}>
-            {/* Bootstrap's markup, as LessonsOverviewPage draws it. */}
-            <table className="table m-0">
-                <thead className="bg-light sticky-top" data-testid="sticky-head">
+            <table style={{ width: '100%' }}>
+                <thead style={STICKY_HEAD} data-testid="sticky-head">
                     <tr><th>Lesson</th><th>Status</th></tr>
                 </thead>
                 <tbody>

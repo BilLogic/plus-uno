@@ -262,8 +262,8 @@ A boolean state prop such as `isDisabled`, `isSelected` or `isLoading`.
 _Avoid_: bare `disabled`, `selected` or `loading` props
 
 **Base UI**:
-The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close), decided in ADR-037; Bootstrap stays the CSS framework for non-interactive markup.
-_Avoid_: "react-bootstrap" as a precedent
+The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close), decided in ADR-037.
+_Avoid_: Bootstrap or React-Bootstrap as a precedent; PLUS ships neither (ADR-041)
 
 **FieldBox / FieldFrame**:
 FieldBox is an input's box (leading and trailing slots, density, radius); FieldFrame carries its label, caption and error, and is the only piece choice controls share.
