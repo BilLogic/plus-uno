@@ -93,6 +93,8 @@ const ROLES = {
   accent: ['--ds-background-brand-bold', 'components/forms-and-inputs/Button/Button.scss'],
   // Drawing devices, no component behind them
   windowDot: ['--ds-background-neutral', null],
+  // A blocked-out object in a motion principle figure: a shape, not a component
+  shape: ['--ds-background-neutral', null],
   annotation: ['--ds-border-bold', null],
 };
 
@@ -125,6 +127,7 @@ const CORNERS = {
   count: ['--radius-sm', 'components/labels/CountTag/CountTag.scss'],
   tracker: ['--radius-h32', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
   cardImage: ['--card-radius-sm', 'patterns/PatternCard/PatternCard.scss'],
+  shape: ['--radius-0375', null],
   full: ['--radius-full', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
 };
 

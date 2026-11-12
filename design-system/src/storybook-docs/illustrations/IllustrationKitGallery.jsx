@@ -4,6 +4,7 @@ import {
   AnatomyMarker, Backdrop, Breadcrumb, ButtonShape, Card, CountTag, Field, Flag, Frame, Modal, Page, PageHeader, Panel, Popup,
   ProgressTracker, Row, Screen, Section, Sidebar, Tabs,
 } from './primitives.jsx';
+import { MOTION_SETS } from './primitives-motion.jsx';
 
 /**
  * Every primitive, neutral then accented, at the one scale the compositions use.
@@ -31,6 +32,8 @@ const SETS = [
   ['Flag', (a) => <Flag x={30} y={26} w={100} h={48} tone={a ? 'success' : 'neutral'} accent={a} />],
   ['Count tag', (a) => <CountTag x={64} y={44} w={32} h={14} accent={a} />],
   ['Anatomy marker', (a) => (<><Section x={44} y={22} w={100} h={56} /><AnatomyMarker x={20} y={50} tx={44} ty={34} accent={a} /></>)],
+  // Motion's own primitives: chart axis and curve, trail, tap ring, pointer.
+  ...MOTION_SETS,
 ];
 
 export const IllustrationKitGallery = () => (

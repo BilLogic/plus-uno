@@ -1,7 +1,7 @@
 /*
  * DropdownMenu — the floating surface the menu rows sit in once a trigger
  * opens it. Same floating-layer treatment as Listbox and Popup:
- * `elevation.surface.overlay`, its shadow, a `color.border` edge and
+ * `elevation.surface.overlay`, its shadow (whose ring is the edge) and
  * Popover/radius-menu-md, capped at Popover/max-height-menu and
  * Popover/max-width-menu.
  */
@@ -12,7 +12,9 @@
     max-width: var(--popover-max-width-menu);
     overflow: hidden;
     background-color: var(--ds-surface-overlay);
-    border: var(--border-default) solid var(--ds-border);
+    // The shadow's ring is the edge; the transparent border keeps one in
+    // forced colors, where shadows are dropped.
+    border: var(--border-default) solid transparent;
     border-radius: var(--popover-radius-menu-md);
     box-shadow: var(--ds-shadow-overlay);
     z-index: var(--layer-popup);

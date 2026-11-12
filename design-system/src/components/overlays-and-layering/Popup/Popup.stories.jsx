@@ -217,7 +217,7 @@ const StatePopup = () => (
     </div>
 );
 
-/** Rest: one surface on the overlay fill, lifted by the overlay shadow, with no border of its own. */
+/** Rest: one surface on the overlay fill, lifted by the overlay shadow, with no painted border (a transparent one keeps an edge in forced colors). */
 export const Rest = {
     render: () => <StatePopup />,
     play: async ({ canvasElement }) => {
@@ -225,7 +225,7 @@ export const Rest = {
         const style = getComputedStyle(popup);
         await expect(style.backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-overlay'));
         await expect(style.boxShadow).not.toBe('none');
-        await expect(parseFloat(style.borderTopWidth)).toBe(0);
+        await expect(style.borderTopColor).toBe('rgba(0, 0, 0, 0)');
     },
 };
 
