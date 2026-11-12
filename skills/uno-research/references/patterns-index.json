@@ -40,7 +40,7 @@
       "name": "responsive_verification",
       "rule": "Use md/lg/xl checks for page-level UI; the Frame resolves the layout from its own width.",
       "references": [
-        "design-system/src/patterns/PageTemplates/PageTemplates.mdx",
+        "design-system/src/storybook-docs/templates/TemplatesOverview.mdx",
         "design-system/src/patterns/Frame/frameLayout.js"
       ]
     },

@@ -10,7 +10,7 @@ summary: If you are building a full page (like a dashboard, student list, or too
 
 ## The standard app shell
 
-If you are building a full page (like a dashboard, student list, or toolkit), you MUST build it on the default template: `Frame` with the PLUS `Sidebar` in `sidebar` and a `Breadcrumb` in `header`. The Frame handles the responsive Sidebar and the breadcrumb row (§ The frame); the Templates pattern page (`design-system/src/patterns/PageTemplates/PageTemplates.mdx`) shows both templates.
+If you are building a full page (like a dashboard, student list, or toolkit), you MUST build it on the default template: `Frame` with the PLUS `Sidebar` in `sidebar` and a `Breadcrumb` in `header`. The Frame handles the responsive Sidebar and the breadcrumb row (§ The frame); the Templates overview (`design-system/src/storybook-docs/templates/TemplatesOverview.mdx`) points to every template page.
 
 ```jsx
 import React from 'react';
