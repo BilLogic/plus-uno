@@ -3,17 +3,20 @@ import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Button } from '../Button/Button';
 import Tooltip from '../../overlays-and-layering/Tooltip/Tooltip';
+import './IconButton.scss';
 
 export const ICON_BUTTON_APPEARANCES = ['default', 'subtle', 'primary', 'discovery'];
 export const ICON_BUTTON_SHAPES = ['default', 'circle'];
 
 /**
  * Icon button: a button that is an icon and nothing else. `label` is required
- * because it is the button's accessible name and its tooltip..
+ * because it is the button's accessible name and its tooltip. A filter trigger
+ * can add `trailingMetric`, the count of filters applied, drawn after the icon.
  */
 export const IconButton = ({
     icon,
     label,
+    trailingMetric,
     appearance = 'default',
     spacing = 'default',
     shape = 'default',
@@ -21,20 +24,44 @@ export const IconButton = ({
     title,
     tooltip,
     isTooltipDisabled = false,
+    isDisabled = false,
+    isSelected,
     ...props
 }) => {
+    // Zero or absent draws no count; a count above zero is itself the selected state.
+    const hasMetric = Number.parseInt(trailingMetric, 10) > 0;
+    const selected = Boolean(isSelected) || hasMetric;
+    // A button given no `isSelected` and no count is not a toggle, so it reports no aria-pressed.
+    const isToggle = isSelected !== undefined || hasMetric;
+    // A menu trigger reports aria-expanded only; the selected fill stays, aria-pressed goes.
+    const isMenuTrigger = props['aria-expanded'] !== undefined || props['aria-haspopup'] !== undefined;
     const button = (
         <Button
             iconBefore={icon}
-            aria-label={label}
-            title={isTooltipDisabled ? undefined : (title ?? (tooltip ? undefined : label))}
+            aria-label={hasMetric ? `${label}, ${trailingMetric} applied` : label}
+            title={isTooltipDisabled || isDisabled ? undefined : (title ?? (tooltip ? undefined : label))}
             appearance={appearance}
             spacing={spacing}
-            className={clsx({ 'plus-btn--circle': shape === 'circle' }, className)}
+            className={clsx({
+                'plus-btn--circle': shape === 'circle',
+                'plus-icon-btn--metric': hasMetric,
+                'plus-btn--selected': selected && isMenuTrigger,
+            }, className)}
+            isDisabled={isDisabled}
+            isSelected={isMenuTrigger || !isToggle ? undefined : selected}
             {...props}
-        />
+        >
+            {hasMetric && (
+                // The accessible name already carries the count, so the drawn digits are hidden.
+                <span className="plus-icon-btn__metric" aria-hidden="true">
+                    {/* Keyed on the value, so each new count fades in rather than ticking. */}
+                    <span key={trailingMetric} className="plus-icon-btn__metric-value">{trailingMetric}</span>
+                </span>
+            )}
+        </Button>
     );
-    if (isTooltipDisabled || !tooltip) return button;
+    // A disabled control carries no tooltip; the reason is visible text beside it.
+    if (isTooltipDisabled || isDisabled || !tooltip) return button;
     return <Tooltip text={tooltip}>{button}</Tooltip>;
 };
 
@@ -43,15 +70,17 @@ IconButton.propTypes = {
     icon: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
     /** The accessible name and tooltip. Sentence case; name the object acted on ("Edit page"). */
     label: PropTypes.string.isRequired,
+    /** The count of filters applied, drawn after the icon; the accessible name becomes "Filters, 2 applied". Zero or absent draws no count, and a count above zero draws the selected fill by itself. */
+    trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** The visual style. `default` suits most actions, `subtle` low-emphasis toolbar actions, `primary` the main action and `discovery` something new. */
     appearance: PropTypes.oneOf(ICON_BUTTON_APPEARANCES),
     /** `default` draws 32. `compact` draws 24. */
     spacing: PropTypes.oneOf(['default', 'compact']),
     /** Square by default; `circle` is for top navigation. */
     shape: PropTypes.oneOf(ICON_BUTTON_SHAPES),
-    /** Marks the button selected and sets `aria-pressed`. Use it for a toggle such as a list or grid view switch. */
+    /** Marks the button selected and sets `aria-pressed` (leave it unset and the button reports none), except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch. */
     isSelected: PropTypes.bool,
-    /** Prevents interaction. Avoid it where you can; say why the action is unavailable instead. */
+    /** Prevents interaction and drops the tooltip and `title`. Leave an action enabled and explain what is missing when it is pressed; disable only while it is sending. */
     isDisabled: PropTypes.bool,
     /** Shows a spinner in place of the icon and blocks interaction. */
     isLoading: PropTypes.bool,

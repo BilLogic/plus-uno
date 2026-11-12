@@ -26,6 +26,7 @@ Written for agent-readability, per storybook.js.org/docs/ai/best-practices:
 - One concept per story, each with a "why" description.
 - JSDoc on component exports and per-prop descriptions — react-docgen extracts them into the generated docs.
 - Explicit MDX content; manifest generation is static, so external imports produce empty docs.
+- A Templates or Patterns docs page carries `tags={['!dev', 'manifest']}`: `get-documentation` serves a docs page only with the `manifest` tag, and `npm run generate:docs-agent-files` fails without it. Its generated agent file is `design-system/agent-views/pages/<templates|patterns>/<Name>.md`.
 - Tag anti-pattern and deprecated stories `!manifest` to keep them out of agent context.
 
 ## Related

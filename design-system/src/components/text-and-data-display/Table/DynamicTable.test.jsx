@@ -203,6 +203,49 @@ describe('DynamicTable selection', () => {
     });
 });
 
+describe('DynamicTable bulk bar', () => {
+    const actions = [{ label: 'Message', onClick: vi.fn() }, { label: 'Export', onClick: vi.fn() }];
+    const headRow = () => within(screen.getByRole('table')).getAllByRole('row')[0];
+
+    it('turns the head row into the bulk bar while rows are selected', () => {
+        render(<DynamicTable head={head} rows={rows} isSelectable bulkActions={actions} label="Students" />);
+        expect(within(headRow()).getByRole('columnheader', { name: /Student/ })).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select row 1' }));
+        const row = headRow();
+        expect(row).toHaveClass('plus-dynamic-table-head--bulk');
+        expect(within(row).getByText('1 selected')).toBeInTheDocument();
+        expect(within(row).getByRole('checkbox', { name: 'Select all rows' })).toHaveAttribute('aria-checked', 'mixed');
+        // One cell spans the columns; the sort heads give way to it.
+        const bar = row.querySelector('.plus-dynamic-table-bulk');
+        expect(bar).toHaveAttribute('colspan', '3');
+        expect(within(row).queryByRole('button', { name: /Sessions/ })).toBeNull();
+        fireEvent.click(within(row).getByRole('button', { name: 'Export' }));
+        expect(actions[1].onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('has no Clear: the checkboxes clear it and the head row comes back', () => {
+        render(<DynamicTable head={head} rows={rows} isSelectable bulkActions={actions} />);
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select row 2' }));
+        expect(screen.queryByRole('button', { name: /clear/i })).toBeNull();
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select row 2' }));
+        const row = headRow();
+        expect(row).not.toHaveClass('plus-dynamic-table-head--bulk');
+        expect(row).toHaveClass('plus-dynamic-table-head--returned');
+        expect(row.querySelector('.plus-dynamic-table-bulk')).toBeNull();
+        expect(within(row).getByRole('columnheader', { name: /Student/ })).toBeInTheDocument();
+    });
+
+    it('keeps the column widths in a colgroup, so the bar does not move them', () => {
+        const { container } = render(<DynamicTable head={head} rows={rows} isSelectable />);
+        expect(container.querySelectorAll('colgroup col')).toHaveLength(4);
+    });
+
+    it('never shows on a table without selection', () => {
+        const { container } = render(<DynamicTable head={head} rows={rows} bulkActions={actions} />);
+        expect(container.querySelector('.plus-dynamic-table-bulk')).toBeNull();
+    });
+});
+
 describe('DynamicTable sticky header and frozen column', () => {
     it('pins the head row inside its own bounded scroll region', () => {
         const { container } = render(<DynamicTable head={head} rows={rows} stickyHeader maxHeight={200} />);

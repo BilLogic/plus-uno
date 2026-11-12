@@ -20,13 +20,11 @@ export default {
     decorators: [(Story) => <div style={{ width: 'var(--frame-sidebar-width)' }}><Story /></div>],
     argTypes: {
         text: { control: 'text', table: { category: 'Content' } },
-        icon: { control: 'text', table: { category: 'Content' } },
+        iconBefore: { control: 'text', table: { category: 'Content' } },
         description: { control: 'text', table: { category: 'Content' } },
         state: { control: 'select', options: ['enabled', 'selected', 'disabled'], table: { category: 'Design' } },
-        leadingVisual: { control: 'boolean', table: { category: 'Design' } },
         href: { control: 'text', table: { category: 'Development' } },
         external: { control: 'boolean', table: { category: 'Development' } },
-        trailingVisual: { table: { disable: true } },
         elemAfter: { table: { disable: true } },
         actionsOnHover: { table: { disable: true } },
         onClick: { table: { disable: true } },
@@ -34,7 +32,7 @@ export default {
         className: { table: { disable: true } },
         style: { table: { disable: true } },
     },
-    args: { text: 'Sessions', icon: 'calendar', state: 'enabled' },
+    args: { text: 'Sessions', iconBefore: 'calendar', state: 'enabled' },
 };
 
 /** A row with its icon and label. */
@@ -57,23 +55,23 @@ export const Selected = {
 export const Disabled = { args: { state: 'disabled', onClick: () => {} } };
 
 /** A second line in Body/small; the row grows past 32 to hold it. */
-export const WithDescription = { args: { text: 'Lin Chen', icon: 'user', description: 'Grade 7 · Math', onClick: () => {} } };
+export const WithDescription = { args: { text: 'Lin Chen', iconBefore: 'user', description: 'Grade 7 · Math', onClick: () => {} } };
 
 /** A count in the trailing slot. */
 export const WithCount = {
-    args: { text: 'Compliance', icon: 'flag', onClick: () => {} },
+    args: { text: 'Compliance', iconBefore: 'flag', onClick: () => {} },
     render: (args) => <SidebarTab {...args} elemAfter={<CountTag value={3} label="3 open flags" />} />,
 };
 
 /** Controls shown on hover and focus, beside the row rather than inside it. */
 export const WithActions = {
-    args: { text: 'Mon 4:00 PM · Lin', icon: 'calendar', onClick: () => {} },
+    args: { text: 'Mon 4:00 PM · Lin', iconBefore: 'calendar', onClick: () => {} },
     render: (args) => <SidebarTab {...args} actionsOnHover={<IconButton appearance="subtle" spacing="compact" icon="xmark" label="Close tab" />} />,
 };
 
 /** `href` makes the row a link; `external` opens it in a new tab and says so. */
 export const ExternalLink = {
-    args: { text: 'Slack', icon: 'fa-brands fa-slack', href: 'https://slack.com/', external: true },
+    args: { text: 'Slack', iconBefore: 'fa-brands fa-slack', href: 'https://slack.com/', external: true },
     play: async ({ canvasElement }) => {
         await expect(within(canvasElement).getByRole('link', { name: /Slack.*opens in a new tab/ })).toBeTruthy();
     },

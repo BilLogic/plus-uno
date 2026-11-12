@@ -15,7 +15,7 @@ import { IconButton, Select } from '@/components';
  * that cap. A render assertion cannot see any of that, so these stories measure
  * the boxes.
  *
- * The screen grid is read from `--plus-modal-screen` when an ancestor sets it,
+ * The screen grid is read from `--plus-overlay-screen` when an ancestor sets it,
  * and from the browser width otherwise. The width stories set it on a frame so
  * the three layout modes can be measured in one browser.
  */
@@ -87,7 +87,7 @@ function ScreenFrame({ screen, sidebar, children }) {
     return (
         <div
             data-testid={`screen-${screen}-${sidebar ? 'sidebar' : 'nosidebar'}`}
-            style={{ '--plus-modal-screen': `${screen}px`, display: 'flex', gap: 'var(--space-100)', width: '100%' }}
+            style={{ '--plus-overlay-screen': `${screen}px`, display: 'flex', gap: 'var(--space-100)', width: '100%' }}
         >
             {sidebar && <div data-sidebar style={{ flex: '0 0 var(--frame-sidebar-width)' }} />}
             <div style={{ ...stack, flex: '1 1 0', minWidth: 0, overflow: 'hidden' }}>{children}</div>
@@ -253,11 +253,18 @@ MenuInsideModal.play = async ({ canvasElement }) => {
 };
 
 /**
- * Page chrome sits under the blanket: a sticky table header (Bootstrap's
- * `.sticky-top`, on the card layer) and a floating control on the navigation
- * layer, as an app's floating nav sits. Bootstrap had them at 1020 and 1100,
- * above a modal at 510.
+ * Page chrome sits under the blanket: a sticky table header on the card layer
+ * and a floating control on the navigation layer, as an app's floating nav
+ * sits. Both stay below a modal at 510.
  */
+
+/** A table header that sticks to the top of its scroll box, on the card layer. */
+const STICKY_HEAD = {
+    position: 'sticky',
+    top: 0,
+    zIndex: 'var(--layer-card)',
+    background: 'var(--ds-surface-sunken)',
+};
 
 /** A floating control pinned to the corner of the screen, on the navigation layer. */
 const FLOATING_NAV = {
@@ -272,9 +279,8 @@ const FLOATING_NAV = {
 export const ChromeUnderTheBlanket = () => (
     <div>
         <div style={{ height: 'var(--size-2000)', overflow: 'auto' }}>
-            {/* Bootstrap's markup, as LessonsOverviewPage draws it. */}
-            <table className="table m-0">
-                <thead className="bg-light sticky-top" data-testid="sticky-head">
+            <table style={{ width: '100%' }}>
+                <thead style={STICKY_HEAD} data-testid="sticky-head">
                     <tr><th>Lesson</th><th>Status</th></tr>
                 </thead>
                 <tbody>
@@ -318,7 +324,7 @@ ChromeUnderTheBlanket.play = async ({ canvasElement }) => {
 /* -------------------------------------------------------------------------- */
 
 export const HeaderOptions = () => (
-    <div style={{ ...stack, '--plus-modal-screen': '1024px' }}>
+    <div style={{ ...stack, '--plus-overlay-screen': '1024px' }}>
         <Modal
             renderAs="inline"
             show

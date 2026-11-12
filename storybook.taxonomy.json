@@ -9,7 +9,8 @@
     "Patterns/",
     "Components/",
     "AI UI/",
-    "Data visualizations/"
+    "Data visualizations/",
+  "Libraries/"
   ],
   "componentGroups": {
     "Forms and inputs": [
@@ -31,7 +32,9 @@
       "Dropdown menu",
       "Fieldset",
       "File upload",
+      "Filter menu",
       "Form",
+      "Popup select",
       "Radio",
       "Radio group",
       "Choice grid",
@@ -57,6 +60,7 @@
       "Tile"
     ],
     "Labels": [
+      "Change tag",
       "Count tag",
       "Date tag",
       "Status tag",
@@ -88,7 +92,6 @@
     "Navigation": [
       "Breadcrumbs",
       "Link",
-      "Menu",
       "Navigation system",
       "Sidebar tab",
       "Pagination",
@@ -244,7 +247,9 @@
         "Dropdown menu",
         "Fieldset",
         "File upload",
+        "Filter menu",
         "Form",
+        "Popup select",
         "Radio",
         [
           "Radio",
@@ -278,6 +283,7 @@
       ],
       "Labels",
       [
+        "Change tag",
         "Count tag",
         "Date tag",
         "Status tag",
@@ -316,7 +322,6 @@
       [
         "Breadcrumbs",
         "Link",
-        "Menu",
         "Navigation system",
         [
           "Navigation system",
@@ -392,6 +397,14 @@
       "Flow & relationships",
       "Part-to-whole",
       "Temporal"
+    ],
+    "Libraries",
+    [
+      "Overview",
+      "Base UI",
+      "Font Awesome",
+      "Highcharts",
+      "Motion"
     ],
     "*"
   ],

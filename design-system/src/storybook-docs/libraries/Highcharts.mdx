@@ -1,0 +1,39 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="Libraries/Highcharts" tags={['!dev']} />
+
+<FoundationHero
+    title="Highcharts"
+    summary="The charting engine under every data visualization, used on its non-commercial terms."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="What it is for">
+
+Highcharts draws the charts: the axes, series, tooltips and the accessibility module. PLUS shapes it to the system, so a chart reads as part of the product and not as a separate widget.
+
+</FoundationSection>
+
+<FoundationSection title="What wraps it">
+
+Each chart type is a component in the <DocsLink id="data-visualizations-overview">Data visualizations</DocsLink> section, such as BarChart and PieChart, rendered with `highcharts-react-official`. The charts share one theme for text, color, spacing and motion, and one place that registers the Highcharts modules they use. Import a chart from the `@/components` barrel and pass it data.
+
+</FoundationSection>
+
+<FoundationSection title="Terms of use">
+
+PLUS uses Highcharts on its non-commercial terms. Charts stay inside PLUS's own products. Do not use PLUS charts in a commercial product, resell them or bundle Highcharts into something else. If a use might fall outside the terms, ask before adding the chart.
+
+</FoundationSection>
+
+<FoundationSection title="What not to do">
+
+- Do not import Highcharts in product code or build a chart from raw options. Use the chart component, and propose one if the question needs a chart type PLUS does not have.
+- Do not import the bare `highcharts` entry or a `highcharts/modules/*` file. Modules are registered in one place, through the `esm/` builds.
+- Do not set Highcharts' own `title`, `shadow` or `borderRadius`. The chart's title comes from the Section or Card around it.
+- Do not use literal colors, sizes or fonts. Chart colors come from the chart palette, and text, spacing and radius from the tokens.
+- Do not let color alone separate series. Keep the labels and the accessibility module on.
+
+</FoundationSection>

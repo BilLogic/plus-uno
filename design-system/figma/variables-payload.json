@@ -1069,6 +1069,13 @@
           }
         },
         {
+          "name": "Spotlight/width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spotlight-width)"
+          }
+        },
+        {
           "name": "Spotlight/media-height",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -1101,6 +1108,34 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--menu-group-item-pad-y)"
+          }
+        },
+        {
+          "name": "Popup/min-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--popup-min-width)"
+          }
+        },
+        {
+          "name": "Popup/max-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--popup-max-width)"
+          }
+        },
+        {
+          "name": "Popup/clip-reach",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--popup-clip-reach)"
+          }
+        },
+        {
+          "name": "Ai/chat-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-chat-width)"
           }
         },
         {

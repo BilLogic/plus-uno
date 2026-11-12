@@ -348,6 +348,7 @@
         "DocsAgentFallback"
       ],
       "tokens": [
+        "--ai-chat-width",
         "--body-default",
         "--body-small",
         "--content-max-width-reading",
@@ -365,7 +366,6 @@
         "--pad-y-sm",
         "--page-pad",
         "--popover-radius",
-        "--popover-width-md",
         "--radius-md",
         "--stack-lg",
         "--stack-md",
@@ -1200,7 +1200,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The `title` attribute, a native tooltip on hover.",
+          "description": "The `title` attribute, a native tooltip on hover. It is left off while the button is disabled or loading.",
           "deprecated": null
         },
         {
@@ -1394,6 +1394,7 @@
         "Selected",
         "Disabled",
         "Loading",
+        "ExplainsOnPress",
         "FitContainer",
         "Truncation",
         "Interactive",
@@ -1949,6 +1950,140 @@
       ]
     },
     {
+      "name": "ChangeTag",
+      "kind": "component",
+      "import": "import { ChangeTag } from '@/components';",
+      "group": "labels",
+      "source": "design-system/src/components/labels/ChangeTag/ChangeTag.jsx",
+      "summary": "A small label for change over time, such as \"+3 vs last week\". The sign sets the arrow, `goodDirection` sets the tone, and the change is spoken in words. It is never a button.",
+      "props": [
+        {
+          "name": "value",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The signed change. Above zero is up, below is down, zero is flat; `null` shows an em dash and reads \"No change data\".",
+          "deprecated": null
+        },
+        {
+          "name": "format",
+          "type": "enum",
+          "required": false,
+          "default": "'number'",
+          "values": [
+            "number",
+            "percent",
+            "points"
+          ],
+          "description": "`number` (+3), `percent` (+12%) or `points` (+3 pts). Always signed.",
+          "deprecated": null
+        },
+        {
+          "name": "goodDirection",
+          "type": "enum",
+          "required": false,
+          "default": "'none'",
+          "values": [
+            "up",
+            "down",
+            "none"
+          ],
+          "description": "Which way is good: `up` or `down` turn the tag success or danger; `none` keeps it neutral for a change with no value judgment.",
+          "deprecated": null
+        },
+        {
+          "name": "comparison",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "What the change is measured against, such as \"vs last week\", in subtle text after the tag.",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "`default` (20) in cards and headers; `compact` (16) in table cells.",
+          "deprecated": null
+        },
+        {
+          "name": "iconBefore",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Replaces the direction arrow: a Font Awesome Free name (`arrow-trend-up`). Decorative; the words carry the direction.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the tag element beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The `id` attribute of the tag element.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Styles",
+        "Formats",
+        "CustomIcon",
+        "ValueChange",
+        "NeverAButton",
+        "UnknownValuesFallBack",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-small",
+        "--border-default",
+        "--ds-background-danger",
+        "--ds-background-danger-pressed",
+        "--ds-background-neutral",
+        "--ds-background-neutral-pressed",
+        "--ds-background-success",
+        "--ds-background-success-pressed",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-subtle",
+        "--ds-text-success",
+        "--icon-sm",
+        "--inline-sm",
+        "--motion-duration-medium",
+        "--motion-easing-entrance",
+        "--motion-easing-standard",
+        "--pad-x-xs",
+        "--plus-change-tag-edge",
+        "--plus-change-tag-fill",
+        "--plus-change-tag-height",
+        "--plus-change-tag-ink",
+        "--radius-md",
+        "--tag-gap-compact"
+      ]
+    },
+    {
       "name": "Checkbox",
       "kind": "component",
       "import": "import { Checkbox } from '@/components';",
@@ -2157,6 +2292,7 @@
         "Selected",
         "Mixed",
         "Disabled",
+        "DisabledWithReason",
         "Required",
         "Description",
         "Card"
@@ -2167,6 +2303,7 @@
         "--ds-background-disabled",
         "--ds-background-input",
         "--ds-background-input-hovered",
+        "--ds-background-neutral",
         "--ds-background-selected-bold",
         "--ds-background-selected-bold-hovered",
         "--ds-border",
@@ -3560,7 +3697,7 @@
       "import": "import { DropdownMenu } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx",
-      "summary": "DropdownMenu: a trigger that opens a `MenuGroup` of `Menu` items in a floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are the public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`, `Section`) so a dropdown's menu looks exactly like any other menu in the system.",
+      "summary": "DropdownMenu: a trigger that opens a list of menu items in a floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are `ButtonItem`, `LinkItem`, `CustomItem` and `Section`, which this folder's `index.js` re-exports.",
       "props": [
         {
           "name": "trigger",
@@ -3656,7 +3793,25 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Draws a spinner in place of the menu's rows while its options load.",
+          "description": "Shows one \"Loading options\" row, with a spinner, in place of the menu's rows while its options load. Never skeleton rows.",
+          "deprecated": null
+        },
+        {
+          "name": "hasError",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Shows \"Couldn't load options\" with a Retry row in place of the menu's rows, after loading failed.",
+          "deprecated": null
+        },
+        {
+          "name": "onRetry",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called when Retry is pressed. The menu stays open.",
           "deprecated": null
         },
         {
@@ -3720,6 +3875,7 @@
         "Spacing",
         "WithSections",
         "Loading",
+        "LoadFailed",
         "EscapeCloses",
         "MenuKeyboardNavigation",
         "Interactive",
@@ -3727,19 +3883,24 @@
         "Open",
         "CompactRows",
         "DisabledRow",
+        "DisabledRowWithReason",
         "HoveredState",
         "KeyboardFocus"
       ],
       "tokens": [
+        "--body-default",
         "--border-default",
         "--ds-border",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
+        "--ds-text-subtle",
         "--layer-popup",
+        "--pad-x-md",
+        "--pad-y-md",
         "--popover-max-height-menu",
         "--popover-max-width-menu",
         "--popover-radius-menu-md",
-        "--space-200"
+        "--stack-md"
       ]
     },
     {
@@ -3748,7 +3909,7 @@
       "import": "import { EmptyState } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/EmptyState/EmptyState.jsx",
-      "summary": "What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional outlined one after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.",
+      "summary": "What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. It also fills the slot when content cannot be shown: a load failure (\"Couldn't load sessions\" with Try again) or no access (the plain reason and who can help). Those are the same parts with different words, so they need no props of their own. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional outlined one after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.",
       "props": [
         {
           "name": "header",
@@ -3832,6 +3993,9 @@
         "Default",
         "Compact",
         "InATable",
+        "LoadFailure",
+        "NoAccess",
+        "LoadFailureInATable",
         "Interactive",
         "Rest",
         "Hovered",
@@ -4288,6 +4452,178 @@
       ]
     },
     {
+      "name": "FilterMenu",
+      "kind": "component",
+      "import": "import { FilterMenu } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.jsx",
+      "summary": "Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Reset** clears every box in the menu without applying. Apply then applies the empty set. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.",
+      "props": [
+        {
+          "name": "categories",
+          "type": "arrayOf",
+          "required": true,
+          "default": "[]",
+          "values": null,
+          "description": "The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, disabled }`. Each category is a list of checkboxes; pick as many as apply.",
+          "deprecated": null
+        },
+        {
+          "name": "value",
+          "type": "objectOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The applied values, `{ [categoryId]: value[] }`. Leave it out to let the menu keep its own.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "objectOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The values applied at first, when `value` is left out.",
+          "deprecated": null
+        },
+        {
+          "name": "onApply",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(value)`, called on Apply with every category, an empty list for a category with nothing picked. Nothing is called while boxes are ticked.",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": "'Filters'",
+          "values": null,
+          "description": "Names the menu and the Filter icon button: \"Filters\", read \"Filters, 2 applied\" once two are.",
+          "deprecated": null
+        },
+        {
+          "name": "trigger",
+          "type": "node or func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A trigger of your own, or `({ isOpen, count }) => node`. Without it the Filter icon button is drawn.",
+          "deprecated": null
+        },
+        {
+          "name": "placement",
+          "type": "enum",
+          "required": false,
+          "default": "'bottom-end'",
+          "values": [
+            "bottom-start",
+            "bottom-end"
+          ],
+          "description": "`bottom-end` (default) for a trigger at the end of a bar, `bottom-start` for one at its start.",
+          "deprecated": null
+        },
+        {
+          "name": "layout",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "side-by-side",
+            "stacked"
+          ],
+          "description": "Leave it out to follow the count: two or three categories side by side, four or more stacked. Set `stacked` for a few categories with long lists.",
+          "deprecated": null
+        },
+        {
+          "name": "width",
+          "type": "enum",
+          "required": false,
+          "default": "'3-col'",
+          "values": [
+            "3-col",
+            "4-col"
+          ],
+          "description": "The column step of a stacked menu, `3-col` (default) or `4-col`. A side-by-side menu is always `3-col`.",
+          "deprecated": null
+        },
+        {
+          "name": "open",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Whether the menu is open. Leave it out to let the trigger open and close it.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Opens the menu on first render, when `open` is left out.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(open)`.",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "The Filter icon button's spacing: `default` draws 32, `compact` 24.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra classes on the popup.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The popup's id.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Staging",
+        "Stacked",
+        "Placement",
+        "Interactive"
+      ],
+      "tokens": [
+        "--heading-xsmall",
+        "--inline-lg",
+        "--plus-filter-menu-columns",
+        "--popover-max-height-menu",
+        "--popover-pad",
+        "--stack-lg"
+      ]
+    },
+    {
       "name": "Flag",
       "kind": "component",
       "import": "import { Flag } from '@/components';",
@@ -4453,6 +4789,7 @@
         "Success",
         "Warning",
         "ErrorAppearance",
+        "BackgroundFailure",
         "Bold",
         "Interactive",
         "Dismiss",
@@ -4518,7 +4855,7 @@
       "import": "import { Frame } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Frame/Frame.jsx",
-      "summary": "There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal (or drawer) closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it opens over the Page on a Blanket that covers the Page and the Sidebar, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under the Blanket are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
+      "summary": "There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal (or drawer) closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it opens over the Page on a Blanket that covers the Page and the Sidebar, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under the Blanket are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
       "props": [
         {
           "name": "id",
@@ -5170,7 +5507,7 @@
       "import": "import { IconButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/IconButton/IconButton.jsx",
-      "summary": "Icon button: a button that is an icon and nothing else. `label` is required because it is the button's accessible name and its tooltip..",
+      "summary": "Icon button: a button that is an icon and nothing else. `label` is required because it is the button's accessible name and its tooltip. A filter trigger can add `trailingMetric`, the count of filters applied, drawn after the icon.",
       "props": [
         {
           "name": "icon",
@@ -5188,6 +5525,15 @@
           "default": null,
           "values": null,
           "description": "The accessible name and tooltip. Sentence case; name the object acted on (\"Edit page\").",
+          "deprecated": null
+        },
+        {
+          "name": "trailingMetric",
+          "type": "number or string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The count of filters applied, drawn after the icon; the accessible name becomes \"Filters, 2 applied\". Zero or absent draws no count, and a count above zero draws the selected fill by itself.",
           "deprecated": null
         },
         {
@@ -5234,16 +5580,16 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Marks the button selected and sets `aria-pressed`. Use it for a toggle such as a list or grid view switch.",
+          "description": "Marks the button selected and sets `aria-pressed` (leave it unset and the button reports none), except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch.",
           "deprecated": null
         },
         {
           "name": "isDisabled",
           "type": "bool",
           "required": false,
-          "default": null,
+          "default": "false",
           "values": null,
-          "description": "Prevents interaction. Avoid it where you can; say why the action is unavailable instead.",
+          "description": "Prevents interaction and drops the tooltip and `title`. Leave an action enabled and explain what is missing when it is pressed; disable only while it is sending.",
           "deprecated": null
         },
         {
@@ -5315,11 +5661,25 @@
         "Circle",
         "Selected",
         "Disabled",
+        "DisabledWithReason",
         "Loading",
+        "FilterCount",
         "HoveredState",
         "PressedState",
         "KeyboardFocus",
         "Interactive"
+      ],
+      "tokens": [
+        "--border-default",
+        "--ds-text-subtlest",
+        "--icon-md",
+        "--inline-sm",
+        "--item-height-md",
+        "--item-height-sm",
+        "--motion-duration-medium",
+        "--motion-duration-short",
+        "--motion-easing-entrance",
+        "--motion-easing-standard"
       ]
     },
     {
@@ -6501,121 +6861,6 @@
       ]
     },
     {
-      "name": "MenuGroup",
-      "kind": "component",
-      "import": "import { MenuGroup } from '@/components';",
-      "group": "navigation",
-      "source": "design-system/src/components/navigation/MenuGroup/MenuGroup.jsx",
-      "summary": "MenuGroup: the scrollable list a menu's sections sit in.",
-      "props": [
-        {
-          "name": "density",
-          "type": "enum",
-          "required": false,
-          "default": "'regular'",
-          "values": [
-            "regular",
-            "compact"
-          ],
-          "description": "`regular` (default) or `compact`, the row height.",
-          "deprecated": null
-        },
-        {
-          "name": "maxHeight",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "maxWidth",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "minWidth",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "testId",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "ButtonAndLinkItems",
-        "KeyboardNavigation",
-        "Selected",
-        "CustomRowExample",
-        "Density",
-        "Interactive",
-        "Rest",
-        "Hovered",
-        "Pressed",
-        "Focused",
-        "SelectedRow",
-        "Disabled"
-      ],
-      "tokens": [
-        "--body-default",
-        "--body-small",
-        "--border-default",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected",
-        "--ds-border",
-        "--ds-icon-subtle",
-        "--ds-text",
-        "--ds-text-disabled",
-        "--ds-text-subtle",
-        "--ds-text-subtlest",
-        "--heading-xxsmall",
-        "--menu-group-gap",
-        "--menu-group-item-pad-y",
-        "--menu-group-min-width",
-        "--menu-group-pad-x",
-        "--pad-y-lg",
-        "--pad-y-md",
-        "--radius-lg",
-        "--stack-lg",
-        "--stack-md",
-        "--stack-sm"
-      ]
-    },
-    {
       "name": "Modal",
       "kind": "component",
       "import": "import { Modal } from '@/components';",
@@ -6855,6 +7100,8 @@
         "ConfirmView",
         "ConfirmViewEscape",
         "TwoOverlayLimit",
+        "BlockingShadow",
+        "SelectKeepsOverlayShadow",
         "Rest",
         "Hovered",
         "Pressed",
@@ -6863,21 +7110,17 @@
       "tokens": [
         "--blanket-max-height-modal",
         "--body-default",
-        "--content-max-width",
-        "--content-min-width",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
         "--ds-border",
         "--ds-border-focused",
         "--ds-icon",
         "--ds-icon-subtle",
-        "--ds-shadow-overlay",
+        "--ds-shadow-blocking",
         "--ds-surface-overlay",
         "--ds-text",
         "--ds-text-subtle",
         "--focus-ring-width",
-        "--grid-columns",
-        "--grid-gutter",
         "--heading-medium",
         "--icon-md",
         "--inline-sm",
@@ -6888,13 +7131,7 @@
         "--modal-stack-md",
         "--motion-duration-short",
         "--motion-easing-standard",
-        "--plus-modal-column",
-        "--plus-modal-grid",
-        "--plus-modal-screen",
-        "--plus-modal-screen-pad",
-        "--plus-modal-span",
         "--radius-md",
-        "--space-150",
         "--stack-md",
         "--stack-sm",
         "--stroke-1"
@@ -8431,7 +8668,7 @@
         "Footer",
         "Anatomy",
         "Levels",
-        "ToolbarSelected",
+        "ToolbarSearch",
         "LoadingDefault",
         "LoadingToolbar",
         "LoadingTabsOnly",
@@ -8449,10 +8686,13 @@
       "tokens": [
         "--body-default",
         "--body-small",
-        "--ds-background-selected",
+        "--border-default",
+        "--ds-background-input",
+        "--ds-border-input",
         "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
+        "--field-width-md",
         "--grid-gutter",
         "--heading-large",
         "--heading-large-tracking",
@@ -8462,7 +8702,9 @@
         "--inline-md",
         "--inline-sm",
         "--item-height-md",
-        "--radius-lg",
+        "--motion-duration-medium",
+        "--motion-easing-standard",
+        "--radius-h32",
         "--section-min-width-main",
         "--section-min-width-side",
         "--section-pad-x-default",
@@ -8473,7 +8715,6 @@
         "--section-stack-sm",
         "--size-300",
         "--stack-sm",
-        "--table-pad-x-cell",
         "--width-3000"
       ],
       "subComponents": [
@@ -8481,13 +8722,6 @@
           "name": "Toolbar",
           "impl": "SectionToolbar",
           "props": [
-            {
-              "name": "state",
-              "type": "enum",
-              "required": false,
-              "default": null,
-              "description": "`default`: search, filters, count and actions. `selected`: the selection, bulk actions and Clear."
-            },
             {
               "name": "search",
               "type": "node",
@@ -8507,7 +8741,7 @@
               "type": "node",
               "required": false,
               "default": null,
-              "description": "Count, such as \"48 students\"; truncates first"
+              "description": "Count in words, such as \"12 of 48 students\"; truncates first, and is announced politely when it changes"
             },
             {
               "name": "actions",
@@ -8517,34 +8751,6 @@
               "description": "Actions slot, at the end"
             },
             {
-              "name": "selection",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Selected state: the selection, such as \"3 selected\""
-            },
-            {
-              "name": "bulkActions",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Selected state: bulk action buttons"
-            },
-            {
-              "name": "onClear",
-              "type": "func",
-              "required": false,
-              "default": null,
-              "description": "Selected state: shows Clear, and runs when it is pressed"
-            },
-            {
-              "name": "clearLabel",
-              "type": "string",
-              "required": false,
-              "default": null,
-              "description": "Selected state: the Clear button's label"
-            },
-            {
               "name": "className",
               "type": "string",
               "required": false,
@@ -8552,6 +8758,11 @@
               "description": null
             }
           ]
+        },
+        {
+          "name": "Search",
+          "impl": "SectionSearch",
+          "props": []
         }
       ]
     },
@@ -8561,7 +8772,7 @@
       "import": "import { PatternSidebar } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Sidebar/Sidebar.jsx",
-      "summary": "Sidebar pattern: the app's side navigation, 240 wide, padded 12, on the sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with radius 6, a 24 icon slot centered on x 32, the label on x 48, and a trailing slot centered on x 208. - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the toggle comes from the Frame; standalone, pass `onToggle`. - **Groups**: the first has no title (Home, Slack). Every other group has a title row, a full 32 row that collapses its group; an `angle-down` shows after the title on hover and focus and turns right while collapsed. Each person's collapsed sections are remembered in localStorage. - **Locked group**: while `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows in the subtlest text with no hover, and the tooltip \"Complete your assigned training to unlock the Toolkit\" (no number). It neither collapses nor opens. - **Training counts**: a row with `training: 'lessons'` shows the Count tag of `lessonsLeft` (\"2 assigned lessons left\"); `training: 'modules'` shows `modulesLeft` (\"3 onboarding modules left\"), only while onboarding is in progress. Zero shows nothing. - **Trailing slot**: a count, a dot, the external icon for a link that leaves the app, or a close button. - **Open tabs** (`tabs[item.id]`): records a person opened (a session, a student) list under their row on a thread, one line on the icon column whose last row turns into the label column. Each tab shows a live dot at rest and Close on hover, focus and while selected; Delete or Backspace closes the focused tab. Three show, then \"Show n more\". On hover the row's icon slot turns into a collapse angle and its trailing slot into Close all. Exactly one row is selected: a selected tab takes the fill and its row goes to ink; collapsed, the row takes the fill and shows the tab count. - **Account row**: `SidebarAccount`, under a divider. Content is data. The pattern draws what it is given and never changes the URL; which groups a role sees is the caller's config.",
+      "summary": "Sidebar pattern: the app's side navigation, 240 wide, padded 12, on the sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with radius 6, a 24 icon slot centered on x 32, the label on x 48, and a trailing slot centered on x 208. - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the toggle comes from the Frame; standalone, pass `onToggle`. - **Groups**: the first has no title (Home, Slack). Every other group has a title row, a full 32 row that collapses its group; an `angle-down` shows after the title on hover and focus and turns right while collapsed. Each person's collapsed sections are remembered in localStorage. - **Locked group**: while `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows in the subtlest text with no hover, and the tooltip \"Complete your assigned training to unlock the Toolkit\" (no number). It neither collapses nor opens. - **Training counts**: a row with `training: 'lessons'` shows the Count tag of `lessonsLeft` (\"2 assigned lessons left\"); `training: 'modules'` shows `modulesLeft` (\"3 onboarding modules left\"), only while onboarding is in progress. Zero shows nothing. - **Trailing slot**: a count, a dot, the external icon for a link that leaves the app, or a close button. - **Open tabs** (`tabs[item.id]`): records a person opened (a session, a student) list under their row on a thread, one line on the icon column whose last row turns into the label column. Each tab shows a live dot at rest and Close on hover, focus and while selected; Delete or Backspace closes the focused tab. Three show, then \"Show n more\". On hover the row's icon slot turns into a collapse angle and its trailing slot into Close all. Exactly one row is selected: a selected tab takes the fill and its row goes to ink; collapsed, the row takes the fill and shows the tab count. - **Icons**: every row icon is outlined (Font Awesome Free regular) in the one subtle icon color. A selected row shows the fill and the selected icon color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only exception. - **Account row**: `SidebarAccount`, under a divider. Content is data. The pattern draws what it is given and never changes the URL; which groups a role sees is the caller's config.",
       "props": [
         {
           "name": "groups",
@@ -8764,6 +8975,7 @@
         "TabsNone",
         "TabsFew",
         "TabsMany",
+        "TabsClipped",
         "TabRest",
         "TabHover",
         "TabFocus",
@@ -8980,10 +9192,19 @@
         {
           "name": "trigger",
           "type": "node",
-          "required": true,
+          "required": false,
           "default": null,
           "values": null,
           "description": "The element that triggers the popup. A plain string becomes a real `button`.",
+          "deprecated": null
+        },
+        {
+          "name": "anchor",
+          "type": "object or func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A ref or element the popup points at when there is no `trigger`: a control that is not itself the popup's opener, such as a toggle whose press opens a follow-up. Drive it with `show`.",
           "deprecated": null
         },
         {
@@ -9103,13 +9324,13 @@
           "name": "width",
           "type": "enum",
           "required": false,
-          "default": "'sm'",
+          "default": "'auto'",
           "values": [
-            "sm",
-            "md",
-            "lg"
+            "auto",
+            "3-col",
+            "4-col"
           ],
-          "description": "The width tier: sm 320 (default), md 400 or lg 480.",
+          "description": "`auto` (default) hugs its content, at least the trigger's width and 160 to 320. `3-col` and `4-col` span that many screen-grid columns, for a menu of several categories.",
           "deprecated": null
         },
         {
@@ -9146,9 +9367,11 @@
         "PlacementBottom",
         "PlacementLeft",
         "PlacementRight",
-        "WidthSmall",
-        "WidthMedium",
-        "WidthLarge",
+        "WidthAuto",
+        "WidthAutoCaps",
+        "WidthColumns",
+        "OpensWithAClip",
+        "KeyboardOpenIsInstant",
         "BodyOnly",
         "TriggerClick",
         "TriggerHover",
@@ -9156,20 +9379,214 @@
         "TriggerHoverAndClick"
       ],
       "tokens": [
+        "--anchor-width",
         "--body-default",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
         "--heading-xsmall",
         "--layer-popup",
+        "--motion-duration-medium",
+        "--motion-duration-short",
+        "--motion-easing-entrance",
+        "--motion-easing-exit",
+        "--plus-popup-clip-bottom",
+        "--plus-popup-clip-left",
+        "--plus-popup-clip-right",
+        "--plus-popup-clip-top",
+        "--plus-popup-reach",
         "--popover-offset",
         "--popover-pad",
         "--popover-radius",
-        "--popover-width-lg",
-        "--popover-width-md",
-        "--popover-width-sm",
+        "--popup-clip-reach",
+        "--popup-max-width",
+        "--popup-min-width",
         "--popup-pad",
         "--stack-md"
+      ]
+    },
+    {
+      "name": "PopupSelect",
+      "kind": "component",
+      "import": "import { PopupSelect } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx",
+      "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker=\"check\"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
+      "props": [
+        {
+          "name": "options",
+          "type": "arrayOf",
+          "required": false,
+          "default": "[]",
+          "values": null,
+          "description": "Strings, or objects with `value`, `label`, `description`, `disabled` and `group`, as Select takes.",
+          "deprecated": null
+        },
+        {
+          "name": "value",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The picked option's `value`. Leave it out to let the menu keep its own.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The value it starts with, when `value` is left out.",
+          "deprecated": null
+        },
+        {
+          "name": "onChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(value, option)`, called the moment a row is picked.",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "What is being picked, such as \"Status\". Names the menu, and with no `trigger` it heads the labeled trigger: \"Status: Upcoming\".",
+          "deprecated": null
+        },
+        {
+          "name": "trigger",
+          "type": "node or func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A trigger of your own, or `({ isOpen, option }) => node`. Without it the labeled trigger is drawn.",
+          "deprecated": null
+        },
+        {
+          "name": "placement",
+          "type": "enum",
+          "required": false,
+          "default": "'bottom-start'",
+          "values": [
+            "bottom-start",
+            "bottom-end"
+          ],
+          "description": "`bottom-start` (default) for a trigger at the start of a bar, `bottom-end` for one at its end.",
+          "deprecated": null
+        },
+        {
+          "name": "isSearchable",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "A search field above the list. Turn it off for a short list.",
+          "deprecated": null
+        },
+        {
+          "name": "searchPlaceholder",
+          "type": "string",
+          "required": false,
+          "default": "'Search'",
+          "values": null,
+          "description": "The search field's placeholder.",
+          "deprecated": null
+        },
+        {
+          "name": "open",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Whether the menu is open. Leave it out to let the trigger open and close it.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Opens the menu on first render, when `open` is left out.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(open)`.",
+          "deprecated": null
+        },
+        {
+          "name": "marker",
+          "type": "enum",
+          "required": false,
+          "default": "'radio'",
+          "values": [
+            "radio",
+            "check"
+          ],
+          "description": "`radio` (default) marks the picked row with a radio before its label; `check` puts a check at the row's end.",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "`default` draws 40 rows and a 32 trigger; `compact` draws 32 rows and a 24 trigger.",
+          "deprecated": null
+        },
+        {
+          "name": "emptyMessage",
+          "type": "node",
+          "required": false,
+          "default": "'No results'",
+          "values": null,
+          "description": "Shown when the search matches nothing.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra classes on the popup.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The popup's id; the list's id is this plus `-listbox`.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Keyboard",
+        "Placement",
+        "Searchable",
+        "Spacing",
+        "Interactive"
+      ],
+      "tokens": [
+        "--popover-max-height-menu",
+        "--popover-pad-menu"
       ]
     },
     {
@@ -9949,6 +10366,7 @@
         "Hovered",
         "Focused",
         "Disabled",
+        "DisabledWithReason",
         "Required"
       ],
       "tokens": [
@@ -9956,6 +10374,7 @@
         "--ds-background-disabled",
         "--ds-background-input",
         "--ds-background-input-hovered",
+        "--ds-background-neutral",
         "--ds-background-selected-bold",
         "--ds-background-selected-bold-hovered",
         "--ds-border",
@@ -10887,7 +11306,7 @@
       "import": "import { SectionMessage } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/SectionMessage/SectionMessage.jsx",
-      "summary": "SectionMessage: a message that belongs to the page and stays there until it is resolved or dismissed. // Simple message <SectionMessage appearance=\"warning\">Warning message here</SectionMessage> // With title <SectionMessage appearance=\"info\" title=\"Info\">This is an info message.</SectionMessage> // Rich content <SectionMessage appearance=\"danger\"> <strong>Error:</strong> Something went wrong. <a href=\"/help\">Get help</a> </SectionMessage> // Leading icon: each style has a default; a name or a node replaces it, false removes it <SectionMessage appearance=\"info\" leadingVisual=\"bell\">Reminders are on.</SectionMessage> <SectionMessage appearance=\"warning\" leadingVisual={false}>Sign-in didn't complete. Please try again.</SectionMessage> // Actions: link buttons after the body, in the order given <SectionMessage appearance=\"warning\" actions={[{ text: 'Reschedule', onClick: onReschedule }]}> This term's schedule is provisional. </SectionMessage>",
+      "summary": "SectionMessage: a message that belongs to the page and stays there until it is resolved or dismissed. // Simple message <SectionMessage appearance=\"warning\">Warning message here</SectionMessage> // With title <SectionMessage appearance=\"info\" title=\"Info\">This is an info message.</SectionMessage> // Rich content <SectionMessage appearance=\"danger\"> <strong>Error:</strong> Something went wrong. <a href=\"/help\">Get help</a> </SectionMessage> // Leading icon: each style has a default; a name or a node replaces it, false removes it <SectionMessage appearance=\"info\" icon=\"bell\">Reminders are on.</SectionMessage> <SectionMessage appearance=\"warning\" icon={false}>Sign-in didn't complete. Please try again.</SectionMessage> // Actions: link buttons after the body, in the order given <SectionMessage appearance=\"warning\" actions={[{ text: 'Reschedule', onClick: onReschedule }]}> This term's schedule is provisional. </SectionMessage>",
       "props": [
         {
           "name": "id",
@@ -10949,7 +11368,7 @@
           "deprecated": null
         },
         {
-          "name": "leadingVisual",
+          "name": "icon",
           "type": "bool or string or node",
           "required": false,
           "default": "true",
@@ -11034,7 +11453,7 @@
       "import": "import { Select } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Select/Select.jsx",
-      "summary": "Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. A searchable field is a text input: typing in it filters the list. A plain one is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode=\"tags\"`), which collapse into \"+n\" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.",
+      "summary": "Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode=\"tags\"`), which collapse into \"+n\" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.",
       "props": [
         {
           "name": "id",
@@ -11121,9 +11540,9 @@
           "name": "isSearchable",
           "type": "bool",
           "required": false,
-          "default": "false",
+          "default": "true",
           "values": null,
-          "description": "Typing in the field filters the list.",
+          "description": "Typing in the field filters the list. On by default; pass `false` for a short list, such as a filter menu's.",
           "deprecated": null
         },
         {
@@ -11385,6 +11804,18 @@
           "deprecated": null
         },
         {
+          "name": "marker",
+          "type": "enum",
+          "required": false,
+          "default": "'check'",
+          "values": [
+            "check",
+            "radio"
+          ],
+          "description": "How a single pick is marked: `check` (default) or `radio`. `isMulti` always draws checkboxes.",
+          "deprecated": null
+        },
+        {
           "name": "onChange",
           "type": "func",
           "required": false,
@@ -11435,12 +11866,18 @@
         "Filled",
         "Multi",
         "Searchable",
+        "Marker",
+        "NotSearchable",
         "Creatable",
         "SpacingDefault",
         "SpacingCompact",
         "Spacing",
         "DependentFields",
         "LongList",
+        "Async",
+        "AsyncCreatable",
+        "AsyncLoading",
+        "AsyncFailed",
         "Overview",
         "Interactive",
         "Colors",
@@ -11449,7 +11886,8 @@
         "Focused",
         "FieldDisabled",
         "FieldInvalid",
-        "FieldReadOnly"
+        "FieldReadOnly",
+        "FieldReadOnlyLongValue"
       ],
       "tokens": [
         "--body-default",
@@ -11929,7 +12367,8 @@
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "ReducedMotion"
       ],
       "tokens": [
         "--ds-icon-inverse",
@@ -12143,7 +12582,6 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-small",
-        "--popover-width-md",
         "--radius-050",
         "--radius-100",
         "--radius-md",
@@ -12152,7 +12590,8 @@
         "--space-075",
         "--space-100",
         "--space-150",
-        "--spotlight-media-height"
+        "--spotlight-media-height",
+        "--spotlight-width"
       ]
     },
     {
@@ -12201,12 +12640,12 @@
           "deprecated": null
         },
         {
-          "name": "leadingVisual",
-          "type": "string or node",
+          "name": "iconBefore",
+          "type": "string",
           "required": false,
           "default": null,
           "values": null,
-          "description": "One icon before the label: a Font Awesome Free name (`circle-check`) or a node.",
+          "description": "One icon before the label: a Font Awesome Free name (`circle-check`).",
           "deprecated": null
         },
         {
@@ -12266,7 +12705,7 @@
         "Styles",
         "WithCount",
         "TrailingMetricAppearance",
-        "LeadingVisual",
+        "IconBefore",
         "Truncation",
         "NarrowContainer",
         "NeverAButton",
@@ -12480,7 +12919,7 @@
           "required": false,
           "default": "[]",
           "values": null,
-          "description": "The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `leading`, `state`, `loading`, `className`, `colSpan` or `style`.",
+          "description": "The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `elemBefore`, `state`, `loading`, `className`, `colSpan` or `style`.",
           "deprecated": null
         },
         {
@@ -12905,7 +13344,7 @@
             "lime",
             "brown"
           ],
-          "description": "A category color: an accent family, on the border and swatch. Never a status. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue.",
+          "description": "A category color: an accent family, on the border (and on the swatch when `swatchBefore` is on). Never a status. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue.",
           "deprecated": null
         },
         {
@@ -12919,7 +13358,7 @@
             "agent",
             "team"
           ],
-          "description": "What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar.",
+          "description": "What the tag names. `plain` leads with nothing unless `swatchBefore` or `elemBefore` is set; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar.",
           "deprecated": null
         },
         {
@@ -12946,16 +13385,16 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Leading content in place of the swatch, such as an icon. Plain tags only: an avatar type leads with its avatar.",
+          "description": "The leading icon slot, empty by default: an icon in front of the text, for when the icon carries meaning. Plain tags only: an avatar type leads with its avatar. Sits after `swatchBefore` when both are set.",
           "deprecated": null
         },
         {
           "name": "swatchBefore",
-          "type": "string",
+          "type": "bool or string",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Overrides the swatch color, for a tag acting as a chart legend entry. Any CSS color.",
+          "description": "A 10 color square in front of the text, off by default, for a tag that uses color for wayfinding such as a chart legend entry. `true` draws it in the tag's own color; a background color token (`background-accent-blue-bolder`, or `--ds-background-accent-blue-bolder`) draws a custom one. Never a raw CSS color. Plain tags only.",
           "deprecated": null
         },
         {
@@ -13018,7 +13457,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Saving: a spinner replaces the swatch or avatar and the tag ignores presses until it is done.",
+          "description": "Saving: a spinner replaces the swatch, icon or avatar and the tag ignores presses until it is done.",
           "deprecated": null
         },
         {
@@ -13027,7 +13466,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. Read-only and link tags only; ignored with a warning on removable and selectable ones.",
+          "description": "For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch, when there is one, or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. Read-only and link tags only; ignored with a warning on removable and selectable ones.",
           "deprecated": null
         },
         {
@@ -13087,6 +13526,8 @@
       ],
       "stories": [
         "Colors",
+        "LeadingSwatchAndIcon",
+        "SwatchRefusesRawColor",
         "NewColorsContrast",
         "Behaviors",
         "Types",
@@ -13222,6 +13663,7 @@
         "--plus-tag-max",
         "--plus-tag-pressed",
         "--plus-tag-selected",
+        "--plus-tag-swatch",
         "--radius-full",
         "--radius-md",
         "--radius-sm",
@@ -14848,7 +15290,8 @@
         "Hovered",
         "HoveredOn",
         "Focused",
-        "Disabled"
+        "Disabled",
+        "DisabledWithReason"
       ],
       "tokens": [
         "--body-default",
@@ -15275,7 +15718,7 @@
       "import": "import { VisuallyHidden } from '@/components';",
       "group": "text-and-data-display",
       "source": "design-system/src/components/text-and-data-display/VisuallyHidden/VisuallyHidden.jsx",
-      "summary": "Text that assistive technology reads and nobody sees: a one-pixel, clipped span taken out of the flow. It is Bootstrap's `.visually-hidden` helper, which the rest of the system already uses by class name, given a component so the caller never types the class. It paints nothing, so it takes no tokens.",
+      "summary": "Text that assistive technology reads and nobody sees: a one-pixel, clipped span taken out of the flow. It is the `.visually-hidden` class `main.scss` defines, which the rest of the system already uses by class name, given a component so the caller never types the class. It paints nothing, so it takes no tokens.",
       "props": [
         {
           "name": "children",

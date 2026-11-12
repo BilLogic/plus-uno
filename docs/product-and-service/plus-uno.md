@@ -18,7 +18,7 @@ plus-uno is the PLUS design team's agentic design-ops workspace: the design syst
 
 ## Tech stack
 
-React on Bootstrap, built with Vite, documented in Storybook, styled with SCSS and design tokens. New interactive behavior is built on Base UI (`@base-ui/react`, ADR-037). Highcharts draws the data visualizations and Motion the animation. uno-bot is TypeScript on Cloudflare Workers.
+React, built with Vite, documented in Storybook, styled with SCSS and design tokens. New interactive behavior is built on Base UI (`@base-ui/react`, ADR-037). Highcharts draws the data visualizations and Motion the animation. uno-bot is TypeScript on Cloudflare Workers.
 
 **Versions live in `package.json`.** They are not restated here: a mirrored table is correct only until the next bump, and nothing makes it fail when it stops being correct.
 
@@ -41,7 +41,6 @@ Netlify hosts the site, configured in `netlify.toml`. A PR gets a deploy preview
 | Target | URL | Built from |
 |--------|-----|------------|
 | **Storybook** | https://plus-uno.netlify.app/storybook/ (also the site root) | `npm run build:all` → `dist/storybook/` |
-| **Tutor revamp** | https://plus-uno.netlify.app/prototypes/tutor-revamp/ | `prototypes/tutor-revamp/` |
 | **Hosted DS MCP** | https://plus-uno.netlify.app/mcp/ds (team key) | `netlify/functions/ds-mcp/` |
 | **PLUS Uno Blueprint** (the blueprint app) | https://plus-uno.netlify.app/blueprint/ | Its own Netlify site (`plus-uno-blueprint`), proxied by a forced rewrite in `netlify.toml` |
 | **Experiments** | Deploy previews or standalone Netlify sites | Feature branches; cataloged in the Notion Prototype Marketplace |

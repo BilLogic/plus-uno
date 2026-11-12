@@ -60,7 +60,7 @@
             hovered: (border-color: var(--ds-border-brand), background-color: var(--ds-background-input-hovered)),
             disabled: (cursor: not-allowed, border-color: var(--ds-border-disabled), background-color: var(--ds-background-disabled)),
         ),
-        $hovered-selector: '&:hover:not([data-disabled]):not([data-checked]):not([data-indeterminate])',
+        $hovered-selector: '&:hover:not([data-disabled]):not([data-readonly]):not([data-checked]):not([data-indeterminate])',
         $disabled-selector: '&[data-disabled]'
     );
 
@@ -73,7 +73,7 @@
             hovered: (background-color: var(--ds-background-selected-bold-hovered), border-color: var(--ds-background-selected-bold-hovered)),
         ),
         $ring: false,
-        $hovered-selector: '&[data-checked]:hover:not([data-disabled]), &[data-indeterminate]:hover:not([data-disabled])'
+        $hovered-selector: '&[data-checked]:hover:not([data-disabled]):not([data-readonly]), &[data-indeterminate]:hover:not([data-disabled]):not([data-readonly])'
     );
 
     // A disabled checked or mixed box keeps the disabled fill and edge; its
@@ -171,4 +171,9 @@
     .plus-form-checkbox:focus-visible {
         border-color: var(--ds-border-brand);
     }
+}
+
+// Read-only, unchecked: the neutral fill. A checked box keeps its Lagoon fill.
+.plus-form-checkbox[data-readonly]:not([data-checked]):not([data-indeterminate]) {
+    background-color: var(--ds-background-neutral);
 }

@@ -34,6 +34,50 @@ export const MOTION_EASINGS = {
 };
 
 /**
+ * Motion springs (ADR-041). Primitives are raw springs, mass 1, named by
+ * stiffness with the damping ratio appended as `-r<percent>` only when it is
+ * not 1. Components never read a primitive; they read a semantic below. The
+ * numbers are the motion table in the motion docs, fixed.
+ *
+ * `kind: 'exit'` aims 3.8x past the edge and is cut where it reaches it;
+ * `kind: 'loop'` has no damping and alternates over half its period.
+ */
+export const SPRING_PRIMITIVES = [
+  { name: '880', stiffness: 880, ratio: 1 },
+  { name: '440', stiffness: 440, ratio: 1 },
+  { name: '190', stiffness: 190, ratio: 1 },
+  { name: '3800', stiffness: 3800, ratio: 1 },
+  { name: '1600', stiffness: 1600, ratio: 1 },
+  { name: '800', stiffness: 800, ratio: 1 },
+  { name: '800-r60', stiffness: 800, ratio: 0.6 },
+  { name: '380-r80', stiffness: 380, ratio: 0.8 },
+  { name: '200-r80', stiffness: 200, ratio: 0.8 },
+  { name: '25', stiffness: 25, ratio: 1, kind: 'exit', aim: 3.8 },
+  { name: '27-r0', stiffness: 27.4, ratio: 0, kind: 'loop' },
+];
+
+/**
+ * Motion semantics: `motion.<family>.<speed>`, written `--ds-motion-<family>-<speed>`
+ * (an easing) with `-duration` beside it (its settle time). `productive` and
+ * `expressive` name a primitive each; Expressive is re-declared under the
+ * `expressive` container attribute, and only where it differs. Reduced turns
+ * every spatial semantic into `appearance.fast` (`REDUCED_FADE`).
+ */
+export const MOTION_SEMANTICS = [
+  { name: 'spatial.fast', productive: '880', expressive: '800-r60', use: 'Small things over short distances: a toggle thumb, a Popup, a row, a tab indicator.' },
+  { name: 'spatial.default', productive: '440', expressive: '380-r80', use: 'Mid-size layers over short travel: a Modal, a Flag, the Sidebar opening, content changing in place.' },
+  { name: 'spatial.slow', productive: '190', expressive: '200-r80', use: 'Large layers and long travel: a Drawer, a docking Panel, a whole page that slides.' },
+  { name: 'appearance.fast', productive: '3800', use: 'The quickest fade and color change; also what every spatial token becomes in Reduced motion.' },
+  { name: 'appearance.default', productive: '1600', use: 'A fade or color change at default weight.' },
+  { name: 'appearance.slow', productive: '800', use: 'A deliberate fade, such as a large surface appearing.' },
+  { name: 'spatial.exit', productive: '25', use: 'A thing that is gone for good, leaving on the system\'s say, or thrown by the hand.' },
+  { name: 'loop', productive: '27-r0', use: 'Work in progress: loading, thinking, typing. Alternating, one cycle every 1.2 s.' },
+];
+
+/** The semantic every spatial token becomes under `prefers-reduced-motion`. */
+export const REDUCED_FADE = 'appearance.fast';
+
+/**
  * THE FOUR-TIER LADDER (#1756, Bill 2026-11-04: "clean up both token on figma
  * and in code and fully align the two"). One plan, one row per token, most
  * general tier to most specific: primitives -> semantics -> patterns ->
@@ -376,11 +420,16 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Flag', new: '--flag-min-height', old: null, ref: 'calc(var(--size-1000) + var(--size-750))', use: 'Minimum height of a Flag.' },
   { tier: 'components', group: 'Flag', new: '--flag-pad', old: null, ref: 'var(--space-125)', use: 'Padding inside a Flag.' },
   { tier: 'components', group: 'Flag', new: '--flag-offset', old: null, ref: 'var(--space-125)', use: 'Distance between a Flag and the edge of the screen.' },
+  { tier: 'components', group: 'Spotlight', new: '--spotlight-width', old: null, ref: 'var(--width-2500)', use: 'Width of a Spotlight.' },
   { tier: 'components', group: 'Spotlight', new: '--spotlight-media-height', old: null, ref: 'calc(var(--size-750) + var(--space-150))', use: 'Height of the media area in a Spotlight.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-min-width', old: null, ref: 'var(--size-1400)', use: 'Minimum width of a menu group.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-pad-x', old: null, ref: 'var(--space-150)', use: 'Horizontal padding of a menu group.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-gap', old: null, ref: 'var(--space-100)', use: 'Vertical gap between groups in a menu.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-item-pad-y', old: null, ref: 'var(--space-0625)', use: 'Vertical padding of an item in a menu group.' },
+  { tier: 'components', group: 'Popup', new: '--popup-min-width', old: null, ref: 'var(--width-1000)', use: 'Narrowest an auto-width Popup gets, unless its trigger is wider.' },
+  { tier: 'components', group: 'Popup', new: '--popup-max-width', old: null, ref: 'var(--width-2000)', use: 'Widest an auto-width Popup grows to fit its content, unless its trigger is wider.' },
+  { tier: 'components', group: 'Popup', new: '--popup-clip-reach', old: null, ref: 'var(--space-300)', use: 'How far past its edges a Popup\'s opening clip stays, so the overlay shadow is never cut.' },
+  { tier: 'components', group: 'AI chat', new: '--ai-chat-width', old: null, ref: 'var(--width-2500)', use: 'Width of the AI chat when it opens as a popup or floats beside the page.' },
   { tier: 'components', group: 'Popup', new: '--popup-pad', old: null, ref: 'var(--space-125)', use: 'Padding inside a Popup.' },
   { tier: 'components', group: 'Table', new: '--table-cell-max-width', old: null, ref: 'var(--size-300)', use: 'Maximum width of a table cell before its text truncates.' },
   { tier: 'components', group: 'Avatar', new: '--avatar-size-96', old: null, ref: 'calc(var(--space-300) * 2)', use: 'Size of an extra-large UserAvatar, such as in a profile header.' },
@@ -393,9 +442,9 @@ export const TOKEN_LADDER = [
   // ─── Components / Spinner, Progress bar (Bill 2026-11-04: one component
   // each, so they move out of SIZE_ROLES in generate-all-tokens.js straight to
   // this tier, not through Semantics' size roles) ───────────────────────
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--space-100', use: 'Size of a small Spinner, such as one inside a Button.' },
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--space-150', use: 'Size of a default Spinner.' },
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--space-300', use: 'Size of a large Spinner, such as one loading a whole section.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--size-100', use: 'Size of a small Spinner, such as one inside a Button.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--size-150', use: 'Size of a default Spinner.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--size-300', use: 'Size of a large Spinner, such as one loading a whole section.' },
   { tier: 'components', group: 'Progress bar', new: '--progress-bar-height', old: null, value: '--space-050', use: 'Height of a ProgressBar track.' },
 
   // ─── Layers (own non-spacing family, code only) ───────────────────────

@@ -83,6 +83,14 @@ const TAB_SETS = {
     none: {},
     few: { sessions: SESSION_TABS.slice(0, 2), students: STUDENT_TABS.slice(0, 1) },
     many: { sessions: SESSION_TABS, students: STUDENT_TABS },
+    // One tab that fits with no longer name, and two that do not.
+    clipped: {
+        sessions: [
+            { id: 't-c1', label: '4:00 PM · Ms. Ortiz' },
+            { id: 't-c2', label: 'Thu 2:30 PM · Mr. Patel-Henderson', tooltip: 'Roosevelt Middle School · Mr. Patel-Henderson' },
+            { id: 't-c3', label: 'Wed 4:30 PM · Mr. Alexander-Montgomery' },
+        ],
+    },
 };
 
 /** The 240 Sidebar on the sunken fill, full height of its box, as the Frame docks it. */
@@ -390,6 +398,50 @@ export const TabsMany = {
     },
 };
 
+/**
+ * A tab whose label is clipped shows the full text in a tooltip, on hover and
+ * on focus. The row is already a button, so it takes no second tab stop, and a
+ * tab that fits has no tooltip of its own (here, none). No `title` is used.
+ */
+export const TabsClipped = {
+    args: { tabSet: 'clipped', activeId: 'home' },
+    play: async ({ canvasElement }) => {
+        const body = within(canvasElement.ownerDocument.body);
+        const fits = tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/);
+        const clipped = tabNamed(canvasElement, /Wed 4:30 PM/);
+        const fullText = 'Wed 4:30 PM · Mr. Alexander-Montgomery';
+        const label = clipped.querySelector('.plus-pattern-sidebar__label');
+
+        await waitFor(() => expect(label.scrollWidth, 'the label is clipped').toBeGreaterThan(label.clientWidth));
+        await expect(clipped, 'no title attribute').not.toHaveAttribute('title');
+        await expect(label, 'no title attribute on the label').not.toHaveAttribute('title');
+
+        // Unclipped, no longer name: nothing to show.
+        await userEvent.hover(fits);
+        await new Promise((resolve) => { setTimeout(resolve, 600); });
+        await expect(body.queryByRole('tooltip'), 'a tab that fits shows no tooltip').toBeNull();
+        await userEvent.unhover(fits);
+
+        // Pointer.
+        await userEvent.hover(clipped);
+        await expect(await body.findByRole('tooltip')).toHaveTextContent(fullText);
+        await userEvent.unhover(clipped);
+        await waitFor(() => expect(body.queryByRole('tooltip')).toBeNull());
+
+        // Keyboard: focus alone shows it.
+        clipped.focus();
+        await expect(await body.findByRole('tooltip')).toHaveTextContent(fullText);
+        clipped.blur();
+        await waitFor(() => expect(body.queryByRole('tooltip')).toBeNull());
+
+        // A tab that has a longer name leads with the clipped label, then the name.
+        const both = tabNamed(canvasElement, /Thu 2:30 PM/);
+        await userEvent.hover(both);
+        await expect(await body.findByRole('tooltip')).toHaveTextContent('Thu 2:30 PM · Mr. Patel-Henderson. Roosevelt Middle School · Mr. Patel-Henderson');
+        await userEvent.unhover(both);
+    },
+};
+
 /** Tab at rest: the live dot in the trailing slot, no Close. */
 export const TabRest = {
     args: { activeId: 'home' },
@@ -615,7 +667,7 @@ export const SidebarFloating = {
             return el;
         });
         await expect(getComputedStyle(aside).position).toBe('absolute');
-        await expect(getComputedStyle(aside).backgroundColor, 'the sunken fill').toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(getComputedStyle(aside).backgroundColor, 'the overlay fill').toBe(tokenColor(canvasElement, '--ds-surface-overlay'));
         await expect(getComputedStyle(aside).boxShadow, 'the overlay shadow').not.toBe('none');
         await expect(canvas.getByRole('button', { name: 'Close sidebar' })).toHaveFocus();
         // The first Escape may close the focused toggle's tooltip; the next closes the Sidebar.

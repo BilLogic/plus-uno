@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import AiIcon from '../../images-and-icons/AiIcon';
 import Icon from '../../images-and-icons/Icon';
+import Spinner from '../../loading/Spinner/Spinner';
 import './Button.scss';
 
 /** A bare `#` or empty `href` names no real destination; Enter still needs one to fire a click on an anchor. */
@@ -138,7 +139,8 @@ export const Button = ({
         <Tag
             id={id}
             className={btnClasses}
-            title={title}
+            // A disabled button carries no tooltip, native or otherwise: the reason is visible text beside it.
+            title={disabled ? undefined : title}
             data-testid={testId}
             {...props}
             {...tagProps}
@@ -150,6 +152,12 @@ export const Button = ({
             <ButtonContent text={text} iconBefore={leadingIcon} iconAfter={iconAfter}>
                 {children}
             </ButtonContent>
+            {/* The button's own name and `aria-busy` carry the state, so the spinner is hidden from assistive tech. */}
+            {isLoading && (
+                <span className="plus-btn-spinner" aria-hidden="true">
+                    <Spinner size={16} />
+                </span>
+            )}
         </Tag>
     );
 };
@@ -160,7 +168,7 @@ Button.propTypes = {
     text: PropTypes.string,
     /** The label, used when `text` is not given. Omit both for an icon-only button. */
     children: PropTypes.node,
-    /** The `title` attribute, a native tooltip on hover. */
+    /** The `title` attribute, a native tooltip on hover. It is left off while the button is disabled or loading. */
     title: PropTypes.string,
 
     // Appearance
@@ -176,7 +184,7 @@ Button.propTypes = {
     // Behavior
     /** Called with the click event when the button is activated by mouse or keyboard. It does not fire while `isDisabled` or `isLoading` is set. */
     onClick: PropTypes.func,
-    /** Prevents interaction and sets `aria-disabled`. Avoid it where you can; say why the action is unavailable instead. */
+    /** Prevents interaction. Leave an action enabled and explain what is missing when it is pressed; disable only while the action is sending (`isLoading` does it for you). A disabled button leaves the tab order and carries no tooltip. */
     isDisabled: PropTypes.bool,
     /** Marks the button selected and sets `aria-pressed`. For a link role it sets `aria-current` instead. */
     isSelected: PropTypes.bool,

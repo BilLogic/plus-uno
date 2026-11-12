@@ -58,6 +58,8 @@ reply. It appears over the page and goes away on its own or when dismissed.
 
 <ComponentExample of={FlagStories.ErrorAppearance} title="Error" description="Something that failed. It stays until dismissed." />
 
+<ComponentExample of={FlagStories.BackgroundFailure} title="Background failure" description="Work that fails out of sight, such as a sync, stays until closed, with Try again." />
+
 <ComponentExample of={FlagStories.Bold} title="Bold" description="bold fills the flag with the appearance's bold color and adds an expand toggle." />
 
 </div>
@@ -220,11 +222,25 @@ A title names the event; the description gives the next step.
     dontCaption="A bare title with no next step."
 />
 
+### Show a background failure as an error Flag with Try again.
+
+When work fails out of sight, such as a sync or an autosave, use an error flag.
+It stays until closed and carries **Try again** as its action, so the person can
+retry without leaving what they are doing. A failure to load a view is not a
+flag: it takes the view's `EmptyState`.
+
+<DoDontPair
+    doExample={<Flag appearance="error" title="Couldn't sync notes" actions={[{ text: 'Try again' }]}>Your latest changes are saved on this device only.</Flag>}
+    doCaption="Error flag with Try again; it stays until closed."
+    dontExample={<Flag appearance="error" title="Couldn't sync notes" autohide delay={3000} />}
+    dontCaption="A failure that times out before it is read."
+/>
+
 ### Nothing important goes only in a flag.
 
 The user can dismiss a flag before reading it, and that takes the only copy
-with it. A failure that needs a decision stays on the page, in a
-`SectionMessage`.
+with it. A rejected form submit stays on the form, in a danger `SectionMessage`
+at the top with an error on each field.
 
 ### Turn off autohide for anything the user might need to re-read.
 

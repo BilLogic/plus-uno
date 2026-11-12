@@ -3,6 +3,22 @@ import { describe, it, expect, vi } from 'vitest';
 import Button from './Button';
 
 describe('Button', () => {
+    it('carries no title while disabled or loading, and keeps it otherwise', () => {
+        const { rerender } = render(<Button text="Save" title="Save the notes" />);
+        expect(screen.getByRole('button')).toHaveAttribute('title', 'Save the notes');
+        rerender(<Button text="Save" title="Save the notes" isDisabled />);
+        expect(screen.getByRole('button')).not.toHaveAttribute('title');
+        rerender(<Button text="Save" title="Save the notes" isLoading />);
+        expect(screen.getByRole('button')).not.toHaveAttribute('title');
+    });
+
+    it('takes no click while disabled', () => {
+        const onClick = vi.fn();
+        render(<Button text="Save" onClick={onClick} isDisabled />);
+        fireEvent.click(screen.getByRole('button'));
+        expect(onClick).not.toHaveBeenCalled();
+    });
+
     it('renders its text as the accessible name', () => {
         render(<Button text="Save notes" />);
         expect(screen.getByRole('button', { name: 'Save notes' })).toBeInTheDocument();

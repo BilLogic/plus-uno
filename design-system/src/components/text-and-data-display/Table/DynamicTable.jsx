@@ -6,6 +6,7 @@ import Spinner from '@/components/loading/Spinner';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
 import HeadCell from './HeadCell';
+import TableBulkActions from './TableBulkActions';
 import { TableCell, TableRow, TableFooter } from './TableParts';
 import './Table.scss';
 import './DynamicTable.scss';
@@ -77,8 +78,12 @@ const deriveState = (state, isLoading, rowCount) => {
  *   is checked when every row on the page is selected and mixed when only
  *   some are. A selected row carries `aria-selected` and the selected fill.
  *   The keys come back through `onSelectionChange`; pass `selectedRowKeys`
- *   to own them. The bulk bar is `TableBulkActions`, in the Section header's
- *   toolbar slot.
+ *   to own them.
+ * - **Bulk bar.** While rows are selected, the head row becomes the bulk bar:
+ *   select-all stays in its cell, and one cell across the columns says
+ *   "N selected" and holds `bulkActions` at the start. The labels cross-fade
+ *   in place and the row keeps its height. There is no Clear: the checkboxes
+ *   clear the selection, and the head row comes back when none are left.
  * - **Sticky header and frozen column.** `stickyHeader` pins the head row
  *   inside the table's own scroll region, bounded by `maxHeight`. `isFrozen`
  *   pins the first column (with the checkboxes, the title column beside
@@ -118,6 +123,7 @@ const DynamicTable = ({
     selectedRowKeys: selectedProp,
     defaultSelectedRowKeys = [],
     onSelectionChange,
+    bulkActions = [],
     stickyHeader = false,
     maxHeight,
     isFrozen = false,
@@ -169,6 +175,12 @@ const DynamicTable = ({
             ? selected.filter((k) => !visibleKeys.includes(k))
             : [...selected, ...visibleKeys.filter((k) => !isSelected(k))]
     );
+
+    // While rows are selected the head row is the bulk bar. Once it has been,
+    // the column heads fade back in when it goes, as the bar faded in.
+    const showsBulkBar = isSelectable && selected.length > 0;
+    const [hasShownBulkBar, setHasShownBulkBar] = useState(false);
+    if (showsBulkBar && !hasShownBulkBar) setHasShownBulkBar(true);
 
     const highlighted = [].concat(highlightedRowIndex ?? []);
 
@@ -246,8 +258,19 @@ const DynamicTable = ({
                 }}
             >
                 {caption && <caption className="plus-dynamic-table-caption">{caption}</caption>}
+                {/* The columns keep their widths while the bulk bar spans the head row. */}
+                <colgroup>
+                    {isSelectable && <col className="plus-dynamic-table-col--select" />}
+                    {head.cells.map((cell, index) => (
+                        <col
+                            key={cell.key ?? index}
+                            className={!isFixedSize && !anyWidth && index > 0 ? 'plus-dynamic-table-col--fit' : undefined}
+                            style={cell.width ? { width: cell.width } : undefined}
+                        />
+                    ))}
+                </colgroup>
                 <thead>
-                    <tr>
+                    <tr className={classes(showsBulkBar && 'plus-dynamic-table-head--bulk', !showsBulkBar && hasShownBulkBar && 'plus-dynamic-table-head--returned')}>
                         {isSelectable && (
                             <th scope="col" className="plus-table-head-cell plus-table-cell--align-icon plus-dynamic-table-select">
                                 <Checkbox
@@ -259,7 +282,18 @@ const DynamicTable = ({
                                 />
                             </th>
                         )}
-                        {head.cells.map((cell, index) => (
+                        {showsBulkBar ? (
+                            <th
+                                colSpan={head.cells.length}
+                                className={classes(
+                                    'plus-table-head-cell plus-dynamic-table-bulk',
+                                    // A sort button is as tall as the row inside the cell's rule; the bar matches it.
+                                    head.cells.some((cell) => cell.isSortable) && 'plus-dynamic-table-bulk--sortable'
+                                )}
+                            >
+                                <TableBulkActions count={selected.length} actions={bulkActions} />
+                            </th>
+                        ) : head.cells.map((cell, index) => (
                             <HeadCell
                                 key={cell.key ?? index}
                                 label={typeof cell.content === 'string' ? cell.content : String(cell.key ?? '')}
@@ -407,6 +441,11 @@ DynamicTable.propTypes = {
     defaultSelectedRowKeys: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])),
     /** Called with every selected key when the selection changes. */
     onSelectionChange: PropTypes.func,
+    /** The bulk bar's actions, one `{ label, onClick }` each: the first three show as buttons, the rest in an overflow menu. */
+    bulkActions: PropTypes.arrayOf(PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        onClick: PropTypes.func,
+    })),
     /** Pin the head row inside the table's own scroll region; needs `maxHeight`. */
     stickyHeader: PropTypes.bool,
     /** Bound the scroll region's height (px or any CSS length). */

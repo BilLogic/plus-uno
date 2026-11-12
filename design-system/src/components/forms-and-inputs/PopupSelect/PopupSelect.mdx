@@ -1,0 +1,210 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as PopupSelectStories from './PopupSelect.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={PopupSelectStories} />
+
+<Title />
+One list in a popup, applied the moment a row is picked. It switches a view
+or sets one filter from a button, with no field and no Apply.
+
+<DocsTabs of={PopupSelectStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/PopupSelect"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<ComponentExample of={PopupSelectStories.Overview} title="Labeled trigger" description="The view switch under page tabs. The trigger reads the label and the current value; a pick swaps the content under it in place." />
+
+<ComponentExample of={PopupSelectStories.Searchable} title="Search" description="A long list keeps its search field. Typing filters the rows; Enter picks the first match." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Layout
+
+<ComponentExample of={PopupSelectStories.Placement} title="Placement" description="A trigger at the start of a bar opens bottom-start; one at the end opens bottom-end. Here the start trigger is a Filter button of the caller's own." />
+
+<ComponentExample of={PopupSelectStories.Spacing} title="Spacing" description="Default draws a 32 trigger and 40 rows; compact draws 24 and 32." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+<ComponentExample of={PopupSelectStories.Keyboard} title="Keyboard" description="Enter or Space opens it on the current value. Arrow keys move, Enter picks and closes, Escape closes and keeps the value. Focus goes back to the trigger." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={PopupSelectStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `PopupSelect` when one pick from one list changes what the page shows:
+
+- **A view switch** under page tabs, such as "Status: Upcoming". Use the
+  labeled trigger: pass `label` and no `trigger`.
+- **One filter** in a section's view bar, such as Subject. Pass the
+  `FilterButton` as `trigger`, with its count once a value is applied.
+
+The pick applies at once and the menu closes, so there is no Apply and no
+Reset. A menu of several filter categories, staged and applied together, is
+a `FilterMenu`. A value that belongs to a form is a `Select` field; a list of
+actions, not values, is a `DropdownMenu`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Trigger.** The labeled trigger is a subtle `FilterButton` reading "Label: Value" with a chevron. Any other trigger is the caller's.
+2. **Popup.** A `Popup` at `width="auto"`: at least the trigger's width, never under 160, up to 320. It sits 4 from the trigger.
+3. **Search** (optional). A compact search field above the list, on by default. Turn it off with `isSearchable={false}` for a short list.
+4. **List.** `Select`'s list: the same rows, groups, descriptions and messages. The picked row takes the selected fill and a radio before its label, since the menu picks one value. `marker="check"` draws a check at the row's end instead.
+
+### Placement
+
+<DocsTable>
+<thead>
+<tr><th>Trigger</th><th><code>placement</code></th></tr>
+</thead>
+<tbody>
+<tr><td>At the start of a bar, or alone</td><td><code>bottom-start</code> (default): the menu's start edge meets the trigger's.</td></tr>
+<tr><td>At the end of a bar</td><td><code>bottom-end</code>: the menu's end edge meets the trigger's.</td></tr>
+</tbody>
+</DocsTable>
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Open</td><td>The menu clips open from the trigger's corner. A keyboard open is instant.</td></tr>
+<tr><td>Hovered row</td><td>The row takes the hovered fill; it is also the keyboard cursor.</td></tr>
+<tr><td>Picked</td><td>The row changes color, then the menu fades and the content behind it swaps in place. Nothing slides.</td></tr>
+<tr><td>No match</td><td>One "No results" row; set your own with <code>emptyMessage</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Surface</td><td>Those of <code>Popup</code>: <code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popover-radius</code>.</td></tr>
+<tr><td>Inset of the rows</td><td>4: <code>--popover-pad-menu</code>.</td></tr>
+<tr><td>Width</td><td><code>--popup-min-width</code> to <code>--popup-max-width</code>, and at least the trigger.</td></tr>
+<tr><td>Height of the list</td><td>Scrolls past 320: <code>--popover-max-height-menu</code>.</td></tr>
+<tr><td>Gap to the trigger</td><td>4: <code>--popover-offset</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+- **Line the menu up with its trigger's side.** Start-of-bar triggers open
+  `bottom-start` and end-of-bar triggers `bottom-end`, so the menu never
+  hangs over the page past its own bar.
+- **Turn search off for a short list.** A handful of statuses reads at a
+  glance; a field above them only adds a step.
+- **Show the value on the trigger.** The labeled trigger does it for you.
+  With a trigger of your own, show the count of what is applied.
+- **Keep it to one list.** Two lists, or picks that wait for an Apply, are
+  a different menu.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name what is picked: "Status", "Subject".</td><td>A verb phrase such as "Filter by status".</td></tr>
+<tr><td>Use short option labels in sentence case: "Upcoming".</td><td>Labels long enough to wrap or truncate.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The trigger is a real button** that says a popup opens and whether it is
+  open. The labeled trigger's name carries the value: "Status: Upcoming".
+- **The popup is named** by `label`, and so is the list inside it.
+- **The search field is the list's combobox.** Focus stays in it while the
+  arrow keys move the highlighted row (`aria-activedescendant`). Without
+  search, focus goes to the list itself.
+- **Focus returns to the trigger** after a pick or Escape.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a value in a form, use `Select`.
+- For a menu of actions, use `DropdownMenu`.
+- For several filter categories applied together, use `FilterMenu`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

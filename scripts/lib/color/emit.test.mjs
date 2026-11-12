@@ -4,8 +4,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { renderPlan } from './build.mjs';
-import { BRIDGE_TRIPLETS, dsName, paletteVar } from './emit.mjs';
+import { buildPlan, renderPlan } from './build.mjs';
+import { dsName, paletteVar } from './emit.mjs';
 
 const files = renderPlan('A', 'scripts/generate-color-tokens.mjs');
 const selectors = (css) => [...css.matchAll(/^(@media[^{]*|\s*[^\s@][^{\n]*)\{$/gm)].map((m) => m[1].trim());
@@ -58,45 +58,54 @@ test('alphas are rgb() with a slash, never 8-digit hex', () => {
   assert.doesNotMatch(files['_palette.scss'] + files['_elevation.scss'], /#[0-9a-f]{8}\b/);
 });
 
-test('the Bootstrap bridge points --bs-* at --ds-* and writes comma triplets Bootstrap can compose', () => {
-  const bridge = files['_bootstrap-bridge.scss'];
-  assert.match(bridge, /--bs-primary: var\(--ds-background-brand-bold\);/);
-  assert.match(bridge, /--bs-primary-rgb: 20, 124, 130;/);
-  for (const v of ['body-bg', 'body-color', 'border-color', 'link-color', 'link-hover-color', 'focus-ring-color']) assert.match(bridge, new RegExp(`--bs-${v}: var\\(--ds-`), v);
-  for (const v of Object.keys(BRIDGE_TRIPLETS)) assert.match(bridge, new RegExp(`${v}: \\d+, \\d+, \\d+;`), v);
-  for (const v of ['secondary-bg', 'tertiary-bg', 'emphasis-color']) assert.ok(`--bs-${v}-rgb` in BRIDGE_TRIPLETS, v);
-  assert.doesNotMatch(bridge, /-rgb: \d+ \d+/); // space-separated triplets break rgba(var(--bs-*-rgb), a)
-  assert.doesNotMatch(bridge, /var\(--ds-[^)]*,/); // no fallbacks
-  const defined = new Set(files['_semantic.scss'].match(/--ds-[\w-]+(?=:)/g));
-  for (const [, name] of bridge.matchAll(/var\((--ds-[\w-]+)\)/g)) assert.ok(defined.has(name), `${name} is a generated role`);
-});
-
-test('the Bootstrap bridge restates the form states and dropdown active item Bootstrap compiles in blue', () => {
-  const bridge = files['_bootstrap-bridge.scss'];
-  assert.doesNotMatch(bridge, /#0d6efd|#86b7fe|13, 110, 253/i);
-  assert.match(bridge, /\.form-check-input:checked,\n[^{]*\{\n  background-color: var\(--ds-background-selected-bold\);/);
-  assert.match(bridge, /\.form-check-input:focus \{\n  border-color: var\(--bs-border-color\);\n  box-shadow: none;\n  outline: 2px solid var\(--ds-border-focused\);\n  outline-offset: 2px;/);
-  assert.match(bridge, /--bs-dropdown-link-active-bg: var\(--ds-background-selected\);/);
-  // The check glyph is the inverse icon color, per mode: white on light, near-black on dark.
-  assert.match(bridge, /^:root,[^}]*--bs-form-check-checked-image: url\("[^"]*stroke='%23ffffff'/m);
-  assert.match(bridge, /^\[data-color-mode="dark"\][^}]*--bs-form-check-checked-image: url\("[^"]*stroke='%23191919'/m);
-});
-
-test('the Bootstrap bridge keeps .bg-light light: its triplet comes from an opaque surface', () => {
-  assert.match(files['_bootstrap-bridge.scss'], /^:root,[^}]*--bs-light-rgb: 249, 248, 247;/m);
-});
-
 test('_elevation.scss follows the same switches as _semantic.scss', () => {
   assert.deepEqual(selectors(files['_elevation.scss']), MODE_SELECTORS);
 });
 
-test('the Bootstrap bridge follows every mode: auto into dark, and increased contrast as triplet overrides', () => {
-  const bridge = files['_bootstrap-bridge.scss'];
-  assert.deepEqual(selectors(bridge).slice(0, MODE_SELECTORS.length), MODE_SELECTORS);
-  const [, dark, auto] = bridge.split(/\n(?=\S)/).filter((b) => b.includes('--bs-'));
-  const decls = (b) => b.match(/--bs-[^\n]+/g);
-  assert.deepEqual(decls(auto), decls(dark));
-  const lightMore = bridge.slice(bridge.indexOf(`${L}[data-contrast-mode="more"]`));
-  assert.match(lightMore.slice(0, lightMore.indexOf('}')), /--bs-body-color-rgb: 29, 27, 22;/);
-  assert.doesNotMatch(lightMore.slice(0, lightMore.indexOf('}')), /var\(/); // the var() lines already follow the mode
+// ---- elevation: raised carries a key layer, blocking is its own token ----
+const elevation = files['_elevation.scss'];
+const decl = (css, name) => [...css.matchAll(new RegExp(`^ +${name}: ([^;]+);`, 'gm'))].map((m) => m[1]);
+const RAISED_LIGHT = '0px 0px 0px 1px rgb(29 27 22 / 0.051), 0px 1px 2px rgb(29 27 22 / 0.161), 0px 12px 32px rgb(29 27 22 / 0.02)';
+const BLOCKING_LIGHT = '0px 0px 0px 1px rgb(29 27 22 / 0.071), 0px 8px 16px rgb(29 27 22 / 0.071), 0px 24px 56px rgb(29 27 22 / 0.161)';
+
+test('light raised has edge, key (16%) and ambient layers', () => {
+  assert.equal(decl(elevation, '--ds-shadow-raised')[0], RAISED_LIGHT);
+});
+
+test('--ds-shadow-blocking exists in all four modes; light matches the proposal', () => {
+  const [light, dark, autoDark, ...rest] = decl(elevation, '--ds-shadow-blocking');
+  assert.equal(light, BLOCKING_LIGHT);
+  assert.ok(dark && autoDark && rest.length >= 4, 'dark, auto-dark and increased-contrast blocks each declare it');
+});
+
+test('dark blocking equals dark overlay, in dark and dark increased contrast', () => {
+  const pairs = (name) => decl(elevation, name);
+  const blocking = pairs('--ds-shadow-blocking');
+  const overlay = pairs('--ds-shadow-overlay');
+  assert.equal(blocking.length, overlay.length);
+  const darkIdx = overlay.map((v, i) => (v.includes('247 246 245') ? i : -1)).filter((i) => i >= 0);
+  assert.ok(darkIdx.length >= 2);
+  for (const i of darkIdx) assert.equal(blocking[i], overlay[i]);
+});
+
+test('increased-contrast rings: 49% light, 50% dark, on raised and blocking', () => {
+  for (const name of ['--ds-shadow-raised', '--ds-shadow-blocking']) {
+    const v = decl(elevation, name);
+    assert.ok(v.some((s) => s.startsWith('0px 0px 0px 1px rgb(29 27 22 / 0.49)')), `${name} light ic ring`);
+    assert.ok(v.some((s) => s.startsWith('0px 0px 0px 1px rgb(247 246 245 / 0.502)')), `${name} dark ic ring`);
+  }
+});
+
+test('raised light keeps its ring at 49% under increased contrast and dark raised is unchanged', () => {
+  const v = decl(elevation, '--ds-shadow-raised');
+  assert.ok(v.includes('0px 0px 0px 1px rgb(29 27 22 / 0.49), 0px 1px 2px rgb(29 27 22 / 0.161), 0px 12px 32px rgb(29 27 22 / 0.02)'));
+  assert.ok(v.includes('0px 0px 0px 1px rgb(247 246 245 / 0.102), 0px 1px 1px rgb(20 20 19 / 0.502), 0px 0px 1px rgb(20 20 19 / 0.502)'));
+});
+
+test('plans name every shadow layer edge, key, ambient', () => {
+  for (const key of ['A', 'B']) {
+    const { semantics } = buildPlan(key);
+    const sh = semantics.palette.shadow;
+    for (const level of ['raised', 'overlay', 'blocking']) assert.deepEqual(Object.keys(sh[level]), ['edge', 'key', 'ambient'], `${key} ${level}`);
+  }
 });

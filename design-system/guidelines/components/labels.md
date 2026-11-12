@@ -1,19 +1,21 @@
 ---
-summary: The label family — Status tag, Date tag, Count tag, Tag, Smart tag, TagGroup and Suggestion — and how to choose between them
+summary: The label family — Status tag, Date tag, Count tag, Change tag, Tag, Smart tag, TagGroup and Suggestion — and how to choose between them
 ---
 
 <!-- Tier: 2 | Load when: choosing a component from the labels group -->
 
 # Labels — which component to reach for
 
-The label family: `StatusTag`, `DateTag`, `CountTag`, `Tag`, `SmartTag`,
+The label family: `StatusTag`, `DateTag`, `CountTag`, `ChangeTag`, `Tag`, `SmartTag`,
 `TagGroup` and `Suggestion`. Generated facts are in
 `design-system/src/components/labels/index.md`; when to use each is on its own
 docs page.
 
-Four questions choose between the first four:
+Four questions choose between the first five:
 
-- **Is it a number?** `CountTag`.
+- **Is it a number?** `CountTag`. If the number is a change over time ("+3
+  vs last week"), `ChangeTag`: the sign sets the arrow and `goodDirection`
+  (up, down, none) sets the tone, so "up is bad" needs no hand-picked color.
 - **Is it a due or event date?** `DateTag`, outlined with a fixed icon the app
   picks from the date and the due-soon window.
 - **Is it the condition something is in, and can that condition change?**

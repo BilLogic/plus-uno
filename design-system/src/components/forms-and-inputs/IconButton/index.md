@@ -2,7 +2,7 @@
 
 # IconButton
 
-Icon button: a button that is an icon and nothing else. `label` is required because it is the button's accessible name and its tooltip..
+Icon button: a button that is an icon and nothing else. `label` is required because it is the button's accessible name and its tooltip. A filter trigger can add `trailingMetric`, the count of filters applied, drawn after the icon.
 
 Also asked as: icon only button, icon action.
 
@@ -10,7 +10,7 @@ Also asked as: icon only button, icon action.
 
 **Source:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.stories.jsx` — Overview, Appearances, Spacing, Shapes, States, Default, Subtle, Primary, Discovery, Compact, Circle, Selected, Disabled, Loading, HoveredState, PressedState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.stories.jsx` — Overview, Appearances, Spacing, Shapes, States, Default, Subtle, Primary, Discovery, Compact, Circle, Selected, Disabled, DisabledWithReason, Loading, FilterCount, HoveredState, PressedState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.mdx`
 
@@ -46,7 +46,17 @@ the difference shows only on hover, on focus and to a screen reader.
 
 Icon buttons stay 32 or 24 square, and round only in top navigation
 (`shape="circle"`). Icon button has no prop to fill its container; never
-stretch one to fill a row.
+stretch one to fill a row. The one exception is a filter trigger's count,
+which widens the button by the count alone.
+
+### Show the applied count on a filter trigger. {#show-the-applied-count-on-a-filter-trigger}
+
+When filters are on, pass their number as `trailingMetric`. A count above zero draws the
+selected fill by itself; zero or absent draws no count and no fill.
+
+```jsx
+<IconButton icon="filter" label="Filters" trailingMetric={applied} />
+```
 
 ### Use primary sparingly. {#use-primary-sparingly}
 
@@ -70,8 +80,9 @@ Don't: The same two views as loose buttons read as unrelated actions.
 ## Accessibility
 
 - `label` is required. It is the accessible name and the tooltip. A missing label fails `check:icon-button-name`.
-- Avoid `isDisabled`. A disabled button leaves the tab order and receives no events. Explain what is unavailable in nearby text instead, and never attach a tooltip to a disabled control.
-- Selected is not color alone: `isSelected` sets `aria-pressed`.
+- Leave an action enabled and explain what is missing when it is pressed; disable an icon button only while it is sending. A disabled icon button leaves the tab order, drops its tooltip and `title`, and takes no `aria-disabled` stand-in that keeps it focusable. Say why in visible text beside it.
+- Selected is not color alone: `isSelected` sets `aria-pressed`. A menu trigger reports `aria-expanded` only, so it never carries `aria-pressed`.
+- With `trailingMetric` the accessible name carries the count: "Filters, 2 applied". A count of zero adds nothing to the name. The drawn digits are hidden from assistive technology so the count is not read twice.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 - The glyph is decoration once the button has a name, so it is hidden from assistive technology.
 
@@ -82,7 +93,7 @@ Don't: The same two views as loose buttons read as unrelated actions.
 - To dismiss a surface, use Close button.
 - To group related icon buttons, use Button group.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -90,6 +101,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 2. **Icon.** A Font Awesome Free glyph at 16. Use an existing system glyph; do not draw custom icons.
 3. **Label.** Not drawn. It is the accessible name and the tooltip on hover and focus.
 4. **Spinner** (loading only). Replaces the icon while the button is busy.
+5. **Count** (filter triggers only). `trailingMetric`, the number of filters applied, after the icon. The button keeps its height and the icon keeps its place; the count widens it.
 
 ### Appearance
 
@@ -114,6 +126,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 | Selected | The selected role fill and icon. Applies to default and subtle, and sets `aria-pressed`. |
 | Disabled | The disabled fill and icon. Avoid disabling icon buttons. |
 | Loading | A spinner replaces the icon. The container keeps its fill, blocks interaction and sets `aria-busy`. |
+| Count changes | The first count opens the button to its width; set at the end of a toolbar, the right edge stays put and it grows left. Each new count fades in; it never counts up. With reduced motion both are instant. |
 
 ### Tokens
 
@@ -124,7 +137,8 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 | Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps; `--ds-background-disabled`. |
 | Icon | `--ds-icon-subtle` (default, subtle), `--ds-icon-inverse` (primary, discovery); the selected and disabled roles. 16, `--icon-md`. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
-| Size | 32: `--item-height-md`. 24: `--item-height-sm`. Square. |
+| Size | 32: `--item-height-md`. 24: `--item-height-sm`. Square, except with a count. |
+| Count | `--ds-text-subtlest`, or the selected text color when selected. `--inline-sm` after the icon. Motion: `--motion-duration-medium` to open, `--motion-duration-short` to fade in. |
 | Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. Circle 50%. |
 
 ## Content guidelines
@@ -141,11 +155,12 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 |------|------|---------|-------------|
 | `icon` | string or node | — | A Font Awesome Free glyph name (`trash`) or a node. |
 | `label` | string (required) | — | The accessible name and tooltip. Sentence case; name the object acted on ("Edit page"). |
+| `trailingMetric` | number or string | — | The count of filters applied, drawn after the icon; the accessible name becomes "Filters, 2 applied". Zero or absent draws no count, and a count above zero draws the selected fill by itself. |
 | `appearance` | enum | `'default'` | The visual style. `default` suits most actions, `subtle` low-emphasis toolbar actions, `primary` the main action and `discovery` something new. |
 | `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24. |
 | `shape` | enum | `'default'` | Square by default; `circle` is for top navigation. |
-| `isSelected` | bool | — | Marks the button selected and sets `aria-pressed`. Use it for a toggle such as a list or grid view switch. |
-| `isDisabled` | bool | — | Prevents interaction. Avoid it where you can; say why the action is unavailable instead. |
+| `isSelected` | bool | — | Marks the button selected and sets `aria-pressed` (leave it unset and the button reports none), except on a menu trigger, which reports `aria-expanded` only. Use it for a toggle such as a list or grid view switch. |
+| `isDisabled` | bool | `false` | Prevents interaction and drops the tooltip and `title`. Leave an action enabled and explain what is missing when it is pressed; disable only while it is sending. |
 | `isLoading` | bool | — | Shows a spinner in place of the icon and blocks interaction. |
 | `onClick` | func | — | Called with the click event when the button is activated. It does not fire while `isDisabled` or `isLoading` is set. |
 | `className` | string | — | Extra class names added to the button element beside the component's own. |
@@ -162,6 +177,12 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 **`shape`** — `default` · `circle`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
+
+## Tokens touched
+
+`--border-default` · `--ds-text-subtlest` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--item-height-sm` · `--motion-duration-medium` · `--motion-duration-short` · `--motion-easing-entrance` · `--motion-easing-standard`
+
+From `design-system/src/components/forms-and-inputs/IconButton/IconButton.scss`. Override these through the token layer, never with a literal.
 
 ## Figma
 

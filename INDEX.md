@@ -88,7 +88,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | Doc | Summary |
 |-----|---------|
 | [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input or button to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
-| [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status tag, Date tag, Count tag, Tag, Smart tag, TagGroup and Suggestion — and how to choose between them |
+| [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status tag, Date tag, Count tag, Change tag, Tag, Smart tag, TagGroup and Suggestion — and how to choose between them |
 | [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | The remaining container components sorted by what is being contained |
 | [`design-system/guidelines/components/loading.md`](design-system/guidelines/components/loading.md) | Progress (Progress bar), Skeleton or Spinner — showing work in flight |
 | [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Flag or Modal — choosing by how long the message lives and whether it blocks |
@@ -154,7 +154,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/006-strip-npm-publishing-from-design-system-package.md`](docs/adr/006-strip-npm-publishing-from-design-system-package.md) | Strip npm publishing from design system package |
 | [`docs/adr/007-agent-agnostic-skills-under-agent-skills.md`](docs/adr/007-agent-agnostic-skills-under-agent-skills.md) | Agent-agnostic skills under .agent/skills/ |
 | [`docs/adr/008-compound-loop-for-cross-session-learning.md`](docs/adr/008-compound-loop-for-cross-session-learning.md) | Compound loop for cross-session learning |
-| [`docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md`](docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md) | Bootstrap-first, no alternative UI frameworks — superseded by ADR-037 on the fallback-behavior half |
+| [`docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md`](docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md) | Bootstrap-first, no alternative UI frameworks — superseded by ADR-037 on the fallback-behavior half and retired in full by ADR-042, which removes Bootstrap |
 | [`docs/adr/010-three-tier-context-loading-architecture.md`](docs/adr/010-three-tier-context-loading-architecture.md) | Three-tier context loading architecture |
 | [`docs/adr/011-doc-splitting-by-task-context.md`](docs/adr/011-doc-splitting-by-task-context.md) | Doc splitting by task context (Index + Modules pattern) |
 | [`docs/adr/012-declarative-route-manifest-over-parallel-maps.md`](docs/adr/012-declarative-route-manifest-over-parallel-maps.md) | Declarative route manifest over parallel maps |
@@ -186,6 +186,8 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md`](docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md) | Space, size, radius, border width, typography and motion become generated from plans this repo owns, the way ADR-035 generates color — Figma downstream, PLUS ×16 numbering kept, one token ladder with the old vocabulary deleted |
 | [`docs/adr/039-one-checker-defines-an-escape.md`](docs/adr/039-one-checker-defines-an-escape.md) | One deterministic checker, check:ds-usage, defines an escape from the design system; the hook, CI, the prototype exit, ds-lens and the usage eval all call it, and AI review advises while the checker blocks |
 | [`docs/adr/040-agent-view-is-the-fourth-component-tab.md`](docs/adr/040-agent-view-is-the-fourth-component-tab.md) | Component docs pages gain a 4th tab, Agent view, that shows the component's generated file byte for byte through one raw glob in the tabs module; amends ADR-025, whose tabs were a human affordance only (2026-11-08) |
+| [`docs/adr/041-motion-is-springs-on-four-tiers.md`](docs/adr/041-motion-is-springs-on-four-tiers.md) | Motion is springs only, on four tiers (primitives, semantics, patterns and components); Expressive is a container switch, Reduced is a fade, Figma holds no motion tokens; supersedes the motion half of ADR-038 |
+| [`docs/adr/042-plus-ships-no-bootstrap.md`](docs/adr/042-plus-ships-no-bootstrap.md) | PLUS ships no Bootstrap — the bootstrap and react-bootstrap packages, the Bootstrap CSS layer, the generated Bootstrap color bridge and their checks are gone; a small element baseline in main.scss keeps what components relied on; completes ADR-037 and retires ADR-009 (2026-11-11) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -214,6 +216,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-143 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

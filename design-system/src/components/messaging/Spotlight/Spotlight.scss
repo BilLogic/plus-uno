@@ -1,7 +1,7 @@
 @use '../../../styles/state' as *;
 
 .plus-spotlight {
-    width: var(--popover-width-md);
+    width: var(--spotlight-width);
     max-width: calc(100vw - var(--space-100) * 2);
     background: var(--ds-background-brand-bold);
     color: var(--ds-text-inverse);

@@ -23,6 +23,9 @@ user can keep working.
 | must be answered before anything else | `Modal` | takes focus, blocks the page behind a backdrop |
 | is extra detail behind an icon, not shown by default | `InlineMessage` | opens a Popup on demand, so it never pushes layout |
 | is about one form field | none of these | the field's own error state |
+| is a view that failed to load, or one the person may not open | `EmptyState` | the view's own slot, with Try again or who can help |
+| is a failed background action, such as a sync | `Flag` (error) | stays until closed, with Try again |
+| is a rejected form submit | `SectionMessage` (danger), with each field's own error | a danger summary at the form top points to the fields |
 
 That last row is the one that matters most. `TextField`, `TextArea`, `FileUpload`
 and `DateTimePicker` all take `isInvalid` plus `errorMessage`,

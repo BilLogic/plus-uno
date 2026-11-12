@@ -460,25 +460,34 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   return { rows, accent_pattern: accentPattern, shadows: shadows(pal), opacity: OPACITY, palette: pal };
 }
 
-// ---- shadows: fixed layer counts (raised 3, overlay 3, overflow 2), per-plan light geometry, shared dark ----
+// ---- shadows: fixed layer counts (raised 3, overlay 3, blocking 3, overflow 2), per-plan light geometry, shared dark ----
 function shadows(pal) {
   const I = pal.neutral['1100'].hex;
   const K = pal.darkNeutral['0'].hex;
   const PA = pal.darkNeutral['1100'].hex;
   const T = '#00000000';
   const a = (hex, pct) => withAlpha(hex, pct / 100);
+  // Every shadow is three named layers, always in this order: edge (the ring), key (the contact), ambient (the wide soft one).
   const layers = (spec) =>
-    spec.map(([x, y, b, sp, pct]) => `${x}px ${y}px ${b}px${sp ? ` ${sp}px` : ''} ${pct ? a(I, pct) : T}`).join(', ');
+    ['edge', 'key', 'ambient']
+      .map((slot) => {
+        const [x, y, b, sp, pct] = spec[slot];
+        return `${x}px ${y}px ${b}px${sp ? ` ${sp}px` : ''} ${pct ? a(I, pct) : T}`;
+      })
+      .join(', ');
   const raisedL = layers(pal.shadow.raised);
   const overlayL = layers(pal.shadow.overlay);
+  const blockingL = layers(pal.shadow.blocking);
   const rw = 'Light geometry comes from the plan (shadow primitives): Plan A Notion cards, Plan B claude.ai cards.';
   const ow = 'Light geometry comes from the plan: Plan A Notion popovers, Plan B claude.ai menus.';
   const raisedD = `0px 0px 0px 1px ${a(PA, 10)}, 0px 1px 1px ${a(K, 50)}, 0px 0px 1px ${a(K, 50)}`;
   const overlayD = `0px 0px 0px 1px ${a(PA, 12)}, 0px 8px 12px ${a(K, 36)}, 0px 0px 1px 1px ${a(K, 50)}`;
+  const blockingW = 'Light geometry comes from the plan. Dark equals dark overlay: on the 60% black Backdrop any shadow measures 1 to 4 gray levels.';
   const CARD = ' Cards rest on surface.raised with this ring; a clickable card moves to shadow.overlay on hover.';
   const SHADOWS = [
     ['elevation.shadow.raised', raisedL, raisedD, 'Box shadow of a raised card. Pair with elevation.surface.raised.', `${rw}${CARD} In dark, the ring is paper at 10%, so cards keep an edge.`],
     ['elevation.shadow.overlay', overlayL, overlayD, 'Box shadow of anything over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay.', `${ow} Modals join this level.`],
+    ['elevation.shadow.blocking', blockingL, overlayD, 'Box shadow of a modal that blocks the page behind a Backdrop. Pair with elevation.surface.overlay.', blockingW],
     ['elevation.shadow.overflow', `0px 0px 8px ${a(I, 16)}, 0px 0px 1px ${a(I, 12)}`, `0px 0px 12px ${a(K, 56)}, 0px 0px 1px ${a(K, 50)}`,
       "Shadow where content scrolls under other content, such as a table's sticky column.", null],
     ['elevation.shadow.overflow.spread', a(I, 16), a(K, 56), 'Fallback for overflow when a box shadow is not feasible; pair with .perimeter.', null],
@@ -487,7 +496,7 @@ function shadows(pal) {
   const icRing = (shadow, ring) => shadow.replace(/^0px 0px 0px 1px #[0-9a-fA-F]{6,8}/, `0px 0px 0px 1px ${ring}`);
   return SHADOWS.map(([name, light, dark, use, deviation]) => {
     const x = { name, light, dark, use, deviation, light_ic: light, dark_ic: dark };
-    if (name === 'elevation.shadow.raised' || name === 'elevation.shadow.overlay') {
+    if (['raised', 'overlay', 'blocking'].some((n) => name === `elevation.shadow.${n}`)) {
       x.light_ic = icRing(light, pal.neutralAlpha['900'].hex);
       x.dark_ic = icRing(dark, pal.darkNeutralAlpha['900'].hex);
     }

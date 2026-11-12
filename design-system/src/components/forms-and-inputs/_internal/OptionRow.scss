@@ -132,7 +132,7 @@
 }
 
 .plus-option-row-leading,
-.plus-option-row-trailing {
+.plus-option-row-elem-after {
     display: flex;
     flex-shrink: 0;
     align-items: center;
@@ -152,7 +152,7 @@
     }
 }
 
-.plus-option-row-trailing {
+.plus-option-row-elem-after {
     gap: var(--stack-md);
     color: var(--ds-text-subtle);
 }
@@ -211,7 +211,7 @@
     box-sizing: border-box;
     border: var(--border-default) solid var(--ds-border-input);
     background-color: var(--ds-background-input);
-    transition: background-color 0.2s, border-color 0.2s;
+    transition: background-color var(--motion-duration-short) var(--motion-easing-standard), border-color var(--motion-duration-short) var(--motion-easing-standard);
 
     &--checkbox {
         border-radius: var(--radius-md);

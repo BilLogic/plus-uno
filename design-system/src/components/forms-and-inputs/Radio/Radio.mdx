@@ -73,6 +73,8 @@ A radio lets a person choose one option from a set.
 
 <ComponentExample of={RadioStories.Disabled} title="Disabled" description="The disabled fill. The radio leaves the tab order." />
 
+<ComponentExample of={RadioStories.DisabledWithReason} title="Disabled with a reason" description="The option's description says what to do first and stays at full contrast." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -129,7 +131,7 @@ Make one option the default: the safest and lowest-risk one. If a person may dec
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the radio, for keyboard focus only.</td></tr>
 <tr><td>Selected</td><td><code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; the dot is <code>--ds-icon-inverse</code>.</td></tr>
 <tr><td>Invalid</td><td>The unselected radio takes <code>--ds-border-danger</code>. A selected radio keeps its fill.</td></tr>
-<tr><td>Read-only</td><td>Full contrast, in the tab order, not changeable.</td></tr>
+<tr><td>Read-only</td><td>Full contrast, in the tab order, no hover; an unchecked radio takes the <code>--ds-background-neutral</code> fill. Not changeable.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> edge, <code>--ds-icon-disabled</code> dot. Out of the tab order.</td></tr>
 </tbody>
 </DocsTable>
@@ -239,7 +241,7 @@ For a long list, use Select. Do not write numeric options that overlap ("0-20", 
 - **Each option has its own id.** The component derives one per instance, so labels never resolve to the first radio of the group.
 - **A radio with no `label` has no accessible name.** Pass `aria-label` where the design has no room for visible text.
 - **Include an error message for a required or invalid group**, for example "Select an option".
-- **Do not disable an option that must stay reachable.** Use validation, so a screen reader user hears why it cannot be chosen.
+- **Disable an option only for something the person can fix on the same screen.** Put the reason in the option's `description`, at full contrast, and never in a tooltip. A disabled option leaves the tab order. For a choice that must stay reachable, keep it enabled and use validation, so a screen reader user hears why it cannot be chosen.
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the radio.** Arrow keys move between the radios of a group.
 
 </div>

@@ -10,7 +10,7 @@ Also asked as: enable disable, on/off setting.
 
 **Source:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled
+**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled, DisabledWithReason
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx`
 
@@ -38,12 +38,12 @@ The switch and its label never disagree. A label that reads as a state, such as 
 Do: Off, and the setting's name still reads right.
 Don't: Off, but the label says on.
 
-### Disable instead of hiding. {#disable-instead-of-hiding}
+### Say why a toggle is disabled. {#say-why-a-toggle-is-disabled}
 
-A disabled toggle tells people the setting exists but is unavailable. Say why next to it.
+Disable a toggle only for something the person can fix on the same screen, and say why in text next to it. A setting a role can never use is hidden. Never put the reason in a tooltip on the disabled toggle.
 
-Do: Visible but disabled.
-Don't: Enabled, though switching it does nothing.
+Do: Disabled, with the reason beside it.
+Don't: Disabled with no reason, so nothing says what to fix.
 
 ### The change lands at once. {#the-change-lands-at-once}
 
@@ -51,7 +51,7 @@ A toggle changes the setting as the person flips it. If the change needs confirm
 
 ### Read-only is not disabled. {#read-only-is-not-disabled}
 
-`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast and ignores clicks. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now.
+`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast, has no hover, says `aria-readonly` and ignores clicks. Say why beside it. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now.
 
 ### Name and id. {#name-and-id}
 
@@ -65,7 +65,7 @@ The native input is a checkbox with `role="switch"`, the markup the W3C switch p
 
 - **Label every toggle.** A visible `label` is better. Where the name sits elsewhere in the layout, pass `aria-label` so it still reaches assistive technology.
 - **Do not change the label with the state.** The label stays the same whether the toggle is on or off.
-- **Explain a disabled toggle.** Put the reason in text beside it, so a person who cannot reach it knows why.
+- **Explain a disabled toggle.** Put the reason in visible text beside it, so a person who cannot reach it knows why. A disabled toggle leaves the tab order, and a tooltip on it is unreachable.
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the track.** Space flips the toggle.
 
 ## Related
@@ -75,7 +75,7 @@ The native input is a checkbox with `role="switch"`, the markup the W3C switch p
 - To choose one option from a longer list, use Select.
 - To explain what flipping a toggle does, add a Tooltip.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -93,7 +93,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Pressed | No step of its own. The hovered fill holds while the pointer is down. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the track, for keyboard focus only. |
 | Disabled | `--ds-background-disabled` track, `--ds-icon-disabled` thumb, in both positions. Out of the tab order. |
-| Read-only | Full contrast, in the tab order, not changeable. |
+| Read-only | Full contrast, in the tab order, no hover, `aria-readonly`. Not changeable. |
 | Loading | A spinner sits between the track and the label; input is ignored. |
 
 ### Tokens

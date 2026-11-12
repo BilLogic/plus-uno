@@ -3,7 +3,7 @@ import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Modal from '@/components/messaging/Modal';
-import { IconButton, Button } from '@/components';
+import { IconButton, Button, Select } from '@/components';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
@@ -242,7 +242,7 @@ function ModalLayoutDemos() {
 
 /** One grid width, drawn at the 1024 screen. */
 const widthStory = (size) => () => (
-    <div style={{ '--plus-modal-screen': '1024px', width: '100%' }}>
+    <div style={{ '--plus-overlay-screen': '1024px', width: '100%' }}>
         <Modal
             show
             renderAs="inline"
@@ -486,6 +486,56 @@ export const TwoOverlayLimit = {
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(hiddenDialog('Second')).toBeNull());
         await waitFor(() => expect(dialogNamed(canvasElement, 'First')).not.toBeNull());
+    },
+};
+
+/* ------------------------------------------------------------------- shadow */
+
+// What a token paints as a box-shadow, resolved by the browser so a color-mode switch is covered.
+const paintedShadow = (doc, token) => {
+    const probe = doc.createElement('div');
+    probe.style.boxShadow = `var(${token})`;
+    doc.body.appendChild(probe);
+    const value = getComputedStyle(probe).boxShadow;
+    probe.remove();
+    return value;
+};
+
+/** The Modal is the one surface on a blanket, so it draws the blocking shadow in every width. */
+export const BlockingShadow = {
+    render: () => (
+        <div style={col}>
+            {['6-col', '8-col', '10-col'].map((width) => (
+                <Modal key={width} show renderAs="inline" width={width} title={`Modal ${width}`} body="Blocks the page." onClose={() => {}} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const blocking = paintedShadow(canvasElement.ownerDocument, '--ds-shadow-blocking');
+        await expect(blocking, 'the two shadow tokens differ').not.toBe(paintedShadow(canvasElement.ownerDocument, '--ds-shadow-overlay'));
+        for (const width of ['6-col', '8-col', '10-col']) {
+            const panel = canvasElement.querySelector(`.plus-modal.plus-modal-width-${width}`);
+            await expect(getComputedStyle(panel).boxShadow, `${width} Modal`).toBe(blocking);
+        }
+    },
+};
+
+/** A Select list opened inside a Modal keeps the overlay shadow: a smaller layer, lower than the Modal. */
+export const SelectKeepsOverlayShadow = {
+    render: () => (
+        <Modal show width="6-col" title="Pick a subject" onClose={() => {}}>
+            <Select label="Subject" options={[{ value: 'a', label: 'Algebra' }, { value: 'b', label: 'Biology' }]} placeholder="Select a subject" />
+        </Modal>
+    ),
+    play: async ({ canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        const body = within(doc.body);
+        const dialog = await body.findByRole('dialog', { name: 'Pick a subject' });
+        await expect(getComputedStyle(dialog).boxShadow, 'the live Modal').toBe(paintedShadow(doc, '--ds-shadow-blocking'));
+
+        await userEvent.click(within(dialog).getByRole('combobox'));
+        const list = await body.findByRole('listbox');
+        await expect(getComputedStyle(list.closest('.plus-listbox')).boxShadow, 'a Select list inside the Modal').toBe(paintedShadow(doc, '--ds-shadow-overlay'));
     },
 };
 

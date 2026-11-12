@@ -6,7 +6,7 @@
   "notes": {
     "neutral": "claude.ai --cds-gray (color v2, served 2026-10-25), placed on Atlassian's steps by role as Plan A's are. Text secondary is 60% and primary 90%; dark page and surface-0 is gray-900 #0b0b0b, surface-1 #151515, surface-2 #191919, popover #202020.",
     "alpha": "Percent of ink (light) or paper (dark) behind each alpha slot. Slot 300 is the line (color.border): claude.ai draws borders at 8% and lines at 12%.",
-    "shadow": "Light geometry per layer: [x, y, blur, spread, ink %]. Raised is claude.ai's cards and composer; overlay is claude.ai's menus.",
+    "shadow": "Light geometry per layer, named by the part it plays (edge: the 1px ring, key: the tight contact shadow, ambient: the wide soft one): [x, y, blur, spread, ink %]. Raised is claude.ai's cards and composer; overlay is claude.ai's menus.",
     "accents": "claude.ai's ramps: tints near L .91 with chroma .04-.08 and vivid fills (chroma .16-.19); a violet purple and a grass green. Each family is a hue and a chroma cap on the shared step shape, with the light tints scaled up."
   },
   "neutral": {
@@ -27,8 +27,9 @@
   },
   "blackAlpha": { "60": 60 },
   "shadow": {
-    "raised": [[0, 0, 0, 1, 12], [0, 4, 20, 0, 7.5], [0, 0, 0, 0, 0]],
-    "overlay": [[0, 0, 0, 1, 8], [0, 2, 6, 0, 8], [0, 8, 24, 0, 12]]
+    "raised": { "edge": [0, 0, 0, 1, 12], "key": [0, 1, 2, 0, 16], "ambient": [0, 4, 20, 0, 7.5] },
+    "overlay": { "edge": [0, 0, 0, 1, 8], "key": [0, 2, 6, 0, 8], "ambient": [0, 8, 24, 0, 12] },
+    "blocking": { "edge": [0, 0, 0, 1, 8], "key": [0, 8, 16, 0, 8], "ambient": [0, 24, 56, 0, 16] }
   },
   "accents": {
     "recipe": "shape",

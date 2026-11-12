@@ -22,6 +22,7 @@ export default {
         appearance: { control: 'select', options: ICON_BUTTON_APPEARANCES, table: { category: 'Design' } },
         spacing: { control: 'inline-radio', options: ['default', 'compact'], table: { category: 'Design' } },
         shape: { control: 'inline-radio', options: ['default', 'circle'], table: { category: 'Design' } },
+        trailingMetric: { control: 'number', table: { category: 'Content' } },
         isSelected: { control: 'boolean', table: { category: 'Behavior' } },
         isDisabled: { control: 'boolean', table: { category: 'Behavior' } },
         isLoading: { control: 'boolean', table: { category: 'Behavior' } },
@@ -163,10 +164,56 @@ export const Disabled = {
     },
 };
 
+/** A disabled icon button carries no tooltip and no `title`; the reason is text beside it. */
+export const DisabledWithReason = {
+    render: () => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)' }}>
+            <IconButton icon="trash" label="Delete session" tooltip="Remove this session" isDisabled />
+            <span>Open sessions cannot be deleted. End the session first.</span>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const button = canvas.getByRole('button', { name: 'Delete session' });
+        await expect(button).toBeDisabled();
+        await expect(button).not.toHaveAttribute('title');
+        await expect(canvas.getByText('Open sessions cannot be deleted. End the session first.')).toBeVisible();
+    },
+};
+
 export const Loading = {
     render: () => <IconButton icon="pen" label="Saving" isLoading />,
     play: async ({ canvasElement }) => {
         await expect(within(canvasElement).getByRole('button', { name: 'Saving' })).toHaveAttribute('aria-busy', 'true');
+    },
+};
+
+/** A filter trigger with filters on: the count follows the icon on the selected fill. */
+export const FilterCount = {
+    render: () => (
+        <div style={{ ...row, justifyContent: 'flex-end' }}>
+            <IconButton icon="filter" label="Filters" />
+            <IconButton icon="filter" label="Filters" trailingMetric={2} />
+            <IconButton icon="filter" label="Filters" trailingMetric={2} spacing="compact" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const [plain, counted, compact] = canvas.getAllByRole('button');
+        await expect(plain).toHaveAccessibleName('Filters');
+        await expect(counted).toHaveAccessibleName('Filters, 2 applied');
+        await expect(counted).toHaveAttribute('aria-pressed', 'true');
+        await expect(compact).toHaveAccessibleName('Filters, 2 applied');
+        // Same height as the square; wider by the count, with the icon where the square puts it.
+        await expect(counted.getBoundingClientRect().height).toBe(32);
+        await expect(counted.getBoundingClientRect().width).toBeGreaterThan(32);
+        await expect(compact.getBoundingClientRect().height).toBe(24);
+        await expect(compact.getBoundingClientRect().width).toBeGreaterThan(24);
+        const iconInset = (button) => button.querySelector('.plus-btn-visual').getBoundingClientRect().left - button.getBoundingClientRect().left;
+        await expect(iconInset(counted)).toBeCloseTo(iconInset(plain), 0);
+        // The count takes the selected color, as the icon does.
+        const metric = counted.querySelector('.plus-icon-btn__metric');
+        await expect(getComputedStyle(metric).color).toBe(getComputedStyle(counted).color);
     },
 };
 

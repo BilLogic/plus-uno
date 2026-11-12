@@ -54,7 +54,7 @@
             hovered: (border-color: var(--ds-border-brand), background-color: var(--ds-background-input-hovered)),
             disabled: (cursor: not-allowed, border-color: var(--ds-border-disabled), background-color: var(--ds-background-disabled)),
         ),
-        $hovered-selector: '&:hover:not([data-disabled]):not([data-checked])',
+        $hovered-selector: '&:hover:not([data-disabled]):not([data-readonly]):not([data-checked])',
         $disabled-selector: '&[data-disabled]'
     );
 
@@ -70,7 +70,7 @@
             hovered: (background-color: var(--ds-background-selected-bold-hovered), border-color: var(--ds-background-selected-bold-hovered)),
         ),
         $ring: false,
-        $hovered-selector: '&[data-checked]:hover:not([data-disabled])'
+        $hovered-selector: '&[data-checked]:hover:not([data-disabled]):not([data-readonly])'
     );
 
     // A disabled checked radio keeps the disabled fill and edge; its dot is
@@ -132,6 +132,7 @@
     }
 }
 
+// Read-only keeps full contrast and drops the pointer affordance.
 .plus-choice-readonly {
     .plus-form-radio,
     .plus-form-radio-label {
@@ -152,4 +153,9 @@
     .plus-form-radio:focus-visible {
         border-color: var(--ds-border-brand);
     }
+}
+
+// Read-only, unchecked: the neutral fill. A checked radio keeps its Lagoon fill.
+.plus-form-radio[data-readonly]:not([data-checked]) {
+    background-color: var(--ds-background-neutral);
 }

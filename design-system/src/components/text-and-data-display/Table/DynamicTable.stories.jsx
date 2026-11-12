@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
-import Table, { DynamicTable, HeadCell, TableBulkActions } from '@/components/text-and-data-display/Table';
+import Table, { DynamicTable, HeadCell } from '@/components/text-and-data-display/Table';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import PatternSection, { SectionToolbar } from '@/patterns/PatternSection';
 import { HeadingLevelContext } from '@/lib/headingLevel';
@@ -54,6 +54,7 @@ export default {
         selectedRowKeys: { control: false, table: { category: 'Selection' } },
         defaultSelectedRowKeys: { control: 'object', table: { category: 'Selection' } },
         onSelectionChange: { control: false, table: { category: 'Selection' } },
+        bulkActions: { control: 'object', table: { category: 'Selection' } },
         stickyHeader: { control: 'boolean', table: { category: 'Scrolling' } },
         maxHeight: { control: 'text', table: { category: 'Scrolling' } },
         isFrozen: { control: 'boolean', table: { category: 'Scrolling' } },
@@ -221,19 +222,16 @@ const BULK = ['Message', 'Export', 'Assign tutor', 'Remove'];
 
 const RosterWithBulkBar = (args) => {
     const [selected, setSelected] = React.useState([]);
-    const toolbar = selected.length > 0 ? (
-        <TableBulkActions
-            count={selected.length}
-            actions={BULK.map((label) => ({ label, onClick: () => {} }))}
-            onClear={() => setSelected([])}
-        />
-    ) : (
-        <SectionToolbar count={`${args.rows.length} students`} />
-    );
     return (
         <HeadingLevelContext.Provider value={3}>
-            <PatternSection title="Students" toolbar={toolbar}>
-                <DynamicTable {...args} isSelectable selectedRowKeys={selected} onSelectionChange={setSelected} />
+            <PatternSection title="Students" toolbar={<SectionToolbar count={`${args.rows.length} students`} />}>
+                <DynamicTable
+                    {...args}
+                    isSelectable
+                    selectedRowKeys={selected}
+                    onSelectionChange={setSelected}
+                    bulkActions={BULK.map((label) => ({ label, onClick: () => {} }))}
+                />
             </PatternSection>
         </HeadingLevelContext.Provider>
     );
@@ -242,25 +240,36 @@ const RosterWithBulkBar = (args) => {
 export const Selection = {
     render: (args) => <RosterWithBulkBar {...args} />,
     args: { head, rows, label: 'Students' },
-    parameters: { docs: { description: { story: 'A checkbox column as wide as the row is tall. Select-all in the head is checked when every row is selected and mixed when only some are. While rows are selected, `TableBulkActions` replaces the Section toolbar: the count, announced politely, up to three actions with an overflow menu, and Clear selection.' } } },
+    parameters: { docs: { description: { story: 'A checkbox column as wide as the row is tall. Select-all in the head is checked when every row is selected and mixed when only some are. While rows are selected the head row becomes the bulk bar: the count, then up to three `bulkActions` with an overflow menu for the rest. The labels cross-fade in place and the row keeps its height. There is no Clear; the checkboxes clear it. The Section toolbar stays put.' } } },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        const headRow = () => canvasElement.querySelector('thead tr');
+        const restHeight = headRow().getBoundingClientRect().height;
         const all = canvas.getByRole('checkbox', { name: 'Select all rows' });
         await expect(all).toHaveAttribute('aria-checked', 'false');
         await userEvent.click(canvas.getByRole('checkbox', { name: 'Select row 2' }));
         await expect(all).toHaveAttribute('aria-checked', 'mixed');
-        const count = canvasElement.querySelector('.plus-section-toolbar__selection');
-        await expect(count).toHaveTextContent('1 selected');
-        await expect(canvas.getByRole('status'), 'announced from the first selection').toHaveTextContent('1 selected');
-        await expect(count).toHaveAttribute('aria-live', 'polite');
+        const bar = headRow().querySelector('.plus-dynamic-table-bulk');
+        await expect(bar, 'the head row is the bulk bar').toHaveTextContent('1 selected');
+        // The toolbar's result count is its own live region; the selection count is the one that says "selected".
+        const selectionLive = canvas.getAllByRole('status').filter((node) => /selected/.test(node.textContent));
+        await expect(selectionLive, 'one live region announces the selection').toHaveLength(1);
+        await expect(selectionLive[0], 'announced from the first selection').toHaveTextContent('1 selected');
+        await expect(bar.querySelector('.plus-table-bulk-actions__count')).not.toHaveAttribute('aria-live');
+        await expect(headRow().getBoundingClientRect().height, 'the row keeps its height').toBe(restHeight);
         await expect(canvas.getByText('Marcus Lee').closest('tr')).toHaveAttribute('aria-selected', 'true');
-        await expect(canvas.getByRole('button', { name: 'More actions' })).toBeVisible();
+        // The bar fades in over the motion token's short duration.
+        await waitFor(() => expect(within(bar).getByRole('button', { name: 'More actions' })).toBeVisible());
+        await expect(canvas.queryByRole('button', { name: /clear/i }), 'no Clear button').toBeNull();
+        await expect(canvas.getByText('8 students'), 'the toolbar stays put').toBeVisible();
         await userEvent.click(all);
         await expect(all).toHaveAttribute('aria-checked', 'true');
-        await expect(canvasElement.querySelector('.plus-section-toolbar__selection')).toHaveTextContent('8 selected');
-        await userEvent.click(canvas.getByRole('button', { name: 'Clear selection' }));
+        await expect(bar).toHaveTextContent('8 selected');
+        await userEvent.click(all);
         await expect(all).toHaveAttribute('aria-checked', 'false');
-        await expect(canvas.getByText('8 students')).toBeVisible();
+        await expect(headRow().querySelector('.plus-dynamic-table-bulk'), 'the head row comes back').toBeNull();
+        await waitFor(() => expect(canvas.getByRole('button', { name: /Student/ })).toBeVisible());
+        await expect(headRow().getBoundingClientRect().height).toBe(restHeight);
     }
 };
 

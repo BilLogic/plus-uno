@@ -226,8 +226,9 @@ export function ResourcesBlock({ figmaLink, githubLink, sets, figmaFileKey }) {
 export function DocsPreviewCard({ children, innerClassName = '' }) {
     return (
         <div
-            className="sb-ds-docs-preview-well overflow-visible"
+            className="sb-ds-docs-preview-well"
             style={{
+                overflow: 'visible',
                 borderRadius: 'var(--card-radius-sm)',
                 backgroundColor: 'var(--ds-surface-container)',
                 border: 'var(--border-default) solid var(--ds-border)',
@@ -478,8 +479,9 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                 <p className="sb-ds-canvas-description">{description}</p>
             ) : null}
             <div
-                className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-visible"
+                className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel"
                 style={{
+                    overflow: 'visible',
                     borderRadius: 'var(--card-radius-sm)',
                     backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--border-default) solid var(--ds-border)',

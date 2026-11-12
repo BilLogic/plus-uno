@@ -35,7 +35,7 @@ calculated it or a person set it.
 
 <ComponentExample of={StatusTagStories.Styles} title="Appearances" description="Six appearances, each with a meaning, at default and spacious spacing: a tinted fill, its (Text) color and a 1px inside border one step darker." />
 
-<ComponentExample of={StatusTagStories.LeadingVisual} title="Leading visual" description={<><code>leadingVisual</code> adds one icon before the label, in the text color.</>} />
+<ComponentExample of={StatusTagStories.IconBefore} title="Icon before" description={<><code>iconBefore</code> adds one icon before the label, in the text color.</>} />
 
 <ComponentExample of={StatusTagStories.WithCount} title="Trailing metric" description={<><code>trailingMetric</code> nests a Count tag of the same appearance, compact in default and default in spacious; a count of 0 is hidden.</>} />
 
@@ -139,7 +139,7 @@ Use `spacing="default"` (20) in rows, lists, tables and sentences, and
 
 ## Parts
 
-1. **Leading visual.** Optional: a Font Awesome Free icon by name, or a node.
+1. **Icon before.** Optional: a Font Awesome Free icon by name.
 2. **Label.** The condition, in a word or two. Past <code>maxWidth</code> it ends in an ellipsis and the full text is a tooltip.
 3. **Trailing metric.** Optional: a compact Count tag nested inside, with its own appearance when it means something else.
 4. **Fill.** The appearance's tinted ground with its words and an edge one step darker.
@@ -268,7 +268,7 @@ success · warning · danger).
   takes focus so a keyboard user can reach the tooltip holding the full text;
   pointer users get the same tooltip on hover. The full text is always in the
   DOM, so a screen reader hears all of it.
-- **Not color alone.** A state can add a `leadingVisual` where color alone is
+- **Not color alone.** A state can add a `iconBefore` where color alone is
   not enough. Icons are decorative and hidden from assistive technology.
 - **An edge on any surface.** The 1px inside border keeps a pale fill visible
   on white and on gray; in forced-colors mode it becomes a real border.

@@ -22,6 +22,7 @@ const steps = [
   ['Agent views (tokens)', `node scripts/generate-cheat-sheet.js${flag}`],
   ['Agent views (component + forms index)', `node scripts/generate-knowledge-components.js${flag}`],
   ['Component docs (generated half + group coverage)', `node scripts/generate-component-docs.mjs${flag}`],
+  ['Template and pattern agent files', `node scripts/generate-docs-agent-files.mjs${flag}`],
   ['Root index (from frontmatter summaries)', `node scripts/generate-index.mjs${flag}`],
   ['Figma component registry', `node scripts/generate-component-registry-from-storybook.js${flag}`],
   ['Figma token registry', `node scripts/generate-token-registry.mjs${flag}`],

@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Checkbox from './Checkbox';
 import Fieldset from '../Fieldset';
 
@@ -180,7 +181,7 @@ export const CheckboxGroup = () => {
                     />
                 ))}
             </Fieldset>
-            <p className="body-default m-0" data-testid="checkbox-group-value">Picked: {picked.join(', ') || 'none'}</p>
+            <p className="body-default" style={{ margin: 0 }} data-testid="checkbox-group-value">Picked: {picked.join(', ') || 'none'}</p>
         </div>
     );
 };
@@ -242,6 +243,9 @@ ReadOnly.play = async ({ canvasElement }) => {
     off.focus();
     await userEvent.keyboard(' ');
     await expect(off.getAttribute('aria-checked')).toBe('false');
+
+    await expectChoiceReadOnly(canvasElement, on, 'checked checkbox');
+    await expectChoiceReadOnly(canvasElement, off, 'unchecked checkbox');
 };
 
 /** A description under the label, and the card appearance. */
@@ -370,6 +374,20 @@ export const Disabled = {
         const el = box(canvasElement, 'Not available');
         await expect(el).toHaveAttribute('data-disabled');
         await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+    },
+};
+
+/** Disabled for a prerequisite the person can fix here; the description says what to do and stays at full contrast. */
+export const DisabledWithReason = {
+    render: () => <Checkbox id="cb-ex-reason" label="Text me reminders" description="Add a phone number first." isDisabled />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const el = box(canvasElement, 'Text me reminders');
+        await expect(el).toHaveAttribute('data-disabled');
+        const reason = canvas.getByText('Add a phone number first.');
+        await expect(reason).toBeVisible();
+        await expect(getComputedStyle(reason.closest('.plus-field-caption')).opacity).toBe('1');
+        await expect(el).toHaveAccessibleDescription('Add a phone number first.');
     },
 };
 

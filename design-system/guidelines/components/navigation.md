@@ -50,8 +50,8 @@ when it is last **or** has no `href`, so a middle crumb without an href also get
 which `NavTabs` does not provide. Standalone it renders as a row
 of links: operable by Tab and Enter, but with no arrow-key navigation — the
 library's key handler returns early when there is no tab context, so setting
-`role="tablist"` by hand does not bring the arrows back. Wrap the bar in
-react-bootstrap's `Tab.Container` when the widget semantics matter.
+`role="tablist"` by hand does not bring the arrows back. Use `Tabs` when the
+widget semantics matter.
 
 **`SidebarTab` is not keyboard operable.** It renders a `div` with
 `role="button"` and `tabIndex={0}`, but no key handler — so it can be focused and

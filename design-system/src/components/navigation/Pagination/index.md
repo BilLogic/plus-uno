@@ -112,7 +112,7 @@ Don't: Only a window of numbers, with no total.
 - For a step-by-step flow, use `ProgressTracker` with your own step control.
 - For a long table, pair pagination with sorting and filtering; on its own it makes a specific row hard to find.
 
-Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Sidebar` · `Tabs`
+Same group: `Breadcrumb` · `Link` · `Sidebar` · `Tabs`
 
 ## Parts
 

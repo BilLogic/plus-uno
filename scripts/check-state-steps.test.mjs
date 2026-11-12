@@ -208,7 +208,7 @@ test('Button: keyboard focus is a 2px focus ring 2px off the edge, with no fill'
 // DropdownMenu has no toggle theme of its own (its trigger is a caller's own
 // Button or IconButton, which carries Button's steps); its rows are
 // MenuGroup's `plus-menu-item`, shared with every other menu in the system.
-const MENU_GROUP = 'components/navigation/MenuGroup/MenuGroup.scss';
+const MENU_GROUP = 'components/forms-and-inputs/_internal/MenuGroup.scss';
 
 test('Menu item: neutral hovered and pressed, selected neutral ink, focus ring only', () => {
   expectRule(MENU_GROUP, '.plus-menu-item:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
@@ -250,10 +250,10 @@ test('Tabs: neutral subtle hovered and pressed on every tab, focus a ring with n
 test('Checkbox: unchecked hover is the input hovered fill; a checked box steps to selected.bold.hovered', () => {
   const file = 'components/forms-and-inputs/Checkbox/Checkbox.scss';
   const control = '.plus-form-checkbox';
-  expectRule(file, `${control}:hover:not([data-disabled]):not([data-checked]):not([data-indeterminate])`, {
+  expectRule(file, `${control}:hover:not([data-disabled]):not([data-readonly]):not([data-checked]):not([data-indeterminate])`, {
     'background-color': layer('--ds-background-input-hovered'),
   });
-  for (const checked of ['[data-checked]:hover:not([data-disabled])', '[data-indeterminate]:hover:not([data-disabled])']) {
+  for (const checked of ['[data-checked]:hover:not([data-disabled]):not([data-readonly])', '[data-indeterminate]:hover:not([data-disabled]):not([data-readonly])']) {
     const decls = declarations(sheet(file), `${control}${checked}`);
     assert.equal(decls['background-color'], layer('--ds-background-selected-bold-hovered'), `${checked} does not take the hovered step`);
     assert.equal(decls['box-shadow'], undefined, `${checked} still lays a layer over the fill`);
@@ -263,10 +263,10 @@ test('Checkbox: unchecked hover is the input hovered fill; a checked box steps t
 test('Radio: unchecked hover is the input hovered fill; a checked radio steps to selected.bold.hovered', () => {
   const file = 'components/forms-and-inputs/Radio/Radio.scss';
   const control = '.plus-form-radio';
-  expectRule(file, `${control}:hover:not([data-disabled]):not([data-checked])`, {
+  expectRule(file, `${control}:hover:not([data-disabled]):not([data-readonly]):not([data-checked])`, {
     'background-color': layer('--ds-background-input-hovered'),
   });
-  const checked = declarations(sheet(file), `${control}[data-checked]:hover:not([data-disabled])`);
+  const checked = declarations(sheet(file), `${control}[data-checked]:hover:not([data-disabled]):not([data-readonly])`);
   assert.equal(checked['background-color'], layer('--ds-background-selected-bold-hovered'), 'a checked radio does not take the hovered step');
   assert.equal(checked['background-image'], undefined, 'a checked radio draws its dot with a separate indicator span, not background-image');
 });
@@ -274,10 +274,10 @@ test('Radio: unchecked hover is the input hovered fill; a checked radio steps to
 test('Toggle: hover steps the track, neutral bold off and selected bold on', () => {
   const file = 'components/forms-and-inputs/Toggle/Toggle.scss';
   const track = '.plus-toggle';
-  expectRule(file, `${track}:hover:not([data-disabled]):not([data-checked])`, {
+  expectRule(file, `${track}:hover:not([data-disabled]):not([data-readonly]):not([data-checked])`, {
     'background-color': layer('--ds-background-neutral-bold-hovered'),
   });
-  expectRule(file, `${track}[data-checked]:hover:not([data-disabled])`, {
+  expectRule(file, `${track}[data-checked]:hover:not([data-disabled]):not([data-readonly])`, {
     'background-color': layer('--ds-background-selected-bold-hovered'),
   });
 });

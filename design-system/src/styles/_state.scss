@@ -42,7 +42,7 @@
 // does) and reach for `plus-ring($ring-token: Highlight)` only for a
 // standalone forced-colors block of a part's own.
 // `$important: true` marks the ring's declarations `!important`, for a native
-// control (Radio) still overriding a Bootstrap rule of its own.
+// control (Radio) overriding a browser default of its own.
 //
 // `$hovered-selector` / `$pressed-selector` / `$selected-selector` /
 // `$disabled-selector` replace the default selector list for that state, for

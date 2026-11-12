@@ -9,7 +9,7 @@ Status: **LIVE** — Design HQ · Prototype Marketplace.
 - Database `397b7cca-4982-8002-826c-c45e2baa8e4f` — https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f
 - Data source `397b7cca-4982-80d8-9967-000b69521ce9`
 
-**Source of truth: this Notion DB.** The in-app `/market` UI is retired. On `main`: Storybook + the tutor revamp (`/prototypes/tutor-revamp/`). The Vibe app and the Full Demo Walkthrough (id `1028`) are on the `archive/legacy-ds` branch, and their URLs redirect to Storybook. Experiments use branch Deploy Previews / standalone Netlify.
+**Source of truth: this Notion DB.** The in-app `/market` UI is retired. On `main`: Storybook only. The Vibe app and the Full Demo Walkthrough (id `1028`) are on the `archive/legacy-ds` branch, and their URLs redirect to Storybook. Experiments use branch Deploy Previews / standalone Netlify.
 
 ## Why Notion (vs. the old JS marketplace UI)
 
@@ -43,7 +43,7 @@ A given field whose column the live schema lacks goes in the page body as a `**P
 
 | Context | URL pattern | When |
 |---|---|---|
-| **Production** | `https://plus-uno.netlify.app/prototypes/{slug}/` | A prototype `main` builds (today only `tutor-revamp`), with its build in `build:all` and its redirect in `netlify.toml` |
+| **Production** | `https://plus-uno.netlify.app/prototypes/{slug}/` | A prototype `main` builds; none does today |
 | **Deploy Preview** | `https://deploy-preview-{PR#}--plus-uno.netlify.app/{path}` | Open a PR against `main` — Netlify builds the whole site |
 | **Branch deploy** | `https://{branch-name}--plus-uno.netlify.app/{path}` | If branch deploys are enabled for the site (same build as prod) |
 

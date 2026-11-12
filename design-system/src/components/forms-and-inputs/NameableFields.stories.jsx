@@ -119,7 +119,7 @@ HidingTheLabelKeepsTheName.play = async ({ canvasElement }) => {
 /**
  * A field with no label of its own takes its name from the caller.
  *
- * A plain `Select` is a `div role="combobox"`, which a `<label for>` cannot
+ * A plain `Select` (`isSearchable={false}`) is a `div role="combobox"`, which a `<label for>` cannot
  * name, and `DatePicker` has no `label` prop. For both, `aria-label` or
  * `aria-labelledby` passed by the caller is the only route to a name, so the
  * component has to hand those on to the control rather than drop them.
@@ -130,6 +130,7 @@ export const CallerPropsNameTheControl = () => (
         <Select
             id="nf-subject"
             aria-label="Subject"
+            isSearchable={false}
             options={[{ value: 'maths', label: 'Maths' }, { value: 'english', label: 'English' }]}
         />
         <Select

@@ -11,6 +11,7 @@ import { Icon } from '@/components';
  * a 16 icon box and a Body/default 14/20 label that truncates.
  *
  * Slots, after Atlassian's side-nav item:
+ * - `iconBefore`: the icon, by Font Awesome Free name. Leave it out for a row with no icon.
  * - `description`: a second line in Body/small. The row grows past 32 to hold it.
  * - `elemAfter`: a count, a badge or a status at the end of the row.
  * - `actionsOnHover`: controls (⋯, ×) that show on hover and while the row has
@@ -41,10 +42,8 @@ import { Icon } from '@/components';
  */
 const SidebarTab = ({
     text,
-    icon,
+    iconBefore,
     state = 'enabled',
-    leadingVisual = true,
-    trailingVisual = false,
     description,
     elemAfter,
     actionsOnHover,
@@ -66,18 +65,11 @@ const SidebarTab = ({
         className,
     ].filter(Boolean).join(' ');
 
-    // `trailingVisual` is the older placeholder glyph; `elemAfter` is the slot that replaces it.
-    const after = elemAfter ?? (trailingVisual ? (
-        <span className="plus-sidebar-tab__icon" aria-hidden="true">
-            <Icon name="icons" />
-        </span>
-    ) : null);
-
     const content = (
         <>
-            {leadingVisual && icon && (
+            {iconBefore && (
                 <span className="plus-sidebar-tab__icon" aria-hidden="true">
-                    <Icon name={icon} />
+                    <Icon name={iconBefore} />
                 </span>
             )}
             <span className="plus-sidebar-tab__text">
@@ -85,7 +77,7 @@ const SidebarTab = ({
                 {description ? <span className="plus-sidebar-tab__description">{description}</span> : null}
             </span>
             {isLink && external ? <span className="visually-hidden">(opens in a new tab)</span> : null}
-            {after ? <span className="plus-sidebar-tab__after">{after}</span> : null}
+            {elemAfter ? <span className="plus-sidebar-tab__after">{elemAfter}</span> : null}
         </>
     );
 
@@ -149,14 +141,10 @@ const SidebarTab = ({
 SidebarTab.propTypes = {
     /** The label. It truncates with an ellipsis past the row's width. */
     text: PropTypes.string.isRequired,
-    /** Font Awesome Free solid name for the 16 leading icon, e.g. `house` */
-    icon: PropTypes.string,
+    /** Font Awesome Free name for the 16 icon before the label, e.g. `house`; drawn outlined, selected or not */
+    iconBefore: PropTypes.string,
     /** `hover` and `focus` are documentation values; drive only `enabled`, `selected` and `disabled`. */
     state: PropTypes.oneOf(['enabled', 'hover', 'selected', 'disabled', 'focus']),
-    /** Show the leading icon */
-    leadingVisual: PropTypes.bool,
-    /** Older placeholder glyph at the end of the row. Prefer `elemAfter`, which wins when both are set. */
-    trailingVisual: PropTypes.bool,
     /** A second line under the label, in Body/small */
     description: PropTypes.node,
     /** A count, badge or status at the end of the row */

@@ -1,0 +1,32 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="Libraries/Overview" tags={['!dev']} />
+
+<FoundationHero
+    title="Libraries"
+    summary="The few libraries PLUS builds on, what each is for, which component wraps it and what not to do with it."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Overview">
+
+A library is used through the PLUS component that wraps it. Product code imports the component from the `@/components` barrel and never reaches for the library underneath. Each page below says what the library is for, what wraps it and what to leave alone.
+
+</FoundationSection>
+
+<FoundationSection title="Pages">
+
+- <DocsLink id="libraries-base-ui">Base UI</DocsLink>: behavior for every interactive component.
+- <DocsLink id="libraries-font-awesome">Font Awesome</DocsLink>: the icon glyphs, Free styles only.
+- <DocsLink id="libraries-highcharts">Highcharts</DocsLink>: the charts, on its non-commercial terms.
+- <DocsLink id="libraries-motion">Motion</DocsLink>: the duration and easing tokens every transition reads.
+
+</FoundationSection>
+
+<FoundationSection title="Not yet">
+
+Drag and drop has no library yet. When a component needs it, it is added here with the component that wraps it, on the same footing as the others: headless, keyboard-first and styled on the tokens.
+
+</FoundationSection>

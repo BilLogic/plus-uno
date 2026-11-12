@@ -1,11 +1,10 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Button, CloseButton, TextField } from '@/components';
+import { Button, TextField } from '@/components';
 import { ModeCompare, Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import { expect } from 'storybook/test';
-import { applyColorModes } from '@/storybook-docs/lib/color-modes.js';
+import { applyColorModes, resolveColorScheme } from '@/storybook-docs/lib/color-modes.js';
 import { emulateColorPreferences } from '@/storybook-docs/lib/test-viewport.js';
-import { BRIDGE_TRIPLETS } from '../../../scripts/lib/color/emit.mjs';
 import figmaSpec from '../tokens/color/figma-spec.json';
 import { iconClass } from '../lib/icon';
 
@@ -320,7 +319,7 @@ export const FocusIsARing = () => (
  * means light at standard contrast. `auto` follows the OS's
  * `prefers-color-scheme` and `prefers-contrast`. The decorator in
  * `.storybook/preview.jsx` sets them from the toolbar through
- * `applyColorModes`, plus Bootstrap's `data-bs-theme`.
+ * `applyColorModes`.
  *
  * WHAT THE PLAY FUNCTIONS HOLD.
  *   - Modes: every color role resolves to the Plan A primitive the generated
@@ -329,11 +328,7 @@ export const FocusIsARing = () => (
  *     is light; and, inside the test runner, `auto` lands on the right mode
  *     under each OS preference Playwright emulates.
  *   - FromToolbar: the toolbar globals, through the real decorator, put the
- *     right three attributes on <html>, and `applyColorModes` resolves
- *     `data-bs-theme` from the OS under auto.
- *   - BootstrapBridge: Bootstrap's modal, dropdown and form
- *     markup paints the `--ds-*` roles in light and dark, and every `*-rgb`
- *     triplet the bridge writes is its role's color in all four modes.
+ *     right two attributes on <html>, and the tokens follow them.
  * Each restores the attributes and the emulation when it is done, so the a11y
  * check and later story files see the page as the toolbar left it.
  */
@@ -513,7 +508,7 @@ const valuesIn = (colorMode, contrastMode) => {
 /** Restores the mode attributes as they were, whatever `run` did. */
 const keepingModes = async (run) => {
     const root = document.documentElement;
-    const attributes = [...MODE_ATTRIBUTES, 'data-bs-theme'];
+    const attributes = MODE_ATTRIBUTES;
     const saved = attributes.map((a) => root.getAttribute(a));
     try {
         await run();
@@ -580,152 +575,24 @@ FromToolbar.globals = { plusColorMode: 'dark', plusContrastMode: 'more' };
 
 const attributesOnRoot = () => {
     const root = document.documentElement;
-    return ['data-color-mode', 'data-contrast-mode', 'data-bs-theme'].map((a) => root.getAttribute(a));
+    return MODE_ATTRIBUTES.map((a) => root.getAttribute(a));
 };
 
 FromToolbar.play = async () => {
     // Set by the decorator from this story's globals, before render.
-    await expect(attributesOnRoot(), 'the toolbar globals reach <html>').toEqual(['dark', 'more', 'dark']);
+    await expect(attributesOnRoot(), 'the toolbar globals reach <html>').toEqual(['dark', 'more']);
     await expect(readToken('--ds-text'), 'and the tokens follow').toBe(specValue('--ds-text', 'Dark IC'));
 
     await keepingModes(async () => {
         applyColorModes('light', 'no-preference');
-        await expect(attributesOnRoot(), 'light').toEqual(['light', 'no-preference', 'light']);
+        await expect(attributesOnRoot(), 'light').toEqual(['light', 'no-preference']);
         await withEmulation(async () => {
             await emulateColorPreferences('dark', null);
             applyColorModes('auto', 'auto');
-            await expect(attributesOnRoot(), 'auto under OS dark').toEqual(['auto', 'auto', 'dark']);
+            await expect(attributesOnRoot(), 'auto').toEqual(['auto', 'auto']);
+            await expect(resolveColorScheme('auto'), 'auto under OS dark').toBe('dark');
             await emulateColorPreferences('light', null);
-            applyColorModes('auto', 'auto');
-            await expect(attributesOnRoot(), 'auto under OS light').toEqual(['auto', 'auto', 'light']);
+            await expect(resolveColorScheme('auto'), 'auto under OS light').toBe('light');
         });
     });
 };
-
-/* --------------------------------------------------------- bootstrap bridge */
-
-/**
- * Bootstrap's own markup, with no PLUS styling: the generated
- * bridge points Bootstrap's root `--bs-*` variables at the `--ds-*` roles, so
- * these follow the color and contrast modes from the toolbar.
- */
-export const BootstrapBridge = () => (
-    <div
-        data-testid="bootstrap-bridge"
-        style={{
-            background: 'var(--ds-surface)',
-            color: 'var(--ds-text)',
-            padding: 'var(--card-pad-default) var(--card-pad-default)',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(18rem, 1fr))',
-            gap: 'var(--card-stack-md)',
-            alignItems: 'start',
-        }}
-    >
-        <div className="modal position-static d-block" style={{ height: 'auto' }}>
-            <div className="modal-dialog m-0">
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <h2 className="modal-title fs-5">Modal</h2>
-                        <CloseButton />
-                    </div>
-                    <div className="modal-body">The dialog surface, body text and border.</div>
-                </div>
-            </div>
-        </div>
-        <div className="dropdown-menu show position-static">
-            <span className="dropdown-item-text">Dropdown</span>
-            <a className="dropdown-item" href="#">An item</a>
-            <a className="dropdown-item active" href="#" aria-current="true">The active item</a>
-            <hr className="dropdown-divider" />
-            <a className="dropdown-item" href="#">Another item</a>
-        </div>
-        <form>
-            <div className="mb-3">
-                <label className="form-label" htmlFor="bridge-text">Text input</label>
-                <input className="form-control" id="bridge-text" placeholder="Placeholder" />
-            </div>
-            <div className="mb-3">
-                <label className="form-label" htmlFor="bridge-select">Select</label>
-                <select className="form-select" id="bridge-select" defaultValue="one">
-                    <option value="one">One</option>
-                    <option value="two">Two</option>
-                </select>
-            </div>
-            <div className="mb-3">
-                <label className="form-label" htmlFor="bridge-invalid">Invalid input</label>
-                <input className="form-control is-invalid" id="bridge-invalid" defaultValue="Wrong" />
-                <div className="invalid-feedback">The danger text role.</div>
-            </div>
-            <div className="mb-3">
-                <label className="form-label" htmlFor="bridge-disabled">Disabled input</label>
-                <input className="form-control" id="bridge-disabled" disabled defaultValue="Disabled" />
-            </div>
-            <div className="form-check">
-                <input className="form-check-input" type="checkbox" id="bridge-check" defaultChecked />
-                <label className="form-check-label" htmlFor="bridge-check">Checkbox</label>
-            </div>
-            <div className="form-check form-switch">
-                <input className="form-check-input" type="checkbox" role="switch" id="bridge-switch" defaultChecked />
-                <label className="form-check-label" htmlFor="bridge-switch">Switch</label>
-            </div>
-        </form>
-    </div>
-);
-
-BootstrapBridge.play = async ({ canvasElement }) => keepingModes(async () => {
-    const root = canvasElement.querySelector('[data-testid="bootstrap-bridge"]');
-    const probe = document.createElement('span');
-    root.append(probe);
-    /** A CSS color as the browser computes it, so values compare as `rgb(…)` strings. */
-    const resolve = (value) => {
-        probe.style.color = value;
-        return getComputedStyle(probe).color;
-    };
-    const style = (selector) => getComputedStyle(root.querySelector(selector));
-    // Bootstrap transitions controls' colors, so a read right after a mode
-    // switch would land mid-fade.
-    root.querySelectorAll('.form-control, .form-select, .form-check-input, .dropdown-item').forEach((el) => { el.style.transition = 'none'; });
-    const painted = {};
-    try {
-        for (const [mode, [color, contrast]] of Object.entries(SPEC_MODES)) {
-            applyColorModes(color, contrast);
-            for (const [triplet, role] of Object.entries(BRIDGE_TRIPLETS)) {
-                await expect(resolve(`rgb(var(${triplet}))`), `${triplet} in ${mode}`).toBe(resolve(`var(${role})`));
-            }
-        }
-        for (const mode of ['light', 'dark']) {
-            applyColorModes(mode, 'no-preference');
-            const surface = resolve('var(--ds-surface)');
-            const text = resolve('var(--ds-text)');
-            await expect(style('.modal-content').backgroundColor, `Modal surface, ${mode}`).toBe(surface);
-            await expect(style('.modal-body').color, `Modal text, ${mode}`).toBe(text);
-            await expect(style('.dropdown-menu').backgroundColor, `Dropdown surface, ${mode}`).toBe(surface);
-            await expect(style('.dropdown-item:not(.active)').color, `Dropdown item, ${mode}`).toBe(text);
-            await expect(style('#bridge-text').backgroundColor, `input fill, ${mode}`).toBe(surface);
-            await expect(style('#bridge-text').color, `input text, ${mode}`).toBe(text);
-            await expect(style('#bridge-text').borderTopColor, `input border, ${mode}`).toBe(resolve('var(--ds-border)'));
-            await expect(style('#bridge-disabled').backgroundColor, `disabled input, ${mode}`).toBe(resolve('var(--ds-surface-hovered)'));
-            await expect(style('.invalid-feedback').color, `invalid feedback, ${mode}`).toBe(resolve('var(--ds-text-danger)'));
-            const selectedBold = resolve('var(--ds-background-selected-bold)');
-            await expect(style('#bridge-check').backgroundColor, `checked checkbox fill, ${mode}`).toBe(selectedBold);
-            await expect(style('#bridge-check').borderTopColor, `checked checkbox border, ${mode}`).toBe(selectedBold);
-            await expect(style('#bridge-switch').backgroundColor, `checked switch fill, ${mode}`).toBe(selectedBold);
-            await expect(style('.dropdown-item.active').backgroundColor, `active dropdown item, ${mode}`).toBe(resolve('var(--ds-background-selected)'));
-            await expect(style('.dropdown-item.active').color, `active dropdown text, ${mode}`).toBe(resolve('var(--ds-text-selected)'));
-            const input = root.querySelector('#bridge-text');
-            input.focus();
-            const focused = getComputedStyle(input);
-            await expect(focused.outlineColor, `focus ring, ${mode}`).toBe(resolve('var(--ds-border-focused)'));
-            await expect([focused.outlineStyle, focused.outlineWidth, focused.outlineOffset], `focus ring shape, ${mode}`).toEqual(['solid', '2px', '2px']);
-            await expect(focused.boxShadow, `no glow, ${mode}`).toBe('none');
-            await expect(focused.borderTopColor, `focused border, ${mode}`).toBe(resolve('var(--ds-border)'));
-            input.blur();
-            await expect(document.documentElement.getAttribute('data-bs-theme'), `data-bs-theme, ${mode}`).toBe(mode);
-            painted[mode] = style('.modal-content').backgroundColor;
-        }
-        await expect(painted.dark, 'the modal changes surface between light and dark').not.toBe(painted.light);
-    } finally {
-        probe.remove();
-    }
-});

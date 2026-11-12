@@ -2,7 +2,7 @@ import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from '
 import PropTypes from 'prop-types';
 import Tag, { TagContext, resolveTagKind, useTagContext } from '../Tag';
 import DropdownMenu from '../../forms-and-inputs/DropdownMenu';
-import { ButtonItem, CustomItem } from '@/components/navigation/MenuGroup';
+import { ButtonItem, CustomItem } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import Icon from '../../images-and-icons/Icon';
 import './TagGroup.scss';
 
@@ -262,8 +262,8 @@ export const TagGroup = ({
     const menuIsOpen = menuOpen && !isDisabled;
 
     /*
-     * The `+n` is the Figma set's: a gray selectable tag with no swatch (the
-     * swatch is hidden in TagGroup.scss). It opens something rather than
+     * The `+n` is the Figma set's: a gray selectable tag with no swatch
+     * (a tag has none unless `swatchBefore` asks). It opens something rather than
      * toggling, so it reports `aria-expanded`, which is also what keeps Tag
      * from announcing it as a toggle.
      */

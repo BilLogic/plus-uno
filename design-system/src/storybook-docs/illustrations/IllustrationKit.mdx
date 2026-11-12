@@ -1,0 +1,61 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection } from '@/storybook-docs/foundation-page.jsx';
+import { IllustrationKitGallery } from '@/storybook-docs/illustrations/IllustrationKitGallery.jsx';
+import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
+import { ThreeLayers, OpeningARecord } from '@/storybook-docs/illustrations/compositions.jsx';
+
+<Meta title="Get started/Illustration kit" tags={['!dev']} />
+
+<FoundationHero
+    kind="Guide"
+    title="Illustration kit"
+    summary="The building blocks every Templates and Patterns drawing is made from."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Drawing rules">
+
+- Paint with design-system tokens only: color, stroke and corner. The kit follows light and dark on its own.
+- Pick each example's fidelity by what the lesson depends on. Remove every word in your head: if the lesson still holds, draw it abstract.
+  - **Concrete:** the lesson is a component's look, states, behavior or wording, such as anatomy, states, content do's and don'ts, or an interaction. Use a live story with real content, not a drawing.
+  - **Real subject:** the lesson is one element inside a screen, such as which action is primary, a label, or one piece's placement. Draw that element real, with its words, and keep everything around it blocked out.
+  - **Blocked out:** the lesson is structure across screens, such as layout options, which surface opens, alignment, phases, or many variants side by side. Use no words, and draw buttons as flat strips.
+  - Motion follows the same split. A component's own motion is a live story. A principle such as easing, choreography or stagger animates blocked-out shapes. One element moving inside a screen animates the real subject over a blocked-out context.
+- Draw skeleton bars where text would sit. Words appear only on a real subject; the rest goes in the caption beside the drawing.
+- Draw buttons only in shipped appearances: primary, the brand fill, on the subject; default, the neutral fill, everywhere else.
+- Keep one scale per set and equal margins around every drawing, balanced by eye.
+- Give each drawing one accent, and place it on the subject.
+
+</FoundationSection>
+
+<FoundationSection title="Primitives">
+
+Each primitive takes a position, a size and an `accent` flag. The top drawing is neutral and the bottom one is accented. Button shows its two fidelities instead: blocked out on top, real below.
+
+<IllustrationKitGallery />
+
+</FoundationSection>
+
+<FoundationSection title="Compositions">
+
+<IllustrationFigure caption="Three layers: the accent follows one button from a component, into a template, onto a pattern's frame.">
+    <ThreeLayers />
+</IllustrationFigure>
+
+<IllustrationFigure caption="Opening a record, lightest to heaviest: popup, panel, modal, page. Pick the lowest step that fits.">
+    <OpeningARecord />
+</IllustrationFigure>
+
+</FoundationSection>
+
+<FoundationSection title="Contributing">
+
+Every docs drawing, static or animated, comes from this one kit. Template, pattern and motion pages all draw from it and add to it.
+
+- Check the primitives above first. Extend one before you add another, the same way components grow.
+- A new primitive takes `x`, `y`, `w`, `h` and `accent`, plus `label` where it has a real fidelity. It paints from `paint.js` only.
+- Give it a gallery entry, neutral above and accented below, and keep the kit story test passing.
+- Animated drawings move kit primitives on the spring tokens and settle to a still frame under reduced motion. The motion layer lives beside the primitives in this folder.
+
+</FoundationSection>
