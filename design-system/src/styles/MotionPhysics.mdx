@@ -82,7 +82,7 @@ Expressive marks the end of something worth finishing, a few times a week at mos
     rows={[
         [<C>fast</C>, 'Small things, short distances', 'Toggle thumb, Popup, a row, a tab indicator'],
         [<C>default</C>, 'Mid-size layers, short travel', 'Modal, Flag, content changing in place, the Sidebar opening, a row growing into its record (Drill, because it repeats all day)'],
-        [<C>slow</C>, 'Large layers, long travel', 'Drawer, a docking Panel, a whole page that slides; anything traveling more than about 600 px'],
+        [<C>slow</C>, 'Large layers, long travel', 'A floating Panel, a docking Panel, a whole page that slides; anything traveling more than about 600 px'],
     ]}
 />
 
@@ -94,7 +94,7 @@ Expressive marks the end of something worth finishing, a few times a week at mos
 
 Two questions decide how something leaves.
 
-1. **Can it come back?** If yes (a Drawer, the Sidebar, a Panel), it reverses its entrance one speed faster (`fast` stays `fast`) and settles at the edge, held there.
+1. **Can it come back?** If yes (a floating Panel, the Sidebar, a docked Panel), it reverses its entrance one speed faster (`fast` stays `fast`) and settles at the edge, held there.
 2. **If it is gone for good, who started it?**
    - **The system** (a Flag timing out): `spatial.exit`. It is aimed 3.8 times past the edge, so it is still speeding up when it crosses and leaves at full speed.
    - **The person, with a click** (a close button, a deleted row): a quick fade on `appearance.fast`, in place. The rows around a deleted row close the gap on `spatial.fast`.
@@ -201,7 +201,7 @@ Size and distance set the speed. How often it happens decides only whether it tr
     rows={[
         ['A part of a control (thumb, indicator, chevron)', <C>spatial.fast</C>],
         ['A layer (Popup, Modal, Flag)', <C>spatial.default</C>],
-        ['A page, a whole view, or a layer crossing much of the screen (Drawer, docked Panel)', <C>spatial.slow</C>],
+        ['A page, a whole view, or a layer crossing much of the screen (floating Panel, docked Panel)', <C>spatial.slow</C>],
     ]}
 />
 

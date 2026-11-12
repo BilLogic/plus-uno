@@ -61,7 +61,7 @@ Use Disabled when something on the page cannot be used right now. Reach for it l
 - Read-only: use when the value must be read.
 - Forms: use for the enabled submit.
 - Common actions: use for the sending button.
-- Navigation: use for the Sidebar's locked Toolkit; it lands as its own pattern page.
+- Navigation: use for the Sidebar's locked Toolkit.
 - `Button`, `IconButton`, `Select`, `Checkbox`, `RadioGroup`, `Toggle`, `DropdownMenu`, `SectionMessage`: the components.
 
 ## Best practices

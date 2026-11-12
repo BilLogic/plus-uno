@@ -84,7 +84,7 @@ every visit.
 
 ## Accessibility
 
-- **A dialog, not a tooltip.** The callout is a popover with a title and a
+- **A dialog, not a tooltip.** The callout is a Popup with a title and a
   description, read together when it opens.
 - **The dismiss control is the first focusable element.** Tab reaches it
   before the body or the actions, so closing never requires finding the

@@ -63,9 +63,9 @@ Use Errors whenever something failed and the person needs to know. Put the messa
 ## Related
 
 - Forms: use for when a field is checked.
-- Empty: use for the slot a load failure takes; it lands as its own pattern page.
-- Notifications: use for the Flag and Banner tiers; it lands as its own pattern page.
-- Loading: use for a menu's Loading row before it fails; it lands as its own pattern page.
+- Empty: use for the slot a load failure takes.
+- Notifications: use for the Flag and Banner tiers.
+- Loading: use for a menu's Loading row before it fails.
 - Disabled: use for a caution before something goes wrong.
 - `SectionMessage`, `Flag`, `Banner`, `EmptyState`, `TextField`: the components.
 

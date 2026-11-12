@@ -77,7 +77,9 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 
 - Common actions: use for where the buttons sit and which look they take.
 - Form: use for how a form sits in each host.
-- Patterns: use when you need Loading, Disabled or Errors.
+- Loading: use for a form that is sending.
+- Disabled: use for a submit that cannot run yet.
+- Errors: use for where a failed save shows.
 
 ## Motion
 

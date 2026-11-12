@@ -70,7 +70,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 ## Related
 
 - Overflow: use for the breadcrumb middle and open-item names.
-- Search: use for narrowing as you type inside a view; it lands as its own pattern page.
+- Search: use for narrowing as you type inside a view.
 - Filtering: use for narrowing a view by attributes.
 - Indicators: use for counts on Sidebar items.
 - Frame, Page, Section: use for the drawn shells.
