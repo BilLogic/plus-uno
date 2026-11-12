@@ -7,7 +7,7 @@ import {
     FoundationSubsection,
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
-import { SpringTokenTable } from '@/storybook-docs/illustrations/motion-physics.jsx';
+import { SpringTokenTable, OneSpringFiveWays } from '@/storybook-docs/illustrations/motion-physics.jsx';
 import * as PhysicsStories from './MotionPhysics.stories.jsx';
 
 <Meta of={PhysicsStories} />
@@ -121,6 +121,59 @@ An exit is shorter than its entrance and lands without a bounce. A floating laye
 
 </FoundationSection>
 
+<FoundationSection title="Velocity">
+
+What a hand moves keeps the hand's speed.
+
+- **Dragging, splitters, swipes and scrubbing run a live spring** that starts from the release velocity, so nothing jumps when the hand lets go.
+- **Opening, closing and selecting use the token as CSS.** There is no velocity to carry.
+- **Past a limit, it resists, then returns** with the hand's speed. The limit stays visible without a hard stop (Damping at a limit, below).
+- **A throw is decided by where it would land,** so a short fast flick dismisses and a long slow drag that lets go does not.
+- **The decision shows before release** as an armed state, so the person can still take it back.
+- **Gestures stay contained:** a press is not a drag, and the page never scrolls under the hand.
+
+Values for engineers: projected rest = velocity ÷ 1000 × 0.998 ÷ 0.002; resistance follows √overshoot × 4 px and returns on `spatial.fast`; 3 px slop before a drag starts, pointer capture, `touch-action: none`.
+
+<FoundationSubsection title="A throw keeps the hand's speed">
+
+The same throw twice. Only whether the spring is handed the hand's speed changes.
+
+<Canvas of={PhysicsStories.Throw} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Where it would land decides">
+
+Both pulls end the same way, with a release. A short, fast flick would carry it past halfway, so it is armed and leaves. A longer, slower drag would come to rest short of halfway, so it returns.
+
+<Canvas of={PhysicsStories.ThrowDecision} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Interruption">
+
+A spring can be reversed at any moment, from where it is and at the speed it has. The second press wins at once, and nothing waits for an animation to end before it answers.
+
+<Canvas of={PhysicsStories.Interruption} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Weight">
+
+Pixels weigh nothing, so weight in PLUS is conceptual: how much a thing holds, and how much it costs to undo. It is chosen by token, never by mass (every token is mass 1).
+
+**Size.** Bigger things travel on slower tokens: a control on `fast`, a layer on `default`, a page on `slow` (Speed follows size and distance, above).
+
+**What you carry.** Something dragged follows the pointer on a spring, and how closely it follows says how much it holds. A tag or a name keeps right under the pointer on `spatial.fast`. A whole card, which carries a record, trails a touch on `spatial.default` and settles a beat after the drop. Neither bounces: weight shows as lag, never as wobble. The lag stays small; a carried thing that falls far behind the hand reads as slow, not heavy.
+
+<Canvas of={PhysicsStories.Carry} sourceState="none" />
+
+**What it costs.** A destructive action is heavy in a different way: it gets friction, not slower motion. Deleting or removing something that can't be undone asks for a second, deliberate step (a Modal that names what goes). The animation stays on its normal token; the weight is in the extra step.
+
+</FoundationSection>
+
 <FoundationSection title="Damping">
 
 Damping is how much a motion is held back. In the spring itself, it is how far the motion passes its target.
@@ -128,6 +181,74 @@ Damping is how much a motion is held back. In the spring itself, it is how far t
 These four share one stiffness, `spatial.default`'s, and differ only in damping ratio. The line under each is its position over time; the dashed line is the target. Productive motion uses ratio 1 everywhere. Expressive uses 0.8 and, for small things thrown with energy, 0.6. Every token stays at 0.6 or above: below that a spring rings, swinging back and forth before it settles.
 
 <Canvas of={PhysicsStories.Damping} sourceState="none" />
+
+<FoundationSubsection title="Damping at a limit">
+
+Dragged past where it can go, a thing moves less and less instead of stopping dead: the square root of the extra distance, × 4 px. On release it springs back on `spatial.fast` with the hand's speed. The limit is felt before it is seen, and the interface never freezes under the hand.
+
+<Canvas of={PhysicsStories.Limit} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Choosing a spring">
+
+Size and distance set the speed. How often it happens decides only whether it travels.
+
+<RefTable
+    head={['Size', 'Token']}
+    rows={[
+        ['A part of a control (thumb, indicator, chevron)', <C>spatial.fast</C>],
+        ['A layer (Popup, Modal, Flag)', <C>spatial.default</C>],
+        ['A page, a whole view, or a layer crossing much of the screen (Drawer, docked Panel)', <C>spatial.slow</C>],
+    ]}
+/>
+
+<RefTable
+    head={['How often', 'What moves']}
+    rows={[
+        ['Dozens a day', <>Color and parts only; a page fades in place on <C>appearance.fast</C></>],
+        ['Once a session', 'It travels on its size’s token'],
+        ['A milestone', 'Expressive, on the one card only'],
+    ]}
+/>
+
+- A page never cuts.
+- From the keyboard, controls and Popups open with no animation; layers and pages keep their motion.
+- Focus rings never animate.
+
+</FoundationSection>
+
+<FoundationSection title="Reduced motion">
+
+When someone turns on reduce motion in their system settings, PLUS switches to Reduced mode. It is a mapping, not a fourth set of springs.
+
+<RefTable
+    head={['Family', 'In Reduced mode']}
+    rows={[
+        [<C>spatial</C>, <>Replaced by an <C>appearance.fast</C> fade in the final place and size. Never a cut</>],
+        [<C>appearance</C>, <>One short fade on <C>appearance.fast</C> (about 100 ms), so a change is still noticed</>],
+        [<C>linear</C>, 'Progress and countdowns keep moving, because they carry information. Skeleton shimmer stops'],
+        ['Loops', 'Stop, and become a static label'],
+        ['Decorative motion', 'Removed, not shortened: Expressive overshoot (the card and the Flag simply fade in), shape morphing, parallax'],
+        ['Shake', 'None. Color, icon, message and focus carry the error'],
+    ]}
+/>
+
+Nothing flashes more than three times a second. Anything that moves for more than 5 s on its own has a pause.
+
+<Canvas of={PhysicsStories.ReducedMotion} sourceState="none" />
+
+</FoundationSection>
+
+<FoundationSection title="One spring, five ways">
+
+One token, written for each target it ships to. Damping = 2 × ratio × √(stiffness × mass), and response = 2π ÷ √stiffness.
+
+<OneSpringFiveWays />
+
+**Loops in CSS.** CSS can't repeat a generated `linear()` easing, so `motion.loop` ships as its own sine shape running back and forth over half a cycle (600 ms, alternating). It is the spring written the only way CSS can repeat it.
 
 </FoundationSection>
 

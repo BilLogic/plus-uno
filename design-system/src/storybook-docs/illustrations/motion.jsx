@@ -103,7 +103,6 @@ function createContext({ scene, getState, setState, track, instant, isLive }) {
     get state() {
       return getState();
     },
-    instant,
     set,
     /** Move one state key to a value on a spring token (or a config). */
     spring: (key, to, token, { mode, velocity } = {}) =>
