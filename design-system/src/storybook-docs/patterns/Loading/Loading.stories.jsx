@@ -3,7 +3,6 @@ import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import {
     BANDS,
     LoadingAction,
@@ -241,19 +240,20 @@ export const TimelineWalksTheBands = {
     },
 };
 
-/** Play runs the clock to the end and stops there; under reduced motion it steps a band at a time and the shimmer holds still. */
+/**
+ * Play runs the clock to the end and stops there; under reduced motion it steps a band at a time and the shimmer holds still.
+ * The story passes `reduced` itself and never emulates the OS preference: that is page-wide and shared with story files running at the same time.
+ */
 export const TimelineReducedMotion = {
     name: 'Timeline: reduced motion',
     tags: ['test-only'],
     render: () => staged(<LoadingTimeline kind="list" seconds={0} reduced />),
-    beforeEach: async () => async () => { await emulateReducedMotion(null); },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Play' }));
         await waitFor(() => expect(canvas.getByText('Still loading students')).toBeInTheDocument(), { timeout: 4000 });
         await waitFor(() => expect(canvas.getByRole('button', { name: 'Play' }), 'Play stops at the end').toBeInTheDocument());
         await expect(canvas.getByText(`${TIMELINE_MAX.toFixed(1)} s`)).toBeInTheDocument();
-        if (!(await emulateReducedMotion('reduce'))) return;
         for (const bar of bars(canvasElement)) {
             await expect(getComputedStyle(bar).animationName, 'the shimmer holds still').toBe('none');
         }
