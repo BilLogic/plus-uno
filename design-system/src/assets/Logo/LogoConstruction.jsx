@@ -2,7 +2,7 @@ import React from 'react';
 import Logo from './Logo';
 import './LogoConstruction.scss';
 import {
-    BOX, CIRCLES, CONSTRUCTION_RADII, DIAGONALS, GRID, KEY_CORNERS, PLUS_BOX,
+    BOX, CIRCLES, CONSTRUCTION_RADII, CORNER_CENTERS, DIAGONALS, GRID, PLUS_BOX,
 } from './logoConstructionGeometry.js';
 
 /**
@@ -60,7 +60,7 @@ const LogoConstruction = ({ appearance = 'colored' }) => (
                 {DIAGONALS.map(([x1, y1, x2, y2]) => (
                     <line key={`${x1}${y1}`} className="plus-logo-construction__long" x1={x1} y1={y1} x2={x2} y2={y2} />
                 ))}
-                {KEY_CORNERS.map(([cx, cy]) => (
+                {CORNER_CENTERS.map(([cx, cy]) => (
                     <circle key={`${cx}${cy}`} className="plus-logo-construction__short" cx={cx} cy={cy} r={CONSTRUCTION_RADII.corner} />
                 ))}
                 <line className="plus-logo-construction__short" x1="80" y1="-6" x2="80" y2="102" />

@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
+import LogoConstruction from '../../assets/Logo/LogoConstruction.jsx';
 import { CIRCLES, CORNER_CENTERS, CONSTRUCTION_RADII, PLUS_BOX, PLUS_CENTER } from '../../assets/Logo/logoConstructionGeometry.js';
 import { crossings } from './trails.js';
 import { chime, isoMatrix, pathGeometry, spring, springStills, stopAtEdge, waveHeights } from './shapes-geometry.js';
@@ -130,6 +133,16 @@ describe('Logo construction geometry', () => {
       expect(src).toMatch(/logoConstructionGeometry/);
       expect(src).not.toMatch(/r="(48|36|16)"|r=\{(48|36|16)\}/);
     }
+  });
+  it('reads the corner circles from CORNER_CENTERS in both drawings', () => {
+    for (const file of ['src/assets/Logo/LogoConstruction.jsx', 'src/storybook-docs/illustrations/shapes.jsx']) {
+      expect(readFileSync(file, 'utf8')).toMatch(/CORNER_CENTERS/);
+    }
+  });
+  it('draws all four corner circles in the overlay, at the kit centers', () => {
+    const html = renderToStaticMarkup(React.createElement(LogoConstruction));
+    const corners = [...html.matchAll(/<circle class="plus-logo-construction__short" cx="(\d+)" cy="(\d+)" r="16"/g)].map((m) => [+m[1], +m[2]]);
+    expect(corners).toEqual(CORNER_CENTERS);
   });
   it('has the circles the mark is built on: outer 48, inner 36, centered in the 96 box', () => {
     expect(CIRCLES).toEqual([

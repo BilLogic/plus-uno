@@ -10,12 +10,11 @@ export const CONSTRUCTION_RADII = { outer: 48, inner: 36, corner: 16 };
 
 /** The corner circles' centers: the plus arms sit in the top-right one. */
 export const CORNER_CENTERS = [[16, 16], [80, 16], [16, 80], [80, 80]];
-/** The circles the overlay draws long-dashed or solid: the two big ones, then the two corners it names. */
+/** The two big circles the overlay draws long-dashed or solid. */
 export const CIRCLES = [
   { cx: CENTER, cy: CENTER, r: CONSTRUCTION_RADII.outer },
   { cx: CENTER, cy: CENTER, r: CONSTRUCTION_RADII.inner },
 ];
-export const KEY_CORNERS = [[80, 16], [16, 80]];
 
 /** The plus arm box, in the top-right corner circle, and the plus's center. */
 export const PLUS_BOX = { x: 56, y: 16, w: 24, h: 24 };
