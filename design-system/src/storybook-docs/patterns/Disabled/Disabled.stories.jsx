@@ -161,7 +161,7 @@ export const KeySending = {
     },
 };
 
-/** Locked, not hidden: the Toolkit during onboarding, drawn blocked out. The visible line is Planned; the real Sidebar carries its message in a hover and focus layer today. */
+/** Locked, not hidden: the Toolkit during onboarding, drawn blocked out. The visible line is Planned. */
 export const KeyLocked = {
     name: 'Key case: Locked, not hidden',
     render: () => <div style={{ padding: 'var(--page-pad)' }}><LockedToolkit /></div>,

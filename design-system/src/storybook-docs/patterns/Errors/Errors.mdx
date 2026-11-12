@@ -45,9 +45,9 @@ Each failure has one home, as close to its cause as it can sit. A submit has two
 
 ## Key cases
 
-<ComponentExample of={ErrorsStories.KeyBlockedSubmit} title="Blocked submit" description="A missing field: the error on the field and focus on the first one. The Modal stays open; never a second dialog. A single shake is Planned." />
+<ComponentExample of={ErrorsStories.KeyBlockedSubmit} title="Blocked submit" description={<>A missing field: the error on the field and focus on the first one. The Modal stays open; never a second dialog. A single shake is Planned <PlannedTag />.</>} />
 
-<ComponentExample of={ErrorsStories.KeyRejectedSubmit} title="Rejected submit" description="The server said no: a danger SectionMessage at the top of the form, announced when it appears, plus the field errors it names. Scrolling it into view is Planned." />
+<ComponentExample of={ErrorsStories.KeyRejectedSubmit} title="Rejected submit" description={<>The server said no: a danger SectionMessage at the top of the form, announced when it appears, plus the field errors it names. Scrolling it into view is Planned <PlannedTag />.</>} />
 
 <ComponentExample of={ErrorsStories.KeySectionFailed} title="A Section that could not load" description="The rest of the page works. The Section's body shows the error in its empty-state slot with Try again; the view bar stays." />
 
@@ -197,7 +197,7 @@ A tooltip is absent on touch and gone on blur. An error is text on the page, nex
 
 - A field error is announced and sets `aria-invalid`; a group's one error is announced once.
 - A `SectionMessage` announces assertively when it appears; a danger `Flag` is an alert. A `Banner` is a status.
-- A blocked submit moves focus to the first field that needs fixing.
+- Move focus to the first field that needs fixing when a submit is blocked.
 - The error icon is decorative; the words say "couldn't", "missing" or "failed".
 
 </div>

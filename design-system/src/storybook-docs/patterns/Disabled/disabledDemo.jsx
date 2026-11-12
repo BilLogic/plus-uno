@@ -20,9 +20,6 @@ import { useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
  *   HiddenForRole    a menu with no Delete: left out for this role
  */
 
-/** The width a picture lays out at, in px: docs geometry. */
-export const STAGE = 1024; // docs-literal
-
 /** The width the card pictures lay out at, so their words stay legible at card size. Docs geometry, in px. */
 export const CARD_STAGE = 600; // docs-literal
 

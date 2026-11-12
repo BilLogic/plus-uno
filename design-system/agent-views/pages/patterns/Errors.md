@@ -57,7 +57,7 @@ Use Errors whenever something failed and the person needs to know. Put the messa
 
 - A field error is announced and sets `aria-invalid`; a group's one error is announced once.
 - A `SectionMessage` announces assertively when it appears; a danger `Flag` is an alert. A `Banner` is a status.
-- A blocked submit moves focus to the first field that needs fixing.
+- Move focus to the first field that needs fixing when a submit is blocked.
 - The error icon is decorative; the words say "couldn't", "missing" or "failed".
 
 ## Related
