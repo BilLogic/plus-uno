@@ -57,5 +57,12 @@ export const stillAtItsLanding = (demo) => async ({ canvasElement }) => {
 // CI browser still settles well inside the test timeout. The landing is the same.
 const TEST_SPEED = 8;
 
-export const story = (demo) => ({ render: () => <MotionDemo {...demo} fastForward={TEST_SPEED} />, play: playsToItsLanding(demo) });
+// `reduced={false}` pins the demo to its animated pass. Left unset, MotionDemo
+// follows the device's `prefers-reduced-motion`, and CI's Chromium reports
+// `reduce`: the demo would sit at `still`, never reach `arrows`/`settled`, and
+// the wait would time out. The Reduced twins cover the reduced path.
+export const story = (demo) => ({
+  render: () => <MotionDemo {...demo} reduced={false} fastForward={TEST_SPEED} />,
+  play: playsToItsLanding(demo),
+});
 export const reducedStory = (demo) => ({ render: () => <MotionDemo {...demo} reduced />, play: stillAtItsLanding(demo) });

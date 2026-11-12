@@ -85,7 +85,7 @@ export const SpeedSlowsThePlayback = {
 
 /** The two ends of the dial, as a Popup opening. */
 export const StiffAndSoft = {
-  render: () => <MotionDemo {...PLAYGROUND_DEMOS.extremes} />,
+  render: () => <MotionDemo {...PLAYGROUND_DEMOS.extremes} reduced={false} />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-motion-demo]');
     await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
@@ -97,7 +97,7 @@ export const StiffAndSoft = {
 
 /** The blocked Save shakes once and comes to rest. */
 export const TheShake = {
-  render: () => <MotionDemo {...PLAYGROUND_DEMOS.shake} />,
+  render: () => <MotionDemo {...PLAYGROUND_DEMOS.shake} reduced={false} />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-motion-demo]');
     await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
@@ -107,7 +107,7 @@ export const TheShake = {
 
 /** The three Productive speeds, each on its own job. */
 export const ThreeSpeeds = {
-  render: () => <MotionDemo {...PLAYGROUND_DEMOS.speeds} />,
+  render: () => <MotionDemo {...PLAYGROUND_DEMOS.speeds} reduced={false} />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-motion-demo]');
     await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
