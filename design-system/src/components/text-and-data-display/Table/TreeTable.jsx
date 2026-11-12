@@ -269,7 +269,7 @@ const TreeTable = ({
                                             role="gridcell"
                                             emphasis="title"
                                             {...rest}
-                                            leading={(
+                                            elemBefore={(
                                                 <>
                                                     <span
                                                         aria-hidden="true"

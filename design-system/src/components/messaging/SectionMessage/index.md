@@ -2,7 +2,7 @@
 
 # SectionMessage
 
-SectionMessage: a message that belongs to the page and stays there until it is resolved or dismissed. // Simple message <SectionMessage appearance="warning">Warning message here</SectionMessage> // With title <SectionMessage appearance="info" title="Info">This is an info message.</SectionMessage> // Rich content <SectionMessage appearance="danger"> <strong>Error:</strong> Something went wrong. <a href="/help">Get help</a> </SectionMessage> // Leading icon: each style has a default; a name or a node replaces it, false removes it <SectionMessage appearance="info" leadingVisual="bell">Reminders are on.</SectionMessage> <SectionMessage appearance="warning" leadingVisual={false}>Sign-in didn't complete. Please try again.</SectionMessage> // Actions: link buttons after the body, in the order given <SectionMessage appearance="warning" actions={[{ text: 'Reschedule', onClick: onReschedule }]}> This term's schedule is provisional. </SectionMessage>
+SectionMessage: a message that belongs to the page and stays there until it is resolved or dismissed. // Simple message <SectionMessage appearance="warning">Warning message here</SectionMessage> // With title <SectionMessage appearance="info" title="Info">This is an info message.</SectionMessage> // Rich content <SectionMessage appearance="danger"> <strong>Error:</strong> Something went wrong. <a href="/help">Get help</a> </SectionMessage> // Leading icon: each style has a default; a name or a node replaces it, false removes it <SectionMessage appearance="info" icon="bell">Reminders are on.</SectionMessage> <SectionMessage appearance="warning" icon={false}>Sign-in didn't complete. Please try again.</SectionMessage> // Actions: link buttons after the body, in the order given <SectionMessage appearance="warning" actions={[{ text: 'Reschedule', onClick: onReschedule }]}> This term's schedule is provisional. </SectionMessage>
 
 Also asked as: callout, inline alert, warning box.
 
@@ -62,12 +62,12 @@ default, so turn it off when the message must stay.
 Do: A blocking error cannot be dismissed.
 Don't: A blocking error that can be dismissed.
 
-### Replace the icon through leadingVisual, not the children. {#replace-the-icon-through-leadingvisual-not-the-children}
+### Replace the icon through icon, not the children. {#replace-the-icon-through-icon-not-the-children}
 
 A Font Awesome Free solid name or a node replaces the default; `false` removes
 it. An icon in the children adds a second one, in the text.
 
-Do: leadingVisual replaces the default icon.
+Do: icon replaces the default icon.
 Don't: An icon in the children, beside the default one.
 
 ### Put field errors on the field. {#put-field-errors-on-the-field}
@@ -156,7 +156,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 | `title` | string | — | Optional title/heading for the message |
 | `headingLevel` | enum | — | Heading level the title renders as, 1 through 6. Defaults to `h2`. |
 | `children` | node (required) | — | Message content - supports text, JSX, or React components |
-| `leadingVisual` | bool or string or node | `true` | Leading icon on the first line: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it. Always decorative. |
+| `icon` | bool or string or node | `true` | Leading icon on the first line: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it. Always decorative. |
 | `actions` | arrayOf (required) | — | Link-button actions after the body, in the order given. Avoid more than two. |
 | `dismissible` | bool | `true` | Whether the message can be dismissed |
 | `onDismiss` | func | — | Callback when the message is dismissed |

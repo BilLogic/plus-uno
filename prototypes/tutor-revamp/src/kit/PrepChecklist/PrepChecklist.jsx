@@ -33,7 +33,7 @@ const PrepChecklist = ({ items, defaultOpenId, onChange, className = '' }) => {
                         titleId={titleId}
                         muted={done.has(item.id)}
                         defaultOpen={item.id === defaultOpenId}
-                        leading={(
+                        elemBefore={(
                             <AnimatedCheckbox
                                 checked={done.has(item.id)}
                                 onChange={(checked) => tick(item.id, checked)}

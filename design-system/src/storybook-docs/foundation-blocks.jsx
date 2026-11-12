@@ -153,7 +153,7 @@ const Verdict = ({ tone, caption, children }) => {
                 }}
             >
                 <span>
-                    <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} leadingVisual={isDo ? 'circle-check' : 'circle-xmark'}>
+                    <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} iconBefore={isDo ? 'circle-check' : 'circle-xmark'}>
                         {isDo ? 'Do' : 'Don’t'}
                     </StatusTag>
                 </span>

@@ -73,7 +73,7 @@ ClippedText.propTypes = {
  * - `emphasis`: `default` | `title`, the one column that names the record
  * - `overflow`: `truncate` (one line, ellipsis and tooltip) | `wrap`
  * - `secondary`: a muted second line under the text (the `lines=2` cell)
- * - `leading`: a slot before the text, for an avatar, an icon or a Status
+ * - `elemBefore`: a slot before the text, for an avatar, an icon or a Status
  * - `state`: `rest` | `error`; `loading` draws a placeholder bar
  */
 export const TableCell = ({
@@ -82,7 +82,7 @@ export const TableCell = ({
     emphasis = 'default',
     overflow = 'truncate',
     secondary,
-    leading,
+    elemBefore,
     state = 'rest',
     loading = false,
     className = '',
@@ -112,7 +112,7 @@ export const TableCell = ({
             {...props}
         >
             <div className="plus-table-cell-inner">
-                {leading != null && leading !== false && <span className="plus-table-cell-leading">{leading}</span>}
+                {elemBefore != null && elemBefore !== false && <span className="plus-table-cell-leading">{elemBefore}</span>}
                 <span className="plus-table-cell-body">
                     {truncate
                         ? <ClippedText className={textClass}>{children}</ClippedText>
@@ -130,7 +130,7 @@ TableCell.propTypes = {
     emphasis: PropTypes.oneOf(['default', 'title']),
     overflow: PropTypes.oneOf(['truncate', 'wrap']),
     secondary: PropTypes.node,
-    leading: PropTypes.node,
+    elemBefore: PropTypes.node,
     state: PropTypes.oneOf(['rest', 'error']),
     loading: PropTypes.bool,
     className: PropTypes.string,

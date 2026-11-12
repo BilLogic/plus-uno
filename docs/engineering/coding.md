@@ -67,6 +67,19 @@ alias.
 One case is not a violation: a component importing its own siblings inside
 `design-system/src/components/`.
 
+## Slot names
+
+A component names a before or after slot by what the slot accepts, so the right prop is predictable:
+
+| Name | Accepts | Used by |
+|---|---|---|
+| `iconBefore` / `iconAfter` | an icon only | Button, Link button, Status tag, Date tag, Change tag, Sidebar tab |
+| `elemBefore` / `elemAfter` | any element: an avatar, a count, a tag | Tag, Smart tag, menu items, Sidebar tab end slot, Table cells, the field box, listbox and option row |
+| `icon` | the single icon of a component built around one | Icon button, Banner, Section message, Empty state, Tile, Modal, Rating |
+| `trailingMetric` | the count after a label | Tag, Status tag, Filter button |
+
+`leadingVisual`, `trailingVisual` and a bare `leading` slot are retired; `npm run check:slot-names` fails on them.
+
 ## Token usage
 
 Use design tokens everywhere — never hardcode colors, spacing, typography, or elevation.

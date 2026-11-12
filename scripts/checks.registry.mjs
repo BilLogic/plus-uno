@@ -251,6 +251,14 @@ export const CHECKS = [
     guards: 'the old component language (state steps, legacy tags, style x fill and small/medium/large props, retired words) staying out of the tree.',
   },
   {
+    name: 'check:slot-names',
+    script: 'node scripts/check-slot-names.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-slot-names.mjs',
+    guards: 'one naming rule for slots: iconBefore / elemBefore by what the slot accepts, with leadingVisual, trailingVisual and a bare leading slot staying out of the tree.',
+  },
+  {
     name: 'check:old-system',
     script: 'node scripts/check-old-system.mjs',
     pkg: 'root',

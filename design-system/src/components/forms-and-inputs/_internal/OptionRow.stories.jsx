@@ -63,7 +63,7 @@ export const LeadingAndTrailing = () => (
         <OptionRow
             label="Algebra"
             check={false}
-            leading={[
+            elemBefore={[
                 <OptionRow.Indent key="i" level={0} />,
                 <OptionRow.Toggle key="t" state="expanded" />,
                 <OptionRow.Checkbox key="c" checked={false} indeterminate />,
@@ -73,19 +73,19 @@ export const LeadingAndTrailing = () => (
             label="Linear equations"
             check={false}
             selected
-            leading={[
+            elemBefore={[
                 <OptionRow.Indent key="i" level={1} />,
                 <OptionRow.Toggle key="t" state="leaf" />,
                 <OptionRow.Checkbox key="c" checked />,
             ]}
         />
-        <OptionRow label="Tuesday" leading={<OptionRow.Radio checked={false} />} />
+        <OptionRow label="Tuesday" elemBefore={<OptionRow.Radio checked={false} />} />
         <OptionRow
             label="Decision recall"
-            leading={<i className={iconClass('grip-vertical')} aria-hidden="true" />}
+            elemBefore={<i className={iconClass('grip-vertical')} aria-hidden="true" />}
             trailing={<i className={iconClass('ellipsis')} aria-hidden="true" />}
         />
-        <OptionRow label="Unread" leading={<i className={iconClass('inbox')} aria-hidden="true" />} trailing={<CountTag value={12} />} />
+        <OptionRow label="Unread" elemBefore={<i className={iconClass('inbox')} aria-hidden="true" />} trailing={<CountTag value={12} />} />
         <OptionRow label="Pennsylvania" trailing={<OptionRow.Chevron />} />
         <OptionRow label="Maria Lopez" description="Grade 7 · Brookfield Middle School" />
     </div>
@@ -139,7 +139,7 @@ export const Colors = () => (
         <OptionRow label="Algebra" />
         <OptionRow label="Biology" highlighted />
         <OptionRow label="Chemistry" selected description="Grade 9" />
-        <OptionRow label="Physics" check={false} selected leading={<OptionRow.Checkbox checked />} />
+        <OptionRow label="Physics" check={false} selected elemBefore={<OptionRow.Checkbox checked />} />
         <OptionRow label="Geometry" dragging />
         <OptionRow label="History" dropIndicator="before" />
     </div>

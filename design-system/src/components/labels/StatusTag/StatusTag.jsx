@@ -16,7 +16,7 @@ import './StatusTag.scss';
  * set it. Otherwise, Tag (or SmartTag for a SMART subject). A Status tag is
  * filled (a meaning); Tag is outlined (a category).
  *
- * THE NAMES FOLLOW THE LIBRARY. `appearance`, `spacing`, `leadingVisual` and
+ * THE NAMES FOLLOW THE LIBRARY. `appearance`, `spacing`, `iconBefore` and
  * `trailingMetric` take the same words Button and Count tag use, and the same
  * values as the Status tag set in Figma, so handoff needs no translation.
  *
@@ -47,7 +47,7 @@ export const StatusTag = ({
     children,
     appearance = 'neutral',
     spacing = 'default',
-    leadingVisual,
+    iconBefore,
     trailingMetric,
     trailingMetricAppearance,
     maxWidth = 200,
@@ -81,7 +81,7 @@ export const StatusTag = ({
         effectiveSpacing = 'default';
     }
 
-    const visual = leadingVisual;
+    const visual = iconBefore;
     const wantsMetric = trailingMetric !== undefined && trailingMetric !== null && formatCount(trailingMetric) !== null;
     let metricAppearance = effectiveAppearance;
     if (trailingMetricAppearance !== undefined) {
@@ -155,7 +155,7 @@ StatusTag.propTypes = {
     /** `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. */
     spacing: PropTypes.oneOf(STATUS_TAG_SPACINGS),
     /** One icon before the label: a Font Awesome Free name (`circle-check`) or a node. */
-    leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** The Count tag's appearance. Defaults to the Status tag's own. */

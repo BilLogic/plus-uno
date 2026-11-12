@@ -55,7 +55,7 @@ describe('OptionRow', () => {
         render(
             <OptionRow
                 label="Linear equations"
-                leading={[
+                elemBefore={[
                     <OptionRow.Indent key="indent" level={2} />,
                     <OptionRow.Toggle key="toggle" state="collapsed" />,
                     <OptionRow.Checkbox key="check" checked={false} indeterminate />,
@@ -73,7 +73,7 @@ describe('OptionRow', () => {
 
     it('warns when more than four leading items are passed', () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        render(<OptionRow label="x" leading={[1, 2, 3, 4, 5].map((n) => <i key={n} />)} />);
+        render(<OptionRow label="x" elemBefore={[1, 2, 3, 4, 5].map((n) => <i key={n} />)} />);
         expect(warn).toHaveBeenCalledWith(expect.stringContaining('at most 4'));
         warn.mockRestore();
     });
@@ -115,7 +115,7 @@ describe('OptionRow', () => {
                 role="treeitem"
                 label="Algebra"
                 onSelect={onSelect}
-                leading={<OptionRow.Toggle state="collapsed" onToggle={onToggle} />}
+                elemBefore={<OptionRow.Toggle state="collapsed" onToggle={onToggle} />}
             />
         );
         await user.click(document.querySelector('.plus-option-row-toggle'));

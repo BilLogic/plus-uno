@@ -62,7 +62,7 @@ dismissed, with an optional title, a leading icon and up to two actions.
 
 <ComponentExample of={SectionMessageStories.Info} title="Info" description="Something worth knowing, with the circle-info icon." />
 
-<ComponentExample of={SectionMessageStories.LeadingIcon} title="Leading icon" description="The style's default icon, replaced by name or node, or removed with leadingVisual={false}." />
+<ComponentExample of={SectionMessageStories.LeadingIcon} title="Leading icon" description="The style's default icon, replaced by name or node, or removed with icon={false}." />
 
 <ComponentExample of={SectionMessageStories.GroundAndText} title="Ground and text" description="Each style's ground with the same text color for the title, body and link." />
 
@@ -243,14 +243,14 @@ default, so turn it off when the message must stay.
     dontCaption="A blocking error that can be dismissed."
 />
 
-### Replace the icon through leadingVisual, not the children.
+### Replace the icon through icon, not the children.
 
 A Font Awesome Free solid name or a node replaces the default; `false` removes
 it. An icon in the children adds a second one, in the text.
 
 <DoDontPair
-    doExample={<SectionMessage appearance="success" leadingVisual="trophy">Goal reached.</SectionMessage>}
-    doCaption="leadingVisual replaces the default icon."
+    doExample={<SectionMessage appearance="success" icon="trophy">Goal reached.</SectionMessage>}
+    doCaption="icon replaces the default icon."
     dontExample={<SectionMessage appearance="success"><i className="fa-solid fa-trophy" aria-hidden="true" /> Goal reached.</SectionMessage>}
     dontCaption="An icon in the children, beside the default one."
 />

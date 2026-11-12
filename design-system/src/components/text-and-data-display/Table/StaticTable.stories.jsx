@@ -14,7 +14,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'A fixed grid people read. Headers and rows accept either plain values or per-cell objects ({ content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }), so a cell can hold any node — a Badge, formatted currency. Rows rest or are highlighted; nothing in a Static table hovers, sorts, selects, pages or expands — see the Dynamic table for that.'
+                    'A fixed grid people read. Headers and rows accept either plain values or per-cell objects ({ content, align, emphasis, overflow, secondary, elemBefore, state, loading, colSpan, className }), so a cell can hold any node — a Badge, formatted currency. Rows rest or are highlighted; nothing in a Static table hovers, sorts, selects, pages or expands — see the Dynamic table for that.'
             }
         }
     },
@@ -29,7 +29,7 @@ export default {
         },
         rows: {
             control: 'object',
-            description: 'Row data — each row is an array of cells; a cell is a node or { content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }',
+            description: 'Row data — each row is an array of cells; a cell is a node or { content, align, emphasis, overflow, secondary, elemBefore, state, loading, colSpan, className }',
             table: { category: 'Content' }
         },
         titleColumn: {
@@ -162,7 +162,7 @@ export const FramedAndLines = {
 };
 
 export const Cells = {
-    parameters: { docs: { description: { story: 'A cell is text or a slot. Text cells add a muted second line, wrap, take the title emphasis, align as text, number or icon, and take a leading slot. A name that does not fit ends in an ellipsis and shows its full text in a tooltip.' } } },
+    parameters: { docs: { description: { story: 'A cell is text or a slot. Text cells add a muted second line, wrap, take the title emphasis, align as text, number or icon, and take an `elemBefore` slot. A name that does not fit ends in an ellipsis and shows its full text in a tooltip.' } } },
     render: () => (
         <Table
             headers={[
@@ -173,7 +173,7 @@ export const Cells = {
             ]}
             rows={[
                 [
-                    { content: 'Ava Thompson', emphasis: 'title', secondary: 'Grade 7 · Lincoln Middle', leading: <i className="fa-regular fa-circle-user" aria-hidden="true" /> },
+                    { content: 'Ava Thompson', emphasis: 'title', secondary: 'Grade 7 · Lincoln Middle', elemBefore: <i className="fa-regular fa-circle-user" aria-hidden="true" /> },
                     { content: 'Rescheduled from Oct 22 because of a school assembly', overflow: 'wrap' },
                     { content: '1,240', align: 'number' },
                     { content: <i className={iconClass('flag')} role="img" aria-label="Flagged" />, align: 'icon' }

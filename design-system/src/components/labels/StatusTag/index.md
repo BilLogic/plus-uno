@@ -10,7 +10,7 @@ Also asked as: lozenge, pill, state label.
 
 **Source:** `design-system/src/components/labels/StatusTag/StatusTag.jsx`
 
-**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — Styles, WithCount, TrailingMetricAppearance, LeadingVisual, Truncation, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — Styles, WithCount, TrailingMetricAppearance, IconBefore, Truncation, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/StatusTag/StatusTag.mdx`
 
@@ -91,7 +91,7 @@ success · warning · danger).
   takes focus so a keyboard user can reach the tooltip holding the full text;
   pointer users get the same tooltip on hover. The full text is always in the
   DOM, so a screen reader hears all of it.
-- **Not color alone.** A state can add a `leadingVisual` where color alone is
+- **Not color alone.** A state can add a `iconBefore` where color alone is
   not enough. Icons are decorative and hidden from assistive technology.
 - **An edge on any surface.** The 1px inside border keeps a pale fill visible
   on white and on gray; in forced-colors mode it becomes a real border.
@@ -106,7 +106,7 @@ Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 
 ## Parts
 
-1. **Leading visual.** Optional: a Font Awesome Free icon by name, or a node.
+1. **Icon before.** Optional: a Font Awesome Free icon by name, or a node.
 2. **Label.** The condition, in a word or two. Past `maxWidth` it ends in an ellipsis and the full text is a tooltip.
 3. **Trailing metric.** Optional: a compact Count tag nested inside, with its own appearance when it means something else.
 4. **Fill.** The appearance's tinted ground with its words and an edge one step darker.
@@ -147,7 +147,7 @@ Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 | `children` | node (required) | — | The status text, as people say it: "Needs review", "Due tomorrow". |
 | `appearance` | enum | `'neutral'` | The meaning. Info is Tertiary; discovery is the curriculum purple. |
 | `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. |
-| `leadingVisual` | string or node | — | One icon before the label: a Font Awesome Free name (`circle-check`) or a node. |
+| `iconBefore` | string or node | — | One icon before the label: a Font Awesome Free name (`circle-check`) or a node. |
 | `trailingMetric` | number or string | — | A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. |
 | `trailingMetricAppearance` | oneOf | — | The Count tag's appearance. Defaults to the Status tag's own. |
 | `maxWidth` | number or string | `200` | The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |
