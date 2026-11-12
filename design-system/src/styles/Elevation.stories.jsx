@@ -51,8 +51,9 @@ export const Stack = {
         const legend = within(root.querySelector('[data-testid="stack-legend"]'));
         await waitFor(() => expect(legend.getByText(/--layer-modal \d+/)).toBeInTheDocument());
         await expect(legend.getByText('Backdrop')).toBeInTheDocument();
-        await expect(root.querySelector('[data-plate="card"]').closest('[data-testid="exploded-stack"]')).not.toBeNull();
-        await expect(within(root).getByText('raised, no layer')).toBeInTheDocument();
+        // Card is raised with no layer: --layer-card belongs to sticky headers and columns.
+        const cardRow = legend.getByText('Card').parentElement;
+        await expect(cardRow).toHaveTextContent(/raised\s*no layer/);
         await expect(legend.queryByText(/--layer-card/)).toBeNull();
         await userEvent.click(canvas.getByRole('button', { name: 'Collapse' }));
         await expect(root).toHaveAttribute('data-state', 'collapsed');

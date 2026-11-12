@@ -234,7 +234,7 @@ const PLATES = [
             </>
         ),
     },
-    { id: 'card', title: 'Card', level: 'raised', layer: null, layerNote: 'raised, no layer', at: [80, 104], draw: <Card x={80} y={104} w={100} h={72} /> },
+    { id: 'card', title: 'Card', level: 'raised', layer: null, at: [80, 104], draw: <Card x={80} y={104} w={100} h={72} /> },
     { id: 'popup', title: 'Popup', level: 'overlay', layer: '--layer-popup', at: [196, 92], draw: <PopupShape x={196} y={92} w={96} h={50} /> },
     { id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-blanket', at: [0, 0], draw: <Backdrop x={0} y={0} w={STAGE.w} h={STAGE.h} /> },
     { id: 'modal', title: 'Modal', level: 'blocking', layer: '--layer-modal', at: [90, 46], draw: <ModalShape x={90} y={46} w={140} h={104} accent /> },
@@ -312,7 +312,7 @@ export const ExplodedStack = () => {
                             <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
                                 <strong>{plate.title}</strong>
                                 <span style={{ color: 'var(--ds-text-subtle)' }}>{levelOf(plate.level).name.toLowerCase()}</span>
-                                <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : (plate.layerNote ?? 'no layer')}</code>
+                                <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : 'no layer'}</code>
                             </span>
                         </li>
                     ))}
