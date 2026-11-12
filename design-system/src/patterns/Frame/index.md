@@ -56,7 +56,7 @@ Don't: Cancel between Back and Next: one run of three buttons, with the way out 
 
 ### Keep the AI panel docked as its own region. {#keep-the-ai-panel-docked-as-its-own-region}
 
-**Checked:** Automatic
+**Checked:** Review
 
 The AI panel is a region of the Frame, never a floating layer, so it stays put as a person moves between pages. The Page makes room for it; below `FRAME_LAYOUT.dockMin` it opens over a Backdrop.
 
