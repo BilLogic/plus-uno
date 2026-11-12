@@ -26,11 +26,9 @@ export const DocsLanding = ({ page, eyebrow, title, purpose, links }) => {
     return (
         <div className="sb-docs-landing" data-docs-landing={page}>
             <header className="sb-docs-header">
-                <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>{eyebrow}</span>
-                <h1 style={{ margin: 0, font: 'var(--heading-xxlarge)', letterSpacing: 'var(--heading-xxlarge-tracking)', color: 'var(--ds-text)' }}>
-                    {title}
-                </h1>
-                <div style={{ margin: 0, font: 'var(--body-large)', color: 'var(--ds-text-subtle)', maxWidth: '72ch' }}>{purpose}</div>
+                <span className="sb-docs-landing__eyebrow">{eyebrow}</span>
+                <h1 className="sb-docs-landing__title">{title}</h1>
+                <div className="sb-docs-landing__purpose sb-docs-measure">{purpose}</div>
             </header>
             {links?.items?.length > 0 && <LandingLinks label={links.label} items={links.items} title={title} />}
             {Hero && (

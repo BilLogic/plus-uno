@@ -6,7 +6,7 @@
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/docs-landing/DocsLanding.stories.jsx
  */
 import React from 'react';
-import { expect, within } from 'storybook/test';
+import { expect } from 'storybook/test';
 
 import { DocsLanding } from './DocsLanding.jsx';
 import { HEROES } from './hero-registry.jsx';
@@ -19,7 +19,7 @@ export default {
   parameters: { layout: 'padded' },
 };
 
-const Page = () => (
+const Page = ({ children }) => (
   <div className="sbdocs">
     <DocsLanding
       page="foundations-color"
@@ -28,33 +28,26 @@ const Page = () => (
       purpose="Every color is a --ds token named for its job."
       links={{ label: 'Tokens', items: [{ title: 'Roles', href: '#foundation-roles' }] }}
     />
+    {children}
   </div>
 );
 
-const before = (a, b) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-
-/** Foundations · Color, in the order a reader meets it. */
-export const Color = {
-  render: () => <Page />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const eyebrow = canvas.getByText('Foundation');
-    const h1 = canvas.getByRole('heading', { level: 1, name: 'Color' });
-    const purpose = canvas.getByText(/Every color is a/);
-    const nav = canvas.getByRole('navigation', { name: 'Tokens' });
-    const hero = canvas.getByRole('img', { name: HEROES['foundations-color'].description });
-
-    await expect(canvas.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    await expect(before(eyebrow, h1) && before(h1, purpose) && before(purpose, nav) && before(nav, hero)).toBe(true);
-    await expect(canvas.getByRole('link', { name: 'Roles' })).toHaveAttribute('href', '#foundation-roles');
-  },
-};
-
-/** The hero is a 5:2 frame, draws no text, and shows both color modes at once. */
+/** Browser-only checks: the hero is a 5:2 frame, draws no text, shows both color modes, and the landing keeps its own gap below. (Order and names are in DocsLanding.test.jsx.) */
 export const Hero = {
-  render: () => <Page />,
+  render: () => (
+    <Page>
+      <div className="sb-docs-section" data-testid="next" />
+    </Page>
+  ),
   play: async ({ canvasElement }) => {
     const hero = canvasElement.querySelector('[data-hero="foundations-color"]');
+    const landing = canvasElement.querySelector('[data-docs-landing]');
+    const next = canvasElement.querySelector('[data-testid="next"]');
+    const gap = next.getBoundingClientRect().top - landing.getBoundingClientRect().bottom;
+    const probe = Object.assign(document.createElement('div'), { style: 'position:absolute;block-size:var(--page-stack-lg)' });
+    document.body.append(probe);
+    await expect(Math.abs(gap - probe.getBoundingClientRect().height)).toBeLessThan(1);
+    probe.remove();
     const { width, height } = hero.getBoundingClientRect();
     await expect(Math.abs(width / height - 2.5)).toBeLessThan(0.02);
     await expect(document.createTreeWalker(hero, NodeFilter.SHOW_TEXT).nextNode()).toBeNull();

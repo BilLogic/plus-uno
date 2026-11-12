@@ -135,8 +135,8 @@
 /*
  * The landing (DocsLanding, docs-landing/): eyebrow, title and purpose sit
  * stack-sm apart through the header rule above; the quick links and the hero
- * each sit section-stack-md below what precedes them; the next section's own
- * page-stack-lg margin is the gap after the hero.
+ * each sit section-stack-md below what precedes them; the landing carries its
+ * own page-stack-lg after the hero, so a section that follows adds none.
  */
 .sbdocs .sb-docs-landing {
     display: flex;
@@ -149,6 +149,35 @@
 
 .sbdocs .sb-docs-landing > * + * {
     margin-block-start: var(--section-stack-md) !important;
+}
+
+.sbdocs .sb-docs-landing {
+    margin-block-end: var(--page-stack-lg) !important;
+}
+
+.sbdocs .sb-docs-landing + :is(.sb-docs-section, .sb-ds-doc-section) {
+    margin-block-start: 0 !important;
+}
+
+/* The reading measure: prose and the purpose line stop at 72 characters. */
+.sbdocs .sb-docs-measure {
+    max-inline-size: 72ch;
+}
+
+.sbdocs .sb-docs-landing__eyebrow {
+    font: var(--heading-xxsmall);
+    color: var(--ds-text-subtle);
+}
+
+.sbdocs .sb-docs-landing__title {
+    font: var(--heading-xxlarge);
+    letter-spacing: var(--heading-xxlarge-tracking);
+    color: var(--ds-text);
+}
+
+.sbdocs .sb-docs-landing__purpose {
+    font: var(--body-large);
+    color: var(--ds-text-subtle);
 }
 
 /* One row: the label, then a link per item, current page in bold. */

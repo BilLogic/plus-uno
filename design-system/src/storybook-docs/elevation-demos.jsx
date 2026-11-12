@@ -3,6 +3,7 @@ import { Button, Toggle } from '@/components';
 import { Page, PatternCard } from '@/patterns';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { C } from '@/storybook-docs/foundation-blocks.jsx';
+import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 import { settleMsOf, springBack } from '@/lib/damping';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
@@ -132,18 +133,6 @@ export const useVarsOn = (ref, names) => {
         return () => observer.disconnect();
     }, [read, ref]);
     return values;
-};
-
-/** The toolbar's contrast mode, carried onto a probe so it resolves the same tokens. */
-const usePageContrast = () => {
-    const read = () => (typeof document === 'undefined' ? null : document.documentElement.getAttribute('data-contrast-mode'));
-    const [contrast, setContrast] = useState(read);
-    useEffect(() => {
-        const observer = new MutationObserver(() => setContrast(read()));
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-contrast-mode'] });
-        return () => observer.disconnect();
-    }, []);
-    return contrast;
 };
 
 /** The page's color mode now, `light` or `dark`, for a block's starting mode. */
