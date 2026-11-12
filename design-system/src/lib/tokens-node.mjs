@@ -358,7 +358,6 @@ export const FAMILIES = [
   { family: 'layer', prefix: '--layer-', what: 'the z-index scale, card to tooltip' },
   { family: 'motion', prefix: '--motion-', what: 'motion durations and easings' },
   { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline, radius and body floor' },
-  { family: 'drawer', prefix: '--drawer-', what: 'drawer pad, stack and inline (the Modal steps, no radius)' },
   { family: 'focused-page', prefix: '--focused-page-', what: 'the focused page frame: its pad, stacks and inline gaps' },
   { family: 'popover', prefix: '--popover-', what: 'menus, popups, tooltips and flags: pad, widths, radii, placement' },
   { family: 'tile', prefix: '--tile-', what: 'Tile radius where a size has no shared radius role' },

@@ -74,7 +74,7 @@ Don't: An empty-view invitation when the load failed.
 
 ### Fill a Table with it, not around it. {#fill-a-table-with-it-not-around-it}
 
-The Table keeps its header row and the EmptyState takes the body.
+The Table's `emptyState` takes the body; an EmptyState never sits under a Table.  The Empty pattern replaces the whole table, header row and footer included; today the Table keeps its header row.
 
 Do: An EmptyState in the Table's emptyState.
 Don't: An EmptyState under a Table with an empty body.

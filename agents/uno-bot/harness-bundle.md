@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **125,726 chars from 9 files**, against an assembled budget of 175,500 (49,774 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,342 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **125,511 chars from 9 files**, against an assembled budget of 175,500 (49,989 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,127 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,284 (−8,789 ide-only) | 10,284 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 36,740 | 47,053 | 20,000 (constitution) ⚠️ **over by 16,740** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 68,536 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 70,182 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 71,430 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 77,124 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 88,910 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 109,871 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 113,339 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 119,897 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 124,870 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 125,726 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 36,525 | 46,838 | 20,000 (constitution) ⚠️ **over by 16,525** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 68,321 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 69,967 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 71,215 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 76,909 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 88,695 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 109,656 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 113,124 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 119,682 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 124,655 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 125,511 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -308,10 +308,6 @@ _Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** stat
 The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time. `Modal` is the component; `PatternModal` draws its shell inline.
 _Avoid_: "Modal dialog", "ModalDialog", "popup" for a blocking dialog
 
-**Popover**:
-The pattern for any layer that floats above the page with no **Backdrop**: **Dropdown menu**, **Popup**, Flag and Tooltip. It names the pattern only.
-_Avoid_: "popover" for the **Popup** component, "floating layer", "popover family"
-
 **Part**:
 A `_`-prefixed piece only its parent uses, such as `_Section header` or `_Modal header`: it lives inside its parent and stays out of the public exports.
 _Avoid_: "sub-component" for a part, "element"
@@ -339,7 +335,7 @@ A table whose rows nest under parent rows.
 _Avoid_: "table tree", "nested table"
 
 **Popup**:
-A floating layer anchored to its trigger, closed by clicking outside: one member of the **Popover** pattern.
+A floating layer anchored to its trigger, closed by clicking outside: a menu, a select list, a filter menu or content, with no **Backdrop**.
 _Avoid_: "popover", "inline dialog"
 
 **Menu**:

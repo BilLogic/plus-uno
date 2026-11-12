@@ -52,7 +52,7 @@ Start here for space, size and radius (ADR-038). A component reads its component
 ```
 
 ## Ladder Patterns
-Space owned by a pattern: page, section, card, table, modal, drawer, popover. Inside a pattern, read its token before a semantics step.
+Space owned by a pattern: page, section, card, table, modal, popover. Inside a pattern, read its token before a semantics step.
 
 ```css
 --blanket-fill  /* Fill of the Blanket that dims the page behind a Modal. */
@@ -62,9 +62,6 @@ Space owned by a pattern: page, section, card, table, modal, drawer, popover. In
 --card-pad-compact  /* Padding inside a PatternCard with compact spacing. */
 --card-pad-default  /* Padding inside a PatternCard with default spacing. */
 --card-pad-spacious  /* Padding inside a PatternCard with spacious spacing. */
---drawer-width-lg  /* Width of a wide PatternDrawer. */
---drawer-width-md  /* Width of a default PatternDrawer. */
---drawer-width-sm  /* Width of a narrow PatternDrawer. */
 --frame-sidebar-group-gap  /* Vertical gap between two groups of rows in the Sidebar. */
 --frame-sidebar-pad  /* Padding on every side inside the Sidebar. */
 --frame-sidebar-row-gap  /* Vertical gap between two rows in the Sidebar. */
@@ -327,13 +324,6 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --card-stack-lg  /* Vertical gap between a PatternCard's header, body and footer. */
 --card-stack-md  /* Vertical gap between blocks in a PatternCard. */
 --card-stack-sm  /* Vertical gap between tightly related lines in a PatternCard, such as a title and its meta. */
---drawer-inline-lg  /* Horizontal gap between columns in a PatternDrawer. */
---drawer-inline-md  /* Horizontal gap between the actions in a PatternDrawer footer. */
---drawer-inline-sm  /* Horizontal gap between small items in a PatternDrawer row. */
---drawer-pad  /* Padding inside a PatternDrawer. */
---drawer-stack-lg  /* Vertical gap between a PatternDrawer's header, body and footer. */
---drawer-stack-md  /* Vertical gap between blocks in a PatternDrawer's body. */
---drawer-stack-sm  /* Vertical gap between a PatternDrawer's title and its description. */
 --focused-page-inline-md  /* Horizontal gap between the actions on a focused page. */
 --focused-page-inline-sm  /* Horizontal gap between small items in a focused page row. */
 --focused-page-pad-x  /* Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step. */

@@ -300,18 +300,6 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Popover', new: '--popover-gap-screen', old: '--popover-gap-screen', use: 'Space a floating layer keeps from the screen edge, such as a Flag or a listbox.' },
   { tier: 'patterns', group: 'Popover', new: '--popover-offset', old: '--popover-offset', use: 'Gap between a Popup, menu or Tooltip and the element that opened it.' },
 
-  // ─── Patterns / Drawer ────────────────────────────────────────────────
-  { tier: 'patterns', group: 'Drawer', new: '--drawer-pad', old: '--drawer-pad', use: 'Padding inside a PatternDrawer.' },
-  { tier: 'patterns', group: 'Drawer', new: '--drawer-stack-sm', old: '--drawer-stack-sm', use: 'Vertical gap between a PatternDrawer\'s title and its description.' },
-  { tier: 'patterns', group: 'Drawer', new: '--drawer-stack-md', old: '--drawer-stack-md', use: 'Vertical gap between blocks in a PatternDrawer\'s body.' },
-  { tier: 'patterns', group: 'Drawer', new: '--drawer-stack-lg', old: '--drawer-stack-lg', use: 'Vertical gap between a PatternDrawer\'s header, body and footer.' },
-  { tier: 'patterns', group: 'Drawer', new: '--drawer-inline-sm', old: '--drawer-inline-sm', use: 'Horizontal gap between small items in a PatternDrawer row.' },
-  { tier: 'patterns', group: 'Drawer', new: '--drawer-inline-md', old: '--drawer-inline-md', use: 'Horizontal gap between the actions in a PatternDrawer footer.' },
-  { tier: 'patterns', group: 'Drawer', new: '--drawer-inline-lg', old: '--drawer-inline-lg', use: 'Horizontal gap between columns in a PatternDrawer.' },
-  { tier: 'patterns', group: 'Drawer', new: '--drawer-width-sm', old: '--layout-width-drawer-sm', ref: 'var(--modal-width-sm)', use: 'Width of a narrow PatternDrawer.' },
-  { tier: 'patterns', group: 'Drawer', new: '--drawer-width-md', old: '--layout-width-drawer-md', ref: 'var(--modal-width-md)', use: 'Width of a default PatternDrawer.' },
-  { tier: 'patterns', group: 'Drawer', new: '--drawer-width-lg', old: '--layout-width-drawer-lg', ref: 'var(--modal-width-lg)', use: 'Width of a wide PatternDrawer.' },
-
   // ─── Patterns / Focused page ──────────────────────────────────────────
   { tier: 'patterns', group: 'Focused page', new: '--focused-page-pad-x', old: '--focused-page-pad-x', use: 'Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step.' },
   { tier: 'patterns', group: 'Focused page', new: '--focused-page-pad-y', old: '--focused-page-pad-y', use: 'Vertical padding of a focused page.' },

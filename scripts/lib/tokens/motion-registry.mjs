@@ -82,7 +82,7 @@ export const MOTION_REGISTRY = [
     name: 'PatternModal',
     tier: 'template',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% and fades in; the Blanket dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts.' },
+      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% and fades in; the Backdrop dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts.' },
       exit: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Leaves at 98%, fading.' },
       swap: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'One Modal at a time: a confirm replaces the content in place, never a second Modal.' },
       rejected: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes it once; never in reduced motion.' },
@@ -92,7 +92,7 @@ export const MOTION_REGISTRY = [
     name: 'Backdrop',
     tier: 'template',
     events: {
-      enter: { transition: 'Open and close an overlay', appearance: 'appearance.default', note: 'The Blanket dims on the same fade as the layer it sits under.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.default', note: 'The Backdrop dims on the same fade as the layer it sits under.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'It fades with the layer; a docked Panel never has one.' },
     },
   },
@@ -104,7 +104,7 @@ export const MOTION_REGISTRY = [
       'docked-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Reverses and stays at the edge.' },
       'floating-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself.' },
       'floating-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'Reverses.' },
-      'narrow-enter': { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'At narrow widths it slides over with a Blanket.' },
+      'narrow-enter': { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'At narrow widths it slides over with a Backdrop.' },
       'narrow-exit': { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'The same way back.' },
     },
   },

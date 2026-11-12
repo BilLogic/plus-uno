@@ -86,7 +86,9 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 - Section: use when the question is the view bar the filters sit in.
 - Popup: use when the question is where a menu opens or how wide it is.
 - Filter menu: use when building a tier 2b or 2c menu.
-- Patterns: use when you need Search for finding by name, Empty for No matches, or Navigation for views.
+- Search: use for finding by name.
+- Empty: use for No matches.
+- Navigation: use for views.
 
 ## Motion
 

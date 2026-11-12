@@ -96,7 +96,7 @@ Use Common actions when a page needs a button and the choice is about the look, 
 - Forms: use when the buttons submit fields.
 - Filtering: use for Reset and Apply inside a filter menu.
 - Modal: use for the confirm a destructive action raises.
-- Patterns: use when you need Disabled for an action that cannot run yet.
+- Disabled: use when an action cannot run yet.
 
 ## Motion
 

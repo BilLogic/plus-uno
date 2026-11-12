@@ -579,27 +579,6 @@
           "codeSyntax": {
             "WEB": "var(--modal-body-min-height)"
           }
-        },
-        {
-          "name": "Drawer/width-sm",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--drawer-width-sm)"
-          }
-        },
-        {
-          "name": "Drawer/width-md",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--drawer-width-md)"
-          }
-        },
-        {
-          "name": "Drawer/width-lg",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--drawer-width-lg)"
-          }
         }
       ]
     },

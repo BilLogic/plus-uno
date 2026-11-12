@@ -133,7 +133,7 @@ function renderTokensDoc() {
     tokensDoc += "```css\n" + ladderSemantics + "\n```\n\n";
 
     tokensDoc += `## Ladder Patterns\n`;
-    tokensDoc += `Space owned by a pattern: page, section, card, table, modal, drawer, popover. Inside a pattern, read its token before a semantics step.\n\n`;
+    tokensDoc += `Space owned by a pattern: page, section, card, table, modal, popover. Inside a pattern, read its token before a semantics step.\n\n`;
     tokensDoc += "```css\n" + ladderPatterns + "\n```\n\n";
 
     tokensDoc += `## Ladder Components\n`;

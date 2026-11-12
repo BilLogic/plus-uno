@@ -523,7 +523,7 @@ const dockScene = ({ id, title, caption, closing }) =>
 const floatScene = scene({
   id: 'dock-floating',
   title: 'A floating Panel slides over and the page stays',
-  caption: 'Opens on spatial.default over the page, which does not move. No Blanket at desktop width.',
+  caption: 'Opens on spatial.default over the page, which does not move. No Backdrop at desktop width.',
   initial: { x: 1 },
   landing: { x: 0 },
   arrows: [[[152, 55], [110, 55]]],
@@ -762,7 +762,7 @@ export const WITHIN_DEMOS = {
 };
 
 export const ABOVE_DEMOS = {
-  modalOpen: { title: 'Modal opens', scenes: [modalScene({ id: 'modal-open', title: 'Scales up from 96% and fades in', caption: 'The Blanket dims on the same clock. Scale is for floating layers only.' })] },
+  modalOpen: { title: 'Modal opens', scenes: [modalScene({ id: 'modal-open', title: 'Scales up from 96% and fades in', caption: 'The Backdrop dims on the same clock. Scale is for floating layers only.' })] },
   modalClose: { title: 'Modal closes', scenes: [modalScene({ id: 'modal-close', title: 'Scales to 98% and fades', closing: true, caption: 'Leaves one speed faster than it arrived, on spatial.fast.' })] },
   flagOpen: { title: 'Flag appears', scenes: [flagScene({ id: 'flag-open', title: 'Slides in from the top right', caption: 'On spatial.default with an appearance.default fade.' })] },
   flagClose: { title: 'Flag leaves', scenes: [flagScene({ id: 'flag-close', title: 'Leaves the way it came', closing: true, caption: 'A timeout leaves on spatial.exit; it is still speeding up as it crosses the edge.' })] },

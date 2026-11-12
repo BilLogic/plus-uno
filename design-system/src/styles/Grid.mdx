@@ -24,7 +24,7 @@ import * as GridStories from './Grid.stories.jsx';
 
 <FoundationSection title="Overview">
 
-PLUS is desktop only, from 768 up. The screen grid spans the screen and lives on the Backdrop layer: modals and drawers size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its `spacing / layout` mode, never by hand-editing its grid. The grid decides where containers sit; the spacing tokens decide everything inside them.
+PLUS is desktop only, from 768 up. The screen grid spans the screen and lives on the Backdrop layer: modals and floating Panels size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its `spacing / layout` mode, never by hand-editing its grid. The grid decides where containers sit; the spacing tokens decide everything inside them.
 
 <Banner appearance="announcement">
 <strong>How the PLUS grid differs from a standard one</strong><br />
@@ -78,7 +78,7 @@ Both grids are 12 columns with a 16 gutter.
   already at its cap with either pad, so its width depends on the screen alone;
   past a 1280 screen it stops growing and centers. It ignores the sidebar, so a
   modal sits in the same place whether the sidebar is docked or closed. Modals
-  and drawers size from it. In Figma it lives on the Backdrop layer only, and
+  and floating Panels size from it. In Figma it lives on the Backdrop layer only, and
   shows and hides with it; code draws no grid at all.
 - **The content grid** sits inside the Page, after the sidebar and the
   Page pad take their share. Cards, tables, forms and text blocks align to
@@ -102,7 +102,7 @@ breakpoint: Medium · Large · X-Large.
     ]}
 />
 
-The screen pad is its own rule, not the Page pad: it stays 24 · 24 · 32 so a Modal or Drawer keeps its width when the Page pad changes.
+The screen pad is its own rule, not the Page pad: it stays 24 · 24 · 32 so a Modal or floating Panel keeps its width when the Page pad changes.
 
 These per-mode widths step at each breakpoint rather than follow the screen. Code that needs the exact width at any screen lays out on the grid itself, as in the Overview, instead of reading `--grid-width-column`. The values are generated from the `spacing / layout` collection into `design-system/src/tokens/_frame_layers.scss`; the breakpoints live in `design-system/src/tokens/_layout.scss`.
 
