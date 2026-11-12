@@ -374,3 +374,69 @@ export const Focused = {
         action.blur();
     },
 };
+
+/*
+ * The stack closes up when one flag leaves. Two stacks side by side: three flags where the
+ * middle one is closed, and a fresh stack of two. When the middle one goes, the two that stay
+ * end where the fresh pair stands. The leaver is out of the flow from the first frame, so the
+ * gap closes as it goes, never after it. Both stories pin `reducedMotion` themselves: CI's
+ * Chromium reports reduced motion, and the page-wide preference is shared with other files.
+ */
+const STACK_SLOT = { position: 'relative', width: 420, height: 360 };
+
+const ClosingStack = ({ reducedMotion }) => {
+    const [middleOpen, setMiddleOpen] = useState(true);
+    return (
+        <div style={{ position: 'relative', display: 'flex', gap: 24, height: 360 }}>
+            <div style={STACK_SLOT}>
+                <FlagGroup position="top-start" containerPosition="absolute" reducedMotion={reducedMotion} data-testid="stack-three">
+                    <Flag title="First" autohide={false} dismissible={false} data-testid="three-first" />
+                    <Flag title="Middle" autohide={false} show={middleOpen} onDismiss={() => setMiddleOpen(false)} data-testid="three-middle" />
+                    <Flag title="Last" autohide={false} dismissible={false} data-testid="three-last" />
+                </FlagGroup>
+            </div>
+            <div style={STACK_SLOT}>
+                <FlagGroup position="top-start" containerPosition="absolute" reducedMotion={reducedMotion} data-testid="stack-two">
+                    <Flag title="First" autohide={false} dismissible={false} data-testid="two-first" />
+                    <Flag title="Last" autohide={false} dismissible={false} data-testid="two-last" />
+                </FlagGroup>
+            </div>
+        </div>
+    );
+};
+
+const topWithin = (el, group) => Math.round(el.getBoundingClientRect().top - group.getBoundingClientRect().top);
+
+const playClosesUp = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const groupThree = canvas.getByTestId('stack-three');
+    const groupTwo = canvas.getByTestId('stack-two');
+    const last = canvas.getByTestId('three-last');
+    const freshLastTop = topWithin(canvas.getByTestId('two-last'), groupTwo);
+
+    await userEvent.click(within(canvas.getByTestId('three-middle')).getByRole('button', { name: 'Dismiss flag' }));
+
+    // The leaver is out of the flow at once, so the last flag's layout place is already the fresh stack's.
+    await expect(last.offsetTop - groupThree.offsetTop - parseFloat(getComputedStyle(groupThree).paddingTop), 'layout place')
+        .toBe(canvas.getByTestId('two-last').offsetTop - groupTwo.offsetTop - parseFloat(getComputedStyle(groupTwo).paddingTop));
+
+    // At rest: the middle one gone, the two that stay where a fresh stack of two has them, no transform left.
+    await waitFor(() => expect(canvas.queryByTestId('three-middle')).toBeNull());
+    await waitFor(() => {
+        expect(topWithin(canvas.getByTestId('three-first'), groupThree)).toBe(topWithin(canvas.getByTestId('two-first'), groupTwo));
+        expect(topWithin(last, groupThree)).toBe(freshLastTop);
+    });
+    await waitFor(() => expect(getComputedStyle(last).opacity).toBe('1'));
+};
+
+export const StackClosesUp = {
+    name: 'Stack closes up on spatial.default',
+    render: () => <ClosingStack reducedMotion={false} />,
+    play: playClosesUp,
+};
+
+export const StackClosesUpReduced = {
+    name: 'Stack closes up: reduced motion',
+    render: () => <ClosingStack reducedMotion />,
+    play: playClosesUp,
+};
