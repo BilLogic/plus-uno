@@ -171,6 +171,29 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'Errors',
+    tier: 'pattern',
+    events: {
+      field: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A field error makes room, then fades in; it fades and the room closes once the rule is met.' },
+      view: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'A view that could not load swaps its body for the error in place; the view bar stays.' },
+      background: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A failed background job raises a danger Flag, which stays until dismissed.' },
+    },
+  },
+  {
+    name: 'Disabled',
+    tier: 'pattern',
+    events: {
+      enable: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A control that waits on another fades to enabled once the prerequisite is met; nothing moves.' },
+    },
+  },
+  {
+    name: 'Read-only',
+    tier: 'pattern',
+    events: {
+      edit: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'Switching a read-only value to its field, where editing is allowed, swaps in place with no change of size.' },
+    },
+  },
+  {
     name: 'Popup',
     tier: 'component',
     events: {
