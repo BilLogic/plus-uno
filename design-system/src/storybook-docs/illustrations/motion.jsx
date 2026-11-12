@@ -274,8 +274,8 @@ function createContext({ scene, getState, setState, track, instant, isLive }) {
 }
 
 /** Pause or play every running animation of a demo, and keep new ones at its speed. */
-function useTracker() {
-  const ref = useRef({ speed: 1, paused: false, controls: new Set() });
+function useTracker(initialSpeed = 1) {
+  const ref = useRef({ speed: initialSpeed, paused: false, controls: new Set() });
   const track = useCallback((controls) => {
     const g = ref.current;
     controls.speed = g.speed;
@@ -352,8 +352,10 @@ const startStates = (scenes, extra) =>
  * A group of scenes that play together and share one speed control. Phases,
  * on `data-phase`: `arrows` (paths drawn over the dimmed start), `playing`,
  * `settled` (holding at the landing), and `still` under reduced motion.
+ * `fastForward` starts every animation at that multiple of 1×, so a test
+ * waits for a pass in a fraction of the time; the control still reads 1×.
  */
-export const MotionDemo = ({ title, scenes, reduced: forcedReduced }) => {
+export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward = 1 }) => {
   const prefersReduced = useReducedMotion();
   const reduced = forcedReduced ?? Boolean(prefersReduced);
   const [states, setStates] = useState(() => startStates(scenes));
@@ -363,7 +365,7 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced }) => {
   const [paused, setPausedState] = useState(false);
   const [replay, setReplay] = useState(0);
   const statesRef = useRef(states);
-  const { track, setSpeed, setPaused, stopAll } = useTracker();
+  const { track, setSpeed, setPaused, stopAll } = useTracker(fastForward);
   const titleId = useId();
 
   useEffect(() => {

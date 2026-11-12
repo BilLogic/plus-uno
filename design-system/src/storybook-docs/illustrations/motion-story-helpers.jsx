@@ -53,5 +53,9 @@ export const stillAtItsLanding = (demo) => async ({ canvasElement }) => {
   await expect(everyPaintIsAToken(root)).toBe(true);
 };
 
-export const story = (demo) => ({ render: () => <MotionDemo {...demo} />, play: playsToItsLanding(demo) });
+// A test does not need to watch a pass in real time: it plays at 8×, so a slow
+// CI browser still settles well inside the test timeout. The landing is the same.
+const TEST_SPEED = 8;
+
+export const story = (demo) => ({ render: () => <MotionDemo {...demo} fastForward={TEST_SPEED} />, play: playsToItsLanding(demo) });
 export const reducedStory = (demo) => ({ render: () => <MotionDemo {...demo} reduced />, play: stillAtItsLanding(demo) });
