@@ -96,8 +96,9 @@ const REFLOW = {
  * Frame layout resolver's (the Sidebar docks from 1024, a Section holds its
  * side from 960 of its own width), not a restated copy.
  */
-export const ResponsiveReflow = ({ width = 1280, title }) => {
-  const { sidebar, title: defaultTitle } = REFLOW[width];
+/** The drawing inside the canvas, without its wrapper, so a motion scene can animate between widths. */
+export const ReflowScreen = ({ width = 1280 }) => {
+  const { sidebar } = REFLOW[width];
   const box = { x: 8, y: 6, w: width / 8, h: 100 };
   const { content } = screenLayout({ ...box, sidebar });
   const body = pageBody({ ...content, header: true });
@@ -105,11 +106,15 @@ export const ResponsiveReflow = ({ width = 1280, title }) => {
   const split = sidebar === 'docked';
   const mainW = split ? body.w * 0.62 : body.w;
   return (
-    <Illustration width={176} height={112} title={title ?? defaultTitle}>
-      <Screen {...box} sidebar={sidebar} accentSidebar={sidebar === 'overlay'}>
-        <Section x={body.x} y={body.y} w={mainW} h={body.h} rows={2} accent={sidebar !== 'overlay'} />
-        {split && <Section x={body.x + mainW + 6} y={body.y} w={body.w - mainW - 6} h={body.h} rows={2} subtle />}
-      </Screen>
-    </Illustration>
+    <Screen {...box} sidebar={sidebar} accentSidebar={sidebar === 'overlay'}>
+      <Section x={body.x} y={body.y} w={mainW} h={body.h} rows={2} accent={sidebar !== 'overlay'} />
+      {split && <Section x={body.x + mainW + 6} y={body.y} w={body.w - mainW - 6} h={body.h} rows={2} subtle />}
+    </Screen>
   );
 };
+
+export const ResponsiveReflow = ({ width = 1280, title }) => (
+  <Illustration width={176} height={112} title={title ?? REFLOW[width].title}>
+    <ReflowScreen width={width} />
+  </Illustration>
+);

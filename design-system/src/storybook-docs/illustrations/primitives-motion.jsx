@@ -104,6 +104,35 @@ export const Pointer = ({ x, y, accent = false }) => (
 );
 
 /**
+ * The timeline under a figure: one thin bar per part, each from when it starts
+ * to when it lands, on a shared time axis. `lanes` are `{ start, end }` in
+ * 0..1 of the axis; `now` (0..1) is the playhead, drawn as the target line.
+ * Accented, the bars are the subject's color. Up to six lanes fit the height.
+ */
+export const SequenceStrip = ({ x, y, w, h = 14, lanes, now = 0, accent = false }) => {
+  const rows = Math.max(1, lanes.length);
+  const lane = (h - 2) / rows;
+  const bar = Math.min(3, lane - 1);
+  return (
+    <g data-sequence-strip>
+      <line x1={x} x2={x + w} y1={y + h} y2={y + h} stroke={PAINT.axis} style={HAIRLINE} />
+      {lanes.map((l, i) => (
+        <Rect
+          key={i}
+          x={x + w * l.start}
+          y={y + 1 + i * lane}
+          w={Math.max(1.5, w * (l.end - l.start))}
+          h={bar}
+          fill={accent ? PAINT.accent : PAINT.shape}
+          corner="shape"
+        />
+      ))}
+      <line x1={x + w * now} x2={x + w * now} y1={y} y2={y + h} stroke={PAINT.target} style={HAIRLINE} />
+    </g>
+  );
+};
+
+/**
  * Gallery entries, neutral then accented, in the kit gallery's 160 × 100 cell.
  * The gallery lists these after the static primitives.
  */
@@ -137,4 +166,21 @@ export const MOTION_SETS = [
     ),
   ],
   ['Pointer', (a) => <Pointer x={76} y={42} accent={a} />],
+  [
+    'Sequence strip',
+    (a) => (
+      <>
+        <Rect x={22} y={26} w={116} h={8} fill={PAINT.shape} corner="shape" />
+        <SequenceStrip
+          x={22}
+          y={44}
+          w={116}
+          h={24}
+          lanes={[{ start: 0, end: 0.3 }, { start: 0.12, end: 0.42 }, { start: 0.24, end: 0.54 }]}
+          now={0.4}
+          accent={a}
+        />
+      </>
+    ),
+  ],
 ];

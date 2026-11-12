@@ -192,6 +192,11 @@ function createContext({ scene, getState, setState, track, instant, isLive }) {
         },
       }).then(snap);
     },
+    /** Wait a number of milliseconds, for rules stated in milliseconds (a stagger, a gap between fades). */
+    after: (ms) => (instant || ms <= 0 ? Promise.resolve() : run(0, 1, { duration: ms / 1000, ease: 'linear' })),
+    /** A clock: `key` counts up to `ms` over `ms` milliseconds, for a sequence strip's playhead. */
+    clock: (key, ms) =>
+      run(getState()[key], ms, { duration: ms / 1000, ease: 'linear', onUpdate: (v) => set({ [key]: v }) }),
     /** Wait a number of beats. */
     hold: (beats) => (instant ? Promise.resolve() : run(0, 1, { duration: beats * BEAT, ease: 'linear' })),
     /**

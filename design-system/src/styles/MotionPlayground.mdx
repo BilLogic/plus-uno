@@ -1,0 +1,72 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as PlaygroundStories from './MotionPlayground.stories.jsx';
+
+<Meta of={PlaygroundStories} />
+
+<FoundationHero
+    title="Playground"
+    summary="Try the springs on a real move, and check how they feel at real speed."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Try a spring">
+
+<FoundationSubsection title="Stiff and soft">
+
+The same menu at the two extremes of the dial. A very stiff spring snaps; a very soft one drifts and makes you wait.
+
+<Canvas of={PlaygroundStories.StiffAndSoft} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Your own spring">
+
+Pick a token and a mode to load its generated spring, then move stiffness and damping ratio. The next move uses exactly the config shown, built the way the token generator builds it (damping = 2 × ratio × √(stiffness × mass)), and the curve and the 90% time update with it. With the controls untouched, it is the generated config, unchanged. Playback speed slows the move so you can study it.
+
+<Canvas of={PlaygroundStories.ControlsStartAtTheGeneratorsConfig} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Feel checks">
+
+<FoundationSubsection title="The shake">
+
+A blocked Save shakes once, at real speed.
+
+<Canvas of={PlaygroundStories.TheShake} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="The three Productive speeds">
+
+Each on its real job, at real speed.
+
+<Canvas of={PlaygroundStories.ThreeSpeeds} sourceState="none" />
+
+</FoundationSubsection>
+
+Anything tuned here is for feel only. To change a token, ask the design team; the numbers in Physics are the only source.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Physics', description: 'The token table and what each spring does.', href: '?path=/docs/foundations-motion-physics--docs' },
+        { title: 'Choreography', description: 'How several moving parts stay coherent.', href: '?path=/docs/foundations-motion-choreography--docs' },
+    ]}
+/>
+
+</FoundationSection>
