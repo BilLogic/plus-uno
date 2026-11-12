@@ -145,7 +145,7 @@ const CORNERS = {
   flag: ['--popup-radius', 'components/messaging/Flag/Flag.scss'],
   tooltip: ['--radius-control-sm', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
   modal: ['--modal-radius', 'components/messaging/Modal/Modal.scss'],
-  field: ['--radius-0625', 'components/forms-and-inputs/_internal/FieldBox.scss'],
+  field: ['--radius-control-lg', 'components/forms-and-inputs/_internal/FieldBox.scss'],
   sidebarRow: ['--frame-sidebar-row-radius', 'patterns/Sidebar/Sidebar.scss'],
   tab: ['--radius-md', 'components/navigation/Tabs/Tabs.scss'],
   count: ['--radius-sm', 'components/labels/CountTag/CountTag.scss'],
