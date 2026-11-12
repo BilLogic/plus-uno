@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { BASELINE, interactiveComponents, run, validTokens } from './check-motion-registry.mjs';
+import { BASELINE, interactiveComponents, patternPages, run, validTokens } from './check-motion-registry.mjs';
 
 const INDEX = '## UI components (3)\n\n- [Button](../x/Button/index.md)\n- [Popup](../x/Popup/index.md)\n- [Heading](../x/Heading/index.md)\n- Logo — exported here\n\n## Before you finish\n- [Nope](../n.md)\n';
 
@@ -104,6 +104,35 @@ test('the allow-list cannot grow: a new component not in the record fails', () =
   const root = scratch([]);
   const f = run({ repoRoot: root, index: INDEX, registry: [row('Button')] });
   assert.match(f[0].message, /Popup/);
+});
+
+const patternRow = (name) => ({ name, tier: 'pattern', events: { change: { transition: 'Swap content in place', appearance: 'appearance.fast' } } });
+
+test('a Patterns page with no pattern row fails', () => {
+  const root = scratch(['Button', 'Popup']);
+  const f = run({ repoRoot: root, index: INDEX, registry: [], patterns: ['Filtering'] });
+  assert.ok(f.some((x) => /Patterns page "Filtering" has no tier: 'pattern' row/.test(x.message)));
+});
+
+test('a Patterns page with a pattern row passes', () => {
+  const root = scratch(['Button', 'Popup']);
+  assert.deepEqual(run({ repoRoot: root, index: INDEX, registry: [patternRow('Filtering')], patterns: ['Filtering'] }), []);
+});
+
+test('a template row of the same name does not satisfy a Patterns page', () => {
+  const root = scratch(['Button', 'Popup']);
+  const f = run({ repoRoot: root, index: INDEX, registry: [{ ...patternRow('Filtering'), tier: 'template' }], patterns: ['Filtering'] });
+  assert.match(f[0].message, /Filtering/);
+});
+
+test('patternPages reads titles under Patterns/ and skips the Overview', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pattern-pages-'));
+  const dir = path.join(root, 'design-system/src/storybook-docs/patterns');
+  fs.mkdirSync(path.join(dir, 'Filtering'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'Overview.mdx'), '<Meta title="Patterns/Overview" />');
+  fs.writeFileSync(path.join(dir, 'Filtering/Filtering.mdx'), '<Meta title="Patterns/Finding things/Filtering" />');
+  fs.writeFileSync(path.join(dir, 'Filtering/Filtering.stories.jsx'), "export default { title: 'Patterns/Finding things/Filtering/Examples' };");
+  assert.deepEqual(patternPages(root), ['Filtering']);
 });
 
 test('the live tree holds its own record', () => {

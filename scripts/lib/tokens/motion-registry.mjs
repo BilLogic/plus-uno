@@ -132,6 +132,22 @@ export const MOTION_REGISTRY = [
       error: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'An error on leaving a field makes room, then fades in; it fades and the room closes once the field is fixed.' },
     },
   },
+  // Patterns: how a pattern composes transitions, from 06-patterns. One row per Patterns page; check:motion-registry requires it.
+  {
+    name: 'Filtering',
+    tier: 'pattern',
+    events: {
+      'menu-open': { transition: 'Open and close an overlay', spatial: 'spatial.fast', note: 'A filter menu clips open from the Filter icon\'s top-right corner; its right edge stays on the icon\'s.' },
+      'menu-close': { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'A filter menu fades closed.' },
+      'count-first': { transition: 'Update a value or state', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'The first filter widens the Filter button to the left, right edge fixed, and the count fades in. A quick FilterButton\'s count hugs the label the same way. Below 960 a filter side hides with no animation: the Filter icon is back with its count in the same frame.' },
+      'count-change': { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The Filter count grows to the left; a changed number fades to its new value.' },
+      reset: { transition: 'Update a value or state', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'The count fades out, then the icon narrows back.' },
+      search: { transition: 'Update a value or state', spatial: 'spatial.fast', note: 'Search grows to the left, right edge fixed, so the pills and the primary never move. Escape, or an empty blur, shrinks it back the same way; fast stays fast on exit.' },
+      chip: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A chip being added or removed is Add or remove.' },
+      results: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'The results swap in place, a clean fade, once per Apply. Typing in Search filters the list the same way.' },
+      'results-load': { transition: 'Load content', appearance: 'appearance.fast', note: 'When the fetch is slow, the results are Load.' },
+    },
+  },
   {
     name: 'Popup',
     tier: 'component',

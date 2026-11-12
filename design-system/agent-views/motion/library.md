@@ -43,6 +43,15 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | PatternTable | template | selection | Update a value or state | `--ds-motion-appearance-fast` |
 | Popup | template | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
 | Popup | template | exit | Open and close an overlay | `--ds-motion-appearance-fast` |
+| Filtering | pattern | menu-open | Open and close an overlay | `--ds-motion-spatial-fast` |
+| Filtering | pattern | menu-close | Open and close an overlay | `--ds-motion-appearance-fast` |
+| Filtering | pattern | count-first | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
+| Filtering | pattern | count-change | Update a value or state | `--ds-motion-appearance-fast` |
+| Filtering | pattern | reset | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
+| Filtering | pattern | search | Update a value or state | `--ds-motion-spatial-fast` |
+| Filtering | pattern | chip | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
+| Filtering | pattern | results | Swap content in place | `--ds-motion-appearance-fast` |
+| Filtering | pattern | results-load | Load content | `--ds-motion-appearance-fast` |
 | Accordion | component | change | Expand and collapse | `--ds-motion-spatial-fast` |
 | AiMessage | component | change | Load content | `--ds-motion-appearance-fast` |
 | Banner | component | enter | Add or remove an item | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |
