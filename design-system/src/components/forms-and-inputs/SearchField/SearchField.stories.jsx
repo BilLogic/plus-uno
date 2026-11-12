@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import SearchField, { SearchFieldAction } from './SearchField';
 import Button from '../Button/Button';
 
@@ -196,6 +196,8 @@ export const CollapsibleScopes = {
     },
 };
 
+const loadSpy = fn(async () => ({ results: [], total: 0 }));
+
 export const Basic = {
     render: () => {
         const [searched, setSearched] = useState([]);
@@ -205,6 +207,7 @@ export const Basic = {
                 <SearchField
                     placeholder="Search students"
                     mode="basic"
+                    loadResults={loadSpy}
                     onValueChange={() => setKeys((n) => n + 1)}
                     onSearch={(text) => setSearched((list) => [...list, text])}
                 />
@@ -215,11 +218,14 @@ export const Basic = {
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        loadSpy.mockClear();
         await userEvent.type(canvas.getByRole('searchbox'), 'ada');
         // Typing alone runs nothing.
         await expect(canvas.getByTestId('searched')).toHaveTextContent('');
         await userEvent.keyboard('{Enter}');
         await expect(canvas.getByTestId('searched')).toHaveTextContent('ada');
+        // Basic mode never calls loadResults, typing or Enter.
+        await expect(loadSpy).not.toHaveBeenCalled();
     },
 };
 
@@ -273,6 +279,11 @@ export const Focused = {
         await expect(input).toHaveValue('Ada');
         // Typing: groups with counts, then See all, then the action row.
         await waitFor(() => expect(page.getByText('Students (1)')).toBeVisible());
+        // Hovering a row sets the cursor; leaving the panel clears it.
+        await userEvent.hover(page.getByRole('option', { name: /Ada Lovelace/ }));
+        await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant'));
+        await userEvent.unhover(page.getByRole('listbox', { name: 'Suggestions' }));
+        await waitFor(() => expect(input).not.toHaveAttribute('aria-activedescendant'));
         // A click on the See all row runs a basic search and closes the panel.
         await userEvent.click(page.getByRole('option', { name: /See all results for/ }));
         await expect(canvas.getByTestId('log')).toHaveTextContent('search:Ada');
@@ -315,6 +326,19 @@ export const FocusedKeyboard = {
         await waitFor(() => expect(page.getByRole('listbox', { name: 'Suggestions' })).toBeVisible());
         await userEvent.keyboard('{Enter}');
         await expect(canvas.getByTestId('log')).toHaveTextContent('search:gr');
+        // Arrows wrap: up from the first row lands on the last, down from the last on the first.
+        await userEvent.clear(input);
+        await userEvent.type(input, 'a');
+        await waitFor(() => expect(page.getByRole('option', { name: /See all results for/ })).toBeVisible());
+        const options = page.getAllByRole('option');
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(input).toHaveAttribute('aria-activedescendant', options[0].id);
+        await userEvent.keyboard('{ArrowUp}');
+        await expect(input).toHaveAttribute('aria-activedescendant', options[options.length - 1].id);
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(input).toHaveAttribute('aria-activedescendant', options[0].id);
+        await userEvent.clear(input);
+        await userEvent.type(input, 'gr');
         // Last row: See all, then the action row, by arrow from the end.
         await userEvent.type(input, 'x');
         await waitFor(() => expect(page.getByRole('option', { name: 'Create student \u201Cgrx\u201D' })).toBeVisible());
