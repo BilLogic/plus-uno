@@ -393,7 +393,8 @@ const TagInput = ({
         if (onColorChange) {
             TAG_COLORS.forEach((color) => rows.push({
                 value: color,
-                label: <Tag color={color}>{COLOR_NAMES[color]}</Tag>,
+                // The color is the whole point of a color row, so the swatch is on.
+                label: <Tag color={color} swatchBefore>{COLOR_NAMES[color]}</Tag>,
                 group: 'Color',
             }));
         }
