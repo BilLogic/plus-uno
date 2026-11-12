@@ -282,10 +282,36 @@ describe('Flag sound', () => {
     });
 
     it('under reduced motion still plays, landing with the reduced spring', () => {
-        reducedMotion(true);
-        render(<Flag title="Saved" />);
+        // The flag's own reduced flag (prop, then FlagGroup, then the OS); the prop is the stable lever in jsdom.
+        render(<Flag title="Saved" reducedMotion />);
         const expected = soundStartFor('spatial.default', 'notify', { mode: 'reduced' });
         expect(Math.abs(scheduledStart() - expected)).toBeLessThan(0.01);
+    });
+
+    it('an error flag plays Error; the other appearances play Notify', () => {
+        reducedMotion(false);
+        const toneCount = (token) => scoreFor(token).events.length;
+        render(<Flag title="Failed" appearance="error" />);
+        expect(audio.starts).toHaveLength(toneCount('error'));
+        audio.starts.length = 0;
+        render(<Flag title="Saved" appearance="success" />);
+        expect(audio.starts).toHaveLength(toneCount('notify'));
+        expect(toneCount('error')).not.toBe(toneCount('notify'));
+    });
+
+    it('the sound prop names a token', () => {
+        reducedMotion(false);
+        render(<Flag title="Prompt" sound="prompt" />);
+        expect(audio.starts.length).toBe(scoreFor('prompt').events.length);
+    });
+
+    it('marks the surface with the reduced value the sound and the enter share', () => {
+        reducedMotion(false);
+        const flagEl = () => screen.getByText('Saved').closest('.plus-flag');
+        const { rerender } = render(<Flag title="Saved" reducedMotion />);
+        expect(flagEl()).toHaveAttribute('data-reduced', 'true');
+        rerender(<FlagGroup reducedMotion><Flag title="Saved" /></FlagGroup>);
+        expect(flagEl()).toHaveAttribute('data-reduced', 'true');
     });
 
     it('a hidden flag plays nothing', () => {

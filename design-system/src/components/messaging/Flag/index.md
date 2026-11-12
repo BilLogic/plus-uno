@@ -39,13 +39,13 @@ Flag reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does | Sound |
 | --- | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Slides in from the top-right corner. | `sound.notify` on land: outside a session; Flags that arrive together play once |
+| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Slides in from the top-right corner. | `sound.notify` on land: outside a session; any appearance but error, which plays Error (the failed event); Flags that arrive together play once |
 | exit | Open and close an overlay | `--ds-motion-spatial-exit` | Timed out: leaves the way it came, toward the top-right corner, on spatial.exit aimed 3.8× past the edge; the stack then closes up. |  |
 | dismiss | Open and close an overlay | `--ds-motion-appearance-fast` | Closed by hand: a quick fade in place. |  |
 | change | Add or remove an item | `--ds-motion-spatial-default` | The stack closes up when one leaves. |  |
 | milestone | Open and close an overlay | `--ds-motion-spatial-fast` | Finishing a reflection: inside an Expressive container, slides in from the top-right corner with one overshoot; leaves by the exit rules. | `sound.done.step` on land: a reflection is complete |
-| prompt | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A Flag that asks for action now enters like any Flag. | `sound.prompt` on land: session link ready, a lead with an empty tutor, wrap-up, few students at 10 min; plays when the tab is hidden |
-| failed | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A danger Flag for a failed background job enters like any Flag and stays until closed. | `sound.error` on land: a background job the person started failed |
+| prompt | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A Flag that asks for action now enters like any Flag. | `sound.prompt` on land: session link ready, a lead with an empty tutor, wrap-up, few students at 10 min; an app passes sound="prompt"; plays when the tab is hidden |
+| failed | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A danger Flag for a failed background job enters like any Flag and stays until closed. | `sound.error` on land: an error Flag, the default for that appearance: a background job the person started failed |
 
 ## Best practices
 
@@ -187,7 +187,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | `headerClass` | string | `''` | Extra class on the header row that holds the title and timestamp. |
 | `bodyClass` | string | `''` | Extra class on the description container. |
 | `timestamp` | node | — | Small text beside the title, such as "11 mins ago". |
-| `sound` | bool | `true` | Plays Notify as the flag lands, through the app's sound setting. Defaults to true; the app passes false when a flag should stay quiet, such as during a session or for all but the first of several that arrive together. |
+| `sound` | string or enum | — | The sound token it plays as it lands, through the app's sound setting, or `false` for none. Unset, an `error` flag plays `error` and every other appearance plays `notify`. Pass `false` when a flag should stay quiet, such as during a session. |
 | `reducedMotion` | bool | — | Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting. |
 
 ## Variants

@@ -63,7 +63,8 @@
     }
 
     // Reduced motion: never a cut, never a move. Enter is the fade alone; both exits are the quick fade.
-    @media (prefers-reduced-motion: reduce) {
+    // Flag.jsx sets `data-reduced` from the one value the sound reads too: the prop, then FlagGroup, then the OS setting.
+    &[data-reduced='true'] {
         animation: plus-flag-fade-in var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
 
         &[data-leaving] {

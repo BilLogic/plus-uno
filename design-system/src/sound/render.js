@@ -5,15 +5,14 @@
  * runtime uses (exponential gain ramps, a sine oscillator, a band-pass biquad
  * over one shared noise buffer).
  *
- * It renders the dry path only. The reverb send is the material's room (0.06)
- * through a wet level of 0.2, far under the dry sound: this render reads every
- * token within 0.3 dB of the Lab's own OfflineAudioContext measurement, reverb
- * included.
+ * It renders the dry path only. The reverb send is far under the dry sound (the
+ * plan's material sets it): this render reads every token within 0.3 dB of the
+ * Lab's own OfflineAudioContext measurement, reverb included.
  */
 import { ENVELOPE, scoreLength } from './score';
+import { SOUND_SPEC } from './spec.generated';
 
 const RATE = 44100;
-const NOISE_SECONDS = 0.2;
 const { floor: FLOOR, knockRise: KNOCK_RISE, knockTail: KNOCK_TAIL, toneTail: TONE_TAIL, glideHold: GLIDE_HOLD } = ENVELOPE;
 const WINDOW = 0.05;
 
@@ -79,7 +78,7 @@ function addKnock(out, rate, e, noise) {
  */
 export function renderScore(score, { sampleRate = RATE, seed = 1 } = {}) {
   const out = new Float32Array(Math.ceil((scoreLength(score) + TONE_TAIL + WINDOW) * sampleRate));
-  const noise = noiseBuffer(Math.round(sampleRate * NOISE_SECONDS), seed);
+  const noise = noiseBuffer(Math.round(sampleRate * SOUND_SPEC.noiseSeconds), seed);
   for (const e of score.events) {
     if (e.kind === 'tone') addTone(out, sampleRate, e);
     else addKnock(out, sampleRate, e, noise);

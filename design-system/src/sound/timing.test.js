@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { SOUND_SPEC } from './spec.generated';
-import { soundStartFor, springT90 } from './timing';
+import { modeFor, soundStartFor, springT90 } from './timing';
 
 // Hand-computed 90% times. A critically damped spring reaches 90% at
 // x / sqrt(stiffness), where (1 + x) e^-x = 0.1, x = 3.88972. The Expressive
@@ -49,5 +49,13 @@ describe('soundStartFor', () => {
 
   it('throws on a name that is not a sound token', () => {
     expect(() => soundStartFor('spatial.default', 'chime')).toThrow(/chime/);
+  });
+});
+
+describe('modeFor', () => {
+  it('names the spring mode a reduced setting lands in', () => {
+    expect(modeFor(true)).toBe('reduced');
+    expect(modeFor(false)).toBe('productive');
+    expect(modeFor(undefined)).toBe('productive');
   });
 });

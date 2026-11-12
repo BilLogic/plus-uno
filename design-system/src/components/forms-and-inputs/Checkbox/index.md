@@ -29,7 +29,7 @@ Checkbox reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does | Sound |
 | --- | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |  |
-| goal | Update a value or state | `--ds-motion-appearance-fast` | A session goal set or checked off together: the mark and fill change color, like any change. | `sound.goal` on land: set or checked together in a session; shared, so the student hears it |
+| goal | Update a value or state | `--ds-motion-appearance-fast` | A session goal set or checked off together: the mark and fill change color, like any change. | `sound.goal` on land: only the session goal check-in done together, shared with the student; other checkboxes stay silent |
 
 ## Best practices
 
