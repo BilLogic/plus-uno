@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Radio from './Radio';
 
 export default {
@@ -181,6 +182,9 @@ ReadOnly.play = async ({ canvasElement }) => {
     await userEvent.click(online);
     await expect(online.nextElementSibling.checked).toBe(false);
     await expect(canvas.getByRole('radio', { name: 'In person' }).nextElementSibling.checked).toBe(true);
+
+    await expectChoiceReadOnly(canvasElement, online, 'unchecked radio');
+    await expectChoiceReadOnly(canvasElement, canvas.getByRole('radio', { name: 'In person' }), 'checked radio');
 };
 
 /** A description under the label, and the card appearance. */

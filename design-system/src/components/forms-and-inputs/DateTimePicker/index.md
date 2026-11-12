@@ -100,7 +100,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the focused half. |
 | Invalid | Both borders take `--ds-border-danger`; the caption shows the error message. |
 | Valid | Both borders take `--ds-border-success`; the caption shows the success message. |
-| Read-only | Both boxes take `--ds-background-neutral`. |
+| Read-only | Both boxes take `--ds-background-neutral`, at full contrast with no hover. The calendar icon and the chevron are not drawn. |
 | Disabled | Both boxes fade to `--ds-opacity-disabled` and leave the tab order. |
 
 ### Tokens

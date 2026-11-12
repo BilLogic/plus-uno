@@ -92,7 +92,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the radio, for keyboard focus only. |
 | Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the dot is `--ds-icon-inverse`. |
 | Invalid | The unselected radio takes `--ds-border-danger`. A selected radio keeps its fill. |
-| Read-only | Full contrast, in the tab order, not changeable. |
+| Read-only | Full contrast, in the tab order, no hover; an unchecked radio takes the `--ds-background-neutral` fill. Not changeable. |
 | Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` dot. Out of the tab order. |
 
 ### Tokens
@@ -148,7 +148,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-surface` · `--ds-text` · `--item-height-sm` · `--pad-x-md` · `--plus-choice-indent` · `--radio-control-size` · `--radius-025` · `--radius-full` · `--space-025` · `--space-0375` · `--space-050` · `--stroke-1` · `--stroke-2` · `--type-weight-regular`
+`--body-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-surface` · `--ds-text` · `--item-height-sm` · `--pad-x-md` · `--plus-choice-indent` · `--radio-control-size` · `--radius-025` · `--radius-full` · `--space-025` · `--space-0375` · `--space-050` · `--stroke-1` · `--stroke-2` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Radio/Radio.scss`. Override these through the token layer, never with a literal.
 

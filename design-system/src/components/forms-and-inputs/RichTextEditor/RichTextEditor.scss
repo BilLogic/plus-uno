@@ -121,8 +121,12 @@
     background-color: var(--ds-background-neutral);
 }
 
+// Read-only is a value to read, so its text keeps full contrast; disabled steps down.
 .plus-rich-text-editor-readonly .plus-rich-text-editor-content,
 .plus-rich-text-editor-disabled .plus-rich-text-editor-content {
-    color: var(--ds-text-subtle);
     cursor: default;
+}
+
+.plus-rich-text-editor-disabled .plus-rich-text-editor-content {
+    color: var(--ds-text-subtle);
 }

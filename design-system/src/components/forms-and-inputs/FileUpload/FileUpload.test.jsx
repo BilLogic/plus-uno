@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import FileUpload from './FileUpload';
 
@@ -67,6 +67,15 @@ describe('FileUpload', () => {
         expect(container.querySelector('.plus-file-upload-container')).toHaveClass('plus-file-upload-readonly');
         expect(container.querySelector('input[type="file"]')).toHaveAttribute('aria-readonly', 'true');
         expect(screen.getByText('zoom_0.mp4')).toBeInTheDocument();
+    });
+
+    it('keeps a read-only field in the tab order and does not open the picker', () => {
+        const { container } = render(<FileUpload label="Recording" isReadOnly />);
+        const input = container.querySelector('input[type="file"]');
+        expect(input.tabIndex).toBeGreaterThanOrEqual(0);
+        expect(input).not.toBeDisabled();
+        const pressed = fireEvent.keyDown(input, { key: 'Enter' });
+        expect(pressed).toBe(false);
     });
 
     it('labels the file input with a plain label element', () => {

@@ -55,7 +55,7 @@ Don't: A disabled box cannot be tabbed to.
 
 ### Read-only is not disabled. {#read-only-is-not-disabled}
 
-`isReadOnly` shows an answer the person may read but not change: the box stays in the tab order at full contrast, says `aria-readonly`, and ignores clicks and Space. `isDisabled` takes it out of the tab order and grays it, for a box that waits on something the person can fix on the same screen. Put the reason in `description`, which stays at full contrast, and never in a tooltip. When it blocks the main action or several boxes, add a warning Section message above that says how to turn them on.
+`isReadOnly` shows an answer the person may read but not change: the box stays in the tab order at full contrast, takes the neutral fill when unchecked, has no hover, says `aria-readonly`, and ignores clicks and Space. Say why in the description. `isDisabled` takes it out of the tab order and grays it, for a box that waits on something the person can fix on the same screen. Put the reason in `description`, which stays at full contrast, and never in a tooltip. When it blocks the main action or several boxes, add a warning Section message above that says how to turn them on.
 
 ### A description describes; the label names. {#a-description-describes-the-label-names}
 
@@ -113,7 +113,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid
 | Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the check is `--ds-icon-inverse`. |
 | Mixed | The same fill and edge as selected; the mark is a dash in `--ds-icon-inverse`. |
 | Invalid | The unselected box takes `--ds-border-danger`. A selected or mixed box keeps its fill. |
-| Read-only | Full contrast, in the tab order, `aria-readonly`; ignores clicks and Space. |
+| Read-only | Full contrast, in the tab order, `aria-readonly`, no hover; an unchecked box takes the `--ds-background-neutral` fill. Ignores clicks and Space. |
 | Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` mark. Out of the tab order. |
 
 ### Tokens
@@ -170,7 +170,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--checkbox-control-size` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-surface` · `--ds-text` · `--item-height-sm` · `--pad-x-md` · `--plus-choice-indent` · `--radius-025` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-regular`
+`--body-default` · `--checkbox-control-size` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-surface` · `--ds-text` · `--item-height-sm` · `--pad-x-md` · `--plus-choice-indent` · `--radius-025` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss`. Override these through the token layer, never with a literal.
 

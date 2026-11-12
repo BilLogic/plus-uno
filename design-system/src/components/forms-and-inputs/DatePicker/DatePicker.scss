@@ -18,7 +18,6 @@
     cursor: pointer;
 }
 
-.plus-field--disabled .plus-date-picker__icon,
-.plus-field--readonly .plus-date-picker__icon {
+.plus-field--disabled .plus-date-picker__icon {
     cursor: default;
 }

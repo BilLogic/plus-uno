@@ -136,7 +136,7 @@ Pick the size by the page. Use 16 where the page has many toggles, such as a set
 <tr><td>Pressed</td><td>No step of its own. The hovered fill holds while the pointer is down.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the track, for keyboard focus only.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-background-disabled</code> track, <code>--ds-icon-disabled</code> thumb, in both positions. Out of the tab order.</td></tr>
-<tr><td>Read-only</td><td>Full contrast, in the tab order, not changeable.</td></tr>
+<tr><td>Read-only</td><td>Full contrast, in the tab order, no hover, <code>aria-readonly</code>. Not changeable.</td></tr>
 <tr><td>Loading</td><td>A spinner sits between the track and the label; input is ignored.</td></tr>
 </tbody>
 </DocsTable>
@@ -201,7 +201,7 @@ A toggle changes the setting as the person flips it. If the change needs confirm
 
 ### Read-only is not disabled.
 
-`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast and ignores clicks. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now.
+`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast, has no hover, says `aria-readonly` and ignores clicks. Say why beside it. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now.
 
 ### Name and id.
 

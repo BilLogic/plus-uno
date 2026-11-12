@@ -298,7 +298,10 @@ const RichTextEditor = ({
                     role="textbox"
                     aria-multiline="true"
                     aria-labelledby={labelId}
-                    aria-readonly={readOnly || disabled || undefined}
+                    aria-readonly={readOnly || undefined}
+                    aria-disabled={disabled || undefined}
+                    // Read-only is a value to read: it stays in the tab order. Disabled leaves it.
+                    tabIndex={readOnly && !disabled ? 0 : undefined}
                     data-placeholder={placeholder}
                     style={{ minHeight: minHeight ? `${minHeight}px` : undefined }}
                     onInput={handleInput}

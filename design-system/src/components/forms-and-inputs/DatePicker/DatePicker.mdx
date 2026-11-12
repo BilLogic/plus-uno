@@ -132,7 +132,7 @@ Use `DatePicker` for a single date or a date range typed or chosen from a calend
 <tr><td>Hovered</td><td>The border takes <code>--ds-border-focused</code>.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box.</td></tr>
 <tr><td>Invalid</td><td>The border takes <code>--ds-border-danger</code> and the input sets <code>aria-invalid</code>.</td></tr>
-<tr><td>Read-only</td><td>The box takes <code>--ds-background-neutral</code>.</td></tr>
+<tr><td>Read-only</td><td>The box takes <code>--ds-background-neutral</code>, at full contrast with no hover. The calendar icon is not drawn and a press opens no calendar. The date can be read, selected and copied.</td></tr>
 <tr><td>Disabled</td><td>The box fades to <code>--ds-opacity-disabled</code> and leaves the tab order.</td></tr>
 </tbody>
 </DocsTable>
@@ -216,6 +216,17 @@ A range picks start and end in one field and one calendar. Two separate fields s
 </div>
 
 <div className="sb-ds-doc-section">
+
+### Read-only is not disabled.
+
+`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+
+<DoDontPair
+    doExample={<DatePicker aria-label="Session date" value="2026-10-25" isReadOnly />}
+    doCaption="Read-only keeps the value readable, and the caption says why."
+    dontExample={<DatePicker aria-label="Session date" value="2026-10-25" isDisabled />}
+    dontCaption="Disabled fades a value people need to read."
+/>
 
 ## Content guidelines
 

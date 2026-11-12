@@ -753,6 +753,7 @@ const TagInput = ({
                             maxLength={maxLength}
                             disabled={disabled}
                             readOnly={readOnly}
+                            aria-readonly={readOnly || undefined}
                             onChange={(event) => { setFilter(event.target.value); setOpen(true); }}
                             onClick={() => { if (editable) setOpen(true); }}
                             onKeyDown={handleKeyDown}
