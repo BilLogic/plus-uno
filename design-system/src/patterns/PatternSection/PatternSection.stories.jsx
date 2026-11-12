@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-<<<<<<< HEAD
-import { Button, IconButton, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, StatusTag, TextField, Tabs as TabsComponent } from '@/components';
-=======
 import {
     Button,
     ButtonGroup,
-    ButtonItem,
     Checkbox,
     CountTag,
-    DropdownMenu,
     DynamicTable,
     EmptyState,
     FilterButton,
@@ -18,12 +13,12 @@ import {
     PanelCloseAction,
     PanelContainer,
     PanelHeader,
+    Select,
     StatusTag,
     TextField,
     Toggle,
     Tabs as TabsComponent,
 } from '@/components';
->>>>>>> 44815d74b (Section template stories: types, header types, side, width behavior, key states)
 import { PANEL_STORAGE_KEY, PatternCard, PatternSection, SECTION_DETAIL_FLOOR, usePanelControl } from '@/patterns';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useOwnWidth } from '../Frame/useOwnWidth';
@@ -999,29 +994,40 @@ export const HeaderTypeViewBarAlone = {
     ),
 };
 
-/** Under page tabs: the views become one labeled dropdown at the start of the bar. */
+/** Under page tabs: the views become one labeled Select at the start of the bar. */
 export const HeaderTypeUnderPageTabs = {
     name: 'Header: Under page tabs',
-    render: () => {
-        const [view, setView] = useState('Upcoming');
-        const viewMenu = (
-            <DropdownMenu trigger={<Button text={`Status: ${view}`} iconAfter="chevron-down" appearance="subtle" />} placement="bottom-start">
-                {['Upcoming', 'Past', 'Canceled'].map((v) => <ButtonItem key={v} onClick={() => setView(v)}>{v}</ButtonItem>)}
-            </DropdownMenu>
-        );
-        return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-                <TabsComponent defaultActiveKey="sessions" aria-label="Student pages">
-                    <TabsComponent.Tab eventKey="overview">Overview</TabsComponent.Tab>
-                    <TabsComponent.Tab eventKey="sessions">Sessions</TabsComponent.Tab>
-                    <TabsComponent.Tab eventKey="notes">Notes</TabsComponent.Tab>
-                </TabsComponent>
-                <PatternSection title="Sessions" type="tabs-only" tabs={<ViewBar start={viewMenu} primary="New session" />}>
-                    <StudentsTable count={3} />
-                </PatternSection>
-            </div>
-        );
-    },
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+            <TabsComponent defaultActiveKey="sessions" aria-label="Student pages">
+                <TabsComponent.Tab eventKey="overview">Overview</TabsComponent.Tab>
+                <TabsComponent.Tab eventKey="sessions">Sessions</TabsComponent.Tab>
+                <TabsComponent.Tab eventKey="notes">Notes</TabsComponent.Tab>
+            </TabsComponent>
+            <PatternSection
+                title="Sessions"
+                type="tabs-only"
+                tabs={(
+                    <ViewBar
+                        start={(
+                            <div style={{ inlineSize: 'var(--card-min-width-sm)' }}>
+                                <Select
+                                    aria-label="Status"
+                                    spacing="compact"
+                                    clearable={false}
+                                    defaultValue="upcoming"
+                                    options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }, { value: 'canceled', label: 'Canceled' }]}
+                                />
+                            </div>
+                        )}
+                        primary="New session"
+                    />
+                )}
+            >
+                <StudentsTable count={3} />
+            </PatternSection>
+        </div>
+    ),
 };
 
 /** Subsection: any type nests once; the title drops to an h3 and the view bar keeps its size. */
@@ -1240,6 +1246,7 @@ export const AnatomyQueue = {
     render: () => (
         <div style={{ inlineSize: STAGE }}>
             <PatternSection
+                data-anatomy-root
                 title="Reflections to review"
                 description="Week of Oct 20"
                 tabs={<ViewBar views={['To review', 'Done']} primary={null} />}

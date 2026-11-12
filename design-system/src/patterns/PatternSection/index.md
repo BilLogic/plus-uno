@@ -10,140 +10,196 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Source:** `design-system/src/patterns/PatternSection/PatternSection.jsx`
 
-**Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, FillSubtle, Footer, Anatomy, Levels, ToolbarSearch, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, DetailWithPanel, DetailWithPanelNoSectionDetail, DetailSplitAt1440, DetailSplitHoldsWithPanelAt1440, DetailReplacesListBelow960
+**Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, FillSubtle, Footer, Anatomy, Levels, ToolbarSelected, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, DetailWithPanel, DetailWithPanelNoSectionDetail, DetailSplitAt1440, DetailSplitHoldsWithPanelAt1440, DetailReplacesListBelow960, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, HeaderTypeTitle, HeaderTypeTitleAndActions, HeaderTypeViewBarOneView, HeaderTypeViewBarSeveralViews, HeaderTypeFormatSwitch, HeaderTypeViewBarAlone, HeaderTypeUnderPageTabs, HeaderTypeSubsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, RowsSelected, EmptyInTable, AnatomyQueue
 
 **Storybook page:** `design-system/src/patterns/PatternSection/PatternSection.mdx`
 
 ## Usage
 
-Make a section when the content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid. Otherwise the content is part of the section above it. A section holds cards, tables, rows, forms or subsections. A subsection is a section inside a section; use two levels at most.
+Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-### Header type guidance
+A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. Below 960 a side or a detail takes over the body, with a way back.
 
-The type is read from the slots you fill: `header` makes it custom, `toolbar` makes it toolbar and `tabs` makes it tabs. Pass `type="tabs-only"` to show only the tabs row.
+## Alternatives
 
-| Type | When to use |
-| --- | --- |
-| Default | Most sections: a title, a description and actions. |
-| Tabs | Views of the same thing, such as saved views over a table. Keep each label to one or two words. |
-| Toolbar | Search, filters, the record count and actions for the table under it. |
-| Custom | A header the default row cannot hold. |
-| Tabs only | The page title already names the view. |
-
-### Detail
-
-Use `detail` for a queue a person works through, such as Admin › Compliance or Admin › Reflections. The detail is for a decision that takes a glance or a short form. Heavy work, such as the recording review, gets its own page: put "Open full review" in `detailFooter`.
-
-The section holds the split from 960 of its own width. Below that, the detail replaces the list and a back link returns to it; with no record open, the list fills the row. Inside a Frame, pass `sectionDetail` and the Frame keeps the split instead, as Frame shows.
-
-The Page around a section supplies the pad; for a region with a fill of its own, use a Page or a Card.
+- For one object with an agreed shape, use `PatternCard` inside a Section.
+- For a quick look at a row from a table on any page, use `Panel`.
+- For the page's own title, use `PageHeader`; a Section stands under it.
 
 ## Best practices
 
-### Make a section only when it earns one. {#make-a-section-only-when-it-earns-one}
+### Make a Section only when it earns one. {#make-a-section-only-when-it-earns-one}
 
-A section gives a group of content its own heading, its own actions and its own place in the grid. If none of those apply, the content belongs to the section above.
+**Checked:** Review
 
-Do: Two cards share one heading, so they form a section: "Upcoming sessions".
-Don't: One card gets a section whose heading repeats its own title. Drop the section; the card stands on its own.
+A Section earns its own heading, its own actions or its own place in the grid. When its heading would repeat its only card's title, drop the Section and let the card stand on its own.
 
-### Keep the footer for "View all"; commit in the card. {#keep-the-footer-for-view-all-commit-in-the-card}
+Do: A card with its own title stands on its own in the page.
+Don't: A Section whose heading repeats its only card's title: two headings for one thing.
 
-The section footer leads somewhere else: View all, or paging. Actions that commit changes belong in a card with a footer.
+### Put the title row first and the view bar under it. {#put-the-title-row-first-and-the-view-bar-under-it}
 
-Do: The card owns its commit action in its footer. The section footer stays free for "View all".
-Don't: A commit action in the section footer sits far from what it saves, and the footer no longer leads to more.
+**Checked:** Automatic
 
-### Put views in the section header. {#put-views-in-the-section-header}
+The title row sits `--section-stack-sm` above the view bar, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. At every width the two stay separate rows: below the narrow width the description truncates first, then Search collapses, the format switch shows icons, extra pills fold and the Primary keeps only its icon.
 
-A tab group is part of the section, not a pattern of its own. The views are the bottom row of the section header, and each tab's content is the section body. Use views only for views of the same thing.
+Do: The title row first, the view bar under it, sharing one left edge.
+Don't: The title pushed into the view bar: the heading and the pills fight for the start, and the description has nowhere to go.
 
-Do: The views sit under the section title, in the header, and the body belongs to the selected tab.
-Don't: Views placed above a section header make two competing headings, and the views no longer belong to the section.
+### Put actions in the title row only when there is no view bar. {#put-actions-in-the-title-row-only-when-there-is-no-view-bar}
 
-### Open a record beside its list. {#open-a-record-beside-its-list}
+**Checked:** Review
 
-Put Previous and Next in the detail header, and keep one detail per Section.
+Each action has one home. With a view bar, every action sits at its end.
 
-Do: The list stays visible beside the detail on wide screens: pick a row and the record opens next to it.
-Don't: Don't open the detail as a modal over the list: it hides the queue behind a blanket and the person loses their place.
+Do: No view bar, so the actions sit at the end of the title row.
+Don't: Actions in the title row and again in the view bar: one action, two homes.
+
+### Keep views at the start as pills that hug their labels. {#keep-views-at-the-start-as-pills-that-hug-their-labels}
+
+**Checked:** Review
+
+Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled Select, so the page keeps one tab system.
+
+### Order the end of the bar: format switch, Search, filters, More, Primary. {#order-the-end-of-the-bar-format-switch-search-filters-more-primary}
+
+**Checked:** Review
+
+Search, Filter and More are icon buttons with Tooltips; the Primary is labeled and last. Keep five controls at most and fold extras into More. Search, Filter and the Primary stay in the bar. Every control is a default button, or compact in a compact bar.
+
+Do: Format switch, Search, Filter, More, then the labeled Primary last.
+Don't: Six controls in no order, the Primary first and a second labeled button: fold extras into More.
+
+### Turn the head row into the bulk bar when rows are selected. {#turn-the-head-row-into-the-bulk-bar-when-rows-are-selected}
+
+**Checked:** Automatic
+
+The part-ticked select-all, the count of selected rows, then the actions, all at the start. The checkboxes clear the selection, so the bar carries no Cancel. Selected rows take the selected fill and the view bar stays put. Only the Dynamic table selects rows.
+
+### Drop the Filter icon while a filter side shows. {#drop-the-filter-icon-while-a-filter-side-shows}
+
+**Checked:** Review
+
+Each control has one home. The icon returns with its count once the side hides, below `SECTION_DETAIL_FLOOR`.
+
+### Open a queue's record in the Section detail. {#open-a-queue-s-record-in-the-section-detail}
+
+**Checked:** Review
+
+Previous and Next sit in the detail header, one detail per Section, and heavy work opens on its own page from the detail footer. The list stays in view beside the record.
+
+### Keep the footer for paging and "View all". {#keep-the-footer-for-paging-and-view-all}
+
+**Checked:** Review
+
+Actions that commit changes belong in the card or form that holds the fields.
+
+Do: The form card holds its own Save; the Section footer is for paging and "View all".
+Don't: Cancel and Save in the Section footer, away from the fields they commit.
+
+### Use the subtle fill only to stand apart. {#use-the-subtle-fill-only-to-stand-apart}
+
+**Checked:** Review
+
+The subtle fill sets a part apart from its neighbor, such as a detail or a filter side. Plain Sections take no fill.
+
+### Nest a Section once at most. {#nest-a-section-once-at-most}
+
+**Checked:** Review
+
+A subsection is an h3. A Section that already has a view bar holds subsections without one.
+
+The table's empty state replaces the whole table, by the Empty pattern; elevation and fills follow Elevation.
 
 ## Accessibility
 
-- The title is a heading, and its level follows nesting: one h1 per page, h2 for a section, h3 for a subsection. Nest sections instead of choosing a tag.
-- A section with no title is a wrapper. What it holds keeps the parent's heading level.
-- In the custom and tabs-only types the title is hidden from sight but stays in the page, so the section keeps its name. Always give those sections a title.
-- `named` makes the section a region named by its title, for a section that stands apart as a landmark. The detail region is named by `detailTitle`.
-- A loading section is marked busy, and the skeleton bars are hidden from assistive technology.
-- Give the tabs row a label that says what the tabs switch, such as "Views".
-- The toolbar count is a polite live region, so a screen reader hears "12 of 48 students" as search and filters narrow the rows.
-- Search's icon, label and placeholder all name its scope. Its clear button is "Clear search". Esc clears, then closes and returns focus to the icon.
+- The title is a heading whose level follows nesting: h2 for a Section, h3 for a subsection. With the view bar alone the title stays in the page, hidden from sight.
+- The pill views are a tablist named "Views"; the selected pill names the body. Views swap in place.
+- Search, Filter and More carry their names: "Search students", "Filters, 2 applied", "More". The Filter count is in the name as well as on the button.
+- The table announces a selection politely, "2 selected", and the bulk bar's actions follow the select-all checkbox in the tab order.
+- The detail is a region named by its title. Below 960 its back link returns to the list.
 
 ## Related
 
-- Card for one object rather than a region.
-- Page for a region that needs a fill or an edge. A section is transparent.
-- Table: the section header above a table carries its toolbar and tabs.
-- Frame sets the pad a section sits in; its `sectionDetail` prop keeps 960 of content for a detail.
+- Page: use when the heading is the page's own.
+- Panel: use when the record should float over the Page instead of sitting beside the list.
+- Popup: use when choosing the menu the view Select or the Filter icon opens.
+- Table: use when the body is rows and columns.
+- Patterns: use when picking a filter tier (Filtering), the search field's behavior (Search) or an empty body (Empty).
 
 Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSidebar` · `PatternTable`
 
-## Parts
+## Types
 
-1. **Section header.** A part of its own: a title, a description and an actions slot, and an optional bottom row for tabs or a toolbar. Its level sets the heading size.
-2. **Content.** A slot for cards, tables, rows or forms.
-3. **Side** (optional). A second content slot, used only by `layout="split"`.
-4. **Footer** (optional). A slot at the end, for "View all" or paging.
-5. **Detail** (optional). A subtle-fill region on the right with its own title, description, Previous and Next, and footer.
+Common starting types of the one Section, not new components. Each is a header type, a body, and sometimes a side or a detail.
 
-The **toolbar** is its own part, `PatternSection.Toolbar`: search, filters and a count that truncates first, then actions. Selecting rows never changes it: a Dynamic table's bulk bar is the table's own head row, so the toolbar stays put.
+- **List.** The view bar alone, one table, paging. The default for an area page.
+- **Queue.** A list with a detail, for working through records one by one.
+- **Cards.** Title and actions over a grid of cards, three or four across.
+- **Stats.** A row of cards, each one number and its label, four at most.
+- **Details.** Label and value pairs in two columns, with Edit in the title row.
+- **Main and side.** A split with the side at the end and no fill: facts beside the main content.
+- **Form.** Fields in a card, with the card's own Save and Cancel at its bottom.
+- **Subsections.** Sections nested one level, each an h3, for a long settings page.
 
-**Search** is a part too, `PatternSection.Search`: an icon button that grows left into a compact Text field and shrinks back into the icon. It narrows the rows of its own section as you type; there is no results page. `label` names the scope ("Search students"): it is the icon's name, the field's label and its placeholder.
+## Header types
 
-- Press the icon and the field opens with focus in it. Set `defaultOpen` when search is the main way into a large collection.
-- Esc clears the text. A second Esc closes the field and returns focus to the icon.
-- The field stays open while it holds text. Empty, it closes when focus leaves it.
-- "Clear search" empties the field and keeps focus in it.
-- Hold the text yourself (`value`, `onValueChange`) so Reset filters clears the search with the filters. Switching views keeps the search; leaving the page clears it.
+A starting set, picked by what the Section holds. Every control state lives on its component: Icon button, Filter button and Tabs. How the search field behaves and which filters the bar takes are the Search and Filtering patterns, listed in Patterns.
 
-### States
+- **Title.** A title and a description, nothing to act on. Most Sections that hold cards or a form.
+- **Title and actions.** Section actions in the title row, only when there is no view bar. One Primary and two others at most.
+- **View bar, one view.** One pill names the rows and stays, so nothing moves when a second view arrives.
+- **View bar, several views.** Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.
+- **Format switch.** When the rows show as a table or a calendar, equal-width segments sit first at the end.
+- **View bar alone.** The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers.
+- **Under page tabs.** One tab system per page: the views become one labeled Select at the start of the bar. It picks a view, not a filter.
+- **Subsection.** Any type nests once. The title drops to an h3; the view bar keeps its size.
 
-A section has no interactive states: it does not respond to hover, press or focus, and it is never disabled. Those belong to the controls inside it.
+## Anatomy
 
-| State | What changes |
+A queue Section with a view bar, a detail and a footer. The title, the first pill and the first column share one left edge.
+
+1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
+2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.
+3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the bar with nothing between.
+4. **Detail** (optional). The picked record beside the list, 5 of 12 columns, with Previous and Next and its own footer.
+5. **Footer** (optional). Paging or "View all".
+
+## Slots
+
+| Slot or prop | Holds |
 | --- | --- |
-| Loading | Skeleton bars replace the header, and the section is marked busy. The body is the content's to load. |
-| Detail open | A record shows in the detail region; below 960 it replaces the list. |
-| Search open | The Search icon is a field on `--field-width-md`, until it is cleared and closed. |
+| `title` · `description` · `actions` | The title row. Actions only when there is no view bar. |
+| `viewBar` | Planned. Pill Tabs at the start; at the end the format switch, Search, the filters, More and the labeled Primary. Today the view bar goes in `tabs`. |
+| `tabs` · `type="tabs-only"` | The row under the title row; `tabs-only` hides the title row from sight when the page title names the collection. |
+| `fill` | `none` or `subtle`, for the Section; the detail always takes `subtle`. |
+| `children` | The body: a Table, a card grid, a list, a form or subsections. |
+| `layout="split"` · `side` | A second column at the end, for a summary. |
+| `sidePlacement` | Planned. `start` puts the side first, for a filter side or a step rail. |
+| `detail` · `detailTitle` · `detailFooter` | The picked record beside the list, with Previous and Next. |
+| `footer` | Paging or "View all". |
 
-### Tokens
+The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, and the Section holds nothing for it: Dynamic table.
 
-| Token | Value | Used for |
-| --- | --- | --- |
-| `--section-stack-sm` | 8 | The title row to the tabs or toolbar row. |
-| `--section-stack-md` | 16 | The header to the body, and the body to the footer. |
-| `--section-stack-lg` | 24 | Between subsections. |
-| `--section-min-width-main`, `-side` | 480, 224 | The main and side columns of a split. |
-| `--section-radius`, `--section-pad-x-default`, `--section-pad-y-default` | radius, pad | A section with `fill="subtle"`. |
-| `--ds-surface-sunken` | color | The subtle fill. |
-| `--stack-sm` | 4 | The title to the description. |
-| `--inline-md` | 8 | Items in the title row and the tabs row. |
-| `--heading-large`, `-medium`, `-small` | 24/28, 20/24, 16/20 | A page title, a section title and a subsection title. |
-| `--body-default` | 14/20 | The description, at every level. |
-| `--ds-text`, `--ds-text-subtle` | color | The title and the description. |
-| `--field-width-md`, `--item-height-md` | 240, 32 | The open Search field, and the icon it grows from. |
-| `--motion-duration-medium`, `--motion-easing-standard` | 200 ms, standard | Search growing into a field and shrinking back. Reduced motion makes it instant. |
+## Sizes
+
+| Token | Used for |
+| --- | --- |
+| `--section-stack-sm` | Title row to view bar. |
+| `--section-stack-md` | Header to body; body to footer. |
+| `--section-stack-lg` | Between subsections. |
+| `--section-min-width-main`, `--section-min-width-side` | The main and side columns of a split. |
+| `--section-radius`, `--section-pad-x-default`, `--section-pad-y-default` | A Section with `fill="subtle"`, on `--ds-surface-sunken`. |
+| `--heading-medium`, `--heading-small` | A Section title and a subsection title. |
 
 ## Content guidelines
 
 | Do | Don't |
 | --- | --- |
-| Title the section with what it holds, in sentence case: "Upcoming sessions". | A title that repeats the only card inside it. |
-| Keep the description to one line: "Next 7 days". | A paragraph under the title. |
-| View labels of one or two words: "Active", "Paused". | Long labels, or views of different things. |
-| A count in words: "48 students", "12 open flags". | A bare number. |
-| Name the search's scope: "Search students". | A bare "Search", which says nothing of what it searches. |
-| A narrowed count against the whole: "12 of 48 students". | A count that drops without saying what it is out of. |
+| Title the Section with what it holds, in sentence case: "Upcoming sessions". | A title that repeats the only card inside it. |
+| Keep the description to one line: "Algebra B · 24 students". | A paragraph under the title. |
+| Name views by the rows they show: "All students", "Needs follow-up". | Views of different things in one strip. |
+| Name the scope in Search: "Search students". | A bare "Search". |
 
 ## Props
 
@@ -206,19 +262,20 @@ Implemented as `SectionToolbar`.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `state` | enum | — | `default`: search, filters, count and actions. `selected`: the selection, bulk actions and Clear. |
 | `search` | node | — | Search field slot, at the start |
 | `filters` | node | — | Filters slot: dropdown buttons |
-| `count` | node | — | Count in words, such as "12 of 48 students"; truncates first, and is announced politely when it changes |
+| `count` | node | — | Count, such as "48 students"; truncates first |
 | `actions` | node | — | Actions slot, at the end |
+| `selection` | node | — | Selected state: the selection, such as "3 selected" |
+| `bulkActions` | node | — | Selected state: bulk action buttons |
+| `onClear` | func | — | Selected state: shows Clear, and runs when it is pressed |
+| `clearLabel` | string | — | Selected state: the Clear button's label |
 | `className` | string | — | — |
-
-### `PatternSection.Search`
-
-Implemented as `SectionSearch`.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--field-width-md` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--motion-duration-medium` · `--motion-easing-standard` · `--radius-h32` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
+`--body-default` · `--body-small` · `--ds-background-selected` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--radius-lg` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--table-pad-x-cell` · `--width-3000`
 
 From `design-system/src/patterns/PatternSection/PatternSection.scss`. Override these through the token layer, never with a literal.
 

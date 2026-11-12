@@ -161,10 +161,10 @@ test('a page with no rule tags renders its rules without Checked lines', () => {
 });
 
 test('a template page\'s Slots table follows Parts, so an agent sees which slots are planned', () => {
-  const page = readDocsPage(`## Usage\n\nUse it.\n\n## Slots\n\n| Slot | Holds |\n| --- | --- |\n| \`side\` Planned | A second column. |\n\n## Parts\n\n1. **Box.**\n`);
+  const page = readDocsPage(`## Usage\n\nUse it.\n\n## Sizes\n\n| Token | Used for |\n| --- | --- |\n| \`--gap\` | Between. |\n\n## Slots\n\n| Slot | Holds |\n| --- | --- |\n| \`side\` Planned | A second column. |\n\n## Parts\n\n1. **Box.**\n`);
   const text = renderComponent(componentFacts(FIXTURE_MANIFEST, 'Widget'), { path: 'w.mdx', page });
   const order = [...text.matchAll(/^## (.*)$/gm)].map((m) => m[1]);
-  assert.deepEqual(order.filter((t) => ['Usage', 'Parts', 'Slots'].includes(t)), ['Usage', 'Parts', 'Slots']);
+  assert.deepEqual(order.filter((t) => ['Usage', 'Parts', 'Slots', 'Sizes'].includes(t)), ['Usage', 'Parts', 'Slots', 'Sizes']);
   assert.match(text, /## Slots\n\n\| Slot \| Holds \|/);
 });
 
@@ -172,7 +172,8 @@ test('a template page\'s type grids carry as one line per type, before Parts', (
   const page = readDocsPage(`## Types\n\n<TypeGrid>\n<TypeCard of={S.List} title="List">The view bar alone, one table.</TypeCard>\n<TypeCard of={S.Queue} title="Queue">A list with a detail.</TypeCard>\n</TypeGrid>\n\n## Header types\n\n<TypeGrid>\n<TypeCard of={S.Title} title="Title">A title, nothing to act on.</TypeCard>\n</TypeGrid>\n\n## Anatomy\n\nPicture.\n\n## Usage\n\nUse it.\n\n## Parts\n\n1. **Box.**\n`);
   const text = renderComponent(componentFacts(FIXTURE_MANIFEST, 'Widget'), { path: 'w.mdx', page });
   const order = [...text.matchAll(/^## (.*)$/gm)].map((m) => m[1]);
-  assert.deepEqual(order.filter((t) => ['Types', 'Header types', 'Parts', 'Anatomy'].includes(t)), ['Types', 'Header types', 'Parts']);
+  assert.deepEqual(order.filter((t) => ['Types', 'Header types', 'Parts', 'Anatomy'].includes(t)), ['Types', 'Header types', 'Anatomy', 'Parts']);
+  assert.match(text, /## Anatomy\n\nPicture\./);
   assert.match(text, /## Types\n\n- \*\*List\.\*\* The view bar alone, one table\.\n- \*\*Queue\.\*\* A list with a detail\./);
 });
 
