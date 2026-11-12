@@ -408,8 +408,9 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Slides in from the top-right corner.' },
-      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', note: 'Leaves by the exit rules.' },
+      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', note: 'Leaves the way it came, toward the top-right corner, on spatial.exit aimed 3.8× past the edge; the stack then closes up.' },
       change: { transition: 'Add or remove an item', spatial: 'spatial.default', note: 'The stack closes up when one leaves.' },
+      milestone: { transition: 'Open and close an overlay', spatial: 'spatial.fast', note: 'Finishing a reflection: inside an Expressive container, slides in from the top-right corner with one overshoot; leaves by the exit rules.' },
     },
   },
   {

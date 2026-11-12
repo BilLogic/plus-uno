@@ -12,6 +12,9 @@ import './Flag.scss';
  */
 export const FLAG_AUTO_CLOSE_MS = 8000;
 
+/** Longest an exiting flag stays mounted if `animationend` never fires. */
+const FLAG_EXIT_FALLBACK_MS = 800;
+
 /** The five appearances, as the Figma Flag set names them. */
 export const FLAG_APPEARANCES = ['normal', 'information', 'warning', 'error', 'success'];
 
@@ -83,11 +86,35 @@ export const Flag = ({
         return () => clearTimeout(timer);
     }, [show, closesItself, delay]);
 
-    if (!show) return null;
+    /*
+     * Leaving. A flag that was showing keeps its place while it flies out toward the
+     * top-right corner on `spatial.exit` (Flag.scss), then unmounts. Under reduced
+     * motion it is gone at once. The timer backs up `animationend`.
+     */
+    const [leaving, setLeaving] = useState(false);
+    const wasShown = useRef(show);
+    useEffect(() => {
+        if (show) {
+            wasShown.current = true;
+            setLeaving(false);
+            return undefined;
+        }
+        if (!wasShown.current) return undefined;
+        wasShown.current = false;
+        const reduced = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) return undefined;
+        setLeaving(true);
+        const timer = setTimeout(() => setLeaving(false), FLAG_EXIT_FALLBACK_MS);
+        return () => clearTimeout(timer);
+    }, [show]);
+
+    if (!show && !leaving) return null;
 
     return (
         <div
             id={id}
+            data-leaving={!show ? '' : undefined}
+            onAnimationEnd={!show ? () => setLeaving(false) : undefined}
             className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''} ${className}`}
             role={liveRole}
             aria-live={livePoliteness}

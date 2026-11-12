@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Flag, FlagGroup, FLAG_AUTO_CLOSE_MS, FLAG_APPEARANCES } from './Flag';
 
@@ -146,5 +146,25 @@ describe('FlagGroup', () => {
     it('takes a logical position as given', () => {
         render(<FlagGroup data-testid="flags" position="top-end"><span>flag</span></FlagGroup>);
         expect(screen.getByTestId('flags')).toHaveAttribute('data-position', 'top-end');
+    });
+});
+
+describe('Flag exit', () => {
+    afterEach(() => { vi.unstubAllGlobals(); });
+
+    it('is gone after dismiss, once its exit ends', async () => {
+        const { rerender } = render(<Flag title="Saved" show onDismiss={() => {}}>Done.</Flag>);
+        rerender(<Flag title="Saved" show={false} onDismiss={() => {}}>Done.</Flag>);
+        const flag = screen.getByText('Saved').closest('.plus-flag');
+        expect(flag).toHaveAttribute('data-leaving');
+        fireEvent.animationEnd(flag);
+        await waitFor(() => expect(screen.queryByText('Saved')).toBeNull());
+    });
+
+    it('is gone at once under reduced motion', () => {
+        vi.stubGlobal('matchMedia', (query) => ({ matches: query.includes('reduce'), addEventListener() {}, removeEventListener() {} }));
+        const { rerender } = render(<Flag title="Saved" show onDismiss={() => {}}>Done.</Flag>);
+        rerender(<Flag title="Saved" show={false} onDismiss={() => {}}>Done.</Flag>);
+        expect(screen.queryByText('Saved')).toBeNull();
     });
 });

@@ -95,6 +95,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Flag | component | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |
 | Flag | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` |
 | Flag | component | change | Add or remove an item | `--ds-motion-spatial-default` |
+| Flag | component | milestone | Open and close an overlay | `--ds-motion-spatial-fast` |
 | GenerativeBorder | component | change | Load content | `--ds-motion-linear` |
 | GenerativeBorder | component | pulse | Load content | `--ds-motion-loop` |
 | IconButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |
