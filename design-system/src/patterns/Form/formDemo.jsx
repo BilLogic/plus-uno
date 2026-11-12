@@ -78,7 +78,7 @@ export const FormMessage = ({ children }) => (
 
 /** Left-aligned under the fields, Primary first, Cancel Subtle: a form on its own page. */
 export const PageFooter = ({ sending, onSave }) => (
-    <div data-probe="footer" style={{ display: 'flex', gap: 'var(--space-100)', marginBlockStart: `var(${BAR_TOKEN})` }}>
+    <div data-probe="footer" style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: `var(${BAR_TOKEN})` }}>
         <Button text="Save session" appearance="primary" isLoading={sending} onClick={onSave} />
         <Button text="Cancel" appearance="subtle" onClick={() => {}} />
     </div>
@@ -148,7 +148,7 @@ export const FormInPanel = () => {
     return (
         <BrowserWindow address="app.plus.org/students" height={WINDOW_HEIGHT}>
             <div style={{ display: 'flex', blockSize: '100%', background: 'var(--ds-surface-sunken)' }}>
-                <div style={{ flex: '1 1 auto', minInlineSize: 0, padding: 'var(--space-300)' }}><Behind /></div>
+                <div style={{ flex: '1 1 auto', minInlineSize: 0, padding: 'var(--page-pad)' }}><Behind /></div>
                 <PanelContainer width="var(--panel-width-default)">
                     <PanelHeader title="Ana Ruiz" actions={<PanelCloseAction onClick={() => {}} />} />
                     <PanelBody data-probe="body">
