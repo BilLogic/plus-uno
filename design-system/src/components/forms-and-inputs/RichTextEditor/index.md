@@ -156,7 +156,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-input` · `--ds-background-neutral` · `--ds-border` · `--ds-border-input` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-lg` · `--pad-y-md` · `--radius-0625` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--border-default` · `--ds-background-input` · `--ds-background-neutral` · `--ds-border` · `--ds-border-input` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-lg` · `--pad-y-md` · `--radius-xl` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss`. Override these through the token layer, never with a literal.
 
