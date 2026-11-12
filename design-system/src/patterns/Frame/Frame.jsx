@@ -610,7 +610,7 @@ const Frame = ({
                 <Dialog.Root
                     open={panelShown || panelPeekShown}
                     onOpenChange={handlePanelOpenChange}
-                    // Modal only as an overlay, and only while no modal (or drawer) is over it.
+                    // Modal only as an overlay, and only while no modal (or floating Panel) is over it.
                     modal={panelModal && !modalOpen ? 'trap-focus' : false}
                     disablePointerDismissal={!panelDismissible}
                 >

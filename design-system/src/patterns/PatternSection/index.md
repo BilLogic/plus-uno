@@ -284,13 +284,9 @@ Implemented as `SectionToolbar`.
 | `actions` | node | — | Actions slot, at the end |
 | `className` | string | — | — |
 
-### `PatternSection.Search`
-
-Implemented as `SectionSearch`.
-
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--field-width-md` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--radius-h32` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
+`--body-default` · `--body-small` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
 
 From `design-system/src/patterns/PatternSection/PatternSection.scss`. Override these through the token layer, never with a literal.
 

@@ -175,6 +175,27 @@ export const Scopes = {
     },
 };
 
+export const CollapsibleScopes = {
+    render: () => (
+        <div style={stack}>
+            <SearchField placeholder="Search students" isCollapsible scopes={SCOPES} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('searchbox')).toBeNull();
+        await userEvent.click(canvas.getByRole('button', { name: 'Search students' }));
+        const input = canvas.getByRole('searchbox');
+        await waitFor(() => expect(input).toHaveFocus());
+        // Opening shows the scope filter with "All" chosen.
+        await expect(canvas.getByRole('combobox', { name: 'Search scope' })).toHaveTextContent('All');
+        // Esc on the empty field closes it and returns focus to the icon.
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(canvas.queryByRole('searchbox')).toBeNull());
+        await waitFor(() => expect(canvas.getByRole('button', { name: 'Search students' })).toHaveFocus());
+    },
+};
+
 export const Basic = {
     render: () => {
         const [searched, setSearched] = useState([]);

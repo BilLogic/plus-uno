@@ -8,7 +8,7 @@ Search field: find a record by typing. It is a TextField with a search icon befo
 
 **Source:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.stories.jsx` — Overview, Active, Spacing, Filled, Disabled, Loading, Async, Collapsible, Scopes, Basic, Focused, FocusedKeyboard, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.stories.jsx` — Overview, Active, Spacing, Filled, Disabled, Loading, Async, Collapsible, Scopes, CollapsibleScopes, Basic, Focused, FocusedKeyboard, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.mdx`
 

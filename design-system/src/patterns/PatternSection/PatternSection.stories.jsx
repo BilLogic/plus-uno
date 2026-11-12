@@ -9,6 +9,7 @@ import {
     PanelCloseAction,
     PanelContainer,
     PanelHeader,
+    SearchField,
     Select,
     StatusTag,
     TextField,
@@ -288,7 +289,7 @@ const SearchableStudents = () => {
                     filters={narrowed ? <Button text="Reset filters" appearance="subtle" spacing="compact" onClick={reset} /> : null}
                     actions={(
                         <>
-                            <PatternSection.Search label="Search students" value={query} onValueChange={setQuery} />
+                            <SearchField mode="active" isCollapsible spacing="compact" placeholder="Search students" value={query} onValueChange={setQuery} />
                             <IconButton icon="filter" label="Filters" appearance="subtle" trailingMetric={activeOnly ? 1 : undefined} isSelected={activeOnly} onClick={() => setActiveOnly((on) => !on)} />
                             <Button text="Add student" appearance="primary" spacing="compact" iconBefore="user-plus" onClick={() => {}} />
                         </>
@@ -316,8 +317,8 @@ export const ToolbarSearch = {
             await userEvent.click(icon());
             await waitFor(() => expect(field()).toHaveFocus());
             expect(field()).toHaveAttribute('placeholder', 'Search students');
-            const root = field().closest('.plus-section-search');
-            expect(getComputedStyle(root).animationName).toBe('plus-section-search-grow');
+            const root = field().closest('.plus-search-field');
+            expect(getComputedStyle(root).animationName).toBe('plus-search-field-grow');
             // Some Chromium builds serialize the computed flex-end as flow-end; both pin the end edge.
             expect(getComputedStyle(root).justifyContent).toMatch(/^(flex|flow)-end$/);
         });
@@ -336,7 +337,7 @@ export const ToolbarSearch = {
             await userEvent.keyboard('{Escape}');
             await waitFor(() => expect(icon()).toHaveFocus());
             expect(canvas.queryByRole('searchbox')).toBeNull();
-            expect(icon().closest('.plus-section-search')).toHaveClass('plus-section-search--shrink');
+            expect(icon().closest('.plus-search-field')).toHaveClass('plus-search-field--shrink');
         });
 
         await step('It stays open while it holds text, and "Clear search" empties it', async () => {
