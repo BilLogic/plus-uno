@@ -28,7 +28,7 @@ export const HIDDEN = {
 export const ChooserDot = ({ filled }) => (
     <span aria-hidden="true" style={{ display: 'inline-block', inlineSize: DOT_SIZE, verticalAlign: 'middle' }}>
         <Illustration width={8} height={8} viewBox="0 0 8 8" title={filled ? 'Yes' : 'No'} capped={false}>
-            <Rect x={1} y={1} w={6} h={6} corner="tab" fill={filled ? PAINT.accent : 'none'} stroke={filled ? undefined : PAINT.annotation} />
+            <Rect x={1} y={1} w={6} h={6} corner="icon" fill={filled ? PAINT.accent : 'none'} stroke={filled ? undefined : PAINT.annotation} />
         </Illustration>
     </span>
 );

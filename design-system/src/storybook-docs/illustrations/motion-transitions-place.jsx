@@ -161,7 +161,7 @@ const PERM = [1, 2, 0];
 const SortRow = ({ x, y, w, i }) => (
   <g>
     <Rule x1={x} x2={x + w} y1={y + 14} y2={y + 14} stroke={PAINT.rowDivider} />
-    <Rect x={x + 4} y={y + 4} w={6} h={6} fill={PAINT.placeholderText} corner="tab" />
+    <Rect x={x + 4} y={y + 4} w={6} h={6} fill={PAINT.placeholderText} corner="icon" />
     <SkeletonBar x={x + 16} y={y + 5} w={WIDTHS[i] * 1.6} heading={i === 0} />
     <SkeletonBar x={x + w * 0.8} y={y + 5} w={w * 0.12} />
   </g>

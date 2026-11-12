@@ -177,7 +177,7 @@ const climbTwo = {
 const TaskLayer = () => (
   <>
     <Frame x={8} y={6} w={144} h={88} />
-    <Rect x={16} y={22} w={6} h={6} fill={PAINT.placeholderText} corner="tab" />
+    <Rect x={16} y={22} w={6} h={6} fill={PAINT.placeholderText} corner="icon" />
     <SkeletonBar x={28} y={23} w={40} h={5} heading />
     {[0, 1, 2, 3, 4].map((i) => (
       <SkeletonBar key={i} x={16} y={40 + i * 9} w={30} heading={i === 1} />
