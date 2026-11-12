@@ -75,7 +75,6 @@
     "check:old-system": "node scripts/check-old-system.mjs",
     "check:state-mixin": "node scripts/check-state-mixin.mjs",
     "check:inline-jsx-tokens": "node scripts/check-inline-jsx-tokens.mjs",
-    "check:react-bootstrap-imports": "node scripts/check-react-bootstrap-imports.mjs",
     "check:raw-buttons": "node scripts/check-raw-buttons.mjs",
     "check:retired-spelling": "node scripts/check-retired-spelling.mjs",
     "check:cross-repo": "node scripts/check-cross-repo-duplication.mjs",
@@ -157,14 +156,12 @@
   "dependencies": {
     "@base-ui/react": "1.9.0",
     "@modelcontextprotocol/sdk": "1.32.2",
-    "bootstrap": "^5.3.3",
     "clsx": "^2.1.1",
     "highcharts": "^13.1.1",
     "highcharts-react-official": "^3.2.3",
     "motion": "^14.10.1",
     "prop-types": "^15.8.1",
     "react": "^19.3.1",
-    "react-bootstrap": "^2.10.10",
     "react-dom": "^19.3.1",
     "react-router-dom": "^7.18.5"
   }

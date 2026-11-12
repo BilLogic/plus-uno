@@ -65,7 +65,7 @@ item before it is a link.
 
 ### `separator` takes a string, not a node. {#separator-takes-a-string-not-a-node}
 
-Despite the `node` prop type, the value is written into Bootstrap's breadcrumb
+Despite the `node` prop type, the value is written into the breadcrumb's
 divider custom property, and a custom property holds text. A string is quoted
 for you and works; a React element is stringified by CSS and disappears. Pass
 `'/'`, `'›'`, `'—'`.

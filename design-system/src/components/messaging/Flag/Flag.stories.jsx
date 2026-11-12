@@ -67,7 +67,7 @@ export default {
 };
 
 export const Overview = () => (
-    <FlagGroup className="p-3" containerPosition="static">
+    <FlagGroup style={{ padding: 'var(--card-pad-compact)' }} containerPosition="static">
         <Flag title="Normal flag" timestamp="Just now" autohide={false}>
             This is a normal flag (default).
         </Flag>
@@ -128,7 +128,7 @@ const FlagInteractiveWrapper = ({ appearance, bold, position, title, children, s
 
     return (
         <div className="plus-flag-interactive-demo">
-            <FlagGroup position={position} className="p-3">
+            <FlagGroup position={position} style={{ padding: 'var(--card-pad-compact)' }}>
                 <Flag
                     show={isOpen}
                     onDismiss={() => setIsOpen(false)}

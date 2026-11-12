@@ -10,8 +10,7 @@ What each component is for, when to reach for it, and how it composes.
 
 PLUS components first. An interactive component's behavior — open/closed
 state, focus management, keyboard handling — is built on Base UI
-(`@base-ui/react`, headless), styled on `--ds-*` tokens; React-Bootstrap is no
-longer the fallback for that behavior (ADR-037).
+(`@base-ui/react`, headless), styled on `--ds-*` tokens (ADR-037).
 
 ## Start here — the group overviews
 

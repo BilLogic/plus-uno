@@ -72,7 +72,7 @@ export const Overview = () => {
                 value={value}
                 onChange={setValue}
             />
-            <p className="body-default m-0" data-testid="rg-overview-value">
+            <p className="body-default" style={{ margin: 0 }} data-testid="rg-overview-value">
                 Answer: {value ?? 'none'}
             </p>
         </div>
@@ -231,7 +231,7 @@ export const Reveal = () => (
                 {
                     value: 'range',
                     label: 'Sessions in a date range',
-                    reveal: <p className="body-default m-0" data-testid="rg-reveal-content">Pick the dates.</p>,
+                    reveal: <p className="body-default" style={{ margin: 0 }} data-testid="rg-reveal-content">Pick the dates.</p>,
                 },
             ]}
             defaultValue="this"

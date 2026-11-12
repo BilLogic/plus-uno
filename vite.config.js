@@ -83,9 +83,6 @@ export default defineConfig({
             if (id.includes('/highcharts') || id.includes('/highcharts-react-official')) {
               return 'vendor-charts';
             }
-            if (id.includes('/react-bootstrap/') || id.includes('/bootstrap/')) {
-              return 'vendor-bootstrap';
-            }
             return 'vendor-core';
           }
           return undefined;

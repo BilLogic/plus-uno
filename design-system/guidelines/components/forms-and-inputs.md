@@ -141,7 +141,7 @@ rule: `Select`, `TagInput`, `TreeSelect`, `Cascader`, `DatePicker`,
 `DateTimePicker` and the `Dropdown` menu.
 
 - **Gap:** `--stack-sm` (4px) between the trigger's edge and the
-  popup surface, as a token, with Bootstrap's spacer margin reset to zero.
+  popup surface, as a token.
   Every popup in the family decides its flip and alignment through one
   module, `_internal/anchorPlacement.js`; a popup placed in CSS uses
   `calc(100% + var(--stack-sm))`.

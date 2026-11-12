@@ -34,19 +34,6 @@ updates:
       # graph broke before (#157). Keep them in one PR so they land together.
       storybook:
         patterns: ["storybook", "@storybook/*"]
-    ignore:
-      # Majors still open a PR each; these two are decisions, not upgrades.
-      #
-      # react-bootstrap 3 is a React-19-native rewrite and is explicitly out of
-      # scope on #266: it wants its own issue once the component build-out
-      # direction is settled. 75+ files import it.
-      - dependency-name: react-bootstrap
-        update-types: [version-update:semver-major]
-      # Bootstrap 6 would move the CSS the whole design system sits on, and the
-      # prototypes load their own copy from a CDN (see CDN_BASELINE in
-      # scripts/check-deps.mjs). Two Bootstraps have to become one first.
-      - dependency-name: bootstrap
-        update-types: [version-update:semver-major]
 
   # ── The Cloudflare Worker, which has its own manifest and its own runtime ──
   - package-ecosystem: npm

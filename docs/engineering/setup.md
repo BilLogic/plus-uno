@@ -10,9 +10,9 @@ Implementation requirements only. For design rules, load `design-system/guidelin
 
 ## Stack
 
-- React + React-Bootstrap on Bootstrap, built with Vite, documented in Storybook.
+- React, built with Vite, documented in Storybook. No Bootstrap (ADR-041).
 - SCSS with design tokens from `design-system/src/tokens/`.
-- Every interactive component's behavior is built on Base UI (`@base-ui/react`, headless), styled on `--ds-*` tokens — ADR-037, widening the AI-only scope ADR-036 set. Bootstrap stays the framework for non-interactive product UI.
+- Every interactive component's behavior is built on Base UI (`@base-ui/react`, headless), styled on `--ds-*` tokens — ADR-037, widening the AI-only scope ADR-036 set.
 - Versions live in `package.json` and nowhere else — read them there rather than from a doc that goes stale on the next bump.
 
 ## Import Aliases
@@ -89,10 +89,10 @@ prototypes/{project-name}/
 
 When mirroring existing code: nearest `*.stories.jsx` → `prototypes/**`.
 
-## Bootstrap & Providers
+## Styles & Providers
 
-- Use PLUS components first — not raw Bootstrap markup for DS surfaces. An interactive PLUS component's behavior comes from Base UI, not Bootstrap (ADR-037); Bootstrap markup covers non-interactive layout.
-- Load `main.scss` for token variables
+- Use PLUS components first. An interactive PLUS component's behavior comes from Base UI (ADR-037); layout is PLUS components and `--ds-*` tokens.
+- Load `main.scss` for token variables and the element baseline (`_base.scss`)
 - Prototype Vite configs must set `@` alias or imports fail
 
 ## Token Workflow
