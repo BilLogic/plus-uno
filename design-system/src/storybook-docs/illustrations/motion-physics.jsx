@@ -3,9 +3,9 @@ import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { PAINT } from './paint.js';
 import {
-  Backdrop, ButtonShape, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule, Section, SkeletonBar,
+  Backdrop, ButtonShape, Flag, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule, Section, SkeletonBar,
 } from './primitives.jsx';
-import { ChartAxis, ChartCurve, MOTION_PAINT, Pointer } from './primitives-motion.jsx';
+import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
 import { BEAT, LOOP_PERIOD, measure, ratioOf, springFor, springWithRatio, stepOf } from './motion.jsx';
 
 /**
@@ -211,7 +211,7 @@ const plotted = ({ id, title, caption, config, seconds }) => {
     draw: ({ x, t }) => (
       <>
         <Rule x1={24} x2={136} y1={18} y2={18} />
-        <Rule x1={130} x2={130} y1={4} y2={32} stroke={MOTION_PAINT.target} dash="3 3" />
+        <Rule x1={130} x2={130} y1={4} y2={32} stroke={PAINT.target} dash="3 3" />
         <Rect x={24 + 100 * x} y={12} w={12} h={12} fill={PAINT.accent} corner="shape" />
         <ChartAxis x={24} y={36} w={112} h={54} />
         <ChartCurve x={24} y={36} w={112} h={54} values={values} upTo={Math.max(0.02, t)} accent />
@@ -245,7 +245,7 @@ const FLAG = { x: 88, y: 22, w: 56, h: 48 };
 const FlagLayer = ({ x = 0, opacity = 1 }) => (
   <Clip x={8} y={6} w={FRAME_RIGHT - 8 - 1} h={88}>
     <Moved x={x} opacity={opacity}>
-      <Popup {...FLAG} accent />
+      <Flag {...FLAG} accent />
     </Moved>
   </Clip>
 );

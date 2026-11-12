@@ -7,27 +7,8 @@ import { Rect } from './primitives.jsx';
  * tap ring and a pointer. Same contract as `primitives.jsx`: position, size and
  * `accent` (the one subject), 1 unit = 2px of product UI, no words.
  *
- * Each role paints from the token the real thing uses for that role. The map
- * stays here until `paint.js` becomes a role map; then these entries move there.
+ * Each paints from a role in `paint.js`, the token the real thing uses for it.
  */
-const ds = (name) => `var(--ds-${name})`;
-
-export const MOTION_PAINT = {
-  // A chart's axis and gridlines: the charts' neutral-20 (dataviz/chartTheme.css).
-  axis: ds('border'),
-  // A chart's reference line, such as the target: the charts' neutral-40 (chartTheme.css).
-  target: ds('border-bold'),
-  // A plotted series: the data-viz neutral series, and the brand series for the subject.
-  curve: ds('chart-neutral'),
-  curveAccent: ds('chart-brand'),
-  // A path a thing travels: the subtle stroke dividers use.
-  trail: ds('border'),
-  // A press: the ring the pressed and focused states draw (styles/_state.scss, plus-ring).
-  tapRing: ds('border-focused'),
-  // The pointer: body in the text ink, edged in the page surface so it reads on any fill.
-  pointer: ds('text'),
-  pointerEdge: ds('surface'),
-};
 
 /** The chart line's weight, from the stroke the charts draw a series with. */
 const SERIES = { strokeWidth: 'var(--stroke-2)', strokeLinejoin: 'round', strokeLinecap: 'round' };
@@ -39,14 +20,14 @@ const RING = { strokeWidth: 'var(--focus-ring-width)' };
  */
 export const ChartAxis = ({ x, y, w, h, target = 0.8 }) => (
   <g>
-    <line x1={x} x2={x} y1={y} y2={y + h} stroke={MOTION_PAINT.axis} style={HAIRLINE} />
-    <line x1={x} x2={x + w} y1={y + h} y2={y + h} stroke={MOTION_PAINT.axis} style={HAIRLINE} />
+    <line x1={x} x2={x} y1={y} y2={y + h} stroke={PAINT.axis} style={HAIRLINE} />
+    <line x1={x} x2={x + w} y1={y + h} y2={y + h} stroke={PAINT.axis} style={HAIRLINE} />
     <line
       x1={x}
       x2={x + w}
       y1={y + h - h * target}
       y2={y + h - h * target}
-      stroke={MOTION_PAINT.target}
+      stroke={PAINT.target}
       strokeDasharray="3 3"
       style={HAIRLINE}
     />
@@ -68,7 +49,7 @@ export const ChartCurve = ({ x, y, w, h, values, scale = 0.8, upTo = 1, accent =
       <polyline
         points={pts.map(([px, py]) => `${px.toFixed(1)},${py.toFixed(1)}`).join(' ')}
         fill="none"
-        stroke={accent ? MOTION_PAINT.curveAccent : MOTION_PAINT.curve}
+        stroke={accent ? PAINT.accent : PAINT.curve}
         style={SERIES}
       />
       {accent && <circle cx={hx} cy={hy} r={2.5} fill={PAINT.accent} />}
@@ -81,7 +62,7 @@ export const ChartCurve = ({ x, y, w, h, values, scale = 0.8, upTo = 1, accent =
  * arrowhead where it lands. A path that ends where it began draws one way only.
  */
 export const Trail = ({ points, accent = false }) => {
-  const color = accent ? PAINT.accent : MOTION_PAINT.trail;
+  const color = accent ? PAINT.accent : PAINT.trail;
   const [sx, sy] = points[0];
   const [ex, ey] = points[points.length - 1];
   const [px, py] = points[points.length - 2] ?? points[0];
@@ -107,8 +88,8 @@ export const Trail = ({ points, accent = false }) => {
  */
 export const TapRing = ({ x, y, r = 6, opacity = 1, accent = false }) => (
   <g opacity={opacity}>
-    <circle cx={x} cy={y} r={r} fill="none" stroke={MOTION_PAINT.tapRing} style={RING} />
-    <circle cx={x} cy={y} r={1.75} fill={accent ? PAINT.accent : MOTION_PAINT.pointer} />
+    <circle cx={x} cy={y} r={r} fill="none" stroke={PAINT.tapRing} style={RING} />
+    <circle cx={x} cy={y} r={1.75} fill={accent ? PAINT.accent : PAINT.pointer} />
   </g>
 );
 
@@ -116,8 +97,8 @@ export const TapRing = ({ x, y, r = 6, opacity = 1, accent = false }) => (
 export const Pointer = ({ x, y, accent = false }) => (
   <path
     d={`M${x} ${y} l0 11 l2.6 -2.6 l2 4.4 l1.8 -0.8 l-2 -4.3 l3.6 0 z`}
-    fill={accent ? PAINT.accent : MOTION_PAINT.pointer}
-    stroke={MOTION_PAINT.pointerEdge}
+    fill={accent ? PAINT.accent : PAINT.pointer}
+    stroke={PAINT.pointerEdge}
     style={{ ...HAIRLINE, strokeLinejoin: 'round' }}
   />
 );

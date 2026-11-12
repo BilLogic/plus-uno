@@ -91,7 +91,20 @@ const ROLES = {
   countText: ['--ds-text', 'components/labels/CountTag/CountTag.scss'],
   // The one accent: it marks the drawing's subject in the brand color.
   accent: ['--ds-background-brand-bold', 'components/forms-and-inputs/Button/Button.scss'],
+  // Motion drawings. A chart's axis and gridlines, and its reference line such as the
+  // target, take the tokens the charts theme gives them (chartTheme.css neutral-20, neutral-40).
+  axis: ['--ds-border', 'dataviz/chartTheme.css'],
+  target: ['--ds-border-bold', 'dataviz/chartTheme.css'],
+  // A press: the ring the pressed and focused states draw (plus-ring in _state.scss).
+  tapRing: ['--ds-border-focused', 'styles/_state.scss'],
   // Drawing devices, no component behind them
+  // A plotted series that is not the subject: the data-viz neutral series.
+  curve: ['--ds-chart-neutral', null],
+  // A path a thing travels: the subtle stroke dividers use.
+  trail: ['--ds-border', null],
+  // The pointer: body in the text ink, edged in the page surface so it reads on any fill.
+  pointer: ['--ds-text', null],
+  pointerEdge: ['--ds-surface', null],
   windowDot: ['--ds-background-neutral', null],
   // A blocked-out object in a motion principle figure: a shape, not a component
   shape: ['--ds-background-neutral', null],
