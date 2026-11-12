@@ -252,10 +252,10 @@ export const Row = ({ x, y, w, accent = false }) => (
 /** A single-line field: --height-250 (40) halved. */
 const FIELD_H = 20;
 
-export const Field = ({ x, y, w, accent = false }) => (
+export const Field = ({ x, y, w, accent = false, invalid = false }) => (
   <g>
     <SkeletonBar x={x} y={y} w={w * 0.3} h={3} heading />
-    <Rect x={x} y={y + 7} w={w} h={FIELD_H} fill={PAINT.fieldSurface} stroke={accent ? PAINT.accent : PAINT.fieldBorder} corner="field" />
+    <Rect x={x} y={y + 7} w={w} h={FIELD_H} fill={PAINT.fieldSurface} stroke={invalid ? PAINT.fieldBorderInvalid : accent ? PAINT.accent : PAINT.fieldBorder} corner="field" />
     <SkeletonBar x={x + 6} y={y + 7 + FIELD_H / 2 - 2} w={w * 0.4} />
   </g>
 );

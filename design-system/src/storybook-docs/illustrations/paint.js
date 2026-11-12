@@ -63,6 +63,8 @@ const ROLES = {
   // Field
   fieldSurface: ['--ds-background-input', 'components/forms-and-inputs/_internal/FieldBox.scss'],
   fieldBorder: ['--ds-border-input', 'components/forms-and-inputs/_internal/FieldBox.scss'],
+  fieldBorderInvalid: ['--ds-border-danger', 'components/forms-and-inputs/_internal/FieldBox.scss'],
+  fieldMessageDanger: ['--ds-text-danger', 'components/forms-and-inputs/_internal/FieldFrame.scss'],
   // Button
   buttonPrimary: ['--ds-background-brand-bold', 'components/forms-and-inputs/Button/Button.scss'],
   buttonPrimaryText: ['--ds-text-inverse', 'components/forms-and-inputs/Button/Button.scss'],

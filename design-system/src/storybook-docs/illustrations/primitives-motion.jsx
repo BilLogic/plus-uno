@@ -133,6 +133,45 @@ export const SequenceStrip = ({ x, y, w, h = 14, lanes, now = 0, accent = false 
 };
 
 /**
+ * A screen in a transition tree: a small block that lights in the subject's
+ * brand color as `lit` runs 0..1. `done` marks it passed with the visited check,
+ * for the steps of an ordered set. Painted from the shape and visited roles.
+ */
+export const TreeNode = ({ x, y, w = 16, h = 12, lit = 0, done = false, accent = false }) => (
+  <g data-part="tree-node">
+    <Rect x={x} y={y} w={w} h={h} fill={PAINT.shape} corner="shape" />
+    {(lit > 0 || accent) && <Rect x={x} y={y} w={w} h={h} fill={PAINT.accent} corner="shape" opacity={accent ? 1 : lit} />}
+    {done && (
+      <path
+        d={`M${x + w / 2 - 2.5} ${y + h / 2} L${x + w / 2 - 0.5} ${y + h / 2 + 2} L${x + w / 2 + 3} ${y + h / 2 - 2}`}
+        fill="none"
+        stroke={PAINT.trackerVisited}
+        style={HAIRLINE}
+      />
+    )}
+  </g>
+);
+
+/**
+ * A link between two screens in a tree, from (`x1`, `y1`) to (`x2`, `y2`). The
+ * neutral line is always there; `progress` (0..1) draws the subject's accent
+ * line over it from the start, and its arrowhead lands once the line has arrived.
+ */
+export const TreeEdge = ({ x1, y1, x2, y2, progress = 0, accent = false }) => {
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const head = (a) => `${(x2 - 5 * Math.cos(angle + a)).toFixed(1)},${(y2 - 5 * Math.sin(angle + a)).toFixed(1)}`;
+  const px = x1 + (x2 - x1) * progress;
+  const py = y1 + (y2 - y1) * progress;
+  return (
+    <g data-part="tree-edge">
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={PAINT.trail} style={HAIRLINE} />
+      {progress > 0 && <line x1={x1} y1={y1} x2={px} y2={py} stroke={PAINT.accent} style={SERIES} />}
+      {accent && progress >= 0.999 && <polygon points={`${x2},${y2} ${head(0.5)} ${head(-0.5)}`} fill={PAINT.accent} />}
+    </g>
+  );
+};
+
+/**
  * Gallery entries, neutral then accented, in the kit gallery's 160 × 100 cell.
  * The gallery lists these after the static primitives.
  */
@@ -180,6 +219,16 @@ export const MOTION_SETS = [
           now={0.4}
           accent={a}
         />
+      </>
+    ),
+  ],
+  [
+    'Tree node and edge',
+    (a) => (
+      <>
+        <TreeEdge x1={80} y1={34} x2={80} y2={62} progress={a ? 1 : 0} accent={a} />
+        <TreeNode x={72} y={22} lit={a ? 0.35 : 0} />
+        <TreeNode x={72} y={62} lit={a ? 1 : 0} />
       </>
     ),
   ],

@@ -180,9 +180,11 @@ const preview = {
             "Typography",
             "Motion",
             [
+              "Principles",
               "Physics",
               "Choreography",
               "Playground",
+              "Transitions",
               "Durations and easings"
             ],
             "Iconography",
