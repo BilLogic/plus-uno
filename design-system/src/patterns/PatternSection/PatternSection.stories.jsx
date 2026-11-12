@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { Button, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, StatusTag, TextField, Tabs as TabsComponent } from '@/components';
+import { Button, IconButton, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, StatusTag, TextField, Tabs as TabsComponent } from '@/components';
 import { PANEL_STORAGE_KEY, PatternCard, PatternSection, SECTION_DETAIL_FLOOR, usePanelControl } from '@/patterns';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -239,6 +239,113 @@ export const Levels = () => (
         </PatternSection>
     </PatternSection>
 );
+
+const STUDENTS = [
+    { name: 'Maya Chen', active: true },
+    { name: 'Marcus Lee', active: false },
+    { name: 'Ana Ruiz', active: true },
+    { name: 'Jordan Park', active: true },
+    { name: 'Priya Shah', active: false },
+    { name: 'Sam Okafor', active: true },
+];
+
+/**
+ * The view bar's Search: the icon grows left into the field. Esc clears, a
+ * second Esc closes; it stays open while it holds text. The count is a polite
+ * live region, and Reset filters clears the search with the filters.
+ */
+const SearchableStudents = () => {
+    const [query, setQuery] = useState('');
+    const [activeOnly, setActiveOnly] = useState(false);
+    const rows = STUDENTS.filter((student) => (!activeOnly || student.active)
+        && student.name.toLowerCase().includes(query.trim().toLowerCase()));
+    const narrowed = query !== '' || activeOnly;
+    const reset = () => {
+        setQuery('');
+        setActiveOnly(false);
+    };
+    return (
+        <PatternSection
+            title="Students"
+            toolbar={(
+                <PatternSection.Toolbar
+                    count={narrowed ? `${rows.length} of ${STUDENTS.length} students` : `${STUDENTS.length} students`}
+                    filters={narrowed ? <Button text="Reset filters" appearance="subtle" spacing="compact" onClick={reset} /> : null}
+                    actions={(
+                        <>
+                            <PatternSection.Search label="Search students" value={query} onValueChange={setQuery} />
+                            <IconButton icon="filter" label="Filters" appearance="subtle" trailingMetric={activeOnly ? 1 : undefined} isSelected={activeOnly} onClick={() => setActiveOnly((on) => !on)} />
+                            <Button text="Add student" appearance="primary" spacing="compact" iconBefore="user-plus" onClick={() => {}} />
+                        </>
+                    )}
+                />
+            )}
+        >
+            <ul style={{ margin: 0, paddingInlineStart: 'var(--space-250)', font: 'var(--body-default)' }}>
+                {rows.map((student) => <li key={student.name}>{student.name}</li>)}
+            </ul>
+        </PatternSection>
+    );
+};
+
+export const ToolbarSearch = {
+    name: 'Search',
+    render: () => <SearchableStudents />,
+    play: async ({ canvasElement, step }) => {
+        const canvas = within(canvasElement);
+        const icon = () => canvas.getByRole('button', { name: 'Search students' });
+        const field = () => canvas.getByRole('searchbox', { name: 'Search students' });
+
+        await step('The icon grows left into the field, named for its scope', async () => {
+            expect(canvas.queryByRole('searchbox')).toBeNull();
+            await userEvent.click(icon());
+            await waitFor(() => expect(field()).toHaveFocus());
+            expect(field()).toHaveAttribute('placeholder', 'Search students');
+            const root = field().closest('.plus-section-search');
+            expect(getComputedStyle(root).animationName).toBe('plus-section-search-grow');
+            expect(getComputedStyle(root).justifyContent).toBe('flex-end');
+        });
+
+        await step('The count narrows in words, in a polite live region', async () => {
+            await userEvent.type(field(), 'ma');
+            const count = canvas.getByRole('status');
+            await waitFor(() => expect(count).toHaveTextContent('2 of 6 students'));
+            expect(canvas.getAllByRole('listitem')).toHaveLength(2);
+        });
+
+        await step('Esc clears and keeps the field open; a second Esc closes it', async () => {
+            await userEvent.keyboard('{Escape}');
+            expect(field()).toHaveValue('');
+            expect(field()).toHaveFocus();
+            await userEvent.keyboard('{Escape}');
+            await waitFor(() => expect(icon()).toHaveFocus());
+            expect(canvas.queryByRole('searchbox')).toBeNull();
+            expect(icon().closest('.plus-section-search')).toHaveClass('plus-section-search--shrink');
+        });
+
+        await step('It stays open while it holds text, and "Clear search" empties it', async () => {
+            await userEvent.click(icon());
+            await userEvent.type(field(), 'jordan');
+            await userEvent.click(canvas.getByRole('heading', { name: 'Students' }));
+            expect(field()).toHaveValue('jordan');
+            await userEvent.click(canvas.getByRole('button', { name: 'Clear search' }));
+            expect(field()).toHaveValue('');
+            expect(field()).toHaveFocus();
+            await userEvent.tab({ shift: true });
+            await waitFor(() => expect(canvas.queryByRole('searchbox')).toBeNull());
+        });
+
+        await step('Reset filters clears the search too', async () => {
+            await userEvent.click(icon());
+            await userEvent.type(field(), 'sam');
+            await userEvent.click(canvas.getByRole('button', { name: /^Filters/ }));
+            expect(canvas.getByRole('status')).toHaveTextContent('1 of 6 students');
+            await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
+            await waitFor(() => expect(canvas.queryByRole('searchbox')).toBeNull());
+            expect(canvas.getByRole('status')).toHaveTextContent('6 students');
+        });
+    },
+};
 
 /** Loading: skeleton bars in place of the header. */
 export const LoadingDefault = {

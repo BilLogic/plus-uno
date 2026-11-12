@@ -75,6 +75,8 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <ComponentExample of={PatternSectionStories.HeaderToolbar} title="Toolbar header" description={<>A <code>PatternSection.Toolbar</code> row with search, filters, the count and actions.</>} />
 
+<ComponentExample of={PatternSectionStories.ToolbarSearch} title="Search" description={<>The Search icon, <code>PatternSection.Search</code>, grows left into a field. Esc clears it, a second Esc closes it, and it stays open while it holds text. Reset filters clears it too.</>} />
+
 <ComponentExample of={PatternSectionStories.HeaderCustom} title="Custom header" description={<><code>header</code> replaces the title and description; the title stays in the page, visually hidden.</>} />
 
 <ComponentExample of={PatternSectionStories.HeaderTabsOnly} title="Tabs only header" description={<><code>type="tabs-only"</code> shows only the tabs row, for a page whose title already names the view.</>} />
@@ -164,6 +166,14 @@ The Page around a section supplies the pad; for a region with a fill of its own,
 
 The **toolbar** is its own part, `PatternSection.Toolbar`: search, filters and a count that truncates first, then actions. Selecting rows never changes it: a Dynamic table's bulk bar is the table's own head row, so the toolbar stays put.
 
+**Search** is a part too, `PatternSection.Search`: an icon button that grows left into a compact Text field and shrinks back into the icon. It narrows the rows of its own section as you type; there is no results page. `label` names the scope ("Search students"): it is the icon's name, the field's label and its placeholder.
+
+- Press the icon and the field opens with focus in it. Set `defaultOpen` when search is the main way into a large collection.
+- Esc clears the text. A second Esc closes the field and returns focus to the icon.
+- The field stays open while it holds text. Empty, it closes when focus leaves it.
+- "Clear search" empties the field and keeps focus in it.
+- Hold the text yourself (`value`, `onValueChange`) so Reset filters clears the search with the filters. Switching views keeps the search; leaving the page clears it.
+
 ### States
 
 A section has no interactive states: it does not respond to hover, press or focus, and it is never disabled. Those belong to the controls inside it.
@@ -175,6 +185,7 @@ A section has no interactive states: it does not respond to hover, press or focu
 <tbody>
 <tr><td>Loading</td><td>Skeleton bars replace the header, and the section is marked busy. The body is the content's to load.</td></tr>
 <tr><td>Detail open</td><td>A record shows in the detail region; below 960 it replaces the list.</td></tr>
+<tr><td>Search open</td><td>The Search icon is a field on <code>--field-width-md</code>, until it is cleared and closed.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -196,6 +207,8 @@ A section has no interactive states: it does not respond to hover, press or focu
 <tr><td><code>--heading-large</code>, <code>-medium</code>, <code>-small</code></td><td>24/28, 20/24, 16/20</td><td>A page title, a section title and a subsection title.</td></tr>
 <tr><td><code>--body-default</code></td><td>14/20</td><td>The description, at every level.</td></tr>
 <tr><td><code>--ds-text</code>, <code>--ds-text-subtle</code></td><td>color</td><td>The title and the description.</td></tr>
+<tr><td><code>--field-width-md</code>, <code>--item-height-md</code></td><td>240, 32</td><td>The open Search field, and the icon it grows from.</td></tr>
+<tr><td><code>--motion-duration-medium</code>, <code>--motion-easing-standard</code></td><td>200 ms, standard</td><td>Search growing into a field and shrinking back. Reduced motion makes it instant.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -264,6 +277,8 @@ Put Previous and Next in the detail header, and keep one detail per Section.
 <tr><td>Keep the description to one line: "Next 7 days".</td><td>A paragraph under the title.</td></tr>
 <tr><td>View labels of one or two words: "Active", "Paused".</td><td>Long labels, or views of different things.</td></tr>
 <tr><td>A count in words: "48 students", "12 open flags".</td><td>A bare number.</td></tr>
+<tr><td>Name the search's scope: "Search students".</td><td>A bare "Search", which says nothing of what it searches.</td></tr>
+<tr><td>A narrowed count against the whole: "12 of 48 students".</td><td>A count that drops without saying what it is out of.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -279,6 +294,8 @@ Put Previous and Next in the detail header, and keep one detail per Section.
 - `named` makes the section a region named by its title, for a section that stands apart as a landmark. The detail region is named by `detailTitle`.
 - A loading section is marked busy, and the skeleton bars are hidden from assistive technology.
 - Give the tabs row a label that says what the tabs switch, such as "Views".
+- The toolbar count is a polite live region, so a screen reader hears "12 of 48 students" as search and filters narrow the rows.
+- Search's icon, label and placeholder all name its scope. Its clear button is "Clear search". Esc clears, then closes and returns focus to the icon.
 
 </div>
 

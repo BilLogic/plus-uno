@@ -5,6 +5,7 @@ import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingL
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useSplitHolds } from '../Frame/SplitContext';
 import { useOwnWidth } from '../Frame/useOwnWidth';
+import SectionSearch from './SectionSearch';
 import './PatternSection.scss';
 
 /**
@@ -136,7 +137,8 @@ export const SectionToolbar = ({
             <div className="plus-section-toolbar__start">
                 {search && <div className="plus-section-toolbar__search">{search}</div>}
                 {filters && <div className="plus-section-toolbar__slot">{filters}</div>}
-                {count && <span className="plus-section-toolbar__count">{count}</span>}
+                {/* A polite live region: the count changes as search and filters narrow the rows. */}
+                {count && <span className="plus-section-toolbar__count" role="status">{count}</span>}
             </div>
             {actions && <div className="plus-section-toolbar__slot plus-section-toolbar__actions">{actions}</div>}
         </div>
@@ -148,7 +150,7 @@ SectionToolbar.propTypes = {
     search: PropTypes.node,
     /** Filters slot: dropdown buttons */
     filters: PropTypes.node,
-    /** Count, such as "48 students"; truncates first */
+    /** Count in words, such as "12 of 48 students"; truncates first, and is announced politely when it changes */
     count: PropTypes.node,
     /** Actions slot, at the end */
     actions: PropTypes.node,
@@ -397,5 +399,8 @@ PatternSection.propTypes = {
 };
 
 PatternSection.Toolbar = SectionToolbar;
+PatternSection.Search = SectionSearch;
+
+export { SectionSearch };
 
 export default PatternSection;

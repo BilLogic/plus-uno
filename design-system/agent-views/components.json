@@ -8638,6 +8638,7 @@
         "Footer",
         "Anatomy",
         "Levels",
+        "ToolbarSearch",
         "LoadingDefault",
         "LoadingToolbar",
         "LoadingTabsOnly",
@@ -8655,9 +8656,13 @@
       "tokens": [
         "--body-default",
         "--body-small",
+        "--border-default",
+        "--ds-background-input",
+        "--ds-border-input",
         "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
+        "--field-width-md",
         "--grid-gutter",
         "--heading-large",
         "--heading-large-tracking",
@@ -8667,6 +8672,9 @@
         "--inline-md",
         "--inline-sm",
         "--item-height-md",
+        "--motion-duration-medium",
+        "--motion-easing-standard",
+        "--radius-h32",
         "--section-min-width-main",
         "--section-min-width-side",
         "--section-pad-x-default",
@@ -8703,7 +8711,7 @@
               "type": "node",
               "required": false,
               "default": null,
-              "description": "Count, such as \"48 students\"; truncates first"
+              "description": "Count in words, such as \"12 of 48 students\"; truncates first, and is announced politely when it changes"
             },
             {
               "name": "actions",
@@ -8720,6 +8728,11 @@
               "description": null
             }
           ]
+        },
+        {
+          "name": "Search",
+          "impl": "SectionSearch",
+          "props": []
         }
       ]
     },
