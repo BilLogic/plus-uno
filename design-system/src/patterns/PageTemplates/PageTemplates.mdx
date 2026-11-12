@@ -28,7 +28,7 @@ export const patterns = [
     ['Table', 'Records in rows and columns, with its own header and pagination slots.', 'Many objects of the same shape.', 'PatternTable', 'templates-section-table'],
     ['Backdrop', 'The shared layer under a Modal or an overlay Panel.', 'Anything that blocks the page behind it.', 'Backdrop', 'templates-modal-backdrop'],
     ['Modal', 'Interrupts the page for one task, centered on the screen.', 'A step that must happen before the page continues.', 'PatternModal', 'templates-modal-modal'],
-    ['Panel', 'A full-height panel at the screen edge, over the backdrop.', 'Details or a task that keeps the page in view.', 'PatternDrawer', 'templates-panel-panel'],
+    ['Panel', 'A full-height layer beside or over the Page, with no backdrop.', 'Details or a task that keeps the page in view.', 'Panel', 'templates-panel-panel'],
     ['Popup', 'A floating layer off a trigger: menu, select list, filter menu, profile menu or content, with no backdrop.', 'Something anchored to a trigger.', 'Popup (component)', 'templates-popup-popup'],
 ];
 
@@ -148,7 +148,7 @@ A page is built from the top down out of patterns. A Sessions page is built on P
 
 ### For developers
 
-A template is a composition, not a component of its own. The default frame is `Frame` with the PLUS `Sidebar` (`@/components`, which fills the Sidebar pattern from the role's config) in `sidebar` and a `Breadcrumb` in `header`; the page's `h1` is its page-level Section header. The focused frame is `Frame` with no `sidebar`, `width="reading"`, the task's name as the `h1` in `header`, and `onBack` and `onClose`, which draw Back and Close; its actions are a group at the foot of the content. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. Figma's `drawer?` toggle is a `PatternDrawer` beside the Frame, whose open state the page holds. `surfaceDirect` puts the children straight in the page with no content grid, for a full-width page such as chat.
+A template is a composition, not a component of its own. The default frame is `Frame` with the PLUS `Sidebar` (`@/components`, which fills the Sidebar pattern from the role's config) in `sidebar` and a `Breadcrumb` in `header`; the page's `h1` is its page-level Section header. The focused frame is `Frame` with no `sidebar`, `width="reading"`, the task's name as the `h1` in `header`, and `onBack` and `onClose`, which draw Back and Close; its actions are a group at the foot of the content. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. The Frame's `panel` holds the AI panel, and its open state is the page's to hold. `surfaceDirect` puts the children straight in the page with no content grid, for a full-width page such as chat.
 
 ### The patterns
 

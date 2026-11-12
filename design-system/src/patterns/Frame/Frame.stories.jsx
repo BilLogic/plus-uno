@@ -697,7 +697,7 @@ export const ModalClosesOverlaySidebarAt768 = {
 /**
  * The Panel area: the Frame's right-hand area, full height. The layout
  * resolver decides whether it docks beside the Page at a hairline or opens
- * over it on a Backdrop. Each story sets the viewport first, then opens the
+ * over it with no Backdrop. Each story sets the viewport first, then opens the
  * Panel the way a person does, from a button on the Page.
  */
 const ChatToggle = () => {
@@ -854,16 +854,14 @@ export const PanelDockedAt1440 = {
     }),
 };
 
-/** The Backdrop covers the Page and the Sidebar's column, full height. */
-const expectBackdrop = async (p) => {
-    const backdrop = p.backdrop();
-    await expect(backdrop, 'an overlay Panel has a Backdrop').not.toBeNull();
-    await expect(rect(backdrop).top, 'from the top').toBeCloseTo(rect(p.frame).top, 0);
-    await expect(rect(backdrop).left, 'it covers the Sidebar column').toBeCloseTo(rect(p.frame).left, 0);
-    await expect(getComputedStyle(backdrop).backgroundColor).toBe(tokenColor(p.frame, '--ds-blanket'));
+/** An overlay Panel floats: no Backdrop is drawn, and a point on the Page lands on the Page, not on a layer over it. */
+const expectNoBackdrop = async (p) => {
+    await expect(p.backdrop(), 'an overlay Panel has no Backdrop').toBeNull();
+    await expect(p.frame.querySelector('.plus-pattern-backdrop'), 'and no shared Backdrop either').toBeNull();
     const s = rect(p.surface);
     const hit = document.elementFromPoint(s.left + 40, s.top + 40);
-    await expect(hit, 'a press on the Page lands on the Backdrop').toBe(backdrop);
+    await expect(p.frame.contains(hit), 'a point on the Page lands inside the Frame').toBe(true);
+    await expect(hit.closest('.plus-frame__panel'), 'and not on the Panel').toBeNull();
 };
 
 const expectOverlayPanel = async (p, width) => {
@@ -900,7 +898,7 @@ export const PanelAutoCollapsesSidebarAt1200 = {
     }),
 };
 
-/** 1100 with a 400 Panel: even the Panel alone leaves 652, so it opens over the Page on a Backdrop; a press outside closes it. */
+/** 1100 with a 400 Panel: even the Panel alone leaves 652, so it floats over the Page with no Backdrop; a press outside closes it. */
 export const PanelOverlayAt1100 = {
     parameters: { frameWidth: 1100 },
     render: WithPanel,
@@ -909,12 +907,12 @@ export const PanelOverlayAt1100 = {
         await waitFor(() => expect(p.sidebar()).not.toBeNull());
         await openPanel(p);
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
-        await expect(p.coveredSidebar(), 'the Sidebar stays docked under the Backdrop, out of reach').not.toBeNull();
+        await expect(p.coveredSidebar(), 'the Sidebar stays docked under the Panel, out of reach').not.toBeNull();
         await expect(rect(p.content).width, 'the Page keeps its width').toBeCloseTo(1100 - 240 - 48, 0);
-        await expectBackdrop(p);
+        await expectNoBackdrop(p);
 
-        // A press on the Backdrop closes it.
-        await userEvent.click(p.backdrop());
+        // A press on the Page, outside the Panel, closes it.
+        await userEvent.click(p.surface);
         await waitFor(() => expect(p.panel(), 'a press outside closes it').toBeNull());
         await expect(p.backdrop()).toBeNull();
 
@@ -937,12 +935,12 @@ export const SidebarByHandWinsAt1300 = {
         await expect(getComputedStyle(panel).position).not.toBe('absolute');
         // Docked, the Panel has no Backdrop, so the Page's toggle is pressable.
         await userEvent.click(p.toggle);
-        // The Panel moves to overlay, so the docked Sidebar is under its Backdrop, out of reach.
+        // The Panel moves to overlay, so the docked Sidebar is under it, out of reach.
         await waitFor(() => expect(p.coveredSidebar(), 'opened by hand, it docks').not.toBeNull());
         await expect(getComputedStyle(p.coveredSidebar()).position).not.toBe('absolute');
         await expect(p.panel(), 'the same Panel, not remounted').toBe(panel);
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
-        await expectBackdrop(p);
+        await expectNoBackdrop(p);
         // Now an overlay, it is modal: focus moves in and the Page goes inert.
         await waitFor(() => expect(panel.contains(canvasElement.ownerDocument.activeElement), 'focus moves into the Panel').toBe(true));
         await expect(p.surface.inert).toBe(true);
@@ -973,7 +971,7 @@ export const ModalOverOverlayPanelAt1100 = {
         const p = panelParts(canvasElement);
         await openPanel(p);
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
-        // The Page is inert under the Backdrop, so the Modal is raised from inside the Panel.
+        // The Page is inert under the Panel, so the Modal is raised from inside the Panel.
         const settings = within(p.panel()).getByRole('button', { name: 'Chat settings' });
         settings.focus();
         await userEvent.keyboard('{Enter}');
@@ -989,7 +987,7 @@ export const ModalOverOverlayPanelAt1100 = {
 
 /**
  * 1100: an overlay Panel is modal. Opening it moves focus in, the Page and the
- * Sidebar under the Backdrop are inert, Tab stays inside it, and closing it
+ * Sidebar under it are inert, Tab stays inside it, and closing it
  * hands focus back to the opener.
  */
 export const OverlayPanelIsModalAt1100 = {
@@ -1009,8 +1007,8 @@ export const OverlayPanelIsModalAt1100 = {
         await expect(panel).toHaveAttribute('aria-modal', 'true');
         await expect(panel).toHaveAccessibleName('AI chat');
         await waitFor(() => expect(panel.contains(doc.activeElement), 'focus moves into the Panel').toBe(true));
-        await expect(p.surface.inert, 'the Page under the Backdrop is inert').toBe(true);
-        await expect(p.coveredSidebar().inert, 'the Sidebar under the Backdrop is inert').toBe(true);
+        await expect(p.surface.inert, 'the Page under the Panel is inert').toBe(true);
+        await expect(p.coveredSidebar().inert, 'the Sidebar under the Panel is inert').toBe(true);
         await expect(p.sidebar(), 'and out of the accessibility tree').toBeNull();
         // Tab and Shift+Tab stay inside the Panel.
         for (let i = 0; i < 4; i += 1) {
@@ -1162,13 +1160,13 @@ export const OneOverlayAt768 = {
         const p = panelParts(canvasElement);
         await openPanel(p);
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-min-width'));
-        await expectBackdrop(p);
+        await expectNoBackdrop(p);
         await expect(p.splitter(), 'no splitter under 1024').toBeNull();
-        // Hovering the left edge under the Backdrop does not peek the Sidebar.
+        // Hovering the left edge under the Panel does not peek the Sidebar.
         await userEvent.hover(p.edge());
         await new Promise((resolve) => { setTimeout(resolve, 100); });
         await expect(p.sidebar(), 'no second overlay').toBeNull();
-        // Opening the Sidebar by hand (the toggle is under the Backdrop, so Ctrl+[) closes the Panel.
+        // Opening the Sidebar by hand (the toggle is inert under the Panel, so Ctrl+[) closes the Panel.
         await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(p.sidebar(), 'the Sidebar opens as an overlay').not.toBeNull());
         await waitFor(() => expect(p.panel(), 'and the Panel closes').toBeNull());
@@ -1478,11 +1476,11 @@ export const StatePanelPeek = frameState(1440, { panel: statePanel, panelPeek: t
     await expect(backdropShows(p), 'no Backdrop under a peek').toBeNull();
 });
 
-/** Panel overlay: under 1024 the Panel opens over the Page on a Backdrop, capped at 320. */
+/** Panel overlay: under 1024 the Panel floats over the Page with no Backdrop, capped at 320. */
 export const StatePanelOverlay = frameState(768, { panel: statePanel, panelOpen: true }, async (p) => {
     await panelIs(p, 'overlay');
     await expect(rect(p.panel()).width).toBeCloseTo(320, 0);
-    await expect(backdropShows(p)).not.toBeNull();
+    await expect(backdropShows(p), 'no Backdrop').toBeNull();
 });
 
 /** Panel full width: under 768 the overlay Panel takes the whole Frame. */
@@ -1516,10 +1514,10 @@ export const StatePanelCollapsesSidebar = frameState(1200, { panel: statePanel, 
     await panelIs(p, 'docked');
 });
 
-/** At 1100 even the Panel alone leaves under 720, so it opens on a Backdrop over the Page and the Sidebar. */
+/** At 1100 even the Panel alone leaves under 720, so it floats over the Page and the Sidebar, with no Backdrop. */
 export const StatePanelOnBackdrop = frameState(1100, { panel: statePanel, panelOpen: true }, async (p) => {
     await panelIs(p, 'overlay');
-    await expect(backdropShows(p)).not.toBeNull();
+    await expect(backdropShows(p), 'no Backdrop').toBeNull();
     // Under the overlay Panel the Sidebar is inert, so it is read among the hidden roles.
     await waitFor(() => expect(p.coveredSidebar()?.className ?? '').toContain('plus-frame__sidebar--docked'));
 });
@@ -1783,7 +1781,7 @@ export const KeyPanelCollapsesSidebar = {
     },
 };
 
-/** Under 1024 the Sidebar never docks and the AI panel opens over the Page, on a Backdrop. */
+/** Under 1024 the Sidebar never docks and the AI panel floats over the Page, with no Backdrop. */
 export const KeyUnder1024 = {
     name: 'Key state: Under 1024',
     parameters: { layout: 'padded' },
@@ -1792,6 +1790,6 @@ export const KeyUnder1024 = {
         const p = panelParts(canvasElement);
         await panelIs(p, 'overlay');
         await expect(p.sidebar(), 'the Sidebar is not docked').toBeNull();
-        await expect(backdropShows(p), 'the panel opens over a Backdrop').not.toBeNull();
+        await expect(backdropShows(p), 'the panel floats with no Backdrop').toBeNull();
     },
 };

@@ -50,13 +50,6 @@ describe('Backdrop', () => {
         expect(backdrop.style.getPropertyValue('--plus-overlay-screen-height')).toBe('520px');
     });
 
-    it('covers its parent instead of the screen when contained, for the overlay Panel', () => {
-        render(<Backdrop data-testid="backdrop" contained aria-hidden="true" />);
-        const backdrop = screen.getByTestId('backdrop');
-        expect(backdrop).toHaveClass('plus-pattern-backdrop', 'plus-pattern-backdrop-contained');
-        expect(backdrop).not.toHaveClass('plus-pattern-backdrop-inline');
-    });
-
     it('ignores the stand-in screen size when it is not inline', () => {
         render(<Backdrop data-testid="backdrop" screenWidth={1024}>x</Backdrop>);
         expect(screen.getByTestId('backdrop').style.getPropertyValue('--plus-overlay-screen')).toBe('');

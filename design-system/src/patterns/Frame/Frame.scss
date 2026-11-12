@@ -179,7 +179,7 @@
 }
 
 // Overlay and peek: over the Page, full height, with the overlay
-// role's fill and shadow. The overlay sits on its Backdrop; a peek has none.
+// role's fill and shadow. Neither has a Backdrop.
 .plus-frame__panel--overlay,
 .plus-frame__panel--peek {
     position: absolute;
@@ -194,12 +194,6 @@
     &:focus {
         box-shadow: var(--ds-shadow-overlay);
     }
-}
-
-// The overlay Panel's Backdrop: the shared Backdrop, contained to the Frame so it
-// covers the Page and the Sidebar. The Frame only picks its layer.
-.plus-frame__backdrop {
-    --blanket-contained-layer: var(--frame-layer-blanket);
 }
 
 // The hover strip that peeks a closed Panel, when the peek option is on.
