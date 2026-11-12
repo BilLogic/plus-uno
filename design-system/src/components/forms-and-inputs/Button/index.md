@@ -14,6 +14,8 @@ Also asked as: cta, submit.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a button for an action on the current page: submit a form, mark attendance, close a dialog. For navigation to another page, use Link button.
@@ -29,6 +31,14 @@ Use a button for an action on the current page: submit a form, mark attendance, 
 | Danger | The final confirmation of a destructive, irreversible action such as deleting. Example: "Delete session recording". |
 | Discovery | The call to action for a new experience. Example: "Try the new schedule view". |
 | AI | The one primary AI action in a region. Draws the sparkle before its label. Example: "Generate summary". |
+
+## Motion
+
+Button reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Hover and press change color, 90% by about 110 ms. |
 
 ## Best practices
 

@@ -14,9 +14,19 @@ Also asked as: icon only button, icon action.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use an icon button when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header. Where space allows, or the action is important, use a Button with a text label.
+
+## Motion
+
+IconButton reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Hover and press change color, 90% by about 110 ms. |
 
 ## Best practices
 

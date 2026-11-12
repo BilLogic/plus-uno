@@ -11,6 +11,7 @@
  */
 
 import { MOTION_REGISTRY } from './motion-registry.mjs';
+import { MOTION_SEMANTICS } from './plan.mjs';
 
 /** The registry row named `name`, or null. */
 export function motionRowOf(name, registry = MOTION_REGISTRY) {
@@ -51,3 +52,36 @@ export function motionSectionOf(row) {
   }
   return `${d}\n`;
 }
+
+
+/**
+ * Every registry row as plain data for the Motion · Library index, sorted by
+ * name: `{ name, tier, events }`. A token a row names that the plan does not
+ * declare throws, so the index can never show a custom property nothing sets.
+ */
+export function motionLibraryOf(registry = MOTION_REGISTRY) {
+  const valid = new Set([...MOTION_SEMANTICS.map((s) => s.name), 'linear']);
+  return [...registry]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((row) => {
+      const events = motionEventsOf(row);
+      for (const e of events) {
+        for (const t of e.tokens) {
+          if (!valid.has(t)) throw new Error(`motion registry row "${row.name}" event "${e.event}" names "${t}", which is not a motion token`);
+        }
+      }
+      return { name: row.name, tier: row.tier, events };
+    });
+}
+
+/** The Library as one Markdown table: one line per event, grouped by row, for the agent file. */
+export function motionLibraryTableOf(registry = MOTION_REGISTRY) {
+  let d = `| Name | Tier | Event | Transition | Tokens |\n| --- | --- | --- | --- | --- |\n`;
+  for (const r of motionLibraryOf(registry)) {
+    for (const e of r.events) {
+      d += `| ${r.name} | ${r.tier} | ${e.event} | ${e.transition} | ${e.tokens.map((t) => code(motionVarOf(t))).join(' · ')} |\n`;
+    }
+  }
+  return d;
+}
+

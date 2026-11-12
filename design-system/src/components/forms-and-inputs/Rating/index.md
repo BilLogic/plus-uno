@@ -14,11 +14,21 @@ Also asked as: stars, score.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Rating/Rating.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a rating for a single satisfaction score out of five: the end of a session, a piece of feedback, a quick judgment the person makes in one gesture. Five items is the whole scale; there is no other length.
 
 `variant` chooses what the row says about itself: `comments` puts one caption under the row, `numeric` puts 1 to 5 above each item. `icon` is `star` or `thumbs-up`.
+
+## Motion
+
+Rating reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Stars fill as a color change, staggered 20 ms. |
 
 ## Best practices
 

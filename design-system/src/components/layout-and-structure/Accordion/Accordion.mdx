@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const sessionBody = "Open a session to see the student's goals, your notes from last time and the materials you planned to use.";
 export const sessionItems = [
@@ -87,6 +88,14 @@ Accordion component for organizing content into collapsible sections.
 <ComponentExample of={AccordionStories.Expanded} title="Expanded" description="The selected ground, chevron turned up. Press again to close." />
 
 <ComponentExample of={AccordionStories.Disabled} title="Disabled" description="Dimmed to the disabled opacity, announced as disabled, and it never opens." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Accordion" />
 
 </div>
 

@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -96,6 +97,14 @@ A choice grid asks one question of several things at once, as a matrix of radios
 <ComponentExample of={ChoiceGridStories.ReadOnly} title="Read-only" description="The answers show and stay in the tab order, and clicking a cell changes nothing." />
 
 <ComponentExample of={ChoiceGridStories.Disabled} title="Disabled" description="The whole grid takes the disabled fill. Cells leave the tab order." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="ChoiceGrid" />
 
 </div>
 

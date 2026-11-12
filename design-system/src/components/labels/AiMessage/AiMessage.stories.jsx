@@ -139,7 +139,8 @@ export const WithFeedback = {
         await expect(up).toHaveAttribute('aria-pressed', 'false');
         await expect(down).toHaveAttribute('aria-pressed', 'true');
         const field = await within(document.body).findByRole('textbox', { name: /What went wrong/ });
-        await expect(field).toBeVisible();
+        // The comment popup springs open from transparent, so wait for it to finish opening.
+        await waitFor(() => expect(field).toBeVisible());
         await userEvent.click(within(document.body).getByRole('button', { name: 'Skip' }));
         await waitFor(() => expect(within(document.body).queryByRole('textbox', { name: /What went wrong/ })).toBeNull());
     },

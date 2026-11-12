@@ -47,6 +47,9 @@ export const INDEX = 'design-system/agent-views/components/index.md';
 export const STATIC = new Set([
   'AiIcon', 'Code', 'CodeBlock', 'DateTag', 'Fieldset', 'Heading', 'Icon', 'Illustration', 'Image',
   'Logo', 'Object', 'VisuallyHidden',
+  // The motion docs' "No motion" list (05-components.md): they never move.
+  'Avatar', 'AvatarGroup', 'ButtonGroup', 'ChangeTag', 'Comment', 'CountTag', 'EmptyState',
+  'RichTextEditor', 'ScrollBar', 'SmartTag', 'StatusTag', 'Tag', 'TagGroup', 'Tile',
 ]);
 
 const TIERS = ['component', 'pattern', 'template'];

@@ -12,12 +12,22 @@ A few things a person could ask the AI, as a wrapping row of prompt `Suggestion`
 
 **Storybook page:** `design-system/src/components/labels/PromptStarters/PromptStarters.mdx`
 
+**Motion:** enter `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `PromptStarters` to offer a few things a person could ask an AI feature,
 before they've typed anything: an empty chat, a fresh reflection, a blank
 prompt field. Once a conversation is underway, use `Suggestion` directly for
 a single follow-up prompt instead of a full row of starters.
+
+## Motion
+
+PromptStarters reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Swap content in place | `--ds-motion-appearance-fast` | Fade in place, staggered; picking one fills the composer. |
 
 ## Best practices
 

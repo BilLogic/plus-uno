@@ -12,6 +12,8 @@ TagInput — a field of Tags with a text entry after them, modeled on Notion's m
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.mdx`
 
+**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `TagInput` when a field's value is a set of short labels the person picks
@@ -23,6 +25,14 @@ focusing it opens the list of options under it.
 - For one value from a list, use `Select`.
 - For several values from a fixed list nobody adds to, use `Select` with `isMulti`.
 - For fewer than 5 options, use a Checkbox group (`Fieldset` + `Checkbox`).
+
+## Motion
+
+TagInput reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A chip is added or removed. |
 
 ## Best practices
 

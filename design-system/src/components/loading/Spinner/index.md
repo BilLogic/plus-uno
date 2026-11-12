@@ -14,6 +14,8 @@ Also asked as: loading, busy indicator, wait indicator, loading indicator.
 
 **Storybook page:** `design-system/src/components/loading/Spinner/Spinner.mdx`
 
+**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Spinner` when the wait is short, indeterminate, and the user has nothing
@@ -26,6 +28,14 @@ to do but wait: a submit in flight, a panel fetching on open. It says
 | --- | --- |
 | Inherit | The default. The ring takes the surrounding text color, so it matches a label, a panel or a disabled control. |
 | Invert | On a bold or colored background. |
+
+## Motion
+
+Spinner reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Load content | `--ds-motion-linear` | Turns while work runs and stops the moment it stops. A static label in reduced motion. |
 
 ## Best practices
 

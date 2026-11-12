@@ -12,12 +12,24 @@ TreeSelect: a field that picks from options that nest, at any level of the tree.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `TreeSelect` when the options genuinely nest and someone may need to see
 or pick at more than one level — a curriculum with units and lessons, a
 category tree. For options that nest but are chosen one level at a time in
 sequence, use `Cascader` instead. For a flat list, use `Select`.
+
+## Motion
+
+TreeSelect reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
+| change | Expand and collapse | `--ds-motion-spatial-fast` | Columns and branches expand. |
 
 ## Best practices
 

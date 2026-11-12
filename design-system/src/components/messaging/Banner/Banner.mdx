@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={BannerStories} />
 
@@ -54,6 +55,14 @@ and unmounts it once it clears.
 <ComponentExample of={BannerStories.Pressed} title="Pressed" description="No pressed layer either." />
 
 <ComponentExample of={BannerStories.Focused} title="Focused" description="Tab skips it; a link inside takes its own focus ring." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Banner" />
 
 </div>
 

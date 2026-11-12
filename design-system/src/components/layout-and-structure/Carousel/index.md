@@ -14,6 +14,8 @@ Also asked as: slideshow, gallery.
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Carousel/Carousel.mdx`
 
+**Motion:** change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Carousel` for a few equal panels a person is invited to look through: what is
@@ -26,6 +28,14 @@ Autoplay is on, at `interval` 5000 ms a slide, and loops. `peek` shows the
 neighbors; turn it off to show the current slide alone. `onSlideChange` gets
 the new index. Give the region a name
 with `aria-label` or `aria-labelledby`.
+
+## Motion
+
+Carousel reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Step to the next or previous | `--ds-motion-spatial-default` | No autoplay by default; if it plays, it has a visible pause. |
 
 ## Best practices
 

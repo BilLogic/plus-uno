@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as TabsStories from './Tabs.stories.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PopupSelect, Tabs } from '@/components';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -74,6 +75,14 @@ export const figmaMeta = {
 <ComponentExample of={TabsStories.SelectedPill} title="Selected pill" description={<>The neutral fill with the default ink; its hover and press step the neutral fill.</>} />
 
 <ComponentExample of={TabsStories.Disabled} title="Disabled" description={<>Disabled ink and no pointer events; never selected.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Tabs" />
 
 </div>
 

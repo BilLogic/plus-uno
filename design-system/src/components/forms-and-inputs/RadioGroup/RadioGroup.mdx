@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import { RadioGroup } from '@/components';
 import * as RadioGroupStories from './RadioGroup.stories.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={RadioGroupStories} />
 
@@ -71,6 +72,14 @@ A radio group asks one question and offers a set of radio answers, one of which 
 ## Keyboard
 
 <ComponentExample of={RadioGroupStories.Keyboard} title="Arrow keys" description="Arrow keys move the roving tab stop between options. Tab enters and leaves the group as one stop." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="RadioGroup" />
 
 </div>
 

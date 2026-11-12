@@ -14,6 +14,8 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.exit` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Flag` to confirm something that has already happened and needs no reply:
@@ -30,6 +32,16 @@ state. `FlagGroup` positions a stack of them.
 | Warning | Something to check before going on. Stays until dismissed. |
 | Error | Something that failed. Stays until dismissed. |
 | Bold | Any appearance on its bold fill, for the one message that must be seen. |
+
+## Motion
+
+Flag reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Slides in from the top-right corner. |
+| exit | Open and close an overlay | `--ds-motion-spatial-exit` | Leaves by the exit rules. |
+| change | Add or remove an item | `--ds-motion-spatial-default` | The stack closes up when one leaves. |
 
 ## Best practices
 
