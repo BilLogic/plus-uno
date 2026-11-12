@@ -139,7 +139,8 @@ export const Button = ({
         <Tag
             id={id}
             className={btnClasses}
-            title={title}
+            // A disabled button carries no tooltip, native or otherwise: the reason is visible text beside it.
+            title={disabled ? undefined : title}
             data-testid={testId}
             {...props}
             {...tagProps}
@@ -167,7 +168,7 @@ Button.propTypes = {
     text: PropTypes.string,
     /** The label, used when `text` is not given. Omit both for an icon-only button. */
     children: PropTypes.node,
-    /** The `title` attribute, a native tooltip on hover. */
+    /** The `title` attribute, a native tooltip on hover. It is left off while the button is disabled or loading. */
     title: PropTypes.string,
 
     // Appearance
@@ -183,7 +184,7 @@ Button.propTypes = {
     // Behavior
     /** Called with the click event when the button is activated by mouse or keyboard. It does not fire while `isDisabled` or `isLoading` is set. */
     onClick: PropTypes.func,
-    /** Prevents interaction and sets `aria-disabled`. Avoid it where you can; say why the action is unavailable instead. */
+    /** Prevents interaction. Leave an action enabled and explain what is missing when it is pressed; disable only while the action is sending (`isLoading` does it for you). A disabled button leaves the tab order and carries no tooltip. */
     isDisabled: PropTypes.bool,
     /** Marks the button selected and sets `aria-pressed`. For a link role it sets `aria-current` instead. */
     isSelected: PropTypes.bool,

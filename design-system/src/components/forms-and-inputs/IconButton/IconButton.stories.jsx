@@ -164,6 +164,23 @@ export const Disabled = {
     },
 };
 
+/** A disabled icon button carries no tooltip and no `title`; the reason is text beside it. */
+export const DisabledWithReason = {
+    render: () => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)' }}>
+            <IconButton icon="trash" label="Delete session" tooltip="Remove this session" isDisabled />
+            <span>Open sessions cannot be deleted. End the session first.</span>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const button = canvas.getByRole('button', { name: 'Delete session' });
+        await expect(button).toBeDisabled();
+        await expect(button).not.toHaveAttribute('title');
+        await expect(canvas.getByText('Open sessions cannot be deleted. End the session first.')).toBeVisible();
+    },
+};
+
 export const Loading = {
     render: () => <IconButton icon="pen" label="Saving" isLoading />,
     play: async ({ canvasElement }) => {

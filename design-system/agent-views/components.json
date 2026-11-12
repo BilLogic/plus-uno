@@ -1200,7 +1200,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The `title` attribute, a native tooltip on hover.",
+          "description": "The `title` attribute, a native tooltip on hover. It is left off while the button is disabled or loading.",
           "deprecated": null
         },
         {
@@ -1394,6 +1394,7 @@
         "Selected",
         "Disabled",
         "Loading",
+        "ExplainsOnPress",
         "FitContainer",
         "Truncation",
         "Interactive",
@@ -2157,6 +2158,7 @@
         "Selected",
         "Mixed",
         "Disabled",
+        "DisabledWithReason",
         "Required",
         "Description",
         "Card"
@@ -3746,6 +3748,7 @@
         "Open",
         "CompactRows",
         "DisabledRow",
+        "DisabledRowWithReason",
         "HoveredState",
         "KeyboardFocus"
       ],
@@ -5445,9 +5448,9 @@
           "name": "isDisabled",
           "type": "bool",
           "required": false,
-          "default": null,
+          "default": "false",
           "values": null,
-          "description": "Prevents interaction. Avoid it where you can; say why the action is unavailable instead.",
+          "description": "Prevents interaction and drops the tooltip and `title`. Leave an action enabled and explain what is missing when it is pressed; disable only while it is sending.",
           "deprecated": null
         },
         {
@@ -5519,6 +5522,7 @@
         "Circle",
         "Selected",
         "Disabled",
+        "DisabledWithReason",
         "Loading",
         "FilterCount",
         "HoveredState",
@@ -10212,6 +10216,7 @@
         "Hovered",
         "Focused",
         "Disabled",
+        "DisabledWithReason",
         "Required"
       ],
       "tokens": [
@@ -15133,7 +15138,8 @@
         "Hovered",
         "HoveredOn",
         "Focused",
-        "Disabled"
+        "Disabled",
+        "DisabledWithReason"
       ],
       "tokens": [
         "--body-default",

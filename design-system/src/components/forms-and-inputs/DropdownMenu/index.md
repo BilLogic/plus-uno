@@ -10,7 +10,7 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 **Source:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, HoveredState, KeyboardFocus
+**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, DisabledRowWithReason, HoveredState, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.mdx`
 
@@ -75,8 +75,9 @@ The public Menu family has no submenu-trigger row of its own yet. Flatten the ch
 
 - **The trigger announces the menu.** Its trigger carries `aria-haspopup="menu"` and an `aria-expanded` that tracks the open state.
 - **Arrow keys move between rows**, Enter and Space pick the row at the cursor, and Escape closes the menu and returns focus to the trigger.
-- **A disabled row is out of the tab order** and cannot be picked.
-- **Disabled is not color alone:** the row sets `aria-disabled`.
+- **A disabled row cannot be picked**, and the arrow keys skip it. Menu rows are not tab stops, so the arrow-key navigation among the enabled rows is unchanged.
+- **Disabled is not color alone:** the row sets `aria-disabled`, and its `description` says why in visible text. A disabled row carries no tooltip.
+- **Disable a row only for something the person can fix on the same screen.** Leave an action enabled and explain on press when it is merely not ready, and leave out a row the role can never use.
 
 ## Related
 
@@ -104,7 +105,7 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 | Pressed row | `--ds-background-neutral-subtle-pressed`. |
 | Selected row | `--ds-background-selected`. |
 | Focused trigger | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
-| Disabled row | Text takes `--ds-text-disabled`; out of the tab order. |
+| Disabled row | Text takes `--ds-text-disabled`; the row cannot be picked. Its description keeps `--ds-text-subtle`, so the reason stays readable. |
 | Loading | One "Loading options" row with a 16 spinner replaces the rows, in `--ds-text-subtle`. |
 | Load failed | A "Couldn't load options" row with an alert icon, then a Retry row. |
 

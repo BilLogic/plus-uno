@@ -95,12 +95,11 @@ it leaves the accordion with no edge to hold it.
 - **Write `header` as a heading.** It becomes the text of a heading, so it is
   read both in place and in the heading list. A short noun phrase, not a
   sentence.
-- **`disabled` stops a press, not discovery.** The header stays focusable and
-  announced as unavailable (`aria-disabled`) rather than removed from the tab
-  order — so a keyboard or screen-reader user can tell the section exists.
-  Pressing it, by mouse or keyboard, never opens it. It is still not a way to
-  withhold content: the body stays in the DOM, so leave the item out if what is
-  inside it is not for this reader.
+- **`disabled` is a real disabled button.** It leaves the tab order and a press,
+  by mouse or keyboard, never opens it. Say why in text inside or beside the
+  item, never in a tooltip on the header. It is still not a way to withhold
+  content: the body stays in the DOM, so leave the item out if what is inside
+  it is not for this reader.
 - **Focus stays on the header after a toggle.** Opening an item does not move
   focus into the body and does not scroll it into view. That is the right
   behavior — the user keeps their place — but it means a tall body opened low

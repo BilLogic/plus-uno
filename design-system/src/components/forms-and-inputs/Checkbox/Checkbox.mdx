@@ -73,6 +73,8 @@ A checkbox lets a person select one or more options from a list, or confirm a si
 
 <ComponentExample of={CheckboxStories.Disabled} title="Disabled" description="The disabled fill. The box leaves the tab order." />
 
+<ComponentExample of={CheckboxStories.DisabledWithReason} title="Disabled with a reason" description="The description says what to do first and stays at full contrast." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -220,7 +222,7 @@ A short label sits level with the box. A long one wraps and pushes the box away 
 
 ### Read-only is not disabled.
 
-`isReadOnly` shows an answer the person may read but not change: the box stays in the tab order at full contrast, says `aria-readonly`, and ignores clicks and Space. `isDisabled` takes it out of the tab order and grays it, for a box that does not apply right now.
+`isReadOnly` shows an answer the person may read but not change: the box stays in the tab order at full contrast, says `aria-readonly`, and ignores clicks and Space. `isDisabled` takes it out of the tab order and grays it, for a box that waits on something the person can fix on the same screen. Put the reason in `description`, which stays at full contrast, and never in a tooltip. When it blocks the main action or several boxes, add a warning Section message above that says how to turn them on.
 
 ### A description describes; the label names.
 

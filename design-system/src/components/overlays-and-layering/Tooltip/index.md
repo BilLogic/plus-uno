@@ -53,6 +53,20 @@ Don't: Repeats the label the control already shows.
 Do: One line, sentence case, no closing period.
 Don't: Two sentences that wrap, with a closing period.
 
+### Never put a tooltip on a disabled control. {#never-put-a-tooltip-on-a-disabled-control}
+
+A disabled control takes no hover and no focus, so a tooltip on it never opens, and touch has no hover at all. Say why in text where the cause is: the field's caption, the option's description line, or a warning Section message above when it blocks the main action. An action stays enabled and explains what is missing when it is pressed.
+
+```jsx
+// Incorrect: the disabled button cannot show the tooltip.
+<Tooltip text="Add the session notes first">
+  <Button appearance="primary" text="Save notes" isDisabled />
+</Tooltip>
+
+// Correct: the button stays enabled and the reason is text on the page.
+<Button appearance="primary" text="Save notes" onClick={explainWhatIsMissing} />
+```
+
 ### Put anything the user can click in a Popup. {#put-anything-the-user-can-click-in-a-popup}
 
 Do: A popup holds content the user can reach.
@@ -66,6 +80,7 @@ Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip
 - **It is wired as a description.** The overlay renders with `role="tooltip"`,
   and the positioning layer adds `aria-describedby` on the trigger pointing at
   it. That is a description, which is why the trigger still needs its own name.
+- **Not on a disabled control.** A disabled control leaves the tab order and takes no hover, so it cannot open a tooltip. The reason it is disabled is visible text beside it.
 - **Touch has no hover.** There is no tap-to-show behavior, so on a touch
   device the tooltip is simply absent. Never let it carry the only copy of
   anything.

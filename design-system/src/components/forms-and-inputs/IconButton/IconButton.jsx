@@ -24,6 +24,7 @@ export const IconButton = ({
     title,
     tooltip,
     isTooltipDisabled = false,
+    isDisabled = false,
     ...props
 }) => {
     const hasMetric = trailingMetric !== undefined && trailingMetric !== null;
@@ -31,10 +32,11 @@ export const IconButton = ({
         <Button
             iconBefore={icon}
             aria-label={hasMetric ? `${label}, ${trailingMetric} applied` : label}
-            title={isTooltipDisabled ? undefined : (title ?? (tooltip ? undefined : label))}
+            title={isTooltipDisabled || isDisabled ? undefined : (title ?? (tooltip ? undefined : label))}
             appearance={appearance}
             spacing={spacing}
             className={clsx({ 'plus-btn--circle': shape === 'circle', 'plus-icon-btn--metric': hasMetric }, className)}
+            isDisabled={isDisabled}
             {...props}
         >
             {hasMetric && (
@@ -46,7 +48,8 @@ export const IconButton = ({
             )}
         </Button>
     );
-    if (isTooltipDisabled || !tooltip) return button;
+    // A disabled control carries no tooltip; the reason is visible text beside it.
+    if (isTooltipDisabled || isDisabled || !tooltip) return button;
     return <Tooltip text={tooltip}>{button}</Tooltip>;
 };
 
@@ -65,7 +68,7 @@ IconButton.propTypes = {
     shape: PropTypes.oneOf(ICON_BUTTON_SHAPES),
     /** Marks the button selected and sets `aria-pressed`. Use it for a toggle such as a list or grid view switch. */
     isSelected: PropTypes.bool,
-    /** Prevents interaction. Avoid it where you can; say why the action is unavailable instead. */
+    /** Prevents interaction and drops the tooltip and `title`. Leave an action enabled and explain what is missing when it is pressed; disable only while it is sending. */
     isDisabled: PropTypes.bool,
     /** Shows a spinner in place of the icon and blocks interaction. */
     isLoading: PropTypes.bool,

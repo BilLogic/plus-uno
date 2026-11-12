@@ -8,7 +8,7 @@ Radio — single option within a named radio group. Supports controlled (`isChec
 
 **Source:** `design-system/src/components/forms-and-inputs/Radio/Radio.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Radio/Radio.stories.jsx` — Overview, Content, States, Invalid, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep, Unselected, Selected, Hovered, Focused, Disabled, Required
+**Stories:** `design-system/src/components/forms-and-inputs/Radio/Radio.stories.jsx` — Overview, Content, States, Invalid, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep, Unselected, Selected, Hovered, Focused, Disabled, DisabledWithReason, Required
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Radio/Radio.mdx`
 
@@ -65,7 +65,7 @@ For a long list, use Select. Do not write numeric options that overlap ("0-20", 
 - **Each option has its own id.** The component derives one per instance, so labels never resolve to the first radio of the group.
 - **A radio with no `label` has no accessible name.** Pass `aria-label` where the design has no room for visible text.
 - **Include an error message for a required or invalid group**, for example "Select an option".
-- **Do not disable an option that must stay reachable.** Use validation, so a screen reader user hears why it cannot be chosen.
+- **Disable an option only for something the person can fix on the same screen.** Put the reason in the option's `description`, at full contrast, and never in a tooltip. A disabled option leaves the tab order. For a choice that must stay reachable, keep it enabled and use validation, so a screen reader user hears why it cannot be chosen.
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the radio.** Arrow keys move between the radios of a group.
 
 ## Related

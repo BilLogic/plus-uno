@@ -276,6 +276,24 @@ export const DisabledRow = {
     },
 };
 
+/** A row disabled for a prerequisite the person can fix here; its description says what to do. */
+export const DisabledRowWithReason = {
+    render: () => (
+        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+            <DropdownMenu trigger={<Button text="Manage" />} isOpen onOpenChange={noop}>
+                <ButtonItem onClick={noop}>Rename</ButtonItem>
+                <ButtonItem onClick={noop} isDisabled description="End the open session first">Archive</ButtonItem>
+            </DropdownMenu>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const page = body(canvasElement);
+        const row = await page.findByRole('menuitem', { name: /Archive/ });
+        await expect(row).toHaveAttribute('aria-disabled', 'true');
+        await expect(page.getByText('End the open session first')).toBeVisible();
+    },
+};
+
 /** Hovered and pressed rows take the neutral subtle steps. */
 export const HoveredState = {
     parameters: { docs: { disable: true } },

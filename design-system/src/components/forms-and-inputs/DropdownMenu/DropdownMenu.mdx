@@ -54,7 +54,9 @@ A dropdown menu is a trigger that opens a menu of actions or navigation items.
 
 <ComponentExample of={DropdownMenuStories.Open} title="Open" description="The trigger shows it is expanded while the menu is open." />
 
-<ComponentExample of={DropdownMenuStories.DisabledRow} title="Disabled row" description="A row that cannot be used right now. It leaves the tab order and cannot be picked." />
+<ComponentExample of={DropdownMenuStories.DisabledRow} title="Disabled row" description="A row that cannot be used right now. It cannot be picked." />
+
+<ComponentExample of={DropdownMenuStories.DisabledRowWithReason} title="Disabled row with a reason" description="The row's description says what to fix first. A disabled row carries no tooltip." />
 
 <ComponentExample of={DropdownMenuStories.Loading} title="Loading" description="One Loading options row, with a spinner, replaces the rows while the options are still being fetched." />
 
@@ -124,7 +126,7 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 <tr><td>Pressed row</td><td><code>--ds-background-neutral-subtle-pressed</code>.</td></tr>
 <tr><td>Selected row</td><td><code>--ds-background-selected</code>.</td></tr>
 <tr><td>Focused trigger</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
-<tr><td>Disabled row</td><td>Text takes <code>--ds-text-disabled</code>; out of the tab order.</td></tr>
+<tr><td>Disabled row</td><td>Text takes <code>--ds-text-disabled</code>; the row cannot be picked. Its description keeps <code>--ds-text-subtle</code>, so the reason stays readable.</td></tr>
 <tr><td>Loading</td><td>One "Loading options" row with a 16 spinner replaces the rows, in <code>--ds-text-subtle</code>.</td></tr>
 <tr><td>Load failed</td><td>A "Couldn't load options" row with an alert icon, then a Retry row.</td></tr>
 </tbody>
@@ -238,8 +240,9 @@ The public Menu family has no submenu-trigger row of its own yet. Flatten the ch
 
 - **The trigger announces the menu.** Its trigger carries `aria-haspopup="menu"` and an `aria-expanded` that tracks the open state.
 - **Arrow keys move between rows**, Enter and Space pick the row at the cursor, and Escape closes the menu and returns focus to the trigger.
-- **A disabled row is out of the tab order** and cannot be picked.
-- **Disabled is not color alone:** the row sets `aria-disabled`.
+- **A disabled row cannot be picked**, and the arrow keys skip it. Menu rows are not tab stops, so the arrow-key navigation among the enabled rows is unchanged.
+- **Disabled is not color alone:** the row sets `aria-disabled`, and its `description` says why in visible text. A disabled row carries no tooltip.
+- **Disable a row only for something the person can fix on the same screen.** Leave an action enabled and explain on press when it is merely not ready, and leave out a row the role can never use.
 
 </div>
 

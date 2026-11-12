@@ -127,7 +127,9 @@ A button triggers an action and lets people know what happens next.
 
 <ComponentExample of={ButtonStories.Selected} title="Selected" description="Applies to default and subtle, and sets aria-pressed." />
 
-<ComponentExample of={ButtonStories.Disabled} title="Disabled" description="A change of color, not of opacity." />
+<ComponentExample of={ButtonStories.ExplainsOnPress} title="Explains on press" description="An action that is not ready stays enabled. Pressing it says what is missing." />
+
+<ComponentExample of={ButtonStories.Disabled} title="Disabled" description="A change of color, not of opacity. Only a button that is sending disables; use Loading for that." />
 
 <ComponentExample of={ButtonStories.Loading} title="Loading" description="A spinner replaces the label and icons while the button is busy." />
 
@@ -266,14 +268,18 @@ The AI appearance marks the single main AI action in a region, such as "Generate
 
 Default spacing for most places; compact for tables and tight spaces, such as a row of student sessions.
 
-### Keep a form's submit button pressable.
+### Keep an action enabled and explain on press.
+
+An action that is not ready stays enabled. When it is pressed, say what is missing: move focus to the first field that needs attention and show the reason as text there, or as a warning Section message above when it blocks the main action or several items. A button disables only while it is sending; `isLoading` does that and keeps the label. Never attach a tooltip to a disabled button.
 
 <DoDontPair
     doExample={<div><Button appearance="primary" text="Save notes" /><p style={{ margin: '8px 0 0' }}>Complete the session notes to continue.</p></div>}
-    doCaption="Explain what is missing with validation text under the field."
+    doCaption="Enabled, with the reason shown as text when the button is pressed."
     dontExample={<Button appearance="primary" text="Save notes" isDisabled />}
     dontCaption="A disabled submit button gives no direction and leaves the tab order."
 />
+
+Self-evident cases need no reason: a Back button on the first step can be disabled. A button for something a role can never do is left out.
 
 ### Align the primary button with its group.
 
@@ -304,7 +310,7 @@ Right-align buttons in focused tasks and modal dialogs, with the primary on the 
 ## Accessibility
 
 - A button performs an action; a link navigates. Use the right element so screen readers announce the right role.
-- Avoid `isDisabled`. A disabled button leaves the tab order and receives no events. Use validation and on-screen directions instead, and never attach a tooltip to one.
+- Leave an action enabled and explain on press; disable a button only while it is sending. A disabled button leaves the tab order and receives no events, and it takes no `aria-disabled` stand-in that keeps it focusable. Never attach a tooltip to one; the reason is visible text beside it.
 - A button with no visible label is an Icon button, which requires a `label`.
 - Loading blocks interaction and sets `aria-busy`; the label stays in the tree for assistive technology.
 - Selected is not color alone: `isSelected` sets `aria-pressed`.

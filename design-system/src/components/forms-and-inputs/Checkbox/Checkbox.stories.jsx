@@ -373,6 +373,20 @@ export const Disabled = {
     },
 };
 
+/** Disabled for a prerequisite the person can fix here; the description says what to do and stays at full contrast. */
+export const DisabledWithReason = {
+    render: () => <Checkbox id="cb-ex-reason" label="Text me reminders" description="Add a phone number first." isDisabled />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const el = box(canvasElement, 'Text me reminders');
+        await expect(el).toHaveAttribute('data-disabled');
+        const reason = canvas.getByText('Add a phone number first.');
+        await expect(reason).toBeVisible();
+        await expect(getComputedStyle(reason.closest('.plus-field-caption')).opacity).toBe('1');
+        await expect(el).toHaveAccessibleDescription('Add a phone number first.');
+    },
+};
+
 export const Required = {
     render: () => <Checkbox id="cb-ex-required" label="I accept the terms" isRequired />,
     play: async ({ canvasElement }) => {

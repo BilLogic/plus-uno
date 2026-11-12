@@ -40,6 +40,15 @@ describe('IconButton', () => {
         expect(button).not.toHaveAttribute('title');
     });
 
+    it('drops the tooltip and title while disabled', () => {
+        const { rerender } = render(<IconButton icon="trash" label="Delete session" isDisabled />);
+        expect(screen.getByRole('button', { name: 'Delete session' })).not.toHaveAttribute('title');
+        rerender(<IconButton icon="trash" label="Delete session" tooltip="Remove this session" isDisabled />);
+        const button = screen.getByRole('button', { name: 'Delete session' });
+        expect(button).toBeDisabled();
+        expect(button).not.toHaveAttribute('aria-describedby');
+    });
+
     it('suppresses the tooltip and title with isTooltipDisabled', () => {
         render(<IconButton icon="trash" label="Delete session" isTooltipDisabled />);
         const button = screen.getByRole('button', { name: 'Delete session' });
