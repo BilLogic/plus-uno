@@ -5153,7 +5153,17 @@
         "StateWithDrawer",
         "StateAt768",
         "StateAt1024",
-        "StateAt1440"
+        "StateAt1440",
+        "TypeDefault",
+        "TypeFocused",
+        "TypeBare",
+        "AnatomyDefault",
+        "AnatomyFocused",
+        "FocusedStepsDown",
+        "FocusedStepsAcross",
+        "ResponsiveWidth",
+        "KeyPanelCollapsesSidebar",
+        "KeyUnder1024"
       ],
       "tokens": [
         "--border-default",

@@ -304,10 +304,16 @@ export const Popup = ({ x, y, w, h, accent = false }) => (
   </g>
 );
 
-export const Panel = ({ x, y, w, h, accent = false }) => (
+export const Panel = ({ x, y, w, h, accent = false, floating = false }) => (
   <g>
-    <Rect x={x} y={y} w={w} h={h} fill={PAINT.panelSurface} />
-    <Rule x1={x} x2={x} y1={y} y2={y + h} stroke={PAINT.panelEdge} />
+    {floating ? (
+      <Layer x={x} y={y} w={w} h={h} fill={PAINT.panelSurface} shadow={PAINT.panelFloatingShadow} />
+    ) : (
+      <>
+        <Rect x={x} y={y} w={w} h={h} fill={PAINT.panelSurface} />
+        <Rule x1={x} x2={x} y1={y} y2={y + h} stroke={PAINT.panelEdge} />
+      </>
+    )}
     {accent && <AccentRing x={x} y={y} w={w} h={h} />}
     <SkeletonBar x={x + 8} y={y + 8} w={w * 0.5} h={5} accent={accent} heading />
     {[0, 1, 2].map((i) => (

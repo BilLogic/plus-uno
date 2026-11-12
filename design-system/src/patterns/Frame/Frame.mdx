@@ -1,14 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
 
 import * as FrameStories from './Frame.stories.jsx';
-import {
-    WithSidebar,
-    WithoutSidebar,
-    TitleInHeader,
-    WithSectionDetail,
-    WithoutSectionDetail,
-} from './Frame.examples.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -16,7 +9,18 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { ModeExample } from '@/storybook-docs/lib/mode-frame.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    AiPanelDocked,
+    AiPanelFloating,
+    BarInOrder,
+    BarScrambled,
+    BareColumn,
+    BareWithSidebar,
+    FocusedNoSidebar,
+    FocusedWithSidebar,
+} from '@/storybook-docs/illustrations/frame.jsx';
 
 <Meta of={FrameStories} />
 
@@ -53,16 +57,14 @@ export const colorTokens = [
 ];
 
 <Title>Frame</Title>
-Frame is the app frame: the Sidebar beside the Page and the Panel, with no top bar. It has no seams: the Page runs to the window edges and meets the Sidebar and the Panel at hairlines. Every value is a token, and values read Medium, Large and X-Large where the layout mode changes them.
-
-The examples on this page follow the **Color mode** switch in the toolbar.
+The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare.
 
 <DocsTabs of={FrameStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19422-2971"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-2971"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Frame"
 />
 
@@ -70,167 +72,85 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 <div className="sb-ds-doc-section">
 
-## Appearance
+## Types
 
-<ComponentExample of={FrameStories.DocsOverview} title="Content width" description="The frame at the docs page's width, with the content capped at 1232." />
+Every page of the app sits in one of three, each shown in a browser window. A Frame with its slots filled for one page is a Screen, and Screens in order are a Flow; both live with the flows, not here.
 
-<ComponentExample of={FrameStories.DocsReading} title="Reading width" description={<><code>width="reading"</code> caps the content at 864 and centers it, for long text.</>} />
-
-<ComponentExample of={FrameStories.DocsContentGrid} title="Content grid" description="Children span the whole row by default; a 4 and an 8 split the next row in whole columns." />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Size and layout
-
-Each state below is drawn at a real screen width, with no browser around it, so the Frame decides what docks exactly as it does in the app.
-
-<ModeExample storyId="templates-frame-frame--state-at-768" width={768} height={480} title="Medium, 768" description="The Sidebar is closed: under 1024 it never docks, and the toggle leads the header row." />
-
-<ModeExample storyId="templates-frame-frame--state-at-1024" width={1024} height={480} title="Large, 1024" description="The Sidebar docks, 240 wide." />
-
-<ModeExample storyId="templates-frame-frame--state-at-1440" width={1440} height={560} title="X-Large, 1440" description="The Sidebar docks, and the Page pad is 24 as at every width." />
+<TypeGrid>
+<TypeCard of={FrameStories.TypeDefault} title="Default" stage={1440}>Pages people move among: the Sidebar, the Page, and the AI panel as its own region on the right.</TypeCard>
+<TypeCard of={FrameStories.TypeFocused} title="Focused" stage={1440}>One task a person finishes or leaves: the whole window, Close beside the title, no Sidebar.</TypeCard>
+<TypeCard of={FrameStories.TypeBare} title="Bare" stage={1440}>Sign-in, errors and welcome: one centered column, with no Sidebar and no header row.</TypeCard>
+</TypeGrid>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Sidebar
+## Anatomy
 
-<ModeExample storyId="templates-frame-frame--state-sidebar-docked" width={1440} height={480} title="Docked" description="In flow beside the Page from 1024, meeting it at the Sidebar's 1px edge." />
+### Default
 
-<ModeExample storyId="templates-frame-frame--state-sidebar-closed" width={1440} height={480} title="Closed" description={<>Closed by the toggle, Ctrl+[ or <code>sidebarDocked={'{false}'}</code>: no rail, and the toggle at the Page's top left.</>} />
+The default type at 1440 with the AI panel docked.
 
-<ModeExample storyId="templates-frame-frame--state-sidebar-peek" width={1440} height={480} title="Peek" description="Hovering the left edge floats a closed Sidebar over the Page with the overlay shadow and no Blanket; the Page does not move." />
+<Story of={FrameStories.AnatomyDefault} inline />
 
-<ModeExample storyId="templates-frame-frame--state-sidebar-floating" width={768} height={480} title="Floating, under 1024" description="Opened by hand under 1024, the Sidebar floats over the Page; an outside press or Escape closes it." />
+1. **Sidebar.** 240 wide, docked from 1024, with the toggle ending its logo row.
+2. **Header row.** The Page's first row, 32 high on the logo row's center line: the breadcrumb, once a person has drilled into a record.
+3. **Content.** The Page's content box: no corner radius, a 24 pad, and a 12-column grid capped at 1232 (864 at reading width).
+4. **AI panel.** A Frame region on the right, 320 to 640 and opening at 400, with its splitter on the left hairline. It is docked wherever it shows.
 
-</div>
+### Focused
 
-<div className="sb-ds-doc-section">
+A task with five steps. No Sidebar and no breadcrumb: nothing invites the person away.
 
-## Panel
+<Story of={FrameStories.AnatomyFocused} inline />
 
-<ModeExample storyId="templates-frame-frame--state-sidebar-docked" width={1440} height={480} title="None" description={<>Closed, or no <code>panel</code> passed: the Page takes the room.</>} />
-
-<ModeExample storyId="templates-frame-frame--state-panel-docked" width={1440} height={480} title="Docked" description="Beside the Page at a hairline, with the splitter on its edge." />
-
-<ModeExample storyId="templates-frame-frame--state-panel-peek" width={1440} height={480} title="Peek" description={<>With <code>panelPeek</code>, hovering the right edge floats a closed Panel over the Page, with no Blanket.</>} />
-
-<ModeExample storyId="templates-frame-frame--state-panel-overlay" width={768} height={480} title="Overlay, under 1024" description="Over the Page on a Blanket, capped at 320." />
-
-<ModeExample storyId="templates-frame-frame--state-panel-full-width" width={600} height={480} title="Full width, under 768" description="The overlay Panel takes the whole Frame." />
-
-<ModeExample storyId="templates-frame-frame--state-panel-narrowest" width={1440} height={480} title="Resized, 320" description="The splitter's narrowest width, beside a docked Sidebar." />
-
-<ModeExample storyId="templates-frame-frame--state-panel-widest" width={1440} height={480} title="Resized, 640" description="The splitter's widest width, never past what keeps 720 of content beside a docked Sidebar." />
+1. **Title row.** Close at the start, then the task's name as the page's one h1.
+2. **Steps.** A Section side at the start, 256 wide (320 for long labels), for five or more.
+3. **Body.** The task's Sections at reading width, 864, centered.
+4. **Bar**, fixed along the bottom and 48 high. Cancel (Subtle) at the start; Back and Next at the end, full bleed. Back on the first step is disabled and needs no reason.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Sidebar and Panel
+## Focused steps
 
-<ModeExample storyId="templates-frame-frame--state-sidebar-and-panel" width={1440} height={480} title="Both docked, 1440" description="The Sidebar, a 400 Panel and 720 of content fit, so both dock." />
+Five or more steps go down the left. Four or fewer run across the top. The bar is the same in both, and the focused Frame moves like a Drill: it slides in over the dimmed opener, and Close or Cancel play it backwards.
 
-<ModeExample storyId="templates-frame-frame--state-panel-collapses-sidebar" width={1200} height={480} title="Panel collapses the Sidebar, 1200" description="Both would leave under 720, so the Sidebar left open by default collapses, and comes back when the Panel closes." />
+<ComponentExample of={FrameStories.FocusedStepsDown} title="Five steps, down the left" description="The rail is 256 wide; use 320 when a label is long. The current step is marked, and visited steps go back." />
 
-<ModeExample storyId="templates-frame-frame--state-panel-on-blanket" width={1100} height={480} title="Panel on a Blanket, 1100" description="Even the Panel alone leaves under 720, so it opens over the Page and the Sidebar on a Blanket." />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Overlays
-
-<ModeExample storyId="templates-frame-frame--state-with-modal" width={1440} height={560} title="Modal" description="A modal leaves a docked Sidebar and the Panel where they are, under its Blanket." />
-
-<ModeExample storyId="templates-frame-frame--state-modal-closes-floating" width={768} height={560} title="Modal, under 1024" description="A modal closes a floating Sidebar, and while it is open the Sidebar does not peek." />
-
-<ModeExample storyId="templates-frame-frame--state-with-drawer" width={1024} height={560} title="Drawer" description="A drawer does the same as a modal: it closes a floating Sidebar and blocks the peek." />
+<ComponentExample of={FrameStories.FocusedStepsAcross} title="Four steps, across the top" description="A horizontal tracker above the body. Back on the first step is disabled, with no reason given." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Width behavior
 
-<DocsInteractivePlayground
-    of={FrameStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page. The
-            Frame is the app alone, with no browser around it: the{' '}
-            <a href="?path=/docs/templates-overview--docs">Template</a> adds the browser window.
-        </>
-    }
-/>
+The Frame decides what docks from its own width, so the content never drops under 720. Drag the width: the Sidebar and an open AI panel both dock from 1408 with a 400 panel; from 1168 the panel docks alone and the Sidebar collapses; below that, and under 1024, the panel opens over the Page on a Backdrop. Under 768 the panel is full width.
 
-</div>
-
-</div>
-
-</DocsTab>
-
-<DocsTab tab="usage">
-
-<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
-
-<div className="sb-ds-doc-section">
-
-## Usage
-
-Use Frame for every page of the app. It owns the frame sizes and the Sidebar's behavior, so a page only supplies its Sidebar, its breadcrumb and its content.
-
-For a whole page with the PLUS Sidebar and breadcrumb already filled in, start from a template. For a bare fill and elevation, use Page. For a region inside the content, use Section.
-
-The Frame decides what docks from its own width, not the window's, through one layout resolver, so the content never drops under 720:
-
-- **Sidebar.** It docks from 1024 and never docks below that. Under 1024, opened by hand, it floats over the Page as an overlay and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Blanket. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
-- **Panel.** It opens from anything inside the Frame through `usePanelControl()`. A Sidebar opened by hand stays docked, and the Panel opens as an overlay if both do not fit. Both dock when the Sidebar, the Panel and 720 fit: with a 400 Panel that is from 1408. Otherwise a Sidebar left open by default collapses, and comes back when the Panel closes; with a 400 Panel the Panel docks alone from 1168. Otherwise the Panel opens as an overlay, on a Blanket that covers the Page and the Sidebar.
-- **Under 1024** the Panel is an overlay 320 wide, and only one overlay is open at a time: opening the Sidebar closes the Panel, and opening the Panel closes the Sidebar. Under 768 the Panel is full width.
-- **`sectionDetail`** collapses the Sidebar first, so a list and its detail keep 960 side by side. If a collapsed Sidebar still leaves under 960, the Panel stays docked and the detail replaces the list.
-- **Modals.** Opening a modal closes a peeking or overlay Sidebar, and a docked Sidebar stays. While a modal is open the Sidebar does not peek, and Escape closes the modal only. A modal leaves the Panel open under its Blanket.
-
-Docked, the Panel meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar: a drag resists past the limit and springs back, and it never collapses the Sidebar. The width and whether the Panel is open are kept for the tab in sessionStorage. The `panelPeek` option, off by default, peeks a closed Panel when a pointer rests on the right edge, with no Blanket.
+<DocsInteractivePlayground of={FrameStories.ResponsiveWidth} description="The width control sets the Frame's own width, with the AI panel open." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Parts
+## Key states
 
-1. **Header.** The Page's first row, 32 high on the Sidebar logo row's center line: the breadcrumb. While the Sidebar is closed, the toggle leads it at the Page's top left. A focused page passes `onBack` or `backHref` and `onClose`, and the row leads with Back and ends with Close.
-2. **Page.** The content box on `--ds-surface`, running the full height to the window edges, flush, with no corner radius. It is the Page's `main` landmark.
-3. **Content.** The slot where Sections go: a 12-column grid, centered and capped at 1232 (864 with `width="reading"`). Each child spans all 12 columns unless it sets its own span.
-4. **Sidebar.** The part passed as `sidebar`: the logo row with the toggle, the groups and the account row. Without it there is no Sidebar and no toggle.
-5. **Panel.** The area on the right, full height, passed as `panel` and filled with the Panel parts (`PanelContainer`, header, body, footer). AI chat goes here first. Its splitter sits on its left hairline.
+<ComponentExample of={FrameStories.TypeBare} title="Bare" description="No Sidebar, so no toggle: the column is centered in the window." />
 
-There is no footer row. A page that needs actions at its foot places them inside the Page. The Sidebar and Page have their own pages.
+<ComponentExample of={FrameStories.KeyPanelCollapsesSidebar} title="Panel collapses the Sidebar, 1200" description="The Sidebar, a 400 panel and 720 of content cannot all fit, so the Sidebar collapses and the toggle moves to the Page's top left. It comes back when the panel closes." />
 
-### States
+<ComponentExample of={FrameStories.KeyUnder1024} title="Under 1024" description="The Sidebar never docks: opened by hand it floats over the Page. The panel opens over a Backdrop, and one layer is open at a time." />
 
-<DocsTable>
-<thead>
-<tr><th>Part</th><th>State</th><th>What changes</th></tr>
-</thead>
-<tbody>
-<tr><td>Sidebar</td><td>Docked</td><td>In flow beside the Page, 240 wide, with a 1px <code>--ds-border</code> edge on the Page side. From 1024.</td></tr>
-<tr><td>Sidebar</td><td>Collapsed</td><td>No rail. The toggle sits at the Page's top left and shows bars.</td></tr>
-<tr><td>Sidebar</td><td>Peeking</td><td>A collapsed Sidebar floated over the Page with the overlay fill and shadow, while a pointer rests on the toggle or the left edge. No Blanket.</td></tr>
-<tr><td>Sidebar</td><td>Overlay</td><td>Under 1024, opened by hand: over the Page, closed by an outside press or Escape.</td></tr>
-<tr><td>Panel</td><td>None</td><td>Closed, or no <code>panel</code> passed.</td></tr>
-<tr><td>Panel</td><td>Docked</td><td>Beside the Page, on the Page's fill, meeting it at a hairline, with the splitter on its edge.</td></tr>
-<tr><td>Panel</td><td>Overlay</td><td>Over the Page on a Blanket that covers the Page and the Sidebar.</td></tr>
-<tr><td>Splitter</td><td>Focused, dragged</td><td>The line takes <code>--ds-border-focused</code>.</td></tr>
-</tbody>
-</DocsTable>
+A system banner, when one is needed, spans the whole width above the Sidebar and the Page: <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>, Notifications.
 
-The Frame has no hover, pressed or disabled state of its own: those belong to the toggle and the controls on the Page.
+</div>
 
-### Tokens
+<div className="sb-ds-doc-section">
+
+## Sizes
 
 Lengths are in pixels. Where the layout mode changes a value, the columns read Medium (768), Large (1024) and X-Large (1440).
 
@@ -276,40 +196,147 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 
 </div>
 
+</div>
+
+</DocsTab>
+
+<DocsTab tab="code">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Slots
+
+<DocsTable>
+<thead>
+<tr><th>Slot or prop</th><th>Holds</th></tr>
+</thead>
+<tbody>
+<tr><td><code>sidebar</code></td><td>The Sidebar. Without it there is no Sidebar and no toggle.</td></tr>
+<tr><td><code>header</code></td><td>The Page's header row: the breadcrumb, or a focused task's Close and title.</td></tr>
+<tr><td><code>children</code></td><td>The content: Sections in a 12-column grid. <code>width="reading"</code> caps it at 864.</td></tr>
+<tr><td><code>panel</code> · <code>panelLabel</code> · <code>panelOpen</code></td><td>The AI panel region at the right, named for its content, filled with the Panel parts.</td></tr>
+<tr><td><code>onBack</code> · <code>onClose</code></td><td>A Back and a Close icon button in the header row. A focused page leads its title row with its own Close instead.</td></tr>
+<tr><td><code>surfaceDirect</code></td><td>Children go straight into the Page with no content box, for a bare column or a full-bleed view.</td></tr>
+<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The focused bottom bar, 48 high, with Cancel, Back and Next. Today the page places the bar.</td></tr>
+<tr><td><code>banner</code> <PlannedTag /></td><td>Planned. System news across the whole width above the Sidebar and the Page.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Frame for every page of the app. It owns the frame sizes and the Sidebar's behavior, so a page only supplies its Sidebar, its breadcrumb and its content.
+
+The Frame decides what docks from its own width, not the window's, through one layout resolver, so the content never drops under 720:
+
+- **Sidebar.** It docks from 1024 and never docks below that. Under 1024, opened by hand, it floats over the Page and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Backdrop. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
+- **AI panel.** It opens from anything inside the Frame through `usePanelControl()`. Both dock when the Sidebar, the panel and 720 fit: with a 400 panel that is from 1408. Otherwise a Sidebar left open by default collapses, and comes back when the panel closes; with a 400 panel the panel docks alone from 1168. Below that, the panel opens over a Backdrop that covers the Page and the Sidebar.
+- **Under 1024** the panel is 320 wide, and only one layer is open at a time: opening the Sidebar closes the panel, and opening the panel closes the Sidebar. Under 768 the panel is full width.
+- **`sectionDetail`** collapses the Sidebar first, so a list and its detail keep 960 side by side. If a collapsed Sidebar still leaves under 960, the panel stays docked and the detail replaces the list.
+- **Modals.** Opening a Modal closes a peeking or floating Sidebar, and a docked Sidebar stays. While a Modal is open the Sidebar does not peek, and Escape closes the Modal only. A Modal leaves the panel open under its Backdrop.
+
+Docked, the panel meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar. The width and whether the panel is open are kept for the tab.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a bare fill and elevation, use `Page`.
+- For a region inside the content, use `PatternSection`.
+- For a short task that keeps the page in view behind it, use `PatternModal`. A focused Frame is for a task that blocks the page until it is done, or has five or more steps.
+
+</div>
+
 <div className="sb-ds-doc-section">
 
 ## Best practices
 
-### Give every app page its Sidebar.
+### Give a focused task the whole window.
 
-A page supplies its Sidebar, its breadcrumb and its content, and the Frame does the rest. Without `sidebar` there is no navigation and no toggle.
+<RuleTag kind="review" />
 
-<DoDontPair
-    doExample={<WithSidebar />}
-    doCaption="An app page passes its Sidebar, which docks from 1024."
-    dontExample={<WithoutSidebar />}
-    dontCaption="The same page with no Sidebar: no navigation and no toggle."
-/>
-
-### Put the place in the header as a breadcrumb.
-
-The header row is the breadcrumb. A page's title belongs to its content, in a Section with `level="page"`.
+A focused Frame has no Sidebar and no breadcrumb. Close leads the title row, so the way out is one control, not a menu of other places.
 
 <DoDontPair
-    doExample={<WithSidebar />}
-    doCaption={'The header row is a breadcrumb: "Home / Dashboard".'}
-    dontExample={<TitleInHeader />}
-    dontCaption="A page title in the header row in place of the breadcrumb."
+    doExample={<FocusedNoSidebar />}
+    doCaption="The task fills the window: no Sidebar, nothing to invite the person away."
+    dontExample={<FocusedWithSidebar />}
+    dontCaption="The Sidebar left docked beside a focused task, one click from leaving it."
 />
+
+### Put Cancel at the start of the bar and Back and Next at the end.
+
+<RuleTag kind="review" />
+
+The bottom bar is fixed along the bottom, one row high (`--space-300`). Cancel (Subtle) is at the start; Back and Next sit together at the end, Next last and Primary. Back on the first step is disabled and needs no reason.
+
+<DoDontPair
+    doExample={<BarInOrder />}
+    doCaption="Cancel alone at the start, then Back and the primary Next together at the end."
+    dontExample={<BarScrambled />}
+    dontCaption="Cancel between Back and Next: one run of three buttons, with the way out beside the way on."
+/>
+
+### Keep the AI panel docked as its own region.
+
+<RuleTag kind="review" />
+
+The AI panel is a region of the Frame, never a floating layer, so it stays put as a person moves between pages. The Page makes room for it; below `FRAME_LAYOUT.dockMin` it opens over a Backdrop.
+
+<DoDontPair
+    doExample={<AiPanelDocked />}
+    doCaption="The panel docked at the right edge, the Page narrowing beside it."
+    dontExample={<AiPanelFloating />}
+    dontCaption="The panel floating over the Page, hiding the rows beneath it."
+/>
+
+### Keep a bare Frame to one column.
+
+<RuleTag kind="review" />
+
+Sign-in, errors and welcome have one job and no account yet, so the Frame carries no Sidebar, header row or Panel.
+
+<DoDontPair
+    doExample={<BareColumn />}
+    doCaption="One centered column: the form and its button."
+    dontExample={<BareWithSidebar />}
+    dontCaption="The Sidebar beside a sign-in: navigation for a person who has not signed in."
+/>
+
+### Show steps by how many there are.
+
+<RuleTag kind="review" />
+
+Five or more go down a left side sized to the longest label. Four or fewer run across the top.
 
 ### Pass sectionDetail for a list and its detail.
 
-<DoDontPair
-    doExample={<WithSectionDetail />}
-    doCaption="With sectionDetail and the Panel open at 1440, the Sidebar collapses and the list keeps its detail beside it."
-    dontExample={<WithoutSectionDetail />}
-    dontCaption="Without it, the Sidebar and the Panel both dock, the content drops under 960 and the detail replaces the list."
-/>
+<RuleTag kind="review" />
+
+With `sectionDetail` and the panel open on a wide Frame, the Sidebar collapses and the list keeps its detail beside it. Without it, both dock and the detail replaces the list.
+
+### Put the place in the header as a breadcrumb.
+
+<RuleTag kind="review" />
+
+The header row is the breadcrumb, shown only after drilling into a record; area pages and focused tasks have none. A page's title belongs to its content, in a Section with `level="page"`.
+
+Elevation and fills follow <a target="_top" href="./?path=/docs/foundations-elevation--docs">Elevation</a>.
 
 </div>
 
@@ -322,9 +349,10 @@ The header row is the breadcrumb. A page's title belongs to its content, in a Se
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Put the place in the header as a breadcrumb: "Home / Dashboard".</td><td>A page title in the header row.</td></tr>
-<tr><td>Name the Panel for its content with <code>panelLabel</code>: "AI chat".</td><td>A generic name such as "Panel".</td></tr>
-<tr><td>Keep Back and Close named for what they do; the defaults are "Back" and "Close".</td><td>Icon buttons with no name.</td></tr>
+<tr><td>Name the focused task for what it does: "Plan a tutoring term".</td><td>A generic title such as "Wizard".</td></tr>
+<tr><td>Name the panel for its content with <code>panelLabel</code>: "AI chat".</td><td>A generic name such as "Panel".</td></tr>
+<tr><td>Name steps with one noun each: "Student", "Schedule", "Review".</td><td>A sentence for a step.</td></tr>
+<tr><td>Keep Cancel, Back and Next named for what they do.</td><td>Icon buttons with no name.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -334,14 +362,12 @@ The header row is the breadcrumb. A page's title belongs to its content, in a Se
 
 ## Accessibility
 
-- The Page is the `main` landmark, and the `nav` inside the Sidebar is the navigation landmark. The box around that `nav` is not a landmark of its own. Pass `contentAs="div"` when the page supplies its own `main`.
-- The toggle is a button. Open, it ends the Sidebar's logo row as "Close sidebar"; closed, it sits at the Page's top left as "Open sidebar". It reports whether the Sidebar is showing, points at it while it is open, and announces its shortcut, Ctrl+[ (Cmd+[ on a Mac). Focus follows a press to the toggle that is left.
-- A peeking or overlay Sidebar closes on Escape, and focus returns to the toggle. A control that handles its own Escape, such as a menu, keeps it.
-- Opening a modal from the peeking Sidebar returns focus to the toggle when the modal closes, because the trigger left with the Sidebar.
-- Docked or peeking, the Panel is a complementary landmark named by `panelLabel`, after the Page in reading order, and it leaves focus where it is. When opening it collapses the Sidebar that held focus, focus moves into the Panel; closing it returns focus to what opened it.
-- As an overlay, the Panel is a modal dialog named by `panelLabel`. Opening it moves focus to its first control and Tab stays inside it; the Page and the Sidebar under the Blanket are inert, so a keyboard or screen reader cannot reach what a pointer cannot. Closing it, by Escape, a press on the Blanket or its Close button, returns focus to what opened it.
-- The splitter is a vertical separator named "Resize panel" that reports its width as its value. The left arrow widens the Panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
-- In light increased contrast the page draws its edge ring in `--ds-border-surface`, so it stays distinct from the frame behind it.
+- The Page is the `main` landmark, and the `nav` inside the Sidebar is the navigation landmark. Pass `contentAs="div"` when the page supplies its own `main`.
+- The toggle is a button. Open, it ends the Sidebar's logo row as "Close sidebar"; closed, it sits at the Page's top left as "Open sidebar". It reports whether the Sidebar is showing and announces its shortcut, Ctrl+[ (Cmd+[ on a Mac).
+- A peeking or floating Sidebar closes on Escape, and focus returns to the toggle.
+- Docked, the AI panel is a complementary landmark named by `panelLabel`, after the Page in reading order. Below `FRAME_LAYOUT.dockMin` it is a Modal-style layer: focus moves to its first control, Tab stays inside it, the Page and the Sidebar under the Backdrop are inert, and closing returns focus to what opened it.
+- The splitter is a vertical separator named "Resize panel" that reports its width. The left arrow widens the panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
+- A focused task's steps are a navigation named "Steps"; the current step is marked, and the bar's buttons follow the body in the tab order.
 
 </div>
 
@@ -349,11 +375,12 @@ The header row is the breadcrumb. A page's title belongs to its content, in a Se
 
 ## Related
 
-- <a href="?path=/docs/templates-page-page--docs">Page</a> for the bare fill-and-elevation primitive the content box is built on.
-- <a href="?path=/docs/components-navigation-navigation-system--docs">Sidebar</a> for the part the frame places beside the Page.
-- <a href="?path=/docs/templates-section-section--docs">Section</a> for a region inside the content.
-- <a href="?path=/docs/templates-overview--docs">Templates</a> for a whole page, Frame with its content slot filled, and the focused frame for one task.
-- <a href="?path=/docs/foundations-grid--docs">Grid</a> for the column math the frame is sized by.
+- <a target="_top" href="./?path=/docs/templates-page-page--docs">Page</a>: use when you need the bare fill-and-elevation the content box is built on.
+- <a target="_top" href="./?path=/docs/components-navigation-navigation-system--docs">Sidebar</a>: use when choosing what the Frame places beside the Page.
+- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use when the content needs a region under its own heading.
+- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use when the task is short and the page should stay in view behind it.
+- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use when the work should float beside the page, not replace it.
+- <a target="_top" href="./?path=/docs/foundations-grid--docs">Grid</a>: use when you need the column math the Frame is sized by.
 
 </div>
 
