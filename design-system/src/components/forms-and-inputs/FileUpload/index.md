@@ -166,7 +166,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-subtler` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border-danger` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-subtler` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border-danger` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-xl` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.scss`. Override these through the token layer, never with a literal.
 

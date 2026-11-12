@@ -1706,7 +1706,6 @@
       "tokens": [
         "--body-default",
         "--border-selected",
-        "--card-radius",
         "--carousel-aspect",
         "--carousel-edge-fade",
         "--carousel-neighbor-dim",
@@ -1742,6 +1741,7 @@
         "--inline-lg",
         "--inline-md",
         "--page-stack-md",
+        "--radius-xxl",
         "--section-stack-lg",
         "--section-stack-md",
         "--stack-md",
@@ -2454,7 +2454,7 @@
         "--ds-text-subtle",
         "--pad-x-md",
         "--pad-y-md",
-        "--radius-md"
+        "--radius-xl"
       ]
     },
     {
@@ -2683,7 +2683,7 @@
         "--pad-y-lg",
         "--plus-code-block-digits",
         "--plus-code-block-gutter",
-        "--radius-md"
+        "--radius-xl"
       ]
     },
     {
@@ -2844,7 +2844,7 @@
         "--ds-background-selected",
         "--ds-border",
         "--ds-text-subtle",
-        "--radius-050",
+        "--radius-xl",
         "--space-025",
         "--space-050",
         "--space-075",
@@ -4295,7 +4295,7 @@
         "--icon-sm",
         "--pad-x-md",
         "--pad-y-md",
-        "--radius-md",
+        "--radius-xl",
         "--stack-md",
         "--stack-sm"
       ]
@@ -8515,6 +8515,7 @@
         "LayoutSplit",
         "LayoutSubsections",
         "FillSubtle",
+        "CardNesting",
         "Footer",
         "Anatomy",
         "Levels",
@@ -8558,6 +8559,7 @@
       "tokens": [
         "--body-default",
         "--body-small",
+        "--card-radius-compact",
         "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
@@ -11675,7 +11677,7 @@
         "--heading-small",
         "--icon-lg",
         "--item-height-md",
-        "--radius-md",
+        "--radius-xl",
         "--stack-md",
         "--type-weight-medium"
       ]
@@ -12816,8 +12818,8 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-small",
-        "--radius-050",
-        "--radius-100",
+        "--radius-lg",
+        "--radius-xl",
         "--space-050",
         "--space-075",
         "--space-100",

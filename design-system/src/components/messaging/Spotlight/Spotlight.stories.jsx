@@ -52,6 +52,7 @@ Basic.play = async () => {
     await expect(headline).toHaveTextContent('Create a new board');
     const dismiss = document.querySelector('.plus-spotlight-dismiss-button');
     await expect(dismiss).toBeTruthy();
+    await expect(getComputedStyle(document.querySelector('.plus-spotlight')).borderTopLeftRadius, 'Spotlight radius is 12').toBe('12px');
 };
 
 export const WithMedia = () => (

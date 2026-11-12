@@ -122,7 +122,7 @@ The image sits above a padded frame, and the header, body and footer sit inside 
 | Token | Value | Used for |
 | --- | --- | --- |
 | `--card-pad-compact`, `-default`, `-spacious` | 16 · 20 · 24 | The pad of a small, medium and large card. |
-| `--card-radius-compact` | 12 | The radius of a small card. |
+| `--card-radius-compact` | 12 | The radius of a small card, and of a card inside a filled Section. |
 | `--card-radius` | 16 | The radius of medium and large cards. |
 | `--card-stack-sm`, `-md`, `-lg` | 4 · 8 · 12 | Title to description; header to body, set by `gap`; body to footer. |
 | `--card-inline-md` | 8 | Items on a row, such as actions in the header. |

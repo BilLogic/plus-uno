@@ -218,6 +218,29 @@ export const FillSubtle = {
             {slotContent('Record')}
         </PatternSection>
     ),
+    play: async ({ canvasElement }) => {
+        await expect(getComputedStyle(canvasElement.querySelector('.plus-pattern-section-fill-subtle')).borderTopLeftRadius, 'Section radius is 16').toBe('16px');
+    },
+};
+
+/** A Card in a Section with a fill is nested and takes the compact radius; in an unfilled Section it keeps the Card radius. */
+export const CardNesting = {
+    name: 'Card in a Section',
+    render: () => (
+        <div style={col}>
+            <PatternSection title="With a fill" fill="subtle" data-testid="filled">
+                <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
+            </PatternSection>
+            <PatternSection title="Without a fill" data-testid="plain">
+                <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
+            </PatternSection>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const radius = (id) => getComputedStyle(canvasElement.querySelector(`[data-testid="${id}"] .plus-pattern-card`)).borderTopLeftRadius;
+        await expect(radius('filled'), 'Card in a filled Section: 12').toBe('12px');
+        await expect(radius('plain'), 'Card in an unfilled Section: 16').toBe('16px');
+    },
 };
 
 export const Footer = () => (

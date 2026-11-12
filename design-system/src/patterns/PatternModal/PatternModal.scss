@@ -3,7 +3,7 @@
  * Inline modal shell, drawn as the Modal component draws one: the overlay
  * pair (elevation.surface.overlay with elevation.shadow.overlay, the level
  * every floating layer takes; the backdrop under a real modal sets it apart),
- * Modal/pad 16, Modal/stack-md 16 and Modal/radius 12. Width is a step of the
+ * Modal/pad 16, Modal/stack-md 16 and Modal/radius 16. Width is a step of the
  * screen grid and height hugs or fills to the screen less 128, both from the
  * Overlay pattern it is placed in.
  */
@@ -92,4 +92,5 @@
     justify-content: flex-end;
     gap: var(--stack-md);
     flex-shrink: 0;
+    border-radius: 0; // full bleed: the Modal's own radius clips the outer corners
 }

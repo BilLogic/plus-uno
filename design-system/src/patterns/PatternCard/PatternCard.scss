@@ -72,6 +72,11 @@ $-dragging: (
     border-radius: var(--card-radius-compact);
 }
 
+/* Nested in a Section with a fill, a Card takes the compact radius; in an unfilled Section it keeps its own. */
+.plus-pattern-section-fill-subtle .plus-pattern-card {
+    border-radius: var(--card-radius-compact);
+}
+
 /* Padding scale: the inner box, so the image stays full bleed */
 .plus-pattern-card-pad-sm .plus-pattern-card-inner {
     padding: var(--card-pad-compact);

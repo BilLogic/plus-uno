@@ -109,3 +109,8 @@ export const Interactive = {
     args: { author: 'Ari Patel', content: 'Comment text', isSaving: false, isHighlighted: false },
     render: (args) => <Comment {...args} />,
 };
+
+const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
+Basic.play = async ({ canvasElement }) => {
+    await expect(radiusOf(canvasElement, '.plus-comment'), 'Comment radius is 12').toBe('12px');
+};
