@@ -115,22 +115,38 @@ TypeCard.propTypes = {
  *
  * @param {object} props
  * @param {number} props.width  the stage width the story lays out at
- * @param {{selector: string, label: string, side?: 'start'|'end', at?: 'start'|'middle'|'end'}[]} props.parts
+ * @param {{selector: string, label: string, side?: 'start'|'top'|'end', at?: 'start'|'middle'|'end'}[]} props.parts
  *   each part's CSS selector inside the story, in Parts-list order, and its
  *   name for the figure's accessible description. `side` picks the gutter
- *   (start by default); `at` picks where along the part the marker sits level
- *   with it (its top by default), for a part whose top shares a line with another.
+ *   (start by default; top puts the marker above the part with a short vertical
+ *   leader; `at: end` drops it just outside the part's trailing edge and turns in); `at` picks where along the part the marker sits: level with it for
+ *   start and end (its top by default), along its top edge for top.
  */
 const MARKER = 24; // docs-literal: the marker's own size, --control-sm, in px for the layout math
+const ELBOW = 8; // docs-literal: how far outside a part's edge an elbow leader drops, px for the layout math
 const GUTTER = 'var(--control-lg)';
 
-/** Each marker's top, in order: level with its part, moved down past an earlier marker on the same side, never below its part. */
+/**
+ * Each marker's place, in order. Start and end markers sit level with their part
+ * (moved down past an earlier marker on the same side, never below the part);
+ * top markers sit above it, `at` choosing where along its top edge, nudged
+ * apart from an earlier top marker. `markerTop` / `markerLeft` are the marker's
+ * own corner in the figure box's coordinates, and `lead` the leader's start.
+ */
 const placeMarkers = (rects, parts) => {
-    const taken = { start: [], end: [] };
+    const taken = { start: [], end: [], top: [] };
     return rects.map((r, i) => {
         if (!r) return null;
-        const side = parts[i].side === 'end' ? 'end' : 'start';
+        const side = parts[i].side === 'end' || parts[i].side === 'top' ? parts[i].side : 'start';
         const at = parts[i].at;
+        if (side === 'top') {
+            // `end` drops the leader in the strip just outside the part's trailing edge, then turns into the edge: the way down to a part that sits under another.
+            const elbow = at === 'end';
+            let left = elbow ? r.left + r.width + ELBOW - MARKER / 2 : at === 'middle' ? r.left + (r.width - MARKER) / 2 : r.left + MARKER / 2;
+            taken.top.forEach((l) => { if (Math.abs(l - left) < MARKER * 1.5) left = l + MARKER * 1.5; });
+            taken.top.push(left);
+            return { ...r, side, markerLeft: left, elbow };
+        }
         let top = at === 'end' ? r.top + r.height - MARKER : at === 'middle' ? r.top + (r.height - MARKER) / 2 : r.top;
         taken[side].forEach((t) => { if (Math.abs(t - top) < MARKER) top = t + MARKER; });
         top = Math.min(top, r.top + r.height - MARKER);
@@ -168,7 +184,7 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
             role="img"
             aria-label={`${title}: ${parts.map((p, i) => `${i + 1}, ${p.label}`).join('; ')}`}
             className="not-prose"
-            style={{ margin: 0, position: 'relative', paddingInline: GUTTER }}
+            style={{ margin: 0, position: 'relative', paddingInline: GUTTER, paddingBlockStart: parts.some((p) => p.side === 'top') ? GUTTER : 0 }}
         >
             <div ref={box} style={{ position: 'relative' }}>
                 <ScaledStory width={width}>{children}</ScaledStory>
@@ -189,14 +205,27 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                         />
                         <span
                             aria-hidden="true"
+                            data-anatomy-leader={i + 1}
                             style={{
                                 position: 'absolute',
-                                top: m.markerTop + MARKER / 2,
-                                height: 0,
-                                borderTop: 'var(--border-default) dashed var(--ds-border-brand)',
-                                ...(m.side === 'end'
-                                    ? { left: m.left + m.width, width: Math.max(boxWidth - m.left - m.width, 0) }
-                                    : { right: boxWidth - m.left, width: Math.max(m.left, 0) }),
+                                ...(m.side === 'top'
+                                    ? {
+                                        left: m.elbow ? m.left + m.width : m.markerLeft + MARKER / 2,
+                                        top: `calc(-1 * (${GUTTER} - ${MARKER}px) / 2)`,
+                                        width: m.elbow ? ELBOW : 0,
+                                        height: `calc(${m.top + (m.elbow ? MARKER / 2 : 0)}px + (${GUTTER} - ${MARKER}px) / 2)`,
+                                        ...(m.elbow
+                                            ? { borderRight: 'var(--border-default) dashed var(--ds-border-brand)', borderBottom: 'var(--border-default) dashed var(--ds-border-brand)' }
+                                            : { borderLeft: 'var(--border-default) dashed var(--ds-border-brand)' }),
+                                    }
+                                    : {
+                                        top: m.markerTop + MARKER / 2,
+                                        height: 0,
+                                        borderTop: 'var(--border-default) dashed var(--ds-border-brand)',
+                                        ...(m.side === 'end'
+                                            ? { left: m.left + m.width, width: Math.max(boxWidth - m.left - m.width, 0) }
+                                            : { right: boxWidth - m.left, width: Math.max(m.left, 0) }),
+                                    }),
                             }}
                         />
                         <span
@@ -204,8 +233,8 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                             data-anatomy-marker={i + 1}
                             style={{
                                 position: 'absolute',
-                                top: m.markerTop,
-                                ...(m.side === 'end' ? { left: `calc(${boxWidth}px + (${GUTTER} - ${MARKER}px) / 2)` } : { left: `calc(-1 * (${GUTTER} + ${MARKER}px) / 2)` }),
+                                ...(m.side === 'top' ? { top: `calc(-1 * (${GUTTER} + ${MARKER}px) / 2)`, left: m.markerLeft } : { top: m.markerTop }),
+                                ...(m.side === 'top' ? {} : m.side === 'end' ? { left: `calc(${boxWidth}px + (${GUTTER} - ${MARKER}px) / 2)` } : { left: `calc(-1 * (${GUTTER} + ${MARKER}px) / 2)` }),
                                 width: 'var(--control-sm)',
                                 height: 'var(--control-sm)',
                                 display: 'grid',
@@ -231,7 +260,7 @@ LiveAnatomy.propTypes = {
     parts: PropTypes.arrayOf(PropTypes.shape({
         selector: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        side: PropTypes.oneOf(['start', 'end']),
+        side: PropTypes.oneOf(['start', 'top', 'end']),
         at: PropTypes.oneOf(['start', 'middle', 'end']),
     })).isRequired,
     /** What the figure shows, read before its numbered parts. */

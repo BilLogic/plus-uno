@@ -1708,9 +1708,9 @@ export const TypeBare = {
 
 /** The default anatomy's parts, in the Parts list's order: the figure and its play read this one list. */
 const ANATOMY_DEFAULT_PARTS = [
-    { selector: '.plus-frame__sidebar', label: 'Sidebar', at: 'end' },
-    { selector: '.plus-frame__head', label: 'Header row' },
-    { selector: '.plus-frame__content', label: 'Content', at: 'middle' },
+    { selector: '.plus-frame__sidebar', label: 'Sidebar', at: 'middle' },
+    { selector: '.plus-frame__head', label: 'Header row', side: 'top', at: 'start' },
+    { selector: '.plus-frame__content', label: 'Content', side: 'top', at: 'end' },
     { selector: '.plus-frame__panel', label: 'AI panel', side: 'end' },
 ];
 
@@ -1722,17 +1722,36 @@ const ANATOMY_FOCUSED_PARTS = [
     { selector: '[data-probe="bar"]', label: 'Bar' },
 ];
 
-/** Every marker's part exists and the marker sits level with it: its center within the part's top and bottom. */
+/** Every marker's part exists and the marker sits level with it (above it for a top marker): its center within the part's top and bottom. */
 const markersLevelWithParts = async (canvasElement, parts) => {
     await waitFor(() => expect(canvasElement.querySelectorAll('[data-anatomy-marker]'), 'a marker for each part').toHaveLength(parts.length));
-    parts.forEach(({ selector, label }, i) => {
+    parts.forEach(({ selector, label, side }, i) => {
         const target = canvasElement.querySelector(selector);
         expect(target, `${label}: its element exists`).not.toBeNull();
         const marker = canvasElement.querySelector(`[data-anatomy-marker="${i + 1}"]`);
         const box = rect(target);
+        if (side === 'top') {
+            expect(rect(marker).bottom, `marker ${i + 1} (${label}) sits above its part`).toBeLessThanOrEqual(box.top);
+            return;
+        }
         const middle = rect(marker).top + rect(marker).height / 2;
         expect(middle, `marker ${i + 1} (${label}) sits level with its part`).toBeGreaterThanOrEqual(box.top - 1);
         expect(middle, `marker ${i + 1} (${label}) sits level with its part`).toBeLessThanOrEqual(box.bottom + 1);
+    });
+};
+
+/** No leader line passes through a part other than its own: the line's box against every other part's box, ignoring a 1px touch. */
+const leadersCrossNoOtherPart = (canvasElement, parts) => {
+    parts.forEach(({ label }, i) => {
+        const leader = canvasElement.querySelector(`[data-anatomy-leader="${i + 1}"]`);
+        expect(leader, `${label}: its leader exists`).not.toBeNull();
+        const line = rect(leader);
+        parts.forEach((other, j) => {
+            if (j === i) return;
+            const box = rect(canvasElement.querySelector(other.selector));
+            const inside = line.right > box.left + 1 && line.left < box.right - 1 && line.bottom > box.top + 1 && line.top < box.bottom - 1;
+            expect(inside, `leader ${i + 1} (${label}) does not cross ${other.label}`).toBe(false);
+        });
     });
 };
 
@@ -1745,7 +1764,10 @@ export const AnatomyDefault = {
             <DefaultType withPanel />
         </LiveAnatomy>
     ),
-    play: ({ canvasElement }) => markersLevelWithParts(canvasElement, ANATOMY_DEFAULT_PARTS),
+    play: async ({ canvasElement }) => {
+        await markersLevelWithParts(canvasElement, ANATOMY_DEFAULT_PARTS);
+        leadersCrossNoOtherPart(canvasElement, ANATOMY_DEFAULT_PARTS);
+    },
 };
 
 /** Anatomy: the focused type, five steps, a marker on each part. */
@@ -1757,7 +1779,10 @@ export const AnatomyFocused = {
             <FocusedType count={5} />
         </LiveAnatomy>
     ),
-    play: ({ canvasElement }) => markersLevelWithParts(canvasElement, ANATOMY_FOCUSED_PARTS),
+    play: async ({ canvasElement }) => {
+        await markersLevelWithParts(canvasElement, ANATOMY_FOCUSED_PARTS);
+        leadersCrossNoOtherPart(canvasElement, ANATOMY_FOCUSED_PARTS);
+    },
 };
 
 /** Steps down the left: five or more, a rail 256 wide, the bar at 48 with Cancel, Back and Next. */
