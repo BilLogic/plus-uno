@@ -16,7 +16,7 @@ export const TYPE_STAGE = 480;
 export const READ_SCREEN = 1280;
 
 /** The stage's own padding, so a trigger never touches the edge of the picture. */
-const STAGE_PAD = 'var(--space-200)';
+const STAGE_PAD = 'var(--page-pad)';
 
 /**
  * A stand-in for the page: a bar with one trigger, at the start or the end of

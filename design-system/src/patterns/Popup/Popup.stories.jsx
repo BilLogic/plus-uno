@@ -38,12 +38,15 @@ const found = (canvasElement, selector) => waitFor(() => {
 const holdsInStage = async (canvasElement, selector) => {
     fitsCanvas(canvasElement);
     const layer = await found(canvasElement, selector);
-    const stage = rect(canvasElement.querySelector('[data-popup-stage]'));
-    const box = rect(layer);
-    await expect(box.left, 'the layer starts inside the stage').toBeGreaterThanOrEqual(stage.left - 0.5);
-    await expect(box.right, 'the layer ends inside the stage').toBeLessThanOrEqual(stage.right + 0.5);
-    await expect(box.top, 'the layer starts inside the stage').toBeGreaterThanOrEqual(stage.top - 0.5);
-    await expect(box.bottom, 'the layer ends inside the stage').toBeLessThanOrEqual(stage.bottom + 0.5);
+    /* The stage fires a resize after 250ms to place its layer: retry until it settles. */
+    await waitFor(() => {
+        const stage = rect(canvasElement.querySelector('[data-popup-stage]'));
+        const box = rect(layer);
+        expect(box.left, 'the layer starts inside the stage').toBeGreaterThanOrEqual(stage.left - 0.5);
+        expect(box.right, 'the layer ends inside the stage').toBeLessThanOrEqual(stage.right + 0.5);
+        expect(box.top, 'the layer starts inside the stage').toBeGreaterThanOrEqual(stage.top - 0.5);
+        expect(box.bottom, 'the layer ends inside the stage').toBeLessThanOrEqual(stage.bottom + 0.5);
+    });
     return layer;
 };
 
