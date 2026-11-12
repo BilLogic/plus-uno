@@ -21,6 +21,7 @@ export { default as IconButton, ICON_BUTTON_APPEARANCES, ICON_BUTTON_SHAPES } fr
 export { default as InlineEditableTextfield } from '@/components/forms-and-inputs/InlineEditableTextfield';
 export { default as LinkButton } from '@/components/forms-and-inputs/LinkButton';
 export { default as LinkIconButton } from '@/components/forms-and-inputs/LinkIconButton';
+export { default as PopupSelect, POPUP_SELECT_PLACEMENTS, POPUP_SELECT_SPACINGS } from '@/components/forms-and-inputs/PopupSelect';
 export { default as PromptInput } from '@/components/forms-and-inputs/PromptInput';
 export { default as Radio } from '@/components/forms-and-inputs/Radio';
 export { default as RadioGroup } from '@/components/forms-and-inputs/RadioGroup';
