@@ -238,7 +238,7 @@ MenuInsideModal.play = async ({ canvasElement }) => {
     await doc.findByText('Pick a site');
     await userEvent.click(doc.getByRole('combobox', { name: 'Site' }));
     const listbox = await doc.findByRole('listbox');
-    const option = within(listbox).getByRole('option', { name: 'Statistics' });
+    const option = within(listbox).getByRole('option', { name: 'South High' });
     // A menu is on the popup layer (400), under a modal (510). Opened from a
     // field inside one, it takes the modal's backdrop: it mounts in the
     // modal's overlay, after the dialog.

@@ -28,7 +28,7 @@ describe('OptionRow', () => {
     it('selects with a click, Enter or Space, and not when disabled', async () => {
         const user = userEvent.setup();
         const onSelect = vi.fn();
-        const { rerender } = render(<OptionRow label="Lincoln Middle" value="maths" tabbable onSelect={onSelect} />);
+        const { rerender } = render(<OptionRow label="Lincoln Middle" value="lincoln-middle" tabbable onSelect={onSelect} />);
         const row = screen.getByRole('option');
 
         await user.click(row);
@@ -39,7 +39,7 @@ describe('OptionRow', () => {
         expect(onSelect).toHaveBeenLastCalledWith('lincoln-middle');
 
         onSelect.mockClear();
-        rerender(<OptionRow label="Lincoln Middle" value="maths" tabbable disabled onSelect={onSelect} />);
+        rerender(<OptionRow label="Lincoln Middle" value="lincoln-middle" tabbable disabled onSelect={onSelect} />);
         expect(row).toHaveAttribute('aria-disabled', 'true');
         await user.click(row);
         await user.keyboard('{Enter}');
