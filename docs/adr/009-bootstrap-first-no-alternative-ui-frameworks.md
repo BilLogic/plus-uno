@@ -1,11 +1,15 @@
 ---
 embodiment: ide
-summary: Bootstrap-first, no alternative UI frameworks — superseded by ADR-037 on the fallback-behavior half
+summary: Bootstrap-first, no alternative UI frameworks — superseded by ADR-037 on the fallback-behavior half and retired in full by ADR-042, which removes Bootstrap
 status: superseded
 verified: 2026-11-03
 ---
 
 # ADR-009: Bootstrap-first, no alternative UI frameworks
+
+> **Retired in full by [ADR-042](042-plus-ships-no-bootstrap.md), 2026-11-11.**
+> PLUS ships no Bootstrap. The ban on other UI frameworks is carried by
+> `AGENTS.md` hard rule 5.
 
 > **Superseded by [ADR-037](037-base-ui-is-the-behavior-layer-for-every-component.md), 2026-11-03.**
 >

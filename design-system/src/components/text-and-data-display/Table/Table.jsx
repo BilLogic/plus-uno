@@ -167,7 +167,7 @@ Table.propTypes = {
             style: PropTypes.object
         })
     ])),
-    /** The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `leading`, `state`, `loading`, `className`, `colSpan` or `style`. */
+    /** The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `elemBefore`, `state`, `loading`, `className`, `colSpan` or `style`. */
     rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.node,
         PropTypes.shape({
@@ -176,7 +176,7 @@ Table.propTypes = {
             emphasis: PropTypes.oneOf(['default', 'title']),
             overflow: PropTypes.oneOf(['truncate', 'wrap']),
             secondary: PropTypes.node,
-            leading: PropTypes.node,
+            elemBefore: PropTypes.node,
             state: PropTypes.oneOf(['rest', 'error']),
             loading: PropTypes.bool,
             className: PropTypes.string,

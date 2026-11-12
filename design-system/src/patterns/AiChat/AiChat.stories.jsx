@@ -317,7 +317,9 @@ export const TrustMarks = {
         await expect(popup.getAllByText('AI can make mistakes. Check important info.'), 'said once').toHaveLength(1);
         const rating = within(reply).getByRole('group', { name: 'Rate this answer' });
         await userEvent.click(within(rating).getByRole('button', { name: 'Good answer' }));
-        await expect(within(rating).getByRole('button', { name: 'Good answer' })).toHaveAttribute('aria-pressed', 'true');
+        // The chosen thumb reports aria-pressed true.
+        const chosen = within(rating).getByRole('button', { name: 'Good answer' });
+        await expect(chosen).toHaveAttribute('aria-pressed', 'true');
         await expect(within(reply).getByRole('status')).toHaveTextContent('Thanks. Marked as a good answer.');
     }),
 };

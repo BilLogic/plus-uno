@@ -2,7 +2,7 @@
 
 # Select
 
-Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. A searchable field is a text input: typing in it filters the list. A plain one is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
+Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
 
 Also asked as: combobox, picklist, option list.
 
@@ -10,16 +10,32 @@ Also asked as: combobox, picklist, option list.
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyLongValue
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
 ## Usage
 
-Use `Select` for a list too long to show all at once, or when typing to
-filter helps more than scanning — a tutor roster, a list of schools. For a
-handful of options visible all at once, use `RadioGroup` instead. For
-options arranged in a hierarchy, use `TreeSelect` or `Cascader`.
+Use `Select` for a list of six or more options, where typing to filter
+helps more than scanning — a tutor roster, a list of schools. Up to five
+options belong in view as a `RadioGroup` (one pick) or a Checkbox group
+(several). Pick the control by the shape of the answer.
+
+| The choice is | Reach for |
+| --- | --- |
+| One pick, up to 5 options | `RadioGroup` |
+| Several picks, up to 5 options | A Checkbox group (`Fieldset` with `Checkbox`) |
+| 6 or more options | `Select`, searchable by default |
+| A list held on a server, too large to ship | `Select` with `loadOptions` |
+| Options in a hierarchy | `Cascader` or `TreeSelect` |
+| Narrowing a table from a bar | The tiers of the Filtering pattern |
+| An action run from a button | `DropdownMenu` |
+
+### Turn typing off for a short set of choices.
+
+Typing is on because most lists are long enough to need it. A menu that
+holds a few choices, applied as you pick, has nothing to search: pass
+`isSearchable={false}` so the field stays a plain trigger and Space opens it.
 
 ## Best practices
 
@@ -46,7 +62,11 @@ Don't: The same words as plain help, in a default field.
 
 ### Pick the mode by the answer. {#pick-the-mode-by-the-answer}
 
-`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. `isSearchable` filters by typing, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
+`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. Typing filters the list unless you pass `isSearchable={false}`, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
+
+### Mark a single pick with a check or a radio. {#mark-a-single-pick-with-a-check-or-a-radio}
+
+A single Select marks its pick with a check at the end of the row. Pass `marker="radio"` to draw a radio before the label instead, when the list reads as a set of alternatives to choose between, as in a view switch or a filter menu. Several picks always use checkboxes, so `marker` has no effect with `isMulti`. The marker changes color on selection; it does not move.
 
 ### Show picks as text when Tags crowd the field. {#show-picks-as-text-when-tags-crowd-the-field}
 
@@ -81,6 +101,33 @@ where firing once, on close, avoids re-querying on every checkbox click.
 `recent` and `suggested` only change the order past 50 static options;
 `loadOptions` is for a list too large to ship as a static array at all.
 
+`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`.
+The first page loads as the list opens and again whenever the typed text
+changes; the next page loads as the list scrolls near its end, 50 at a time,
+and an older answer never overwrites a newer one. `isCreatable` works with it.
+
+```jsx
+<Select
+    label="Student"
+    isCreatable
+    loadOptions={(text, { offset, limit }) => fetchStudents(text, offset, limit)}
+/>
+```
+
+While a page is on its way the list shows one "Loading options" row; a Select
+never draws skeleton rows. If the request fails the list shows "Couldn't load
+options" with a Retry button, and Enter in the field retries too. A later page
+that fails keeps the rows already loaded and puts the same message in the
+footer. Options fade in one after another, 20 ms apart, the wait capped at
+500 ms; reduced motion shows them at once.
+
+### Read-only is not disabled. {#read-only-is-not-disabled}
+
+`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+
+Do: Read-only keeps the value readable, and the caption says why.
+Don't: Disabled fades a value people need to read.
+
 ## Accessibility
 
 - **A real combobox.** The field is `role="combobox"` with
@@ -101,7 +148,7 @@ where firing once, on close, avoids re-querying on every checkbox click.
 - For hierarchical options, use `TreeSelect` or `Cascader`.
 - For free-form tags rather than a fixed option list, use `TagInput`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -121,7 +168,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Disabled | The whole field fades to `--ds-opacity-disabled` and leaves the tab order. |
 | Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
 | Valid | With `isValid`, the edge takes `--ds-border-success` and `successMessage` shows under the field. |
-| Read-only | The `--ds-background-neutral` fill. The value can be read, selected and copied. |
+| Read-only | The `--ds-background-neutral` fill, full contrast, no hover. The chevron is not drawn, a press opens nothing, and a long value wraps instead of clipping. The value can be read, selected and copied. |
 
 ### Tokens
 
@@ -160,7 +207,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `value` | arrayOf | — | The picked id, or ids with `isMulti`. Pass it to control the field. |
 | `defaultValue` | arrayOf | — | The picked id, or ids with `isMulti`, to start with when the field is uncontrolled. |
 | `placeholder` | string | `'Select...'` | The text shown when nothing is picked. It names the field when there is no label. |
-| `isSearchable` | bool | `false` | Typing in the field filters the list. |
+| `isSearchable` | bool | `true` | Typing in the field filters the list. On by default; pass `false` for a short list, such as a filter menu's. |
 | `isCreatable` | bool | `false` | Offers "Create text " when nothing matches exactly, ignoring case. Implies typing. |
 | `onCreate` | func | — | Called with the text of a created option, which is then picked. |
 | `createOption` | func | — | `(text)` → the option a typed text creates, `{ value, label }`, or null to create nothing. Defaults to the text itself. |
@@ -189,6 +236,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `loadOptions` | func | — | `(text, { offset, limit })` → `Promise<{ options, total }>`. Options load as the list opens, as you type and as you scroll, 50 at a time. |
 | `recent` | arrayOf | — | Ids shown under "Recent" before typing, in a list of more than 50. |
 | `suggested` | arrayOf | — | Ids shown under "Suggested" before typing, in a list of more than 50. |
+| `marker` | enum | `'check'` | How a single pick is marked: `check` (default) or `radio`. `isMulti` always draws checkboxes. |
 | `onChange` | func | — | `(next)`: an id, or an array of ids with `isMulti`. |
 | `onFocus` | func | — | Focus entering the field from outside it. |
 | `onBlur` | func | — | Focus leaving the field and its list. |
@@ -200,6 +248,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 **`displayMode`** — `tags` · `text`
 
 **`spacing`** — `default` · `compact`
+
+**`marker`** — `check` · `radio`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

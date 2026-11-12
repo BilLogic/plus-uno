@@ -10,7 +10,7 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window, 
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, TwoOverlayLimit, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, TwoOverlayLimit, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
@@ -36,6 +36,10 @@ many columns of the screen grid plus the modal pad.
 | 6-col | A confirmation or a short question. | 384 · 512 · 640 |
 | 8-col | A short form. | 507 · 677 · 848 |
 | 10-col | A table or an editor. | 629 · 843 · 1056 |
+
+The Modal draws `--ds-surface-overlay` with `--ds-shadow-blocking`, in every
+type and width: it is the one surface that sits on a Blanket, so it lifts higher
+than a menu. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
 
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
 height hugs its content up to the cap the Blanket sets
@@ -211,7 +215,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--body-default` · `--content-max-width` · `--content-min-width` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--grid-columns` · `--grid-gutter` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--motion-duration-short` · `--motion-easing-standard` · `--plus-modal-column` · `--plus-modal-grid` · `--plus-modal-screen` · `--plus-modal-screen-pad` · `--plus-modal-span` · `--radius-md` · `--space-150` · `--stack-md` · `--stack-sm` · `--stroke-1`
+`--blanket-max-height-modal` · `--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-shadow-blocking` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--motion-duration-short` · `--motion-easing-standard` · `--radius-md` · `--stack-md` · `--stack-sm` · `--stroke-1`
 
 From `design-system/src/components/messaging/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

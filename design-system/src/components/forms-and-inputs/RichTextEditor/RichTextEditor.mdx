@@ -65,7 +65,7 @@ A rich text editor lets a person write text with formatting such as emphasis, li
 
 <ComponentExample of={RichTextEditorStories.Focused} title="Focused" description="A 2px ring wraps the box while the writing area has focus." />
 
-<ComponentExample of={RichTextEditorStories.ReadOnly} title="Read-only" description="The content shows on the neutral fill and cannot be edited. The toolbar is inactive." />
+<ComponentExample of={RichTextEditorStories.ReadOnly} title="Read-only" description="The content shows at full contrast on the neutral fill and cannot be edited. The toolbar is inactive." />
 
 <ComponentExample of={RichTextEditorStories.DisabledState} title="Disabled" description="The content and toolbar fade and leave the tab order." />
 
@@ -126,8 +126,8 @@ Use a rich text editor where the formatting is part of the meaning: session note
 <tr><td>Pressed</td><td>Toolbar buttons take <code>--ds-background-neutral-subtle-pressed</code>.</td></tr>
 <tr><td>Active format</td><td>The button takes <code>--ds-background-selected</code> with <code>--ds-text-selected</code> and <code>--ds-icon-selected</code>.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> wraps the box while the writing area has focus.</td></tr>
-<tr><td>Read-only</td><td><code>--ds-background-neutral</code> box, <code>--ds-text-subtle</code> text, toolbar faded and inert.</td></tr>
-<tr><td>Disabled</td><td>As read-only: the neutral box and subtle text, and the toolbar faded to <code>--ds-opacity-disabled</code> and inert.</td></tr>
+<tr><td>Read-only</td><td><code>--ds-background-neutral</code> box, <code>--ds-text</code> text at full contrast, the writing area in the tab order, toolbar faded and inert.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-neutral</code> box and <code>--ds-text-subtle</code> text, the writing area out of the tab order, and the toolbar faded to <code>--ds-opacity-disabled</code> and inert.</td></tr>
 <tr><td>Invalid</td><td>Not drawn. Mark the surrounding field and explain the error beside it.</td></tr>
 </tbody>
 </DocsTable>
@@ -177,7 +177,7 @@ Long-form writing needs the full set of tools.
 
 ### Use read-only for content people read.
 
-Set `readOnly` on content people need to read, and keep `disabled` for an editor that is unavailable. Both draw the same here, so the choice is about what the content is for.
+Set `readOnly` on content people need to read: it stays in the tab order at full contrast, so it can be selected and copied. Keep `disabled` for an editor that is unavailable; it steps down and leaves the tab order.
 
 ### Use the placeholder for a hint.
 
@@ -242,7 +242,7 @@ Pressing those buttons opens the platform `prompt()` dialog for a URL. It is uns
 
 ## Accessibility
 
-- **The editable region announces itself as a multi-line textbox.** `role="textbox"` with `aria-multiline`, and `aria-readonly` tracking the flag that turns editing off.
+- **The editable region announces itself as a multi-line textbox.** `role="textbox"` with `aria-multiline`, and `aria-readonly` while it is read-only and `aria-disabled` while it is disabled.
 - **`label` names it, and is effectively required.** The prop renders a `span` above the editor and the region points at it with `aria-labelledby`. A `label` element cannot be used, because `contentEditable` is not a form control for `htmlFor` to bind to. Without a `label` the region is a named role with no name, which a screen-reader user hears as nothing.
 - **The toolbar buttons are named.** Each carries an `aria-label` from its definition, and the bold, italic and underline set is a `role="group"` labeled "Bold, italic, and underline". Their pressed state is tracked internally and is not exposed as `aria-pressed`.
 - **The placeholder is CSS.** It is drawn from a `data-placeholder` attribute, so it is not part of the accessible name and may not be announced at all.

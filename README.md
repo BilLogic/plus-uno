@@ -41,7 +41,7 @@ npm install
 npm run dev          # Storybook on :4200
 ```
 
-Storybook opens at [localhost:4200](http://localhost:4200), and `npm run dev:tutor-revamp` runs the tutor revamp prototype. Every other script is in [`package.json`](package.json); [`SETUP.md`](SETUP.md) says which part of the repo you are in.
+Storybook opens at [localhost:4200](http://localhost:4200). Every other script is in [`package.json`](package.json); [`SETUP.md`](SETUP.md) says which part of the repo you are in.
 
 ## Storybook
 
@@ -111,7 +111,7 @@ The source of truth for how the PLUS service runs today: phases, scenarios, step
 
 ## Prototypes and the marketplace
 
-`main` hosts Storybook and the tutor revamp prototype (`/prototypes/tutor-revamp/`), and holds only the current design system. The old Specs screens, the Vibe app and the Full Demo Walkthrough live on the `archive/legacy-ds` branch; their old URLs (`/home`, `/app`, `/demo`) redirect to Storybook. Everything else is an experiment:
+`main` hosts Storybook and holds only the current design system. The old Specs screens, the Vibe app and the Full Demo Walkthrough live on the `archive/legacy-ds` branch; their old URLs (`/home`, `/app`, `/demo`) redirect to Storybook. Everything else is an experiment:
 
 1. Scaffold one on a feature branch (`bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>`) and build with design-system components.
 2. Open a PR; the Netlify deploy preview is the prototype's URL.
@@ -126,7 +126,7 @@ plus-uno/
 ├── design-system/       components, patterns, data viz, tokens, guidelines
 │   ├── agent-views/     generated indexes agents read (regenerate, never hand-edit)
 │   └── figma/           Figma registries and alignment runbooks
-├── prototypes/          the tutor revamp (tutor-revamp/)
+├── prototypes/          the experiment ritual (no prototype lives on main)
 ├── skills/              the six uno skills
 ├── agents/              researchers/, reviewers/, writers/, and uno-bot/ (the Worker)
 ├── docs/                connectors/, engineering/, conventions/, adr/, evals/, knowledge/

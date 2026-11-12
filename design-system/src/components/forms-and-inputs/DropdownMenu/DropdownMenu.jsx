@@ -2,8 +2,9 @@ import React, { useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
+import Icon from '@/components/images-and-icons/Icon';
 import Spinner from '@/components/loading/Spinner/Spinner';
-import { MenuGroup } from '@/components/navigation/MenuGroup';
+import { ButtonItem, CustomItem, MenuGroup } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import './DropdownMenu.scss';
 
 /** Every placement this component accepts, matching Popup's side+align shape. */
@@ -28,12 +29,11 @@ function isButtonLike(element) {
 }
 
 /**
- * DropdownMenu: a trigger that opens a `MenuGroup` of `Menu` items in a
+ * DropdownMenu: a trigger that opens a list of menu items in a
  * floating popup. Positioning and
- * dismissal (outside click, Escape) are Base UI Menu's; the rows are the
- * public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`,
- * `Section`) so a dropdown's menu looks exactly like any other menu in the
- * system.
+ * dismissal (outside click, Escape) are Base UI Menu's; the rows are
+ * `ButtonItem`, `LinkItem`, `CustomItem` and `Section`, which this folder's
+ * `index.js` re-exports.
  */
 const DropdownMenu = ({
     trigger,
@@ -45,6 +45,8 @@ const DropdownMenu = ({
     shouldFlip = true,
     spacing = 'cozy',
     loading = false,
+    hasError = false,
+    onRetry,
     minWidth,
     maxHeight,
     container,
@@ -120,13 +122,19 @@ const DropdownMenu = ({
                         aria-busy={loading || undefined}
                         onClick={handleRowPick}
                     >
-                        {loading ? (
+                        {hasError && !loading ? (
+                            <MenuGroup density={spacing === 'compact' ? 'compact' : 'regular'} minWidth={minWidth}>
+                                <CustomItem elemBefore={<Icon name="circle-exclamation" />}>Couldn't load options</CustomItem>
+                                <ButtonItem onClick={onRetry} data-keep-open="true">Retry</ButtonItem>
+                            </MenuGroup>
+                        ) : loading ? (
                             // `role="menu"` only owns menuitem/group children, so the
                             // Spinner's own `role="status"` is hidden from the tree
                             // entirely rather than left as a disallowed child;
                             // `aria-busy` above carries the loading announcement.
                             <div className="plus-dropdown-menu-loading" aria-hidden="true">
-                                <Spinner size={16} label="Loading" />
+                                <Spinner size={16} label="" />
+                                <span>Loading options</span>
                             </div>
                         ) : (
                             <MenuGroup density={spacing === 'compact' ? 'compact' : 'regular'} maxHeight={maxHeight} minWidth={minWidth}>
@@ -157,8 +165,12 @@ DropdownMenu.propTypes = {
     shouldFlip: PropTypes.bool,
     /** `cozy` draws 40px rows (default), `compact` draws 32px. */
     spacing: PropTypes.oneOf(['cozy', 'compact']),
-    /** Draws a spinner in place of the menu's rows while its options load. */
+    /** Shows one "Loading options" row, with a spinner, in place of the menu's rows while its options load. Never skeleton rows. */
     loading: PropTypes.bool,
+    /** Shows "Couldn't load options" with a Retry row in place of the menu's rows, after loading failed. */
+    hasError: PropTypes.bool,
+    /** Called when Retry is pressed. The menu stays open. */
+    onRetry: PropTypes.func,
     /** Minimum width of the menu list, as a CSS length such as `240px`. */
     minWidth: PropTypes.string,
     /** Maximum height of the menu list, as a CSS length such as `320px`. */

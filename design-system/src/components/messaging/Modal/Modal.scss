@@ -7,42 +7,26 @@
  * Modal/stack-md 16, radius Modal/radius 12, centered in an overlay that pads
  * Overlay/pad-x 16 at the sides and Overlay/pad-y 64 above and below.
  */
+@use '../../../styles/screen-grid' as *;
 @use '../../../styles/state' as *;
 
 .plus-modal {
     /*
-     * The width comes from the SCREEN grid: 12 columns, gutter 16, inside the
-     * screen pad, never under 720 and capped at 1232 like content. So it grows
-     * with the screen, stops at 1280, never shrinks below the 768 screen and
-     * ignores the sidebar. Figma's Modal/width-modal-* per mode are this rule
-     * at 768 · 1024 · 1440, and its column there is Grid/width-column-screen
-     * (`--grid-width-column-screen`); scripts/frame-layer-tokens.test.mjs
-     * holds this formula to that token, and holds the same rule in
-     * styles/_screen-grid.scss, which the patterns use. `--plus-modal-screen` stands in for the screen when
-     * an ancestor sets it, such as a docs frame drawn at a mode's width.
-     *
-     * The screen pad is Screen/pad-x-screen below 1440, 24. From 1440 it is 32,
-     * but there the grid is already at its 1232 cap with either pad, so the
-     * width is a function of the screen width alone and a stand-in frame gets
-     * the same width at any browser size.
+     * The width comes from the SCREEN grid, worked out once for every layer by
+     * `screen-grid-width` (styles/_screen-grid.scss): 6 · 8 · 10 columns plus
+     * the modal pad. It grows with the screen, stops at 1280, never shrinks
+     * below the 768 screen and ignores the sidebar. `--plus-overlay-screen`
+     * stands in for the screen when an ancestor sets it, such as a docs frame
+     * drawn at a mode's width.
      */
-    --plus-modal-screen-pad: var(--space-150);
-    --plus-modal-grid: clamp(
-        var(--content-min-width),
-        var(--plus-modal-screen, 100vw) - 2 * var(--plus-modal-screen-pad),
-        var(--content-max-width)
-    );
-    --plus-modal-column: calc((var(--plus-modal-grid) - (var(--grid-columns) - 1) * var(--grid-gutter)) / var(--grid-columns));
-    --plus-modal-span: 6;
+    @include screen-grid-width(var(--modal-pad-x-default));
+    --plus-overlay-span: 6;
 
-    width: calc(var(--plus-modal-span) * var(--plus-modal-column) + (var(--plus-modal-span) - 1) * var(--grid-gutter) + 2 * var(--modal-pad-x-default));
-    flex-shrink: 0;
-    box-sizing: border-box;
-    /* The overlay pair, as every floating layer: the blanket under the modal sets it apart from a menu. */
+    /* The overlay fill, with the blocking shadow: the Modal is the one surface on a blanket, so it lifts higher than a menu or Select list (those keep the overlay shadow). The shadow reaches about 80px below; the Modal has no clip-path open or close, so nothing cuts it. */
     background-color: var(--ds-surface-overlay);
     color: var(--ds-text);
     border-radius: var(--modal-radius);
-    box-shadow: var(--ds-shadow-overlay);
+    box-shadow: var(--ds-shadow-blocking);
     display: flex;
     flex-direction: column;
     gap: var(--modal-stack-md);
@@ -53,11 +37,11 @@
 }
 
 .plus-modal-width-8-col {
-    --plus-modal-span: 8;
+    --plus-overlay-span: 8;
 }
 
 .plus-modal-width-10-col {
-    --plus-modal-span: 10;
+    --plus-overlay-span: 10;
 }
 
 /* Fill: at the cap whatever the content, so a settings or editor modal never jumps. */

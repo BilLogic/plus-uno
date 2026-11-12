@@ -251,6 +251,14 @@ export const CHECKS = [
     guards: 'the old component language (state steps, legacy tags, style x fill and small/medium/large props, retired words) staying out of the tree.',
   },
   {
+    name: 'check:slot-names',
+    script: 'node scripts/check-slot-names.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-slot-names.mjs',
+    guards: 'one naming rule for slots: iconBefore / elemBefore by what the slot accepts, with leadingVisual, trailingVisual and a bare leading slot staying out of the tree.',
+  },
+  {
     name: 'check:old-system',
     script: 'node scripts/check-old-system.mjs',
     pkg: 'root',
@@ -297,16 +305,6 @@ export const CHECKS = [
     baseline: 'scripts/baselines/motion-registry.json',
     update: 'node scripts/check-motion-registry.mjs --update',
     guards: 'every interactive component having a motion row naming real tokens; the allow-list of components without one may only shrink.',
-  },
-  {
-    name: 'check:react-bootstrap-imports',
-    script: 'node scripts/check-react-bootstrap-imports.mjs',
-    pkg: 'root',
-    trigger: 'pull_request',
-    module: 'scripts/check-react-bootstrap-imports.mjs',
-    baseline: 'scripts/baselines/react-bootstrap-imports.json',
-    update: 'node scripts/check-react-bootstrap-imports.mjs --update',
-    guards: 'imports of react-bootstrap in design-system/src, prototypes and src, counted per file; a count may fall and never rise.',
   },
   {
     name: 'check:raw-buttons',

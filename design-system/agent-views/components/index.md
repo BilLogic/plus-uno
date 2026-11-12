@@ -25,7 +25,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Badge` | `StatusTag`, `CountTag` (StatusTag for a state, CountTag for a number) |
 | `BadgeVariants` | `StatusTag`, `CountTag` |
 | `Jumbotron` | `PatternSection`, `SectionMessage` (PatternSection at page level) |
-| `ListGroup` | `MenuGroup`, `Table` |
+| `ListGroup` | `DropdownMenu`, `Table` |
 | `MediaObject` | `Avatar`, `Tile` |
 | `Navbar` | `PatternSidebar` (a pattern, inside Frame) |
 | `Scrollspy` | `Tabs`, `ProgressTracker` |
@@ -85,7 +85,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 | Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
 | AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
-## UI components (83)
+## UI components (85)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
@@ -99,6 +99,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [Calendar](../../src/components/forms-and-inputs/Calendar/index.md)
 - [Carousel](../../src/components/layout-and-structure/Carousel/index.md)
 - [Cascader](../../src/components/forms-and-inputs/Cascader/index.md)
+- [ChangeTag](../../src/components/labels/ChangeTag/index.md)
 - [Checkbox](../../src/components/forms-and-inputs/Checkbox/index.md)
 - [ChoiceGrid](../../src/components/forms-and-inputs/ChoiceGrid/index.md)
 - [CloseButton](../../src/components/forms-and-inputs/CloseButton/index.md)
@@ -114,6 +115,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [Fieldset](../../src/components/forms-and-inputs/Fieldset.md)
 - [FileUpload](../../src/components/forms-and-inputs/FileUpload/index.md)
 - [FilterButton](../../src/components/forms-and-inputs/FilterButton/index.md)
+- [FilterMenu](../../src/components/forms-and-inputs/FilterMenu/index.md)
 - [Flag](../../src/components/messaging/Flag/index.md)
 - [GenerativeBorder](../../src/components/loading/GenerativeBorder/index.md)
 - [Heading](../../src/components/text-and-data-display/Heading/index.md)
@@ -128,13 +130,13 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [LinkButton](../../src/components/forms-and-inputs/LinkButton/index.md)
 - [LinkIconButton](../../src/components/forms-and-inputs/LinkIconButton/index.md)
 - Logo — exported here, implemented outside `src/components/`; read the source
-- [MenuGroup](../../src/components/navigation/MenuGroup/index.md)
 - [Modal](../../src/components/messaging/Modal/index.md)
 - [Object](../../src/components/images-and-icons/Object/index.md)
 - [PageHeader](../../src/components/layout-and-structure/PageHeader/index.md)
 - [Pagination](../../src/components/navigation/Pagination/index.md)
 - [Panel](../../src/components/layout-and-structure/Panel/index.md)
 - [Popup](../../src/components/overlays-and-layering/Popup/index.md)
+- [PopupSelect](../../src/components/forms-and-inputs/PopupSelect/index.md)
 - [ProgressBar](../../src/components/loading/ProgressBar/index.md)
 - [ProgressIndicator](../../src/components/status-indicators/ProgressIndicator/index.md)
 - [ProgressTracker](../../src/components/status-indicators/ProgressTracker/index.md)

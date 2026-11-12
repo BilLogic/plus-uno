@@ -360,7 +360,7 @@ test('the commented props of the real Tag and StatusTag all survive', () => {
   const status = parsePropTypes(
     read('design-system/src/components/labels/StatusTag/StatusTag.jsx'), 'StatusTag',
   ).map((p) => p.name);
-  for (const name of ['spacing', 'appearance', 'leadingVisual', 'maxWidth', 'trailingMetric']) {
+  for (const name of ['spacing', 'appearance', 'iconBefore', 'maxWidth', 'trailingMetric']) {
     assert.ok(status.includes(name), `StatusTag.${name} was dropped`);
   }
 });

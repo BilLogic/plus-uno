@@ -28,7 +28,7 @@ export const figmaMeta = {
 };
 
 {/* Pairs draw the inline panel, never a live dialog. A narrow stand-in screen keeps every width inside a pair card. */}
-export const narrowScreen = { '--plus-modal-screen': '480px', width: '100%' };
+export const narrowScreen = { '--plus-overlay-screen': '480px', width: '100%' };
 // Pair one draws both widths at three quarters, so ten columns fit beside six at the same scale.
 export const scaledScreen = { ...narrowScreen, zoom: 0.75 };
 export const shortCap = { ...narrowScreen, '--blanket-max-height-modal': 'var(--size-2000)' };
@@ -154,6 +154,10 @@ many columns of the screen grid plus the modal pad.
 <tr><td>10-col</td><td>A table or an editor.</td><td>{MODAL_WIDTH_PX['10-col'].join(' · ')}</td></tr>
 </tbody>
 </DocsTable>
+
+The Modal draws `--ds-surface-overlay` with `--ds-shadow-blocking`, in every
+type and width: it is the one surface that sits on a Blanket, so it lifts higher
+than a menu. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
 
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
 height hugs its content up to the cap the Blanket sets

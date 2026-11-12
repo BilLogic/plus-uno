@@ -37,8 +37,9 @@
         background-color: transparent;
     }
 
-    // The first column fills; the others size to their content.
-    th.plus-dynamic-table-col--fit {
+    // The first column fills; the others size to their content. The colgroup
+    // carries the same hint, so the columns hold while the bulk bar spans them.
+    :is(th, col).plus-dynamic-table-col--fit {
         width: 1%;
         white-space: nowrap;
     }
@@ -96,10 +97,50 @@
 }
 
 // The checkbox column is as wide as the row is tall, the box centered in it.
-.plus-pattern-table-table.plus-dynamic-table-table .plus-dynamic-table-select {
+.plus-pattern-table-table.plus-dynamic-table-table :is(.plus-dynamic-table-select, .plus-dynamic-table-col--select) {
     width: var(--plus-table-row-height);
     padding: 0;
     text-align: center;
+}
+
+/*
+ * The bulk bar. While rows are selected the head row holds the count and the
+ * actions in one cell across the columns, at the start. It keeps the head
+ * row's height, and the labels cross-fade in place: the bar fades in over
+ * where the column heads were, and the heads fade back in when it goes.
+ * The motion tokens collapse to 0ms under reduced motion.
+ */
+@keyframes plus-dynamic-table-label-in {
+    from {
+        opacity: 0;
+    }
+}
+
+.plus-dynamic-table-bulk > *,
+.plus-dynamic-table-head--returned > th:not(.plus-dynamic-table-select) > * {
+    animation: plus-dynamic-table-label-in var(--motion-duration-short) var(--motion-easing-standard);
+}
+
+.plus-table-bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--inline-sm);
+    min-width: 0;
+    // The bar fits inside the head row's height; it never grows the row.
+    max-height: var(--plus-table-row-height);
+}
+
+// With sortable columns the head row is as tall as a sort button; the bar
+// takes the same height, so the row does not move when it swaps.
+.plus-dynamic-table-bulk--sortable .plus-table-bulk-actions {
+    height: var(--plus-table-row-height);
+}
+
+.plus-table-bulk-actions__count {
+    margin-inline-end: var(--inline-md);
+    font: var(--body-small);
+    color: var(--ds-text);
+    white-space: nowrap;
 }
 
 /*

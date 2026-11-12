@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { AVATAR_SIZES, AVATAR_SHAPES } from '../Avatar';
 import DropdownMenu from '../../forms-and-inputs/DropdownMenu';
-import { CustomItem } from '@/components/navigation/MenuGroup';
+import { CustomItem } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import '../Avatar/Avatar.scss';
 
 /**

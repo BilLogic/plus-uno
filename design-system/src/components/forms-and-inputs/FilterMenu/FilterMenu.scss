@@ -1,0 +1,56 @@
+/*
+ * Filter menu: filter categories in a Popup, with Reset and Apply full bleed
+ * across the bottom. The Popup draws the surface, the column-step width and
+ * the motion: it clips open from the trigger's corner and fades on close, so
+ * Apply reads as the fade and then the content behind swapping in place.
+ * Ticks and Reset are the checkboxes' own color change; nothing moves.
+ *
+ * STRUCTURE:
+ * .plus-popup.plus-filter-menu
+ *   └── .plus-popup-body
+ *         ├── .plus-filter-menu__categories (columns, or one under another)
+ *         │     └── .plus-filter-menu__category (Fieldset of Checkboxes)
+ *         └── .plus-filter-menu__footer (Reset · Apply, half each)
+ */
+.plus-popup.plus-filter-menu {
+    // The footer bleeds to the popup's edges; the popup's radius clips its
+    // corners. The shadow is the popup's own box-shadow, so it is not cut.
+    overflow: hidden;
+
+    .plus-popup-body {
+        display: flex;
+        flex-direction: column;
+        gap: var(--popover-pad);
+    }
+}
+
+.plus-filter-menu__categories {
+    display: grid;
+    gap: var(--stack-lg) var(--inline-lg);
+    max-height: var(--popover-max-height-menu);
+    overflow-y: auto;
+}
+
+.plus-filter-menu--side-by-side .plus-filter-menu__categories {
+    grid-template-columns: repeat(var(--plus-filter-menu-columns, 1), minmax(0, 1fr));
+}
+
+.plus-filter-menu--stacked .plus-filter-menu__categories {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.plus-filter-menu__category .plus-fieldset-legend {
+    font: var(--heading-xsmall);
+}
+
+// Full bleed: out past the popup pad on the sides and the bottom, two
+// buttons half each with no gap and no radius of their own.
+.plus-filter-menu__footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 calc(-1 * var(--popover-pad)) calc(-1 * var(--popover-pad));
+
+    .plus-btn {
+        border-radius: 0;
+    }
+}

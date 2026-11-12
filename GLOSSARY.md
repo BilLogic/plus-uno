@@ -237,6 +237,10 @@ _Avoid_: "chip"
 A set of **Tag**s laid out together.
 _Avoid_: "tag list"
 
+**Change tag**:
+A label for change over time, such as "+3 vs last week": the arrow follows the sign, and which way is good sets the tone.
+_Avoid_: "delta tag", "trend indicator"
+
 **Date tag**:
 A label that shows a date or due date, colored by how close it is.
 _Avoid_: "date pill"
@@ -282,8 +286,8 @@ A boolean state prop such as `isDisabled`, `isSelected` or `isLoading`.
 _Avoid_: bare `disabled`, `selected` or `loading` props
 
 **Base UI**:
-The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close), decided in ADR-037; Bootstrap stays the CSS framework for non-interactive markup.
-_Avoid_: "react-bootstrap" as a precedent
+The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close), decided in ADR-037.
+_Avoid_: Bootstrap or React-Bootstrap as a precedent; PLUS ships neither (ADR-042)
 
 **FieldBox / FieldFrame**:
 FieldBox is an input's box (leading and trailing slots, density, radius); FieldFrame carries its label, caption and error, and is the only piece choice controls share.

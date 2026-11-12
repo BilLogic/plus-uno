@@ -52,6 +52,18 @@ line on what goes here, and the one action that fills it.
 
 <div className="sb-ds-doc-section">
 
+## Errors
+
+<ComponentExample of={EmptyStateStories.LoadFailure} title="Load failure" description="Content that fails to load says what happened and offers Try again." />
+
+<ComponentExample of={EmptyStateStories.NoAccess} title="No access" description="The plain reason and who can help, with no action to retry." />
+
+<ComponentExample of={EmptyStateStories.LoadFailureInATable} title="In a table" description="A table body that fails to load keeps its header row." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## State
 
 <ComponentExample of={EmptyStateStories.Rest} title="Rest" description="The header and description visible, the icon hidden from assistive technology." />
@@ -91,7 +103,24 @@ Use `EmptyState` when a view, panel, card or table has no content yet, in place
 of a blank area or a bare "No results". It carries a picture, a header, one line
 and one primary action.
 
-Use a `SectionMessage`, not an `EmptyState`, for a failure.
+Use `EmptyState` too when content cannot be shown. A view, panel or table that
+fails to load shows the failure in the same slot, with a filled **Try again**.
+A view the person may not open says so plainly and names who can help. A
+rejected form submit is not one of these: a danger `SectionMessage` at the top
+of the form summarizes it. A failure in the background is a `Flag`.
+
+### Kind guidance
+
+<DocsTable>
+<thead>
+<tr><th>The view is</th><th>The slot says</th></tr>
+</thead>
+<tbody>
+<tr><td>Empty</td><td>What goes here and the action that fills it. Example: "No students yet", Add student.</td></tr>
+<tr><td>Failed to load</td><td>What failed and a filled Try again. Example: "Couldn't load sessions".</td></tr>
+<tr><td>No access</td><td>The plain reason and who can help, with no action. Example: "Only supervisors can see session notes. Ask your supervisor to add you."</td></tr>
+</tbody>
+</DocsTable>
 
 ### Spacing guidance
 
@@ -185,6 +214,18 @@ Say what goes here and what to do, in a warm voice. Never apologize.
     dontCaption="A cold label with no way forward."
 />
 
+### Show a load failure in the slot, with Try again.
+
+State what failed and offer the retry. Never leave the view blank or send the
+person to a message above it.
+
+<DoDontPair
+    doExample={<EmptyState icon="circle-exclamation" header="Couldn't load sessions" description="Check your connection and try again." primaryAction={<Button text="Try again" appearance="primary" />} />}
+    doCaption="What failed, with Try again."
+    dontExample={<EmptyState icon="calendar-plus" header="No sessions this week" description="Book a session to fill this view." primaryAction={<Button text="Book a session" appearance="primary" />} />}
+    dontCaption="An empty-view invitation when the load failed."
+/>
+
 ### Fill a Table with it, not around it.
 
 The Table keeps its header row and the EmptyState takes the body.
@@ -211,6 +252,8 @@ The Table keeps its header row and the EmptyState takes the body.
 <tr><td>Use the description for context that helps someone decide what to do.</td><td>Repeat the header in the description.</td></tr>
 <tr><td>Make the primary action name the next step: "Add student".</td><td>Use a generic label such as "Continue".</td></tr>
 <tr><td>Add a secondary action only for a real alternative, such as importing.</td><td>Add a second action just to fill space.</td></tr>
+<tr><td>For a failure, say what happened in plain words and offer Try again.</td><td>Show an error code or "Something went wrong" with no next step.</td></tr>
+<tr><td>For no access, give the reason and who can help.</td><td>Offer an action the person is not allowed to take.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -237,7 +280,8 @@ The Table keeps its header row and the EmptyState takes the body.
 
 - `Table`, whose `emptyState` slot takes it.
 - `Illustration`, for the image slot.
-- `SectionMessage`, for a failure rather than an empty view.
+- `Flag`, for a failure in the background that stays until closed.
+- `SectionMessage`, for a rejected form submit at the top of the form.
 
 </div>
 

@@ -66,7 +66,11 @@ category.
 
 <ComponentExample of={TagStories.Colors} title="Colors" description={<>Ten colors, the accent families, with gray the default; a color is a category, never a status, so there is no <code>success</code> or <code>danger</code>.</>} />
 
-<ComponentExample of={TagStories.Types} title="Person, agent and team" description="A person, an agent or a team leads with a 16 avatar in place of the swatch: round, hexagon and square, with the color filling the avatar." />
+<ComponentExample of={TagStories.LeadingSwatchAndIcon} title="Swatch and leading icon" description={<>A plain tag leads with nothing. <code>swatchBefore</code> adds a 10 color square, in the tag's color for <code>true</code> or in a background color token; <code>elemBefore</code> adds an icon. Use the swatch when color is how a reader finds the tag, such as a chart legend, and the icon when it carries meaning.</>} />
+
+<ComponentExample of={TagStories.SwatchRefusesRawColor} title="Swatch takes a token" description={<><code>swatchBefore</code> refuses a raw CSS color, with a warning in development, and keeps the tag's own color.</>} />
+
+<ComponentExample of={TagStories.Types} title="Person, agent and team" description="A person, an agent or a team leads with a 16 avatar: round, hexagon and square, with the color filling the avatar." />
 
 <ComponentExample of={TagStories.AvatarFallback} title="Avatar fallback" description={<>With no <code>avatar</code>, or one that fails to load, initials stand in the same 16 box, so the tag does not move.</>} />
 
@@ -88,7 +92,7 @@ category.
 
 ## Behavior
 
-<ComponentExample of={TagStories.Behaviors} title="Read-only, removable, selectable and link" description="Every kind is 22 tall and outlined, with neutral text and the color on the border and swatch." />
+<ComponentExample of={TagStories.Behaviors} title="Read-only, removable, selectable and link" description="Every kind is 22 tall and outlined, with neutral text and the color on the border." />
 
 <ComponentExample of={TagStories.TypeBehaviors} title="Kinds on every type" description="Removable, selectable, link with a separate ×, saving and disabled all work on every type." />
 
@@ -104,7 +108,7 @@ category.
 
 <ComponentExample of={TagStories.ElevatedOnlyReadOnlyAndLink} title="Elevated only for read-only and link" description={<>A removable or selectable tag ignores <code>isElevated</code> and keeps its outline, with a warning in development.</>} />
 
-<ComponentExample of={TagStories.Saving} title="Saving" description="A spinner replaces the swatch or avatar, so the tag keeps its width, and the × waits for the save." />
+<ComponentExample of={TagStories.Saving} title="Saving" description="A spinner takes the place of a swatch, icon or avatar, so a tag that leads with one keeps its width; a tag with none gains the spinner's own box. The × waits for the save." />
 
 <ComponentExample of={TagStories.DisabledInField} title="Disabled by the field" description={<>Disabled comes from the field through <code>TagContext</code>: a neutral fill, no ×, and nothing to focus.</>} />
 
@@ -122,7 +126,7 @@ category.
 
 <ComponentExample of={TagStories.PersonFocusRing} title="Person focus ring" description="On a person tag the ring follows the round shape, and a focused × is round too." />
 
-<ComponentExample of={TagStories.ElevatedDisabled} title="Elevated disabled" description="An elevated tag keeps its solid ground and shadow when disabled; only the label, the swatch and the avatar turn disabled." />
+<ComponentExample of={TagStories.ElevatedDisabled} title="Elevated disabled" description="An elevated tag keeps its solid ground and shadow when disabled; only the label, the swatch, the icon and the avatar turn disabled." />
 
 <ComponentExample of={TagStories.ElevatedRemoveFocus} title="Elevated remove focus" description="Focus on an elevated link's × keeps the same 2px surface gap inside its ring as the tag's own focus." />
 
@@ -179,7 +183,7 @@ so a reader tells a category from a meaning without reading the words.
 
 ## Parts
 
-1. **Swatch or avatar.** A 10 swatch in the hue, or a 16 avatar for a person, an agent or a team.
+1. **Lead, optional.** Nothing by default. A 10 swatch (`swatchBefore`), an icon (`elemBefore`), or for a person, an agent or a team a 16 avatar.
 2. **Label.** Neutral text; the hue never colors the words.
 3. **Trailing metric.** Optional on a selectable tag: a compact Count tag, such as a filter's result count.
 4. **Remove button.** Optional, with the 2px focus ring on the button itself and a name that says what it removes.
@@ -253,6 +257,17 @@ Selection is a state of the tag, never a new color.
     dontExample={<Tag color="green">Algebra</Tag>}
     dontCaption="A new color for selected."
 />
+
+### Add a swatch only when color is the way to find the tag.
+
+A plain tag is its outline and neutral words. Turn on `swatchBefore` for a tag that is a legend entry or a color-coded filter, where the reader matches the square to a chart or a key. An icon in `elemBefore` is for when the icon carries meaning of its own.
+
+```jsx
+<Tag color="blue">Algebra</Tag>                                  {/* plain: outline only */}
+<Tag color="blue" swatchBefore>Algebra</Tag>                       {/* the tag's own color */}
+<Tag swatchBefore="background-accent-orange-bolder">Week 3</Tag>   {/* a background color token */}
+<Tag elemBefore={<Icon name="star" />}>Starred</Tag>                {/* an icon that means something */}
+```
 
 ### Let the props pick the kind of tag.
 

@@ -193,7 +193,8 @@
   "want": [
    "Tabs",
    "FilterButton",
-   "Select"
+   "Select",
+   "PopupSelect"
   ],
   "kind": "real-intent",
   "source": "ledger"
@@ -203,7 +204,8 @@
   "want": [
    "Tabs",
    "FilterButton",
-   "Select"
+   "Select",
+   "PopupSelect"
   ],
   "kind": "real-intent",
   "source": "ledger"
@@ -213,7 +215,8 @@
   "want": [
    "Tabs",
    "FilterButton",
-   "Select"
+   "Select",
+   "PopupSelect"
   ],
   "kind": "real-intent",
   "source": "ledger"

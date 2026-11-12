@@ -1,12 +1,11 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import PatternSection, { SectionToolbar } from './PatternSection';
+import PatternSection, { SectionSearch, SectionToolbar } from './PatternSection';
 
 /**
  * The Section pattern follows the Figma Section: no fill and no pad of its
  * own, a `_Section header` of five types, a body laid out single, split or
- * as subsections, an optional footer, a toolbar with a default and a selected
- * state, and a loading header. Sizes and colors are asserted in the browser,
+ * as subsections, an optional footer, a toolbar, and a loading header. Sizes and colors are asserted in the browser,
  * in the `Templates/Section/Section` stories; this file holds structure.
  */
 const section = (container) => container.querySelector('section');
@@ -144,7 +143,7 @@ describe('PatternSection', () => {
 });
 
 describe('SectionToolbar', () => {
-    it('default state: search, filters, count, then actions at the end', () => {
+    it('search, filters, count, then actions at the end', () => {
         const { container } = render(
             <SectionToolbar
                 search={<input aria-label="Search students" />}
@@ -154,7 +153,6 @@ describe('SectionToolbar', () => {
             />,
         );
         const toolbar = container.firstChild;
-        expect(toolbar.className).toContain('plus-section-toolbar--default');
         const start = toolbar.querySelector('.plus-section-toolbar__start');
         expect(within(start).getByRole('textbox', { name: 'Search students' })).toBeInTheDocument();
         expect(within(start).getByRole('button', { name: 'Status' })).toBeInTheDocument();
@@ -162,30 +160,31 @@ describe('SectionToolbar', () => {
         expect(within(toolbar.querySelector('.plus-section-toolbar__actions')).getByRole('button', { name: 'Export' })).toBeInTheDocument();
     });
 
-    it('selected state: the selection, bulk actions and Clear, announced politely', () => {
-        const onClear = vi.fn();
-        const { container } = render(
-            <SectionToolbar
-                state="selected"
-                selection="3 selected"
-                bulkActions={<button type="button">Assign tutor</button>}
-                actions={<button type="button">Export</button>}
-                search={<input aria-label="Search" />}
-                onClear={onClear}
-            />,
-        );
-        expect(container.firstChild.className).toContain('plus-section-toolbar--selected');
-        expect(screen.getByText('3 selected')).toHaveAttribute('aria-live', 'polite');
-        expect(screen.getByRole('button', { name: 'Assign tutor' })).toBeInTheDocument();
-        // The default state's parts give way to the bulk bar.
-        expect(screen.queryByRole('button', { name: 'Export' })).toBeNull();
-        expect(screen.queryByRole('textbox')).toBeNull();
-        screen.getByRole('button', { name: 'Clear' }).click();
-        expect(onClear).toHaveBeenCalledOnce();
-    });
-
     it('is reachable as PatternSection.Toolbar', () => {
         expect(PatternSection.Toolbar).toBe(SectionToolbar);
+    });
+
+    it('announces the count politely', () => {
+        render(<SectionToolbar count="12 of 48 students" />);
+        expect(screen.getByRole('status')).toHaveTextContent('12 of 48 students');
+    });
+});
+
+describe('SectionSearch', () => {
+    it('is reachable as PatternSection.Search, an icon named for its scope', () => {
+        expect(PatternSection.Search).toBe(SectionSearch);
+        render(<SectionSearch label="Search students" />);
+        expect(screen.getByRole('button', { name: 'Search students' })).toBeInTheDocument();
+        expect(screen.queryByRole('searchbox')).toBeNull();
+    });
+
+    it('starts open with `defaultOpen`, and stays open while it holds text', () => {
+        const { unmount } = render(<SectionSearch label="Search students" defaultOpen />);
+        expect(screen.getByRole('searchbox', { name: 'Search students' })).toHaveAttribute('placeholder', 'Search students');
+        unmount();
+        render(<SectionSearch label="Search students" value="maya" onValueChange={() => {}} />);
+        expect(screen.getByRole('searchbox')).toHaveValue('maya');
+        expect(screen.getByRole('button', { name: 'Clear search' })).toBeInTheDocument();
     });
 });
 

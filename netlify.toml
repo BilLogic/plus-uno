@@ -79,17 +79,6 @@
   to = "/storybook/:splat"
   status = 200
 
-# Tutor revamp prototype (shell, kit and screens)
-[[redirects]]
-  from = "/prototypes/tutor-revamp"
-  to = "/prototypes/tutor-revamp/"
-  status = 302
-
-[[redirects]]
-  from = "/prototypes/tutor-revamp/*"
-  to = "/prototypes/tutor-revamp/index.html"
-  status = 200
-
 # Removed from main (2026-11-09): the Vibe app (/home, /app), the Full Demo
 # Walkthrough (/demo) and the prototypes built on the old Specs code. Their
 # code is on the archive/legacy-ds branch; their old links land on Storybook.

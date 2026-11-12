@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Toggle from './Toggle';
 
 export default {
@@ -151,6 +152,7 @@ ReadOnly.play = async ({ canvasElement }) => {
     await expect(control.getAttribute('aria-readonly')).toBe('true');
     await userEvent.click(control);
     await expect(control.getAttribute('aria-checked')).toBe('true');
+    await expectChoiceReadOnly(canvasElement, control, 'toggle');
 };
 
 /** Keyboard focus: the focus-ring role, 2px wide and 2px off the track, as on Checkbox and Radio. */
@@ -266,5 +268,20 @@ export const Disabled = {
         const el = switchOf(canvasElement, 'Not available');
         await expect(el).toHaveAttribute('data-disabled');
         await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+    },
+};
+
+/** A toggle disabled for a prerequisite the person can fix here; the reason is visible text beside it. */
+export const DisabledWithReason = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+            <Toggle id="toggle-ex-reason" label="Share notes" isDisabled />
+            <span>Add a co-tutor to share notes.</span>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(switchOf(canvasElement, 'Share notes')).toHaveAttribute('data-disabled');
+        await expect(canvas.getByText('Add a co-tutor to share notes.')).toBeVisible();
     },
 };

@@ -3,7 +3,7 @@
   "updated_for_branch": "main",
   "runtime_and_tooling": {
     "framework": "React",
-    "ui_library": "React-Bootstrap",
+    "ui_library": "PLUS components on Base UI",
     "bundler": "Vite",
     "storybook": "Storybook"
   },

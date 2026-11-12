@@ -13,14 +13,16 @@ export { default as CloseButton } from '@/components/forms-and-inputs/CloseButto
 export { default as Comment } from '@/components/forms-and-inputs/Comment';
 export { default as DatePicker } from '@/components/forms-and-inputs/DatePicker';
 export { default as DateTimePicker } from '@/components/forms-and-inputs/DateTimePicker';
-export { default as DropdownMenu } from '@/components/forms-and-inputs/DropdownMenu';
+export { default as DropdownMenu, ButtonItem, CustomItem, LinkItem, Section } from '@/components/forms-and-inputs/DropdownMenu';
 export { default as Fieldset } from '@/components/forms-and-inputs/Fieldset';
 export { default as FileUpload } from '@/components/forms-and-inputs/FileUpload';
 export { default as FilterButton, FILTER_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/FilterButton';
+export { default as FilterMenu, FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WIDTHS } from '@/components/forms-and-inputs/FilterMenu';
 export { default as IconButton, ICON_BUTTON_APPEARANCES, ICON_BUTTON_SHAPES } from '@/components/forms-and-inputs/IconButton';
 export { default as InlineEditableTextfield } from '@/components/forms-and-inputs/InlineEditableTextfield';
 export { default as LinkButton } from '@/components/forms-and-inputs/LinkButton';
 export { default as LinkIconButton } from '@/components/forms-and-inputs/LinkIconButton';
+export { default as PopupSelect, POPUP_SELECT_PLACEMENTS, POPUP_SELECT_SPACINGS } from '@/components/forms-and-inputs/PopupSelect';
 export { default as PromptInput } from '@/components/forms-and-inputs/PromptInput';
 export { default as Radio } from '@/components/forms-and-inputs/Radio';
 export { default as RadioGroup } from '@/components/forms-and-inputs/RadioGroup';
@@ -48,6 +50,7 @@ export { default as Object, BugIcon, createObjectIcon, IdeaIcon, OBJECT_SIZES, P
 export { default as Tile, TILE_APPEARANCES, TILE_COLORS, TILE_CONTENTS, TILE_SIZES } from '@/components/images-and-icons/Tile';
 
 export { default as AiMessage, AI_MESSAGE_STATUSES, AiFeedback, AiSources, TypingText } from '@/components/labels/AiMessage';
+export { default as ChangeTag, CHANGE_TAG_FORMATS, CHANGE_TAG_GOOD_DIRECTIONS, CHANGE_TAG_ICONS, CHANGE_TAG_SPACINGS, changeTone, describeChange } from '@/components/labels/ChangeTag';
 export { default as CountTag, COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS, formatCount } from '@/components/labels/CountTag';
 export { default as DateTag, DATE_TAG_APPEARANCES, DATE_TAG_ICONS, DATE_TAG_SPACINGS } from '@/components/labels/DateTag';
 export { default as PromptStarters } from '@/components/labels/PromptStarters';
@@ -78,12 +81,11 @@ export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightP
 
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';
-export { default as MenuGroup, ButtonItem, CustomItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
 export { default as Pagination, PAGINATION_NAVIGATORS, PAGINATION_SPACINGS } from '@/components/navigation/Pagination';
 export { default as Sidebar } from '@/components/navigation/Sidebar';
 export { default as Tabs } from '@/components/navigation/Tabs';
 
-export { default as Popup, acceptsExpandedState } from '@/components/overlays-and-layering/Popup';
+export { default as Popup, acceptsExpandedState, POPUP_WIDTH_PX, POPUP_WIDTHS } from '@/components/overlays-and-layering/Popup';
 export { default as Tooltip } from '@/components/overlays-and-layering/Tooltip';
 
 export { default as ProgressIndicator, PROGRESS_INDICATOR_APPEARANCES, PROGRESS_INDICATOR_SIZES, PROGRESS_INDICATOR_SPACINGS } from '@/components/status-indicators/ProgressIndicator';

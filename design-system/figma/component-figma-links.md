@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-36 docs-page links + 60 style/variant entries across 57 components.
+36 docs-page links + 59 style/variant entries across 56 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -83,7 +83,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Link | Link | `20624:87` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20624-87) | verified |
 | Components | LinkButton | Link button | `20303:77826` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20303-77826) | verified |
 | Components | LinkIconButton | Link icon button | `20304:2570` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20304-2570) | verified |
-| Components | MenuGroup | Menu item | `20625:91` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20625-91) | verified |
 | Components | Modal | Modal | `20701:48348` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20701-48348) | verified |
 | Components | Object | Object | `20630:40` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-40) | verified |
 | Components | PageHeader | Page header | `20622:81` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20622-81) | verified |

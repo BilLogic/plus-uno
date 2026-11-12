@@ -110,6 +110,7 @@
     --flag-offset: var(--space-125);
 
     /* Spotlight */
+    --spotlight-width: var(--width-2500);
     --spotlight-media-height: calc(var(--size-750) + var(--space-150));
 
     /* Menu group */
@@ -119,7 +120,13 @@
     --menu-group-item-pad-y: var(--space-0625);
 
     /* Popup */
+    --popup-min-width: var(--width-1000);
+    --popup-max-width: var(--width-2000);
+    --popup-clip-reach: var(--space-300);
     --popup-pad: var(--space-125);
+
+    /* AI chat */
+    --ai-chat-width: var(--width-2500);
 
     /* Table */
     --table-cell-max-width: var(--size-300);
@@ -129,9 +136,9 @@
     --avatar-size-128: calc(var(--space-400) * 2);
 
     /* Spinner */
-    --spinner-size-sm: var(--space-100);
-    --spinner-size-md: var(--space-150);
-    --spinner-size-lg: var(--space-300);
+    --spinner-size-sm: var(--size-100);
+    --spinner-size-md: var(--size-150);
+    --spinner-size-lg: var(--size-300);
 
     /* Progress bar */
     --progress-bar-height: var(--space-050);
