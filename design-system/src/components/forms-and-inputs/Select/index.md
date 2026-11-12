@@ -10,7 +10,7 @@ Also asked as: combobox, picklist, option list.
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
@@ -96,6 +96,26 @@ where firing once, on close, avoids re-querying on every checkbox click.
 
 `recent` and `suggested` only change the order past 50 static options;
 `loadOptions` is for a list too large to ship as a static array at all.
+
+`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`.
+The first page loads as the list opens and again whenever the typed text
+changes; the next page loads as the list scrolls near its end, 50 at a time,
+and an older answer never overwrites a newer one. `isCreatable` works with it.
+
+```jsx
+<Select
+    label="Student"
+    isCreatable
+    loadOptions={(text, { offset, limit }) => fetchStudents(text, offset, limit)}
+/>
+```
+
+While a page is on its way the list shows one "Loading options" row; a Select
+never draws skeleton rows. If the request fails the list shows "Couldn't load
+options" with a Retry button, and Enter in the field retries too. A later page
+that fails keeps the rows already loaded and puts the same message in the
+footer. Options fade in one after another, 20 ms apart, the wait capped at
+500 ms; reduced motion shows them at once.
 
 ## Accessibility
 

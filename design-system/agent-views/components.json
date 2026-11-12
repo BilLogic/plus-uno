@@ -3656,7 +3656,25 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Draws a spinner in place of the menu's rows while its options load.",
+          "description": "Shows one \"Loading options\" row, with a spinner, in place of the menu's rows while its options load. Never skeleton rows.",
+          "deprecated": null
+        },
+        {
+          "name": "hasError",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Shows \"Couldn't load options\" with a Retry row in place of the menu's rows, after loading failed.",
+          "deprecated": null
+        },
+        {
+          "name": "onRetry",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called when Retry is pressed. The menu stays open.",
           "deprecated": null
         },
         {
@@ -3720,6 +3738,7 @@
         "Spacing",
         "WithSections",
         "Loading",
+        "LoadFailed",
         "EscapeCloses",
         "MenuKeyboardNavigation",
         "Interactive",
@@ -3731,15 +3750,19 @@
         "KeyboardFocus"
       ],
       "tokens": [
+        "--body-default",
         "--border-default",
         "--ds-border",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
+        "--ds-text-subtle",
         "--layer-popup",
+        "--pad-x-md",
+        "--pad-y-md",
         "--popover-max-height-menu",
         "--popover-max-width-menu",
         "--popover-radius-menu-md",
-        "--space-200"
+        "--stack-md"
       ]
     },
     {
@@ -11405,6 +11428,10 @@
         "Spacing",
         "DependentFields",
         "LongList",
+        "Async",
+        "AsyncCreatable",
+        "AsyncLoading",
+        "AsyncFailed",
         "Overview",
         "Interactive",
         "Colors",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
@@ -217,6 +217,96 @@ export const LongList = {
             <Select label="Tutor" options={people} recent={['p3']} suggested={['p8', 'p21']} />
         </div>
     )
+};
+
+/** Rows live in a portal on `document.body`, so they are looked up on the whole page. */
+const page = () => within(document.body);
+
+const students = Array.from({ length: 120 }, (_, i) => ({ value: `s${i + 1}`, label: `Student ${i + 1}` }));
+
+/** A server stand-in: filters by the typed text and answers a page after a short wait. */
+const loadStudents = (query, { offset, limit }) => new Promise((resolve) => {
+    const matches = students.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()));
+    setTimeout(() => resolve({ options: matches.slice(offset, offset + limit), total: matches.length }), 20);
+});
+
+/**
+ * Async — `loadOptions` pages in 50 at a time as the list opens, as you type and
+ * as you scroll, and the list says how many there are. Typing is on with it.
+ */
+export const Async = {
+    render: () => (
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+            <Select label="Student" loadOptions={loadStudents} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const field = within(canvasElement).getByRole('combobox', { name: 'Student' });
+        await userEvent.click(field);
+        await expect(await page().findByText('Showing 50 of 120')).toBeInTheDocument();
+
+        const body = page().getByRole('listbox').closest('.plus-listbox-body');
+        body.scrollTop = body.scrollHeight;
+        fireEvent.scroll(body);
+        await expect(await page().findByText('Showing 100 of 120')).toBeInTheDocument();
+
+        await userEvent.type(field, 'Student 11');
+        await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(11));
+        await expect(page().queryByText(/^Showing/)).toBeNull();
+    },
+};
+
+/** AsyncCreatable — `isCreatable` works over loaded options: what nothing matches can be created. */
+export const AsyncCreatable = {
+    render: () => (
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+            <Select label="Student" isCreatable loadOptions={loadStudents} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const field = within(canvasElement).getByRole('combobox', { name: 'Student' });
+        await userEvent.click(field);
+        await userEvent.type(field, 'Zoe Park');
+        await userEvent.click(await page().findByRole('option', { name: /Create\s+Zoe Park/ }));
+        await waitFor(() => expect(field).toHaveValue('Zoe Park'));
+    },
+};
+
+/** Until the first page arrives, the list shows one "Loading options" row. Never skeleton rows. */
+export const AsyncLoading = {
+    render: () => (
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+            <Select label="Teacher" options={[]} isLoading defaultOpen />
+        </div>
+    ),
+    play: async () => {
+        // The list also announces it, so the row is found by its own class.
+        await waitFor(() => expect(document.querySelector('.plus-listbox-message--loading')).toHaveTextContent('Loading options'));
+    },
+};
+
+/** When a request fails, the list says "Couldn't load options" with Retry, which asks for the same page again. */
+export const AsyncFailed = {
+    render: () => {
+        const calls = React.useRef(0);
+        const loadOptions = (query, paging) => {
+            calls.current += 1;
+            return calls.current === 1 ? Promise.reject(new Error('offline')) : loadStudents(query, paging);
+        };
+        return (
+            <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+                <Select label="Student" loadOptions={loadOptions} />
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const field = within(canvasElement).getByRole('combobox', { name: 'Student' });
+        await userEvent.click(field);
+        await waitFor(() => expect(document.querySelector('.plus-listbox-message--error')).toHaveTextContent("Couldn't load options"));
+        await userEvent.click(page().getByRole('button', { name: 'Retry' }));
+        await expect(await page().findByText('Showing 50 of 120')).toBeInTheDocument();
+        await expect(document.querySelector('.plus-listbox-message--error')).toBeNull();
+    },
 };
 
 /** Overview — Single-select default for docs landing. */

@@ -12,9 +12,6 @@
         "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.scss": {
           "count": 1
         },
-        "design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss": {
-          "count": 1
-        },
         "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss": {
           "count": 1
         },
@@ -58,7 +55,7 @@
           "count": 10
         },
         "design-system/src/components/messaging/Modal/Modal.scss": {
-          "count": 2
+          "count": 1
         },
         "design-system/src/components/messaging/Spotlight/Spotlight.scss": {
           "count": 14

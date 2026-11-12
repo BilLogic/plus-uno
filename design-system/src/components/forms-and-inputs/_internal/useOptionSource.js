@@ -29,7 +29,7 @@ export const labelOf = (option) => (typeof option.label === 'string' ? option.la
  */
 export default function useOptionSource({ options, loadOptions, filter, shown, listId }) {
     const [created, setCreated] = useState([]);
-    const [loaded, setLoaded] = useState({ query: null, options: [], total: 0, busy: false });
+    const [loaded, setLoaded] = useState({ query: null, options: [], total: 0, busy: false, failed: null });
     const known = useRef(new Map());
     const all = useMemo(
         () => [...(loadOptions ? loaded.options : options), ...created],
@@ -55,7 +55,7 @@ export default function useOptionSource({ options, loadOptions, filter, shown, l
     const hasLoader = Boolean(loadOptions);
     const load = useCallback((text, offset) => {
         const ticket = ++request.current;
-        setLoaded((prev) => ({ ...prev, busy: true, ...(offset === 0 ? { query: text } : {}) }));
+        setLoaded((prev) => ({ ...prev, busy: true, failed: null, ...(offset === 0 ? { query: text } : {}) }));
         Promise.resolve(loadOptionsRef.current(text, { offset, limit: PAGE_SIZE })).then((result) => {
             if (ticket !== request.current) return;
             setLoaded((prev) => ({
@@ -63,9 +63,10 @@ export default function useOptionSource({ options, loadOptions, filter, shown, l
                 options: offset === 0 ? result.options : [...prev.options, ...result.options],
                 total: result.total ?? result.options.length,
                 busy: false,
+                failed: null,
             }));
         }, () => {
-            if (ticket === request.current) setLoaded((prev) => ({ ...prev, busy: false }));
+            if (ticket === request.current) setLoaded((prev) => ({ ...prev, busy: false, failed: offset }));
         });
     }, []);
 
@@ -75,7 +76,12 @@ export default function useOptionSource({ options, loadOptions, filter, shown, l
 
     const more = hasLoader && loaded.options.length < loaded.total;
     const loadMore = () => {
-        if (more && !loaded.busy) load(filter, loaded.options.length);
+        // A failed page waits for Retry rather than asking again on every scroll.
+        if (more && !loaded.busy && loaded.failed === null) load(filter, loaded.options.length);
+    };
+    // Retry asks again for the page that failed: the first, or the next.
+    const retry = () => {
+        if (!loaded.busy && loaded.failed !== null) load(filter, loaded.failed);
     };
 
     /* ---------- the next page on scroll ---------- */
@@ -103,6 +109,10 @@ export default function useOptionSource({ options, loadOptions, filter, shown, l
             total: loaded.total,
             busy: loaded.busy,
             more,
+            /** The last request failed: on the first page of a search, or on a later one. `retry` asks for it again. */
+            failed: loaded.failed !== null,
+            firstFailed: loaded.failed === 0,
+            retry,
             /** The first page is on its way and the list has nothing to show yet. */
             firstPage: hasLoader && loaded.busy && loaded.options.length === 0,
         },

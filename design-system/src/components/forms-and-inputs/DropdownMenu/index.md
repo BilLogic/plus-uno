@@ -10,7 +10,7 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 **Source:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, HoveredState, KeyboardFocus
+**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, HoveredState, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.mdx`
 
@@ -18,7 +18,7 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 Use a dropdown menu for a trigger that opens a list of actions or navigation links. Its rows are the public Menu family: Section, Button item, Link item and Custom item. For picking one value from a list of options, use Select: a dropdown menu is for actions, a select is for a value.
 
-`trigger` is the element that opens it, `children` are its rows. `isOpen` and `onOpenChange` make it controlled; left uncontrolled it opens and closes on its own. `placement` and `shouldFlip` govern where it opens and whether it flips when there is no room. `spacing` is `cozy` (40 rows, the default) or `compact` (32). `loading` swaps the rows for a spinner while its options are still being fetched.
+`trigger` is the element that opens it, `children` are its rows. `isOpen` and `onOpenChange` make it controlled; left uncontrolled it opens and closes on its own. `placement` and `shouldFlip` govern where it opens and whether it flips when there is no room. `spacing` is `cozy` (40 rows, the default) or `compact` (32). `loading` swaps the rows for one Loading options row while its options are still being fetched; after a failure, `hasError` shows Couldn't load options with a Retry row that calls `onRetry`. A menu never draws skeleton rows.
 
 ## Best practices
 
@@ -102,7 +102,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Selected row | `--ds-background-selected`. |
 | Focused trigger | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
 | Disabled row | Text takes `--ds-text-disabled`; out of the tab order. |
-| Loading | A spinner replaces the rows. |
+| Loading | One "Loading options" row with a 16 spinner replaces the rows, in `--ds-text-subtle`. |
+| Load failed | A "Couldn't load options" row with an alert icon, then a Retry row. |
 
 ### Tokens
 
@@ -135,7 +136,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `placement` | enum | `'bottom-start'` | Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side. |
 | `shouldFlip` | bool | `true` | Flips to the opposite side when there isn't room. |
 | `spacing` | enum | `'cozy'` | `cozy` draws 40px rows (default), `compact` draws 32px. |
-| `loading` | bool | `false` | Draws a spinner in place of the menu's rows while its options load. |
+| `loading` | bool | `false` | Shows one "Loading options" row, with a spinner, in place of the menu's rows while its options load. Never skeleton rows. |
+| `hasError` | bool | `false` | Shows "Couldn't load options" with a Retry row in place of the menu's rows, after loading failed. |
+| `onRetry` | func | — | Called when Retry is pressed. The menu stays open. |
 | `minWidth` | string | — | Minimum width of the menu list, as a CSS length such as `240px`. |
 | `maxHeight` | string | — | Maximum height of the menu list, as a CSS length such as `320px`. |
 | `container` | object | — | Where the menu portals to. Defaults to the page. |
@@ -153,7 +156,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--layer-popup` · `--popover-max-height-menu` · `--popover-max-width-menu` · `--popover-radius-menu-md` · `--space-200`
+`--body-default` · `--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text-subtle` · `--layer-popup` · `--pad-x-md` · `--pad-y-md` · `--popover-max-height-menu` · `--popover-max-width-menu` · `--popover-radius-menu-md` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss`. Override these through the token layer, never with a literal.
 

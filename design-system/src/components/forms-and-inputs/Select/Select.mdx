@@ -72,6 +72,14 @@ type. A short list, such as a filter menu's, turns typing off with
 
 <ComponentExample of={SelectStories.LongList} title="Long list" description="Past 50 options, Recent and Suggested come first and typing searches the rest." />
 
+<ComponentExample of={SelectStories.Async} title="Async" description="loadOptions fetches 50 at a time as the list opens, as you type and as you scroll, and the list says how many there are." />
+
+<ComponentExample of={SelectStories.AsyncCreatable} title="Async and creatable" description="isCreatable works over loaded options: text nothing matches can be created." />
+
+<ComponentExample of={SelectStories.AsyncLoading} title="Loading options" description="Until the first page arrives the list shows one Loading options row, never skeleton rows." />
+
+<ComponentExample of={SelectStories.AsyncFailed} title="Couldn't load options" description="When a request fails the list says so with a Retry button, which asks for the same page again." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -274,6 +282,26 @@ where firing once, on close, avoids re-querying on every checkbox click.
 
 `recent` and `suggested` only change the order past 50 static options;
 `loadOptions` is for a list too large to ship as a static array at all.
+
+`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`.
+The first page loads as the list opens and again whenever the typed text
+changes; the next page loads as the list scrolls near its end, 50 at a time,
+and an older answer never overwrites a newer one. `isCreatable` works with it.
+
+```jsx
+<Select
+    label="Student"
+    isCreatable
+    loadOptions={(text, { offset, limit }) => fetchStudents(text, offset, limit)}
+/>
+```
+
+While a page is on its way the list shows one "Loading options" row; a Select
+never draws skeleton rows. If the request fails the list shows "Couldn't load
+options" with a Retry button, and Enter in the field retries too. A later page
+that fails keeps the rows already loaded and puts the same message in the
+footer. Options fade in one after another, 20 ms apart, the wait capped at
+500 ms; reduced motion shows them at once.
 
 </div>
 

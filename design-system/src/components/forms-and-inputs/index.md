@@ -17,7 +17,7 @@ authored half, counted rather than assumed.
 | [Comment](Comment/index.md) | 14 | ✅ | ✅ | ✅ |
 | [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
 | [DateTimePicker](DateTimePicker/index.md) | 30 | ✅ | ✅ | ✅ |
-| [DropdownMenu](DropdownMenu/index.md) | 15 | ✅ | ✅ | ✅ |
+| [DropdownMenu](DropdownMenu/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Fieldset](Fieldset.md) | 8 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload/index.md) | 17 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✅ | ✅ | ✅ |
