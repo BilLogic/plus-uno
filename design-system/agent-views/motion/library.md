@@ -88,6 +88,9 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Overflow | pattern | fold-close | Open and close an overlay | `--ds-motion-spatial-exit` |
 | Overflow | pattern | truncate | Update a value or state | `--ds-motion-appearance-fast` |
 | Read-only | pattern | change | Update a value or state | `--ds-motion-appearance-fast` |
+| Search | pattern | grow | Swap content in place | `--ds-motion-spatial-fast` |
+| Search | pattern | narrow | Swap content in place | `--ds-motion-appearance-fast` |
+| Search | pattern | shrink | Swap content in place | `--ds-motion-spatial-fast` |
 | Accordion | component | change | Expand and collapse | `--ds-motion-spatial-fast` |
 | AiMessage | component | change | Load content | `--ds-motion-appearance-fast` |
 | Banner | component | enter | Add or remove an item | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |

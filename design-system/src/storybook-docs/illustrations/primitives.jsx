@@ -249,6 +249,21 @@ export const Row = ({ x, y, w, accent = false }) => (
   </g>
 );
 
+/**
+ * Overflow: a header row that stays put while rows scroll under it. It sits on
+ * the page surface and takes the overflow shadow, the one level with no surface
+ * of its own. Rows draw first so the header covers them.
+ */
+export const StickyHeader = ({ x, y, w, h = 64, accent = false }) => (
+  <g>
+    {Array.from({ length: Math.max(1, Math.floor((h - 10) / 15)) }, (_, i) => <Row key={i} x={x} y={y + 10 + i * 15} w={w} />)}
+    <Layer x={x} y={y} w={w} h={16} fill={PAINT.pageSurface} shadow={PAINT.overflowShadow} />
+    {accent && <AccentRing x={x} y={y} w={w} h={16} />}
+    <SkeletonBar x={x + 16} y={y + 6} w={w * 0.2} heading />
+    <SkeletonBar x={x + w * 0.5} y={y + 6} w={w * 0.14} heading />
+  </g>
+);
+
 /** A single-line field: --height-250 (40) halved. */
 const FIELD_H = 20;
 

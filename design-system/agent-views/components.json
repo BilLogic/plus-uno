@@ -4764,6 +4764,15 @@
           "values": null,
           "description": "Small text beside the title, such as \"11 mins ago\".",
           "deprecated": null
+        },
+        {
+          "name": "reducedMotion",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting.",
+          "deprecated": null
         }
       ],
       "stories": [
@@ -4782,7 +4791,9 @@
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "StackClosesUp",
+        "StackClosesUpReduced"
       ],
       "tokens": [
         "--body-default",

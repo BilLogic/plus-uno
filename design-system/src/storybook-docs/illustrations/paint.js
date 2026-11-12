@@ -62,6 +62,8 @@ const ROLES = {
   placeholderHeading: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
   // Table row
   rowDivider: ['--ds-border', 'components/text-and-data-display/Table/Table.scss'],
+  // Overflow: a part that stays put while content scrolls under it, such as a sticky table header
+  overflowShadow: ['--ds-shadow-overflow', 'patterns/PatternTable/PatternTable.scss'],
   rowSelected: ['--ds-background-selected', 'components/text-and-data-display/Table/Table.scss'],
   // Field
   fieldSurface: ['--ds-background-input', 'components/forms-and-inputs/_internal/FieldBox.scss'],
