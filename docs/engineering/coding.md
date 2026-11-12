@@ -78,7 +78,7 @@ A component names a before or after slot by what the slot accepts, so the right 
 | `icon` | the single icon of an icon-led component | Icon button, Banner, Section message, Empty state, Tile, Modal, Rating |
 | `trailingMetric` | the count after a label | Tag, Status tag, Filter button |
 
-`leadingVisual`, `trailingVisual` and a bare `leading` slot are retired; `npm run check:slot-names` fails on them. One known exception: the internal field box (`forms-and-inputs/_internal/FieldBox.jsx`) still takes `trailing` for its end slot, which every field built on it passes, until it is renamed to `elemAfter`.
+`leadingVisual`, `trailingVisual` and a bare `leading` slot are retired; `npm run check:slot-names` fails on them.
 
 ## Token usage
 

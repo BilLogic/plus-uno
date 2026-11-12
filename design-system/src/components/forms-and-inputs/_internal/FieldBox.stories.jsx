@@ -40,7 +40,7 @@ export const Anatomy = () => (
     <div style={row}>
         <FieldBox
             elemBefore={<i className={iconClass('magnifying-glass')} aria-hidden="true" />}
-            trailing={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
+            elemAfter={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
         >
             {control('Search tutors')}
         </FieldBox>
@@ -156,7 +156,7 @@ export const Subtle = () => (
                     subtle
                     {...props}
                     data-testid={name}
-                    trailing={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
+                    elemAfter={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
                 >
                     {control(`Grade level, ${name}`, { defaultValue: '8th grade' })}
                 </FieldBox>

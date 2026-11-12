@@ -447,7 +447,7 @@ const Select = ({
                     disabled={disabled}
                     readOnly={isReadOnly}
                     {...tones.field}
-                    trailing={trailing}
+                    elemAfter={trailing}
                     onClick={handleFieldClick}
                 >
                     {chips}

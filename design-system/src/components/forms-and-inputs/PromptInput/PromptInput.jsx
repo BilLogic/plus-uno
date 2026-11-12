@@ -127,7 +127,7 @@ const PromptInput = ({
                     state={state === 'focus' ? 'focus' : undefined}
                     className="plus-prompt-input__field"
                     elemBefore={startSlot}
-                    trailing={trailing}
+                    elemAfter={trailing}
                 >
                     <textarea
                         id={fieldId}
