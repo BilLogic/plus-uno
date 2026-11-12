@@ -251,7 +251,10 @@ export const Selection = {
         await expect(all).toHaveAttribute('aria-checked', 'mixed');
         const bar = headRow().querySelector('.plus-dynamic-table-bulk');
         await expect(bar, 'the head row is the bulk bar').toHaveTextContent('1 selected');
-        await expect(canvas.getByRole('status'), 'announced from the first selection').toHaveTextContent('1 selected');
+        // The toolbar's result count is its own live region; the selection count is the one that says "selected".
+        const selectionLive = canvas.getAllByRole('status').filter((node) => /selected/.test(node.textContent));
+        await expect(selectionLive, 'one live region announces the selection').toHaveLength(1);
+        await expect(selectionLive[0], 'announced from the first selection').toHaveTextContent('1 selected');
         await expect(bar.querySelector('.plus-table-bulk-actions__count')).not.toHaveAttribute('aria-live');
         await expect(headRow().getBoundingClientRect().height, 'the row keeps its height').toBe(restHeight);
         await expect(canvas.getByText('Marcus Lee').closest('tr')).toHaveAttribute('aria-selected', 'true');

@@ -179,7 +179,7 @@ When a person asks for reduced motion, product motion is off and instant. It is 
 
 - Under `prefers-reduced-motion: reduce` every `--motion-duration-*` token becomes 0 ms, so components that read the tokens comply without a branch of their own. Jump to the final state, so nothing is left half-transparent.
 - Never flash, oscillate rapidly or sweep large areas of the screen, whether or not reduced motion is on.
-- Replace a rotating Spinner with a static icon and the word Loading, so the status still reads. A Skeleton becomes a flat fill with no sweep.
+- A Spinner holds its ring still, and its hidden label still names the wait. A Skeleton becomes a flat fill with no sweep.
 - Charts draw their final state with no intro. Characters show the rest pose.
 - Nothing is communicated by motion alone.
 - Verify every flow is fully usable with all motion turned off.

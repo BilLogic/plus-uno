@@ -28,13 +28,13 @@ options belong in view as a `RadioGroup` (one pick) or a Checkbox group
 | 6 or more options | `Select`, searchable by default |
 | A list held on a server, too large to ship | `Select` with `loadOptions` |
 | Options in a hierarchy | `Cascader` or `TreeSelect` |
-| Narrowing a table or list from a bar | The tiers of the Filtering pattern |
+| Narrowing a table from a bar | The tiers of the Filtering pattern |
 | An action run from a button | `DropdownMenu` |
 
-### Turn typing off for a short filter list.
+### Turn typing off for a short set of choices.
 
-Typing is on because most lists are long enough to need it. A filter menu that
-holds one short list, applied as you pick, has nothing to search: pass
+Typing is on because most lists are long enough to need it. A menu that
+holds a few choices, applied as you pick, has nothing to search: pass
 `isSearchable={false}` so the field stays a plain trigger and Space opens it.
 
 ## Best practices

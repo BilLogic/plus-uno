@@ -141,7 +141,7 @@
 }
 
 /*
- * The button a TEXT trigger becomes.
+ * #321. The button a TEXT trigger becomes.
  *
  * `<Popup trigger="Learn more">` renders a real `button` — it carries the
  * role, its own text as the accessible name, and Enter/Space. This rule makes

@@ -351,6 +351,7 @@ export const FAMILIES = [
   { family: 'skeleton', prefix: '--skeleton-', what: 'Skeleton preset heights and widths' },
   { family: 'flag', prefix: '--flag-', what: 'the Flag minimum height, pad and offset' },
   { family: 'spotlight', prefix: '--spotlight-', what: 'the Spotlight media height' },
+  { family: 'ai-chat', prefix: '--ai-chat-', what: 'the AI chat width' },
   { family: 'menu-group', prefix: '--menu-group-', what: 'Menu group minimum width, pad and gap' },
   { family: 'popup', prefix: '--popup-', what: 'the Popup pad' },
   { family: 'avatar', prefix: '--avatar-', what: 'the two largest Avatar sizes, 96 and 128' },
