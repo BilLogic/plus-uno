@@ -5,7 +5,7 @@
  *
  *   readDocsPage(source, {kind?, root?, file?})   the page model:
  *     { kind, title, intro, sections, alternatives, rules, related, aliases, figmaMeta }
- *       title         a foundation page's FoundationHero title, or the page's `#` heading, or null
+ *       title         a foundation page's FoundationHero or DocsLanding title, or the page's `#` heading, or null
  *       sections      [{title, level, text, subsections: [{title, level, text}]}]
  *       alternatives  [{text, routesTo}]  the lines under Alternatives, each with the component it names
  *       rules         [{id, sentence, text, tag}]  one per `###` under Best practices, id from the slug,
@@ -438,6 +438,8 @@ function elementText(el) {
       return `\n\n### ${valueText(attrs.title)}\n\n${kids()}\n\n`;
     case 'FoundationHero':
       return attrs.summary ? block(valueText(attrs.summary)) : '';
+    case 'DocsLanding':
+      return attrs.purpose ? block(valueText(attrs.purpose)) : '';
     case 'TokenTable':
       return tokenTable(attrs);
     case 'RefTable':
@@ -654,7 +656,7 @@ export function readDocsPage(source, { kind, root, file } = {}) {
   const tags = ruleTags(src);
   return {
     kind: pageKind,
-    title: src.match(/<FoundationHero\b[^>]*?\btitle=["']([^"']*)["']/)?.[1] ?? src.match(/<Title>([^<]+)<\/Title>/)?.[1].trim() ?? heads.find((h) => h.level === 1)?.title ?? null,
+    title: src.match(/<(?:FoundationHero|DocsLanding)\b[^>]*?\btitle=["']([^"']*)["']/s)?.[1] ?? src.match(/<Title>([^<]+)<\/Title>/)?.[1].trim() ?? heads.find((h) => h.level === 1)?.title ?? null,
     intro: before.split(/\n\s*\n/).map((p) => p.trim()).filter((p) => p && !p.startsWith('#')).join('\n\n'),
     sections,
     alternatives: linesOf(sectionNamed(sections, 'Alternatives')?.text).map((text) => ({ text, routesTo: routeOf(text) })),

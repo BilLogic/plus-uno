@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -14,12 +13,22 @@ import * as ColorsStories from './Colors.stories.jsx';
 
 <Meta of={ColorsStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-color"
+    eyebrow="Foundation"
     title="Color"
-    summary="Every color is a --ds token named for its job."
+    purpose="Every color is a --ds token named for its job."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Naming', href: '#foundation-how-the-tokens-are-built' },
+            { title: 'Roles', href: '#foundation-roles' },
+            { title: 'Surfaces', href: '#foundation-surfaces' },
+            { title: 'States', href: '#foundation-states' },
+            { title: 'Chart', href: '#foundation-data-viz-color' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

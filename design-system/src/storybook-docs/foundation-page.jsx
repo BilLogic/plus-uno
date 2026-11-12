@@ -134,7 +134,7 @@ export const FoundationExample = ({ caption, children }) => (
 
 /** Prose with paragraph rhythm, for sections written as sentences. */
 export const FoundationProse = ({ children }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-sm)', font: 'var(--body-default)', color: 'var(--ds-text)', maxWidth: '72ch' }}>
+    <div className="sb-docs-measure" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
         {children}
     </div>
 );
