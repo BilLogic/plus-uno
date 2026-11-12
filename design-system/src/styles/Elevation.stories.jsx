@@ -137,6 +137,9 @@ export const SlotTable = {
         await waitFor(() => expect(canvasElement.querySelectorAll('tbody tr')).toHaveLength(9));
         const ambient = canvasElement.querySelector('[data-row="blocking-ambient"]');
         await waitFor(() => expect(ambient.textContent).toMatch(/\d+ \d+ · \d+ · \d+ · [\d.]+%/));
+        // A value never breaks mid-value: a narrow table scrolls in its own container.
+        await expect(getComputedStyle(ambient.querySelectorAll('td')[1]).whiteSpace).toBe('nowrap');
+        await expect(canvasElement.querySelector('[data-docs-stage]')).not.toBeNull();
     },
 };
 
@@ -164,6 +167,9 @@ export const Layers = {
         await waitFor(() => expect(values.length).toBe(9));
         for (let i = 1; i < values.length; i += 1) await expect(values[i]).toBeGreaterThan(values[i - 1]);
         await expect(canvasElement.querySelector('[data-layer="--layer-dialog"]')).not.toBeNull();
+        // Every row's description is one type role, whatever the row says.
+        const fonts = new Set([...canvasElement.querySelectorAll('[data-layer] > span:not([aria-hidden])')].map((n) => getComputedStyle(n).fontSize));
+        await expect(fonts.size).toBe(1);
     },
 };
 

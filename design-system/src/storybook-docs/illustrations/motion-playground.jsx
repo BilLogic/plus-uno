@@ -108,6 +108,7 @@ export const SpringPlayground = ({ reduced: forcedReduced }) => {
   return (
     <section
       data-playground
+      data-docs-stage
       data-config={JSON.stringify(config)}
       data-played={played ? JSON.stringify(played) : ''}
       data-phase={phase}

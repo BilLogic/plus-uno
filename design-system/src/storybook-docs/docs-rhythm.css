@@ -255,3 +255,31 @@
 .sbdocs .sb-docs-hero__pane--dark > svg {
     inset-inline-start: -100%;
 }
+
+/*
+ * Stage cards: a demo that draws its own card (a motion demo, an elevation or
+ * radius stage) marks its root `data-docs-stage`. The docs canvas around it then
+ * drops its border, fill and padding, so the stage card IS the canvas and fills
+ * it edge to edge: one frame, not a box in a box in a box. The card's own
+ * padding is the only space between its edge and the drawing.
+ */
+.sbdocs .sbdocs-preview:has([data-docs-stage]) {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+
+.sbdocs .sbdocs-preview:has([data-docs-stage]) .docs-story {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+.sbdocs .sbdocs-preview:has([data-docs-stage]) .docs-story > div:first-child {
+    padding: 0 !important;
+}
+
+.sbdocs .sbdocs-preview:has([data-docs-stage]) .innerZoomElementWrapper > * {
+    border-width: 0 !important;
+}
