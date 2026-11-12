@@ -13,7 +13,7 @@ export { default as CloseButton } from '@/components/forms-and-inputs/CloseButto
 export { default as Comment } from '@/components/forms-and-inputs/Comment';
 export { default as DatePicker } from '@/components/forms-and-inputs/DatePicker';
 export { default as DateTimePicker } from '@/components/forms-and-inputs/DateTimePicker';
-export { default as DropdownMenu } from '@/components/forms-and-inputs/DropdownMenu';
+export { default as DropdownMenu, ButtonItem, CustomItem, LinkItem, Section } from '@/components/forms-and-inputs/DropdownMenu';
 export { default as Fieldset } from '@/components/forms-and-inputs/Fieldset';
 export { default as FileUpload } from '@/components/forms-and-inputs/FileUpload';
 export { default as FilterButton, FILTER_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/FilterButton';
@@ -80,7 +80,6 @@ export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightP
 
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';
-export { default as MenuGroup, ButtonItem, CustomItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
 export { default as Pagination, PAGINATION_NAVIGATORS, PAGINATION_SPACINGS } from '@/components/navigation/Pagination';
 export { default as Sidebar } from '@/components/navigation/Sidebar';
 export { default as Tabs } from '@/components/navigation/Tabs';

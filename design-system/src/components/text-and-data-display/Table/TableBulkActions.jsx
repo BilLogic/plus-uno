@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
 import IconButton from '@/components/forms-and-inputs/IconButton';
 import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';
-import { ButtonItem } from '@/components/navigation/MenuGroup';
+import { ButtonItem } from '@/components/forms-and-inputs/_internal/MenuGroup';
 
 /** How many bulk actions show as buttons before the rest move to the overflow menu. */
 const VISIBLE_ACTIONS = 3;

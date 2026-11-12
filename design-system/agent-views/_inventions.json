@@ -79,7 +79,7 @@
     {
       "not": "ListGroup",
       "use": [
-        "MenuGroup",
+        "DropdownMenu",
         "Table"
       ],
       "retired": true

@@ -104,7 +104,7 @@ Don't: Counts and status in the label.
 - For more tabs than fit the width, use `Select` — the strip is `flex-wrap: wrap`, so the overflow becomes a second row of tabs rather than a scroll or an overflow menu, and the row the reader is on stops being obvious.
 - For filtering a list rather than switching between views, use `Select` or `RadioGroup` — filters combine, tabs do not.
 
-Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Pagination` · `Sidebar`
+Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 
 ## Parts
 

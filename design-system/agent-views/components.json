@@ -3560,7 +3560,7 @@
       "import": "import { DropdownMenu } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx",
-      "summary": "DropdownMenu: a trigger that opens a `MenuGroup` of `Menu` items in a floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are the public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`, `Section`) so a dropdown's menu looks exactly like any other menu in the system.",
+      "summary": "DropdownMenu: a trigger that opens a list of menu items in a floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are `ButtonItem`, `LinkItem`, `CustomItem` and `Section`, which this folder's `index.js` re-exports.",
       "props": [
         {
           "name": "trigger",
@@ -6715,121 +6715,6 @@
         "--palette-yellow-250",
         "--palette-yellow-300",
         "--palette-yellow-400"
-      ]
-    },
-    {
-      "name": "MenuGroup",
-      "kind": "component",
-      "import": "import { MenuGroup } from '@/components';",
-      "group": "navigation",
-      "source": "design-system/src/components/navigation/MenuGroup/MenuGroup.jsx",
-      "summary": "MenuGroup: the scrollable list a menu's sections sit in.",
-      "props": [
-        {
-          "name": "density",
-          "type": "enum",
-          "required": false,
-          "default": "'regular'",
-          "values": [
-            "regular",
-            "compact"
-          ],
-          "description": "`regular` (default) or `compact`, the row height.",
-          "deprecated": null
-        },
-        {
-          "name": "maxHeight",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "maxWidth",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "minWidth",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "testId",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "ButtonAndLinkItems",
-        "KeyboardNavigation",
-        "Selected",
-        "CustomRowExample",
-        "Density",
-        "Interactive",
-        "Rest",
-        "Hovered",
-        "Pressed",
-        "Focused",
-        "SelectedRow",
-        "Disabled"
-      ],
-      "tokens": [
-        "--body-default",
-        "--body-small",
-        "--border-default",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected",
-        "--ds-border",
-        "--ds-icon-subtle",
-        "--ds-text",
-        "--ds-text-disabled",
-        "--ds-text-subtle",
-        "--ds-text-subtlest",
-        "--heading-xxsmall",
-        "--menu-group-gap",
-        "--menu-group-item-pad-y",
-        "--menu-group-min-width",
-        "--menu-group-pad-x",
-        "--pad-y-lg",
-        "--pad-y-md",
-        "--radius-lg",
-        "--stack-lg",
-        "--stack-md",
-        "--stack-sm"
       ]
     },
     {

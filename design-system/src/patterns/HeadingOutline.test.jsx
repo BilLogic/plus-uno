@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 // Module paths rather than the barrels, so the rest stays light.
 import PatternCard from './PatternCard';
 import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';
-import { ButtonItem, Section } from '@/components/navigation/MenuGroup';
+import { ButtonItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import Modal from '@/components/messaging/Modal';
 import Sidebar from '@/components/navigation/Sidebar';
 import Table from '@/components/text-and-data-display/Table';
