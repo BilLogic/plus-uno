@@ -4,7 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { Flag, FlagGroup } from '@/components';
-import { InboxFrame } from '../../../patterns/Panel/panelDemo.jsx';
+import { FLOAT_STAGE, InboxFrame } from '../../../patterns/Panel/panelDemo.jsx';
 import { Acknowledge, ModalStage } from '../../../patterns/PatternModal/modalDemo.jsx';
 import {
     FlagOnPage,
@@ -78,7 +78,7 @@ export const CarrierSectionMessage = {
 /** The Inbox: what arrived over time, in the Panel template's Notifications type. */
 export const CarrierInbox = {
     name: 'Carrier: The Inbox',
-    render: () => staged(<InboxFrame />, 1100),
+    render: () => staged(<InboxFrame />, FLOAT_STAGE),
     play: async ({ canvasElement }) => {
         await expect(canvasElement.querySelector('.plus-frame__panel'), 'the Inbox Panel').toHaveAccessibleName('Inbox');
         await fitsCanvas(canvasElement);

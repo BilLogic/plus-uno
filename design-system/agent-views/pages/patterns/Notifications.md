@@ -35,8 +35,8 @@ Use Notifications when the product needs to tell someone something: an action fi
 
 | The message is about… | Carrier | Where | Leaves |
 | --- | --- | --- | --- |
-| Something that already happened and needs no reply: saved, sent, copied | `Flag` | Top right | On its own after 8 s; warning and danger on Dismiss |
-| A job that finished or failed after the person moved on | `Flag` with an action | Top right | On Dismiss |
+| Something that already happened and needs no reply: saved, sent, copied | `Flag` | Top right | On its own after 8 s; warning and error on Dismiss |
+| A job that finished or failed after the person moved on | `Flag` with an action, `autohide={false}` | Top right | On Dismiss |
 | Something to read or act on in this part of the page | `SectionMessage` | Top of the Section or form | Resolved or dismissed |
 | Guidance before a task that must not be missed | `SectionMessage`, dismiss off | By the action it informs | When it stops applying |
 | A condition that holds for everything in a Frame, page or Section | `Banner` at that tier | Top of the tier | When the condition ends |
@@ -95,9 +95,9 @@ Notifications reads these motion tokens and no literal duration or curve.
 
 ### Place Flags at the top right, two lines at most. {#place-flags-at-the-top-right-two-lines-at-most}
 
-**Checked:** Automatic
+**Checked:** Review
 
-A title that names the event and one line for the next step. A `FlagGroup` stacks them newest on top and renders with the page so each one is announced. `FlagGroup` takes `position="top-end"` today; the top right as its default is Planned .
+A title that names the event and one line for the next step. A `FlagGroup` stacks them in the order you pass them, so pass the newest first, and renders with the page so each one is announced. `FlagGroup` takes `position="top-end"` today; the top right as its default is Planned .
 
 ### Put nothing important only in a Flag. {#put-nothing-important-only-in-a-flag}
 
@@ -108,11 +108,11 @@ A Flag can be dismissed before it is read. A failure that needs a decision stays
 Do: A finished action as a success Flag: the event in the title, the next step below.
 Don't: A decision in a Flag, which is gone before it is answered.
 
-### Let routine Flags leave and keep warning and danger until dismissed. {#let-routine-flags-leave-and-keep-warning-and-danger-until-dismissed}
+### Let routine Flags leave and keep warning and error until dismissed. {#let-routine-flags-leave-and-keep-warning-and-error-until-dismissed}
 
 **Checked:** Automatic
 
-Normal, information and success close after 8 s. Warning and error stay until dismissed. A Flag with an action keeps autohide only when the action is optional.
+Normal, information and success close after 8 s. Warning and error stay until dismissed. A Flag with an action keeps autohide only when the action is optional: set `autohide={false}` when the person must act.
 
 ### Show one Banner at a time, one line, at the tier it concerns, for as long as the condition holds. {#show-one-banner-at-a-time-one-line-at-the-tier-it-concerns-for-as-long-as-the-condition-holds}
 
