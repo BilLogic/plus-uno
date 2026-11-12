@@ -10,7 +10,7 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused, StackClosesUp, StackClosesUpReduced
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
@@ -185,6 +185,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | `headerClass` | string | `''` | Extra class on the header row that holds the title and timestamp. |
 | `bodyClass` | string | `''` | Extra class on the description container. |
 | `timestamp` | node | — | Small text beside the title, such as "11 mins ago". |
+| `reducedMotion` | bool | — | Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting. |
 
 ## Variants
 
