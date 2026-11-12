@@ -22,8 +22,8 @@ export const TIERS = ['1', '2a', '2b', '2c', '3'];
 /** The width a tier's picture lays out at: past the Section's 960, so a filter side sits beside its rows. Docs geometry, in px. */
 export const STAGE = 1024;
 
-/** The room a held-open picture keeps under its bar, so the tallest menu (four stacked categories) hangs below its trigger whole. Docs geometry, in px. */
-const OPEN_ROOM = 760;
+/** The room a held-open picture keeps, so its menu hangs below its trigger whole: a stacked menu runs to its max height. Docs geometry, in px. */
+const OPEN_ROOM = { short: 440, stacked: 640 };
 
 /** A Popup reads its column steps against the screen; a picture reads them at this one, in px. Docs geometry. */
 const READ_SCREEN = 1280;
@@ -231,7 +231,7 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
                     boxSizing: 'border-box',
                     // The page's own pad, so a menu at the bar's start is not pushed off its trigger by the picture's edge.
                     padding: 'var(--page-pad)',
-                    minBlockSize: openMenu ? OPEN_ROOM : undefined,
+                    minBlockSize: openMenu ? OPEN_ROOM[tier === '2c' ? 'stacked' : 'short'] : undefined,
                     '--plus-overlay-screen': `${READ_SCREEN}px`,
                 }}
             >
