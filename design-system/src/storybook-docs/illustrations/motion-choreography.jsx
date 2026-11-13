@@ -64,7 +64,7 @@ const unifyScene = ({ id, title, caption, offsets, crossing }) => ({
     <>
       <Frame x={8} y={6} w={144} h={88} />
       {PARTS.map(({ rect, card, heading, row, button }, i) => (
-        <Moved key={i} x={offsets[i][0] * (1 - p)} y={offsets[i][1] * (1 - p)} opacity={p}>
+        <Moved key={i} x={offsets[i][0] * (1 - p)} y={offsets[i][1] * (1 - p)}>
           {card ? (
             <CardBox {...rect} accent />
           ) : row ? (
