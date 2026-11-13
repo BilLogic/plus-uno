@@ -39,6 +39,18 @@ export const REGISTRY = 'design-system/src/storybook-docs/docs-landing/hero-regi
  */
 export const PAGES = [
   { file: 'design-system/src/styles/Colors.mdx', id: 'foundations-color' },
+  { file: 'design-system/src/styles/Accessibility.mdx', id: 'foundations-accessibility' },
+  { file: 'design-system/src/styles/Border.mdx', id: 'foundations-border' },
+  { file: 'design-system/src/styles/Elevation.mdx', id: 'foundations-elevation' },
+  { file: 'design-system/src/styles/FoundationsOverview.mdx', id: 'foundations-overview' },
+  { file: 'design-system/src/styles/Grid.mdx', id: 'foundations-grid' },
+  { file: 'design-system/src/styles/Icons.mdx', id: 'foundations-iconography' },
+  { file: 'design-system/src/styles/Illustrations.mdx', id: 'foundations-illustrations' },
+  { file: 'design-system/src/styles/Logos.mdx', id: 'foundations-logos' },
+  { file: 'design-system/src/styles/Radius.mdx', id: 'foundations-radius' },
+  { file: 'design-system/src/styles/Spacing.mdx', id: 'foundations-spacing' },
+  { file: 'design-system/src/styles/Tokens.mdx', id: 'foundations-tokens' },
+  { file: 'design-system/src/styles/Typography.mdx', id: 'foundations-typography' },
   { file: 'design-system/src/storybook-docs/patterns/PatternsOverview.mdx', id: 'patterns-overview' },
   { file: 'design-system/src/storybook-docs/patterns/CommonActions/CommonActions.mdx', id: 'patterns-actions-and-input-common-actions' },
   { file: 'design-system/src/storybook-docs/patterns/Forms/Forms.mdx', id: 'patterns-actions-and-input-forms' },

@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -15,12 +14,20 @@ import * as GridStories from './Grid.stories.jsx';
 
 <Meta of={GridStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-grid"
+    eyebrow="Foundation"
     title="Layout & Grid"
-    summary="Two 12-column grids with a 16 gutter at every width; page content caps at 1232."
+    purpose="Two 12-column grids with a 16 gutter at every width; page content caps at 1232."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Breakpoints', href: '#foundation-breakpoints' },
+            { title: 'Content widths', href: '#foundation-content-widths' },
+            { title: 'Size roles', href: '#foundation-size-roles' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -24,18 +23,24 @@ import * as RadiusStories from './Radius.stories.jsx';
 
 <Meta of={RadiusStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-radius"
+    eyebrow="Foundation"
     title="Radius"
-    summary="How round a corner is, and which rule decides it. Every corner reads a token."
+    purpose="How round a corner is, and which rule decides it. Every corner reads a token."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Scale', href: '#foundation-scale' },
+            { title: 'Controls', href: '#foundation-controls' },
+            { title: 'Tokens', href: '#foundation-tokens' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 
-A corner's radius comes from where the element sits and what it is. Each part below rounds by its own token, and the legend reads each value from the code.
-
-<Canvas of={RadiusStories.Cover} sourceState="none" />
+A corner's radius comes from where the element sits and what it is. Each part rounds by its own token.
 
 Nine rules decide a corner. Take the first one that matches.
 

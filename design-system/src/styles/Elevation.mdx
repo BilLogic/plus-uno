@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { C, ModeCompare } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -13,12 +12,20 @@ import * as ElevationStories from './Elevation.stories.jsx';
 
 <Meta of={ElevationStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-elevation"
+    eyebrow="Foundation"
     title="Elevation"
-    summary="What sits above what, and whether it blocks. Shadow and surface color show it."
+    purpose="What sits above what, and whether it blocks. Shadow and surface color show it."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Levels', href: '#foundation-the-levels' },
+            { title: 'Shadow', href: '#foundation-shadow-anatomy' },
+            { title: 'Surface color', href: '#foundation-surface-color-and-dark-mode' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

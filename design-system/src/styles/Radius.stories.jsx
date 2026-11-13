@@ -1,11 +1,10 @@
 import React from 'react';
-import { expect, waitFor, within } from 'storybook/test';
+import { expect, waitFor } from 'storybook/test';
 import {
     ButtonInField,
     JoinedGroup,
     NestingDiagram,
     PillExemption,
-    RadiusCover,
     ScaleStrip,
     TemplateMap,
     WindowEdge,
@@ -50,25 +49,6 @@ const expectLegendValue = async (root, part, token, canvasElement) => {
     await expect(item, `legend names ${part}`).not.toBeNull();
     const px = radiusOf(canvasElement, token);
     await waitFor(() => expect(item.querySelector('[data-value]')).toHaveTextContent(px >= 999 ? 'full' : String(px)));
-};
-
-/* ------------------------------------------------------------ overview */
-
-/** One screen with every rule on it, numbered, its values in the legend. */
-export const Cover = {
-    render: () => <RadiusCover />,
-    play: async ({ canvasElement }) => {
-        const root = canvasElement.querySelector('[data-testid="radius-cover"]');
-        await expectNoWords(root);
-        const legend = within(root.querySelector('[data-testid="radius-legend"]'));
-        await expect(legend.getAllByRole('listitem')).toHaveLength(8);
-        await expectLegendValue(root, 'section', '--section-radius', canvasElement);
-        await expectLegendValue(root, 'popup', '--popup-radius', canvasElement);
-        await expectLegendValue(root, 'field', '--radius-control-lg', canvasElement);
-        await expectLegendValue(root, 'button', '--button-radius-default', canvasElement);
-        await expectLegendValue(root, 'pill', '--radius-full', canvasElement);
-        await expect(root.querySelector('[data-legend="page"] [data-value]')).toHaveTextContent('0');
-    },
 };
 
 /* --------------------------------------------------------------- scale */
