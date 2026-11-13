@@ -5,6 +5,7 @@ import './storybook-overrides.css';
 import '../design-system/src/storybook-docs/docs-rhythm.css';
 import { TocDocsContainer } from './docs-toc.jsx';
 import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.js';
+import { mountInPageAnchors } from '../design-system/src/storybook-docs/lib/in-page-anchors.js';
 import BrowserFrame from '../design-system/src/storybook-docs/chrome/BrowserFrame';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
@@ -19,6 +20,7 @@ import { assertContained } from '../design-system/src/storybook-docs/lib/contain
 
 // ---- Docs floating button (AI agent, Marketplace, Uno Blueprint) -----------------------
 mountDocsFab();
+mountInPageAnchors();
 
 // ---- Console noise filters (Storybook-only) ---------------------------------
 // Goal: keep the console clean for design review by hiding known, non-actionable
