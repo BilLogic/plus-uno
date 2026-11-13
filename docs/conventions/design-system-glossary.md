@@ -261,7 +261,7 @@ A design value: color, spacing, typography, elevation, radius.
 A fundamental design primitive (color palette, type scale, grid), and the Figma and Storybook pages that document one. A docs word: the token collections say semantics.
 
 **Token tier**:
-The four levels every spacing token sits on, one Figma collection each and the same in code: `spacing / primitives` → `spacing / semantics` → `spacing / patterns` → `spacing / components`, read as **Primitive** → **Semantic** → **Pattern token** → **Component token**. Color mirrors it with `color / primitives`, `color / semantics` and `color / opacity`; the fallback rule for picking a tier is in `design-system/src/styles/Tokens.mdx` § The four-tier ladder.
+The four levels every spacing token sits on, one Figma collection each and the same in code: `spacing / primitives` → `spacing / semantics` → `spacing / patterns` → `spacing / components`, read as **Primitive** → **Semantic** → **Pattern token** → **Component token**. Color mirrors it with `color / primitives`, `color / semantics` and `color / opacity`; the fallback rule for picking a tier is in `design-system/guidelines/foundations/overview.md` § Token rules.
 _Avoid_: "token layer", "level", "foundations" for a collection
 
 **Primitive**:

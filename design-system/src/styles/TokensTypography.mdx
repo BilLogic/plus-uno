@@ -1,0 +1,40 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    FoundationSection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import { TokenCollection } from '@/storybook-docs/token-collection-blocks.jsx';
+
+<Meta title="Foundations/Tokens/Typography" />
+
+<DocsLanding
+    page="foundations-tokens-typography"
+    eyebrow="Foundation · Tokens"
+    title="Typography"
+    purpose="The type primitives and the text styles built from them: family, weight, size and line height, named once."
+    section="foundations-tokens"
+/>
+
+<FoundationSection title="Overview">
+
+A text style bundles family, weight, size, line height and tracking into one token, so a heading or body line is a single decision. Features bind a text style, never a size on its own.
+
+</FoundationSection>
+
+<TokenCollection
+    collection="typography"
+    primitives={<p>Font sizes and line heights in rem steps, plus the families, weights and tracking values the text styles read.</p>}
+    semantics={<p>Heading, Body, Metric and Code text styles, each a complete `font` value. They are global: no component has a type token of its own.</p>}
+/>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Color', description: 'Roles, surfaces and states.', href: '?path=/docs/foundations-tokens-color--docs' },
+        { title: 'Typography', description: 'Type scale, serif and sans.', href: '?path=/docs/foundations-visual-typography--docs' },
+    ]}
+/>
+
+</FoundationSection>

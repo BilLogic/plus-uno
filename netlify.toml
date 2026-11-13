@@ -258,7 +258,15 @@
 [[redirects]]
   from = "/storybook/"
   query = { path = "/docs/foundations-basics-tokens--docs" }
-  to = "/storybook/?path=/docs/foundations-tokens--docs"
+  to = "/storybook/?path=/docs/foundations-tokens-color--docs"
+  status = 301
+  force = true
+
+# Tokens became a group of collection pages on 2026-11-13; the old single page lands on the first.
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-tokens--docs" }
+  to = "/storybook/?path=/docs/foundations-tokens-color--docs"
   status = 301
   force = true
 

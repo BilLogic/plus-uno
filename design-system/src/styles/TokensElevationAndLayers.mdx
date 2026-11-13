@@ -1,0 +1,39 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    FoundationSection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import { TokenCollection } from '@/storybook-docs/token-collection-blocks.jsx';
+
+<Meta title="Foundations/Tokens/Elevation and layers" />
+
+<DocsLanding
+    page="foundations-tokens-elevation-and-layers"
+    eyebrow="Foundation · Tokens"
+    title="Elevation and layers"
+    purpose="Shadow and opacity for how high a surface sits, and the layer order for what stacks over what."
+    section="foundations-tokens"
+/>
+
+<FoundationSection title="Overview">
+
+Elevation is shown by shadow and surface color; layers decide stacking. Opacity steps live here too.
+
+</FoundationSection>
+
+<TokenCollection
+    collection="elevation"
+    semantics={<p>Global holds the shadow, opacity and layer scale. Templates holds the Frame layers, which order the Sidebar, Topbar and Panel against each other.</p>}
+/>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Elevation', description: 'Surface and shadow.', href: '?path=/docs/foundations-visual-elevation--docs' },
+        { title: 'Color', description: 'Roles, surfaces and states.', href: '?path=/docs/foundations-tokens-color--docs' },
+    ]}
+/>
+
+</FoundationSection>
