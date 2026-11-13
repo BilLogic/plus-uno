@@ -308,7 +308,8 @@ export function sweepItemText(f: PendingFinding): string {
  *  it. Its card's Why line, and Review's Issue (`PendingProposal.issue`). */
 export function sweepIssue(f: PendingFinding): string {
   const at = saidAt(f);
-  return `${capitalized(saidIn(f, true))} said “${escapeSlackText(flat(f.threadSays))}”${at ? ` · <${at}|see it>` : ""}`;
+  // A relayed fix is read in #plus-design, away from its thread.
+  return `${capitalized(saidIn(f, !f.evidence.relayToDesign))} said “${escapeSlackText(flat(f.threadSays))}”${at ? ` · <${at}|see it>` : ""}`;
 }
 
 /** What a sweep fix says at the gate (`PendingProposal.stated`). */

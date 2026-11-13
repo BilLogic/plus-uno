@@ -154,6 +154,9 @@ export interface FindingEvidence {
   messageTs: string[];
   /** Their permalinks, fetched rather than built, when a fetch succeeded. */
   permalinks: string[];
+  /** Set when the channel relays to #plus-design (`SWEEP_RELAY_TO_DESIGN`):
+   *  the finding goes there rather than back into its thread. */
+  relayToDesign?: true;
   /** Set when the evidence is a note or a card rather than a message:
    *  `channel` is then the source's queue name and `threadTs` null. */
   record?: RecordEvidence;

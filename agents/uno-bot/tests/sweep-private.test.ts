@@ -111,6 +111,34 @@ test("a public drift and a private drift make two cards, each in its own thread,
   assert.equal(privateStaged.sweepShare, undefined, "a private channel's card never offers to share");
 });
 
+test("a relayed channel is swept, but its cards go to #plus-design and tag only people in #plus-design", async () => {
+  const priv = thread({ user: "U0BILL", when: ts(29, 15, 30), pages: [PAGE_B.url] }, [
+    { user: "U0DEV", when: ts(29, 17), text: "Owner is Quinn now" },
+  ]);
+  const h = sweepHarness({
+    channels: {
+      [DESIGN]: { kind: "public", history: [], threads: {}, members: ["U0BILL", "U0CY"] },
+      [FEEDBACK]: place("private", priv, ["U0BILL", "U0DEV", "U0CY"]),
+    },
+    sources: [PAGE_B],
+    people: { "Cy Contributor": "U0CY" },
+    privateAllowlist: [FEEDBACK],
+    relayToDesign: [FEEDBACK],
+    // The developer who said it claims it, but is not in #plus-design.
+    detectorReplies: [reply(drift({ source: PAGE_B, block: PAGE_B.blocks[1]!.id, evidence: [ts(29, 17)], claimedBy: "U0DEV", replacement: "Owner: Quinn" }))],
+    now: at(29, 22),
+  });
+
+  await runSweepJob(nightOf(FEEDBACK), h.deps);
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+
+  assert.deepEqual(h.posted.map((p) => [p.channel, p.threadTs]), [[DESIGN, null]], "one top-level post in #plus-design, none in the feedback thread");
+  const said = [h.posted[0]!.text, JSON.stringify(h.posted[0]!.blocks), ...h.staged.map((p) => p.proposalText)].join("\n");
+  assert.doesNotMatch(said, /<@U0DEV>/, "someone outside #plus-design is not tagged");
+  assert.match(said, /<@U0CY>/, "the card's Contributor in #plus-design owns it");
+});
+
 test("a fix whose evidence spans a public and a private thread lands only on the private card", async () => {
   const pub = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
   const priv = thread({ user: "U0PRIV", when: ts(29, 15, 30), pages: [PAGE_A.url] }, [{ user: "U0QUIET", when: ts(29, 17) }]);

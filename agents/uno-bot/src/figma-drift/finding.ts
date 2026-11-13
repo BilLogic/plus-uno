@@ -140,6 +140,8 @@ export function askGroupOf(f: Pick<FileDriftFinding, "fileKey" | "evidence">): s
 export interface FileDriftInput {
   channel: string;
   channelKind: ChannelKind;
+  /** Set for a channel that relays to #plus-design (`relaysToDesign`). */
+  relayToDesign?: true;
   rootTs: string;
   runDate: string;
   now: number;
@@ -177,6 +179,7 @@ export function fileDriftFinding(input: FileDriftInput): FileDriftFinding | null
     evidence: {
       channel: input.channel,
       channelKind: input.channelKind,
+      ...(input.relayToDesign ? { relayToDesign: true as const } : {}),
       threadTs: input.rootTs,
       messageTs: [...input.evidenceTs],
       permalinks: input.permalinks ?? [],

@@ -274,6 +274,10 @@ FIGMA_DEV_LINKS = "on"
 # is swept. Dry run: GET /debug/sweep?dry_run=1.
 #   plus-design C03FC8AS69K · plus-design-feedback C074QG2V7DJ (private)
 SWEEP_CHANNELS = "C03FC8AS69K,C074QG2V7DJ"
+# Swept channels whose findings and card to-dos post on #plus-design's morning
+# message instead of back in their own thread (ADR-031, 2026-11-13 addendum):
+# #plus-design-feedback, where supervisors and developers give feedback.
+SWEEP_RELAY_TO_DESIGN = "C074QG2V7DJ"
 # #plus-design-feedback channel id — shareout_post drops feedback bundles here
 # (distinct from the reviews channel above). Leave blank → shareout falls back
 # to the origin thread.

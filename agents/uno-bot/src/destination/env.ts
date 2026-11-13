@@ -20,6 +20,10 @@ export function channelIdsFor(env: Env): ChannelIds {
     plusTraining: set(env.PLUS_TRAINING_CHANNEL_ID),
     plusMarketing: set(env.PLUS_MARKETING_CHANNEL_ID),
     unoBot: set(env.UNO_BOT_CHANNEL_ID),
+    relayToDesign: (env.SWEEP_RELAY_TO_DESIGN ?? "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean),
   };
 }
 

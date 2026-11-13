@@ -118,7 +118,7 @@
 // suite runs whole days against fakes (tests/sweep-run.test.ts). `Env` enters
 // in `./env.ts`.
 
-import { CHANNEL_ROLES, PILLAR_CHANNELS, channelIdOf, teamOfChannel, type ChannelIds } from "../destination/index";
+import { CHANNEL_ROLES, PILLAR_CHANNELS, channelIdOf, relaysToDesign, teamOfChannel, type ChannelIds } from "../destination/index";
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { HistoryMessage } from "../slack/api";
 import { proposalReplyThread, type OwnerLine, type PendingProposal, type ProposalOperation, type ReportItem, type ThreadState } from "../thread-state/index";
@@ -158,7 +158,7 @@ import { sweepFigmaComments } from "../figma-comments/read";
 import { postFigmaDecisions } from "../figma-comments/post";
 import type { QueuedFile, SweepFigmaComments } from "../figma-comments/queue";
 import { draftRow, rowUpdateOf, rowWords, type DecisionRow } from "../decisions-db/row";
-import { escapeSlackText } from "../slack/mrkdwn";
+import { escapeSlackText, toPlainText } from "../slack/mrkdwn";
 import { isActive, notionPersonOfSlack, type ActivePeople, type NotionPeople } from "../usage/roles";
 import { readUsable, searchGate } from "./surfaces";
 import { findBySearch, looksAnswered, namedThings, questionQuery, type SourceSearch } from "./search";
@@ -719,13 +719,17 @@ async function sweepChannel(
   let reached = cursor;
   const notes: string[] = [];
   const resolved = new Map<string, string | null>();
+  // A relayed channel's cards go to #plus-design (`relaysToDesign`), so its
+  // owners are people there: the members read are #plus-design's.
+  const relayed = kind !== "dm" && kind !== "group-dm" && relaysToDesign(channel, deps.config);
+  const ownersIn = relayed ? deps.config.plusDesign?.trim() || null : channel;
   // A private place's members, read once, the first time a Contributor is
   // about to be named owner there.
   let members: Promise<ReadonlySet<string>> | undefined;
   // A DM's one member beside uno-bot is its person, who is its owner anyway:
   // no Contributor elsewhere is named there.
   const membersOf = (): Promise<ReadonlySet<string>> =>
-    (members ??= (kind === "dm" ? Promise.resolve(null) : deps.slack.members ? deps.slack.members(channel) : Promise.resolve(null)).then(
+    (members ??= (kind === "dm" || !ownersIn ? Promise.resolve(null) : deps.slack.members ? deps.slack.members(ownersIn) : Promise.resolve(null)).then(
       (m) => new Set(m ?? []),
     ));
 
@@ -770,6 +774,7 @@ async function sweepChannel(
           ...(dm ? { dm } : {}),
           channel,
           channelKind: kind,
+          ...(relayed ? { relayed } : {}),
           rootTs: unit.root.ts,
           humans,
           runDate,
@@ -882,7 +887,11 @@ async function sweepThread(
     runDate: string;
     now: number;
     resolved: Map<string, string | null>;
-    /** The place's members — read only for a place that is not public. */
+    /** Set when the channel relays to #plus-design: its findings go there
+     *  (`relaysToDesign`), and only people in #plus-design own them. */
+    relayed?: boolean;
+    /** The place's members — read only for a place that is not public; for a
+     *  relayed channel, #plus-design's. */
     membersOf: () => Promise<ReadonlySet<string>>;
     /** A DM thread's verdict (`DmThreadVerdict`), and uno-bot's own messages
      *  there, whose links are followed but whose words are never evidence. */
@@ -998,16 +1007,19 @@ async function sweepThread(
     const cardContributors = d.source.contributors.length
       ? d.source.contributors
       : sources.flatMap((s) => s.contributors);
-    const named = claimed ? [] : await contributorsOf(deps, cardContributors, t.resolved);
+    // From a relayed channel the claimer may not be in #plus-design, so the
+    // Contributors are looked up as the fallback anyway (`ownerOf`).
+    const named = claimed && !t.relayed ? [] : await contributorsOf(deps, cardContributors, t.resolved);
     // In a private place the owner is someone in it: a Contributor outside it
     // could not see the card, and naming them there would reach past it.
     const contributorIds =
-      t.channelKind === "public" || !named.length ? named : await inPlace(named, t.membersOf);
-    const { owner } = routeOwner({ claimedBy: d.claimedBy, participants, contributorIds, starter: root.user });
+      (t.channelKind === "public" && !t.relayed) || !named.length ? named : await inPlace(named, t.membersOf);
+    const { owner } = await ownerOf(t, { claimedBy: d.claimedBy, participants, contributorIds, starter: root.user });
     if (!writable) {
       const drift = fileDriftFinding({
         channel: t.channel,
         channelKind: t.channelKind,
+        ...(t.relayed ? { relayToDesign: true } : {}),
         rootTs: t.rootTs,
         runDate: t.runDate,
         now: t.now,
@@ -1051,7 +1063,7 @@ async function sweepThread(
       sourceSays: d.sourceSays,
       threadSays: d.threadSays,
       replacement: d.replacement,
-      evidence: { channel: t.channel, channelKind: t.channelKind, threadTs: t.rootTs, messageTs: d.evidenceTs, permalinks: [] },
+      evidence: { channel: t.channel, channelKind: t.channelKind, threadTs: t.rootTs, messageTs: d.evidenceTs, permalinks: [], ...relayFlag(t) },
       owner,
       confidence: d.confidence,
       participants,
@@ -1069,8 +1081,9 @@ async function sweepThread(
     for (const a of placed.answers) {
       const answers = shown.messages.filter((m) => a.evidenceTs.includes(m.ts) && m.ts !== a.questionTs);
       const answerer = a.answeredBy && participants.includes(a.answeredBy) ? a.answeredBy : (answers[0]?.user ?? null);
-      const { owner } = routeOwner({ claimedBy: answerer, participants, contributorIds: [], starter: root.user });
-      const said = answers.map((m) => m.text).join(" ");
+      const { owner } = await ownerOf(t, { claimedBy: answerer, participants, contributorIds: [], starter: root.user });
+      // Slack text, markup and all: kept as the plain words it shows.
+      const said = toPlainText(answers.map((m) => m.text).join(" "));
       findings.push({
         id: `${t.channel}:${t.rootTs}:add:${a.anchorId}`,
         runDate: t.runDate,
@@ -1090,7 +1103,7 @@ async function sweepThread(
         sourceSays: "",
         threadSays: said.length > 300 ? `${said.slice(0, 299)}…` : said,
         replacement: a.text,
-        evidence: { channel: t.channel, channelKind: t.channelKind, threadTs: t.rootTs, messageTs: a.evidenceTs, permalinks: [] },
+        evidence: { channel: t.channel, channelKind: t.channelKind, threadTs: t.rootTs, messageTs: a.evidenceTs, permalinks: [], ...relayFlag(t) },
         owner,
         confidence: a.confidence,
         participants,
@@ -1122,6 +1135,33 @@ function withinThreadBudget(messages: SweepMessage[], rootTs: string): { message
   }
   const shown = root ? [root, ...kept] : kept;
   return { messages: shown, trimmed: messages.length - shown.length };
+}
+
+/** The evidence's relay mark: present only for a relayed channel. */
+function relayFlag(t: { relayed?: boolean }): { relayToDesign?: true } {
+  return t.relayed ? { relayToDesign: true } : {};
+}
+
+/**
+ * Who owns a finding (`routeOwner`). From a relayed channel the card goes to
+ * #plus-design, so only someone there is tagged: whoever claimed it, else a
+ * Contributor, else the starter, else anyone in the thread, each only when
+ * they are in #plus-design. When none is, the starter stands.
+ */
+async function ownerOf(
+  t: { relayed?: boolean; membersOf: () => Promise<ReadonlySet<string>> },
+  input: Parameters<typeof routeOwner>[0],
+): Promise<ReturnType<typeof routeOwner>> {
+  if (!t.relayed) return routeOwner(input);
+  const members = await t.membersOf();
+  const there = (id: string | null): id is string => !!id && members.has(id);
+  const starter = there(input.starter) ? input.starter : (input.participants.find(there) ?? input.starter);
+  return routeOwner({
+    claimedBy: there(input.claimedBy) ? input.claimedBy : null,
+    participants: input.participants,
+    contributorIds: input.contributorIds.filter(there),
+    starter,
+  });
 }
 
 /** The ids that are members of the place, in order. */
