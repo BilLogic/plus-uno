@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import { HERO_HAIRLINE } from '../illustrations/paint.js';
 import { HeroGround } from '../illustrations/primitives.jsx';
 
@@ -30,6 +30,13 @@ const STAGE_ORIGIN = {
 const HERO_STROKE = { '--hero-stroke': 'calc(var(--stroke-1) / 2)' };
 
 /**
+ * How a drawing fits a box of another shape. The landing's 5:2 frame meets its
+ * box; a thumbnail tile of any shape (`HeroThumb`) covers it instead, cropping
+ * the frame around the centered stage.
+ */
+export const HeroFit = createContext('xMidYMid meet');
+
+/**
  * An SVG the size of the whole frame, with the stage's origin at (0, 0) of its
  * children. Hidden from assistive tech: the frame carries the description.
  */
@@ -37,6 +44,7 @@ export const HeroDrawing = ({ children }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox={`0 0 ${FRAME_UNITS.w} ${FRAME_UNITS.h}`}
+        preserveAspectRatio={useContext(HeroFit)}
         aria-hidden="true"
         focusable="false"
         style={{ '--stroke-hairline': HERO_HAIRLINE }}

@@ -250,6 +250,94 @@
     border-radius: 0;
 }
 
+/*
+ * An overview page's thumbnail grid (HeroThumbs.jsx): three columns; a tile
+ * spans two columns (wide) or two rows (tall). Every picture is at least one
+ * cell's 8:5 tall, measured on the grid's own width, so a row's pictures line
+ * up and a tall tile grows into its two rows. The picture is a sunken tile with
+ * no outline, its hero covering it.
+ */
+.sbdocs .sb-docs-thumbs {
+    container-type: inline-size;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--section-stack-md);
+    row-gap: var(--card-stack-md);
+}
+
+/* Each tile takes two row tracks, its picture's and its caption's, through a
+   subgrid, so every picture in a row shares one height whatever its caption. */
+.sbdocs .sb-docs-thumb {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 2;
+    margin: 0;
+    min-inline-size: 0;
+}
+
+.sbdocs .sb-docs-thumb--wide {
+    grid-column: span 2;
+}
+
+/* Two rows: the picture runs through the first row's caption track into the second row. */
+.sbdocs .sb-docs-thumb--tall {
+    grid-row: span 4;
+}
+
+.sbdocs .sb-docs-thumb--tall > .sb-docs-thumb__picture {
+    grid-row: 1 / 4;
+}
+
+.sbdocs .sb-docs-thumb__picture {
+    position: relative;
+    min-block-size: calc((100cqi - 2 * var(--section-stack-md)) / 3 * 5 / 8);
+    overflow: hidden;
+    border-radius: var(--card-radius);
+    background-color: var(--ds-surface-sunken);
+}
+
+.sbdocs .sb-docs-thumb__picture > svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+}
+
+/* The caption's foot pad is the space to the next row of tiles. */
+.sbdocs .sb-docs-thumb__caption {
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-stack-sm);
+    padding-block-end: var(--section-stack-md);
+}
+
+.sbdocs .sb-docs-thumb__title {
+    font: var(--heading-xsmall);
+    color: var(--ds-link);
+    text-decoration: underline;
+}
+
+.sbdocs .sb-docs-thumb__text {
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+}
+
+/* A narrow column: one tile per row, each its own 8:5. docs-literal: a container query takes no custom property, and no token is the width under which three thumbnails stop reading. */
+@container (max-width: 34rem) {
+    .sbdocs .sb-docs-thumbs > .sb-docs-thumb {
+        grid-column: 1 / -1;
+        grid-row: span 2;
+    }
+
+    .sbdocs .sb-docs-thumbs > .sb-docs-thumb--tall > .sb-docs-thumb__picture {
+        grid-row: auto;
+    }
+
+    .sbdocs .sb-docs-thumbs .sb-docs-thumb__picture {
+        min-block-size: calc(100cqi * 5 / 8);
+    }
+}
+
 .sbdocs .sb-docs-hero > svg {
     position: absolute;
     inset: 0;

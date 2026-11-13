@@ -158,7 +158,8 @@ export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => {
         </>
       )}
       <Rect x={x + 6} y={y + 4} w={12} h={12} fill={accent ? PAINT.accent : icon} corner="sidebarRow" />
-      {/* The logo row ends with the sidebar toggle, on the trailing column. */}
+      {/* The logo row: the mark, then the wordmark, then the sidebar toggle on the trailing column. */}
+      {w >= 56 && <SkeletonBar x={x + 22} y={y + 8} w={w * 0.3} h={4} heading />}
       {w >= 56 && <Rect x={x + w - 16} y={y + 6} w={8} h={8} fill={icon} corner="icon" />}
       {Array.from({ length: rowCount }, (_, i) => {
         const ry = y + 24 + i * SIDEBAR_ROW_PITCH;
