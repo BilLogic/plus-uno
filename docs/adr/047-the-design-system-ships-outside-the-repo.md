@@ -11,6 +11,8 @@ verified: 2026-11-13
 
 **Why.** Prototypes and product code outside this repo had only the hosted MCP and Storybook to read, and no way to take the components. ADR-006 removed publishing because nothing consumed a package; something does now. One package, not two, because the CLI and the MCP share one lookup and one baked snapshot, and splitting them would ship the snapshot twice. The copy-in registry (as shadcn does) leaves the consumer owning the files, so no runtime dependency on the design system is added.
 
-**Constraints.** The package name lives in one constant (`packages/cli/src/constants.mjs`); the README install lines read it, so a rename is one line. Publishing goes through npm trusted publishing over OIDC, with provenance and no token secret, and the first publish waits for a release Bill calls. The MCP SDK is the one runtime dependency, pinned to the version the repo already uses.
+**Constraints.** The package name lives in one constant (`packages/cli/src/constants.mjs`); a test checks the package README and the root README against it, so a rename is the constant plus a find-and-replace the test points at. Publishing goes through npm trusted publishing over OIDC, with provenance and no token secret, and the first publish waits for a release Bill calls. The MCP SDK is the one runtime dependency, pinned to the version the repo already uses.
 
 **What would reopen it.** A consumer that needs live updates rather than copied files, or a snapshot too large to ship, calls for a new decision on the package shape.
+
+— Bill, Nov 2026, deciding in #2117; recorded by Claude.
