@@ -4,9 +4,10 @@ import { useReducedMotion } from 'motion/react';
 
 import { Button, Range, RadioGroup } from '@/components';
 import { Illustration } from './Illustration.jsx';
-import { Backdrop, Frame, Modal, PageHeader, Popup, Row } from './primitives.jsx';
-import { ChartAxis, ChartCurve } from './primitives-motion.jsx';
-import { SPEEDS, SPEED_LABELS, measure, ratioOf, springFor, stepOf } from './motion.jsx';
+import { HERO_HAIRLINE, PAINT } from './paint.js';
+import { Backdrop, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule } from './primitives.jsx';
+import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
+import { SPEEDS, SPEED_LABELS, measure, ratioOf, resisted, springFor, stepOf } from './motion.jsx';
 import { PHYSICS_DEMOS } from './motion-physics.jsx';
 
 /**
@@ -269,6 +270,158 @@ const shake = {
     ctx.set({ shook: 1, x: 0.001 });
     await ctx.spring('x', 0, SHAKE_SPRING, { velocity: SHAKE_KICK });
   },
+};
+
+// ---------- Damping at a limit, by hand ----------
+
+// A docked Panel on the right of the Frame: its resting width, how far it may
+// widen, and the Frame's right edge, in kit units (1 unit = 2 px).
+const LIMIT_FRAME_RIGHT = 152;
+const LIMIT_PANEL = { y: 18, h: 76, rest: 40, extra: 25 };
+const LIMIT_W = LIMIT_PANEL.rest + LIMIT_PANEL.extra;
+/** The Panel's width for a pull of `d` units: one to one up to the limit, then `resisted()`. */
+export const limitWidth = (d) => LIMIT_PANEL.rest + Math.min(Math.max(0, d), LIMIT_PANEL.extra) + resisted(d - LIMIT_PANEL.extra);
+/** Where a let-go Panel comes to rest: where it was, held to the limit. */
+export const limitRest = (w) => Math.min(Math.max(w, LIMIT_PANEL.rest), LIMIT_W);
+const KEY_STEP = 6;
+
+/**
+ * Drag a docked Panel's edge to the left, past the dashed limit: up to it the
+ * Panel follows the hand one to one, past it less and less, and let go it
+ * springs back to the limit on `motion.spatial.fast` with the speed it had.
+ * ArrowLeft and ArrowRight pull while held; letting go of the key lets go.
+ */
+export const DragPastLimit = ({ reduced: forcedReduced }) => {
+  const deviceReduced = useReducedMotion();
+  const reduced = forcedReduced ?? deviceReduced;
+  const [w, setW] = useState(LIMIT_PANEL.rest);
+  const [phase, setPhase] = useState('rest');
+  const [hand, setHand] = useState(null);
+  const svgRef = useRef(null);
+  const drag = useRef(null);
+  const controls = useRef(null);
+  useEffect(() => () => controls.current?.stop(), []);
+
+  const unitsPerPx = () => 160 / svgRef.current.getBoundingClientRect().width;
+  const grab = (startW) => {
+    controls.current?.stop();
+    // The pull that gives the current width, so a second grab picks up where the Panel is.
+    let d = startW - LIMIT_PANEL.rest;
+    if (startW > LIMIT_W) {
+      const over = startW - LIMIT_W;
+      d = LIMIT_PANEL.extra + (over * over) / 8;
+    }
+    drag.current = { d, last: { w: startW, t: performance.now() }, v: 0 };
+    setPhase('dragging');
+  };
+  const pull = (d) => {
+    const g = drag.current;
+    const next = limitWidth(d);
+    const now = performance.now();
+    if (now > g.last.t) g.v = ((next - g.last.w) / (now - g.last.t)) * 1000;
+    g.last = { w: next, t: now };
+    g.d = d;
+    setW(next);
+  };
+  const letGo = () => {
+    const g = drag.current;
+    if (!g) return;
+    drag.current = null;
+    setHand(null);
+    const from = g.last.w;
+    const to = limitRest(from);
+    if (from === to) return setPhase('rest');
+    // Under reduced motion the hand still drives the drag, but the return does not travel.
+    if (reduced) {
+      setW(to);
+      return setPhase('rest');
+    }
+    setPhase('returning');
+    controls.current = animate(from, to, { ...springFor('spatial.fast'), velocity: g.v, onUpdate: setW });
+    controls.current.then(() => setPhase('rest'));
+  };
+
+  const onPointerDown = (e) => {
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    grab(w);
+    drag.current.x0 = e.clientX;
+    drag.current.d0 = drag.current.d;
+  };
+  const onPointerMove = (e) => {
+    const g = drag.current;
+    if (!g || g.x0 === undefined) return;
+    const d = g.d0 + (g.x0 - e.clientX) * unitsPerPx();
+    const rect = svgRef.current.getBoundingClientRect();
+    setHand({ x: (e.clientX - rect.left) * unitsPerPx(), y: (e.clientY - rect.top) * unitsPerPx() });
+    pull(d);
+  };
+  const onKeyDown = (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    if (!drag.current) grab(w);
+    pull(drag.current.d + (e.key === 'ArrowLeft' ? KEY_STEP : -KEY_STEP));
+  };
+
+  const edge = LIMIT_FRAME_RIGHT - w;
+  return (
+    <section
+      data-drag-limit
+      data-docs-stage
+      data-phase={phase}
+      data-width={String(Math.round(w * 100) / 100)}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--stack-md)',
+        padding: 'var(--card-pad-default)',
+        borderRadius: 'var(--card-radius)',
+        background: 'var(--ds-surface-sunken)',
+      }}
+    >
+      <div
+        style={{
+          borderRadius: 'var(--radius-lg)',
+          background: 'var(--ds-surface)',
+          paddingBlock: 'var(--card-pad-default)',
+          '--stroke-hairline': HERO_HAIRLINE,
+          touchAction: 'none',
+        }}
+      >
+        {/* The whole drawing is the handle: grab anywhere and pull left. */}
+        <div
+          ref={svgRef}
+          role="slider"
+          tabIndex={0}
+          aria-label="Panel width: drag left or hold ArrowLeft to pull it wider, let go to release"
+          aria-orientation="horizontal"
+          aria-valuemin={LIMIT_PANEL.rest}
+          aria-valuemax={LIMIT_W}
+          aria-valuenow={Math.round(Math.min(w, LIMIT_W))}
+          data-grab
+          style={{ maxInlineSize: 320, marginInline: 'auto', cursor: 'ew-resize', borderRadius: 'var(--radius-lg)' }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={letGo}
+          onPointerCancel={letGo}
+          onKeyDown={onKeyDown}
+          onKeyUp={letGo}
+          onBlur={letGo}
+        >
+          <Illustration viewBox={VIEW} title="A docked Panel whose edge you drag left, past a dashed limit">
+            <Frame x={8} y={6} w={144} h={88} />
+            <PageHeader x={16} y={24} w={Math.max(20, edge - 24)} />
+            {[0, 1, 2].map((i) => (
+              <Row key={i} x={16} y={44 + i * 14} w={Math.max(20, edge - 24)} />
+            ))}
+            <Panel x={edge} y={LIMIT_PANEL.y} w={w} h={LIMIT_PANEL.h} accent />
+            <Rule x1={LIMIT_FRAME_RIGHT - LIMIT_W} x2={LIMIT_FRAME_RIGHT - LIMIT_W} y1={18} y2={94} stroke={PAINT.target} dash="3 3" />
+            <Rect x={edge - 1} y={50} w={2} h={12} fill={PAINT.accent} corner="shape" />
+            {hand && <Pointer x={hand.x} y={hand.y} />}
+          </Illustration>
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export const PLAYGROUND_DEMOS = {

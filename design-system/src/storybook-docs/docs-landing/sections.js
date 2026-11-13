@@ -12,8 +12,8 @@ export const SECTIONS = {
         ['foundations-motion-physics', 'Physics'],
         ['foundations-motion-transitions', 'Transitions'],
         ['foundations-motion-choreography', 'Choreography'],
-        ['foundations-motion-playground', 'Playground'],
         ['foundations-motion-library', 'Library'],
+        ['foundations-motion-playground', 'Playground'],
     ]),
     'foundations-sound': strip([
         ['foundations-sound-overview', 'Overview'],

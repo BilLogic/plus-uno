@@ -201,10 +201,11 @@ const preview = {
               "Principles",
               "Physics",
               "Choreography",
-              "Playground",
               "Transitions",
               "Library",
-              "Stage never blank"
+              "Playground",
+              "Stage never blank",
+              "Engine speed"
             ],
             "Sound",
             [

@@ -423,8 +423,9 @@ const bpScene = ({ id, title, caption, lags }) => ({
   arrows: [[[168, 56], [104, 56]]],
   draw: ({ w, shown, blend }) => (
     <>
+      {/* The window follows the hand; the layout inside is the breakpoint's. */}
       <g opacity={blend}>
-        <ReflowScreen width={shown} neutral />
+        <ReflowScreen width={w} layout={shown} neutral resizing />
       </g>
       <Pointer x={8 + w / 8} y={52} />
     </>

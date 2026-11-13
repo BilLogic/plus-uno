@@ -813,7 +813,7 @@ const drillScene = ({ id, title, caption, reduced }) => ({
       <Frame x={8} y={6} w={144} h={88} />
       <g opacity={list}>
         <PageHeader x={16} y={24} w={128} />
-        {[0, 1, 2, 3].map((i) => (
+        {[0, 1, 2].map((i) => (
           <Row key={i} x={16} y={44 + i * 14} w={128} />
         ))}
       </g>
