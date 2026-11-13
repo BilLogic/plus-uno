@@ -97,7 +97,7 @@ const LANDING = /<DocsLanding\b/;
 /** A body Contents block: the right rail lists each page's contents, so the page does not list them twice. */
 const BODY_CONTENTS = /<FoundationContents\b|<Contents\b|aria-label="Contents"|^#{1,4}\s+Contents\s*$/m;
 /** An overview card's hero: `<TypeCard hero="page-id" ...>`. */
-const CARD_HERO = /\bhero="([a-z0-9-]+)"/g;
+const CARD_HERO = /<TypeCard\b[^>]*?\bhero="([a-z0-9-]+)"/g;
 const LANDING_PAGE = /<DocsLanding\b[^>]*?\bpage="([^"]+)"/s;
 
 /**
