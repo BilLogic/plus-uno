@@ -29,11 +29,7 @@ _Avoid_: "report", "incident", "alert"
 
 **Card**:
 The container of one object.
-_Avoid_: "tile" (Tile is its own component), "box"
-
-**Drawer**:
-A panel docked to one edge.
-_Avoid_: "slide-over", "side panel"
+_Avoid_: "tile" (Tile is its own component), "box", "side panel"
 
 **Panel**:
 The area at the right.
@@ -70,7 +66,7 @@ _Avoid_: \`style\`, \`fill\`
 _Avoid_: "nothing"
 `;
 
-const NAMES = ['Panel', 'Tile', 'PatternCard', 'PatternDrawer', 'SectionMessage', 'DropdownMenu', 'Modal', 'Flag', 'Banner'];
+const NAMES = ['Panel', 'Tile', 'PatternCard', 'SectionMessage', 'DropdownMenu', 'Modal', 'Flag', 'Banner'];
 const facts = { names: NAMES, notHere: ['Alert', 'Dropdown'], handAliases: { SectionMessage: ['callout'], Flag: ['toast message'] } };
 
 test('parse: reads each term of a section with its avoid-words, and stops at the next ## heading', () => {
@@ -80,7 +76,6 @@ test('parse: reads each term of a section with its avoid-words, and stops at the
     [
       'Product | Escalation',
       'Design system: structure | Card',
-      'Design system: structure | Drawer',
       'Design system: structure | Panel',
       'Design system: components | Section message',
       'Design system: components | Dropdown menu',
@@ -94,6 +89,7 @@ test('parse: reads each term of a section with its avoid-words, and stops at the
   assert.deepEqual(card.avoid, [
     { word: 'tile', plain: false },
     { word: 'box', plain: true },
+    { word: 'side panel', plain: true },
   ]);
   const modal = terms.find((t) => t.term === 'Modal');
   assert.deepEqual(modal.avoid.map((a) => [a.word, a.plain]), [['Modal dialog', true], ['ModalDialog', true], ['popup', false]]);
@@ -105,7 +101,6 @@ test('aliases: a design-system term maps to its component, the Pattern name incl
   const { aliases } = vocabularyAliases(parseGlossary(GLOSSARY), facts);
   assert.deepEqual(aliases, {
     PatternCard: ['box'],
-    PatternDrawer: ['slide-over'],
     DropdownMenu: ['action list'],
     Modal: ['modal dialog'],
   });
@@ -124,7 +119,7 @@ test('aliases: a not-here name, a qualified word and a shared word are skipped w
   assert.equal(reasons['Section message: alert'], 'not-here');
   assert.equal(reasons['Card: tile'], 'qualified');
   assert.equal(reasons['Dropdown menu: dropdown'], 'qualified');
-  assert.equal(reasons['Drawer: side panel'], 'shared', 'a word two terms both avoid names neither');
+  assert.equal(reasons['Card: side panel'], 'shared', 'a word two terms both avoid names neither');
   assert.equal(reasons['Panel: side panel'], 'shared');
 });
 

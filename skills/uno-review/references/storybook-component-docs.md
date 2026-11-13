@@ -35,7 +35,7 @@ replacement the index's Not-here table gives.
 
 Patterns (Frame, Page, Section, Card, Table, Modal, floating Panel, Backdrop, Popups,
 Sidebar, AI chat) take the same page template from `design-system/src/patterns/`.
-**Libraries** (Overview, Base UI, Font Awesome, Highcharts, Motion) is its own
+**Libraries** (Overview, Base UI, Font Awesome, Highcharts) is its own
 section: one short page per library PLUS builds on, from
 `design-system/src/storybook-docs/libraries/`.
 
