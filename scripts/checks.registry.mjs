@@ -108,6 +108,14 @@ export const CHECKS = [
     guards: 'the seven generated artifacts (cheat sheet, indexes, component docs, Figma and token registries, knowledge audit) against the design-system source.',
   },
   {
+    name: 'check:registry',
+    script: 'node scripts/generate-registry.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-registry.mjs',
+    guards: 'the copy-in registry: every item builds from source, and none imports an internal, deprecated or retired part.',
+  },
+  {
     name: 'check:deps',
     script: 'node scripts/check-deps.mjs',
     pkg: 'root',
