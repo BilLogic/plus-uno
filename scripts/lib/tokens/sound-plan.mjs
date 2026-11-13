@@ -101,8 +101,8 @@ const AI_LEAD_IN = [
  * done.sent -27.0, error -25.7 and ai.strong -23.4. Each is moved by exactly
  * that gap (goal -1.3 to -2.4, done.sent 0.7 to 1.7, error 3 to 4.7,
  * ai.strong -1.1 to -1.7); a trim shifts a sound's level one for one.
- * Goal was later rewritten to rise rather than settle (Bill, 2026-11-12); its
- * trim, -2.3, holds it at the old Goal's measured level.
+ * Goal was later rewritten as a fanfare, short-short-long then up a fifth
+ * (Bill, 2026-11-12); its trim, -3.1, holds it at the old Goal's measured level.
  */
 export const SOUND_SEMANTICS = [
   {
@@ -121,9 +121,9 @@ export const SOUND_SEMANTICS = [
     notes: [{ r: 5 / 6, t: 0, d: 0.11, g: 0.55 }, { r: 5 / 4, t: 0, d: 0.11, g: 0.4 }, { r: 5 / 6, t: 0.13, d: 0.34, g: 0.5 }, { r: 5 / 4, t: 0.13, d: 0.34, g: 0.36 }],
   },
   {
-    name: 'goal', family: 'Goal', base: 'tonic', level: 'soft', trim: -2.3,
-    summary: 'C5 and E5 rise to meet on G5, then C6 (shared)',
-    notes: [{ r: 1, to: 3 / 2, t: 0, d: 0.6, g: 0.6, gl: 0.2 }, { r: 5 / 4, to: 3 / 2, t: 0, d: 0.6, g: 0.5, gl: 0.2 }, { r: 2, t: 0.26, d: 0.5, g: 0.4 }],
+    name: 'goal', family: 'Goal', base: 'tonic', level: 'soft', trim: -3.1,
+    summary: 'C5 C5, then G5 + C6: a fanfare (shared)',
+    notes: [{ r: 1, t: 0, d: 0.07, g: 0.5 }, { r: 1, t: 0.09, d: 0.07, g: 0.5 }, { r: 3 / 2, t: 0.18, d: 0.7, g: 0.66 }, { r: 2, t: 0.18, d: 0.7, g: 0.48 }],
   },
   {
     name: 'commit', family: 'Commit', base: 'tonic', level: 'standard', trim: -0.7,
