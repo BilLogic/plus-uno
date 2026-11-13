@@ -41,7 +41,7 @@ export const PrinciplesHero = () => {
       {cards.map((x) => (
         <CardBox key={x} x={x} y={5} w={100} h={150} />
       ))}
-      {/* Show what changed: a new row lands in its slot, the path from where it came */}
+      {/* Build understanding: a new row lands in its slot, the path from where it came */}
       {[25, 45, 85].map((y) => (
         <Rect key={y} x={-70} y={y} w={80} h={15} fill={PAINT.placeholderText} corner="shape" />
       ))}
@@ -53,7 +53,7 @@ export const PrinciplesHero = () => {
       <circle cx={96} cy={77} r={17} fill="none" stroke={PAINT.accent} opacity={0.35} style={HAIRLINE} />
       <circle cx={96} cy={77} r={25} fill="none" stroke={PAINT.accent} opacity={0.18} style={HAIRLINE} />
       <Pointer x={92} y={74} />
-      {/* Move like real things: one shape at equal steps, settling past its target */}
+      {/* A spring: one shape at equal steps, settling past its target */}
       <Dashed x1={168} x2={252} y={40} />
       {Array.from({ length: 7 }, (_, i) => (
         <Rect
@@ -67,7 +67,7 @@ export const PrinciplesHero = () => {
           opacity={still(i)}
         />
       ))}
-      {/* Quiet until it counts: many small neutral moves, one big accent one */}
+      {/* Cut the noise: many small neutral moves, one big accent one */}
       {[0, 1, 2].flatMap((r) =>
         [0, 1, 2, 3].map((c) => (
           <Rect key={`${r}${c}`} x={293 + 20 * c} y={20 + 15 * r} w={12} h={7} fill={PAINT.shape} corner="shape" />
