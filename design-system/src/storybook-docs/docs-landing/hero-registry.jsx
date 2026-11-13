@@ -38,6 +38,8 @@ import {
   ReadOnlyHero,
 } from './PatternHeroes.jsx';
 
+import { OverviewHero as SoundOverviewHero, WhenToPlayHero, WithMotionHero, SoundsHero, SettingsHero } from './SoundHeroes.jsx';
+
 /**
  * The hero registry: each docs page id (its Storybook id, the title lower-cased
  * and joined with dashes) maps to the drawing that opens it and the one
@@ -114,6 +116,26 @@ export const HEROES = {
     Hero: ColorHero,
     description:
       'One card painted by its role tokens, shown in light on the left and dark on the right; the primary button is the subject.',
+  },
+  'foundations-sound-overview': {
+    Hero: SoundOverviewHero,
+    description: 'Three sounds as three waveforms; the chime is ringed.',
+  },
+  'foundations-sound-when-to-play': {
+    Hero: WhenToPlayHero,
+    description: 'A run of events along one line; only a few make a sound.',
+  },
+  'foundations-sound-with-motion': {
+    Hero: WithMotionHero,
+    description: 'Two tracks, motion over sound; the tick where the shape lands is where the sound starts.',
+  },
+  'foundations-sound-sounds': {
+    Hero: SoundsHero,
+    description: 'The library as a list: play, waveform, name; one sound playing.',
+  },
+  'foundations-sound-settings-and-accessibility': {
+    Hero: SettingsHero,
+    description: 'Sound off, volume down: the person decides.',
   },
   'foundations-motion-principles': {
     Hero: PrinciplesHero,

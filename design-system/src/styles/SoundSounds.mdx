@@ -1,8 +1,7 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { C } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
@@ -15,12 +14,21 @@ export const Ms = ({ s }) => <>{Math.round(s * 1000)} ms</>;
 
 <Meta of={SoundStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-sound-sounds"
+    eyebrow="Foundation · Sound"
     title="Sounds"
-    summary="Twelve tokens on one material: nine sounds and three for AI feedback."
+    purpose="Twelve tokens on one material: nine sounds and three for AI feedback."
+    links={{
+        items: [
+            { title: 'Overview', href: '?path=/docs/foundations-sound-overview--docs' },
+            { title: 'When to play', href: '?path=/docs/foundations-sound-when-to-play--docs' },
+            { title: 'With motion', href: '?path=/docs/foundations-sound-with-motion--docs' },
+            { title: 'Sounds', href: '?path=/docs/foundations-sound-sounds--docs', current: true },
+            { title: 'Settings and accessibility', href: '?path=/docs/foundations-sound-settings-and-accessibility--docs' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Material">
 
