@@ -1,7 +1,7 @@
 # PLUS Design System
 
 The PLUS component library, consumed inside this repository by Storybook and
-the prototypes. It is private and unpublished (ADR-006).
+the prototypes. It is private and unpublished; what ships outside the repo is the `@plus-uno/cli` package (ADR-047).
 
 ## Installation
 

@@ -66,6 +66,16 @@ f. **Retrieval proof.** The build ends with a short table in the chat: each
 
    A name with no source is an escape: look it up, or replace it.
 
+## Outside plus-uno
+
+When the working directory is not plus-uno (no `design-system/` here), there is no `prototypes/`, no barrel and no `agent-views/`: build with the registry and the package instead (ADR-047).
+
+- Lookup: the MCP `plus-ds` (`npx -y @plus-uno/cli mcp`) or `npx @plus-uno/cli find | get | tokens | guide`. Every name you write comes from one of these in this run; keep the retrieval proof (step f) with `ds` as the source.
+- Install: `npx @plus-uno/cli add <item>` for each component, pattern, template or chart the plan names (`find` names the item). Load `plus-ds/styles/main.scss` once at the entry and paste `plus-ds/head.html` into the HTML head.
+- Gap: an item `find` does not list is absent; name the gap and propose the nearest composition.
+- Exit gate: `npx @plus-uno/cli check <paths>` replaces `check:ds-usage`; fix every fail-level finding.
+- The Figma question and `AGENTS.md` hard rules (Font Awesome Free, tokens over literals) still apply; the scaffold script and Vite aliases are plus-uno only.
+
 ## Validate & exit (the loop — method §5)
 
 Iterate until clean, **max 3 attempts** (stop early if an attempt fixes
