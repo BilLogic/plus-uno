@@ -60,10 +60,11 @@ test('a hero with no description fails', () => {
   assert.ok(found.some((m) => /no description/.test(m)), found.join('\n'));
 });
 
-test('the real tree passes, and covers Color, the 12 other Foundations pages and all 14 Patterns pages', () => {
+test('the real tree passes, and covers Color, the 12 other Foundations pages, the 6 Motion pages and all 14 Patterns pages', () => {
   const ids = PAGES.map((p) => p.id);
   assert.equal(ids.filter((id) => id.startsWith('patterns-')).length, 14);
-  assert.equal(ids.filter((id) => id.startsWith('foundations-')).length, 13);
+  assert.equal(ids.filter((id) => id.startsWith('foundations-')).length, 19);
+  assert.equal(ids.filter((id) => id.startsWith('foundations-motion-')).length, 6);
   assert.ok(ids.includes('foundations-color'));
   assert.ok(REGISTRY.endsWith('hero-registry.jsx'));
   assert.deepEqual(run(), []);
