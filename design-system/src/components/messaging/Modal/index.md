@@ -124,7 +124,7 @@ focused task, each with its own Backdrop.
   button as the exit, so keep that button. The header, and its close button, is
   left out only when the Modal has no `title`, no `description`, no
   `headerActions` and `showBottomButtons` is false.
-- **The close button is labeled `Close modal`**, hard-coded. Its icon is
+- **The close button is labeled `Close`**, hard-coded. Its icon is
   `aria-hidden`. `showCloseButton={false}` removes it; keep Escape or a footer
   action as a way out.
 - **The title is the dialog's h1 and its accessible name**, through

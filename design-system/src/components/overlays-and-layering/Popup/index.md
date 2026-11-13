@@ -25,7 +25,7 @@ less than a `Modal`, and unlike a modal it does not take the page.
 
 `trigger` is the element it hangs off, `children` the body, `title` the optional
 title. `triggerType` is `click` (the default), `hover`, `focus`, an array of
-those, or `manual` for a popup you drive with `show`.
+those, or `manual` for a popup you drive with `show`. `defaultShow` opens it on first render. With no `trigger`, `anchor` is the ref or element it points at, driven by `show`. `container` is the element it portals into.
 
 It is the Popup template's layer: one surface padded 16, with the title in
 heading.xsmall over the body, and no arrow. `width` is `auto` (the default),

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Popover } from '@base-ui/react/popover';
 import { Button } from '../../forms-and-inputs/Button/Button';
-import { IconButton } from '../../forms-and-inputs/IconButton/IconButton';
+import CloseButton from '../../forms-and-inputs/CloseButton';
 import './Spotlight.scss';
 
 export const SPOTLIGHT_PLACEMENTS = [
@@ -110,10 +110,9 @@ export const Spotlight = ({
     const [side, align] = PLACEMENT_TO_SIDE_ALIGN[placement] ?? PLACEMENT_TO_SIDE_ALIGN.bottom;
 
     const dismissControl = dismissible && (
-        <IconButton
-            icon="xmark"
+        <CloseButton
             label="Dismiss"
-            appearance="subtle"
+            tone="inverse"
             isTooltipDisabled
             className="plus-spotlight-dismiss-button"
             onClick={onDismiss}

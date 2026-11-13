@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { TreeTable } from '@/components/text-and-data-display/Table';
+import { TreeTable } from '@/components';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 
 /**

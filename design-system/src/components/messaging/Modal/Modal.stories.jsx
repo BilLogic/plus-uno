@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import Modal from '@/components/messaging/Modal';
+import { Modal } from '@/components';
 import { IconButton, Button, Select } from '@/components';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
@@ -535,7 +535,7 @@ const StateModal = () => (
     <Modal show renderAs="inline" width="6-col" title="Settings" body="Changes save when you close." onClose={() => {}} />
 );
 const bodyOf = (canvasElement) => within(canvasElement);
-const closeOf = async (canvasElement) => bodyOf(canvasElement).findByRole('button', { name: 'Close modal' });
+const closeOf = async (canvasElement) => bodyOf(canvasElement).findByRole('button', { name: 'Close' });
 
 /** Rest: the panel with its title as the h1 and the close button at rest. Drawn inline so a docs page holds no live overlay; the dialog role is asserted in Overview and ConfirmView. */
 export const Rest = {

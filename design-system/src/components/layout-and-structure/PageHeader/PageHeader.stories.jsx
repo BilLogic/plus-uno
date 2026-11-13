@@ -1,8 +1,7 @@
 import React from 'react';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, within } from 'storybook/test';
-import Button from '@/components/forms-and-inputs/Button';
-import PageHeader from '@/components/layout-and-structure/PageHeader';
+import { Button, PageHeader } from '@/components';
 
 export default {
     title: 'Components/Layout and structure/Page header',

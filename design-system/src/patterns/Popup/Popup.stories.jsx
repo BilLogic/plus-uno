@@ -1,11 +1,10 @@
 import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
 
-import { Button, ButtonItem, Popup } from '@/components';
+import { Button, ButtonItem, Popup, POPUP_WIDTH_PX } from '@/components';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
-import { POPUP_WIDTH_PX } from '@/components/overlays-and-layering/Popup/Popup.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import * as Demo from './popupDemo.jsx';
 

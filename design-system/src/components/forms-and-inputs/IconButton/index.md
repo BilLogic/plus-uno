@@ -109,7 +109,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 1. **Container.** A square, 32 at default spacing and 24 at compact. `shape="circle"` rounds it for top navigation.
 2. **Icon.** A Font Awesome Free glyph at 16. Use an existing system glyph; do not draw custom icons.
-3. **Label.** Not drawn. It is the accessible name and the tooltip on hover and focus.
+3. **Label.** Not drawn. It is the accessible name and the tooltip on hover and focus. `isTooltipDisabled` turns that tooltip off, for a control the surface already makes obvious, such as the close button in a Modal and a Spotlight.
 4. **Spinner** (loading only). Replaces the icon while the button is busy.
 5. **Count** (filter triggers only). `trailingMetric`, the number of filters applied, after the icon. The button keeps its height and the icon keeps its place; the count widens it.
 

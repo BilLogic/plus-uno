@@ -71,7 +71,7 @@ announced at all, so anything rendered on mount has to read correctly as plain
 content too.
 
 Every close control in the group has a hard-coded label: `Dismiss message` on
-`SectionMessage`, `Dismiss flag` on `Flag`, `Close modal` on `Modal`. None of them can be
+`SectionMessage`, `Dismiss flag` on `Flag`, `Close` on `Modal`. None of them can be
 renamed, so several dismissible messages on one screen expose several
 identically named buttons. `CloseButton`, the shared 24×24 dismiss control that
 `SectionMessage` and `Flag` use, takes `what` for a "Dismiss {what}" name; each

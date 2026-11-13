@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import Avatar, { AVATAR_SIZES } from '../Avatar';
+import { Avatar, AVATAR_SIZES } from '@/components';
 import AvatarGroup from './AvatarGroup';
 
 /**

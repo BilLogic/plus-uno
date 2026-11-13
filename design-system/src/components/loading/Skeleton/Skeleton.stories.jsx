@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from '@/components';
+import { Button, CountTag, StatusTag, Tag, TagGroup } from '@/components';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
-import CountTag from '../../labels/CountTag';
-import StatusTag from '../../labels/StatusTag';
-import Tag from '../../labels/Tag';
-import TagGroup from '../../labels/TagGroup';
 import Skeleton, { SKELETON_PRESETS, SKELETON_RADII, SKELETON_SHAPES } from './Skeleton';
 
 /**

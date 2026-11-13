@@ -1,8 +1,7 @@
 import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import Accordion from './Accordion/Accordion';
-
+import { Accordion } from '@/components';
 /**
  * What `disabled` on an accordion item actually stops.
  *

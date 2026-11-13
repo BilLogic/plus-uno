@@ -12805,7 +12805,6 @@
         "--body-default",
         "--body-small",
         "--ds-background-brand-bold",
-        "--ds-icon-inverse",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
         "--ds-shadow-overlay",

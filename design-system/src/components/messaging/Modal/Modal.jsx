@@ -2,7 +2,7 @@ import React, { useId, useLayoutEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Dialog } from '@base-ui/react/dialog';
 import Button from '@/components/forms-and-inputs/Button';
-import { IconButton } from '@/components/forms-and-inputs/IconButton/IconButton';
+import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import Skeleton from '@/components/loading/Skeleton';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { useOverlaySlot, reportFocusLost } from '@/lib/overlay';
@@ -220,10 +220,8 @@ const Modal = ({
                             )}
                             {headerActions && <div className="plus-modal-header-actions">{headerActions}</div>}
                             {showCloseButton && (
-                                <IconButton
-                                    icon="xmark"
-                                    label="Close modal"
-                                    appearance="subtle"
+                                <CloseButton
+                                    label="Close"
                                     isTooltipDisabled
                                     className="plus-modal-close-btn"
                                     onClick={onClose}

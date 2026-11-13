@@ -3,8 +3,7 @@ import { expect } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { decorationUnder, expectInk } from '@/storybook-docs/lib/navigation-states.js';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import Link, { LINK_APPEARANCES } from '@/components/navigation/Link';
-
+import { Link, LINK_APPEARANCES } from '@/components';
 export default {
     title: 'Components/Navigation/Link',
     component: Link,

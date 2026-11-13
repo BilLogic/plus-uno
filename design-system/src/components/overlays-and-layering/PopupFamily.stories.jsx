@@ -2,10 +2,7 @@ import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
 
 import { probe, px } from '@/storybook-docs/lib/style-probes.js';
-import { Flag, FlagGroup, Button } from '@/components';
-import Popup from './Popup/Popup';
-import Tooltip from './Tooltip/Tooltip';
-
+import { Flag, FlagGroup, Button, Popup, Tooltip } from '@/components';
 /**
  * The Popups pattern: Popup, Flag and Tooltip. Menu's own behavior and size
  * cover lives on `DropdownMenu`'s own stories

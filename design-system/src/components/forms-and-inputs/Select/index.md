@@ -73,7 +73,7 @@ Don't: The same words as plain help, in a default field.
 
 ### Pick the mode by the answer. {#pick-the-mode-by-the-answer}
 
-`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. Typing filters the list unless you pass `isSearchable={false}`, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
+`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` (the most options a person can pick) apply to it only. `onOpenChange` reports the list opening and closing. Typing filters the list unless you pass `isSearchable={false}`, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
 
 ### Mark a single pick with a check or a radio. {#mark-a-single-pick-with-a-check-or-a-radio}
 

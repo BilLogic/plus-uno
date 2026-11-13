@@ -5,7 +5,7 @@ import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.j
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Popup from './Popup';
-import Button from '@/components/forms-and-inputs/Button/Button';
+import { Button } from '@/components';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {

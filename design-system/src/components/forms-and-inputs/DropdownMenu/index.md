@@ -18,7 +18,7 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 ## Usage
 
-Use a dropdown menu for a trigger that opens a list of actions or navigation links. Its rows are Section, Button item, Link item and Custom item, all exported from Dropdown menu. For picking one value from a list of options, use Select: a dropdown menu is for actions, a select is for a value.
+Use a dropdown menu for a trigger that opens a list of actions or navigation links. Its rows are Section, Button item, Link item and Custom item, all exported from Dropdown menu. For picking one value from a list of options, use Select: a dropdown menu is for actions, a select is for a value. `maxHeight` caps the menu's height before it scrolls, and `container` is the element the menu portals into.
 
 `trigger` is the element that opens it, `children` are its rows. `isOpen` and `onOpenChange` make it controlled; left uncontrolled it opens and closes on its own. `placement` and `shouldFlip` govern where it opens and whether it flips when there is no room. `spacing` is `default` (32 rows) or `compact` (24). `loading` swaps the rows for one Loading options row while its options are still being fetched; after a failure, `hasError` shows Couldn't load options with a Retry row that calls `onRetry`. A menu never draws skeleton rows.
 
@@ -78,9 +78,9 @@ One or two words each. Long, near-identical labels make the choice harder and wr
 Do: Short, distinct labels.
 Don't: Long, near-identical labels.
 
-### Nested menus are not yet built. {#nested-menus-are-not-yet-built}
+### Keep menus one level deep. {#keep-menus-one-level-deep}
 
-The public Menu family has no submenu-trigger row of its own yet. Flatten the choices or use sections.
+The Menu family has no submenu-trigger row. Flatten the choices or use sections.
 
 ## Accessibility
 

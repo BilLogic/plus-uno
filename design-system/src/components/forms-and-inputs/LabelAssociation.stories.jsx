@@ -1,16 +1,12 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import DateTimePicker from './DateTimePicker/DateTimePicker';
+import { DateTimePicker, TextField, TextArea } from '@/components';
 import FileUpload from './FileUpload';
 import RadioGroup from './RadioGroup';
-import TextField from './TextField/TextField';
-
 import Radio from './Radio';
 import Rating from './Rating';
 import TagInput from './TagInput';
-import TextArea from './TextArea/TextArea';
-
 /**
  * Label association across every form component that renders its own label.
  *

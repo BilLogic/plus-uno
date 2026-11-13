@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, userEvent } from 'storybook/test';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
-import ScrollBar from '@/components/layout-and-structure/ScrollBar';
+import { ScrollBar } from '@/components';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {

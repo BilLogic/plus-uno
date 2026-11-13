@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
-import Table, { DynamicTable, HeadCell } from '@/components/text-and-data-display/Table';
+import { Table, DynamicTable, HeadCell } from '@/components';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import PatternSection, { SectionToolbar } from '@/patterns/PatternSection';
 import { HeadingLevelContext } from '@/lib/headingLevel';

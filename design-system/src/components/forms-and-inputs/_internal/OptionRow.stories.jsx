@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import CountTag from '@/components/labels/CountTag/CountTag';
+import { CountTag } from '@/components';
 import OptionRow from './OptionRow';
 import { iconClass } from '../../../lib/icon';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArgTypes, Canvas, Controls, Source, Stories } from '@storybook/addon-docs/blocks';
+import { ArgTypes, Canvas, Controls, Source, Stories, useOf } from '@storybook/addon-docs/blocks';
 
 /**
  * Shared Storybook docs layout primitives (PLUS DS).
@@ -48,6 +48,27 @@ export function DocsProperties({ of: ofMeta, include, exclude }) {
         <div className="sb-ds-docs-props not-prose">
             <ArgTypes of={ofMeta} include={include} exclude={exclude} />
         </div>
+    );
+}
+
+/**
+ * Every prop the component declares, read from its propTypes by the docgen
+ * and not from the story's `argTypes`, so a prop a story hides from Controls
+ * (a callback, an escape hatch, a label string) still shows up here. A prop
+ * tagged `@ignore` in its doc comment stays out. Folded under the playground
+ * by `DocsInteractivePlayground`; a page needs no markup of its own.
+ *
+ * @param {unknown} props.of - a story export or the story meta
+ */
+export function DocsAllProps({ of: ofStory }) {
+    const resolved = useOf(ofStory);
+    const component = resolved.type === 'story' ? resolved.story.component : resolved.preparedMeta?.component;
+    if (!component) return null;
+    return (
+        <details className="sb-ds-docs-all-props not-prose">
+            <summary>All props</summary>
+            <ArgTypes of={component} />
+        </details>
     );
 }
 
@@ -520,6 +541,7 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                     <Controls of={ofStory} />
                 </div>
             </div>
+            <DocsAllProps of={ofStory} />
         </div>
     );
 }

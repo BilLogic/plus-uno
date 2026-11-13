@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import DatePicker from './DatePicker/DatePicker';
-
+import { DatePicker } from '@/components';
 /**
  * What DatePicker does, held to a play test each: where its calendar opens,
  * picking a range, the earliest and latest dates, and typing a date.

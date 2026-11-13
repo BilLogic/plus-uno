@@ -1,8 +1,7 @@
 import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import DateTimePicker from './DateTimePicker/DateTimePicker';
-
+import { DateTimePicker } from '@/components';
 /**
  * A time surviving a round trip through the control that shows it.
  *
