@@ -162,7 +162,7 @@ export const FormInPanel = () => {
     const f = useFormState();
     return (
         <BrowserWindow address="app.plus.org/students" height={WINDOW_HEIGHT}>
-            <div style={{ display: 'flex', blockSize: '100%', background: 'var(--ds-surface-sunken)' }}>
+            <div style={{ display: 'flex', blockSize: '100%', background: 'var(--ds-surface)' }}>
                 <div style={{ flex: '1 1 auto', minInlineSize: 0, padding: 'var(--page-pad)' }}><Behind /></div>
                 <PanelContainer width="var(--panel-width-default)">
                     <PanelHeader title="Ana Ruiz" actions={<PanelCloseAction onClick={() => {}} />} />

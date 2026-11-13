@@ -201,7 +201,7 @@ export const ConfirmOverPanel = () => {
     return (
         <BrowserWindow address="app.plus.org/students" height={420}>
             <div ref={root} style={{ position: 'relative', blockSize: '100%' }} onKeyDown={(e) => { if (open && e.key === 'Escape') close(); }}>
-                <div style={{ display: 'flex', blockSize: '100%', background: 'var(--ds-surface-sunken)' }}>
+                <div style={{ display: 'flex', blockSize: '100%', background: 'var(--ds-surface)' }}>
                     <div style={{ flex: '1 1 auto', minInlineSize: 0, padding: 'var(--page-pad)' }}><PageBehind /></div>
                     <PanelContainer width="var(--panel-width-default)">
                         <PanelHeader title="Ana Ruiz" actions={<PanelCloseAction onClick={() => {}} />} />

@@ -309,10 +309,11 @@ export const BrowserWindow = ({ address = 'app.plus.org', height, fill = false, 
             border: 'var(--border-default) solid var(--ds-border)',
             borderRadius: 'var(--radius-md)',
             overflow: 'hidden',
-            background: 'var(--ds-surface-sunken)',
+            // The body is the Page's surface: a window that holds a Frame shows the Frame's own sunken fill.
+            background: 'var(--ds-surface)',
         }}
     >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)', padding: 'var(--space-050) var(--space-100)', borderBottom: 'var(--border-default) solid var(--ds-border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)', background: 'var(--ds-surface-sunken)', padding: 'var(--space-050) var(--space-100)', borderBottom: 'var(--border-default) solid var(--ds-border)' }}>
             <span aria-hidden="true" style={{ display: 'flex', gap: 'var(--space-050)' }}>
                 {[0, 1, 2].map((i) => (
                     <span key={i} style={{ inlineSize: 'var(--space-075)', blockSize: 'var(--space-075)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)' }} />
