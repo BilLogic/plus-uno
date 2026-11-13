@@ -238,7 +238,6 @@ export const PlaygroundHero = () => (
         </g>
       );
     })}
-    <Dashed x1={120} x2={380} y={50} />
     <SpringTrail x={120} y={7} w={260} h={135} n={7} still={24} step={0.1} advance={33} accent accentAll />
   </HeroDrawing>
 );

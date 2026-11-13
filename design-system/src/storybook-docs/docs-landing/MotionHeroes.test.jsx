@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { HEROES } from './hero-registry.jsx';
 import { TRANSITION_PARTS } from './MotionHeroes.jsx';
 import { crossings } from '../illustrations/trails.js';
+import { SpringTrail } from '../illustrations/shapes.jsx';
 import { pathGeometry } from '../illustrations/shapes-geometry.js';
 
 const IDS = ['principles', 'physics', 'transitions', 'choreography', 'playground', 'library'].map((n) => `foundations-motion-${n}`);
@@ -73,5 +74,28 @@ describe('Motion heroes', () => {
         const c = draw('foundations-motion-principles');
         expect(c.querySelectorAll('[data-time-grid]')).toHaveLength(0);
         expect(c.querySelectorAll('foreignObject')).toHaveLength(4);
+    });
+
+    it('Playground draws one target line, the spring trail\'s own', () => {
+        expect(draw('foundations-motion-playground').querySelectorAll('line[stroke-dasharray]')).toHaveLength(1);
+    });
+});
+
+describe('SpringTrail options', () => {
+    const trail = (props) =>
+        render(<svg><SpringTrail x={0} y={0} w={100} h={80} n={5} accent {...props} /></svg>).container.querySelectorAll('[data-shape="spring-trail"] rect');
+    const fills = (rects) => [...rects].map((r) => r.getAttribute('fill'));
+    it('accents only the last still by default, every still with accentAll', () => {
+        expect(fills(trail({})).filter((f) => f === ACCENT)).toHaveLength(1);
+        expect(fills(trail({ accentAll: true })).filter((f) => f === ACCENT)).toHaveLength(5);
+    });
+    it('with advance, the first still starts at the left edge and each is `advance` further on', () => {
+        const xs = [...trail({ advance: 10, still: 12 })].map((r) => +r.getAttribute('x'));
+        expect(xs[0]).toBe(0);
+        expect(xs.slice(1).map((x, i) => x - xs[i])).toEqual([10, 10, 10, 10]);
+    });
+    it('step sets the seconds between stills', () => {
+        const ys = (step) => [...trail({ step })].map((r) => +r.getAttribute('y'));
+        expect(ys(0.15)).not.toEqual(ys(0.05));
     });
 });
