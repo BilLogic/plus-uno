@@ -80,14 +80,14 @@ export function cli(argv, root = REPO_ROOT, { consumerRoot = root } = {}) {
 
 /** `ds add`: only the packaged `ds` installs, into the caller's project; the repo's own `ds` has no project to write to. */
 function add(root, consumerRoot, names, flags) {
-  if (consumerRoot === root) { console.error('ds add installs into your project: run it from the @plus-uno/cli package (npx ds add Button).'); return 2; }
+  if (consumerRoot === root) { console.error('ds add installs into your project: run the packaged `ds` in your project (npx ds add Button).'); return 2; }
   const dir = registryDir(root);
   if (!dir || !names.length) { console.error(dir ? 'ds add: name an item (ds find <task> names it), or `foundation` for the tokens and styles alone.' : 'ds add: this build carries no registry.'); return 2; }
   try {
     const p = plan(dir, names);
     const r = apply(p, { projectRoot: consumerRoot, dir: flags.dir, overwrite: flags.overwrite, install: !flags.noInstall });
     console.log(flags.json ? JSON.stringify({ items: p.items, ...r }, null, 2) : renderAdd(p, r, consumerRoot));
-    return r.conflicts.length ? 1 : 0;
+    return r.conflicts.length || r.installFailed ? 1 : 0;
   } catch (e) {
     console.error(e.message);
     return 2;

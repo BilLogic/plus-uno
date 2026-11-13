@@ -5,6 +5,8 @@
  * and a snapshot of the facts it reads, so `dist/` is a repo root as far as
  * `createLookup` can tell. The snapshot is the file set the hosted `/mcp/ds` bundles
  * (netlify.toml `[functions."ds-mcp"]`), minus consumer code, which only `ds check` reads.
+ * It also builds `registry/` (one item JSON per foundation and component, from `generate-registry.mjs`) for `ds add`;
+ * that registry is most of the size, which is why the budget in `snapshot-budget.json` sits near 3.4 MB packed and 13.5 MB unpacked.
  * Runs as the package's `prepack`; `snapshot-budget.json` holds its size.
  */
 import fs from 'node:fs';

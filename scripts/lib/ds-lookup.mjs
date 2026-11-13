@@ -52,6 +52,7 @@ import { contextOf, escapes, expandPaths } from '../check-ds-usage.mjs';
 import { BARRELS, loadFacts } from './ds-facts.mjs';
 import { createPageFinder, pageText, readDocsPage, sectionText } from './docs-page.mjs';
 import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
+import { INSTALL_FOLDER } from './ds-add.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
 import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, renderComponent, sectionsOf } from './component-render.mjs';
@@ -283,8 +284,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   const item = (name, extra = {}) => {
     const a = facts.lookup(name);
     // A component is a registry item; `ds add <registryItem>` installs it (an alias installs its target).
-    const row = { kind: a.kind, name, status: 'exists', import: a.import, summary: shortSummary(a.summary), aliasOf: a.aliasOf, ...(a.kind === 'component' ? { registryItem: a.aliasOf ?? name } : {}), ...extra };
-    return row;
+    return { kind: a.kind, name, status: 'exists', import: a.import, summary: shortSummary(a.summary), aliasOf: a.aliasOf, ...(a.kind === 'component' ? { registryItem: a.aliasOf ?? name } : {}), ...extra };
   };
   /** A not-here row: the name, why, and what to use instead. */
   const notHereRow = (row) => {
@@ -606,7 +606,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     } else if (paths?.length || consumerRoot !== root) {
       if (!readPaths) throw new PathsRefused();
       // In a project, the `plus-ds/` folder `ds add` copied in is the design system's own source (it defines the raw values), not the project's code.
-      const files = expandPaths(consumerRoot, paths?.length ? paths : ['.']).filter((f) => consumerRoot === root || !/(^|\/)plus-ds\//.test(f));
+      const files = expandPaths(consumerRoot, paths?.length ? paths : ['.']).filter((f) => consumerRoot === root || !new RegExp(`(^|/)${INSTALL_FOLDER}/`).test(f));
       checked = files.length;
       found = escapes(consumerRoot, files, root);
     } else {

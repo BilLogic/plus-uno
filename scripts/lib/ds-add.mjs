@@ -8,7 +8,9 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const FOLDER = 'plus-ds';
+/** The folder every item's files sit under; `ds check` skips it in a project. */
+export const INSTALL_FOLDER = 'plus-ds';
+const FOLDER = INSTALL_FOLDER;
 
 /** Where the item JSON lives for a lookup root: the package's `registry/`, else a generated `dist/registry/`. */
 export function registryDir(root) {
@@ -42,6 +44,7 @@ export function plan(dir, names) {
     for (const f of item.files) files.set(f.target, f.content);
     for (const d of item.dependencies ?? []) {
       const at = d.lastIndexOf('@');
+      if (at <= 0) throw new Error(`${item.name}: dependency "${d}" has no version`);
       dependencies[d.slice(0, at)] = d.slice(at + 1);
     }
   }
@@ -68,36 +71,43 @@ function manager(projectRoot) {
  */
 export function apply(p, { projectRoot, dir, overwrite = false, install = true, run = spawnSync }) {
   const base = baseDir(projectRoot, dir);
-  const out = { written: [], unchanged: [], conflicts: [], added: [], installed: false, missingPeers: [] };
+  const out = { base: path.relative(projectRoot, base) || '.', written: [], unchanged: [], conflicts: [], added: [], installed: false, installFailed: false, missingPeers: [], manualDependencies: {} };
+  // Decide everything before writing anything, so a conflict or a broken package.json leaves the project untouched.
+  const pkgPath = path.join(projectRoot, 'package.json');
+  const pkg = fs.existsSync(pkgPath) ? JSON.parse(fs.readFileSync(pkgPath, 'utf8')) : null;
+  const todo = [];
   for (const f of p.files) {
-    const dest = path.join(base, f.target);
+    const dest = path.resolve(base, f.target);
+    if (path.relative(base, dest).startsWith('..') || path.isAbsolute(path.relative(base, dest))) throw new Error(`refusing to write ${f.target}: it leaves ${out.base}`);
     const rel = path.relative(projectRoot, dest);
     if (fs.existsSync(dest)) {
       if (fs.readFileSync(dest, 'utf8') === f.content) { out.unchanged.push(rel); continue; }
       if (!overwrite) { out.conflicts.push(rel); continue; }
     }
-    fs.mkdirSync(path.dirname(dest), { recursive: true });
-    fs.writeFileSync(dest, f.content);
-    out.written.push(rel);
+    todo.push({ dest, rel, content: f.content });
   }
   if (out.conflicts.length) return out;
+  for (const t of todo) {
+    fs.mkdirSync(path.dirname(t.dest), { recursive: true });
+    fs.writeFileSync(t.dest, t.content);
+    out.written.push(t.rel);
+  }
 
-  const pkgPath = path.join(projectRoot, 'package.json');
-  const pkg = fs.existsSync(pkgPath) ? JSON.parse(fs.readFileSync(pkgPath, 'utf8')) : null;
-  if (!pkg) return out;
-  const have = { ...pkg.devDependencies, ...pkg.peerDependencies, ...pkg.dependencies };
-  for (const [name, version] of Object.entries(p.dependencies)) {
-    if (have[name]) continue;
+  const have = { ...pkg?.devDependencies, ...pkg?.peerDependencies, ...pkg?.dependencies };
+  const missing = Object.entries(p.dependencies).filter(([name]) => !have[name]);
+  out.missingPeers = ['react', 'react-dom'].filter((n) => !have[n]);
+  if (!pkg) { out.manualDependencies = Object.fromEntries(missing); return out; }
+  for (const [name, version] of missing) {
     pkg.dependencies = { ...pkg.dependencies, [name]: `^${version}` };
     out.added.push(name);
   }
-  out.missingPeers = ['react', 'react-dom'].filter((n) => !have[n]);
   if (out.added.length) {
     pkg.dependencies = Object.fromEntries(Object.entries(pkg.dependencies).sort(([a], [b]) => (a < b ? -1 : 1)));
     fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
     if (install) {
       const [cmd, args] = manager(projectRoot);
       out.installed = run(cmd, args, { cwd: projectRoot, stdio: ['ignore', 2, 2] }).status === 0;
+      out.installFailed = !out.installed;
     }
   }
   return out;
@@ -105,10 +115,12 @@ export function apply(p, { projectRoot, dir, overwrite = false, install = true, 
 
 export function renderAdd(p, r, projectRoot) {
   const lines = [`ds add: ${p.items.join(', ')}`];
-  if (r.written.length) lines.push(`wrote ${r.written.length} file(s) under ${path.relative(projectRoot, path.dirname(path.dirname(path.join(projectRoot, r.written[0])))) || '.'}`);
+  if (r.written.length) lines.push(`wrote ${r.written.length} file(s) under ${path.posix.join(r.base.split(path.sep).join('/'), FOLDER)}`);
   if (r.unchanged.length) lines.push(`${r.unchanged.length} file(s) already up to date`);
   if (r.conflicts.length) lines.push(`not written, these differ from the registry (--overwrite replaces them):`, ...r.conflicts.map((c) => `  ${c}`));
   if (r.added.length) lines.push(`added to package.json: ${r.added.join(', ')}${r.installed ? ' (installed)' : ' (run your package manager install)'}`);
+  if (r.installFailed) lines.push('the install failed: fix it and run your package manager install.');
+  if (Object.keys(r.manualDependencies).length) lines.push(`no package.json here; install: ${Object.entries(r.manualDependencies).map(([n, v]) => `${n}@${v}`).join(', ')}`);
   if (r.missingPeers.length) lines.push(`peer dependencies to install yourself: ${r.missingPeers.join(', ')}`);
   if (!r.conflicts.length) lines.push(`Next: import the parts from ${FOLDER}/components/…, load ${FOLDER}/styles/main.scss once at the entry, and paste ${FOLDER}/head.html into your HTML head.`);
   return lines.join('\n');

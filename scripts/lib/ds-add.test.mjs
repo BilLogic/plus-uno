@@ -68,3 +68,21 @@ test('apply: --no-install writes package.json but runs nothing', () => {
   assert.equal(calls.length, 0);
   assert.ok(fs.existsSync(path.join(root, 'lib/plus-ds/Icon.jsx')));
 });
+
+test('apply: a conflict writes nothing and touches no package.json; a target that leaves the folder is refused', () => {
+  const { reg, root } = fixture();
+  fs.mkdirSync(path.join(root, 'src/plus-ds'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'package.json'), '{}');
+  fs.writeFileSync(path.join(root, 'src/plus-ds/Button.jsx'), 'edited');
+  const r = apply(plan(reg, ['Button']), { projectRoot: root, install: false });
+  assert.deepEqual(r.conflicts, ['src/plus-ds/Button.jsx']);
+  assert.ok(!fs.existsSync(path.join(root, 'src/plus-ds/Icon.jsx')));
+  assert.equal(fs.readFileSync(path.join(root, 'package.json'), 'utf8'), '{}');
+  assert.throws(() => apply({ files: [{ target: '../out.js', content: 'x' }], dependencies: {} }, { projectRoot: root }), /leaves/);
+});
+
+test('apply: no package.json reports the dependencies to install by hand', () => {
+  const { reg, root } = fixture();
+  const r = apply(plan(reg, ['Button']), { projectRoot: root });
+  assert.deepEqual(r.manualDependencies, { sass: '1.0.0', clsx: '2.1.1' });
+});
