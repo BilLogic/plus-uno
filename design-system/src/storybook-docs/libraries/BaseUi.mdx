@@ -1,7 +1,9 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import * as BaseUiStories from './BaseUi.stories.jsx';
+import { BaseUiGallery } from './library-gallery.jsx';
 import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
-<Meta title="Libraries/Base UI" />
+<Meta of={BaseUiStories} />
 
 <FoundationHero
     title="Base UI"
@@ -9,6 +11,14 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 />
 
 <FoundationContents />
+
+<FoundationSection title="Gallery">
+
+Every tile is a live PLUS component built on Base UI. Open, pick and close each one: the focus, keyboard and open and closed behavior is Base UI's, and the look is PLUS's.
+
+<BaseUiGallery />
+
+</FoundationSection>
 
 <FoundationSection title="What it is for">
 
@@ -18,7 +28,7 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 
 <FoundationSection title="What wraps it">
 
-Each interactive component wraps its own Base UI part, among them <DocsLink id="components-overlays-and-layering-popup">Popup</DocsLink>, <DocsLink id="components-overlays-and-layering-tooltip">Tooltip</DocsLink>, <DocsLink id="components-messaging-modal-dialog">Modal dialog</DocsLink>, <DocsLink id="components-navigation-tabs">Tabs</DocsLink>, Checkbox, Radio, Toggle, Range and Accordion. Use the PLUS component. Its props are the API; Base UI's are not.
+Each interactive component wraps its own Base UI part, among them <DocsLink id="components-overlays-and-layering-popup">Popup</DocsLink>, <DocsLink id="components-overlays-and-layering-tooltip">Tooltip</DocsLink>, <DocsLink id="components-messaging-modal-dialog">Modal</DocsLink>, <DocsLink id="components-navigation-tabs">Tabs</DocsLink>, Checkbox, Radio, Toggle, Range and Accordion. Use the PLUS component. Its props are the API; Base UI's are not.
 
 </FoundationSection>
 

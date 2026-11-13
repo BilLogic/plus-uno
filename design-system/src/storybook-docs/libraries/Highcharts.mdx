@@ -1,7 +1,9 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import * as HighchartsStories from './Highcharts.stories.jsx';
+import { HighchartsGallery } from './library-gallery.jsx';
 import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
-<Meta title="Libraries/Highcharts" />
+<Meta of={HighchartsStories} />
 
 <FoundationHero
     title="Highcharts"
@@ -9,6 +11,14 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 />
 
 <FoundationContents />
+
+<FoundationSection title="Gallery">
+
+Every tile is a PLUS chart component drawn by Highcharts. Hover a mark for its tooltip, and click a legend entry to hide or show its series.
+
+<HighchartsGallery />
+
+</FoundationSection>
 
 <FoundationSection title="What it is for">
 

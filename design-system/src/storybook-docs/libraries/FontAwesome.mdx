@@ -1,7 +1,9 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import * as FontAwesomeStories from './FontAwesome.stories.jsx';
+import { FontAwesomeGallery } from './library-gallery.jsx';
 import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
-<Meta title="Libraries/Font Awesome" />
+<Meta of={FontAwesomeStories} />
 
 <FoundationHero
     title="Font Awesome"
@@ -9,6 +11,14 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 />
 
 <FoundationContents />
+
+<FoundationSection title="Gallery">
+
+Search the Free set by typing, and see the three icon sizes side by side. Every glyph is drawn through the Icon component.
+
+<FontAwesomeGallery />
+
+</FoundationSection>
 
 <FoundationSection title="What it is for">
 
