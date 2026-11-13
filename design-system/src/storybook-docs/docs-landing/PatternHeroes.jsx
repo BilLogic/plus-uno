@@ -94,7 +94,7 @@ export const CommonActionsHero = () => {
 
 export const FormsHero = () => (
     <HeroDrawing>
-        <Rect x={70} y={-20} w={160} h={200} fill={PAINT.pageSurface} stroke={PAINT.pageEdge} />
+        <Rect x={70} y={-20} w={160} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
         <Field x={86} y={2} w={128} />
         <Field x={86} y={38} w={128} accent />
         <Field x={86} y={74} w={128} />
@@ -117,9 +117,8 @@ export const FilteringHero = () => {
             <ButtonShape x={first.x} y={12} w={first.w} />
             <Rect x={filter.x} y={11} w={filter.w} h={10} fill={PAINT.rowSelected} stroke={PAINT.accent} corner="button" />
             <ButtonShape x={last.x} y={12} w={last.w} />
-            <Popup x={box.x} y={box.y} w={box.w} h={box.h} />
-            {/* The kit's Popup draws its own placeholder lines; the menu's rows replace them. */}
-            <Rect x={box.x + 1} y={box.y + 1} w={box.w - 2} h={box.h - 2} fill={PAINT.popupSurface} corner="popup" />
+            {/* The menu's rows replace the kit Popup's placeholder lines. */}
+            <Popup x={box.x} y={box.y} w={box.w} h={box.h} lines={false} />
             {[0, 1, 2, 3].map((i) => (
                 <React.Fragment key={i}>
                     <Rect x={box.x + 8} y={box.y + 8 + i * 12} w={6} h={6} fill={i === 1 || i === 2 ? PAINT.accent : PAINT.fieldSurface} stroke={i === 1 || i === 2 ? undefined : PAINT.fieldBorder} corner="icon" />
@@ -137,7 +136,7 @@ export const NavigationHero = () => {
         <HeroDrawing>
             <Sidebar x={sb.x} y={sb.y} w={sb.w} h={sb.h} />
             <Ring x={sb.x + 4} y={selectedY} w={sb.w - 8} h={16} corner="sidebarRow" />
-            <Rect x={sb.x + sb.w} y={-20} w={204} h={200} fill={PAINT.pageSurface} />
+            <Rect x={sb.x + sb.w} y={-20} w={204} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
             <Breadcrumb x={116} y={10} w={120} count={3} accent />
             <SkeletonBar x={116} y={30} w={70} h={6} heading />
             <SkeletonBar x={116} y={42} w={110} />
@@ -192,7 +191,7 @@ export const NotificationsHero = () => (
 
 export const DisabledHero = () => (
     <HeroDrawing>
-        <Rect x={50} y={-20} w={200} h={200} fill={PAINT.pageSurface} stroke={PAINT.pageEdge} />
+        <Rect x={50} y={-20} w={200} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
         <SkeletonBar x={66} y={0} w={60} h={5} heading />
         <SkeletonBar x={66} y={12} w={110} />
         <Field x={66} y={30} w={168} />
@@ -208,7 +207,7 @@ export const DisabledHero = () => (
 
 export const EmptyHero = () => (
     <HeroDrawing>
-        <Rect x={50} y={-20} w={200} h={200} fill={PAINT.pageSurface} stroke={PAINT.pageEdge} />
+        <Rect x={50} y={-20} w={200} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
         <SkeletonBar x={66} y={0} w={60} h={5} heading />
         <Rule x1={50} x2={250} y1={14} y2={14} />
         <Rect x={118} y={26} w={64} h={64} fill={PAINT.accent} opacity={0.2} corner="full" />
@@ -224,7 +223,7 @@ export const ErrorsHero = () => {
     const w = 130;
     return (
         <HeroDrawing>
-            <Rect x={75} y={-20} w={150} h={200} fill={PAINT.pageSurface} stroke={PAINT.pageEdge} />
+            <Rect x={75} y={-20} w={150} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
             <Rect x={x} y={6} w={w} h={22} fill={PAINT.dangerSurface} stroke={PAINT.fieldBorderInvalid} corner="card" />
             <Ring x={x} y={6} w={w} h={22} corner="card" />
             <circle cx={x + 12} cy={17} r={4} fill={PAINT.flagIconDanger} />
@@ -239,7 +238,7 @@ export const ErrorsHero = () => {
 
 export const LoadingHero = () => (
     <HeroDrawing>
-        <Rect x={60} y={-20} w={180} h={200} fill={PAINT.pageSurface} stroke={PAINT.pageEdge} />
+        <Rect x={60} y={-20} w={180} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
         <Rule x1={60} x2={240} y1={14} y2={14} stroke={PAINT.tabsDivider} />
         <Rule x1={60} x2={120} y1={14} y2={14} stroke={PAINT.accent} thick />
         {[0, 1].map((i) => (
@@ -258,7 +257,7 @@ export const LoadingHero = () => (
 
 export const OverflowHero = () => (
     <HeroDrawing>
-        <Rect x={50} y={-20} w={200} h={200} fill={PAINT.pageSurface} stroke={PAINT.pageEdge} />
+        <Rect x={50} y={-20} w={200} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
         <StickyHeader x={62} y={8} w={176} h={140} accent />
         <Rect x={242} y={40} w={3} h={44} fill={PAINT.accent} corner="icon" />
     </HeroDrawing>

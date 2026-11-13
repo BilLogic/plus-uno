@@ -167,7 +167,7 @@ export const ChoreographyHero = () => {
         const lx = x0 + indent;
         return (
           <g key={i} data-track={kind}>
-            <Rect x={lx} y={cy - 7.5} w={labelW - 4 - indent} h={15} fill={PAINT.cardSurface} stroke={PAINT.axis} corner="shape" />
+            <Rect x={lx} y={cy - 7.5} w={labelW - 4 - indent} h={15} fill={PAINT.cardSurface} stroke={PAINT.illustrationEdge} corner="shape" />
             {kind === "title" && <SkeletonBar x={lx + 6} y={cy - 2} w={30} h={4} />}
             {kind === "card" && (
               <>

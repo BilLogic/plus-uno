@@ -17,6 +17,7 @@ import { ThreeLayers, OpeningARecord, ResponsiveReflow } from '@/storybook-docs/
 <FoundationSection title="Drawing rules">
 
 - Paint with design-system tokens only: color, stroke and corner. Each part uses the token its real component uses for that role, from the role map in `paint.js`. The kit follows light and dark on its own.
+- A surface on a hero's sunken ground always shows its edge. The real edge roles are too faint there (the page edge is transparent outside increased contrast, the divider is about 1.1:1 on the ground), so a hero's layers and pages take one hairline in `illustrationEdge`, the bold border, on top of the real shadow. The primitives add it inside `HeroDrawing`; a hand-drawn surface in a hero sets it itself. `HeroEdges.test.jsx` holds the role to 1.5:1 against the ground in light and dark and fails any registered hero with a bare surface.
 - Pick each example's fidelity by what the lesson depends on. Remove every word in your head: if the lesson still holds, draw it abstract.
   - **Concrete:** the lesson is a component's look, states, behavior or wording, such as anatomy, states, content do's and don'ts, or an interaction. Use a live story with real content, not a drawing.
   - **Real subject:** the lesson is one element inside a screen, such as which action is primary, a label, or one piece's placement. Draw that element real, with its words, and keep everything around it blocked out.

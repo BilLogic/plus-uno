@@ -1,4 +1,5 @@
 import React from 'react';
+import { HeroGround } from '../illustrations/primitives.jsx';
 
 /**
  * The drawing surface every hero shares. The hero frame is 1000 x 400 at the
@@ -28,7 +29,9 @@ export const HeroDrawing = ({ children }) => (
         aria-hidden="true"
         focusable="false"
     >
-        <g transform={`translate(${STAGE_ORIGIN.x} ${STAGE_ORIGIN.y})`}>{children}</g>
+        <HeroGround.Provider value>
+            <g transform={`translate(${STAGE_ORIGIN.x} ${STAGE_ORIGIN.y})`}>{children}</g>
+        </HeroGround.Provider>
     </svg>
 );
 

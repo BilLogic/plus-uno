@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import { LABEL_FONT, PAINT, CORNER, CORNER_TOKEN, HAIRLINE, TAB_UNDERLINE } from './paint.js';
 
 /**
@@ -8,6 +8,13 @@ import { LABEL_FONT, PAINT, CORNER, CORNER_TOKEN, HAIRLINE, TAB_UNDERLINE } from
  * product UI. No primitive draws text; skeleton bars stand in for it. Every
  * part paints with the PAINT role of the token its real component uses.
  */
+
+/**
+ * True inside a hero drawing. A hero's ground is the sunken surface, which a
+ * layer's real shadow and the real edge roles barely separate from, so every
+ * surface the primitives draw there adds one `illustrationEdge` hairline.
+ */
+export const HeroGround = createContext(false);
 
 /**
  * A corner token, held to half the shape's shorter side. SVG draws a corner
@@ -67,7 +74,10 @@ export const SkeletonBar = ({ x, y, w, h = 4, accent = false, heading = false, t
  * scale (one unit is 2px) rather than twice too big. With no `shadow` it is a
  * plain fill.
  */
-const Layer = ({ x, y, w, h, fill, shadow, corner }) => (
+const Layer = ({ x, y, w, h, fill, shadow, corner }) => {
+  const onHeroGround = useContext(HeroGround);
+  return (
+  <>
   <foreignObject x={x} y={y} width={w} height={h} style={{ overflow: 'visible' }}>
     <div
       xmlns="http://www.w3.org/1999/xhtml"
@@ -83,21 +93,27 @@ const Layer = ({ x, y, w, h, fill, shadow, corner }) => (
       }}
     />
   </foreignObject>
-);
+  {onHeroGround && <Rect x={x} y={y} w={w} h={h} stroke={PAINT.illustrationEdge} corner={corner} />}
+  </>
+  );
+};
 
 /** The accent marking a layer as the subject: a brand outline over its edge. */
 const AccentRing = ({ x, y, w, h, corner }) => <Rect x={x} y={y} w={w} h={h} stroke={PAINT.accent} corner={corner} />;
 
-export const Frame = ({ x, y, w, h, accent = false }) => (
+export const Frame = ({ x, y, w, h, accent = false }) => {
+  const onHeroGround = useContext(HeroGround);
+  return (
   <g>
-    <Rect x={x} y={y} w={w} h={h} fill={PAINT.frameSunken} stroke={accent ? PAINT.accent : PAINT.frameDivider} corner="window" />
+    <Rect x={x} y={y} w={w} h={h} fill={PAINT.frameSunken} stroke={accent ? PAINT.accent : onHeroGround ? PAINT.illustrationEdge : PAINT.frameDivider} corner="window" />
     {[0, 1, 2].map((i) => (
       <circle key={i} cx={x + 8 + i * 7} cy={y + 6} r={2} fill={PAINT.windowDot} />
     ))}
     <SkeletonBar x={x + 34} y={y + 4} w={w * 0.35} />
     <Rule x1={x} x2={x + w} y1={y + 12} y2={y + 12} />
   </g>
-);
+  );
+};
 
 const SIDEBAR_W = 44;
 /** A Sidebar row: item-height-md (32) halved, 2 apart (frame-sidebar-row-gap) halved. */
@@ -149,9 +165,11 @@ export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => {
  */
 export const pageBody = ({ x, y, w, h, header }) => ({ x: x + 8, y: y + (header ? 30 : 8), w: w - 16, h: h - (header ? 38 : 16) });
 
-export const Page = ({ x, y, w, h, accent = false, header = false, children }) => (
+export const Page = ({ x, y, w, h, accent = false, header = false, children }) => {
+  const onHeroGround = useContext(HeroGround);
+  return (
   <g>
-    <Rect x={x} y={y} w={w} h={h} fill={PAINT.pageSurface} stroke={accent ? PAINT.accent : PAINT.pageEdge} />
+    <Rect x={x} y={y} w={w} h={h} fill={PAINT.pageSurface} stroke={accent ? PAINT.accent : onHeroGround ? PAINT.illustrationEdge : PAINT.pageEdge} />
     {header && (
       <>
         <SkeletonBar x={x + 8} y={y + 8} w={w * 0.3} h={6} heading />
@@ -160,7 +178,8 @@ export const Page = ({ x, y, w, h, accent = false, header = false, children }) =
     )}
     {children}
   </g>
-);
+  );
+};
 
 /** Where a Screen puts its Page: beside a docked Sidebar, or full width. */
 export const screenLayout = ({ x, y, w, h, sidebar = 'docked' }) => {
@@ -309,11 +328,11 @@ export const ButtonShape = ({ x, y, w, appearance = 'default', label }) => {
   );
 };
 
-export const Popup = ({ x, y, w, h, accent = false }) => (
+export const Popup = ({ x, y, w, h, accent = false, lines = true }) => (
   <g>
     <Layer x={x} y={y} w={w} h={h} fill={PAINT.popupSurface} shadow={PAINT.popupShadow} corner="popup" />
     {accent && <AccentRing x={x} y={y} w={w} h={h} corner="popup" />}
-    {[0, 1, 2, 3].map((i) => (
+    {lines && [0, 1, 2, 3].map((i) => (
       <SkeletonBar key={i} x={x + 8} y={y + 8 + i * 10} w={w * (0.7 - i * 0.1)} />
     ))}
   </g>
