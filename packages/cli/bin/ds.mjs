@@ -13,8 +13,8 @@ if (argv[0] === 'mcp') {
   const { createServer } = await import('../dist/scripts/lib/ds-mcp-server.mjs');
   await createServer(root, { hosted: true }).connect(new StdioServerTransport());
 } else if (argv[0] === 'check') {
-  console.error('ds check is not in this version of the package yet.');
-  process.exitCode = 1;
+  // The facts come from the baked snapshot; the files come from the caller's working directory, so it runs in their CI.
+  process.exitCode = cli(argv, root, { consumerRoot: process.cwd() });
 } else {
   process.exitCode = cli(argv, root);
 }
