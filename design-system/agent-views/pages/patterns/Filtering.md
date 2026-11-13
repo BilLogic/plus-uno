@@ -2,7 +2,7 @@
 
 # Filtering
 
-How a person narrows a collection: a table, a list, a calendar or a card grid. Filters sit at the end of the Section's view bar, and the start stays for views. Five tiers by how much filtering the content needs, one tier per bar.
+How a person narrows a collection, with filters at the end of the Section's view bar in one of five tiers.
 
 **Kind:** Pattern
 

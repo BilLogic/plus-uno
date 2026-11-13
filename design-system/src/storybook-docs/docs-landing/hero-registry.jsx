@@ -225,7 +225,7 @@ export const HEROES = {
   'patterns-states-disabled': {
     Hero: DisabledHero,
     description:
-      'A Primary button you cannot press yet, and why, in one tooltip.',
+      'A Primary button you cannot press yet, with the reason in text beside it.',
   },
   'patterns-states-empty': {
     Hero: EmptyHero,

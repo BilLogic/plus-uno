@@ -41,9 +41,9 @@ Use Common actions when a page needs a button and the choice is about the look, 
 
 | Action | Appearance | Place | Word |
 | --- | --- | --- | --- |
-| The main action of an area | Primary, one per area | Last in its group | Verb and object: "Add students" |
+| The main action of an area | Primary, one per area | Last in its group (on a page form: first, before Cancel) | Verb and object: "Add students" |
 | Another action in the area | Default | Before the Primary | Verb and object: "Reschedule session" |
-| Leave without doing anything | Subtle; Default in a full-bleed footer | Left of the Primary | "Cancel"; a link is allowed |
+| Leave without doing anything | Subtle; Default in a full-bleed footer | Left of the Primary (on a page form: after it) | "Cancel"; a link is allowed |
 | Close a layer | Icon button | Start of a focused title row; end of a Modal, Panel or Flag header | Named "Close" |
 | Empty a menu's choices | Default, full bleed with Apply | The menu's footer, or the top of a filter side | "Reset" in a menu; "Reset filters" everywhere else |
 | Empty one field | Icon button inside the field | End of the field | Named "Clear", "Clear search" |

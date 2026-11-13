@@ -8,7 +8,7 @@ Code-free guidance for a situation, shown on templates used as they are or tweak
 
 **Storybook page:** `design-system/src/storybook-docs/patterns/PatternsOverview.mdx`
 
-## The thirteen patterns
+## The patterns
 
 Four groups. Each pattern is one page: its situations first, then the key cases drawn on templates, then the usage spine. Reach for one when you are unsure of a choice or challenging it; Templates and patterns says how the layers fit together.
 

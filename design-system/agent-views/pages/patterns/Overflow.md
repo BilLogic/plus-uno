@@ -2,7 +2,7 @@
 
 # Overflow
 
-What happens when text or a list is longer than its room. Titles and messages wrap; cells and tags truncate with the full text in a Tooltip; lists fold; tables page. No fades.
+What happens when text or a list is longer than its room: titles wrap, cells truncate, lists fold, tables page.
 
 **Kind:** Pattern
 

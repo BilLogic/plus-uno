@@ -21,7 +21,7 @@ import {
     page="patterns-actions-and-input-forms"
     eyebrow="Pattern · Actions and input"
     title="Forms"
-    purpose="How a form takes and checks what someone types: which host it lives in, when to validate, what a blocked submit does, how required and optional are marked, and what happens on leaving with edits."
+    purpose="How a form takes and checks what someone types: its host, when it validates, what a blocked submit does."
     links={{
         label: 'Uses',
         items: [
@@ -163,7 +163,7 @@ A disabled submit gives no direction and leaves the tab order. Pressing it marks
 
 <RuleTag kind="automatic" />
 
-Mark the field, say what to fix inline, scroll the body to it, shake once. Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: <a target="_top" href="./?path=/docs/patterns-overview--docs">Errors</a>.
+Mark the field, say what to fix inline, scroll the body to it, shake once. Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a>.
 
 <DoDontPair
     doExample={<ErrorOnField />}
@@ -195,7 +195,7 @@ A caption stays after the person types and is read by a screen reader with the f
 
 <RuleTag kind="automatic" />
 
-Close, Cancel and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A confirm view prop on the Modal is Planned <PlannedTag />. A form with no edits leaves at once. In a focused task, Close and Cancel play the opening backwards once the person confirms.
+Close, Cancel and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a focused task, Close and Cancel play the opening backwards once the person confirms.
 
 ### Prefer a bound input to a free one.
 

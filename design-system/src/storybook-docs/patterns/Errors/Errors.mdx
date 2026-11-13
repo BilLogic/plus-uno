@@ -20,7 +20,7 @@ import {
     page="patterns-states-errors"
     eyebrow="Pattern · States"
     title="Errors"
-    purpose="Where a failure shows and what it says. The place follows what failed: a field, a form, a view, a background job, or the whole page. The message is words, never a code, never in a tooltip, never color alone."
+    purpose="Where a failure shows and what it says: the place follows what failed, and the message is words, never a code or color alone."
     links={{
         label: 'Uses',
         items: [
@@ -65,7 +65,7 @@ Each failure has one home, as close to its cause as it can sit. A submit has two
 
 <ComponentExample of={ErrorsStories.KeySectionFailed} title="A Section that could not load" description="The rest of the page works. The Section's body shows the error in its empty-state slot with Try again; the view bar stays." />
 
-<ComponentExample of={ErrorsStories.KeyFlagOnPage} title="A failed save in the background" description="The person moved on; the Flag finds them at the top right, stays until dismissed, and offers Try again." />
+<ComponentExample of={ErrorsStories.KeyFlagOnPage} title="A failed save in the background" description="The person moved on; the Flag finds them at the top right, stays until Try again resolves it." />
 
 </div>
 
@@ -93,7 +93,7 @@ Use Errors whenever something failed and the person needs to know. Put the messa
 <tr><td>A submit the server rejected</td><td>Danger `SectionMessage` at the top of the form, plus field errors</td><td>Dismissed or fixed</td><td>What happened, what to do</td></tr>
 <tr><td>A view's content could not load</td><td>The empty-state slot</td><td>It loads</td><td>Try again</td></tr>
 <tr><td>This person has no access</td><td>The empty-state slot</td><td>Access changes</td><td>Who can help</td></tr>
-<tr><td>A job in the background</td><td>Danger `Flag`, top right, no autohide</td><td>Dismissed</td><td>Try again</td></tr>
+<tr><td>A job in the background</td><td>Danger `Flag`, top right, no autohide</td><td>Try again resolves it</td><td>Try again</td></tr>
 <tr><td>A condition on the whole page</td><td>Danger `Banner` at its tier</td><td>The condition ends</td><td>A link if there is one</td></tr>
 <tr><td>A menu's options</td><td>A "Couldn't load options" row in the menu</td><td>Retry succeeds</td><td>Retry</td></tr>
 </tbody>
@@ -163,7 +163,7 @@ Content that fails to load takes the place an empty view would, in the Section's
 
 <RuleTag kind="automatic" />
 
-The person has moved on, so the Flag finds them at the top right. A danger Flag does not hide on its own; it offers Try again and leaves on dismiss. `Flag` names the appearance `error`.
+The person has moved on, so the Flag finds them at the top right. A danger Flag does not hide on its own; it offers Try again and stays until Try again resolves it. `Flag` names the appearance `error`.
 
 ### Use a Banner only for a condition on the whole page.
 

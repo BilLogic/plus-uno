@@ -19,9 +19,9 @@ Every empty state is one of four. The type decides the words and whether there i
 
 ## Where it sits
 
-The place sets the spacing and the alignment. The words stay the same.
+The place sets the spacing and the alignment; the words stay the same. Today the block is centered; the Planned alignment is shown first.
 
-- **A full page.** The block lines up with the page title, left-aligned with no wide margin, the picture above the text. The block is centered today.
+- **A full page.** The block lines up with the page title, left-aligned with no wide margin, the picture above the text.
 - **In a table.** The empty state replaces the whole table: no column headers, no footer. The block is centered and its text stays left-aligned. The Table keeps its header row and centers the text today.
 - **In a card.** Compact: a smaller picture and heading, the block centered in the card, the text left-aligned. Several cards at once drop their pictures and use Subtle actions. The text is centered today.
 - **In a Panel.** The Details Panel when its record was removed: the block at the top of the body, with a way back.
