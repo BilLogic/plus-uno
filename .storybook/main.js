@@ -81,13 +81,6 @@ const config = {
     // Map @ to src
     config.resolve.alias['@'] = srcPath;
 
-    // `vitest/browser` exists only under the vitest browser runner. A story that
-    // imports it must still load in the real build, so outside vitest it resolves
-    // to a stub (scripts/stories-vitest-only-imports.test.mjs holds the rule).
-    if (!process.env.VITEST) {
-      config.resolve.alias['vitest/browser'] = path.resolve(__dirname, 'vitest-browser-stub.js');
-    }
-
     // Ensure Vite can resolve relative paths from project root
     if (!config.resolve.modules) {
       config.resolve.modules = ['node_modules', rootDir];

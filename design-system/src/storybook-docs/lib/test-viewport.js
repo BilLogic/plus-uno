@@ -147,3 +147,13 @@ export const emulateReducedMotion = (value) => runBrowserCommand('emulateReduced
  */
 export const emulateColorPreferences = (colorScheme, contrast) =>
     runBrowserCommand('emulateColorPreferences', [colorScheme, contrast]);
+
+/**
+ * Drags the element at one CSS selector onto another with a real mouse, in the
+ * story's frame. Native drag-and-drop needs it; a synthetic pointer sequence
+ * never starts one.
+ * @param {string} from
+ * @param {string} to
+ * @returns {Promise<boolean>} false only in plain Storybook.
+ */
+export const dragAndDrop = (from, to) => runBrowserCommand('dragAndDrop', [from, to]);

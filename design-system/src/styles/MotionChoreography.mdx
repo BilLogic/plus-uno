@@ -5,7 +5,9 @@ import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
+    DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
+import { SpringMs } from '@/storybook-docs/illustrations/motion-physics.jsx';
 import * as ChoreographyStories from './MotionChoreography.stories.jsx';
 
 <Meta of={ChoreographyStories} />
@@ -15,16 +17,7 @@ import * as ChoreographyStories from './MotionChoreography.stories.jsx';
     eyebrow="Foundation · Motion"
     title="Choreography"
     purpose="How several moving parts stay coherent: one direction, no collisions, a set order, and a clear cause."
-    links={{
-        items: [
-            { title: 'Principles', href: '?path=/docs/foundations-motion-principles--docs' },
-            { title: 'Physics', href: '?path=/docs/foundations-motion-physics--docs' },
-            { title: 'Transitions', href: '?path=/docs/foundations-motion-transitions--docs' },
-            { title: 'Choreography', href: '?path=/docs/foundations-motion-choreography--docs', current: true },
-            { title: 'Playground', href: '?path=/docs/foundations-motion-playground--docs' },
-            { title: 'Library', href: '?path=/docs/foundations-motion-library--docs' },
-        ],
-    }}
+    section="foundations-motion"
 />
 
 <FoundationSection title="How to read the figures">
@@ -89,7 +82,7 @@ Nothing collides with a neighbor or shares its place mid-move. What leaves fades
 
 <FoundationSubsection title="Clean fades">
 
-The old content is fully gone before the new starts: the new content begins when the old is about 90% out, which is the 90% time of <C>appearance.fast</C> in the Physics table (about 70 ms). A true crossfade is kept for non-text content: an image, the Blanket, content arriving over a Skeleton.
+The old content is fully gone before the new starts: the new content begins when the old is about 90% out, which is the 90% time of <C>appearance.fast</C> in the Physics table (about <SpringMs token="appearance.fast" />). A true crossfade is kept for non-text content: an image, the Blanket, content arriving over a Skeleton.
 
 <Canvas of={ChoreographyStories.CleanFades} sourceState="none" />
 
@@ -204,7 +197,7 @@ Every motion is built from these atoms, each on a family.
         ['Scale and opacity', 'spatial with appearance', 'Modal'],
         ['Reveal from under another element', <C>spatial</C>, 'Breadcrumb row opening above the title'],
         ['Position and opacity', 'spatial with appearance', 'Flag; a milestone settle'],
-        ['Corner radius, moving with size', <C>spatial</C>, 'Drill into and climb back out: corners square off as the row becomes a page'],
+        ['Corner radius, moving with size', <C>spatial</C>, <>Drill into and climb back out (<DocsLink id="foundations-motion-transitions">Transitions</DocsLink>): corners square off as the row becomes a page</>],
     ]}
 />
 

@@ -955,3 +955,13 @@ export const OneSpringFiveWays = () => {
     </>
   );
 };
+
+// ---------- Numbers in prose ----------
+
+/**
+ * A spring's time in prose, read from the same generated config the token table
+ * reads, so a sentence cannot drift from the table. `of` is `t90` (the table's
+ * 90% column) or `settle`; `mode` is `productive` or `expressive`.
+ */
+export const springMs = (token, of = 't90', mode = 'productive') => ms(measure(springFor(token, mode))[of]);
+export const SpringMs = ({ token, of = 't90', mode = 'productive' }) => <>{springMs(token, of, mode)}</>;

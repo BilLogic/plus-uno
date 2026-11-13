@@ -1,5 +1,6 @@
 import React from 'react';
 import { HEROES } from './hero-registry.jsx';
+import { sectionLinks } from './sections.js';
 
 /**
  * The opener every Foundations, Templates and Patterns docs page shares: an
@@ -12,6 +13,8 @@ import { HEROES } from './hero-registry.jsx';
  * - `page`: the page's id, which picks the hero.
  * - `eyebrow`: the layer, then the group when the page has one (`Foundation`).
  * - `purpose`: the page's lead, unchanged, at most two lines.
+ * - `section`: a section id from `sections.js` (`foundations-motion`); the
+ *   links are that section's tab strip, with `page` marked current. Replaces `links`.
  * - `links`: `{ label, items }` for a labeled list (`Uses`; with no `label` it reads `Tokens`), or
  *   `{ items }` alone for the siblings of a group, where an item with
  *   `current: true` is the page you are on. An item is `{ title, href }`.
@@ -23,9 +26,10 @@ import { HEROES } from './hero-registry.jsx';
 /** The label a links row takes when the page passes none and the row is not a sibling list. */
 const DEFAULT_LINKS_LABEL = 'Tokens';
 
-export const DocsLanding = ({ page, eyebrow, title, purpose, links }) => {
+export const DocsLanding = ({ page, eyebrow, title, purpose, links, section }) => {
     const entry = HEROES[page];
     const Hero = entry?.Hero;
+    const strip = section ? { items: sectionLinks(section, page) } : links;
     return (
         <div className="sb-docs-landing" data-docs-landing={page}>
             <header className="sb-docs-header">
@@ -33,7 +37,7 @@ export const DocsLanding = ({ page, eyebrow, title, purpose, links }) => {
                 <h1 className="sb-docs-landing__title">{title}</h1>
                 <div className="sb-docs-landing__purpose sb-docs-measure">{purpose}</div>
             </header>
-            {links?.items?.length > 0 && <LandingLinks label={links.label ?? (links.items.some((i) => i.current) ? undefined : DEFAULT_LINKS_LABEL)} items={links.items} title={title} />}
+            {strip?.items?.length > 0 && <LandingLinks label={strip.label ?? (strip.items.some((i) => i.current) ? undefined : DEFAULT_LINKS_LABEL)} items={strip.items} title={title} />}
             {Hero && (
                 <div role="img" aria-label={entry.description} className="sb-docs-hero" data-hero={page}>
                     <Hero />

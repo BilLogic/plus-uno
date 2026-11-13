@@ -194,7 +194,8 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 }
 
 export const REMEDY =
-  '  -> Open the page with <DocsLanding page="<id>" eyebrow title purpose links />, and add the\n'
+  '  -> Open the page with <DocsLanding page="<id>" eyebrow title purpose links />\n'
+  + '     (or section="<id>" for a section tab strip), and add the\n'
   + `     page's hero to ${REGISTRY} with its one-sentence description.\n`
   + '     A new page is also added to PAGES in scripts/check-docs-landing.mjs.';
 

@@ -5,11 +5,11 @@
  *
  * Run: npx vitest run --project=storybook design-system/src/styles/MotionTransitions.stories.jsx
  */
-import { expect, waitFor } from 'storybook/test';
-import { userEvent as pointer } from 'vitest/browser';
+import { expect, userEvent, waitFor } from 'storybook/test';
 
 import { TRANSITION_DEMOS, TRANSITION_TREES } from '@/storybook-docs/illustrations/motion-transitions.jsx';
 import { DragReorder } from '@/storybook-docs/illustrations/motion-drag.jsx';
+import { dragAndDrop } from '@/storybook-docs/lib/test-viewport.js';
 import { reducedStory, story } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
 
 export default {
@@ -137,17 +137,17 @@ const settled = (canvasElement) => waitFor(() => expect(canvasElement.querySelec
 const dragsWithPointer = async ({ canvasElement }) => {
   const [list] = lists(canvasElement);
   await expect(orderOf(list)).toBe('a,b,c');
-  await pointer.dragAndDrop(handle(canvasElement, 'a'), canvasElement.querySelector('[data-item="c"]'));
+  await dragAndDrop('[data-item="a"] [data-grab]', '[data-item="c"]');
   await waitFor(() => expect(orderOf(list)).toBe('b,c,a'), { timeout: 15000 });
   await settled(canvasElement);
 };
 const movesWithKeyboard = async ({ canvasElement }) => {
   const [list] = lists(canvasElement);
   handle(canvasElement, 'a').focus();
-  await pointer.keyboard('{ }');
-  await pointer.keyboard('{ArrowDown}');
+  await userEvent.keyboard('{ }');
+  await userEvent.keyboard('{ArrowDown}');
   await expect(canvasElement.querySelector('[aria-live]').textContent).toMatch(/position 2 of 3/);
-  await pointer.keyboard('{ }');
+  await userEvent.keyboard('{ }');
   await waitFor(() => expect(orderOf(list)).toBe('b,a,c'), { timeout: 15000 });
   await settled(canvasElement);
 };
@@ -172,7 +172,7 @@ export const DragBetweenLists = {
   render: () => <DragReorder between fastForward={TEST_SPEED} />,
   play: async ({ canvasElement }) => {
     const [from, to] = lists(canvasElement);
-    await pointer.dragAndDrop(handle(canvasElement, 'a'), canvasElement.querySelector('[data-item="y"]'));
+    await dragAndDrop('[data-item="a"] [data-grab]', '[data-item="y"]');
     await waitFor(() => expect([orderOf(from), orderOf(to)]).toEqual(['b,c', 'x,a,y,z']), { timeout: 15000 });
     await settled(canvasElement);
   },
@@ -182,9 +182,9 @@ export const DragBetweenListsKeyboard = {
   play: async ({ canvasElement }) => {
     const [from, to] = lists(canvasElement);
     handle(canvasElement, 'a').focus();
-    await pointer.keyboard('{ }');
-    await pointer.keyboard('{ArrowRight}');
-    await pointer.keyboard('{ }');
+    await userEvent.keyboard('{ }');
+    await userEvent.keyboard('{ArrowRight}');
+    await userEvent.keyboard('{ }');
     await waitFor(() => expect([orderOf(from), orderOf(to)]).toEqual(['b,c', 'a,x,y,z']), { timeout: 15000 });
   },
 };
