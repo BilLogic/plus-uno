@@ -447,13 +447,14 @@ const preview = {
             "Part-to-whole",
             "Temporal"
           ],
-          "Libraries",
+          "Tech stack",
           [
             "Overview",
             "Base UI",
             "Font Awesome",
             "Highcharts",
-            "Motion"
+            "Motion",
+            "Pragmatic drag and drop"
           ],
           "*"
         ],

@@ -10,7 +10,7 @@
     "Templates/",
     "AI UI/",
     "Data visualizations/",
-    "Libraries/"
+    "Tech stack/"
   ],
   "componentGroups": {
     "Forms and inputs": [
@@ -445,13 +445,14 @@
       "Part-to-whole",
       "Temporal"
     ],
-    "Libraries",
+    "Tech stack",
     [
       "Overview",
       "Base UI",
       "Font Awesome",
       "Highcharts",
-      "Motion"
+      "Motion",
+      "Pragmatic drag and drop"
     ],
     "*"
   ],

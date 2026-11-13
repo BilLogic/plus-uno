@@ -27,7 +27,7 @@
  *   6. The sidebar's roots lead with the benchmark site's sections plus our
  *      Patterns and Templates, in order: Get started, Foundations, Components,
  *      Patterns, Templates, AI UI. Our own extras (Data visualizations,
- *      Libraries) follow.
+ *      Tech stack) follow.
  *   7. Every docs page and story file under `design-system/src/` is titled
  *      under a root the sidebar sort lists, so a page left under a retired
  *      root (`Getting started/…`, `Foundations/Patterns/…`) cannot open a
