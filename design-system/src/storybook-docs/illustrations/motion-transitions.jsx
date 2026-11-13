@@ -350,7 +350,7 @@ const SideSteps = ({ x, y, current }) => (
               d={`M${x + 4.5} ${cy} L${x + 6.5} ${cy + 2} L${x + 10} ${cy - 2}`}
               fill="none"
               stroke={PAINT.trackerVisited}
-              style={{ strokeWidth: 'var(--stroke-1)' }}
+              style={{ strokeWidth: 'var(--stroke-hairline)' }}
             />
           ) : (
             <circle
@@ -359,7 +359,7 @@ const SideSteps = ({ x, y, current }) => (
               r={2.5}
               fill="none"
               stroke={i === current ? PAINT.trackerCurrentRing : PAINT.trackerDot}
-              style={{ strokeWidth: 'var(--stroke-1)' }}
+              style={{ strokeWidth: 'var(--stroke-hairline)' }}
             />
           )}
           <SkeletonBar x={x + 14} y={cy - 2} w={16} heading={i === current} />

@@ -202,7 +202,7 @@
 /* The illustration kit's hairline: the stroke token. A hero drawing overrides it
    with half a stroke (HeroDrawing.jsx), since one kit unit is 2px there. */
 :root {
-    --illustration-hairline: var(--stroke-1);
+    --stroke-hairline: var(--stroke-1);
 }
 
 /* The hero frame: full column at 5:2, sunken, on a dot ground (one dot per

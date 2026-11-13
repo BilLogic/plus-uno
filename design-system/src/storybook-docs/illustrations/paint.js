@@ -192,10 +192,10 @@ export const CORNER = {
 
 /**
  * The hairline every outline and divider draws with. A hero draws one unit as 2px,
- * so `HeroDrawing` sets `--illustration-hairline` to half a stroke and every kit
+ * so `HeroDrawing` sets `--stroke-hairline` to half a stroke and every kit
  * outline inside a hero renders 1 device px; elsewhere docs-rhythm.css leaves it the stroke token.
  */
-export const HAIRLINE = { strokeWidth: 'var(--illustration-hairline)' };
+export const HAIRLINE = { strokeWidth: 'var(--stroke-hairline)' };
 
 /** The hairline a hero sets on its drawing: half a stroke, since one unit is 2px there. */
 export const HERO_HAIRLINE = 'calc(var(--stroke-1) / 2)';

@@ -89,7 +89,7 @@ export const Trail = ({ points, ghost, accent = false }) => {
         points={points.map(([x, y]) => `${x},${y}`).join(' ')}
         fill="none"
         stroke={color}
-        style={{ ...SERIES, strokeWidth: 'var(--stroke-1)' }}
+        style={{ ...SERIES, strokeWidth: 'var(--stroke-hairline)' }}
       />
       <circle cx={sx} cy={sy} r={1.75} fill={color} />
       <polygon points={`${ex},${ey} ${head(0.5, 5)} ${head(-0.5, 5)}`} fill={color} />

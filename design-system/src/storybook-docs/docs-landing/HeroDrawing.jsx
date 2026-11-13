@@ -29,7 +29,7 @@ export const HeroDrawing = ({ children }) => (
         viewBox={`0 0 ${FRAME_UNITS.w} ${FRAME_UNITS.h}`}
         aria-hidden="true"
         focusable="false"
-        style={{ '--illustration-hairline': HERO_HAIRLINE }}
+        style={{ '--stroke-hairline': HERO_HAIRLINE }}
     >
         <HeroGround.Provider value>
             <g transform={`translate(${STAGE_ORIGIN.x} ${STAGE_ORIGIN.y})`}>{children}</g>
