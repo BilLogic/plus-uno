@@ -34,6 +34,17 @@ describe('springStills', () => {
   });
 });
 
+describe('springStills, advancing in time', () => {
+  const stills = springStills({ n: 5, from: [10, 80], to: [10, 20], advance: 12 });
+  it('moves each still `advance` along x, so time reads left to right', () => {
+    expect(stills.map((s) => s.x)).toEqual([10, 22, 34, 46, 58]);
+  });
+  it('keeps the spring on y, unchanged by the advance', () => {
+    const flat = springStills({ n: 5, from: [10, 80], to: [10, 20] });
+    expect(stills.map((s) => s.y)).toEqual(flat.map((s) => s.y));
+  });
+});
+
 describe('stopAtEdge', () => {
   const rect = { x: 40, y: 20, w: 20, h: 10 };
   it('stops a path from the left at the left edge', () => {

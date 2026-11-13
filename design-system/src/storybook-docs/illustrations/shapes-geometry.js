@@ -18,12 +18,13 @@ export const spring = (t, z = 0.38, w = 9) => {
  * One thing sampled at equal time steps on its way to `to` from `from`: the
  * stills of a spring trail. Points are spaced evenly in time (`step` seconds
  * apart) and along the travel axis by the spring, so they bunch where it slows.
- * `t` is 0..1 along the run, for fading the early stills.
+ * `advance` shifts each still that far along x, so time reads across the page
+ * while the spring runs on y. `t` is 0..1 along the run, for fading the early stills.
  */
-export const springStills = ({ n = 9, step = 0.08, from, to, z, w }) =>
+export const springStills = ({ n = 9, step = 0.08, from, to, z, w, advance = 0 }) =>
   Array.from({ length: n }, (_, i) => {
     const p = spring(i * step, z, w);
-    return { x: from[0] + (to[0] - from[0]) * p, y: from[1] + (to[1] - from[1]) * p, p, t: n === 1 ? 1 : i / (n - 1) };
+    return { x: from[0] + (to[0] - from[0]) * p + advance * i, y: from[1] + (to[1] - from[1]) * p, p, t: n === 1 ? 1 : i / (n - 1) };
   });
 
 /**

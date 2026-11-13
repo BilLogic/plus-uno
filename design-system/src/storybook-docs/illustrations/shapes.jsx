@@ -153,13 +153,16 @@ export const LogoConstruction = ({ x, y, size, accent = false, mark = false }) =
  * A spring caught at equal time steps: one still per step along a vertical run
  * from `from` to the dashed target line, fading in as it lands, so the gaps
  * show it fast, then overshooting, then settling. Accented, the last still is
- * the subject.
+ * the subject; `accentAll` paints every still in it, the fade carrying the
+ * order. `advance` spreads the stills across x, one `advance` per step, so time
+ * runs left to right; `step` is the seconds between stills.
  */
-export const SpringTrail = ({ x, y, w, h, accent = false, n = 9, still = 12 }) => {
+export const SpringTrail = ({ x, y, w, h, accent = false, accentAll = false, n = 9, still = 12, step = 0.075, advance = 0 }) => {
   const top = y + still / 2 + 4;
   const bottom = y + h - still / 2;
   const target = top + (bottom - top) * 0.25;
-  const stills = springStills({ n, step: 0.075, from: [x + w / 2, bottom], to: [x + w / 2, target] });
+  const x0 = advance ? x + still / 2 : x + w / 2;
+  const stills = springStills({ n, step, from: [x0, bottom], to: [x0, target], advance });
   const lastIndex = stills.length - 1;
   return (
     <g data-shape="spring-trail">
@@ -171,7 +174,7 @@ export const SpringTrail = ({ x, y, w, h, accent = false, n = 9, still = 12 }) =
           y={s.y - still / 2}
           w={still}
           h={still}
-          fill={accent && i === lastIndex ? PAINT.accent : PAINT.shape}
+          fill={accent && (accentAll || i === lastIndex) ? PAINT.accent : PAINT.shape}
           corner="shape"
           opacity={0.4 + 0.6 * s.t}
         />

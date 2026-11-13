@@ -28,7 +28,7 @@ import { HeroDrawing, HeroPane } from "./HeroDrawing.jsx";
  */
 
 /** The mouse pointer: the kit's pointer roles. */
-const Pointer = ({ x, y }) => (
+export const Pointer = ({ x, y }) => (
   <path
     transform={`translate(${x} ${y}) scale(1.5)`}
     d="M0 0 l0 12 l3 -3 l2.5 5.5 l2 -1 l-2.5 -5.5 l4.5 0 z"
