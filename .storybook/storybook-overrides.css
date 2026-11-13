@@ -208,6 +208,12 @@ body,
     font-family: var(--type-family-code) !important;
 }
 
+/* A code block scrolls inside its own box instead of widening the page. */
+.sbdocs pre {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
 .sbdocs code {
     color: var(--ds-text-subtle);
 }
@@ -215,6 +221,22 @@ body,
 /* Inline code is set apart by its fill; Storybook's border around it adds a second edge. */
 .sbdocs :not(pre) > code:not(:where(.docs-story *)) {
     border: 0 !important;
+    /* A long path breaks where it must, so prose never widens the page. */
+    overflow-wrap: anywhere;
+    white-space: normal !important;
+    display: inline !important;
+}
+
+/* A wide block (a swatch row, a table) scrolls inside its own box. */
+.sbdocs .sb-docs-scroll {
+    position: relative;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* A token name wraps inside its swatch cell instead of spilling out of it. */
+.sbdocs .sb-docs-scroll span {
+    overflow-wrap: anywhere;
 }
 
 /*
@@ -500,7 +522,9 @@ a.sbdocs-a {
  * Prefer `<DocsTable>` / `<table class="sb-ds-doc-table">` over Markdown pipe tables.
  */
 .sbdocs .sb-ds-doc-table-wrap {
-  overflow: hidden;
+  /* Positioned, so screen-reader text inside it scrolls with the table instead of widening the page. */
+  position: relative;
+  overflow-x: auto;
   width: 100%;
   margin: var(--stack-md) 0 0;
   border: var(--border-default) solid var(--ds-border);
@@ -664,7 +688,8 @@ a.sbdocs-a {
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 0 !important;
-    overflow: visible !important;
+    min-width: 0;
+    overflow-x: auto !important;
     background: transparent !important;
     padding: 0 !important;
     width: 100% !important;
@@ -1171,6 +1196,26 @@ html[data-color-mode="dark"] .docs-story {
 .sbdocs .sb-ds-docs-preview-well__inner {
   min-height: calc(var(--control-lg) * 2.5);
   padding: var(--page-stack-lg);
+}
+
+/* A demo never widens the page: the well shrinks to its column and a demo wider
+   than the screen scrolls inside the well. */
+.sbdocs .sb-docs-demo,
+.sbdocs .sb-ds-docs-preview-well {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sbdocs .sb-ds-docs-preview-well__inner {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* The attached canvas (a story shown as its own block) scrolls the same way. */
+.sbdocs .sb-ds-docs-canvas-attached-root .docs-story {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 /* The Resources block: a docs section (docs-rhythm.css sets its spacing). */

@@ -316,7 +316,7 @@ export const ExplodedStack = () => {
 
 /** One tile per level: its surface with its shadow, on the ground it sits on. */
 export const LevelTiles = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(calc(var(--image-xl) * 2), 1fr))', gap: 'var(--grid-gutter)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, calc(var(--image-xl) * 2)), 1fr))', gap: 'var(--grid-gutter)' }}>
         {LEVELS.map((l) => {
             const onBackdrop = l.id === 'blocking';
             return (
@@ -505,7 +505,7 @@ export const ShadowComposer = () => {
                 <Choice name="Level" options={SLOTTED_LEVELS.map((l) => ({ id: l.id, label: l.name }))} value={levelId} onChange={setLevelId} />
                 <Choice name="Color mode" options={MODE_OPTIONS} value={mode} onChange={setMode} />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--grid-gutter)', alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))', gap: 'var(--grid-gutter)', alignItems: 'start' }}>
                 <div
                     ref={ground}
                     data-color-mode={mode}
@@ -720,7 +720,7 @@ const LadderPane = ({ mode }) => {
 
 /** The surface ladder in light and dark: in dark, each step up is lighter. */
 export const SurfaceLadder = () => (
-    <div data-testid="surface-ladder" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--grid-gutter)' }}>
+    <div data-testid="surface-ladder" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))', gap: 'var(--grid-gutter)' }}>
         <LadderPane mode="light" />
         <LadderPane mode="dark" />
     </div>
@@ -910,7 +910,7 @@ export const ContrastDemo = () => {
             <div
                 data-color-mode={mode}
                 data-contrast-mode={more ? 'more' : 'no-preference'}
-                data-docs-stage style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)' }}
+                data-docs-stage style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)' }}
             >
                 <PatternCard title="Card" description="The raised ring." />
                 <div className="plus-popup" style={{ position: 'relative', width: 'auto' }}>
