@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { claudeToolUse, excludesOf, geminiSettings, isGemini, runGemini, toClaudeStream, vertexMissing } from './gemini-agent.mjs';
+import { claudeToolUse, estimateGeminiCost, excludesOf, geminiSettings, isGemini, runGemini, toClaudeStream, vertexBudget, vertexMissing } from './gemini-agent.mjs';
 
 const line = (o) => JSON.stringify(o);
 
@@ -81,4 +81,23 @@ test('runGemini isolates settings in GEMINI_CLI_HOME and normalizes the output',
   assert.ok(seen.args.includes('--sandbox'));
   assert.notEqual(seen.home, undefined);
   assert.equal(JSON.parse(out.stdout).type, 'result');
+});
+
+test('Vertex output includes reasoning tokens omitted by the CLI candidate count', () => {
+  const result = JSON.parse(toClaudeStream(line({ type: 'result', status: 'success', stats: { input_tokens: 100, input: 60, cached: 40, output_tokens: 7, total_tokens: 132 } }), '/c'));
+  assert.equal(result.usage.output_tokens, 32);
+});
+
+test('Vertex estimates use separate uncached, cached and billable output counts', () => {
+  assert.equal(estimateGeminiCost({ input_tokens: 1_000_000, cache_read_tokens: 2_000_000, output_tokens: 100_000 }), 1.275);
+  assert.equal(estimateGeminiCost({ input_tokens: 0, cache_read_tokens: 0, output_tokens: 0 }), 0);
+  assert.equal(estimateGeminiCost({ input_tokens: null, output_tokens: null }), null);
+});
+
+test('Vertex budget reserves the next run and stops on missing usage', () => {
+  const rows = [{ model: 'sonnet', cost_usd: 100 }, { model: 'gemini-3.8-flash', estimated_cost_usd: 39.5 }];
+  assert.equal(vertexBudget(rows).can_start, true);
+  assert.equal(vertexBudget([...rows, { model: 'gemini-3.8-flash', estimated_cost_usd: 1 }]).can_start, false);
+  assert.equal(vertexBudget([{ model: 'gemini-3.8-flash', input_tokens: null, output_tokens: null }]).can_start, false);
+  assert.equal(vertexBudget(rows).spent, 39.5);
 });
