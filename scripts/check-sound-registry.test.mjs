@@ -87,3 +87,13 @@ test('the sound runtime and tests may use them', () => {
     { path: 'design-system/src/components/Flag/Flag.test.jsx', text },
   ]), []);
 });
+
+test('unknown literal moment references fail with their source location', () => {
+  const registry = [row('Flag', ev({ token: 'notify' }))];
+  const file = 'design-system/src/components/Flag/Flag.jsx';
+  assert.deepEqual(go(registry, [{ path: file, text: "playMoment('Flag', 'enter');" }]), []);
+  const failures = go(registry, [{ path: file, text: "resolveMoment('Flag', 'typo');\nplayMoment('Missing', 'enter');" }]);
+  assert.equal(failures.length, 2);
+  assert.equal(failures[0].line, 1);
+  assert.match(failures[0].message, /Unknown sound moment.*Flag.typo/);
+});
