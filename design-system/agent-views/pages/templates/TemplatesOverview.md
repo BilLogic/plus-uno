@@ -18,7 +18,7 @@ Broadest first. Each page opens with its types, then the anatomy and key states 
 - **Form.** A stack of fields with a footer, in one of four places: in a page, in a Panel, in a Modal, or in steps.
 - **Modal.** One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps.
 - **Panel.** A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications.
-- **Popup.** A floating layer that hangs off its trigger and closes on an outside click. Five types, from menu to filter menu.
+- **Popup.** A floating layer that hangs off its trigger and closes on an outside click. Six types, from menu to stacked filter menu.
 
 ## Which template for which job
 
@@ -31,7 +31,7 @@ A suggested starting point for each scenario, with the patterns to consult and t
 | A record page, one level down | Page with a breadcrumb and page tabs | Navigation · Indicators | `Breadcrumb`, `PageHeader`, `StatusTag`, `Tabs`, `PopupSelect` |
 | Working through a queue | Section with a detail | Navigation · Common actions | `Table`, `Button` |
 | A quick look at one row | Panel · Details | Navigation | `Panel`, `Button` |
-| A short decision before going on | Modal · Active, 4-col | Common actions · Errors | `Modal`, `Button` |
+| A short decision before going on | Modal · Active, confirm width | Common actions · Errors | `Modal`, `Button` |
 | A long task with steps | Frame · focused, with a Form in steps | Forms · Navigation | `ProgressTracker`, `Fieldset`, `Button` |
 | Settings saved as a group | Section with subsections, Form in a page | Forms · Read-only · Disabled | `Fieldset`, `TextField`, `PopupSelect`, `Toggle`, `Button` |
 | Narrowing a long catalog | Section with a filter side | Filtering | `Checkbox`, `PopupSelect`, `Button` |
@@ -56,16 +56,10 @@ One chooser for the four layers that take over from the page or sit above it. A 
 | has its own URL | Yes | No | No | No |
 | closes on Escape and returns focus | No | Yes | Yes | Yes |
 
-A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or that outlives a click, leaves the Popup for a Panel. Leaving a focused task goes through Close or Cancel, and unsaved work asks first, in a Modal. Only a Modal brings a Backdrop, and a confirm Modal over a Panel, a Popup or a focused task brings its own.
+A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or that outlives a click, leaves the Popup for a Panel. Leaving a focused task goes through Close or Cancel, and unsaved work asks first, in a Modal.
 
 ## Opening a record
 
 Least room to most. Pick the lowest step that fits; Navigation holds the rule.
-
-1. **Expand the row.** A few more lines, links at most.
-2. **Section detail.** On a queue page, the record opens beside its list.
-3. **Details Panel.** A quick look or a short edit from a table on any other page.
-4. **Modal.** A rare, critical task with fewer than five fields.
-5. **Its own page.** Complex or stepped work, or anything worth a URL.
 
 Where a message sits, in a Frame, Page or Section banner, a Flag or a SectionMessage, is Notifications.

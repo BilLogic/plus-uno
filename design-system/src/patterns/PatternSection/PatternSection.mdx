@@ -1,3 +1,4 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -104,11 +105,11 @@ A queue Section with a view bar, a detail and a footer. The title, the first pil
 
 ## Header types
 
-A starting set, picked by what the Section holds. Every control state lives on its component: <a target="_top" href="./?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a>, <a target="_top" href="./?path=/docs/components-forms-and-inputs-button-filter-button--docs">Filter button</a> and <a target="_top" href="./?path=/docs/components-navigation-tabs--docs">Tabs</a>. Which filters the bar takes is <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>; how the search field behaves is the Search pattern, listed in <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>.
+A starting set, picked by what the Section holds. Every control state lives on its component: <DocsLink id="components-forms-and-inputs-button-icon-button">Icon button</DocsLink>, <DocsLink id="components-forms-and-inputs-button-filter-button">Filter button</DocsLink> and <DocsLink id="components-navigation-tabs">Tabs</DocsLink>. Which filters the bar takes is <DocsLink id="patterns-finding-things-filtering">Filtering</DocsLink>; how the search field behaves is the Search pattern, listed in <DocsLink id="patterns-overview">Patterns</DocsLink>.
 
 <TypeGrid>
 <TypeCard of={PatternSectionStories.HeaderTypeTitle} title="Title">A title and a description, nothing to act on. Most Sections that hold cards or a form.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeTitleAndActions} title="Title and actions">Section actions in the title row, only when there is no view bar. One Primary and two others at most.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeTitleAndActions} title="Title and actions">Section actions in the title row. One Primary and two others at most.</TypeCard>
 <TypeCard of={PatternSectionStories.HeaderTypeViewBarOneView} title="View bar, one view">One pill names the rows and stays, so nothing moves when a second view arrives.</TypeCard>
 <TypeCard of={PatternSectionStories.HeaderTypeViewBarSeveralViews} title="View bar, several views">Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.</TypeCard>
 <TypeCard of={PatternSectionStories.HeaderTypeFormatSwitch} title="Format switch">When the rows show as a table or a calendar, equal-width segments sit first at the end.</TypeCard>
@@ -127,7 +128,7 @@ A starting set, picked by what the Section holds. Every control state lives on i
 
 <ComponentExample of={PatternSectionStories.SideAtEnd} title="Side at the end" description="A summary beside the body with no fill. The header spans the full width; body and side split under it." />
 
-<ComponentExample of={PatternSectionStories.FilterSideAtStart} title="Filter side at the start" description={'When filtering is the main job: "Reset filters" at the top and a count beside each category. The bar has no Filter icon while the side shows. The tiers are the Filtering pattern.'} />
+<ComponentExample of={PatternSectionStories.FilterSideAtStart} title="Filter side at the start" description={'When filtering is the main job: "Reset filters" at the top and a count beside each category. The tiers are the Filtering pattern.'} />
 
 <ComponentExample of={PatternSectionStories.TypeQueue} title="Detail" description="The picked record beside the list, with Previous and Next in its header and its own footer. Heavy work opens on its own page from the detail footer." />
 
@@ -151,7 +152,7 @@ Drag the width through 960 and 768. From 960 the filter side sits at the start. 
 
 <ComponentExample of={PatternSectionStories.EmptyInTable} title="Empty, in a table" description={'The empty state replaces the whole table, column headers and footer too, and offers "Reset filters". The rule is the Empty pattern\'s.'} />
 
-Loading, errors and the search field follow their patterns and components: Loading, Errors and Search, listed in <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>.
+Loading, errors and the search field follow their patterns and components: Loading, Errors and Search, listed in <DocsLink id="patterns-overview">Patterns</DocsLink>.
 
 </div>
 
@@ -168,6 +169,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><td><code>--section-stack-md</code></td><td>Header to body; body to footer.</td></tr>
 <tr><td><code>--section-stack-lg</code></td><td>Between subsections.</td></tr>
 <tr><td><code>--section-min-width-main</code>, <code>--section-min-width-side</code></td><td>The main and side columns of a split.</td></tr>
+<tr><td>Detail split</td><td>The list spans 7 of 12 columns and the detail 5, from 960 up (<code>SECTION_DETAIL_FLOOR</code>). A grid span in the Section styles, with no token.</td></tr>
 <tr><td><code>--section-radius</code></td><td>16: the corner of a Section with <code>fill="subtle"</code>. A Card inside it takes <code>--card-radius-compact</code> (12) instead of <code>--card-radius</code>.</td></tr>
 <tr><td><code>--section-pad-x-default</code>, <code>--section-pad-y-default</code></td><td>A Section with <code>fill="subtle"</code>, on <code>--ds-surface-sunken</code>.</td></tr>
 <tr><td><code>--heading-medium</code>, <code>--heading-small</code></td><td>A Section title and a subsection title.</td></tr>
@@ -201,8 +203,9 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><th>Slot or prop</th><th>Holds</th></tr>
 </thead>
 <tbody>
-<tr><td><code>title</code> · <code>description</code> · <code>actions</code></td><td>The title row. Actions only when there is no view bar.</td></tr>
+<tr><td><code>title</code> · <code>description</code> · <code>actions</code></td><td>The title row.</td></tr>
 <tr><td><code>viewBar</code> <PlannedTag /></td><td>Planned. Pill Tabs at the start; at the end the format switch, Search, the filters, More and the labeled Primary. Today the view bar goes in <code>tabs</code>.</td></tr>
+<tr><td><code>toolbar</code></td><td>A <code>SectionToolbar</code>, the row under the title row for the search, filters and actions of a table. Pass a <code>PatternSection.Toolbar</code> as the <code>toolbar</code> prop. It takes the place of <code>tabs</code> when both are passed.</td></tr>
 <tr><td><code>tabs</code> · <code>type="tabs-only"</code></td><td>The row under the title row; <code>tabs-only</code> hides the title row from sight when the page title names the collection.</td></tr>
 <tr><td><code>fill</code></td><td><code>none</code> or <code>subtle</code>, for the Section; the detail always takes <code>subtle</code>.</td></tr>
 <tr><td><code>children</code></td><td>The body: a Table, a card grid, a list, a form or subsections.</td></tr>
@@ -213,7 +216,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 </tbody>
 </DocsTable>
 
-The bulk bar lives in the Dynamic table's head row, through its <code>bulkActions</code>, and the Section holds nothing for it: <a target="_top" href="./?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a>.
+The bulk bar lives in the Dynamic table's head row, through its <code>bulkActions</code>, and the Section holds nothing for it: <DocsLink id="components-text-and-data-display-dynamic-table">Dynamic table</DocsLink>.
 
 </div>
 
@@ -231,7 +234,7 @@ The bulk bar lives in the Dynamic table's head row, through its <code>bulkAction
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. Below 960 a side or a detail takes over the body, with a way back.
+A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill.
 
 </div>
 
@@ -350,7 +353,7 @@ The subtle fill sets a part apart from its neighbor, such as a detail or a filte
 
 A subsection is an h3. A Section that already has a view bar holds subsections without one.
 
-The table's empty state replaces the whole table, by the Empty pattern; elevation and fills follow <a target="_top" href="./?path=/docs/foundations-elevation--docs">Elevation</a>.
+The table's empty state replaces the whole table, by the Empty pattern; elevation and fills follow <DocsLink id="foundations-elevation">Elevation</DocsLink>.
 
 </div>
 
@@ -388,12 +391,12 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/templates-page-page--docs">Page</a>: use when the heading is the page's own.
-- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use when the record should float over the Page instead of sitting beside the list.
-- <a target="_top" href="./?path=/docs/templates-popup-popup--docs">Popup</a>: use when choosing the menu the view Select or the Filter icon opens.
-- <a target="_top" href="./?path=/docs/templates-section-table--docs">Table</a>: use when the body is rows and columns.
-- <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>: use when picking a filter tier for the view bar.
-- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when the question is the search field's behavior (Search) or an empty body (Empty).
+- <DocsLink id="templates-page-page">Page</DocsLink>: use when the heading is the page's own.
+- <DocsLink id="templates-panel-panel">Panel</DocsLink>: use when the record should float over the Page instead of sitting beside the list.
+- <DocsLink id="templates-popup-popup">Popup</DocsLink>: use when choosing the menu the view Select or the Filter icon opens.
+- <DocsLink id="templates-section-table">Table</DocsLink>: use when the body is rows and columns.
+- <DocsLink id="patterns-finding-things-filtering">Filtering</DocsLink>: use when picking a filter tier for the view bar.
+- <DocsLink id="patterns-overview">Patterns</DocsLink>: use when the question is the search field's behavior (Search) or an empty body (Empty).
 
 </div>
 

@@ -99,7 +99,7 @@ When to validate, what a blocked submit does, required and optional marks, and l
 
 - For a single value changed in place, use `InlineEdit`.
 - For a yes-or-no that applies at once, use `Toggle`.
-- For a confirm with no fields, use `Modal` · Active at 4-col.
+- For a confirm with no fields, use `Modal` · Active, at the confirm width.
 
 ## Content guidelines
 
@@ -140,8 +140,8 @@ The rules for a form live in the pattern pages. This page keeps only how a form 
 
 - Where the buttons sit and in which look, full bleed and 48 high, and the footer that stays put: Common actions.
 - When to validate, the enabled submit, a blocked submit and a rejected one, bound inputs and leaving with edits: Forms.
-- The sending button: Patterns, Loading.
-- A field that waits on another, and where its reason goes: Patterns, Disabled.
+- The sending button: Loading.
+- A field that waits on another, and where its reason goes: Disabled.
 
 ### Keep a short edit beside the page. {#keep-a-short-edit-beside-the-page}
 

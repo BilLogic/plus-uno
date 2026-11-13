@@ -20,7 +20,7 @@ Also asked as: page section, toolbar, section header, block, region.
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. Below 960 a side or a detail takes over the body, with a way back.
+A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill.
 
 ## Motion
 
@@ -163,7 +163,7 @@ Common starting types of the one Section, not new components. Each is a header t
 A starting set, picked by what the Section holds. Every control state lives on its component: Icon button, Filter button and Tabs. Which filters the bar takes is Filtering; how the search field behaves is the Search pattern, listed in Patterns.
 
 - **Title.** A title and a description, nothing to act on. Most Sections that hold cards or a form.
-- **Title and actions.** Section actions in the title row, only when there is no view bar. One Primary and two others at most.
+- **Title and actions.** Section actions in the title row. One Primary and two others at most.
 - **View bar, one view.** One pill names the rows and stays, so nothing moves when a second view arrives.
 - **View bar, several views.** Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.
 - **Format switch.** When the rows show as a table or a calendar, equal-width segments sit first at the end.
@@ -185,8 +185,9 @@ A queue Section with a view bar, a detail and a footer. The title, the first pil
 
 | Slot or prop | Holds |
 | --- | --- |
-| `title` · `description` · `actions` | The title row. Actions only when there is no view bar. |
+| `title` · `description` · `actions` | The title row. |
 | `viewBar` | Planned. Pill Tabs at the start; at the end the format switch, Search, the filters, More and the labeled Primary. Today the view bar goes in `tabs`. |
+| `toolbar` | A `SectionToolbar`, the row under the title row for the search, filters and actions of a table. Pass a `PatternSection.Toolbar` as the `toolbar` prop. It takes the place of `tabs` when both are passed. |
 | `tabs` · `type="tabs-only"` | The row under the title row; `tabs-only` hides the title row from sight when the page title names the collection. |
 | `fill` | `none` or `subtle`, for the Section; the detail always takes `subtle`. |
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
@@ -205,6 +206,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `--section-stack-md` | Header to body; body to footer. |
 | `--section-stack-lg` | Between subsections. |
 | `--section-min-width-main`, `--section-min-width-side` | The main and side columns of a split. |
+| Detail split | The list spans 7 of 12 columns and the detail 5, from 960 up (`SECTION_DETAIL_FLOOR`). A grid span in the Section styles, with no token. |
 | `--section-radius` | 16: the corner of a Section with `fill="subtle"`. A Card inside it takes `--card-radius-compact` (12) instead of `--card-radius`. |
 | `--section-pad-x-default`, `--section-pad-y-default` | A Section with `fill="subtle"`, on `--ds-surface-sunken`. |
 | `--heading-medium`, `--heading-small` | A Section title and a subsection title. |

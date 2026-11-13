@@ -1,3 +1,4 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -11,8 +12,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { PlannedTag, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
-import { TypeCard } from './pageDemo.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
     AddInViewBar,
@@ -57,11 +57,9 @@ import {
 
 ## Types
 
-"Fluid" means only the full-width type; everything else adapts inside the cap.
-
 <TypeGrid>
-<TypeCard of={PageStories.TypeDefault} title="Default">The content grid, centered and capped at its content width. Nearly every page.</TypeCard>
-<TypeCard of={PageStories.TypeFullWidth} title="Full width">The content runs to the pad with no cap, for a page that fills it, such as chat or a board.</TypeCard>
+<TypeCard of={PageStories.TypeDefault} title="Default" stage={1920}>The content grid, centered and capped at its content width. Nearly every page.</TypeCard>
+<TypeCard of={PageStories.TypeFullWidth} title="Full width" stage={1920}>The content runs to the pad with no cap, for a page that fills it, such as chat or a board.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -114,23 +112,13 @@ Drag the width through the content cap. Past it the content stops at the cap and
 
 <ComponentExample of={PageStories.KeyBanner} title="Page banner" description="A message about this page sits under the page header and scrolls with the content. Which tier a message belongs to is the Notifications pattern, listed in the Patterns overview." />
 
-Scrolled is planned: once the title scrolls away the header shrinks to one sticky row, with the page tabs under it.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Levels
 
-A Page used alone is a tokenized container: a level is a fill and its shadow together, so a Page never wears one without the other. The frame draws its own content box the same way.
-
-<ComponentExample of={PageStories.Sunken} title="Sunken" description="The frame's backdrop, with no shadow." />
-
-<ComponentExample of={PageStories.DefaultLevel} title="Default" description="The page, edged by its surface border." />
-
-<ComponentExample of={PageStories.Raised} title="Raised" description="A card, with the raised shadow." />
-
-<ComponentExample of={PageStories.Overlay} title="Overlay" description="Anything over the UI, with the overlay shadow." />
+A Page used alone is a tokenized container: a fill and its shadow together. The four levels, Sunken, Default, Raised and Overlay, are taught on <DocsLink id="foundations-elevation">Elevation</DocsLink>.
 
 </div>
 
@@ -150,7 +138,7 @@ A Page used alone is a tokenized container: a level is a fill and its shadow tog
 <tr><td><code>--heading-large</code>, <code>--body-default</code>, <code>--body-small</code></td><td>The title, the description, the breadcrumb.</td></tr>
 <tr><td><code>--content-max-width</code>, <code>--content-min-width</code></td><td>The cap and the floor of the content grid.</td></tr>
 <tr><td><code>--grid-columns</code>, <code>--grid-gutter</code>, <code>--page-pad</code></td><td>The 12-column grid, its gutter and the pad.</td></tr>
-<tr><td><code>--ds-surface-sunken</code>, <code>--ds-surface</code>, <code>--ds-surface-raised</code>, <code>--ds-surface-overlay</code></td><td>The four levels' fills, each with its shadow from <a target="_top" href="./?path=/docs/foundations-elevation--docs">Elevation</a>.</td></tr>
+<tr><td><code>--ds-surface-sunken</code>, <code>--ds-surface</code>, <code>--ds-surface-raised</code>, <code>--ds-surface-overlay</code></td><td>The four levels' fills, each with its shadow from <DocsLink id="foundations-elevation">Elevation</DocsLink>.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -206,7 +194,7 @@ A Page used alone is a tokenized container: a level is a fill and its shadow tog
 
 ## Usage
 
-Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at its content width; full width is the only fluid option and is for a page that fills it.
+Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at its content width; full width is for a page that fills it.
 
 </div>
 
@@ -241,7 +229,7 @@ A Section never stands in for it. Sections inside open at h2.
 
 <RuleTag kind="review" />
 
-When it shows and what it holds: the <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a> pattern.
+When it shows and what it holds: the <DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink> pattern.
 
 <DoDontPair
     doExample={<AreaPageTitleAlone />}
@@ -254,7 +242,7 @@ When it shows and what it holds: the <a target="_top" href="./?path=/docs/patter
 
 <RuleTag kind="review" />
 
-Page actions sit at the end of the title row and are about the page only. Where an add action goes: the <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a> pattern.
+Page actions sit at the end of the title row and are about the page only. Where an add action goes: the <DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink> pattern.
 
 <DoDontPair
     doExample={<AddInViewBar />}
@@ -280,7 +268,7 @@ Anything longer moves into the first Section.
 
 <RuleTag kind="review" />
 
-The rule and its reasons: the <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a> pattern. Page tabs name views of one subject; the Section's views become one labeled Select.
+The rule and its reasons: the <DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink> pattern. Page tabs name views of one subject; the Section's views become one labeled Select.
 
 <DoDontPair
     doExample={<OneTabSystem />}
@@ -299,7 +287,7 @@ The breadcrumb with the title at its end, then the page actions; page tabs stick
 
 <RuleTag kind="review" />
 
-Which tier a message belongs to: the <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a> pattern.
+Which tier a message belongs to: the <DocsLink id="patterns-notifications-and-indicators-notifications">Notifications</DocsLink> pattern.
 
 </div>
 
@@ -338,11 +326,11 @@ Which tier a message belongs to: the <a target="_top" href="./?path=/docs/patter
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a>: use when deciding which type the page sits in.
-- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use when a region needs its own heading, view bar or detail.
-- <a target="_top" href="./?path=/docs/templates-section-card--docs">Card</a>: use when one object has a shape already agreed.
-- <a target="_top" href="./?path=/docs/foundations-elevation--docs">Elevation</a>: use when picking which shadow goes with which level.
-- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
+- <DocsLink id="templates-frame-frame">Frame</DocsLink>: use when deciding which type the page sits in.
+- <DocsLink id="templates-section-section">Section</DocsLink>: use when a region needs its own heading, view bar or detail.
+- <DocsLink id="templates-section-card">Card</DocsLink>: use when one object has a shape already agreed.
+- <DocsLink id="foundations-elevation">Elevation</DocsLink>: use when picking which shadow goes with which level.
+- <DocsLink id="patterns-overview">Patterns</DocsLink>: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
 </div>
 

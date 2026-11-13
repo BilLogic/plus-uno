@@ -1,3 +1,4 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -29,7 +30,7 @@ import {
     page="templates-panel-panel"
     eyebrow="Template"
     title="Panel"
-    purpose="A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications. The AI panel is a region of the Frame."
+    purpose="A full-height layer on the right with no Backdrop: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame."
     links={{
         label: 'Uses',
         items: [
@@ -51,7 +52,7 @@ import {
 
 ## Types
 
-Both open on the right with no Backdrop: docked at an edge line from 1168 and floating over the Page below that. Floating at every width is Planned.
+Both open on the right with no Backdrop: docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths). Floating at every width is Planned.
 
 <TypeGrid>
 <TypeCard of={PanelStories.TypeDetails} title="Details" stage={1100}>A quick look at a row, floating over the right of the Page. The picked row stays highlighted.</TypeCard>
@@ -105,9 +106,9 @@ Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge l
 
 <ComponentExample of={PanelStories.KeyEditing} title="Editing" description="The same Panel with the form open and its full-bleed footer: Cancel (Default) left and Save (Primary) right. Save returns to reading, which has no footer." />
 
-<ComponentExample of={PanelStories.KeyRecordGone} title="Record gone" description="When the row no longer exists the body shows its empty state with a way back: Patterns, Empty." />
+<ComponentExample of={PanelStories.KeyRecordGone} title="Record gone" description={<>When the row no longer exists the body shows its empty state with a way back: <DocsLink id="patterns-states-empty">Empty</DocsLink>.</>} />
 
-<ComponentExample of={PanelStories.KeyUnder1024} title="Under 1024" description="Too narrow to float beside the table: the Panel is capped at 320 and takes the whole width under 768. It floats on the overlay fill and shadow, still with no Backdrop." />
+<ComponentExample of={PanelStories.KeyUnder1024} title="Under 1024" description="Too narrow to dock beside the table: the Panel floats on the overlay fill and shadow, capped as Width behavior says, still with no Backdrop." />
 
 ### Beside the AI panel <PlannedTag />
 
@@ -216,7 +217,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 
 <RuleTag kind="automatic" />
 
-The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Under 1024 it is capped at 320, and under 768 it takes the whole width, still with no Backdrop. A confirm Modal over a Panel brings its own Backdrop.
+The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Narrow, it is capped and then full width, still with no Backdrop. A confirm Modal over a Panel brings its own Backdrop.
 
 <DoDontPair
     doExample={<FloatsNoBackdrop />}
@@ -319,7 +320,7 @@ For the step up when the quick look is not enough.
 ## Accessibility
 
 - Floating, the Panel is a complementary landmark named by its title, after the Page in reading order. Focus moves to its title on open and returns to the row, or the Bell, on close.
-- Under 1024 it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
+- Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
 - Escape closes the Panel unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
 - An unread dot is paired with the text "unread" for a screen reader.
@@ -330,11 +331,11 @@ For the step up when the quick look is not enough.
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a>: use when the question is the AI panel, which is a Frame region.
-- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use when the record belongs beside its list on a queue page.
-- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use when the task needs full attention.
-- <a target="_top" href="./?path=/docs/templates-form--docs">Form</a>: use when the Panel edits a record.
-- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when you need the rules around a Panel: Navigation, Empty, Notifications.
+- <DocsLink id="templates-frame-frame">Frame</DocsLink>: use when the question is the AI panel, which is a Frame region.
+- <DocsLink id="templates-section-section">Section</DocsLink>: use when the record belongs beside its list on a queue page.
+- <DocsLink id="templates-modal-modal">Modal</DocsLink>: use when the task needs full attention.
+- <DocsLink id="templates-form">Form</DocsLink>: use when the Panel edits a record.
+- <DocsLink id="patterns-overview">Patterns</DocsLink>: use when you need the rules around a Panel: Navigation, Empty, Notifications.
 
 </div>
 

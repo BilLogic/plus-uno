@@ -2,7 +2,7 @@
 
 # Popup
 
-A floating layer that hangs off its trigger and closes on an outside click. Five types: menu, select list, filter menu, profile menu and content.
+A floating layer that hangs off its trigger and closes on an outside click. Six types: menu, profile menu, select list, content, filter menu and stacked filter menu.
 
 **Kind:** Template
 
@@ -15,7 +15,7 @@ Each is a composition on the Popup component, which owns placement, the outside 
 - **Menu.** Actions from a More button, at auto width. Applies on pick.
 - **Profile menu.** From the account row: who is signed in, then links and Sign out. The 3-col width is Planned: today the menu hugs its rows.
 - **Select list.** One list that applies as you pick: radios for one choice, checkboxes for several.
-- **Content.** A preview or a short explanation at 4-col, the cap. Anything wider is a Panel or a Modal.
+- **Content.** A preview or a short explanation. Anything wider is a Panel or a Modal.
 - **Filter menu.** Two or three categories, held until Apply. Reset and Apply sit full bleed, half each.
 - **Filter menu, stacked.** Four or more categories, or long lists, stacked at 3-col up to 4-col. The categories scroll between the pinned header and footer.
 
@@ -143,7 +143,7 @@ Don't: An end trigger with a start-aligned menu: it runs off the edge of the pag
 
 **Checked:** Automatic
 
-It hugs the longest item. The width is set once, on open, so it holds still while someone types. A long or loading list opens at 320. A long row: Patterns, Overflow.
+It hugs the longest item. The width is set once, on open, so it holds still while someone types. A long or loading list opens at 320. A long row: Overflow.
 
 Do: The menu is at least as wide as its trigger, so their edges line up.
 Don't: A menu narrower than the trigger it hangs off: the edges no longer line up.
@@ -187,4 +187,4 @@ A Popup floats on the overlay pair, `--ds-surface-overlay` with `--ds-shadow-ove
 
 Start with the verb: "Reschedule", "Export notes". An option that waits on something says why in its description line, as visible text.
 
-When a list applies, and the words Reset and Reset filters: Patterns, Filtering.
+When a list applies, and the words Reset and Reset filters: Filtering.

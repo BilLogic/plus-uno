@@ -1,3 +1,4 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -30,7 +31,7 @@ import {
     page="templates-popup-popup"
     eyebrow="Template"
     title="Popup"
-    purpose="A floating layer that hangs off its trigger and closes on an outside click. Five types: menu, select list, filter menu, profile menu and content."
+    purpose="A floating layer that hangs off its trigger and closes on an outside click. Six types: menu, profile menu, select list, content, filter menu and stacked filter menu."
     links={{
         label: 'Uses',
         items: [
@@ -58,7 +59,7 @@ Each is a composition on the Popup component, which owns placement, the outside 
 <TypeCard of={PopupStories.TypeMenu} title="Menu" stage={480}>Actions from a More button, at auto width. Applies on pick.</TypeCard>
 <TypeCard of={PopupStories.TypeProfileMenu} title="Profile menu" stage={480}>From the account row: who is signed in, then links and Sign out. The 3-col width is Planned: today the menu hugs its rows.</TypeCard>
 <TypeCard of={PopupStories.TypeSelectList} title="Select list" stage={480}>One list that applies as you pick: radios for one choice, checkboxes for several.</TypeCard>
-<TypeCard of={PopupStories.TypeContent} title="Content" stage={480}>A preview or a short explanation at 4-col, the cap. Anything wider is a Panel or a Modal.</TypeCard>
+<TypeCard of={PopupStories.TypeContent} title="Content" stage={480}>A preview or a short explanation. Anything wider is a Panel or a Modal.</TypeCard>
 <TypeCard of={PopupStories.TypeFilterMenu} title="Filter menu" stage={480}>Two or three categories, held until Apply. Reset and Apply sit full bleed, half each.</TypeCard>
 <TypeCard of={PopupStories.TypeFilterMenuStacked} title="Filter menu, stacked" stage={480}>Four or more categories, or long lists, stacked at 3-col up to 4-col. The categories scroll between the pinned header and footer.</TypeCard>
 </TypeGrid>
@@ -104,15 +105,15 @@ Aligned to the edge of the trigger on the side where it sits. A trigger at the s
 
 ## Key states
 
-<ComponentExample of={PopupStories.KeyLongLabel} title="Long label" description="A menu stops at 320. Past that a row ends in an ellipsis, and the full text opens in a Tooltip when clipped: Patterns, Overflow. The Tooltip on a clipped row is Planned." />
+<ComponentExample of={PopupStories.KeyLongLabel} title="Long label" description={<>A menu stops at 320. Past that a row ends in an ellipsis, and the full text opens in a Tooltip when clipped: <DocsLink id="patterns-states-overflow">Overflow</DocsLink>. The Tooltip on a clipped row is Planned.</>} />
 
-<ComponentExample of={PopupStories.KeyLoading} title="Loading a list" description="One “Loading options” row, with no skeleton: Patterns, Loading." />
+<ComponentExample of={PopupStories.KeyLoading} title="Loading a list" description={<>One “Loading options” row, with no skeleton: <DocsLink id="patterns-states-loading">Loading</DocsLink>.</>} />
 
 <ComponentExample of={PopupStories.KeyLoadFailed} title="Load failed" description="“Couldn't load options” with Retry; the menu stays open." />
 
 <ComponentExample of={PopupStories.KeyFlipped} title="Flipped" description="With no room below, the layer opens above the trigger and stays 8 from the screen edge." />
 
-<ComponentExample of={PopupStories.KeyFilterApplied} title="Filter applied" description="After Apply the menu closes and the count sits on the Filter icon's selected fill, read “Filters, 2 applied”. No chip row: Patterns, Filtering." />
+<ComponentExample of={PopupStories.KeyFilterApplied} title="Filter applied" description={<>After Apply the menu closes and the count sits on the Filter icon's selected fill, read “Filters, 2 applied”. No chip row: <DocsLink id="patterns-finding-things-filtering">Filtering</DocsLink>.</>} />
 
 </div>
 
@@ -253,7 +254,7 @@ A trigger at the start of a bar, such as the view picker under page tabs, gets a
 
 <RuleTag kind="automatic" />
 
-It hugs the longest item. The width is set once, on open, so it holds still while someone types. A long or loading list opens at 320. A long row: Patterns, Overflow.
+It hugs the longest item. The width is set once, on open, so it holds still while someone types. A long or loading list opens at 320. A long row: <DocsLink id="patterns-states-overflow">Overflow</DocsLink>.
 
 <DoDontPair
     doExample={<AsWideAsTrigger />}
@@ -313,7 +314,7 @@ A Popup floats on the overlay pair, `--ds-surface-overlay` with `--ds-shadow-ove
 
 Start with the verb: "Reschedule", "Export notes". An option that waits on something says why in its description line, as visible text.
 
-When a list applies, and the words Reset and Reset filters: Patterns, Filtering.
+When a list applies, and the words Reset and Reset filters: <DocsLink id="patterns-finding-things-filtering">Filtering</DocsLink>.
 
 </div>
 
@@ -351,11 +352,11 @@ When a list applies, and the words Reset and Reset filters: Patterns, Filtering.
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use when placing the Filter icon, the view picker or More in the view bar.
-- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use when the content must be finished before going on.
-- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use when the content is wider than 4-col or outlives a click.
-- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when you need the rules around a Popup: Filtering, Overflow, Loading, Disabled.
-- <a target="_top" href="./?path=/docs/components-overlays-and-layering-popup--docs">Popup</a>: use when you need its props and states.
+- <DocsLink id="templates-section-section">Section</DocsLink>: use when placing the Filter icon, the view picker or More in the view bar.
+- <DocsLink id="templates-modal-modal">Modal</DocsLink>: use when the content must be finished before going on.
+- <DocsLink id="templates-panel-panel">Panel</DocsLink>: use when the content is wider than 4-col or outlives a click.
+- <DocsLink id="patterns-overview">Patterns</DocsLink>: use when you need the rules around a Popup: Filtering, Overflow, Loading, Disabled.
+- <DocsLink id="components-overlays-and-layering-popup">Popup</DocsLink>: use when you need its props and states.
 
 </div>
 

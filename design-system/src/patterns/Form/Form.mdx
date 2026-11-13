@@ -1,3 +1,4 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -108,11 +109,11 @@ Each state shows how the form behaves in its host. Every field's own states live
 
 <ComponentExample of={FormStories.KeyFieldError} title="Field error on blur" description="The field takes its error look and the message says how to fix it. It clears once the rule is met." />
 
-<ComponentExample of={FormStories.KeyDisabledReason} title="Disabled with its reason" description="A field waits on another on the same screen; the caption says what to do first. Save stays enabled and says what is missing when pressed: Patterns, Disabled." />
+<ComponentExample of={FormStories.KeyDisabledReason} title="Disabled with its reason" description={<>A field waits on another on the same screen; the caption says what to do first. Save stays enabled and says what is missing when pressed: <DocsLink id="patterns-states-disabled">Disabled</DocsLink>.</>} />
 
 <ComponentExample of={FormStories.KeyBlockedSubmit} title="Blocked submit" description="The Modal stays open and marks the field with what to fix. Focus moves to the first bad field and the footer never moves. The Modal's single shake is Planned." />
 
-<ComponentExample of={FormStories.KeyServerSaysNo} title="The server says no" description="A danger SectionMessage at the top of the form, plus the field errors the server sent back. Nothing shakes: Patterns, Errors." />
+<ComponentExample of={FormStories.KeyServerSaysNo} title="The server says no" description={<>A danger SectionMessage at the top of the form, plus the field errors the server sent back. Nothing shakes: <DocsLink id="patterns-states-errors">Errors</DocsLink>.</>} />
 
 <ComponentExample of={FormStories.KeySending} title="Sending" description="The only time a button disables: it swaps its label for a spinner in place and keeps its width. Cancel stays live." />
 
@@ -206,7 +207,7 @@ Pick the host from the task:
 </tbody>
 </DocsTable>
 
-When to validate, what a blocked submit does, required and optional marks, and leaving with edits are the <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> pattern; where the buttons sit is the <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a> pattern. This page shows how a form sits in each container.
+When to validate, what a blocked submit does, required and optional marks, and leaving with edits are the <DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink> pattern; where the buttons sit is the <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink> pattern. This page shows how a form sits in each container.
 
 </div>
 
@@ -216,7 +217,7 @@ When to validate, what a blocked submit does, required and optional marks, and l
 
 - For a single value changed in place, use `InlineEdit`.
 - For a yes-or-no that applies at once, use `Toggle`.
-- For a confirm with no fields, use `Modal` · Active at 4-col.
+- For a confirm with no fields, use `Modal` · Active, at the confirm width.
 
 </div>
 
@@ -226,10 +227,10 @@ When to validate, what a blocked submit does, required and optional marks, and l
 
 The rules for a form live in the pattern pages. This page keeps only how a form sits in each container.
 
-- Where the buttons sit and in which look, full bleed and 48 high, and the footer that stays put: <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs#left-align-buttons-under-a-page-form-and-right-align-them-in-a-modal-a-focused-task-or-steps">Common actions</a>.
-- When to validate, the enabled submit, a blocked submit and a rejected one, bound inputs and leaving with edits: <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>.
-- The sending button: Patterns, Loading.
-- A field that waits on another, and where its reason goes: Patterns, Disabled.
+- Where the buttons sit and in which look, full bleed and 48 high, and the footer that stays put: <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink>.
+- When to validate, the enabled submit, a blocked submit and a rejected one, bound inputs and leaving with edits: <DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink>.
+- The sending button: <DocsLink id="patterns-states-loading">Loading</DocsLink>.
+- A field that waits on another, and where its reason goes: <DocsLink id="patterns-states-disabled">Disabled</DocsLink>.
 
 ### Keep a short edit beside the page.
 
@@ -292,11 +293,11 @@ Pair two fields side by side only when they belong together, such as first and l
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a>: use for a stepped form on its own page, in the focused type.
-- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use for the region a page form sits in.
-- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use for a rare, critical task with few fields.
-- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use for a short edit with the page still in view.
-- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use for the rules across forms: <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>, <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a>, Loading, Disabled, Errors.
+- <DocsLink id="templates-frame-frame">Frame</DocsLink>: use for a stepped form on its own page, in the focused type.
+- <DocsLink id="templates-section-section">Section</DocsLink>: use for the region a page form sits in.
+- <DocsLink id="templates-modal-modal">Modal</DocsLink>: use for a rare, critical task with few fields.
+- <DocsLink id="templates-panel-panel">Panel</DocsLink>: use for a short edit with the page still in view.
+- <DocsLink id="patterns-overview">Patterns</DocsLink>: use for the rules across forms: <DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink>, <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink>, Loading, Disabled, Errors.
 
 </div>
 

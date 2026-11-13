@@ -1,3 +1,4 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -5,18 +6,9 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import * as BackdropStories from './Backdrop.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
-    PanelWithConfirm,
-    PanelWithUnrelatedModal,
-    ModalConfirmsInside,
-    ModalOverModal,
-    ConfirmSmallDo,
-    ConfirmSmallDont,
-} from './Backdrop.examples.jsx';
-import {
     ComponentExample,
     DocsInteractivePlayground,
     DocsTable,
-    DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -26,7 +18,7 @@ import {
     page="templates-modal-backdrop"
     eyebrow="Template · Modal"
     title="Backdrop"
-    purpose="The Backdrop is the full-screen layer that holds the backdrop fill and the one layer above it, a modal, so that layer is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, and centers a modal. The examples on this page follow the toolbar's Color mode switch."
+    purpose="The Backdrop is the full-screen layer that holds the dimming fill and the one layer above it, a modal, so that layer is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, and centers a modal. The examples on this page follow the toolbar's Color mode switch."
     links={{
         items: [
             { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
@@ -102,14 +94,7 @@ import {
 
 A Backdrop interrupts the page for one task. It dims everything behind it with one fill, so the person sees only the layer on top. It never draws content of its own.
 
-<DocsTable>
-<thead>
-<tr><th>Layer</th><th>When to use</th></tr>
-</thead>
-<tbody>
-<tr><td>Modal</td><td>One task blocks the page. The Backdrop centers it.</td></tr>
-</tbody>
-</DocsTable>
+One layer sits on it today: a Modal, which the Backdrop centers.
 
 A task that keeps the page in view is a Panel, which floats with no Backdrop. The Backdrop draws the layer only. It does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
 
@@ -170,40 +155,7 @@ A Backdrop has no states. It is shown while its layer is open and gone when it c
 
 ## Best practices
 
-A confirm Modal may open over a Panel, a Popup or a focused task, and brings its own Backdrop, because a Panel floats with none. A Modal never opens on another Modal.
-
-### Stack only a confirm over a Panel, a Popup or a focused task.
-
-A confirm raised from a Panel or a focused task puts one Backdrop over the page and the Panel. A Modal for another task waits until the first one closes.
-
-<DoDontPair
-    doExample={<PanelWithConfirm />}
-    doCaption="A Panel and the confirm it raises, over it."
-    dontExample={<PanelWithUnrelatedModal />}
-    dontCaption="A modal for an unrelated task opened over a Panel."
-/>
-
-### Never a Modal on a Modal.
-
-A Modal confirms inside itself, with a warning SectionMessage and the danger button. The overlay module refuses a second Modal: it stays closed and calls its `onClose`.
-
-<DoDontPair
-    doExample={<ModalConfirmsInside />}
-    doCaption="A Modal confirming inside itself, with a warning and the danger button."
-    dontExample={<ModalOverModal />}
-    dontCaption="A Modal opened on another Modal."
-/>
-
-### Confirm in a small modal.
-
-<DoDontPair
-    doExample={<ConfirmSmallDo />}
-    doCaption="Confirm in a small modal."
-    dontExample={<ConfirmSmallDont />}
-    dontCaption="Confirm in a large modal."
-/>
-
-Popups, flags and tooltips never bring a backdrop. How a modal meets the Sidebar is on <a href="?path=/docs/templates-frame-frame--docs">Frame</a>.
+What may stack on a Backdrop, and why a Modal never opens on a Modal, is on <DocsLink id="templates-modal-modal">Modal</DocsLink> under Stacking.
 
 ### Place a modal in the Backdrop.
 

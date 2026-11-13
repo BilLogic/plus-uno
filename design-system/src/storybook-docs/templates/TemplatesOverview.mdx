@@ -39,7 +39,7 @@ Broadest first. Each page opens with its types, then the anatomy and key states 
 <TypeCard hero="templates-form" title="Form" to="templates-form">A stack of fields with a footer, in one of four places: in a page, in a Panel, in a Modal, or in steps.</TypeCard>
 <TypeCard hero="templates-modal-modal" title="Modal" to="templates-modal-modal">One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps.</TypeCard>
 <TypeCard hero="templates-panel-panel" title="Panel" to="templates-panel-panel">A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications.</TypeCard>
-<TypeCard hero="templates-popup-popup" title="Popup" to="templates-popup-popup">A floating layer that hangs off its trigger and closes on an outside click. Five types, from menu to filter menu.</TypeCard>
+<TypeCard hero="templates-popup-popup" title="Popup" to="templates-popup-popup">A floating layer that hangs off its trigger and closes on an outside click. Six types, from menu to stacked filter menu.</TypeCard>
 </TypeGrid>
 
 </FoundationSection>
@@ -53,18 +53,18 @@ A suggested starting point for each scenario, with the patterns to consult and t
 <tr><th>Scenario</th><th>Template</th><th>Patterns</th><th>Components</th></tr>
 </thead>
 <tbody>
-<tr><td>An area page with one collection</td><td><DocsLink id="templates-page-page">Page</DocsLink> · default, with a <DocsLink id="templates-section-section">Section</DocsLink> view bar alone</td><td><a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a> · <a target="_top" href="./?path=/docs/patterns-finding-things-search--docs">Search</a> · <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a></td><td><code>PageHeader</code>, <code>Tabs</code> (pill), <code>FilterButton</code>, <code>IconButton</code>, <code>Button</code>, <code>Table</code></td></tr>
-<tr><td>A home page with several Sections</td><td><DocsLink id="templates-page-page">Page</DocsLink> · default, titled Sections, cards</td><td><a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a> · <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a></td><td><code>PageHeader</code>, <code>Card</code>, <code>Button</code></td></tr>
-<tr><td>A record page, one level down</td><td><DocsLink id="templates-page-page">Page</DocsLink> with a breadcrumb and page tabs</td><td><a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a> · <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-indicators--docs">Indicators</a></td><td><code>Breadcrumb</code>, <code>PageHeader</code>, <code>StatusTag</code>, <code>Tabs</code>, <code>PopupSelect</code></td></tr>
-<tr><td>Working through a queue</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a detail</td><td><a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a> · <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a></td><td><code>Table</code>, <code>Button</code></td></tr>
-<tr><td>A quick look at one row</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Details</td><td><a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a></td><td><code>Panel</code>, <code>Button</code></td></tr>
-<tr><td>A short decision before going on</td><td><DocsLink id="templates-modal-modal">Modal</DocsLink> · Active, 4-col</td><td><a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a> · <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a></td><td><code>Modal</code>, <code>Button</code></td></tr>
-<tr><td>A long task with steps</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink> · focused, with a <DocsLink id="templates-form">Form</DocsLink> in steps</td><td><a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> · <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a></td><td><code>ProgressTracker</code>, <code>Fieldset</code>, <code>Button</code></td></tr>
-<tr><td>Settings saved as a group</td><td><DocsLink id="templates-section-section">Section</DocsLink> with subsections, <DocsLink id="templates-form">Form</DocsLink> in a page</td><td><a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> · <a target="_top" href="./?path=/docs/patterns-states-read-only--docs">Read-only</a> · <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a></td><td><code>Fieldset</code>, <code>TextField</code>, <code>PopupSelect</code>, <code>Toggle</code>, <code>Button</code></td></tr>
-<tr><td>Narrowing a long catalog</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a filter side</td><td><a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a></td><td><code>Checkbox</code>, <code>PopupSelect</code>, <code>Button</code></td></tr>
-<tr><td>Signing in</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink> · bare</td><td><a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> · <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a></td><td><code>Logo</code>, <code>TextField</code>, <code>Button</code></td></tr>
-<tr><td>Notifications</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Notifications (the Inbox)</td><td><a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a></td><td><code>Panel</code>, <code>Avatar</code>, <code>PopupSelect</code></td></tr>
-<tr><td>AI chat</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink>, the AI panel region</td><td><a target="_top" href="./?path=/docs/ai-ui-ai-interaction-guidelines--docs">AI interaction guidelines</a></td><td><code>AiChat</code>, <code>PromptInput</code>, <code>AiMessage</code></td></tr>
+<tr><td>An area page with one collection</td><td><DocsLink id="templates-page-page">Page</DocsLink> · default, with a <DocsLink id="templates-section-section">Section</DocsLink> view bar alone</td><td><DocsLink id="patterns-finding-things-filtering">Filtering</DocsLink> · <DocsLink id="patterns-finding-things-search">Search</DocsLink> · <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink></td><td><code>PageHeader</code>, <code>Tabs</code> (pill), <code>FilterButton</code>, <code>IconButton</code>, <code>Button</code>, <code>Table</code></td></tr>
+<tr><td>A home page with several Sections</td><td><DocsLink id="templates-page-page">Page</DocsLink> · default, titled Sections, cards</td><td><DocsLink id="patterns-states-empty">Empty</DocsLink> · <DocsLink id="patterns-states-loading">Loading</DocsLink></td><td><code>PageHeader</code>, <code>Card</code>, <code>Button</code></td></tr>
+<tr><td>A record page, one level down</td><td><DocsLink id="templates-page-page">Page</DocsLink> with a breadcrumb and page tabs</td><td><DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink> · <DocsLink id="patterns-notifications-and-indicators-indicators">Indicators</DocsLink></td><td><code>Breadcrumb</code>, <code>PageHeader</code>, <code>StatusTag</code>, <code>Tabs</code>, <code>PopupSelect</code></td></tr>
+<tr><td>Working through a queue</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a detail</td><td><DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink> · <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink></td><td><code>Table</code>, <code>Button</code></td></tr>
+<tr><td>A quick look at one row</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Details</td><td><DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink></td><td><DocsLink id="components-layout-and-structure-panel"><code>Panel</code></DocsLink>, <code>Button</code></td></tr>
+<tr><td>A short decision before going on</td><td><DocsLink id="templates-modal-modal">Modal</DocsLink> · Active, confirm width</td><td><DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink> · <DocsLink id="patterns-states-errors">Errors</DocsLink></td><td><DocsLink id="components-messaging-modal-dialog"><code>Modal</code></DocsLink>, <code>Button</code></td></tr>
+<tr><td>A long task with steps</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink> · focused, with a <DocsLink id="templates-form">Form</DocsLink> in steps</td><td><DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink> · <DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink></td><td><code>ProgressTracker</code>, <code>Fieldset</code>, <code>Button</code></td></tr>
+<tr><td>Settings saved as a group</td><td><DocsLink id="templates-section-section">Section</DocsLink> with subsections, <DocsLink id="templates-form">Form</DocsLink> in a page</td><td><DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink> · <DocsLink id="patterns-states-read-only">Read-only</DocsLink> · <DocsLink id="patterns-states-disabled">Disabled</DocsLink></td><td><code>Fieldset</code>, <code>TextField</code>, <code>PopupSelect</code>, <code>Toggle</code>, <code>Button</code></td></tr>
+<tr><td>Narrowing a long catalog</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a filter side</td><td><DocsLink id="patterns-finding-things-filtering">Filtering</DocsLink></td><td><code>Checkbox</code>, <code>PopupSelect</code>, <code>Button</code></td></tr>
+<tr><td>Signing in</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink> · bare</td><td><DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink> · <DocsLink id="patterns-states-errors">Errors</DocsLink></td><td><code>Logo</code>, <code>TextField</code>, <code>Button</code></td></tr>
+<tr><td>Notifications</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Notifications (the Inbox)</td><td><DocsLink id="patterns-notifications-and-indicators-notifications">Notifications</DocsLink></td><td><DocsLink id="components-layout-and-structure-panel"><code>Panel</code></DocsLink>, <code>Avatar</code>, <code>PopupSelect</code></td></tr>
+<tr><td>AI chat</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink>, the AI panel region</td><td><DocsLink id="ai-ui-ai-interaction-guidelines">AI interaction guidelines</DocsLink></td><td><code>AiChat</code>, <code>PromptInput</code>, <code>AiMessage</code></td></tr>
 </tbody>
 </DocsTable>
 
@@ -92,24 +92,18 @@ One chooser for the four layers that take over from the page or sit above it. A 
 </tbody>
 </DocsTable>
 
-A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or that outlives a click, leaves the Popup for a Panel. Leaving a focused task goes through Close or Cancel, and unsaved work asks first, in a Modal. Only a Modal brings a Backdrop, and a confirm Modal over a Panel, a Popup or a focused task brings its own.
+A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or that outlives a click, leaves the Popup for a Panel. Leaving a focused task goes through Close or Cancel, and unsaved work asks first, in a Modal.
 
 </FoundationSection>
 
 <FoundationSection title="Opening a record">
 
-Least room to most. Pick the lowest step that fits; <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs#opening-a-record">Navigation</a> holds the rule.
+Least room to most. Pick the lowest step that fits; <DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink> holds the rule.
 
 <IllustrationFigure caption="Opening a record, least room to most: expand the row, Section detail, Details Panel, Modal, its own page.">
     <OpeningARecord />
 </IllustrationFigure>
 
-1. **Expand the row.** A few more lines, links at most.
-2. **Section detail.** On a queue page, the record opens beside its list.
-3. **Details Panel.** A quick look or a short edit from a table on any other page.
-4. **Modal.** A rare, critical task with fewer than five fields.
-5. **Its own page.** Complex or stepped work, or anything worth a URL.
-
-Where a message sits, in a Frame, Page or Section banner, a Flag or a SectionMessage, is <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a>.
+Where a message sits, in a Frame, Page or Section banner, a Flag or a SectionMessage, is <DocsLink id="patterns-notifications-and-indicators-notifications">Notifications</DocsLink>.
 
 </FoundationSection>

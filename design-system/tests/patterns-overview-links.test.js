@@ -21,8 +21,8 @@ const OVERVIEW_ID = 'patterns-overview--docs';
 const PATTERNS = Object.keys(docsIndex(ROOT)).filter((id) => id.startsWith('patterns-') && id !== OVERVIEW_ID);
 const STATES = ['empty', 'loading', 'errors', 'overflow', 'disabled', 'read-only'].map((s) => `patterns-states-${s}--docs`);
 
-const LINK = /path=\/docs\/([a-z0-9-]+--docs)/g;
-const linksIn = (text) => [...text.matchAll(LINK)].map((m) => m[1]);
+const LINK = /path=\/docs\/([a-z0-9-]+--docs)|<DocsLink id="([a-z0-9-]+)"/g;
+const linksIn = (text) => [...text.matchAll(LINK)].map((m) => m[1] ?? `${m[2]}--docs`);
 
 /** The text of one `<FoundationSection title="…">`. */
 const section = (source, title) => {
@@ -87,7 +87,7 @@ describe('the Templates overview', () => {
         expect(rows.length).toBeGreaterThan(0);
         rows.forEach((row) => {
             const cell = cells(row)[2];
-            const names = cell.replace(/<a [^>]*>[^<]*<\/a>/g, '').split('·').map((s) => s.trim()).filter(Boolean);
+            const names = cell.replace(/<a [^>]*>[^<]*<\/a>|<DocsLink [^>]*>[^<]*<\/DocsLink>/g, '').split('·').map((s) => s.trim()).filter(Boolean);
             const linked = linksIn(cell);
             // AI chat routes to the AI guidelines, outside the Patterns root.
             if (/AI interaction/.test(cell)) return;
