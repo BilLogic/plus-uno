@@ -1,7 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
@@ -9,12 +8,21 @@ import { SoundSwitch } from '@/storybook-docs/sound-docs.jsx';
 
 <Meta title="Foundations/Sound/Settings and accessibility" tags={['!dev', 'manifest']} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-sound-settings-and-accessibility"
+    eyebrow="Foundation · Sound"
     title="Settings and accessibility"
-    summary="One switch turns all sound off, and no one misses anything when it is off."
+    purpose="One switch turns all sound off, and no one misses anything when it is off."
+    links={{
+        items: [
+            { title: 'Overview', href: '?path=/docs/foundations-sound-overview--docs' },
+            { title: 'When to play', href: '?path=/docs/foundations-sound-when-to-play--docs' },
+            { title: 'With motion', href: '?path=/docs/foundations-sound-with-motion--docs' },
+            { title: 'Sounds', href: '?path=/docs/foundations-sound-sounds--docs' },
+            { title: 'Settings and accessibility', href: '?path=/docs/foundations-sound-settings-and-accessibility--docs', current: true },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="The switch">
 

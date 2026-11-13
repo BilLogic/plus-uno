@@ -1,7 +1,6 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
@@ -10,12 +9,21 @@ import * as FlagStories from '../components/messaging/Flag/Flag.stories.jsx';
 
 <Meta title="Foundations/Sound/With motion" tags={['!dev', 'manifest']} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-sound-with-motion"
+    eyebrow="Foundation · Sound"
     title="With motion"
-    summary="A sound lands when its motion lands."
+    purpose="A sound lands when its motion lands."
+    links={{
+        items: [
+            { title: 'Overview', href: '?path=/docs/foundations-sound-overview--docs' },
+            { title: 'When to play', href: '?path=/docs/foundations-sound-when-to-play--docs' },
+            { title: 'With motion', href: '?path=/docs/foundations-sound-with-motion--docs', current: true },
+            { title: 'Sounds', href: '?path=/docs/foundations-sound-sounds--docs' },
+            { title: 'Settings and accessibility', href: '?path=/docs/foundations-sound-settings-and-accessibility--docs' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="The land rule">
 

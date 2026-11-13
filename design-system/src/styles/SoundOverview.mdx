@@ -1,7 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -12,12 +11,21 @@ export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-soun
 
 <Meta title="Foundations/Sound/Overview" tags={['!dev', 'manifest']} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-sound-overview"
+    eyebrow="Foundation · Sound"
     title="Sound"
-    summary="Sound marks the few moments worth hearing, and lands with the motion that shows them."
+    purpose="Sound marks the few moments worth hearing, and lands with the motion that shows them."
+    links={{
+        items: [
+            { title: 'Overview', href: '?path=/docs/foundations-sound-overview--docs', current: true },
+            { title: 'When to play', href: '?path=/docs/foundations-sound-when-to-play--docs' },
+            { title: 'With motion', href: '?path=/docs/foundations-sound-with-motion--docs' },
+            { title: 'Sounds', href: '?path=/docs/foundations-sound-sounds--docs' },
+            { title: 'Settings and accessibility', href: '?path=/docs/foundations-sound-settings-and-accessibility--docs' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

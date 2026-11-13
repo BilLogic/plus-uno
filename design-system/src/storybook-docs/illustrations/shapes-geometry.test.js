@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import LogoConstruction from '../../assets/Logo/LogoConstruction.jsx';
 import { CIRCLES, CORNER_CENTERS, CONSTRUCTION_RADII, PLUS_BOX, PLUS_CENTER } from '../../assets/Logo/logoConstructionGeometry.js';
 import { crossings } from './trails.js';
-import { chime, isoMatrix, pathGeometry, spring, springStills, stopAtEdge, waveHeights } from './shapes-geometry.js';
+import { chime, doubleChime, isoMatrix, pathGeometry, spring, springStills, stopAtEdge, swell, tap, waveHeights } from './shapes-geometry.js';
 
 describe('spring', () => {
   it('starts at rest, overshoots the target, and settles on it', () => {
@@ -134,6 +134,23 @@ describe('waveHeights', () => {
     const h = waveHeights(24, chime);
     expect(Math.max(...h.slice(0, 5))).toBeGreaterThan(Math.max(...h.slice(-5)));
     expect(h.every((v) => v >= 0.12 && v <= 1)).toBe(true);
+  });
+});
+
+describe('sound envelopes', () => {
+  it('a tap falls faster than a chime', () => {
+    expect(tap(0.4)).toBeLessThan(chime(0.4));
+    expect(tap(0.05)).toBeCloseTo(1, 5);
+  });
+  it('a swell is silent at both ends and loudest in the middle', () => {
+    expect(swell(0)).toBeCloseTo(0, 5);
+    expect(swell(1)).toBeCloseTo(0, 5);
+    expect(swell(0.5)).toBeCloseTo(1, 5);
+  });
+  it('a double chime strikes twice: it rises again after its first fall', () => {
+    const h = waveHeights(24, doubleChime);
+    const dip = Math.min(...h.slice(6, 10));
+    expect(Math.max(...h.slice(10, 15))).toBeGreaterThan(dip);
   });
 });
 

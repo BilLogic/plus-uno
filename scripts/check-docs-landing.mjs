@@ -71,6 +71,11 @@ export const PAGES = [
   { file: 'design-system/src/styles/MotionChoreography.mdx', id: 'foundations-motion-choreography' },
   { file: 'design-system/src/styles/MotionPlayground.mdx', id: 'foundations-motion-playground' },
   { file: 'design-system/src/styles/MotionLibrary.mdx', id: 'foundations-motion-library' },
+  { file: 'design-system/src/styles/SoundOverview.mdx', id: 'foundations-sound-overview' },
+  { file: 'design-system/src/styles/SoundWhenToPlay.mdx', id: 'foundations-sound-when-to-play' },
+  { file: 'design-system/src/styles/SoundWithMotion.mdx', id: 'foundations-sound-with-motion' },
+  { file: 'design-system/src/styles/SoundSounds.mdx', id: 'foundations-sound-sounds' },
+  { file: 'design-system/src/styles/SoundSettings.mdx', id: 'foundations-sound-settings-and-accessibility' },
 ];
 
 const OLD_OPENER = /<FoundationHero\b|<Title\b/;

@@ -84,3 +84,12 @@ export const waveHeights = (n, env, { min = 0.12 } = {}) =>
 
 /** A struck sound: a fast attack, then a decay. */
 export const chime = (t) => (t < 0.08 ? t / 0.08 : Math.exp(-(t - 0.08) * 2.6));
+
+/** A short tap: a sharper attack than a chime and a quick fall. */
+export const tap = (t) => (t < 0.05 ? t / 0.05 : Math.exp(-(t - 0.05) * 6));
+
+/** A swell: rises to the middle and falls away, no strike. */
+export const swell = (t) => Math.sin(Math.PI * t) ** 1.5;
+
+/** Two struck notes: the second, a little lower, lands just under halfway. */
+export const doubleChime = (t) => Math.max(chime(Math.min(1, t * 1.8)), t > 0.45 ? chime(Math.max(0, t - 0.45) * 1.8) * 0.9 : 0);

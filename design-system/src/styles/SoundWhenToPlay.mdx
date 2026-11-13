@@ -1,7 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
@@ -9,12 +8,21 @@ import { SilentTable, SoundRegistryTable } from '@/storybook-docs/sound-docs.jsx
 
 <Meta title="Foundations/Sound/When to play" tags={['!dev', 'manifest']} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-sound-when-to-play"
+    eyebrow="Foundation · Sound"
     title="When to play"
-    summary="The registry names every moment that plays. Everything else is silent."
+    purpose="The registry names every moment that plays. Everything else is silent."
+    links={{
+        items: [
+            { title: 'Overview', href: '?path=/docs/foundations-sound-overview--docs' },
+            { title: 'When to play', href: '?path=/docs/foundations-sound-when-to-play--docs', current: true },
+            { title: 'With motion', href: '?path=/docs/foundations-sound-with-motion--docs' },
+            { title: 'Sounds', href: '?path=/docs/foundations-sound-sounds--docs' },
+            { title: 'Settings and accessibility', href: '?path=/docs/foundations-sound-settings-and-accessibility--docs' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Rules">
 
