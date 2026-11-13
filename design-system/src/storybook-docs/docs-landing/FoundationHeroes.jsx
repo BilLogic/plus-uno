@@ -117,7 +117,7 @@ const Layers = () => (
     />
     <CardBox x={50} y={55} w={200} h={65} />
     <Popup x={75} y={25} w={150} h={55} />
-    <Modal x={100} y={-2} w={100} h={45} accent />
+    <Modal x={100} y={-2} w={100} h={45} accent divider={false} closeButton />
   </>
 );
 

@@ -22,10 +22,10 @@
  *   so a neutral drawing never uses the brand fill.
  * - CountTag: the accent is an outline around the pill, since CountTag has no
  *   brand tone.
- * - Hero surfaces: on the hero ground a layer carries a hairline in `illustrationEdge`
- *   as well as its real shadow, since the real edge and shadow roles are too faint on
- *   the sunken ground. The primitives that draw a surface (Layer, Page, Frame, Isometric
- *   stack) take it inside `HeroGround`; a surface a hero draws by hand sets it itself.
+ * - Hero surfaces: on the hero ground the real edge and shadow roles are too faint for a flat layer,
+ *   so it takes a hairline in `illustrationEdge`; a layer with a real shadow (a page, a card, a
+ *   popup) reads by that shadow, and the subject takes the accent ring. The primitives that draw
+ *   a layer take this inside `HeroGround`; a layer a hero draws by hand sets it itself.
  * - Panel: docked, its SCSS has an edge line and no shadow, so the kit draws the
  *   same; floating, Frame's overlay fill and shadow, and no edge line.
  */

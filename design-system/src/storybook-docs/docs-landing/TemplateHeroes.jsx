@@ -2,6 +2,8 @@ import React from 'react';
 import { HAIRLINE, PAINT } from '../illustrations/paint.js';
 import {
     Backdrop,
+    Breadcrumb,
+    PageSheet,
     ButtonShape,
     CardBox,
     Field,
@@ -16,6 +18,7 @@ import {
 } from '../illustrations/primitives.jsx';
 import { IsoStack } from '../illustrations/shapes.jsx';
 import { HeroDrawing, FRAME_UNITS, STAGE_UNITS } from './HeroDrawing.jsx';
+import { AppWindow } from './HeroWindow.jsx';
 
 /**
  * The Templates heroes: each template's anatomy blocked out, with the template
@@ -33,19 +36,7 @@ import { HeroDrawing, FRAME_UNITS, STAGE_UNITS } from './HeroDrawing.jsx';
 
 /** A page-surface rectangle with its edge, or the ring when it is the subject. */
 const PageFill = ({ x, y, w, h, ring = false, corner = 'window' }) => (
-    <Rect x={x} y={y} w={w} h={h} fill={PAINT.pageSurface} stroke={ring ? PAINT.accent : PAINT.illustrationEdge} corner={corner} />
-);
-
-/** The Frame's ground: the sunken surface with its edge, the sidebar's icon column on it. */
-const Ground = ({ x, y, w, h }) => <Rect x={x} y={y} w={w} h={h} fill={PAINT.frameSunken} stroke={PAINT.illustrationEdge} corner="window" />;
-
-/** A column of sidebar icons, `n` squares from (x, y). */
-const IconColumn = ({ x, y, n = 5 }) => (
-    <>
-        {Array.from({ length: n }, (_, i) => (
-            <Rect key={i} x={x} y={y + i * 14} w={8} h={8} fill={PAINT.placeholderText} corner="icon" />
-        ))}
-    </>
+    <PageSheet x={x} y={y} w={w} h={h} accent={ring} corner={corner} />
 );
 
 /** Rows of a table between two content edges. */
@@ -99,41 +90,44 @@ export const TemplatesAndPatternsHero = () => (
 
 export const FrameHero = () => {
     const f = { x: 20, y: 6, w: 260, h: 148 };
-    const sb = { x: f.x, y: f.y, w: 44, h: f.h };
+    const panelW = 70;
     return (
         <HeroDrawing>
-            <Ground {...f} />
-            <Sidebar x={sb.x} y={sb.y} w={sb.w} h={sb.h} />
-            <Rect x={sb.x - 2} y={sb.y - 2} w={sb.w + 4} h={sb.h + 4} fill="none" stroke={PAINT.accent} corner="window" />
-            {/* The Page: a top bar, then rows. */}
-            <PageFill x={sb.x + sb.w} y={f.y} w={150} h={f.h} />
-            <SkeletonBar x={sb.x + sb.w + 10} y={f.y + 8} w={50} h={5} heading />
-            <Rect x={f.x + f.w - 26 - 56} y={f.y + 6} w={14} h={8} fill={PAINT.countSurface} corner="full" />
-            <Rows x={sb.x + sb.w + 10} w={130} y={f.y + 24} n={7} pitch={16} />
-            {/* The AI panel, its own region. */}
-            <Rect x={f.x + f.w - 66} y={f.y} w={66} h={f.h} fill={PAINT.panelSurface} stroke={PAINT.illustrationEdge} />
-            <SkeletonBar x={f.x + f.w - 56} y={f.y + 8} w={30} h={5} heading />
-            {[0, 1, 2].map((i) => (
-                <SkeletonBar key={i} x={f.x + f.w - 56} y={f.y + 26 + i * 10} w={42 - i * 6} />
-            ))}
+            <AppWindow {...f} panel={panelW} ring>
+                {(page) => (
+                    <>
+                        {/* The Page's header row (the breadcrumb), then its content. */}
+                        <Breadcrumb x={page.x + 10} y={f.y + 8} w={50} count={2} />
+                        <Rows x={page.x + 10} w={page.w - 20} y={f.y + 24} n={7} pitch={16} />
+                        {/* The Panel area, docked: a title and lines. */}
+                        <SkeletonBar x={f.x + f.w - panelW + 10} y={f.y + 10} w={30} h={5} heading />
+                        {[0, 1, 2].map((i) => (
+                            <SkeletonBar key={i} x={f.x + f.w - panelW + 10} y={f.y + 26 + i * 10} w={48 - i * 8} />
+                        ))}
+                    </>
+                )}
+            </AppWindow>
         </HeroDrawing>
     );
 };
 
 export const PageHero = () => {
-    const outer = { x: 30, y: 4, w: 240, h: 152 };
-    const page = { x: outer.x + 30, y: outer.y + 6, w: outer.w - 38, h: outer.h - 12 };
-    const pad = 10;
+    const f = { x: 20, y: 6, w: 260, h: 148 };
+    const pad = 12;
     return (
         <HeroDrawing>
-            <Ground {...outer} />
-            <IconColumn x={outer.x + 11} y={outer.y + 18} />
-            <PageFill {...page} ring />
-            <SkeletonBar x={page.x + pad} y={page.y + 10} w={60} h={6} heading />
-            <SkeletonBar x={page.x + pad} y={page.y + 22} w={100} />
-            <ButtonShape x={page.x + page.w - pad - 30} y={page.y + 10} w={30} appearance="primary" />
-            <Section x={page.x + pad} y={page.y + 38} w={page.w - 2 * pad} h={42} rows={2} subtle />
-            <Section x={page.x + pad} y={page.y + 88} w={page.w - 2 * pad} h={42} rows={2} subtle />
+            <AppWindow {...f} ringPage>
+                {(page) => (
+                    <>
+                        {/* The Page's title and its actions, then Sections with no fill: a heading and rows. */}
+                        <SkeletonBar x={page.x + pad} y={page.y + 12} w={60} h={6} heading />
+                        <SkeletonBar x={page.x + pad} y={page.y + 24} w={100} />
+                        <ButtonShape x={page.x + page.w - pad - 30} y={page.y + 12} w={30} appearance="primary" />
+                        <Section x={page.x + pad} y={page.y + 44} w={page.w - 2 * pad} h={42} rows={2} />
+                        <Section x={page.x + pad} y={page.y + 96} w={page.w - 2 * pad} h={42} rows={2} />
+                    </>
+                )}
+            </AppWindow>
         </HeroDrawing>
     );
 };
@@ -171,7 +165,6 @@ export const SectionHero = () => {
             {/* The view bar: its last control ends at the content's right edge. */}
             <Rect x={right - 10 - 4 - 40} y={s.y + 10} w={40} h={8} fill={PAINT.buttonDefault} stroke={PAINT.buttonDefaultBorder} corner="button" />
             <Rect x={right - 10} y={s.y + 10} w={10} h={8} fill={PAINT.buttonDefault} stroke={PAINT.buttonDefaultBorder} corner="button" />
-            <Rule x1={left} x2={right} y1={s.y + 32} y2={s.y + 32} stroke={PAINT.rowDivider} />
             {/* The body, and the side beside it. */}
             <Rows x={left} w={side.x - 14 - left} y={s.y + 38} n={6} pitch={14} />
             <CardBox {...side} />
@@ -191,8 +184,8 @@ export const CardHero = () => {
             <SkeletonBar x={c.x + 8} y={c.y + 82} w={52} h={5} heading />
             <SkeletonBar x={c.x + 8} y={c.y + 96} w={c.w - 16} />
             <SkeletonBar x={c.x + 8} y={c.y + 104} w={c.w - 36} />
-            <Rule x1={c.x} x2={c.x + c.w} y1={c.y + 124} y2={c.y + 124} stroke={PAINT.rowDivider} />
-            <ButtonShape x={c.x + c.w - 8 - 38} y={c.y + 134} w={38} />
+            {/* The footer sits below the body, left-aligned, with no divider. */}
+            <ButtonShape x={c.x + 8} y={c.y + 134} w={38} />
         </HeroDrawing>
     );
 };
@@ -213,7 +206,8 @@ export const TableHero = () => {
             {[0, 1, 2, 3, 4, 5].map((i) => (
                 <React.Fragment key={i}>
                     <Rule x1={left} x2={right} y1={rowY(i)} y2={rowY(i)} stroke={PAINT.rowDivider} />
-                    <circle cx={left + 4} cy={rowY(i) + 8.5} r={3} fill={i === 1 ? PAINT.accent : 'none'} stroke={i === 1 ? undefined : PAINT.fieldBorder} style={HAIRLINE} />
+                    {/* The row checkbox is the selection cue. */}
+                    <Rect x={left + 1} y={rowY(i) + 5.5} w={6} h={6} fill={i === 1 ? PAINT.accent : PAINT.fieldSurface} stroke={i === 1 ? undefined : PAINT.fieldBorder} corner="icon" />
                     {cols.map((cx, k) => (
                         <SkeletonBar key={cx} x={cx} y={rowY(i) + 6.5} w={k === 0 ? 62 : 24} />
                     ))}
@@ -235,7 +229,6 @@ export const FormHero = () => {
             <Field x={x} y={38} w={w} />
             <Field x={x} y={74} w={half} />
             <Field x={x + half + 8} y={74} w={half} />
-            <Rule x1={col.x} x2={col.x + col.w} y1={118} y2={118} />
             <ButtonShape x={x + w - 34 - 4 - 34} y={130} w={34} />
             <ButtonShape x={x + w - 34} y={130} w={34} appearance="primary" />
         </HeroDrawing>
@@ -245,11 +238,11 @@ export const FormHero = () => {
 export const ModalHero = () => (
     <HeroDrawing>
         {/* The page behind: rows across the whole frame. */}
-        <Rect {...WHOLE} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
+        <PageSheet {...WHOLE} />
         <Rows x={WHOLE.x} w={WHOLE.w} y={WHOLE.y + 6} n={14} pitch={14} />
         {/* The Backdrop covers the whole frame; the Modal sits centered on it, ringed. */}
         <Backdrop {...WHOLE} />
-        <Modal x={80} y={26} w={140} h={100} accent />
+        <Modal x={80} y={26} w={140} h={100} accent divider={false} closeButton />
     </HeroDrawing>
 );
 
@@ -259,13 +252,16 @@ export const BackdropHero = () => {
     return (
         <HeroDrawing>
             {/* The screen under the Backdrop: Sidebar, header, two cards. */}
-            <Ground {...screen} />
-            <Sidebar x={screen.x} y={screen.y} w={44} h={screen.h} />
-            <PageFill x={screen.x + 44} y={screen.y} w={screen.w - 44} h={screen.h} />
-            <SkeletonBar x={screen.x + 56} y={screen.y + 10} w={50} h={5} heading />
-            <ButtonShape x={screen.x + screen.w - 12 - 30} y={screen.y + 8} w={30} appearance="primary" />
-            <CardBox x={screen.x + 56} y={screen.y + 34} w={84} h={70} />
-            <CardBox x={screen.x + 148} y={screen.y + 34} w={84} h={70} />
+            <AppWindow {...screen}>
+                {(page) => (
+                    <>
+                        <SkeletonBar x={page.x + 10} y={screen.y + 10} w={50} h={5} heading />
+                        <ButtonShape x={page.x + page.w - 10 - 30} y={screen.y + 8} w={30} appearance="primary" />
+                        <CardBox x={page.x + 10} y={screen.y + 34} w={84} h={70} />
+                        <CardBox x={page.x + 102} y={screen.y + 34} w={84} h={70} />
+                    </>
+                )}
+            </AppWindow>
             {/* The Backdrop covers the whole frame, so the picture's frame is the fill. */}
             <Backdrop {...WHOLE} />
             <Rect x={screen.x} y={screen.y} w={screen.w} h={screen.h} fill="none" stroke={PAINT.accent} corner="window" />
@@ -285,24 +281,28 @@ export const BackdropHero = () => {
 };
 
 export const PanelHero = () => {
-    const f = { x: 20, y: 4, w: 260, h: 152 };
-    const panel = { x: f.x + f.w - 116, y: f.y, w: 116, h: f.h };
+    const f = { x: 20, y: 6, w: 260, h: 148 };
+    const panelW = 100;
+    const panel = { x: f.x + f.w - panelW, y: f.y, w: panelW, h: f.h };
     return (
         <HeroDrawing>
-            <Ground {...f} />
-            <IconColumn x={f.x + 9} y={f.y + 20} />
-            <PageFill x={f.x + 26} y={f.y} w={f.w - 26 - panel.w} h={f.h} />
-            <SkeletonBar x={f.x + 36} y={f.y + 10} w={48} h={5} heading />
-            <Rows x={f.x + 36} w={panel.x - f.x - 36 - 10} y={f.y + 26} n={7} pitch={16} />
-            <Rect {...panel} fill={PAINT.panelSurface} stroke={PAINT.illustrationEdge} />
-            <Rect {...panel} fill="none" stroke={PAINT.accent} />
-            <SkeletonBar x={panel.x + 8} y={panel.y + 10} w={panel.w * 0.4} h={5} accent heading />
-            {[0, 1].map((i) => (
-                <SkeletonBar key={i} x={panel.x + 8} y={panel.y + 26 + i * 10} w={panel.w * 0.7 - i * 14} />
-            ))}
-            <Field x={panel.x + 8} y={f.y + 62} w={panel.w - 16} />
-            <Field x={panel.x + 8} y={f.y + 92} w={panel.w - 16} />
-            <ButtonShape x={panel.x + panel.w - 8 - 32} y={f.y + 128} w={32} appearance="primary" />
+            <AppWindow {...f} panel={panelW}>
+                {(page) => (
+                    <>
+                        <SkeletonBar x={page.x + 10} y={f.y + 10} w={48} h={5} heading />
+                        <Rows x={page.x + 10} w={page.w - 20} y={f.y + 26} n={7} pitch={16} />
+                        {/* The Panel: a title, a form, its commit at the end. */}
+                        <SkeletonBar x={panel.x + 8} y={panel.y + 10} w={panel.w * 0.4} h={5} accent heading />
+                        {[0, 1].map((i) => (
+                            <SkeletonBar key={i} x={panel.x + 8} y={panel.y + 26 + i * 10} w={panel.w * 0.7 - i * 14} />
+                        ))}
+                        <Field x={panel.x + 8} y={f.y + 62} w={panel.w - 16} />
+                        <Field x={panel.x + 8} y={f.y + 92} w={panel.w - 16} />
+                        <ButtonShape x={panel.x + panel.w - 8 - 32} y={f.y + 128} w={32} appearance="primary" />
+                    </>
+                )}
+            </AppWindow>
+            <Rect {...panel} stroke={PAINT.accent} />
         </HeroDrawing>
     );
 };

@@ -13,11 +13,21 @@ import { HeroGround } from '../illustrations/primitives.jsx';
 export const FRAME_UNITS = { w: 500, h: 200 };
 export const STAGE_UNITS = { w: 300, h: 160 };
 
+/**
+ * The docked Sidebar's width on a hero frame, in units. The real Sidebar is 240
+ * wide in a Frame of about 1040, and a hero frame is 260 units, so it draws 60.
+ * Every hero that shows a sidebar uses this one width.
+ */
+export const HERO_SIDEBAR_W = 60;
+
 /** The stage's corner inside the frame, in units: the stage sits centered. */
 const STAGE_ORIGIN = {
     x: (FRAME_UNITS.w - STAGE_UNITS.w) / 2,
     y: (FRAME_UNITS.h - STAGE_UNITS.h) / 2,
 };
+
+/** One unit is 2px here, so half of `--stroke-1` draws a 1px line (see `HAIRLINE` in paint.js). */
+const HERO_STROKE = { '--hero-stroke': 'calc(var(--stroke-1) / 2)' };
 
 /**
  * An SVG the size of the whole frame, with the stage's origin at (0, 0) of its

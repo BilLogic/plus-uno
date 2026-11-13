@@ -7,16 +7,17 @@ import {
     CountTag,
     Field,
     Flag,
+    PageSheet,
     Popup,
     Rect,
     Row,
     Rule,
     Section,
-    Sidebar,
     SkeletonBar,
     StickyHeader,
 } from '../illustrations/primitives.jsx';
-import { HeroDrawing } from './HeroDrawing.jsx';
+import { HeroDrawing, HERO_SIDEBAR_W } from './HeroDrawing.jsx';
+import { AppWindow } from './HeroWindow.jsx';
 
 /**
  * The Patterns heroes: each pattern's situation, cropped to its one cue, drawn
@@ -94,7 +95,7 @@ export const CommonActionsHero = () => {
 
 export const FormsHero = () => (
     <HeroDrawing>
-        <Rect x={70} y={-20} w={160} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
+        <PageSheet x={70} y={-20} w={160} h={200} />
         <Field x={86} y={2} w={128} />
         <Field x={86} y={38} w={128} accent />
         <Field x={86} y={74} w={128} />
@@ -130,17 +131,22 @@ export const FilteringHero = () => {
 };
 
 export const NavigationHero = () => {
-    const sb = { x: 10, y: -12, w: 86, h: 190 };
-    const selectedY = sb.y + 24 + 17;
+    const w = { x: -20, y: -6, w: 340, h: 172 };
+    // The selected row: the second row, 24 below the logo row, one 17 pitch down.
+    const selectedY = w.y + 24 + 17;
     return (
         <HeroDrawing>
-            <Sidebar x={sb.x} y={sb.y} w={sb.w} h={sb.h} />
-            <Ring x={sb.x + 4} y={selectedY} w={sb.w - 8} h={16} corner="sidebarRow" />
-            <Rect x={sb.x + sb.w} y={-20} w={204} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
-            <Breadcrumb x={116} y={10} w={120} count={3} accent />
-            <SkeletonBar x={116} y={30} w={70} h={6} heading />
-            <SkeletonBar x={116} y={42} w={110} />
-            <Rows x={116} w={174} y={60} n={7} />
+            <AppWindow {...w}>
+                {(page) => (
+                    <>
+                        <Breadcrumb x={page.x + 12} y={w.y + 10} w={120} count={3} accent />
+                        <SkeletonBar x={page.x + 12} y={w.y + 30} w={70} h={6} heading />
+                        <SkeletonBar x={page.x + 12} y={w.y + 42} w={110} />
+                        <Rows x={page.x + 12} w={page.w - 24} y={w.y + 60} n={7} />
+                    </>
+                )}
+            </AppWindow>
+            <Ring x={w.x + 4} y={selectedY} w={HERO_SIDEBAR_W - 8} h={16} corner="sidebarRow" />
         </HeroDrawing>
     );
 };
@@ -191,7 +197,7 @@ export const NotificationsHero = () => (
 
 export const DisabledHero = () => (
     <HeroDrawing>
-        <Rect x={50} y={-20} w={200} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
+        <PageSheet x={50} y={-20} w={200} h={200} />
         <SkeletonBar x={66} y={0} w={60} h={5} heading />
         <SkeletonBar x={66} y={12} w={110} />
         <Field x={66} y={30} w={168} />
@@ -206,7 +212,7 @@ export const DisabledHero = () => (
 
 export const EmptyHero = () => (
     <HeroDrawing>
-        <Rect x={50} y={-20} w={200} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
+        <PageSheet x={50} y={-20} w={200} h={200} />
         <SkeletonBar x={66} y={0} w={60} h={5} heading />
         <Rule x1={50} x2={250} y1={14} y2={14} />
         <Rect x={118} y={26} w={64} h={64} fill={PAINT.accent} opacity={0.2} corner="full" />
@@ -222,7 +228,7 @@ export const ErrorsHero = () => {
     const w = 130;
     return (
         <HeroDrawing>
-            <Rect x={75} y={-20} w={150} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
+            <PageSheet x={75} y={-20} w={150} h={200} />
             <Rect x={x} y={6} w={w} h={22} fill={PAINT.dangerSurface} stroke={PAINT.fieldBorderInvalid} corner="card" />
             <Ring x={x} y={6} w={w} h={22} corner="card" />
             <circle cx={x + 12} cy={17} r={4} fill={PAINT.flagIconDanger} />
@@ -237,7 +243,7 @@ export const ErrorsHero = () => {
 
 export const LoadingHero = () => (
     <HeroDrawing>
-        <Rect x={60} y={-20} w={180} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
+        <PageSheet x={60} y={-20} w={180} h={200} />
         <Rule x1={60} x2={240} y1={14} y2={14} stroke={PAINT.tabsDivider} />
         <Rule x1={60} x2={120} y1={14} y2={14} stroke={PAINT.accent} thick />
         {[0, 1].map((i) => (
@@ -256,7 +262,7 @@ export const LoadingHero = () => (
 
 export const OverflowHero = () => (
     <HeroDrawing>
-        <Rect x={50} y={-20} w={200} h={200} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} />
+        <PageSheet x={50} y={-20} w={200} h={200} />
         <StickyHeader x={62} y={8} w={176} h={140} accent />
         <Rect x={242} y={40} w={3} h={44} fill={PAINT.accent} corner="icon" />
     </HeroDrawing>
