@@ -12,6 +12,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { PAGE_EDGE } from '@/patterns/Page';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
  * Frame — the app frame: the Sidebar beside the Page (and the Panel), with no
@@ -61,6 +62,9 @@ export default {
     beforeEach: () => { window.sessionStorage.removeItem(PANEL_STORAGE_KEY); },
     render: FrameWithSlots,
     decorators: [
+        // The geometry stories read settled layouts, so they run with motion held off; the Space motion
+        // stories below pin it on or off themselves, since CI's Chromium reports reduced motion.
+        (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>,
         // A width story renders at its stated width whatever the preview is. The
         // Frame sizes itself from its own box, so a box of that width makes it dock
         // or float as it does there. The runner also resizes the viewport to match.
@@ -1787,4 +1791,264 @@ export const KeyUnder1024 = {
         await expect(p.sidebar(), 'the Sidebar is not docked').toBeNull();
         await expect(backdropShows(p), 'the panel floats with no Backdrop').toBeNull();
     },
+};
+
+/* ------------------------------------------------------------- space motion */
+
+/**
+ * Space motion: the Sidebar collapses and opens, the Panel docks and undocks, and the Page makes
+ * room on the same clock. Each story runs with the motion setting pinned, and reads the spring
+ * mid-flight by pausing its animation, never by sleeping.
+ */
+const motionOn = (Story) => <MotionPreferenceContext.Provider value={false}><Story /></MotionPreferenceContext.Provider>;
+const motionOff = (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>;
+
+/** Pause every running animation on `el` part-way and return how far in it was put. */
+const pauseAt = (el, fraction = 0.2) => {
+    const running = el.getAnimations().filter((a) => a.effect.getComputedTiming().iterations !== Infinity);
+    running.forEach((a) => {
+        a.pause();
+        a.currentTime = Number(a.effect.getComputedTiming().duration) * fraction;
+    });
+    return running;
+};
+const finish = (animations) => animations.forEach((a) => a.finish());
+
+const sidebarBox = (p) => p.frame.querySelector('.plus-frame__sidebar--docked');
+const settled = async (el) => {
+    await Promise.allSettled(el.getAnimations({ subtree: true })
+        .filter((a) => a.effect.getComputedTiming().iterations !== Infinity)
+        .map((a) => a.finished));
+};
+
+/** Nothing outside the moving region shifts: the Page keeps its top, foot and trailing edge. */
+const expectOnlyTheRegionMoves = async (p, before) => {
+    await expect(rect(p.surface).top, 'the Page keeps its top').toBeCloseTo(before.top, 0);
+    await expect(rect(p.surface).bottom, 'and its foot').toBeCloseTo(before.bottom, 0);
+    await expect(rect(p.surface).right, 'and its trailing edge').toBeCloseTo(before.right, 0);
+};
+
+const collapsePlay = (reduced) => async ({ canvasElement }) => atViewport(1440, async () => {
+    const p = parts(canvasElement);
+    await waitFor(() => expect(sidebarBox(p), 'docked at 1440').not.toBeNull());
+    await settled(p.frame);
+    const width = tokenLength(p.frame, '--frame-sidebar-width');
+    const before = { top: rect(p.surface).top, bottom: rect(p.surface).bottom, right: rect(p.surface).right };
+    await expect(rect(p.surface).left - rect(p.frame).left).toBeCloseTo(width, 0);
+
+    const box = sidebarBox(p);
+    if (reduced) await expect(getComputedStyle(box).animationName, 'reduced motion does not animate').toBe('none');
+    await userEvent.click(p.canvas.getByRole('button', { name: 'Close sidebar' }));
+    if (reduced) {
+        await waitFor(() => expect(sidebarBox(p), 'it is gone at once').toBeNull());
+        await expect(rect(p.surface).left - rect(p.frame).left, 'the Page runs to the edge').toBeCloseTo(0, 0);
+        return;
+    }
+    await expect(box, 'it stays for its exit').toHaveAttribute('data-leaving', 'true');
+    await expect(getComputedStyle(box).animationName, 'it moves on a spring').not.toBe('none');
+    await expect(box, 'a leaving Sidebar is out of reach').toHaveAttribute('inert');
+    const running = pauseAt(box);
+    await expect(running.length, 'a spring is running').toBeGreaterThan(0);
+    const left = rect(p.surface).left - rect(p.frame).left;
+    await expect(left, 'the Page is part-way to the edge').toBeGreaterThan(0);
+    await expect(left, 'and has left its first place').toBeLessThan(width);
+    await expect(rect(box).width, 'the Sidebar keeps its width while it leaves').toBeCloseTo(width, 0);
+    await expectOnlyTheRegionMoves(p, before);
+    finish(running);
+    await waitFor(() => expect(sidebarBox(p), 'it leaves once the spring ends').toBeNull());
+    await expect(rect(p.surface).left - rect(p.frame).left).toBeCloseTo(0, 0);
+
+    await userEvent.click(p.canvas.getByRole('button', { name: 'Open sidebar' }));
+    const back = await waitFor(() => { const el = sidebarBox(p); expect(el).not.toBeNull(); return el; });
+    await expect(getComputedStyle(back).animationName, 'opening moves on a spring too').not.toBe('none');
+    const opening = pauseAt(back);
+    const mid = rect(p.surface).left - rect(p.frame).left;
+    await expect(mid, 'the Page narrows as it opens').toBeGreaterThan(0);
+    await expect(mid).toBeLessThan(width);
+    await expectOnlyTheRegionMoves(p, before);
+    finish(opening);
+    await waitFor(() => expect(rect(p.surface).left - rect(p.frame).left).toBeCloseTo(width, 0));
+});
+
+/** Collapse and open the docked Sidebar: it keeps its width, and the Page makes room on the same spring. */
+export const SidebarCollapseMotion = {
+    name: 'Space motion: Sidebar collapse',
+    parameters: { frameWidth: 1440 },
+    decorators: [motionOn],
+    play: collapsePlay(false),
+};
+
+export const SidebarCollapseMotionReduced = {
+    name: 'Space motion: Sidebar collapse, reduced',
+    parameters: { frameWidth: 1440 },
+    decorators: [motionOff],
+    play: collapsePlay(true),
+};
+
+/** A peek slides over the Page on spatial.default and leaves on spatial.fast; the Page never moves. */
+const peekPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, async () => {
+    const p = parts(canvasElement);
+    await waitFor(() => expect(p.edge(), 'closed, with a hover strip').not.toBeNull());
+    const left = rect(p.surface).left;
+    p.edge().dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+    p.edge().dispatchEvent(new PointerEvent('pointerenter', { bubbles: false }));
+    const peek = await waitFor(() => { const el = p.frame.querySelector('.plus-frame__sidebar--raised'); expect(el).not.toBeNull(); return el; });
+    if (reduced) {
+        await expect(getComputedStyle(peek).animationName).toBe('none');
+        return;
+    }
+    await expect(getComputedStyle(peek).animationName, 'the peek slides in').not.toBe('none');
+    const running = pauseAt(peek);
+    await expect(rect(peek).left, 'part-way in from the left').toBeLessThan(rect(p.frame).left);
+    await expect(rect(p.surface).left, 'the Page does not move for a peek').toBeCloseTo(left, 0);
+    finish(running);
+});
+export const SidebarPeekMotion = {
+    name: 'Space motion: Sidebar peek',
+    args: { sidebarDocked: false },
+    parameters: { frameWidth: 1440 },
+    decorators: [motionOn],
+    play: peekPlay(false),
+};
+export const SidebarPeekMotionReduced = {
+    name: 'Space motion: Sidebar peek, reduced',
+    args: { sidebarDocked: false },
+    parameters: { frameWidth: 1440 },
+    decorators: [motionOff],
+    play: peekPlay(true),
+};
+
+const dockPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, async () => {
+    const p = panelParts(canvasElement);
+    await waitFor(() => expect(p.sidebar(), 'docked at 1440').not.toBeNull());
+    await settled(p.frame);
+    const before = { top: rect(p.surface).top, bottom: rect(p.surface).bottom };
+    const fullPage = rect(p.surface).width;
+    await userEvent.click(p.canvas.getByRole('button', { name: 'Open chat' }));
+    const panel = await waitFor(() => { const el = p.panel(); expect(el, 'the Panel opens').not.toBeNull(); return el; });
+    const full = tokenLength(p.frame, '--panel-width-default');
+    if (reduced) {
+        await expect(getComputedStyle(panel).animationName, 'reduced motion does not animate').toBe('none');
+        await expect(rect(panel).width).toBeCloseTo(full, 0);
+    } else {
+        await expect(getComputedStyle(panel).animationName, 'it docks on a spring').not.toBe('none');
+        const running = pauseAt(panel);
+        await expect(running.length).toBeGreaterThan(0);
+        await expect(rect(panel).width, 'the Panel is part-way open').toBeGreaterThan(0);
+        await expect(rect(panel).width).toBeLessThan(full);
+        await expect(rect(p.surface).width, 'the Page has narrowed on the same clock').toBeLessThan(fullPage);
+        await expect(rect(p.surface).right, 'and meets the Panel').toBeCloseTo(rect(panel).left, 0);
+        await expect(rect(p.surface).top).toBeCloseTo(before.top, 0);
+        await expect(rect(p.surface).bottom).toBeCloseTo(before.bottom, 0);
+        await expect(rect(within(panel).getByRole('button', { name: 'Close' })).width, 'the content keeps its size').toBeGreaterThan(0);
+        finish(running);
+        await settled(p.frame);
+    }
+    await expect(rect(p.surface).width).toBeCloseTo(fullPage - full, 0);
+
+    await userEvent.click(within(panel).getByRole('button', { name: 'Close' }));
+    if (reduced) {
+        await waitFor(() => expect(p.panel(), 'it is gone at once').toBeNull());
+    } else {
+        await waitFor(() => expect(panel).toHaveAttribute('data-ending-style'));
+        const leaving = pauseAt(panel);
+        await expect(leaving.length, 'it leaves on a spring').toBeGreaterThan(0);
+        await expect(p.panel(), 'it stays for its exit').not.toBeNull();
+        await expect(rect(p.surface).width, 'the Page is part-way back').toBeGreaterThan(fullPage - full);
+        finish(leaving);
+        await waitFor(() => expect(p.panel()).toBeNull());
+    }
+    await expect(rect(p.surface).width, 'the Page has its width back').toBeCloseTo(fullPage, 0);
+});
+
+/** Dock and undock the Panel: it grows from its edge, the Page narrows with it, and it leaves the same way. */
+export const PanelDockMotion = {
+    name: 'Space motion: Panel dock and undock',
+    parameters: { frameWidth: 1440 },
+    render: WithPanel,
+    decorators: [motionOn],
+    play: dockPlay(false),
+};
+export const PanelDockMotionReduced = {
+    name: 'Space motion: Panel dock and undock, reduced',
+    parameters: { frameWidth: 1440 },
+    render: WithPanel,
+    decorators: [motionOff],
+    play: dockPlay(true),
+};
+
+const overlayPlay = (reduced) => async ({ canvasElement }) => atViewport(1100, async () => {
+    const p = panelParts(canvasElement);
+    await waitFor(() => expect(p.frame).not.toBeNull());
+    await settled(p.frame);
+    const pageWidth = rect(p.surface).width;
+    await userEvent.click(p.canvas.getByRole('button', { name: 'Open chat' }));
+    const panel = await waitFor(() => { const el = p.panel(); expect(el).not.toBeNull(); return el; });
+    await panelIs(p, 'overlay');
+    if (reduced) {
+        await expect(getComputedStyle(panel).animationName).toBe('none');
+        return;
+    }
+    await expect(getComputedStyle(panel).animationName, 'the overlay slides in').not.toBe('none');
+    const running = pauseAt(panel);
+    await expect(rect(panel).left, 'part-way in from the edge').toBeGreaterThan(rect(p.frame).right - tokenLength(p.frame, '--panel-width-default'));
+    await expect(rect(p.surface).width, 'an overlay does not move the Page').toBeCloseTo(pageWidth, 0);
+    finish(running);
+});
+export const PanelOverlayMotion = {
+    name: 'Space motion: Panel overlay',
+    parameters: { frameWidth: 1100 },
+    render: WithPanel,
+    decorators: [motionOn],
+    play: overlayPlay(false),
+};
+export const PanelOverlayMotionReduced = {
+    name: 'Space motion: Panel overlay, reduced',
+    parameters: { frameWidth: 1100 },
+    render: WithPanel,
+    decorators: [motionOff],
+    play: overlayPlay(true),
+};
+
+/** Crossing the 1024 breakpoint: the Sidebar leaves on its spring and the Page widens with it, with no jump. */
+const breakpointPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, async () => {
+    const p = panelParts(canvasElement);
+    const stage = canvasElement.querySelector('[data-probe="stage"]');
+    await sidebarIs(p, 'docked');
+    await settled(p.frame);
+    const box = sidebarBox(p);
+    const width = tokenLength(p.frame, '--frame-sidebar-width');
+    const edge = () => rect(p.surface).left - rect(p.frame).left;
+    await expect(edge()).toBeCloseTo(width, 0);
+    stage.style.inlineSize = `${FRAME_LAYOUT.dockMin - 64}px`;
+    if (reduced) {
+        await waitFor(() => expect(sidebarBox(p)).toBeNull());
+        await expect(edge()).toBeCloseTo(0, 0);
+        return;
+    }
+    await waitFor(() => expect(box).toHaveAttribute('data-leaving', 'true'));
+    const running = pauseAt(box);
+    await expect(running.length, 'the Sidebar leaves on a spring').toBeGreaterThan(0);
+    await expect(edge(), 'the Page is part-way, not jumped').toBeGreaterThan(0);
+    await expect(edge()).toBeLessThan(width);
+    await expect(rect(box).width, 'the Sidebar is never squeezed').toBeCloseTo(width, 0);
+    finish(running);
+    await waitFor(() => expect(sidebarBox(p)).toBeNull());
+    await expect(edge()).toBeCloseTo(0, 0);
+});
+export const BreakpointReflowMotion = {
+    name: 'Space motion: breakpoint reflow',
+    args: { width: 1200 },
+    parameters: { layout: 'padded' },
+    render: (args) => <WidthStage {...args} defaultPanelOpen={false} />,
+    decorators: [motionOn],
+    play: breakpointPlay(false),
+};
+export const BreakpointReflowMotionReduced = {
+    name: 'Space motion: breakpoint reflow, reduced',
+    args: { width: 1200 },
+    parameters: { layout: 'padded' },
+    render: (args) => <WidthStage {...args} defaultPanelOpen={false} />,
+    decorators: [motionOff],
+    play: breakpointPlay(true),
 };

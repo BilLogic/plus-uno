@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 
 import PropTypes from 'prop-types';
 import { Dialog } from '@base-ui/react/dialog';
 import { openOverlayCount, subscribeOverlays } from '@/lib/overlay';
+import { useOverlayPresence } from '@/lib/overlayMotion';
+import { useMotionReduced } from '@/lib/motionPreference';
 import { IconButton, LinkIconButton, PanelHostContext } from '@/components';
 import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
@@ -40,7 +42,11 @@ const writePanelMemory = (key, memory) => {
 };
 
 /** Whether focus has nowhere to be: on the body, or on an element that left the page. */
-const focusLost = (doc) => !doc.activeElement || doc.activeElement === doc.body || !doc.activeElement.isConnected;
+const focusLost = (doc) => !doc.activeElement || doc.activeElement === doc.body || !doc.activeElement.isConnected
+    || Boolean(doc.activeElement.closest('[inert]'));
+
+/** A toggle that can take focus: on the page, and not inside a Sidebar that is leaving. */
+const canFocus = (el) => Boolean(el?.isConnected && !el.closest('[inert]'));
 
 /** The dismiss attempts Base UI reports for the Panel's dialog that the Frame acts on. */
 const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
@@ -194,9 +200,18 @@ const Frame = ({
     const raised = peeking || overlay;
     const collapsed = hasSidebar && layout.sidebar === 'collapsed';
 
+    // Space moves: the Sidebar and the Panel slide on spatial springs while the Page makes room on
+    // the same clock. A closing Sidebar stays mounted until its exit finishes (never a timer),
+    // inert and out of the accessibility tree, so what it leaves behind is the Page's width.
+    const reduced = useMotionReduced();
+    const dockedRef = useRef(null);
+    const raisedRef = useRef(null);
+    const dockedPresent = useOverlayPresence(docked, dockedRef);
+    const raisedPresent = useOverlayPresence(raised, raisedRef);
+
     /** The toggle that shows: the Page's when the Sidebar is closed, else the Sidebar's own. */
     const focusToggle = useCallback(() => {
-        const visible = [toggleRef.current, closeRef.current].find((el) => el?.isConnected);
+        const visible = [toggleRef.current, closeRef.current].find(canFocus);
         visible?.focus();
     }, []);
 
@@ -278,7 +293,7 @@ const Frame = ({
     useEffect(() => {
         if (!refocusToggle.current) return;
         refocusToggle.current = false;
-        const visible = [closeRef.current, toggleRef.current].find((el) => el?.isConnected);
+        const visible = [closeRef.current, toggleRef.current].find(canFocus);
         visible?.focus({ preventScroll: true });
     }, [layout.sidebar]);
 
@@ -431,7 +446,7 @@ const Frame = ({
         const doc = frameRef.current?.ownerDocument ?? document;
         if (!focusLost(doc) && !panelRef.current?.contains(doc.activeElement)) return false;
         const opener = panelOpenerRef.current;
-        return (opener?.isConnected ? opener : [toggleRef.current, closeRef.current].find((el) => el?.isConnected)) ?? false;
+        return (canFocus(opener) ? opener : [toggleRef.current, closeRef.current].find(canFocus)) ?? false;
     }, []);
 
     // The splitter's range never lets a resize collapse the Sidebar. Docked,
@@ -456,11 +471,15 @@ const Frame = ({
         panelId,
     } : null), [hasPanel, panelOpen, setPanelOpen, panelState, layout.panelWidth, panelId]);
 
+    const lastPanelLook = useRef({ mode: 'docked', width: panelWidth });
     const renderPanel = () => {
-        const mode = panelPeekShown ? 'peek' : panelState;
-        const width = panelPeekShown
+        // Closing, the resolver says 'none' and a width of nothing; the Panel keeps its last look for its exit.
+        const live = panelPeekShown ? 'peek' : panelState;
+        const liveWidth = panelPeekShown
             ? (narrow ? layout.panelWidth : panelWidth)
             : (panelPreview ?? layout.panelWidth);
+        if (live !== 'none') lastPanelLook.current = { mode: live, width: liveWidth };
+        const { mode, width } = live !== 'none' ? { mode: live, width: liveWidth } : lastPanelLook.current;
         // The splitter resizes from 1024 up; under it the Panel is fixed at 320, or full width under 768.
         const resizable = !panelPeekShown && !narrow;
         return (
@@ -474,7 +493,8 @@ const Frame = ({
                 tabIndex={-1}
                 initialFocus={panelInitialFocus}
                 finalFocus={panelFinalFocus}
-                className={`plus-frame__panel plus-frame__panel--${mode}`}
+                className={`plus-frame__panel plus-frame__panel--${mode}${mode === 'overlay' && narrow ? ' plus-frame__panel--narrow' : ''}`}
+                data-reduced={reduced ? 'true' : undefined}
                 style={{ '--frame-panel-width': `${width}px` }}
                 onPointerEnter={panelPeekShown ? cancelPanelLeave : undefined}
                 onPointerLeave={panelPeekShown ? leavePanel : undefined}
@@ -503,15 +523,22 @@ const Frame = ({
         className,
     ].filter(Boolean).join(' ');
 
-    // A plain box: the `nav` inside the Sidebar is the navigation landmark.
-    const sidebarPanel = (isRaised) => (
+    // A plain box: the `nav` inside the Sidebar is the navigation landmark. A leaving one is only
+    // the exit's last frames: it is inert and hidden, and the live Sidebar owns the id and the ref.
+    const sidebarPanel = (isRaised, leaving) => (
         <div
-            ref={sidebarRef}
-            id={sidebarId}
+            ref={(el) => {
+                (isRaised ? raisedRef : dockedRef).current = el;
+                if (!leaving) sidebarRef.current = el;
+            }}
+            id={leaving ? undefined : sidebarId}
             className={`plus-frame__sidebar plus-frame__sidebar--${isRaised ? 'raised' : 'docked'}`}
-            inert={panelModal}
-            onPointerEnter={isRaised ? cancelLeave : undefined}
-            onPointerLeave={isRaised ? leave : undefined}
+            data-reduced={reduced ? 'true' : undefined}
+            data-leaving={leaving ? 'true' : undefined}
+            inert={panelModal || leaving}
+            aria-hidden={leaving ? true : undefined}
+            onPointerEnter={isRaised && !leaving ? cancelLeave : undefined}
+            onPointerLeave={isRaised && !leaving ? leave : undefined}
         >
             {sidebar}
         </div>
@@ -582,14 +609,14 @@ const Frame = ({
                 {collapsed ? (
                     <div className="plus-frame__edge" aria-hidden="true" onPointerEnter={peekSidebar} />
                 ) : null}
-                {raised ? sidebarPanel(true) : null}
+                {raisedPresent && hasSidebar ? sidebarPanel(true, !raised) : null}
 
                 {hasPanel && panelPeek && !panelOpen && !panelPeekShown ? (
                     <div className="plus-frame__panel-edge" aria-hidden="true" onPointerEnter={peekPanel} />
                 ) : null}
 
                 <div ref={rowRef} className="plus-frame__row">
-                    {docked ? sidebarPanel(false) : null}
+                    {dockedPresent && hasSidebar ? sidebarPanel(false, !docked) : null}
                     {/* Under an overlay Panel's Backdrop the Page is out of reach for keyboards too. */}
                     <SurfaceTag className="plus-frame__surface" inert={panelModal}>
                         {pageHead}
