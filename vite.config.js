@@ -190,8 +190,6 @@ export default defineConfig({
               emulateReducedMotion: async ({ page }, value) => {
                 await page.emulateMedia({ reducedMotion: value });
               },
-              // The OS color scheme and contrast, for the `auto` color and
-              // contrast modes. Same rule: pass `null` for each to restore.
               // A real mouse drag between two CSS selectors in the story frame,
               // which is what native drag-and-drop needs (a synthetic pointer
               // sequence never starts one). MotionTransitions' reorder stories use it.
@@ -199,6 +197,8 @@ export default defineConfig({
                 const frame = await context.frame();
                 await frame.dragAndDrop(from, to);
               },
+              // The OS color scheme and contrast, for the `auto` color and
+              // contrast modes. Same rule: pass `null` for each to restore.
               emulateColorPreferences: async ({ page }, colorScheme, contrast) => {
                 await page.emulateMedia({ colorScheme, contrast });
               }
