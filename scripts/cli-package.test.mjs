@@ -51,12 +51,14 @@ test('npm pack, install in a scratch project, `npx ds find Button` answers from 
     const project = path.join(scratch, 'project');
     fs.mkdirSync(project);
     fs.writeFileSync(path.join(project, 'package.json'), '{"name":"scratch","private":true}');
-    sh('npm', ['install', '--no-package-lock', path.join(scratch, filename)], project);
+    // --save keeps the tarball in package.json, so the install `ds add` runs later does not prune it.
+    sh('npm', ['install', '--no-package-lock', '--save', path.join(scratch, filename)], project);
 
     const find = sh('npx', ['--no-install', 'ds', 'find', 'Button'], project);
     assert.match(find, /Button/);
+    assert.match(find, /ds add Button/, 'find names the registry item to add');
     const data = JSON.parse(sh('npx', ['--no-install', 'ds', 'find', 'Button', '--json'], project));
-    assert.deepEqual(data.results[0], { kind: 'component', name: 'Button', status: 'exists', import: "import { Button } from '@/components';", summary: 'Button: triggers an action.', aliasOf: null });
+    assert.deepEqual(data.results[0], { kind: 'component', name: 'Button', status: 'exists', import: "import { Button } from '@/components';", summary: 'Button: triggers an action.', aliasOf: null, registryItem: 'Button' });
 
     assert.match(sh('npx', ['--no-install', 'ds', 'get', 'Button'], project), /Button/);
     assert.ok(sh('npx', ['--no-install', 'ds', 'tokens', 'color'], project).length > 0);
@@ -77,6 +79,27 @@ test('npm pack, install in a scratch project, `npx ds find Button` answers from 
     assert.match(missing.stderr, /no such path: nope\.jsx/);
     fs.mkdirSync(path.join(project, 'empty'));
     assert.equal(spawnSync('npx', ['--no-install', 'ds', 'check'], { cwd: path.join(project, 'empty') }).status, 2, 'no files to check is not a pass');
+
+    // `ds add`: the foundation and Button into a plain Vite + React project, which then builds and checks clean.
+    fs.rmSync(path.join(project, 'src/Bad.jsx'));
+    sh('npm', ['install', '--no-package-lock', '--save', 'react', 'react-dom'], project);
+    sh('npm', ['install', '--no-package-lock', '--save-dev', 'vite', '@vitejs/plugin-react'], project);
+    fs.writeFileSync(path.join(project, 'vite.config.js'), "import react from '@vitejs/plugin-react';\nexport default { plugins: [react()] };\n");
+    fs.writeFileSync(path.join(project, 'index.html'), '<!doctype html><div id="root"></div><script type="module" src="/src/main.jsx"></script>\n');
+    fs.writeFileSync(path.join(project, 'src/main.jsx'), "import { createRoot } from 'react-dom/client';\nimport './plus-ds/styles/main.scss';\nimport { Button } from './plus-ds/components/forms-and-inputs/Button';\ncreateRoot(document.getElementById('root')).render(<Button>Save</Button>);\n");
+    const added = JSON.parse(sh('npx', ['--no-install', 'ds', 'add', 'foundation', 'Button', '--json'], project));
+    assert.ok(added.items.includes('foundation') && added.items.includes('Button') && added.items.includes('Spinner'), 'dependent items come along');
+    assert.ok(added.written.some((f) => f === 'src/plus-ds/components/forms-and-inputs/Button/Button.jsx'));
+    assert.ok(added.added.includes('sass') && added.installed, 'npm dependencies are added and installed');
+    assert.equal(JSON.parse(fs.readFileSync(path.join(project, 'package.json'), 'utf8')).dependencies.clsx.startsWith('^'), true);
+    assert.deepEqual(JSON.parse(sh('npx', ['--no-install', 'ds', 'add', 'Button', '--json'], project)).written, [], 'a second add writes nothing');
+    fs.appendFileSync(path.join(project, 'src/plus-ds/components/forms-and-inputs/Button/Button.jsx'), '// local edit\n');
+    assert.equal(spawnSync('npx', ['--no-install', 'ds', 'add', 'Button'], { cwd: project }).status, 1, 'a locally edited file is a conflict, not overwritten');
+    assert.equal(spawnSync('npx', ['--no-install', 'ds', 'add', 'Nope'], { cwd: project }).status, 2, 'an unknown item is a usage error');
+    sh('npx', ['--no-install', 'ds', 'add', 'Button', '--overwrite'], project);
+    sh('npx', ['--no-install', 'vite', 'build'], project);
+    const after = spawnSync('npx', ['--no-install', 'ds', 'check', 'src', '--json'], { cwd: project, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    assert.equal(JSON.parse(after.stdout).failing, 0, `ds check finds no fail-level escape: ${after.stdout.slice(0, 400)}`);
 
     // `ds mcp`: the stdio server from the installed tarball lists its five tools.
     const tools = mcpTools(project);

@@ -12,6 +12,7 @@ import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { isEntry } from './lib/findings.mjs';
+import { generate } from './generate-registry.mjs';
 
 export const PACKAGE_DIR = path.join(REPO_ROOT, 'packages/cli');
 export const DIST = path.join(PACKAGE_DIR, 'dist');
@@ -72,9 +73,14 @@ export function build(root = REPO_ROOT, dist = DIST) {
     fs.mkdirSync(path.dirname(path.join(dist, f)), { recursive: true });
     fs.copyFileSync(path.join(root, f), path.join(dist, f));
   }
+  // The copy-in registry `ds add` installs from: one item JSON per foundation/component, dependencies by name.
+  const { items, problems } = generate(root);
+  if (problems.length) throw new Error(`registry cannot ship:\n${problems.map((x) => `  - ${x}`).join('\n')}`);
+  fs.mkdirSync(path.join(dist, 'registry'), { recursive: true });
+  for (const item of items) fs.writeFileSync(path.join(dist, 'registry', `${item.name}.json`), `${JSON.stringify(item)}\n`);
   // The scripts import design-system/src/lib as ESM and read the repo's package type.
   fs.writeFileSync(path.join(dist, 'package.json'), '{"type":"module","private":true}\n');
-  return list;
+  return [...list, ...items.map((i) => `registry/${i.name}.json`)];
 }
 
 if (isEntry(import.meta.url)) {

@@ -16,7 +16,7 @@ function fixture(extra = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'registry-'));
   const files = {
     'package.json': '{"version":"2.3.4"}',
-    'package-lock.json': JSON.stringify({ packages: { 'node_modules/clsx': { version: '2.1.1' }, 'node_modules/react': { version: '19.0.0' } } }),
+    'package-lock.json': JSON.stringify({ packages: { 'node_modules/clsx': { version: '2.1.1' }, 'node_modules/react': { version: '19.0.0' }, 'node_modules/sass': { version: '1.108.1' } } }),
     [`${L}/components/index.js`]: "export { default as Button } from '@/components/g/Button';\n",
     'design-system/agent-views/components/index.md': '- [Button](../../src/components/g/Button/index.md)\n- [Tag](../../src/components/g/Tag/index.md)\n',
     [`${L}/tokens/_t.scss`]: ':root { --a: 1; }\n',

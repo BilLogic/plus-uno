@@ -12,8 +12,8 @@ if (argv[0] === 'mcp') {
   const { StdioServerTransport } = await import('@modelcontextprotocol/sdk/server/stdio.js');
   const { createServer } = await import('../dist/scripts/lib/ds-mcp-server.mjs');
   await createServer(root, { hosted: true }).connect(new StdioServerTransport());
-} else if (argv[0] === 'check') {
-  // The facts come from the baked snapshot; the files come from the caller's working directory, so it runs in their CI.
+} else if (argv[0] === 'check' || argv[0] === 'add') {
+  // The facts come from the baked snapshot; the files come from the caller's working directory, so it runs in their CI; `add` writes the registry items there.
   process.exitCode = cli(argv, root, { consumerRoot: process.cwd() });
 } else {
   process.exitCode = cli(argv, root);
