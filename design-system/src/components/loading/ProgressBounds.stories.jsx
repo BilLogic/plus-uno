@@ -1,8 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import ProgressBar from './ProgressBar/ProgressBar';
-
+import { ProgressBar } from '@/components';
 /**
  * What a progress bar says when the number is out of range.
  *

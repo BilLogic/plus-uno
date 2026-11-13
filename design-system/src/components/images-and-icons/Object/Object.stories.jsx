@@ -1,7 +1,6 @@
 import React from 'react';
 import { expect } from 'storybook/test';
-import { BugIcon, IdeaIcon, OBJECT_SIZES, PageIcon, ProjectIcon, PullRequestIcon, TaskIcon } from '@/components/images-and-icons/Object';
-
+import { BugIcon, IdeaIcon, OBJECT_SIZES, PageIcon, ProjectIcon, PullRequestIcon, TaskIcon } from '@/components';
 export default {
     title: 'Components/Images and icons/Object',
     tags: ['!dev', '!autodocs'],

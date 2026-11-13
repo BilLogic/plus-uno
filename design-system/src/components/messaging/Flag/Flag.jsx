@@ -327,9 +327,15 @@ Flag.propTypes = {
     autohide: PropTypes.bool,
     /** Extra class on the flag surface. */
     className: PropTypes.string,
-    /** Extra class on the header row that holds the title and timestamp. */
+    /**
+     * Extra class on the header row that holds the title and timestamp.
+     * @ignore
+     */
     headerClass: PropTypes.string,
-    /** Extra class on the description container. */
+    /**
+     * Extra class on the description container.
+     * @ignore
+     */
     bodyClass: PropTypes.string,
     /** Small text beside the title, such as "11 mins ago". */
     timestamp: PropTypes.node,

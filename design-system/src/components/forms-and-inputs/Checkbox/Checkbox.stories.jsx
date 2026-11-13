@@ -6,8 +6,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Checkbox from './Checkbox';
-import Fieldset from '../Fieldset';
-
+import { Fieldset } from '@/components';
 export default {
     title: 'Components/Forms and inputs/Checkbox',
     component: Checkbox,

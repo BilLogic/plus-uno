@@ -1,12 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import DatePicker from './DatePicker/DatePicker';
-import TextField from './TextField/TextField';
-
-
+import { DatePicker, TextField, TextArea } from '@/components';
 import Select from './Select';
-import TextArea from './TextArea/TextArea';
 import Listbox from './_internal/Listbox';
 
 /**

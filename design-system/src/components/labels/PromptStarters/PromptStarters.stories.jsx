@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import PromptStarters from './PromptStarters';
-import PromptInput from '../../forms-and-inputs/PromptInput/PromptInput';
-
+import { PromptInput } from '@/components';
 /**
  * `PromptStarters` — a few things a person could ask the AI, as a wrapping
  * row of `Suggestion` chips.

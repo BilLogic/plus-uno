@@ -9,9 +9,9 @@ export const webAppSourceSnippets = {
     accordion: snippet([
         '<Accordion',
         '  items={[',
-        '    { eventKey: "0", header: "Accordion Item #1", body: "This is the first accordion item\'s content." },',
-        '    { eventKey: "1", header: "Accordion Item #2", body: "This is the second accordion item\'s content." },',
-        '    { eventKey: "2", header: "Accordion Item #3", body: "This is the third accordion item\'s content." },',
+        '    { header: "Accordion Item #1", body: "This is the first accordion item\'s content." },',
+        '    { header: "Accordion Item #2", body: "This is the second accordion item\'s content." },',
+        '    { header: "Accordion Item #3", body: "This is the third accordion item\'s content." },',
         '  ]}',
         '  defaultActiveKey="0"',
         '/>'
@@ -188,15 +188,9 @@ export const webAppSourceSnippets = {
         '/>'
     ]),
     popup: snippet([
-        '<div className="plus-popup-overview-static">',
-        '  <Button type="button" text="Toggle popup" appearance="primary" />',
-        '  <div className="plus-popup">',
-        '    <div className="plus-popup-title">Popup title</div>',
-        '    <div className="plus-popup-body">',
-        '      Body content appears below the title.',
-        '    </div>',
-        '  </div>',
-        '</div>'
+        '<Popup trigger="Toggle popup" title="Popup title">',
+        '  Body content appears below the title.',
+        '</Popup>'
     ]),
     progressBar: snippet([
         '<ProgressBar value={50} />'

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Button from './Button';
-import DropdownMenu from './DropdownMenu/DropdownMenu';
+import { DropdownMenu } from '@/components';
 import { ButtonItem } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import Select from './Select';
 import Toggle from './Toggle';

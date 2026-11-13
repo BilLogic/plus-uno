@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import LinkIconButton from './LinkIconButton';
-import { ICON_BUTTON_APPEARANCES } from '../IconButton/IconButton';
+import { ICON_BUTTON_APPEARANCES } from '@/components';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };

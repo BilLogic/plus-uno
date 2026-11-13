@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import Button from '../Button/Button';
+import { Button } from '@/components';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
 import TextField from './TextField';
 import { iconClass } from '../../../lib/icon';

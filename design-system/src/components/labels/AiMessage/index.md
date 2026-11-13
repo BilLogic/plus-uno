@@ -111,7 +111,7 @@ Same group: `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 
 | State | What changes |
 | --- | --- |
-| Complete | The text, then the sources and the thumbs when they are passed. With `typeOut`, the text types out character by character. |
+| Complete | The text, then the sources and the thumbs when they are passed. With `typeOut`, the text types out character by character (`TypingText` takes `speed`, in milliseconds per character, and `onComplete`). `linkTarget` sets where links open, such as `_top` from inside a frame, and `resolveHref` rewrites a link's address. |
 | Streaming | A caret follows the last character, and the message carries `aria-busy`. No sources and no thumbs yet. |
 | Thinking | The typing indicator, a status named "AI is writing", in place of the text. |
 | Reduced motion | The caret and dots stop animating, and typed-out text shows at once. |

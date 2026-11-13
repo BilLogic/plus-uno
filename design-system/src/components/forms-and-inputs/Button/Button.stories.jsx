@@ -4,8 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import Button, { BUTTON_APPEARANCES } from './Button';
-import SectionMessage from '../../messaging/SectionMessage/SectionMessage';
-
+import { SectionMessage } from '@/components';
 const icons = {
     'none': null,
     'plus': 'plus',

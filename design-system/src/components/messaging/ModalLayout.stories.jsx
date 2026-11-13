@@ -367,7 +367,7 @@ HeaderOptions.play = async ({ canvasElement }) => {
     await expect(within(full).getByRole('heading', { level: 1, name: 'Share report' })).toBeInTheDocument();
     await expect(within(full).getByText('People with the link can view it.')).toBeInTheDocument();
     await expect(within(full).getByRole('button', { name: 'Copy link' })).toBeInTheDocument();
-    const close = within(full).getByRole('button', { name: 'Close modal' });
+    const close = within(full).getByRole('button', { name: 'Close' });
     await expect(heightOf(close)).toBe(32);
     await expect(full.querySelectorAll('.plus-modal-divider')).toHaveLength(2);
     // Footer actions align right.
@@ -376,7 +376,7 @@ HeaderOptions.play = async ({ canvasElement }) => {
     await expect(Math.round(box.right - done.right)).toBe(Math.round(lengthOf(canvasElement.ownerDocument, '--modal-pad-x-default')));
 
     const noClose = canvas.getByTestId('no-close');
-    await expect(within(noClose).queryByRole('button', { name: 'Close modal' })).toBeNull();
+    await expect(within(noClose).queryByRole('button', { name: 'Close' })).toBeNull();
     await expect(noClose.querySelectorAll('.plus-modal-divider')).toHaveLength(0);
 
     const loading = canvas.getByTestId('loading');

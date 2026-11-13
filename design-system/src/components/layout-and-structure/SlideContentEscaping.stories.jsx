@@ -1,8 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import Carousel from './Carousel/Carousel';
-
+import { Carousel } from '@/components';
 /**
  * What a `Carousel` slide does with a string.
  *

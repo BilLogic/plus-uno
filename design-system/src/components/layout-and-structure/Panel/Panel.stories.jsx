@@ -1,13 +1,7 @@
 import React from 'react';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, within } from 'storybook/test';
-import Button from '@/components/forms-and-inputs/Button';
-import PanelContainer, {
-    PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelDisclaimer,
-    PanelFooter, PanelHeader, PanelMoreAction, PanelProvider, PanelSubheader,
-} from '@/components/layout-and-structure/Panel';
-
-export default {
+import { Button, Panel as PanelContainer, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelDisclaimer, PanelFooter, PanelHeader, PanelMoreAction, PanelProvider, PanelSubheader } from '@/components';export default {
     title: 'Components/Layout and structure/Panel',
     component: PanelContainer,
     tags: ['!dev', '!autodocs'],

@@ -1,8 +1,7 @@
 import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import DateTimePicker from './DateTimePicker/DateTimePicker';
-
+import { DateTimePicker } from '@/components';
 /**
  * What DateTimePicker does, held to a play test each: its calendar is the
  * shared one and opens 4px from the date field, the list of times keeps the

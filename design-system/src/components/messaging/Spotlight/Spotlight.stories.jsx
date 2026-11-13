@@ -3,10 +3,7 @@ import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expect, waitFor } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import Button from '@/components/forms-and-inputs/Button';
-import Spotlight, { SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
-
-export default {
+import { Button, Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components';export default {
     title: 'Components/Messaging/Spotlight',
     component: Spotlight,
     tags: ['!dev', '!autodocs'],

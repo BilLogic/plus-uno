@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { Button } from '@/components';
+import { Button, Tag, Suggestion } from '@/components';
 import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import Tag from '../Tag';
-import Suggestion from '../Suggestion';
 import TagGroup from './TagGroup';
 import { expectGroundUnder, expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 

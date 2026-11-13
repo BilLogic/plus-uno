@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { Button } from '@/components';
+import { Button, Tag, TagContext, TagGroup } from '@/components';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import Tag, { TagContext } from '../Tag';
-import TagGroup from '../TagGroup';
 import Suggestion, { SUGGESTION_TYPES } from './Suggestion';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';

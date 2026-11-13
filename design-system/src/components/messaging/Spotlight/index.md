@@ -104,11 +104,11 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 1. **Target.** `SpotlightTarget` wraps the element the callout points at and
    shares its anchor with the `Spotlight` through a `SpotlightProvider`.
 2. **Headline.** The dialog title, read first.
-3. **Dismiss.** A close button in the header, the dialog's first focusable element.
+3. **Dismiss.** The shared `CloseButton` in its `inverse` tone, in the header, the dialog's first focusable element. `dismissible={false}` leaves it out.
 4. **Media.** An optional image above the body.
 5. **Body.** The `children` text.
 6. **Step count.** A short label like "1 of 3".
-7. **Actions.** A secondary and a primary `SpotlightAction`, the secondary first.
+7. **Actions.** A secondary and a primary `SpotlightAction`, the secondary first. Each takes `onClick`, or `href` to render a link.
 
 ### States
 
@@ -167,7 +167,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-brand-bold` · `--ds-icon-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-small` · `--radius-lg` · `--radius-xl` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width`
+`--body-default` · `--body-small` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-small` · `--radius-lg` · `--radius-xl` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width`
 
 From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override these through the token layer, never with a literal.
 

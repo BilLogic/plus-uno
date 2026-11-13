@@ -41,11 +41,15 @@ opens its description and actions behind a chevron; its actions are buttons.
 
 | Appearance | When to use |
 | --- | --- |
-| Normal | The default flag, for passive news a person can clear. Example: "Notes copied". Set `icon` to a status icon or an Avatar. |
+| Normal | The default flag, for passive news a person can clear. Closes itself after 8 seconds. Example: "Notes copied". Set `icon` to a status icon or an Avatar. |
 | Information | Bold. Something worth knowing, on the dark neutral fill. Times out. |
 | Success | Bold. A finished action. Times out. |
 | Warning | Bold. Something to check before going on. Never closes itself; offers a next action. |
 | Error | Bold. Something that failed. Never closes itself; offers a next action. |
+
+### Sound
+
+A flag plays a sound as it lands: Error for an error flag, Notify for every other appearance, through the app's sound setting. Pass `sound={false}` where a flag should stay quiet, such as during a session.
 
 ## Motion
 
@@ -196,8 +200,8 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | `delay` | number | `FLAG_AUTO_CLOSE_MS` | How long it stays before closing itself, in ms. 8000 by default; keep it at 8000 or more so a slow reader is not cut off. |
 | `autohide` | bool | — | Close itself after `delay`. Defaults to true for normal, information and success; warning and error never close themselves. |
 | `className` | string | `''` | Extra class on the flag surface. |
-| `headerClass` | string | `''` | Extra class on the header row that holds the title and timestamp. |
-| `bodyClass` | string | `''` | Extra class on the description container. |
+| `headerClass` | string | `''` | Extra class on the header row that holds the title and timestamp. @ignore |
+| `bodyClass` | string | `''` | Extra class on the description container. @ignore |
 | `timestamp` | node | — | Small text beside the title, such as "11 mins ago". |
 | `sound` | string or enum | — | The sound token it plays as it lands, through the app's sound setting, or `false` for none. Unset, an `error` flag plays `error` and every other appearance plays `notify`. Pass `false` when a flag should stay quiet, such as during a session. |
 | `reducedMotion` | bool | — | Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting. |

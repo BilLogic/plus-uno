@@ -4739,7 +4739,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": "Extra class on the header row that holds the title and timestamp.",
+          "description": "Extra class on the header row that holds the title and timestamp. @ignore",
           "deprecated": null
         },
         {
@@ -4748,7 +4748,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": "Extra class on the description container.",
+          "description": "Extra class on the description container. @ignore",
           "deprecated": null
         },
         {
@@ -12805,7 +12805,6 @@
         "--body-default",
         "--body-small",
         "--ds-background-brand-bold",
-        "--ds-icon-inverse",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
         "--ds-shadow-overlay",

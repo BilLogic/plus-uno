@@ -1,7 +1,6 @@
 import React from 'react';
 import { expect } from 'storybook/test';
-import Image, { IMAGE_SIZES } from '@/components/images-and-icons/Image';
-
+import { Image, IMAGE_SIZES } from '@/components';
 const SAMPLE = 'https://placehold.co/320x180';
 const SAMPLE_DARK = 'https://placehold.co/320x180/111/eee';
 

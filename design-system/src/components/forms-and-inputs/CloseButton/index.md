@@ -40,7 +40,7 @@ Don't: Bottom-left, under the content.
 
 ### Name what it closes. {#name-what-it-closes}
 
-Use "Close" for a surface that blocks, like a Modal, and "Dismiss" plus what goes away for a message: "Dismiss update", "Dismiss warning". The × glyph is the same either way, so `label` is the only thing that tells a screen reader user what just went away.
+Use "Close" for a surface that blocks, like a Modal, and "Dismiss" plus what goes away for a message: "Dismiss update", "Dismiss message". The × glyph is the same either way, so `label` is the only thing that tells a screen reader user what just went away.
 
 ```jsx
 <CloseButton label="Dismiss update" onClick={dismiss} />
@@ -110,7 +110,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Do | Don't |
 | --- | --- |
-| Say what closes: "Close filters", "Dismiss alert". | A bare "Close", or a label that repeats the glyph: "X icon". |
+| Say what closes: "Close filters", "Dismiss message". | A bare "Close", or a label that repeats the glyph: "X icon". |
 | Use "Close" for a surface people can reopen and "Dismiss" for a message they are done with. | The same word for both, or "Cancel", which names a different action. |
 | Use sentence case. | Title case or all capitals. |
 
