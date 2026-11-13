@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+// `ds`: the design-system lookup over the snapshot baked into dist/ at build time.
+import { fileURLToPath } from 'node:url';
+
+import { cli } from '../dist/scripts/ds.mjs';
+
+const root = fileURLToPath(new URL('../dist/', import.meta.url));
+const argv = process.argv.slice(2);
+
+if (argv[0] === 'check') {
+  console.error('ds check is not in this version of the package yet.');
+  process.exitCode = 1;
+} else {
+  process.exitCode = cli(argv, root);
+}
