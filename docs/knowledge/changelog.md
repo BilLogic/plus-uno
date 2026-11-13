@@ -84,3 +84,7 @@ Design-system terms moved from GLOSSARY.md to `docs/conventions/design-system-gl
 ## 2026-11-13 — existing DS decisions in the ADR trail
 
 The harness round records the merged Panel, Radius and drag decisions in ADR-044 through ADR-046. ADR-036 points to the Bootstrap removal; ADR-038 marks its historical pattern and radius names as corrected. No component behavior or ruling changes.
+
+## 2026-11-13 — routing and authoring conventions
+
+The animation load points to the generated event-to-token library, and rule 5 names the drag exception recorded in ADR-046. Setup owns the fresh-origin/main branch rule. Page documentation and the illustration kit carry the existing soft skeleton-bar convention; the component overview drops the vendor-name map.
