@@ -71,6 +71,16 @@ node scripts/eval-ds-usage.mjs run --model sonnet
 
 The default run is small: three arms (`control`, `current`, `checker-removed`), four tasks (`page-from-prd`, `trap-missing-component`, `debt-extend`, `forbidden-ask`) and two runs a cell, 24 builds that answer whether the harness or the checker earns the result. Widen it by flags only when a small run leaves that unclear: `--arms` and `--tasks` take any of the arms and tasks above, and `--runs` sets the repeats. `--model` is the model both the build and the judge run on (default `sonnet`), recorded on every row. `--ref` picks the commit the arms copy (default `origin/main`), and `--scratch` the folder the throwaway copies go in (removed as each run finishes). A run uses the `claude` login, so on a subscription it costs no tokens; it refuses to start when an API key, Vertex or Bedrock is set in the environment, unless `--allow-metered` says the per-token bill is intended. Builds run one at a time, so start a run in the background. Each build is copied to `~/Documents/Claude/Projects/PLUS/evals/ds-usage/<run-id>/` with the agent's result JSON.
 
+## Run it on Gemini
+
+`--model` names a Gemini model (`gemini-3.8-flash`) to run the builds and the judge on Gemini CLI over the PLUS Vertex project, which runs Google models only. Export the Vertex variables first: `GOOGLE_GENAI_USE_VERTEXAI=true`, `GOOGLE_CLOUD_PROJECT=hcii-plus`, `GOOGLE_CLOUD_LOCATION=global`, and `GOOGLE_APPLICATION_CREDENTIALS` pointing at the service-account key. Then pass `--allow-metered`, because Vertex bills per token:
+
+```bash
+node scripts/eval-ds-usage.mjs run --model gemini-3.8-flash --allow-metered --arms current --runs 1
+```
+
+Each run gets its own settings folder (`GEMINI_CLI_HOME`), so the operator's own Gemini login never reaches it. AGENTS.md is the context file. Writes and shell run in the macOS sandbox, and a shell read past the copy is flagged in `reached_checkout`, as on Claude. Claude's project hooks and skills have no Gemini equivalent, so `hook-off` measures the same harness as `current` on Gemini. Gemini reports tokens but no cost, so `cost_usd` is null. Rows group by model, so Gemini rows are compared only with Gemini rows: a Gemini round needs its own before run.
+
 ## Read the ledger
 
 `ds-usage-ledger.jsonl` gains one row per run, losses and agent errors included: date, model, harness commit, `scenarios_sha` (the briefs, template and judge are read from the working tree, so this hash says which ones), arm, task, run, escapes and `by_rule`, warnings and `warn_by_rule`, `seeded_escapes` and `seeded_by_rule`, judge verdicts and `judge_sha`, tokens, turns, cost and wall time, `reached_checkout`, `read_set`, `a11y_violations` or `a11y_error`, and where the build was kept.

@@ -23,6 +23,7 @@
  * scoring, the ledger rows and the summary.
  *
  *   node scripts/eval-ds-usage.mjs run [--arms control,current] [--tasks a,b] [--runs 2] [--allow-metered] [--model sonnet] [--ref origin/main] [--scratch DIR]
+ *   --model gemini-* runs the builds and the judge on Gemini CLI over Vertex (lib/gemini-agent.mjs).
  *   node scripts/eval-ds-usage.mjs summary [--since YYYY-MM-DD]
  *   node scripts/eval-ds-usage.mjs compare [--baseline current] [--commit SHA]   the keep rule
  *   node scripts/eval-ds-usage.mjs rescore   re-score every kept build with this checkout's rules
@@ -39,6 +40,7 @@ import { REPO_ROOT } from './lib/corpus.mjs';
 import { escapesIn, pageRootOf, pagesOf } from './lib/ds-usage.mjs';
 import { blankComments } from './lib/jsx-scan.mjs';
 import { isEntry } from './lib/findings.mjs';
+import { isGemini, runGemini, vertexMissing } from './lib/gemini-agent.mjs';
 
 export const SCENARIOS = 'docs/evals/scenarios/ds-usage';
 export const LEDGER = 'docs/evals/ds-usage-ledger.jsonl';
@@ -452,7 +454,9 @@ function agent({ cwd, prompt, model, readOnly = false, deny = [], mcp = lookupWi
     ...(readOnly ? [...DISALLOWED, 'Write', 'Edit', 'NotebookEdit', 'Bash'] : DISALLOWED),
   ];
   const started = Date.now();
-  const out = spawnSync('claude', args, { cwd, encoding: 'utf8', maxBuffer: 1 << 28, timeout: 45 * 60 * 1000 });
+  const out = isGemini(model)
+    ? runGemini({ cwd, prompt, model, readOnly, disallowed: DISALLOWED, deny, mcp, spawn: spawnSync })
+    : spawnSync('claude', args, { cwd, encoding: 'utf8', maxBuffer: 1 << 28, timeout: 45 * 60 * 1000 });
   return { result: resultOf(out), reached: reachedCheckout(out.stdout), read: readSet(out.stdout, cwd), wallMs: Date.now() - started };
 }
 
@@ -893,9 +897,15 @@ if (isEntry(import.meta.url)) {
   try {
     const opts = options(rest);
     if (command === 'run') {
-      const metered = meteredIn(process.env);
-      if (metered.length && !opts.allowMetered) {
-        throw new Error(`${metered.join(', ')} set: this run would bill per token. Unset it to run on the subscription login, or pass --allow-metered.`);
+      if (isGemini(opts.model)) {
+        const missing = vertexMissing(process.env);
+        if (missing.length) throw new Error(`${missing.join(', ')} unset: a Gemini run goes to Vertex (docs/evals/ds-usage.md § Run it on Gemini).`);
+        if (!opts.allowMetered) throw new Error('A Gemini run bills Vertex per token; pass --allow-metered.');
+      } else {
+        const metered = meteredIn(process.env);
+        if (metered.length && !opts.allowMetered) {
+          throw new Error(`${metered.join(', ')} set: this run would bill per token. Unset it to run on the subscription login, or pass --allow-metered.`);
+        }
       }
       await runAll(opts);
     }
