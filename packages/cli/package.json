@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "The PLUS design system from a shell: find, get, tokens and guide over a baked snapshot.",
   "type": "module",
-  "license": "UNLICENSED",
+  "license": "ISC",
   "bin": { "ds": "bin/ds.mjs" },
   "files": ["bin", "dist", "src"],
   "engines": { "node": ">=22" },

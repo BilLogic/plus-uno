@@ -21,6 +21,12 @@ test('package name is held in one constant', () => {
   assert.equal(pkg.publishConfig?.access, 'public');
 });
 
+test('the README install lines read the constant', () => {
+  const readme = fs.readFileSync(path.join(PKG, 'README.md'), 'utf8');
+  const named = readme.match(/@plus-uno\/[\w-]+/g) ?? [];
+  assert.ok(named.length > 0 && named.every((n) => n === PACKAGE_NAME), `README names ${[...new Set(named)]}, not only ${PACKAGE_NAME}`);
+});
+
 test('npm pack, install in a scratch project, `npx ds find Button` answers from the snapshot', { timeout: 300_000 }, () => {
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'plus-uno-cli-'));
   try {
@@ -38,7 +44,7 @@ test('npm pack, install in a scratch project, `npx ds find Button` answers from 
     const find = sh('npx', ['--no-install', 'ds', 'find', 'Button'], project);
     assert.match(find, /Button/);
     const data = JSON.parse(sh('npx', ['--no-install', 'ds', 'find', 'Button', '--json'], project));
-    assert.ok(JSON.stringify(data).includes('"Button"'));
+    assert.deepEqual(data.results[0], { kind: 'component', name: 'Button', status: 'exists', import: "import { Button } from '@/components';", summary: 'Button: triggers an action.', aliasOf: null });
 
     assert.match(sh('npx', ['--no-install', 'ds', 'get', 'Button'], project), /Button/);
     assert.ok(sh('npx', ['--no-install', 'ds', 'tokens', 'color'], project).length > 0);
