@@ -4,6 +4,7 @@ import { Story } from '@storybook/addon-docs/blocks';
 
 import { Tag } from '@/components';
 import { useFitScale } from './use-fit-scale.js';
+import { ANATOMY_REGIONS, isOwnRegion } from './anatomy-regions.js';
 import { HeroCard } from '../docs-landing/HeroCard.jsx';
 
 /**
@@ -187,12 +188,20 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
         const read = () => {
             const origin = root.getBoundingClientRect();
             setBoxWidth(origin.width);
-            setMarks(placeMarkers(parts.map(({ selector }) => {
-                const el = root.querySelector(selector);
-                if (!el) return null;
+            const regions = [...root.querySelectorAll(ANATOMY_REGIONS)];
+            const placed = parts.map((part) => {
+                const el = root.querySelector(part.selector);
+                if (!el) return { part, rect: null };
                 const r = el.getBoundingClientRect();
-                return { top: r.top - origin.top, left: r.left - origin.left, width: r.width, height: r.height };
-            }), parts));
+                // A start leader runs left from the part to the gutter: when a region it does not label (the Sidebar) sits in that run, the marker moves to the end gutter, nearest the part.
+                const blocked = (part.side ?? 'start') === 'start' && regions.some((region) => {
+                    if (isOwnRegion(region, el)) return false;
+                    const g = region.getBoundingClientRect();
+                    return g.right <= r.left + 1 && g.right > origin.left && g.bottom > r.top + 1 && g.top < r.bottom - 1;
+                });
+                return { part: blocked ? { ...part, side: 'end' } : part, rect: { top: r.top - origin.top, left: r.left - origin.left, width: r.width, height: r.height } };
+            });
+            setMarks(placeMarkers(placed.map((p) => p.rect), placed.map((p) => p.part)));
         };
         read();
         if (typeof ResizeObserver === 'undefined') return undefined;

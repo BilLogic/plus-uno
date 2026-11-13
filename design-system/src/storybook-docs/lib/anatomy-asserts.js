@@ -1,4 +1,5 @@
 import { expect, waitFor } from 'storybook/test';
+import { ANATOMY_REGIONS, isOwnRegion } from './anatomy-regions.js';
 
 /**
  * The anatomy figures' play assertions, shared by every template page: each
@@ -41,6 +42,14 @@ export const leadersCrossNoOtherPart = (canvasElement, parts) => {
             const box = rect(canvasElement.querySelector(other.selector));
             const inside = line.right > box.left + 1 && line.left < box.right - 1 && line.bottom > box.top + 1 && line.top < box.bottom - 1;
             expect(inside, `leader ${i + 1} (${label}) does not cross ${other.label}`).toBe(false);
+        });
+        // Nor a Sidebar or Panel the leader does not label.
+        const target = canvasElement.querySelector(parts[i].selector);
+        canvasElement.querySelectorAll(ANATOMY_REGIONS).forEach((region) => {
+            if (isOwnRegion(region, target)) return;
+            const box = rect(region);
+            const inside = line.right > box.left + 1 && line.left < box.right - 1 && line.bottom > box.top + 1 && line.top < box.bottom - 1;
+            expect(inside, `leader ${i + 1} (${label}) does not cross the ${region.className.split(' ')[0]}`).toBe(false);
         });
     });
 };
