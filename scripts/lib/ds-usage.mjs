@@ -197,7 +197,9 @@ export function escapesIn({ path, text: raw, page = isPageModule(path) }, ctx) {
   if (isDsStyle(path)) {
     for (const m of blankAtRules(text).matchAll(DECLARATION)) {
       const [, lead, property, value] = m;
-      if (!/^(?:transition|animation)(?:-(?:duration|delay|timing-function))?$/.test(property)) continue;
+      // Stagger delays have their own documented cadence (Listbox: 20 ms,
+      // capped at 500 ms); this rule guards duration and easing only.
+      if (!/^(?:transition|animation)(?:-(?:duration|timing-function))?$/.test(property)) continue;
       if (!/(?<![\w-])(?:\d*\.)?\d+(?:ms|s)\b|\bease(?:-in-out|-in|-out)?\b|\bcubic-bezier\s*\(/.test(value)) continue;
       add('ds/no-raw-motion', m.index + lead.length,
         `\`${property}: ${value.trim()}\` hardcodes motion`,

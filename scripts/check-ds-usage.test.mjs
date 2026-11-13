@@ -74,6 +74,7 @@ test('DS styles are in scope and raw motion fails while semantic motion passes',
       animation: pulse var(--ds-motion-loop-duration) var(--ds-motion-loop) infinite alternate;
     }`;
     assert.deepEqual(escapesIn({ path: file, text: clean }, ctx), []);
+    assert.deepEqual(escapesIn({ path: file, text: '.option { animation-delay: min(calc(var(--index) * 20ms), 500ms); }' }, ctx), []);
   }
 });
 

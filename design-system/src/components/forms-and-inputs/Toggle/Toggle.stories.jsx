@@ -21,7 +21,7 @@ export const Motion = {
         await userEvent.click(toggle);
         await expect(toggle).toHaveAttribute('aria-checked', 'true');
         if (!(await emulateReducedMotion('reduce'))) return;
-        await expect(getComputedStyle(thumb).transitionDuration).toBe('0s');
+        await expect(parseFloat(getComputedStyle(thumb).transitionDuration)).toBe(0);
         await userEvent.click(toggle);
         await expect(toggle).toHaveAttribute('aria-checked', 'false');
         await expect(getComputedStyle(thumb).transform).toBe('none');

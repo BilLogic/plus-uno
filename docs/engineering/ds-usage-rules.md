@@ -48,7 +48,7 @@ Read a token: `var(--ds-text)`, `var(--stack-md)`, a typography token. `0`, unit
 
 ## ds/no-raw-motion
 
-**fail.** In component, pattern and template CSS/SCSS under `design-system/src/`, a `transition` or `animation` shorthand, duration, delay or timing function with literal times, `ease*` or `cubic-bezier()` fails. This rule checks DS implementation styles; the other usage rules check consumer code.
+**fail.** In component, pattern and template CSS/SCSS under `design-system/src/`, a `transition` or `animation` shorthand, duration or timing function with literal times, `ease*` or `cubic-bezier()` fails. Separate stagger delays retain their documented cadence. This rule checks DS implementation styles; the other usage rules check consumer code.
 
 Read the matching `--ds-motion-*` semantic and its `-duration`. Loops use `--ds-motion-loop`; time-following progress uses `--ds-motion-linear`. The shared reduced-motion rule in `styles/main.scss` makes CSS state changes instant and stops loops.
 
