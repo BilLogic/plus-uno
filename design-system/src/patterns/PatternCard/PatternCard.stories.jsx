@@ -364,12 +364,16 @@ export const LayoutStacksBelowMd = {
             });
             doc.documentElement.className = document.documentElement.className;
             doc.documentElement.setAttribute('style', document.documentElement.getAttribute('style') ?? '');
+            await Promise.all(Array.from(doc.head.querySelectorAll('link[rel="stylesheet"]')).map((link) => (
+                link.sheet ? null : new Promise((resolve) => { link.onload = resolve; link.onerror = resolve; })
+            )));
             doc.body.innerHTML = canvasElement.querySelector('[data-testid="layout-card"]').parentElement.outerHTML;
             await new Promise((resolve) => setTimeout(resolve, 300));
             const card = doc.querySelector('[data-testid="layout-card"]');
             const root = card.getBoundingClientRect();
             const image = card.querySelector('.plus-pattern-card-image').getBoundingClientRect();
             const inner = card.querySelector('.plus-pattern-card-inner').getBoundingClientRect();
+            await expect(frame.contentWindow.getComputedStyle(card).display, 'the page styles reached the frame').toBe('flex');
             await expect(frame.contentWindow.innerWidth, 'the frame is narrower than md').toBeLessThan(768);
             await expect(image.width, 'below md the image runs the full width').toBe(root.width);
             await expect(inner.top, 'below md the content sits under the image').toBeGreaterThanOrEqual(image.bottom);

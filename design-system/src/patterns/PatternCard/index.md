@@ -152,7 +152,7 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 | `actions` | node | — | Actions at the end of the header row: buttons, a pager or an overflow |
 | `header` | node | — | Custom header that replaces title, description and actions (tabs, a toolbar) |
 | `image` | node | — | Image slot, full bleed: above the content, or at the start or end edge per `layout` |
-| `layout` | enum | `'stacked'` | Where the image sits. `stacked` puts it above the content. `image-start` and `image-end` put it beside the content at one third of the width, full height, bleeding to the card's top, bottom and that side's edge; for wide cards, and below the md breakpoint they stack. |
+| `layout` | enum | `'stacked'` | Where the image sits. `stacked` puts it above the content. `image-start` and `image-end` put it beside the content at one third of the width, full height, bleeding to the card's top, bottom and that side's edge; for wide cards, and below the md breakpoint they stack. Pass one media element: it fills the cell and crops to cover. |
 | `footer` | node | — | Footer slot: commit actions, left-aligned, Card/stack-lg below the body |
 | `padding` | enum | `'md'` | Padding scale: Card/pad-sm · md · lg (16 · 20 · 24) |
 | `gap` | enum | `'md'` | Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12) |

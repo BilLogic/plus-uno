@@ -101,7 +101,8 @@ PatternCard.propTypes = {
     /**
      * Where the image sits. `stacked` puts it above the content. `image-start` and `image-end`
      * put it beside the content at one third of the width, full height, bleeding to the card's
-     * top, bottom and that side's edge; for wide cards, and below the md breakpoint they stack.
+     * top, bottom and that side's edge; for wide cards, and below the md breakpoint they stack. Pass one media element:
+     * it fills the cell and crops to cover.
      */
     layout: PropTypes.oneOf(['stacked', 'image-start', 'image-end']),
     /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body */

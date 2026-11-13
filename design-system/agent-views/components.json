@@ -7822,7 +7822,7 @@
             "image-start",
             "image-end"
           ],
-          "description": "Where the image sits. `stacked` puts it above the content. `image-start` and `image-end` put it beside the content at one third of the width, full height, bleeding to the card's top, bottom and that side's edge; for wide cards, and below the md breakpoint they stack.",
+          "description": "Where the image sits. `stacked` puts it above the content. `image-start` and `image-end` put it beside the content at one third of the width, full height, bleeding to the card's top, bottom and that side's edge; for wide cards, and below the md breakpoint they stack. Pass one media element: it fills the cell and crops to cover.",
           "deprecated": null
         },
         {

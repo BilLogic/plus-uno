@@ -138,6 +138,9 @@ $-dragging: (
 
     .plus-pattern-card--image-start {
         grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        // Place both explicitly: with no image the content still takes the two-thirds column.
+        > .plus-pattern-card-image { grid-column: 1; grid-row: 1; }
+        > .plus-pattern-card-inner { grid-column: 2; grid-row: 1; }
     }
 
     .plus-pattern-card--image-end {
