@@ -162,6 +162,99 @@
   status = 301
   force = true
 
+# Foundations grouped under Basics, Visual, Layout and Brand headings on 2026-11-13:
+# each old flat id lands on its page under the heading.
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-overview--docs" }
+  to = "/storybook/?path=/docs/foundations-basics-overview--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-tokens--docs" }
+  to = "/storybook/?path=/docs/foundations-basics-tokens--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-accessibility--docs" }
+  to = "/storybook/?path=/docs/foundations-basics-accessibility--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-color--docs" }
+  to = "/storybook/?path=/docs/foundations-visual-color--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-typography--docs" }
+  to = "/storybook/?path=/docs/foundations-visual-typography--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-iconography--docs" }
+  to = "/storybook/?path=/docs/foundations-visual-iconography--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-radius--docs" }
+  to = "/storybook/?path=/docs/foundations-visual-radius--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-border--docs" }
+  to = "/storybook/?path=/docs/foundations-visual-border--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-elevation--docs" }
+  to = "/storybook/?path=/docs/foundations-visual-elevation--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-spacing--docs" }
+  to = "/storybook/?path=/docs/foundations-layout-spacing--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-grid--docs" }
+  to = "/storybook/?path=/docs/foundations-layout-grid--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-logos--docs" }
+  to = "/storybook/?path=/docs/foundations-brand-logos--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-illustrations--docs" }
+  to = "/storybook/?path=/docs/foundations-brand-illustrations--docs"
+  status = 301
+  force = true
+
 # Storybook static files — serve as-is
 [[redirects]]
   from = "/storybook/*"

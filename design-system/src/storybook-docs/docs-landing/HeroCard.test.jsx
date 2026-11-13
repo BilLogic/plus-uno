@@ -5,9 +5,9 @@ import { HEROES } from './hero-registry.jsx';
 
 describe('HeroCard', () => {
   it('draws the registry hero and names it with its description', () => {
-    const { container } = render(<HeroCard page="foundations-color" />);
-    const card = screen.getByRole('img', { name: HEROES['foundations-color'].description });
-    expect(card).toBe(container.querySelector('[data-hero-card="foundations-color"]'));
+    const { container } = render(<HeroCard page="foundations-visual-color" />);
+    const card = screen.getByRole('img', { name: HEROES['foundations-visual-color'].description });
+    expect(card).toBe(container.querySelector('[data-hero-card="foundations-visual-color"]'));
     expect(card.querySelector('svg, .sb-docs-hero__pane')).not.toBeNull();
   });
 

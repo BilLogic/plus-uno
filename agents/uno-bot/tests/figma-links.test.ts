@@ -73,7 +73,7 @@ const REGISTRY: DevLinkRegistry = {
     PatternCard: {
       code: {
         source: "design-system/src/patterns/PatternCard/PatternCard.jsx",
-        storybookId: "patterns-section-card--docs",
+        storybookId: "templates-card--docs",
       },
       figma: { fileKey: SPECS, sets: [{ componentSetNodeId: "10661:10292" }] },
     },
@@ -266,7 +266,7 @@ describe("only registry components", () => {
       chip.map((l) => [l.name, l.url]),
       [
         ["Code (plus-uno): PatternCard", "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/patterns/PatternCard/PatternCard.jsx"],
-        ["Storybook: PatternCard", "https://plus-uno.netlify.app/storybook/?path=/docs/patterns-section-card--docs"],
+        ["Storybook: PatternCard", "https://plus-uno.netlify.app/storybook/?path=/docs/templates-card--docs"],
       ],
     );
     assert.equal(linksOf(card).length, 8);

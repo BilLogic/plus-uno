@@ -171,13 +171,31 @@ const preview = {
           ],
           "Foundations",
           [
-            "Overview",
-            "Tokens",
-            "Accessibility",
-            "Spacing",
-            "Grid",
-            "Color",
-            "Typography",
+            "Basics",
+            [
+              "Overview",
+              "Tokens",
+              "Accessibility"
+            ],
+            "Visual",
+            [
+              "Color",
+              "Typography",
+              "Iconography",
+              "Radius",
+              "Border",
+              "Elevation"
+            ],
+            "Layout",
+            [
+              "Spacing",
+              "Grid"
+            ],
+            "Brand",
+            [
+              "Logos",
+              "Illustrations"
+            ],
             "Motion",
             [
               "Principles",
@@ -195,60 +213,6 @@ const preview = {
               "When to play",
               "With motion",
               "Settings and accessibility"
-            ],
-            "Iconography",
-            "Illustrations",
-            "Logos",
-            "Elevation",
-            "Border",
-            "Radius"
-          ],
-          "Templates",
-          [
-            "Overview",
-            "Frame",
-            "Page",
-            [
-              "Page"
-            ],
-            "Section",
-            [
-              "Section"
-            ],
-            "Card",
-            "Table",
-            "Form",
-            "Modal",
-            [
-              "Modal"
-            ],
-            "Panel",
-            [
-              "Panel"
-            ],
-            "Popup",
-            [
-              "Popup"
-            ]
-          ],
-          "Patterns",
-          [
-            "Overview",
-            "Common actions",
-            "Forms",
-            "Filtering",
-            "Navigation",
-            "Search",
-            "Indicators",
-            "Notifications",
-            "States",
-            [
-              "Empty",
-              "Loading",
-              "Errors",
-              "Overflow",
-              "Disabled",
-              "Read-only"
             ]
           ],
           "Components",
@@ -385,6 +349,54 @@ const preview = {
               "Dynamic table",
               "Tree table",
               "Visually hidden"
+            ]
+          ],
+          "Patterns",
+          [
+            "Overview",
+            "Common actions",
+            "Forms",
+            "Filtering",
+            "Navigation",
+            "Search",
+            "Indicators",
+            "Notifications",
+            "States",
+            [
+              "Empty",
+              "Loading",
+              "Errors",
+              "Overflow",
+              "Disabled",
+              "Read-only"
+            ]
+          ],
+          "Templates",
+          [
+            "Overview",
+            "Frame",
+            "Page",
+            [
+              "Page"
+            ],
+            "Section",
+            [
+              "Section"
+            ],
+            "Card",
+            "Table",
+            "Form",
+            "Modal",
+            [
+              "Modal"
+            ],
+            "Panel",
+            [
+              "Panel"
+            ],
+            "Popup",
+            [
+              "Popup"
             ]
           ],
           "AI UI",

@@ -14,7 +14,7 @@ import * as SpacingStories from './Spacing.stories.jsx';
 <Meta of={SpacingStories} />
 
 <DocsLanding
-    page="foundations-spacing"
+    page="foundations-layout-spacing"
     eyebrow="Foundation"
     title="Spacing"
     purpose="The kind of box sets its pad; the pattern it sits in sets its stack and inline."
@@ -36,7 +36,7 @@ padding: var(--card-pad-default);
 gap: var(--card-stack-md);
 ```
 
-Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Backdrop, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens](?path=/docs/foundations-tokens--docs) owns the tiers.
+Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Backdrop, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens](?path=/docs/foundations-basics-tokens--docs) owns the tiers.
 
 </FoundationSection>
 
@@ -101,7 +101,7 @@ content and the footer buttons.
 
 <FoundationSection title="Tokens">
 
-Every spacing, size and radius value comes from the four-tier ladder described on [Tokens](?path=/docs/foundations-tokens--docs#foundation-collections), which owns the tiers and the fallback rule. A token is used bare, and a typed px value never appears.
+Every spacing, size and radius value comes from the four-tier ladder described on [Tokens](?path=/docs/foundations-basics-tokens--docs#foundation-collections), which owns the tiers and the fallback rule. A token is used bare, and a typed px value never appears.
 
 - **Primitives** are the raw scale, named rem × 100: `--space-100` is 16 px,
   `--space-050` is 8 px. They are hidden in Figma, and nothing binds them.
@@ -493,7 +493,7 @@ Group by proximity, match the token to the container you are in, and take every 
 
 - Spacing groups content: related items sit closer (a tighter stack) than unrelated ones (a looser stack), so a reader can tell what belongs together without reading every label. Pick one stack tier for the context and keep it across the container.
 - Spacing never carries meaning alone. If a gap separates two groups, a heading, label or fieldset legend says so as well.
-- Keep the focus ring's room: the ring is drawn outside a control, so a control never sits flush against a clipping edge ([Border](?path=/docs/foundations-border--docs) owns the ring).
+- Keep the focus ring's room: the ring is drawn outside a control, so a control never sits flush against a clipping edge ([Border](?path=/docs/foundations-visual-border--docs) owns the ring).
 
 </FoundationSection>
 
@@ -501,12 +501,12 @@ Group by proximity, match the token to the container you are in, and take every 
 
 <FoundationRelated
     items={[
-        { title: "Grid", description: "Columns, gutters, content caps, modal widths and size roles.", href: "?path=/docs/foundations-grid--docs" },
-        { title: "Radius", description: "Corner radius, and how a menu's rows round inside it.", href: "?path=/docs/foundations-radius--docs" },
-        { title: "Border", description: "Border widths and the colors they pair with.", href: "?path=/docs/foundations-border--docs" },
-        { title: "Iconography", description: "Icon sizes.", href: "?path=/docs/foundations-iconography--docs" },
-        { title: "Typography", description: "The 14/20 label that sets every item height.", href: "?path=/docs/foundations-typography--docs" },
-        { title: "Elevation", description: "Raised and floating layers and their shadows.", href: "?path=/docs/foundations-elevation--docs" },
+        { title: "Grid", description: "Columns, gutters, content caps, modal widths and size roles.", href: "?path=/docs/foundations-layout-grid--docs" },
+        { title: "Radius", description: "Corner radius, and how a menu's rows round inside it.", href: "?path=/docs/foundations-visual-radius--docs" },
+        { title: "Border", description: "Border widths and the colors they pair with.", href: "?path=/docs/foundations-visual-border--docs" },
+        { title: "Iconography", description: "Icon sizes.", href: "?path=/docs/foundations-visual-iconography--docs" },
+        { title: "Typography", description: "The 14/20 label that sets every item height.", href: "?path=/docs/foundations-visual-typography--docs" },
+        { title: "Elevation", description: "Raised and floating layers and their shadows.", href: "?path=/docs/foundations-visual-elevation--docs" },
     ]}
 />
 

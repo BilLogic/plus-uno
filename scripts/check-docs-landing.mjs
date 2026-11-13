@@ -39,19 +39,19 @@ export const REGISTRY = 'design-system/src/storybook-docs/docs-landing/hero-regi
  * the page (its title, lower-cased and joined with dashes).
  */
 export const PAGES = [
-  { file: 'design-system/src/styles/Colors.mdx', id: 'foundations-color' },
-  { file: 'design-system/src/styles/Accessibility.mdx', id: 'foundations-accessibility' },
-  { file: 'design-system/src/styles/Border.mdx', id: 'foundations-border' },
-  { file: 'design-system/src/styles/Elevation.mdx', id: 'foundations-elevation' },
-  { file: 'design-system/src/styles/FoundationsOverview.mdx', id: 'foundations-overview' },
-  { file: 'design-system/src/styles/Grid.mdx', id: 'foundations-grid' },
-  { file: 'design-system/src/styles/Icons.mdx', id: 'foundations-iconography' },
-  { file: 'design-system/src/styles/Illustrations.mdx', id: 'foundations-illustrations' },
-  { file: 'design-system/src/styles/Logos.mdx', id: 'foundations-logos' },
-  { file: 'design-system/src/styles/Radius.mdx', id: 'foundations-radius' },
-  { file: 'design-system/src/styles/Spacing.mdx', id: 'foundations-spacing' },
-  { file: 'design-system/src/styles/Tokens.mdx', id: 'foundations-tokens' },
-  { file: 'design-system/src/styles/Typography.mdx', id: 'foundations-typography' },
+  { file: 'design-system/src/styles/Colors.mdx', id: 'foundations-visual-color' },
+  { file: 'design-system/src/styles/Accessibility.mdx', id: 'foundations-basics-accessibility' },
+  { file: 'design-system/src/styles/Border.mdx', id: 'foundations-visual-border' },
+  { file: 'design-system/src/styles/Elevation.mdx', id: 'foundations-visual-elevation' },
+  { file: 'design-system/src/styles/FoundationsOverview.mdx', id: 'foundations-basics-overview' },
+  { file: 'design-system/src/styles/Grid.mdx', id: 'foundations-layout-grid' },
+  { file: 'design-system/src/styles/Icons.mdx', id: 'foundations-visual-iconography' },
+  { file: 'design-system/src/styles/Illustrations.mdx', id: 'foundations-brand-illustrations' },
+  { file: 'design-system/src/styles/Logos.mdx', id: 'foundations-brand-logos' },
+  { file: 'design-system/src/styles/Radius.mdx', id: 'foundations-visual-radius' },
+  { file: 'design-system/src/styles/Spacing.mdx', id: 'foundations-layout-spacing' },
+  { file: 'design-system/src/styles/Tokens.mdx', id: 'foundations-basics-tokens' },
+  { file: 'design-system/src/styles/Typography.mdx', id: 'foundations-visual-typography' },
   { file: 'design-system/src/storybook-docs/patterns/PatternsOverview.mdx', id: 'patterns-overview' },
   { file: 'design-system/src/storybook-docs/patterns/CommonActions/CommonActions.mdx', id: 'patterns-common-actions' },
   { file: 'design-system/src/storybook-docs/patterns/Forms/Forms.mdx', id: 'patterns-forms' },
@@ -99,7 +99,7 @@ const LANDING_PAGE = /<DocsLanding\b[^>]*?\bpage="([^"]+)"/s;
 
 /**
  * The page ids a registry source declares: the quoted keys that open an entry
- * (`'foundations-color': {`), in order.
+ * (`'foundations-visual-color': {`), in order.
  *
  * @param {string} source
  * @returns {string[]}

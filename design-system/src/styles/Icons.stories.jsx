@@ -7,7 +7,7 @@ import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
  * icon sizes, in the icon color tokens.
  */
 export default {
-    title: 'Foundations/Iconography',
+    title: 'Foundations/Visual/Iconography',
     tags: ['!dev', '!autodocs'],
 };
 

@@ -12,7 +12,7 @@ test('a ?path= link names a docs or story id', () => {
 });
 
 test('a DocsLink names its page by id, and a story by id and story', () => {
-  assert.deepEqual(ids('<DocsLink id="foundations-tokens">Tokens</DocsLink>'), ['foundations-tokens--docs']);
+  assert.deepEqual(ids('<DocsLink id="foundations-basics-tokens">Tokens</DocsLink>'), ['foundations-basics-tokens--docs']);
   assert.deepEqual(ids('<DocsLink id="tools-documented-contract" story="documented-variants-render">x</DocsLink>'), [
     'tools-documented-contract--documented-variants-render',
   ]);
@@ -20,7 +20,7 @@ test('a DocsLink names its page by id, and a story by id and story', () => {
 
 test('a registry storybookId and an iframe id are links', () => {
   assert.deepEqual(ids('"storybookId": "components-labels-ai-label-ai-label--docs"'), ['components-labels-ai-label-ai-label--docs']);
-  assert.deepEqual(ids('src="iframe.html?id=foundations-color--surface-roles&viewMode=story"'), ['foundations-color--surface-roles']);
+  assert.deepEqual(ids('src="iframe.html?id=foundations-visual-color--surface-roles&viewMode=story"'), ['foundations-visual-color--surface-roles']);
 });
 
 test('an id assembled at run time is not a link to check', () => {

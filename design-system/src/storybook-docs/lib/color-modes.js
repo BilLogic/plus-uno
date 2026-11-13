@@ -7,7 +7,7 @@
  * OS's `prefers-color-scheme`; `resolveColorScheme` says which one that is now.
  *
  * The Storybook decorator in `.storybook/preview.jsx` calls this with the
- * toolbar's globals, and the Foundations/Color modes story tests it.
+ * toolbar's globals, and the Foundations/Visual/Color modes story tests it.
  */
 
 import { tokenColor } from './style-probes.js';

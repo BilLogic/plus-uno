@@ -11,7 +11,7 @@ const rules = [...toml.matchAll(/from = "\/storybook\/"\n\s+query = \{ path = "\
 const ids = new Set(PAGES.map((p) => p.id));
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 12);
+  assert.equal(rules.length, 25);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
     assert.ok(ids.has(r.to), `${r.from} redirects to ${r.to}, which is not a page`);

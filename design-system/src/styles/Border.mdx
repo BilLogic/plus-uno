@@ -24,10 +24,10 @@ export const field = (extra = {}) => ({
 
 export const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 
-<Meta title="Foundations/Border" tags={['!dev']} />
+<Meta title="Foundations/Visual/Border" />
 
 <DocsLanding
-    page="foundations-border"
+    page="foundations-visual-border"
     eyebrow="Foundation"
     title="Border"
     purpose="A border is a width token paired with a color token."
@@ -123,7 +123,7 @@ The focus ring shows keyboard users where they are. It is a ring, never a fill: 
         ['Width', <>2 px, <C>--border-focused</C></>],
         ['Distance', '2 px away from the control'],
         ['Color', <><C>color/border/focused</C> (<C>--ds-border-focused</C>); <C>color/border/focused/inverse</C> on a dark surface</>],
-        ['Radius', <>The control’s radius plus 2 px. <a href="?path=/docs/foundations-radius--docs">Radius</a> owns the pairs.</>],
+        ['Radius', <>The control’s radius plus 2 px. <a href="?path=/docs/foundations-visual-radius--docs">Radius</a> owns the pairs.</>],
         ['Containers', 'Cards and modals draw no ring of their own'],
     ]}
 />
@@ -268,10 +268,10 @@ The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no 
 
 <FoundationRelated
     items={[
-        { title: 'Color', description: 'The color/border/* roles each width pairs with.', href: '?path=/docs/foundations-color--docs' },
-        { title: 'Radius', description: 'The corner of a bordered shape and of its focus ring.', href: '?path=/docs/foundations-radius--docs' },
-        { title: 'Elevation', description: 'How a card gets its edge without a border.', href: '?path=/docs/foundations-elevation--docs' },
-        { title: 'Tokens', description: 'How token names read and which layer to bind.', href: '?path=/docs/foundations-tokens--docs' },
+        { title: 'Color', description: 'The color/border/* roles each width pairs with.', href: '?path=/docs/foundations-visual-color--docs' },
+        { title: 'Radius', description: 'The corner of a bordered shape and of its focus ring.', href: '?path=/docs/foundations-visual-radius--docs' },
+        { title: 'Elevation', description: 'How a card gets its edge without a border.', href: '?path=/docs/foundations-visual-elevation--docs' },
+        { title: 'Tokens', description: 'How token names read and which layer to bind.', href: '?path=/docs/foundations-basics-tokens--docs' },
     ]}
 />
 

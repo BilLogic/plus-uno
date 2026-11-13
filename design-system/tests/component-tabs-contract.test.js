@@ -79,7 +79,7 @@ describe('componentIdentity', () => {
   it('returns null for anything outside the components tree', () => {
     expect(
       componentIdentity({
-        title: 'Foundations/Color',
+        title: 'Foundations/Visual/Color',
         importPath: './design-system/src/styles/Colors.stories.jsx',
       }),
     ).toBeNull();

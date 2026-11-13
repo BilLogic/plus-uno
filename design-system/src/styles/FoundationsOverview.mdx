@@ -7,10 +7,10 @@ import {
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
 
-<Meta title="Foundations/Overview" tags={['!dev']} />
+<Meta title="Foundations/Basics/Overview" />
 
 <DocsLanding
-    page="foundations-overview"
+    page="foundations-basics-overview"
     eyebrow="Foundation"
     title="Overview"
     purpose="Foundations create consistent experiences across the tutor and student apps."
@@ -40,7 +40,7 @@ Each card shows the foundation's own hero and its one-line definition.
 <FoundationSubsection title="Design tokens">
 
 <TypeGrid>
-<TypeCard hero="foundations-tokens" title="Tokens" to="foundations-tokens">Named values that store a design decision once, for every theme.</TypeCard>
+<TypeCard hero="foundations-basics-tokens" title="Tokens" to="foundations-basics-tokens">Named values that store a design decision once, for every theme.</TypeCard>
 </TypeGrid>
 
 </FoundationSubsection>
@@ -48,9 +48,9 @@ Each card shows the foundation's own hero and its one-line definition.
 <FoundationSubsection title="Guidelines">
 
 <TypeGrid>
-<TypeCard hero="foundations-accessibility" title="Accessibility" to="foundations-accessibility">What makes the apps usable by everyone, and how each foundation supports it.</TypeCard>
-<TypeCard hero="foundations-spacing" title="Spacing" to="foundations-spacing">The space inside and between boxes, named by the job it does.</TypeCard>
-<TypeCard hero="foundations-grid" title="Grid" to="foundations-grid">Two 12-column grids, the breakpoints and the content widths.</TypeCard>
+<TypeCard hero="foundations-basics-accessibility" title="Accessibility" to="foundations-basics-accessibility">What makes the apps usable by everyone, and how each foundation supports it.</TypeCard>
+<TypeCard hero="foundations-layout-spacing" title="Spacing" to="foundations-layout-spacing">The space inside and between boxes, named by the job it does.</TypeCard>
+<TypeCard hero="foundations-layout-grid" title="Grid" to="foundations-layout-grid">Two 12-column grids, the breakpoints and the content widths.</TypeCard>
 </TypeGrid>
 
 Content, the fifteenth, has no page here: the guidance on how the words inside the apps are written lives in the repo.
@@ -60,16 +60,16 @@ Content, the fifteenth, has no page here: the guidance on how the words inside t
 <FoundationSubsection title="Styles">
 
 <TypeGrid>
-<TypeCard hero="foundations-color" title="Color" to="foundations-color">Every color as a token named for its job.</TypeCard>
-<TypeCard hero="foundations-typography" title="Typography" to="foundations-typography">Heading, Body, Metric and Code text styles.</TypeCard>
+<TypeCard hero="foundations-visual-color" title="Color" to="foundations-visual-color">Every color as a token named for its job.</TypeCard>
+<TypeCard hero="foundations-visual-typography" title="Typography" to="foundations-visual-typography">Heading, Body, Metric and Code text styles.</TypeCard>
 <TypeCard hero="foundations-motion-principles" title="Motion" to="foundations-motion-principles">Duration, easing and what is allowed to move.</TypeCard>
 <TypeCard hero="foundations-sound-overview" title="Sound" to="foundations-sound-overview">Short synthesized sounds for the few moments worth hearing, landing with their motion.</TypeCard>
-<TypeCard hero="foundations-iconography" title="Iconography" to="foundations-iconography">Font Awesome Free icons at three sizes.</TypeCard>
-<TypeCard hero="foundations-illustrations" title="Illustrations" to="foundations-illustrations">The hand-drawn characters for moments with room to breathe.</TypeCard>
-<TypeCard hero="foundations-logos" title="Logos" to="foundations-logos">The PLUS mark, with or without the wordmark.</TypeCard>
-<TypeCard hero="foundations-elevation" title="Elevation" to="foundations-elevation">Surface and shadow pairs that lift a layer.</TypeCard>
-<TypeCard hero="foundations-border" title="Border" to="foundations-border">A width token paired with a color token.</TypeCard>
-<TypeCard hero="foundations-radius" title="Radius" to="foundations-radius">Corner roundness: height ÷ 4, with buttons at 6 and 4.</TypeCard>
+<TypeCard hero="foundations-visual-iconography" title="Iconography" to="foundations-visual-iconography">Font Awesome Free icons at three sizes.</TypeCard>
+<TypeCard hero="foundations-brand-illustrations" title="Illustrations" to="foundations-brand-illustrations">The hand-drawn characters for moments with room to breathe.</TypeCard>
+<TypeCard hero="foundations-brand-logos" title="Logos" to="foundations-brand-logos">The PLUS mark, with or without the wordmark.</TypeCard>
+<TypeCard hero="foundations-visual-elevation" title="Elevation" to="foundations-visual-elevation">Surface and shadow pairs that lift a layer.</TypeCard>
+<TypeCard hero="foundations-visual-border" title="Border" to="foundations-visual-border">A width token paired with a color token.</TypeCard>
+<TypeCard hero="foundations-visual-radius" title="Radius" to="foundations-visual-radius">Corner roundness: height ÷ 4, with buttons at 6 and 4.</TypeCard>
 </TypeGrid>
 
 </FoundationSubsection>
@@ -89,7 +89,7 @@ Every foundation page follows the same shape, so you can find the same thing in 
 
 <FoundationSection title="Accessibility">
 
-Each foundation page ends its guidance with the accessibility rules it owns, and the [Accessibility](?path=/docs/foundations-accessibility--docs) page holds the rules that cut across them.
+Each foundation page ends its guidance with the accessibility rules it owns, and the [Accessibility](?path=/docs/foundations-basics-accessibility--docs) page holds the rules that cut across them.
 
 </FoundationSection>
 
@@ -97,7 +97,7 @@ Each foundation page ends its guidance with the accessibility rules it owns, and
 
 <FoundationRelated
     items={[
-        { title: 'Tokens', description: 'The names every other foundation points back to.', href: '?path=/docs/foundations-tokens--docs' },
+        { title: 'Tokens', description: 'The names every other foundation points back to.', href: '?path=/docs/foundations-basics-tokens--docs' },
         { title: 'Templates', description: 'Where foundations are composed into layouts.', href: '?path=/docs/templates-overview--docs' },
     ]}
 />

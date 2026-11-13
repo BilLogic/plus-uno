@@ -9,7 +9,7 @@ import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
  * page keeps one heading outline.
  */
 export default {
-    title: 'Foundations/Typography',
+    title: 'Foundations/Visual/Typography',
     tags: ['!dev', '!autodocs'],
 };
 

@@ -195,7 +195,7 @@ const FOUNDATION_PAGE = `import { Meta } from '@storybook/addon-docs/blocks';
 
 export const field = (extra = {}) => ({ display: 'flex', ...extra });
 
-<Meta title="Foundations/Border" tags={['!dev']} />
+<Meta title="Foundations/Visual/Border" tags={['!dev']} />
 
 <FoundationHero
     title="Border"
@@ -258,7 +258,7 @@ A card has no border.
 `;
 
 test('a page opening with DocsLanding reads its title and purpose like a FoundationHero page', () => {
-  const landing = FOUNDATION_PAGE.replace(/<FoundationHero[\s\S]*?\/>\n\n<FoundationContents \/>/, '<DocsLanding\n    page="foundations-border"\n    eyebrow="Foundation"\n    title="Border"\n    purpose="A border is a width token paired with a color token."\n    links={{ label: \'Tokens\', items: [] }}\n/>');
+  const landing = FOUNDATION_PAGE.replace(/<FoundationHero[\s\S]*?\/>\n\n<FoundationContents \/>/, '<DocsLanding\n    page="foundations-visual-border"\n    eyebrow="Foundation"\n    title="Border"\n    purpose="A border is a width token paired with a color token."\n    links={{ label: \'Tokens\', items: [] }}\n/>');
   assert.ok(landing.includes('<DocsLanding'), 'the fixture swap applied');
   const page = readDocsPage(landing);
   assert.equal(page.title, 'Border');

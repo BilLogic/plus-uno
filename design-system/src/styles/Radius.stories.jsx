@@ -16,7 +16,7 @@ import {
  * the same token. Each play test holds both to the code.
  */
 export default {
-    title: 'Foundations/Radius',
+    title: 'Foundations/Visual/Radius',
     tags: ['!dev', '!autodocs'],
 };
 

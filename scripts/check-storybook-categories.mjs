@@ -25,11 +25,9 @@
  *      not "Text Field". An all-caps acronym (AI, API) is allowed.
  *   5. No tracked file names a retired folder path.
  *   6. The sidebar's roots lead with the benchmark site's sections plus our
- *      Templates and Patterns, in order: Get started, Foundations, Templates,
- *      Patterns, Components, AI UI. Templates and Patterns come before
- *      Components because a page is composed from them first, Templates before
- *      the guidance that points at them. Our own extra (Data visualizations)
- *      follows.
+ *      Patterns and Templates, in order: Get started, Foundations, Components,
+ *      Patterns, Templates, AI UI. Our own extras (Data visualizations,
+ *      Libraries) follow.
  *   7. Every docs page and story file under `design-system/src/` is titled
  *      under a root the sidebar sort lists, so a page left under a retired
  *      root (`Getting started/…`, `Foundations/Patterns/…`) cannot open a
@@ -96,8 +94,8 @@ export const ATLASSIAN_CATEGORIES = [
 export const AI_ROOT = 'AI UI';
 export const AI_COMPONENTS = 'Components';
 
-/** The sidebar's leading sections, in order: the benchmark site's, with our Templates and Patterns before Components. */
-export const SITE_SECTIONS = ['Get started', 'Foundations', 'Templates', 'Patterns', 'Components', 'AI UI'];
+/** The sidebar's leading sections, in order: the benchmark site's, with our Patterns and Templates after Components. */
+export const SITE_SECTIONS = ['Get started', 'Foundations', 'Components', 'Patterns', 'Templates', 'AI UI'];
 
 /**
  * Folders that held components before the move, as the repo path or the `@/`
