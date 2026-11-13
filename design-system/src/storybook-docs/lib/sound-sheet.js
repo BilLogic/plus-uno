@@ -6,8 +6,7 @@
  * `check:sound-registry`, so a table can only be as stale as its source.
  */
 import { scoreFor, scoreLength } from '@/sound/score';
-import { SOUND_SPEC } from '@/sound/spec.generated';
-import { MOTION_REGISTRY } from '../../../../scripts/lib/tokens/motion-registry.mjs';
+import { SOUND_MOMENTS, SOUND_SPEC } from '@/sound/spec.generated';
 import { SOUND_SILENT } from '../../../../scripts/lib/tokens/sound-silence.mjs';
 
 const tens = (seconds) => Math.round(seconds * 100) * 10;
@@ -41,20 +40,8 @@ export function soundFamiliesOf(spec = SOUND_SPEC) {
 }
 
 /** Every registry event that plays a sound, in registry order. */
-export function soundCellsOf(registry = MOTION_REGISTRY) {
-  return registry.flatMap((row) =>
-    Object.entries(row.events)
-      .filter(([, e]) => e.sound)
-      .map(([event, e]) => ({
-        row: row.name,
-        tier: row.tier,
-        event,
-        transition: e.transition ?? '',
-        token: e.sound.token,
-        at: e.sound.at ?? 'land',
-        when: e.sound.when ?? '',
-      })),
-  );
+export function soundCellsOf() {
+  return SOUND_MOMENTS.map(({ spring, ...cell }) => cell);
 }
 
 /** The always-silent list grouped by its reason; a row reads `Row` or `Row · event`. */

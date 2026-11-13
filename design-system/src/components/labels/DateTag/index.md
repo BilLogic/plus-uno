@@ -133,7 +133,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-warning` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--radius-lg` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-end` · `--tag-pad-end-compact`
+`--body-default` · `--body-small` · `--border-default` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-warning` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--radius-control-md` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-end` · `--tag-pad-end-compact`
 
 From `design-system/src/components/labels/DateTag/DateTag.scss`. Override these through the token layer, never with a literal.
 

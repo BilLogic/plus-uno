@@ -5,7 +5,7 @@
     max-width: calc(100vw - var(--space-100) * 2);
     background: var(--ds-background-brand-bold);
     color: var(--ds-text-inverse);
-    border-radius: var(--radius-xl);
+    border-radius: var(--popup-radius);
     padding: var(--space-150);
     box-shadow: var(--ds-shadow-overlay);
 }

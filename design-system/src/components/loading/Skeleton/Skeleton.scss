@@ -73,7 +73,7 @@
 .plus-skeleton--status-spacious {
     --plus-skeleton-width: var(--skeleton-status-width-spacious);
     --plus-skeleton-height: #{label.$status-height-spacious};
-    --plus-skeleton-radius: var(--radius-lg);
+    --plus-skeleton-radius: var(--radius-control-md);
 }
 
 .plus-skeleton--count {

@@ -1709,6 +1709,7 @@
       "tokens": [
         "--body-default",
         "--border-selected",
+        "--card-radius",
         "--carousel-aspect",
         "--carousel-edge-fade",
         "--carousel-neighbor-dim",
@@ -1744,7 +1745,6 @@
         "--inline-lg",
         "--inline-md",
         "--page-stack-md",
-        "--radius-xxl",
         "--section-stack-lg",
         "--section-stack-md",
         "--stack-md",
@@ -2295,7 +2295,7 @@
         "--item-height-sm",
         "--pad-x-md",
         "--plus-choice-indent",
-        "--radius-lg",
+        "--radius-control-md",
         "--radius-md",
         "--space-025",
         "--space-0375",
@@ -2458,7 +2458,7 @@
         "--ds-text-subtle",
         "--pad-x-md",
         "--pad-y-md",
-        "--radius-xl"
+        "--table-radius"
       ]
     },
     {
@@ -2671,6 +2671,7 @@
       ],
       "tokens": [
         "--border-default",
+        "--card-radius-compact",
         "--code",
         "--ds-background-code-default",
         "--ds-background-code-gutter",
@@ -2686,8 +2687,7 @@
         "--pad-x-md",
         "--pad-y-lg",
         "--plus-code-block-digits",
-        "--plus-code-block-gutter",
-        "--radius-xl"
+        "--plus-code-block-gutter"
       ]
     },
     {
@@ -2845,10 +2845,10 @@
         "--body-default",
         "--body-small",
         "--border-default",
+        "--card-radius-compact",
         "--ds-background-selected",
         "--ds-border",
         "--ds-text-subtle",
-        "--radius-xl",
         "--space-025",
         "--space-050",
         "--space-075",
@@ -3344,7 +3344,7 @@
         "--plus-date-tag-height",
         "--plus-date-tag-icon-box",
         "--plus-date-tag-max",
-        "--radius-lg",
+        "--radius-control-md",
         "--radius-md",
         "--stack-sm",
         "--tag-gap",
@@ -4283,6 +4283,7 @@
         "--body-default",
         "--body-small",
         "--border-default",
+        "--card-radius-compact",
         "--ds-background-danger-subtler",
         "--ds-background-neutral",
         "--ds-background-success-subtler",
@@ -4299,7 +4300,6 @@
         "--icon-sm",
         "--pad-x-md",
         "--pad-y-md",
-        "--radius-xl",
         "--stack-md",
         "--stack-sm"
       ]
@@ -10270,8 +10270,8 @@
         "--pad-x-md",
         "--plus-choice-indent",
         "--radio-control-size",
+        "--radius-control-md",
         "--radius-full",
-        "--radius-lg",
         "--space-025",
         "--space-0375",
         "--space-050",
@@ -11668,12 +11668,12 @@
         "--border-default",
         "--card-inline-sm",
         "--card-pad-compact",
+        "--card-radius-compact",
         "--ds-border",
         "--ds-text",
         "--heading-small",
         "--icon-lg",
         "--item-height-md",
-        "--radius-xl",
         "--stack-md",
         "--type-weight-medium"
       ]
@@ -12460,8 +12460,8 @@
         "--plus-skeleton-height",
         "--plus-skeleton-radius",
         "--plus-skeleton-width",
+        "--radius-control-md",
         "--radius-full",
-        "--radius-lg",
         "--radius-md",
         "--skeleton-circle-size",
         "--skeleton-height",
@@ -12812,8 +12812,8 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-small",
+        "--popup-radius",
         "--radius-lg",
-        "--radius-xl",
         "--space-075",
         "--space-100",
         "--space-150",
@@ -12976,7 +12976,7 @@
         "--plus-status-height",
         "--plus-status-icon-box",
         "--plus-status-max",
-        "--radius-lg",
+        "--radius-control-md",
         "--radius-md",
         "--stack-sm",
         "--tag-gap",
