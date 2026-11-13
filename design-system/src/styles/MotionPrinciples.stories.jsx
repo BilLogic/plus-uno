@@ -20,14 +20,14 @@ export default {
   parameters: { layout: 'padded' },
 };
 
-export const ShowWhatChanged = story(PRINCIPLE_DEMOS.showWhatChanged);
-export const ShowWhatChangedReduced = reducedStory(PRINCIPLE_DEMOS.showWhatChanged);
 export const AlwaysResponsive = story(PRINCIPLE_DEMOS.alwaysResponsive);
 export const AlwaysResponsiveReduced = reducedStory(PRINCIPLE_DEMOS.alwaysResponsive);
-export const MoveLikeRealThings = story(PRINCIPLE_DEMOS.moveLikeRealThings);
-export const MoveLikeRealThingsReduced = reducedStory(PRINCIPLE_DEMOS.moveLikeRealThings);
-export const QuietByDefault = story(PRINCIPLE_DEMOS.quietByDefault);
-export const QuietByDefaultReduced = reducedStory(PRINCIPLE_DEMOS.quietByDefault);
+export const BuildUnderstanding = story(PRINCIPLE_DEMOS.buildUnderstanding);
+export const BuildUnderstandingReduced = reducedStory(PRINCIPLE_DEMOS.buildUnderstanding);
+export const LeadWithEmpathy = story(PRINCIPLE_DEMOS.leadWithEmpathy);
+export const LeadWithEmpathyReduced = reducedStory(PRINCIPLE_DEMOS.leadWithEmpathy);
+export const CutTheNoise = story(PRINCIPLE_DEMOS.cutTheNoise);
+export const CutTheNoiseReduced = reducedStory(PRINCIPLE_DEMOS.cutTheNoise);
 
 /** Each pair is the same scene twice: a Do and a Don't, so a tile is never alone. */
 export const PairsAreSameScene = {
@@ -46,11 +46,11 @@ export const PairsAreSameScene = {
 
 /** A cut still lands on the record: both tiles end on the same drawing, whichever way they got there. */
 export const CutLandsOnTheRecord = {
-  render: () => <MotionDemo {...PRINCIPLE_DEMOS.showWhatChanged} reduced />,
+  render: () => <MotionDemo {...PRINCIPLE_DEMOS.buildUnderstanding} reduced />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-motion-demo]');
     await waitFor(() => expect(root.dataset.phase).toBe('still'), PASS);
     const count = (id) => canvasElement.querySelector(`[data-tile="${id}"] svg`).querySelectorAll('*').length;
-    await expect(count('show-dont')).toBe(count('show-do'));
+    await expect(count('understand-dont')).toBe(count('understand-do'));
   },
 };
