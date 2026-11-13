@@ -9416,7 +9416,7 @@
             "default",
             "compact"
           ],
-          "description": "`default` draws 40 rows and a 32 trigger; `compact` draws 32 rows and a 24 trigger.",
+          "description": "`default` draws 32 rows and a 32 trigger; `compact` draws 24 rows and a 24 trigger.",
           "deprecated": null
         },
         {

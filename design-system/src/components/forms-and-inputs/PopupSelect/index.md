@@ -125,7 +125,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `defaultOpen` | bool | `false` | Opens the menu on first render, when `open` is left out. |
 | `onOpenChange` | func | — | `(open)`. |
 | `marker` | enum | `'radio'` | `radio` (default) marks the picked row with a radio before its label; `check` puts a check at the row's end. |
-| `spacing` | enum | `'default'` | `default` draws 40 rows and a 32 trigger; `compact` draws 32 rows and a 24 trigger. |
+| `spacing` | enum | `'default'` | `default` draws 32 rows and a 32 trigger; `compact` draws 24 rows and a 24 trigger. |
 | `emptyMessage` | node | `'No results'` | Shown when the search matches nothing. |
 | `className` | string | `''` | Extra classes on the popup. |
 | `id` | string | — | The popup's id; the list's id is this plus `-listbox`. |

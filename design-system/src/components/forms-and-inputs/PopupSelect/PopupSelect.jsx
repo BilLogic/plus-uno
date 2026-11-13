@@ -195,7 +195,7 @@ PopupSelect.propTypes = {
     onOpenChange: PropTypes.func,
     /** `radio` (default) marks the picked row with a radio before its label; `check` puts a check at the row's end. */
     marker: PropTypes.oneOf(['radio', 'check']),
-    /** `default` draws 40 rows and a 32 trigger; `compact` draws 32 rows and a 24 trigger. */
+    /** `default` draws 32 rows and a 32 trigger; `compact` draws 24 rows and a 24 trigger. */
     spacing: PropTypes.oneOf(POPUP_SELECT_SPACINGS),
     /** Shown when the search matches nothing. */
     emptyMessage: PropTypes.node,
