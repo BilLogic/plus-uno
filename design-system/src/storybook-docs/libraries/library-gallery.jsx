@@ -11,6 +11,7 @@ import {
     Checkbox,
     DonutChart,
     DropdownMenu,
+    HeadingContextProvider,
     Icon,
     IconButton,
     LineChart,
@@ -24,7 +25,6 @@ import {
     TextField,
     Toggle,
     Tooltip,
-    chartPalette,
 } from '@/components';
 import { FREE_SOLID_ICONS } from '@/lib/icon-free.generated.js';
 import { FREE_REGULAR_ICONS } from '@/lib/icon-regular.generated.js';
@@ -49,8 +49,8 @@ export const LibraryGallery = ({ label, children }) => (
     </div>
 );
 
-/** One category of tiles, under a small heading. */
-export const GalleryGroup = ({ title, children }) => (
+/** One category of tiles, under a small heading. `wide` gives each tile a wider column, for a chart or a search. */
+export const GalleryGroup = ({ title, wide = false, children }) => (
     <section data-gallery-group={title} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
         <h3 style={{ margin: 0, font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>{title}</h3>
         <ul
@@ -59,7 +59,7 @@ export const GalleryGroup = ({ title, children }) => (
                 padding: 0,
                 listStyle: 'none',
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, var(--card-min-width-md)), 1fr))',
+                gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, var(${wide ? '--card-min-width-md' : '--card-min-width-sm'})), 1fr))`,
                 gap: 'var(--grid-gutter)',
             }}
         >
@@ -95,7 +95,8 @@ export const GalleryTile = ({ name, docsId, cues = [], bare = false, children })
                 overflow: 'hidden',
             }}
         >
-            {children}
+            {/* A tile sits under the group's h3, so a heading inside it is an h4. */}
+            <HeadingContextProvider value={3}>{children}</HeadingContextProvider>
         </div>
         <Link href={docsHref(docsId)}>{name}</Link>
         {cues.length > 0 && (
@@ -281,7 +282,7 @@ export const BaseUiGallery = () => (
                 <RangeTile />
             </GalleryTile>
         </GalleryGroup>
-        <GalleryGroup title="Disclosure and navigation">
+        <GalleryGroup title="Disclosure and navigation" wide>
             <GalleryTile name="Tabs" docsId="components-navigation-tabs" cues={['click', 'arrows']}>
                 <TabsTile />
             </GalleryTile>
@@ -455,7 +456,7 @@ const chartBox = { width: '100%', alignSelf: 'stretch' };
 /** Highcharts: the chart components, each with its own tooltip and legend. */
 export const HighchartsGallery = () => (
     <LibraryGallery label="Highcharts">
-        <GalleryGroup title="Chart types">
+        <GalleryGroup title="Chart types" wide>
             <GalleryTile name="Bar chart" docsId="data-visualizations-comparison-bar-chart" cues={['hover', 'legend toggle']}>
                 <div style={chartBox}>
                     <BarChart
@@ -488,9 +489,9 @@ export const HighchartsGallery = () => (
                     value="62%"
                     label="On track"
                     segments={[
-                        { value: 62, color: chartPalette.CATEGORICAL[0], label: 'On track' },
-                        { value: 25, color: chartPalette.CATEGORICAL[1], label: 'Needs a check-in' },
-                        { value: 13, color: chartPalette.CATEGORICAL[2], label: 'Behind' },
+                        { value: 62, color: 'var(--ds-chart-categorical-1)', label: 'On track' },
+                        { value: 25, color: 'var(--ds-chart-categorical-2)', label: 'Needs a check-in' },
+                        { value: 13, color: 'var(--ds-chart-categorical-3)', label: 'Behind' },
                     ]}
                 />
             </GalleryTile>
@@ -567,7 +568,7 @@ export const IconSizes = () => (
                     <Icon name="bell" size={size} />
                 </span>
                 <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
-                    {size} · <code>{token}</code>
+                    {size} · {token}
                 </span>
             </div>
         ))}
@@ -577,7 +578,7 @@ export const IconSizes = () => (
 /** Font Awesome: the Free set, searched and sized through Icon. */
 export const FontAwesomeGallery = () => (
     <LibraryGallery label="Font Awesome">
-        <GalleryGroup title="Icons">
+        <GalleryGroup title="Icons" wide>
             <GalleryTile name="Icon" docsId="components-images-and-icons-icon" cues={['type to filter', 'hover for the name']}>
                 <IconSearch />
             </GalleryTile>
