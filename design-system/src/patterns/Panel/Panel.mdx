@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PanelStories from './Panel.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -24,8 +25,21 @@ import {
 
 <Meta title="Templates/Panel/Panel" tags={['!dev', 'manifest']} />
 
-<Title>Panel</Title>
-A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications. The AI panel is a region of the Frame.
+<DocsLanding
+    page="templates-panel-panel"
+    eyebrow="Template"
+    title="Panel"
+    purpose="A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications. The AI panel is a region of the Frame."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+            { title: 'Frame', href: './?path=/docs/templates-frame-frame--docs' },
+            { title: 'Form', href: './?path=/docs/templates-form--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={PanelStories}>
 

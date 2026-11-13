@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FormStories from './Form.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -15,8 +16,21 @@ import {
 
 <Meta title="Templates/Form" tags={['!dev', 'manifest']} />
 
-<Title>Form</Title>
-A stack of fields with a footer, in one of four places: in a page, in a Panel, in a Modal, or in steps. There is no Form component; Fieldset groups the fields.
+<DocsLanding
+    page="templates-form"
+    eyebrow="Template"
+    title="Form"
+    purpose="A stack of fields with a footer, in one of four places: in a page, in a Panel, in a Modal, or in steps. There is no Form component; Fieldset groups the fields."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+            { title: 'Frame', href: './?path=/docs/templates-frame-frame--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={FormStories}>
 

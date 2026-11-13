@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PatternSectionStories from './PatternSection.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -27,8 +28,19 @@ import {
 
 <Meta of={PatternSectionStories} />
 
-<Title />
-A span of the page grid under one heading: a header, a body, and an optional side, detail and footer. The header owns the title row and the view bar.
+<DocsLanding
+    page="templates-section-section"
+    eyebrow="Template · Section"
+    title="Section"
+    purpose="A span of the page grid under one heading: a header, a body, and an optional side, detail and footer. The header owns the title row and the view bar."
+    links={{
+        items: [
+            { title: 'Section', current: true },
+            { title: 'Card', href: './?path=/docs/templates-section-card--docs' },
+            { title: 'Table', href: './?path=/docs/templates-section-table--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={PatternSectionStories}>
 

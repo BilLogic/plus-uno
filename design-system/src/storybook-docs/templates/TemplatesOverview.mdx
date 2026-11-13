@@ -1,7 +1,8 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { OpeningARecord } from '@/storybook-docs/illustrations/compositions.jsx';
-import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { ChooserDot, HIDDEN } from '@/storybook-docs/templates/overview-parts.jsx';
@@ -10,13 +11,24 @@ import { THUMB_STAGE, FrameThumb, PageThumb, SectionThumb, FormThumb, ModalThumb
 
 <Meta title="Templates/Overview" tags={['!dev', 'manifest']} />
 
-<FoundationHero
-    kind="Overview"
+<DocsLanding
+    page="templates-overview"
+    eyebrow="Template"
     title="Templates"
-    summary="A template is an arrangement of components with slots. Grab one, fill the slots, and the thinking from the patterns comes with it."
+    purpose="A template is an arrangement of components with slots. Grab one, fill the slots, and the thinking from the patterns comes with it."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Frame', href: './?path=/docs/templates-frame-frame--docs' },
+            { title: 'Page', href: './?path=/docs/templates-page-page--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Form', href: './?path=/docs/templates-form--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
+            { title: 'Popup', href: './?path=/docs/templates-popup-popup--docs' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="The seven templates">
 

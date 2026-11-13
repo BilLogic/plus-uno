@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PatternCardStories from './PatternCard.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -21,8 +22,19 @@ import {
 
 <Meta of={PatternCardStories} />
 
-<Title />
-A card is a raised container for one object on a page, such as a student, a session or a metric. It holds an optional image, a header over a body, and an optional footer, and it rests on the raised pair with no border. The pad and the radius follow the card size, and the stack between parts follows use.
+<DocsLanding
+    page="templates-section-card"
+    eyebrow="Template · Section"
+    title="Card"
+    purpose="A card is a raised container for one object on a page, such as a student, a session or a metric. It holds an optional image, a header over a body, and an optional footer, and it rests on the raised pair with no border. The pad and the radius follow the card size, and the stack between parts follows use."
+    links={{
+        items: [
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Card', current: true },
+            { title: 'Table', href: './?path=/docs/templates-section-table--docs' },
+        ],
+    }}
+/>
 
 The examples on this page follow the toolbar's Color mode switch.
 

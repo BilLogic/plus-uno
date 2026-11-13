@@ -37,6 +37,21 @@ import {
   OverflowHero,
   ReadOnlyHero,
 } from './PatternHeroes.jsx';
+import {
+  OverviewHero as TemplatesOverviewHero,
+  TemplatesAndPatternsHero,
+  FrameHero,
+  PageHero,
+  HeadingOutlineHero,
+  SectionHero,
+  CardHero,
+  TableHero,
+  FormHero,
+  ModalHero,
+  BackdropHero,
+  PanelHero,
+  PopupHero,
+} from './TemplateHeroes.jsx';
 
 import { OverviewHero as SoundOverviewHero, WhenToPlayHero, WithMotionHero, SoundsHero, SettingsHero } from './SoundHeroes.jsx';
 
@@ -236,5 +251,70 @@ export const HEROES = {
     Hero: ReadOnlyHero,
     description:
       'Values you can read but not edit, ringed as one group.',
+  },
+  'templates-overview': {
+    Hero: TemplatesOverviewHero,
+    description:
+      'The templates pulled apart: Frame, Page, Section ringed, Modal on top.',
+  },
+  'templates-templates-and-patterns': {
+    Hero: TemplatesAndPatternsHero,
+    description:
+      'A component, inside a template, placed by a pattern.',
+  },
+  'templates-frame-frame': {
+    Hero: FrameHero,
+    description:
+      'The app frame: sidebar ringed, top bar, panel.',
+  },
+  'templates-page-page': {
+    Hero: PageHero,
+    description:
+      'The page header and its Sections, the page ringed.',
+  },
+  'templates-page-heading-outline': {
+    Hero: HeadingOutlineHero,
+    description:
+      'Headings nested by level; the page title leads.',
+  },
+  'templates-section-section': {
+    Hero: SectionHero,
+    description:
+      'Header, view bar, body and side, ringed.',
+  },
+  'templates-section-card': {
+    Hero: CardHero,
+    description:
+      'A Section as a card: media, title, one action.',
+  },
+  'templates-section-table': {
+    Hero: TableHero,
+    description:
+      'A Section as a table: header, rows, one selected.',
+  },
+  'templates-form': {
+    Hero: FormHero,
+    description:
+      'Fields in a column, the commit at the end.',
+  },
+  'templates-modal-modal': {
+    Hero: ModalHero,
+    description:
+      'One task over a Backdrop; the Modal ringed.',
+  },
+  'templates-modal-backdrop': {
+    Hero: BackdropHero,
+    description:
+      'The Backdrop alone, covering the whole frame, with a dashed slot where a Modal will sit.',
+  },
+  'templates-panel-panel': {
+    Hero: PanelHero,
+    description:
+      'A full-height layer beside the page, ringed.',
+  },
+  'templates-popup-popup': {
+    Hero: PopupHero,
+    description:
+      'A Popup opening bottom-end from its trigger at the bar end, 4 below it, ringed.',
   },
 };

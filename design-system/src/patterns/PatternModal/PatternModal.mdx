@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PatternModalStories from './PatternModal.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -26,8 +27,18 @@ import {
 
 <Meta of={PatternModalStories} />
 
-<Title>Modal</Title>
-One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps.
+<DocsLanding
+    page="templates-modal-modal"
+    eyebrow="Template · Modal"
+    title="Modal"
+    purpose="One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps."
+    links={{
+        items: [
+            { title: 'Modal', current: true },
+            { title: 'Backdrop', href: './?path=/docs/templates-modal-backdrop--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={PatternModalStories}>
 

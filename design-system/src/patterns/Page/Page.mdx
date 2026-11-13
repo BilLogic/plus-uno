@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PageStories from './Page.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -28,8 +29,18 @@ import {
 
 <Meta of={PageStories} />
 
-<Title>Page</Title>
-The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width.
+<DocsLanding
+    page="templates-page-page"
+    eyebrow="Template · Page"
+    title="Page"
+    purpose="The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width."
+    links={{
+        items: [
+            { title: 'Page', current: true },
+            { title: 'Heading outline', href: './?path=/docs/templates-page-heading-outline--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={PageStories}>
 
