@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { C } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -11,12 +10,22 @@ import * as PrinciplesStories from './MotionPrinciples.stories.jsx';
 
 <Meta of={PrinciplesStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-motion-principles"
+    eyebrow="Foundation · Motion"
     title="Principles"
-    summary="Motion in PLUS explains a change. If it explains nothing, it is not there."
+    purpose="Motion in PLUS explains a change. If it explains nothing, it is not there."
+    links={{
+        items: [
+            { title: 'Principles', href: '?path=/docs/foundations-motion-principles--docs', current: true },
+            { title: 'Physics', href: '?path=/docs/foundations-motion-physics--docs' },
+            { title: 'Transitions', href: '?path=/docs/foundations-motion-transitions--docs' },
+            { title: 'Choreography', href: '?path=/docs/foundations-motion-choreography--docs' },
+            { title: 'Playground', href: '?path=/docs/foundations-motion-playground--docs' },
+            { title: 'Library', href: '?path=/docs/foundations-motion-library--docs' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Four principles">
 

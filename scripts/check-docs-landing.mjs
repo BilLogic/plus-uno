@@ -65,6 +65,12 @@ export const PAGES = [
   { file: 'design-system/src/storybook-docs/patterns/Loading/Loading.mdx', id: 'patterns-states-loading' },
   { file: 'design-system/src/storybook-docs/patterns/Overflow/Overflow.mdx', id: 'patterns-states-overflow' },
   { file: 'design-system/src/storybook-docs/patterns/ReadOnly/ReadOnly.mdx', id: 'patterns-states-read-only' },
+  { file: 'design-system/src/styles/MotionPrinciples.mdx', id: 'foundations-motion-principles' },
+  { file: 'design-system/src/styles/MotionPhysics.mdx', id: 'foundations-motion-physics' },
+  { file: 'design-system/src/styles/MotionTransitions.mdx', id: 'foundations-motion-transitions' },
+  { file: 'design-system/src/styles/MotionChoreography.mdx', id: 'foundations-motion-choreography' },
+  { file: 'design-system/src/styles/MotionPlayground.mdx', id: 'foundations-motion-playground' },
+  { file: 'design-system/src/styles/MotionLibrary.mdx', id: 'foundations-motion-library' },
 ];
 
 const OLD_OPENER = /<FoundationHero\b|<Title\b/;

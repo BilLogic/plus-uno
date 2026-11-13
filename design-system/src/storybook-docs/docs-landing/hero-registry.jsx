@@ -14,6 +14,14 @@ import {
   TypographyHero,
 } from './FoundationHeroes.jsx';
 import {
+  PrinciplesHero,
+  PhysicsHero,
+  TransitionsHero,
+  ChoreographyHero,
+  PlaygroundHero,
+  LibraryHero,
+} from './MotionHeroes.jsx';
+import {
   OverviewHero,
   CommonActionsHero,
   FormsHero,
@@ -106,6 +114,36 @@ export const HEROES = {
     Hero: ColorHero,
     description:
       'One card painted by its role tokens, shown in light on the left and dark on the right; the primary button is the subject.',
+  },
+  'foundations-motion-principles': {
+    Hero: PrinciplesHero,
+    description:
+      'The four principles as four small scenes: show what changed, always responsive, move like real things, quiet until it counts.',
+  },
+  'foundations-motion-physics': {
+    Hero: PhysicsHero,
+    description:
+      'One shape drawn at equal time steps, fast at first, then settling past its target and back.',
+  },
+  'foundations-motion-transitions': {
+    Hero: TransitionsHero,
+    description:
+      'Before and after: a list row becomes a card, and each part moves from where it was to where it lands, all downward, none crossing.',
+  },
+  'foundations-motion-choreography': {
+    Hero: ChoreographyHero,
+    description:
+      'An editing timeline: an exit, a parent with its children, a burst of three short clips that do not overlap, a late pop and the playhead.',
+  },
+  'foundations-motion-playground': {
+    Hero: PlaygroundHero,
+    description:
+      'Three dials on the left and the shape they move on the right, drawn as stills settling past the target.',
+  },
+  'foundations-motion-library': {
+    Hero: LibraryHero,
+    description:
+      'A shelf of named motions as stills, one large and ringed with its neighbors cropped.',
   },
   'patterns-overview': {
     Hero: OverviewHero,
