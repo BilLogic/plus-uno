@@ -230,10 +230,11 @@ export function buildRegistry(root, release) {
   const fclose = closure(root, [...foundation]);
   refusals.push(...fclose.refusals.map((r) => `foundation: ${r}`));
   const fnames = new Set([...foundation]);
+  // The copied styles are Sass; the project compiles them, so the foundation brings `sass` (no file imports it by name).
   const items = [{
     name: 'foundation', type: 'registry:lib', title: 'PLUS foundation',
     description: 'Tokens, global styles, fonts, Font Awesome Free setup and the shared helpers every component uses.',
-    dependencies: Object.entries(lockVersions(root, fclose.packages.filter((p) => !PEERS.has(p)))).map(([n, v]) => `${n}@${v}`),
+    dependencies: Object.entries(lockVersions(root, [...fclose.packages.filter((p) => !PEERS.has(p)), 'sass'])).map(([n, v]) => `${n}@${v}`),
     registryDependencies: [],
     files: [...fnames].sort().map((f) => fileEntry(root, f)).concat([headSnippet(root)]),
     meta: stamp,

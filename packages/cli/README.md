@@ -7,8 +7,13 @@ npx @plus-uno/cli find Button
 npx @plus-uno/cli get Button --section props
 npx @plus-uno/cli tokens pad
 npx @plus-uno/cli guide
+npx @plus-uno/cli add Button
 npx @plus-uno/cli check src
 ```
+
+## Add
+
+`add <item…>` copies registry items into your project, with the items they depend on and their npm dependencies, no shadcn needed. `find` names the item to add (`Add to a project: ds add Button`); `foundation` is the tokens, global styles and shared helpers every component needs, and a component brings it. Files land under `src/plus-ds/` (`plus-ds/` when the project has no `src`; `--dir <folder>` chooses the parent), keeping the design system's own folder shape, so every import between them is relative and no alias is needed. New npm dependencies, including `sass`, are added to `package.json` and installed with the project's package manager (`--no-install` skips the install). A file you have edited is a conflict: it is left alone and the exit is `1`, until `--overwrite` replaces it. Then load `plus-ds/styles/main.scss` once at your entry and paste `plus-ds/head.html` (fonts, Font Awesome Free) into your HTML head. `check` skips the copied `plus-ds/` folder: it is the design system's source, not your code.
 
 ## Check
 

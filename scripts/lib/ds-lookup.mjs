@@ -52,6 +52,7 @@ import { contextOf, escapes, expandPaths } from '../check-ds-usage.mjs';
 import { BARRELS, loadFacts } from './ds-facts.mjs';
 import { createPageFinder, pageText, readDocsPage, sectionText } from './docs-page.mjs';
 import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
+import { INSTALL_FOLDER } from './ds-add.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
 import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, renderComponent, sectionsOf } from './component-render.mjs';
@@ -282,7 +283,8 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   /** A component or pattern as a find row. */
   const item = (name, extra = {}) => {
     const a = facts.lookup(name);
-    return { kind: a.kind, name, status: 'exists', import: a.import, summary: shortSummary(a.summary), aliasOf: a.aliasOf, ...extra };
+    // A component is a registry item; `ds add <registryItem>` installs it (an alias installs its target).
+    return { kind: a.kind, name, status: 'exists', import: a.import, summary: shortSummary(a.summary), aliasOf: a.aliasOf, ...(a.kind === 'component' ? { registryItem: a.aliasOf ?? name } : {}), ...extra };
   };
   /** A not-here row: the name, why, and what to use instead. */
   const notHereRow = (row) => {
@@ -603,7 +605,8 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       found = escapesIn({ path: file ?? 'prototypes/snippet.jsx', text: code }, contextOf(root));
     } else if (paths?.length || consumerRoot !== root) {
       if (!readPaths) throw new PathsRefused();
-      const files = expandPaths(consumerRoot, paths?.length ? paths : ['.']);
+      // In a project, the `plus-ds/` folder `ds add` copied in is the design system's own source (it defines the raw values), not the project's code.
+      const files = expandPaths(consumerRoot, paths?.length ? paths : ['.']).filter((f) => consumerRoot === root || !new RegExp(`(^|/)${INSTALL_FOLDER}/`).test(f));
       checked = files.length;
       found = escapes(consumerRoot, files, root);
     } else {
@@ -645,7 +648,9 @@ function renderFind(r) {
     const via = x.figma ? `  (Figma "${x.figma}")` : x.aliasOf ? `  (alias of ${x.aliasOf})` : '';
     return `${pad(x.kind, 10)}${x.import ?? x.name}${via}${x.summary ? `  ${x.summary}` : ''}`;
   });
-  return [...lines, r.next].join('\n');
+  // One line names what to install, so no result row grows past the width a find line holds.
+  const add = [...new Set(r.results.map((x) => x.registryItem).filter(Boolean))];
+  return [...lines, ...(add.length ? [`Add to a project: ds add ${add.slice(0, 5).join(' ')}`] : []), r.next].join('\n');
 }
 
 function renderGet(r) {
