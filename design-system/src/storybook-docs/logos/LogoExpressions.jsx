@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Logo } from '@/components';
 
+// The brackets follow the Logo's own geometry: the logomark is `size` wide and
+// the wordmark starts a quarter-mark gap after it, so they take the size in px.
 const LOCKUP_SIZE = 64;
 
 const label = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
@@ -29,7 +31,7 @@ const Bar = ({ width, height = 'var(--space-8)' }) => (
 );
 Bar.propTypes = { width: PropTypes.string.isRequired, height: PropTypes.string };
 
-/** One bracket: a short rule with end ticks, and its label above. */
+/** One bracket: a rule under its label, spanning the part it names. */
 const Bracket = ({ children, style }) => (
     <span
         style={{
@@ -51,7 +53,7 @@ Bracket.propTypes = { children: PropTypes.node.isRequired, style: PropTypes.obje
 const Expression = ({ tagLetter, name, job, children }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <div style={ground}>{children}</div>
-        <span style={tag}>{tagLetter}</span>
+        <span style={tag} aria-hidden="true">{tagLetter}</span>
         <h3 style={{ margin: 0, font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>{name}</h3>
         <p style={{ margin: 0, font: 'var(--body-medium)', color: 'var(--ds-text)' }}>{job}</p>
     </div>
@@ -118,7 +120,7 @@ export const LogoExpressions = () => (
             <figcaption style={label}>The lockup is the logomark and the wordmark in a fixed arrangement.</figcaption>
         </figure>
 
-        <ul aria-label="In the product" style={{ margin: 0, padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
+        <ul aria-label="In the product" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
             <Example title="Sidebar header ·" expression="Logomark">
                 <div style={{ ...pad, width: '35%', background: 'var(--ds-surface-sunken)' }}>
                     <Logo size={24} />
