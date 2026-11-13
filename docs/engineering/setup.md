@@ -15,6 +15,10 @@ Implementation requirements only. For design rules, load `design-system/guidelin
 - Every interactive component's behavior is built on Base UI (`@base-ui/react`, headless), styled on `--ds-*` tokens — ADR-037, widening the AI-only scope ADR-036 set.
 - Versions live in `package.json` and nowhere else — read them there rather than from a doc that goes stale on the next bump.
 
+## PR branches
+
+Fetch `origin` and cut each ticket's PR branch from fresh `origin/main` in its own worktree.
+
 ## Import Aliases
 
 | Alias | Resolves to |

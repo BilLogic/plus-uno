@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **125,820 chars from 9 files**, against an assembled budget of 175,500 (49,680 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,436 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **125,921 chars from 9 files**, against an assembled budget of 175,500 (49,579 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,537 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,284 (−8,789 ide-only) | 10,284 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 36,834 | 47,147 | 20,000 (constitution) ⚠️ **over by 16,834** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 68,630 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 70,276 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 71,524 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 77,218 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 89,004 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 109,965 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 113,433 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 119,991 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 124,964 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 125,820 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,385 (−8,878 ide-only) | 10,385 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 36,834 | 47,248 | 20,000 (constitution) ⚠️ **over by 16,834** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 68,731 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 70,377 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 71,625 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 77,319 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 89,105 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 110,066 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 113,534 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 120,092 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 125,065 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 125,921 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -145,7 +145,7 @@ Every embodiment, including Slack.
 2. **Read the source for every name you use** (`read-source-first`, `no-hallucinated-props`). Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
 3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
 4. **Notion writes follow `docs/connectors/notion/`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
-5. **PLUS components first; interactive behavior built on Base UI** (`PLUS-components-first`): reach for a PLUS component before any other framework, and build any new interactive behavior — open/closed state, focus, keyboard — on `@base-ui/react`, headless, styled on `--ds-*` tokens (ADR-037, widening ADR-036). Non-interactive markup is PLUS components and `--ds-*` tokens; PLUS ships no Bootstrap (ADR-042). The Storybook docs chrome is styled on the same tokens as the app, with no other framework.
+5. **PLUS components first; interactive behavior built on Base UI** (`PLUS-components-first`): reach for a PLUS component before any other framework, and build any new interactive behavior — open/closed state, focus, keyboard — on `@base-ui/react`, headless, styled on `--ds-*` tokens (ADR-037, widening ADR-036). Drag uses Pragmatic drag and drop ([ADR-046](docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md)). Non-interactive markup is PLUS components and `--ds-*` tokens; PLUS ships no Bootstrap (ADR-042). The Storybook docs chrome is styled on the same tokens as the app, with no other framework.
 
 
 ## Knowledge
