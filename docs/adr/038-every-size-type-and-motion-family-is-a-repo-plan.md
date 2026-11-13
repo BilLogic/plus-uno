@@ -1,13 +1,15 @@
 ---
 embodiment: ide
 summary: Space, size, radius, border width, typography and motion become generated from plans this repo owns, the way ADR-035 generates color — Figma downstream, PLUS ×16 numbering kept, one token ladder with the old vocabulary deleted
-status: active
-verified: 2026-11-03 (#1704)
+status: active-with-correction
+verified: 2026-11-13
 ---
 
 # ADR-038: Every size, type and motion family is a repo plan (2026-11-03)
 
-> **Superseded for motion** by [ADR-041](041-motion-is-springs-on-four-tiers.md) (2026-11-12): springs only, no durations or bezier easings. The rest of this ADR stands.
+> **Superseded for motion** by [ADR-041](041-motion-is-springs-on-four-tiers.md) (2026-11-12): springs only, no durations or bezier easings. Space, size and type stand; the corrections below cover pattern names and radius.
+
+> **Correction (2026-11-13).** Blanket is now Backdrop; Drawer and its tokens are retired ([ADR-044](044-a-panel-floats-without-a-backdrop.md)). Radius 2.0 replaces the historical element-radius roles and per-size pattern radii with role-based tokens ([ADR-045](045-radius-follows-role-not-size.md)). The names below record the original migration, not the current token inventory.
 
 **Decision.** Extends ADR-035's pattern — a plan this repo owns, generated into SCSS and a Figma variables payload, Figma downstream of code — from color to every other token family: space, size, radius, border width, typography and motion. PLUS ×16 numbering stays (`--space-100` is 16px, per Bill 2026-11-03); nothing here renumbers the primitive ladder. Container roles are keyed to density, not `sm`/`md`/`lg`: `--{card|section|modal|page}-pad[-x|-y]-{default|compact|spacious}`. Element roles: `--element-{pad|gap|radius}-{default|compact}`. Motion gets duration and easing roles, with reduced motion handled once at the token layer rather than once per component.
 
