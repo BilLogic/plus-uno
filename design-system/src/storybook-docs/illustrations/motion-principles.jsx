@@ -1,25 +1,24 @@
 import React from 'react';
 import { PAINT } from './paint.js';
-import { Frame, Panel, Rect, Row, Screen } from './primitives.jsx';
-import { Pointer } from './primitives-motion.jsx';
+import { Frame, Rect, SkeletonBar } from './primitives.jsx';
 import { pair } from './motion.jsx';
-import { Clip, VIEW, mix } from './motion-parts.jsx';
+import { VIEW } from './motion-parts.jsx';
 import { drillScene } from './motion-transitions.jsx';
 
 /**
- * The Principles page's Do/Don't pairs (Foundations/Expression/Motion/Principles). Each pair
+ * The Principles page's Do/Don't pairs (Foundations/Expression/Motion/Principles), one per principle. Each pair
  * is one scene with one rule broken, so the difference is the lesson, and the
  * arrows before the move are the same in both tiles. Blocked out in kit shapes,
  * no words.
  */
 
-// ---------- Show what changed: a row grows into its record, or the record just replaces the list ----------
+// ---------- Build understanding: a row grows into its record, or the record just replaces the list ----------
 
-const showWhatChanged = {
-  title: 'Show what changed',
+const buildUnderstanding = {
+  title: 'Build understanding',
   scenes: pair(
-    drillScene({ id: 'show-do', title: 'The row grows into the record', caption: 'You can point to where the record came from, and back.' }),
-    drillScene({ id: 'show-dont', title: 'The record replaces the list', mode: 'cut', caption: 'A cut: nothing says where the record came from.' }),
+    drillScene({ id: 'understand-do', title: 'The row grows into the record', caption: 'You can point to where the record came from, and back.' }),
+    drillScene({ id: 'understand-dont', title: 'The record replaces the list', mode: 'cut', caption: 'A cut: nothing says where the record came from.' }),
   ),
 };
 
@@ -62,90 +61,88 @@ const alwaysResponsive = {
   ),
 };
 
-// ---------- Move like real things: a floating Panel thrown closed ----------
+// ---------- Lead with empathy: a failed save eases in, or shakes ----------
 
-const EDGE = 70;
-const thrown = ({ id, title, caption, keepsSpeed }) => ({
+const MESSAGE = { x: 20, y: 60, w: 120, h: 26 };
+const save = ({ id, title, caption, shakes }) => ({
   id,
   title,
   caption,
   viewBox: VIEW,
-  initial: { x: 0, h: 0 },
-  landing: { x: EDGE, h: 0 },
-  arrows: [[[110, 50], [150, 50]]],
-  draw: ({ x, h }) => (
-    <>
-      <Screen x={8} y={6} w={144} h={88} sidebar="none" header={false}>
-        {[0, 1, 2].map((i) => (
-          <Row key={i} x={16} y={30 + i * 14} w={128} />
-        ))}
-      </Screen>
-      <Clip x={8} y={18} w={144} h={75}>
-        <g transform={`translate(${x} 0)`}>
-          <Panel x={96} y={24} w={52} h={64} floating accent />
-        </g>
-      </Clip>
-      {h > 0 && <Pointer x={mix(104, 124, x / 20)} y={50} />}
-    </>
-  ),
-  play: async (ctx) => {
-    await ctx.hold(1);
-    ctx.set({ h: 1 });
-    await ctx.linear('x', 20, 0.3);
-    ctx.set({ h: 0 });
-    if (keepsSpeed) {
-      // The spring starts from the hand's speed, so nothing jumps.
-      await ctx.exit('x', EDGE, { velocity: 110 });
-    } else {
-      // The hand's speed is dropped: it stops, then plays a canned slide from rest.
-      await ctx.hold(1);
-      await ctx.spring('x', EDGE, 'spatial.default');
-    }
-  },
-});
-
-const moveLikeRealThings = {
-  title: 'Move like real things',
-  scenes: pair(
-    thrown({ id: 'real-do', title: 'It leaves at the speed it was thrown', keepsSpeed: true, caption: 'On release the exit spring starts from the hand\'s speed, so nothing jumps.' }),
-    thrown({ id: 'real-dont', title: 'It stops, then plays a canned slide', caption: 'The hand\'s speed is dropped; the Panel pauses and restarts from rest.' }),
-  ),
-};
-
-// ---------- Quiet by default: a view pill used dozens of times a day ----------
-
-const PILLS = [60, 90, 120];
-const pill = ({ id, title, caption, expressive }) => ({
-  id,
-  title,
-  caption,
-  viewBox: VIEW,
-  initial: { x: 0 },
-  landing: { x: 1 },
-  arrows: [[[PILLS[0] + 12, 50], [PILLS[1] + 12, 50]]],
-  draw: ({ x }) => (
+  initial: { o: 0, y: 1, x: 0 },
+  landing: { o: 1, y: 0, x: 0 },
+  arrows: [[[80, 50], [80, 58]]],
+  draw: ({ o, y, x }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />
-      {PILLS.map((px) => (
-        <Rect key={px} x={px} y={42} w={26} h={16} fill={PAINT.shape} corner="tab" />
-      ))}
-      <Rect x={mix(PILLS[0], PILLS[1], x)} y={42} w={26} h={16} fill={PAINT.accent} corner="tab" />
+      <SkeletonBar x={16} y={14} w={80} h={5} heading />
+      <SkeletonBar x={16} y={26} w={100} />
+      <g opacity={o} transform={`translate(${x} ${y * 4})`}>
+        <Rect {...MESSAGE} fill={PAINT.dangerSurface} corner="card" />
+        <circle cx={MESSAGE.x + 12} cy={MESSAGE.y + 13} r={5} fill={PAINT.flagIconDanger} />
+        <SkeletonBar x={MESSAGE.x + 24} y={MESSAGE.y + 11} w={60} />
+      </g>
     </>
   ),
   play: async (ctx) => {
     await ctx.hold(1);
-    await ctx.tap(PILLS[1] + 13, 50);
-    // Expressive is for the end of something worth finishing, never a control used all day.
-    await ctx.spring('x', 1, 'spatial.fast', expressive ? { mode: 'expressive' } : undefined);
+    if (shakes) {
+      // The Don't treats a failed save like a blocked submit: it jolts a person already worried.
+      await Promise.all([ctx.spring('o', 1, 'appearance.fast'), ctx.spring('y', 0, 'spatial.fast')]);
+      for (const to of [5, -5, 3, 0]) await ctx.spring('x', to, 'spatial.fast');
+      return;
+    }
+    await Promise.all([ctx.spring('o', 1, 'appearance.default'), ctx.spring('y', 0, 'spatial.default')]);
   },
 });
 
-const quietByDefault = {
-  title: 'Quiet by default',
+const leadWithEmpathy = {
+  title: 'Lead with empathy',
   scenes: pair(
-    pill({ id: 'quiet-do', title: 'Dozens a day: the fill glides', caption: 'A view pill moves on Productive spatial.fast. Nobody notices it twice.' }),
-    pill({ id: 'quiet-dont', title: 'Dozens a day: the fill bounces', expressive: true, caption: 'The same pill on Expressive overshoots every time. A control used all day stays Productive.' }),
+    save({ id: 'empathy-do', title: 'A failed save eases in', caption: 'It fades in from just above its place and stays still until it is fixed.' }),
+    save({ id: 'empathy-dont', title: 'A failed save shakes', shakes: true, caption: 'A shake belongs to a blocked submit, once. A save that failed is not a scolding.' }),
   ),
 };
 
-export const PRINCIPLE_DEMOS = { showWhatChanged, alwaysResponsive, moveLikeRealThings, quietByDefault };
+// ---------- Cut the noise: a filtered list arrives as one group, or every row scatters ----------
+
+const ROWS = [0, 1, 2, 3];
+const list = ({ id, title, caption, scatters }) => ({
+  id,
+  title,
+  caption,
+  viewBox: VIEW,
+  initial: { g: 0 },
+  landing: { g: 1 },
+  arrows: [[[140, 30], [140, 40]]],
+  draw: ({ g }) => (
+    <>
+      <Frame x={8} y={6} w={144} h={88} />
+      {ROWS.map((r) => {
+        const left = 1 - g;
+        // One group moves together; the scatter sends each row its own way.
+        const dx = scatters ? (r % 2 ? 1 : -1) * left * (24 + r * 6) : 0;
+        const dy = scatters ? 0 : left * 8;
+        return (
+          <g key={r} opacity={g} transform={`translate(${dx} ${dy})`}>
+            <SkeletonBar x={16} y={16 + r * 18} w={110 - r * 12} h={6} />
+          </g>
+        );
+      })}
+    </>
+  ),
+  play: async (ctx) => {
+    await ctx.hold(1);
+    await ctx.spring('g', 1, 'spatial.default');
+  },
+});
+
+const cutTheNoise = {
+  title: 'Cut the noise',
+  scenes: pair(
+    list({ id: 'noise-do', title: 'The new list arrives as one group', caption: 'Every row moves together, so there is one story to follow.' }),
+    list({ id: 'noise-dont', title: 'Every row goes its own way', scatters: true, caption: 'Four rows, four paths: nothing says which one matters.' }),
+  ),
+};
+
+export const PRINCIPLE_DEMOS = { alwaysResponsive, buildUnderstanding, leadWithEmpathy, cutTheNoise };

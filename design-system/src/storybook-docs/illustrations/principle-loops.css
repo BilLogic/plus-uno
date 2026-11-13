@@ -1,0 +1,219 @@
+/*
+ * The Motion principles page: the framework strip's four loops and the cards
+ * around them. Every loop runs on a motion spring token, per keyframe segment,
+ * and its cycle is a multiple of a token's duration, so no time or curve is
+ * written here. Under reduced motion each loop stops on its landing, drawn
+ * still. Color, space and radius are `--ds-*` and role tokens.
+ */
+
+.principle-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr));
+    gap: var(--section-stack-md);
+}
+
+.principle-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-sm);
+    background: var(--ds-surface-raised);
+    box-shadow: var(--ds-shadow-raised);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.principle-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-sm);
+    padding: var(--card-pad-default);
+}
+
+.principle-card__framework {
+    font: var(--body-small);
+    color: var(--ds-text-brand);
+}
+
+.principle-card__name {
+    font: var(--heading-xsmall);
+    color: var(--ds-text);
+}
+
+.principle-card__sticky {
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+}
+
+/* ---------- The loop stage ---------- */
+
+[data-principle-loop] {
+    --loop-cycle: calc(var(--ds-motion-spatial-default-duration) * 10);
+    position: relative;
+    height: calc(var(--space-100) * 9);
+    background: var(--ds-surface-sunken);
+    overflow: hidden;
+    animation-duration: var(--loop-cycle);
+}
+
+[data-principle-loop] > * {
+    position: absolute;
+    animation-duration: var(--loop-cycle);
+    animation-iteration-count: infinite;
+    animation-timing-function: var(--ds-motion-spatial-default);
+}
+
+/* Always responsive: a press answers in the same frame, then a ring spreads. */
+[data-loop='responsive'] .loop-press {
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    width: var(--space-500);
+    height: var(--space-500);
+    margin: calc(var(--space-250) * -1) 0 0 calc(var(--space-250) * -1);
+    border-radius: var(--radius-full);
+    background: var(--ds-background-brand-bold);
+    animation-name: loop-press;
+    animation-timing-function: var(--ds-motion-appearance-fast);
+}
+[data-loop='responsive'] .loop-ring {
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    width: var(--space-500);
+    height: var(--space-500);
+    margin: calc(var(--space-250) * -1) 0 0 calc(var(--space-250) * -1);
+    border-radius: var(--radius-full);
+    border: var(--stroke-2) solid var(--ds-border-brand);
+    opacity: 0;
+    animation-name: loop-ring;
+}
+@keyframes loop-press {
+    0%, 30% { background: var(--ds-background-brand-bold); transform: scale(1); }
+    32%, 60% { background: var(--ds-background-brand-bold-pressed); transform: scale(0.92); }
+    62%, 100% { background: var(--ds-background-brand-bold); transform: scale(1); }
+}
+@keyframes loop-ring {
+    0%, 30% { opacity: 0; transform: scale(0.9); }
+    32% { opacity: 0.6; transform: scale(1); }
+    60%, 100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* Build understanding: a Panel leaves and returns by the edge it came from. */
+[data-loop='understanding'] .loop-bar {
+    inset-inline-start: var(--space-300);
+    height: var(--space-150);
+    border-radius: var(--radius-sm);
+    background: var(--ds-skeleton);
+}
+[data-loop='understanding'] .loop-bar--a { inset-block-start: var(--space-300); width: 40%; }
+[data-loop='understanding'] .loop-bar--b { inset-block-start: var(--space-500); width: 30%; }
+[data-loop='understanding'] .loop-panel {
+    inset-block: var(--space-200);
+    inset-inline-end: var(--space-200);
+    width: 36%;
+    border-radius: var(--radius-md);
+    background: var(--ds-background-brand-bold);
+    animation-name: loop-panel;
+}
+@keyframes loop-panel {
+    0%, 10% { transform: translateX(150%); }
+    35%, 60% { transform: translateX(0); }
+    85%, 100% { transform: translateX(150%); }
+}
+
+/* Lead with empathy: the win pops once; the miss eases in and never shakes. */
+[data-loop='empathy'] .loop-win,
+[data-loop='empathy'] .loop-miss {
+    inset-block-start: 50%;
+    width: var(--space-500);
+    height: var(--space-500);
+    margin-top: calc(var(--space-300) * -1);
+}
+[data-loop='empathy'] .loop-win {
+    inset-inline-start: 22%;
+    border-radius: var(--radius-full);
+    background: var(--ds-background-success-bold);
+    animation-name: loop-win;
+}
+[data-loop='empathy'] .loop-miss {
+    inset-inline-end: 22%;
+    border-radius: var(--radius-lg);
+    background: var(--ds-background-danger-bold);
+    animation-name: loop-miss;
+    animation-timing-function: var(--ds-motion-appearance-default);
+}
+@keyframes loop-win {
+    0%, 8% { transform: scale(0); opacity: 0; }
+    12% { opacity: 1; }
+    40%, 100% { transform: scale(1); opacity: 1; }
+}
+@keyframes loop-miss {
+    0%, 45% { opacity: 0; transform: translateY(calc(var(--space-050) * -1)); }
+    75%, 100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Cut the noise: the parts settle together and leave as one group. */
+[data-loop='simplicity'] .loop-group {
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    width: 60%;
+    height: 60%;
+    transform: translate(-50%, -50%);
+    animation-name: loop-group;
+    animation-timing-function: var(--ds-motion-appearance-default);
+}
+[data-loop='simplicity'] .loop-group > i {
+    display: block;
+    position: absolute;
+    inset-inline-start: 0;
+    height: var(--space-150);
+    border-radius: var(--radius-sm);
+    background: var(--ds-background-brand-bold);
+    animation-duration: var(--loop-cycle);
+    animation-iteration-count: infinite;
+    animation-timing-function: var(--ds-motion-spatial-default);
+    animation-name: loop-settle;
+}
+[data-loop='simplicity'] .loop-group > i:nth-child(1) { inset-block-start: 0; width: 100%; --from: 0 var(--space-200); }
+[data-loop='simplicity'] .loop-group > i:nth-child(2) { inset-block-start: 25%; width: 84%; --from: var(--space-200) 0; }
+[data-loop='simplicity'] .loop-group > i:nth-child(3) { inset-block-start: 50%; width: 68%; --from: 0 calc(var(--space-200) * -1); }
+[data-loop='simplicity'] .loop-group > i:nth-child(4) { inset-block-start: 75%; width: 52%; --from: calc(var(--space-200) * -1) 0; }
+@keyframes loop-settle {
+    0%, 10% { translate: var(--from); }
+    50%, 100% { translate: 0 0; }
+}
+@keyframes loop-group {
+    0%, 70% { opacity: 1; }
+    85%, 92% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* ---------- Reels ---------- */
+
+.principle-reel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--section-stack-md);
+}
+.principle-reel figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-sm);
+}
+.principle-reel svg {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    background: var(--ds-surface-sunken);
+}
+.principle-reel figcaption {
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+/* Reduced motion: every loop stops on its landing. */
+@media (prefers-reduced-motion: reduce) {
+    [data-principle-loop],
+    [data-principle-loop] * {
+        animation: none;
+    }
+}
