@@ -56,7 +56,14 @@ const BoldEdge = ({ x, y, w, h, fill, corner = "card" }) => {
   );
 };
 
-const BRAND_RAMP = [PAINT.swatchBrand1, PAINT.swatchBrand2, PAINT.swatchBrand3, PAINT.swatchBrand4, PAINT.swatchBrand5];
+/** The brand ramp, light to dark: the accent tinted by opacity over the card, then the boldest brand step. */
+const BRAND_RAMP = [
+  [PAINT.accent, 0.18],
+  [PAINT.accent, 0.4],
+  [PAINT.accent, 0.7],
+  [PAINT.accent, 1],
+  [PAINT.swatchBrandBoldest, 1],
+];
 const NEUTRALS = [PAINT.swatchNeutral1, PAINT.swatchNeutral2, PAINT.swatchNeutral3, PAINT.swatchNeutral4, PAINT.swatchNeutral5];
 const ELEVATIONS = [PAINT.cardShadow, PAINT.popupShadow, PAINT.modalShadow];
 
@@ -69,8 +76,8 @@ const ELEVATIONS = [PAINT.cardShadow, PAINT.popupShadow, PAINT.modalShadow];
 export const OverviewHero = () => (
   <HeroDrawing>
     <BentoCell name="color" x={-80} y={-5} w={145} h={170}>
-      {BRAND_RAMP.map((fill, i) => (
-        <Rect key={fill} x={-66 + i * 24} y={9} w={20} h={85} fill={fill} corner="cardImage" />
+      {BRAND_RAMP.map(([fill, opacity], i) => (
+        <Rect key={i} x={-66 + i * 24} y={9} w={20} h={85} fill={fill} opacity={opacity} corner="cardImage" />
       ))}
       {NEUTRALS.map((fill, i) => (
         <Rect key={fill} x={-66 + i * 24} y={102} w={20} h={49} fill={fill} stroke={i === 0 ? PAINT.illustrationEdge : undefined} corner="cardImage" />
