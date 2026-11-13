@@ -1,4 +1,5 @@
 @use '../../../styles/state' as *;
+@use 'row-spacing';
 
 .plus-menu-group {
     display: flex;
@@ -9,8 +10,7 @@
 
     // The same rows as OptionRow: Item 32 by default, Item 24 compact.
     &--compact .plus-menu-item {
-        min-height: var(--item-height-sm);
-        padding-block: var(--pad-y-sm);
+        @include row-spacing.size('compact');
     }
 }
 
@@ -35,8 +35,8 @@
     width: 100%;
     gap: var(--menu-group-gap);
     box-sizing: border-box;
-    min-height: var(--item-height-md);
-    padding: var(--pad-y-md) var(--menu-group-pad-x);
+    @include row-spacing.size('default');
+    padding-inline: var(--menu-group-pad-x);
     border: none;
     background: none;
     border-radius: var(--radius-lg);

@@ -4,6 +4,7 @@
  * line, inset in its list, with every state's fill on the row's own radius.
  */
 @use '../../../styles/state' as *;
+@use 'row-spacing';
 
 .plus-option-row {
     /* Figma Tree/indent and Tree/toggle, which alias these spacing steps. */
@@ -16,8 +17,8 @@
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
-    min-height: var(--item-height-md);
-    padding: var(--pad-y-md) var(--pad-x-md);
+    @include row-spacing.size('default');
+    padding-inline: var(--pad-x-md);
     margin: 0;
     border: none;
     border-radius: var(--radius-control-md);
@@ -71,8 +72,7 @@
 
 /* Matches a compact field (32): Menu row Item 24 rather than Item 32. */
 .plus-option-row--compact {
-    min-height: var(--item-height-sm);
-    padding-block: var(--pad-y-sm);
+    @include row-spacing.size('compact');
 }
 
 /*

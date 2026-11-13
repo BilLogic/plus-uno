@@ -89,6 +89,31 @@ export const Density = () => (
     </div>
 );
 
+Density.play = async ({ canvasElement }) => {
+    for (const [spacing, height] of [['default', 32], ['compact', 24]]) {
+        const rows = canvasElement.querySelectorAll(`#menu-density-${spacing} .plus-menu-item`);
+        for (const row of rows) await expect(row.getBoundingClientRect().height).toBe(height);
+    }
+};
+
+/** A description grows past the spacing floor in either density. */
+export const MultilineSpacing = {
+    render: () => (
+        <div>
+            {['default', 'compact'].map((density) => (
+                <MenuGroup key={density} density={density}>
+                    <ButtonItem description="A second line">{density}</ButtonItem>
+                </MenuGroup>
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const rows = canvasElement.querySelectorAll('.plus-menu-item');
+        await expect(rows[0].getBoundingClientRect().height).toBeGreaterThan(32);
+        await expect(rows[1].getBoundingClientRect().height).toBeGreaterThan(24);
+    },
+};
+
 export const Interactive = {
     args: { density: 'default' },
     render: (args) => (
