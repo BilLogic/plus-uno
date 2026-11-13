@@ -228,7 +228,7 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
             <div
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: `repeat(${panes.length}, minmax(min(100%, var(--card-min-width-sm)), 1fr))`,
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))',
                     gap: 'var(--grid-gutter)',
                 }}
             >

@@ -208,6 +208,12 @@ body,
     font-family: var(--type-family-code) !important;
 }
 
+/* A code block scrolls inside its own box instead of widening the page. */
+.sbdocs pre {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
 .sbdocs code {
     color: var(--ds-text-subtle);
 }
@@ -231,12 +237,6 @@ body,
 /* A token name wraps inside its swatch cell instead of spilling out of it. */
 .sbdocs .sb-docs-scroll span {
     overflow-wrap: anywhere;
-}
-
-/* A code block scrolls inside its own box instead of widening the page. */
-.sbdocs pre {
-    max-width: 100%;
-    overflow-x: auto;
 }
 
 /*
