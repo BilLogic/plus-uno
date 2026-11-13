@@ -9,7 +9,7 @@ import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
  * so they follow the docs page's own width.
  */
 export default {
-    title: 'Foundations/Grid',
+    title: 'Foundations/Layout/Grid',
     tags: ['!dev', '!autodocs'],
 };
 

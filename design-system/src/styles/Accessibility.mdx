@@ -14,7 +14,7 @@ import * as AccessibilityStories from './Accessibility.stories.jsx';
 <Meta of={AccessibilityStories} />
 
 <DocsLanding
-    page="foundations-accessibility"
+    page="foundations-basics-accessibility"
     eyebrow="Foundation"
     title="Accessibility"
     purpose="The rules every PLUS screen meets, built into the tokens and patterns."
@@ -37,7 +37,7 @@ Most rules are built into the tokens and the patterns, so a screen built from th
 
 <FoundationSection title="Heading levels">
 
-Every page's outline starts with one `h1`, and a heading's tag is its place in the outline, never its size. A page whose name sits only in the topbar still has an `h1`, hidden visually but kept for assistive technology: moved off-screen, never `display: none`. Typography owns the rules: [Heading levels](?path=/docs/foundations-typography--docs#foundation-heading-levels).
+Every page's outline starts with one `h1`, and a heading's tag is its place in the outline, never its size. A page whose name sits only in the topbar still has an `h1`, hidden visually but kept for assistive technology: moved off-screen, never `display: none`. Typography owns the rules: [Heading levels](?path=/docs/foundations-visual-typography--docs#foundation-heading-levels).
 
 </FoundationSection>
 
@@ -61,7 +61,7 @@ Focus is shown by the **focus ring**, never by a fill.
 
 - The ring is the same on every interactive element, including cards, table rows and list items, and it clears 3:1 against what it sits on.
 - The control's fill stays as it is, and its opacity stays at 100%.
-- Border owns the ring's color, width and offset, and Radius owns its corner: [Focus ring](?path=/docs/foundations-border--docs).
+- Border owns the ring's color, width and offset, and Radius owns its corner: [Focus ring](?path=/docs/foundations-visual-border--docs).
 
 See Do and don't for the ring beside the fill-only mistake.
 
@@ -153,9 +153,9 @@ violation, so a component that breaks a rule here is caught before it ships.
 
 <FoundationRelated
     items={[
-        { title: "Color", description: "Contrast pairs for every token.", href: "?path=/docs/foundations-color--docs" },
-        { title: "Typography", description: "Heading levels and text styles.", href: "?path=/docs/foundations-typography--docs" },
-        { title: "Border", description: "The focus ring.", href: "?path=/docs/foundations-border--docs" },
+        { title: "Color", description: "Contrast pairs for every token.", href: "?path=/docs/foundations-visual-color--docs" },
+        { title: "Typography", description: "Heading levels and text styles.", href: "?path=/docs/foundations-visual-typography--docs" },
+        { title: "Border", description: "The focus ring.", href: "?path=/docs/foundations-visual-border--docs" },
         { title: "Motion", description: "Reduced motion.", href: "?path=/docs/foundations-motion-physics--docs" },
     ]}
 />

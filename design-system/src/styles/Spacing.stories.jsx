@@ -9,7 +9,7 @@ import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
  * shows a wrong gap names the wrong value in its caption.
  */
 export default {
-    title: 'Foundations/Spacing',
+    title: 'Foundations/Layout/Spacing',
     tags: ['!dev', '!autodocs'],
 };
 

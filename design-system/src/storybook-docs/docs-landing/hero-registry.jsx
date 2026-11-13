@@ -64,67 +64,67 @@ import { OverviewHero as SoundOverviewHero, WhenToPlayHero, WithMotionHero, Soun
  * which is how the check reads it.
  */
 export const HEROES = {
-  'foundations-overview': {
+  'foundations-basics-overview': {
     Hero: FoundationsOverviewHero,
     description:
       'One screen pulled apart into its foundations: grid, surface and space, content, and the accent.',
   },
-  'foundations-accessibility': {
+  'foundations-basics-accessibility': {
     Hero: AccessibilityHero,
     description:
       'One big button: its focus ring and the target around it.',
   },
-  'foundations-border': {
+  'foundations-visual-border': {
     Hero: BorderHero,
     description:
       'Two surfaces bleed off the edge; only the edge is drawn.',
   },
-  'foundations-elevation': {
+  'foundations-visual-elevation': {
     Hero: ElevationHero,
     description:
       'The layers lifted apart, light on the left and dark on the right.',
   },
-  'foundations-grid': {
+  'foundations-layout-grid': {
     Hero: GridHero,
     description:
       'Column stripes; blocks snap to spans, one in the brand color.',
   },
-  'foundations-iconography': {
+  'foundations-visual-iconography': {
     Hero: IconographyHero,
     description:
       'One glyph on its keyline grid, neighbors cropped.',
   },
-  'foundations-illustrations': {
+  'foundations-brand-illustrations': {
     Hero: IllustrationsHero,
     description:
       'A fanned stack of heroes; the front shows the house style.',
   },
-  'foundations-logos': {
+  'foundations-brand-logos': {
     Hero: LogosHero,
     description:
       'The PLUS mark, desaturated, with its construction drawn exactly on top.',
   },
-  'foundations-radius': {
+  'foundations-visual-radius': {
     Hero: RadiusHero,
     description:
       'One corner cropped big, drawn as the circle it comes from.',
   },
-  'foundations-spacing': {
+  'foundations-layout-spacing': {
     Hero: SpacingHero,
     description:
       'The scale itself: each step a square its own size.',
   },
-  'foundations-tokens': {
+  'foundations-basics-tokens': {
     Hero: TokensHero,
     description:
       'Chips repeat; one value threads through them.',
   },
-  'foundations-typography': {
+  'foundations-visual-typography': {
     Hero: TypographyHero,
     description:
       'Serif and sans on one set of guides: cap height, x-height, and the baseline in the brand color.',
   },
-  'foundations-color': {
+  'foundations-visual-color': {
     Hero: ColorHero,
     description:
       'One card painted by its role tokens, shown in light on the left and dark on the right; the primary button is the subject.',

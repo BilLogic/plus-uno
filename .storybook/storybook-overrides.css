@@ -57,7 +57,7 @@ body,
  * weight, size AND line height together. Setting only `font-size` left the line
  * height to Storybook's own emotion rules, which are smaller than our sizes, so a
  * 28px heading sat on a 20px line and its descender ran into the meta text
- * under it (the type specimen titles on Foundations/Typography). It also gave
+ * under it (the type specimen titles on Foundations/Visual/Typography). It also gave
  * h1 and h2 the same 32px, and h3 and h4 the same 28px, so the outline had no
  * visible steps.
  *
@@ -166,7 +166,7 @@ body,
 }
 
 /*
- * Measure. The longest paragraph on Foundations/Accessibility ran 134 characters
+ * Measure. The longest paragraph on Foundations/Basics/Accessibility ran 134 characters
  * per line at a 1140px docs column, against a comfortable 45–75. The cap is on
  * the text, not on the column: canvases stay full-bleed at 864px while prose
  * narrows, and splitting the two is what lets both be right.

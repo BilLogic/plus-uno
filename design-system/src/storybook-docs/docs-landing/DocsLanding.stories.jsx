@@ -22,7 +22,7 @@ export default {
 const Page = ({ children }) => (
   <div className="sbdocs">
     <DocsLanding
-      page="foundations-color"
+      page="foundations-visual-color"
       eyebrow="Foundation"
       title="Color"
       purpose="Every color is a --ds token named for its job."
@@ -40,7 +40,7 @@ export const Hero = {
     </Page>
   ),
   play: async ({ canvasElement }) => {
-    const hero = canvasElement.querySelector('[data-hero="foundations-color"]');
+    const hero = canvasElement.querySelector('[data-hero="foundations-visual-color"]');
     const landing = canvasElement.querySelector('[data-docs-landing]');
     const next = canvasElement.querySelector('[data-testid="next"]');
     const gap = next.getBoundingClientRect().top - landing.getBoundingClientRect().bottom;

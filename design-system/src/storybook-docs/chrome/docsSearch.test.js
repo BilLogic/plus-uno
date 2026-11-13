@@ -8,7 +8,7 @@ const INDEX = {
         'components-forms-and-inputs-button-button--overview': { id: 'components-forms-and-inputs-button-button--overview', title: 'Forms and inputs/Button', name: 'Overview', type: 'story' },
         'components-forms-and-inputs-checkbox--overview': { id: 'components-forms-and-inputs-checkbox--overview', title: 'Forms and inputs/Checkbox', name: 'Overview', type: 'story' },
         'patterns-frame--docs': { id: 'patterns-frame--docs', title: 'Templates/Frame', name: 'Docs', type: 'docs' },
-        'foundations-color--docs': { id: 'foundations-color--docs', title: 'Foundations/Color', name: 'Docs', type: 'docs' },
+        'foundations-visual-color--docs': { id: 'foundations-visual-color--docs', title: 'Foundations/Visual/Color', name: 'Docs', type: 'docs' },
     },
 };
 
@@ -92,7 +92,7 @@ describe('answerDocsQuery', () => {
 
 describe('findPage and resolvePageLinks', () => {
     const entries = [
-        { title: 'Foundations/Color', name: 'Color', id: 'foundations-color--docs', type: 'docs' },
+        { title: 'Foundations/Visual/Color', name: 'Color', id: 'foundations-visual-color--docs', type: 'docs' },
         { title: 'AI UI/Foundations/Color', name: 'Color', id: 'ai-ui-foundations-color--docs', type: 'docs' },
         { title: 'Components/Forms and inputs/Button/Button', name: 'Button', id: 'button--docs', type: 'docs' },
         { title: 'Tag', name: 'Tag', id: null, type: null },
@@ -107,7 +107,7 @@ describe('findPage and resolvePageLinks', () => {
         expect(findPage('zzz', entries)).toBeNull();
     });
     it('rewrites page: links and keeps the label of one that does not resolve', () => {
-        const out = resolvePageLinks('[Color](page:Foundations/Color), [X](page:zzz)', entries, (id) => `#${id}`);
-        expect(out).toBe('[Color](#foundations-color--docs), X');
+        const out = resolvePageLinks('[Color](page:Foundations/Visual/Color), [X](page:zzz)', entries, (id) => `#${id}`);
+        expect(out).toBe('[Color](#foundations-visual-color--docs), X');
     });
 });

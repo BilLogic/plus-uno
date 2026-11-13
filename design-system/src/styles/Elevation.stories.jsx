@@ -25,7 +25,7 @@ import { parseShadow } from '@/storybook-docs/lib/shadow-anatomy';
  * test; the values every block shows are read from the page's tokens.
  */
 export default {
-    title: 'Foundations/Elevation',
+    title: 'Foundations/Visual/Elevation',
     tags: ['!dev', '!autodocs'],
 };
 

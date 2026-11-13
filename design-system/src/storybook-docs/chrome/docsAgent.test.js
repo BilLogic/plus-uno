@@ -34,7 +34,7 @@ describe('createAgentResponder', () => {
 
 describe('createAgentResponder pages and navigation', () => {
     const entries = [
-        { title: 'Foundations/Color', name: 'Color', id: 'foundations-color--docs', type: 'docs' },
+        { title: 'Foundations/Visual/Color', name: 'Color', id: 'foundations-visual-color--docs', type: 'docs' },
         { title: 'Components/Forms and inputs/Button/Button', name: 'Button', id: 'components-forms-and-inputs-button-button--docs', type: 'docs' },
     ];
     const pages = async () => entries;
@@ -49,11 +49,11 @@ describe('createAgentResponder pages and navigation', () => {
     it('opens the page the model asked for, in place, and says so when it wrote nothing', async () => {
         vi.useFakeTimers();
         const navigate = vi.fn(() => true);
-        const fetchFn = async () => ok({ text: '', open: 'Foundations/Color' });
+        const fetchFn = async () => ok({ text: '', open: 'Foundations/Visual/Color' });
         const out = await createAgentResponder({ fetchFn, search, pages, href, navigate })('Take me to color');
-        expect(out.text).toBe('Opening [Color](?path=/docs/foundations-color--docs).');
+        expect(out.text).toBe('Opening [Color](?path=/docs/foundations-visual-color--docs).');
         vi.runAllTimers();
-        expect(navigate).toHaveBeenCalledWith('?path=/docs/foundations-color--docs');
+        expect(navigate).toHaveBeenCalledWith('?path=/docs/foundations-visual-color--docs');
         vi.useRealTimers();
     });
 
@@ -61,7 +61,7 @@ describe('createAgentResponder pages and navigation', () => {
         vi.useFakeTimers();
         const navigate = vi.fn(() => true);
         const out = await createAgentResponder({ fetchFn: async () => ok({}, 502), search, pages, href, navigate })('Take me to the Color page');
-        expect(out.text).toBe('Opening [Color](?path=/docs/foundations-color--docs).');
+        expect(out.text).toBe('Opening [Color](?path=/docs/foundations-visual-color--docs).');
         vi.runAllTimers();
         expect(navigate).toHaveBeenCalledOnce();
         vi.useRealTimers();

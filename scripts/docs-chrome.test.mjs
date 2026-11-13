@@ -212,7 +212,7 @@ test('the measured shape is what the assertions read', () => {
 import { tocFailures, tocMeasureScript, TOC_LINE_BAND } from './docs-chrome.mjs';
 
 const toc = (over = {}) => ({
-  page: 'foundations-typography--docs',
+  page: 'foundations-visual-typography--docs',
   entries: 30,
   untitled: [],
   wrapped: [],

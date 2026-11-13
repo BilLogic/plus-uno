@@ -84,14 +84,14 @@ test('per-IP rate limit answers 429, per IP and per window', async () => {
 
 test('offers open_page, lists the page titles, and returns the page the model asked to open', async () => {
     const { handler, calls } = make({
-        pageTitles: async () => ['Components/Forms and inputs/Button/Button', 'Foundations/Color'],
-        callVertex: async (args) => { calls.push(args); return { ok: true, status: 200, text: '', calls: [{ name: 'open_page', args: { title: 'Foundations/Color' } }] }; },
+        pageTitles: async () => ['Components/Forms and inputs/Button/Button', 'Foundations/Visual/Color'],
+        callVertex: async (args) => { calls.push(args); return { ok: true, status: 200, text: '', calls: [{ name: 'open_page', args: { title: 'Foundations/Visual/Color' } }] }; },
     });
     const res = await handler(post({ question: 'Take me to color' }));
     assert.equal(res.status, 200);
-    assert.deepEqual(await res.json(), { text: '', open: 'Foundations/Color' });
+    assert.deepEqual(await res.json(), { text: '', open: 'Foundations/Visual/Color' });
     assert.equal(calls[0].tools[0].functionDeclarations[0].name, 'open_page');
-    assert.match(calls[0].system, /--- PAGES ---\nComponents\/Forms and inputs\/Button\/Button\nFoundations\/Color/);
+    assert.match(calls[0].system, /--- PAGES ---\nComponents\/Forms and inputs\/Button\/Button\nFoundations\/Visual\/Color/);
 });
 
 test('a page list that fails to load still answers', async () => {
@@ -101,7 +101,7 @@ test('a page list that fails to load still answers', async () => {
 });
 
 test('the prompt asks for inline page links and no file citations', () => {
-    const p = buildSystemPrompt('CTX', ['Foundations/Color']);
+    const p = buildSystemPrompt('CTX', ['Foundations/Visual/Color']);
     assert.match(p, /page:/);
     assert.match(p, /Never cite files/);
 });

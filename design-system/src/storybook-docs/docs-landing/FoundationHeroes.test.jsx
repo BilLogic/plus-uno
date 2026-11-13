@@ -5,18 +5,18 @@ import { HEROES } from './hero-registry.jsx';
 import { PAINT } from '../illustrations/paint.js';
 
 const FOUNDATION_IDS = [
-    'foundations-overview',
-    'foundations-accessibility',
-    'foundations-border',
-    'foundations-elevation',
-    'foundations-grid',
-    'foundations-iconography',
-    'foundations-illustrations',
-    'foundations-logos',
-    'foundations-radius',
-    'foundations-spacing',
-    'foundations-tokens',
-    'foundations-typography',
+    'foundations-basics-overview',
+    'foundations-basics-accessibility',
+    'foundations-visual-border',
+    'foundations-visual-elevation',
+    'foundations-layout-grid',
+    'foundations-visual-iconography',
+    'foundations-brand-illustrations',
+    'foundations-brand-logos',
+    'foundations-visual-radius',
+    'foundations-layout-spacing',
+    'foundations-basics-tokens',
+    'foundations-visual-typography',
 ];
 
 const ACCENT = 'var(--ds-background-brand-bold)';
@@ -29,14 +29,14 @@ describe('Foundations heroes', () => {
         expect(HEROES[id].description).toMatch(/^[A-Z].*\.$/);
     });
 
-    it.each(FOUNDATION_IDS.filter((id) => id !== 'foundations-typography'))('%s draws no text', (id) => {
+    it.each(FOUNDATION_IDS.filter((id) => id !== 'foundations-visual-typography'))('%s draws no text', (id) => {
         const { container } = render(React.createElement(HEROES[id].Hero));
         expect(container.querySelector('text')).toBeNull();
         expect(container.textContent).toBe('');
     });
 
     it('Typography is the one hero with letterforms: Aa twice, serif and sans', () => {
-        const { container } = render(React.createElement(HEROES['foundations-typography'].Hero));
+        const { container } = render(React.createElement(HEROES['foundations-visual-typography'].Hero));
         const glyphs = [...container.querySelectorAll('text')];
         expect(glyphs.map((t) => t.textContent)).toEqual(['Aa', 'Aa']);
         expect(glyphs[0].style.fontFamily).toContain('serif');
@@ -54,17 +54,17 @@ describe('Foundations heroes', () => {
     });
 
     it('Elevation is a light | dark split, the same drawing in two panes', () => {
-        const { container } = render(React.createElement(HEROES['foundations-elevation'].Hero));
+        const { container } = render(React.createElement(HEROES['foundations-visual-elevation'].Hero));
         expect([...container.querySelectorAll('[data-color-mode]')].map((n) => n.dataset.colorMode)).toEqual(['light', 'dark']);
     });
 
     it('Logos draws the kit construction: the four corner circles', () => {
-        const { container } = render(React.createElement(HEROES['foundations-logos'].Hero));
+        const { container } = render(React.createElement(HEROES['foundations-brand-logos'].Hero));
         expect(container.querySelectorAll('[data-shape="logo-construction"] circle[stroke-dasharray]')).toHaveLength(4);
     });
 
     it('Logos draws the mark: a rounded tile at the mark radius and the whole white plus', () => {
-        const { container } = render(React.createElement(HEROES['foundations-logos'].Hero));
+        const { container } = render(React.createElement(HEROES['foundations-brand-logos'].Hero));
         const tile = container.querySelector('rect[fill="' + PAINT.markTile + '"]');
         expect(tile).not.toBeNull();
         expect(tile.getAttribute('rx')).toBe('16');
@@ -78,7 +78,7 @@ describe('Foundations heroes', () => {
     });
 
     it('Radius: the surface corner is the circle it comes from, drawn dashed whole', () => {
-        const { container } = render(React.createElement(HEROES['foundations-radius'].Hero));
+        const { container } = render(React.createElement(HEROES['foundations-visual-radius'].Hero));
         const surface = container.querySelector('rect[fill="' + PAINT.cardSurface + '"]');
         const circle = container.querySelector('circle[stroke-dasharray]');
         expect(surface.getAttribute('rx')).toBe(circle.getAttribute('r'));

@@ -14,7 +14,7 @@ import { iconClass } from '../lib/icon';
  * at once and follows the toolbar's Contrast switch.
  */
 export default {
-    title: 'Foundations/Color',
+    title: 'Foundations/Visual/Color',
     tags: ['!dev', '!autodocs'],
 };
 

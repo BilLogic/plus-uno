@@ -970,7 +970,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 ```
 
 ## Elevation and Opacity Tokens (`--ds-`)
-Pick the level by what the surface does (Foundations/Elevation § Choose by behavior). Each shadow is edge + key + ambient and pairs with its level's surface (`--ds-shadow-raised` with `--ds-surface-raised`); a Tooltip takes none. Opacity dims a whole element.
+Pick the level by what the surface does (Foundations/Visual/Elevation § Choose by behavior). Each shadow is edge + key + ambient and pairs with its level's surface (`--ds-shadow-raised` with `--ds-surface-raised`); a Tooltip takes none. Opacity dims a whole element.
 
 ```css
 --ds-opacity-disabled  /* Images and whole elements in a disabled state. */

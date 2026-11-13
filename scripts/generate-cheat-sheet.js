@@ -167,7 +167,7 @@ function renderTokensDoc() {
     tokensDoc += "```css\n" + dsColorTokens + "\n```\n\n";
 
     tokensDoc += `## Elevation and Opacity Tokens (\`--ds-\`)\n`;
-    tokensDoc += `Pick the level by what the surface does (Foundations/Elevation § Choose by behavior). Each shadow is edge + key + ambient and pairs with its level's surface (\`--ds-shadow-raised\` with \`--ds-surface-raised\`); a Tooltip takes none. Opacity dims a whole element.\n\n`;
+    tokensDoc += `Pick the level by what the surface does (Foundations/Visual/Elevation § Choose by behavior). Each shadow is edge + key + ambient and pairs with its level's surface (\`--ds-shadow-raised\` with \`--ds-surface-raised\`); a Tooltip takes none. Opacity dims a whole element.\n\n`;
     tokensDoc += "```css\n" + dsElevationTokens + "\n```\n\n";
 
     tokensDoc += `## Color Primitives (\`--palette-\`)\n`;

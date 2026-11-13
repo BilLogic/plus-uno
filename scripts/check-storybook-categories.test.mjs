@@ -42,10 +42,10 @@ function fixture(files) {
     storySortOrder: [
       'Get started',
       'Foundations',
-      'Templates',
-      'Patterns',
       'Components',
       ['Forms and inputs', [], 'Labels', []],
+      'Patterns',
+      'Templates',
       'AI UI',
       'Specs',
       '*',
@@ -130,7 +130,7 @@ test('a group that is not an Atlassian category, and a sort that disagrees, go r
     path.join(root, 'storybook.taxonomy.json'),
     JSON.stringify({
       componentGroups: { 'Forms and inputs': [], Actions: [], Labels: [] },
-      storySortOrder: [...SITE_SECTIONS.slice(0, 5), ['Forms and inputs', [], 'Labels', []], ...SITE_SECTIONS.slice(5)],
+      storySortOrder: [...SITE_SECTIONS.slice(0, 3), ['Forms and inputs', [], 'Labels', []], ...SITE_SECTIONS.slice(3)],
     }),
   );
   const found = messages(root);
@@ -197,8 +197,8 @@ test('an AI component may sit under AI UI, and only one the taxonomy names', () 
 });
 
 test('Templates and Patterns sit above Components, Templates first, and there is no Tools section', () => {
-  assert.ok(SITE_SECTIONS.indexOf('Templates') < SITE_SECTIONS.indexOf('Patterns'));
-  assert.ok(SITE_SECTIONS.indexOf('Patterns') < SITE_SECTIONS.indexOf('Components'));
+  assert.ok(SITE_SECTIONS.indexOf('Components') < SITE_SECTIONS.indexOf('Patterns'));
+  assert.ok(SITE_SECTIONS.indexOf('Patterns') < SITE_SECTIONS.indexOf('Templates'));
   assert.ok(!SITE_SECTIONS.includes('Tools'));
 });
 
@@ -235,13 +235,13 @@ test('a page in a template source folder titled outside Templates goes red', () 
   assert.ok(messages(root).some((m) => m.includes('Stray.mdx') && m.includes('belongs under "Templates"')));
 });
 
-test('a sidebar sort that lists Patterns before Templates goes red', () => {
+test('a sidebar sort that lists Templates before Patterns goes red', () => {
   const root = fixture({});
   fs.writeFileSync(
     path.join(root, 'storybook.taxonomy.json'),
     JSON.stringify({
       componentGroups: { 'Forms and inputs': [], Labels: [] },
-      storySortOrder: ['Get started', 'Foundations', 'Patterns', 'Templates', 'Components', ['Forms and inputs', [], 'Labels', []], 'AI UI'],
+      storySortOrder: ['Get started', 'Foundations', 'Components', ['Forms and inputs', [], 'Labels', []], 'Templates', 'Patterns', 'AI UI'],
     }),
   );
   assert.ok(messages(root).some((m) => m.includes('roots must lead with')));

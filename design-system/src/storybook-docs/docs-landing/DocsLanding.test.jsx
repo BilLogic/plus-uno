@@ -14,7 +14,7 @@ const TOKENS_LINKS = {
 const renderColor = (props = {}) =>
     render(
         <DocsLanding
-            page="foundations-color"
+            page="foundations-visual-color"
             eyebrow="Foundation"
             title="Color"
             purpose="Every color is a --ds token named for its job."
@@ -53,7 +53,7 @@ describe('DocsLanding', () => {
 
     it('names the hero with its registry sentence and draws no text', () => {
         const { container } = renderColor();
-        const hero = screen.getByRole('img', { name: HEROES['foundations-color'].description });
+        const hero = screen.getByRole('img', { name: HEROES['foundations-visual-color'].description });
         expect(hero).toBe(container.querySelector('[data-hero]'));
 
         const walker = document.createTreeWalker(hero, NodeFilter.SHOW_TEXT);
