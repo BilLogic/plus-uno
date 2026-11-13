@@ -2,6 +2,7 @@ import React from 'react';
 import { PAINT } from './paint.js';
 import { Frame, Panel, Rect, Row, Screen } from './primitives.jsx';
 import { Pointer } from './primitives-motion.jsx';
+import { pair } from './motion.jsx';
 import { Clip, VIEW, mix } from './motion-parts.jsx';
 import { drillScene } from './motion-transitions.jsx';
 
@@ -16,10 +17,10 @@ import { drillScene } from './motion-transitions.jsx';
 
 const showWhatChanged = {
   title: 'Show what changed',
-  scenes: [
+  scenes: pair(
     drillScene({ id: 'show-do', title: 'The row grows into the record', caption: 'You can point to where the record came from, and back.' }),
     drillScene({ id: 'show-dont', title: 'The record replaces the list', mode: 'cut', caption: 'A cut: nothing says where the record came from.' }),
-  ],
+  ),
 };
 
 // ---------- Always responsive: a Toggle ----------
@@ -55,10 +56,10 @@ const toggle = ({ id, title, caption, waits }) => ({
 
 const alwaysResponsive = {
   title: 'Always responsive',
-  scenes: [
+  scenes: pair(
     toggle({ id: 'responsive-do', title: 'Color answers in the same frame', caption: 'The fill changes at once; the thumb follows.' }),
     toggle({ id: 'responsive-dont', title: 'Nothing answers until the thumb arrives', waits: true, caption: 'The person pressed and nothing changed for a moment.' }),
-  ],
+  ),
 };
 
 // ---------- Move like real things: a floating Panel thrown closed ----------
@@ -105,10 +106,10 @@ const thrown = ({ id, title, caption, keepsSpeed }) => ({
 
 const moveLikeRealThings = {
   title: 'Move like real things',
-  scenes: [
+  scenes: pair(
     thrown({ id: 'real-do', title: 'It leaves at the speed it was thrown', keepsSpeed: true, caption: 'On release the exit spring starts from the hand\'s speed, so nothing jumps.' }),
     thrown({ id: 'real-dont', title: 'It stops, then plays a canned slide', caption: 'The hand\'s speed is dropped; the Panel pauses and restarts from rest.' }),
-  ],
+  ),
 };
 
 // ---------- Quiet by default: a view pill used dozens of times a day ----------
@@ -141,10 +142,10 @@ const pill = ({ id, title, caption, expressive }) => ({
 
 const quietByDefault = {
   title: 'Quiet by default',
-  scenes: [
+  scenes: pair(
     pill({ id: 'quiet-do', title: 'Dozens a day: the fill glides', caption: 'A view pill moves on Productive spatial.fast. Nobody notices it twice.' }),
     pill({ id: 'quiet-dont', title: 'Dozens a day: the fill bounces', expressive: true, caption: 'The same pill on Expressive overshoots every time. A control used all day stays Productive.' }),
-  ],
+  ),
 };
 
 export const PRINCIPLE_DEMOS = { showWhatChanged, alwaysResponsive, moveLikeRealThings, quietByDefault };

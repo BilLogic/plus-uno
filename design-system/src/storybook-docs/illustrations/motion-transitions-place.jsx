@@ -3,7 +3,7 @@ import { HAIRLINE, PAINT } from './paint.js';
 import {
   Backdrop, ButtonShape, CardBox, Field, Flag, Modal, Panel, PageHeader, Rect, Rule, Row, Screen, SkeletonBar,
 } from './primitives.jsx';
-import { BEAT } from './motion.jsx';
+import { BEAT, pair } from './motion.jsx';
 import { Clip, Moved, VIEW, mix } from './motion-parts.jsx';
 import { travel } from './trails.js';
 
@@ -35,26 +35,17 @@ const Base = ({ children, header = true }) => (
 const scene = (s) => ({ viewBox: VIEW, arrows: [], ...s });
 
 /**
- * The rows below something that opens or closes: each moves straight up or down
- * by `shift`, in its own lane. A row that starts or lands below the body's edge
- * is out of view there, so its path runs to the frame's edge and it draws no
- * landing outline.
+ * The rows below something that opens or closes move as one group, straight up
+ * or down by `shift`: one path, from the group's top row to where that row
+ * lands, and one outline around the whole group where it lands, cut at the
+ * body's bottom edge.
  */
 const BODY_BOTTOM = BODY.y + BODY.h;
-const FRAME_BOTTOM = 93;
-const visible = (y) => y >= BODY.y && y + 14 <= BODY_BOTTOM;
-const rowsBelow = (rows, shift) =>
-  rows.map((y, i) => {
-    const lane = 80 + i * 40;
-    const landing = y + shift;
-    return {
-      points: [
-        [lane, visible(y) ? y + 7 : FRAME_BOTTOM],
-        [lane, visible(landing) ? landing + 7 : FRAME_BOTTOM],
-      ],
-      ...(visible(landing) ? { ghost: { x: 60, y: landing, w: 83, h: 14 } } : {}),
-    };
-  });
+const rowsBelow = (rows, shift) => {
+  const top = rows[0] + shift;
+  const bottom = Math.min(rows[rows.length - 1] + 14 + shift, BODY_BOTTOM);
+  return [{ points: [[101, rows[0] + 7], [101, top + 7]], ghost: { x: 60, y: top, w: 83, h: bottom - top } }];
+};
 
 // ---------- Scroll to a spot on the page ----------
 
@@ -289,10 +280,10 @@ const load = ({ id, title, caption, skeleton }) =>
     caption,
     initial: { sk: skeleton ? 1 : 0, sh: 0, hd: 0, r1: 0, r2: 0, r3: 0, pri: 0, ch: 0 },
     landing: { sk: 0, hd: 1, r1: 1, r2: 1, r3: 1, pri: 1, ch: 1 },
-    // With no Skeleton, the three rows are pushed down together when the header arrives.
+    // With no Skeleton, the three rows are pushed down as one group when the header arrives.
     arrows: skeleton
       ? []
-      : LOAD_ROWS.map((y, i) => travel({ x: 60, y, w: 83, h: 14 }, 0, -12, { lane: { x: 80 + i * 30 } })),
+      : [travel({ x: 60, y: LOAD_ROWS[0], w: 83, h: LOAD_ROWS[LOAD_ROWS.length - 1] + 14 - LOAD_ROWS[0] }, 0, -12)],
     draw: ({ sk, sh, hd, r1, r2, r3, pri, ch }) => {
       // With no Skeleton to hold the room, the rows sit high until the header arrives and push them down.
       const rise = skeleton ? 0 : 12 * (1 - hd);
@@ -756,10 +747,10 @@ const errPage = ({ id, title, caption, shakes }) =>
     caption,
     initial: shakes ? { b: 0, sx: 0, shook: 0 } : { b: 0, h: 0, m: 0, f1: 0 },
     landing: shakes ? { b: 1, sx: 0, shook: 1 } : { b: 1, h: 1, m: 1, f1: 1 },
-    // The summary makes room: both fields move down together, in two lanes.
+    // The summary makes room: both fields move down as one group.
     arrows: shakes
       ? []
-      : [travel({ x: 60, y: 33, w: 58, h: 20 }, 0, -9, { lane: { x: 80 } }), travel({ x: 60, y: 64, w: 58, h: 20 }, 0, -9, { lane: { x: 105 } })],
+      : [travel({ x: 60, y: 33, w: 58, h: 51 }, 0, -9)],
     draw: ({ b, sx = 0, h = 0, m = 0, f1 = 0 }) => (
       <Moved x={sx}>
         <Base header={false} />
@@ -790,10 +781,10 @@ export const WITHIN_DEMOS = {
   scroll: { title: 'Scroll to a spot on the page', scenes: [scrollTo] },
   swap: {
     title: 'Swap content in place',
-    scenes: [
+    scenes: pair(
       swap({ id: 'swap-do', title: 'The old content is gone before the new arrives', caption: 'The pill fill glides; the rows fade out, then the cards fade in. One clean frame between.' }),
       swap({ id: 'swap-dont', title: 'Old and new cross-fade on top of each other', crossfade: true, caption: 'Half-transparent rows and cards overlap for a muddy moment, and the eye cannot read either.' }),
-    ],
+    ),
   },
   add: { title: 'Add an item', scenes: [addRemove({ id: 'add-row', title: 'A row joins from its seam', caption: 'The rows below make room on spatial.fast as the new row opens; its content fades in once there is room.' })] },
   remove: { title: 'Remove an item', scenes: [addRemove({ id: 'remove-row', title: 'A row fades, then the gap closes', removing: true, caption: 'The removed row fades on appearance.fast as the rows below close the gap.' })] },
@@ -802,10 +793,10 @@ export const WITHIN_DEMOS = {
   collapse: { title: 'Collapse a row', scenes: [expand({ id: 'collapse-row', title: 'A row closes back to its seam', closing: true, caption: 'The detail fades first, then the height closes on the same token it opened on.' })] },
   load: {
     title: 'Load content',
-    scenes: [
+    scenes: pair(
       load({ id: 'load-do', title: 'A Skeleton holds the layout; content fades in, in order', skeleton: true, caption: 'The shimmer runs while waiting. Rows arrive 20 ms apart, then the primary action, then the chart. Nothing jumps.' }),
       load({ id: 'load-dont', title: 'No Skeleton: content pops in and pushes the layout', caption: 'The same order with nothing holding the room: each part pops in, and the rows jump when the header arrives.' }),
-    ],
+    ),
   },
 };
 
@@ -836,23 +827,23 @@ export const FEEDBACK_DEMOS = {
   attention: { title: 'Call attention', scenes: [attention] },
   errField: {
     title: 'An error in a field',
-    scenes: [
+    scenes: pair(
       errField({ id: 'err-field-do', title: 'Checked when the field is left', caption: 'On blur the field turns red and its message makes room on spatial.fast, then fades in. No shake.' }),
       errField({ id: 'err-field-dont', title: 'Checked while typing', early: true, caption: 'An error before the person has finished is an interruption, not help.' }),
-    ],
+    ),
   },
   errModal: {
     title: 'Sending from a Modal failed',
-    scenes: [
+    scenes: pair(
       errModal({ id: 'err-modal-do', title: 'A message makes room', caption: 'The failure is the system\'s, so the Modal stays still: a message opens at its top on spatial.fast and fades in.' }),
       errModal({ id: 'err-modal-dont', title: 'The Modal shakes', shakes: true, caption: 'The person did nothing wrong, yet the Modal shakes as if they had. A shake is only for a blocked submit.' }),
-    ],
+    ),
   },
   errPage: {
     title: 'Submitting a page',
-    scenes: [
+    scenes: pair(
       errPage({ id: 'err-page-do', title: 'A summary makes room at the top', caption: 'The fields are marked, a one-line summary opens above the form, and focus goes to the first error. No shake.' }),
       errPage({ id: 'err-page-dont', title: 'The page shakes', shakes: true, caption: 'The whole page shakes and nothing says what to fix. A page gets a summary, never a shake.' }),
-    ],
+    ),
   },
 };

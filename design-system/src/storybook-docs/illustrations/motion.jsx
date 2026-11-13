@@ -3,6 +3,7 @@ import { animate } from 'motion';
 import { useReducedMotion } from 'motion/react';
 
 import { Button, IconButton } from '@/components';
+import { VerdictTag } from '@/storybook-docs/foundation-blocks.jsx';
 
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { measureSpring, springStep } from '@/tokens/spring.js';
@@ -32,6 +33,15 @@ import { crossings, ghostOf, pointsOf } from './trails.js';
  * `trails.js`). There are no timings here: every move reads a
  * spring token, and every pause is counted in beats.
  */
+
+/**
+ * A right way and its wrong ways, side by side: the first scene is the Do, every
+ * other one a Don't, and each tile carries the tag the docs' Do/Don't pairs use.
+ */
+export const pair = (doScene, ...donts) => [
+  { ...doScene, verdict: 'do' },
+  ...donts.map((scene) => ({ ...scene, verdict: 'dont' })),
+];
 
 /** The speed control's steps, and how each reads. */
 export const SPEEDS = [1, 0.5, 0.25];
@@ -357,8 +367,19 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
           )}
         </Illustration>
       </div>
-      <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)', marginBlockEnd: 'var(--stack-md)' }}>
-        {scene.caption}
+      <figcaption
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: 'var(--stack-sm)',
+          font: 'var(--body-small)',
+          color: 'var(--ds-text-subtle)',
+          marginBlockEnd: 'var(--stack-md)',
+        }}
+      >
+        {scene.verdict && <VerdictTag tone={scene.verdict} />}
+        <span>{scene.caption}</span>
       </figcaption>
     </figure>
   );

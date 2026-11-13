@@ -7,6 +7,7 @@ import {
 import { TreeEdge, TreeNode } from './primitives-motion.jsx';
 import { Clip, Moved, VIEW, mix } from './motion-parts.jsx';
 import { travel } from './trails.js';
+import { pair } from './motion.jsx';
 import { ABOVE_DEMOS, FEEDBACK_DEMOS, WITHIN_DEMOS } from './motion-transitions-place.jsx';
 
 /**
@@ -580,10 +581,10 @@ export const TRANSITION_TREES = {
 export const TRANSITION_DEMOS = {
   go: {
     title: 'Go to another area',
-    scenes: [
+    scenes: pair(
       goTo({ id: 'go-fade', title: 'A clean fade in place', caption: 'The Sidebar highlight moves; the old page fades out, then the new page fades in, in place. The Sidebar itself does not move.' }),
       goTo({ id: 'go-slide', title: 'The pages slide', slide: true, caption: 'A slide says the two areas sit side by side. They are unrelated, so nothing should slide.' }),
-    ],
+    ),
   },
   drill: {
     title: 'Depth 1: the row grows into the record',
@@ -593,34 +594,39 @@ export const TRANSITION_DEMOS = {
   },
   deeper: {
     title: 'Deeper levels: the same rule',
-    scenes: [
+    scenes: pair(
       drill({ id: 'deeper-grow', title: 'Depth 2: the row grows again', crumbs: 2, caption: 'Whatever was chosen becomes the page, at any depth, and the Breadcrumb arrives one level longer.' }),
       drill({ id: 'deeper-slide', title: 'Depth 2: a page slides in from the right', mode: 'slide', crumbs: 2, caption: 'Beside a docked Sidebar a sliding page reads as a floating Panel opening, not a deeper place.' }),
-    ],
+    ),
   },
   climb: { title: 'Climbing back out', scenes: [climbOne, climbTwo] },
   focused: {
     title: 'A focused task',
-    scenes: [
+    scenes: pair(
       focused({ id: 'focused-fade', title: 'The frame fades, the task fades in', caption: 'The task changes the frame itself, so it is a clean fade in place: the page and Sidebar fade out, then the task fades in. Close reverses it.' }),
       focused({ id: 'focused-slide', title: 'The task slides in from the side', slide: true, caption: 'A slide says the task sits beside the page. It replaces the frame, so it fades.' }),
-    ],
+    ),
   },
   switch: {
     title: 'Switch views',
-    scenes: [
+    scenes: pair(
       switchViews({ id: 'switch-slide', title: 'Both bodies slide together', caption: 'The views are peers in a row: the indicator moves on spatial.fast and both bodies slide as one flat sheet, no fade.' }),
       switchViews({ id: 'switch-fade', title: 'A fade on the slide', fade: true, caption: 'A fade on top of the slide reads as going deeper, and tabs are not deeper.' }),
-    ],
+    ),
   },
   step: {
-    title: 'Step to the next or previous',
-    scenes: [
+    title: 'Steps across the top',
+    scenes: pair(
       step({ id: 'step-across', title: 'Steps across the top: the body slides across', axis: 'x', caption: 'The row runs across, so the body moves across with it. Visited, current and unvisited change in place.' }),
       step({ id: 'step-across-wrong', title: 'Steps across the top: the body slides up', axis: 'y', caption: 'The row says across and the body says up: two axes for one move.' }),
+    ),
+  },
+  stepDown: {
+    title: 'Steps down a side',
+    scenes: pair(
       step({ id: 'step-down', title: 'Steps down a side: the body slides up', side: true, axis: 'y', caption: 'The list runs down, so Next brings the new step up from below and Back brings it down from above.' }),
       step({ id: 'step-down-wrong', title: 'Steps down a side: the body slides across', side: true, axis: 'x', caption: 'The list says down and the body says across: two axes for one move.' }),
-    ],
+    ),
   },
   ...WITHIN_DEMOS,
   ...ABOVE_DEMOS,
