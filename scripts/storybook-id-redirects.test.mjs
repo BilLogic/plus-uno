@@ -11,7 +11,7 @@ const rules = [...toml.matchAll(/from = "\/storybook\/"\n\s+query = \{ path = "\
 const ids = new Set(PAGES.map((p) => p.id));
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 39);
+  assert.equal(rules.length, 40);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
     assert.ok(ids.has(r.to), `${r.from} redirects to ${r.to}, which is not a page`);
@@ -48,4 +48,10 @@ test('a folded page lands on its parent section, a renamed page on the page', ()
 
 test('the id rules sit before the catch-all /storybook/* rule', () => {
   assert.ok(toml.lastIndexOf('query = { path') < toml.indexOf('from = "/storybook/*"'));
+});
+
+test('the retired Get started > Content design id lands on Voice and tone', () => {
+  const rule = rules.find((r) => r.from === 'get-started-content-design');
+  assert.equal(rule?.to, 'foundations-brand-content-voice-and-tone');
+  assert.ok(ids.has('foundations-brand-content-voice-and-tone'));
 });

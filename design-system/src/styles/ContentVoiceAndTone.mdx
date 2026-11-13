@@ -1,0 +1,115 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { RefTable, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import { FoundationSection, FoundationSubsection, FoundationRelated, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { VoiceTag } from '@/storybook-docs/rule-tag.jsx';
+import { Say, Sample, RuleHead } from '@/storybook-docs/content-blocks.jsx';
+
+{/* Agent twin: design-system/guidelines/foundations/content/voice-and-tone.md. Change the two together. */}
+
+<Meta title="Foundations/Brand/Content/Voice and tone" />
+
+<DocsLanding
+    page="foundations-brand-content-voice-and-tone"
+    eyebrow="Foundation"
+    title="Voice and tone"
+    purpose="How PLUS sounds to everyone it serves."
+    links={{
+        items: [
+            { title: 'Voice', href: '#foundation-voice' },
+            { title: 'When to dial', href: '#foundation-when-to-dial' },
+            { title: 'Tone', href: '#foundation-tone' },
+            { title: 'In the product', href: '#foundation-in-the-product' },
+        ],
+    }}
+/>
+
+We write for many people. Who we are stays the same. How we say it fits who is reading.
+
+<FoundationSection title="Voice">
+
+Our voice is helpful, honest, warm and clear.
+
+<RefTable
+    head={['Word', 'The idea', 'What it asks of the writer']}
+    rows={[
+        [<VoiceTag word="helpful" />, 'The purpose · Productivity', 'Point to the next step. Tell people what is coming, then show them how to get there.'],
+        [<VoiceTag word="honest" />, 'The truth · Learning', 'Say what happened. Give feedback straight, with the reason. Own our mistakes.'],
+        [<VoiceTag word="warm" />, 'The feeling · Uplift', 'Write the way a colleague talks. Notice the effort. Skip the jargon.'],
+        [<VoiceTag word="clear" />, 'The words · Simplicity', 'Keep it short. Use everyday words. Lead with the verb. One idea per sentence.'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="When to dial">
+
+The four words never change. How hard we lean on each one does.
+
+<RefTable
+    head={['Word', 'Lean in', 'Pull back']}
+    rows={[
+        [<VoiceTag word="helpful" />, 'A tutor is about to start a session.', 'The reader is browsing, not doing.'],
+        [<VoiceTag word="honest" />, 'Something failed, or a student is stuck.', 'Never. Soften how you say it, not what you say.'],
+        [<VoiceTag word="warm" />, 'A student did well. A tutor showed up.', 'Money, policy, or an error.'],
+        [<VoiceTag word="clear" />, 'A live session, a phone, a hurry.', 'Never. Clear is always on.'],
+    ]}
+/>
+
+<FoundationSubsection title="Warm, pulled back">
+
+<RuleHead><VoiceTag word="warm" /></RuleHead>
+
+When money is late, warm means calm and specific. The date is the kindest part.
+
+<DoDont>
+<Do caption="Kind, because it answers “when?”."><Say>Your October payout is delayed. It arrives by Nov 20.</Say></Do>
+<Dont caption="Polite, but the tutor still has to ask when."><Say>We’re sorry, your October payout is delayed.</Say></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Tone">
+
+One moment, told five ways: Maya, a sixth-grade student, can now solve fractions on her own. However the tone shifts, it always sounds like PLUS.
+
+<RefTable
+    head={['Reader', 'Where', 'Tone', 'The line']}
+    rows={[
+        ['Tutor', 'Product', 'Quick, warm, like a teammate', '“Maya solved her first fraction on her own. Nice work this week.”'],
+        ['Supervisor', 'Product', 'Brief, factual, ranked', '“Maya mastered fractions in four sessions with her tutor, Priya.”'],
+        ['Researcher', 'Product', 'Precise, neutral, numbers first', '“Fractions: mastered at session 4. School B, grade 6.”'],
+        ['Teacher', 'Service', 'Respectful, free of product terms', '“Maya can now solve fractions on her own. Next, her tutor moves on to decimals.”'],
+        ['Student', 'Service', 'Short, kind, about effort', '“You did it, Maya. Fractions are yours.”'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="In the product">
+
+One card for each person who uses PLUS. The voice holds; the tone shifts with the job. In each card the headline is the action, what to do next, and the body says why it matters in that reader’s terms.
+
+<RefTable
+    head={['Reader', 'Context', 'Headline (the action)', 'Body (why it matters)', 'Actions']}
+    rows={[
+        ['Tutor', 'Today · 3:30 PM · Breakout room 3 · Starts in 10 min', 'Prep for Maya’s session', 'Last week you tagged her Stuck on fractions. Start with a warm-up problem to build her confidence.', 'Open session · View notes'],
+        ['Lead tutor', 'Room 3 · Attendance · 2 of 6 joined', 'Mark attendance for Room 3', 'Four students haven’t joined yet. Marking them absent frees their tutors for students who are here.', 'Mark attendance · Wait 5 min'],
+        ['Supervisor', 'Reviews · This week · 2 urgent', 'Start with 2 urgent reflections', 'Priya flagged a session where a student seemed upset. Reading it first lets you check in before her next session.', 'Open review · See all 5'],
+        ['Researcher', 'Exports · Fall term · Ready', 'Your export is ready', '1,240 sessions from three schools, with student names removed. It matches the filters you saved on Monday.', 'Download CSV · Edit filters'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated items={[
+    { title: 'Language', description: 'How we write every word, for everyone PLUS reaches.', href: '?path=/docs/foundations-brand-content-language--docs' },
+    { title: 'Messages', description: 'What to say when something happens.', href: '?path=/docs/foundations-brand-content-messages--docs' },
+    { title: 'Overview', description: 'The framework the four voice words come from.', href: '?path=/docs/foundations-overview--docs' },
+]} />
+
+</FoundationSection>
