@@ -1,12 +1,12 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
-import { C, ModeCompare } from '@/storybook-docs/foundation-blocks.jsx';
+import { C, ModeCompare, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
-import { LevelTiles } from '@/storybook-docs/elevation-demos.jsx';
+import { LevelTiles, LEVELS } from '@/storybook-docs/elevation-demos.jsx';
 import * as ElevationStories from './Elevation.stories.jsx';
 
 
@@ -18,7 +18,6 @@ import * as ElevationStories from './Elevation.stories.jsx';
     title="Elevation"
     purpose="What sits above what, and whether it blocks. Shadow and surface color show it."
     links={{
-        label: 'Tokens',
         items: [
             { title: 'Levels', href: '#foundation-the-levels' },
             { title: 'Shadow', href: '#foundation-shadow-anatomy' },
@@ -40,6 +39,11 @@ import * as ElevationStories from './Elevation.stories.jsx';
 Six levels, lowest first. A surface and its shadow always travel together.
 
 <ModeCompare>{() => <LevelTiles />}</ModeCompare>
+
+<RefTable
+    head={['Level', 'Surface', 'Shadow']}
+    rows={LEVELS.map((l) => [l.name, l.surface ? <C>{l.surface}</C> : '—', l.shadow ? <C>{l.shadow}</C> : '—'])}
+/>
 
 Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked. `--ds-surface-container` is a translucent well inside a surface, and it is not a level.
 
@@ -197,30 +201,44 @@ It grows one to one with the scroll position, with no spring token of its own.
 <FoundationSection title="Do and don't">
 
 <FoundationSubsection title="Lift with shadow, not a darker fill">
+A lifted surface gets its height from its shadow; a darker fill reads as a different surface.
+
 <Canvas of={ElevationStories.LiftWithShadow} sourceState="none" />
 </FoundationSubsection>
 
 <FoundationSubsection title="No border on a lifted surface">
+The shadow's edge slot is the border, so a drawn border doubles it.
+
 <Canvas of={ElevationStories.NoBorder} sourceState="none" />
 </FoundationSubsection>
 
 <FoundationSubsection title="Pair the surface with its shadow">
+A level's surface and shadow travel together.
+
 <Canvas of={ElevationStories.AlwaysPair} sourceState="none" />
 </FoundationSubsection>
 
 <FoundationSubsection title="Blocking only on the Backdrop">
+The blocking shadow belongs to the Modal over its Backdrop, and nothing else.
+
 <Canvas of={ElevationStories.BlockingOnBackdrop} sourceState="none" />
 </FoundationSubsection>
 
 <FoundationSubsection title="Sunken never floats">
+A sunken surface is a ground, so it sits behind the work and never lifts.
+
 <Canvas of={ElevationStories.SunkenNeverFloats} sourceState="none" />
 </FoundationSubsection>
 
 <FoundationSubsection title="Keep the Tooltip flat">
+A Tooltip is a label, so it has no shadow.
+
 <Canvas of={ElevationStories.TooltipFlat} sourceState="none" />
 </FoundationSubsection>
 
 <FoundationSubsection title="Raise one focal point">
+Raise the one object a person acts on; a page of raised cards has no focus.
+
 <Canvas of={ElevationStories.OneFocalPoint} sourceState="none" />
 </FoundationSubsection>
 

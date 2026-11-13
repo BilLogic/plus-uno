@@ -12,7 +12,7 @@ import { HEROES } from './hero-registry.jsx';
  * - `page`: the page's id, which picks the hero.
  * - `eyebrow`: the layer, then the group when the page has one (`Foundation`).
  * - `purpose`: the page's lead, unchanged, at most two lines.
- * - `links`: `{ label, items }` for a labeled list (`Tokens`, `Uses`), or
+ * - `links`: `{ label, items }` for a labeled list (`Uses`; with no `label` it reads `Tokens`), or
  *   `{ items }` alone for the siblings of a group, where an item with
  *   `current: true` is the page you are on. An item is `{ title, href }`.
  *
@@ -20,6 +20,9 @@ import { HEROES } from './hero-registry.jsx';
  * title, section-stack-md before the links and the hero, page-stack-lg after
  * the hero.
  */
+/** The label a links row takes when the page passes none and the row is not a sibling list. */
+const DEFAULT_LINKS_LABEL = 'Tokens';
+
 export const DocsLanding = ({ page, eyebrow, title, purpose, links }) => {
     const entry = HEROES[page];
     const Hero = entry?.Hero;
@@ -30,7 +33,7 @@ export const DocsLanding = ({ page, eyebrow, title, purpose, links }) => {
                 <h1 className="sb-docs-landing__title">{title}</h1>
                 <div className="sb-docs-landing__purpose sb-docs-measure">{purpose}</div>
             </header>
-            {links?.items?.length > 0 && <LandingLinks label={links.label} items={links.items} title={title} />}
+            {links?.items?.length > 0 && <LandingLinks label={links.label ?? (links.items.some((i) => i.current) ? undefined : DEFAULT_LINKS_LABEL)} items={links.items} title={title} />}
             {Hero && (
                 <div role="img" aria-label={entry.description} className="sb-docs-hero" data-hero={page}>
                     <Hero />

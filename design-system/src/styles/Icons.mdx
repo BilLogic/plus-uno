@@ -1,5 +1,5 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
-import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { RefTable, C, Do, Dont, DoDont, Glyph } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
@@ -7,12 +7,8 @@ import {
     FoundationRelated,
     FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
-import { Banner, Icon } from '@/components';
+import { Icon } from '@/components';
 import * as IconsStories from './Icons.stories.jsx';
-
-export const Glyph = ({ name, family }) => (
-    <Icon name={family ? `${family} fa-${name}` : name} size={16} color="default" />
-);
 
 <Meta of={IconsStories} />
 
@@ -22,7 +18,6 @@ export const Glyph = ({ name, family }) => (
     title="Iconography"
     purpose="Icons are small symbols that help people find their way and act faster."
     links={{
-        label: 'Tokens',
         items: [
             { title: 'Sizes', href: '#foundation-sizes-12-16-and-24' },
             { title: 'Color', href: '#foundation-font-awesome-free-and-color-tokens' },
@@ -77,10 +72,7 @@ Before adding an icon, ask whether a label does the job better. Leave out icons 
 
 Icons come in three sizes, bound to the Size/Icon tokens. The box is exactly the size, so an icon never adds height to the line it sits in.
 
-<Banner appearance="announcement">
-<strong>Sizes and source</strong><br />
-Icons come in 12, 16 and 24. 12 is for chevrons, which are always 12, field validation icons, compact text, small contained elements such as tags, badges and statuses, and secondary actions. PLUS draws icons from Font Awesome Free, so stroke, corner and end-cap rules do not apply.
-</Banner>
+PLUS draws icons from Font Awesome Free, so stroke, corner and end-cap rules do not apply. Chevrons are always 12.
 
 <Canvas of={IconsStories.Sizes} sourceState="none" />
 
@@ -109,7 +101,7 @@ An icon sits in space the way any box does: give it room with the spacing tokens
 
 <FoundationSection title="Font Awesome Free and color tokens">
 
-Use Font Awesome Free 7.2 only: `fa-solid`, `fa-regular` and `fa-brands`, including brand glyphs such as `fa-brands fa-figma` and `fa-brands fa-github`. Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are not licensed here and render blank. Check a glyph name against the Free set before you use it; the Free names are generated into `design-system/src/lib/icon-free.generated.js` and `icon-regular.generated.js` (`npm run generate:icon-lists`). A glyph Free does not have is replaced by another glyph that is in the Free set.
+Use Font Awesome Free 7.2 only: `fa-solid`, `fa-regular` and `fa-brands`, including brand glyphs such as `fa-brands fa-figma` and `fa-brands fa-github`. Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are not licensed here and render blank. Check a glyph name against the Free set before you use it. A glyph Free does not have is replaced by another glyph that is in the Free set.
 
 Regular is the default weight, and solid is used only where Free has no regular. Where one set of icons needs a glyph Free draws only in solid, that one glyph is solid and the rest stay regular. Use a glyph's current name: an alias such as `calendar-alt` is not in the list and draws solid.
 
@@ -128,7 +120,7 @@ An Icon backs up a label at the size of its text; a Tile frames an icon, logo or
 </FoundationSubsection>
 
 <FoundationSubsection title="Contribution and adding new icons">
-Before a glyph joins the product, check four things. Does a similar icon already exist? Can an existing one serve more than one purpose? Could it be confused with another icon in the same view? Would a label do the job better? A new glyph is proposed through the Intake, and a design lead approves it.
+Before a glyph joins the product, check four things. Does a similar icon already exist? Can an existing one serve more than one purpose? Could it be confused with another icon in the same view? Would a label do the job better? A new glyph is proposed through the Intake, and a design lead approves it. Zoom has no Font Awesome Free glyph: a Zoom link is not an icon, and partner and tool logos go in a Tile, never in the Logo set.
 </FoundationSubsection>
 
 </FoundationSection>
@@ -161,8 +153,6 @@ Use the same glyph for the same job everywhere. These cover most of what a tutor
     ]}
 />
 
-- Zoom has no Font Awesome Free glyph. A Zoom link is not an icon; partner and tool logos go in a Tile, never in the Logo set.
-
 </FoundationSection>
 
 <FoundationSection title="Do and don't">
@@ -193,7 +183,7 @@ Icons are 16 beside body text. Keep 12 for chevrons, validation and compact part
 
 <DoDont>
 <Do caption="A 16 icon leads the label; the chevron is 12.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" />Add tutor<Glyph name="chevron-down" size="--icon-sm" /></span>
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" />Add tutor<Glyph name="chevron-down" size={12} /></span>
 </Do>
 <Dont caption="A 12 icon as the main way-finding mark is too small to read beside the label.">
 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Icon name="plus" size={12} color="default" />Add tutor</span>

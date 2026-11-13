@@ -302,16 +302,6 @@ a.sbdocs-a {
  */
 
 
-.sbdocs .sb-plus-intro-page .sb-plus-intro-overview-title {
-  font-family: var(--type-family-heading-serif);
-  font-size: var(--font-size-200);
-  font-weight: var(--type-weight-medium);
-  line-height: 1.1;
-  margin: 0 0 var(--stack-lg);
-  color: var(--ds-text);
-}
-
-
 
 /*
  * `.sb-plus-intro-mini-grid` was the other half of both of these selector lists.
