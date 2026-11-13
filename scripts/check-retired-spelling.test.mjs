@@ -214,10 +214,12 @@ test('a retired Foundations id or title is caught, the new ids pass', () => {
   ];
   const found = findingsIn(retired.join('\n'), 'AGENTS.md');
   assert.equal(found.length, retired.length, JSON.stringify(found, null, 1));
+  assert.deepEqual(found.map((f) => f.line), retired.map((_, i) => i + 1));
   const current = [
     'foundations-expression-motion-principles',
     'foundations-expression-sound-overview',
     'foundations-tokens-library',
+    'foundations-expression-motion-library',
     'Foundations › Expression › Motion',
     'Always responsive, Build understanding, Lead with empathy, Cut the noise',
   ];
