@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
  * four-tier plan does. A retired name in doc text is a stale claim.
  */
 const STYLES = join(__dirname, '..', 'styles');
-const PAGES = ['Accessibility', 'Border', 'Colors', 'Elevation', 'Grid', 'Icons', 'Illustrations', 'Logos', 'Radius', 'Spacing', 'Tokens', 'Typography', 'FoundationsOverview'];
+const PAGES = ['Accessibility', 'Border', 'Colors', 'Elevation', 'Grid', 'Icons', 'Illustrations', 'Logos', 'Radius', 'Spacing', 'TokensColor', 'TokensTypography', 'TokensSpacingAndSize', 'TokensElevationAndLayers', 'TokensMotion', 'Typography', 'FoundationsOverview'];
 const RETIRED = ['color / foundations', 'spacing / foundations', 'spacing / layout', 'Element/', 'Surface 16'];
 
 describe('Foundations pages', () => {

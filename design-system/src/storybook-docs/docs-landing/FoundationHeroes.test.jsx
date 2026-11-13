@@ -18,7 +18,11 @@ const FOUNDATION_IDS = [
     'foundations-brand-content-messages',
     'foundations-visual-radius',
     'foundations-layout-spacing',
-    'foundations-tokens',
+    'foundations-tokens-color',
+    'foundations-tokens-typography',
+    'foundations-tokens-spacing-and-size',
+    'foundations-tokens-elevation-and-layers',
+    'foundations-tokens-motion',
     'foundations-visual-typography',
 ];
 

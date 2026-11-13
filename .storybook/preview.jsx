@@ -221,7 +221,14 @@ const preview = {
               ]
             ],
             "Accessibility",
-            "Tokens"
+            "Tokens",
+            [
+              "Color",
+              "Typography",
+              "Spacing and size",
+              "Elevation and layers",
+              "Motion"
+            ]
           ],
           "Components",
           [

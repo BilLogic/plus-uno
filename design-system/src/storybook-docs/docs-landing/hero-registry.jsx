@@ -132,11 +132,11 @@ export const HEROES = {
     description:
       'The scale itself: each step a square its own size.',
   },
-  'foundations-tokens': {
-    Hero: TokensHero,
-    description:
-      'Chips repeat; one value threads through them.',
-  },
+  'foundations-tokens-color': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
+  'foundations-tokens-typography': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
+  'foundations-tokens-spacing-and-size': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
+  'foundations-tokens-elevation-and-layers': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
+  'foundations-tokens-motion': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
   'foundations-visual-typography': {
     Hero: TypographyHero,
     description:
