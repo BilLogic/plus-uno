@@ -518,3 +518,43 @@ export const TypographyHero = () => (
     />
   </HeroDrawing>
 );
+
+/** A speech bubble: a card with a tail, text drawn as soft bars. */
+const Bubble = ({ x, y, w, h, accent = false, lines = 2 }) => (
+  <g>
+    <CardBox x={x} y={y} w={w} h={h} accent={accent} />
+    {Array.from({ length: lines }, (_, i) => (
+      <SkeletonBar key={i} x={x + 10} y={y + 12 + i * 11} w={w - 20 - (i === lines - 1 ? 24 : 0)} h={5} heading={i === 0} accent={accent && i === 0} />
+    ))}
+  </g>
+);
+
+export const VoiceAndToneHero = () => (
+  <HeroDrawing>
+    <Bubble x={20} y={20} w={150} h={52} lines={2} />
+    <Bubble x={110} y={84} w={170} h={56} accent lines={3} />
+  </HeroDrawing>
+);
+
+export const LanguageHero = () => (
+  <HeroDrawing>
+    <CardBox x={50} y={25} w={200} h={110} />
+    <SkeletonBar x={66} y={43} w={90} h={6} heading />
+    <SkeletonBar x={66} y={60} w={160} h={4} />
+    <SkeletonBar x={66} y={72} w={140} h={4} />
+    <SkeletonBar x={66} y={84} w={150} h={4} />
+    <Rect x={64} y={100} w={70} h={16} fill={PAINT.rowSelected} corner="icon" />
+    <SkeletonBar x={72} y={106} w={54} h={4} accent />
+  </HeroDrawing>
+);
+
+export const MessagesHero = () => (
+  <HeroDrawing>
+    <CardBox x={60} y={30} w={180} h={96} accent />
+    <Rect x={74} y={46} w={14} h={14} fill={PAINT.accent} corner="full" />
+    <SkeletonBar x={96} y={48} w={80} h={6} heading />
+    <SkeletonBar x={74} y={70} w={150} h={4} />
+    <SkeletonBar x={74} y={82} w={120} h={4} />
+    <Rect x={74} y={98} w={54} h={16} fill={PAINT.accent} corner="icon" />
+  </HeroDrawing>
+);

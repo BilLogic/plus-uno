@@ -250,6 +250,13 @@
 
 [[redirects]]
   from = "/storybook/"
+  query = { path = "/docs/get-started-content-design--docs" }
+  to = "/storybook/?path=/docs/foundations-brand-content-voice-and-tone--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
   query = { path = "/docs/foundations-basics-overview--docs" }
   to = "/storybook/?path=/docs/foundations-overview--docs"
   status = 301

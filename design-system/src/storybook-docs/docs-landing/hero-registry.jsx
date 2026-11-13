@@ -8,6 +8,9 @@ import {
   IconographyHero,
   IllustrationsHero,
   LogosHero,
+  VoiceAndToneHero,
+  LanguageHero,
+  MessagesHero,
   RadiusHero,
   SpacingHero,
   TokensHero,
@@ -98,6 +101,21 @@ export const HEROES = {
     Hero: IllustrationsHero,
     description:
       'A fanned stack of heroes; the front shows the house style.',
+  },
+  'foundations-brand-content-voice-and-tone': {
+    Hero: VoiceAndToneHero,
+    description:
+      'Two speech bubbles in a conversation; the reply in the brand color.',
+  },
+  'foundations-brand-content-language': {
+    Hero: LanguageHero,
+    description:
+      'A short card of text, its action line picked out in the brand color.',
+  },
+  'foundations-brand-content-messages': {
+    Hero: MessagesHero,
+    description:
+      'A message card: an icon and title, a body, and one action in the brand color.',
   },
   'foundations-brand-logos': {
     Hero: LogosHero,
