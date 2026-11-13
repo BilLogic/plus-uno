@@ -447,7 +447,7 @@ $tag-colors: (
     border-right-color: var(--plus-tag-hue);
     border-bottom-color: var(--plus-tag-hue);
     border-radius: var(--radius-full);
-    animation: plus-tag-spin 0.8s linear infinite;
+    animation: plus-tag-spin var(--ds-motion-loop-duration) var(--ds-motion-loop) infinite alternate;
 }
 
 /*
@@ -461,7 +461,7 @@ $tag-colors: (
     height: var(--icon-sm);
     color: var(--ds-icon-subtle);
     stroke: currentColor;
-    animation: plus-tag-spin 0.8s linear infinite;
+    animation: plus-tag-spin var(--ds-motion-loop-duration) var(--ds-motion-loop) infinite alternate;
 }
 
 @keyframes plus-tag-spin {
@@ -471,7 +471,7 @@ $tag-colors: (
 @media (prefers-reduced-motion: reduce) {
     .plus-tag__spinner,
     .plus-tag__avatar-spinner {
-        animation-duration: 2.4s;
+        animation: none;
     }
 }
 

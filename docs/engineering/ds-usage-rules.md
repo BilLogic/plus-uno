@@ -9,6 +9,8 @@ summary: The escape rules `check:ds-usage` holds consumer code to — one sectio
 
 An **escape** is one place where code in `prototypes/` or `src/` leaves the design system. `npm run check:ds-usage` finds them from the generated manifests (`design-system/agent-views/components.json`, `tokens.json`), so a rule here is only as current as `npm run generate:agent` left those files.
 
+The motion rule also checks component, pattern and template styles under `design-system/src/`.
+
 Each finding reads `file:line:col  rule-id  message`, then `->` with what to write instead, then a link to its section below. Fix the escape the line names; the suggestion is the nearest real name in the manifest, and where it lists several tokens that hold the same value, pick the one named for the role.
 
 How it runs:
@@ -43,6 +45,12 @@ Use a prop from the record in `components.json` (or the component's generated do
 **fail.** A raw color (hex, `rgb()`, `hsl()`, `oklch()`…), a non-zero `px`/`rem`/`em` size, or a font family or weight, written as a value: in a JSX `style={{…}}` object (a bare number counts where React adds `px`), or in a SCSS or CSS declaration.
 
 Read a token: `var(--ds-text)`, `var(--stack-md)`, a typography token. `0`, unitless numbers (`line-height`, `z-index`, `opacity`), percentages, and anything inside `var(…)`, including a fallback, are fine. At-rule preludes such as `@media (max-width: 768px)` are not declarations.
+
+## ds/no-raw-motion
+
+**fail.** In component, pattern and template CSS/SCSS under `design-system/src/`, a `transition` or `animation` shorthand, duration, delay or timing function with literal times, `ease*` or `cubic-bezier()` fails. This rule checks DS implementation styles; the other usage rules check consumer code.
+
+Read the matching `--ds-motion-*` semantic and its `-duration`. Loops use `--ds-motion-loop`; time-following progress uses `--ds-motion-linear`. The shared reduced-motion rule in `styles/main.scss` makes CSS state changes instant and stops loops.
 
 ## ds/no-unknown-token
 

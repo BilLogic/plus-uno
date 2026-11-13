@@ -165,4 +165,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
+## Tokens touched
+
+`--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration`
+
+From `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.scss`. Override these through the token layer, never with a literal.
+
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

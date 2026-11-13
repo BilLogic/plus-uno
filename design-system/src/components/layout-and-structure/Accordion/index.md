@@ -190,7 +190,7 @@ Implemented as `AccordionItem`.
 
 ## Tokens touched
 
-`--body-large` · `--border-default` · `--card-pad-default` · `--card-radius-compact` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text-subtle` · `--heading-small` · `--icon-md`
+`--body-large` · `--border-default` · `--card-pad-default` · `--card-radius-compact` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text-subtle` · `--heading-small` · `--icon-md`
 
 From `design-system/src/components/layout-and-structure/Accordion/Accordion.scss`. Override these through the token layer, never with a literal.
 

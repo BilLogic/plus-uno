@@ -183,7 +183,7 @@
 // the last wait capped at 500 ms. Reduced motion shows them at once.
 .plus-listbox-reveal {
     animation: plus-listbox-reveal var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default) both;
-    animation-delay: min(calc(var(--plus-listbox-reveal-index, 0) * 20ms), 500ms);
+    animation-delay: min(calc(var(--plus-listbox-reveal-index, 0) * var(--ds-motion-appearance-fast-duration) / 8), var(--ds-motion-appearance-slow-duration));
 
     @media (prefers-reduced-motion: reduce) {
         animation: none;

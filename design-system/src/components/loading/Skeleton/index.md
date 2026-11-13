@@ -186,7 +186,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--control-sm` · `--ds-skeleton` · `--ds-skeleton-subtle` · `--plus-skeleton-duration` · `--plus-skeleton-height` · `--plus-skeleton-radius` · `--plus-skeleton-width` · `--radius-control-md` · `--radius-full` · `--radius-md` · `--skeleton-circle-size` · `--skeleton-height` · `--skeleton-status-width` · `--skeleton-status-width-spacious` · `--skeleton-tag-width` · `--skeleton-tag-width-narrow` · `--skeleton-tag-width-person` · `--skeleton-tag-width-widest` · `--skeleton-text-height` · `--stack-md`
+`--border-default` · `--control-sm` · `--ds-motion-linear` · `--ds-motion-loop-duration` · `--ds-skeleton` · `--ds-skeleton-subtle` · `--plus-skeleton-duration` · `--plus-skeleton-height` · `--plus-skeleton-radius` · `--plus-skeleton-width` · `--radius-control-md` · `--radius-full` · `--radius-md` · `--skeleton-circle-size` · `--skeleton-height` · `--skeleton-status-width` · `--skeleton-status-width-spacious` · `--skeleton-tag-width` · `--skeleton-tag-width-narrow` · `--skeleton-tag-width-person` · `--skeleton-tag-width-widest` · `--skeleton-text-height` · `--stack-md`
 
 From `design-system/src/components/loading/Skeleton/Skeleton.scss`. Override these through the token layer, never with a literal.
 

@@ -118,7 +118,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-selected` · `--ds-border-brand` · `--ds-border-discovery` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width`
+`--border-selected` · `--ds-border-brand` · `--ds-border-discovery` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width`
 
 From `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.scss`. Override these through the token layer, never with a literal.
 
