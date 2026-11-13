@@ -76,3 +76,7 @@ The audit of Figma Core's docs pages (clipping, section hugging, absolute layout
 ## 2026-11-13 — touched-file debt at review
 
 `skills/uno-review/references/method.md` now makes recorded escapes in edited files review blockers until the build pays them down. Review still diagnoses; the artifact workflow repairs. Stale examples and the blueprint instance count were corrected at their sources.
+
+## 2026-11-13 — existing DS decisions in the ADR trail
+
+The harness round records the merged Panel, Radius and drag decisions in ADR-044 through ADR-046. ADR-036 points to the Bootstrap removal; ADR-038 marks its historical pattern and radius names as corrected. No component behavior or ruling changes.
