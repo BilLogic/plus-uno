@@ -1,0 +1,28 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="Tech stack/Highcharts" />
+
+<FoundationHero kind="Tech stack" title="Highcharts" summary="Charting engine under every data visualization." />
+
+<FoundationContents />
+
+<FoundationSection title="What it is for">
+
+Highcharts draws the axes, series, tooltips and accessibility module. PLUS uses it on its non-commercial terms, so charts stay inside PLUS products.
+
+</FoundationSection>
+
+<FoundationSection title="What wraps it">
+
+Each chart is a component in <DocsLink id="data-visualizations-overview">Data visualizations</DocsLink>, rendered with `highcharts-react-official`. One shared theme and one module registry sit under all of them.
+
+</FoundationSection>
+
+<FoundationSection title="What not to do">
+
+- Do not import `highcharts` or `highcharts/modules/*` in product code. Use the chart component from `@/components`.
+- Do not use a chart in a commercial product, resell it or bundle Highcharts elsewhere.
+- Do not use literal colors or let color alone separate series.
+
+</FoundationSection>

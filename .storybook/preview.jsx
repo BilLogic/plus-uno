@@ -454,7 +454,7 @@ const preview = {
             "Part-to-whole",
             "Temporal"
           ],
-          "Libraries",
+          "Tech stack",
           [
             "Overview",
             "Base UI",

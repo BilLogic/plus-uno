@@ -1,0 +1,28 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="Tech stack/Motion" />
+
+<FoundationHero kind="Tech stack" title="Motion" summary="The animation package, used by one component." />
+
+<FoundationContents />
+
+<FoundationSection title="What it is for">
+
+Components animate with CSS on the `--ds-motion-*` tokens. The `motion` package covers the one case CSS cannot: an entrance and exit that can be interrupted mid-flight.
+
+</FoundationSection>
+
+<FoundationSection title="What wraps it">
+
+<DocsLink id="components-messaging-flag">Flag</DocsLink> is the only component that imports `motion`. Token values are on <DocsLink id="foundations-expression-motion-physics">Physics</DocsLink>.
+
+</FoundationSection>
+
+<FoundationSection title="What not to do">
+
+- Do not import `motion` for a transition CSS can do.
+- Do not write a literal `ms` value or `cubic-bezier()`. Read the motion tokens.
+- Do not make motion the only signal; keep the reduced-motion form.
+
+</FoundationSection>

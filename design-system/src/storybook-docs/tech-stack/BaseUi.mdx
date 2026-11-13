@@ -1,0 +1,28 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="Tech stack/Base UI" />
+
+<FoundationHero kind="Tech stack" title="Base UI" summary="Headless behavior under every interactive component." />
+
+<FoundationContents />
+
+<FoundationSection title="What it is for">
+
+`@base-ui/react` supplies open and closed state, focus, keyboard and ARIA roles. PLUS supplies the look with `--ds-*` tokens on Base UI's `data-*` state attributes.
+
+</FoundationSection>
+
+<FoundationSection title="What wraps it">
+
+Each interactive component wraps its own part: <DocsLink id="components-overlays-and-layering-popup">Popup</DocsLink>, <DocsLink id="components-overlays-and-layering-tooltip">Tooltip</DocsLink>, <DocsLink id="components-messaging-modal-dialog">Modal</DocsLink>, <DocsLink id="components-navigation-tabs">Tabs</DocsLink>, Checkbox, Radio, Toggle, Range, Accordion, Dropdown menu, Field, Fieldset and Spotlight.
+
+</FoundationSection>
+
+<FoundationSection title="What not to do">
+
+- Do not import `@base-ui/react` in product code. Use the PLUS component, or propose one.
+- Do not hand-write open state, focus trapping or arrow-key handling. Build it on a Base UI part.
+- Do not style a part with literal values. Use tokens.
+
+</FoundationSection>
