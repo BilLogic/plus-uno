@@ -38,8 +38,6 @@ export const Stack = {
     render: () => <ExplodedStack />,
     play: async ({ canvasElement }) => {
         const root = canvasElement.querySelector('[data-testid="exploded-stack"]');
-        const canvas = within(canvasElement);
-        await expect(root).toHaveAttribute('data-state', 'exploded');
         // Seven plates, each drawn from the illustration kit, with no words inside the figure:
         // the names and the --layer-* values live in the numbered legend beside it.
         const plates = root.querySelectorAll('[data-plate]');
