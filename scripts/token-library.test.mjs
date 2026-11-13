@@ -62,3 +62,7 @@ test('results group by collection, then subgroup', () => {
   assert.deepEqual(groups.map((g) => g.collection), ['motion']);
   assert.ok(groups[0].sections.length >= 2);
 });
+
+test('every row has a one-line description', () => {
+  assert.ok(library.every((e) => e.description && !e.description.includes('\n')));
+});

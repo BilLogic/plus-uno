@@ -48,12 +48,18 @@ export function buildLibrary(corpus, { darkSources = [], intents = new Map() } =
       name,
       light: entry.value,
       dark: touched ? dark ?? entry.value : null,
-      description: intents.get(name) ?? '',
+      description: intents.get(name) || fallbackDescription(place),
       ...place,
     });
   }
   return rows;
 }
+
+/** A token with no written intent is still described by where it sits. */
+const fallbackDescription = ({ collection, tier, scope }) =>
+  tier === 'primitive'
+    ? `Primitive ${COLLECTION_TITLES[collection].toLowerCase()} value`
+    : `${SCOPE_TITLES[scope]} ${COLLECTION_TITLES[collection].toLowerCase()} token`;
 
 const bare = (s) => s.trim().toLowerCase().replace(/^-+/, '');
 

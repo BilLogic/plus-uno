@@ -72,12 +72,12 @@ const Row = ({ row, onCopy }) => (
                         <Preview row={row} value={row.dark} />
                     </span>
                 )}
-                <Button appearance="subtle" spacing="compact" aria-label={`Copy ${row.name}`} onClick={() => onCopy(row.name)}>
+                <Button appearance="subtle" spacing="compact" aria-label={`${row.name} (copy)`} onClick={() => onCopy(row.name)}>
                     <span data-token-name={row.name} style={{ font: 'var(--code)' }}>{row.name}</span>
                 </Button>
             </span>
         </td>
-        <td>{row.description || '—'}</td>
+        <td>{row.description}</td>
         <td><Value row={row} /></td>
     </tr>
 );
@@ -98,11 +98,14 @@ export const TokenLibrary = () => {
     const [collection, setCollection] = useState(ALL);
     const [tier, setTier] = useState(ALL);
     const [scope, setScope] = useState(ALL);
-    const [copied, setCopied] = useState('');
+    const [copied, setCopied] = useState({ text: '', n: 0 });
 
     const rows = useMemo(() => filterLibrary(LIBRARY, { query, exact, collection, tier, scope }), [query, exact, collection, tier, scope]);
     const groups = useMemo(() => groupLibrary(rows), [rows]);
-    const onCopy = async (name) => setCopied((await copyText(name)) ? `Copied ${name}` : `Could not copy ${name}`);
+    const onCopy = async (name) => {
+        const text = (await copyText(name)) ? `Copied ${name}` : `Could not copy ${name}`;
+        setCopied((prev) => ({ text, n: prev.n + 1 }));
+    };
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
@@ -119,7 +122,7 @@ export const TokenLibrary = () => {
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>
                 <p role="status" data-testid="token-count" style={{ margin: 0 }}>{rows.length.toLocaleString('en-US')} of {LIBRARY.length.toLocaleString('en-US')} tokens</p>
-                <p role="status" aria-live="polite" data-testid="copy-status" style={{ margin: 0 }}>{copied}</p>
+                <p role="status" aria-live="polite" data-testid="copy-status" style={{ margin: 0 }}><span key={copied.n}>{copied.text}</span></p>
             </div>
             {groups.length === 0 && <p style={{ margin: 0, font: 'var(--body-default)' }}>No tokens match. Clear the search or loosen a filter.</p>}
             {groups.map((g) => (

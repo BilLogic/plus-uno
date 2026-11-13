@@ -137,7 +137,7 @@ export const HEROES = {
   'foundations-tokens-spacing-and-size': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
   'foundations-tokens-elevation-and-layers': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
   'foundations-tokens-motion': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
-  'foundations-tokens-library': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
+  'foundations-tokens-library': { Hero: TokensHero, description: 'Every token in one list, found by name or by filter.' },
   'foundations-visual-typography': {
     Hero: TypographyHero,
     description:

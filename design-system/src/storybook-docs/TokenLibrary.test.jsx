@@ -76,11 +76,14 @@ describe('TokenLibrary', () => {
         Object.assign(navigator, { clipboard: { writeText } });
         render(<TokenLibrary />);
         search('--ds-text-subtle');
-        const button = screen.getByRole('button', { name: "Copy --ds-text-subtle" });
+        const button = screen.getByRole('button', { name: "--ds-text-subtle (copy)" });
         button.focus();
         fireEvent.click(button); // a keyboard Enter or Space on a button fires click
         expect(writeText).toHaveBeenCalledWith('--ds-text-subtle');
         expect((await screen.findByTestId('copy-status')).textContent).toContain('Copied --ds-text-subtle');
         expect(screen.getByTestId('copy-status').getAttribute('aria-live')).toBe('polite');
+        const first = screen.getByText('Copied --ds-text-subtle');
+        fireEvent.click(button);
+        await vi.waitFor(() => expect(screen.getByText('Copied --ds-text-subtle')).not.toBe(first)); // a second copy re-announces
     });
 });
