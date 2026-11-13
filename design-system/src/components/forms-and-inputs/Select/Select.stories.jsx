@@ -1,3 +1,4 @@
+import { reducedMotionSetup, selectMotionPlay } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useEffect, useState } from 'react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -559,3 +560,9 @@ export const OpenListEdge = {
         await userEvent.keyboard('{Escape}');
     },
 };
+
+export const MotionOpenClose = {
+    render: () => <Select label="Student" options={['Ana Ruiz', 'Daniel Lee']} />,
+    play: selectMotionPlay(),
+};
+export const MotionReduced = { ...MotionOpenClose, beforeEach: reducedMotionSetup, play: selectMotionPlay(true) };

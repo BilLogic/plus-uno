@@ -1,3 +1,4 @@
+@use '../../styles/overlay-motion' as *;
 /**
  * Modal pattern (Patterns/Modal)
  * Inline modal shell, drawn as the Modal component draws one: the overlay
@@ -93,4 +94,9 @@
     gap: var(--stack-md);
     flex-shrink: 0;
     border-radius: 0; // full bleed: the Modal's own radius clips the outer corners
+}
+
+.plus-pattern-modal {
+    @include overlay-motion(plus-overlay-scale-in, plus-overlay-scale-out, default, default);
+    transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
 }

@@ -1,3 +1,4 @@
+import { reducedMotionSetup } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { TreeTable } from '@/components';
@@ -184,3 +185,22 @@ export const Focused = {
 export const Interactive = {
     args: { ...Overview.args }
 };
+
+const motionTreeItems = [{ id: 'school', cells: [{ content: 'Lincoln School' }], children: [{ id: 'student', cells: [{ content: 'Ana Ruiz' }] }] }];
+const treeHeightPlay = (reduced = false) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const parent = canvas.getByRole('row', { name: /Lincoln School/ });
+    parent.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    const child = await canvas.findByRole('row', { name: /Ana Ruiz/ });
+    const height = child.querySelector('td > div');
+    await expect(height.style.height).not.toBe('');
+    if (reduced) await expect(height.style.height).toBe('auto');
+    await waitFor(() => expect(child.getBoundingClientRect().height).toBeGreaterThan(1));
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect(parent).toHaveAttribute('aria-expanded', 'false');
+    await expect(child.isConnected).toBe(true);
+    await waitFor(() => expect(child.isConnected).toBe(false));
+};
+export const MotionOpenClose = { render: () => <TreeTable label="Students" head={{ cells: [{ key: 'name', content: 'Name' }] }} items={motionTreeItems} />, play: treeHeightPlay() };
+export const MotionReduced = { ...MotionOpenClose, beforeEach: reducedMotionSetup, play: treeHeightPlay(true) };

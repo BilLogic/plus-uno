@@ -1,5 +1,6 @@
+import { reducedMotionSetup, expectOverlayExit } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useEffect, useState } from 'react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import TreeSelect from './TreeSelect';
 
@@ -231,3 +232,25 @@ export const FieldInvalid = {
     render: () => <div style={wrap}><TreeSelect id="treeselect-ex-invalid" label="Topic" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" isInvalid errorMessage="Pick a topic." /></div>,
     play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
 };
+
+const motionTreeOptions = [{ value: 'school', label: 'Lincoln School', children: [{ value: 'student', label: 'Ana Ruiz' }] }];
+const treeMotionPlay = (reduced = false) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('combobox'));
+    const parent = await canvas.findByRole('treeitem', { name: 'Lincoln School' });
+    parent.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    const child = await canvas.findByRole('treeitem', { name: 'Ana Ruiz' });
+    const reveal = child.parentElement;
+    await expect(reveal.style.height).not.toBe('');
+    if (reduced) await expect(reveal.style.height).toBe('auto');
+    await waitFor(() => expect(reveal.getBoundingClientRect().height).toBeGreaterThan(0));
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect(parent).toHaveAttribute('aria-expanded', 'false');
+    await expect(child.isConnected).toBe(true);
+    await waitFor(() => expect(child.isConnected).toBe(false));
+    const surface = parent.closest('.plus-tree-select-menu');
+    await expectOverlayExit(surface, () => parent.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })), reduced);
+};
+export const MotionOpenClose = { render: () => <TreeSelect label="Student" options={motionTreeOptions} />, play: treeMotionPlay() };
+export const MotionReduced = { ...MotionOpenClose, beforeEach: reducedMotionSetup, play: treeMotionPlay(true) };

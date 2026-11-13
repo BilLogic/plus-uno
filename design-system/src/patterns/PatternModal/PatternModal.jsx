@@ -1,3 +1,5 @@
+import { useOverlayPresence, useOverlayOrigin } from '@/lib/overlayMotion';
+import { BackdropOpenContext } from '../Backdrop/Backdrop';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Icon, IconButton, Tabs, Skeleton } from '@/components';
@@ -34,6 +36,7 @@ import './PatternModal.scss';
  * Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.
  */
 const PatternModal = ({
+    show = true,
     id,
     title,
     onClose,
@@ -52,6 +55,11 @@ const PatternModal = ({
     children,
     ...props
 }) => {
+    const backdropOpen = React.useContext(BackdropOpenContext);
+    const open = show && backdropOpen;
+    const surface = React.useRef(null);
+    const present = useOverlayPresence(open, surface);
+    useOverlayOrigin(open, surface);
     const reactId = React.useId();
     const tabState = useTabs(tabs, { activeTab, defaultActiveTab, onTabChange });
 
@@ -114,8 +122,13 @@ const PatternModal = ({
         ? { role: 'tabpanel', id: panelId, 'aria-labelledby': tabId(tabState.current), tabIndex: 0 }
         : { tabIndex: bodyScrolls ? 0 : undefined };
 
+    if (!present) return null;
     return (
         <div
+            ref={surface}
+            data-ending-style={!open ? '' : undefined}
+            aria-hidden={!open ? true : undefined}
+            inert={!open ? true : undefined}
             id={id}
             className={classes}
             style={style}
@@ -208,6 +221,8 @@ function useOverflows(ref) {
 }
 
 PatternModal.propTypes = {
+    /** Keep mounted and set false to finish the exit before removal; also follows its Backdrop. */
+    show: PropTypes.bool,
     id: PropTypes.string,
     /** Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name */
     title: PropTypes.node,

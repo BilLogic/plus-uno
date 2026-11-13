@@ -1,3 +1,5 @@
+import { Button } from '@/components';
+import { expectOverlayExit, reducedMotionSetup, settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useRef, useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
@@ -340,6 +342,7 @@ InsideAModal.play = async ({ canvasElement }) => {
     await expect(surface.width).toBeGreaterThanOrEqual(Math.floor(field.width));
     await expect(surface.height).toBeLessThanOrEqual(320);
 
+    await settleAnimations(listbox.closest('.plus-listbox'));
     const lastSite = within(listbox).getByRole('option', { name: 'Washington Middle' });
     lastSite.scrollIntoView({ block: 'nearest' });
     const box = lastSite.getBoundingClientRect();
@@ -442,3 +445,16 @@ Colors.play = async ({ canvasElement }) => {
         "the list clips the header field's focus ring").toBe(true);
     input.blur();
 };
+
+const MotionListbox = () => {
+    const [open, setOpen] = useState(false);
+    return <><Button text="Pick student" onClick={() => setOpen(!open)} /><Listbox open={open} options={['Ana Ruiz']} label="Student" onSelect={() => setOpen(false)} /></>;
+};
+const listboxMotionPlay = (reduced = false) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Pick student' }));
+    const list = await canvas.findByRole('listbox');
+    await expectOverlayExit(list.closest('.plus-listbox'), () => canvas.getByRole('button', { name: 'Pick student' }).click(), reduced);
+};
+export const MotionOpenClose = { render: MotionListbox, play: listboxMotionPlay() };
+export const MotionReduced = { ...MotionOpenClose, beforeEach: reducedMotionSetup, play: listboxMotionPlay(true) };

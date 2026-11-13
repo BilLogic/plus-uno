@@ -65,3 +65,15 @@
 .plus-tree-table-table .plus-tree-table-message-row .plus-table-message-body {
     align-items: flex-start;
 }
+
+// The cell wrapper owns animated height; native tr/td semantics stay intact.
+.plus-tree-table-table tbody tr.plus-tree-table-row td {
+    height: auto;
+    padding-block: 0;
+}
+.plus-tree-table-cell-height {
+    min-height: var(--plus-table-row-height);
+    display: flex;
+    align-items: center;
+}
+.plus-tree-table-cell-height > .plus-table-cell-inner { width: 100%; }

@@ -1,3 +1,4 @@
+@use '../../../styles/overlay-motion' as *;
 /*
  * Listbox — the internal option list (Figma _Listbox), a Popups Menu.
  * `elevation.surface.overlay` and its shadow (as every floating layer
@@ -200,4 +201,10 @@
     .plus-listbox-options:focus-visible {
         @include plus-ring($ring-offset: calc(-1 * var(--focus-ring-width)), $ring-token: Highlight, $ring-width: var(--focus-ring-width));
     }
+}
+
+.plus-listbox {
+    @include trigger-clip;
+    @include overlay-motion(plus-popup-clip-open, plus-popup-clip-close);
+    transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
 }

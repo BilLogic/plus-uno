@@ -1,3 +1,4 @@
+import { useOverlayPresence } from '@/lib/overlayMotion';
 import React, { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { animate, motion, useReducedMotion } from 'motion/react';
@@ -17,8 +18,6 @@ import './Flag.scss';
  */
 export const FLAG_AUTO_CLOSE_MS = 8000;
 
-/** Longest an exiting flag stays mounted if `animationend` never fires. */
-const FLAG_EXIT_FALLBACK_MS = 800;
 
 /** Where the flags that stay go when one leaves: `spatial.default`, read from the generated springs. */
 const CLOSE_UP = SPRINGS['spatial.default'].productive;
@@ -130,6 +129,7 @@ export const Flag = ({
 
     // How the flag is leaving: 'timeout' flies out the way it came, 'hand' fades in place.
     const exitKind = useRef('timeout');
+    useEffect(() => { if (show) exitKind.current = 'timeout'; }, [show]);
     const dismissByHand = (event) => {
         exitKind.current = 'hand';
         onDismiss?.(event);
@@ -148,24 +148,8 @@ export const Flag = ({
      * Leaving. A flag that was showing keeps its place until its exit animation ends, then
      * unmounts, in every motion setting. Timed out, it flies toward the top-right on
      * `spatial.exit`; closed by hand, it fades in place on `appearance.fast`. Under reduced
-     * motion the tokens and Flag.scss turn both into that fade. The timer backs up `animationend`.
+     * motion the shared Reduced policy removes CSS movement. Removal waits for finite exit animations.
      */
-    const [leaving, setLeaving] = useState(false);
-    const wasShown = useRef(show);
-    useEffect(() => {
-        if (show) {
-            wasShown.current = true;
-            exitKind.current = 'timeout';
-            setLeaving(false);
-            return undefined;
-        }
-        if (!wasShown.current) return undefined;
-        wasShown.current = false;
-        setLeaving(true);
-        const timer = setTimeout(() => setLeaving(false), FLAG_EXIT_FALLBACK_MS);
-        return () => clearTimeout(timer);
-    }, [show]);
-
     /*
      * The stack closes up. A leaving flag drops out of the flow at once, held where it stood,
      * so the gap closes as it goes. The flags that stay glide to their new places on
@@ -176,6 +160,7 @@ export const Flag = ({
     const osReduced = useReducedMotion();
     const reduced = reducedMotion ?? group ?? osReduced;
     const surface = useRef(null);
+    const present = useOverlayPresence(show, surface);
     const lastTop = useRef(null);
 
     useLayoutEffect(() => {
@@ -208,7 +193,7 @@ export const Flag = ({
         if (show && token !== false && token !== '') playOnLand(currentAppearance, token, isReduced);
     }, [show]);
 
-    if (!show && !leaving) return null;
+    if (!present) return null;
 
     return (
         <motion.div
@@ -218,7 +203,6 @@ export const Flag = ({
             id={id}
             data-reduced={reduced ? 'true' : 'false'}
             data-leaving={!show ? exitKind.current : undefined}
-            onAnimationEnd={!show ? () => setLeaving(false) : undefined}
             className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''} ${className}`}
             role={liveRole}
             aria-live={livePoliteness}

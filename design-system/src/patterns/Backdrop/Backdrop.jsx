@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { createContext, useRef } from 'react';
+import { useOverlayPresence } from '@/lib/overlayMotion';
 import PropTypes from 'prop-types';
 import './Backdrop.scss';
 
@@ -25,7 +26,10 @@ export const BACKDROP_SPANS = Object.freeze({ sm: 6, md: 8, lg: 10 });
  * the Modal slot. For a real dialog, use the core Modal
  * component, which draws the same layers and backdrop token.
  */
+export const BackdropOpenContext = createContext(true);
+
 const Backdrop = ({
+    show = true,
     inline = false,
     screenWidth,
     screenHeight,
@@ -35,6 +39,8 @@ const Backdrop = ({
     children,
     ...props
 }) => {
+    const surface = useRef(null);
+    const present = useOverlayPresence(show, surface);
     const classes = [
         'plus-pattern-backdrop',
         inline ? 'plus-pattern-backdrop-inline' : '',
@@ -55,16 +61,30 @@ const Backdrop = ({
         }
         : undefined;
 
+    if (!present) return null;
     return (
         // The backdrop is a pointer shortcut, not a control: a keyboard closes a
         // dialog from inside it, so the backdrop takes no role or key handler.
-        <div className={classes} style={backdropStyle} onClick={handleClick} {...props}>
-            {children}
-        </div>
+        <BackdropOpenContext.Provider value={show}>
+            <div
+                ref={surface}
+                data-ending-style={!show ? '' : undefined}
+                aria-hidden={!show ? true : undefined}
+                inert={!show ? true : undefined}
+                className={classes}
+                style={backdropStyle}
+                onClick={handleClick}
+                {...props}
+            >
+                {children}
+            </div>
+        </BackdropOpenContext.Provider>
     );
 };
 
 Backdrop.propTypes = {
+    /** Keep mounted and set false to finish the exit before removal. */
+    show: PropTypes.bool,
     /** Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page. */
     inline: PropTypes.bool,
     /** Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440. */

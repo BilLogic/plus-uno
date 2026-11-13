@@ -1,0 +1,93 @@
+// Shared overlay lifecycle. Base UI supplies data-ending-style; owned shells
+// use the same attributes through useOverlayPresence. Shapes only supply names.
+@mixin overlay-motion($enter: none, $exit: none, $speed: fast, $fade: fast, $fade-in: plus-overlay-fade, $fade-out: plus-overlay-fade-out) {
+    animation:
+        #{$enter} var(--ds-motion-spatial-#{$speed}-duration) var(--ds-motion-spatial-#{$speed}),
+        #{$fade-in} var(--ds-motion-appearance-#{$fade}-duration) var(--ds-motion-appearance-#{$fade});
+
+    &[data-ending-style], &[data-leaving] {
+        pointer-events: none;
+        animation:
+            #{$exit} var(--ds-motion-spatial-exit-duration) var(--ds-motion-spatial-exit) forwards,
+            #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+    }
+    &[data-leaving='hand'] {
+        animation: #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+    }
+    &[data-reduced='true'] {
+        animation: #{$fade-in} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+        &[data-ending-style], &[data-leaving] {
+            animation: #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        animation: #{$fade-in} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+        &[data-ending-style], &[data-leaving] {
+            animation: #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+        }
+    }
+    &[data-open][data-instant='click'] { animation: none; }
+}
+
+@keyframes plus-overlay-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes plus-overlay-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes plus-overlay-scale-in { from { transform: scale(.96); } to { transform: scale(1); } }
+@keyframes plus-overlay-scale-out { from { transform: scale(1); } to { transform: scale(.98); } }
+
+@mixin trigger-clip {
+    --plus-popup-reach: calc(-1 * var(--popup-clip-reach));
+    --plus-popup-clip-top: var(--plus-popup-reach);
+    --plus-popup-clip-right: var(--plus-popup-reach);
+    --plus-popup-clip-bottom: var(--plus-popup-reach);
+    --plus-popup-clip-left: var(--plus-popup-reach);
+
+    &[data-side='bottom'] { --plus-popup-clip-bottom: 100%; }
+    &[data-side='top'] { --plus-popup-clip-top: 100%; }
+    &[data-side='right'] { --plus-popup-clip-right: 100%; }
+    &[data-side='left'] { --plus-popup-clip-left: 100%; }
+
+    &:is([data-side='top'], [data-side='bottom']) {
+        &[data-align='start'] { --plus-popup-clip-right: 100%; }
+        &[data-align='end'] { --plus-popup-clip-left: 100%; }
+        &[data-align='center'] { --plus-popup-clip-left: 50%; --plus-popup-clip-right: 50%; }
+    }
+
+    &:is([data-side='left'], [data-side='right']) {
+        &[data-align='start'] { --plus-popup-clip-bottom: 100%; }
+        &[data-align='end'] { --plus-popup-clip-top: 100%; }
+        &[data-align='center'] { --plus-popup-clip-top: 50%; --plus-popup-clip-bottom: 50%; }
+    }
+
+}
+
+@keyframes plus-popup-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes plus-popup-clip-close {
+    from {
+        clip-path: inset(var(--plus-popup-reach));
+    }
+
+    to {
+        clip-path: inset(
+            var(--plus-popup-clip-top) var(--plus-popup-clip-right)
+            var(--plus-popup-clip-bottom) var(--plus-popup-clip-left)
+        );
+    }
+}
+
+@keyframes plus-popup-clip-open {
+    from {
+        clip-path: inset(
+            var(--plus-popup-clip-top) var(--plus-popup-clip-right)
+            var(--plus-popup-clip-bottom) var(--plus-popup-clip-left)
+        );
+    }
+
+    to {
+        clip-path: inset(var(--plus-popup-reach));
+    }
+}
+

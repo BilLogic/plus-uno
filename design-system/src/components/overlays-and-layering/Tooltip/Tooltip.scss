@@ -1,3 +1,4 @@
+@use '../../../styles/overlay-motion' as *;
 /*
  * Tooltip Component Styles: the Popups pattern's Tooltip (Figma
  * Pattern/Tooltip). body.small 12/16 on the inverse surface, pad-y
@@ -25,4 +26,9 @@
     .plus-tooltip {
         outline: 1px solid CanvasText;
     }
+}
+
+.plus-tooltip {
+    @include overlay-motion();
+    transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
 }

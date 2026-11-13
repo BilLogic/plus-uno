@@ -10,7 +10,7 @@ Also asked as: collapsible, expand collapse, disclosure, expandable sections, fa
 
 **Source:** `design-system/src/components/layout-and-structure/Accordion/Accordion.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx` — Styles, Behavior, InteractionStates, Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Expanded, Disabled
+**Stories:** `design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx` — Styles, Behavior, InteractionStates, Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Expanded, Disabled, MotionOpenClose, MotionReduced
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Accordion/Accordion.mdx`
 

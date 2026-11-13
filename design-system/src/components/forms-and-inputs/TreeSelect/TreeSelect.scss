@@ -28,3 +28,14 @@
         transform: rotate(180deg);
     }
 }
+
+.plus-tree-select-menu {
+    --transform-origin: left top;
+    &[data-placement='bottom'] { --plus-popup-clip-bottom: 100%; }
+    &[data-placement='top'] { --plus-popup-clip-top: 100%; }
+    --plus-popup-clip-right: 100%;
+    &[data-side='end'] { --plus-popup-clip-right: var(--plus-popup-reach); --plus-popup-clip-left: 100%; }
+    &[data-placement='top'] { --transform-origin: left bottom; }
+    &[data-side='end'] { --transform-origin: right top; }
+    &[data-placement='top'][data-side='end'] { --transform-origin: right bottom; }
+}
