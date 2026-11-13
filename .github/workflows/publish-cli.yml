@@ -1,0 +1,73 @@
+name: Publish @plus-uno/cli
+
+# Publishes the `@plus-uno/cli` package (command `ds`, MCP as `ds mcp`) to npm through
+# trusted publishing: GitHub mints a short-lived OIDC token, npm verifies it against the
+# publisher linked on the package's settings page, and provenance is signed from the same
+# identity. No token secret exists, so none can leak. The name is `PACKAGE_NAME` in
+# packages/cli/src/constants.mjs.
+#
+# Triggers: a published GitHub release (its tag is the version), a manual run with the tag,
+# and netlify-production-deploy.yml, which dispatches this file when Bill calls a release
+# with a tag. A pull request that touches the package runs the dry run only.
+#
+# npm trusted publishing is bound to this workflow FILE NAME: renaming it unlinks the
+# publisher.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag whose version is published (for example v1.4.0)
+        required: true
+  pull_request:
+    paths:
+      - packages/cli/**
+      - scripts/build-cli-package.mjs
+      - scripts/publish-cli.mjs
+      - scripts/lib/cli-release.mjs
+      - .github/workflows/publish-cli.yml
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+      - name: Pack and dry-run the publish
+        run: npm publish --dry-run
+        working-directory: packages/cli
+
+  publish:
+    needs: dry-run
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm 11.5.1 or newer; the Node floor in .nvmrc ships an older npm.
+      - name: Use an npm that supports trusted publishing
+        run: npm install -g npm@^11.5.1
+      - name: Stamp the release version and check the registry
+        id: prepare
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: node scripts/publish-cli.mjs "$RELEASE_TAG"
+      - name: Publish
+        if: steps.prepare.outputs.publish == 'true'
+        env:
+          DIST_TAG: ${{ steps.prepare.outputs.dist_tag }}
+        run: npm publish --provenance --access public --tag "$DIST_TAG"
+        working-directory: packages/cli
