@@ -2,7 +2,7 @@ import React from 'react';
 import { PAINT, HAIRLINE } from './paint.js';
 import { Rect, SkeletonBar } from './primitives.jsx';
 import {
-  BOX, CENTER, CIRCLES, CONSTRUCTION_RADII, CORNER_CENTERS, DIAGONALS, GRID, PLUS_BOX, PLUS_CENTER,
+  BOX, CENTER, CIRCLES, CONSTRUCTION_RADII, CORNER_CENTERS, DIAGONALS, GRID, MARK_CORNER, PLUS_ARMS, PLUS_BOX, PLUS_CENTER,
 } from '../../assets/Logo/logoConstructionGeometry.js';
 import { chime, isoMatrix, pathGeometry, springStills, waveHeights } from './shapes-geometry.js';
 
@@ -107,20 +107,33 @@ export const IsoStack = ({ x, y, w, h, accent = false, layers = 3 }) => {
  * its center. Every number comes from `logoConstructionGeometry.js`, the same
  * file the Logo construction docs overlay reads. `size` is the drawn side.
  */
-export const LogoConstruction = ({ x, y, size, accent = false }) => {
+export const LogoConstruction = ({ x, y, size, accent = false, mark = false }) => {
   const k = size / BOX;
   const guide = accent ? PAINT.accent : PAINT.annotation;
   return (
     <g data-shape="logo-construction" transform={`translate(${x} ${y}) scale(${k})`}>
-      <Rect x={0} y={0} w={BOX} h={BOX} fill={PAINT.shape} corner="card" />
+      {mark ? (
+        <rect width={BOX} height={BOX} rx={MARK_CORNER} fill={PAINT.markTile} />
+      ) : (
+        <Rect x={0} y={0} w={BOX} h={BOX} fill={PAINT.shape} corner="card" />
+      )}
       {GRID.map((n) => (
         <g key={n} stroke={PAINT.pageSurface} opacity={0.5}>
           <line x1={n} x2={n} y1={0} y2={BOX} style={FIXED} />
           <line x1={0} x2={BOX} y1={n} y2={n} style={FIXED} />
         </g>
       ))}
-      <rect x={PLUS_BOX.x} y={PLUS_CENTER[1] - 2.8} width={PLUS_BOX.w} height={5.6} fill={PAINT.pageSurface} />
-      <rect x={PLUS_CENTER[0] - 3} y={PLUS_BOX.y} width={6} height={PLUS_BOX.h} fill={PAINT.pageSurface} />
+      {mark ? (
+        <>
+          <rect x={PLUS_BOX.x} y={PLUS_CENTER[1] - PLUS_ARMS.horizontal / 2} width={PLUS_ARMS.length} height={PLUS_ARMS.horizontal} rx={PLUS_ARMS.radius} fill={PAINT.pageSurface} />
+          <rect x={PLUS_CENTER[0] - PLUS_ARMS.thick / 2} y={PLUS_BOX.y} width={PLUS_ARMS.thick} height={PLUS_ARMS.length} rx={PLUS_ARMS.radius} fill={PAINT.pageSurface} />
+        </>
+      ) : (
+        <>
+          <rect x={PLUS_BOX.x} y={PLUS_CENTER[1] - 2.8} width={PLUS_BOX.w} height={5.6} fill={PAINT.pageSurface} />
+          <rect x={PLUS_CENTER[0] - 3} y={PLUS_BOX.y} width={6} height={PLUS_BOX.h} fill={PAINT.pageSurface} />
+        </>
+      )}
       <g fill="none" stroke={guide}>
         <rect width={BOX} height={BOX} style={FIXED} />
         {CIRCLES.map((c) => <circle key={c.r} cx={c.cx} cy={c.cy} r={c.r} style={FIXED} />)}
