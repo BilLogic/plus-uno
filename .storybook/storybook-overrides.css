@@ -1268,21 +1268,6 @@ html[data-color-mode="dark"] .docs-story {
   color: var(--ds-icon-subtle);
 }
 
-.sb-ds-figma-nodes__label {
-  font: var(--heading-xxsmall);
-  color: var(--ds-text-subtle);
-}
-
-.sbdocs .sb-ds-figma-nodes {
-  display: flex;
-  flex-direction: column;
-  gap: var(--section-stack-sm);
-}
-
-.sbdocs .sb-ds-figma-nodes .sb-ds-doc-table-wrap {
-  margin: 0;
-}
-
 /*
  * Storybook's Typeset block brings their own 25px / 40px
  * margins, so a type specimen sat 25 under its token line and 40 over the next

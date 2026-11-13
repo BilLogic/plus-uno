@@ -12118,6 +12118,7 @@
         "FieldDisabled",
         "FieldInvalid",
         "FieldReadOnly",
+        "FieldReadOnlyShowsLabel",
         "FieldReadOnlyLongValue",
         "OpenListEdge"
       ],

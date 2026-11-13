@@ -506,6 +506,22 @@ export const FieldReadOnly = {
     },
 };
 
+/** A read-only Select shows the option's label, never its value. */
+export const FieldReadOnlyShowsLabel = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={wrap}>
+            <Select id="select-ex-readonly-label" label="Site" isReadOnly value="lincoln" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const control = within(canvasElement).getByRole('combobox', { name: 'Site' });
+        const shown = control.value ?? control.textContent;
+        await expect(shown).toContain('Lincoln Middle');
+        await expect(shown).not.toContain('lincoln');
+    },
+};
+
 /** A read-only value is shown whole: it wraps, and is never clipped to one line. */
 export const FieldReadOnlyLongValue = {
     render: () => (

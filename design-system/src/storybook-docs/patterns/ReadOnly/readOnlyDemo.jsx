@@ -37,7 +37,7 @@ export const ReadOnlyField = () => (
 /** A Select and a DatePicker: no chevron, no calendar button, the value reads as text. */
 export const ReadOnlyPickers = () => (
     <div style={column}>
-        <Select label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} value="algebra" onChange={noop} isReadOnly caption="Set by your supervisor." />
+        <Select label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} value="lincoln" onChange={noop} isReadOnly caption="Set by your supervisor." />
         <DatePicker aria-label="Date" value="2026-03-05" onChange={noop} isReadOnly />
     </div>
 );
@@ -68,7 +68,7 @@ export const OwnedForm = () => (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' }}>
                     <TextField label="Student" value="Ana Ruiz" onChange={noop} isReadOnly />
                     <TextField label="Time" value="Thursday at 4:00 PM" onChange={noop} isReadOnly />
-                    <Select label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} value="algebra" onChange={noop} isReadOnly />
+                    <Select label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} value="lincoln" onChange={noop} isReadOnly />
                 </div>
             </PatternSection>
         </InAppFrame>

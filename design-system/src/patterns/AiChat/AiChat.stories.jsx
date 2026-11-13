@@ -106,8 +106,10 @@ const parts = (canvasElement) => {
 
 const press = (scope, name) => userEvent.click(scope.getByRole('button', { name }));
 
-/** Overview: chat closed, the button at the bottom right of the Page. */
-export const Overview = {};
+/** Overview: chat closed, the button at the bottom right of the Page. A short, wide Page: the button sits in its corner. */
+export const Overview = {
+    args: { height: 'var(--size-1500)' },
+};
 
 /** Docs: the popup, open, in an inline frame. Nothing is remembered. */
 export const Popup = {
