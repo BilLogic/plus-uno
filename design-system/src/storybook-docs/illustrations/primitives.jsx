@@ -79,7 +79,7 @@ export const SkeletonBar = ({ x, y, w, h = 4, accent = false, heading = false, t
  * or the accent ring when `accent` marks the layer as the subject, so the two
  * never overprint).
  */
-export const Layer = ({ x, y, w, h, fill, shadow, corner, accent = false }) => {
+const Layer = ({ x, y, w, h, fill, shadow, corner, accent = false }) => {
   const onHeroGround = useContext(HeroGround);
   // On the hero ground a layer with a real shadow reads by it, as the real card and page do;
   // only the subject's ring, or a flat layer with no shadow, draws a stroke.
