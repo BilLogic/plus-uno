@@ -182,7 +182,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/033-bot-skills-live-with-the-worker.md`](docs/adr/033-bot-skills-live-with-the-worker.md) | uno-bot's instructions are its own bot skills, kept with the Worker and named for what the bot does, each ending in answer, file or hand off; the six uno skills become IDE-only, and the bot never builds code or draws in Figma (2026-10-14) |
 | [`docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md`](docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md) | uno-bot writes approved blueprint revisions itself, through the authoring RPCs under its own rpc_writer identity, all or none, on a ✅ from a confirmer the card names; it may delete through the delete RPCs, and every row it causes in authoring_changes reads author uno-bot; writers/blueprint becomes the IDE writer plus the Worker's gated writer (2026-10-15) |
 | [`docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md`](docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md) | PLUS colors follow Atlassian's token grammar under --ds- (semantic) and --palette- (primitive), generated in the repo from plan files that hold primitive values only; a plan swaps without touching the semantic layer, and a parity check enforces it (2026-10-25) |
-| [`docs/adr/036-base-ui-for-ai-components.md`](docs/adr/036-base-ui-for-ai-components.md) | PLUS AI components use Base UI (@base-ui/react, pinned) as their headless behavior layer, styled with SCSS on --ds-* tokens; Assistant UI is gone, and the rest of product UI stays on React-Bootstrap (2026-11-03) |
+| [`docs/adr/036-base-ui-for-ai-components.md`](docs/adr/036-base-ui-for-ai-components.md) | PLUS AI components use Base UI (@base-ui/react, pinned) as their headless behavior layer, styled with SCSS on --ds-* tokens; Assistant UI is gone, later widened by ADR-037 and corrected by ADR-042 to remove Bootstrap (2026-11-03) |
 | [`docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md`](docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md) | Base UI (@base-ui/react, pinned per ADR-036) is the headless behavior layer for every interactive PLUS component, not just AI surfaces; supersedes ADR-009, widens ADR-036 (2026-11-03) |
 | [`docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md`](docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md) | Space, size, radius, border width, typography and motion become generated from plans this repo owns, the way ADR-035 generates color — Figma downstream, PLUS ×16 numbering kept, one token ladder with the old vocabulary deleted |
 | [`docs/adr/039-one-checker-defines-an-escape.md`](docs/adr/039-one-checker-defines-an-escape.md) | One deterministic checker, check:ds-usage, defines an escape from the design system; the hook, CI, the prototype exit, ds-lens and the usage eval all call it, and AI review advises while the checker blocks |
@@ -190,6 +190,9 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/041-motion-is-springs-on-four-tiers.md`](docs/adr/041-motion-is-springs-on-four-tiers.md) | Motion is springs only, on four tiers (primitives, semantics, patterns and components); Expressive is a container switch, Reduced is a fade, Figma holds no motion tokens; supersedes the motion half of ADR-038 |
 | [`docs/adr/042-plus-ships-no-bootstrap.md`](docs/adr/042-plus-ships-no-bootstrap.md) | PLUS ships no Bootstrap — the bootstrap and react-bootstrap packages, the Bootstrap CSS layer, the generated Bootstrap color bridge and their checks are gone; a small element baseline in main.scss keeps what components relied on; completes ADR-037 and retires ADR-009 (2026-11-11) |
 | [`docs/adr/043-sound-is-synthesized-on-the-motion-registry.md`](docs/adr/043-sound-is-synthesized-on-the-motion-registry.md) | Sound is synthesized in the browser from a repo plan, behind one switch, and plays only where motion lands an Expressive moment, named by a sound cell on the motion registry; the always-silent list never plays |
+| [`docs/adr/044-a-panel-floats-without-a-backdrop.md`](docs/adr/044-a-panel-floats-without-a-backdrop.md) | A floating Panel keeps the page usable; Modal owns the Backdrop and modal focus behavior; Drawer is retired. |
+| [`docs/adr/045-radius-follows-role-not-size.md`](docs/adr/045-radius-follows-role-not-size.md) | Radius tokens follow a corner’s role and nesting; controls follow their height, and templates own a radius token. |
+| [`docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md`](docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md) | Pragmatic drag and drop owns pointer drag; Base UI supplies the grab handle and Motion supplies spring travel. |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -219,6 +222,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-148 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+151 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
