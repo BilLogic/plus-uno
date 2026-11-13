@@ -45,7 +45,7 @@ export const FoundationContents = () => {
             </h2>
             <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-md) var(--section-stack-md)' }}>
                 {items.map((item) => (
-                    <li key={item.id}>
+                    <li key={item.id} style={{ margin: 0 }}>
                         <a href={`#${item.id}`} style={linkStyle}>{item.title}</a>
                     </li>
                 ))}
