@@ -87,7 +87,7 @@ export const CommonActionsHero = () => {
             <ButtonShape x={def.x} y={def.y} w={def.w} />
             <ButtonShape x={primary.x} y={primary.y} w={primary.w} appearance="primary" />
             <Ring x={primary.x} y={primary.y} w={primary.w} h={8} />
-            <Popup x={more.x - 6} y={26} w={52} h={40} />
+            <Popup x={more.x - 6} y={26} w={52} h={46} />
         </HeroDrawing>
     );
 };
@@ -118,6 +118,8 @@ export const FilteringHero = () => {
             <Rect x={filter.x} y={11} w={filter.w} h={10} fill={PAINT.rowSelected} stroke={PAINT.accent} corner="button" />
             <ButtonShape x={last.x} y={12} w={last.w} />
             <Popup x={box.x} y={box.y} w={box.w} h={box.h} />
+            {/* The kit's Popup draws its own placeholder lines; the menu's rows replace them. */}
+            <Rect x={box.x + 1} y={box.y + 1} w={box.w - 2} h={box.h - 2} fill={PAINT.popupSurface} corner="popup" />
             {[0, 1, 2, 3].map((i) => (
                 <React.Fragment key={i}>
                     <Rect x={box.x + 8} y={box.y + 8 + i * 12} w={6} h={6} fill={i === 1 || i === 2 ? PAINT.accent : PAINT.fieldSurface} stroke={i === 1 || i === 2 ? undefined : PAINT.fieldBorder} corner="icon" />
