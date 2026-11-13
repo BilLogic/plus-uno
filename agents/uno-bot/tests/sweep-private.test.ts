@@ -139,6 +139,21 @@ test("a relayed channel is swept, but its cards go to #plus-design and tag only 
   assert.match(said, /<@U0CY>/, "the card's Contributor in #plus-design owns it");
 });
 
+test("a fix queued from the relayed channel before the relay was set also goes to #plus-design", async () => {
+  const priv = thread({ user: "U0BILL", when: ts(29, 15, 30), pages: [PAGE_B.url] }, [{ user: "U0BILL", when: ts(29, 17) }]);
+  const channels = {
+    [DESIGN]: { kind: "public" as const, history: [], threads: {}, members: ["U0BILL"] },
+    [FEEDBACK]: place("private", priv, ["U0BILL"]),
+  };
+  const found = [reply(drift({ source: PAGE_B, block: PAGE_B.blocks[1]!.id, evidence: [ts(29, 17)] }))];
+  const before = sweepHarness({ channels, sources: [PAGE_B], privateAllowlist: [FEEDBACK], detectorReplies: found, now: at(29, 22) });
+  await runSweepJob(nightOf(FEEDBACK), before.deps);
+
+  const after = sweepHarness({ channels, sources: [PAGE_B], privateAllowlist: [FEEDBACK], relayToDesign: [FEEDBACK], store: before.store, now: at(30, 14) });
+  await runSweepJob(MORNING, after.deps);
+  assert.deepEqual(after.posted.map((p) => [p.channel, p.threadTs]), [[DESIGN, null]]);
+});
+
 test("a fix whose evidence spans a public and a private thread lands only on the private card", async () => {
   const pub = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
   const priv = thread({ user: "U0PRIV", when: ts(29, 15, 30), pages: [PAGE_A.url] }, [{ user: "U0QUIET", when: ts(29, 17) }]);

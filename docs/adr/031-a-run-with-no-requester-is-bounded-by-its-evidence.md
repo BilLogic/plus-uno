@@ -42,5 +42,5 @@ The card's design owner is tagged while their Team Members row is active. With n
 
 **Why.** Sweep cards in the feedback thread pinged supervisors and developers about Notion upkeep that only the design team acts on. The design team is in both channels, so the change mostly takes those cards away from people outside it. Quotes and names from the feedback channel now reach #plus-design's members, which is the trade Bill chose.
 
-**Consequences.** `routeFinding` (`agents/uno-bot/src/destination/`) sends evidence marked `relayToDesign` to rung 4's #plus-design; the sweep sets the mark and reads #plus-design's members for the owner; the card to-do hook records a relayed to-do against #plus-design with its thread's link. Promise reminders were already DMs and are unchanged. — uno (agent), Nov 2026
+**Consequences.** `routeFinding` (`agents/uno-bot/src/destination/`) sends evidence marked `relayToDesign` to #plus-design ahead of every other rung (rung 0 in `docs/connectors/slack/overview.md`); the sweep sets the mark and reads #plus-design's members for the owner; the card to-do hook records a relayed to-do against #plus-design with its thread's link. Promise reminders were already DMs and are unchanged. — uno (agent), Nov 2026
 

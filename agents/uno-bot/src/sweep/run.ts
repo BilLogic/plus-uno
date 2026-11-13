@@ -1019,7 +1019,7 @@ async function sweepThread(
       const drift = fileDriftFinding({
         channel: t.channel,
         channelKind: t.channelKind,
-        ...(t.relayed ? { relayToDesign: true } : {}),
+        ...relayFlag(t),
         rootTs: t.rootTs,
         runDate: t.runDate,
         now: t.now,
@@ -1137,6 +1137,19 @@ function withinThreadBudget(messages: SweepMessage[], rootTs: string): { message
   return { messages: shown, trimmed: messages.length - shown.length };
 }
 
+/**
+ * The queue as the morning posts it. A fix read from a relayed channel before
+ * its relay was set carries no mark, so it is marked here and goes to
+ * #plus-design like one read since.
+ */
+async function queuedFindings(deps: SweepDeps): Promise<PendingFinding[]> {
+  return (await deps.store.pendingFindings()).map((f) =>
+    !f.evidence.relayToDesign && !f.evidence.record && relaysToDesign(f.evidence.channel, deps.config)
+      ? { ...f, evidence: { ...f.evidence, relayToDesign: true as const } }
+      : f,
+  );
+}
+
 /** The evidence's relay mark: present only for a relayed channel. */
 function relayFlag(t: { relayed?: boolean }): { relayToDesign?: true } {
   return t.relayed ? { relayToDesign: true } : {};
@@ -1220,7 +1233,7 @@ async function spreadMorning(job: ScheduledJob, deps: SweepDeps): Promise<SweepJ
   const add = (place: SectionPlace | null) => {
     if (place) places.set(placeKeyOf(place), { channel: place.channel, threadTs: place.threadTs });
   };
-  const due = (await deps.store.pendingFindings()).filter((f) => postableAt(f.detectedAt) <= now);
+  const due = (await queuedFindings(deps)).filter((f) => postableAt(f.detectedAt) <= now);
   for (const plan of planSweepCards(due, deps.runDate)) add(resolveDestination(plan.destination, deps.config));
   for (const item of await deps.store.openItems()) if (item.proposalTs === null) add(placeOf(item.destination, deps.config));
   for (const section of deps.sections ?? []) {
@@ -1276,7 +1289,7 @@ async function postPlaces(job: ScheduledJob, deps: SweepDeps, scope: SectionPlac
 
   let due: PendingFinding[] = [];
   try {
-    const queued = await deps.store.pendingFindings();
+    const queued = await queuedFindings(deps);
     due = queued.filter((f) => postableAt(f.detectedAt) <= now && fixHere(f));
     const open = deps.dryRun ? [] : (await deps.store.openItems()).filter(itemHere);
 

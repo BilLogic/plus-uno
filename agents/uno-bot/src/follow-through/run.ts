@@ -472,7 +472,7 @@ export async function recordThreadCardTodos(thread: SweepThread, since: string, 
   // A relayed channel's to-do is asked at #plus-design's top, as a running
   // note's is, and links back to its thread (`relaysToDesign`).
   const design = deps.config.plusDesign?.trim();
-  const relayed = !!design && relaysToDesign(thread.channel, deps.config);
+  const relayTo = design && relaysToDesign(thread.channel, deps.config) ? design : null;
   const rows: CommitmentRecord[] = [];
   const texts: Record<string, CommitmentText> = {};
   for (const todo of found.todos) {
@@ -483,9 +483,9 @@ export async function recordThreadCardTodos(thread: SweepThread, since: string, 
     rows.push({
       id,
       kind: "card_todo",
-      channel: relayed ? design! : thread.channel,
-      channelKind: relayed ? "public" : thread.channelKind,
-      threadTs: relayed ? "" : thread.rootTs,
+      channel: relayTo ?? thread.channel,
+      channelKind: relayTo ? "public" : thread.channelKind,
+      threadTs: relayTo ? "" : thread.rootTs,
       messageTs: todo.messageTs,
       promiserId: owner,
       requesterId: null,
@@ -509,7 +509,7 @@ export async function recordThreadCardTodos(thread: SweepThread, since: string, 
       what: todo.what,
       bodies: {},
       participants: participants.filter((p) => p !== owner),
-      ...(relayed ? { sourceUrl: archiveUrl(thread.channel, todo.messageTs), relayed: true } : {}),
+      ...(relayTo ? { sourceUrl: archiveUrl(thread.channel, todo.messageTs), relayed: true } : {}),
     };
   }
   if (deps.dryRun || !rows.length) return rows;
