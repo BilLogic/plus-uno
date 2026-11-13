@@ -309,7 +309,7 @@ OptionRow.propTypes = {
     tabbable: PropTypes.bool,
     /** `option` by default; `treeitem` inside a tree. */
     role: PropTypes.oneOf(['option', 'treeitem']),
-    /** `default` draws 40 and `compact` draws 32, matching the field it belongs to. */
+    /** `default` draws a 32 row and `compact` a 24 row, matching the field it belongs to. */
     spacing: PropTypes.oneOf(['default', 'compact']),
     /** Called with `value` on click, and on Enter or Space when the row holds focus. */
     onSelect: PropTypes.func,

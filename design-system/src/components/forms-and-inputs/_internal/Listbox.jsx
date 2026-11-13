@@ -573,7 +573,7 @@ Listbox.propTypes = {
     emptyMessage: PropTypes.node,
     /** Draws no surface of its own, for a list inside another menu. */
     embedded: PropTypes.bool,
-    /** `default` draws 40 rows and `compact` draws 32, matching the field it opens from. */
+    /** `default` draws 32 rows and `compact` draws 24, matching the field it opens from. */
     spacing: PropTypes.oneOf(['default', 'compact']),
     /** `(id)` of the highlighted row, for the field's `aria-activedescendant`. */
     onActiveChange: PropTypes.func,
