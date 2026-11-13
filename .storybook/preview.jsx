@@ -168,7 +168,6 @@ const preview = {
             "Design",
             "Develop",
             "With AI",
-            "Content design",
             "About"
           ],
           "Foundations",
@@ -177,6 +176,11 @@ const preview = {
             "Brand",
             [
               "Content",
+              [
+                "Voice and tone",
+                "Language",
+                "Messages"
+              ],
               "Logos",
               "Illustrations"
             ],

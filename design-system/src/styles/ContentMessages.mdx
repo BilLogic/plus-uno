@@ -1,0 +1,138 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { RefTable, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import { FoundationSection, FoundationSubsection, FoundationRelated, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { VoiceTag } from '@/storybook-docs/rule-tag.jsx';
+import { Say, Sample, RuleHead } from '@/storybook-docs/content-blocks.jsx';
+
+{/* Agent twin: design-system/guidelines/foundations/content/messages.md. Change the two together. */}
+
+<Meta title="Foundations/Brand/Content/Messages" />
+
+<DocsLanding
+    page="foundations-brand-content-messages"
+    eyebrow="Foundation"
+    title="Messages"
+    purpose="What to say when something happens."
+    links={{
+        items: [
+            { title: 'Anatomy', href: '#foundation-anatomy' },
+            { title: 'Choose a type', href: '#foundation-choose-a-type' },
+            { title: 'Writing each type', href: '#foundation-writing-each-type' },
+        ],
+    }}
+/>
+
+<FoundationSection title="Anatomy">
+
+Every message has the same three parts.
+
+<Sample title="Sessions start late Monday" action="See schedule">School B has a late start. Sessions begin at 10:30 AM ET.</Sample>
+
+<RefTable
+    head={['Part', 'What it says', 'Length']}
+    rows={[
+        ['Title', 'What happened.', '2 to 5 words'],
+        ['Body', 'Why, and what it means for the reader.', '1 or 2 sentences'],
+        ['Action', 'A verb that says what the button does.', 'One verb, then the object'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Choose a type">
+
+Pick by what the reader needs. Each type has a home component.
+
+<RefTable
+    head={['Type', 'When', 'Component']}
+    rows={[
+        ['Error', 'Something failed and the reader can act', <><DocsLink id="components-messaging-flag">Flag</DocsLink>, <DocsLink id="components-messaging-section-message">Section message</DocsLink>, <DocsLink id="components-messaging-inline-message">Inline message</DocsLink></>],
+        ['Warning', 'Before a step that’s hard to undo', <><DocsLink id="components-messaging-modal-dialog">Modal dialog</DocsLink>, <DocsLink id="components-messaging-section-message">Section message</DocsLink></>],
+        ['Success', 'A task finished', <DocsLink id="components-messaging-flag">Flag</DocsLink>],
+        ['Info', 'Context that helps, then gets out of the way', <><DocsLink id="components-messaging-banner">Banner</DocsLink>, <DocsLink id="components-messaging-section-message">Section message</DocsLink></>],
+        ['Empty state', 'Nothing to show yet', <DocsLink id="components-messaging-empty-state">Empty state</DocsLink>],
+        ['Feature discovery', 'Something new and useful', <DocsLink id="components-messaging-spotlight">Spotlight</DocsLink>],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Writing each type">
+
+<FoundationSubsection title="Errors: reassure, then fix">
+
+<RuleHead><VoiceTag word="honest" /></RuleHead>
+
+Say what broke, what’s safe, and the next step.
+
+<DoDont>
+<Do caption="Answers the first worry: did I lose my work?"><Sample icon="circle-exclamation" title="Notes didn’t save" action="Try again">Your connection dropped. Your draft is safe on this device.</Sample></Do>
+<Dont caption="Polite and short, but the tutor still wonders if the notes are gone."><Sample icon="circle-exclamation" title="Notes didn’t save" action="Try again">Something went wrong. Try again.</Sample></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Warnings: name who it affects">
+
+<RuleHead><VoiceTag word="helpful" /></RuleHead>
+
+Say what happens to other people, then name both buttons.
+
+<DoDont>
+<Do caption="The tutor sees the ripple before deciding."><Sample icon="triangle-exclamation" title="Call off Thursday’s session?" action="Keep session" secondary="Call off">Jordan’s teacher gets a note, and we look for a fill-in.</Sample></Do>
+<Dont caption="Clear action, but it hides the people it touches."><Sample icon="triangle-exclamation" title="Call off this session?" action="Cancel" secondary="Call off">You can’t undo this.</Sample></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Success: say what’s next">
+
+<RuleHead><VoiceTag word="warm" /></RuleHead>
+
+Name what finished, then what happens with it.
+
+<DoDont>
+<Do caption="The tutor knows their work lands somewhere."><Sample icon="circle-check" title="Reflection submitted">Your lead tutor reads it before Friday’s check-in.</Sample></Do>
+<Dont caption="Warm, but the tutor doesn’t know who reads it."><Sample icon="circle-check" title="Reflection submitted">Thanks for sharing.</Sample></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Empty states: say how it fills">
+
+<RuleHead><VoiceTag word="helpful" /></RuleHead>
+
+Say why it’s empty and what will fill it.
+
+<DoDont>
+<Do caption="Sets the expectation and names who acts."><Sample icon="calendar" title="No sessions this week">Sessions show up here once your lead tutor schedules them.</Sample></Do>
+<Dont caption="Calm, but later when, and why?"><Sample icon="calendar" title="No sessions this week">Check back later.</Sample></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Field errors: write the fix">
+
+<RuleHead><VoiceTag word="clear" /></RuleHead>
+
+One line, under the field, phrased as what to do.
+
+<DoDont>
+<Do caption="An instruction, with the unit."><Sample icon="circle-exclamation" title="Session length: 95">Enter 30 to 90 minutes.</Sample></Do>
+<Dont caption="Correct, but reads like a rule, and drops the unit."><Sample icon="circle-exclamation" title="Session length: 95">Must be between 30 and 90.</Sample></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated items={[
+    { title: 'Errors', description: 'Where and when errors appear.', href: '?path=/docs/patterns-states-errors--docs' },
+    { title: 'Empty', description: 'Layouts for empty and first-use states.', href: '?path=/docs/patterns-states-empty--docs' },
+    { title: 'Notifications', description: 'Flags, banners and their timing.', href: '?path=/docs/patterns-notifications--docs' },
+]} />
+
+</FoundationSection>
