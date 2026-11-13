@@ -19,8 +19,8 @@ import { BoundInputs, Marks, STAGE } from './formsDemo.jsx';
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/Forms/Forms.stories.jsx
  */
 export default {
-    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Actions and input/Forms (Forms.mdx).
-    title: 'Patterns/Actions and input/Forms/Examples',
+    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Forms (Forms.mdx).
+    title: 'Patterns/Forms/Examples',
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'padded' },
 };

@@ -10,7 +10,7 @@
     "Components/",
     "AI UI/",
     "Data visualizations/",
-  "Libraries/"
+    "Libraries/"
   ],
   "componentGroups": {
     "Forms and inputs": [
@@ -205,13 +205,11 @@
     ],
     "Templates",
     [
-      "Templates and patterns",
       "Overview",
       "Frame",
       "Page",
       [
-        "Page",
-        "Heading outline"
+        "Page"
       ],
       "Section",
       [
@@ -222,8 +220,7 @@
       "Form",
       "Modal",
       [
-        "Modal",
-        "Backdrop"
+        "Modal"
       ],
       "Panel",
       [
@@ -237,11 +234,13 @@
     "Patterns",
     [
       "Overview",
-      "Actions and input",
-      [
-        "Common actions",
-        "Forms"
-      ],
+      "Common actions",
+      "Forms",
+      "Filtering",
+      "Navigation",
+      "Search",
+      "Indicators",
+      "Notifications",
       "States",
       [
         "Empty",
@@ -250,17 +249,6 @@
         "Overflow",
         "Disabled",
         "Read-only"
-      ],
-      "Notifications and indicators",
-      [
-        "Notifications",
-        "Indicators"
-      ],
-      "Finding things",
-      [
-        "Navigation",
-        "Search",
-        "Filtering"
       ]
     ],
     "Components",

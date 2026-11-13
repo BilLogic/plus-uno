@@ -39,16 +39,13 @@ import {
 } from './PatternHeroes.jsx';
 import {
   OverviewHero as TemplatesOverviewHero,
-  TemplatesAndPatternsHero,
   FrameHero,
   PageHero,
-  HeadingOutlineHero,
   SectionHero,
   CardHero,
   TableHero,
   FormHero,
   ModalHero,
-  BackdropHero,
   PanelHero,
   PopupHero,
 } from './TemplateHeroes.jsx';
@@ -187,37 +184,37 @@ export const HEROES = {
     description:
       'Four situations in four cards: a focused field, a filter menu, an empty state and a notification.',
   },
-  'patterns-actions-and-input-common-actions': {
+  'patterns-common-actions': {
     Hero: CommonActionsHero,
     description:
       'The end of a view bar: a More menu open, a default button, and the Primary button ringed.',
   },
-  'patterns-actions-and-input-forms': {
+  'patterns-forms': {
     Hero: FormsHero,
     description:
       'A form mid-fill with the middle field in focus and its buttons at the end.',
   },
-  'patterns-finding-things-filtering': {
+  'patterns-filtering': {
     Hero: FilteringHero,
     description:
       'The filter menu open from the end of the view bar, two options checked.',
   },
-  'patterns-finding-things-navigation': {
+  'patterns-navigation': {
     Hero: NavigationHero,
     description:
       'The current item in the sidebar, ringed; the breadcrumb says the same.',
   },
-  'patterns-finding-things-search': {
+  'patterns-search': {
     Hero: SearchHero,
     description:
       'The search field open with its results below it.',
   },
-  'patterns-notifications-and-indicators-indicators': {
+  'patterns-indicators': {
     Hero: IndicatorsHero,
     description:
       'A status column cropped big; the new status and the count are in the brand color.',
   },
-  'patterns-notifications-and-indicators-notifications': {
+  'patterns-notifications': {
     Hero: NotificationsHero,
     description:
       'Flags stacked at the corner, the newest ringed.',
@@ -257,11 +254,6 @@ export const HEROES = {
     description:
       'The templates pulled apart: Frame, Page, Section ringed, Modal on top.',
   },
-  'templates-templates-and-patterns': {
-    Hero: TemplatesAndPatternsHero,
-    description:
-      'A component, inside a template, placed by a pattern.',
-  },
   'templates-frame-frame': {
     Hero: FrameHero,
     description:
@@ -271,11 +263,6 @@ export const HEROES = {
     Hero: PageHero,
     description:
       'The page header and its Sections, the page ringed.',
-  },
-  'templates-page-heading-outline': {
-    Hero: HeadingOutlineHero,
-    description:
-      'Headings nested by level; the page title leads.',
   },
   'templates-section-section': {
     Hero: SectionHero,
@@ -301,11 +288,6 @@ export const HEROES = {
     Hero: ModalHero,
     description:
       'One task over a Backdrop; the Modal ringed.',
-  },
-  'templates-modal-backdrop': {
-    Hero: BackdropHero,
-    description:
-      'The Backdrop alone, covering the whole frame, with a dashed slot where a Modal will sit.',
   },
   'templates-panel-panel': {
     Hero: PanelHero,

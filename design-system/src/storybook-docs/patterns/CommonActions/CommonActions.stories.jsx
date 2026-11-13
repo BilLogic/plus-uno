@@ -32,8 +32,8 @@ import {
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/CommonActions/CommonActions.stories.jsx
  */
 export default {
-    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Actions and input/Common actions (CommonActions.mdx).
-    title: 'Patterns/Actions and input/Common actions/Examples',
+    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Common actions (CommonActions.mdx).
+    title: 'Patterns/Common actions/Examples',
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'padded' },
 };

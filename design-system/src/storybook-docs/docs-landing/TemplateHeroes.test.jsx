@@ -5,16 +5,13 @@ import { HEROES } from './hero-registry.jsx';
 
 const TEMPLATE_IDS = [
     'templates-overview',
-    'templates-templates-and-patterns',
     'templates-frame-frame',
     'templates-page-page',
-    'templates-page-heading-outline',
     'templates-section-section',
     'templates-section-card',
     'templates-section-table',
     'templates-form',
     'templates-modal-modal',
-    'templates-modal-backdrop',
     'templates-panel-panel',
     'templates-popup-popup',
 ];

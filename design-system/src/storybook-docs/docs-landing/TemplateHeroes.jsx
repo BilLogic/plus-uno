@@ -62,32 +62,6 @@ export const OverviewHero = () => (
     </HeroDrawing>
 );
 
-export const TemplatesAndPatternsHero = () => (
-    <HeroDrawing>
-        {/* A component, alone. */}
-        <CardBox x={6} y={46} w={40} h={34} />
-        <ButtonShape x={15} y={59} w={22} appearance="primary" />
-        <Rule x1={50} x2={64} y1={63} y2={63} dash="1 2" />
-        {/* A template, ringed: the component inside a Section. */}
-        <PageFill x={66} y={22} w={106} h={82} ring />
-        <SkeletonBar x={76} y={32} w={40} h={5} heading />
-        {[0, 1, 2].map((i) => (
-            <React.Fragment key={i}>
-                <SkeletonBar x={76} y={48 + i * 10} w={26} />
-                <SkeletonBar x={110} y={48 + i * 10} w={16} />
-                <SkeletonBar x={138} y={48 + i * 10} w={20} />
-            </React.Fragment>
-        ))}
-        <ButtonShape x={130} y={88} w={30} appearance="primary" />
-        <Rule x1={174} x2={188} y1={63} y2={63} dash="1 2" />
-        {/* A pattern places it on a Frame; the Frame bleeds past the stage. */}
-        <PageFill x={190} y={14} w={130} h={100} />
-        <Rect x={200} y={24} w={90} h={34} fill={PAINT.sectionSubtleSurface} stroke={PAINT.illustrationEdge} corner="section" />
-        <Rect x={200} y={64} w={90} h={34} fill={PAINT.sectionSubtleSurface} stroke={PAINT.illustrationEdge} corner="section" />
-        <ButtonShape x={256} y={36} w={26} appearance="primary" />
-    </HeroDrawing>
-);
-
 export const FrameHero = () => {
     const f = { x: 20, y: 6, w: 260, h: 148 };
     const panelW = 70;
@@ -131,24 +105,6 @@ export const PageHero = () => {
         </HeroDrawing>
     );
 };
-
-export const HeadingOutlineHero = () => (
-    <HeroDrawing>
-        <PageFill x={50} y={-20} w={200} h={200} />
-        <SkeletonBar x={68} y={4} w={108} h={6} accent heading />
-        <Rule x1={74} x2={74} y1={16} y2={126} stroke={PAINT.rowDivider} />
-        <Rule x1={88} x2={88} y1={46} y2={70} stroke={PAINT.rowDivider} />
-        <Rule x1={88} x2={88} y1={100} y2={124} stroke={PAINT.rowDivider} />
-        <SkeletonBar x={82} y={22} w={88} h={5} heading />
-        <SkeletonBar x={82} y={33} w={110} />
-        <SkeletonBar x={96} y={50} w={70} h={4} heading />
-        <SkeletonBar x={96} y={60} w={98} />
-        <SkeletonBar x={82} y={78} w={80} h={5} heading />
-        <SkeletonBar x={82} y={89} w={104} />
-        <SkeletonBar x={96} y={104} w={64} h={4} heading />
-        <SkeletonBar x={96} y={114} w={92} />
-    </HeroDrawing>
-);
 
 export const SectionHero = () => {
     const s = { x: 0, y: 12, w: 300, h: 136 };
@@ -245,40 +201,6 @@ export const ModalHero = () => (
         <Modal x={80} y={26} w={140} h={100} accent divider={false} closeButton />
     </HeroDrawing>
 );
-
-export const BackdropHero = () => {
-    const screen = { x: 20, y: 6, w: 260, h: 148 };
-    const slot = { x: 80, y: 38, w: 140, h: 84 };
-    return (
-        <HeroDrawing>
-            {/* The screen under the Backdrop: Sidebar, header, two cards. */}
-            <AppWindow {...screen}>
-                {(page) => (
-                    <>
-                        <SkeletonBar x={page.x + 10} y={screen.y + 10} w={50} h={5} heading />
-                        <ButtonShape x={page.x + page.w - 10 - 30} y={screen.y + 8} w={30} appearance="primary" />
-                        <CardBox x={page.x + 10} y={screen.y + 34} w={84} h={70} />
-                        <CardBox x={page.x + 102} y={screen.y + 34} w={84} h={70} />
-                    </>
-                )}
-            </AppWindow>
-            {/* The Backdrop covers the whole frame, so the picture's frame is the fill. */}
-            <Backdrop {...WHOLE} />
-            <Rect x={screen.x} y={screen.y} w={screen.w} h={screen.h} fill="none" stroke={PAINT.accent} corner="window" />
-            {/* Where a Modal will sit. */}
-            <rect
-                x={slot.x}
-                y={slot.y}
-                width={slot.w}
-                height={slot.h}
-                fill="none"
-                stroke={PAINT.accent}
-                strokeDasharray="3 2"
-                style={HAIRLINE}
-            />
-        </HeroDrawing>
-    );
-};
 
 export const PanelHero = () => {
     const f = { x: 20, y: 6, w: 260, h: 148 };

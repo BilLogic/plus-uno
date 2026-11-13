@@ -210,7 +210,7 @@ import * as SectionStories from './Section.stories.jsx';
 const SECTION_STORIES = "export default { title: 'Templates/Section/Section' };\n";
 const pattern = (href) => `import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta title="Patterns/Finding things/Filtering" />
+<Meta title="Patterns/Filtering" />
 
 Where the filters sit: <a target="_top" href="./?path=/docs/${href}">Section</a>.
 `;
@@ -230,7 +230,7 @@ test('a cross-link to a rule another page owns resolves, by page id and rule slu
 });
 
 test('a cross-link to a page titled by its Meta resolves too', () => {
-  const r = crossRepo('patterns-finding-things-filtering--docs');
+  const r = crossRepo('patterns-filtering--docs');
   try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
 });
 

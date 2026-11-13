@@ -4,7 +4,7 @@
  * overview's Patterns column routes there too. Read from source with the same
  * docs index `check:pointers` uses, so a link must land on a page that exists:
  *
- *   - every group card links each of its patterns, and the four cards cover all of them
+ *   - every card links its pattern or, for States, each of its six, and the eight cards cover all of them
  *   - every row of the situation chooser links its pattern, and every pattern has a row
  *   - the state matrix links each of the six states in its head row
  *   - every pattern the Templates overview names is a link, not a word
@@ -21,8 +21,8 @@ const OVERVIEW_ID = 'patterns-overview--docs';
 const PATTERNS = Object.keys(docsIndex(ROOT)).filter((id) => id.startsWith('patterns-') && id !== OVERVIEW_ID);
 const STATES = ['empty', 'loading', 'errors', 'overflow', 'disabled', 'read-only'].map((s) => `patterns-states-${s}--docs`);
 
-const LINK = /path=\/docs\/([a-z0-9-]+--docs)|<DocsLink id="([a-z0-9-]+)"/g;
-const linksIn = (text) => [...text.matchAll(LINK)].map((m) => m[1] ?? `${m[2]}--docs`);
+const LINK = /path=\/docs\/([a-z0-9-]+--docs)|<DocsLink id="([a-z0-9-]+)"|<TypeCard\b[^>]*?\bto="([a-z0-9-]+)"/g;
+const linksIn = (text) => [...text.matchAll(LINK)].map((m) => m[1] ?? `${m[2] ?? m[3]}--docs`);
 
 /** The text of one `<FoundationSection title="…">`. */
 const section = (source, title) => {
@@ -41,9 +41,9 @@ const templates = readFileSync(resolve(DOCS, 'templates/TemplatesOverview.mdx'),
 describe('the Patterns overview', () => {
     it('finds the thirteen pattern pages', () => expect(PATTERNS).toHaveLength(13));
 
-    it('links each pattern from exactly one group card', () => {
+    it('links each pattern from exactly one card', () => {
         const cards = section(patterns, 'The patterns').match(/<TypeCard[\s\S]*?<\/TypeCard>/g) ?? [];
-        expect(cards, 'four group cards').toHaveLength(4);
+        expect(cards, 'seven page cards and the States group card').toHaveLength(8);
         const linked = cards.flatMap(linksIn);
         expect([...linked].sort()).toEqual([...PATTERNS].sort());
     });

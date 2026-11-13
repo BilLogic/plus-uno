@@ -73,6 +73,81 @@
   status = 200
   force = true
 
+# Storybook docs ids renamed or folded on 2026-11-13 (Patterns flattened to
+# Patterns/<Name>; Heading outline, Backdrop and Templates and patterns folded
+# into Page, Modal and Templates overview). Storybook addresses a page by the
+# `path` query, so each rule matches the old id and lands on the new one; a
+# folded page lands on its section. Before the `/storybook/*` rule: first match wins.
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/patterns-actions-and-input-common-actions--docs" }
+  to = "/storybook/?path=/docs/patterns-common-actions--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/patterns-actions-and-input-forms--docs" }
+  to = "/storybook/?path=/docs/patterns-forms--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/patterns-finding-things-filtering--docs" }
+  to = "/storybook/?path=/docs/patterns-filtering--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/patterns-finding-things-navigation--docs" }
+  to = "/storybook/?path=/docs/patterns-navigation--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/patterns-finding-things-search--docs" }
+  to = "/storybook/?path=/docs/patterns-search--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/patterns-notifications-and-indicators-indicators--docs" }
+  to = "/storybook/?path=/docs/patterns-indicators--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/patterns-notifications-and-indicators-notifications--docs" }
+  to = "/storybook/?path=/docs/patterns-notifications--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-page-heading-outline--docs" }
+  to = "/storybook/?path=/docs/templates-page-page--docs#heading-outline"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-modal-backdrop--docs" }
+  to = "/storybook/?path=/docs/templates-modal-modal--docs#backdrop"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-templates-and-patterns--docs" }
+  to = "/storybook/?path=/docs/templates-overview--docs#templates-and-patterns"
+  status = 301
+  force = true
+
 # Storybook static files — serve as-is
 [[redirects]]
   from = "/storybook/*"

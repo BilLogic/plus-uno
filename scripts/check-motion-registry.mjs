@@ -70,7 +70,7 @@ export function interactiveComponents(index) {
 const PATTERNS_DIR = 'design-system/src/storybook-docs/patterns';
 const NOT_PAGES = new Set(['Overview']);
 
-/** Patterns pages by Storybook title (`Patterns/<Group>/<Page>[/...]`), the Overview excluded. */
+/** Patterns pages by Storybook title (`Patterns/<Page>[/...]`, or `Patterns/States/<Page>[/...]` for the States group), the Overview excluded. */
 export function patternPages(repoRoot = REPO_ROOT) {
   const names = new Set();
   const walk = (dir) => {
@@ -80,7 +80,7 @@ export function patternPages(repoRoot = REPO_ROOT) {
       else if (/\.(mdx|stories\.jsx?)$/.test(e.name)) {
         for (const m of fs.readFileSync(full, 'utf8').matchAll(/title[:=]\s*['"]Patterns\/([^'"]+)['"]/g)) {
           const parts = m[1].split('/');
-          const page = parts.length > 1 ? parts[1] : parts[0];
+          const page = parts[0] === 'States' && parts.length > 1 ? parts[1] : parts[0];
           // The Overview and its test harnesses (`Patterns/Overview/...`) are not a pattern page.
           if (!NOT_PAGES.has(parts[0]) && !NOT_PAGES.has(page)) names.add(page);
         }

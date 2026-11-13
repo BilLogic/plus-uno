@@ -15,8 +15,8 @@ import { BesideTitle, InARow, NARROW, NotColorOnly, OnNavigation, ROLL_UP_STAGE,
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/Indicators/Indicators.stories.jsx
  */
 export default {
-    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Notifications and indicators/Indicators (Indicators.mdx).
-    title: 'Patterns/Notifications and indicators/Indicators/Examples',
+    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Indicators (Indicators.mdx).
+    title: 'Patterns/Indicators/Examples',
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'padded' },
 };
