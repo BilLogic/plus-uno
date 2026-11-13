@@ -52,8 +52,12 @@ export const Timeline = ({ x, y, w, h, accent = false, playhead = 0.55 }) => {
   );
 };
 
-/** A waveform: one pill per sample, tall where the sound is loud, centered on the box. */
-export const Waveform = ({ x, y, w, h, accent = false, n = 20, envelope = chime }) => {
+/**
+ * A waveform: one pill per sample, tall where the sound is loud, centered on the
+ * box. `tone` is the paint of the pills when not accented (the shape role by
+ * default; a heavier role where the wave must read on a bare ground).
+ */
+export const Waveform = ({ x, y, w, h, accent = false, n = 20, envelope = chime, tone = PAINT.shape }) => {
   const heights = waveHeights(n, envelope);
   const step = w / n;
   const bar = step * 0.55;
@@ -66,7 +70,7 @@ export const Waveform = ({ x, y, w, h, accent = false, n = 20, envelope = chime 
           y={y + (h - h * v) / 2}
           w={bar}
           h={Math.max(bar, h * v)}
-          fill={accent ? PAINT.accent : PAINT.shape}
+          fill={accent ? PAINT.accent : tone}
           corner="full"
         />
       ))}

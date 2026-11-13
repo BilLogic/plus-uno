@@ -3,7 +3,7 @@
  * plays a generated token, the switch turns them all off, and the land figure
  * draws from the generated spring and score.
  *
- * Run: npx vitest run --project=storybook design-system/src/styles/Sound.stories.jsx
+ * Run: npx vitest run --project=storybook design-system/src/styles/SoundSounds.stories.jsx
  */
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';

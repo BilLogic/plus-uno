@@ -24,11 +24,11 @@ const PlayButton = ({ cx, cy, on }) => (
 export const OverviewHero = () => (
   <HeroDrawing>
     <CardBox x={-65} y={15} w={130} h={130} />
-    <Waveform x={-52} y={15} w={108} h={130} n={24} envelope={tap} />
+    <Waveform x={-52} y={15} w={108} h={130} n={24} envelope={tap} tone={PAINT.annotation} />
     <CardBox x={85} y={5} w={130} h={150} accent />
     <Waveform x={98} y={5} w={108} h={150} n={24} envelope={doubleChime} accent />
     <CardBox x={235} y={15} w={130} h={130} />
-    <Waveform x={248} y={15} w={108} h={130} n={24} envelope={swell} />
+    <Waveform x={248} y={15} w={108} h={130} n={24} envelope={swell} tone={PAINT.annotation} />
   </HeroDrawing>
 );
 
@@ -56,7 +56,7 @@ export const WhenToPlayHero = () => (
       const hit = kind === 2;
       return (
         <g key={t} data-event={sounds ? "sound" : "silent"}>
-          {sounds && <Waveform x={x - 20} y={0} w={45} h={60} n={10} envelope={hit ? doubleChime : chime} accent={hit} />}
+          {sounds && <Waveform x={x - 20} y={0} w={45} h={60} n={10} envelope={hit ? doubleChime : chime} accent={hit} tone={PAINT.annotation} />}
           <circle
             cx={x}
             cy={105}
@@ -131,7 +131,7 @@ export const SoundsHero = () => {
             )}
             <PlayButton cx={x + 23} cy={cy} on={on} />
             <SkeletonBar x={x + 42} y={cy - 2} w={60} h={4} />
-            <Waveform x={x + 125} y={cy - 14} w={198} h={28} n={36} envelope={envelope} accent={on} />
+            <Waveform x={x + 125} y={cy - 14} w={198} h={28} n={36} envelope={envelope} accent={on} tone={PAINT.annotation} />
             {(i === 0 || i === 2) && <line x1={x + 12} x2={x + w - 12} y1={top + 37} y2={top + 37} stroke={PAINT.axis} style={HAIRLINE} />}
           </g>
         );
@@ -154,7 +154,7 @@ export const SettingsHero = () => (
     <Rect x={20} y={90} w={60} h={4} fill={PAINT.accent} corner="full" />
     <circle cx={80} cy={92} r={8} fill={PAINT.cardSurface} stroke={PAINT.accent} style={HAIRLINE} />
     <g opacity={0.5}>
-      <Waveform x={230} y={79.5} w={54} h={25} n={12} envelope={swell} />
+      <Waveform x={230} y={79.5} w={54} h={25} n={12} envelope={swell} tone={PAINT.annotation} />
     </g>
   </HeroDrawing>
 );

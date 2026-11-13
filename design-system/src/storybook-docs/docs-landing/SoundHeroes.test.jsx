@@ -33,6 +33,13 @@ describe('Sound heroes', () => {
         expect([...waves].filter((w) => w.querySelector(`[fill="${ACCENT}"]`))).toHaveLength(1);
     });
 
+    it('the neutral waveforms read at the annotation weight, not the faint shape fill', () => {
+        const c = draw('foundations-sound-overview');
+        const neutral = [...c.querySelectorAll('[data-shape="waveform"]')].filter((w) => !w.querySelector(`[fill="${ACCENT}"]`));
+        expect(neutral).toHaveLength(2);
+        for (const w of neutral) expect(w.querySelector('rect').getAttribute('fill')).toBe('var(--ds-border-bold)');
+    });
+
     it('When to play is a run of events where only a few make a sound', () => {
         const c = draw('foundations-sound-when-to-play');
         const sounding = c.querySelectorAll('[data-event="sound"]');
