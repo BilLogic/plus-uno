@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StatusTag } from '@/components';
+import { StatusTag, Icon } from '@/components';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 
@@ -258,3 +258,48 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
         </div>
     );
 };
+
+/**
+ * A rule or note set apart from the prose. Neutral: a sunken surface and no
+ * status color, because a rule is not a status. Use a Banner only for status.
+ */
+export const Callout = ({ title, children }) => (
+    <aside
+        style={{
+            padding: 'var(--card-pad-default)',
+            borderRadius: 'var(--card-radius)',
+            background: 'var(--ds-surface-sunken)',
+            color: 'var(--ds-text)',
+            font: 'var(--body-default)',
+        }}
+    >
+        {title && <strong style={{ display: 'block', marginBottom: 'var(--stack-sm)', fontWeight: 'var(--type-weight-medium)' }}>{title}</strong>}
+        {children}
+    </aside>
+);
+
+/**
+ * The focus ring as the app draws it: an outline in `--ds-border-focused`,
+ * `--border-focused` wide, offset by `--focus-ring-width`. Every ring demo on
+ * the Foundations pages goes through this block, so they draw one ring.
+ */
+export const RingDemo = ({ children, style }) => (
+    <span
+        style={{
+            display: 'inline-flex',
+            outline: 'var(--border-focused) solid var(--ds-border-focused)',
+            outlineOffset: 'var(--focus-ring-width)',
+            ...style,
+        }}
+    >
+        {children}
+    </span>
+);
+
+/**
+ * A Font Awesome Free glyph at a documented size (12, 16 or 24). `family`
+ * prefixes the name (`fa-regular`); `size` passes straight to Icon.
+ */
+export const Glyph = ({ name, family, size = 16 }) => (
+    <Icon name={family ? `${family} fa-${name}` : name} size={size} color="default" />
+);

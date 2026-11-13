@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as SpotlightStories from './Spotlight.stories.jsx';
-import { IconButton, SpotlightAction } from '@/components';
+import { CloseButton, SpotlightAction } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -31,7 +31,7 @@ export const StaticSpotlight = ({ headline, children, stepCount, primaryAction, 
     <div className="plus-spotlight" inert aria-hidden="true">
         <div className="plus-spotlight-header">
             <div className="plus-spotlight-dismiss">
-                <IconButton icon="xmark" label="Dismiss" appearance="subtle" isTooltipDisabled className="plus-spotlight-dismiss-button" />
+                <CloseButton label="Dismiss" tone="inverse" isTooltipDisabled className="plus-spotlight-dismiss-button" />
             </div>
             <div className="plus-spotlight-headline">{headline}</div>
         </div>
@@ -155,11 +155,11 @@ For a message that stays on the page until resolved, use `SectionMessage` or
 1. **Target.** `SpotlightTarget` wraps the element the callout points at and
    shares its anchor with the `Spotlight` through a `SpotlightProvider`.
 2. **Headline.** The dialog title, read first.
-3. **Dismiss.** A close button in the header, the dialog's first focusable element.
+3. **Dismiss.** The shared `CloseButton` in its `inverse` tone, in the header, the dialog's first focusable element. `dismissible={false}` leaves it out.
 4. **Media.** An optional image above the body.
 5. **Body.** The `children` text.
 6. **Step count.** A short label like "1 of 3".
-7. **Actions.** A secondary and a primary <code>SpotlightAction</code>, the secondary first.
+7. **Actions.** A secondary and a primary <code>SpotlightAction</code>, the secondary first. Each takes `onClick`, or `href` to render a link.
 
 ### States
 

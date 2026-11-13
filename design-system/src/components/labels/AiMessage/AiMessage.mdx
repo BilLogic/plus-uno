@@ -130,7 +130,7 @@ sent until the first text arrives, `streaming` while text arrives, then
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Complete</td><td>The text, then the sources and the thumbs when they are passed. With <code>typeOut</code>, the text types out character by character.</td></tr>
+<tr><td>Complete</td><td>The text, then the sources and the thumbs when they are passed. With <code>typeOut</code>, the text types out character by character (<code>TypingText</code> takes <code>speed</code>, in milliseconds per character, and <code>onComplete</code>). <code>linkTarget</code> sets where links open, such as <code>_top</code> from inside a frame, and <code>resolveHref</code> rewrites a link's address.</td></tr>
 <tr><td>Streaming</td><td>A caret follows the last character, and the message carries <code>aria-busy</code>. No sources and no thumbs yet.</td></tr>
 <tr><td>Thinking</td><td>The typing indicator, a status named "AI is writing", in place of the text.</td></tr>
 <tr><td>Reduced motion</td><td>The caret and dots stop animating, and typed-out text shows at once.</td></tr>

@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { Frame, PatternCard, PatternSection } from '@/patterns';
 import { ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
-import { Story } from '@storybook/addon-docs/blocks';
 
 /**
  * Page-template docs helpers: the page header assembled from its parts, a
@@ -136,32 +135,6 @@ PageStage.propTypes = { full: PropTypes.bool, width: PropTypes.number, height: P
 
 /** The banner slot, under the header. */
 export const PageBanner = () => <Banner appearance="warning">Tutoring sessions move to the new calendar on Friday.</Banner>;
-
-/** The Page type card (named TypeCard so the page model reads it): its live story on the raised card at the real stage width, then its name and one line. */
-export const TypeCard = ({ of, title, children }) => (
-    <figure
-        style={{
-            margin: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--card-stack-lg)',
-            padding: 'var(--card-pad-default)',
-            borderRadius: 'var(--card-radius)',
-            background: 'var(--ds-surface-raised)',
-            boxShadow: 'var(--ds-shadow-raised)',
-        }}
-    >
-        <ScaledStory width={TYPE_STAGE}>
-            <Story of={of} inline />
-        </ScaledStory>
-        <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)' }}>
-            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{title}</span>
-            <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{children}</span>
-        </figcaption>
-    </figure>
-);
-
-TypeCard.propTypes = { of: PropTypes.any.isRequired, title: PropTypes.string.isRequired, children: PropTypes.node };
 
 /** The marker's size, the gutter it sits in and the clearance between two markers in one gutter. */
 const GUTTER = 'var(--control-lg)';

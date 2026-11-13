@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import DatePicker from './DatePicker/DatePicker';
-
+import { DatePicker } from '@/components';
 /**
  * What a day in the calendar announces itself as.
  *

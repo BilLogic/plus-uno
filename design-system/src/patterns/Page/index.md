@@ -18,7 +18,7 @@ Also asked as: surface.
 
 ## Usage
 
-Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at its content width; full width is the only fluid option and is for a page that fills it.
+Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at its content width; full width is for a page that fills it.
 
 ## Motion
 
@@ -115,8 +115,6 @@ Which tier a message belongs to: the Notifications pattern.
 Same group: `AiChat` · `Backdrop` · `Frame` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Types
-
-"Fluid" means only the full-width type; everything else adapts inside the cap.
 
 - **Default.** The content grid, centered and capped at its content width. Nearly every page.
 - **Full width.** The content runs to the pad with no cap, for a page that fills it, such as chat or a board.

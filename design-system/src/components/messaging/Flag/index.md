@@ -41,11 +41,15 @@ opens its description and actions behind a chevron; its actions are buttons.
 
 | Appearance | When to use |
 | --- | --- |
-| Normal | The default flag, for passive news a person can clear. Example: "Notes copied". Set `icon` to a status icon or an Avatar. |
+| Normal | The default flag, for passive news a person can clear. Closes itself after 8 seconds. Example: "Notes copied". Set `icon` to a status icon or an Avatar. |
 | Information | Bold. Something worth knowing, on the dark neutral fill. Times out. |
 | Success | Bold. A finished action. Times out. |
 | Warning | Bold. Something to check before going on. Never closes itself; offers a next action. |
 | Error | Bold. Something that failed. Never closes itself; offers a next action. |
+
+### Sound
+
+A flag plays a sound as it lands: Error for an error flag, Notify for every other appearance, through the app's sound setting. Pass `sound={false}` where a flag should stay quiet, such as during a session.
 
 ## Motion
 

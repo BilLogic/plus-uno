@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
-import Table, { StaticTable, HeadCell } from '@/components/text-and-data-display/Table';
+import { Table, StaticTable, HeadCell } from '@/components';
 import { iconClass } from '../../../lib/icon';
 
 export default {

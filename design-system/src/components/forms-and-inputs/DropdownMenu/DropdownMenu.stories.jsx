@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
-import Button from '@/components/forms-and-inputs/Button';
+import { Button } from '@/components';
 import { ButtonItem, LinkItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';

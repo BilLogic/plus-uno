@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Button } from '@/components';
+import { Button, TextField } from '@/components';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled } from '../_internal/fieldStatePlays';
-import TextField from '../TextField/TextField';
 import TagInput from './TagInput';
 
 /**

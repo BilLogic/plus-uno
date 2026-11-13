@@ -5,8 +5,7 @@ import { alpha, computedShadow, tokenColor } from '@/storybook-docs/lib/style-pr
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import Button from '@/components/forms-and-inputs/Button';
-import { Checkbox } from '@/components';
+import { Checkbox, Button } from '@/components';
 
 const sampleRows = [
     { name: 'Jordan Blake', role: 'Tutor', status: 'Active' },

@@ -4,8 +4,7 @@ import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import Tooltip from '@/components/overlays-and-layering/Tooltip';
-import Button from '@/components/forms-and-inputs/Button';
+import { Tooltip, Button } from '@/components';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {

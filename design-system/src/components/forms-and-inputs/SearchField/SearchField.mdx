@@ -125,6 +125,8 @@ Pick the mode by where the answer lands:
 
 The panel's last row is a slot: pass a `SearchFieldAction` child, such as "Create student", and it joins the keyboard order.
 
+`isCollapsible` starts the field as an icon button; `defaultOpen` starts it open. The field's own words are props, so a translation or a product term can replace them: `clearLabel` ("Clear search"), `panelLabel` ("Suggestions"), `recentLabel` ("Recent searches"), `noMatchesLabel` ("No matches for") and `seeAllLabel` ("See all results for").
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -176,6 +178,8 @@ The panel's last row is a slot: pass a `SearchFieldAction` child, such as "Creat
 <tr><td>Field</td><td>Those of the text field.</td></tr>
 <tr><td>Gap between scope and field</td><td><code>--inline-sm</code>.</td></tr>
 <tr><td>Width open</td><td><code>--field-width-md</code>.</td></tr>
+<tr><td>Collapsed width and height</td><td><code>--item-height-md</code>.</td></tr>
+<tr><td>Panel maximum height</td><td><code>--popover-max-height-menu</code>.</td></tr>
 </tbody>
 </DocsTable>
 

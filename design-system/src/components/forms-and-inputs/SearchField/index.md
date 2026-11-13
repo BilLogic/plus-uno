@@ -30,6 +30,8 @@ Pick the mode by where the answer lands:
 
 The panel's last row is a slot: pass a `SearchFieldAction` child, such as "Create student", and it joins the keyboard order.
 
+`isCollapsible` starts the field as an icon button; `defaultOpen` starts it open. The field's own words are props, so a translation or a product term can replace them: `clearLabel` ("Clear search"), `panelLabel` ("Suggestions"), `recentLabel` ("Recent searches"), `noMatchesLabel` ("No matches for") and `seeAllLabel` ("See all results for").
+
 ## Motion
 
 SearchField reads these motion tokens and no literal duration or curve.
@@ -104,6 +106,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Field | Those of the text field. |
 | Gap between scope and field | `--inline-sm`. |
 | Width open | `--field-width-md`. |
+| Collapsed width and height | `--item-height-md`. |
+| Panel maximum height | `--popover-max-height-menu`. |
 
 ## Content guidelines
 

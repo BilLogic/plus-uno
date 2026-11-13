@@ -20,9 +20,7 @@ Also asked as: scrim.
 
 A Backdrop interrupts the page for one task. It dims everything behind it with one fill, so the person sees only the layer on top. It never draws content of its own.
 
-| Layer | When to use |
-| --- | --- |
-| Modal | One task blocks the page. The Backdrop centers it. |
+One layer sits on it today: a Modal, which the Backdrop centers.
 
 A task that keeps the page in view is a Panel, which floats with no Backdrop. The Backdrop draws the layer only. It does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
 
@@ -49,27 +47,6 @@ Backdrop reads these motion tokens and no literal duration or curve.
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | It fades with the layer; a docked Panel never has one. |
 
 ## Best practices
-
-### Stack only a confirm over a Panel, a Popup or a focused task. {#stack-only-a-confirm-over-a-panel-a-popup-or-a-focused-task}
-
-A confirm raised from a Panel or a focused task puts one Backdrop over the page and the Panel. A Modal for another task waits until the first one closes.
-
-Do: A Panel and the confirm it raises, over it.
-Don't: A modal for an unrelated task opened over a Panel.
-
-### Never a Modal on a Modal. {#never-a-modal-on-a-modal}
-
-A Modal confirms inside itself, with a warning SectionMessage and the danger button. The overlay module refuses a second Modal: it stays closed and calls its `onClose`.
-
-Do: A Modal confirming inside itself, with a warning and the danger button.
-Don't: A Modal opened on another Modal.
-
-### Confirm in a small modal. {#confirm-in-a-small-modal}
-
-Do: Confirm in a small modal.
-Don't: Confirm in a large modal.
-
-Popups, flags and tooltips never bring a backdrop. How a modal meets the Sidebar is on Frame.
 
 ### Place a modal in the Backdrop. {#place-a-modal-in-the-backdrop}
 
@@ -142,4 +119,6 @@ The Backdrop holds no text of its own. The words belong to the layer it holds.
 
 From `design-system/src/patterns/Backdrop/Backdrop.scss`. Override these through the token layer, never with a literal.
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+
+> Authored guidance is partial: missing correct/incorrect.

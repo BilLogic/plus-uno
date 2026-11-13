@@ -99,7 +99,7 @@ EveryRouteOut.play = async ({ canvasElement }) => {
     // 1. The header's own close button.
     await userEvent.click(open);
     await doc.findByText('Delete session');
-    await userEvent.click(doc.getByRole('button', { name: 'Close modal' }));
+    await userEvent.click(doc.getByRole('button', { name: 'Close' }));
     await expectDialogGone(canvasElement, 'Delete session');
     await expect(log).toHaveTextContent(/^close$/);
 
@@ -175,7 +175,7 @@ StaticBackdropRefusesToClose.play = async ({ canvasElement }) => {
     await expect(doc.getByText('Uploading transcript')).toBeInTheDocument();
 
     // The one route the caller left open still works, and still reports.
-    await userEvent.click(doc.getByRole('button', { name: 'Close modal' }));
+    await userEvent.click(doc.getByRole('button', { name: 'Close' }));
     await expectDialogGone(canvasElement, 'Uploading transcript');
     await expect(closes).toHaveTextContent('1');
 };

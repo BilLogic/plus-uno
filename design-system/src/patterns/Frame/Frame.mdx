@@ -1,3 +1,4 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -41,7 +42,6 @@ export const tokens = [
     ['--content-max-width', '1232', '1232', '1232', 'The content cap.'],
     ['--content-max-width-reading', '864', '864', '864', 'The content cap for the reading width.'],
     ['--content-min-width', '720', '720', '720', 'The narrowest the content gets. Narrower, the Page scrolls sideways.'],
-    ['Sidebar docked', 'false', 'true', 'true', 'A Figma variable. The sidebar docks from 1024. In code the Frame measures its own width through the layout resolver and has no token for it.'],
     ['--page-stack-sm', '16', '16', '16', 'Related sections.'],
     ['--page-stack-md', '24', '24', '24', 'Sections, and the row gap of the content grid.'],
 ];
@@ -120,7 +120,7 @@ A task with five steps. No Sidebar and no breadcrumb: nothing invites the person
 <Story of={FrameStories.AnatomyFocused} inline />
 
 1. **Title row.** Close at the start, then the task's name as the page's one h1.
-2. **Steps.** A Section side at the start, 256 wide (320 for long labels), for five or more.
+2. **Steps.** A Section side at the start, 256 wide (320 for long labels), or a bar across the top; <i>Focused steps</i> says which.
 3. **Body.** The task's Sections at reading width, 864, centered.
 4. **Bar**, fixed along the bottom and 48 high. Cancel (Subtle) at the start; Back and Next at the end, full bleed. Back on the first step is disabled and needs no reason.
 
@@ -130,7 +130,7 @@ A task with five steps. No Sidebar and no breadcrumb: nothing invites the person
 
 ## Focused steps
 
-Five or more steps go down the left. Four or fewer run across the top. The bar is the same in both, and the focused Frame moves like a Drill: it slides in over the dimmed opener, and Close or Cancel play it backwards. When a long task gets its own Frame is the <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a> pattern.
+Five or more steps go down the left. Four or fewer run across the top. Placement is chosen when the task opens and does not change mid-task, however the count moves. The bar is the same in both, and the focused Frame moves like a Drill: it slides in over the dimmed opener, and Close or Cancel play it backwards. When a long task gets its own Frame is the <DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink> pattern.
 
 <ComponentExample of={FrameStories.FocusedStepsDown} title="Five steps, down the left" description="The rail is 256 wide; use 320 when a label is long. The current step is marked, and visited steps go back." />
 
@@ -142,7 +142,7 @@ Five or more steps go down the left. Four or fewer run across the top. The bar i
 
 ## Width behavior
 
-The Frame decides what docks from its own width, so the content never drops under 720. Drag the width: the Sidebar and an open AI panel both dock from 1408 with a 400 panel; from 1168 the panel docks alone and the Sidebar collapses; below that, and under 1024, the panel floats over the Page with no Backdrop. Under 768 the panel is full width.
+The Frame decides what docks from its own width, so the content never drops under 720. Drag the width: the Sidebar and an open AI panel both dock from 1408 with a 400 panel; from 1168 the panel docks alone and the Sidebar collapses; below that, and under 1024, the panel floats over the Page with no Backdrop. Under 768 the panel is full width. The Sidebar docks from 1024 (in Figma, the `Sidebar docked` variable); in code the Frame measures its own width through the layout resolver and has no token for it.
 
 <DocsInteractivePlayground of={FrameStories.ResponsiveWidth} description="The width control sets the Frame's own width, with the AI panel open." />
 
@@ -152,13 +152,11 @@ The Frame decides what docks from its own width, so the content never drops unde
 
 ## Key states
 
-<ComponentExample of={FrameStories.TypeBare} title="Bare" description="No Sidebar, so no toggle: the column is centered in the window." />
-
 <ComponentExample of={FrameStories.KeyPanelCollapsesSidebar} title="Panel collapses the Sidebar, 1200" description="The Sidebar, a 400 panel and 720 of content cannot all fit, so the Sidebar collapses and the toggle moves to the Page's top left. It comes back when the panel closes." />
 
 <ComponentExample of={FrameStories.KeyUnder1024} title="Under 1024" description="The Sidebar never docks: opened by hand it floats over the Page. The panel floats over the Page with no Backdrop, and one layer is open at a time." />
 
-A system banner, when one is needed, spans the whole width above the Sidebar and the Page: <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a>.
+A system banner, when one is needed, spans the whole width above the Sidebar and the Page: <DocsLink id="patterns-notifications-and-indicators-notifications">Notifications</DocsLink>.
 
 </div>
 
@@ -241,7 +239,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 <tr><td><code>panel</code> · <code>panelLabel</code> · <code>panelOpen</code></td><td>The AI panel region at the right, named for its content, filled with the Panel parts.</td></tr>
 <tr><td><code>onBack</code> · <code>onClose</code></td><td>A Back and a Close icon button in the header row. A focused page leads its title row with its own Close instead.</td></tr>
 <tr><td><code>surfaceDirect</code></td><td>Children go straight into the Page with no content box, for a bare column or a full-bleed view.</td></tr>
-<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The focused bottom bar, 48 high, with Cancel, Back and Next. Today the page places the bar.</td></tr>
+<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The focused bottom bar, 48 high, with Cancel, Back and Next. Today the page places the bar, so the Anatomy bar is the target shape.</td></tr>
 <tr><td><code>banner</code> <PlannedTag /></td><td>Planned. System news across the whole width above the Sidebar and the Page.</td></tr>
 </tbody>
 </DocsTable>
@@ -264,9 +262,9 @@ Use Frame for every page of the app. It owns the frame sizes and the Sidebar's b
 
 The Frame decides what docks from its own width, not the window's, through one layout resolver, so the content never drops under 720:
 
-- **Sidebar.** It docks from 1024 and never docks below that. Under 1024, opened by hand, it floats over the Page and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Backdrop. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
-- **AI panel.** It opens from anything inside the Frame through `usePanelControl()`. Both dock when the Sidebar, the panel and 720 fit: with a 400 panel that is from 1408. Otherwise a Sidebar left open by default collapses, and comes back when the panel closes; with a 400 panel the panel docks alone from 1168. Below that, the panel floats over the Page and the Sidebar on the overlay fill and shadow, with no Backdrop.
-- **Under 1024** the panel is 320 wide, and only one layer is open at a time: opening the Sidebar closes the panel, and opening the panel closes the Sidebar. Under 768 the panel is full width.
+- **Sidebar.** Below its docking width, opened by hand, it floats over the Page and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Backdrop. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
+- **AI panel.** It opens from anything inside the Frame through `usePanelControl()`. Both dock when the Sidebar, the panel and the content minimum fit. Otherwise a Sidebar left open by default collapses and comes back when the panel closes. Below that, the panel floats over the Page and the Sidebar on the overlay fill and shadow, with no Backdrop.
+- **Narrow Frames** hold one layer open at a time: opening the Sidebar closes the panel, and opening the panel closes the Sidebar.
 - **`sectionDetail`** collapses the Sidebar first, so a list and its detail keep 960 side by side. If a collapsed Sidebar still leaves under 960, the panel stays docked and the detail replaces the list.
 - **Modals.** Opening a Modal closes a peeking or floating Sidebar, and a docked Sidebar stays. While a Modal is open the Sidebar does not peek, and Escape closes the Modal only. A Modal leaves the panel open under its Backdrop.
 
@@ -280,7 +278,7 @@ Docked, the panel meets the Page at a hairline. Its splitter resizes it from 320
 
 - For a bare fill and elevation, use `Page`.
 - For a region inside the content, use `PatternSection`.
-- For a short task that keeps the page in view behind it, use `PatternModal`. A focused Frame is for a task that blocks the page until it is done, or has five or more steps.
+- For a short task that keeps the page in view behind it, use `PatternModal`. A focused Frame is for a task that blocks the page until it is done, or a long one.
 
 </div>
 
@@ -344,7 +342,7 @@ Sign-in, errors and welcome have one job and no account yet, so the Frame carrie
 
 <RuleTag kind="review" />
 
-Five or more go down a left side sized to the longest label. Four or fewer run across the top.
+The count sets the side or the top once, when the task opens. The thresholds are under Focused steps.
 
 ### Pass sectionDetail for a list and its detail.
 
@@ -358,7 +356,7 @@ With `sectionDetail` and the panel open on a wide Frame, the Sidebar collapses a
 
 The header row is the breadcrumb, shown only after drilling into a record; area pages and focused tasks have none. A page's title belongs to its content, in a Section with `level="page"`.
 
-Elevation and fills follow <a target="_top" href="./?path=/docs/foundations-elevation--docs">Elevation</a>.
+Elevation and fills follow <DocsLink id="foundations-elevation">Elevation</DocsLink>.
 
 </div>
 
@@ -397,12 +395,12 @@ Elevation and fills follow <a target="_top" href="./?path=/docs/foundations-elev
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/templates-page-page--docs">Page</a>: use when you need the bare fill-and-elevation the content box is built on.
-- <a target="_top" href="./?path=/docs/components-navigation-navigation-system--docs">Sidebar</a>: use when choosing what the Frame places beside the Page.
-- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use when the content needs a region under its own heading.
-- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use when the task is short and the page should stay in view behind it.
-- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use when the work should float beside the page, not replace it.
-- <a target="_top" href="./?path=/docs/foundations-grid--docs">Grid</a>: use when you need the column math the Frame is sized by.
+- <DocsLink id="templates-page-page">Page</DocsLink>: use when you need the bare fill-and-elevation the content box is built on.
+- <DocsLink id="components-navigation-navigation-system">Sidebar</DocsLink>: use when choosing what the Frame places beside the Page.
+- <DocsLink id="templates-section-section">Section</DocsLink>: use when the content needs a region under its own heading.
+- <DocsLink id="templates-modal-modal">Modal</DocsLink>: use when the task is short and the page should stay in view behind it.
+- <DocsLink id="templates-panel-panel">Panel</DocsLink>: use when the work should float beside the page, not replace it.
+- <DocsLink id="foundations-grid">Grid</DocsLink>: use when you need the column math the Frame is sized by.
 
 </div>
 

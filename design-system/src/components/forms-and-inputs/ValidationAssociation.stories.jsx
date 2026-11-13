@@ -1,10 +1,8 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import DateTimePicker from './DateTimePicker/DateTimePicker';
+import { DateTimePicker, TextField } from '@/components';
 import FileUpload from './FileUpload';
-import TextField from './TextField/TextField';
-
 
 /**
  * Pointing a field at the reason it was rejected.

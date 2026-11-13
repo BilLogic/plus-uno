@@ -26,6 +26,16 @@ const renderColor = (props = {}) =>
 const before = (a, b) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
 
 describe('DocsLanding', () => {
+    it('labels a links row "Tokens" when the page passes no label', () => {
+        renderColor({ links: { items: TOKENS_LINKS.items } });
+        expect(screen.getByRole('navigation', { name: 'Tokens' })).toBeTruthy();
+    });
+
+    it('leaves a sibling row (one item current) unlabeled', () => {
+        renderColor({ links: { items: [{ title: 'Color', current: true }, { title: 'Type', href: '#t' }] } });
+        expect(screen.queryByRole('navigation', { name: 'Tokens' })).toBeNull();
+    });
+
     it('renders eyebrow, one h1, purpose, links and hero, in that order', () => {
         const { container } = renderColor();
         const eyebrow = screen.getByText('Foundation');

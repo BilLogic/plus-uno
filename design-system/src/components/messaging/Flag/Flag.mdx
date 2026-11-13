@@ -49,7 +49,7 @@ reply. It appears over the page and goes away on its own or when dismissed.
 
 ## Appearance
 
-<ComponentExample of={FlagStories.Normal} title="Normal" description="The default flag: the overlay surface, an icon that carries the meaning, always the dismiss ×, actions as links." />
+<ComponentExample of={FlagStories.Normal} title="Normal" description="The default flag: the overlay surface, an icon that carries the meaning, always the dismiss ×, actions as links. It closes itself after 8 seconds." />
 
 <ComponentExample of={FlagStories.Information} title="Information" description="Bold, on the dark neutral fill. It starts collapsed to its title; the chevron opens the description." />
 
@@ -149,13 +149,17 @@ opens its description and actions behind a chevron; its actions are buttons.
 <tr><th>Appearance</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td>Normal</td><td>The default flag, for passive news a person can clear. Example: "Notes copied". Set `icon` to a status icon or an Avatar.</td></tr>
+<tr><td>Normal</td><td>The default flag, for passive news a person can clear. Closes itself after 8 seconds. Example: "Notes copied". Set `icon` to a status icon or an Avatar.</td></tr>
 <tr><td>Information</td><td>Bold. Something worth knowing, on the dark neutral fill. Times out.</td></tr>
 <tr><td>Success</td><td>Bold. A finished action. Times out.</td></tr>
 <tr><td>Warning</td><td>Bold. Something to check before going on. Never closes itself; offers a next action.</td></tr>
 <tr><td>Error</td><td>Bold. Something that failed. Never closes itself; offers a next action.</td></tr>
 </tbody>
 </DocsTable>
+
+### Sound
+
+A flag plays a sound as it lands: Error for an error flag, Notify for every other appearance, through the app's sound setting. Pass `sound={false}` where a flag should stay quiet, such as during a session.
 
 </div>
 

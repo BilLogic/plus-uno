@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import Button from '../Button/Button';
-import IconButton from '../IconButton/IconButton';
+import { Button, IconButton } from '@/components';
 import SplitButton from './SplitButton';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 

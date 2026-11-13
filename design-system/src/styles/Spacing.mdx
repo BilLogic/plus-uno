@@ -19,7 +19,6 @@ import * as SpacingStories from './Spacing.stories.jsx';
     title="Spacing"
     purpose="The kind of box sets its pad; the pattern it sits in sets its stack and inline."
     links={{
-        label: 'Tokens',
         items: [
             { title: 'Tokens', href: '#foundation-tokens' },
             { title: 'Padding', href: '#foundation-padding' },
@@ -30,14 +29,14 @@ import * as SpacingStories from './Spacing.stories.jsx';
 
 <FoundationSection title="Overview">
 
-Spacing tokens name a job, not a size. Pick the pattern you are in (Page, Section, Card, Modal, Popup, Table or Element inside a component), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Primitives hold the raw numbers and stay hidden: designers and code bind the semantic token, never a primitive and never a typed number.
+Spacing tokens name a job, not a size. Pick the pattern you are in (Page, Section, Card, Modal, Popup, Table or a control), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Primitives hold the raw numbers and stay hidden: designers and code bind the semantic token, never a primitive and never a typed number.
 
 ```css
 padding: var(--card-pad-default);
 gap: var(--card-stack-md);
 ```
 
-Figma holds them in `spacing / foundations` (Element, Border, Size), `spacing / patterns` (Frame, Section, Card, Table, Backdrop, Modal, Popup, Tile), `spacing / layout` (Page, Grid, Content, Screen) and the hidden `spacing / primitives`.
+Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Backdrop, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens](?path=/docs/foundations-tokens--docs) owns the tiers.
 
 </FoundationSection>
 
@@ -47,7 +46,7 @@ Five principles decide which tier a gap takes. Similar things share one gap,
 a new group gets a bigger one, tiers grow from the component to the page,
 headings and actions get room, and a modal breathes before its footer.
 
-<FoundationSubsection title="1 · Similarity: the same kind of thing takes the same gap">
+<FoundationSubsection title="Similarity">
 
 
 Items of equal weight, such as the fields of one form group, sit close
@@ -57,7 +56,7 @@ together with one stack.
 
 </FoundationSubsection>
 
-<FoundationSubsection title="2 · Differentiation: a new group gets a bigger gap">
+<FoundationSubsection title="Differentiation">
 
 
 When the content changes kind, from a suggestion to the form controls, step
@@ -67,18 +66,18 @@ up a tier so the change reads at a glance.
 
 </FoundationSubsection>
 
-<FoundationSubsection title="3 · Rhythm: tiers, never one value">
+<FoundationSubsection title="Rhythm">
 
 
-Gaps grow with the box: Element and Card 4 · 8 · 12 inside a component,
-Section and Modal 8 · 16 · 24 inside a region, Surface 16 · 24 · 40 between
+Gaps grow with the box: a control and a Card 4 · 8 · 12 px inside a component,
+Section and Modal 8 · 16 · 24 px inside a region, Page 16 · 24 · 40 px between
 regions.
 
 <Canvas of={SpacingStories.Rhythm} sourceState="none" />
 
 </FoundationSubsection>
 
-<FoundationSubsection title="4 · Hierarchy: headings and primary actions get room">
+<FoundationSubsection title="Hierarchy">
 
 
 The heading and the main action read first because they have space around
@@ -88,7 +87,7 @@ them. Give them the larger stack of their tier, and never add space by hand.
 
 </FoundationSubsection>
 
-<FoundationSubsection title="5 · White space: let a modal breathe before its footer">
+<FoundationSubsection title="White space">
 
 
 Pad the modal on every side, and leave the largest gap of its tier between the
@@ -102,10 +101,10 @@ content and the footer buttons.
 
 <FoundationSection title="Tokens">
 
-Every spacing, size and radius value comes from one ladder of four tiers, most general to most specific: **primitives**, **semantics**, **patterns**, **components**. A token is used bare, by its tier name, and a typed px value never appears. The plan is `scripts/lib/tokens/plan.mjs`; the generated output in `design-system/src/tokens/ladder/` is never hand-edited. Old names map to new ones in `architecture/token-tiers-name-map.md`.
+Every spacing, size and radius value comes from the four-tier ladder described on [Tokens](?path=/docs/foundations-tokens--docs#foundation-collections), which owns the tiers and the fallback rule. A token is used bare, and a typed px value never appears.
 
-- **Primitives** are the raw scale, named rem × 100: `--space-100` is 16,
-  `--space-050` is 8. They are hidden in Figma, and nothing binds them.
+- **Primitives** are the raw scale, named rem × 100: `--space-100` is 16 px,
+  `--space-050` is 8 px. They are hidden in Figma, and nothing binds them.
 - **Every other tier** points at a primitive and names a job, as
   `Collection/property-variant` in Figma, and the same words joined by dashes
   in code: `Section/pad-x-default` is `--section-pad-x-default`. A collection with a
@@ -135,61 +134,6 @@ call a page margin is the Page pad, `--page-pad`.
     rows={['0', '00625', '0125', '025', '03125', '0375', '050', '0625', '075', '0875', '100', '125', '150', '200', '250', '300', '400', '500'].map((s) => ({ token: `--space-${s}` }))}
 />
 
-<FoundationSubsection title="Four tiers">
-
-<RefTable
-    head={['Tier', 'Holds', 'Code', 'Density words']}
-    rows={[
-        ['Primitives', 'The raw scale, named rem × 100', <><C>--space-*</C> · <C>--radius-*</C> · <C>--stroke-*</C> · <C>--size-*</C></>, 'Never'],
-        ['Semantics', 'Steps shared by anything: pad, stack, inline, radius, border, focus ring, grid, screen, content and size roles', <><C>--pad-x-md</C> · <C>--stack-sm</C> · <C>--inline-lg</C> · <C>--radius-md</C> · <C>--focus-ring-width</C> · <C>--control-md</C> · <C>--icon-sm</C></>, <>Never: steps <C>xs</C> · <C>sm</C> · <C>md</C> · <C>lg</C> only</>],
-        ['Patterns', 'A layout pattern’s own pad, stack, radius and widths: Frame, Page, Section, Card, Table, Backdrop, Modal, Popup, floating Panel, Focused page', <><C>--card-pad-default</C> · <C>--section-pad-x-compact</C> · <C>--modal-width-md</C></>, <><C>default</C> · <C>compact</C> · <C>spacious</C></>],
-        ['Components', 'A value exactly one component needs that no shared tier covers', <><C>--button-radius-compact</C> · <C>--calendar-day-md</C> · <C>--listbox-max-height</C></>, <><C>default</C> · <C>compact</C> · <C>spacious</C></>],
-    ]}
-/>
-
-Density words appear only where a `spacing` prop lives: patterns and components. Semantics stay on steps, so one step serves every density. Stacking order (z-index) is a separate code-only family, `--layer-*`.
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Fallback rule">
-
-Read the most specific tier that holds the value you need:
-
-1. A component token, if the component has one (`--button-radius-default`).
-2. Otherwise the pattern token of the pattern you are inside (`--card-pad-compact`).
-3. Otherwise a semantics step (`--pad-x-md`, `--stack-sm`).
-
-A value belongs to a pattern or component when it would change if that pattern or component changed; a step nothing specific owns is semantics. When no tier holds the value, name the gap and add a row to `scripts/lib/tokens/plan.mjs` (then `npm run generate:design-tokens`) rather than read a primitive. Adding a step is a design call.
-
-```css
-/* Component radius, semantics pad, pattern pad and stack */
-.my-button { border-radius: var(--button-radius-default); padding: var(--pad-y-md) var(--pad-x-md); }
-.my-card   { padding: var(--card-pad-default); gap: var(--card-stack-md); }
-.my-row    { display: flex; gap: var(--inline-md); }
-```
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Private wiring">
-
-A component that resolves a tier token into its own rules does it through a private custom property named `--_<component>-<role>`, set once on the component root and read by that component's rules:
-
-```scss
-.plus-tag {
-  --_tag-pad-x: var(--pad-x-xs);
-  --_tag-gap: var(--inline-sm);
-
-  padding: 0 var(--_tag-pad-x);
-  gap: var(--_tag-gap);
-
-  &--spacious { --_tag-pad-x: var(--pad-x-sm); }
-}
-```
-
-The leading underscore marks the property as the component's own: no other file reads it and no tier declares it. A variant or density changes the one `--_` line, and the rules below it stay put. The value on the right is always a tier token, chosen by the fallback rule. `npm run check:no-primitive-reads` holds components and patterns to that: the count of numbered-primitive reads can fall and never rise.
-
-</FoundationSubsection>
-
 </FoundationSection>
 
 <FoundationSection title="Three kinds of box">
@@ -215,8 +159,8 @@ pad.
 
 
 The label stays 14/20 at every size, so pad-y is (height − 20) ÷ 2: 2 at 24
-and 6 at 32. Pad-x is always the larger: 8 at 24 and 12 at 32. Buttons and tabs come in
-32, or 24 compact inside table rows and inline toolbars. Fields and menu rows come
+and 6 at 32. Pad-x is always the larger: 8 at 24 and 12 at 32. Buttons, tabs and menu rows come in
+32, or 24 compact inside table rows and inline toolbars. Fields come
 in 40, or 32 compact, with pad-y 10 at 40. Buttons round 6 (4 compact); every
 other control rounds to its height ÷ 4. Labels (Tag, Status, Count) pad 4 across.
 
@@ -224,11 +168,11 @@ other control rounds to its height ÷ 4. Labels (Tag, Status, Count) pad 4 acros
 
 <TokenTable
     rows={[
-        { token: '--pad-x-xs', figma: 'Element/pad-x-xs', use: 'Labels: Tag, Status, Count' },
-        { token: '--pad-x-sm', figma: 'Element/pad-x-sm', use: 'Compact 24 Items' },
-        { token: '--pad-x-md', figma: 'Element/pad-x-md', use: 'Default 32 Items' },
-        { token: '--pad-y-sm', figma: 'Element/pad-y-sm', use: 'Compact 24 Items' },
-        { token: '--pad-y-md', figma: 'Element/pad-y-md', use: 'Default 32 Items' },
+        { token: '--pad-x-xs', figma: 'Pad/pad-x-xs', use: 'Labels: Tag, Status, Count' },
+        { token: '--pad-x-sm', figma: 'Pad/pad-x-sm', use: 'Compact 24 Items' },
+        { token: '--pad-x-md', figma: 'Pad/pad-x-md', use: 'Default 32 Items' },
+        { token: '--pad-y-sm', figma: 'Pad/pad-y-sm', use: 'Compact 24 Items' },
+        { token: '--pad-y-md', figma: 'Pad/pad-y-md', use: 'Default 32 Items' },
     ]}
 />
 
@@ -240,19 +184,7 @@ other control rounds to its height ÷ 4. Labels (Tag, Status, Count) pad 4 acros
 A pattern carries its own pad. A container that is not a pattern takes the
 Card pad of its size: a Section message and File upload take 16.
 
-<TokenTable
-    rows={[
-        { token: '--card-pad-compact', figma: 'Card/pad-sm' },
-        { token: '--card-pad-default', figma: 'Card/pad-md', use: 'The default card' },
-        { token: '--card-pad-spacious', figma: 'Card/pad-lg' },
-        { token: '--modal-pad', figma: 'Modal/pad', use: 'Every side, at every width' },
-        { token: '--popover-pad', figma: 'Popup and flag/pad', use: 'Popup and flag' },
-        { token: '--popover-pad-menu', figma: 'Menu/pad-menu', use: 'The outer box of a menu' },
-        { token: '--blanket-pad-x', figma: 'Backdrop/pad-x', use: 'The Backdrop’s side pad' },
-        { token: '--blanket-pad-y', figma: 'Backdrop/pad-y', use: 'The Backdrop’s top and bottom pad' },
-        { token: '--page-pad', figma: 'Page/pad', value: '24', use: 'Inside the Page, at every width' },
-    ]}
-/>
+The tokens are listed under [Pattern tokens](#foundation-pattern-tokens): Card, Modal, Popup, Backdrop and Page.
 
 </FoundationSubsection>
 
@@ -263,14 +195,7 @@ Cells pad 4 top and bottom and 8 across. The row height is a minimum, and the
 row grows with its content. On a plain table, the first and last cells sit
 flush with the table's edge.
 
-<TokenTable
-    rows={[
-        { token: '--table-pad-y-cell', figma: 'Table/pad-y-cell' },
-        { token: '--table-pad-x-cell', figma: 'Table/pad-x-cell' },
-        { token: '--table-pad-x-footer', figma: 'Table/pad-x-footer' },
-        { token: '--table-indent', figma: 'Table/indent', use: 'One level of a tree' },
-    ]}
-/>
+The tokens are listed under Table in [Pattern tokens](#foundation-pattern-tokens).
 
 </FoundationSubsection>
 
@@ -283,9 +208,9 @@ to three times the space inside them. A card stacks its parts 8 apart at every
 size: stack follows use, not the size of the box.
 
 <RefTable
-    head={['Group', 'sm', 'md', 'lg', 'Used between']}
+    head={['Group', 'sm (px)', 'md (px)', 'lg (px)', 'Used between']}
     rows={[
-        ['Element', '4', '8', '12', 'Parts inside a component: icon and label, label and field, field and help text'],
+        ['Control', '4', '8', '12', 'Parts inside a component: icon and label, label and field, field and help text'],
         ['Card', '4', '8', '12', 'The parts of a card: title, body, footer'],
         ['Modal', '8', '16', '24', 'Header, body and footer content'],
         ['Section', '8', '16', '24', 'A section’s heading, its body and its footer'],
@@ -296,12 +221,12 @@ size: stack follows use, not the size of the box.
 
 <TokenTable
     rows={[
-        { token: '--stack-sm', figma: 'Element/stack-sm' },
-        { token: '--stack-md', figma: 'Element/stack-md' },
-        { token: '--stack-lg', figma: 'Element/stack-lg' },
-        { token: '--inline-sm', figma: 'Element/inline-sm' },
-        { token: '--inline-md', figma: 'Element/inline-md' },
-        { token: '--inline-lg', figma: 'Element/inline-lg' },
+        { token: '--stack-sm', figma: 'Stack/stack-sm' },
+        { token: '--stack-md', figma: 'Stack/stack-md' },
+        { token: '--stack-lg', figma: 'Stack/stack-lg' },
+        { token: '--inline-sm', figma: 'Inline/inline-sm' },
+        { token: '--inline-md', figma: 'Inline/inline-md' },
+        { token: '--inline-lg', figma: 'Inline/inline-lg' },
     ]}
 />
 
@@ -458,7 +383,7 @@ is one tier up. In a modal form:
 5. Set the actions side by side: `--modal-inline-sm` (8).
 
 **Pick by context, not by number.** A Card token inside a card, a Section
-token inside a section, Element tokens inside a component. Never borrow a
+token inside a section, Stack and Inline tokens inside a component. Never borrow a
 token because its number happens to match. When the card's tokens change, the
 borrowed one does not follow.
 
@@ -530,7 +455,7 @@ Group by proximity, match the token to the container you are in, and take every 
 **Group by proximity.** Elements placed close together read as related. Keep a label near its own field and put the larger gap between groups.
 
 <DoDont>
-<Do caption="Label to field 8 (Element/stack-md), group to group 24 (Modal/stack-lg), so each label attaches to its field.">
+<Do caption="Label to field 8 (Stack/stack-md), group to group 24 (Modal/stack-lg), so each label attaches to its field.">
 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', font: 'var(--body-small)' }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><span>School</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a school</span></div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><span>Teacher</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a teacher</span></div>
@@ -544,13 +469,13 @@ Group by proximity, match the token to the container you are in, and take every 
 </Dont>
 </DoDont>
 
-**Match the token to the context.** Element tokens for elements, card tokens for cards.
+**Match the token to the context.** Pad tokens for controls, card tokens for cards.
 
 <DoDont>
 <Do caption="A card pads with a card token, so the content breathes at the card scale.">
 <div style={{ padding: 'var(--card-pad-default)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
 </Do>
-<Dont caption="An element token on a card squeezes the content to a button-sized pad.">
+<Dont caption="A control pad on a card squeezes the content to a button-sized pad.">
 <div style={{ padding: 'var(--pad-x-xs)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
 </Dont>
 </DoDont>
@@ -566,12 +491,9 @@ Group by proximity, match the token to the container you are in, and take every 
 
 <FoundationSection title="Accessibility">
 
-- Spacing groups content, so keep the grouping consistent.
-- Related items sit closer together (a tighter stack) than unrelated ones (a looser stack), so a reader can tell what belongs together without reading every label.
-- Spacing never carries meaning alone. If a gap separates two groups, a heading, label or divider says so as well.
-- Pick one stack tier for the context, then keep to it across the container, so the rhythm reads the same on every screen.
-- Keep the focus ring's room. The ring is drawn 2 outside a control, so a control never sits flush against a clipping edge, and Element and Card tokens leave room for it.
-- The same groups need structure for everyone: a heading for each section, and a fieldset or a group label for related fields.
+- Spacing groups content: related items sit closer (a tighter stack) than unrelated ones (a looser stack), so a reader can tell what belongs together without reading every label. Pick one stack tier for the context and keep it across the container.
+- Spacing never carries meaning alone. If a gap separates two groups, a heading, label or fieldset legend says so as well.
+- Keep the focus ring's room: the ring is drawn outside a control, so a control never sits flush against a clipping edge ([Border](?path=/docs/foundations-border--docs) owns the ring).
 
 </FoundationSection>
 

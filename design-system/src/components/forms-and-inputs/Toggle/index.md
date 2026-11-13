@@ -110,7 +110,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Track size | `--toggle-track-height-16` and `--toggle-track-width-16`; `-20` for the large size. |
+| Track size | `--toggle-track-height-16` and `--toggle-track-width-16`; `-20` for size 20. |
 | Thumb inset | `--toggle-pad`. |
 | Track fill | `--ds-background-neutral-bold` off; `--ds-background-selected-bold` on. |
 | Thumb | `--ds-icon-inverse`; `--ds-icon-disabled` when disabled. |

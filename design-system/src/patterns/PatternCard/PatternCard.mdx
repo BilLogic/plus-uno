@@ -1,3 +1,4 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -53,11 +54,11 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Size and layout
 
-<ComponentExample of={PatternCardStories.SizeSmall} title="Small" description={<><code>padding="sm"</code>: pad 16, radius 12, at its minimum width of 224.</>} />
+<ComponentExample of={PatternCardStories.SizeSmall} title="Small" description={<><code>padding="sm"</code>, for one number or one line.</>} />
 
-<ComponentExample of={PatternCardStories.SizeMedium} title="Medium" description={<><code>padding="md"</code>, the default: pad 20, radius 16, at its minimum width of 304.</>} />
+<ComponentExample of={PatternCardStories.SizeMedium} title="Medium" description={<><code>padding="md"</code>, the default, for a short list or a few lines.</>} />
 
-<ComponentExample of={PatternCardStories.SizeLarge} title="Large" description={<><code>padding="lg"</code>: pad 24, radius 16, at its minimum width of 480.</>} />
+<ComponentExample of={PatternCardStories.SizeLarge} title="Large" description={<><code>padding="lg"</code>, for a summary with several parts.</>} />
 
 <ComponentExample of={PatternCardStories.Rows} title="Cards in a row" description="Six medium cards at each content width: 2, 2 and 3 to a row." />
 
@@ -91,7 +92,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## State
 
-<ComponentExample of={PatternCardStories.Static} title="Rest" description="A card rests on the raised pair, and its shadow's 1px ring is the edge." />
+<ComponentExample of={PatternCardStories.Static} title="Rest" description="A card rests on the raised pair." />
 
 <ComponentExample of={PatternCardStories.Clickable} title="Clickable" description={<>With <code>onClick</code>, the card lifts on hover and settles back while pressed. Hover it.</>} />
 
@@ -137,7 +138,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Usage
 
-Use a card when one object needs its own container on the page. A card holds a heading, some content and, when people can act on it, a footer. This pattern is the shell: you fill its slots with your own parts.
+Use a card when one object needs its own container on the page. A card holds a heading, some content and, when people can act on it, a footer. This template is the shell: you fill its slots with your own parts.
 
 Build a card in four steps. Pick the size by what it holds. Choose the header, or turn it off when the body carries its own title. Fill the body slot, spacing only inside the slot content with the Card stack tokens. Add the footer only for actions that commit.
 
@@ -302,10 +303,10 @@ A card that holds actions that commit a change gets a footer, and its actions st
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a> for a region that holds cards under one heading.
-- <a target="_top" href="./?path=/docs/templates-section-table--docs">Table</a> for many objects of the same shape that people compare across columns.
-- <a target="_top" href="./?path=/docs/templates-page-page--docs">Page</a> for a fill and an elevation with no slots.
-- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a> for something that must be decided before the page can continue.
+- <DocsLink id="templates-section-section">Section</DocsLink> for a region that holds cards under one heading.
+- <DocsLink id="templates-section-table">Table</DocsLink> for many objects of the same shape that people compare across columns.
+- <DocsLink id="templates-page-page">Page</DocsLink> for the content area's own fill, header and elevation.
+- <DocsLink id="templates-modal-modal">Modal</DocsLink> for something that must be decided before the page can continue.
 
 </div>
 

@@ -2,9 +2,7 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 
 import RadioGroup from './RadioGroup';
-import DatePicker from './DatePicker/DatePicker';
-import TextField from './TextField/TextField';
-import RichTextEditor from './RichTextEditor/RichTextEditor';
+import { DatePicker, TextField, RichTextEditor } from '@/components';
 import Select from './Select';
 import { iconClass } from '../../lib/icon';
 

@@ -3,10 +3,8 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px } from '@/storybook-docs/lib/style-probes.js';
-import { Button } from '@/components';
+import { Button, InlineEditableTextfield } from '@/components';
 import InlineEdit from './InlineEdit';
-import InlineEditableTextfield from '@/components/forms-and-inputs/InlineEditableTextfield';
-
 /**
  * `InlineEdit` and `InlineEditableTextfield`: text that becomes a field when pressed.
  *

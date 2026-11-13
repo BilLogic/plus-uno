@@ -1,10 +1,7 @@
 import React from 'react';
-import { Button } from '@/components';
+import { Button, Avatar, Comment } from '@/components';
 import { expect } from 'storybook/test';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import Avatar from '@/components/images-and-icons/Avatar';
-import Comment from '@/components/forms-and-inputs/Comment';
-
 export default {
     title: 'Components/Forms and inputs/Comment',
     component: Comment,

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import SearchField, { SearchFieldAction } from './SearchField';
-import Button from '../Button/Button';
-
+import { Button } from '@/components';
 const stack = { display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-start' };
 const SCOPES = [
     { value: 'students', label: 'Students', count: 42 },

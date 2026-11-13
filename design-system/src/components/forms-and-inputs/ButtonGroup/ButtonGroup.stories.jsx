@@ -4,8 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import ButtonGroup from './ButtonGroup';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
-import Button from '@/components/forms-and-inputs/Button/Button';
-import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
+import { Button, IconButton } from '@/components';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center' };
 

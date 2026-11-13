@@ -302,16 +302,6 @@ a.sbdocs-a {
  */
 
 
-.sbdocs .sb-plus-intro-page .sb-plus-intro-overview-title {
-  font-family: var(--type-family-heading-serif);
-  font-size: var(--font-size-200);
-  font-weight: var(--type-weight-medium);
-  line-height: 1.1;
-  margin: 0 0 var(--stack-lg);
-  color: var(--ds-text);
-}
-
-
 
 /*
  * `.sb-plus-intro-mini-grid` was the other half of both of these selector lists.
@@ -1105,6 +1095,7 @@ html[data-color-mode="dark"] .docs-story {
  * same header weight, on tokens.
  */
 .sbdocs .sb-ds-docs-props .docblock-argstable,
+.sbdocs .sb-ds-docs-all-props .docblock-argstable,
 .sbdocs .sb-ds-docs-source pre {
     margin: 0 !important;
     border-radius: var(--card-radius-compact);
@@ -1112,20 +1103,37 @@ html[data-color-mode="dark"] .docs-story {
     box-shadow: none;
 }
 
-.sbdocs .sb-ds-docs-props .docblock-argstable-head th {
+.sbdocs .sb-ds-docs-props .docblock-argstable-head th,
+.sbdocs .sb-ds-docs-all-props .docblock-argstable-head th {
     font-weight: var(--type-weight-semibold) !important;
     color: var(--ds-text);
     background: transparent;
 }
 
 .sbdocs .sb-ds-docs-props .docblock-argstable td,
-.sbdocs .sb-ds-docs-props .docblock-argstable th {
+.sbdocs .sb-ds-docs-props .docblock-argstable th,
+.sbdocs .sb-ds-docs-all-props .docblock-argstable td,
+.sbdocs .sb-ds-docs-all-props .docblock-argstable th {
     border-color: var(--ds-border);
     color: var(--ds-text);
 }
 
-.sbdocs .sb-ds-docs-props .docblock-argstable code {
+.sbdocs .sb-ds-docs-props .docblock-argstable code,
+.sbdocs .sb-ds-docs-all-props .docblock-argstable code {
     color: var(--ds-text);
+}
+
+/* The "All props" fold under a playground: closed by default, a summary line the page's prose size. */
+.sbdocs .sb-ds-docs-all-props {
+    margin-block-start: var(--stack-md);
+}
+
+.sbdocs .sb-ds-docs-all-props > summary {
+    font: var(--body-large);
+    font-weight: var(--type-weight-semibold);
+    color: var(--ds-text);
+    cursor: pointer;
+    margin-block-end: var(--stack-sm);
 }
 
 .sbdocs .sb-ds-docs-props .docblock-argstable {

@@ -98,6 +98,7 @@ job only risks a different icon or label than the rest of the system uses.
 ## Related
 
 - For something that must be decided before the page continues, use `Modal`.
+- The Panel pattern, for the Panel as a Frame area with its docked, peek and overlay states; this page is the component inside it.
 - For the page's persistent navigation rail, see `Sidebar`.
 - Frame for where the Panel docks, peeks or opens as an overlay at each width.
 

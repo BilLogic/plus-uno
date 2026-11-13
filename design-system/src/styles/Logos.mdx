@@ -30,7 +30,6 @@ export const Ground = ({ token, children, caption }) => (
     title="Logos"
     purpose="A logo is the visual representation of PLUS. It is one mark, shown with or without the wordmark."
     links={{
-        label: 'Specs',
         items: [
             { title: 'Construction', href: '#foundation-construction' },
             { title: 'Color options', href: '#foundation-color-options' },
@@ -41,7 +40,7 @@ export const Ground = ({ token, children, caption }) => (
 
 <FoundationSection title="Overview">
 
-Use it to mark PLUS itself in the tutor and student apps: the sidebar and navbar header, sign-in, email headers and the loading screen. Never use it as decoration. Its colors are brand artwork rather than theme tokens, so it looks the same on every surface.
+Use the logo to mark PLUS itself in the tutor and student apps: the sidebar and navbar header, sign-in, email headers and the loading screen. Never use it as decoration. Its colors are brand artwork rather than theme tokens, so it looks the same on every surface.
 
 ```jsx
 import { Logo } from '@/components';
@@ -152,21 +151,6 @@ Every PLUS logo has the logomark, so clearance is measured from the logomark. Al
 
 </FoundationSection>
 
-<FoundationSection title="Alt text">
-
-Write the name in the alt text for the logo in digital experiences.
-
-<RefTable
-    head={['Case', 'Alt text']}
-    rows={[
-        ['Logo is the only thing naming PLUS (sign-in screen)', 'PLUS'],
-        ['Logo sits beside a visible PLUS title', 'Empty. It is decorative; hide it from assistive technology.'],
-        ['Logo links home', 'PLUS home (names where it goes)'],
-    ]}
-/>
-
-</FoundationSection>
-
 <FoundationSection title="Do and don't">
 
 <FoundationSubsection title="Use approved colors">
@@ -193,7 +177,7 @@ Pick a size step. Do not stretch, crop or rotate the logomark.
 
 <FoundationSubsection title="Give the logomark breathing room">
 
-Do not add unnecessary containers around the logomark.
+Do not add unnecessary containers around the logomark. Never rebuild it from shapes or type; use the Logo component.
 
 <DoDont>
 <Do caption="The logomark on its own, with space around it."><Mark color="colored" size={64} /></Do>
@@ -204,7 +188,7 @@ Do not add unnecessary containers around the logomark.
 
 <FoundationSubsection title="Keep the artwork clean">
 
-Do not add effects to the logo.
+Do not add effects to the logo or edit the artwork. Use the outlined option on photos and busy grounds, and keep to one Logo per view: partner and tool logos go in a Tile, never in the Logo set.
 
 <DoDont>
 <Do caption="The logomark as drawn."><Mark color="colored" size={64} /></Do>
@@ -213,17 +197,22 @@ Do not add effects to the logo.
 
 </FoundationSubsection>
 
-- Do not place a colored or filled logo on a complex background, and do not edit the artwork. Use the outlined option on photos and busy grounds.
-- Do not rebuild the logomark from shapes or type; use the Logo component.
-- One Logo per view. Partner and tool logos go in a Tile, never in the Logo set.
 
 </FoundationSection>
 
 <FoundationSection title="Accessibility">
 
-- Where the logo is the only thing naming PLUS, give it the alt text "PLUS".
-- Beside a visible PLUS title the logomark is decorative: hide it so the name is not read twice.
-- A logo that links home is a link: name it for where it goes, give it keyboard focus and the focus ring.
+Write the name in the alt text for the logo in digital experiences.
+
+<RefTable
+    head={['Case', 'Alt text']}
+    rows={[
+        ['Logo is the only thing naming PLUS (sign-in screen)', 'PLUS'],
+        ['Logo sits beside a visible PLUS title', 'Empty. It is decorative; hide it from assistive technology.'],
+        ['Logo links home', 'PLUS home (names where it goes). Give it keyboard focus and the focus ring.'],
+    ]}
+/>
+
 - Choose the color option by ground so the logomark keeps its contrast.
 
 </FoundationSection>

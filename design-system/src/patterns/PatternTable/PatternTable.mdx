@@ -1,3 +1,4 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -142,11 +143,10 @@ Search, filters and actions sit in the Section header: `<PatternSection toolbar=
 
 ## Parts
 
-1. **Section header.** Not part of the table: the title and, in the toolbar type, search, filters, the count and actions.
-2. **Head row.** Names the columns. Its rule is the bold border.
-3. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
-4. **Pagination** (optional). A slot under the rows, aligned to the end. It hides while the empty state shows.
-5. **Message row.** The `emptyState` slot, which replaces the rows when `empty` is true. It sits under the head row and spans every column.
+1. **Head row.** Names the columns. Its rule is the bold border.
+2. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
+3. **Pagination** (optional). A slot under the rows, aligned to the end. It hides while the empty state shows.
+4. **Message row.** The `emptyState` slot, which replaces the rows when `empty` is true. It sits under the head row and spans every column.
 
 ### States
 
@@ -179,13 +179,12 @@ Row states are layered over each cell's fill, never swapped for it.
 <tr><td><code>--ds-text</code>, <code>--body-default</code></td><td>14/20</td><td>Body cells.</td></tr>
 <tr><td><code>--ds-text-subtle</code>, <code>--heading-xxsmall</code></td><td>color, type</td><td>Head cells and the message row.</td></tr>
 <tr><td><code>--table-radius</code></td><td>12</td><td>The corner of the table and of its scroll region.</td></tr>
-<tr><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code>, <code>--stack-md</code></td><td>length</td><td>Cell padding and the gap inside a cell.</td></tr>
+<tr><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code>, <code>--stack-md</code></td><td>length</td><td>Cell padding, the gap inside a cell, and the side pad (8) of the message row.</td></tr>
 <tr><td><code>--ds-background-neutral-subtle-hovered</code>, <code>-pressed</code></td><td>color</td><td>A hovered and a pressed row.</td></tr>
 <tr><td><code>--ds-background-selected</code>, <code>-hovered</code>, <code>-pressed</code></td><td>color</td><td>A selected row.</td></tr>
 <tr><td><code>--ds-shadow-overflow</code></td><td>shadow</td><td>A sticky edge, only while content is scrolled under it.</td></tr>
 <tr><td><code>--ds-utility-elevation-surface-current</code></td><td>color</td><td>The fill of sticky cells, so they match what the table sits on.</td></tr>
 <tr><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td><td>focus ring</td><td>The ring of a scroll region.</td></tr>
-<tr><td><code>--table-pad-x-cell</code></td><td>8</td><td>The side pad of the message row.</td></tr>
 <tr><td><code>--row-height-md</code></td><td>40</td><td>The least height of the message row.</td></tr>
 <tr><td><code>--section-stack-md</code>, <code>--stack-sm</code></td><td>16, 4</td><td>Space around the message, and between its lines.</td></tr>
 </tbody>
@@ -281,11 +280,10 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: the header types, toolbar and tabs, that sit above every table.
-- <a target="_top" href="./?path=/docs/components-text-and-data-display-static-table--docs">Table component</a>: the table components, with a set of headers and rows.
-- <a target="_top" href="./?path=/docs/components-navigation-pagination--docs">Pagination</a>: the pager that fills the pagination slot.
-- <a target="_top" href="./?path=/docs/templates-section-card--docs">Card</a>: a table never sits inside a card.
-- <a href="?path=/docs/templates-overview--docs">Templates</a>: the dashboard content shows a Students table in a Section at every breakpoint.
+- <DocsLink id="templates-section-section">Section</DocsLink>: the header types, toolbar and tabs, that sit above every table.
+- <DocsLink id="components-text-and-data-display-static-table">Table component</DocsLink>: the table components, with a set of headers and rows.
+- <DocsLink id="components-navigation-pagination">Pagination</DocsLink>: the pager that fills the pagination slot.
+- <DocsLink id="templates-section-card">Card</DocsLink>: a table never sits inside a card.
 
 </div>
 

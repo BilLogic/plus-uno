@@ -6,7 +6,7 @@ import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Flag, { FlagGroup, FLAG_APPEARANCES } from './Flag';
-import Button from '@/components/forms-and-inputs/Button/Button';
+import { Button } from '@/components';
 import { SoundProvider, useSound } from '@/sound';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { Screen, Section } from '@/storybook-docs/illustrations/primitives.jsx';
@@ -18,7 +18,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Flag component for displaying notifications.'
+                component: 'A message that lands on its own, over the page, and goes away when it is read or resolved.'
             }
         }
     },

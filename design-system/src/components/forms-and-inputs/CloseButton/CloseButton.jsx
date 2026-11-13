@@ -34,7 +34,7 @@ const CloseButton = ({
 );
 
 CloseButton.propTypes = {
-    /** The accessible name and tooltip. "Close" for a surface that blocks; "Dismiss {what}" for a message. */
+    /** The accessible name and hover title. "Close" for a surface that blocks; "Dismiss {what}" for a message. */
     label: PropTypes.string,
     /** `default` for neutral surfaces; `inverse` for colored or dark grounds */
     tone: PropTypes.oneOf(['default', 'inverse']),

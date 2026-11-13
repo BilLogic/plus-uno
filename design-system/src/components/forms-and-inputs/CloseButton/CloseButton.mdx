@@ -147,7 +147,7 @@ The close button anchors the top-right corner of the modal, panel or message it 
 
 ### Name what it closes.
 
-Use "Close" for a surface that blocks, like a Modal, and "Dismiss" plus what goes away for a message: "Dismiss update", "Dismiss warning". The × glyph is the same either way, so `label` is the only thing that tells a screen reader user what just went away.
+Use "Close" for a surface that blocks, like a Modal, and "Dismiss" plus what goes away for a message: "Dismiss update", "Dismiss message". The × glyph is the same either way, so `label` is the only thing that tells a screen reader user what just went away.
 
 ```jsx
 <CloseButton label="Dismiss update" onClick={dismiss} />
@@ -192,7 +192,7 @@ isn't one of `CloseButton`'s props.
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Say what closes: "Close filters", "Dismiss alert".</td><td>A bare "Close", or a label that repeats the glyph: "X icon".</td></tr>
+<tr><td>Say what closes: "Close filters", "Dismiss message".</td><td>A bare "Close", or a label that repeats the glyph: "X icon".</td></tr>
 <tr><td>Use "Close" for a surface people can reopen and "Dismiss" for a message they are done with.</td><td>The same word for both, or "Cancel", which names a different action.</td></tr>
 <tr><td>Use sentence case.</td><td>Title case or all capitals.</td></tr>
 </tbody>

@@ -55,7 +55,7 @@ Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` �
 
 ## Parts
 
-1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it is the small icon size, or the size the component around it sets.
+1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it is 16 (`--icon-md`), or the size the component around it sets.
 
 ### States
 

@@ -1,12 +1,11 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
-import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
+import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
-import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import {
     CloseDo,
     CloseDont,
@@ -29,7 +28,6 @@ import * as RadiusStories from './Radius.stories.jsx';
     title="Radius"
     purpose="How round a corner is, and which rule decides it. Every corner reads a token."
     links={{
-        label: 'Tokens',
         items: [
             { title: 'Scale', href: '#foundation-scale' },
             { title: 'Controls', href: '#foundation-controls' },
@@ -73,7 +71,7 @@ A primitive's name is its rem value × 100 (`--radius-0625` is 0.625rem, 10), an
 A control rounds at a quarter of its height, so the corner reads the same at every size. The three heights each have a token in the `Radius / Control` group.
 
 <RefTable
-    head={['Control height', 'Radius', 'Token', 'For example']}
+    head={['Control height (px)', 'Radius (px)', 'Token', 'For example']}
     rows={[
         ['24', '6', <C>--radius-control-sm</C>, 'A Tooltip, a Sidebar row, a compact tab'],
         ['32', '8', <C>--radius-control-md</C>, 'A compact field, a tab, an option row'],
@@ -106,7 +104,7 @@ Each template owns a token. A Page sits square in the Frame; a Section with a fi
 <Canvas of={RadiusStories.Templates} sourceState="none" />
 
 <RefTable
-    head={['Template', 'Radius', 'Token']}
+    head={['Template', 'Radius (px)', 'Token']}
     rows={[
         ['Page in the Frame', '0', '—'],
         ['Section with a fill', '16', <C>--section-radius</C>],
@@ -120,11 +118,13 @@ Each template owns a token. A Page sits square in the Frame; a Section with a fi
 
 A box inside a page, such as a Comment, a Code block, a Section message or a File upload, rounds at 12 (`--radius-xl`). The smallest nested visual, such as a choice card or a spacious Status tag, rounds at 8 (`--radius-lg`).
 
-### Window edge
+<FoundationSubsection title="Window edge">
 
 Where a box meets the window or its parent's side, it takes 0. The Page runs to the Frame's edge, and a Modal footer with a fill runs to the Modal's sides, so its seam is square and the Modal's own corner clips it.
 
 <Canvas of={RadiusStories.Window} sourceState="none" />
+
+</FoundationSubsection>
 
 </FoundationSection>
 
@@ -136,11 +136,13 @@ A shape inset in a rounded box rounds at the box's radius minus the inset, so th
 
 If the corners still look uneven, change the padding, not the radius: the inner radius has to land on a step. A part flush with its parent's edge, such as a Table's head row or a Card's image, takes no radius of its own; the parent clips it.
 
-### Pills
+<FoundationSubsection title="Pills">
 
 A pill is exempt from nesting. It keeps `--radius-full` inside a Card, a field or a row.
 
 <Canvas of={RadiusStories.Pill} sourceState="none" />
+
+</FoundationSubsection>
 
 </FoundationSection>
 
@@ -149,7 +151,7 @@ A pill is exempt from nesting. It keeps `--radius-full` inside a Card, a field o
 Small parts take the two smallest steps, and keep them wherever they sit.
 
 <RefTable
-    head={['Radius', 'Token', 'For example']}
+    head={['Radius (px)', 'Token', 'For example']}
     rows={[
         ['2', <C>--radius-sm</C>, 'A logo in a Tile, a team avatar in a Tag'],
         ['4', <C>--radius-md</C>, 'A Count tag, a Status tag, a Checkbox, a Link, a day in the Calendar, a Table loading bar'],
@@ -162,10 +164,10 @@ A tight grid, such as the days of a Calendar, rounds at 4. A larger radius pinch
 
 <FoundationSection title="Focus ring">
 
-The focus ring sits 2 outside the element (`--focus-ring-width` for both its width and its offset), so its radius is the element's radius + 2. Interactive PLUS components draw the ring for you, and the browser rounds the outline to match.
+The focus ring sits 2 px outside the element (`--focus-ring-width` for both its width and its offset), so its radius is the element's radius + 2. Interactive PLUS components draw the ring for you, and the browser rounds the outline to match.
 
 <RefTable
-    head={['Element', 'Radius', 'Focus ring radius']}
+    head={['Element', 'Radius (px)', 'Focus ring radius (px)']}
     rows={[
         ['Default button (32)', '6', '8'],
         ['Compact button (24)', '4', '6'],
@@ -176,7 +178,7 @@ The focus ring sits 2 outside the element (`--focus-ring-width` for both its wid
     ]}
 />
 
-The ring follows the element's shape and keeps 3:1 contrast against its ground. Radius is decoration: never let a corner alone signal state or meaning.
+[Border](?path=/docs/foundations-border--docs#foundation-focus-ring) owns the ring's color and width. Radius is decoration: never let a corner alone signal state or meaning.
 
 </FoundationSection>
 
@@ -246,59 +248,59 @@ The `Radius` group names a step by size; the `Radius / Control` group names it b
 
 <FoundationSection title="Do and don't">
 
-### Round an inner corner smaller than its parent
+<FoundationSubsection title="Round an inner corner smaller than its parent">
 
-<DoDontPair
-    doExample={<NestedDo />}
-    doCaption="Rows inset 4 in a 12 Popup take 8, so the gap between the curves stays even."
-    dontExample={<NestedDont />}
-    dontCaption="Rows at the Popup's own 12. Their corners bulge toward its edge, and the inset looks uneven."
-/>
+<DoDont>
+<Do caption="Rows inset 4 in a 12 Popup take 8, so the gap between the curves stays even.">{<NestedDo />}</Do>
+<Dont caption="Rows at the Popup's own 12. Their corners bulge toward its edge, and the inset looks uneven.">{<NestedDont />}</Dont>
+</DoDont>
 
-### Keep a component's own radius
+</FoundationSubsection>
 
-<DoDontPair
-    doExample={<OverrideDo />}
-    doCaption="Both buttons keep the button radius, 6."
-    dontExample={<OverrideDont />}
-    dontCaption="One button overridden to a pill. One component now has two shapes."
-/>
+<FoundationSubsection title="Keep a component's own radius">
 
-### Stay on the scale
+<DoDont>
+<Do caption="Both buttons keep the button radius, 6.">{<OverrideDo />}</Do>
+<Dont caption="One button overridden to a pill. One component now has two shapes.">{<OverrideDont />}</Dont>
+</DoDont>
 
-<DoDontPair
-    doExample={<OffScaleDo />}
-    doCaption="The Card at 16 and the tag at 4, both steps on the scale."
-    dontExample={<OffScaleDont />}
-    dontCaption="A Card at 14 and a tag at 5. Off-scale values drift from every neighbor."
-/>
+</FoundationSubsection>
 
-### Round a tight group at 4
+<FoundationSubsection title="Stay on the scale">
 
-<DoDontPair
-    doExample={<TightDo />}
-    doCaption="Tiles 2 apart at 4. The gaps stay straight."
-    dontExample={<TightDont />}
-    dontCaption="The same tiles at 12. Every gap pinches where the curves meet."
-/>
+<DoDont>
+<Do caption="The Card at 16 and the tag at 4, both steps on the scale.">{<OffScaleDo />}</Do>
+<Dont caption="A Card at 14 and a tag at 5. Off-scale values drift from every neighbor.">{<OffScaleDont />}</Dont>
+</DoDont>
 
-### Close with an Icon button
+</FoundationSubsection>
 
-<DoDontPair
-    doExample={<CloseDo />}
-    doCaption="The subtle Icon button: the button radius, the ring and the states come with it."
-    dontExample={<CloseDont />}
-    dontCaption="A hand-built circle. Its corner, its states and its focus ring are all guesses."
-/>
+<FoundationSubsection title="Round a tight group at 4">
 
-### Read a token, never a px value
+<DoDont>
+<Do caption="Tiles 2 apart at 4. The gaps stay straight.">{<TightDo />}</Do>
+<Dont caption="The same tiles at 12. Every gap pinches where the curves meet.">{<TightDont />}</Dont>
+</DoDont>
 
-<DoDontPair
-    doExample={<C>border-radius: var(--radius-control-lg);</C>}
-    doCaption="The token follows the rules when a value moves."
-    dontExample={<C>border-radius: 10px;</C>}
-    dontCaption="A literal is right today and wrong after the next change. The radius lint fails it."
-/>
+</FoundationSubsection>
+
+<FoundationSubsection title="Close with an Icon button">
+
+<DoDont>
+<Do caption="The subtle Icon button: the button radius, the ring and the states come with it.">{<CloseDo />}</Do>
+<Dont caption="A hand-built circle. Its corner, its states and its focus ring are all guesses.">{<CloseDont />}</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Read a token, never a px value">
+
+<DoDont>
+<Do caption="The token follows the rules when a value moves.">{<C>border-radius: var(--radius-control-lg);</C>}</Do>
+<Dont caption="A literal is right today and wrong after the next change. The radius lint fails it.">{<C>border-radius: 10px;</C>}</Dont>
+</DoDont>
+
+</FoundationSubsection>
 
 </FoundationSection>
 

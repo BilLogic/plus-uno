@@ -18,7 +18,7 @@ Also asked as: summary card, object card.
 
 ## Usage
 
-Use a card when one object needs its own container on the page. A card holds a heading, some content and, when people can act on it, a footer. This pattern is the shell: you fill its slots with your own parts.
+Use a card when one object needs its own container on the page. A card holds a heading, some content and, when people can act on it, a footer. This template is the shell: you fill its slots with your own parts.
 
 Build a card in four steps. Pick the size by what it holds. Choose the header, or turn it off when the body carries its own title. Fill the body slot, spacing only inside the slot content with the Card stack tokens. Add the footer only for actions that commit.
 
@@ -91,7 +91,7 @@ A card that holds actions that commit a change gets a footer, and its actions st
 
 - Section for a region that holds cards under one heading.
 - Table for many objects of the same shape that people compare across columns.
-- Page for a fill and an elevation with no slots.
+- Page for the content area's own fill, header and elevation.
 - Modal for something that must be decided before the page can continue.
 
 Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
