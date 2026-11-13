@@ -7,6 +7,7 @@ import {
     ButtonShape,
     CardBox,
     Field,
+    Layer,
     Modal,
     Rect,
     Row,
@@ -16,8 +17,7 @@ import {
     SkeletonBar,
     Popup,
 } from '../illustrations/primitives.jsx';
-import { IsoStack } from '../illustrations/shapes.jsx';
-import { HeroDrawing, FRAME_UNITS, STAGE_UNITS } from './HeroDrawing.jsx';
+import { HeroDrawing, FRAME_UNITS, HERO_SIDEBAR_W, STAGE_UNITS } from './HeroDrawing.jsx';
 import { AppWindow } from './HeroWindow.jsx';
 
 /**
@@ -56,11 +56,92 @@ const WHOLE = {
     h: FRAME_UNITS.h,
 };
 
-export const OverviewHero = () => (
-    <HeroDrawing>
-        <IsoStack x={50} y={-4} w={200} h={168} layers={4} accent />
-    </HeroDrawing>
-);
+/**
+ * The Templates overview's exploded view: four plates, back to front, each the
+ * same size and the same flat turn (no perspective, so edges stay parallel and
+ * bars stay crisp). `left` and `w` place each plate's part inside it, and the
+ * plates step so the parts' centers sit evenly apart, left to right, each layer
+ * a step higher. Units are the kit's, from the stage's corner.
+ */
+const PLATE = { w: 160, h: 115 };
+const TURN = { skew: -12, scaleX: 0.8 };
+const CENTER_STEP = 75;
+/** The Page's content inset, and the rows' inset inside the Section. */
+const PAGE_PAD = 11;
+const ROWS_PAD = 6;
+const SECTION = { left: HERO_SIDEBAR_W + PAGE_PAD, w: PLATE.w - HERO_SIDEBAR_W - 2 * PAGE_PAD };
+const PARTS = [
+    { name: 'frame', left: 0, w: PLATE.w },
+    { name: 'shell', left: 0, w: PLATE.w },
+    { name: 'section', ...SECTION },
+    { name: 'rows', left: SECTION.left + ROWS_PAD, w: SECTION.w - 2 * ROWS_PAD },
+];
+const k = TURN.scaleX;
+const span = (k * PARTS[0].w) / 2 + CENTER_STEP * (PARTS.length - 1) + (k * PARTS[PARTS.length - 1].w) / 2;
+const firstCenter = (FRAME_UNITS.w - span) / 2 + (k * PARTS[0].w) / 2 - (FRAME_UNITS.w - STAGE_UNITS.w) / 2;
+
+export const PLATES = PARTS.map((part, i) => {
+    const center = firstCenter + i * CENTER_STEP;
+    return { ...part, center, x: center - k * (part.left + part.w / 2), y: 37 - i * 7 };
+});
+
+const Plate = ({ i, children }) => {
+    const { name, x, y } = PLATES[i];
+    return (
+        <g data-plate={name} transform={`translate(${x} ${y}) skewY(${TURN.skew}) scale(${TURN.scaleX} 1)`}>
+            {children}
+        </g>
+    );
+};
+
+export const OverviewHero = () => {
+    const section = { x: PARTS[2].left, y: 43, w: PARTS[2].w, h: 63 };
+    const rows = { x: PARTS[3].left, y: section.y + 17, w: PARTS[3].w, h: 9 + 4 * 12 };
+    return (
+        <HeroDrawing>
+            {/* 1 The Frame: the plain sunken ground, the one plate with an outline. */}
+            <Plate i={0}>
+                <Layer x={0} y={0} w={PLATE.w} h={PLATE.h} fill={PAINT.frameSunken} shadow={PAINT.cardShadow} corner="window" />
+                <Rect x={0} y={0} w={PLATE.w} h={PLATE.h} stroke={PAINT.illustrationEdge} corner="window" />
+            </Plate>
+            {/* 2 The app shell: the docked Sidebar and the Page, its breadcrumb and title. */}
+            <Plate i={1}>
+                <AppWindow x={0} y={0} w={PLATE.w} h={PLATE.h}>
+                    {(page) => (
+                        <>
+                            <SkeletonBar x={page.x + PAGE_PAD} y={9} w={32} h={3} />
+                            <SkeletonBar x={page.x + PAGE_PAD} y={20} w={56} h={6} heading />
+                            <SkeletonBar x={page.x + PAGE_PAD} y={31} w={72} />
+                        </>
+                    )}
+                </AppWindow>
+            </Plate>
+            {/* 3 One Section, on the sunken fill with the section radius, and its heading. */}
+            <Plate i={2}>
+                <Layer {...section} fill={PAINT.sectionSubtleSurface} shadow={PAINT.cardShadow} corner="section" />
+                <SkeletonBar x={section.x + 7} y={section.y + 7} w={42} h={5} heading />
+            </Plate>
+            {/* 4 Its rows: a table on the raised surface, one row selected and ringed. */}
+            <Plate i={3}>
+                <Layer {...rows} fill={PAINT.cardSurface} shadow={PAINT.cardShadow} corner="card" />
+                <SkeletonBar x={rows.x + 6} y={rows.y + 3} w={25} h={3} />
+                <SkeletonBar x={rows.x + 50} y={rows.y + 3} w={15} h={3} />
+                {[0, 1, 2, 3].map((i) => {
+                    const y = rows.y + 9 + i * 12;
+                    return (
+                        <React.Fragment key={i}>
+                            <Rule x1={rows.x} x2={rows.x + rows.w} y1={y} y2={y} stroke={PAINT.rowDivider} />
+                            {i === 1 && <Rect x={rows.x + 1} y={y + 1} w={rows.w - 2} h={10} fill={PAINT.rowSelected} stroke={PAINT.accent} corner="icon" />}
+                            <circle cx={rows.x + 8.5} cy={y + 6} r={2.5} fill={PAINT.placeholderText} />
+                            <SkeletonBar x={rows.x + 14} y={y + 4.5} w={28 - (i % 2) * 6} h={3.5} />
+                            <SkeletonBar x={rows.x + 50} y={y + 4.5} w={17} h={3.5} />
+                        </React.Fragment>
+                    );
+                })}
+            </Plate>
+        </HeroDrawing>
+    );
+};
 
 export const FrameHero = () => {
     const f = { x: 20, y: 6, w: 260, h: 148 };

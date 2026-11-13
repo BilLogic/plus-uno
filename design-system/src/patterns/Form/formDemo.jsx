@@ -26,7 +26,12 @@ const HOST_RADIUS = '--modal-radius';
 /** A page form needs more room than the other windows: the fields, the footer below them, and a server message above. */
 const PAGE_HEIGHT = 540; // docs-literal
 
+/** The Frame docks its Sidebar from 1024 of its own width, so the page example's stage is a little wider than the window's border. */
+export const PAGE_WIDTH = 1060; // docs-literal
+
 export const SCREEN = { width: 1024, height: 580 }; // docs-literal
+
+const PAGE_BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions', href: '#' }, { text: 'Log a session' }];
 
 const SUBJECTS = [
     { value: 'lincoln', label: 'Lincoln Middle' },
@@ -141,13 +146,17 @@ const useFormState = ({ initial = EMPTY, sendingForever = false, server = false,
     return { values, setValues, errors, sending, serverError, setServerError, setRef, onBlurField, submit };
 };
 
-/** A form in a page: in a Section with the subtle fill, buttons left under the fields. */
+/**
+ * A form in a page: drawn in the Frame with the Sidebar docked, straight on the
+ * Page. The form's title is the page-level Section header (the page's h1), then
+ * the fields and the left-aligned footer follow with no Section around them.
+ */
 export const FormInPage = ({ initial, server, subjectWaits, sendingForever, marked, sending }) => {
     const f = useFormState({ initial, server, sendingForever, marked, sending });
     return (
-        <BrowserWindow address="app.plus.org/settings/sessions" height={PAGE_HEIGHT}>
-            <InAppFrame height="100%" panelStorageKey={null}>
-                <PatternSection title="Log a session" fill="subtle">
+        <BrowserWindow address="app.plus.org/sessions/new" height={PAGE_HEIGHT}>
+            <InAppFrame height="100%" activeTabId="sessions" breadcrumbs={PAGE_BREADCRUMBS} panelStorageKey={null}>
+                <PatternSection level="page" title="Log a session">
                     {f.serverError && <FormMessage>{SERVER_MESSAGE}</FormMessage>}
                     <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} subjectWaits={subjectWaits} setRef={f.setRef} />
                     <PageFooter sending={f.sending} onSave={f.submit} />

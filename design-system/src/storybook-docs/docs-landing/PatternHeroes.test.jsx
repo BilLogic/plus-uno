@@ -51,3 +51,17 @@ describe('Patterns heroes', () => {
         for (const id of PATTERN_IDS.filter((p) => p !== 'patterns-states-errors')) expect(danger(id)).toEqual([]);
     });
 });
+
+describe('Patterns Overview: a bento of real moments', () => {
+    it('draws four cells, Filtering big and ringed, a Flag wide, a Spinner and a bell with a count badge small', () => {
+        const { container } = render(React.createElement(HEROES['patterns-overview'].Hero));
+        const cells = [...container.querySelectorAll('[data-cell]')];
+        expect(cells.map((c) => c.dataset.cell)).toEqual(['filtering', 'flag', 'spinner', 'badge']);
+        const ringed = cells.filter((c) => c.querySelector(':scope > g > rect[stroke="' + ACCENT + '"]'));
+        expect(ringed.map((c) => c.dataset.cell)).toEqual(['filtering']);
+        const size = (c) => +c.dataset.w * +c.dataset.h;
+        expect(size(cells[0])).toBeGreaterThan(size(cells[1]));
+        expect(size(cells[1])).toBeGreaterThan(size(cells[2]));
+        expect(size(cells[2])).toBe(size(cells[3]));
+    });
+});

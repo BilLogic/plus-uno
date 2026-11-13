@@ -5,7 +5,7 @@ import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps } from '../../../patterns/Form/formDemo.jsx';
+import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
 import { BoundInputs, Marks, STAGE } from './formsDemo.jsx';
 
 /**
@@ -35,7 +35,7 @@ const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitSta
 
 export const HostPage = {
     name: 'Host: In a page',
-    render: () => staged(<FormInPage />),
+    render: () => staged(<FormInPage />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
@@ -99,7 +99,7 @@ export const RequiredMarks = {
 /** Student was touched and left empty: its error is showing; Site was not touched, so it is not marked. */
 export const ShownOnBlur = {
     name: 'Validation: On blur (shown)',
-    render: () => staged(<FormInPage initial={EMPTY} marked="student" />),
+    render: () => staged(<FormInPage initial={EMPTY} marked="student" />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByLabelText(/Student/), 'touched and empty').toHaveAttribute('aria-invalid', 'true');
@@ -112,7 +112,7 @@ export const ShownOnBlur = {
 /** After the press: the Primary is still enabled and every missing field is marked. */
 export const ShownSubmitStaysEnabled = {
     name: 'Validation: Submit stays enabled (shown)',
-    render: () => staged(<FormInPage initial={EMPTY} marked />),
+    render: () => staged(<FormInPage initial={EMPTY} marked />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByLabelText(/Student/)).toHaveAttribute('aria-invalid', 'true');
@@ -150,7 +150,7 @@ export const ShownSending = {
 /** A field checks itself when it loses focus, and clears once the rule is met. */
 export const OnBlur = {
     name: 'Test: On blur',
-    render: () => staged(<FormInPage />),
+    render: () => staged(<FormInPage />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const student = canvas.getByLabelText(/Student/);
@@ -169,7 +169,7 @@ export const OnBlur = {
 /** The submit stays enabled with a field missing; pressing it marks the field and moves focus there. */
 export const SubmitStaysEnabled = {
     name: 'Test: Submit stays enabled',
-    render: () => staged(<FormInPage />),
+    render: () => staged(<FormInPage />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
