@@ -553,4 +553,4 @@ export const AnatomyMarker = ({ x, y, tx, ty, accent = false }) => (
   </g>
 );
 
-export { Rect, Rule };
+export { Layer, Rect, Rule };

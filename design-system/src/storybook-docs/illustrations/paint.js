@@ -134,6 +134,15 @@ const ROLES = {
   glyph: ['--ds-text', null],
   // An icon drawn as an icon (the Iconography set): the Icon component's default subtle ink.
   iconGlyph: ['--ds-icon-subtle', 'components/images-and-icons/Icon/Icon.scss'],
+  // The palette shown as itself (the Foundations overview's color cell): the darkest brand
+  // step closing the ramp (the lighter steps are the accent at reduced opacity), and the
+  // neutrals from the ground to the text ink.
+  swatchBrandBoldest: ['--ds-background-brand-boldest', null],
+  swatchNeutral1: ['--ds-surface-sunken', null],
+  swatchNeutral2: ['--ds-background-neutral', null],
+  swatchNeutral3: ['--ds-border-bold', null],
+  swatchNeutral4: ['--ds-text-subtle', null],
+  swatchNeutral5: ['--ds-text', null],
 };
 
 /**
