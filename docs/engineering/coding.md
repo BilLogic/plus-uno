@@ -15,6 +15,18 @@ summary: How to write code in this repo — barrel imports, tokens over literals
 - **Docs**: kebab-case with a date prefix for plans (e.g., `2026-04-11-001-refactor-three-tier-context-architecture-plan.md`)
 - **Prompt-specs**: same folder, same date prefix, `-spec` suffix (`docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md`). `uno-prototype`'s spec-handoff deliverables — text handed to an external design tool, not code, so nothing builds them.
 
+## Stories and tests
+
+Stories declare args and render examples. Interaction assertions belong in
+co-located `*.test.*` files, or in `play` functions using `storybook/test`.
+Keep runner-only Vitest imports in test files: the built Storybook loads stories
+without a Vitest runner. `scripts/stories-vitest-only-imports.test.mjs` checks
+static imports, re-exports and dynamic imports, including subpaths.
+
+When a play function needs a runner capability, use the adapter in
+`storybook-docs/lib/test-viewport.js`; it handles ordinary Storybook viewing
+and reports inconsistent runner signals.
+
 ## Folder shape
 
 Every component is one folder, under a group, with this shape (not every file is

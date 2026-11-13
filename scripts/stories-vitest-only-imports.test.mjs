@@ -16,7 +16,31 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const VITEST_IMPORT = /^\s*(?:import\s[^;]*?from|import)\s+['"](vitest(?:\/[^'"]*)?|@vitest\/[^'"]*)['"]/m;
+// Scan loading syntax, skipping comments and treating quoted examples as one
+// token. This covers re-exports and lazy imports without flagging inert prose.
+function hasVitestImport(source) {
+  const tokens = [...source.matchAll(/\/\*[\s\S]*?\*\/|\/\/[^\n]*|'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`|[A-Za-z_$][\w$]*|[^\s]/g)]
+    .map((m) => m[0]).filter((t) => !t.startsWith('//') && !t.startsWith('/*'));
+  const forbidden = (t = '') => /^['"`](?:vitest(?:\/[^'"`]*)?|@vitest\/[^'"`]+)['"`]$/.test(t);
+  for (let i = 0; i < tokens.length; i++) {
+    const keyword = tokens[i];
+    if (keyword !== 'import' && keyword !== 'export') continue;
+    if (tokens[i - 1] === '.') continue;
+    if (keyword === 'import' && (forbidden(tokens[i + 1]) ||
+        (tokens[i + 1] === '(' && forbidden(tokens[i + 2])))) return true;
+    // A declaration's module specifier follows `from`. Stop at its first
+    // string or statement boundary, so later code is considered separately.
+    if (keyword === 'export' && !['*', '{', 'type'].includes(tokens[i + 1])) continue;
+    for (let j = i + 1; j < tokens.length && tokens[j] !== ';'; j++) {
+      if (/^['"`]/.test(tokens[j])) break;
+      if (tokens[j] === 'from') {
+        if (forbidden(tokens[j + 1])) return true;
+        break;
+      }
+    }
+  }
+  return false;
+}
 
 const walk = (dir) =>
   fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
@@ -27,7 +51,7 @@ const walk = (dir) =>
 
 test('stories import nothing from vitest', () => {
   const offenders = walk(path.join(ROOT, 'design-system/src'))
-    .filter((f) => VITEST_IMPORT.test(fs.readFileSync(f, 'utf8')))
+    .filter((f) => hasVitestImport(fs.readFileSync(f, 'utf8')))
     .map((f) => path.relative(ROOT, f));
   assert.deepEqual(offenders, []);
 });
@@ -46,4 +70,27 @@ test('MDX pages import stories files by relative path', () => {
     /^\s*import\s+\*\s+as\s+\w+\s+from\s+['"]@\/[^'"]*\.stories(\.\w+)?['"]/m.test(fs.readFileSync(f, 'utf8')),
   );
   assert.deepEqual(bad.map((f) => path.relative(ROOT, f)), []);
+});
+
+test('the story import guard covers runner-only loading forms', () => {
+  for (const source of [
+    "import { expect } from 'vitest';",
+    "import\n{ expect }\nfrom 'vitest/browser';",
+    "import '@vitest/browser/context';",
+    "export { expect } from 'vitest';",
+    "export * from '@vitest/browser';",
+    "const test = import('vitest');",
+    "const test = import(/* runner */ '@vitest/browser/context');",
+    'const test = import(`vitest/browser`);',
+  ]) assert.equal(hasVitestImport(source), true, source);
+});
+
+test('the story import guard permits storybook play assertions and inert text', () => {
+  for (const source of [
+    "import { expect, within } from 'storybook/test'; export const Demo = { play: () => expect(true).toBe(true) };",
+    "// import 'vitest';\nexport const Demo = {};",
+    "/* export * from 'vitest'; */ export const Demo = {};",
+    'const example = "import(\'vitest\')";',
+    "import { VitestIcon } from './vitest-icon';",
+  ]) assert.equal(hasVitestImport(source), false, source);
 });
