@@ -12,7 +12,7 @@ import Select from './Select';
  * isSearchable={false} turns that off for a short list.
  */
 export default {
-    title: 'Components/Forms and inputs/Select',
+    title: 'Components/Forms and inputs/Select/Select',
     component: Select,
     tags: ['!dev', '!autodocs'],
     parameters: {

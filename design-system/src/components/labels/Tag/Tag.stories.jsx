@@ -30,7 +30,7 @@ import { iconClass } from '../../../lib/icon';
  */
 
 export default {
-    title: 'Components/Labels/Tag',
+    title: 'Components/Labels/Tag/Tag',
     component: Tag,
     tags: ['!dev', '!autodocs'],
     parameters: {

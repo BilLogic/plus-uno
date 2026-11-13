@@ -330,3 +330,16 @@ test('a Foundations › Expression › Sound entry in the sort with no page goes
   listSound(root, ['Overview', 'Sounds']);
   assert.match(messages(root).join('\n'), /Foundations > Expression > Sound lists "Sounds", but no page is titled Foundations\/Expression\/Sound\/Sounds/);
 });
+
+test('a component page titled as the folder of its sub-pages goes red; Name/Name is green', () => {
+  const bad = fixture({
+    'design-system/src/components/forms-and-inputs/Radio.stories.jsx': story('Components/Forms and inputs/Radio'),
+    'design-system/src/components/forms-and-inputs/RadioGroup.stories.jsx': story('Components/Forms and inputs/Radio/Radio group'),
+  });
+  assert.ok(messages(bad).some((m) => m.includes('Radio.stories.jsx') && m.includes('"Docs" entry')));
+  const good = fixture({
+    'design-system/src/components/forms-and-inputs/Radio.stories.jsx': story('Components/Forms and inputs/Radio/Radio'),
+    'design-system/src/components/forms-and-inputs/RadioGroup.stories.jsx': story('Components/Forms and inputs/Radio/Radio group'),
+  });
+  assert.ok(!messages(good).some((m) => m.includes('"Docs" entry')));
+});

@@ -8,7 +8,7 @@ import DatePicker from './DatePicker';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
-    title: 'Components/Forms and inputs/Date time picker/Date picker',
+    title: 'Components/Forms and inputs/Date time picker/Date picker/Date picker',
     component: DatePicker,
     tags: ['!dev', '!autodocs'],
     parameters: {
