@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * The copy-in registry (#2117): static shadcn registry-item JSON for the foundation and
+ * The copy-in registry: static shadcn registry-item JSON for the foundation and
  * every component, built from the design-system source into `dist/registry/`. It runs in
  * `build:all`, so it publishes only with a release (Netlify production is release-only).
  *

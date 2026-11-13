@@ -1,5 +1,5 @@
 // The registry generator's decisions, over a fixture tree: import rewriting, dependency
-// resolution, and the refusal of internal, deprecated and retired parts (#2401).
+// resolution, and the refusal of internal, deprecated and retired parts.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -62,6 +62,11 @@ test('a component item carries its files, takes the foundation and sibling items
   assert.equal(button.meta.release, 'v2.3.4');
 });
 
+test('a commented-out import is not an import', () => {
+  const root = fixture({ [`${L}/components/g/Tag/Tag.jsx`]: "// import x from '@/storybook-docs/x';\nexport const Tag = 1;\n" });
+  assert.deepEqual(generate(root, 'v1').problems, []);
+});
+
 test('the foundation holds tokens, the stylesheet entry without component styles, and the helpers', () => {
   const { items } = generate(fixture(), 'v2.3.4');
   const f = item(items, 'foundation');
@@ -95,9 +100,12 @@ test('an import outside the design system, or one that does not resolve, or a pa
   assert.throws(() => generate(pkg, 'v1'), /left-pad/);
 });
 
-test('check:registry passes on this repo', () => {
-  const { problems } = generate(REPO_ROOT);
+test('check:registry passes on this repo, and the foundation ships its stylesheet entry without component loads', () => {
+  const { items, problems } = generate(REPO_ROOT);
   assert.deepEqual(problems, []);
+  const main = items.find((i) => i.name === 'foundation').files.find((f) => f.target === 'plus-ds/styles/main.scss');
+  assert.ok(main, 'foundation lacks styles/main.scss');
+  assert.doesNotMatch(main.content, /load-css\(\s*['"]\.\.\/(components|assets)\//);
 });
 
 test('check:registry fails on an injected unshippable import', () => {

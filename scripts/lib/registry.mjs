@@ -1,5 +1,5 @@
 /**
- * The registry generator's decisions (#2117): which files make an item, what makes
+ * The registry generator's decisions: which files make an item, what makes
  * an import shippable, how an import is rewritten, where an npm version comes from.
  * Pure over a repo root so tests run it on a fixture tree; `scripts/generate-registry.mjs`
  * writes the JSON and `check:registry` fails on any refusal.
@@ -64,7 +64,7 @@ export function expandBarrelImports(root, text) {
 
 /** The foundation's stylesheet entry loads every component's styles; a component item brings its own. */
 export function stripComponentStyles(file, text) {
-  return file === `${LIBRARY}/styles/main.scss` ? text.replace(/^[ \t]*@include meta\.load-css\(\s*["']\.\.\/components\/[^\n]*\n/gm, '') : text;
+  return file === `${LIBRARY}/styles/main.scss` ? text.replace(/^[ \t]*@include meta\.load-css\(\s*["']\.\.\/(?:components|assets|patterns)\/[^\n]*\n/gm, '') : text;
 }
 
 export class Refusal extends Error {}
@@ -73,8 +73,16 @@ const read = (root, rel) => fs.readFileSync(path.join(root, rel), 'utf8');
 const isFile = (root, rel) => { try { return fs.statSync(path.join(root, rel)).isFile(); } catch { return false; } };
 const isScss = (f) => f.endsWith('.scss');
 
+/** Line comments (`//`, SCSS and JS) and block comments become spaces, so a commented-out import is not an import and offsets hold. */
+function blankComments(file, text) {
+  const blank = (m) => m.replace(/[^\n]/g, ' ');
+  const noBlock = text.replace(/\/\*[\s\S]*?\*\//g, blank);
+  return isScss(file) || /\.m?jsx?$/.test(file) ? noBlock.replace(/(^|[^:'"\w])\/\/[^\n]*/g, (m, pre) => pre + blank(m.slice(pre.length))) : noBlock;
+}
+
 /** Every import specifier in a file: `{ spec, start, end }` spans over the specifier text. */
 export function importsOf(file, text) {
+  text = blankComments(file, text);
   const re = isScss(file) ? SCSS_USE : file.endsWith('.css') ? /(@import\s+(?:url\()?)(['"])([^'"\n]+)\2/g : JS_IMPORT;
   return [...text.matchAll(re)].map((m) => {
     const start = m.index + m[0].lastIndexOf(m[3]);
@@ -183,7 +191,7 @@ const target = (file) => `${TARGET}/${file.slice(LIBRARY.length + 1)}`;
 
 function fileEntry(root, file) {
   const content = rewriteImports(file, stripComponentStyles(file, expandBarrelImports(root, read(root, file))));
-  return { path: file, type: file.endsWith('.scss') || file.endsWith('.css') ? 'registry:file' : 'registry:lib', content, target: target(file) };
+  return { path: file, type: file.endsWith('.scss') || file.endsWith('.css') ? 'registry:file' : file.startsWith(`${LIBRARY}/components/`) ? 'registry:ui' : 'registry:lib', content, target: target(file) };
 }
 
 /** Where a file belongs: a component's folder (its item), the foundation, or nowhere in particular (copied with whoever imports it). */
@@ -217,6 +225,7 @@ export function buildRegistry(root, release) {
   const foundation = foundationFiles(root);
   const refusals = [];
   const stamp = { release };
+  if (!foundation.has(`${LIBRARY}/styles/main.scss`)) refusals.push('foundation: styles/main.scss is not self-contained, so the foundation would ship without its stylesheet entry');
 
   const fclose = closure(root, [...foundation]);
   refusals.push(...fclose.refusals.map((r) => `foundation: ${r}`));
