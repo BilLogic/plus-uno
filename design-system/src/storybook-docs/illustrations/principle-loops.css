@@ -52,7 +52,6 @@
     height: calc(var(--space-100) * 9);
     background: var(--ds-surface-sunken);
     overflow: hidden;
-    animation-duration: var(--loop-cycle);
 }
 
 [data-principle-loop] > * {
@@ -190,7 +189,7 @@
 
 .principle-reel {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr));
     gap: var(--section-stack-md);
 }
 .principle-reel figure {

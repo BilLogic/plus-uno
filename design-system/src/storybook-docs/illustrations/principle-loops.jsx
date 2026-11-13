@@ -81,17 +81,17 @@ const Page = ({ children }) => (
 const REELS = {
   // Opening a session: the press, the pressed color in the same frame, the state settling.
   responsive: [
-    { caption: 'The press', draw: () => (
+    { caption: '0 ms · press', draw: () => (
       <Page>
         <Rect x={44} y={40} w={72} h={22} fill={PAINT.accent} corner="shape" />
       </Page>
     ) },
-    { caption: 'Same frame: the pressed color', draw: () => (
+    { caption: 'Same frame · pressed color', draw: () => (
       <Page>
         <Rect x={44} y={40} w={72} h={22} fill={PAINT.accent} corner="shape" opacity={0.7} />
       </Page>
     ) },
-    { caption: 'About 120 ms later: the state settles', draw: () => (
+    { caption: 'A beat later: the state settles', draw: () => (
       <Page>
         <Rect x={44} y={40} w={72} h={22} fill={PAINT.accent} corner="shape" opacity={0.7} />
         <SkeletonBar x={60} y={49} w={40} h={4} tone={PAINT.pageSurface} />
@@ -165,7 +165,7 @@ export const PrincipleReel = ({ id }) => (
   <div className="principle-reel" data-principle-reel={id}>
     {REELS[id].map((frame) => (
       <figure key={frame.caption} data-reel-frame="">
-        <svg viewBox={VIEW} role="img" aria-label={frame.caption}>
+        <svg viewBox={VIEW} aria-hidden="true">
           {frame.draw()}
         </svg>
         <figcaption>{frame.caption}</figcaption>
