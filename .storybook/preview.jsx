@@ -453,8 +453,7 @@ const preview = {
             "Base UI",
             "Font Awesome",
             "Highcharts",
-            "Motion",
-            "Pragmatic drag and drop"
+            "Motion"
           ],
           "*"
         ],
