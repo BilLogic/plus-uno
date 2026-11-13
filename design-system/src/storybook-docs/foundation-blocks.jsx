@@ -202,8 +202,9 @@ const MODES = [
  * the toolbar is set to. Each pane sets `data-color-mode` on itself, and the
  * generated tokens key off that attribute on any element, so the pane reads
  * its own mode's values. The page's contrast setting carries into both panes.
+ * `stacked` puts the panes one above the other at full width, for a figure too wide to halve.
  */
-export const ModeCompare = ({ children, initial = 'both' }) => {
+export const ModeCompare = ({ children, initial = 'both', stacked = false }) => {
     const [mode, setMode] = useState(initial);
     const contrast = usePageContrast();
     const panes = mode === 'both' ? ['light', 'dark'] : [mode];
@@ -235,7 +236,7 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
             <div
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))',
+                    gridTemplateColumns: stacked ? '1fr' : 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))',
                     gap: 'var(--grid-gutter)',
                 }}
             >

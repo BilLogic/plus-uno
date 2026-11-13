@@ -11,6 +11,7 @@ import { seriesColor } from '@/dataviz/palette';
  */
 const AreaChart = ({
     data,
+    categories,
     stacking = null, // 'normal', 'percent', or null
     xAxisLabel,
     yAxisLabel,
@@ -31,7 +32,7 @@ const AreaChart = ({
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: data[0]?.categories,
+            categories: categories ?? data[0]?.categories,
             title: { text: xAxisLabel }
         },
         yAxis: {
@@ -72,6 +73,8 @@ AreaChart.propTypes = {
         data: PropTypes.array.isRequired,
         categories: PropTypes.array
     })).isRequired,
+    /** X-axis period labels, one per point. Without them the axis counts 0, 1, 2. */
+    categories: PropTypes.arrayOf(PropTypes.string),
     stacking: PropTypes.oneOf(['normal', 'percent', null]),
     xAxisLabel: PropTypes.string,
     yAxisLabel: PropTypes.string,

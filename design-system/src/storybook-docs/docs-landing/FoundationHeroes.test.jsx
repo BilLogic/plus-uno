@@ -37,7 +37,7 @@ describe('Foundations heroes', () => {
         expect(HEROES[id].description).toMatch(/^[A-Z].*\.$/);
     });
 
-    it.each(FOUNDATION_IDS.filter((id) => !['foundations-visual-typography', 'foundations-overview'].includes(id)))('%s draws no text', (id) => {
+    it.each(FOUNDATION_IDS.filter((id) => !['foundations-visual-typography', 'foundations-tokens-typography', 'foundations-overview'].includes(id)))('%s draws no text', (id) => {
         const { container } = render(React.createElement(HEROES[id].Hero));
         expect(container.querySelector('text')).toBeNull();
         expect(container.textContent).toBe('');

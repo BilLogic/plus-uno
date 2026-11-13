@@ -26,9 +26,14 @@ const ArcDiagram = ({
             data: data,
             centeredLinks: true,
             colorByPoint: true,
+            // Node names only. A link has no name of its own, so its default label is an internal id
+            // that lands on top of the nodes; the weight is in the tooltip.
             dataLabels: {
                 enabled: true,
-                format: '{point.name}'
+                nodeFormat: '{point.name}',
+                format: '',
+                linkTextPath: { enabled: false },
+                style: { textOutline: 'none' }
             }
         }]
     };

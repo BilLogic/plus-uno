@@ -303,7 +303,7 @@ const shadowNote = (plate) => {
 
 /** One tile per level: its surface with its shadow, on the ground it sits on. */
 export const LevelTiles = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, calc(var(--image-xl) * 2)), 1fr))', gap: 'var(--grid-gutter)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))', gap: 'var(--grid-gutter)' }}>
         {LEVELS.map((l) => {
             const onBackdrop = l.id === 'blocking';
             return (

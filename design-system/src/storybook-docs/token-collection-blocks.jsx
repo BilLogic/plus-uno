@@ -1,5 +1,7 @@
 import React from 'react';
-import { TokenTable } from '@/storybook-docs/foundation-blocks.jsx';
+import { TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SPRING_PRIMITIVES, MOTION_SEMANTICS } from '../../../scripts/lib/tokens/plan.mjs';
 import { FoundationSection, FoundationSubsection } from '@/storybook-docs/foundation-page.jsx';
 import { collectTokens, groupBySection } from '@/storybook-docs/lib/token-collections.mjs';
 import scales from '@/tokens/_scales.scss?raw';
@@ -38,6 +40,94 @@ export const SOURCES = [
 ].map(([file, text]) => ({ file, text }));
 
 export const corpus = collectTokens(SOURCES);
+
+/* ------------------------------------------------------------------ motion */
+
+/** Each spring primitive's raw `linear()` easing and settle time, read from the generated stylesheet. */
+export const springValues = (text = springs) => {
+    const out = {};
+    for (const m of text.matchAll(/--motion-spring-([\w-]+?)(-duration)?:\s*([^;]+);/g)) {
+        out[m[1]] ??= {};
+        out[m[1]][m[2] ? 'duration' : 'easing'] = m[3].trim();
+    }
+    return out;
+};
+
+const SPRINGS = springValues();
+
+/** Damping for a unit mass: critical damping is 2·√stiffness, scaled by the ratio. */
+export const dampingOf = ({ stiffness, ratio }) => Math.round(2 * ratio * Math.sqrt(stiffness) * 10) / 10;
+
+const RawValue = ({ value }) => (
+    <details>
+        <summary>Raw value</summary>
+        <C>{value}</C>
+    </details>
+);
+
+const springCells = (spring) => {
+    const v = SPRINGS[spring.name] ?? {};
+    return [
+        spring.stiffness,
+        dampingOf(spring),
+        v.duration ?? '—',
+        <RawValue key="raw" value={v.easing ?? '—'} />,
+    ];
+};
+
+const SPRING_HEAD = ['Stiffness', 'Damping', 'Settle', 'Raw value'];
+
+/** The spring primitives in readable columns: stiffness, damping and settle time, with the `linear()` curve folded away. */
+export const SpringPrimitiveTable = () => (
+    <DocsTable>
+        <thead>
+            <tr>
+                <th scope="col">Token</th>
+                {SPRING_HEAD.map((h) => <th key={h} scope="col">{h}</th>)}
+            </tr>
+        </thead>
+        <tbody>
+            {SPRING_PRIMITIVES.map((p) => (
+                <tr key={p.name}>
+                    <td><C>{`--motion-spring-${p.name}`}</C></td>
+                    {springCells(p).map((cell, i) => <td key={i}>{cell}</td>)}
+                </tr>
+            ))}
+        </tbody>
+    </DocsTable>
+);
+
+const byName = (name) => SPRING_PRIMITIVES.find((p) => p.name === name);
+
+/** The motion semantics by job: the spring each one aliases, its numbers and its use. */
+export const SpringSemanticTable = () => (
+    <DocsTable>
+        <thead>
+            <tr>
+                <th scope="col">Token</th>
+                <th scope="col">Spring</th>
+                {SPRING_HEAD.slice(0, 3).map((h) => <th key={h} scope="col">{h}</th>)}
+                <th scope="col">Use</th>
+            </tr>
+        </thead>
+        <tbody>
+            {MOTION_SEMANTICS.map((m) => {
+                const p = byName(m.productive);
+                const [stiffness, damping, settle] = springCells(p);
+                return (
+                    <tr key={m.name}>
+                        <td><C>{`--ds-motion-${m.name.replace('.', '-')}`}</C></td>
+                        <td><C>{`--motion-spring-${p.name}`}</C></td>
+                        <td>{stiffness}</td>
+                        <td>{damping}</td>
+                        <td>{settle}</td>
+                        <td>{m.use}</td>
+                    </tr>
+                );
+            })}
+        </tbody>
+    </DocsTable>
+);
 
 const TWO_WORD = new Set(['focused', 'frame', 'font', 'line', 'scroll', 'option', 'menu', 'join', 'choice', 'progress', 'count', 'focus', 'ai', 'motion', 'grid', 'type']);
 
@@ -88,13 +178,13 @@ export const TokenCollection = ({ collection, swatch = false, primitives, semant
             {prim && (
                 <FoundationSection title="Primitives">
                     {primitives}
-                    <Tables section={prim} swatch={swatch} />
+                    {collection === 'motion' ? <SpringPrimitiveTable /> : <Tables section={prim} swatch={swatch} />}
                 </FoundationSection>
             )}
             {sem.length > 0 && (
                 <FoundationSection title="Semantics">
                     {semantics}
-                    {sem.map((s) => (
+                    {collection === 'motion' ? <SpringSemanticTable /> : sem.map((s) => (
                         <FoundationSubsection key={s.id} title={s.title}>
                             <Tables section={s} swatch={swatch && collection === 'color'} />
                         </FoundationSubsection>
