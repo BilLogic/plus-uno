@@ -100,7 +100,7 @@ describe('every drawn paint resolves to a role', () => {
       const vars = [...html.matchAll(/var\((--[\w-]+)\)/g)].map((m) => `var(${m[1]})`);
       expect(vars.length, `${name} paints nothing`).toBeGreaterThan(0);
       for (const v of vars) {
-        const structural = /^var\(--(stroke|hero-stroke|border|radius|type|font-size)/.test(v) || /^var\(--[\w-]*radius/.test(v);
+        const structural = /^var\(--(stroke|border|radius|type|font-size)/.test(v) || /^var\(--[\w-]*radius/.test(v);
         if (structural) {
           // A corner or stroke width: a corner must be a component radius token.
           if (/radius/.test(v)) expect(corners.has(v), `${v} in ${name} is not a CORNER role token`).toBe(true);
