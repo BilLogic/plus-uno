@@ -26,7 +26,7 @@
  * lists (`_inventions.json`; `_patterns.json`, which adds only a pattern's group
  * and when to reach for it; `_aliases.json`, the other words a component is
  * asked by, as `lookup(name).aliases`), the glossary's design-system avoid-words
- * (`GLOSSARY.md`, read through `ds-vocabulary.mjs` and appended to those aliases;
+ * (`docs/conventions/design-system-glossary.md`, read through `ds-vocabulary.mjs` and appended to those aliases;
  * a packaged design-system folder has no glossary and carries the hand-kept ones
  * alone), the token plan's retired renames, and the public
  * barrels themselves. `root` is either a repo root (facts under
@@ -37,7 +37,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { aliasInputs, searchAliases } from './ds-vocabulary.mjs';
+import { DS_GLOSSARY, aliasInputs, searchAliases } from './ds-vocabulary.mjs';
 import { tokenMatchers } from './inventions.mjs';
 import { stripComments } from './js-comments.mjs';
 import { retiredRenames } from './tokens/plan.mjs';
@@ -188,7 +188,7 @@ export function loadFacts(root) {
   const tokenManifest = optional('tokens.json', { tokens: [] });
   const inventions = optional('_inventions.json', { components: [], props: [], tokens: [] });
   const patterns = optional('_patterns.json', { patterns: [] }).patterns;
-  const glossaryFile = path.join(root, 'GLOSSARY.md');
+  const glossaryFile = path.join(root, DS_GLOSSARY);
   const { rows: aliasRows, vocabulary } = searchAliases(
     fs.existsSync(glossaryFile) ? fs.readFileSync(glossaryFile, 'utf8') : '',
     aliasInputs(views, componentManifest.components.map((c) => c.name)),

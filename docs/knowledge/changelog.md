@@ -77,6 +77,10 @@ The audit of Figma Core's docs pages (clipping, section hugging, absolute layout
 
 `skills/uno-review/references/method.md` now makes recorded escapes in edited files review blockers until the build pays them down. Review still diagnoses; the artifact workflow repairs. Stale examples and the blueprint instance count were corrected at their sources.
 
+## 2026-11-13 — DS vocabulary loads on demand
+
+Design-system terms moved from GLOSSARY.md to `docs/conventions/design-system-glossary.md`, disclosed through read_reference for uno-bot and pointed to by the root glossary and DS entry guide. The root keeps product, estate and harness terms; existing component definitions are retained and missing foundation vocabulary is sourced to its owning pages.
+
 ## 2026-11-13 — existing DS decisions in the ADR trail
 
 The harness round records the merged Panel, Radius and drag decisions in ADR-044 through ADR-046. ADR-036 points to the Bootstrap removal; ADR-038 marks its historical pattern and radius names as corrected. No component behavior or ruling changes.

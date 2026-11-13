@@ -38,7 +38,7 @@
     "design-system/src/**/*.{js,jsx,tsx,scss,css,mdx}",
     "prototypes/**/*.{js,jsx,tsx,scss,css}",
     "docs/engineering/ds-usage-rules.md",
-    "GLOSSARY.md",
+    "docs/conventions/design-system-glossary.md",
   ]
 
 # The hosted design-system MCP

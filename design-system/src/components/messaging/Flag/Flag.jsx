@@ -7,7 +7,8 @@ import Button from '@/components/forms-and-inputs/Button';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import { MESSAGE_APPEARANCE_ICONS } from '../messageAppearance';
 import Icon from '../../images-and-icons/Icon';
-import { modeFor, playSound, soundStartFor } from '@/sound';
+import { modeFor } from '@/sound';
+import { playMoment } from '@/sound/moments';
 import './Flag.scss';
 
 /**
@@ -37,12 +38,11 @@ export const FLAG_APPEARANCES = ['normal', 'information', 'warning', 'error', 's
  * minus its pickup. Under reduced motion the flag fades in on the reduced spring
  * and the sound still plays, on that landing.
  */
-function playOnLand(token, reduced) {
-    playSound(token, { at: soundStartFor('spatial.default', token, { mode: modeFor(reduced) }) });
+function playOnLand(appearance, token, reduced) {
+    const options = { token, mode: modeFor(reduced) };
+    if (appearance === 'error') playMoment('Flag', 'failed', options);
+    else playMoment('Flag', 'enter', options);
 }
-
-/** The sound a Flag plays by default: an error appearance sounds Error, every other one Notify. */
-const defaultSound = (appearance) => (appearance === 'error' ? 'error' : 'notify');
 
 /** Warning and error are urgent: they interrupt a screen reader and stay until dismissed. */
 const URGENT_APPEARANCES = ['warning', 'error'];
@@ -202,10 +202,10 @@ export const Flag = ({
      * never another prop change.
      */
     const landing = useRef({});
-    landing.current = { sound: sound ?? defaultSound(flagAppearance), reduced };
+    landing.current = { sound, appearance: flagAppearance, reduced };
     useEffect(() => {
-        const { sound: token, reduced: isReduced } = landing.current;
-        if (show && token) playOnLand(token, isReduced);
+        const { sound: token, appearance: currentAppearance, reduced: isReduced } = landing.current;
+        if (show && token !== false && token !== '') playOnLand(currentAppearance, token, isReduced);
     }, [show]);
 
     if (!show && !leaving) return null;

@@ -6,7 +6,7 @@
  * THE RULES.
  *
  *   avoid-word   a plain avoid-word of a design-system term that names a
- *                component or pattern (`GLOSSARY.md`, any `### Design system: …`
+ *                component or pattern (`docs/conventions/design-system-glossary.md`, any `### Design system: …`
  *                section; the words that also feed `ds_find`) in the prose of a
  *                component, pattern or foundation page, outside code. The
  *                finding names the term to say instead. A hit inside a correct
@@ -39,11 +39,11 @@ import { fileURLToPath } from 'node:url';
 import { byRoot, main, report } from './lib/findings.mjs';
 import { createPageFinder, pagesUnder, readDocsPage } from './lib/docs-page.mjs';
 import { lineOf, readJson, readText, withoutCode } from './lib/ds-check-helpers.mjs';
-import { DS_SECTION, aliasInputs, componentOf, parseGlossary, vocabularyAliases } from './lib/ds-vocabulary.mjs';
+import { DS_GLOSSARY, DS_SECTION, aliasInputs, componentOf, parseGlossary, vocabularyAliases } from './lib/ds-vocabulary.mjs';
 import { ENFORCE_STRICT, STRICT_PAGES } from './lib/ds-strict.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const GLOSSARY = 'GLOSSARY.md';
+const GLOSSARY = DS_GLOSSARY;
 const VIEWS = 'design-system/agent-views';
 const REGISTRY = 'design-system/figma/component-registry.json';
 /** The docs pages the vocabulary binds: component, pattern and foundation pages. */
@@ -179,7 +179,7 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
 }
 
 export const REMEDY =
-  '  -> Say the glossary term the finding names (GLOSSARY.md § Design system). A collision is\n' +
+  '  -> Say the glossary term the finding names (docs/conventions/design-system-glossary.md). A collision is\n' +
   '     fixed in the glossary: qualify the avoid-word or drop it. The rules and their reasons\n' +
   '     are in the header of scripts/check-ds-vocabulary.mjs.';
 

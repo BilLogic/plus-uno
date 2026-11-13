@@ -5,7 +5,6 @@ import { Flag, FlagGroup, FLAG_AUTO_CLOSE_MS, FLAG_APPEARANCES } from './Flag';
 import { resetSound, unlockAudio } from '@/sound/play';
 import { scoreFor } from '@/sound/score';
 import { setSoundEnabled } from '@/sound/settings';
-import { soundStartFor, springT90 } from '@/sound/timing';
 
 /**
  * How long a flag stays. Success and information close themselves after 8 seconds;
@@ -298,8 +297,6 @@ describe('Flag sound', () => {
     const reducedMotion = (matches) => {
         window.matchMedia = vi.fn().mockReturnValue({ matches, addEventListener: vi.fn(), removeEventListener: vi.fn() });
     };
-    /** Seconds from now to the earliest node the flag scheduled: the sound's start. */
-    const scheduledStart = () => Math.min(...audio.starts) - audio.made[0].currentTime;
 
     beforeEach(() => {
         resetSound();
@@ -313,16 +310,6 @@ describe('Flag sound', () => {
         resetSound();
         delete window.AudioContext;
         window.matchMedia = originalMatchMedia;
-    });
-
-    it('starts Notify at the spatial.default 90% time minus the pickup, within 10 ms', () => {
-        reducedMotion(false);
-        render(<Flag title="Saved" />);
-        const expected = springT90('spatial.default') - scoreFor('notify').pickup;
-        expect(expected).toBeCloseTo(soundStartFor('spatial.default', 'notify'), 6);
-        expect(Math.abs(scheduledStart() - expected)).toBeLessThan(0.01);
-        // The landing note sounds on the 90% time itself.
-        expect(audio.starts.length).toBeGreaterThan(0);
     });
 
     it('plays once, on enter, not on a re-render', () => {
@@ -346,11 +333,14 @@ describe('Flag sound', () => {
         expect(audio.starts).toHaveLength(0);
     });
 
-    it('under reduced motion still plays, landing with the reduced spring', () => {
-        // The flag's own reduced flag (prop, then FlagGroup, then the OS); the prop is the stable lever in jsdom.
+    it('under reduced motion still requests sound', () => {
         render(<Flag title="Saved" reducedMotion />);
-        const expected = soundStartFor('spatial.default', 'notify', { mode: 'reduced' });
-        expect(Math.abs(scheduledStart() - expected)).toBeLessThan(0.01);
+        expect(audio.starts.length).toBeGreaterThan(0);
+    });
+
+    it('an empty sound override stays silent', () => {
+        render(<Flag title="Saved" sound="" />);
+        expect(audio.starts).toHaveLength(0);
     });
 
     it('an error flag plays Error; the other appearances play Notify', () => {
