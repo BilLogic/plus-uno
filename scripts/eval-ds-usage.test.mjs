@@ -504,7 +504,7 @@ test('prepare hides the eval implementation from builders, and control has no gl
   const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-isolation-'));
   try {
     for (const arm of ['current', 'control', 'checker-removed']) {
-      const { root } = prepare({ ref: '6fc0ca6b7', arm, task: 'forbidden-ask', into: path.join(into, arm) });
+      const { root } = prepare({ ref: 'HEAD', arm, task: 'forbidden-ask', into: path.join(into, arm) });
       for (const rel of ['scripts/eval-ds-usage.mjs', 'scripts/eval-ds-usage.test.mjs']) assert.equal(fs.existsSync(path.join(root, rel)), false, `${arm}: ${rel}`);
       if (arm === 'control') assert.equal(fs.existsSync(path.join(root, 'GLOSSARY.md')), false);
       if (arm !== 'current') assert.equal(fs.existsSync(path.join(root, 'scripts/lib/__fixtures__/ds-usage')), false);
