@@ -1039,7 +1039,7 @@ a.sbdocs-a {
     outline-offset: var(--stack-sm);
 }
 
-/* Agent view (ADR-040): a lead line, one row of actions, then the file. */
+/* Harness tab (ADR-040): a lead line, one row of actions, then the file. */
 .sb-ds-agent-view__lead {
     color: var(--ds-text-subtle);
     margin: 0 0 var(--space-150);

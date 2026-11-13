@@ -73,7 +73,7 @@ pair in `design-system/src/storybook-docs/foundation-blocks.jsx`.
 ## The four tabs
 
 A component page has four faces below its title — **Examples · Code · Usage ·
-Agent view** — as tabs inside the page, not sidebar entries. Four entries per
+Harness** — as tabs inside the page, not sidebar entries. Four entries per
 component would fragment the sidebar, which is the one place the tree above is
 spoken out loud.
 
@@ -82,24 +82,24 @@ spoken out loud.
 - **Examples:** one story per appearance, state and size, each as a `ComponentExample` (an h3 and a one-line description over the live canvas), then the interactive playground.
 - **Code:** generated. The import line (from the `@/components` barrel, `@/patterns` on a pattern page) and the props table, derived from the story meta, so neither is authored.
 - **Usage:** the Usage spine below, with parts (anatomy and tokens) and content guidelines after its Usage section.
-- **Agent view:** generated. The component's generated file, byte for byte — what agents read, with a raw-text view, Copy, and a "Report a problem" link that opens a GitHub issue. Author nothing for it: the page and the source are its inputs.
+- **Harness:** generated. The component's generated file, byte for byte — what agents read, with a raw-text view, Copy, and a "Report a problem" link that opens a GitHub issue. Author nothing for it: the page and the source are its inputs.
 
 `Button/Button.mdx` is the reference page.
 
 **Pattern pages take the same template.** A pattern in its own folder,
-`patterns/<Name>/<Name>.mdx`, has the same four faces, and its Agent view shows
+`patterns/<Name>/<Name>.mdx`, has the same four faces, and its Harness shows
 the `index.md` the generator writes beside it. A docs-only pattern page with no
 component of its own (Templates, Popups) has no generated file, so it shows
 Examples · Code · Usage. The flat reading pages directly under `patterns/` have no Usage spine and stay untabbed.
 
 **One generated file per component is the agent's whole answer.** Agents read
 `<Name>/index.md` (`<Name>.md` when filed flat), never the `.mdx`: one file per
-question, the same bytes `ds_get` returns. Agent view shows that file to the
+question, the same bytes `ds_get` returns. Harness shows that file to the
 designer, so a wrong sentence there is fixed on this page or in the source and
 regenerated.
 
 The tabs render inside the page from `design-system/src/storybook-docs/docs-tabs.jsx`
-(ADR-025, ADR-040), and Agent view reads the generated files through one raw
+(ADR-025, ADR-040), and Harness reads the generated files through one raw
 glob there; a page with no usage content, no props or no generated file shows
 fewer.
 

@@ -52,8 +52,8 @@ const FrameWithSlots = (args) => (
 );
 
 export default {
-    title: 'Templates/Frame/Frame',
-    id: 'templates-frame-frame',
+    title: 'Templates/Frame',
+    id: 'templates-frame',
     component: Frame,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },

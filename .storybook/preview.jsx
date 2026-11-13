@@ -376,9 +376,6 @@ const preview = {
             "Overview",
             "Frame",
             "Page",
-            [
-              "Page"
-            ],
             "Section",
             [
               "Section"

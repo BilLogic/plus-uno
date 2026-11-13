@@ -129,8 +129,22 @@
 
 [[redirects]]
   from = "/storybook/"
+  query = { path = "/docs/templates-frame-frame--docs" }
+  to = "/storybook/?path=/docs/templates-frame--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-page-page--docs" }
+  to = "/storybook/?path=/docs/templates-page--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
   query = { path = "/docs/templates-page-heading-outline--docs" }
-  to = "/storybook/?path=/docs/templates-page-page--docs#heading-outline"
+  to = "/storybook/?path=/docs/templates-page--docs#heading-outline"
   status = 301
   force = true
 

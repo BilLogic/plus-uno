@@ -98,14 +98,14 @@ describe('componentIdentity', () => {
 });
 
 describe('the tab contract', () => {
-  it('declares four tabs, with Examples first and unparameterized and Agent view last', () => {
+  it('declares four tabs, with Examples first and unparameterized and Harness last', () => {
     expect(TABS.map((t) => t.key)).toEqual(['examples', 'code', 'usage', 'agent']);
-    expect(TABS.map((t) => t.title)).toEqual(['Examples', 'Code', 'Usage', 'Agent view']);
+    expect(TABS.map((t) => t.title)).toEqual(['Examples', 'Code', 'Usage', 'Harness']);
     // Examples is the DEFAULT tab, so it carries no query param — the addon tabs
     // behaved the same way, and those URLs are still in circulation.
     expect(TABS[0].id).toBeNull();
     expect(TABS.slice(1).map((t) => t.id)).toEqual(['plus-code', 'plus-usage', 'plus-agent-view']);
-    expect(TABS.at(-1)).toEqual({ key: 'agent', id: TAB_IDS.agent, title: 'Agent view' });
+    expect(TABS.at(-1)).toEqual({ key: 'agent', id: TAB_IDS.agent, title: 'Harness' });
   });
 
 });
@@ -170,7 +170,7 @@ function rawGlob(repoPaths) {
   );
 }
 
-describe('the Agent view tab', () => {
+describe('the Harness tab', () => {
   const MODAL = 'design-system/src/components/messaging/Modal/index.md';
   const FIELDSET = 'design-system/src/components/forms-and-inputs/Fieldset.md';
   const PATTERN = 'design-system/src/patterns/PatternModal/index.md';
