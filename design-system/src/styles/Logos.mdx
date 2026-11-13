@@ -12,6 +12,7 @@ import { Logo } from '@/components';
 import { LOGO_SIZES } from '@/assets/Logo/Logo';
 import LogoConstruction from '@/assets/Logo/LogoConstruction';
 import LogoClearSpace from '@/assets/Logo/LogoClearSpace';
+import { LogoExpressions } from '@/storybook-docs/logos/LogoExpressions.jsx';
 
 export const Mark = ({ color = 'colored', size = 64, wordmark = false }) => <Logo appearance={color} size={size} wordmark={wordmark} />;
 
@@ -52,7 +53,7 @@ The Logo component set is documented on the Logo page under Images and icons.
 
 <FoundationSection title="One logo, two parts">
 
-PLUS has one logo. In product, use the Logo component; do not redraw or export the mark by hand.
+PLUS has one logo, drawn from two parts: the logomark and the wordmark. Together they make the lockup. Logo is the umbrella word for all of it, in either expression. In product, use the Logo component; do not redraw or export the mark by hand.
 
 <RefTable
     head={['Part', 'What it is', 'When it shows']}
@@ -62,14 +63,13 @@ PLUS has one logo. In product, use the Logo component; do not redraw or export t
     ]}
 />
 
-<FoundationExample>
-<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-lg)' }}>
-    <Mark color="colored" size={64} />
-    <Mark color="colored" size={64} wordmark />
-</div>
-</FoundationExample>
+<FoundationSubsection title="Two expressions">
 
-Use the logomark on its own where the PLUS name already appears nearby or space is tight, and pair it with descriptive text where you can. Use the logomark with the wordmark where nothing else names PLUS.
+One logo, used two ways. Each has one job.
+
+<LogoExpressions />
+
+</FoundationSubsection>
 
 </FoundationSection>
 
