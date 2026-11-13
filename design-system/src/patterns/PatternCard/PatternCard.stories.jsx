@@ -87,7 +87,7 @@ function PatternCardRowsDemo() {
 }
 
 export default {
-    title: 'Templates/Section/Card',
+    title: 'Templates/Card',
     component: PatternCard,
     tags: ['!dev', '!autodocs'],
     argTypes: {

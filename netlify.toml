@@ -148,6 +148,20 @@
   status = 301
   force = true
 
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-section-card--docs" }
+  to = "/storybook/?path=/docs/templates-card--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-section-table--docs" }
+  to = "/storybook/?path=/docs/templates-table--docs"
+  status = 301
+  force = true
+
 # Storybook static files — serve as-is
 [[redirects]]
   from = "/storybook/*"
