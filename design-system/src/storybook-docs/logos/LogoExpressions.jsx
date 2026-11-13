@@ -9,11 +9,12 @@ const LOCKUP_SIZE = 64;
 const label = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 const tag = {
     alignSelf: 'flex-start',
-    font: 'var(--body-small-strong)',
+    font: 'var(--body-small)',
+            fontWeight: 600, // docs-literal: no weight token pairs with the body-small style
     color: 'var(--ds-text-inverse)',
     background: 'var(--ds-background-neutral-bold)',
-    borderRadius: 'var(--radius-pill)',
-    padding: 'var(--space-2) var(--space-8)',
+    borderRadius: 'var(--radius-full)',
+    padding: 'var(--stack-sm) var(--stack-md)',
 };
 const ground = {
     display: 'flex',
@@ -26,7 +27,7 @@ const ground = {
 };
 
 /** A soft placeholder bar standing in for text. */
-const Bar = ({ width, height = 'var(--space-8)' }) => (
+const Bar = ({ width, height = 'var(--stack-sm)' }) => (
     <span style={{ display: 'block', width, height, borderRadius: 'var(--radius-sm)', background: 'var(--ds-skeleton)' }} />
 );
 Bar.propTypes = { width: PropTypes.string.isRequired, height: PropTypes.string };
@@ -35,12 +36,12 @@ Bar.propTypes = { width: PropTypes.string.isRequired, height: PropTypes.string }
 const Bracket = ({ children, style }) => (
     <span
         style={{
-            position: 'absolute',
             display: 'flex',
             justifyContent: 'center',
             borderBottom: 'var(--border-default) solid var(--ds-border-bold)',
-            paddingBottom: 'var(--space-2)',
-            font: 'var(--body-small-strong)',
+            paddingBottom: 'var(--stack-sm)',
+            font: 'var(--body-small)',
+            fontWeight: 600, // docs-literal: no weight token pairs with the body-small style
             color: 'var(--ds-text)',
             ...style,
         }}
@@ -55,7 +56,7 @@ const Expression = ({ tagLetter, name, job, children }) => (
         <div style={ground}>{children}</div>
         <span style={tag} aria-hidden="true">{tagLetter}</span>
         <h3 style={{ margin: 0, font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>{name}</h3>
-        <p style={{ margin: 0, font: 'var(--body-medium)', color: 'var(--ds-text)' }}>{job}</p>
+        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{job}</p>
     </div>
 );
 Expression.propTypes = {
@@ -111,17 +112,19 @@ export const LogoExpressions = () => (
         </div>
 
         <figure role="group" aria-label="Parts of the lockup" style={{ ...ground, margin: 0, flexDirection: 'column' }}>
-            <div style={{ position: 'relative', paddingTop: 'calc(var(--space-32) * 2)' }}>
-                <Bracket style={{ top: 0, left: 0, right: 0 }}>Lockup</Bracket>
-                <Bracket style={{ top: 'var(--space-32)', left: 0, width: `${LOCKUP_SIZE}px` }}>Logomark</Bracket>
-                <Bracket style={{ top: 'var(--space-32)', right: 0, left: `${LOCKUP_SIZE * 1.25}px` }}>Wordmark</Bracket>
-                <Logo size={LOCKUP_SIZE} wordmark />
+            <div style={{ display: 'inline-grid', gridTemplateColumns: `${LOCKUP_SIZE}px ${LOCKUP_SIZE / 4}px auto`, rowGap: 'var(--stack-md)' }}>
+                <Bracket style={{ gridColumn: '1 / -1' }}>Lockup</Bracket>
+                <Bracket style={{ gridColumn: 1 }}>Logomark</Bracket>
+                <Bracket style={{ gridColumn: 3 }}>Wordmark</Bracket>
+                <span style={{ gridColumn: '1 / -1', display: 'flex' }}>
+                    <Logo size={LOCKUP_SIZE} wordmark />
+                </span>
             </div>
             <figcaption style={label}>The logomark, the wordmark and the lockup they make, each named once.</figcaption>
         </figure>
 
         <h3 style={{ margin: 0, font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>In the product</h3>
-        <p style={{ margin: 0, font: 'var(--body-medium)', color: 'var(--ds-text)' }}>Where each expression lives. The logomark marks the app; the lockup introduces PLUS.</p>
+        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Where each expression lives. The logomark marks the app; the lockup introduces PLUS.</p>
         <ul aria-label="In the product" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
             <Example title="Sidebar header ·" expression="Logomark">
                 <div style={{ ...pad, width: '35%', background: 'var(--ds-surface-sunken)' }}>
@@ -139,13 +142,13 @@ export const LogoExpressions = () => (
             <Example title="Sign-in ·" expression="Lockup">
                 <div style={{ ...pad, alignItems: 'center' }}>
                     <Logo size={32} wordmark />
-                    <Bar width="70%" height="var(--space-16)" />
-                    <Bar width="70%" height="var(--space-16)" />
+                    <Bar width="70%" height="var(--stack-md)" />
+                    <Bar width="70%" height="var(--stack-md)" />
                 </div>
             </Example>
             <Example title="Email header ·" expression="Lockup">
                 <div style={{ ...pad, width: '100%' }}>
-                    <div style={{ padding: 'var(--space-8)', background: 'var(--ds-surface-sunken)' }}>
+                    <div style={{ padding: 'var(--stack-sm)', background: 'var(--ds-surface-sunken)' }}>
                         <Logo size={24} wordmark />
                     </div>
                     <Bar width="90%" />
