@@ -229,7 +229,7 @@ mkdir -p .agent/skills/uno-plan/examples
 - Action-oriented labels: "Start Session" not "Session Initiation", "Call Off" not "Request Absence" *(derivable from prototypes prototypes by inspection)*
 - Error messages: say what happened, what to do, no blame *(new)*
 - Terminology: use PLUS vocabulary (see `docs/context/conventions/terminology.md`) *(valid cross-ref)*
-- Capitalization: sentence case for UI labels, title case for page titles only *(new)*
+- Capitalization: sentence case everywhere *(new)*
 - **Note:** This file requires original authorship. An implementer cannot write it without design leadership input. Mark as draft and iterate.
 
 **`components/patterns.md`** (~60-80 lines) — **Extract from existing code + LAYOUT_CHEAT_SHEET.md:**

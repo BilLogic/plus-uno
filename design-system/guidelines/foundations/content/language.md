@@ -40,7 +40,7 @@ Write so every student, family and school is included, including those who never
 - Describe the work, not who the student is.
   - Do: "Leo is working on two-step equations."
   - Don't: "Leo is struggling with equations."
-- Don't assume a household. Families, devices and quiet rooms differ.
+- Write for any household; families, devices and quiet rooms differ.
   - Do: "Ask someone at home to sign the form."
   - Don't: "Ask a parent or guardian to sign the form."
 - Show the least you need. Shared screens get first name and last initial; research exports carry no names.
@@ -49,9 +49,9 @@ Write so every student, family and school is included, including those who never
 
 ## Sentences
 
-- Say who acted. Passive voice hides the person.
+- Say who acted; use passive only in a tight flag.
   - Do: "Your lead tutor approved the swap."
-  - Don't: "Swap approved." (fine in a tight flag, not in a notice)
+  - Don't: "Swap approved." in a notice
 - PLUS is "we", the reader is "you". Use contractions.
   - Do: "We'll remind you 30 min before."
   - Don't: "A reminder will be sent 30 min before."
@@ -64,11 +64,11 @@ Write so every student, family and school is included, including those who never
 | Punctuation | No period in titles, buttons or labels; no exclamation marks in errors | Reflection submitted |
 | Numbers | Digits in the UI; spell out one to nine in a sentence | 3 sessions left |
 | Dates | Shortest clear format; add the year only in records | Wed, Nov 13 |
-| Times | 12-hour, with the time zone | 3:30 PM ET |
+| Times | 12-hour, always with the time zone: tutors and schools sit in different zones | 3:30 PM ET |
 | Ranges | En dash, no spaces | 3:30–4:15 PM ET |
 | Recent | Relative under a week, then the date | 10 min ago · Yesterday · Nov 4 |
 | School calendar | Terms, not quarters | Fall term |
 
-Always add the time zone. Tutors and schools sit in different zones.
+Do/Don't for times:
 - Do: "Wed, Nov 13 · 3:30 PM ET"
 - Don't: "Wed, Nov 13 at 3:30 PM"
