@@ -107,6 +107,7 @@ export const SpringSemanticTable = () => (
                 <th scope="col">Token</th>
                 <th scope="col">Spring</th>
                 {SPRING_HEAD.slice(0, 3).map((h) => <th key={h} scope="col">{h}</th>)}
+                <th scope="col">Expressive spring</th>
                 <th scope="col">Use</th>
             </tr>
         </thead>
@@ -121,6 +122,7 @@ export const SpringSemanticTable = () => (
                         <td>{stiffness}</td>
                         <td>{damping}</td>
                         <td>{settle}</td>
+                        <td>{m.expressive ? <C>{`--motion-spring-${m.expressive}`}</C> : '—'}</td>
                         <td>{m.use}</td>
                     </tr>
                 );
