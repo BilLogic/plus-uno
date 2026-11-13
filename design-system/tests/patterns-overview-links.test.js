@@ -42,7 +42,7 @@ describe('the Patterns overview', () => {
     it('finds the thirteen pattern pages', () => expect(PATTERNS).toHaveLength(13));
 
     it('links each pattern from exactly one group card', () => {
-        const cards = section(patterns, 'The thirteen patterns').match(/<TypeCard[\s\S]*?<\/TypeCard>/g) ?? [];
+        const cards = section(patterns, 'The patterns').match(/<TypeCard[\s\S]*?<\/TypeCard>/g) ?? [];
         expect(cards, 'four group cards').toHaveLength(4);
         const linked = cards.flatMap(linksIn);
         expect([...linked].sort()).toEqual([...PATTERNS].sort());
