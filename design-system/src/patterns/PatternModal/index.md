@@ -53,11 +53,11 @@ PatternModal reads these motion tokens and no literal duration or curve.
 
 A button, a link, an icon. Never on its own.
 
-### Size a confirm at 4-col and step up to 6-col with a detail line or a field. {#size-a-confirm-at-4-col-and-step-up-to-6-col-with-a-detail-line-or-a-field}
+### Size a confirm at the smallest step and step up with a detail line or a field. {#size-a-confirm-at-the-smallest-step-and-step-up-with-a-detail-line-or-a-field}
 
 **Checked:** Review
 
-One rule, so nobody guesses. A short form is 8-col; a table, an editor or steps is 10-col. Never pick a width to make content look a certain way. The 4-col step is Planned: until it lands a confirm takes 6-col.
+One rule, so nobody guesses. A short form is 8-col; a table, an editor or steps is 10-col. Never pick a width to make content look a certain way. A confirm takes 6-col today; 4-col is Planned (see Widths).
 
 Do: A confirm at the narrow step: the title, one line and two buttons.
 Don't: The same confirm at a wide step: empty width around one line, picked to make it look a certain way.
@@ -66,7 +66,7 @@ Don't: The same confirm at a wide step: empty width around one line, picked to m
 
 **Checked:** Automatic
 
-A confirm Modal may open over a Panel, a Popup or a focused task, and brings its own Backdrop. A Modal that needs a confirm holds it inside itself: the title, body and footer swap in place, with a warning SectionMessage and the danger button, and Back returns without losing anything typed. The overlay module keeps a second Modal closed and calls its `onClose`.
+Stacking holds the rule. The overlay module keeps a second Modal closed and calls its `onClose`.
 
 Do: One Modal that confirms inside itself, with a message and its own buttons.
 Don't: A Modal opened on another Modal, a second Backdrop dimming the first.
@@ -89,7 +89,7 @@ Two to five views of one thing opened in any order; one footer saves them all. V
 Do: Views in order are Steps: Cancel at the start, Back and Next on the right half.
 Don't: Numbered tabs as steps: any order, one Save, nothing to go back to.
 
-Footer buttons, Cancel and Close, and which destructive tier, including type the name: Common actions. A blocked submit: Forms. The sending button: Patterns, Loading.
+Footer buttons, Cancel and Close, and which destructive tier, including type the name: Common actions. A blocked submit: Forms. The sending button: Loading.
 
 ## Accessibility
 
@@ -120,7 +120,7 @@ Picked by what the person has to do. The component page holds every prop and sta
 
 ## Anatomy
 
-An Active Modal at 8-col with a short form. Every part once; the pad is 16 on every side, the radius 12, and the parts sit 16 apart.
+An Active Modal at 8-col with a short form. Every part once; the pad is 16 on every side, the radius 16, and the parts sit 16 apart.
 
 1. **Backdrop.** Dims the page and holds the Modal centered.
 2. **Header.** The title at 20/24 and the Close icon button. With tabs, the tab group sits 8 under the title.

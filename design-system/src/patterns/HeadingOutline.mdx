@@ -1,4 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as HeadingOutlineStories from './HeadingOutline.stories.jsx';
@@ -51,7 +52,7 @@ Use one h1 per page. Each Section opens with an h2, and a subsection inside it w
 
 Container titles are fixed whatever level they sit at.
 
-<DocsCanvasShell description={<>A card's title is 14 over a 14 description, and its tag is one level below its section.</>}>
+<DocsCanvasShell description={<>A card's tag is one level below its section; its title and description sizes are on <DocsLink id="templates-section-card">Card</DocsLink>.</>}>
     <DsCanvasQuiet of={HeadingOutlineStories.CardTitles} />
 </DocsCanvasShell>
 

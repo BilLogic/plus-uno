@@ -85,17 +85,15 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 - Table component: the table components, with a set of headers and rows.
 - Pagination: the pager that fills the pagination slot.
 - Card: a table never sits inside a card.
-- Templates: the dashboard content shows a Students table in a Section at every breakpoint.
 
 Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar`
 
 ## Parts
 
-1. **Section header.** Not part of the table: the title and, in the toolbar type, search, filters, the count and actions.
-2. **Head row.** Names the columns. Its rule is the bold border.
-3. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
-4. **Pagination** (optional). A slot under the rows, aligned to the end. It hides while the empty state shows.
-5. **Message row.** The `emptyState` slot, which replaces the rows when `empty` is true. It sits under the head row and spans every column.
+1. **Head row.** Names the columns. Its rule is the bold border.
+2. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
+3. **Pagination** (optional). A slot under the rows, aligned to the end. It hides while the empty state shows.
+4. **Message row.** The `emptyState` slot, which replaces the rows when `empty` is true. It sits under the head row and spans every column.
 
 ### States
 
@@ -120,13 +118,12 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-text`, `--body-default` | 14/20 | Body cells. |
 | `--ds-text-subtle`, `--heading-xxsmall` | color, type | Head cells and the message row. |
 | `--table-radius` | 12 | The corner of the table and of its scroll region. |
-| `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding and the gap inside a cell. |
+| `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding, the gap inside a cell, and the side pad (8) of the message row. |
 | `--ds-background-neutral-subtle-hovered`, `-pressed` | color | A hovered and a pressed row. |
 | `--ds-background-selected`, `-hovered`, `-pressed` | color | A selected row. |
 | `--ds-shadow-overflow` | shadow | A sticky edge, only while content is scrolled under it. |
 | `--ds-utility-elevation-surface-current` | color | The fill of sticky cells, so they match what the table sits on. |
 | `--ds-border-focused`, `--focus-ring-width` | focus ring | The ring of a scroll region. |
-| `--table-pad-x-cell` | 8 | The side pad of the message row. |
 | `--row-height-md` | 40 | The least height of the message row. |
 | `--section-stack-md`, `--stack-sm` | 16, 4 | Space around the message, and between its lines. |
 

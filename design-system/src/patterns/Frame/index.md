@@ -22,9 +22,9 @@ Use Frame for every page of the app. It owns the frame sizes and the Sidebar's b
 
 The Frame decides what docks from its own width, not the window's, through one layout resolver, so the content never drops under 720:
 
-- **Sidebar.** It docks from 1024 and never docks below that. Under 1024, opened by hand, it floats over the Page and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Backdrop. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
-- **AI panel.** It opens from anything inside the Frame through `usePanelControl()`. Both dock when the Sidebar, the panel and 720 fit: with a 400 panel that is from 1408. Otherwise a Sidebar left open by default collapses, and comes back when the panel closes; with a 400 panel the panel docks alone from 1168. Below that, the panel floats over the Page and the Sidebar on the overlay fill and shadow, with no Backdrop.
-- **Under 1024** the panel is 320 wide, and only one layer is open at a time: opening the Sidebar closes the panel, and opening the panel closes the Sidebar. Under 768 the panel is full width.
+- **Sidebar.** Below its docking width, opened by hand, it floats over the Page and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Backdrop. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
+- **AI panel.** It opens from anything inside the Frame through `usePanelControl()`. Both dock when the Sidebar, the panel and the content minimum fit. Otherwise a Sidebar left open by default collapses and comes back when the panel closes. Below that, the panel floats over the Page and the Sidebar on the overlay fill and shadow, with no Backdrop.
+- **Narrow Frames** hold one layer open at a time: opening the Sidebar closes the panel, and opening the panel closes the Sidebar.
 - **`sectionDetail`** collapses the Sidebar first, so a list and its detail keep 960 side by side. If a collapsed Sidebar still leaves under 960, the panel stays docked and the detail replaces the list.
 - **Modals.** Opening a Modal closes a peeking or floating Sidebar, and a docked Sidebar stays. While a Modal is open the Sidebar does not peek, and Escape closes the Modal only. A Modal leaves the panel open under its Backdrop.
 
@@ -48,7 +48,7 @@ Frame reads these motion tokens and no literal duration or curve.
 
 - For a bare fill and elevation, use `Page`.
 - For a region inside the content, use `PatternSection`.
-- For a short task that keeps the page in view behind it, use `PatternModal`. A focused Frame is for a task that blocks the page until it is done, or has five or more steps.
+- For a short task that keeps the page in view behind it, use `PatternModal`. A focused Frame is for a task that blocks the page until it is done, or a long one.
 
 ## Best practices
 
@@ -92,7 +92,7 @@ Don't: The Sidebar beside a sign-in: navigation for a person who has not signed 
 
 **Checked:** Review
 
-Five or more go down a left side sized to the longest label. Four or fewer run across the top.
+The count sets the side or the top once, when the task opens. The thresholds are under Focused steps.
 
 ### Pass sectionDetail for a list and its detail. {#pass-sectiondetail-for-a-list-and-its-detail}
 
@@ -152,7 +152,7 @@ The default type at 1440 with the AI panel docked.
 A task with five steps. No Sidebar and no breadcrumb: nothing invites the person away.
 
 1. **Title row.** Close at the start, then the task's name as the page's one h1.
-2. **Steps.** A Section side at the start, 256 wide (320 for long labels), for five or more.
+2. **Steps.** A Section side at the start, 256 wide (320 for long labels), or a bar across the top; Focused steps says which.
 3. **Body.** The task's Sections at reading width, 864, centered.
 4. **Bar**, fixed along the bottom and 48 high. Cancel (Subtle) at the start; Back and Next at the end, full bleed. Back on the first step is disabled and needs no reason.
 
@@ -166,7 +166,7 @@ A task with five steps. No Sidebar and no breadcrumb: nothing invites the person
 | `panel` · `panelLabel` · `panelOpen` | The AI panel region at the right, named for its content, filled with the Panel parts. |
 | `onBack` · `onClose` | A Back and a Close icon button in the header row. A focused page leads its title row with its own Close instead. |
 | `surfaceDirect` | Children go straight into the Page with no content box, for a bare column or a full-bleed view. |
-| `bar` | Planned. The focused bottom bar, 48 high, with Cancel, Back and Next. Today the page places the bar. |
+| `bar` | Planned. The focused bottom bar, 48 high, with Cancel, Back and Next. Today the page places the bar, so the Anatomy bar is the target shape. |
 | `banner` | Planned. System news across the whole width above the Sidebar and the Page. |
 
 ## Sizes

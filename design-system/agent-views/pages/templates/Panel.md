@@ -2,7 +2,7 @@
 
 # Panel
 
-A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications. The AI panel is a region of the Frame.
+A full-height layer on the right with no Backdrop: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame.
 
 **Kind:** Template
 
@@ -10,7 +10,7 @@ A full-height layer beside or over the Page with no Backdrop. Two floating types
 
 ## Types
 
-Both open on the right with no Backdrop: docked at an edge line from 1168 and floating over the Page below that. Floating at every width is Planned.
+Both open on the right with no Backdrop: docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths). Floating at every width is Planned.
 
 - **Details.** A quick look at a row, floating over the right of the Page. The picked row stays highlighted.
 - **Notifications.** The Inbox, opened from the Bell. It lists items by time and stays open as you pick one.
@@ -101,7 +101,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 ## Accessibility
 
 - Floating, the Panel is a complementary landmark named by its title, after the Page in reading order. Focus moves to its title on open and returns to the row, or the Bell, on close.
-- Under 1024 it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
+- Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
 - Escape closes the Panel unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
 - An unread dot is paired with the text "unread" for a screen reader.
@@ -133,7 +133,7 @@ Panel reads these motion tokens and no literal duration or curve.
 
 **Checked:** Automatic
 
-The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Under 1024 it is capped at 320, and under 768 it takes the whole width, still with no Backdrop. A confirm Modal over a Panel brings its own Backdrop.
+The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Narrow, it is capped and then full width, still with no Backdrop. A confirm Modal over a Panel brings its own Backdrop.
 
 Do: The Panel floats on its shadow and the page beside it stays undimmed.
 Don't: The same Panel with a Backdrop dimming the whole page.
