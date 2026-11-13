@@ -6,6 +6,7 @@ import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps } from './formDemo.jsx';
+import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 /**
  * Form: the template page's examples, run in the Storybook tests. There is no
@@ -30,7 +31,7 @@ const STAGE = 1024; // docs-literal
 
 export const TypePage = {
     name: 'Type: In a page',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInPage /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInPage /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -44,7 +45,7 @@ export const TypePage = {
 
 export const TypePanel = {
     name: 'Type: In a Panel',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInPanel /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInPanel /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         await expect(rect(footer).height, 'the full-bleed footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
@@ -53,7 +54,7 @@ export const TypePanel = {
 
 export const TypeModal = {
     name: 'Type: In a Modal',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal height="fill" stageHeight={680} /></div>, // docs-literal
+    render: () => <ScreenStage width={STAGE}><FormInModal height="fill" stageHeight={680} /></ScreenStage>, // docs-literal
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -74,7 +75,7 @@ export const TypeModal = {
 
 export const TypeSteps = {
     name: 'Type: In steps',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInSteps /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInSteps /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'four steps run across the top').toHaveClass('plus-progress-tracker--horizontal');
@@ -167,7 +168,7 @@ export const AnatomySteps = {
 /** A field takes its error look on blur, and the message says what to fix. */
 export const KeyFieldError = {
     name: 'Key state: Field error on blur',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInPage /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInPage /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const student = canvas.getByLabelText(/Student/);
@@ -184,7 +185,7 @@ export const KeyFieldError = {
 /** A field waiting on another says so in its caption; Save stays enabled. */
 export const KeyDisabledReason = {
     name: 'Key state: Disabled with its reason',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInPage subjectWaits /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInPage subjectWaits /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByText('Choose a student first.'), 'the reason is visible text on the field').toBeInTheDocument();
@@ -195,7 +196,7 @@ export const KeyDisabledReason = {
 /** A blocked submit keeps the Modal open, marks the field, and the footer never moves. */
 export const KeyBlockedSubmit = {
     name: 'Key state: Blocked submit',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal height="fill" stageHeight={680} /></div>, // docs-literal
+    render: () => <ScreenStage width={STAGE}><FormInModal height="fill" stageHeight={680} /></ScreenStage>, // docs-literal
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -215,7 +216,7 @@ export const KeyBlockedSubmit = {
 /** The server says no: a danger message at the top of the body, plus field errors. */
 export const KeyServerSaysNo = {
     name: 'Key state: The server says no',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal server initial={FILLED} /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInModal server initial={FILLED} /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const message = canvasElement.querySelector('[data-probe="message"]');
@@ -229,7 +230,7 @@ export const KeyServerSaysNo = {
 /** Sending: the button swaps its label for a spinner in place at the same width; Cancel stays live. */
 export const KeySending = {
     name: 'Key state: Sending',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal initial={FILLED} sendingForever /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInModal initial={FILLED} sendingForever /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
@@ -247,7 +248,7 @@ export const KeySending = {
 /** Leaving with edits asks first, in the same Modal; Back keeps what was typed. */
 export const KeyLeaving = {
     name: 'Key state: Leaving with edits',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInModal /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await userEvent.type(canvas.getByLabelText(/Student/), 'Ana');

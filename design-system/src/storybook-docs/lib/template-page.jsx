@@ -61,17 +61,21 @@ ScaledStory.propTypes = {
 /** The stage a type card's story lays out at, so every card shows one scale; wide enough for a list beside its detail. */
 const TYPE_STAGE = 1024;
 
-/** The opening grid of a template's types: two across, a Section group apart. */
-export const TypeGrid = ({ children }) => (
+/**
+ * The opening grid of a template's types: two across, a Section group apart.
+ * `wide` puts one type per row, for types that each show a whole screen, so
+ * the screen draws at a size that reads.
+ */
+export const TypeGrid = ({ wide = false, children }) => (
     <div
         className="not-prose"
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, var(--card-min-width-lg)), 1fr))', gap: 'var(--section-stack-md)' }}
+        style={{ display: 'grid', gridTemplateColumns: wide ? 'minmax(0, 1fr)' : 'repeat(auto-fill, minmax(min(100%, var(--card-min-width-lg)), 1fr))', gap: 'var(--section-stack-md)' }}
     >
         {children}
     </div>
 );
 
-TypeGrid.propTypes = { children: PropTypes.node };
+TypeGrid.propTypes = { wide: PropTypes.bool, children: PropTypes.node };
 
 /** One type: its live story (or, with `hero`, a page's registry hero) on the raised card, then its name and one line. */
 export const TypeCard = ({ of, thumb, hero, title, stage = TYPE_STAGE, to, thumbRatio, children }) => (

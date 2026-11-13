@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button, IconButton, ProgressTracker, Skeleton } from '@/components';
 import { Frame } from '@/patterns';
 import { BrowserWindow } from './template-page.jsx';
+import { ScreenStage } from './fit-stage.jsx';
 
 /**
  * The focused Frame type, shared by the Frame and Form template pages: one
@@ -13,6 +14,8 @@ import { BrowserWindow } from './template-page.jsx';
 
 /** The browser body's height on the docs page: docs geometry, in px. */
 export const WINDOW_HEIGHT = 440; // docs-literal
+/** The widest the focused window lays out at on a docs page: the docs' stand-in screen. */
+const FOCUSED_SCREEN = 1024; // docs-literal
 /** The focused type's step rail, 256 wide (320 for long labels): the Section side's width. */
 export const STEPS_RAIL = 256; // docs-literal
 /** The focused bottom bar's height in the ledger: the 32 button plus 16 of padding, `--space-300`. */
@@ -106,8 +109,11 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
     );
 };
 
+/** The focused type in its window: on a docs page it reflows with the canvas and scales below the Page's floor. */
 export const FocusedType = ({ address = 'app.plus.org/terms/new', ...props }) => (
-    <BrowserWindow address={address} height={WINDOW_HEIGHT}>
-        <FocusedTask {...props} />
-    </BrowserWindow>
+    <ScreenStage width={FOCUSED_SCREEN} fluid>
+        <BrowserWindow address={address} height={WINDOW_HEIGHT}>
+            <FocusedTask {...props} />
+        </BrowserWindow>
+    </ScreenStage>
 );
