@@ -57,3 +57,17 @@ test('npm pack, install in a scratch project, `npx ds find Button` answers from 
 test('the repo root `ds` script is unchanged and still answers', () => {
   assert.match(sh('node', ['scripts/ds.mjs', 'find', 'Button'], REPO_ROOT), /Button/);
 });
+
+test('the registry builds into dist/registry: foundation and component items, stamped, no alias left in a copied file', { timeout: 120_000 }, () => {
+  sh('node', ['scripts/generate-registry.mjs'], REPO_ROOT);
+  const dir = path.join(REPO_ROOT, 'dist/registry');
+  const read = (n) => JSON.parse(fs.readFileSync(path.join(dir, `${n}.json`), 'utf8'));
+  const index = read('registry');
+  assert.ok(index.items.some((i) => i.name === 'foundation') && index.items.some((i) => i.name === 'Button'));
+  const button = read('Button');
+  assert.ok(button.registryDependencies.some((d) => d.endsWith('/foundation.json')));
+  for (const item of [read('foundation'), button]) {
+    assert.match(item.meta.release, /^v\d/);
+    for (const f of item.files) assert.ok(!/from\s+['"]@\//.test(f.content) && !/@use\s+['"]@\//.test(f.content), `${f.target} still imports through the @ alias`);
+  }
+});
