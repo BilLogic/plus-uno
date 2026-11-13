@@ -295,6 +295,49 @@ Dismiss.play = async ({ canvasElement }) => {
 };
 
 /**
+ * A timed action: `timer` draws a 4 px bar as the top cap, emptying over `delay`, and steps the
+ * corners from 12 to 4. The first action is Undo; the change commits in `onDismiss`. Hover or
+ * focus pauses the wait and dims the bar.
+ */
+export const UndoTimer = () => {
+    const [state, setState] = useState('timed');
+    return (
+        <FlagGroup containerPosition="static">
+            <Flag
+                title={state === 'restored' ? 'Session restored' : 'Session archived'}
+                timer={state === 'timed'}
+                show={state !== 'committed'}
+                delay={60000}
+                actions={state === 'timed' ? [{ text: 'Undo', onClick: () => setState('restored') }] : undefined}
+                onDismiss={() => setState((current) => (current === 'timed' ? 'committed' : current))}
+                data-testid="undo-flag"
+            />
+        </FlagGroup>
+    );
+};
+
+UndoTimer.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const flag = canvas.getByTestId('undo-flag');
+    const bar = flag.querySelector('.plus-flag-timer');
+    await expect(bar, 'the bar is the top cap').toBeInTheDocument();
+    await expect(Math.round(bar.getBoundingClientRect().height), 'bar is 4').toBe(4);
+    for (const corner of ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius']) {
+        await expect(getComputedStyle(flag)[corner], corner).toBe('4px');
+    }
+    // Hover pauses and dims.
+    await userEvent.hover(flag);
+    await expect(flag).toHaveAttribute('data-paused', 'true');
+    await waitFor(() => expect(Number(getComputedStyle(bar).opacity), 'the bar dims').toBeLessThan(1));
+    await userEvent.unhover(flag);
+    await waitFor(() => expect(flag).not.toHaveAttribute('data-paused'));
+    // Undo replaces it with a plain Flag, no timer.
+    await userEvent.click(canvas.getByRole('button', { name: 'Undo' }));
+    await waitFor(() => expect(canvas.getByText('Session restored')).toBeInTheDocument());
+    await expect(canvasElement.querySelector('.plus-flag-timer')).toBeNull();
+};
+
+/**
  * The default flag sits on one surface, elevation.surface.overlay, with a subtle icon; a bold
  * flag takes its appearance's bold fill (information is the dark neutral fill) with inverse
  * text, and warning keeps its warning-inverse text.

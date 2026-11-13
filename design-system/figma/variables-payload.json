@@ -1083,6 +1083,20 @@
           }
         },
         {
+          "name": "Flag/radius-timer",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--flag-radius-timer)"
+          }
+        },
+        {
+          "name": "Flag/timer-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--flag-timer-height)"
+          }
+        },
+        {
           "name": "Spotlight/width",
           "resolvedType": "FLOAT",
           "codeSyntax": {

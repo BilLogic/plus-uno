@@ -10,6 +10,7 @@ import {
     FlagOnPage,
     FlagStack,
     FlagTopRight,
+    FlagUndo,
     FlagWithActions,
     MustStay,
     PLACE_STAGE,
@@ -156,6 +157,19 @@ export const KeyFlagWithAction = {
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Undo' })).toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'View sessions' })).toBeInTheDocument();
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** Undo: a timed Flag, then the plain Flag that replaces it. */
+export const KeyFlagUndo = {
+    name: 'Key case: Undo with a timer',
+    render: () => staged(<FlagUndo />, PLACE_STAGE),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('button', { name: 'Undo' })).toBeInTheDocument();
+        await expect(canvasElement.querySelectorAll('.plus-flag-timer')).toHaveLength(1);
+        await expect(canvas.getByText('Session restored')).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };

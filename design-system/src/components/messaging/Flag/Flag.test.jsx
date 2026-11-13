@@ -205,16 +205,94 @@ describe('Flag expand on bold', () => {
 });
 
 describe('FlagGroup', () => {
-    it('sits bottom-start by default', () => {
+    it('sits top-end by default', () => {
         render(<FlagGroup data-testid="flags"><span>flag</span></FlagGroup>);
         const group = screen.getByTestId('flags');
-        expect(group).toHaveAttribute('data-position', 'bottom-start');
+        expect(group).toHaveAttribute('data-position', 'top-end');
         expect(group).toHaveAttribute('data-container-position', 'fixed');
     });
 
     it('takes a logical position as given', () => {
         render(<FlagGroup data-testid="flags" position="top-end"><span>flag</span></FlagGroup>);
         expect(screen.getByTestId('flags')).toHaveAttribute('data-position', 'top-end');
+    });
+});
+
+describe('Flag timer', () => {
+    afterEach(() => { vi.useRealTimers(); });
+    const bar = () => document.querySelector('.plus-flag-timer [role="progressbar"]');
+
+    it('draws the countdown bar only with timer', () => {
+        const { rerender } = render(<Flag title="Archived" />);
+        expect(bar()).toBeNull();
+        expect(document.querySelector('.plus-flag')).not.toHaveClass('plus-flag--timer');
+        rerender(<Flag title="Archived" timer />);
+        expect(bar()).toBeInTheDocument();
+        expect(document.querySelector('.plus-flag')).toHaveClass('plus-flag--timer');
+    });
+
+    it('counts the bar down over delay', () => {
+        vi.useFakeTimers();
+        render(<Flag title="Archived" timer delay={1000} onDismiss={() => {}} />);
+        expect(bar()).toHaveAttribute('aria-valuenow', '100');
+        expect(document.querySelector('.plus-flag-timer')).toHaveStyle({ '--flag-timer-duration': '1000ms' });
+    });
+
+    it('pauses on hover and resumes on leave, for any flag', () => {
+        vi.useFakeTimers();
+        const onDismiss = vi.fn();
+        render(<Flag title="Saved" delay={1000} onDismiss={onDismiss} />);
+        const flag = document.querySelector('.plus-flag');
+        act(() => { vi.advanceTimersByTime(600); });
+        fireEvent.mouseEnter(flag);
+        expect(flag).toHaveAttribute('data-paused', 'true');
+        act(() => { vi.advanceTimersByTime(5000); });
+        expect(onDismiss).not.toHaveBeenCalled();
+        fireEvent.mouseLeave(flag);
+        expect(flag).not.toHaveAttribute('data-paused');
+        act(() => { vi.advanceTimersByTime(399); });
+        expect(onDismiss).not.toHaveBeenCalled();
+        act(() => { vi.advanceTimersByTime(2); });
+        expect(onDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it('pauses on focus and resumes on blur', () => {
+        vi.useFakeTimers();
+        const onDismiss = vi.fn();
+        render(<Flag title="Saved" delay={1000} onDismiss={onDismiss} />);
+        const flag = document.querySelector('.plus-flag');
+        fireEvent.focus(screen.getByRole('button', { name: 'Dismiss flag' }));
+        expect(flag).toHaveAttribute('data-paused', 'true');
+        act(() => { vi.advanceTimersByTime(3000); });
+        expect(onDismiss).not.toHaveBeenCalled();
+        fireEvent.blur(screen.getByRole('button', { name: 'Dismiss flag' }));
+        act(() => { vi.advanceTimersByTime(1001); });
+        expect(onDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it('stays paused while hovered even if focus leaves', () => {
+        vi.useFakeTimers();
+        render(<Flag title="Saved" delay={1000} onDismiss={() => {}} />);
+        const flag = document.querySelector('.plus-flag');
+        const close = screen.getByRole('button', { name: 'Dismiss flag' });
+        fireEvent.mouseEnter(flag);
+        fireEvent.focus(close);
+        fireEvent.blur(close);
+        expect(flag).toHaveAttribute('data-paused', 'true');
+    });
+
+    it('commits onDismiss once when the timer ends', () => {
+        vi.useFakeTimers();
+        const onDismiss = vi.fn();
+        render(<Flag title="Archived" timer delay={1000} onDismiss={onDismiss} actions={[{ text: 'Undo' }]} />);
+        act(() => { vi.advanceTimersByTime(5000); });
+        expect(onDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the countdown under reduced motion', () => {
+        render(<Flag title="Archived" timer reducedMotion />);
+        expect(bar()).toBeInTheDocument();
+        expect(document.querySelector('.plus-flag')).toHaveAttribute('data-reduced', 'true');
     });
 });
 

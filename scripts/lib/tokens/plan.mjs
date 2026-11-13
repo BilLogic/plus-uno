@@ -386,6 +386,8 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Flag', new: '--flag-min-height', old: null, ref: 'calc(var(--size-1000) + var(--size-750))', use: 'Minimum height of a Flag.' },
   { tier: 'components', group: 'Flag', new: '--flag-pad', old: null, ref: 'var(--space-125)', use: 'Padding inside a Flag.' },
   { tier: 'components', group: 'Flag', new: '--flag-offset', old: null, ref: 'var(--space-125)', use: 'Distance between a Flag and the edge of the screen.' },
+  { tier: 'components', group: 'Flag', new: '--flag-radius-timer', old: null, ref: 'var(--radius-025)', use: 'Corner radius of a Flag with a countdown bar: stepped down from the popup radius to match the bar height.' },
+  { tier: 'components', group: 'Flag', new: '--flag-timer-height', old: null, ref: 'var(--space-025)', use: 'Height of the countdown bar on a Flag.' },
   { tier: 'components', group: 'Spotlight', new: '--spotlight-width', old: null, ref: 'var(--width-2500)', use: 'Width of a Spotlight.' },
   { tier: 'components', group: 'Spotlight', new: '--spotlight-media-height', old: null, ref: 'calc(var(--size-750) + var(--space-150))', use: 'Height of the media area in a Spotlight.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-min-width', old: null, ref: 'var(--size-1400)', use: 'Minimum width of a menu group.' },

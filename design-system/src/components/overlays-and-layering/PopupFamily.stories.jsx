@@ -254,9 +254,9 @@ FlagsStack.play = async ({ canvasElement }) => {
     const second = canvas.getByTestId('pf-flag-2').getBoundingClientRect();
     const view = { width: doc.documentElement.clientWidth, height: doc.defaultView.innerHeight };
 
-    // Bottom-left, 8 from the screen edge.
-    await expect(Math.round(first.left)).toBe(8);
-    await expect(Math.round(view.height - second.bottom)).toBe(8);
+    // Top right by default, 8 from the screen edge.
+    await expect(Math.round(view.width - first.right)).toBe(8);
+    await expect(Math.round(first.top)).toBe(8);
     // 400 wide, 16 apart.
     await expect(first.width).toBe(400);
     await expect(Math.round(second.top - first.bottom)).toBe(16);

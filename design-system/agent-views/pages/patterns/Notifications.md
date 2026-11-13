@@ -98,7 +98,13 @@ Notifications reads these motion tokens and no literal duration or curve.
 
 **Checked:** Review
 
-A title that names the event and one line for the next step. A `FlagGroup` stacks them in the order you pass them, so pass the newest first, and renders with the page so each one is announced. `FlagGroup` takes `position="top-end"` today; the top right as its default is Planned .
+A title that names the event and one line for the next step. A `FlagGroup` stacks them in the order you pass them, so pass the newest first, and renders with the page so each one is announced. `FlagGroup` sits at the top right (`top-end`) by default.
+
+### Offer Undo on a Flag with a timer, and commit when it ends. {#offer-undo-on-a-flag-with-a-timer-and-commit-when-it-ends}
+
+**Checked:** Review
+
+An archive or a delete confirms with a Flag that has `timer` and Undo as its first action, instead of a confirmation dialog first. The change commits in `onDismiss`, once. Pressing Undo replaces the Flag with a plain "restored" Flag. Hovering or focusing the Flag pauses the countdown, so reading it never costs the chance to undo.
 
 ### Put nothing important only in a Flag. {#put-nothing-important-only-in-a-flag}
 
