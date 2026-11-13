@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Checkbox, DatePicker, RadioGroup, Select, TextArea, TextField, Toggle } from '@/components';
 import { PatternSection } from '@/patterns';
+import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
+import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 
 /**
  * The Read-only pattern's examples, drawn with the real fields in their
@@ -15,9 +17,6 @@ import { PatternSection } from '@/patterns';
  *   LongValue        a long value in a TextArea whose rows show all of it
  *   PlainText        a value nobody changes here: a label and a value, not a field
  */
-
-/** The width a picture lays out at, in px: docs geometry. */
-export const STAGE = 1024; // docs-literal
 
 /** The width the card pictures lay out at, so their words stay legible at card size. Docs geometry, in px. */
 export const CARD_STAGE = 600; // docs-literal
@@ -52,17 +51,28 @@ export const ReadOnlyChoices = () => (
     </div>
 );
 
-/** A whole form someone else owns: every field read-only, one caption on the group, no Save. */
+/** The window's height: the title, three fields and the caption, with room under them. Docs geometry, in px. */
+const PAGE_HEIGHT = 420; // docs-literal
+
+const PAGE_BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions', href: '#' }, { text: 'Session details' }];
+
+/**
+ * A whole form someone else owns, in a page: drawn in the Frame with the Sidebar
+ * docked, straight on the Page like the Form template. The title is the page's
+ * h1 and the fields follow it, every one read-only, one caption on the group, no Save.
+ */
 export const OwnedForm = () => (
-    <div style={pad}>
-        <PatternSection title="Session details" description="Set by Lincoln's supervisor." fill="subtle">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' }}>
-                <TextField label="Student" value="Ana Ruiz" onChange={noop} isReadOnly />
-                <TextField label="Time" value="Thursday at 4:00 PM" onChange={noop} isReadOnly />
-                <Select label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} value="algebra" onChange={noop} isReadOnly />
-            </div>
-        </PatternSection>
-    </div>
+    <BrowserWindow address="app.plus.org/sessions/ana-ruiz" height={PAGE_HEIGHT}>
+        <InAppFrame height="100%" activeTabId="sessions" breadcrumbs={PAGE_BREADCRUMBS} panelStorageKey={null}>
+            <PatternSection level="page" title="Session details" description="Set by Lincoln's supervisor.">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' }}>
+                    <TextField label="Student" value="Ana Ruiz" onChange={noop} isReadOnly />
+                    <TextField label="Time" value="Thursday at 4:00 PM" onChange={noop} isReadOnly />
+                    <Select label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} value="algebra" onChange={noop} isReadOnly />
+                </div>
+            </PatternSection>
+        </InAppFrame>
+    </BrowserWindow>
 );
 
 /** Docs geometry: rows enough to show the whole note; a read-only TextArea does not size itself to its value today. */
