@@ -67,7 +67,7 @@ export const HEROES = {
   'foundations-basics-overview': {
     Hero: FoundationsOverviewHero,
     description:
-      'One screen pulled apart into its foundations: grid, surface and space, content, and the accent.',
+      'The foundations side by side, sized by weight: color, type, grid and space, elevation, icons, motion.',
   },
   'foundations-basics-accessibility': {
     Hero: AccessibilityHero,
@@ -92,7 +92,7 @@ export const HEROES = {
   'foundations-visual-iconography': {
     Hero: IconographyHero,
     description:
-      'Ten different icons in one style; the bell ringed, drawn on its keyline.',
+      'A set of different icons in one style; the bell drawn on its construction grid.',
   },
   'foundations-brand-illustrations': {
     Hero: IllustrationsHero,
@@ -182,7 +182,7 @@ export const HEROES = {
   'patterns-overview': {
     Hero: OverviewHero,
     description:
-      'Four situations in four cards: a focused field, a filter menu, an empty state and a notification.',
+      'Real moments, sized by scope: Filtering big, a Flag wide, a Spinner and a badge small.',
   },
   'patterns-common-actions': {
     Hero: CommonActionsHero,
@@ -252,7 +252,7 @@ export const HEROES = {
   'templates-overview': {
     Hero: TemplatesOverviewHero,
     description:
-      'The templates pulled apart: Frame, Page, Section ringed, Modal on top.',
+      'The app exploded into its templates: the Frame, the Sidebar and Page, a Section, its rows (one selected) in front.',
   },
   'templates-frame': {
     Hero: FrameHero,

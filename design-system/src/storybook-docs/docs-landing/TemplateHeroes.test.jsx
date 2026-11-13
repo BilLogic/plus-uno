@@ -2,6 +2,8 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { HEROES } from './hero-registry.jsx';
+import { PLATES } from './TemplateHeroes.jsx';
+import { PAINT } from '../illustrations/paint.js';
 
 const TEMPLATE_IDS = [
     'templates-overview',
@@ -46,3 +48,31 @@ describe('Templates heroes', () => {
     });
 });
 
+
+describe('Templates Overview: the flat exploded view', () => {
+    const draw = () => render(React.createElement(HEROES['templates-overview'].Hero)).container;
+
+    it('draws four plates, back to front, each with the same flat turn and no perspective', () => {
+        const plates = [...draw().querySelectorAll('[data-plate]')];
+        expect(plates.map((p) => p.dataset.plate)).toEqual(['frame', 'shell', 'section', 'rows']);
+        for (const p of plates) expect(p.getAttribute('transform')).toMatch(/skewY\(-12\) scale\(0\.8 1\)$/);
+    });
+
+    it('spaces the part centers evenly', () => {
+        const centers = PLATES.map((p) => p.center);
+        const steps = centers.slice(1).map((c, i) => +(c - centers[i]).toFixed(6));
+        expect(new Set(steps).size).toBe(1);
+    });
+
+    it('outlines only the Frame plate', () => {
+        const edged = [...draw().querySelectorAll('[data-plate]')].filter((p) => p.querySelector(`[stroke="${PAINT.illustrationEdge}"]`));
+        expect(edged.map((p) => p.dataset.plate)).toEqual(['frame']);
+    });
+
+    it('selects one table row and rings it', () => {
+        const rows = draw().querySelector('[data-plate="rows"]');
+        const selected = rows.querySelectorAll(`rect[fill="${PAINT.rowSelected}"]`);
+        expect(selected).toHaveLength(1);
+        expect(selected[0].getAttribute('stroke')).toBe(ACCENT);
+    });
+});

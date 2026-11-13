@@ -7,15 +7,18 @@ import {
 } from "../illustrations/paint.js";
 import {
   CardBox,
+  Layer,
   Modal,
   Popup,
   Rect,
   Rule,
   SkeletonBar,
 } from "../illustrations/primitives.jsx";
-import { IsoStack, LogoConstruction } from "../illustrations/shapes.jsx";
+import { LogoConstruction } from "../illustrations/shapes.jsx";
 import { usePageContrast } from "../lib/use-page-contrast.js";
 import { HeroDrawing, HeroPane } from "./HeroDrawing.jsx";
+import { BentoCell } from "./bento.jsx";
+import { Glyph, IconConstruction } from "./glyphs.jsx";
 
 /**
  * The Foundations heroes: each foundation as one object, cropped to what
@@ -53,9 +56,59 @@ const BoldEdge = ({ x, y, w, h, fill, corner = "card" }) => {
   );
 };
 
+const BRAND_RAMP = [PAINT.swatchBrand1, PAINT.swatchBrand2, PAINT.swatchBrand3, PAINT.swatchBrand4, PAINT.swatchBrand5];
+const NEUTRALS = [PAINT.swatchNeutral1, PAINT.swatchNeutral2, PAINT.swatchNeutral3, PAINT.swatchNeutral4, PAINT.swatchNeutral5];
+const ELEVATIONS = [PAINT.cardShadow, PAINT.popupShadow, PAINT.modalShadow];
+
+/**
+ * The foundations side by side, sized by weight: color tall at the left (the
+ * brand ramp over the neutrals), type and grid stacked in the middle, elevation
+ * ringed at the top right, icons and motion small under it. The bento runs the
+ * frame's width, past the stage.
+ */
 export const OverviewHero = () => (
   <HeroDrawing>
-    <IsoStack x={0} y={-4} w={300} h={180} accent layers={4} />
+    <BentoCell name="color" x={-80} y={-5} w={145} h={170}>
+      {BRAND_RAMP.map((fill, i) => (
+        <Rect key={fill} x={-66 + i * 24} y={9} w={20} h={85} fill={fill} corner="cardImage" />
+      ))}
+      {NEUTRALS.map((fill, i) => (
+        <Rect key={fill} x={-66 + i * 24} y={102} w={20} h={49} fill={fill} stroke={i === 0 ? PAINT.illustrationEdge : undefined} corner="cardImage" />
+      ))}
+    </BentoCell>
+    <BentoCell name="type" x={75} y={-5} w={165} h={80}>
+      <text
+        x={89}
+        y={45}
+        aria-hidden="true"
+        fill={PAINT.glyph}
+        style={{ fontFamily: "var(--type-family-heading-serif)", fontWeight: "var(--type-weight-medium)", fontSize: 46 }}
+      >
+        Aa
+      </text>
+      <Rule x1={89} x2={226} y1={49} y2={49} stroke={PAINT.illustrationEdge} />
+      <SkeletonBar x={155} y={18} w={65} h={5} heading />
+      <SkeletonBar x={155} y={29} w={50} />
+    </BentoCell>
+    <BentoCell name="grid" x={75} y={85} w={165} h={80}>
+      {Array.from({ length: 12 }, (_, k) => (
+        <Rect key={k} x={89 + k * 11.75} y={99} w={8} h={52} fill={PAINT.accent} opacity={0.22} corner="icon" />
+      ))}
+    </BentoCell>
+    <BentoCell name="elevation" x={250} y={-5} w={130} h={80} accent>
+      {ELEVATIONS.map((shadow, i) => (
+        <Layer key={shadow} x={268 + i * 17} y={9 + i * 8} w={60} h={38} fill={PAINT.popupSurface} shadow={shadow} corner="popup" />
+      ))}
+    </BentoCell>
+    <BentoCell name="icons" x={250} y={85} w={60} h={80}>
+      {["calendar", "bell", "search", "star"].map((name, i) => (
+        <Glyph key={name} name={name} x={261 + (i % 2) * 22} y={100 + Math.floor(i / 2) * 26} size={16} />
+      ))}
+    </BentoCell>
+    <BentoCell name="motion" x={320} y={85} w={60} h={80}>
+      <path d="M328 145 C338 95 345 98 352 115 S363 130 372 125" fill="none" stroke={PAINT.accent} strokeLinecap="round" style={TAB_UNDERLINE} />
+      <circle cx={372} cy={125} r={3} fill={PAINT.accent} />
+    </BentoCell>
   </HeroDrawing>
 );
 
@@ -177,79 +230,39 @@ export const GridHero = () => (
   </HeroDrawing>
 );
 
-/**
- * Ten stroke glyphs on a 24 grid, each a different object, so the set reads as
- * one family: the same stroke, the same corners, the same live area.
- */
-const GLYPHS = {
-  calendar: (
-    <>
-      <rect x="3" y="5" width="18" height="16" rx="2.5" />
-      <path d="M3 10H21M8 3v4M16 3v4" />
-    </>
-  ),
-  user: (
-    <>
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
-    </>
-  ),
-  bell: <path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4" />,
-  search: (
-    <>
-      <circle cx="10.5" cy="10.5" r="6.5" />
-      <path d="M15.5 15.5L21 21" />
-    </>
-  ),
-  chat: <path d="M4 5h16v11H9l-5 4z" />,
-  check: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M8 12l3 3 5-6" />
-    </>
-  ),
-  star: <path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4 6.5 20.3l1-6.2L3 9.7l6.2-.9z" />,
-  folder: <path d="M3 6h7l2 2h9v11H3z" />,
-  clock: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3 2" />
-    </>
-  ),
-  book: <path d="M4 4h7a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4zM20 4h-7a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h7z" />,
-};
-
 /** The set, five across and two down; the bell is the subject. */
 const ICON_SET = ["calendar", "user", "bell", "search", "chat", "check", "star", "folder", "clock", "book"];
 
+/**
+ * Ten different icons in one style, each on its tile. The bell is the subject:
+ * drawn in the brand color on its own construction (the 24 grid, the
+ * diagonals, the keyline circle and square), with no ring around it.
+ */
 export const IconographyHero = () => {
   const cell = 48;
   const gap = 10;
   const x0 = (300 - (5 * cell + 4 * gap)) / 2;
-  const y0 = (160 - (2 * cell + gap)) / 2;
+  const y0 = 15;
   return (
     <HeroDrawing>
       {ICON_SET.map((name, i) => {
         const x = x0 + (i % 5) * (cell + gap);
         const y = y0 + Math.floor(i / 5) * (cell + gap);
-        const subject = name === "bell";
+        if (name !== "bell") {
+          return (
+            <g key={name}>
+              <CardBox x={x} y={y} w={cell} h={cell} />
+              <Glyph name={name} x={x + 12} y={y + 12} size={24} />
+            </g>
+          );
+        }
+        const size = 36;
+        const at = (cell - size) / 2;
         return (
           <g key={name}>
-            <CardBox x={x} y={y} w={cell} h={cell} accent={subject} />
-            {/* The bell's 24 keyline: the live area the glyph is drawn in. */}
-            {subject && (
-              <rect x={x + 12} y={y + 12} width={24} height={24} fill="none" stroke={PAINT.annotation} strokeDasharray="1.5 1.5" style={HAIRLINE} />
-            )}
-            <g
-              transform={`translate(${x + 12} ${y + 12})`}
-              fill="none"
-              stroke={subject ? PAINT.accent : PAINT.iconGlyph}
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              {GLYPHS[name]}
-            </g>
+            <CardBox x={x} y={y} w={cell} h={cell} />
+            <IconConstruction x={x + at} y={y + at} size={size} />
+            <Glyph name={name} x={x + at} y={y + at} size={size} stroke={PAINT.accent} weight={1.5} />
           </g>
         );
       })}
