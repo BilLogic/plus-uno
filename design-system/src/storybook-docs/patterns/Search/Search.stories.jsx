@@ -39,7 +39,7 @@ export const TypeActive = {
     },
 };
 
-/** Focused: the field in a page's top bar with its panel open under it, grouped matches and "See all results". */
+/** Focused: the field in a page header with its panel open under it, grouped matches and "See all results". */
 export const TypeFocused = {
     name: 'Type: focused',
     render: () => staged(<FocusedPage />),
@@ -52,7 +52,7 @@ export const TypeFocused = {
     },
 };
 
-/** Basic: the field with its text in the top bar, and the results page Enter leads to. */
+/** Basic: the field with its text in the page header, and the results page Enter leads to. */
 export const TypeBasic = {
     name: 'Type: basic',
     render: () => staged(<BasicPage />),

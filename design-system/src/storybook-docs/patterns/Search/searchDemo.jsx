@@ -13,8 +13,8 @@ import { BarEnd, STUDENTS, row, useLayerMount } from '@/storybook-docs/lib/view-
  *   SearchStudents      active: the view bar's field, rows narrow as you type
  *   FocusedStudents     focused: the panel of recent searches or grouped results
  *   BasicStudents       basic: the field, submitted on Enter
- *   FocusedPage         focused in a page's top bar, its panel held open for a picture
- *   BasicPage           basic in a page's top bar, with the results page Enter leads to
+ *   FocusedPage         focused in a page header, its panel held open for a picture
+ *   BasicPage           basic in a page header, with the results page Enter leads to
  *   ScopedStudents      the scope filter before the field
  *   matching, countWords   the rule and the count the field reads
  */
@@ -197,7 +197,7 @@ export const BasicStudents = ({ onSearch }) => (
 /** The height a type card's picture lays out at, in px: docs geometry, half the stage so it fills the card's 2 / 1 frame. */
 const THUMB_HEIGHT = STAGE / 2; // docs-literal
 
-/** A page whose top bar carries the search field, at the picture's frame size. */
+/** A page whose header carries the search field, at the picture's frame size. */
 const PageFrame = ({ mountRef, field, children }) => (
     <div ref={mountRef} style={{ position: 'relative', blockSize: THUMB_HEIGHT, overflow: 'hidden', padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
         <PageHeader title="Students" actions={field} />
@@ -206,7 +206,7 @@ const PageFrame = ({ mountRef, field, children }) => (
 );
 
 /**
- * Focused, as a picture: the field in the page's top bar with its panel open
+ * Focused, as a picture: the field in the page header with its panel open
  * under it, grouped matches for the text and the "See all results" row. The
  * panel mounts inside the picture, so it scales and clips with it.
  */
@@ -250,7 +250,7 @@ export const FocusedPage = ({ text = 'a' }) => {
 };
 
 /**
- * Basic, as a picture: the field with its text in the page's top bar, and
+ * Basic, as a picture: the field with its text in the page header, and
  * under it the results page that Enter leads to, as Skeleton bars.
  */
 export const BasicPage = ({ text = 'Ava' }) => (

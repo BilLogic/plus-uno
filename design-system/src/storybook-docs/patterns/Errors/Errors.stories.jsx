@@ -11,7 +11,7 @@ import { BackgroundJob, FieldError, FlagOnPage, InPage, LoadFailure, MenuError, 
  * drawn in the state its heading names, from initial-state props, and asserts
  * the ruling it shows: the message is visible text where the cause is, a load
  * failure takes the empty-state slot, no access offers no action, a failed
- * background job stays until dismissed, and nothing carries a message in a
+ * background job stays until Try again resolves it, and nothing carries a message in a
  * tooltip.
  *
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/Errors/Errors.stories.jsx

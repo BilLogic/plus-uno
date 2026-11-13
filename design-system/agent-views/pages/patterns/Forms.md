@@ -113,7 +113,7 @@ A disabled submit gives no direction and leaves the tab order. Pressing it marks
 
 **Checked:** Automatic
 
-Mark the field, say what to fix inline, scroll the body to it, shake once. Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: Errors.
+Mark the field, say what to fix inline, scroll the body to it, and shake once . Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: Errors.
 
 Do: The message under the field, in the same Modal.
 Don't: A second dialog over the first, with the field left unexplained.
