@@ -101,6 +101,7 @@ export const WithMotionHero = () => {
       {/* the sync tick through both tracks */}
       <Rect x={land - 0.5} y={2} w={1} h={156} fill={PAINT.accent} />
       <Rect x={land - 3.5} y={0} w={7} h={8} fill={PAINT.accent} corner="shape" />
+      {/* 25.25 is the trail's dashed target row: top 11 (y + still/2 + 4) plus a quarter of the 57-unit run */}
       <g data-sync="">
         <circle cx={land} cy={25.25} r={3} fill={PAINT.cardSurface} stroke={PAINT.accent} style={HAIRLINE} />
         <circle cx={land} cy={soundY} r={3} fill={PAINT.cardSurface} stroke={PAINT.accent} style={HAIRLINE} />
