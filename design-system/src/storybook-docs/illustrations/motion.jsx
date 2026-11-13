@@ -475,7 +475,8 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
   const cycleSpeed = () => {
     const next = (speedIndex + 1) % SPEEDS.length;
     setSpeedIndex(next);
-    setSpeed(SPEEDS[next]);
+    // The control scales the demo's own rate: ½× of a fast-forwarded test is still half of it.
+    setSpeed(SPEEDS[next] * fastForward);
   };
   const togglePause = () => {
     setPaused(!paused);
