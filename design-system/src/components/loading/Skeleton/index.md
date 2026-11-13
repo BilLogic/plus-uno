@@ -14,7 +14,7 @@ Also asked as: loading placeholder, shimmer, ghost.
 
 **Storybook page:** `design-system/src/components/loading/Skeleton/Skeleton.mdx`
 
-**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

@@ -12,7 +12,7 @@ InlineEdit — text that reads as text and becomes a field when it is pressed. T
 
 **Storybook page:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.mdx`
 
-**Motion:** change `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

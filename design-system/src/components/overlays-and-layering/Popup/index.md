@@ -14,7 +14,7 @@ Also asked as: popover, flyout, inline dialog.
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Popup/Popup.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.exit` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.exit` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

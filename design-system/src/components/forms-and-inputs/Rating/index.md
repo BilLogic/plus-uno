@@ -14,7 +14,7 @@ Also asked as: stars, score.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Rating/Rating.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

@@ -1,5 +1,5 @@
 /**
- * Foundations · Sound's live parts, run in the Storybook tests: every player
+ * Foundations › Expression › Sound's live parts, run in the Storybook tests: every player
  * plays a generated token, the switch turns them all off, and the land figure
  * draws from the generated spring and score.
  *

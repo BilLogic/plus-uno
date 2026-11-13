@@ -8,7 +8,7 @@ InlineEditableTextfield — `InlineEdit` with a Text field for its edit view. It
 
 **Source:** `design-system/src/components/forms-and-inputs/InlineEditableTextfield/InlineEditableTextfield.jsx`
 
-**Motion:** change `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Motion
 

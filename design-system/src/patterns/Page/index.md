@@ -14,7 +14,7 @@ Also asked as: surface.
 
 **Storybook page:** `design-system/src/patterns/Page/Page.mdx`
 
-**Motion:** title `linear` · anchor `linear` · tabs-shadow `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** title `linear` · anchor `linear` · tabs-shadow `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

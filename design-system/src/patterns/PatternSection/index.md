@@ -14,7 +14,7 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Storybook page:** `design-system/src/patterns/PatternSection/PatternSection.mdx`
 
-**Motion:** view-bar `spatial.fast` + `appearance.fast` · side-open `spatial.default` · side-close `spatial.default` · detail `spatial.default` + `appearance.default` · body `spatial.fast` + `appearance.fast` · footer `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** view-bar `spatial.fast` + `appearance.fast` · side-open `spatial.default` · side-close `spatial.default` · detail `spatial.default` + `appearance.default` · body `spatial.fast` + `appearance.fast` · footer `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

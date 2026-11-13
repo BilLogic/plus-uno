@@ -107,6 +107,15 @@ export const RETIRED = [
     re: /\blanes?[- ](?:honors?|honors?|report|reports|run|runs|log|logs)\b/gi,
     why: 'an adapter honors/reports/runs — "lane" in the provider sense is retired',
   },
+  // THE THIRD RETIREMENT: the pre-regroup Foundations IA (#2429). Foundations became
+  // Brand, Visual, Layout, Expression, Accessibility and Tokens (#2433); Basics, the
+  // top-level Motion and Sound groups, Get started › Content design and the first
+  // motion principles are gone. Old ids resolve through netlify redirects for readers;
+  // an agent that cites one sends a human to a page that no longer exists.
+  { re: /\bfoundations-(?:basics|motion|sound)-[a-z-]+/g, why: 'a retired Storybook id: Foundations is Brand, Visual, Layout, Expression, Accessibility and Tokens (motion and sound ids start foundations-expression-)' },
+  { re: /\bFoundations(?: · |\/)(?:Basics|Motion|Sound)\b/g, why: 'Motion and Sound sit under Foundations › Expression; Basics is gone' },
+  { re: /\bGet started(?: › |\/)Content design\b/g, why: 'Content design became Foundations › Brand › Content (Voice and tone, Language, Messages)' },
+  { re: /\b(?:Show what changed|Move like real things|Quiet by default)\b/g, why: 'the motion principles are Always responsive, Build understanding, Lead with empathy, Cut the noise' },
 ];
 
 /**

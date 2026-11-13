@@ -14,7 +14,7 @@ Also asked as: summary card, object card.
 
 **Storybook page:** `design-system/src/patterns/PatternCard/PatternCard.mdx`
 
-**Motion:** change `appearance.fast` · milestone `spatial.default`, sound `sound.done.milestone`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · milestone `spatial.default`, sound `sound.done.milestone`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

@@ -14,7 +14,7 @@ Also asked as: time input, clock, time field, time selector.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

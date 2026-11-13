@@ -12,7 +12,7 @@ The one dismiss control for a surface that closes as a whole — Modal, Section 
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

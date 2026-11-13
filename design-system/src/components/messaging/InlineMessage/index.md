@@ -14,7 +14,7 @@ Also asked as: field error, helper error, inline error, form validation.
 
 **Storybook page:** `design-system/src/components/messaging/InlineMessage/InlineMessage.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

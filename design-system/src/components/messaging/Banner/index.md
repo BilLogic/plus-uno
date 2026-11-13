@@ -14,7 +14,7 @@ Also asked as: announcement, top of page, system message, outage.
 
 **Storybook page:** `design-system/src/components/messaging/Banner/Banner.mdx`
 
-**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

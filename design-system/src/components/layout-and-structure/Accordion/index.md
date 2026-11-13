@@ -14,7 +14,7 @@ Also asked as: collapsible, expand collapse, disclosure, expandable sections, fa
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Accordion/Accordion.mdx`
 
-**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

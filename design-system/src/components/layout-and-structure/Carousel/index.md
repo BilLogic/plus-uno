@@ -14,7 +14,7 @@ Also asked as: slideshow, gallery.
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Carousel/Carousel.mdx`
 
-**Motion:** change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

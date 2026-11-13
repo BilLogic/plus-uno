@@ -125,12 +125,12 @@ test('a MotionSection naming a row the registry lacks fails the render', () => {
   assert.throws(() => renderDocsAgentFile(source, { file: 'x.mdx', kind: 'Template', registry: [] }), /Ghost/);
 });
 
-// ── Foundations · Motion through get-documentation ──
+// ── Foundations › Expression › Motion through get-documentation ──
 
 const MOTION_MDX = (name) => `import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title="Foundations/Expression/Motion/${name}" tags={['!dev', 'manifest']} />\n\n# ${name}\n`;
 const MOTION_STORIES = (name, tags) => `export default {\n    title: 'Foundations/Expression/Motion/${name}',\n    tags: [${tags}],\n};\n`;
 
-test('a Foundations · Motion page without the manifest tag is named, whether its Meta or its stories file carries the title', () => {
+test('a Foundations › Expression › Motion page without the manifest tag is named, whether its Meta or its stories file carries the title', () => {
   const root = fixture({
     'design-system/src/styles/MotionLibrary.mdx': MOTION_MDX('Library').replace(", 'manifest'", ''),
     'design-system/src/styles/MotionPhysics.mdx': `import * as S from './MotionPhysics.stories.jsx';\n\n<Meta of={S} />\n`,
@@ -144,17 +144,17 @@ test('a Foundations · Motion page without the manifest tag is named, whether it
   ]);
 });
 
-test('on the real repo every Foundations · Motion page is served, and a component with a motion row carries its Motion section', () => {
+test('on the real repo every Foundations › Expression › Motion page is served, and a component with a motion row carries its Motion section', () => {
   const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
   assert.deepEqual(pagesMissingManifestTag(root), []);
   const served = fs.readdirSync(path.join(root, 'design-system/src/styles')).filter((f) => /^Motion[A-Z].*\.mdx$/.test(f));
-  assert.ok(served.length >= 6, `expected the six Foundations · Motion pages, found ${served.length}`);
+  assert.ok(served.length >= 6, `expected the six Foundations › Expression › Motion pages, found ${served.length}`);
   const popup = fs.readFileSync(path.join(root, 'design-system/src/components/overlays-and-layering/Popup/index.md'), 'utf8');
   assert.match(popup, /^## Motion$/m);
   assert.match(popup, /--ds-motion-spatial-fast/);
 });
 
-test('a Foundations · Sound page without the manifest tag is named', () => {
+test('a Foundations › Expression › Sound page without the manifest tag is named', () => {
   const root = fixture({
     'design-system/src/styles/SoundOverview.mdx': MOTION_MDX('Overview').replace('Motion', 'Sound').replace(", 'manifest'", ''),
     'design-system/src/styles/SoundSettings.mdx': MOTION_MDX('Settings').replace('Motion', 'Sound'),
@@ -162,7 +162,7 @@ test('a Foundations · Sound page without the manifest tag is named', () => {
   assert.deepEqual(pagesMissingManifestTag(root), ['design-system/src/styles/SoundOverview.mdx']);
 });
 
-test('on the real repo every Foundations · Sound page is served, and a component with a sound cell carries it in its Motion section', () => {
+test('on the real repo every Foundations › Expression › Sound page is served, and a component with a sound cell carries it in its Motion section', () => {
   const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
   assert.deepEqual(pagesMissingManifestTag(root), []);
   const flag = fs.readdirSync(path.join(root, 'design-system/src/components'), { recursive: true }).find((f) => String(f).endsWith('Flag/index.md'));

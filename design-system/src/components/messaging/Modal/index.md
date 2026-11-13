@@ -14,7 +14,7 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window, 
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
-**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

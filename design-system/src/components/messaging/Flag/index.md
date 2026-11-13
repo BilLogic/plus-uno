@@ -14,7 +14,7 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
-**Motion:** enter `spatial.default` + `appearance.default`, sound `sound.notify` · exit `spatial.exit` · dismiss `appearance.fast` · change `spatial.default` · milestone `spatial.fast`, sound `sound.done.step` · prompt `spatial.default` + `appearance.default`, sound `sound.prompt` · failed `spatial.default` + `appearance.default`, sound `sound.error`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` + `appearance.default`, sound `sound.notify` · exit `spatial.exit` · dismiss `appearance.fast` · change `spatial.default` · milestone `spatial.fast`, sound `sound.done.step` · prompt `spatial.default` + `appearance.default`, sound `sound.prompt` · failed `spatial.default` + `appearance.default`, sound `sound.error`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

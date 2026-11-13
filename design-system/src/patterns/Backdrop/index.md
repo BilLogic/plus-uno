@@ -12,7 +12,7 @@ Also asked as: scrim.
 
 **Stories:** `design-system/src/patterns/Backdrop/Backdrop.stories.jsx` — Inline, ConfirmOverPanel, Layers, Pads, ScreenGrid, Interactive
 
-**Motion:** enter `appearance.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `appearance.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Motion
 

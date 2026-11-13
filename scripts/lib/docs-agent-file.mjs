@@ -62,7 +62,7 @@ export { ruleTags };
 const TAGS = /\btags(?:=\{\[|:\s*\[)([^\]]*)\]/;
 
 /**
- * The Foundations · Motion and Foundations · Sound pages, as `{file, tags}`. A page names its title and tags in its own
+ * The Foundations › Expression › Motion and Foundations › Expression › Sound pages, as `{file, tags}`. A page names its title and tags in its own
  * `<Meta>` or, with `<Meta of={Stories}>`, in the stories file it imports.
  */
 function foundationPages(root) {
@@ -84,8 +84,8 @@ function foundationPages(root) {
 
 /**
  * Pages the Storybook MCP would not serve: `get-documentation` lists a docs page
- * only when it carries the `manifest` tag, so a template, pattern, Foundations · Motion
- * or Foundations · Sound page without it is invisible to an agent that asks the endpoint.
+ * only when it carries the `manifest` tag, so a template, pattern, Foundations › Expression › Motion
+ * or Foundations › Expression › Sound page without it is invisible to an agent that asks the endpoint.
  */
 export function pagesMissingManifestTag(root) {
   const docsOnly = docsAgentPages(root).map((p) => ({

@@ -12,7 +12,7 @@ TagInput — a field of Tags with a text entry after them, modeled on Notion's m
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.mdx`
 
-**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
