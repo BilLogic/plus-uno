@@ -25,11 +25,6 @@
     to { opacity: 1; }
 }
 
-@keyframes plus-flag-countdown {
-    from { width: 100%; }
-    to { width: 0; }
-}
-
 @keyframes plus-flag-exit {
     to { transform: translate(calc(100% + var(--popover-gap-screen)), calc(-100% - var(--popover-gap-screen))); }
 }
@@ -78,7 +73,7 @@
     }
 
     // Timed (Undo): the corners step down from 12 to 4, and the bar is the top cap, clipped by them.
-    // The bar empties over `delay` on the linear token; hover or focus pauses it and dims it.
+    // Flag.jsx empties the bar over `delay`, linear; hover or focus pauses it and dims it.
     // Reduced motion keeps the countdown: it is information, not movement.
     &.plus-flag--timer {
         position: relative;
@@ -104,16 +99,12 @@
         .plus-progressbar-fill {
             border-radius: 0;
             transition: none;
-            animation: plus-flag-countdown var(--flag-timer-duration) var(--ds-motion-linear) forwards;
+            transform-origin: left;
         }
     }
 
     &[data-paused='true'] .plus-flag-timer {
         opacity: var(--ds-opacity-disabled);
-
-        .plus-progressbar-fill {
-            animation-play-state: paused;
-        }
     }
 
     // --- ICON: 16, in a box one title line tall ---
@@ -360,7 +351,7 @@
     }
 }
 
-// --- FLAG CONTAINER: bottom-left, 8 from the screen edge, 16 apart ---
+// --- FLAG CONTAINER: top-right by default, 8 from the screen edge, 16 apart ---
 .plus-flag-container {
     z-index: var(--layer-flag);
     display: flex;

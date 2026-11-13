@@ -148,7 +148,32 @@ export const Flag = ({
     const remaining = useRef(delay);
     useEffect(() => {
         remaining.current = delay;
+        // A flag removed under the pointer or the focus gets no leave or blur: clear both with it.
+        if (!show) {
+            setHovered(false);
+            setFocused(false);
+        }
     }, [delay, show]);
+
+    /*
+     * The bar. Only a flag that closes itself counts down. Driven with `animate` rather than a CSS
+     * animation, so the app-wide reduced-motion rule (which turns CSS animations off) leaves the
+     * countdown running: it is information, not movement. It pauses with the wait.
+     */
+    const barRef = useRef(null);
+    const countdown = useRef(null);
+    const counts = timer && closesItself && delay > 0;
+    useEffect(() => {
+        const fill = barRef.current?.querySelector('.plus-progressbar-fill');
+        if (!show || !counts || !fill) return undefined;
+        const controls = animate(fill, { transform: ['scaleX(1)', 'scaleX(0)'] }, { duration: delay / 1000, ease: 'linear' });
+        countdown.current = controls;
+        return () => { controls.stop(); countdown.current = null; };
+    }, [show, counts, delay]);
+    useEffect(() => {
+        if (paused) countdown.current?.pause();
+        else countdown.current?.play();
+    }, [paused, show, counts, delay]);
 
     useEffect(() => {
         if (!show || !closesItself || !(delay > 0) || paused) return undefined;
@@ -227,9 +252,6 @@ export const Flag = ({
         if (show && token !== false && token !== '') playOnLand(currentAppearance, token, isReduced);
     }, [show]);
 
-    // The countdown's length is the caller's `delay`: a runtime value the stylesheet cannot know.
-    const timerStyle = { '--flag-timer-duration': `${delay}ms` };
-
     if (!show && !leaving) return null;
 
     return (
@@ -243,19 +265,19 @@ export const Flag = ({
             onAnimationEnd={!show ? () => setLeaving(false) : undefined}
             className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''}${timer ? ' plus-flag--timer' : ''} ${className}`}
             data-paused={paused ? 'true' : undefined}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
             role={liveRole}
             aria-live={livePoliteness}
             aria-atomic="true"
             {...props}
+            onMouseEnter={(event) => { setHovered(true); props.onMouseEnter?.(event); }}
+            onMouseLeave={(event) => { setHovered(false); props.onMouseLeave?.(event); }}
+            onFocus={(event) => { setFocused(true); props.onFocus?.(event); }}
+            onBlur={(event) => { setFocused(false); props.onBlur?.(event); }}
         >
             {timer && (
-                // The top cap: counts down over `delay` on the linear token; Flag.scss runs it and pauses it.
-                <div className="plus-flag-timer" style={timerStyle}>
-                    <ProgressBar value={100} ariaLabel="Time left to undo" />
+                // The top cap, decorative: it counts down over `delay` (linear) and pauses with the wait.
+                <div className="plus-flag-timer" ref={barRef} aria-hidden="true" data-counting={counts ? 'true' : undefined}>
+                    <ProgressBar value={100} ariaLabel="Time left" />
                 </div>
             )}
             {/*

@@ -220,7 +220,7 @@ describe('FlagGroup', () => {
 
 describe('Flag timer', () => {
     afterEach(() => { vi.useRealTimers(); });
-    const bar = () => document.querySelector('.plus-flag-timer [role="progressbar"]');
+    const bar = () => document.querySelector('.plus-flag-timer .plus-progressbar-fill');
 
     it('draws the countdown bar only with timer', () => {
         const { rerender } = render(<Flag title="Archived" />);
@@ -231,11 +231,29 @@ describe('Flag timer', () => {
         expect(document.querySelector('.plus-flag')).toHaveClass('plus-flag--timer');
     });
 
-    it('counts the bar down over delay', () => {
-        vi.useFakeTimers();
-        render(<Flag title="Archived" timer delay={1000} onDismiss={() => {}} />);
-        expect(bar()).toHaveAttribute('aria-valuenow', '100');
-        expect(document.querySelector('.plus-flag-timer')).toHaveStyle({ '--flag-timer-duration': '1000ms' });
+    it('counts only on a flag that closes itself', () => {
+        const { rerender } = render(<Flag title="Archived" timer />);
+        expect(document.querySelector('.plus-flag-timer')).toHaveAttribute('data-counting', 'true');
+        rerender(<Flag title="Archived" timer autohide={false} />);
+        expect(document.querySelector('.plus-flag-timer')).not.toHaveAttribute('data-counting');
+        rerender(<Flag title="Failed" appearance="error" timer />);
+        expect(document.querySelector('.plus-flag-timer')).not.toHaveAttribute('data-counting');
+    });
+
+    it('drops a stuck hover when the flag is hidden', () => {
+        const { rerender } = render(<Flag title="Saved" />);
+        fireEvent.mouseEnter(document.querySelector('.plus-flag'));
+        rerender(<Flag title="Saved" show={false} />);
+        rerender(<Flag title="Saved" show />);
+        expect(document.querySelector('.plus-flag')).not.toHaveAttribute('data-paused');
+    });
+
+    it('keeps a caller handler beside the pause', () => {
+        const onMouseEnter = vi.fn();
+        render(<Flag title="Saved" onMouseEnter={onMouseEnter} />);
+        fireEvent.mouseEnter(document.querySelector('.plus-flag'));
+        expect(onMouseEnter).toHaveBeenCalled();
+        expect(document.querySelector('.plus-flag')).toHaveAttribute('data-paused', 'true');
     });
 
     it('pauses on hover and resumes on leave, for any flag', () => {

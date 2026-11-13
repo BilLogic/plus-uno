@@ -36,7 +36,7 @@ export default {
         },
         position: {
             control: 'select',
-            options: ['top-start', 'top-end', 'bottom-start', 'bottom-end'],
+            options: ['top-start', 'top-center', 'top-end', 'bottom-start', 'bottom-end'],
             table: { category: 'Layout' }
         },
         title: {

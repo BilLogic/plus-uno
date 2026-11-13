@@ -11,7 +11,7 @@ import { Flag, FlagGroup, Button, Popup, Tooltip } from '@/components';
  *
  * Floating layers behave the same everywhere, and these stories hold them to
  * the Popups pattern page: popups auto 160 to 320 or a column step, padded 16,
- * tooltips 4 · 8 up to 240, flags 400 wide stacking 16 apart bottom-left, and
+ * tooltips 4 · 8 up to 240, flags 400 wide stacking 16 apart top-right, and
  * every one of them at least 8 from the screen edge, 4 from its trigger.
  *
  * Popups and tooltips portal out of the story canvas, so those queries run
