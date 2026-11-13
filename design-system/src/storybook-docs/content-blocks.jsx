@@ -17,10 +17,10 @@ export const Say = ({ children }) => (
 export const Sample = ({ icon = 'circle-info', title, children, action, secondary }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
         <div style={{ display: 'flex', gap: 'var(--stack-sm)', alignItems: 'flex-start' }}>
-            <span aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)', paddingTop: 'var(--stack-xs)' }}>
+            <span aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)', paddingTop: 'var(--stack-sm)' }}>
                 <Icon name={icon} />
             </span>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xs)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{title}</strong>
                 {children && <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{children}</span>}
             </div>

@@ -36,7 +36,7 @@ describe('Content pages', () => {
             const text = readFileSync(join(STYLES, file), 'utf8');
             const tags = (text.match(/<VoiceTag word="(helpful|honest|warm|clear)"/g) ?? []).length;
             const pairs = (text.match(/<DoDont>/g) ?? []).length;
-            if (file !== 'ContentVoiceAndTone.mdx') expect(tags, file).toBeGreaterThanOrEqual(pairs);
+            expect(tags, file).toBeGreaterThanOrEqual(pairs);
         }
     });
 
