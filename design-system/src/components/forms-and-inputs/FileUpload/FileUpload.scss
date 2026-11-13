@@ -16,7 +16,7 @@
     flex-direction: column;
     gap: var(--stack-md);
     padding: var(--pad-y-md) var(--pad-x-md);
-    border-radius: var(--radius-xl);
+    border-radius: var(--card-radius-compact);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
     border: var(--border-default) solid transparent;
