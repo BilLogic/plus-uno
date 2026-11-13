@@ -175,6 +175,23 @@ The lookup run at `6cc39f0d7`: `current`, `lookup` (the five MCP tools) and `loo
 - **Two tools are not enough.** `lookup-min` keeps half the escapes; the gain comes with `ds_tokens`, `ds_guide` and `ds_check` in reach.
 - **Decision (2026-11-07): keep all five tools.** Bill kept the lookup on the quality gain. The keep rule now puts escapes first (§ Does the lookup pay off?), and on these rows `compare` reads keep. The `lookup-min` arm and the server's `--tools` flag are gone; its rows stay in the ledger.
 
+## Review run (2026-11-12)
+
+32 builds on `sonnet`, harness at main `db0ed10ba` (after SearchField, the Flag model, Drawer's retirement, the motion revamp and Radius 2.0), four arms, the four default tasks, two runs a cell. Two builds errored (trap task, `checker-removed` and `lookup` run 2: no result after about 55 minutes each). No run reached the checkout. Recorded cost $8.24, the two errored builds not counted.
+
+| | control | current | checker-removed | lookup |
+|---|---|---|---|---|
+| Escapes per run | 12.5 | 1.63 | 1.86 | 2.14 |
+| Escapes outside `debt-extend` | 13.8 | 0 | 0 | 0.6 |
+| `debt-extend`: seeded 6, left per run | 8.5 | 6.5 | 6.5 | 6 |
+| Trap task, gap named | 2/2 | 2/2 | 1/1 | 1/1 |
+| Forbidden ask escalated | 0/2 | 2/2 | 2/2 | 1/2 |
+| Layout formula used | 3/8 | 6/8 | 6/7 | 5/7 |
+| Mean turns / minutes | 18.3 / 4.8 | 20.4 / 1.5 | 19.6 / 1.9 | 20 / 1.3 |
+| Axe violations per build | 8.4 | 3 | 3 | 3 |
+
+Read: outside the seeded task, `current` holds at zero escapes, as it has since phase 1, and the layout formula reached 6 of 8. The recorded debt is still not paid down: every harness arm leaves the seeded 4 deep imports and 2 raw literals in place. The lookup arm lost ground against its 2026-11-07 run (`debt-extend` left 6 where it left 0, and one `forbidden-ask` build used 2 unknown tokens), and its trap run hung. Two runs a cell show direction only. The trap task asks for a drag-and-drop board PLUS has no component for, and drag now runs on Pragmatic drag and drop, so whether it is still a trap is open.
+
 ## Retrieval bench
 
 Whether `ds_find` puts the right component first is measured apart from the agent runs, in seconds and with no model: `node scripts/bench-ds-find.mjs`. It scores two sets under `scripts/bench/ds-find/`:

@@ -207,10 +207,10 @@ A form field for picking a value from a list of options. A list loaded from a se
 _Avoid_: "dropdown", "Dropdown menu" for a value picker, "async select"
 
 **Close / Dismiss**:
-Close ends a blocking layer (**Modal**); Dismiss removes a message (Flag, Banner, Section message).
+Close ends a blocking layer (**Modal**); Dismiss removes a message (the default Flag, Banner, Section message).
 
 **Flag**:
-A short message that appears at the screen corner and leaves on its own or on Dismiss.
+A short message at the screen corner; `appearance` alone decides its kind. `normal` is the default flag, with the dismiss × and actions as links. Every other appearance is bold: no ×, collapsed to its title, actions as buttons, and it leaves when its action resolves.
 _Avoid_: "toast", "snackbar"
 
 **Section message**:

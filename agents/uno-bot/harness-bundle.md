@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **125,627 chars from 9 files**, against an assembled budget of 175,500 (49,873 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,243 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **125,820 chars from 9 files**, against an assembled budget of 175,500 (49,680 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,436 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,284 (−8,789 ide-only) | 10,284 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 36,641 | 46,954 | 20,000 (constitution) ⚠️ **over by 16,641** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 68,437 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 70,083 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 71,331 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 77,025 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 88,811 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 109,772 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 113,240 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 119,798 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 124,771 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 125,627 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 36,834 | 47,147 | 20,000 (constitution) ⚠️ **over by 16,834** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 68,630 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 70,276 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 71,524 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 77,218 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 89,004 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 109,965 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 113,433 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 119,991 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 124,964 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 125,820 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -363,10 +363,10 @@ A form field for picking a value from a list of options. A list loaded from a se
 _Avoid_: "dropdown", "Dropdown menu" for a value picker, "async select"
 
 **Close / Dismiss**:
-Close ends a blocking layer (**Modal**); Dismiss removes a message (Flag, Banner, Section message).
+Close ends a blocking layer (**Modal**); Dismiss removes a message (the default Flag, Banner, Section message).
 
 **Flag**:
-A short message that appears at the screen corner and leaves on its own or on Dismiss.
+A short message at the screen corner; `appearance` alone decides its kind. `normal` is the default flag, with the dismiss × and actions as links. Every other appearance is bold: no ×, collapsed to its title, actions as buttons, and it leaves when its action resolves.
 _Avoid_: "toast", "snackbar"
 
 **Section message**:

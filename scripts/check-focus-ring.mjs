@@ -84,7 +84,7 @@ export const MIN_FILES = 100;
 // does not see.
 // Lowered from 40 to 39: AiLabel was deleted, and its explain button's ring
 // rule went with it.
-// Lowered from 39 to 34 when the Specs code, the root app and the specs prototypes left main (kept on archive/legacy-ds), then to 33 when PatternDrawer retired, then to 32 when the Modal close button became an IconButton.
+// Lowered from 39 to 34 when the Specs code, the root app and the specs prototypes left main (kept on archive/legacy-ds), then to 33 when a retired drawer pattern left, then to 32 when the Modal close button became an IconButton.
 export const MIN_RULES = 32;
 
 export const REMEDY =

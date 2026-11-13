@@ -80,7 +80,7 @@ Views are a fixed set the product defines, and one pill stays even with one view
 
 **Checked:** Review
 
-Search, Filter and More are icon buttons with Tooltips; the Primary is labeled and last. Keep five controls at most and fold extras into More. Search, Filter and the Primary stay in the bar. Every control is a default button, or compact in a compact bar.
+Filter and More are icon buttons with Tooltips; Search is a compact `SearchField` (`spacing="compact"`, and `isCollapsible` where the bar is tight); the Primary is labeled and last. Keep five controls at most and fold extras into More. Search, Filter and the Primary stay in the bar. Every control is a default button, or compact in a compact bar.
 
 Do: Format switch, Search, Filter, More, then the labeled Primary last.
 Don't: Six controls in no order, the Primary first and a second labeled button: fold extras into More.
