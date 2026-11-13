@@ -41,11 +41,12 @@ const Clip = ({ x, y, w, h, children }) => {
 };
 
 /** The blocked-out screen most app examples sit in: a frame, a header and rows. */
-const Screen = ({ rows = 4, header = true }) => (
+const Screen = ({ rows = 3, header = true }) => (
   <>
     <Frame x={8} y={6} w={144} h={88} />
     {header && <PageHeader x={16} y={24} w={128} />}
-    {Array.from({ length: rows }, (_, i) => (
+    {/* Never more rows than fit above the Frame's bottom edge. */}
+    {Array.from({ length: Math.min(rows, Math.floor((94 - 44) / 14)) }, (_, i) => (
       <Row key={i} x={16} y={44 + i * 14} w={128} />
     ))}
   </>
@@ -92,7 +93,8 @@ const popupOpening = ({ id, title, caption, token }) => ({
     <>
       <Screen rows={3} header={false} />
       <ButtonShape x={112} y={22} w={28} />
-      <Clip x={140 - 74 * p} y={34} w={74 * p} h={52 * p}>
+      {/* The reveal reaches one unit past the Popup's top and right, so its ring is never sliced. */}
+      <Clip x={140 - 74 * p} y={33} w={74 * p + 1} h={52 * p + 1}>
         <Popup x={68} y={34} w={72} h={48} accent />
       </Clip>
     </>

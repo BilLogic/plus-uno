@@ -7,6 +7,7 @@ import { Button, IconButton } from '@/components';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { measureSpring, springStep } from '@/tokens/spring.js';
 import { Illustration } from './Illustration.jsx';
+import { HERO_HAIRLINE } from './paint.js';
 import { Trail, TapRing } from './primitives-motion.jsx';
 import { crossings, ghostOf, pointsOf } from './trails.js';
 
@@ -328,7 +329,17 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
       style={{ margin: 0, display: 'grid', gridTemplateRows: 'subgrid', gridRow: 'span 3', gap: 'var(--stack-sm)', minInlineSize: 0 }}
     >
       <div style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text)' }}>{scene.title}</div>
-      <div style={{ borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', overflow: 'hidden' }}>
+      <div
+        style={{
+          borderRadius: 'var(--radius-lg)',
+          background: 'var(--ds-surface)',
+          overflow: 'hidden',
+          // Vertical room around the drawing: a frame never sits against the tile edge.
+          paddingBlock: 'var(--card-pad-default)',
+          // One viewBox unit is 2px, so every kit outline here is half a stroke: 1px, as in the heroes.
+          '--stroke-hairline': HERO_HAIRLINE,
+        }}
+      >
         <Illustration viewBox={scene.viewBox} title={scene.label ?? `${scene.title}. ${scene.caption}`}>
           <g opacity={round(1 - dim * VEIL)}>
             {resetting && <g>{scene.draw(startStates([scene])[scene.id])}</g>}
@@ -523,7 +534,9 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))`,
+          // Two tiles a row at most: a drawing keeps its natural size (two px a unit) instead of
+          // shrinking to a fractional scale that blurs its hairlines.
+          gridTemplateColumns: `repeat(auto-fit, minmax(max(min(100%, var(--card-min-width-sm)), calc((100% - var(--grid-gutter)) / 2)), 1fr))`,
           columnGap: 'var(--grid-gutter)',
           rowGap: 'var(--stack-sm)',
           alignItems: 'start',

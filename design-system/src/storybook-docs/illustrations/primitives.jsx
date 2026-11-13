@@ -115,7 +115,22 @@ export const PageSheet = ({ x, y, w, h, accent = false, corner = 'window' }) => 
 );
 
 /** The accent marking a layer as the subject: a brand outline over its edge. */
-const AccentRing = ({ x, y, w, h, corner }) => <Rect x={x} y={y} w={w} h={h} stroke={PAINT.accent} corner={corner} />;
+/**
+ * The subject's ring around a layer (a Popup, a Modal, a Tooltip): a hairline in the accent. A
+ * layer is large, so the kit-unit accent stroke reads as a heavy border at its size; the hairline
+ * renders 1px wherever a drawing sets `--stroke-hairline` to half a stroke (heroes, motion demos).
+ */
+const AccentRing = ({ x, y, w, h, corner }) => (
+  <rect
+    x={x}
+    y={y}
+    width={w}
+    height={h}
+    fill="none"
+    stroke={PAINT.accent}
+    style={{ ...HAIRLINE, rx: clampedCorner(CORNER[corner], w, h), ry: clampedCorner(CORNER[corner], w, h) }}
+  />
+);
 
 export const Frame = ({ x, y, w, h, accent = false }) => {
   const onHeroGround = useContext(HeroGround);
