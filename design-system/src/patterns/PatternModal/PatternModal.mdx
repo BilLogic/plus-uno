@@ -279,6 +279,23 @@ The Backdrop holds no text of its own. The words belong to the layer it holds.
 - The backdrop at `--ds-blanket` keeps the dialog legible in Light and Dark. The toolbar's Contrast switch changes it with the rest of the page.
 - A layer wider than a narrow screen keeps its width, and the Backdrop scrolls.
 
+### Backdrop playground
+
+<DocsInteractivePlayground
+    of={BackdropStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+### Backdrop related
+
+- <DocsLink id="templates-panel-panel">Panel</DocsLink> floats beside the page for a task that needs it in view, with no Backdrop.
+- <DocsLink id="templates-frame-frame">Frame</DocsLink> shows the floating Sidebar and the floating AI panel, which take a shadow and no backdrop.
+
 ### Backdrop motion
 
 <MotionSection component="Backdrop" tier="template" />
