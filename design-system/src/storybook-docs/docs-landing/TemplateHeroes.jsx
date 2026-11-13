@@ -32,7 +32,7 @@ import { HeroDrawing, FRAME_UNITS, STAGE_UNITS } from './HeroDrawing.jsx';
  */
 
 /** A page-surface rectangle with its edge, or the ring when it is the subject. */
-const PageFill = ({ x, y, w, h, ring = false, corner }) => (
+const PageFill = ({ x, y, w, h, ring = false, corner = 'window' }) => (
     <Rect x={x} y={y} w={w} h={h} fill={PAINT.pageSurface} stroke={ring ? PAINT.accent : PAINT.illustrationEdge} corner={corner} />
 );
 
@@ -43,7 +43,7 @@ const Ground = ({ x, y, w, h }) => <Rect x={x} y={y} w={w} h={h} fill={PAINT.fra
 const IconColumn = ({ x, y, n = 5 }) => (
     <>
         {Array.from({ length: n }, (_, i) => (
-            <Rect key={i} x={x} y={y + i * 14} w={8} h={8} fill={PAINT.sidebarIcon} corner="icon" />
+            <Rect key={i} x={x} y={y + i * 14} w={8} h={8} fill={PAINT.placeholderText} corner="icon" />
         ))}
     </>
 );
@@ -78,7 +78,7 @@ export const TemplatesAndPatternsHero = () => (
         <ButtonShape x={15} y={59} w={22} appearance="primary" />
         <Rule x1={50} x2={64} y1={63} y2={63} dash="1 2" />
         {/* A template, ringed: the component inside a Section. */}
-        <PageFill x={66} y={22} w={106} h={82} ring corner="section" />
+        <PageFill x={66} y={22} w={106} h={82} ring />
         <SkeletonBar x={76} y={32} w={40} h={5} heading />
         {[0, 1, 2].map((i) => (
             <React.Fragment key={i}>
@@ -163,7 +163,7 @@ export const SectionHero = () => {
     const side = { x: right - 76, y: s.y + 44, w: 76, h: 52 };
     return (
         <HeroDrawing>
-            <PageFill {...s} ring corner="section" />
+            <PageFill {...s} ring />
             {/* The header: heading at the content's left edge. */}
             <SkeletonBar x={left} y={s.y + 12} w={44} h={5} accent heading />
             <SkeletonBar x={left + 52} y={s.y + 13} w={40} />
@@ -205,7 +205,7 @@ export const TableHero = () => {
     const rowY = (i) => t.y + 28 + i * 17;
     return (
         <HeroDrawing>
-            <PageFill {...t} ring corner="section" />
+            <PageFill {...t} ring />
             {cols.map((cx, i) => (
                 <SkeletonBar key={cx} x={cx} y={t.y + 12} w={i === 0 ? 40 : 26} h={4} heading />
             ))}
@@ -316,7 +316,7 @@ export const PopupHero = () => {
     const popup = { w: 76, h: 66 };
     return (
         <HeroDrawing>
-            <PageFill {...page} corner="window" />
+            <PageFill {...page} />
             <SkeletonBar x={left} y={11} w={52} h={5} heading />
             <Rows x={left} w={right - left} y={30} n={9} pitch={14} />
             {/* The trigger sits at the bar's end, aligned to the rows' right edge. */}

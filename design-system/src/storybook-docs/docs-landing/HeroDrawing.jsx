@@ -1,4 +1,5 @@
 import React from 'react';
+import { HERO_HAIRLINE } from '../illustrations/paint.js';
 import { HeroGround } from '../illustrations/primitives.jsx';
 
 /**
@@ -28,6 +29,7 @@ export const HeroDrawing = ({ children }) => (
         viewBox={`0 0 ${FRAME_UNITS.w} ${FRAME_UNITS.h}`}
         aria-hidden="true"
         focusable="false"
+        style={{ '--stroke-hairline': HERO_HAIRLINE }}
     >
         <HeroGround.Provider value>
             <g transform={`translate(${STAGE_ORIGIN.x} ${STAGE_ORIGIN.y})`}>{children}</g>

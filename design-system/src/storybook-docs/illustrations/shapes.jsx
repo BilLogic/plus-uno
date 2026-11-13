@@ -15,8 +15,8 @@ import { chime, isoMatrix, pathGeometry, springStills, waveHeights } from './sha
  * skeleton bars. The arithmetic lives in `shapes-geometry.js`.
  */
 
-/** A stroke that stays a hairline however its group is scaled or skewed. */
-const FIXED = { ...HAIRLINE, vectorEffect: 'non-scaling-stroke' };
+/** A stroke that stays a hairline however its group is scaled or skewed. Non-scaling, so it is device px at any hero size and keeps the full stroke token. */
+const FIXED = { strokeWidth: 'var(--stroke-1)', vectorEffect: 'non-scaling-stroke' };
 
 /**
  * A timeline: two tracks, a clip on the first, keyframes along the second and a
