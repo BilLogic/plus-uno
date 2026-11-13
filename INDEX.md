@@ -196,6 +196,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
+| [`docs/conventions/design-system-glossary.md`](docs/conventions/design-system-glossary.md) | Design-system vocabulary — load for component, pattern, token, motion and sound terms |
 | [`docs/conventions/writing.md`](docs/conventions/writing.md) | How agents and humans write long-form prose and findings pages here. |
 
 ## Rubrics and golden scenarios
@@ -218,6 +219,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-147 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+148 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
