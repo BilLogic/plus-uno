@@ -95,6 +95,30 @@ describe('DynamicTable', () => {
         expect(screen.getByText('5–6 of 340')).toBeInTheDocument();
     });
 
+    it('puts the table noun in the range and shows the count alone on one page', () => {
+        render(<DynamicTable head={head} rows={rows} rowsPerPage={10} noun="students" label="Students" />);
+        expect(screen.getByText('1–5 of 5 students')).toBeInTheDocument();
+        expect(screen.queryByRole('navigation', { name: 'Students pages' })).toBeNull();
+    });
+
+    it('offers a "25 / page" Select beside the pager and reports the chosen size', () => {
+        const onRowsPerPageChange = vi.fn();
+        render(
+            <DynamicTable
+                head={head}
+                rows={rows}
+                rowsPerPage={2}
+                rowsPerPageOptions={[2, 25]}
+                onRowsPerPageChange={onRowsPerPageChange}
+            />
+        );
+        const select = screen.getByRole('combobox', { name: 'Rows per page' });
+        expect(select).toHaveTextContent('2 / page');
+        fireEvent.click(select);
+        fireEvent.click(screen.getByRole('option', { name: '25 / page' }));
+        expect(onRowsPerPageChange).toHaveBeenCalledWith(25);
+    });
+
     it('names its pager after the table, so two tables on a page have two distinct landmarks', () => {
         render(<DynamicTable head={head} rows={rows} rowsPerPage={2} label="Students" />);
         expect(screen.getByRole('navigation', { name: 'Students pages' })).toBeInTheDocument();

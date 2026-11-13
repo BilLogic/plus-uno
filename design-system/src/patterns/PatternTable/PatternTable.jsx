@@ -34,7 +34,7 @@ const renderedColumnCount = (table) => {
 /**
  * Table pattern for PLUS design system.
  * Table shell: table children (consumers pass their own thead/tbody), a
- * pagination slot under the rows, and an empty-state slot. The table has no
+ * footer slot under the rows, and an empty-state slot. The table has no
  * toolbar of its own: the Section header above it carries the title, search,
  * filters and actions. With `empty`, the header stays and the empty state
  * takes the body as one message row spanning every column, so the columns
@@ -59,7 +59,7 @@ const renderedColumnCount = (table) => {
  */
 const PatternTable = ({
     id,
-    pagination,
+    footer,
     emptyState,
     empty = false,
     stickyHeader = false,
@@ -138,8 +138,8 @@ const PatternTable = ({
                     ) : children}
                 </table>
             </div>
-            {pagination && !showEmptyState && (
-                <div className="plus-pattern-table-pagination">{pagination}</div>
+            {footer && !showEmptyState && (
+                <div className="plus-pattern-table-footer">{footer}</div>
             )}
         </div>
     );
@@ -147,8 +147,8 @@ const PatternTable = ({
 
 PatternTable.propTypes = {
     id: PropTypes.string,
-    /** Pagination slot under the rows; hidden while the empty state shows */
-    pagination: PropTypes.node,
+    /** Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows */
+    footer: PropTypes.node,
     /** Empty-state slot: a message row under the head row, spanning every column, when `empty` is true */
     emptyState: PropTypes.node,
     /** Swap the body rows for the empty-state message row; the head row stays */

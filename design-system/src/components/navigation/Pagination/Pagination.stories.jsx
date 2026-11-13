@@ -338,3 +338,18 @@ export const Disabled = {
         await expect(onDisabledChange, 'a disabled Previous does nothing').not.toHaveBeenCalled();
     },
 };
+
+/** The pill's outer height is its spacing's height, border included: 32 default, 24 compact. */
+export const OuterHeight = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', alignItems: 'flex-start' }}>
+            <Pagination currentPage={2} totalPages={8} label="Default pages" />
+            <Pagination currentPage={2} totalPages={8} spacing="compact" label="Compact pages" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const outer = (name) => within(canvasElement).getByRole('navigation', { name }).firstElementChild.getBoundingClientRect().height;
+        await expect(outer('Default pages')).toBe(32);
+        await expect(outer('Compact pages')).toBe(24);
+    },
+};

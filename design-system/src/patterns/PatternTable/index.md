@@ -2,7 +2,7 @@
 
 # PatternTable
 
-Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a pagination slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the header stays and the empty state takes the body as one message row spanning every column, so the columns still say what will appear. The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected="true"` (in a `role="grid"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the "Table" slot component in the Figma design system file.
+Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a footer slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the header stays and the empty state takes the body as one message row spanning every column, so the columns still say what will appear. The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected="true"` (in a `role="grid"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the "Table" slot component in the Figma design system file.
 
 Also asked as: list of records, data table on a page, sortable list, records with filters.
 
@@ -83,7 +83,7 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 
 - Section: the header types, toolbar and tabs, that sit above every table.
 - Table component: the table components, with a set of headers and rows.
-- Pagination: the pager that fills the pagination slot.
+- Pagination: the pager that fills the footer slot.
 - Card: a table never sits inside a card.
 
 Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar`
@@ -140,7 +140,7 @@ Row states are layered over each cell's fill, never swapped for it.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `pagination` | node | — | Pagination slot under the rows; hidden while the empty state shows |
+| `footer` | node | — | Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows |
 | `emptyState` | node | — | Empty-state slot: a message row under the head row, spanning every column, when `empty` is true |
 | `empty` | bool | `false` | Swap the body rows for the empty-state message row; the head row stays |
 | `stickyHeader` | bool | `false` | Pin the head row while the rows scroll under it; needs `maxHeight`, since only a bounded region scrolls vertically |
@@ -153,7 +153,7 @@ Row states are layered over each cell's fill, never swapped for it.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-shadow-overflow` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--focus-ring-width` · `--heading-xxsmall` · `--layer-card` · `--pattern-table-overflow-reach` · `--pattern-table-z-corner` · `--pattern-table-z-sticky` · `--plus-pattern-table-row-state` · `--row-height-md` · `--section-stack-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--table-overflow-reach` · `--table-pad-x-cell` · `--table-pad-y-cell` · `--table-radius`
+`--body-default` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-shadow-overflow` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--focus-ring-width` · `--heading-xxsmall` · `--layer-card` · `--pattern-table-overflow-reach` · `--pattern-table-z-corner` · `--pattern-table-z-sticky` · `--plus-pattern-table-row-state` · `--row-height-md` · `--section-stack-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--table-footer-height` · `--table-overflow-reach` · `--table-pad-x-cell` · `--table-pad-y-cell` · `--table-radius`
 
 From `design-system/src/patterns/PatternTable/PatternTable.scss`. Override these through the token layer, never with a literal.
 
