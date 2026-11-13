@@ -83,7 +83,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19592-512"
       }
     },
     "AvatarGroup": {
@@ -127,7 +128,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-1947"
       }
     },
     "Breadcrumb": {
@@ -242,7 +244,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-1507"
       }
     },
     "Carousel": {
@@ -267,7 +270,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21734-21493"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19498"
       }
     },
     "Checkbox": {
@@ -350,7 +353,8 @@
             "status": "verified",
             "isComponentSet": false
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20627-28"
       }
     },
     "CountTag": {
@@ -432,7 +436,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
       }
     },
     "DateTimePicker": {
@@ -456,7 +461,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
       }
     },
     "DynamicTable": {
@@ -505,7 +511,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288"
       }
     },
     "Flag": {
@@ -556,7 +563,8 @@
               "size": "Size"
             }
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-7227"
       }
     },
     "IconButton": {
@@ -620,7 +628,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20299-5105"
       }
     },
     "Illustration": {
@@ -664,7 +673,7 @@
             "notes": "On the Illustrations page. Figma names each character in words; code takes the same name in kebab-case. Re-checked in Figma on 2026-11-07."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19785-489"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21788-11925"
       }
     },
     "Image": {
@@ -687,7 +696,8 @@
             "source": "node-chart",
             "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19592-514"
       }
     },
     "InlineEdit": {
@@ -712,7 +722,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-7667"
       }
     },
     "LabelAndCaption": {
@@ -768,7 +779,8 @@
             "source": "node-chart",
             "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-4587"
       }
     },
     "LinkButton": {
@@ -833,7 +845,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20303-76277"
       }
     },
     "LinkIconButton": {
@@ -891,7 +904,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20304-2513"
       }
     },
     "Logo": {
@@ -943,7 +957,8 @@
             "status": "verified",
             "isComponentSet": true
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19592-515"
       }
     },
     "Modal": {
@@ -991,7 +1006,8 @@
             "source": "node-chart",
             "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-28"
       }
     },
     "PageHeader": {
@@ -1015,7 +1031,8 @@
             "status": "verified",
             "isComponentSet": false
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-2827"
       }
     },
     "Pagination": {
@@ -1063,7 +1080,8 @@
             "status": "verified",
             "isComponentSet": false
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-44"
       }
     },
     "Popup": {
@@ -1122,7 +1140,7 @@
             "isComponentSet": true
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5127"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19483"
       }
     },
     "Radio": {
@@ -1244,7 +1262,7 @@
             "notes": "Single component, not a variant set — no variant props to map."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13717-87300"
       }
     },
     "SectionMessage": {
@@ -1373,7 +1391,7 @@
             "isComponentSet": true
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5249"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-56"
       }
     },
     "Spotlight": {
@@ -1487,7 +1505,7 @@
             "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from isDisabled or from a disabled field's or TagGroup's TagContext."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17867-28"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21749-1113"
       }
     },
     "Tabs": {
@@ -1616,7 +1634,8 @@
             "isComponentSet": true,
             "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false; left and right are start and end in code, and disabled is isDisabled. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a gray selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n. Suggestions are never counted into +n and stay after it; menu items keep their tag's action (selectable toggles, link opens with a trailing arrow); remove stays on the row."
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20454-1779"
       }
     },
     "TagInput": {
@@ -1667,7 +1686,7 @@
             "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `TextField spacing=\"compact\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Color heading and one row per Tag color showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-58780"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-47559"
       }
     },
     "TextArea": {
@@ -1692,7 +1711,7 @@
             "isComponentSet": true
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13338-2290"
       }
     },
     "TextField": {
@@ -1717,7 +1736,7 @@
             "isComponentSet": true
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6957"
       }
     },
     "Tile": {
@@ -1814,7 +1833,8 @@
             "status": "verified",
             "notes": "The Time picker set on the Time picker page. Re-checked in Figma on 2026-11-07."
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20593-28"
       }
     },
     "Toggle": {
