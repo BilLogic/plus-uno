@@ -58,11 +58,11 @@ const BoldEdge = ({ x, y, w, h, fill, corner = "card" }) => {
 
 /** The brand ramp, light to dark: the accent tinted by opacity over the card, then the boldest brand step. */
 const BRAND_RAMP = [
-  [PAINT.accent, 0.18],
-  [PAINT.accent, 0.4],
-  [PAINT.accent, 0.7],
-  [PAINT.accent, 1],
-  [PAINT.swatchBrandBoldest, 1],
+  { fill: PAINT.accent, opacity: 0.18 },
+  { fill: PAINT.accent, opacity: 0.4 },
+  { fill: PAINT.accent, opacity: 0.7 },
+  { fill: PAINT.accent, opacity: 1 },
+  { fill: PAINT.swatchBrandBoldest, opacity: 1 },
 ];
 const NEUTRALS = [PAINT.swatchNeutral1, PAINT.swatchNeutral2, PAINT.swatchNeutral3, PAINT.swatchNeutral4, PAINT.swatchNeutral5];
 const ELEVATIONS = [PAINT.cardShadow, PAINT.popupShadow, PAINT.modalShadow];
@@ -71,12 +71,13 @@ const ELEVATIONS = [PAINT.cardShadow, PAINT.popupShadow, PAINT.modalShadow];
  * The foundations side by side, sized by weight: color tall at the left (the
  * brand ramp over the neutrals), type and grid stacked in the middle, elevation
  * ringed at the top right, icons and motion small under it. The bento runs the
- * frame's width, past the stage.
+ * frame's width, past the stage. The type cell's "Aa" is a specimen, like the
+ * Typography hero's: the one place a hero sets real letterforms.
  */
 export const OverviewHero = () => (
   <HeroDrawing>
     <BentoCell name="color" x={-80} y={-5} w={145} h={170}>
-      {BRAND_RAMP.map(([fill, opacity], i) => (
+      {BRAND_RAMP.map(({ fill, opacity }, i) => (
         <Rect key={i} x={-66 + i * 24} y={9} w={20} h={85} fill={fill} opacity={opacity} corner="cardImage" />
       ))}
       {NEUTRALS.map((fill, i) => (
@@ -104,7 +105,10 @@ export const OverviewHero = () => (
     </BentoCell>
     <BentoCell name="elevation" x={250} y={-5} w={130} h={80} accent>
       {ELEVATIONS.map((shadow, i) => (
-        <Layer key={shadow} x={268 + i * 17} y={9 + i * 8} w={60} h={38} fill={PAINT.popupSurface} shadow={shadow} corner="popup" />
+        <React.Fragment key={shadow}>
+          <Layer x={268 + i * 17} y={9 + i * 8} w={60} h={38} fill={PAINT.popupSurface} shadow={shadow} corner="popup" />
+          <Rect x={268 + i * 17} y={9 + i * 8} w={60} h={38} stroke={PAINT.frameDivider} corner="popup" />
+        </React.Fragment>
       ))}
     </BentoCell>
     <BentoCell name="icons" x={250} y={85} w={60} h={80}>
