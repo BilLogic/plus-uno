@@ -117,9 +117,11 @@ export const LogoExpressions = () => (
                 <Bracket style={{ top: 'var(--space-32)', right: 0, left: `${LOCKUP_SIZE * 1.25}px` }}>Wordmark</Bracket>
                 <Logo size={LOCKUP_SIZE} wordmark />
             </div>
-            <figcaption style={label}>The lockup is the logomark and the wordmark in a fixed arrangement.</figcaption>
+            <figcaption style={label}>The logomark, the wordmark and the lockup they make, each named once.</figcaption>
         </figure>
 
+        <h3 style={{ margin: 0, font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>In the product</h3>
+        <p style={{ margin: 0, font: 'var(--body-medium)', color: 'var(--ds-text)' }}>Where each expression lives. The logomark marks the app; the lockup introduces PLUS.</p>
         <ul aria-label="In the product" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
             <Example title="Sidebar header ·" expression="Logomark">
                 <div style={{ ...pad, width: '35%', background: 'var(--ds-surface-sunken)' }}>
