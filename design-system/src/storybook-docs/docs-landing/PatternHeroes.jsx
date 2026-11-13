@@ -5,7 +5,7 @@ import {
     ButtonShape,
     CardBox,
     Field,
-    Flag,
+    Layer,
     PageSheet,
     Popup,
     Rect,
@@ -16,6 +16,8 @@ import {
 } from '../illustrations/primitives.jsx';
 import { HeroDrawing, HERO_SIDEBAR_W } from './HeroDrawing.jsx';
 import { AppWindow } from './HeroWindow.jsx';
+import { BentoCell } from './bento.jsx';
+import { Glyph } from './glyphs.jsx';
 
 /**
  * The Patterns heroes: each pattern's situation, cropped to its one cue, drawn
@@ -47,26 +49,54 @@ const Rows = ({ x = VIEW.x0, w = VIEW.x1 - VIEW.x0, y, n, pitch = 14 }) => (
     </>
 );
 
-export const OverviewHero = () => (
-    <HeroDrawing>
-        {[
-            [10, 8],
-            [155, 8],
-            [10, 86],
-            [155, 86],
-        ].map(([x, y]) => (
-            <CardBox key={`${x}-${y}`} x={x} y={y} w={135} h={66} />
-        ))}
-        <Field x={22} y={22} w={100} accent />
-        <Rect x={168} y={20} w={56} h={14} fill={PAINT.fieldSurface} stroke={PAINT.fieldBorder} corner="field" />
-        <Rect x={168} y={38} w={72} h={24} fill={PAINT.popupSurface} stroke={PAINT.illustrationEdge} corner="popup" />
-        <SkeletonBar x={176} y={45} w={48} />
-        <SkeletonBar x={176} y={53} w={34} />
-        <Rect x={61} y={102} w={32} h={32} fill={PAINT.accent} opacity={0.2} corner="full" />
-        <Rect x={69} y={110} w={16} h={16} fill={PAINT.accent} corner="card" />
-        <Flag x={168} y={102} w={112} h={26} />
-    </HeroDrawing>
-);
+/**
+ * Real moments, sized by scope: Filtering big and ringed (a view bar with its
+ * filter buttons over rows), a Flag wide, a Spinner and a bell with its count
+ * badge small. The bento runs the frame's width, past the stage.
+ */
+export const OverviewHero = () => {
+    const filtering = { x: -70, y: -5, w: 235, h: 170 };
+    const flag = { x: 175, y: -5, w: 205, h: 80 };
+    const small = { y: 85, w: 97.5, h: 80 };
+    const spinner = { x: 175, ...small };
+    const badge = { x: 282.5, ...small };
+    const mid = (c) => ({ cx: c.x + c.w / 2, cy: c.y + c.h / 2 });
+    const s = mid(spinner);
+    const b = mid(badge);
+    const rowsX = filtering.x + 14;
+    return (
+        <HeroDrawing>
+            <BentoCell name="filtering" {...filtering} accent>
+                <SkeletonBar x={rowsX} y={11} w={55} h={6} heading />
+                <FilterButton x={11} y={6} w={75} label={30} count />
+                <FilterButton x={91} y={6} w={60} label={26} />
+                {[0, 1, 2, 3, 4].map((i) => (
+                    <React.Fragment key={i}>
+                        <Rule x1={rowsX} x2={filtering.x + filtering.w - 14} y1={40 + i * 22} y2={40 + i * 22} stroke={PAINT.rowDivider} />
+                        <SkeletonBar x={rowsX} y={48 + i * 22} w={70} />
+                        <SkeletonBar x={60} y={48 + i * 22} w={35} />
+                    </React.Fragment>
+                ))}
+            </BentoCell>
+            <BentoCell name="flag" {...flag}>
+                <Layer x={flag.x + 15} y={flag.y + 15} w={flag.w - 30} h={flag.h - 30} fill={PAINT.flagSurface} shadow={PAINT.flagShadow} corner="flag" />
+                <FlagIcon x={flag.x + 31} y={flag.y + 31} r={6.5} />
+                <SkeletonBar x={flag.x + 43} y={flag.y + 27} w={65} h={6} heading />
+                <SkeletonBar x={flag.x + 43} y={flag.y + 39} w={95} />
+                <SkeletonBar x={flag.x + 43} y={flag.y + 46} w={60} tone={PAINT.accent} />
+            </BentoCell>
+            <BentoCell name="spinner" {...spinner}>
+                <circle cx={s.cx} cy={s.cy} r={11} fill="none" stroke={PAINT.trail} strokeWidth={2.5} />
+                <path d={`M${s.cx} ${s.cy - 11} A11 11 0 0 1 ${s.cx + 11} ${s.cy}`} fill="none" stroke={PAINT.accent} strokeWidth={2.5} strokeLinecap="round" />
+            </BentoCell>
+            <BentoCell name="badge" {...badge}>
+                <Glyph name="bell" x={b.cx - 10} y={b.cy - 10} size={20} />
+                <Rect x={b.cx + 4} y={b.cy - 15} w={13} h={10} fill={PAINT.accent} corner="count" />
+                <SkeletonBar x={b.cx + 7.5} y={b.cy - 11} w={6} h={2} tone={PAINT.buttonPrimaryText} />
+            </BentoCell>
+        </HeroDrawing>
+    );
+};
 
 /** A real button at a readable size: its box and its word as a bar in the label color. */
 const BigButton = ({ x, y, w, h, primary = false }) => (
