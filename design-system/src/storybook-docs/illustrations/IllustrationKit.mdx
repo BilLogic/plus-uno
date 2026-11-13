@@ -23,7 +23,7 @@ import { ThreeLayers, OpeningARecord, ResponsiveReflow } from '@/storybook-docs/
   - **Real subject:** the lesson is one element inside a screen, such as which action is primary, a label, or one piece's placement. Draw that element real, with its words, and keep everything around it blocked out.
   - **Blocked out:** the lesson is structure across screens, such as layout options, which surface opens, alignment, phases, or many variants side by side. Use no words, and draw buttons as flat strips.
   - Motion follows the same split. A component's own motion is a live story. A principle such as easing, choreography or stagger animates blocked-out shapes. One element moving inside a screen animates the real subject over a blocked-out context.
-- Draw skeleton bars where text would sit. Words appear only on a real subject; the rest goes in the caption beside the drawing.
+- Draw text as soft `--ds-skeleton` bars. Black or dark text bars are outside this palette. Real text appears only on the real subject in a real-context picture; the surrounding diagram stays blocked out, and explanations go in the caption.
 - Draw buttons only in shipped appearances: primary, the brand fill, on the subject; default, the neutral fill, everywhere else.
 - Keep one scale per set and equal margins around every drawing, balanced by eye.
 - Give each drawing one accent, and place it on the subject.

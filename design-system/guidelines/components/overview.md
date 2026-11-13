@@ -32,36 +32,6 @@ Two rules reach every group, each stated once:
 - [Navigation](navigation.md) — sorted by what the user moves between
 - [Overlays and layering](overlays-and-layering.md) — `Tooltip`, `Popup`, and where every popup opens
 
-## Name map
-
-Where PLUS names a thing differently from atlassian.design, the row says why.
-Confirmed rows only; the terms are defined in `GLOSSARY.md`. Atlassian is the
-benchmark for every page, so a name that matches it needs no row.
-
-<!-- retired-names-ok: maps PLUS names to the benchmark's names, which include retired ones -->
-| Our name | ADS name | Why different |
-| :--- | :--- | :--- |
-| Frame (pattern) | Root | The app's outer shell, the layout's root area that holds the rest |
-| Sidebar (pattern) | Side nav | One word |
-| Page (pattern) | Main | The content area inside the Frame, with the page title |
-| Panel (area) | Panel | Same name; the app-level area at the right of the Frame, holding AI chat first |
-| Frame (informal) | none | "App shell" is an informal alias in talk only; code and docs say Frame |
-| Section detail (region) | none | A region PLUS adds to Section: a record opens beside its list, 7 + 5 columns |
-| Docked | Inline (side nav mode) | We say docked for a Sidebar or Panel that sits beside the Page and moves it |
-| Peek | Flyout (side nav mode) | We say peek for a closed Sidebar, or a closed Panel with `panelPeek`, shown over the Page, which does not move |
-| Splitter | Splitter | Same name; the draggable edge that resizes the docked Panel |
-| Backdrop (pattern) | Backdrop | Same name; here it also sets the width of what sits on it, in screen-grid columns |
-| Modal (pattern) | none | The pattern is the backdrop plus a layer; ADS has only the dialog component |
-| Modal (component) | Modal dialog | Built on the Modal pattern |
-| Status tag | Lozenge | Named for what it shows, a state, in the label family |
-| Count tag | Badge | Named for what it shows, a number, in the label family |
-| Tag | Tag | Same name and role |
-| Tag group | Tag group | Same name and role |
-| Suggestion | none | Offers what the AI proposes, accepted or dismissed |
-| Panel (floating) | Drawer | A floating Panel over the page with no Backdrop; PLUS has no Drawer |
-| `appearance` | `appearance` | Same prop; values carry meaning (`default`, `subtle`, `primary`) |
-| `spacing` | `spacing` | Density in words: `default`, `compact`, `spacious`; pixel values stay on `size` |
-
 Facts about a single component — props, variants, defaults, tokens touched,
 related components — are generated from source into each component's own
 `index.md` beside it, and each group's `index.md` counts how much authored
