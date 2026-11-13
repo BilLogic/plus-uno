@@ -1,7 +1,7 @@
 // The seam for the @plus-uno/cli package (#2117): pack it, install the tarball into a
 // scratch project outside the repo, and run `npx ds` against the baked snapshot.
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -61,6 +61,18 @@ test('npm pack, install in a scratch project, `npx ds find Button` answers from 
     assert.match(sh('npx', ['--no-install', 'ds', 'get', 'Button'], project), /Button/);
     assert.ok(sh('npx', ['--no-install', 'ds', 'tokens', 'color'], project).length > 0);
     assert.ok(sh('npx', ['--no-install', 'ds', 'guide'], project).length > 0);
+
+    // `ds check` reads the project's own files against the baked facts, with CI-suitable exit codes.
+    fs.mkdirSync(path.join(project, 'src'));
+    fs.writeFileSync(path.join(project, 'src/Clean.jsx'), "import { Button } from '@/components';\nexport const Clean = () => <Button>Save</Button>;\n");
+    assert.match(sh('npx', ['--no-install', 'ds', 'check', 'src/Clean.jsx'], project), /Clean: no escapes/);
+    fs.writeFileSync(path.join(project, 'src/Bad.jsx'), "export const Bad = () => <i className=\"fa-light fa-grid-2\" style={{ color: '#ff0000' }} />;\n");
+    const bad = spawnSync('npx', ['--no-install', 'ds', 'check', 'src', '--json'], { cwd: project, encoding: 'utf8' });
+    assert.equal(bad.status, 1, 'a raw color or Pro icon exits 1');
+    const verdict = JSON.parse(bad.stdout);
+    assert.ok(verdict.failing >= 2 && verdict.findings.every((f) => f.file.startsWith('src/')), 'findings name the project file');
+    assert.equal(spawnSync('npx', ['--no-install', 'ds', 'check', 'src/Clean.jsx'], { cwd: project }).status, 0);
+    assert.equal(spawnSync('npx', ['--no-install', 'ds', 'check', 'nope.jsx'], { cwd: project }).status, 1, 'a missing path is a usage error, not a pass');
 
     // `ds mcp`: the stdio server from the installed tarball lists its five tools.
     const tools = mcpTools(project);

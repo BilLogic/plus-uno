@@ -8,7 +8,7 @@
  *   ds get <Name…> [--section s]     props · usage · examples · a11y · figma
  *   ds tokens <role>                 the steps for a role, with intent
  *   ds guide [topic | rule id]       a guideline, a rule, or the orientation
- *   ds check <paths…>                check:ds-usage on those paths
+ *   ds check [paths…]                check:ds-usage on those paths (the packaged one: your project, `.` by default)
  *   ds check --code '<jsx>' [--path f.jsx]
  *   --json                           the answer as data
  *
@@ -23,7 +23,7 @@ const USAGE = `usage: ds <find|get|tokens|guide|check> …
   get <Name…> [--section s]   props | usage | examples | a11y | figma
   tokens <role>               the steps for a role, with intent
   guide [topic | rule id]     no argument: the orientation
-  check <paths…> | --code '<jsx>' [--path f.jsx]
+  check [paths…] | --code '<jsx>' [--path f.jsx]
   --json                      the answer as data`;
 
 /** `--name value` out of argv; the rest stay positional. */
@@ -39,10 +39,11 @@ function parse(argv) {
   return { flags, rest };
 }
 
-export function cli(argv, root = REPO_ROOT) {
+/** `consumerRoot`: where `check` reads files from when that is not `root` (the package checks the caller's project). */
+export function cli(argv, root = REPO_ROOT, { consumerRoot = root } = {}) {
   const [op, ...args] = argv;
   const { flags, rest } = parse(args);
-  const lookup = createLookup(root);
+  const lookup = createLookup(root, { consumerRoot });
   const calls = {
     find: () => lookup.find(rest.join(' ')),
     get: () => lookup.get(rest, flags.section),

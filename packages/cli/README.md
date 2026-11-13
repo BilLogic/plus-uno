@@ -7,7 +7,12 @@ npx @plus-uno/cli find Button
 npx @plus-uno/cli get Button --section props
 npx @plus-uno/cli tokens pad
 npx @plus-uno/cli guide
+npx @plus-uno/cli check src
 ```
+
+## Check
+
+`check [paths…]` holds your project's files to the design system: a raw color, a Font Awesome Pro icon, an unknown prop or token. The rules come from the baked snapshot; the files come from the working directory (`.` when no path is given, `node_modules`, `dist`, `build` and dot folders skipped), so it runs in your own CI. Exit `0` when no file has a fail-level escape, `1` when one does or a path does not exist; warnings print and never fail. `--json` prints the findings as data, and `--code '<jsx>' [--path f.jsx]` checks a snippet.
 
 ## MCP server
 
