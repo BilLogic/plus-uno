@@ -94,16 +94,21 @@ name: uno-bot — deploy Worker
 #                            `vendored contract matches the app`, then set this.
 # The account id is non-secret and pinned below (the account that hosts uno-bot).
 #
-# WHY AN ENVIRONMENT. `main` is unprotected and this repo has 19 people who can
-# push to it. A plain repo secret is readable by any workflow this job runs, so
-# auto-deploy-on-push handed a Workers-edit token to a job that executes
-# whatever code the pushed commit contains. Binding the job to a GitHub
-# Environment with required reviewers keeps the automatic build and puts one
-# human approval in front of the token. Create it at
-# Settings → Environments → `uno-bot-production`: add the required reviewer(s),
-# then move CLOUDFLARE_API_TOKEN there from repo secrets. Until the environment
-# exists, runs will queue for approval rather than deploy — that is the intended
-# failure direction.
+# WHY AN ENVIRONMENT. A plain repo secret is readable by any workflow, from any
+# branch. CLOUDFLARE_API_TOKEN lives on the `uno-bot-production` environment
+# instead, and that environment's deployment-branch policy admits `main` only,
+# so a workflow run from any other branch cannot read the token.
+#
+# There is NO required reviewer, and that is deliberate (Bill's call,
+# 2026-11-12). The environment used to require one approval per run. That gate
+# starved every deploy: GitHub keeps one pending run per concurrency group, so
+# each push to main cancelled the run that was still waiting for approval.
+# From 8 Nov to 12 Nov, 133 runs were cancelled with 0 steps run and one
+# succeeded, so the live bot answered from a four-day-old harness. Do not add a
+# reviewer back while this workflow runs on push: as long as main merges more
+# often than someone approves, a reviewer means no deploys at all.
+# What a push to main ships is still gated by the checks in `npm run deploy`
+# and by the PR checks before it.
 
 on:
   push:
@@ -119,7 +124,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # The approval gate in front of CLOUDFLARE_API_TOKEN. See the header.
+    # Holds CLOUDFLARE_API_TOKEN, admitted from `main` only. See the header.
     environment: uno-bot-production
     # Hoisted so a STEP can branch on whether the token exists.
     #
