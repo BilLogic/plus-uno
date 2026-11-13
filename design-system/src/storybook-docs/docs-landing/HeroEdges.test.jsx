@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { PAINT } from '../illustrations/paint.js';
+import { PAINT, CORNER } from '../illustrations/paint.js';
 import { HEROES } from './hero-registry.jsx';
 
 /**
@@ -49,6 +49,7 @@ const contrast = (a, b) => {
     const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
     return (hi + 0.05) / (lo + 0.05);
 };
+const CORNER_WINDOW = CORNER.window.match(/var\((--[\w-]+)\)/)[1];
 const tokenName = (cssVar) => cssVar.match(/var\((--[\w-]+)\)/)[1];
 
 describe('the hero edge role', () => {
@@ -101,6 +102,8 @@ describe('every hero surface shows its edge', () => {
         for (const el of container.querySelectorAll('rect,circle,path,ellipse')) {
             // The Logo mark's own parts: the white plus and grid on its tile.
             if (el.closest('[data-shape="logo-construction"]')) continue;
+            // The parts inside a window's clip: the window's own layer carries the shadow.
+            if (el.closest('[data-window-parts]')) continue;
             if (SURFACES.has(fillOf(el)) && !EDGES.has(el.getAttribute('stroke') || el.style.stroke)) {
                 bare.push(`${el.tagName} ${fillOf(el)}`);
             }
@@ -108,7 +111,9 @@ describe('every hero surface shows its edge', () => {
         for (const fo of container.querySelectorAll('foreignObject')) {
             const fill = fo.firstElementChild?.style.background;
             const next = fo.nextElementSibling;
-            const edged = next?.tagName === 'rect' && same(fo, next) && EDGES.has(next.getAttribute('stroke'));
+            // A layer reads by its real shadow, or by a stroke in an edge role.
+            const shadowed = Boolean(fo.firstElementChild?.style.boxShadow);
+            const edged = shadowed || (next?.tagName === 'rect' && same(fo, next) && EDGES.has(next.getAttribute('stroke')));
             if (fill && !edged) bare.push(`layer ${fill}`);
         }
         expect(bare).toEqual([]);
@@ -135,5 +140,13 @@ describe('hero line weight', () => {
 
     it('the edge role is the field border the approved covers draw', () => {
         expect(PAINT.illustrationEdge).toBe('var(--ds-border-input)');
+    });
+});
+
+describe('hero window corners', () => {
+    it('draws the Frame hero window with the window corner, not a card or section radius', () => {
+        const { container } = render(React.createElement(HEROES['templates-frame-frame'].Hero));
+        const clip = container.querySelector('clipPath rect');
+        expect(clip.style.rx).toContain(CORNER_WINDOW);
     });
 });

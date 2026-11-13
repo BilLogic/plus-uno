@@ -23,6 +23,9 @@ export const HeroGround = createContext(false);
  */
 const clampedCorner = (token, w, h) => (token ? `min(${token}, ${Math.min(w, h) / 2}px)` : undefined);
 
+/** The accent ring is the one outline heavier than a hairline: a kit unit (2px in a hero). */
+const ACCENT_STROKE = { strokeWidth: 'var(--stroke-1)' };
+
 const Rect = ({ x, y, w, h, fill, stroke, corner, opacity }) => {
   const radius = clampedCorner(CORNER[corner], w, h);
   return (
@@ -34,7 +37,7 @@ const Rect = ({ x, y, w, h, fill, stroke, corner, opacity }) => {
       fill={fill ?? 'none'}
       stroke={stroke}
       opacity={opacity}
-      style={{ ...(stroke ? HAIRLINE : null), rx: radius, ry: radius }}
+      style={{ ...(stroke ? (stroke === PAINT.accent ? ACCENT_STROKE : HAIRLINE) : null), rx: radius, ry: radius }}
     />
   );
 };
@@ -76,8 +79,11 @@ export const SkeletonBar = ({ x, y, w, h = 4, accent = false, heading = false, t
  * or the accent ring when `accent` marks the layer as the subject, so the two
  * never overprint).
  */
-const Layer = ({ x, y, w, h, fill, shadow, corner, accent = false }) => {
+export const Layer = ({ x, y, w, h, fill, shadow, corner, accent = false }) => {
   const onHeroGround = useContext(HeroGround);
+  // On the hero ground a layer with a real shadow reads by it, as the real card and page do;
+  // only the subject's ring, or a flat layer with no shadow, draws a stroke.
+  const stroke = accent ? PAINT.accent : shadow ? undefined : PAINT.illustrationEdge;
   return (
     <>
       <foreignObject x={x} y={y} width={w} height={h} style={{ overflow: 'visible' }}>
@@ -95,10 +101,18 @@ const Layer = ({ x, y, w, h, fill, shadow, corner, accent = false }) => {
           }}
         />
       </foreignObject>
-      {onHeroGround && <Rect x={x} y={y} w={w} h={h} stroke={accent ? PAINT.accent : PAINT.illustrationEdge} corner={corner} />}
+      {onHeroGround && stroke && <Rect x={x} y={y} w={w} h={h} stroke={stroke} corner={corner} />}
     </>
   );
 };
+
+/**
+ * A page-surface sheet on the raised pair, as the approved covers draw a page or
+ * a screen: the page fill, the raised shadow, the window's corner. `accent` rings it.
+ */
+export const PageSheet = ({ x, y, w, h, accent = false, corner = 'window' }) => (
+  <Layer x={x} y={y} w={w} h={h} fill={PAINT.pageSurface} shadow={PAINT.cardShadow} corner={corner} accent={accent} />
+);
 
 /** The accent marking a layer as the subject: a brand outline over its edge. */
 const AccentRing = ({ x, y, w, h, corner }) => <Rect x={x} y={y} w={w} h={h} stroke={PAINT.accent} corner={corner} />;
@@ -137,6 +151,8 @@ export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => {
         </>
       )}
       <Rect x={x + 6} y={y + 4} w={12} h={12} fill={accent ? PAINT.accent : icon} corner="sidebarRow" />
+      {/* The logo row ends with the sidebar toggle, on the trailing column. */}
+      {w >= 56 && <Rect x={x + w - 16} y={y + 6} w={8} h={8} fill={icon} corner="icon" />}
       {Array.from({ length: rowCount }, (_, i) => {
         const ry = y + 24 + i * SIDEBAR_ROW_PITCH;
         const selected = i === (rowCount > 1 ? 1 : 0);
@@ -371,7 +387,7 @@ export const Panel = ({ x, y, w, h, accent = false, floating = false }) => (
 
 export const Backdrop = ({ x, y, w, h }) => <Rect x={x} y={y} w={w} h={h} fill={PAINT.backdrop} />;
 
-export const Modal = ({ x, y, w, h, accent = false }) => {
+export const Modal = ({ x, y, w, h, accent = false, divider = true, closeButton = false }) => {
   // Footer buttons shrink with a narrow modal so they stay inside it.
   const bw = Math.min(28, (w - 24) / 2);
   return (
@@ -381,7 +397,8 @@ export const Modal = ({ x, y, w, h, accent = false }) => {
       <SkeletonBar x={x + 10} y={y + 10} w={w * 0.45} h={5} accent={accent} heading />
       <SkeletonBar x={x + 10} y={y + 24} w={w * 0.75} />
       <SkeletonBar x={x + 10} y={y + 33} w={w * 0.6} />
-      <Rule x1={x} x2={x + w} y1={y + h - 22} y2={y + h - 22} stroke={PAINT.modalDivider} />
+      {closeButton && <Rect x={x + w - 18} y={y + 9} w={8} h={8} fill={PAINT.placeholderText} corner="icon" />}
+      {divider && <Rule x1={x} x2={x + w} y1={y + h - 22} y2={y + h - 22} stroke={PAINT.modalDivider} />}
       <ButtonShape x={x + w - 14 - 2 * bw} y={y + h - 14} w={bw} />
       <ButtonShape x={x + w - 10 - bw} y={y + h - 14} w={bw} appearance={accent ? 'primary' : 'default'} />
     </g>

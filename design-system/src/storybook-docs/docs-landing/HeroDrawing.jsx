@@ -13,6 +13,13 @@ import { HeroGround } from '../illustrations/primitives.jsx';
 export const FRAME_UNITS = { w: 500, h: 200 };
 export const STAGE_UNITS = { w: 300, h: 160 };
 
+/**
+ * The docked Sidebar's width on a hero frame, in units. The real Sidebar is 240
+ * wide in a Frame of about 1040, and a hero frame is 260 units, so it draws 60.
+ * Every hero that shows a sidebar uses this one width.
+ */
+export const HERO_SIDEBAR_W = 60;
+
 /** The stage's corner inside the frame, in units: the stage sits centered. */
 const STAGE_ORIGIN = {
     x: (FRAME_UNITS.w - STAGE_UNITS.w) / 2,
