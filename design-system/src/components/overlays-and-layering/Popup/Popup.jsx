@@ -1,3 +1,4 @@
+import { useMotionReduced } from '@/lib/motionPreference';
 import React, { useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Popover as BasePopover } from '@base-ui/react/popover';
@@ -95,6 +96,7 @@ const Popup = ({
     id,
     ...props
 }) => {
+    const reduced = useMotionReduced();
     const widthClass = POPUP_WIDTHS.includes(width) && width !== 'auto' ? `plus-popup--${width}` : '';
     const { side, align } = sideAlignOf(placement);
     const [along = 4, away] = offset ?? [];
@@ -174,6 +176,7 @@ const Popup = ({
                     collisionPadding={8}
                 >
                     <BasePopover.Popup
+                        data-reduced={reduced ? 'true' : undefined}
                         id={id}
                         className={['plus-popup', widthClass, className].filter(Boolean).join(' ')}
                         finalFocus={dismissible ? undefined : false}

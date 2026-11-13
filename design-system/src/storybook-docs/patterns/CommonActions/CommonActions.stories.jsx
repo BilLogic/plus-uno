@@ -1,3 +1,4 @@
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -49,6 +50,7 @@ export const AppearancesRow = {
     name: 'Appearances',
     render: () => staged(<Appearances />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         for (const [appearance, label] of APPEARANCES) {
             const button = canvas.getByRole('button', { name: label });
@@ -67,6 +69,7 @@ export const PlacementPage = {
     name: 'Placement: In a page',
     render: () => staged(<Page />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         const cancel = canvas.getByRole('button', { name: 'Cancel' });
@@ -83,6 +86,7 @@ export const PlacementModal = {
     name: 'Placement: In a Modal',
     render: () => staged(<ModalFooter />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const dialog = canvas.getByRole('dialog');
@@ -104,6 +108,7 @@ export const PlacementFocused = {
     name: 'Placement: In a focused task',
     render: () => staged(<FocusedBar />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const bar = canvasElement.querySelector('[data-probe="bar"]');
         const cancel = canvas.getByRole('button', { name: 'Cancel' });
@@ -121,6 +126,7 @@ export const PlacementCard = {
     name: 'Placement: In a card',
     render: () => staged(<CardAction />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const open = within(canvasElement).getByRole('button', { name: 'Open session' });
         await expect(open.className, 'the main action is Subtle').toContain('subtle');
         await expect(open.closest('.plus-pattern-card-footer'), 'in the card\'s footer').not.toBeNull();
@@ -135,6 +141,7 @@ export const ResetChoices = {
     name: 'Reset',
     render: () => staged(<Reset />, 480),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('checkbox', { name: 'Grade 7' })).toBeChecked();
         await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
@@ -148,6 +155,7 @@ export const CopyValue = {
     name: 'Copy',
     render: () => staged(<Copy held />, 480),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const copy = within(canvasElement).getByRole('button', { name: 'Copy' });
         await expect(copy.textContent, 'an icon button').toBe('');
         await expect(await within(document.body).findByText('Copied'), 'the tooltip says Copied').toBeInTheDocument();
@@ -160,6 +168,7 @@ export const EditValue = {
     name: 'Edit: one value',
     render: () => staged(<EditOne />, 480),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: /Lincoln Middle/ }));
         const field = await canvas.findByRole('textbox');
@@ -175,6 +184,7 @@ export const EditWholeRecord = {
     name: 'Edit: the whole record',
     render: () => staged(<EditRecord held />, 480),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         // The menu is held open inside the picture, once the picture's element is in state.
         await waitFor(() => expect(within(canvasElement).getByRole('menuitem', { name: 'Edit' }), 'Edit sits in the More menu').toBeInTheDocument());
         await expect(within(canvasElement).getByRole('menuitem', { name: 'Remove from group' }), 'beside Remove, which is Default').toBeInTheDocument();
@@ -189,6 +199,7 @@ export const TierActiveModal = {
     name: 'Destructive tier: Active',
     render: () => staged(<TierActive />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const action = within(canvasElement).getByRole('button', { name: 'Remove from this week' });
         await expect(action.className, 'Primary').toContain('primary');
         await fitsCanvas(canvasElement);
@@ -200,6 +211,7 @@ export const TierDangerModal = {
     name: 'Destructive tier: Active with Danger',
     render: () => staged(<TierDanger />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const action = within(canvasElement).getByRole('button', { name: 'Delete note' });
         await expect(action.className, 'Danger').toContain('danger');
         await fitsCanvas(canvasElement);
@@ -211,6 +223,7 @@ export const TierTypeNameModal = {
     name: 'Destructive tier: Danger, type the name',
     render: () => staged(<TierTypeName />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const action = canvas.getByRole('button', { name: 'Delete group' });
         await expect(action, 'disabled until the name matches').toBeDisabled();
@@ -229,6 +242,7 @@ export const BulkBar = {
     name: 'Many rows: the bulk bar',
     render: () => staged(<ManyRows />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const head = within(canvasElement.querySelector('thead'));
         await expect(head.getByText('2 selected')).toBeInTheDocument();
@@ -247,6 +261,7 @@ export const SendingShown = {
     name: 'Key state: Sending (shown)',
     render: () => staged(<Sending sending />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'the spinner button disables').toBeDisabled();
         await expect(canvas.getByRole('button', { name: 'Cancel' }), 'Cancel stays live').not.toBeDisabled();
@@ -259,6 +274,7 @@ export const SendingKeepsWidth = {
     name: 'Test: Sending',
     render: () => staged(<Sending />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         const footer = canvasElement.querySelector('[data-probe="footer"]');

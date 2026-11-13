@@ -2,15 +2,13 @@
 
 # Backdrop
 
-The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token.
-
 Also asked as: scrim.
 
 **Import:** `import { Backdrop } from '@/patterns';`
 
 **Source:** `design-system/src/patterns/Backdrop/Backdrop.jsx`
 
-**Stories:** `design-system/src/patterns/Backdrop/Backdrop.stories.jsx` — Inline, ConfirmOverPanel, Layers, Pads, ScreenGrid, Interactive
+**Stories:** `design-system/src/patterns/Backdrop/Backdrop.stories.jsx` — Inline, ConfirmOverPanel, Layers, Pads, ScreenGrid, Interactive, MotionOpenClose, MotionReduced
 
 **Motion:** enter `appearance.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
@@ -31,6 +29,7 @@ Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternModal` · 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `show` | bool | `true` | Keep mounted and set false to finish the exit before removal. |
 | `inline` | bool | `false` | Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page. |
 | `screenWidth` | number | — | Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440. |
 | `screenHeight` | number | — | Inline only: the screen height (px); a layer inside caps at it less Backdrop/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do. |
@@ -41,7 +40,7 @@ Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternModal` · 
 
 ## Tokens touched
 
-`--blanket-pad-x` · `--blanket-pad-y` · `--ds-blanket` · `--layer-blanket` · `--layer-modal` · `--plus-overlay-screen` · `--plus-overlay-screen-height`
+`--blanket-pad-x` · `--blanket-pad-y` · `--ds-blanket` · `--layer-blanket` · `--layer-modal` · `--plus-overlay-origin` · `--plus-overlay-screen` · `--plus-overlay-screen-height` · `--transform-origin`
 
 From `design-system/src/patterns/Backdrop/Backdrop.scss`. Override these through the token layer, never with a literal.
 

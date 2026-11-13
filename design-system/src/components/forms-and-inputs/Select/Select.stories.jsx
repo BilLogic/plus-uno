@@ -1,3 +1,4 @@
+import { withReducedMotion, selectMotionPlay } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useEffect, useState } from 'react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -12,7 +13,7 @@ import Select from './Select';
  * isSearchable={false} turns that off for a short list.
  */
 export default {
-    title: 'Components/Forms and inputs/Select',
+    title: 'Components/Forms and inputs/Select/Select',
     component: Select,
     tags: ['!dev', '!autodocs'],
     parameters: {
@@ -557,5 +558,29 @@ export const OpenListEdge = {
         await expect(style.borderTopColor, 'no painted border').toBe('rgba(0, 0, 0, 0)');
         await expect(style.boxShadow, 'the overlay shadow is the edge').toBe(computedShadow(canvasElement, 'var(--ds-shadow-overlay)'));
         await userEvent.keyboard('{Escape}');
+    },
+};
+
+export const MotionOpenClose = {
+    render: () => <Select label="Student" options={['Ana Ruiz', 'Daniel Lee']} />,
+    play: selectMotionPlay(),
+};
+export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: selectMotionPlay(true) };
+
+export const MotionKeyboardOpen = {
+    ...MotionOpenClose,
+    play: async ({ canvasElement }) => {
+        const field = within(canvasElement).getByRole('combobox');
+        field.focus();
+        await userEvent.keyboard('{ArrowDown}');
+        const surface = await waitFor(() => {
+            const element = canvasElement.ownerDocument.querySelector('.plus-listbox');
+            expect(element).not.toBeNull();
+            return element;
+        });
+        await expect(getComputedStyle(surface).animationName).toBe('none');
+        await expect(surface).toBeVisible();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(surface.isConnected).toBe(false));
     },
 };

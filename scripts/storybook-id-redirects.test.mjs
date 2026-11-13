@@ -9,11 +9,22 @@ const rules = [...toml.matchAll(/from = "\/storybook\/"\n\s+query = \{ path = "\
   (m) => ({ from: m[1], to: m[2], anchor: m[3] }),
 );
 const ids = new Set(PAGES.map((p) => p.id));
+const FAMILIES = {
+  'components-forms-and-inputs-radio': 'Components/Forms and inputs/Radio/Radio',
+  'components-forms-and-inputs-select': 'Components/Forms and inputs/Select/Select',
+  'components-forms-and-inputs-date-time-picker': 'Components/Forms and inputs/Date time picker/Date time picker',
+  'components-forms-and-inputs-date-time-picker-date-picker': 'Components/Forms and inputs/Date time picker/Date picker/Date picker',
+  'components-labels-tag': 'Components/Labels/Tag/Tag',
+  'components-text-and-data-display-code': 'Components/Text and data display/Code/Code',
+  'components-navigation-navigation-system': 'Components/Navigation/Navigation system/Navigation system',
+  'ai-ui-components-ai-message': 'AI UI/Components/AI message/AI message',
+};
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 40);
+  assert.equal(rules.length, 48);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
+    if (r.from in FAMILIES) continue;
     assert.ok(ids.has(r.to), `${r.from} redirects to ${r.to}, which is not a page`);
   }
 });
@@ -54,4 +65,19 @@ test('the retired Get started > Content design id lands on Voice and tone', () =
   const rule = rules.find((r) => r.from === 'get-started-content-design');
   assert.equal(rule?.to, 'foundations-brand-content-voice-and-tone');
   assert.ok(ids.has('foundations-brand-content-voice-and-tone'));
+});
+
+test('a component family parent redirects to its Name/Name page, whose story is titled that way', async () => {
+  const { storybookId } = await import('./lib/storybook-id.mjs');
+  const root = new URL('../design-system/src/', import.meta.url).pathname;
+  const sources = fs
+    .readdirSync(root, { recursive: true })
+    .filter((f) => f.endsWith('.stories.jsx'))
+    .map((f) => fs.readFileSync(root + f, 'utf8'))
+    .join('\n');
+  for (const [from, title] of Object.entries(FAMILIES)) {
+    const rule = rules.find((r) => r.from === from);
+    assert.equal(rule?.to + '--docs', storybookId(title, 'Docs'), `${from} target`);
+    assert.ok(sources.includes(`title: '${title}',`), `no story is titled ${title}`);
+  }
 });

@@ -422,7 +422,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DatePicker",
         "source": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx",
-        "storybookId": "components-forms-and-inputs-date-time-picker-date-picker--docs"
+        "storybookId": "components-forms-and-inputs-date-time-picker-date-picker-date-picker--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -447,7 +447,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DateTimePicker",
         "source": "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.jsx",
-        "storybookId": "components-forms-and-inputs-date-time-picker--docs"
+        "storybookId": "components-forms-and-inputs-date-time-picker-date-time-picker--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1150,7 +1150,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/Radio/Radio.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Radio/Radio.jsx",
-        "storybookId": "components-forms-and-inputs-radio--docs"
+        "storybookId": "components-forms-and-inputs-radio-radio--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1297,7 +1297,7 @@
         "mdxPath": "design-system/src/patterns/Sidebar/Sidebar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Sidebar",
         "source": "design-system/src/patterns/Sidebar/Sidebar.jsx",
-        "storybookId": "components-navigation-navigation-system--docs"
+        "storybookId": "components-navigation-navigation-system-navigation-system--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1540,7 +1540,7 @@
         "mdxPath": "design-system/src/components/labels/Tag/Tag.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Tag",
         "source": "design-system/src/components/labels/Tag/Tag.jsx",
-        "storybookId": "components-labels-tag--docs",
+        "storybookId": "components-labels-tag-tag--docs",
         "props": {
           "color": {
             "type": "enum",

@@ -10,7 +10,7 @@ Also asked as: hover hint, hover text.
 
 **Source:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.jsx`
 
-**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview, Rest, Hovered, Pressed, Focused, Disabled, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, Wrapping
+**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview, Rest, Hovered, Pressed, Focused, Disabled, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, Wrapping, MotionOpenClose, MotionReduced
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx`
 
@@ -196,7 +196,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-tooltip` · `--pad-x-sm` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--radius-control-sm`
+`--body-small` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-tooltip` · `--pad-x-sm` · `--plus-overlay-origin` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--radius-control-sm` · `--transform-origin`
 
 From `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss`. Override these through the token layer, never with a literal.
 

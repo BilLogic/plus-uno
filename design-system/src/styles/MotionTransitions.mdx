@@ -7,6 +7,8 @@ import {
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
 import * as TransitionStories from './MotionTransitions.stories.jsx';
+import * as AccordionStories from '../components/layout-and-structure/Accordion/Accordion.stories.jsx';
+import * as ModalStories from '../patterns/PatternModal/PatternModal.stories.jsx';
 import * as PopupStories from '../components/overlays-and-layering/Popup/Popup.stories.jsx';
 
 <Meta of={TransitionStories} />
@@ -333,9 +335,9 @@ Between two lists the dropped item takes the place it lands on, and both lists c
 
 A row expanding and a Select opening are the same reveal; size sets the speed. Closing reverses it on the same token, with the detail fading first.
 
-<Canvas of={TransitionStories.ExpandARow} sourceState="none" />
+<Canvas of={AccordionStories.MotionOpenClose} sourceState="none" />
 
-<Canvas of={TransitionStories.CollapseARow} sourceState="none" />
+<Canvas of={AccordionStories.MotionReduced} sourceState="none" />
 
 </FoundationSubsection>
 
@@ -409,9 +411,9 @@ A Modal opens only from something the person did, never by itself. Focus moves t
 
 **Modal.**
 
-<Canvas of={TransitionStories.ModalOpens} sourceState="none" />
+<Canvas of={ModalStories.MotionOpenClose} sourceState="none" />
 
-<Canvas of={TransitionStories.ModalCloses} sourceState="none" />
+<Canvas of={ModalStories.MotionReduced} sourceState="none" />
 
 **Popup.** The component's own motion is its live story: click Details to open it, press Escape to close it.
 

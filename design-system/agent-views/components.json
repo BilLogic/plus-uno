@@ -104,7 +104,9 @@
         "Pressed",
         "Focused",
         "Expanded",
-        "Disabled"
+        "Disabled",
+        "MotionOpenClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--body-large",
@@ -891,8 +893,17 @@
       "import": "import { Backdrop } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Backdrop/Backdrop.jsx",
-      "summary": "The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token.",
+      "summary": null,
       "props": [
+        {
+          "name": "show",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "Keep mounted and set false to finish the exit before removal.",
+          "deprecated": null
+        },
         {
           "name": "inline",
           "type": "bool",
@@ -963,7 +974,9 @@
         "Layers",
         "Pads",
         "ScreenGrid",
-        "Interactive"
+        "Interactive",
+        "MotionOpenClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--blanket-pad-x",
@@ -971,8 +984,10 @@
         "--ds-blanket",
         "--layer-blanket",
         "--layer-modal",
+        "--plus-overlay-origin",
         "--plus-overlay-screen",
-        "--plus-overlay-screen-height"
+        "--plus-overlay-screen-height",
+        "--transform-origin"
       ]
     },
     {
@@ -4823,7 +4838,10 @@
         "Focused",
         "LandsWithNotify",
         "StackClosesUp",
-        "StackClosesUpReduced"
+        "StackClosesUpReduced",
+        "MotionOpenClose",
+        "MotionReduced",
+        "MotionExitCompletes"
       ],
       "tokens": [
         "--body-default",
@@ -4846,14 +4864,8 @@
         "--ds-icon-warning-inverse",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
-        "--ds-motion-appearance-default",
-        "--ds-motion-appearance-default-duration",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
-        "--ds-motion-spatial-default",
-        "--ds-motion-spatial-default-duration",
-        "--ds-motion-spatial-exit",
-        "--ds-motion-spatial-exit-duration",
         "--ds-opacity-disabled",
         "--ds-shadow-overlay",
         "--ds-surface",
@@ -7996,6 +8008,15 @@
       "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Backdrop`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (backdrop, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
       "props": [
         {
+          "name": "show",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "Keep mounted and set false to finish the exit before removal; also follows its Backdrop.",
+          "deprecated": null
+        },
+        {
           "name": "id",
           "type": "string",
           "required": false,
@@ -8180,7 +8201,9 @@
         "KeyLoading",
         "KeyConfirmInside",
         "StackConfirmOverPanel",
-        "StackModalOnModalRefused"
+        "StackModalOnModalRefused",
+        "MotionOpenClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--border-default",
@@ -8194,8 +8217,10 @@
         "--modal-radius",
         "--modal-stack-md",
         "--modal-stack-sm",
+        "--plus-overlay-origin",
         "--stack-lg",
-        "--stack-md"
+        "--stack-md",
+        "--transform-origin"
       ]
     },
     {
@@ -9276,25 +9301,13 @@
         "--anchor-width",
         "--body-default",
         "--border-default",
-        "--ds-motion-appearance-fast",
-        "--ds-motion-appearance-fast-duration",
-        "--ds-motion-spatial-exit",
-        "--ds-motion-spatial-exit-duration",
-        "--ds-motion-spatial-fast",
-        "--ds-motion-spatial-fast-duration",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
         "--heading-xsmall",
         "--layer-popup",
-        "--plus-popup-clip-bottom",
-        "--plus-popup-clip-left",
-        "--plus-popup-clip-right",
-        "--plus-popup-clip-top",
-        "--plus-popup-reach",
         "--popover-offset",
         "--popover-pad",
-        "--popup-clip-reach",
         "--popup-max-width",
         "--popup-min-width",
         "--popup-pad",
@@ -12167,7 +12180,10 @@
         "FieldReadOnly",
         "FieldReadOnlyShowsLabel",
         "FieldReadOnlyLongValue",
-        "OpenListEdge"
+        "OpenListEdge",
+        "MotionOpenClose",
+        "MotionReduced",
+        "MotionKeyboardOpen"
       ],
       "tokens": [
         "--body-default",
@@ -15712,7 +15728,9 @@
         "PlacementBottom",
         "PlacementLeft",
         "PlacementRight",
-        "Wrapping"
+        "Wrapping",
+        "MotionOpenClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--body-small",
@@ -15720,9 +15738,11 @@
         "--ds-text-inverse",
         "--layer-tooltip",
         "--pad-x-sm",
+        "--plus-overlay-origin",
         "--popover-max-width-tooltip",
         "--popover-pad-y-tooltip",
-        "--radius-control-sm"
+        "--radius-control-sm",
+        "--transform-origin"
       ]
     },
     {
@@ -15901,11 +15921,15 @@
         "Hovered",
         "Focused",
         "FieldDisabled",
-        "FieldInvalid"
+        "FieldInvalid",
+        "MotionOpenClose",
+        "MotionReduced",
+        "MotionKeyboardOpen"
       ],
       "tokens": [
         "--ds-motion-spatial-fast",
-        "--ds-motion-spatial-fast-duration"
+        "--ds-motion-spatial-fast-duration",
+        "--plus-popup-reach"
       ]
     },
     {

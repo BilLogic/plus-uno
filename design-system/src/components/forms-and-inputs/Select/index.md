@@ -10,11 +10,11 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge, MotionOpenClose, MotionReduced, MotionKeyboardOpen
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.exit` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -46,7 +46,7 @@ Select reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
-| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
+| exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Clips back to the trigger and fades; stays mounted until the exit completes. |
 
 ## Best practices
 

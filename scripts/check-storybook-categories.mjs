@@ -325,6 +325,20 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   }
   listed('Sound', SOUND_ROOT);
 
+  // (10) No component page is titled a path-prefix of another: a page that is also a folder
+  // shows up in the sidebar as a "Docs" child. The parent's own page is titled Name/Name.
+  const titles = new Set(stories.map(({ title }) => title).filter(Boolean));
+  for (const { rel, title } of stories) {
+    if (!title) continue;
+    const child = [...titles].find((other) => other.startsWith(`${title}/`));
+    if (child) {
+      found.push(
+        `${rel}  is titled "${title}", which is also the folder of "${child}", so the sidebar lists it as a "Docs" entry.\n` +
+          `      -> Title the page ${title}/${title.split("/").pop()}.`,
+      );
+    }
+  }
+
   // (5) Retired paths.
   const self = new Set(['scripts/check-storybook-categories.mjs', 'scripts/check-storybook-categories.test.mjs']);
   for (const rel of tracked) {

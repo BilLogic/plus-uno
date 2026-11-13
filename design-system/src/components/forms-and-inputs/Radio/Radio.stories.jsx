@@ -8,7 +8,7 @@ import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Radio from './Radio';
 
 export default {
-    title: 'Components/Forms and inputs/Radio',
+    title: 'Components/Forms and inputs/Radio/Radio',
     component: Radio,
     tags: ['!dev', '!autodocs'],
     parameters: {
