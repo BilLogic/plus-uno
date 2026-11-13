@@ -28,8 +28,8 @@ import {
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/Navigation/Navigation.stories.jsx
  */
 export default {
-    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Finding things/Navigation (Navigation.mdx).
-    title: 'Patterns/Finding things/Navigation/Examples',
+    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Navigation (Navigation.mdx).
+    title: 'Patterns/Navigation/Examples',
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'padded' },
 };

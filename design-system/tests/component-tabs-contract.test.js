@@ -127,7 +127,6 @@ describe('which docs pages are tabbed', () => {
 
   it('leaves the flat pattern reading pages and the foundations untabbed', () => {
     expect(isTabbedDocsPage('design-system/src/patterns/Introduction.mdx')).toBe(false);
-    expect(isTabbedDocsPage('design-system/src/patterns/HeadingOutline.mdx')).toBe(false);
     expect(isTabbedDocsPage('design-system/src/styles/Colors.mdx')).toBe(false);
     expect(TABBED_EXCEPTIONS).toEqual([]);
   });

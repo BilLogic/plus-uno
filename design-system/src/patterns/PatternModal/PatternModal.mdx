@@ -4,6 +4,7 @@ import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PatternModalStories from './PatternModal.stories.jsx';
+import * as BackdropStories from '../Backdrop/Backdrop.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -33,9 +34,9 @@ import {
     title="Modal"
     purpose="One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps."
     links={{
+        label: 'Uses',
         items: [
-            { title: 'Modal', current: true },
-            { title: 'Backdrop', href: './?path=/docs/templates-modal-backdrop--docs' },
+            { title: 'Form', href: './?path=/docs/templates-form--docs' },
         ],
     }}
 />
@@ -117,7 +118,7 @@ Drag the screen's width. The Modal grows with it and never shrinks.
 
 ## Destructive tiers
 
-Which tier, and its words: <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink>.
+Which tier, and its words: <DocsLink id="patterns-common-actions">Common actions</DocsLink>.
 
 <ComponentExample of={PatternModalStories.TierActive} title="Active" description="A change that can be undone: Cancel and the action in Primary." />
 
@@ -131,7 +132,7 @@ Which tier, and its words: <DocsLink id="patterns-actions-and-input-common-actio
 
 ## Footers
 
-The rule for full bleed, Cancel and Close: <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink>.
+The rule for full bleed, Cancel and Close: <DocsLink id="patterns-common-actions">Common actions</DocsLink>.
 
 <ComponentExample of={PatternModalStories.FooterOne} title="One button" description="It fills the whole footer, flush with the bottom and both sides." />
 
@@ -185,6 +186,102 @@ A confirm Modal may open over a Panel, a Popup or a focused task, and brings its
 </DocsTable>
 
 The Modal's maximum height is the screen less `--space-400` above and below.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Backdrop
+
+The Backdrop is the full-screen layer that holds the dimming fill and the one layer above it, a modal, so that layer is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, and centers a modal. The examples in this section follow the toolbar's Color mode switch.
+
+<ComponentExample of={BackdropStories.Inline} title="Modal in a Backdrop" description="A modal centered in the backdrop at the 768 stand-in screen." />
+
+<ComponentExample of={BackdropStories.Pads} title="Pads" description="Pad 16 at the sides and 64 above and below, shaded here; under 640 tall the vertical pad drops to 24." />
+
+<ComponentExample of={BackdropStories.ScreenGrid} title="Screen grid" description="12 columns with a 16 gutter, centered and capped at 1232; a modal spans 6, 8 or 10 of them." />
+
+A Backdrop interrupts the page for one task. It dims everything behind it with one fill, so the person sees only the layer on top. It never draws content of its own.
+
+One layer sits on it today: a Modal, which the Backdrop centers.
+
+A task that keeps the page in view is a Panel, which floats with no Backdrop. The Backdrop draws the layer only. It does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
+
+### Layers
+
+Figma has no z-index, so the order is written here and lives in code.
+
+<DocsTable>
+<thead>
+<tr><th>Layer</th><th>Number</th><th>Token</th><th>Holds</th></tr>
+</thead>
+<tbody>
+<tr><td>Navigation</td><td>200</td><td><code>--layer-navigation</code></td><td>The floating sidebar. It has a shadow and no backdrop, and an outside click closes it.</td></tr>
+<tr><td>Menu and Popup</td><td>400</td><td><code>--layer-popup</code></td><td>The Menu and the Popup. One opened from a Modal mounts in it and takes the Modal layer, 510.</td></tr>
+<tr><td>Backdrop</td><td>500</td><td><code>--layer-blanket</code></td><td>The Backdrop and its fill.</td></tr>
+<tr><td>Modal</td><td>510</td><td><code>--layer-modal</code></td><td>A Modal.</td></tr>
+<tr><td>Flag</td><td>600</td><td><code>--layer-flag</code></td><td>Flags, above a modal.</td></tr>
+<tr><td>Tooltip</td><td>800</td><td><code>--layer-tooltip</code></td><td>Tooltips, above everything.</td></tr>
+</tbody>
+</DocsTable>
+
+### Parts
+
+1. **Backdrop.** The screen-size layer with the backdrop fill, the screen grid and the pads.
+2. **Layer.** The one modal it holds, centered. The Modal brings its body and footer slots.
+
+The Backdrop carries the screen grid; page frames carry the content grid. Height, hug or fill, lives on the Modal inside it.
+
+### States
+
+A Backdrop has no states. It is shown while its layer is open and gone when it closes; a click on the backdrop, not on the layer, calls `onBackdropClick`.
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--ds-blanket</code></td><td>32% in Light, 60% in Dark</td><td>The fill, under every modal.</td></tr>
+<tr><td><code>--blanket-pad-x</code></td><td>16</td><td>The closest a modal gets to the sides.</td></tr>
+<tr><td><code>--blanket-pad-y</code></td><td>64</td><td>The closest a modal gets to the top and bottom. It drops to 24 under 640 tall.</td></tr>
+<tr><td><code>--blanket-max-height-modal</code></td><td>screen height less 2 × pad-y: 128, or 48 under 640 tall</td><td>The tallest a modal or confirm gets. Its body scrolls past it.</td></tr>
+<tr><td><code>--grid-gutter</code></td><td>16</td><td>The gutter between screen-grid columns.</td></tr>
+<tr><td><code>--grid-width-column-screen</code></td><td>45.33, 66.67, 88</td><td>One screen-grid column at 768, 1024 and 1440.</td></tr>
+<tr><td><code>--content-max-width</code></td><td>1232</td><td>The cap on the screen grid.</td></tr>
+<tr><td><code>--layer-blanket</code>, <code>--layer-modal</code></td><td>500, 510</td><td>The Backdrop and the layer it holds.</td></tr>
+</tbody>
+</DocsTable>
+
+### Place a modal in the Backdrop.
+
+Let the Backdrop place the modal. Do not detach it to move things around: the pads are the closest a modal gets to the screen edge.
+
+### Backdrop content guidelines
+
+The Backdrop holds no text of its own. The words belong to the layer it holds.
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title a confirm with the question: "Discard changes?"</td><td>A second dialog that repeats the first one's title.</td></tr>
+<tr><td>Name the confirm's primary action for what it does: "Discard changes".</td><td>"OK" or "Yes".</td></tr>
+</tbody>
+</DocsTable>
+
+### Backdrop accessibility
+
+- The Backdrop is a layout layer with no role. The Modal inside it is the dialog.
+- The backdrop is a pointer shortcut, not a control. A keyboard closes a dialog from inside it, so the backdrop takes no role and no key handler.
+- The backdrop at `--ds-blanket` keeps the dialog legible in Light and Dark. The toolbar's Contrast switch changes it with the rest of the page.
+- A layer wider than a narrow screen keeps its width, and the Backdrop scrolls.
+
+### Backdrop motion
+
+<MotionSection component="Backdrop" tier="template" />
 
 </div>
 
@@ -334,7 +431,7 @@ Two to five views of one thing opened in any order; one footer saves them all. V
     dontCaption="Numbered tabs as steps: any order, one Save, nothing to go back to."
 />
 
-Footer buttons, Cancel and Close, and which destructive tier, including type the name: <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink>. A blocked submit: <DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink>. The sending button: <DocsLink id="patterns-states-loading">Loading</DocsLink>.
+Footer buttons, Cancel and Close, and which destructive tier, including type the name: <DocsLink id="patterns-common-actions">Common actions</DocsLink>. A blocked submit: <DocsLink id="patterns-forms">Forms</DocsLink>. The sending button: <DocsLink id="patterns-states-loading">Loading</DocsLink>.
 
 </div>
 
@@ -375,8 +472,7 @@ Footer buttons, Cancel and Close, and which destructive tier, including type the
 - <DocsLink id="templates-form">Form</DocsLink>: use when the Modal holds fields.
 - <DocsLink id="templates-panel-panel">Panel</DocsLink>: use when the page must stay usable.
 - <DocsLink id="templates-popup-popup">Popup</DocsLink>: use when the content is a menu or a short list.
-- <DocsLink id="templates-modal-backdrop">Backdrop</DocsLink>: use when you need the dimmed ground, the pads and the screen grid under the Modal.
-- <DocsLink id="patterns-overview">Patterns</DocsLink>: use when you need the rules across Modals: <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink>, <DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink>, Errors, Loading.
+- <DocsLink id="patterns-overview">Patterns</DocsLink>: use when you need the rules across Modals: <DocsLink id="patterns-common-actions">Common actions</DocsLink>, <DocsLink id="patterns-forms">Forms</DocsLink>, Errors, Loading.
 
 </div>
 

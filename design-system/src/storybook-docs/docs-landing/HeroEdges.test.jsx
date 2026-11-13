@@ -122,7 +122,7 @@ describe('every hero surface shows its edge', () => {
 
 describe('the Indicators hero chips on the ground show their edge', () => {
     it('every neutral count chip carries the edge', () => {
-        const { container } = render(React.createElement(HEROES['patterns-notifications-and-indicators-indicators'].Hero));
+        const { container } = render(React.createElement(HEROES['patterns-indicators'].Hero));
         const chips = [...container.querySelectorAll('rect,circle')].filter((el) => fillOf(el) === PAINT.countSurface);
         expect(chips.length).toBeGreaterThan(0);
         for (const chip of chips) expect(chip.getAttribute('stroke')).toBe(PAINT.illustrationEdge);

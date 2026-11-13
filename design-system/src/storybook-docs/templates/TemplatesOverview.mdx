@@ -1,8 +1,8 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
-import { OpeningARecord } from '@/storybook-docs/illustrations/compositions.jsx';
-import { FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { OpeningARecord, ThreeLayers } from '@/storybook-docs/illustrations/compositions.jsx';
+import { FoundationSection, FoundationSubsection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { ChooserDot, HIDDEN } from '@/storybook-docs/templates/overview-parts.jsx';
@@ -30,7 +30,7 @@ import { ChooserDot, HIDDEN } from '@/storybook-docs/templates/overview-parts.js
 
 <FoundationSection title="The seven templates">
 
-Broadest first. Each page opens with its types, then the anatomy and key states of each type, then the usage spine. <DocsLink id="templates-templates-and-patterns">Templates and patterns</DocsLink> says how the layers fit together.
+Broadest first. Each page opens with its types, then the anatomy and key states of each type, then the usage spine. The Templates and patterns section below says how the layers fit together.
 
 <TypeGrid>
 <TypeCard hero="templates-frame-frame" title="Frame" to="templates-frame-frame">The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare.</TypeCard>
@@ -44,6 +44,44 @@ Broadest first. Each page opens with its types, then the anatomy and key states 
 
 </FoundationSection>
 
+<FoundationSection title="Templates and patterns">
+
+A template is an arrangement of components with slots. A pattern is the thinking baked into it.
+
+<FoundationSubsection title="Three layers">
+
+Grab a template, fill the slots, and open a pattern when you are lost or want to challenge a choice. Each layer answers one question and holds its guidance in one place.
+
+- **Components** are single pieces with props, imported by name. The question is "Am I using this piece right?" Anatomy is the piece's parts.
+- **Templates** are arrangements of components with slots. They hold key scenarios and key states, and link to components for detail. The question is "Are the slots filled right?" Anatomy is the numbered slots.
+- **Patterns** are code-free guidance for a situation, shown on annotated templates used as they are or tweaked. The question is "Is this the right approach?" A pattern has no anatomy and no code.
+
+<IllustrationFigure caption="One primary button across the layers: on its own as a component, inside a Section template, and placed on a Frame by a pattern.">
+    <ThreeLayers />
+</IllustrationFigure>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="The tie-break">
+
+Behavior splits out into a component, and a template that only redraws one component stays a component. One component's behavior goes on the component page. How pieces sit in one template goes on that template's page. Anything that holds across two or more templates is a pattern.
+
+The step up from a quick look to its own page is under Opening a record, below. A rule lives in one place. A template page that needs a pattern's rule links to it and keeps its own words for the slots.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Frame, Screen, Flow">
+
+The empty Frame is the template. A filled Frame is a Screen. A sequence of Screens that fulfills one user story is a Flow.
+
+- **Frame:** the template. Sidebar, Page and the AI panel slot, in its default, focused and bare types.
+- **Screen:** a Frame with its slots filled for one page. Screens are documented under Flows in Figma.
+- **Flow:** Screens in order, fulfilling one user story. Flows are documented under Flows in Figma as well.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
 <FoundationSection title="Which template for which job">
 
 A suggested starting point for each scenario, with the patterns to consult and the components it is built from. Never "always use". To start from the situation instead, use the <DocsLink id="patterns-overview">Patterns overview</DocsLink>.
@@ -53,17 +91,17 @@ A suggested starting point for each scenario, with the patterns to consult and t
 <tr><th>Scenario</th><th>Template</th><th>Patterns</th><th>Components</th></tr>
 </thead>
 <tbody>
-<tr><td>An area page with one collection</td><td><DocsLink id="templates-page-page">Page</DocsLink> · default, with a <DocsLink id="templates-section-section">Section</DocsLink> view bar alone</td><td><DocsLink id="patterns-finding-things-filtering">Filtering</DocsLink> · <DocsLink id="patterns-finding-things-search">Search</DocsLink> · <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink></td><td><code>PageHeader</code>, <code>Tabs</code> (pill), <code>FilterButton</code>, <code>IconButton</code>, <code>Button</code>, <code>Table</code></td></tr>
+<tr><td>An area page with one collection</td><td><DocsLink id="templates-page-page">Page</DocsLink> · default, with a <DocsLink id="templates-section-section">Section</DocsLink> view bar alone</td><td><DocsLink id="patterns-filtering">Filtering</DocsLink> · <DocsLink id="patterns-search">Search</DocsLink> · <DocsLink id="patterns-common-actions">Common actions</DocsLink></td><td><code>PageHeader</code>, <code>Tabs</code> (pill), <code>FilterButton</code>, <code>IconButton</code>, <code>Button</code>, <code>Table</code></td></tr>
 <tr><td>A home page with several Sections</td><td><DocsLink id="templates-page-page">Page</DocsLink> · default, titled Sections, cards</td><td><DocsLink id="patterns-states-empty">Empty</DocsLink> · <DocsLink id="patterns-states-loading">Loading</DocsLink></td><td><code>PageHeader</code>, <code>Card</code>, <code>Button</code></td></tr>
-<tr><td>A record page, one level down</td><td><DocsLink id="templates-page-page">Page</DocsLink> with a breadcrumb and page tabs</td><td><DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink> · <DocsLink id="patterns-notifications-and-indicators-indicators">Indicators</DocsLink></td><td><code>Breadcrumb</code>, <code>PageHeader</code>, <code>StatusTag</code>, <code>Tabs</code>, <code>PopupSelect</code></td></tr>
-<tr><td>Working through a queue</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a detail</td><td><DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink> · <DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink></td><td><code>Table</code>, <code>Button</code></td></tr>
-<tr><td>A quick look at one row</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Details</td><td><DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink></td><td><DocsLink id="components-layout-and-structure-panel"><code>Panel</code></DocsLink>, <code>Button</code></td></tr>
-<tr><td>A short decision before going on</td><td><DocsLink id="templates-modal-modal">Modal</DocsLink> · Active, confirm width</td><td><DocsLink id="patterns-actions-and-input-common-actions">Common actions</DocsLink> · <DocsLink id="patterns-states-errors">Errors</DocsLink></td><td><DocsLink id="components-messaging-modal-dialog"><code>Modal</code></DocsLink>, <code>Button</code></td></tr>
-<tr><td>A long task with steps</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink> · focused, with a <DocsLink id="templates-form">Form</DocsLink> in steps</td><td><DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink> · <DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink></td><td><code>ProgressTracker</code>, <code>Fieldset</code>, <code>Button</code></td></tr>
-<tr><td>Settings saved as a group</td><td><DocsLink id="templates-section-section">Section</DocsLink> with subsections, <DocsLink id="templates-form">Form</DocsLink> in a page</td><td><DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink> · <DocsLink id="patterns-states-read-only">Read-only</DocsLink> · <DocsLink id="patterns-states-disabled">Disabled</DocsLink></td><td><code>Fieldset</code>, <code>TextField</code>, <code>PopupSelect</code>, <code>Toggle</code>, <code>Button</code></td></tr>
-<tr><td>Narrowing a long catalog</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a filter side</td><td><DocsLink id="patterns-finding-things-filtering">Filtering</DocsLink></td><td><code>Checkbox</code>, <code>PopupSelect</code>, <code>Button</code></td></tr>
-<tr><td>Signing in</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink> · bare</td><td><DocsLink id="patterns-actions-and-input-forms">Forms</DocsLink> · <DocsLink id="patterns-states-errors">Errors</DocsLink></td><td><code>Logo</code>, <code>TextField</code>, <code>Button</code></td></tr>
-<tr><td>Notifications</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Notifications (the Inbox)</td><td><DocsLink id="patterns-notifications-and-indicators-notifications">Notifications</DocsLink></td><td><DocsLink id="components-layout-and-structure-panel"><code>Panel</code></DocsLink>, <code>Avatar</code>, <code>PopupSelect</code></td></tr>
+<tr><td>A record page, one level down</td><td><DocsLink id="templates-page-page">Page</DocsLink> with a breadcrumb and page tabs</td><td><DocsLink id="patterns-navigation">Navigation</DocsLink> · <DocsLink id="patterns-indicators">Indicators</DocsLink></td><td><code>Breadcrumb</code>, <code>PageHeader</code>, <code>StatusTag</code>, <code>Tabs</code>, <code>PopupSelect</code></td></tr>
+<tr><td>Working through a queue</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a detail</td><td><DocsLink id="patterns-navigation">Navigation</DocsLink> · <DocsLink id="patterns-common-actions">Common actions</DocsLink></td><td><code>Table</code>, <code>Button</code></td></tr>
+<tr><td>A quick look at one row</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Details</td><td><DocsLink id="patterns-navigation">Navigation</DocsLink></td><td><DocsLink id="components-layout-and-structure-panel"><code>Panel</code></DocsLink>, <code>Button</code></td></tr>
+<tr><td>A short decision before going on</td><td><DocsLink id="templates-modal-modal">Modal</DocsLink> · Active, confirm width</td><td><DocsLink id="patterns-common-actions">Common actions</DocsLink> · <DocsLink id="patterns-states-errors">Errors</DocsLink></td><td><DocsLink id="components-messaging-modal-dialog"><code>Modal</code></DocsLink>, <code>Button</code></td></tr>
+<tr><td>A long task with steps</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink> · focused, with a <DocsLink id="templates-form">Form</DocsLink> in steps</td><td><DocsLink id="patterns-forms">Forms</DocsLink> · <DocsLink id="patterns-navigation">Navigation</DocsLink></td><td><code>ProgressTracker</code>, <code>Fieldset</code>, <code>Button</code></td></tr>
+<tr><td>Settings saved as a group</td><td><DocsLink id="templates-section-section">Section</DocsLink> with subsections, <DocsLink id="templates-form">Form</DocsLink> in a page</td><td><DocsLink id="patterns-forms">Forms</DocsLink> · <DocsLink id="patterns-states-read-only">Read-only</DocsLink> · <DocsLink id="patterns-states-disabled">Disabled</DocsLink></td><td><code>Fieldset</code>, <code>TextField</code>, <code>PopupSelect</code>, <code>Toggle</code>, <code>Button</code></td></tr>
+<tr><td>Narrowing a long catalog</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a filter side</td><td><DocsLink id="patterns-filtering">Filtering</DocsLink></td><td><code>Checkbox</code>, <code>PopupSelect</code>, <code>Button</code></td></tr>
+<tr><td>Signing in</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink> · bare</td><td><DocsLink id="patterns-forms">Forms</DocsLink> · <DocsLink id="patterns-states-errors">Errors</DocsLink></td><td><code>Logo</code>, <code>TextField</code>, <code>Button</code></td></tr>
+<tr><td>Notifications</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Notifications (the Inbox)</td><td><DocsLink id="patterns-notifications">Notifications</DocsLink></td><td><DocsLink id="components-layout-and-structure-panel"><code>Panel</code></DocsLink>, <code>Avatar</code>, <code>PopupSelect</code></td></tr>
 <tr><td>AI chat</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink>, the AI panel region</td><td><DocsLink id="ai-ui-ai-interaction-guidelines">AI interaction guidelines</DocsLink></td><td><code>AiChat</code>, <code>PromptInput</code>, <code>AiMessage</code></td></tr>
 </tbody>
 </DocsTable>
@@ -98,12 +136,12 @@ A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or
 
 <FoundationSection title="Opening a record">
 
-Least room to most. Pick the lowest step that fits; <DocsLink id="patterns-finding-things-navigation">Navigation</DocsLink> holds the rule.
+Least room to most. Pick the lowest step that fits; <DocsLink id="patterns-navigation">Navigation</DocsLink> holds the rule.
 
 <IllustrationFigure caption="Opening a record, least room to most: expand the row, Section detail, Details Panel, Modal, its own page.">
     <OpeningARecord />
 </IllustrationFigure>
 
-Where a message sits, in a Frame, Page or Section banner, a Flag or a SectionMessage, is <DocsLink id="patterns-notifications-and-indicators-notifications">Notifications</DocsLink>.
+Where a message sits, in a Frame, Page or Section banner, a Flag or a SectionMessage, is <DocsLink id="patterns-notifications">Notifications</DocsLink>.
 
 </FoundationSection>

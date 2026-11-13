@@ -21,11 +21,11 @@ const footer = (primary) => (
 );
 
 /**
- * Stories for the Backdrop pattern. They are docs-only: the Backdrop page in the
+ * Stories for the Backdrop pattern. They are docs-only: the Backdrop section of the Modal page in the
  * Patterns group draws them inline, at a stand-in screen.
  */
 export default {
-    title: 'Templates/Modal/Backdrop',
+    title: 'Templates/Modal/Modal/Backdrop',
     component: Backdrop,
     tags: ['!dev', '!autodocs'],
     argTypes: {

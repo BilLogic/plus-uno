@@ -17,8 +17,8 @@ import { FilteredStudents, PageTabs, STAGE, ViewPicker } from './filteringDemo.j
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/Filtering/Filtering.stories.jsx
  */
 export default {
-    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Finding things/Filtering (Filtering.mdx).
-    title: 'Patterns/Finding things/Filtering/Examples',
+    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Filtering (Filtering.mdx).
+    title: 'Patterns/Filtering/Examples',
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'padded' },
 };

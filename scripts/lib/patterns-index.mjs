@@ -22,8 +22,11 @@ export const PATTERNS_FILE = 'design-system/agent-views/_patterns.json';
 /** The fields a row may carry: everything else comes from source. */
 const ROW_FIELDS = new Set(['group', 'name', 'use']);
 
-/** A pattern's Storybook page: the MDX beside its source. */
-const docOf = (answer) => answer.source?.replace(/\.jsx$/, '.mdx') ?? null;
+/** A pattern with no page of its own: the section of its parent's page that documents it. */
+const FOLDED_INTO = { Backdrop: 'design-system/src/patterns/PatternModal/PatternModal.mdx' };
+
+/** A pattern's Storybook page: the MDX beside its source, or the page it is folded into. */
+const docOf = (answer, name) => FOLDED_INTO[name] ?? answer.source?.replace(/\.jsx$/, '.mdx') ?? null;
 
 /**
  * Every row that names nothing real, keeps a field source owns, or points at a
@@ -42,7 +45,7 @@ export function checkPatterns(rows, { lookup, exists, required }) {
       problems.push(`${r.name} is not a pattern or component the design system exports`);
       continue;
     }
-    const doc = docOf(answer);
+    const doc = docOf(answer, r.name);
     if (!doc || !exists(doc)) problems.push(`${r.name}: ${doc ?? 'its source'} is not a file`);
   }
   const listed = new Set(rows.map((r) => r.name));
@@ -60,7 +63,7 @@ export function renderPatterns(rows, { from, lookup }) {
   out += `| Group | Name | Import | Reach for it when |\n|---|---|---|---|\n`;
   for (const r of rows) {
     const answer = lookup(r.name);
-    out += `| ${r.group} | [\`${r.name}\`](${link(docOf(answer))}) | \`${answer.import}\` | ${r.use} |\n`;
+    out += `| ${r.group} | [\`${r.name}\`](${link(docOf(answer, r.name))}) | \`${answer.import}\` | ${r.use} |\n`;
   }
   return `${out}\n`;
 }

@@ -45,7 +45,7 @@ import {
 Each failure has one home, as close to its cause as it can sit. A submit has two cases, drawn under Key cases: blocked and rejected.
 
 <TypeGrid>
-<TypeCard of={ErrorsStories.PlaceField} title="A field" stage={PLACE_STAGE}>The error on the field, after blur. It clears once the rule is met: <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceField} title="A field" stage={PLACE_STAGE}>The error on the field, after blur. It clears once the rule is met: <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a>.</TypeCard>
 <TypeCard of={ErrorsStories.PlaceLoadFailure} title="A view that could not load" stage={PLACE_STAGE}>The error in the empty-state slot, with Try again. The view bar stays.</TypeCard>
 <TypeCard of={ErrorsStories.PlaceNoAccess} title="No access" stage={PLACE_STAGE}>The same slot, saying who can help. No action the person cannot take.</TypeCard>
 <TypeCard of={ErrorsStories.PlaceBackgroundJob} title="A background job" stage={PLACE_STAGE}>A danger Flag that stays, with Try again.</TypeCard>
@@ -119,7 +119,7 @@ Use Errors whenever something failed and the person needs to know. Put the messa
 
 <RuleTag kind="automatic" />
 
-The error sits on the field and says what to fix. <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> holds when a field is checked.
+The error sits on the field and says what to fix. <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a> holds when a field is checked.
 
 ### Say what to fix on the field, in words.
 
@@ -138,7 +138,7 @@ The message sits right under the invalid field and names the fix. The red border
 
 <RuleTag kind="automatic" />
 
-Mark the field and move focus to it; never a second dialog for the error. A single shake is Planned <PlannedTag />. <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> holds the whole rule.
+Mark the field and move focus to it; never a second dialog for the error. A single shake is Planned <PlannedTag />. <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a> holds the whole rule.
 
 ### Show a rejected submit as a danger SectionMessage at the top of the form.
 
@@ -220,9 +220,9 @@ A tooltip is absent on touch and gone on blur. An error is text on the page, nex
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>: use for when a field is checked.
+- <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a>: use for when a field is checked.
 - <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a>: use for the slot a load failure takes.
-- <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a>: use for the Flag and Banner tiers.
+- <a target="_top" href="./?path=/docs/patterns-notifications--docs">Notifications</a>: use for the Flag and Banner tiers.
 - <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a>: use for a menu's Loading row before it fails.
 - <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a>: use for a caution before something goes wrong.
 - `SectionMessage`, `Flag`, `Banner`, `EmptyState`, `TextField`: the components.

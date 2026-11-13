@@ -15,8 +15,8 @@ import { BasicPage, BasicStudents, BodySearch, FocusedPage, FocusedStudents, PAN
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/Search/Search.stories.jsx
  */
 export default {
-    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Finding things/Search (Search.mdx).
-    title: 'Patterns/Finding things/Search/Examples',
+    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Search (Search.mdx).
+    title: 'Patterns/Search/Examples',
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'padded' },
 };

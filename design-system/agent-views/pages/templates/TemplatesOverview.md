@@ -10,7 +10,7 @@ A template is an arrangement of components with slots. Grab one, fill the slots,
 
 ## The seven templates
 
-Broadest first. Each page opens with its types, then the anatomy and key states of each type, then the usage spine. Templates and patterns says how the layers fit together.
+Broadest first. Each page opens with its types, then the anatomy and key states of each type, then the usage spine. The Templates and patterns section below says how the layers fit together.
 
 - **Frame.** The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare.
 - **Page.** The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width.
@@ -19,6 +19,32 @@ Broadest first. Each page opens with its types, then the anatomy and key states 
 - **Modal.** One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps.
 - **Panel.** A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications.
 - **Popup.** A floating layer that hangs off its trigger and closes on an outside click. Six types, from menu to stacked filter menu.
+
+## Templates and patterns
+
+A template is an arrangement of components with slots. A pattern is the thinking baked into it.
+
+### Three layers
+
+Grab a template, fill the slots, and open a pattern when you are lost or want to challenge a choice. Each layer answers one question and holds its guidance in one place.
+
+- **Components** are single pieces with props, imported by name. The question is "Am I using this piece right?" Anatomy is the piece's parts.
+- **Templates** are arrangements of components with slots. They hold key scenarios and key states, and link to components for detail. The question is "Are the slots filled right?" Anatomy is the numbered slots.
+- **Patterns** are code-free guidance for a situation, shown on annotated templates used as they are or tweaked. The question is "Is this the right approach?" A pattern has no anatomy and no code.
+
+### The tie-break
+
+Behavior splits out into a component, and a template that only redraws one component stays a component. One component's behavior goes on the component page. How pieces sit in one template goes on that template's page. Anything that holds across two or more templates is a pattern.
+
+The step up from a quick look to its own page is under Opening a record, below. A rule lives in one place. A template page that needs a pattern's rule links to it and keeps its own words for the slots.
+
+### Frame, Screen, Flow
+
+The empty Frame is the template. A filled Frame is a Screen. A sequence of Screens that fulfills one user story is a Flow.
+
+- **Frame:** the template. Sidebar, Page and the AI panel slot, in its default, focused and bare types.
+- **Screen:** a Frame with its slots filled for one page. Screens are documented under Flows in Figma.
+- **Flow:** Screens in order, fulfilling one user story. Flows are documented under Flows in Figma as well.
 
 ## Which template for which job
 

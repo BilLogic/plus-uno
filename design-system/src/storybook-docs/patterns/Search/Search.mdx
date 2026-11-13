@@ -9,11 +9,11 @@ import { ComponentExample, DocsInteractivePlayground, DocsTable } from '@/storyb
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 
-<Meta title="Patterns/Finding things/Search" tags={['!dev', 'manifest']} />
+<Meta title="Patterns/Search" tags={['!dev', 'manifest']} />
 
 <DocsLanding
-    page="patterns-finding-things-search"
-    eyebrow="Pattern · Finding things"
+    page="patterns-search"
+    eyebrow="Pattern"
     title="Search"
     purpose={<>How a person finds a record by typing, with a <a target="_top" href="./?path=/docs/components-forms-and-inputs-search-field--docs">Search field</a> in one of three modes: active, focused or basic.</>}
     links={{
@@ -115,7 +115,7 @@ The field alone. Typing runs nothing; Enter runs the search and a results page t
 
 ## Usage
 
-Use Search when a person knows what a record is called. Search finds by name; <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a> narrows by attribute, so the two keep separate controls and separate counts.
+Use Search when a person knows what a record is called. Search finds by name; <a target="_top" href="./?path=/docs/patterns-filtering--docs">Filtering</a> narrows by attribute, so the two keep separate controls and separate counts.
 
 <DocsTable>
 <thead>
@@ -151,9 +151,9 @@ Use Search when a person knows what a record is called. Search finds by name; <a
 
 ## Alternatives
 
-- For narrowing by an attribute, follow <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>.
+- For narrowing by an attribute, follow <a target="_top" href="./?path=/docs/patterns-filtering--docs">Filtering</a>.
 - For picking one value from a long list, use a Select with its own search.
-- For moving to another area, follow <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a>.
+- For moving to another area, follow <a target="_top" href="./?path=/docs/patterns-navigation--docs">Navigation</a>.
 
 </div>
 
@@ -273,7 +273,7 @@ The view bar holds controls of one height, so the field takes `spacing="compact"
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>: use for narrowing by attributes; its Reset clears the search.
+- <a target="_top" href="./?path=/docs/patterns-filtering--docs">Filtering</a>: use for narrowing by attributes; its Reset clears the search.
 - <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a>: use for the No matches state.
 - <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a>: use for the wait while results load.
 - <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use for where the view bar sits.

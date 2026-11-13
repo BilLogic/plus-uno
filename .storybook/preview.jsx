@@ -185,7 +185,8 @@ const preview = {
               "Choreography",
               "Playground",
               "Transitions",
-              "Library"
+              "Library",
+              "Stage never blank"
             ],
             "Sound",
             [
@@ -204,13 +205,11 @@ const preview = {
           ],
           "Templates",
           [
-            "Templates and patterns",
             "Overview",
             "Frame",
             "Page",
             [
-              "Page",
-              "Heading outline"
+              "Page"
             ],
             "Section",
             [
@@ -221,8 +220,7 @@ const preview = {
             "Form",
             "Modal",
             [
-              "Modal",
-              "Backdrop"
+              "Modal"
             ],
             "Panel",
             [
@@ -235,7 +233,23 @@ const preview = {
           ],
           "Patterns",
           [
-            "Overview"
+            "Overview",
+            "Common actions",
+            "Forms",
+            "Filtering",
+            "Navigation",
+            "Search",
+            "Indicators",
+            "Notifications",
+            "States",
+            [
+              "Empty",
+              "Loading",
+              "Errors",
+              "Overflow",
+              "Disabled",
+              "Read-only"
+            ]
           ],
           "Components",
           [

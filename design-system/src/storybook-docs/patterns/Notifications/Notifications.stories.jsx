@@ -30,8 +30,8 @@ import {
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/Notifications/Notifications.stories.jsx
  */
 export default {
-    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Notifications and indicators/Notifications (Notifications.mdx).
-    title: 'Patterns/Notifications and indicators/Notifications/Examples',
+    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Patterns/Notifications (Notifications.mdx).
+    title: 'Patterns/Notifications/Examples',
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'padded' },
 };

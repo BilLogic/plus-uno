@@ -12,30 +12,7 @@ Also asked as: scrim.
 
 **Stories:** `design-system/src/patterns/Backdrop/Backdrop.stories.jsx` — Inline, ConfirmOverPanel, Layers, Pads, ScreenGrid, Interactive
 
-**Storybook page:** `design-system/src/patterns/Backdrop/Backdrop.mdx`
-
 **Motion:** enter `appearance.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
-
-## Usage
-
-A Backdrop interrupts the page for one task. It dims everything behind it with one fill, so the person sees only the layer on top. It never draws content of its own.
-
-One layer sits on it today: a Modal, which the Backdrop centers.
-
-A task that keeps the page in view is a Panel, which floats with no Backdrop. The Backdrop draws the layer only. It does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
-
-### Layers
-
-Figma has no z-index, so the order is written here and lives in code.
-
-| Layer | Number | Token | Holds |
-| --- | --- | --- | --- |
-| Navigation | 200 | `--layer-navigation` | The floating sidebar. It has a shadow and no backdrop, and an outside click closes it. |
-| Menu and Popup | 400 | `--layer-popup` | The Menu and the Popup. One opened from a Modal mounts in it and takes the Modal layer, 510. |
-| Backdrop | 500 | `--layer-blanket` | The Backdrop and its fill. |
-| Modal | 510 | `--layer-modal` | A Modal. |
-| Flag | 600 | `--layer-flag` | Flags, above a modal. |
-| Tooltip | 800 | `--layer-tooltip` | Tooltips, above everything. |
 
 ## Motion
 
@@ -46,60 +23,9 @@ Backdrop reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-appearance-default` | The Backdrop dims on the same fade as the layer it sits under. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | It fades with the layer; a docked Panel never has one. |
 
-## Best practices
-
-### Place a modal in the Backdrop. {#place-a-modal-in-the-backdrop}
-
-Let the Backdrop place the modal. Do not detach it to move things around: the pads are the closest a modal gets to the screen edge.
-
-## Accessibility
-
-- The Backdrop is a layout layer with no role. The Modal inside it is the dialog.
-- The backdrop is a pointer shortcut, not a control. A keyboard closes a dialog from inside it, so the backdrop takes no role and no key handler.
-- The backdrop at `--ds-blanket` keeps the dialog legible in Light and Dark. The toolbar's Contrast switch changes it with the rest of the page.
-- A layer wider than a narrow screen keeps its width, and the Backdrop scrolls.
-
 ## Related
 
-- [Modal](?path=/docs/templates-modal-modal--docs) is the layer a Backdrop usually holds, centered, for one task that blocks the page.
-- [Panel](?path=/docs/templates-panel-panel--docs) floats beside the page for a task that needs it in view, with no Backdrop.
-- [Popup](?path=/docs/templates-popup-popup--docs): use when the layer floats off a trigger and the page stays usable, with no Backdrop.
-- [Frame](?path=/docs/templates-frame-frame--docs) shows the floating Sidebar and the floating AI panel, which take a shadow and no backdrop.
-
 Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
-
-## Parts
-
-1. **Backdrop.** The screen-size layer with the backdrop fill, the screen grid and the pads.
-2. **Layer.** The one modal it holds, centered. The Modal brings its body and footer slots.
-
-The Backdrop carries the screen grid; page frames carry the content grid. Height, hug or fill, lives on the Modal inside it.
-
-### States
-
-A Backdrop has no states. It is shown while its layer is open and gone when it closes; a click on the backdrop, not on the layer, calls `onBackdropClick`.
-
-### Tokens
-
-| Token | Value | What it is for |
-| --- | --- | --- |
-| `--ds-blanket` | 32% in Light, 60% in Dark | The fill, under every modal. |
-| `--blanket-pad-x` | 16 | The closest a modal gets to the sides. |
-| `--blanket-pad-y` | 64 | The closest a modal gets to the top and bottom. It drops to 24 under 640 tall. |
-| `--blanket-max-height-modal` | screen height less 2 × pad-y: 128, or 48 under 640 tall | The tallest a modal or confirm gets. Its body scrolls past it. |
-| `--grid-gutter` | 16 | The gutter between screen-grid columns. |
-| `--grid-width-column-screen` | 45.33, 66.67, 88 | One screen-grid column at 768, 1024 and 1440. |
-| `--content-max-width` | 1232 | The cap on the screen grid. |
-| `--layer-blanket`, `--layer-modal` | 500, 510 | The Backdrop and the layer it holds. |
-
-## Content guidelines
-
-The Backdrop holds no text of its own. The words belong to the layer it holds.
-
-| Do | Don't |
-| --- | --- |
-| Title a confirm with the question: "Discard changes?" | A second dialog that repeats the first one's title. |
-| Name the confirm's primary action for what it does: "Discard changes". | "OK" or "Yes". |
 
 ## Props
 
@@ -119,6 +45,8 @@ The Backdrop holds no text of its own. The words belong to the layer it holds.
 
 From `design-system/src/patterns/Backdrop/Backdrop.scss`. Override these through the token layer, never with a literal.
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
-> Authored guidance is partial: missing correct/incorrect.
+> No authored guidance yet: when to use, correct/incorrect, and accessibility
+> are unwritten for this component. Nothing above tells you whether
+> reaching for `Backdrop` is the right call, only what it accepts.

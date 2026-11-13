@@ -10,12 +10,16 @@ Code-free guidance for a situation, shown on templates used as they are or tweak
 
 ## The patterns
 
-Four groups. Each pattern is one page: its situations first, then the key cases drawn on templates, then the usage spine. Reach for one when you are unsure of a choice or challenging it; Templates and patterns says how the layers fit together.
+Seven pages and one group of six States pages. Each pattern is one page: its situations first, then the key cases drawn on templates, then the usage spine. Reach for one when you are unsure of a choice or challenging it; Templates and patterns says how the layers fit together.
 
-- **Actions and input.** What a person does to a page: which button, where it sits, and how a form takes and checks what they type. Common actions · Forms
+- **Common actions.** Which button, in which look, in which place, with which word, and acting on many rows at once.
+- **Forms.** How a form takes and checks what someone types, and what happens on leaving with edits.
+- **Filtering.** How a person narrows a collection to the rows that matter, in five tiers.
+- **Navigation.** How a person moves between areas, views and records, with one control and one motion per move.
+- **Search.** How a person finds a record by typing, in one of three modes.
+- **Indicators.** The small labels that say how something is: its state, how many, how much it moved.
+- **Notifications.** What the product says back, and where: a Flag, a Banner, a SectionMessage, the Inbox.
 - **States.** What a view shows when it has nothing, is still working, has failed, has too much, or cannot be changed right now. Empty · Loading · Errors · Overflow · Disabled · Read-only
-- **Notifications and indicators.** What the product says back: passing notices, page conditions, the Inbox, and the tags that carry state, counts and change. Notifications · Indicators
-- **Finding things.** Moving between areas and records, and narrowing a collection to the rows that matter. Navigation · Search · Filtering
 
 ## Which pattern for which situation
 

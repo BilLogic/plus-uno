@@ -252,7 +252,7 @@ test('the real Templates tree is flat: eight templates, no Overlays folder', () 
   const at = tax.storySortOrder.indexOf('Templates');
   const order = tax.storySortOrder[at + 1];
   assert.deepEqual(order.filter((x) => typeof x === 'string'), [
-    'Templates and patterns', 'Overview', 'Frame', 'Page', 'Section', 'Form', 'Modal', 'Panel', 'Popup',
+    'Overview', 'Frame', 'Page', 'Section', 'Form', 'Modal', 'Panel', 'Popup',
   ]);
   assert.ok(!order.includes('Overlays'));
   assert.ok(!order.includes('Page templates'));

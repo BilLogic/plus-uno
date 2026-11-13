@@ -130,8 +130,8 @@ test('patternPages reads titles under Patterns/ and skips the Overview', () => {
   const dir = path.join(root, 'design-system/src/storybook-docs/patterns');
   fs.mkdirSync(path.join(dir, 'Filtering'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'Overview.mdx'), '<Meta title="Patterns/Overview" />');
-  fs.writeFileSync(path.join(dir, 'Filtering/Filtering.mdx'), '<Meta title="Patterns/Finding things/Filtering" />');
-  fs.writeFileSync(path.join(dir, 'Filtering/Filtering.stories.jsx'), "export default { title: 'Patterns/Finding things/Filtering/Examples' };");
+  fs.writeFileSync(path.join(dir, 'Filtering/Filtering.mdx'), '<Meta title="Patterns/Filtering" />');
+  fs.writeFileSync(path.join(dir, 'Filtering/Filtering.stories.jsx'), "export default { title: 'Patterns/Filtering/Examples' };");
   assert.deepEqual(patternPages(root), ['Filtering']);
 });
 

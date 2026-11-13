@@ -16,11 +16,11 @@ import {
     PageButtonsLeft,
 } from '@/storybook-docs/illustrations/form.jsx';
 
-<Meta title="Patterns/Actions and input/Common actions" tags={['!dev', 'manifest']} />
+<Meta title="Patterns/Common actions" tags={['!dev', 'manifest']} />
 
 <DocsLanding
-    page="patterns-actions-and-input-common-actions"
-    eyebrow="Pattern · Actions and input"
+    page="patterns-common-actions"
+    eyebrow="Pattern"
     title="Common actions"
     purpose="Which button, in which look, in which place, with which word. Cancel, Close, Reset, copy, edit, remove, the destructive tiers, and acting on many rows at once."
     links={{
@@ -163,7 +163,7 @@ Use Common actions when a page needs a button and the choice is about the look, 
 - For a menu of actions behind one trigger, use `DropdownMenu` from a More icon button.
 - For a main action with variations, use `SplitButton`.
 - For moving to another page, use `LinkButton`; a button acts on this page.
-- For narrowing rows, follow <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>: a filter is not an action.
+- For narrowing rows, follow <a target="_top" href="./?path=/docs/patterns-filtering--docs">Filtering</a>: a filter is not an action.
 
 </div>
 
@@ -232,7 +232,7 @@ Beside a Primary it is already clear the row is interactive, so Cancel steps bac
 
 <RuleTag kind="automatic" />
 
-The words and where they sit: <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs#say-reset-in-a-menu-and-reset-filters-everywhere-else">Filtering › Say Reset in a menu and Reset filters everywhere else</a>.
+The words and where they sit: <a target="_top" href="./?path=/docs/patterns-filtering--docs#say-reset-in-a-menu-and-reset-filters-everywhere-else">Filtering › Say Reset in a menu and Reset filters everywhere else</a>.
 
 ### Confirm a copy with a Copied tooltip, not a Flag.
 
@@ -244,7 +244,7 @@ The tooltip opens on the Copy button the moment the value is on the clipboard an
 
 <RuleTag kind="review" />
 
-A value read far more than changed takes `InlineEdit`: a pencil on hover and focus, saved on its own. The record's More menu includes Edit, which opens the form host the <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> pattern picks. Never put inline edits inside a form that has its own Save.
+A value read far more than changed takes `InlineEdit`: a pencil on hover and focus, saved on its own. The record's More menu includes Edit, which opens the form host the <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a> pattern picks. Never put inline edits inside a form that has its own Save.
 
 ### Name a destructive action by its tier.
 
@@ -319,8 +319,8 @@ A clickable card has no inner buttons; the whole card is the action. When a card
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>: use when the buttons submit fields.
-- <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>: use for Reset and Apply inside a filter menu.
+- <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a>: use when the buttons submit fields.
+- <a target="_top" href="./?path=/docs/patterns-filtering--docs">Filtering</a>: use for Reset and Apply inside a filter menu.
 - <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use for the confirm a destructive action raises.
 - <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a>: use when an action cannot run yet.
 
