@@ -154,12 +154,20 @@ function statusWords(status: string | null): string {
 
 /** F3's card: the to-do, where it came from, the people asked, and the
  *  drafted card behind Review. */
-export function todoItem(input: { id: string; people: readonly string[]; what: string; sourceUrl: string; fromNote: boolean }): ReportItem {
+export function todoItem(input: {
+  id: string;
+  people: readonly string[];
+  what: string;
+  sourceUrl: string;
+  /** The running note, the thread it is asked in, or a relayed channel's
+   *  thread, asked in #plus-design. */
+  from: "note" | "thread" | "relayed";
+}): ReportItem {
   return {
     id: input.id,
     kind: "roadmap-check-in",
     title: draftTitle(input.what) || "untitled",
-    subtitle: `from ${input.fromNote ? "the running note" : "this thread"}`,
+    subtitle: `from ${input.from === "note" ? "the running note" : input.from === "relayed" ? "a thread" : "this thread"}`,
     owners: ownersOf(input.people),
     body: "No Roadmap card found for this. Review holds the drafted card.",
     done: "the drafted Roadmap card is filed.",

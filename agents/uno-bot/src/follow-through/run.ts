@@ -77,7 +77,7 @@
 // Every dependency is injected (tests/card-follow-through.test.ts). `Env`
 // enters in `./env.ts`.
 
-import { teamOfChannel, type ChannelIds } from "../destination/index";
+import { relaysToDesign, teamOfChannel, type ChannelIds } from "../destination/index";
 import { D1QueryBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { pickDestination, resolveDestination, routeOwner, type ChannelKind, type SweepMessage, type SweepThread } from "../sweep/finding";
@@ -447,7 +447,7 @@ async function ownersOf(
 export interface TodoDeps extends Pick<JobContext, "runDate"> {
   detector: CardTodoDetector;
   store: CommitmentStore;
-  config: Pick<FollowThroughConfig, "unoBot">;
+  config: Pick<FollowThroughConfig, "unoBot" | "plusDesign" | "relayToDesign">;
   now(): number;
   dryRun?: boolean;
 }
@@ -469,6 +469,10 @@ export async function recordThreadCardTodos(thread: SweepThread, since: string, 
   const now = deps.now();
   const participants = [...new Set(thread.messages.map((m) => m.user))];
   const starter = thread.messages.find((m) => m.ts === thread.rootTs)?.user ?? thread.messages[0]?.user ?? "";
+  // A relayed channel's to-do is asked at #plus-design's top, as a running
+  // note's is, and links back to its thread (`relaysToDesign`).
+  const design = deps.config.plusDesign?.trim();
+  const relayTo = design && relaysToDesign(thread.channel, deps.config) ? design : null;
   const rows: CommitmentRecord[] = [];
   const texts: Record<string, CommitmentText> = {};
   for (const todo of found.todos) {
@@ -479,9 +483,9 @@ export async function recordThreadCardTodos(thread: SweepThread, since: string, 
     rows.push({
       id,
       kind: "card_todo",
-      channel: thread.channel,
-      channelKind: thread.channelKind,
-      threadTs: thread.rootTs,
+      channel: relayTo ?? thread.channel,
+      channelKind: relayTo ? "public" : thread.channelKind,
+      threadTs: relayTo ? "" : thread.rootTs,
       messageTs: todo.messageTs,
       promiserId: owner,
       requesterId: null,
@@ -501,7 +505,12 @@ export async function recordThreadCardTodos(thread: SweepThread, since: string, 
       remindedOn: null,
       resolvedAt: null,
     });
-    texts[id] = { what: todo.what, bodies: {}, participants: participants.filter((p) => p !== owner) };
+    texts[id] = {
+      what: todo.what,
+      bodies: {},
+      participants: participants.filter((p) => p !== owner),
+      ...(relayTo ? { sourceUrl: archiveUrl(thread.channel, todo.messageTs), relayed: true } : {}),
+    };
   }
   if (deps.dryRun || !rows.length) return rows;
   await keepRows(deps.store, rows, texts);
@@ -963,7 +972,7 @@ async function askFor(deps: DueDeps, c: CommitmentRecord, text: CommitmentText, 
   const card = text.card ?? { title: text.what, url: "", status: null };
   switch (c.kind as CardKind) {
     case "card_todo": {
-      const fromNote = !c.threadTs;
+      const fromNote = !c.threadTs && !text.relayed;
       const sourceUrl =
         text.sourceUrl ?? (fromNote ? null : await deps.slack.permalink(c.channel, c.messageTs)) ?? archiveUrl(c.channel, c.messageTs || c.threadTs);
       const drafted = await draftOperation(c, text, deps);
@@ -971,7 +980,7 @@ async function askFor(deps: DueDeps, c: CommitmentRecord, text: CommitmentText, 
         c,
         text,
         people,
-        item: todoItem({ id: c.id, people, what: text.what, sourceUrl, fromNote }),
+        item: todoItem({ id: c.id, people, what: text.what, sourceUrl, from: fromNote ? "note" : text.relayed ? "relayed" : "thread" }),
         card: statedCard("file this Roadmap card", todoReviewLead(String(drafted.input.title ?? text.what)), drafted),
       };
     }
@@ -1402,13 +1411,13 @@ async function acknowledge(deps: Pick<AnswerDeps, "update">, c: CommitmentRecord
  */
 export async function draftOperation(
   c: Pick<CommitmentRecord, "channel">,
-  text: Pick<CommitmentText, "what" | "sourceUrl">,
+  text: Pick<CommitmentText, "what" | "sourceUrl" | "relayed">,
   deps: { reads: Pick<CardReads, "pillarOptions">; config: FollowThroughConfig },
 ): Promise<ProposalOperation> {
   let pillar: string | undefined;
   const team = teamOfChannel(c.channel, deps.config);
   if (team) pillar = (await deps.reads.pillarOptions()).find((o) => o === team);
-  const where = text.sourceUrl ? `the running note (${text.sourceUrl})` : "a Slack thread";
+  const where = !text.sourceUrl ? "a Slack thread" : text.relayed ? `a Slack thread (${text.sourceUrl})` : `the running note (${text.sourceUrl})`;
   return {
     toolName: "notion_create",
     input: {

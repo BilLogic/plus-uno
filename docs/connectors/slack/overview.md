@@ -33,6 +33,7 @@ Pillar → channel map (group announcements; **all private — uno-bot must be i
 
 Every scheduled action sends a finding to the first rung that fits (`agents/uno-bot/src/destination/`):
 
+0. Evidence in a **relayed channel** (`SWEEP_RELAY_TO_DESIGN`: #plus-design-feedback) → #plus-design, at the top, linking back to its thread; only people in #plus-design are tagged (ADR-031, addendum 2026-11-13).
 1. Evidence in a private channel, a group DM or a DM → that place only.
 2. Evidence in a Slack thread → **that thread**.
 3. The team's channel, by the pillar → channel map above. The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when one of its pillars has a channel, and when none does (Tutoring, Help Center) the Figma file's team decides. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
@@ -71,7 +72,8 @@ The Worker's one proactive read of channels, whose rules are the `sweep` schedul
   - #uno-bot stays off the read path, whatever the list says.
 - **Audience rule.** A finding reaches only people who could already see its evidence:
   - a public thread's finding is posted in that thread;
-  - a private channel's stays there, with an owner and confirmers from that channel, and a group DM's goes back to that group DM. After a group-DM fix writes a page, a separate share card there offers a reworded note (page name only, no quote, no names) for rung 3 or 4, and only its own Approve posts it (`sweep_share_post`, a `worker` tool only the Worker stages);
+  - a relayed channel's goes to #plus-design (rung 0), the one exception;
+  - any other private channel's stays there, with an owner and confirmers from that channel, and a group DM's goes back to that group DM. After a group-DM fix writes a page, a separate share card there offers a reworded note (page name only, no quote, no names) for rung 3 or 4, and only its own Approve posts it (`sweep_share_post`, a `worker` tool only the Worker stages);
   - a fix found in both a public thread and a private place goes only on the private card (ADR-031);
   - findings in no thread take the posting ladder (§ The posting ladder).
 - **Reports** post at the next weekday 9 am ET run on the shared decision card: one live report per thread, up to 10 fixes, each its own proposal, and the rest queued until every fix on it is decided or lapses. A thread is taken while any fix of its report is live by the records or in ThreadState. Owners and thread posters can decide; a fix lapses after 24 weekday hours with no re-ping.

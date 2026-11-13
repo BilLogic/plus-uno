@@ -26,6 +26,7 @@
 // the fake adapter (tests/sweep-detector.test.ts, and the eval cases in
 // docs/evals/fixtures/sweep-drift-cases.json).
 
+import { toPlainText } from "../slack/mrkdwn";
 import type { ModelProvider } from "../agent/model-provider";
 import type { SweepSource, SweepThread } from "./finding";
 import { RICH_TEXT_TYPES } from "../integrations/notion-rich-text";
@@ -183,7 +184,9 @@ export function parseDetectorReply(text: string, thread: SweepThread, sources: S
     const evidenceTs = (Array.isArray(f.evidence_ts) ? f.evidence_ts : []).map(str).filter((ts) => threadTs.has(ts));
     if (!evidenceTs.length) continue;
     const sourceSays = cap(str(f.source_says), MAX_SAID_CHARS);
-    const threadSays = cap(str(f.thread_says), MAX_SAID_CHARS);
+    // A quote of Slack text carries its markup (`<@U…>`, `&amp;`): kept as
+    // the plain words it shows, so the card's escape runs on words only.
+    const threadSays = cap(toPlainText(str(f.thread_says)), MAX_SAID_CHARS);
     if (!sourceSays || !threadSays) continue;
 
     let blockId: string | null = null;

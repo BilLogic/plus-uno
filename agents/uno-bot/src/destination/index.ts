@@ -44,8 +44,9 @@ export type Addressee = { slack: string };
 /** What the ladder reads about a finding. */
 export interface FindingContext {
   /** Where the evidence was read; null when it is no conversation (a Notion
-   *  record, a check that reads none). */
-  evidence: { channel: string; channelKind: ChannelKind; threadTs: string | null } | null;
+   *  record, a check that reads none). `relayToDesign` marks a channel whose
+   *  findings go to #plus-design rather than back into it (`relaysToDesign`). */
+  evidence: { channel: string; channelKind: ChannelKind; threadTs: string | null; relayToDesign?: boolean } | null;
   /** The linked Roadmap card: its Product Pillar values, and its design owner
    *  as a Slack id — the caller passes one only when they are active. */
   card?: { pillars: readonly string[]; designOwner?: string | null } | null;
@@ -64,6 +65,9 @@ export function routeFinding(context: FindingContext): { destination: Destinatio
 }
 
 function destinationOf({ evidence, card, figmaFile }: FindingContext): Destination {
+  // A relayed channel is read like any other, but what it settles is the
+  // design team's to act on: it goes to #plus-design, never back into it.
+  if (evidence?.relayToDesign) return { rung: "design", channel: "plus-design" };
   if (evidence && evidence.channelKind !== "public") {
     return { rung: "private", channel: evidence.channel, threadTs: evidence.threadTs };
   }
@@ -94,9 +98,12 @@ export interface ChannelIds {
   plusTraining?: string;
   plusMarketing?: string;
   unoBot?: string;
+  /** Channels whose findings go to #plus-design instead of back into their
+   *  own thread (`SWEEP_RELAY_TO_DESIGN`). */
+  relayToDesign?: readonly string[];
 }
 
-const ID_KEYS: Record<ChannelRole, keyof ChannelIds> = {
+const ID_KEYS: Record<ChannelRole, Exclude<keyof ChannelIds, "relayToDesign" | "unoBot">> = {
   "plus-design": "plusDesign",
   "plus-universal": "plusUniversal",
   "plus-admin": "plusAdmin",
@@ -104,6 +111,16 @@ const ID_KEYS: Record<ChannelRole, keyof ChannelIds> = {
   "plus-training": "plusTraining",
   "plus-marketing": "plusMarketing",
 };
+
+/**
+ * Whether a channel's findings go to #plus-design rather than back into it.
+ *
+ * @param channel - Where the evidence was read
+ * @param ids - The Worker's channel ids, with the relay list
+ */
+export function relaysToDesign(channel: string, ids: Pick<ChannelIds, "relayToDesign">): boolean {
+  return (ids.relayToDesign ?? []).some((id) => id.trim() === channel);
+}
 
 /** Every role, #plus-design first. */
 export const CHANNEL_ROLES = Object.keys(ID_KEYS) as ChannelRole[];
