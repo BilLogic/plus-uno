@@ -316,6 +316,9 @@ function useTracker(initialSpeed = 1) {
 
 /** One tile: a scene's drawing, its arrows layer, the tap ring and its caption. */
 const Tile = ({ scene, state, arrows, dim, showArrows }) => {
+  // While a loop resets, the finished drawing fades out over the start state:
+  // a crossfade, so the tile never paints nothing.
+  const resetting = (state.fade ?? 1) < 1;
   return (
     <figure
       data-tile={scene.id}
@@ -325,9 +328,10 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
       style={{ margin: 0, display: 'grid', gridTemplateRows: 'subgrid', gridRow: 'span 3', gap: 'var(--stack-sm)', minInlineSize: 0 }}
     >
       <div style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text)' }}>{scene.title}</div>
-      <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)' }}>
+      <div style={{ borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', overflow: 'hidden' }}>
         <Illustration viewBox={scene.viewBox} title={scene.label ?? `${scene.title}. ${scene.caption}`}>
-          <g opacity={round(1 - dim * 0.7)}>
+          <g opacity={round(1 - dim * VEIL)}>
+            {resetting && <g>{scene.draw(startStates([scene])[scene.id])}</g>}
             <g opacity={round(state.fade ?? 1)}>{scene.draw(state)}</g>
           </g>
           {state.tapOpacity > 0 && (
@@ -350,6 +354,8 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
 };
 
 const NO_CHROME = { arrows: 0, dim: 0 };
+/** How far the arrows phase veils the drawing: light, so the window stays readable under the paths. */
+const VEIL = 0.15;
 /** Every scene at its start, with the layer's own keys at rest. */
 const startStates = (scenes, extra) =>
   Object.fromEntries(scenes.map((s) => [s.id, { fade: 1, tap: 0, tapOpacity: 0, tapX: 0, tapY: 0, ...s.initial, ...extra }]));
@@ -450,11 +456,11 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
           if (!live) return;
           await chromeCtx.hold(4);
           if (!live) return;
-          // Fade out, put every scene back at its start, fade in: a loop never jumps.
+          // Crossfade the landing out over the start state, then put every scene
+          // back at its start: a loop never jumps and a tile never goes empty.
           await Promise.all(contexts(false).map((ctx) => ctx.spring('fade', 0, 'appearance.default')));
           if (!live) return;
-          putStates(startStates(scenes, { fade: 0 }));
-          await Promise.all(contexts(false).map((ctx) => ctx.spring('fade', 1, 'appearance.default')));
+          putStates(startStates(scenes));
         }
       })();
     }
@@ -479,6 +485,7 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
   return (
     <section
       data-motion-demo
+      data-docs-stage
       data-phase={phase}
       data-speed={String(SPEEDS[speedIndex])}
       aria-labelledby={title ? titleId : undefined}

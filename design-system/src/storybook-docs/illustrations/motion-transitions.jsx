@@ -202,13 +202,14 @@ const focused = ({ id, title, caption, slide }) => ({
   arrows: [slide ? [[148, 50], [80, 50]] : [[128, 34], [80, 50]]],
   draw: ({ fr, f = 0, x = 0 }) => (
     <>
-      <g opacity={fr}>
-        <Screen x={8} y={6} w={144} h={88} header={false}>
+      {/* The window stays; only what is inside it fades, so the tile is never empty. */}
+      <Screen x={8} y={6} w={144} h={88} header={false}>
+        <g opacity={fr}>
           <PageHeader x={60} y={26} w={83} />
           <Row x={BODY.x} y={BODY.y} w={BODY.w} />
           <Row x={BODY.x} y={ROW.y} w={BODY.w} />
-        </Screen>
-      </g>
+        </g>
+      </Screen>
       {slide ? (
         <Clip x={8} y={6} w={144} h={88}>
           <Moved x={x * 144}>

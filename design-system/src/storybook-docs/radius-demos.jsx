@@ -127,7 +127,7 @@ const Legended = ({ testid, title, stage, parts, children }) => {
     return (
         <div data-testid={testid} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
             {probes}
-            <div style={well}>
+            <div data-docs-stage style={well}>
                 <div style={{ position: 'relative' }}>
                     <Illustration viewBox={`0 0 ${stage.w} ${stage.h}`} capped={false} title={title}>
                         {children}
@@ -292,7 +292,7 @@ const Values = ({ items }) => {
 /** A close-up in a well, its values beneath. */
 const CloseUp = ({ testid, children, values }) => (
     <div data-testid={testid} style={stack}>
-        <div style={well}>{children}</div>
+        <div data-docs-stage style={well}>{children}</div>
         {values && <Values items={values} />}
     </div>
 );

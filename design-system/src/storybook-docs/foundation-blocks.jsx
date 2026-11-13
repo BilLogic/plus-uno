@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StatusTag } from '@/components';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 
 /**
  * Building blocks for the Foundations docs pages: token tables whose values are
@@ -182,20 +183,6 @@ export const DoDont = ({ children }) => (
         {children}
     </div>
 );
-
-/** The page's contrast mode, followed as the toolbar changes it. */
-const usePageContrast = () => {
-    const read = () => (typeof document === 'undefined'
-        ? null
-        : document.documentElement.getAttribute('data-contrast-mode'));
-    const [contrast, setContrast] = useState(read);
-    useEffect(() => {
-        const observer = new MutationObserver(() => setContrast(read()));
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-contrast-mode'] });
-        return () => observer.disconnect();
-    }, []);
-    return contrast;
-};
 
 const MODES = [
     { id: 'both', label: 'Light and dark' },

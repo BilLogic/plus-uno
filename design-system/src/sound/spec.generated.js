@@ -199,30 +199,32 @@ export const SOUND_SPEC = {
     "goal": {
       "family": "Goal",
       "level": "soft",
-      "trim": -2.4,
-      "summary": "G4 and G5 glide to C5, then C6 (shared)",
+      "trim": -3.1,
+      "summary": "C5 C5, then G5 + C6: a fanfare (shared)",
       "notes": [
         {
-          "r": 0.75,
-          "to": 1,
+          "r": 1,
           "t": 0,
-          "d": 0.62,
-          "g": 0.6,
-          "gl": 0.22
+          "d": 0.07,
+          "g": 0.5
+        },
+        {
+          "r": 1,
+          "t": 0.09,
+          "d": 0.07,
+          "g": 0.5
         },
         {
           "r": 1.5,
-          "to": 1,
-          "t": 0,
-          "d": 0.62,
-          "g": 0.5,
-          "gl": 0.22
+          "t": 0.18,
+          "d": 0.7,
+          "g": 0.66
         },
         {
           "r": 2,
-          "t": 0.27,
-          "d": 0.5,
-          "g": 0.38
+          "t": 0.18,
+          "d": 0.7,
+          "g": 0.48
         }
       ],
       "base": 523.25

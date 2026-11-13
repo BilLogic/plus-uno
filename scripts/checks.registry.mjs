@@ -609,6 +609,14 @@ export const CHECKS = [
     guards: 'no rule in the docs stylesheet aiming at a class nothing puts in the DOM.',
   },
   {
+    name: 'check:docs-landing',
+    script: 'node scripts/check-docs-landing.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-docs-landing.mjs',
+    guards: 'covered Foundations, Templates and Patterns pages opening with DocsLanding, and every covered page id having a hero in the registry.',
+  },
+  {
     name: 'check:storybook-categories',
     script: 'node scripts/check-storybook-categories.mjs',
     pkg: 'root',

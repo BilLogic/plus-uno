@@ -5,6 +5,7 @@ import {
   ProgressTracker, Row, Screen, Section, Sidebar, StickyHeader, Tabs, Tooltip,
 } from './primitives.jsx';
 import { MOTION_SETS } from './primitives-motion.jsx';
+import { SHAPE_SETS } from './shapes.jsx';
 
 /**
  * Every primitive, neutral then accented, at the one scale the compositions use.
@@ -36,6 +37,8 @@ const SETS = [
   ['Anatomy marker', (a) => (<><Section x={44} y={22} w={100} h={56} /><AnatomyMarker x={20} y={50} tx={44} ty={34} accent={a} /></>)],
   // Motion's own primitives: chart axis and curve, trail, tap ring, pointer.
   ...MOTION_SETS,
+  // The cover shapes: timeline, waveform, isometric stack, Logo construction, spring trail, path.
+  ...SHAPE_SETS,
 ];
 
 export const IllustrationKitGallery = () => (

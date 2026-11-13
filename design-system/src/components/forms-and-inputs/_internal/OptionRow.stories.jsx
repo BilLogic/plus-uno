@@ -53,6 +53,20 @@ Kinds.play = async ({ canvasElement }) => {
     await expect(canvas.getByRole('option', { name: 'Create Music' })).toBeInTheDocument();
 };
 
+/** A default row is 32 high and a compact row 24, matching the field each belongs to. */
+export const Spacing = () => (
+    <div role="listbox" aria-label="Spacing" style={frame}>
+        <OptionRow label="Default row" />
+        <OptionRow label="Compact row" spacing="compact" />
+    </div>
+);
+
+Spacing.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('option', { name: 'Default row' }).getBoundingClientRect().height).toBe(32);
+    await expect(canvas.getByRole('option', { name: 'Compact row' }).getBoundingClientRect().height).toBe(24);
+};
+
 /**
  * What the Leading slot takes: tree indent and caret, a checkbox (including
  * partly checked), a radio, an icon or a drag handle. Trailing takes a Count,
