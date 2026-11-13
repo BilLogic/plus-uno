@@ -164,7 +164,7 @@ A heading is a real heading: a sub-topic is a `FoundationSubsection` or an `###`
 
 A covered Foundations, Templates or Patterns page opens with `<DocsLanding page eyebrow title purpose links />` (`design-system/src/storybook-docs/docs-landing/`), in this order: eyebrow, the page's one `h1`, its purpose, one row of quick links, then the hero. The hero is chosen by `page` from the hero registry (`hero-registry.jsx`), which also holds the sentence that is its accessible name; a hero draws no text. `npm run check:docs-landing` fails a covered page with no landing or no registry hero, and a later page joins by adding itself to `PAGES` in that script. The check also fails a landing page that still renders a body Contents block (the right rail lists the contents), and an overview card whose `hero` names no registry page.
 
-The hero tile is `--ds-surface-sunken`, about 1.06:1 against the white docs page in light mode, so it carries one hairline in `--ds-border-bold`, which reads against both the page and the tile in light, dark and both increased-contrast modes. The overview cards (`<TypeCard hero="<page id>">`) use the same tile through `HeroCard`: the registry drawing cropped to its 300 × 160-unit stage, never a separate thumbnail.
+The hero tile has no outline: its `--ds-surface-sunken` fill against the white page is the edge. The overview cards (`<TypeCard hero="<page id>">`) use the same tile through `HeroCard`: the registry drawing cropped to its 300 × 160-unit stage, never a separate thumbnail.
 
 ## Related
 
