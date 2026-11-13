@@ -12,7 +12,7 @@ test('a ?path= link names a docs or story id', () => {
 });
 
 test('a DocsLink names its page by id, and a story by id and story', () => {
-  assert.deepEqual(ids('<DocsLink id="foundations-basics-tokens">Tokens</DocsLink>'), ['foundations-basics-tokens--docs']);
+  assert.deepEqual(ids('<DocsLink id="foundations-tokens">Tokens</DocsLink>'), ['foundations-tokens--docs']);
   assert.deepEqual(ids('<DocsLink id="tools-documented-contract" story="documented-variants-render">x</DocsLink>'), [
     'tools-documented-contract--documented-variants-render',
   ]);

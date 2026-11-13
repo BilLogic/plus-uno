@@ -14,8 +14,8 @@ import { DragPastLimit, PLAYGROUND_DEMOS, SpringPlayground, limitWidth, playgrou
 
 export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
-  // The page itself is Foundations/Motion/Playground (MotionPlayground.mdx).
-  title: 'Foundations/Motion/Playground',
+  // The page itself is Foundations/Expression/Motion/Playground (MotionPlayground.mdx).
+  title: 'Foundations/Expression/Motion/Playground',
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };

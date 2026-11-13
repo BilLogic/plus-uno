@@ -77,7 +77,7 @@ function foundationPages(root) {
       holder = fs.readFileSync(abs, 'utf8');
     }
     const title = holder.match(/<Meta\b[^>]*?\btitle=["']([^"']+)["']/)?.[1] ?? holder.match(/\btitle:\s*['"]([^'"]+)['"]/)?.[1];
-    if (title?.startsWith('Foundations/Motion/') || title?.startsWith('Foundations/Sound/')) out.push({ file, tags: holder.match(TAGS)?.[1] ?? '' });
+    if (title?.startsWith('Foundations/Expression/Motion/') || title?.startsWith('Foundations/Expression/Sound/')) out.push({ file, tags: holder.match(TAGS)?.[1] ?? '' });
   }
   return out;
 }

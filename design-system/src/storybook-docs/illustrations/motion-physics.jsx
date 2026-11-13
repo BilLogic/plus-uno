@@ -9,7 +9,7 @@ import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
 import { BEAT, LOOP_PERIOD, measure, pair, projectedRest, ratioOf, resisted, springFor, springWithRatio, stepOf } from './motion.jsx';
 
 /**
- * The Physics page's figures (Foundations/Motion/Physics). Each is a principle,
+ * The Physics page's figures (Foundations/Expression/Motion/Physics). Each is a principle,
  * so it animates blocked-out kit shapes with no words; the app examples keep
  * the moving element as the one accented subject in a blocked-out screen.
  * Every scene lands at `landing`; the stories assert it.

@@ -7,12 +7,12 @@ import {
 } from '@/storybook-docs/foundation-page.jsx';
 import { SoundPlayers } from '@/storybook-docs/sound-docs.jsx';
 
-export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-sound-${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
+export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-expression-sound-${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
 
-<Meta title="Foundations/Sound/Overview" tags={['manifest']} />
+<Meta title="Foundations/Expression/Sound/Overview" tags={['manifest']} />
 
 <DocsLanding
-    page="foundations-sound-overview"
+    page="foundations-expression-sound-overview"
     eyebrow="Foundation · Sound"
     title="Sound"
     purpose="Sound marks the few moments worth hearing, and lands with the motion that shows them."
@@ -67,7 +67,7 @@ AI feedback adds three more, on the Sounds page.
 
 <FoundationRelated
     items={[
-        { title: 'Motion', description: 'The springs every sound lands with.', href: '?path=/docs/foundations-motion-physics--docs' },
+        { title: 'Motion', description: 'The springs every sound lands with.', href: '?path=/docs/foundations-expression-motion-physics--docs' },
         { title: 'Flag', description: 'The first component that plays a sound.', href: '?path=/docs/components-messaging-flag--docs' },
     ]}
 />

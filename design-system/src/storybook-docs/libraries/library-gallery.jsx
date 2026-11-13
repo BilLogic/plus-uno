@@ -428,22 +428,22 @@ export const EnterAndExit = () => {
 export const MotionGallery = () => (
     <LibraryGallery label="Motion">
         <GalleryGroup title="Springs">
-            <GalleryTile name="Spring to rest" docsId="foundations-motion-physics" cues={['replay', '½× speed']}>
+            <GalleryTile name="Spring to rest" docsId="foundations-expression-motion-physics" cues={['replay', '½× speed']}>
                 <SpringToRest />
             </GalleryTile>
         </GalleryGroup>
         <GalleryGroup title="Layout">
-            <GalleryTile name="Reorder" docsId="foundations-motion-transitions" cues={['drag', 'Space', 'arrows']}>
+            <GalleryTile name="Reorder" docsId="foundations-expression-motion-transitions" cues={['drag', 'Space', 'arrows']}>
                 <div style={{ width: '100%' }}>
                     <DragReorder />
                 </div>
             </GalleryTile>
-            <GalleryTile name="Enter and exit" docsId="foundations-motion-choreography" cues={['add', 'remove']}>
+            <GalleryTile name="Enter and exit" docsId="foundations-expression-motion-choreography" cues={['add', 'remove']}>
                 <EnterAndExit />
             </GalleryTile>
         </GalleryGroup>
         <GalleryGroup title="Gesture">
-            <GalleryTile name="Drag with resistance" docsId="foundations-motion-playground" cues={['drag past the limit', 'arrows']} bare>
+            <GalleryTile name="Drag with resistance" docsId="foundations-expression-motion-playground" cues={['drag past the limit', 'arrows']} bare>
                 <DragPastLimit />
             </GalleryTile>
         </GalleryGroup>

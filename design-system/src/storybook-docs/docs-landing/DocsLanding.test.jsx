@@ -106,11 +106,11 @@ describe('DocsLanding', () => {
     });
 
     it('builds a section\'s tab strip from the registry and marks the page current', () => {
-        render(<DocsLanding page="foundations-motion-physics" section="foundations-motion" eyebrow="Foundation · Motion" title="Physics" purpose="p" />);
+        render(<DocsLanding page="foundations-expression-motion-physics" section="foundations-motion" eyebrow="Foundation · Motion" title="Physics" purpose="p" />);
         const nav = screen.getByRole('navigation', { name: 'Physics pages' });
         const names = within(nav).getAllByText(/./).map((n) => n.textContent);
         expect(names).toEqual(['Principles', 'Physics', 'Transitions', 'Choreography', 'Library', 'Playground']);
         expect(within(nav).getByText('Physics')).toHaveAttribute('aria-current', 'page');
-        expect(within(nav).getByText('Library')).toHaveAttribute('href', '?path=/docs/foundations-motion-library--docs');
+        expect(within(nav).getByText('Library')).toHaveAttribute('href', '?path=/docs/foundations-expression-motion-library--docs');
     });
 });

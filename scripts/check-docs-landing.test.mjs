@@ -65,8 +65,8 @@ test('the real tree passes, and covers Color, the 12 other Foundations pages, th
   assert.equal(ids.filter((id) => id.startsWith('patterns-')).length, 14);
   assert.equal(ids.filter((id) => id.startsWith('templates-')).length, 10);
   assert.equal(ids.filter((id) => id.startsWith('foundations-')).length, 24);
-  assert.equal(ids.filter((id) => id.startsWith('foundations-motion-')).length, 6);
-  assert.equal(ids.filter((id) => id.startsWith('foundations-sound-')).length, 5);
+  assert.equal(ids.filter((id) => id.startsWith('foundations-expression-motion-')).length, 6);
+  assert.equal(ids.filter((id) => id.startsWith('foundations-expression-sound-')).length, 5);
   assert.ok(ids.includes('foundations-visual-color'));
   assert.ok(REGISTRY.endsWith('hero-registry.jsx'));
   assert.deepEqual(run(), []);

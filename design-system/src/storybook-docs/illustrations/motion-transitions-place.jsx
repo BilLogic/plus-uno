@@ -9,7 +9,7 @@ import { travel } from './trails.js';
 
 /**
  * The Transitions page's figures for Within a place, Above a place and Feedback
- * (Foundations/Motion/Transitions). Blocked out in kit shapes with no words;
+ * (Foundations/Expression/Motion/Transitions). Blocked out in kit shapes with no words;
  * every scene lands at `landing`, which the stories assert. A Don't is the same
  * scene with one rule broken, listed second in its demo.
  */

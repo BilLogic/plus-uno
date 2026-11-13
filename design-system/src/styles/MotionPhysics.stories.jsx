@@ -17,8 +17,8 @@ import { PHYSICS_DEMOS, SpringTokenTable, OneSpringFiveWays } from '@/storybook-
 
 export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
-  // The page itself is Foundations/Motion/Physics (MotionPhysics.mdx).
-  title: 'Foundations/Motion/Physics',
+  // The page itself is Foundations/Expression/Motion/Physics (MotionPhysics.mdx).
+  title: 'Foundations/Expression/Motion/Physics',
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };

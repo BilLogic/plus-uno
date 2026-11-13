@@ -176,29 +176,8 @@
   status = 301
   force = true
 
-# Foundations grouped under Basics, Visual, Layout and Brand headings on 2026-11-13:
-# each old flat id lands on its page under the heading.
-[[redirects]]
-  from = "/storybook/"
-  query = { path = "/docs/foundations-overview--docs" }
-  to = "/storybook/?path=/docs/foundations-basics-overview--docs"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/storybook/"
-  query = { path = "/docs/foundations-tokens--docs" }
-  to = "/storybook/?path=/docs/foundations-basics-tokens--docs"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/storybook/"
-  query = { path = "/docs/foundations-accessibility--docs" }
-  to = "/storybook/?path=/docs/foundations-basics-accessibility--docs"
-  status = 301
-  force = true
-
+# Foundations grouped under Brand, Visual, Layout, Expression, Accessibility and Tokens on 2026-11-13:
+# each old id, flat or under the retired Basics group, lands on its page.
 [[redirects]]
   from = "/storybook/"
   query = { path = "/docs/foundations-color--docs" }
@@ -266,6 +245,104 @@
   from = "/storybook/"
   query = { path = "/docs/foundations-illustrations--docs" }
   to = "/storybook/?path=/docs/foundations-brand-illustrations--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-basics-overview--docs" }
+  to = "/storybook/?path=/docs/foundations-overview--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-basics-tokens--docs" }
+  to = "/storybook/?path=/docs/foundations-tokens--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-basics-accessibility--docs" }
+  to = "/storybook/?path=/docs/foundations-accessibility--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-motion-principles--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-motion-principles--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-motion-physics--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-motion-physics--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-motion-choreography--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-motion-choreography--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-motion-transitions--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-motion-transitions--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-motion-library--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-motion-library--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-motion-playground--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-motion-playground--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-sound-overview--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-sound-overview--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-sound-sounds--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-sound-sounds--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-sound-when-to-play--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-sound-when-to-play--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-sound-with-motion--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-sound-with-motion--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-sound-settings-and-accessibility--docs" }
+  to = "/storybook/?path=/docs/foundations-expression-sound-settings-and-accessibility--docs"
   status = 301
   force = true
 

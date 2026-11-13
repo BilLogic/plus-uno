@@ -14,8 +14,8 @@ import { reducedStory, story } from '@/storybook-docs/illustrations/motion-story
 
 export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
-  // The page itself is Foundations/Motion/Transitions (MotionTransitions.mdx).
-  title: 'Foundations/Motion/Transitions',
+  // The page itself is Foundations/Expression/Motion/Transitions (MotionTransitions.mdx).
+  title: 'Foundations/Expression/Motion/Transitions',
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };

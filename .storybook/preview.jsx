@@ -173,50 +173,51 @@ const preview = {
           ],
           "Foundations",
           [
-            "Basics",
+            "Overview",
+            "Brand",
             [
-              "Overview",
-              "Tokens",
-              "Accessibility"
+              "Content",
+              "Logos",
+              "Illustrations"
             ],
             "Visual",
             [
               "Color",
               "Typography",
               "Iconography",
+              "Elevation",
               "Radius",
-              "Border",
-              "Elevation"
+              "Border"
             ],
             "Layout",
             [
               "Spacing",
               "Grid"
             ],
-            "Brand",
+            "Expression",
             [
-              "Logos",
-              "Illustrations"
+              "Motion",
+              [
+                "Principles",
+                "Physics",
+                "Choreography",
+                "Transitions",
+                "Library",
+                "Playground",
+                "Stage never blank",
+                "Engine speed"
+              ],
+              "Sound",
+              [
+                "Overview",
+                "Sounds",
+                "When to play",
+                "With motion",
+                "Settings and accessibility"
+              ]
             ],
-            "Motion",
-            [
-              "Principles",
-              "Physics",
-              "Choreography",
-              "Transitions",
-              "Library",
-              "Playground",
-              "Stage never blank",
-              "Engine speed"
-            ],
-            "Sound",
-            [
-              "Overview",
-              "Sounds",
-              "When to play",
-              "With motion",
-              "Settings and accessibility"
-            ]
+            "Accessibility",
+            "Tokens"
           ],
           "Components",
           [

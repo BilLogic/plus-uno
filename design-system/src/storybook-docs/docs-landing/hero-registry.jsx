@@ -64,12 +64,12 @@ import { OverviewHero as SoundOverviewHero, WhenToPlayHero, WithMotionHero, Soun
  * which is how the check reads it.
  */
 export const HEROES = {
-  'foundations-basics-overview': {
+  'foundations-overview': {
     Hero: FoundationsOverviewHero,
     description:
       'The foundations side by side, sized by weight: color, type, grid and space, elevation, icons, motion.',
   },
-  'foundations-basics-accessibility': {
+  'foundations-accessibility': {
     Hero: AccessibilityHero,
     description:
       'One big button: its focus ring and the target around it.',
@@ -114,7 +114,7 @@ export const HEROES = {
     description:
       'The scale itself: each step a square its own size.',
   },
-  'foundations-basics-tokens': {
+  'foundations-tokens': {
     Hero: TokensHero,
     description:
       'Chips repeat; one value threads through them.',
@@ -129,52 +129,52 @@ export const HEROES = {
     description:
       'One card painted by its role tokens, shown in light on the left and dark on the right; the primary button is the subject.',
   },
-  'foundations-sound-overview': {
+  'foundations-expression-sound-overview': {
     Hero: SoundOverviewHero,
     description: 'Three sounds as three waveforms; the chime is ringed.',
   },
-  'foundations-sound-when-to-play': {
+  'foundations-expression-sound-when-to-play': {
     Hero: WhenToPlayHero,
     description: 'A run of events along one line; only a few make a sound.',
   },
-  'foundations-sound-with-motion': {
+  'foundations-expression-sound-with-motion': {
     Hero: WithMotionHero,
     description: 'Two tracks, motion over sound; the tick where the shape lands is where the sound starts.',
   },
-  'foundations-sound-sounds': {
+  'foundations-expression-sound-sounds': {
     Hero: SoundsHero,
     description: 'The library as a list: play, waveform, name; one sound playing.',
   },
-  'foundations-sound-settings-and-accessibility': {
+  'foundations-expression-sound-settings-and-accessibility': {
     Hero: SettingsHero,
     description: 'Sound off, volume down: the person decides.',
   },
-  'foundations-motion-principles': {
+  'foundations-expression-motion-principles': {
     Hero: PrinciplesHero,
     description:
       'The four principles as four small scenes: show what changed, always responsive, move like real things, quiet until it counts.',
   },
-  'foundations-motion-physics': {
+  'foundations-expression-motion-physics': {
     Hero: PhysicsHero,
     description:
       'One shape drawn at equal time steps, fast at first, then settling past its target and back.',
   },
-  'foundations-motion-transitions': {
+  'foundations-expression-motion-transitions': {
     Hero: TransitionsHero,
     description:
       'Before and after: a list row becomes a card, and each part moves from where it was to where it lands, all downward, none crossing.',
   },
-  'foundations-motion-choreography': {
+  'foundations-expression-motion-choreography': {
     Hero: ChoreographyHero,
     description:
       'An editing timeline: an exit, a parent with its children, a burst of three short clips that do not overlap, a late pop and the playhead.',
   },
-  'foundations-motion-playground': {
+  'foundations-expression-motion-playground': {
     Hero: PlaygroundHero,
     description:
       'Three dials on the left and the shape they move on the right, drawn as stills settling past the target.',
   },
-  'foundations-motion-library': {
+  'foundations-expression-motion-library': {
     Hero: LibraryHero,
     description:
       'A shelf of named motions as stills, one large and ringed with its neighbors cropped.',
