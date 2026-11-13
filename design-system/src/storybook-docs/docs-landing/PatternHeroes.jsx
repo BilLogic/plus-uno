@@ -68,16 +68,6 @@ export const OverviewHero = () => (
     </HeroDrawing>
 );
 
-/** The More icon button: a square with three dots. */
-const MoreButton = ({ x, y, s }) => (
-    <g>
-        <Rect x={x} y={y} w={s} h={s} fill={PAINT.buttonDefault} stroke={PAINT.buttonDefaultBorder} corner="button" />
-        {[-1, 0, 1].map((i) => (
-            <circle key={i} cx={x + s / 2 + i * s * 0.2} cy={y + s / 2} r={s * 0.05} fill={PAINT.buttonDefaultText} />
-        ))}
-    </g>
-);
-
 /** A real button at a readable size: its box and its word as a bar in the label color. */
 const BigButton = ({ x, y, w, h, primary = false }) => (
     <g>
@@ -86,19 +76,18 @@ const BigButton = ({ x, y, w, h, primary = false }) => (
     </g>
 );
 
-/** The button group itself, centered and large: More, a Default, the Primary ringed. */
+/** The button group itself, centered and large: the secondary (Default) and the Primary, ringed. */
 export const CommonActionsHero = () => {
     const h = 28;
     const y = 80 - h / 2;
-    const more = { x: 26, w: h };
-    const def = { x: more.x + more.w + 8, w: 96 };
-    const primary = { x: def.x + def.w + 8, w: 120 };
+    const def = { w: 104 };
+    const primary = { w: 124 };
+    const x0 = (300 - (def.w + 8 + primary.w)) / 2;
     return (
         <HeroDrawing>
-            <MoreButton x={more.x} y={y} s={h} />
-            <BigButton x={def.x} y={y} w={def.w} h={h} />
-            <BigButton x={primary.x} y={y} w={primary.w} h={h} primary />
-            <Ring x={primary.x} y={y} w={primary.w} h={h} />
+            <BigButton x={x0} y={y} w={def.w} h={h} />
+            <BigButton x={x0 + def.w + 8} y={y} w={primary.w} h={h} primary />
+            <Ring x={x0 + def.w + 8} y={y} w={primary.w} h={h} />
         </HeroDrawing>
     );
 };

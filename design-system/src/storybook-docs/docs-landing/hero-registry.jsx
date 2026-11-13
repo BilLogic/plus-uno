@@ -187,7 +187,7 @@ export const HEROES = {
   'patterns-common-actions': {
     Hero: CommonActionsHero,
     description:
-      'The button group itself: More, a Default button and the Primary, ringed.',
+      'The button group itself: the secondary Default button and the Primary, ringed.',
   },
   'patterns-forms': {
     Hero: FormsHero,

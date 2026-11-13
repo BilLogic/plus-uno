@@ -40,20 +40,23 @@ export const HeroFit = createContext('xMidYMid meet');
  * An SVG the size of the whole frame, with the stage's origin at (0, 0) of its
  * children. Hidden from assistive tech: the frame carries the description.
  */
-export const HeroDrawing = ({ children }) => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox={`0 0 ${FRAME_UNITS.w} ${FRAME_UNITS.h}`}
-        preserveAspectRatio={useContext(HeroFit)}
-        aria-hidden="true"
-        focusable="false"
-        style={{ '--stroke-hairline': HERO_HAIRLINE }}
-    >
-        <HeroGround.Provider value>
-            <g transform={`translate(${STAGE_ORIGIN.x} ${STAGE_ORIGIN.y})`}>{children}</g>
-        </HeroGround.Provider>
-    </svg>
-);
+export const HeroDrawing = ({ children }) => {
+    const fit = useContext(HeroFit);
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox={`0 0 ${FRAME_UNITS.w} ${FRAME_UNITS.h}`}
+            preserveAspectRatio={fit}
+            aria-hidden="true"
+            focusable="false"
+            style={{ '--stroke-hairline': HERO_HAIRLINE }}
+        >
+            <HeroGround.Provider value>
+                <g transform={`translate(${STAGE_ORIGIN.x} ${STAGE_ORIGIN.y})`}>{children}</g>
+            </HeroGround.Provider>
+        </svg>
+    );
+};
 
 /**
  * One half of a split hero. The pane sets its own color mode, so the tokens it
