@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
@@ -7,8 +7,6 @@ import {
     FoundationRelated,
     FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
-
-export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
 
 <Meta title="Foundations/Overview" tags={['!dev']} />
 
@@ -39,28 +37,44 @@ Foundations are the tokens, guidelines and visual styles that every pattern and 
 
 <FoundationSection title="The fifteen foundations">
 
-Each foundation has a one-line definition.
+Each card shows the foundation's own hero and its one-line definition.
 
-<RefTable
-    head={['Group', 'Foundation', 'What it is']}
-    rows={[
-        ['Design tokens', <Page id="tokens">Tokens</Page>, 'Named values that store a design decision once, for every theme.'],
-        ['Guidelines', <Page id="accessibility">Accessibility</Page>, 'What makes the apps usable by everyone, and how each foundation supports it.'],
-        ['Guidelines', 'Content', 'How the words inside the apps are written. The guidance lives in the repo.'],
-        ['Guidelines', <Page id="spacing">Spacing</Page>, 'The space inside and between boxes, named by the job it does.'],
-        ['Guidelines', <Page id="grid">Grid</Page>, 'Two 12-column grids, the breakpoints and the content widths.'],
-        ['Styles', <Page id="color">Color</Page>, 'Every color as a token named for its job.'],
-        ['Styles', <Page id="typography">Typography</Page>, 'Heading, Body, Metric and Code text styles.'],
-        ['Styles', <Page id="motion">Motion</Page>, 'Duration, easing and what is allowed to move.'],
-        ['Styles', <Page id="sound-overview">Sound</Page>, 'Short synthesized sounds for the few moments worth hearing, landing with their motion.'],
-        ['Styles', <Page id="iconography">Iconography</Page>, 'Font Awesome Free icons at three sizes.'],
-        ['Styles', <Page id="illustrations">Illustrations</Page>, 'The hand-drawn characters for moments with room to breathe.'],
-        ['Styles', <Page id="logos">Logos</Page>, 'The PLUS mark, with or without the wordmark.'],
-        ['Styles', <Page id="elevation">Elevation</Page>, 'Surface and shadow pairs that lift a layer.'],
-        ['Styles', <Page id="border">Border</Page>, 'A width token paired with a color token.'],
-        ['Styles', <Page id="radius">Radius</Page>, 'Corner roundness: height ÷ 4, with buttons at 6 and 4.'],
-    ]}
-/>
+<FoundationSubsection title="Design tokens">
+
+<TypeGrid>
+<TypeCard hero="foundations-tokens" title="Tokens" to="foundations-tokens">Named values that store a design decision once, for every theme.</TypeCard>
+</TypeGrid>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Guidelines">
+
+<TypeGrid>
+<TypeCard hero="foundations-accessibility" title="Accessibility" to="foundations-accessibility">What makes the apps usable by everyone, and how each foundation supports it.</TypeCard>
+<TypeCard hero="foundations-spacing" title="Spacing" to="foundations-spacing">The space inside and between boxes, named by the job it does.</TypeCard>
+<TypeCard hero="foundations-grid" title="Grid" to="foundations-grid">Two 12-column grids, the breakpoints and the content widths.</TypeCard>
+</TypeGrid>
+
+Content, the fifteenth, has no page here: the guidance on how the words inside the apps are written lives in the repo.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Styles">
+
+<TypeGrid>
+<TypeCard hero="foundations-color" title="Color" to="foundations-color">Every color as a token named for its job.</TypeCard>
+<TypeCard hero="foundations-typography" title="Typography" to="foundations-typography">Heading, Body, Metric and Code text styles.</TypeCard>
+<TypeCard hero="foundations-motion-principles" title="Motion" to="foundations-motion">Duration, easing and what is allowed to move.</TypeCard>
+<TypeCard hero="foundations-sound-overview" title="Sound" to="foundations-sound-overview">Short synthesized sounds for the few moments worth hearing, landing with their motion.</TypeCard>
+<TypeCard hero="foundations-iconography" title="Iconography" to="foundations-iconography">Font Awesome Free icons at three sizes.</TypeCard>
+<TypeCard hero="foundations-illustrations" title="Illustrations" to="foundations-illustrations">The hand-drawn characters for moments with room to breathe.</TypeCard>
+<TypeCard hero="foundations-logos" title="Logos" to="foundations-logos">The PLUS mark, with or without the wordmark.</TypeCard>
+<TypeCard hero="foundations-elevation" title="Elevation" to="foundations-elevation">Surface and shadow pairs that lift a layer.</TypeCard>
+<TypeCard hero="foundations-border" title="Border" to="foundations-border">A width token paired with a color token.</TypeCard>
+<TypeCard hero="foundations-radius" title="Radius" to="foundations-radius">Corner roundness: height ÷ 4, with buttons at 6 and 4.</TypeCard>
+</TypeGrid>
+
+</FoundationSubsection>
 
 </FoundationSection>
 
@@ -68,8 +82,8 @@ Each foundation has a one-line definition.
 
 Every foundation page follows the same shape, so you can find the same thing in the same place.
 
-- A hero names the foundation, says what it is in one line.
-- Contents lists every section, Overview and Related included.
+- A landing opens the page: the foundation's name, what it is in one line, and its hero.
+- The right rail lists every section, Overview and Related included.
 - The foundation's own sections come next, then Accessibility, then Related last.
 - Examples are drawn from live tokens, so they follow the toolbar's Color mode and Contrast switches.
 
