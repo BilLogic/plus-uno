@@ -31,7 +31,6 @@ import { FREE_REGULAR_ICONS } from '@/lib/icon-regular.generated.js';
 import { SPEEDS, SPEED_LABELS, springFor } from '@/storybook-docs/illustrations/motion.jsx';
 import { DragReorder } from '@/storybook-docs/illustrations/motion-drag.jsx';
 import { DragPastLimit } from '@/storybook-docs/illustrations/motion-playground.jsx';
-import { FoundationHero } from '@/storybook-docs/foundation-page.jsx';
 import './library-gallery.css';
 
 /**
@@ -60,9 +59,6 @@ export const GalleryGroup = ({ title, children }) => (
         </ul>
     </section>
 );
-
-/** The hero of every Libraries page: the shared page hero, with the kind label "Library". */
-export const LibraryHero = (props) => <FoundationHero {...props} kind="Library" />;
 
 /**
  * One live example. `docsId` is the Storybook docs id the name links to;
