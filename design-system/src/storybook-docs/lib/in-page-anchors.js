@@ -14,8 +14,8 @@ export function handleInPageLink(event, doc = document, win = window) {
     const target = id && doc.getElementById(id);
     if (!target) return false;
     event.preventDefault();
-    const reduce = win.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    // An instant jump: a smooth scroll is cancelled inside the Storybook iframe, and docs motion is springs, not CSS smooth scrolling.
+    target.scrollIntoView({ block: 'start' });
     win.history.replaceState(win.history.state, '', `#${id}`);
     return true;
 }
