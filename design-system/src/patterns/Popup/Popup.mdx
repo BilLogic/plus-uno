@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PopupStories from './Popup.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -25,8 +26,21 @@ import {
 
 <Meta title="Templates/Popup/Popup" tags={['!dev', 'manifest']} />
 
-<Title>Popup</Title>
-A floating layer that hangs off its trigger and closes on an outside click. Five types: menu, select list, filter menu, profile menu and content.
+<DocsLanding
+    page="templates-popup-popup"
+    eyebrow="Template"
+    title="Popup"
+    purpose="A floating layer that hangs off its trigger and closes on an outside click. Five types: menu, select list, filter menu, profile menu and content."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+            { title: 'Popup component', href: './?path=/docs/components-overlays-and-layering-popup--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={PopupStories}>
 

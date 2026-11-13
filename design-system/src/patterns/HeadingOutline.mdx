@@ -1,12 +1,23 @@
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as HeadingOutlineStories from './HeadingOutline.stories.jsx';
 import { DocsCanvasShell, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={HeadingOutlineStories} />
 
-<Title />
-Headings step down one size per nesting level, and their tags follow the nesting. The page's one h1 is Heading large (24), a section's h2 is Heading medium (20), and a subsection's h3 is Heading small (16).
+<DocsLanding
+    page="templates-page-heading-outline"
+    eyebrow="Template · Page"
+    title="Heading outline"
+    purpose="Headings step down one size per nesting level, and their tags follow the nesting. The page's one h1 is Heading large (24), a section's h2 is Heading medium (20), and a subsection's h3 is Heading small (16)."
+    links={{
+        items: [
+            { title: 'Page', href: './?path=/docs/templates-page-page--docs' },
+            { title: 'Heading outline', current: true },
+        ],
+    }}
+/>
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/patterns/HeadingOutline.stories.jsx"

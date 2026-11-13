@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FrameStories from './Frame.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -55,8 +56,22 @@ export const colorTokens = [
     ['--ds-border-focused', 'The splitter\'s line while it has keyboard focus or is dragged.'],
 ];
 
-<Title>Frame</Title>
-The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare.
+<DocsLanding
+    page="templates-frame-frame"
+    eyebrow="Template"
+    title="Frame"
+    purpose="The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Page', href: './?path=/docs/templates-page-page--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+            { title: 'Navigation system', href: './?path=/docs/components-navigation-navigation-system--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={FrameStories}>
 

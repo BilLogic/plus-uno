@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PatternTableStories from './PatternTable.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -23,8 +24,19 @@ import {
 
 <Meta of={PatternTableStories} />
 
-<Title />
-The table pattern is how a table sits on a page. A Section holds the table, and the Section header carries the title and the toolbar. The table spans the section under it, plain, with no card around it and no padding of its own. The shell takes your head and rows, and adds a pagination slot and an empty-state slot.
+<DocsLanding
+    page="templates-section-table"
+    eyebrow="Template · Section"
+    title="Table"
+    purpose="The table pattern is how a table sits on a page. A Section holds the table, and the Section header carries the title and the toolbar. The table spans the section under it, plain, with no card around it and no padding of its own. The shell takes your head and rows, and adds a pagination slot and an empty-state slot."
+    links={{
+        items: [
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Card', href: './?path=/docs/templates-section-card--docs' },
+            { title: 'Table', current: true },
+        ],
+    }}
+/>
 
 `StaticTable`, `DynamicTable` and `TreeTable` are the components for the three table types.
 

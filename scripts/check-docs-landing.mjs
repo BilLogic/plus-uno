@@ -76,6 +76,19 @@ export const PAGES = [
   { file: 'design-system/src/styles/SoundWithMotion.mdx', id: 'foundations-sound-with-motion' },
   { file: 'design-system/src/styles/SoundSounds.mdx', id: 'foundations-sound-sounds' },
   { file: 'design-system/src/styles/SoundSettings.mdx', id: 'foundations-sound-settings-and-accessibility' },
+  { file: 'design-system/src/storybook-docs/templates/TemplatesOverview.mdx', id: 'templates-overview' },
+  { file: 'design-system/src/storybook-docs/templates/TemplatesAndPatterns.mdx', id: 'templates-templates-and-patterns' },
+  { file: 'design-system/src/patterns/Frame/Frame.mdx', id: 'templates-frame-frame' },
+  { file: 'design-system/src/patterns/Page/Page.mdx', id: 'templates-page-page' },
+  { file: 'design-system/src/patterns/HeadingOutline.mdx', id: 'templates-page-heading-outline' },
+  { file: 'design-system/src/patterns/PatternSection/PatternSection.mdx', id: 'templates-section-section' },
+  { file: 'design-system/src/patterns/PatternCard/PatternCard.mdx', id: 'templates-section-card' },
+  { file: 'design-system/src/patterns/PatternTable/PatternTable.mdx', id: 'templates-section-table' },
+  { file: 'design-system/src/patterns/Form/Form.mdx', id: 'templates-form' },
+  { file: 'design-system/src/patterns/PatternModal/PatternModal.mdx', id: 'templates-modal-modal' },
+  { file: 'design-system/src/patterns/Backdrop/Backdrop.mdx', id: 'templates-modal-backdrop' },
+  { file: 'design-system/src/patterns/Panel/Panel.mdx', id: 'templates-panel-panel' },
+  { file: 'design-system/src/patterns/Popup/Popup.mdx', id: 'templates-popup-popup' },
 ];
 
 const OLD_OPENER = /<FoundationHero\b|<Title\b/;

@@ -1,17 +1,24 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { ThreeLayers } from '@/storybook-docs/illustrations/compositions.jsx';
-import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
 <Meta title="Templates/Templates and patterns" tags={['!dev', 'manifest']} />
 
-<FoundationHero
-    kind="Guide"
+<DocsLanding
+    page="templates-templates-and-patterns"
+    eyebrow="Template"
     title="Templates and patterns"
-    summary="A template is an arrangement of components with slots. A pattern is the thinking baked into it."
+    purpose="A template is an arrangement of components with slots. A pattern is the thinking baked into it."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Templates', href: './?path=/docs/templates-overview--docs' },
+            { title: 'Patterns', href: './?path=/docs/patterns-overview--docs' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Three layers">
 
