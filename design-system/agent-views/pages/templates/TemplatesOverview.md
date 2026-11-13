@@ -26,14 +26,14 @@ A suggested starting point for each scenario, with the patterns to consult and t
 
 | Scenario | Template | Patterns | Components |
 | --- | --- | --- | --- |
-| An area page with one collection | Page · default, with a Section view bar alone | Filtering · Search | `PageHeader`, `Tabs` (pill), `FilterButton`, `IconButton`, `Button`, `Table` |
+| An area page with one collection | Page · default, with a Section view bar alone | Filtering · Search · Common actions | `PageHeader`, `Tabs` (pill), `FilterButton`, `IconButton`, `Button`, `Table` |
 | A home page with several Sections | Page · default, titled Sections, cards | Empty · Loading | `PageHeader`, `Card`, `Button` |
 | A record page, one level down | Page with a breadcrumb and page tabs | Navigation · Indicators | `Breadcrumb`, `PageHeader`, `StatusTag`, `Tabs`, `PopupSelect` |
 | Working through a queue | Section with a detail | Navigation · Common actions | `Table`, `Button` |
 | A quick look at one row | Panel · Details | Navigation | `Panel`, `Button` |
 | A short decision before going on | Modal · Active, confirm width | Common actions · Errors | `Modal`, `Button` |
 | A long task with steps | Frame · focused, with a Form in steps | Forms · Navigation | `ProgressTracker`, `Fieldset`, `Button` |
-| Settings saved as a group | Section with subsections, Form in a page | Forms · Read-only | `Fieldset`, `TextField`, `PopupSelect`, `Toggle`, `Button` |
+| Settings saved as a group | Section with subsections, Form in a page | Forms · Read-only · Disabled | `Fieldset`, `TextField`, `PopupSelect`, `Toggle`, `Button` |
 | Narrowing a long catalog | Section with a filter side | Filtering | `Checkbox`, `PopupSelect`, `Button` |
 | Signing in | Frame · bare | Forms · Errors | `Logo`, `TextField`, `Button` |
 | Notifications | Panel · Notifications (the Inbox) | Notifications | `Panel`, `Avatar`, `PopupSelect` |
