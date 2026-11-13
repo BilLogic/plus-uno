@@ -12,9 +12,9 @@ const ROWS = [
  * Section whose header carries the title and the action over a table. Copy it,
  * then replace the rows and the sidebar with the product's own.
  */
-const ListPage = ({ title = 'Members', rows = ROWS, sidebar }) => (
+const ListPage = ({ title = 'Members', rows = ROWS, sidebar, onAdd }) => (
     <Frame sidebar={sidebar} header={<Breadcrumb items={[{ text: 'Home', href: '/' }, { text: title }]} />}>
-        <PatternSection title={title} actions={<Button text="Add member" appearance="primary" spacing="compact" onClick={() => {}} />}>
+        <PatternSection level="page" title={title} actions={<Button text="Add member" appearance="primary" spacing="compact" onClick={onAdd} />}>
             <PatternTable>
                 <thead>
                     <tr>

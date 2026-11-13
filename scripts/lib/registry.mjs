@@ -22,7 +22,7 @@ const EXTS = ['', '.jsx', '.js', '.mjs', '.scss', '.css', '/index.jsx', '/index.
 const JS_IMPORT = /(^\s*(?:import|export)[^'"\n;]*?from\s*|^\s*import\s*|\bimport\()\s*(['"])([^'"\n]+)\2/gm;
 const SCSS_USE = /(@(?:use|forward|import)\s+|meta\.load-css\(\s*)(['"])([^'"\n]+)\2/g;
 /** Parts that are not the system's current, shippable source. */
-const NOT_SOURCE = /(\.stories\.|-node\.mjs$|\.test\.|\.mdx$|\.md$|(^|\/)\.storybook\/|(^|\/)storybook-docs\/|(^|\/)prototypes\/|(^|\/)(retired|deprecated|_retired|_deprecated)\/)/;
+const NOT_SOURCE = /(\.stories\.|-node\.mjs$|\.test\.|\.mdx$|\.md$|(^|\/)\.storybook\/|(^|\/)storybook-docs\/|(^|\/)prototypes\/|(^|\/)(retired|deprecated|_retired|_deprecated|specs)\/)/;
 const DEPRECATED_TAG = /^\s*\*?\s*@deprecated\b/m;
 
 const BARRELS = { '@/components': `${LIBRARY}/components/index.js`, '@/patterns': `${LIBRARY}/patterns/index.js` };

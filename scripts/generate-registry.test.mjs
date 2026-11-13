@@ -166,3 +166,8 @@ test('a template that imports a retired part is refused', () => {
   const root = withPatternsAndCharts({ [`${L}/patterns/retired/Old.jsx`]: 'export const Old = 1;\n', [`${L}/templates/ListPage/ListPage.jsx`]: "import { Old } from '../../patterns/retired/Old';\nexport default Old;\n" });
   assert.ok(generate(root, 'v1').problems.some((p) => /ListPage\.jsx: imports .*retired\/Old/.test(p)));
 });
+
+test('a template that imports a reserved spec is refused', () => {
+  const root = withPatternsAndCharts({ [`${L}/specs/Old.jsx`]: 'export const Old = 1;\n', [`${L}/templates/ListPage/ListPage.jsx`]: "import { Old } from '../../specs/Old';\nexport default Old;\n" });
+  assert.ok(generate(root, 'v1').problems.some((p) => /ListPage\.jsx: imports .*specs\/Old/.test(p)));
+});
