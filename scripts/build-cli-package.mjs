@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Bakes the `@plus-uno/cli` package: `packages/cli/dist/` gets the lookup's own
- * source (the import closure of `scripts/ds.mjs`, at the same repo-relative paths)
+ * source (the import closure of `scripts/ds.mjs` and the MCP server, at the same repo-relative paths)
  * and a snapshot of the facts it reads, so `dist/` is a repo root as far as
  * `createLookup` can tell. The snapshot is the file set the hosted `/mcp/ds` bundles
  * (netlify.toml `[functions."ds-mcp"]`), minus consumer code, which only `ds check` reads.
@@ -15,7 +15,8 @@ import { isEntry } from './lib/findings.mjs';
 
 export const PACKAGE_DIR = path.join(REPO_ROOT, 'packages/cli');
 export const DIST = path.join(PACKAGE_DIR, 'dist');
-const ENTRY = 'scripts/ds.mjs';
+// `ds` and `ds mcp` (the stdio server), both over the same lookup.
+const ENTRIES = ['scripts/ds.mjs', 'scripts/lib/ds-mcp-server.mjs'];
 
 /** The snapshot: [folder, extensions | null for any, extra file names] and single files, repo-relative. */
 export const SNAPSHOT_DIRS = [
@@ -33,8 +34,7 @@ export const SNAPSHOT_FILES = [
 const IMPORT = /^\s*(?:import|export)[^'"\n;]*from\s*['"]([^'"]+)['"]|^\s*import\s*['"]([^'"]+)['"]/gm;
 
 /** Every repo-relative file `entry` imports, itself included. */
-export function importClosure(entry, root = REPO_ROOT) {
-  const seen = new Set();
+export function importClosure(entry, root = REPO_ROOT, seen = new Set()) {
   const walk = (file) => {
     seen.add(file);
     for (const m of fs.readFileSync(path.join(root, file), 'utf8').matchAll(IMPORT)) {
@@ -58,7 +58,8 @@ function* files(dir, exts, names, root) {
 
 /** Every repo-relative file the package carries, sorted. */
 export function bakedFiles(root = REPO_ROOT) {
-  const set = new Set(importClosure(ENTRY, root));
+  const set = new Set();
+  for (const entry of ENTRIES) importClosure(entry, root, set);
   for (const f of SNAPSHOT_FILES) if (fs.existsSync(path.join(root, f))) set.add(f);
   for (const [dir, exts, names] of SNAPSHOT_DIRS) for (const f of files(dir, exts, names, root)) set.add(f);
   return [...set].sort();

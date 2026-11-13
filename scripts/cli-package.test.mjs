@@ -13,6 +13,18 @@ import { PACKAGE_NAME } from '../packages/cli/src/constants.mjs';
 const PKG = path.join(REPO_ROOT, 'packages/cli');
 const sh = (cmd, args, cwd) => execFileSync(cmd, args, { cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, env: { ...process.env, npm_config_audit: 'false', npm_config_fund: 'false' } });
 
+/** Speak MCP over stdio to `npx ds mcp` in `cwd`: initialize, then tools/list. */
+function mcpTools(cwd) {
+  const input = [
+    { jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'seam-test', version: '0' } } },
+    { jsonrpc: '2.0', method: 'notifications/initialized' },
+    { jsonrpc: '2.0', id: 2, method: 'tools/list' },
+  ].map((m) => JSON.stringify(m)).join('\n') + '\n';
+  const out = execFileSync('npx', ['--no-install', 'ds', 'mcp'], { cwd, input, encoding: 'utf8', timeout: 60_000 });
+  const reply = out.split('\n').filter(Boolean).map((l) => JSON.parse(l)).find((m) => m.id === 2);
+  return reply.result.tools;
+}
+
 test('package name is held in one constant', () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(PKG, 'package.json'), 'utf8'));
   assert.equal(pkg.name, PACKAGE_NAME);
@@ -49,6 +61,11 @@ test('npm pack, install in a scratch project, `npx ds find Button` answers from 
     assert.match(sh('npx', ['--no-install', 'ds', 'get', 'Button'], project), /Button/);
     assert.ok(sh('npx', ['--no-install', 'ds', 'tokens', 'color'], project).length > 0);
     assert.ok(sh('npx', ['--no-install', 'ds', 'guide'], project).length > 0);
+
+    // `ds mcp`: the stdio server from the installed tarball lists its five tools.
+    const tools = mcpTools(project);
+    assert.deepEqual(tools.map((t) => t.name), ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check']);
+    assert.ok(!('paths' in tools.find((t) => t.name === 'ds_check').inputSchema.properties), 'the packaged server reads no paths');
   } finally {
     fs.rmSync(scratch, { recursive: true, force: true });
   }
