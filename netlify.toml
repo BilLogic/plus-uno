@@ -412,6 +412,13 @@
   force = true
 
 [[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-forms-and-inputs-date-time-picker-date-picker--docs" }
+  to = "/storybook/?path=/docs/components-forms-and-inputs-date-time-picker-date-picker-date-picker--docs"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/storybook/*"
   to = "/storybook/:splat"
   status = 200

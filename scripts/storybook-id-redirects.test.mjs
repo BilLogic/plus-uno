@@ -13,6 +13,7 @@ const FAMILIES = {
   'components-forms-and-inputs-radio': 'Components/Forms and inputs/Radio/Radio',
   'components-forms-and-inputs-select': 'Components/Forms and inputs/Select/Select',
   'components-forms-and-inputs-date-time-picker': 'Components/Forms and inputs/Date time picker/Date time picker',
+  'components-forms-and-inputs-date-time-picker-date-picker': 'Components/Forms and inputs/Date time picker/Date picker/Date picker',
   'components-labels-tag': 'Components/Labels/Tag/Tag',
   'components-text-and-data-display-code': 'Components/Text and data display/Code/Code',
   'components-navigation-navigation-system': 'Components/Navigation/Navigation system/Navigation system',
@@ -20,7 +21,7 @@ const FAMILIES = {
 };
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 47);
+  assert.equal(rules.length, 48);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
     if (r.from in FAMILIES) continue;
