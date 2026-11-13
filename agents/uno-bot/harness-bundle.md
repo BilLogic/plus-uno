@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 140,514 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 140,541 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -53,7 +53,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,169 |
+| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,196 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
 | `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 9,103 |
@@ -2402,7 +2402,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | Dev Mode links for merged PRs | morning run: `figma-dev-links-post` — the PRs merged into main since the last card that changed `design-system/src/components/`, one card on `sweep-post`'s #plus-design message | Bill | [`src/figma-links/`](../../agents/uno-bot/src/figma-links/) |
 | Figma snapshot refresh | each publish (the end-of-day `figma-snapshot-refresh` job's `repository_dispatch`) or `workflow_dispatch` | Bill | [`figma-snapshot-refresh.yml`](../../.github/workflows/figma-snapshot-refresh.yml) |
 | Figma notifications | each comment or change on a subscribed team's file, at `POST /figma/events` | Bill | [`src/figma-notify/`](../../agents/uno-bot/src/figma-notify/) |
-| Figma notification subscriptions | on demand (`workflow_dispatch` from `main`; `create` waits for the `uno-bot-production` reviewer) | Bill | [`figma-subscriptions.yml`](../../.github/workflows/figma-subscriptions.yml) |
+| Figma notification subscriptions | on demand (`workflow_dispatch` from `main`; `create` reads the passcode from the main-only `uno-bot-production` environment) | Bill | [`figma-subscriptions.yml`](../../.github/workflows/figma-subscriptions.yml) |
 | Figma backstop | end-of-day run: three `figma-backstop` jobs | Bill | [`src/figma-notify/backstop.ts`](../../agents/uno-bot/src/figma-notify/backstop.ts) |
 | End-of-day sweep | end-of-day run: `sweep-channel` (one per `SWEEP_CHANNELS` entry), `sweep-group-dms`, `sweep-dms`, `sweep-notes`, `sweep-cards`; morning run: `sweep-post`, after every job that hands it a section, spawns one `sweep-post:<place>` job a place — one message a place; `figma-drift-post`; both runs: `figma-drift-recheck` | Bill | [`sweep`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) |
 | Figma comments | end-of-day run: `sweep-figma-comments`; morning run: `sweep-figma-post`; an @uno ask, at `POST /figma/events` | Bill | [`figma-comments`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) |

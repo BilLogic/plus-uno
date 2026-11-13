@@ -14,10 +14,12 @@ name: Figma notification subscriptions
 #             creates nothing that exists, and stops at the first failure
 #   • status  each subscription's newest deliveries and how the route answered
 #
-# BILL'S OK IS THE GATE ON `create` (#884, #891). Its job runs in the
-# uno-bot-production environment, whose required reviewer approves the run
-# before the passcode is read. `list` and `status` only read, so they run
-# without it, and never see the passcode.
+# THE GATE ON `create` IS THE MANUAL DISPATCH FROM `main`. Its job runs in the
+# uno-bot-production environment, which admits `main` only, so the passcode is
+# never read from another branch. That environment had a required reviewer
+# (#884, #891) until 2026-11-12, when Bill dropped it to unblock uno-bot's
+# deploys, and he accepted the dispatch alone as the gate here. `list` and
+# `status` only read, so they skip the environment and never see the passcode.
 #
 # The defaults are the 12 #896 asks for: FILE_COMMENT and FILE_UPDATE on all
 # six teams. #895's first step made FILE_COMMENT on Universal alone and checked
@@ -93,7 +95,7 @@ jobs:
     if: inputs.action == 'create'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # The approval in front of the passcode: Bill's OK, given in Actions.
+    # The passcode lives here, readable from `main` only. See the header.
     environment: uno-bot-production
     steps:
       - name: Refuse a run off the default branch
