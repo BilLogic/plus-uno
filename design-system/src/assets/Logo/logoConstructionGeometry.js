@@ -24,3 +24,7 @@ export const PLUS_CENTER = [PLUS_BOX.x + PLUS_BOX.w / 2, PLUS_BOX.y + PLUS_BOX.h
 export const GRID = Array.from({ length: 11 }, (_, i) => (i + 1) * 8);
 
 export const DIAGONALS = [[0, 0, BOX, BOX], [BOX, 0, 0, BOX]];
+
+/** The mark's tile corner, and the plus's arms as the Logo draws them (large size). */
+export const MARK_CORNER = 16;
+export const PLUS_ARMS = { length: 24, thick: 6, horizontal: 5.58, radius: 1.25 };

@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { HEROES } from './hero-registry.jsx';
+import { PAINT } from '../illustrations/paint.js';
 
 const FOUNDATION_IDS = [
     'foundations-overview',
@@ -44,7 +45,7 @@ describe('Foundations heroes', () => {
 
     it.each(FOUNDATION_IDS)('%s paints only through tokens', (id) => {
         const { container } = render(React.createElement(HEROES[id].Hero));
-        for (const value of paints(container)) expect(value).toMatch(/^var\(--ds-[a-z-]+\)$/);
+        for (const value of paints(container)) expect(value === PAINT.markTile || /^var\(--ds-[a-z-]+\)$/.test(value), value).toBe(true);
     });
 
     it.each(FOUNDATION_IDS)('%s puts the brand accent on its subject', (id) => {
@@ -60,5 +61,28 @@ describe('Foundations heroes', () => {
     it('Logos draws the kit construction: the four corner circles', () => {
         const { container } = render(React.createElement(HEROES['foundations-logos'].Hero));
         expect(container.querySelectorAll('[data-shape="logo-construction"] circle[stroke-dasharray]')).toHaveLength(4);
+    });
+
+    it('Logos draws the mark: a rounded tile at the mark radius and the whole white plus', () => {
+        const { container } = render(React.createElement(HEROES['foundations-logos'].Hero));
+        const tile = container.querySelector('rect[fill="' + PAINT.markTile + '"]');
+        expect(tile).not.toBeNull();
+        expect(tile.getAttribute('rx')).toBe('16');
+        const arms = [...container.querySelectorAll('rect[fill="' + PAINT.pageSurface + '"][rx="1.25"]')];
+        expect(arms.map((a) => [a.getAttribute('width'), a.getAttribute('height')])).toEqual([['24', '5.58'], ['6', '24']]);
+        // the plus sits inside the tile: nothing clipped by the plus box
+        for (const a of arms) {
+            expect(+a.getAttribute('x') + +a.getAttribute('width')).toBeLessThanOrEqual(96);
+            expect(+a.getAttribute('y')).toBeGreaterThanOrEqual(0);
+        }
+    });
+
+    it('Radius: the surface corner is the circle it comes from, drawn dashed whole', () => {
+        const { container } = render(React.createElement(HEROES['foundations-radius'].Hero));
+        const surface = container.querySelector('rect[fill="' + PAINT.cardSurface + '"]');
+        const circle = container.querySelector('circle[stroke-dasharray]');
+        expect(surface.getAttribute('rx')).toBe(circle.getAttribute('r'));
+        expect(+circle.getAttribute('cx')).toBe(+surface.getAttribute('x') + +surface.getAttribute('rx'));
+        expect(+circle.getAttribute('cy')).toBe(+surface.getAttribute('y') + +surface.getAttribute('ry'));
     });
 });

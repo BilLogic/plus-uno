@@ -167,7 +167,10 @@ export const ROLE_SOURCES = Object.fromEntries(
   ]),
 );
 
-export const PAINT = Object.fromEntries(Object.entries(ROLES).map(([role, [token]]) => [role, `var(${token})`]));
+export const PAINT = {
+  ...Object.fromEntries(Object.entries(ROLES).map(([role, [token]]) => [role, `var(${token})`])),
+  /* docs-literal: the Logo mark's desaturated tile is a mix of two tokens, and no token carries that gray. */ markTile: 'color-mix(in srgb, var(--ds-text) 22%, var(--ds-surface-sunken))',
+};
 
 /** A role's real token, at full scale. A foreignObject box scales it by half itself. */
 export const CORNER_TOKEN = Object.fromEntries(Object.entries(CORNERS).map(([role, [token]]) => [role, `var(${token})`]));

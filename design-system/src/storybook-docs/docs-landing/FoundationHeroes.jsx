@@ -252,7 +252,7 @@ export const IllustrationsHero = () => (
 
 export const LogosHero = () => (
   <HeroDrawing>
-    <LogoConstruction x={75} y={5} size={150} accent />
+    <LogoConstruction x={75} y={5} size={150} accent mark />
   </HeroDrawing>
 );
 
