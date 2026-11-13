@@ -22,8 +22,8 @@ test('every pre-regroup Foundations id lands on its page in the new groups', () 
   const to = Object.fromEntries(rules.map((r) => [r.from, r.to]));
   const expected = {
     'foundations-basics-overview': 'foundations-overview',
-    'foundations-basics-tokens': 'foundations-tokens-color',
-    'foundations-tokens': 'foundations-tokens-color',
+    'foundations-basics-tokens': 'foundations-tokens-library',
+    'foundations-tokens': 'foundations-tokens-library',
     'foundations-basics-accessibility': 'foundations-accessibility',
     'foundations-motion-principles': 'foundations-expression-motion-principles',
     'foundations-motion-library': 'foundations-expression-motion-library',

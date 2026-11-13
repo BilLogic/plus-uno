@@ -1,0 +1,40 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import { FoundationSection, FoundationRelated } from '@/storybook-docs/foundation-page.jsx';
+import { TokenLibrary } from '@/storybook-docs/token-library-blocks.jsx';
+
+<Meta title="Foundations/Tokens/Library" />
+
+<DocsLanding
+    page="foundations-tokens-library"
+    eyebrow="Foundation · Tokens"
+    title="Library"
+    purpose="Every token in one place: search by name, narrow by collection, tier and scope, and copy a name."
+    section="foundations-tokens"
+/>
+
+<FoundationSection title="Overview">
+
+Tokens form a ladder. A primitive is a raw value, such as a palette step or a spacing step, and is never used in a feature. A semantic token names a job and points at a primitive: Global tokens apply anywhere, Components tokens belong to one component, and Templates tokens belong to the page frame. A screen binds the semantic token whose job matches, so one decision is made once and every mode follows.
+
+Search matches part of a name; turn on Exact match to find one whole name. The filters and the search combine, and the count shows how many tokens remain. Select a name to copy it. A color role shows its Light and Dark value.
+
+</FoundationSection>
+
+<FoundationSection title="Find a token">
+
+<TokenLibrary />
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Color', description: 'The palette and the roles built on it.', href: '?path=/docs/foundations-tokens-color--docs' },
+        { title: 'Spacing and size', description: 'Space, size, radius and the frame tokens.', href: '?path=/docs/foundations-tokens-spacing-and-size--docs' },
+        { title: 'Motion', description: 'Spring primitives and the motion tokens.', href: '?path=/docs/foundations-tokens-motion--docs' },
+    ]}
+/>
+
+</FoundationSection>

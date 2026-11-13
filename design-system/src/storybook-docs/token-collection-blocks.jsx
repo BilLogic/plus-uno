@@ -23,7 +23,7 @@ import springs from '@/tokens/ladder/_springs.scss?raw';
  */
 
 // A file name decides where a Components token with no named family lands.
-const SOURCES = [
+export const SOURCES = [
     ['_scales.scss', scales],
     ['_type.scss', type],
     ['_frame_layers.scss', frameLayers],
@@ -37,7 +37,7 @@ const SOURCES = [
     ['ladder/_springs.scss', springs],
 ].map(([file, text]) => ({ file, text }));
 
-const corpus = collectTokens(SOURCES);
+export const corpus = collectTokens(SOURCES);
 
 const TWO_WORD = new Set(['focused', 'frame', 'font', 'line', 'scroll', 'option', 'menu', 'join', 'choice', 'progress', 'count', 'focus', 'ai', 'motion', 'grid', 'type']);
 

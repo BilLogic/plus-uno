@@ -23,6 +23,7 @@ const FOUNDATION_IDS = [
     'foundations-tokens-spacing-and-size',
     'foundations-tokens-elevation-and-layers',
     'foundations-tokens-motion',
+    'foundations-tokens-library',
     'foundations-visual-typography',
 ];
 

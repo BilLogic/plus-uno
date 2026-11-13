@@ -21,6 +21,7 @@ export const SECTIONS = {
         ['foundations-tokens-spacing-and-size', 'Spacing and size'],
         ['foundations-tokens-elevation-and-layers', 'Elevation and layers'],
         ['foundations-tokens-motion', 'Motion'],
+        ['foundations-tokens-library', 'Library'],
     ]),
     'foundations-sound': strip([
         ['foundations-expression-sound-overview', 'Overview'],
