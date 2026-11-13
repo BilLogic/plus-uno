@@ -152,7 +152,7 @@ export const HEROES = {
   'foundations-expression-motion-principles': {
     Hero: PrinciplesHero,
     description:
-      'The four principles as four small scenes: show what changed, always responsive, move like real things, quiet until it counts.',
+      'The four principles as four small scenes: always responsive, build understanding, lead with empathy, cut the noise.',
   },
   'foundations-expression-motion-physics': {
     Hero: PhysicsHero,
