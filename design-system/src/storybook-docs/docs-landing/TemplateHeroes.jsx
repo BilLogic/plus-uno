@@ -32,7 +32,7 @@ import { HeroDrawing, FRAME_UNITS, STAGE_UNITS } from './HeroDrawing.jsx';
  */
 
 /** A page-surface rectangle with its edge, or the ring when it is the subject. */
-const Surface = ({ x, y, w, h, ring = false, corner }) => (
+const PageFill = ({ x, y, w, h, ring = false, corner }) => (
     <Rect x={x} y={y} w={w} h={h} fill={PAINT.pageSurface} stroke={ring ? PAINT.accent : PAINT.illustrationEdge} corner={corner} />
 );
 
@@ -78,7 +78,7 @@ export const TemplatesAndPatternsHero = () => (
         <ButtonShape x={15} y={59} w={22} appearance="primary" />
         <Rule x1={50} x2={64} y1={63} y2={63} dash="1 2" />
         {/* A template, ringed: the component inside a Section. */}
-        <Surface x={66} y={22} w={106} h={82} ring corner="section" />
+        <PageFill x={66} y={22} w={106} h={82} ring corner="section" />
         <SkeletonBar x={76} y={32} w={40} h={5} heading />
         {[0, 1, 2].map((i) => (
             <React.Fragment key={i}>
@@ -90,7 +90,7 @@ export const TemplatesAndPatternsHero = () => (
         <ButtonShape x={130} y={88} w={30} appearance="primary" />
         <Rule x1={174} x2={188} y1={63} y2={63} dash="1 2" />
         {/* A pattern places it on a Frame; the Frame bleeds past the stage. */}
-        <Surface x={190} y={14} w={130} h={100} />
+        <PageFill x={190} y={14} w={130} h={100} />
         <Rect x={200} y={24} w={90} h={34} fill={PAINT.sectionSubtleSurface} stroke={PAINT.illustrationEdge} corner="section" />
         <Rect x={200} y={64} w={90} h={34} fill={PAINT.sectionSubtleSurface} stroke={PAINT.illustrationEdge} corner="section" />
         <ButtonShape x={256} y={36} w={26} appearance="primary" />
@@ -106,7 +106,7 @@ export const FrameHero = () => {
             <Sidebar x={sb.x} y={sb.y} w={sb.w} h={sb.h} />
             <Rect x={sb.x - 2} y={sb.y - 2} w={sb.w + 4} h={sb.h + 4} fill="none" stroke={PAINT.accent} corner="window" />
             {/* The Page: a top bar, then rows. */}
-            <Surface x={sb.x + sb.w} y={f.y} w={150} h={f.h} />
+            <PageFill x={sb.x + sb.w} y={f.y} w={150} h={f.h} />
             <SkeletonBar x={sb.x + sb.w + 10} y={f.y + 8} w={50} h={5} heading />
             <Rect x={f.x + f.w - 26 - 56} y={f.y + 6} w={14} h={8} fill={PAINT.countSurface} corner="full" />
             <Rows x={sb.x + sb.w + 10} w={130} y={f.y + 24} n={7} pitch={16} />
@@ -128,7 +128,7 @@ export const PageHero = () => {
         <HeroDrawing>
             <Ground {...outer} />
             <IconColumn x={outer.x + 11} y={outer.y + 18} />
-            <Surface {...page} ring />
+            <PageFill {...page} ring />
             <SkeletonBar x={page.x + pad} y={page.y + 10} w={60} h={6} heading />
             <SkeletonBar x={page.x + pad} y={page.y + 22} w={100} />
             <ButtonShape x={page.x + page.w - pad - 30} y={page.y + 10} w={30} appearance="primary" />
@@ -140,7 +140,7 @@ export const PageHero = () => {
 
 export const HeadingOutlineHero = () => (
     <HeroDrawing>
-        <Surface x={50} y={-20} w={200} h={200} />
+        <PageFill x={50} y={-20} w={200} h={200} />
         <SkeletonBar x={68} y={4} w={108} h={6} accent heading />
         <Rule x1={74} x2={74} y1={16} y2={126} stroke={PAINT.rowDivider} />
         <Rule x1={88} x2={88} y1={46} y2={70} stroke={PAINT.rowDivider} />
@@ -163,7 +163,7 @@ export const SectionHero = () => {
     const side = { x: right - 76, y: s.y + 44, w: 76, h: 52 };
     return (
         <HeroDrawing>
-            <Surface {...s} ring corner="section" />
+            <PageFill {...s} ring corner="section" />
             {/* The header: heading at the content's left edge. */}
             <SkeletonBar x={left} y={s.y + 12} w={44} h={5} accent heading />
             <SkeletonBar x={left + 52} y={s.y + 13} w={40} />
@@ -205,7 +205,7 @@ export const TableHero = () => {
     const rowY = (i) => t.y + 28 + i * 17;
     return (
         <HeroDrawing>
-            <Surface {...t} ring corner="section" />
+            <PageFill {...t} ring corner="section" />
             {cols.map((cx, i) => (
                 <SkeletonBar key={cx} x={cx} y={t.y + 12} w={i === 0 ? 40 : 26} h={4} heading />
             ))}
@@ -230,7 +230,7 @@ export const FormHero = () => {
     const half = (w - 8) / 2;
     return (
         <HeroDrawing>
-            <Surface {...col} ring />
+            <PageFill {...col} ring />
             <Field x={x} y={2} w={w} />
             <Field x={x} y={38} w={w} />
             <Field x={x} y={74} w={half} />
@@ -261,7 +261,7 @@ export const BackdropHero = () => {
             {/* The screen under the Backdrop: Sidebar, header, two cards. */}
             <Ground {...screen} />
             <Sidebar x={screen.x} y={screen.y} w={44} h={screen.h} />
-            <Surface x={screen.x + 44} y={screen.y} w={screen.w - 44} h={screen.h} />
+            <PageFill x={screen.x + 44} y={screen.y} w={screen.w - 44} h={screen.h} />
             <SkeletonBar x={screen.x + 56} y={screen.y + 10} w={50} h={5} heading />
             <ButtonShape x={screen.x + screen.w - 12 - 30} y={screen.y + 8} w={30} appearance="primary" />
             <CardBox x={screen.x + 56} y={screen.y + 34} w={84} h={70} />
@@ -291,7 +291,7 @@ export const PanelHero = () => {
         <HeroDrawing>
             <Ground {...f} />
             <IconColumn x={f.x + 9} y={f.y + 20} />
-            <Surface x={f.x + 26} y={f.y} w={f.w - 26 - panel.w} h={f.h} />
+            <PageFill x={f.x + 26} y={f.y} w={f.w - 26 - panel.w} h={f.h} />
             <SkeletonBar x={f.x + 36} y={f.y + 10} w={48} h={5} heading />
             <Rows x={f.x + 36} w={panel.x - f.x - 36 - 10} y={f.y + 26} n={7} pitch={16} />
             <Rect {...panel} fill={PAINT.panelSurface} stroke={PAINT.illustrationEdge} />
@@ -316,7 +316,7 @@ export const PopupHero = () => {
     const popup = { w: 76, h: 66 };
     return (
         <HeroDrawing>
-            <Surface {...page} corner="window" />
+            <PageFill {...page} corner="window" />
             <SkeletonBar x={left} y={11} w={52} h={5} heading />
             <Rows x={left} w={right - left} y={30} n={9} pitch={14} />
             {/* The trigger sits at the bar's end, aligned to the rows' right edge. */}
