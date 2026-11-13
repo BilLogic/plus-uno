@@ -5,6 +5,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as FormsStories from './Forms.stories.jsx';
 import { STAGE } from './formsDemo.jsx';
+import { PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -47,7 +48,7 @@ import {
 A form lives in one of four hosts. The <a target="_top" href="./?path=/docs/templates-form--docs">Form</a> template draws each; this pattern says which to pick and how the form behaves inside it.
 
 <TypeGrid>
-<TypeCard of={FormsStories.HostPage} title="In a page" stage={STAGE}>Settings and anything saved as a group. Buttons left-aligned under the fields.</TypeCard>
+<TypeCard of={FormsStories.HostPage} title="In a page" stage={PAGE_WIDTH}>Settings and anything saved as a group. Buttons left-aligned under the fields.</TypeCard>
 <TypeCard of={FormsStories.HostPanel} title="In a Panel" stage={STAGE}>A short edit from a table, with the page in view. Cancel and Save full bleed at the bottom.</TypeCard>
 <TypeCard of={FormsStories.HostModal} title="In a Modal" stage={STAGE}>A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col.</TypeCard>
 <TypeCard of={FormsStories.HostSteps} title="In steps" stage={STAGE}>A long task on Frame · focused: steps down the left side when there are five or more.</TypeCard>
@@ -261,7 +262,7 @@ The form's title is the page, Panel or Modal heading. Groups take a `Fieldset` l
 <tr><td>Fields</td><td><a target="_top" href="./?path=/docs/templates-form--docs">Form</a> template</td><td>There is no Form component: a Fieldset groups the fields inside a host.</td></tr>
 <tr><td>Rejection at the top</td><td>`SectionMessage`</td><td>A danger message, scrolled into view.</td></tr>
 <tr><td>Choices</td><td>`RadioGroup`, `Select`, `DatePicker`</td><td>A control that cannot be wrong.</td></tr>
-<tr><td>Hosts</td><td><a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>, <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>, <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>, <a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a></td><td>Page, Panel, Modal and steps.</td></tr>
+<tr><td>Hosts</td><td><a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a>, <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>, <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a></td><td>A page (on the Page itself, no Section around it), a Panel, a Modal, or steps on Frame · focused.</td></tr>
 <tr><td>Confirm view</td><td>Modal</td><td>Swapped in place today. <PlannedTag /> A confirm view prop is Planned.</td></tr>
 </tbody>
 </DocsTable>

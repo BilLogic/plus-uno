@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Backdrop, ButtonShape, Field, Panel, Rect, Row, Rule, Section, SkeletonBar } from './primitives.jsx';
+import { Backdrop, ButtonShape, Field, Panel, Rect, Row, Rule, SkeletonBar } from './primitives.jsx';
 
 /**
  * The Form template's do and don't drawings. Each lesson is about where the
@@ -21,11 +21,10 @@ const Canvas = ({ title, children }) => (
   </Illustration>
 );
 
-/** A Section with the subtle fill holding the fields; the buttons sit where the caller puts them. */
+/** The fields straight on the Page, under the page header bar; no Section around them. The buttons sit where the caller puts them. */
 const PageForm = ({ fields = 2, children, columns = 1 }) => (
   <g>
     <Rect x={8} y={8} w={W - 16} h={H - 16} fill={PAINT.pageSurface} corner="section" />
-    <Section x={14} y={14} w={W - 28} h={H - 28} subtle rows={0} />
     <SkeletonBar x={22} y={22} w={36} h={5} heading />
     {Array.from({ length: fields }, (_, i) => {
       const col = columns === 2 ? i % 2 : 0;

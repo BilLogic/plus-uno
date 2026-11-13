@@ -4,7 +4,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as CommonActionsStories from './CommonActions.stories.jsx';
-import { STAGE } from './commonActionsDemo.jsx';
+import { PAGE_WIDTH, STAGE } from './commonActionsDemo.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -57,7 +57,7 @@ Primary, Default, Subtle, Warning, Danger, Discovery and AI. One Primary per are
 The place sets the alignment. A page form's buttons start under the fields; a layer's end where the eye does.
 
 <TypeGrid>
-<TypeCard of={CommonActionsStories.PlacementPage} title="In a page form" stage={STAGE}>Left-aligned under the fields, Primary first, Cancel Subtle beside it.</TypeCard>
+<TypeCard of={CommonActionsStories.PlacementPage} title="In a page form" stage={PAGE_WIDTH}>Left-aligned under the fields, Primary first, Cancel Subtle beside it.</TypeCard>
 <TypeCard of={CommonActionsStories.PlacementModal} title="In a Modal" stage={STAGE}>Full bleed across the footer: Cancel (Default) left, Primary right, Close in the header. The footer is 48 high and never moves.</TypeCard>
 <TypeCard of={CommonActionsStories.PlacementFocused} title="In a focused task" stage={STAGE}>The bottom bar: Cancel (Subtle) at the start, Back and Next at the end. Back is disabled on the first step.</TypeCard>
 <TypeCard of={CommonActionsStories.PlacementCard} title="In a card" stage={STAGE}>The main action is Subtle in the footer. A clickable card has no inner buttons; when in doubt, full-span inside tiles.</TypeCard>
