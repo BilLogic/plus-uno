@@ -4754,6 +4754,15 @@
           "deprecated": null
         },
         {
+          "name": "timer",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Draws a 4 px countdown bar as the flag's top cap, emptying over `delay`, and steps the corners from 12 to 4. For a timed action such as Undo: the first action undoes, `onDismiss` commits. The bar and the wait pause while the flag is hovered or focused.",
+          "deprecated": null
+        },
+        {
           "name": "className",
           "type": "string",
           "required": false,
@@ -4819,6 +4828,7 @@
         "Bold",
         "Interactive",
         "Dismiss",
+        "UndoTimer",
         "FlagContent",
         "UnknownAppearance",
         "ActionKinds",
@@ -4854,6 +4864,9 @@
         "--ds-icon-warning-inverse",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-opacity-disabled",
         "--ds-shadow-overlay",
         "--ds-surface",
         "--ds-surface-overlay",
@@ -4864,6 +4877,8 @@
         "--flag-min-height",
         "--flag-offset",
         "--flag-pad",
+        "--flag-radius-timer",
+        "--flag-timer-height",
         "--heading-xsmall",
         "--icon-md",
         "--inline-lg",

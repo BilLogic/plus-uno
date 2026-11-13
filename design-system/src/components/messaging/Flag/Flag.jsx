@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { animate, motion } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
+import ProgressBar from '@/components/loading/ProgressBar';
 import Button from '@/components/forms-and-inputs/Button';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import { MESSAGE_APPEARANCE_ICONS } from '../messageAppearance';
@@ -84,6 +85,7 @@ export const Flag = ({
     onDismiss,
     delay = FLAG_AUTO_CLOSE_MS,
     autohide,
+    timer = false,
     className = '',
     headerClass = '',
     bodyClass = '',
@@ -136,14 +138,56 @@ export const Flag = ({
         onDismiss?.(event);
     };
 
+    /*
+     * The wait pauses while the flag is hovered or holds focus, so reading it never costs the
+     * chance to act, and resumes with the time that was left. Hover and focus are tracked apart:
+     * leaving one while the other holds keeps it paused.
+     */
+    const [hovered, setHovered] = useState(false);
+    const [focused, setFocused] = useState(false);
+    const paused = hovered || focused;
+    const remaining = useRef(delay);
     useEffect(() => {
-        if (!show || !closesItself || !(delay > 0)) return undefined;
-        const timer = setTimeout(() => {
+        remaining.current = delay;
+        // A flag removed under the pointer or the focus gets no leave or blur: clear both with it.
+        if (!show) {
+            setHovered(false);
+            setFocused(false);
+        }
+    }, [delay, show]);
+
+    /*
+     * The bar. Only a flag that closes itself counts down. Driven with `animate` rather than a CSS
+     * animation, so the app-wide reduced-motion rule (which turns CSS animations off) leaves the
+     * countdown running: it is information, not movement. It pauses with the wait.
+     */
+    const barRef = useRef(null);
+    const countdown = useRef(null);
+    const counts = timer && closesItself && delay > 0;
+    useEffect(() => {
+        const fill = barRef.current?.querySelector('.plus-progressbar-fill');
+        if (!show || !counts || !fill) return undefined;
+        const controls = animate(fill, { transform: ['scaleX(1)', 'scaleX(0)'] }, { duration: delay / 1000, ease: 'linear' });
+        countdown.current = controls;
+        return () => { controls.stop(); countdown.current = null; };
+    }, [show, counts, delay]);
+    useEffect(() => {
+        if (paused) countdown.current?.pause();
+        else countdown.current?.play();
+    }, [paused, show, counts, delay]);
+
+    useEffect(() => {
+        if (!show || !closesItself || !(delay > 0) || paused) return undefined;
+        const startedAt = Date.now();
+        const timeout = setTimeout(() => {
             exitKind.current = 'timeout';
             onDismissRef.current?.();
-        }, delay);
-        return () => clearTimeout(timer);
-    }, [show, closesItself, delay]);
+        }, remaining.current);
+        return () => {
+            clearTimeout(timeout);
+            remaining.current = Math.max(0, remaining.current - (Date.now() - startedAt));
+        };
+    }, [show, closesItself, delay, paused]);
 
     /*
      * Leaving. A flag that was showing keeps its place until its exit animation ends, then
@@ -204,12 +248,23 @@ export const Flag = ({
             id={id}
             data-reduced={reduced ? 'true' : 'false'}
             data-leaving={!show ? exitKind.current : undefined}
-            className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''} ${className}`}
+            className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''}${timer ? ' plus-flag--timer' : ''} ${className}`}
+            data-paused={paused ? 'true' : undefined}
             role={liveRole}
             aria-live={livePoliteness}
             aria-atomic="true"
             {...props}
+            onMouseEnter={(event) => { setHovered(true); props.onMouseEnter?.(event); }}
+            onMouseLeave={(event) => { setHovered(false); props.onMouseLeave?.(event); }}
+            onFocus={(event) => { setFocused(true); props.onFocus?.(event); }}
+            onBlur={(event) => { setFocused(false); props.onBlur?.(event); }}
         >
+            {timer && (
+                // The top cap, decorative: it counts down over `delay` (linear) and pauses with the wait.
+                <div className="plus-flag-timer" ref={barRef} aria-hidden="true" data-counting={counts ? 'true' : undefined}>
+                    <ProgressBar value={100} ariaLabel="Time left" />
+                </div>
+            )}
             {/*
               * The icon sits on the title's first line: a box one title line
               * tall, so a wrapping title keeps it on line 1.
@@ -310,6 +365,8 @@ Flag.propTypes = {
     delay: PropTypes.number,
     /** Close itself after `delay`. Defaults to true for normal, information and success; warning and error never close themselves. */
     autohide: PropTypes.bool,
+    /** Draws a 4 px countdown bar as the flag's top cap, emptying over `delay`, and steps the corners from 12 to 4. For a timed action such as Undo: the first action undoes, `onDismiss` commits. The bar and the wait pause while the flag is hovered or focused. */
+    timer: PropTypes.bool,
     /** Extra class on the flag surface. */
     className: PropTypes.string,
     /** Extra class on the header row that holds the title and timestamp. */
@@ -325,11 +382,11 @@ Flag.propTypes = {
 };
 
 /**
- * FlagGroup: where flags sit: bottom-left by default, fixed to the screen,
+ * FlagGroup: where flags sit: top-right by default, fixed to the screen,
  * Popover/gap-screen 8 from its edges, stacking Popover/stack-flag 16 apart.
  */
 export const FlagGroup = ({
-    position = 'bottom-start', // 'top-start', 'top-center', 'top-end', 'middle-start', etc.
+    position = 'top-end', // 'top-start', 'top-center', 'top-end', 'middle-start', etc.
     containerPosition = 'fixed',
     className = '',
     reducedMotion,
@@ -349,6 +406,7 @@ export const FlagGroup = ({
 );
 
 FlagGroup.propTypes = {
+    /** Where the stack sits: `top-end` (default), `top-start`, `top-center`, `middle-*` or `bottom-*`. */
     position: PropTypes.string,
     /** `fixed` (default) holds the stack to the screen; `absolute` or `static` to a parent. */
     containerPosition: PropTypes.string,
