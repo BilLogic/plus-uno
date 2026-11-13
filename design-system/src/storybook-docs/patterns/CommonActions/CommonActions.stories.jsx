@@ -20,6 +20,7 @@ import {
     Reset,
     STAGE,
     Sending,
+    PAGE_WIDTH,
 } from './commonActionsDemo.jsx';
 
 /**
@@ -64,7 +65,7 @@ export const AppearancesRow = {
 /** A page form: left-aligned under the fields, Primary first, Cancel Subtle. */
 export const PlacementPage = {
     name: 'Placement: In a page',
-    render: () => staged(<Page />),
+    render: () => staged(<Page />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });

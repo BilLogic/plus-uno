@@ -21,7 +21,7 @@ The place sets the footer. The fields are the same everywhere.
 
 ### In a page
 
-Settings saved as a group, in a Section with the subtle fill.
+Settings saved as a group, drawn in the Frame with the Sidebar docked. The form sits straight on the Page: its title is the page-level Section header, the page's `h1`, and the fields and footer follow it with no Section around them. A settings page with several groups can use subsections under that header.
 
 1. **Message slot.** At the top, for a server failure.
 2. **Group.** One Fieldset per group of fields that describe one thing, with its legend.
@@ -120,7 +120,7 @@ When to validate, what a blocked submit does, required and optional marks, and l
 ## Related
 
 - Frame: use for a stepped form on its own page, in the focused type.
-- Section: use for the region a page form sits in.
+- Section: use for the page header a page form sits under, and for subsections when settings have several groups.
 - Modal: use for a rare, critical task with few fields.
 - Panel: use for a short edit with the page still in view.
 - Patterns: use for the rules across forms: Forms, Common actions, Loading, Disabled, Errors.

@@ -61,7 +61,7 @@ A suggested starting point for each scenario, with the patterns to consult and t
 | A quick look at one row | Panel · Details | Navigation | `Panel`, `Button` |
 | A short decision before going on | Modal · Active, confirm width | Common actions · Errors | `Modal`, `Button` |
 | A long task with steps | Frame · focused, with a Form in steps | Forms · Navigation | `ProgressTracker`, `Fieldset`, `Button` |
-| Settings saved as a group | Section with subsections, Form in a page | Forms · Read-only · Disabled | `Fieldset`, `TextField`, `PopupSelect`, `Toggle`, `Button` |
+| Settings saved as a group | Form in a page, on the Page under its page-level header; subsections for several groups | Forms · Read-only · Disabled | `Fieldset`, `TextField`, `PopupSelect`, `Toggle`, `Button` |
 | Narrowing a long catalog | Section with a filter side | Filtering | `Checkbox`, `PopupSelect`, `Button` |
 | Signing in | Frame · bare | Forms · Errors | `Logo`, `TextField`, `Button` |
 | Notifications | Panel · Notifications (the Inbox) | Notifications | `Panel`, `Avatar`, `PopupSelect` |

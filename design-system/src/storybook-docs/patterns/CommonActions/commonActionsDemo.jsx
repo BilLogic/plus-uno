@@ -5,7 +5,7 @@ import { PatternCard, PatternSection } from '@/patterns';
 import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
-import { FormFields, FILLED, PageFooter } from '../../../patterns/Form/formDemo.jsx';
+import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
 import { ModalStage, TwoCells } from '../../../patterns/PatternModal/modalDemo.jsx';
 
 /**
@@ -26,6 +26,9 @@ import { ModalStage, TwoCells } from '../../../patterns/PatternModal/modalDemo.j
 /** The width a picture lays out at, in px: docs geometry. */
 export const STAGE = 1024; // docs-literal
 
+/** A page form's stage: wide enough for the Frame to dock its Sidebar. */
+export const PAGE_WIDTH = FORM_PAGE_WIDTH;
+
 const text = (copy) => <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{copy}</p>;
 
 /** Every appearance with the word it takes: one Primary, one AI, the rest in their places. */
@@ -45,13 +48,8 @@ export const Appearances = () => (
     </div>
 );
 
-/** Buttons under a page form: left-aligned, Primary first, Cancel Subtle. */
-export const Page = () => (
-    <PatternSection title="Log a session" fill="subtle">
-        <FormFields values={FILLED} onChange={() => {}} />
-        <PageFooter onSave={() => {}} />
-    </PatternSection>
-);
+/** Buttons under a page form: left-aligned, Primary first, Cancel Subtle. The form sits on the Page, in the Frame. */
+export const Page = () => <FormInPage initial={FILLED} />;
 
 /** A Modal's footer: full bleed, Cancel (Default) left and the action right; Close sits in the header. */
 export const ModalFooter = () => (

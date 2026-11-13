@@ -4,6 +4,7 @@ import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FormStories from './Form.stories.jsx';
+import { PAGE_WIDTH } from './formDemo.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
@@ -46,7 +47,7 @@ import {
 The place sets the footer. The fields are the same everywhere.
 
 <TypeGrid>
-<TypeCard of={FormStories.TypePage} title="In a page">Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first.</TypeCard>
+<TypeCard of={FormStories.TypePage} title="In a page" stage={PAGE_WIDTH}>Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first.</TypeCard>
 <TypeCard of={FormStories.TypePanel} title="In a Panel">Editing a record beside the page. A full-bleed footer, only while editing.</TypeCard>
 <TypeCard of={FormStories.TypeModal} title="In a Modal">Fewer than five fields. A full-bleed footer, Primary furthest right.</TypeCard>
 <TypeCard of={FormStories.TypeSteps} title="In steps">Frame · focused with the form in the body. The bar carries Cancel, Back and Next.</TypeCard>
@@ -60,7 +61,7 @@ The place sets the footer. The fields are the same everywhere.
 
 ### In a page
 
-Settings saved as a group, in a Section with the subtle fill.
+Settings saved as a group, drawn in the Frame with the Sidebar docked. The form sits straight on the Page: its title is the page-level Section header, the page's `h1`, and the fields and footer follow it with no Section around them. A settings page with several groups can use subsections under that header.
 
 <Story of={FormStories.AnatomyPage} inline />
 
@@ -294,7 +295,7 @@ Pair two fields side by side only when they belong together, such as first and l
 ## Related
 
 - <DocsLink id="templates-frame">Frame</DocsLink>: use for a stepped form on its own page, in the focused type.
-- <DocsLink id="templates-section-section">Section</DocsLink>: use for the region a page form sits in.
+- <DocsLink id="templates-section-section">Section</DocsLink>: use for the page header a page form sits under, and for subsections when settings have several groups.
 - <DocsLink id="templates-modal-modal">Modal</DocsLink>: use for a rare, critical task with few fields.
 - <DocsLink id="templates-panel-panel">Panel</DocsLink>: use for a short edit with the page still in view.
 - <DocsLink id="patterns-overview">Patterns</DocsLink>: use for the rules across forms: <DocsLink id="patterns-forms">Forms</DocsLink>, <DocsLink id="patterns-common-actions">Common actions</DocsLink>, Loading, Disabled, Errors.

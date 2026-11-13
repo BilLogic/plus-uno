@@ -5,7 +5,7 @@ import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps } from './formDemo.jsx';
+import { FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from './formDemo.jsx';
 import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 /**
@@ -31,7 +31,7 @@ const STAGE = 1024; // docs-literal
 
 export const TypePage = {
     name: 'Type: In a page',
-    render: () => <ScreenStage width={STAGE}><FormInPage /></ScreenStage>,
+    render: () => <ScreenStage width={PAGE_WIDTH}><FormInPage /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -40,6 +40,8 @@ export const TypePage = {
         await expect(rect(save).left, 'Primary comes first, left-aligned under the fields').toBeLessThan(rect(cancel).left);
         await expect(rect(footer).left, 'the footer starts at the fields’ edge').toBeCloseTo(rect(canvasElement.querySelector('.plus-fieldset')).left, 0);
         await expect(cancel.className, 'Cancel is Subtle').toContain('subtle');
+        await expect(canvas.getByRole('heading', { level: 1, name: 'Log a session' }), 'the form’s title is the page’s h1').toBeInTheDocument();
+        await expect(canvasElement.querySelector('.plus-pattern-section-fill-subtle'), 'the form sits on the Page, not in a subtle Section').toBeNull();
     },
 };
 
@@ -96,7 +98,7 @@ const ANATOMY_PAGE_PARTS = [
 export const AnatomyPage = {
     name: 'Anatomy: In a page',
     render: () => (
-        <LiveAnatomy width={STAGE} title="A form in a page with its parts numbered" parts={ANATOMY_PAGE_PARTS}>
+        <LiveAnatomy width={PAGE_WIDTH} title="A form in a page with its parts numbered" parts={ANATOMY_PAGE_PARTS}>
             <FormInPage server />
         </LiveAnatomy>
     ),
@@ -168,7 +170,7 @@ export const AnatomySteps = {
 /** A field takes its error look on blur, and the message says what to fix. */
 export const KeyFieldError = {
     name: 'Key state: Field error on blur',
-    render: () => <ScreenStage width={STAGE}><FormInPage /></ScreenStage>,
+    render: () => <ScreenStage width={PAGE_WIDTH}><FormInPage /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const student = canvas.getByLabelText(/Student/);
@@ -185,7 +187,7 @@ export const KeyFieldError = {
 /** A field waiting on another says so in its caption; Save stays enabled. */
 export const KeyDisabledReason = {
     name: 'Key state: Disabled with its reason',
-    render: () => <ScreenStage width={STAGE}><FormInPage subjectWaits /></ScreenStage>,
+    render: () => <ScreenStage width={PAGE_WIDTH}><FormInPage subjectWaits /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByText('Choose a student first.'), 'the reason is visible text on the field').toBeInTheDocument();
