@@ -70,7 +70,7 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 | Fields | Form template | There is no Form component: a Fieldset groups the fields inside a host. |
 | Rejection at the top | `SectionMessage` | A danger message, scrolled into view. |
 | Choices | `RadioGroup`, `Select`, `DatePicker` | A control that cannot be wrong. |
-| Hosts | Section, Panel, Modal, Frame | Page, Panel, Modal and steps. |
+| Hosts | Frame, Panel, Modal | A page (on the Page itself, no Section around it), a Panel, a Modal, or steps on Frame · focused. |
 | Confirm view | Modal | Swapped in place today. A confirm view prop is Planned. |
 
 ## Related
