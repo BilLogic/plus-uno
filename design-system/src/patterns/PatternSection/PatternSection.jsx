@@ -5,7 +5,6 @@ import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingL
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useSplitHolds } from '../Frame/SplitContext';
 import { useOwnWidth } from '../Frame/useOwnWidth';
-import SectionSearch from './SectionSearch';
 import './PatternSection.scss';
 
 /**
@@ -399,8 +398,5 @@ PatternSection.propTypes = {
 };
 
 PatternSection.Toolbar = SectionToolbar;
-PatternSection.Search = SectionSearch;
-
-export { SectionSearch };
 
 export default PatternSection;

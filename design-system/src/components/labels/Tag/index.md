@@ -51,8 +51,8 @@ Don't: A new color for selected.
 A plain tag is its outline and neutral words. Turn on `swatchBefore` for a tag that is a legend entry or a color-coded filter, where the reader matches the square to a chart or a key. An icon in `elemBefore` is for when the icon carries meaning of its own.
 
 ```jsx
-<Tag color="blue">Algebra</Tag>                                  {/* plain: outline only */}
-<Tag color="blue" swatchBefore>Algebra</Tag>                       {/* the tag's own color */}
+<Tag color="blue">Lincoln Middle</Tag>                                  {/* plain: outline only */}
+<Tag color="blue" swatchBefore>Lincoln Middle</Tag>                       {/* the tag's own color */}
 <Tag swatchBefore="background-accent-orange-bolder">Week 3</Tag>   {/* a background color token */}
 <Tag elemBefore={<Icon name="star" />}>Starred</Tag>                {/* an icon that means something */}
 ```
@@ -70,8 +70,8 @@ A plain tag is its outline and neutral words. Turn on `swatchBefore` for a tag t
 <Tag isSelected={on} onClick={toggle} trailingMetric={12}>Science</Tag>
 
 // Link, and a link with a separate ×.
-<Tag href="/subjects/algebra">Algebra</Tag>
-<Tag href="/subjects/algebra" isRemovable onAfterRemoveAction={drop}>Algebra</Tag>
+<Tag href="/sites/lincoln-middle">Lincoln Middle</Tag>
+<Tag href="/sites/lincoln-middle" isRemovable onAfterRemoveAction={drop}>Lincoln Middle</Tag>
 ```
 
 `isSelected` is a boolean on purpose: `false` is an unselected toggle, and
@@ -93,7 +93,7 @@ warning.
 
 ```jsx
 // A subject on a lesson thumbnail, 8 from the corner.
-<Tag color="blue" isElevated>Algebra</Tag>
+<Tag color="blue" isElevated>Lincoln Middle</Tag>
 <Tag href="/lessons/42" color="magenta" isElevated>Open lesson</Tag>
 ```
 

@@ -1,27 +1,91 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import { FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { ChooserDot, HIDDEN } from '@/storybook-docs/templates/overview-parts.jsx';
+import { GROUP_STAGE, GROUP_THUMB_RATIO } from './overview-parts.js';
+import * as FormsStories from './Forms/Forms.stories.jsx';
+import * as EmptyStories from './Empty/Empty.stories.jsx';
+import * as NotificationsStories from './Notifications/Notifications.stories.jsx';
+import * as NavigationStories from './Navigation/Navigation.stories.jsx';
 
 <Meta title="Patterns/Overview" tags={['!dev', 'manifest']} />
 
-<FoundationHero
-    kind="Overview"
+<DocsLanding
+    page="patterns-overview"
+    eyebrow="Pattern"
     title="Patterns"
-    summary="Code-free guidance for a situation, shown on templates used as they are or tweaked."
+    purpose="Code-free guidance for a situation, shown on templates used as they are or tweaked."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Templates and patterns', href: './?path=/docs/templates-templates-and-patterns--docs' },
+        ],
+    }}
 />
 
-<FoundationContents />
+<FoundationSection title="The thirteen patterns">
 
-<FoundationSection title="What a pattern is">
+Four groups. Each pattern is one page: its situations first, then the key cases drawn on templates, then the usage spine. Reach for one when you are unsure of a choice or challenging it; <DocsLink id="templates-templates-and-patterns">Templates and patterns</DocsLink> says how the layers fit together.
 
-A pattern holds a rule that applies across two or more templates: when to use a choice, which choice fits, and the words to use. <DocsLink id="templates-templates-and-patterns">Templates and patterns</DocsLink> says how the layers fit together.
+<TypeGrid>
+<TypeCard of={FormsStories.HostPanel} stage={GROUP_STAGE} title="Actions and input" thumbRatio={GROUP_THUMB_RATIO}>What a person does to a page: which button, where it sits, and how a form takes and checks what they type. <span style={{ display: 'block' }}><a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a> · <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a></span></TypeCard>
+<TypeCard of={EmptyStories.PlaceFullPage} stage={GROUP_STAGE} title="States" thumbRatio={GROUP_THUMB_RATIO}>What a view shows when it has nothing, is still working, has failed, has too much, or cannot be changed right now. <span style={{ display: 'block' }}><a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a> · <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a> · <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a> · <a target="_top" href="./?path=/docs/patterns-states-overflow--docs">Overflow</a> · <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a> · <a target="_top" href="./?path=/docs/patterns-states-read-only--docs">Read-only</a></span></TypeCard>
+<TypeCard of={NotificationsStories.CarrierInbox} stage={GROUP_STAGE} title="Notifications and indicators" thumbRatio={GROUP_THUMB_RATIO}>What the product says back: passing notices, page conditions, the Inbox, and the tags that carry state, counts and change. <span style={{ display: 'block' }}><a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a> · <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-indicators--docs">Indicators</a></span></TypeCard>
+<TypeCard of={NavigationStories.KeyFocusedTask} stage={GROUP_STAGE} title="Finding things" thumbRatio={GROUP_THUMB_RATIO}>Moving between areas and records, and narrowing a collection to the rows that matter. <span style={{ display: 'block' }}><a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a> · <a target="_top" href="./?path=/docs/patterns-finding-things-search--docs">Search</a> · <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a></span></TypeCard>
+</TypeGrid>
 
 </FoundationSection>
 
-<FoundationSection title="Coming next">
+<FoundationSection title="Which pattern for which situation">
 
-- Actions and input: Common actions and Forms.
-- States: Empty, Loading, Errors, Overflow, Disabled and Read-only.
-- Notifications and indicators: Notifications and Indicators.
-- Finding things: Navigation, Search and Filtering.
+Start from what is happening on the page. Each row names the pattern that answers it and the ones to read beside it.
+
+<DocsTable>
+<thead>
+<tr><th>The situation</th><th>Pattern</th><th>Also read</th></tr>
+</thead>
+<tbody>
+<tr><td>Choosing a button's look, words or place</td><td><a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a></td><td><a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a></td></tr>
+<tr><td>Acting on several rows at once</td><td><a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs#acting-on-many-rows">Common actions</a> · the bulk bar</td><td>None</td></tr>
+<tr><td>Taking and checking what someone types</td><td><a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a></td><td><a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a> · <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a></td></tr>
+<tr><td>A view with nothing to show</td><td><a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a></td><td><a target="_top" href="./?path=/docs/patterns-finding-things-search--docs">Search</a> · <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a> · <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a></td></tr>
+<tr><td>Something is still fetching or saving</td><td><a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a></td><td><a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a></td></tr>
+<tr><td>Something failed</td><td><a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a></td><td><a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> · <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a> · <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a></td></tr>
+<tr><td>Text or a list is longer than its room</td><td><a target="_top" href="./?path=/docs/patterns-states-overflow--docs">Overflow</a></td><td><a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a></td></tr>
+<tr><td>A control cannot be used yet, or by this person</td><td><a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a></td><td><a target="_top" href="./?path=/docs/patterns-states-read-only--docs">Read-only</a> · <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a></td></tr>
+<tr><td>A value this person may see but not change</td><td><a target="_top" href="./?path=/docs/patterns-states-read-only--docs">Read-only</a></td><td><a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a></td></tr>
+<tr><td>Telling someone what happened or what is wrong</td><td><a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a></td><td><a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a></td></tr>
+<tr><td>Showing a state, a number or a change on something</td><td><a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-indicators--docs">Indicators</a></td><td><a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a></td></tr>
+<tr><td>Moving between areas, views and records</td><td><a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a></td><td><a target="_top" href="./?path=/docs/patterns-states-overflow--docs">Overflow</a></td></tr>
+<tr><td>Finding rows by what they are called</td><td><a target="_top" href="./?path=/docs/patterns-finding-things-search--docs">Search</a></td><td><a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a> · <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a></td></tr>
+<tr><td>Narrowing rows by their attributes</td><td><a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a></td><td><a target="_top" href="./?path=/docs/patterns-finding-things-search--docs">Search</a> · <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a></td></tr>
+</tbody>
+</DocsTable>
+
+</FoundationSection>
+
+<FoundationSection title="Which state is it?">
+
+The six states told apart by what the view is doing. A filled dot means the pattern is built for it.
+
+<DocsTable>
+<thead>
+<tr><th>The view…</th><th><a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a></th><th><a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a></th><th><a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a></th><th><a target="_top" href="./?path=/docs/patterns-states-overflow--docs">Overflow</a></th><th><a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a></th><th><a target="_top" href="./?path=/docs/patterns-states-read-only--docs">Read-only</a></th></tr>
+</thead>
+<tbody>
+<tr><td>has no records to show</td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>is still fetching or saving</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>could not load its content</td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>could not save</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>has more than fits</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>has a control that waits on something the person can fix here</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>shows a value this person cannot change right now</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td></tr>
+<tr><td>hides what this role can never use</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+</tbody>
+</DocsTable>
+
+A load failure fills two dots: Errors owns its words, and Empty owns the slot they show in. To choose a layer for a task, use the chooser on the <DocsLink id="templates-overview">Templates overview</DocsLink>.
 
 </FoundationSection>

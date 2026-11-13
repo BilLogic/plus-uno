@@ -14,6 +14,8 @@ Also asked as: percent complete, determinate loading.
 
 **Storybook page:** `design-system/src/components/loading/ProgressBar/ProgressBar.mdx`
 
+**Motion:** change `linear` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `ProgressBar` for progress through a task: an upload, a course, a
@@ -27,6 +29,15 @@ a short wait with no task to track, use a `Spinner`.
 | Default | Most bars: a brand fill on a neutral track. |
 | Success | Marks completion. Show a finished task at 100 in success. |
 | Inverse | On a bold or colored background. |
+
+## Motion
+
+ProgressBar reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Load content | `--ds-motion-linear` | Fills with the work, never ahead of it. |  |
+| success | Update a value or state | `--ds-motion-appearance-fast` | The bar reaches its end and its fill changes to done. | `sound.done.step` on land: a module or lesson is done |
 
 ## Best practices
 

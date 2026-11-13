@@ -73,7 +73,7 @@ const action = {
     alignItems: 'center',
     height: 'var(--item-height-md)',
     padding: '0 var(--pad-x-md)',
-    borderRadius: 'var(--radius-h32)',
+    borderRadius: 'var(--radius-control-md)',
     font: 'var(--body-default)',
     fontWeight: 'var(--type-weight-medium)',
 };
@@ -240,7 +240,7 @@ const sample = {
     flexDirection: 'column',
     gap: 'var(--card-stack-md)',
     padding: 'var(--card-pad-compact)',
-    borderRadius: 'var(--card-radius-sm)',
+    borderRadius: 'var(--card-radius-compact)',
     background: 'var(--ds-surface-raised)',
     boxShadow: 'var(--ds-shadow-raised)',
 };
@@ -293,12 +293,12 @@ TextTokenForWords.parameters = { a11y: { config: { rules: [{ id: 'color-contrast
 export const FocusIsARing = () => (
     <DoDont>
         <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the field. The fill stays as it was.</>}>
-            <div style={{ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)', borderRadius: 'var(--radius-h32)' }}>
+            <div style={{ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)', borderRadius: 'var(--radius-control-md)' }}>
                 <TextField id="color-focus-do" label="Student name" isLabelHidden placeholder="Search students" />
             </div>
         </Do>
         <Dont caption="Focus shown by tinting the field. A fill reads as selected or hovered, and keyboard users lose their place.">
-            <div style={{ borderRadius: 'var(--radius-h32)', background: 'var(--ds-background-selected)' }}>
+            <div style={{ borderRadius: 'var(--radius-control-md)', background: 'var(--ds-background-selected)' }}>
                 <TextField id="color-focus-dont" label="Student name" isLabelHidden placeholder="Search students" />
             </div>
         </Dont>

@@ -90,10 +90,10 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input or button to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
 | [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status tag, Date tag, Count tag, Change tag, Tag, Smart tag, TagGroup and Suggestion — and how to choose between them |
 | [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | The remaining container components sorted by what is being contained |
-| [`design-system/guidelines/components/loading.md`](design-system/guidelines/components/loading.md) | Progress (Progress bar), Skeleton or Spinner — showing work in flight |
-| [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Flag or Modal — choosing by how long the message lives and whether it blocks |
-| [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Four navigation components sorted by what the user is moving between |
-| [`design-system/guidelines/components/overlays-and-layering.md`](design-system/guidelines/components/overlays-and-layering.md) | Tooltip or Popover (Popup) — hover description versus click-triggered content |
+| [`design-system/guidelines/components/loading.md`](design-system/guidelines/components/loading.md) | ProgressBar, Skeleton, Spinner or GenerativeBorder — showing work in flight |
+| [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | SectionMessage, Flag or Modal — choosing by how long the message lives and whether it blocks |
+| [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Five navigation components sorted by what the user is moving between |
+| [`design-system/guidelines/components/overlays-and-layering.md`](design-system/guidelines/components/overlays-and-layering.md) | Tooltip or Popup — hover description versus click-triggered content, and where every popup opens |
 | [`design-system/guidelines/components/overview.md`](design-system/guidelines/components/overview.md) | What each component is for, when to reach for it, and how it composes |
 | [`design-system/guidelines/composition/form-behavior.md`](design-system/guidelines/composition/form-behavior.md) | How a PLUS form behaves — when it validates, how errors surface on submit, required fields, disabled vs read-only, unsaved changes, dependent fields, and subtle vs standard fields |
 | [`design-system/guidelines/composition/forms.md`](design-system/guidelines/composition/forms.md) | How PLUS form elements compose inside surfaces |
@@ -116,8 +116,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/foundations/content/overview.md`](design-system/guidelines/foundations/content/overview.md) | Product copy rules |
 | [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | Warm, direct, encouraging |
 | [`design-system/guidelines/foundations/data-visualization.md`](design-system/guidelines/foundations/data-visualization.md) | A chart's foundations other than color come from the same component tokens as the rest of the design system |
-| [`design-system/guidelines/foundations/motion.md`](design-system/guidelines/foundations/motion.md) | Motion tokens (three durations, three easings), patterns and reduced motion |
-| [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fourteen foundations, in the order they are documented |
+| [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fifteen foundations, in the order they are documented |
 | [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | says where design knowledge lives |
 
 ## Engineering
@@ -129,6 +128,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/engineering/measurement-window.md`](docs/engineering/measurement-window.md) | How to run uno-bot's measurement window each week and close it — the five numbers, where each comes from, where it is recorded, and what stays private. |
 | [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, owner and a link to its home. |
 | [`docs/engineering/setup.md`](docs/engineering/setup.md) | Aliases, package structure, prototype conventions, token workflow, local preview. |
+| [`docs/engineering/sound.md`](docs/engineering/sound.md) | How code adds a sound — a cell on the motion registry, played through the runtime in design-system/src/sound/. |
 
 ## Product and service
 
@@ -188,6 +188,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/040-agent-view-is-the-fourth-component-tab.md`](docs/adr/040-agent-view-is-the-fourth-component-tab.md) | Component docs pages gain a 4th tab, Agent view, that shows the component's generated file byte for byte through one raw glob in the tabs module; amends ADR-025, whose tabs were a human affordance only (2026-11-08) |
 | [`docs/adr/041-motion-is-springs-on-four-tiers.md`](docs/adr/041-motion-is-springs-on-four-tiers.md) | Motion is springs only, on four tiers (primitives, semantics, patterns and components); Expressive is a container switch, Reduced is a fade, Figma holds no motion tokens; supersedes the motion half of ADR-038 |
 | [`docs/adr/042-plus-ships-no-bootstrap.md`](docs/adr/042-plus-ships-no-bootstrap.md) | PLUS ships no Bootstrap — the bootstrap and react-bootstrap packages, the Bootstrap CSS layer, the generated Bootstrap color bridge and their checks are gone; a small element baseline in main.scss keeps what components relied on; completes ADR-037 and retires ADR-009 (2026-11-11) |
+| [`docs/adr/043-sound-is-synthesized-on-the-motion-registry.md`](docs/adr/043-sound-is-synthesized-on-the-motion-registry.md) | Sound is synthesized in the browser from a repo plan, behind one switch, and plays only where motion lands an Expressive moment, named by a sound cell on the motion registry; the always-silent list never plays |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -216,6 +217,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+146 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

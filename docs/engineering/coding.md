@@ -9,7 +9,7 @@ summary: How to write code in this repo — barrel imports, tokens over literals
 
 ## File naming
 
-- **Components**: PascalCase directories and files (e.g., `Button/Button.jsx`, `Alert/Alert.scss`)
+- **Components**: PascalCase directories and files (e.g., `Button/Button.jsx`, `SectionMessage/SectionMessage.scss`)
 - **Stories**: Co-located with component (e.g., `Button.stories.jsx`)
 - **Prototypes**: kebab-case directories (e.g., `onboarding-flow`)
 - **Docs**: kebab-case with a date prefix for plans (e.g., `2026-04-11-001-refactor-three-tier-context-architecture-plan.md`)
@@ -50,8 +50,8 @@ component on its way to this shape.
 **Barrel exports — the rule for every new file:**
 
 ```js
-import { Button, Alert, Modal } from '@/components';
-import { Input, Select, Checkbox } from '@/components'; // forms-and-inputs re-exports through the components barrel
+import { Button, SectionMessage, Modal } from '@/components';
+import { TextField, Select, Checkbox } from '@/components'; // forms-and-inputs re-exports through the components barrel
 import '@/styles/globals.scss';
 ```
 
@@ -69,13 +69,13 @@ One case is not a violation: a component importing its own siblings inside
 
 ## Slot names
 
-A component names a before or after slot by what the slot accepts, so the right prop is predictable:
+A component names a before or after slot by what the slot accepts, so the right prop is predictable. Every new slot prop takes one of the four names below.
 
 | Name | Accepts | Used by |
 |---|---|---|
 | `iconBefore` / `iconAfter` | an icon only | Button, Link button, Status tag, Date tag, Change tag, Sidebar tab |
 | `elemBefore` / `elemAfter` | any element: an avatar, a count, a tag | Tag, Smart tag, menu items, Sidebar tab end slot, Table cells, the field box, listbox and option row |
-| `icon` | the single icon of a component built around one | Icon button, Banner, Section message, Empty state, Tile, Modal, Rating |
+| `icon` | the single icon of an icon-led component | Icon button, Banner, Section message, Empty state, Tile, Modal, Rating |
 | `trailingMetric` | the count after a label | Tag, Status tag, Filter button |
 
 `leadingVisual`, `trailingVisual` and a bare `leading` slot are retired; `npm run check:slot-names` fails on them.
@@ -156,7 +156,7 @@ rename that reached `AGENTS.md` and stopped there.
 | Token generation must follow sync | Generated files overwrite manual edits | Always run sync first, then generate |
 | `design-system/src/index.js` is the barrel | New components not exported = import fails | Add to barrel export when creating new components |
 | Storybook uses autodocs | Missing JSDoc = empty docs page | Add JSDoc to component exports |
-| Raw HTML in marketplace pages | Breaks DS consistency | Use DS components: Button, Input, Badge, Card, Select |
+| Raw HTML in marketplace pages | Breaks DS consistency | Use DS components: Button, TextField, StatusTag, PatternCard, Select |
 | Nested Router providers | `MemoryRouter` inside `BrowserRouter` renders an empty root in React 19, with a silent console | One Router provider per tree — a shell mounted under another app takes its route from props |
 | A shell mounted under `<Route path="/x/*">` | Descendant `<Routes>` sees only the remainder after the prefix, so every path collapses to `/` and the index route always wins | Declare the named shell paths (`/monthly-reports/*`, `/admin/*`) above `/:prototypeId/*` — v6 ranks static segments first — and pass the shell a `contentKey` prop so it knows what to render at `index` |
 | `Failed to import test file` naming a setup file, with a `SyntaxError` that is not a real syntax error | A dependency discovered mid-run forced a Vite re-optimize and the page reloaded through the setup import. Look for `Vite unexpectedly reloaded a test` in the same run | Add the dependency to `optimizeDeps.include` on the `storybook` test project in `vite.config.js` — that is the one field the browser server reads. `design-system/tests/storybook-vitest-project.test.js` holds the assertions |

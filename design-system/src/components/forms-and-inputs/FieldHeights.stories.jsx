@@ -27,22 +27,22 @@ const fieldIn = (canvasElement, name) => canvasElement.querySelector(`[data-fiel
 const textIn = (box) => box.querySelector('.plus-select-text, input:not([type="hidden"])');
 
 const OPTIONS = [
-    { value: 'math', label: 'Math' },
-    { value: 'science', label: 'Science' },
+    { value: 'middle', label: 'Middle schools' },
+    { value: 'high', label: 'High schools' },
 ];
 
 const CASCADE = [
-    { text: 'Math', value: 'math', children: [{ text: 'Algebra', value: 'algebra' }] },
+    { text: 'Middle schools', value: 'middle', children: [{ text: 'Lincoln Middle', value: 'lincoln-middle' }] },
 ];
 
 const TREE = [
-    { label: 'Math', value: 'math', children: [{ label: 'Algebra', value: 'algebra' }] },
+    { label: 'Middle schools', value: 'middle', children: [{ label: 'Lincoln Middle', value: 'lincoln-middle' }] },
 ];
 
 /** One of each single-line field, at its default spacing. */
 const SINGLE_LINE = [
     ['Text field', () => <TextField label="Text field" placeholder="Name" />],
-    ['Select', () => <Select label="Select" options={OPTIONS} placeholder="Subject" />],
+    ['Select', () => <Select label="Select" options={OPTIONS} placeholder="Site" />],
     ['Number field', () => <TextField type="number" label="Number field" defaultValue={3} />],
     ['Date picker', () => <DatePicker aria-label="Date picker" placeholder="MM/DD/YYYY" />],
     ['Date time picker', () => <DateTimePicker label="Date time picker" />],
@@ -163,7 +163,7 @@ ButtonInside.play = async ({ canvasElement }) => {
     }
 };
 
-const MANY_TAGS = ['Algebra', 'Geometry', 'Biology', 'Chemistry', 'Physics', 'History', 'Spanish', 'Writing'];
+const MANY_TAGS = ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High', 'Riverside Academy', 'Jefferson Elementary', 'Washington Middle', 'Oakwood'];
 
 /** Text area, Rich text editor and Tag field start at their minimums and grow. */
 export const MultiLine = () => (

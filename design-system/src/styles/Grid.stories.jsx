@@ -28,7 +28,7 @@ const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 /** Twelve columns with a 16 gutter, inside the surface pad. */
 export const GridAnatomy = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <div style={{ padding: 'var(--page-pad)', borderRadius: 'var(--page-radius)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
+        <div style={{ padding: 'var(--page-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
             <div style={grid12}>
                 {Array.from({ length: 12 }, (_, i) => (
                     <div key={i} style={{ ...columnFill, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 'var(--pad-y-md)', font: 'var(--body-small)', color: 'var(--ds-text-accent-blue)' }}>
@@ -43,7 +43,7 @@ export const GridAnatomy = () => (
 
 /** Regions span whole columns. */
 export const ColumnSpans = () => (
-    <div style={{ ...grid12, padding: 'var(--page-pad)', borderRadius: 'var(--page-radius)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
+    <div style={{ ...grid12, padding: 'var(--page-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
         <div style={{ gridColumn: 'span 12' }}><PatternCard title="span 12" description="A table or a full-width chart" /></div>
         <div style={{ gridColumn: 'span 8' }}><PatternCard title="span 8" description="The main column" /></div>
         <div style={{ gridColumn: 'span 4' }}><PatternCard title="span 4" description="A side column" /></div>
@@ -70,12 +70,12 @@ export const SpanWholeColumns = () => (
     <DoDont>
         <Do caption="Three cards, four columns each. Every edge lands on a column edge.">
             <div style={{ ...ground, ...grid12 }}>
-                {['Algebra', 'Geometry', 'Ratios'].map((t) => <div key={t} style={{ gridColumn: 'span 4' }}><PatternCard title={t} padding="sm" /></div>)}
+                {['Lincoln Middle', 'Roosevelt K-8', 'Riverside Academy'].map((t) => <div key={t} style={{ gridColumn: 'span 4' }}><PatternCard title={t} padding="sm" /></div>)}
             </div>
         </Do>
         <Dont caption="Cards sized by hand. Their edges fall mid-gutter and mid-column, so nothing lines up with the rows above and below.">
             <div style={{ ...ground, display: 'flex', gap: 'var(--space-0625)' }}>
-                {[['Algebra', '41%'], ['Geometry', '23%'], ['Ratios', '30%']].map(([t, w]) => <div key={t} style={{ width: w }}><PatternCard title={t} padding="sm" /></div>)}
+                {[['Lincoln Middle', '41%'], ['Roosevelt K-8', '23%'], ['Riverside Academy', '30%']].map(([t, w]) => <div key={t} style={{ width: w }}><PatternCard title={t} padding="sm" /></div>)}
             </div>
         </Dont>
     </DoDont>

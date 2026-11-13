@@ -4,10 +4,11 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as TagInputStories from './TagInput.stories.jsx';
 import { TagInput } from '@/components';
 import { DocsInteractivePlayground, ResourcesBlock, ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const topics = [
-    { value: 'fractions', label: 'Fractions', color: 'blue' },
-    { value: 'geometry', label: 'Geometry', color: 'purple' },
+    { value: 'session-prep', label: 'Session prep', color: 'blue' },
+    { value: 'tutor-coaching', label: 'Tutor coaching', color: 'purple' },
 ];
 
 export const figmaMeta = {
@@ -120,6 +121,14 @@ from a list or adds, such as the topics a session covers.
 
 <div className="sb-ds-doc-section">
 
+## Motion
+
+<MotionSection component="TagInput" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -194,10 +203,10 @@ focusing it opens the list of options under it.
 <tbody>
 <tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>.</td></tr>
 <tr><td>Height</td><td>Starts at 40: <code>--height-250</code>. Compact 32: <code>--item-height-md</code>. Grows as tags wrap.</td></tr>
-<tr><td>Radius</td><td>10: <code>--radius-0625</code>. Compact 8: <code>--radius-h32</code>.</td></tr>
+<tr><td>Radius</td><td>10: <code>--radius-0625</code>. Compact 8: <code>--radius-control-md</code>.</td></tr>
 <tr><td>Tags and entry</td><td><code>--stack-md</code> between them; with focus, up to three rows of tags before the content scrolls.</td></tr>
 <tr><td>Entry text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
-<tr><td>List</td><td><code>--ds-surface-overlay</code> with a <code>--ds-border</code> edge, <code>--popover-radius-menu-md</code> and <code>--ds-shadow-overlay</code>.</td></tr>
+<tr><td>List</td><td><code>--ds-surface-overlay</code> with a <code>--ds-border</code> edge, <code>--popup-radius</code> and <code>--ds-shadow-overlay</code>.</td></tr>
 <tr><td>List hint</td><td><code>--body-small</code> in <code>--ds-text-subtle</code>, <code>--space-025</code> <code>--pad-x-md</code>.</td></tr>
 <tr><td>Row handle</td><td><code>--ds-icon-subtle</code>.</td></tr>
 <tr><td>Option menu</td><td><code>--option-menu-width</code> wide; the name field <code>--space-025</code> <code>--pad-x-sm</code>; a <code>--border-default</code> rule in <code>--ds-border</code> above the colors.</td></tr>

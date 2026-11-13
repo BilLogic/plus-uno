@@ -85,7 +85,7 @@ const DonutChartSVG = ({
                             style={{
                                 cursor: hasTooltip ? 'pointer' : 'default',
                                 opacity: hoveredIndex !== null && hoveredIndex !== index ? 'var(--ds-opacity-disabled)' : 1,
-                                transition: 'opacity var(--motion-duration-medium) var(--motion-easing-standard)'
+                                transition: 'opacity var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default)'
                             }}
                             onMouseEnter={() => {
                                 setHoveredIndex(index);
@@ -106,7 +106,7 @@ const DonutChartSVG = ({
                         backgroundColor: 'var(--ds-surface-overlay)',
                         color: 'var(--ds-text)',
                         padding: 'var(--popover-pad-y-tooltip) var(--pad-x-sm)',
-                        borderRadius: 'var(--popover-radius-tooltip)',
+                        borderRadius: 'var(--radius-control-sm)',
                         fontSize: 'var(--font-size-075)',
                         fontFamily: 'var(--type-family-body)',
                         pointerEvents: 'none',

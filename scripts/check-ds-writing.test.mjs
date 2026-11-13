@@ -166,14 +166,19 @@ test('gradeFindings: warnings everywhere, a stale marker always an error, a stri
   assert.deepEqual(gradeFindings(raw, { strict: true, enforce: true }).map((f) => f.severity), ['error', 'error']);
 });
 
-test('the strict list starts with Modal, enforced in the gate', () => {
-  assert.deepEqual(STRICT_PAGES, ['Modal']);
+test('the strict list holds Modal and the Section template, enforced in the gate', () => {
+  assert.deepEqual(STRICT_PAGES, ['Modal', 'PatternModal', 'PatternSection', 'Frame', 'Page']);
   assert.equal(ENFORCE_STRICT, true);
 });
 
 test('run: the committed Modal page passes every rule, strict', () => {
   const modal = run({ enforceStrict: true }).filter((f) => /\/Modal\/Modal\.(mdx|stories\.jsx)$/.test(f.file ?? ''));
   assert.deepEqual(modal, []);
+});
+
+test('run: the committed Section template page passes every rule, strict', () => {
+  const section = run({ enforceStrict: true }).filter((f) => /\/PatternSection\/PatternSection\.(mdx|stories\.jsx)$/.test(f.file ?? ''));
+  assert.deepEqual(section, []);
 });
 
 // ── the whole check, over a fixture repo ───────────────────────────────────

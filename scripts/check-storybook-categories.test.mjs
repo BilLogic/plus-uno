@@ -247,12 +247,12 @@ test('a sidebar sort that lists Patterns before Templates goes red', () => {
   assert.ok(messages(root).some((m) => m.includes('roots must lead with')));
 });
 
-test('the real Templates tree is flat: seven templates, no Overlays folder', () => {
+test('the real Templates tree is flat: eight templates, no Overlays folder', () => {
   const tax = JSON.parse(fs.readFileSync(new URL('../storybook.taxonomy.json', import.meta.url), 'utf8'));
   const at = tax.storySortOrder.indexOf('Templates');
   const order = tax.storySortOrder[at + 1];
   assert.deepEqual(order.filter((x) => typeof x === 'string'), [
-    'Templates and patterns', 'Overview', 'Frame', 'Page', 'Section', 'Modal', 'Panel', 'Popup',
+    'Templates and patterns', 'Overview', 'Frame', 'Page', 'Section', 'Form', 'Modal', 'Panel', 'Popup',
   ]);
   assert.ok(!order.includes('Overlays'));
   assert.ok(!order.includes('Page templates'));
@@ -263,4 +263,70 @@ test('the illustration kit is a Get started page, not a Templates source', () =>
   assert.ok(!tax.rootSources.Templates.some((dir) => dir.includes('/illustrations')));
   const mdx = fs.readFileSync(new URL('../design-system/src/storybook-docs/illustrations/IllustrationKit.mdx', import.meta.url), 'utf8');
   assert.equal(docsTitle(mdx), 'Get started/Illustration kit');
+});
+
+/** Lists the Foundations · Motion pages in the fixture's sidebar sort. */
+function listMotion(root, entries) {
+  const file = path.join(root, 'storybook.taxonomy.json');
+  const taxonomy = JSON.parse(fs.readFileSync(file, 'utf8'));
+  taxonomy.storySortOrder.splice(2, 0, 'Foundations', ['Motion', entries]);
+  taxonomy.storySortOrder.splice(1, 1);
+  fs.writeFileSync(file, JSON.stringify(taxonomy));
+}
+const motionPage = (name) => `<Meta title="Foundations/Motion/${name}" />\n`;
+const motionFiles = (...names) =>
+  Object.fromEntries(names.map((n) => [`design-system/src/styles/Motion${n.replace(/ /g, '')}.mdx`, motionPage(n)]));
+
+test('Foundations · Motion pages that the sort lists, Library among them, are green', () => {
+  const root = fixture(motionFiles('Physics', 'Library'));
+  listMotion(root, ['Physics', 'Library']);
+  assert.deepEqual(messages(root), []);
+});
+
+test('a Foundations · Motion page the sort does not list goes red', () => {
+  const root = fixture(motionFiles('Physics', 'Library', 'Durations and easings'));
+  listMotion(root, ['Physics', 'Library']);
+  assert.match(messages(root).join('\n'), /Durations and easings/);
+});
+
+test('a Foundations · Motion entry in the sort with no page, Library included, goes red', () => {
+  const root = fixture(motionFiles('Physics'));
+  listMotion(root, ['Physics', 'Library']);
+  assert.match(messages(root).join('\n'), /Library/);
+});
+
+test('a Foundations · Motion list without Library goes red', () => {
+  const root = fixture(motionFiles('Physics'));
+  listMotion(root, ['Physics']);
+  assert.match(messages(root).join('\n'), /Library/);
+});
+
+// ── Foundations · Sound ──
+
+const soundFiles = (...names) =>
+  Object.fromEntries(names.map((n) => [`design-system/src/styles/Sound${n.replace(/ /g, '')}.mdx`, `<Meta title="Foundations/Sound/${n}" />\n`]));
+function listSound(root, entries) {
+  const file = path.join(root, 'storybook.taxonomy.json');
+  const taxonomy = JSON.parse(fs.readFileSync(file, 'utf8'));
+  taxonomy.storySortOrder.splice(2, 0, 'Foundations', ['Sound', entries]);
+  taxonomy.storySortOrder.splice(1, 1);
+  fs.writeFileSync(file, JSON.stringify(taxonomy));
+}
+
+test('Foundations · Sound pages that the sort lists are green', () => {
+  const root = fixture(soundFiles('Overview', 'With motion'));
+  listSound(root, ['Overview', 'With motion']);
+  assert.deepEqual(messages(root), []);
+});
+
+test('a Foundations · Sound page the sort does not list goes red', () => {
+  const root = fixture(soundFiles('Overview', 'Extra'));
+  listSound(root, ['Overview']);
+  assert.match(messages(root).join('\n'), /a Foundations · Sound page the sidebar sort does not list/);
+});
+
+test('a Foundations · Sound entry in the sort with no page goes red', () => {
+  const root = fixture(soundFiles('Overview'));
+  listSound(root, ['Overview', 'Sounds']);
+  assert.match(messages(root).join('\n'), /Foundations > Sound lists "Sounds", but no page is titled Foundations\/Sound\/Sounds/);
 });

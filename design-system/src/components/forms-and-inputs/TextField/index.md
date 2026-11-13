@@ -14,6 +14,8 @@ Also asked as: search box, single-line, text box.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TextField/TextField.mdx`
 
+**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a Text field for single-line text entry: names, emails, search boxes and
@@ -22,6 +24,14 @@ the right home for an error rather than a Section message at the top of the form
 
 Use a [Text area](?path=/docs/components-forms-and-inputs-text-area--docs) for several lines, a
 Select for a value chosen from a list, and a Date picker for dates.
+
+## Motion
+
+TextField reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Border color changes on focus and error. An error message makes room, then fades in; it fades, then the room closes, once the field is fixed. |
 
 ## Best practices
 
@@ -118,7 +128,7 @@ Don't: Disabled fades a value people need to read.
 - For dates, see Date picker and Date time picker.
 - For the label and caption conventions, see Form.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -147,7 +157,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
 | Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
 | Side padding | `--pad-x-md`; a Button in a slot sits `--pad-x-xs` from the edge. |
 | Slot button | `--item-height-md` in the 40 field, `--item-height-sm` in the 32 field. |
 | Slots | `--ds-text-subtle`, `--stack-sm` apart; `--space-0625` between slot and control. |

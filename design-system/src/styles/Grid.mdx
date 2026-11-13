@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -15,20 +14,28 @@ import * as GridStories from './Grid.stories.jsx';
 
 <Meta of={GridStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-grid"
+    eyebrow="Foundation"
     title="Layout & Grid"
-    summary="Two 12-column grids with a 16 gutter at every width; page content caps at 1232."
+    purpose="Two 12-column grids with a 16 gutter at every width; page content caps at 1232."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Breakpoints', href: '#foundation-breakpoints' },
+            { title: 'Content widths', href: '#foundation-content-widths' },
+            { title: 'Size roles', href: '#foundation-size-roles' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 
-PLUS is desktop only, from 768 up. The screen grid spans the screen and lives on the Blanket layer: modals and drawers size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its `spacing / layout` mode, never by hand-editing its grid. The grid decides where containers sit; the spacing tokens decide everything inside them.
+PLUS is desktop only, from 768 up. The screen grid spans the screen and lives on the Backdrop layer: modals and floating Panels size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its `spacing / layout` mode, never by hand-editing its grid. The grid decides where containers sit; the spacing tokens decide everything inside them.
 
 <Banner appearance="announcement">
 <strong>How the PLUS grid differs from a standard one</strong><br />
-PLUS is desktop only, from 768 up: there are no 2 or 6 column tiers and no mobile size. The gutter is 16 at every width. The page margin is 24 at every width. The 1232 maximum counts content only, without margins. Layers over the page sit outside the grid; only the Modal and Drawer take their width from the screen grid.
+PLUS is desktop only, from 768 up: there are no 2 or 6 column tiers and no mobile size. The gutter is 16 at every width. The page margin is 24 at every width. The 1232 maximum counts content only, without margins. Layers over the page sit outside the grid; only the Modal takes its width from the screen grid.
 </Banner>
 
 <Canvas of={GridStories.GridAnatomy} sourceState="none" />
@@ -41,7 +48,7 @@ grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
 gap: var(--grid-gutter);
 ```
 
-Figma holds the breakpoint modes in the `spacing / layout` collection: 768, 1024 and 1440. The content grid is on the Page's content frame; the screen grid is on the Blanket only.
+Figma holds the breakpoint modes in the `spacing / layout` collection: 768, 1024 and 1440. The content grid is on the Page's content frame; the screen grid is on the Backdrop only.
 
 </FoundationSection>
 
@@ -78,7 +85,7 @@ Both grids are 12 columns with a 16 gutter.
   already at its cap with either pad, so its width depends on the screen alone;
   past a 1280 screen it stops growing and centers. It ignores the sidebar, so a
   modal sits in the same place whether the sidebar is docked or closed. Modals
-  and drawers size from it. In Figma it lives on the Blanket layer only, and
+  and floating Panels size from it. In Figma it lives on the Backdrop layer only, and
   shows and hides with it; code draws no grid at all.
 - **The content grid** sits inside the Page, after the sidebar and the
   Page pad take their share. Cards, tables, forms and text blocks align to
@@ -102,7 +109,7 @@ breakpoint: Medium · Large · X-Large.
     ]}
 />
 
-The screen pad is its own rule, not the Page pad: it stays 24 · 24 · 32 so a Modal or Drawer keeps its width when the Page pad changes.
+The screen pad is its own rule, not the Page pad: it stays 24 · 24 · 32 so a Modal or floating Panel keeps its width when the Page pad changes.
 
 These per-mode widths step at each breakpoint rather than follow the screen. Code that needs the exact width at any screen lays out on the grid itself, as in the Overview, instead of reading `--grid-width-column`. The values are generated from the `spacing / layout` collection into `design-system/src/tokens/_frame_layers.scss`; the breakpoints live in `design-system/src/tokens/_layout.scss`.
 
@@ -115,9 +122,9 @@ Two patterns carry the grids. Take the grid by using the pattern and setting its
 <RefTable
     head={['Grid', 'Carried by', 'How to apply']}
     rows={[
-        ['Screen grid', 'The Blanket: 12 columns, centered, each column Grid/width-column-screen wide, gutter Grid/gutter.', 'Put the Modal in the Blanket. Change the breakpoint with the spacing / layout mode in the appearance panel, never by resizing.'],
+        ['Screen grid', 'The Backdrop: 12 columns, centered, each column Grid/width-column-screen wide, gutter Grid/gutter.', 'Put the Modal in the Backdrop. Change the breakpoint with the spacing / layout mode in the appearance panel, never by resizing.'],
         ['Content grid', 'The Content frame of the Page inside the Frame: 12 columns, stretched, gutter Grid/gutter; the margin is Page/pad.', 'Build the page inside the Frame and set the mode on the frame. Place containers on the columns with auto layout.'],
-        ['Grid styles', 'Grid and Grid/Adaptive (12-col) are the content grid: stretch, 12 columns, gutter 16, offset Page/pad. Grid/Viewport (adaptive) is the screen grid: centered, 12 columns, gutter 16.', 'Apply Grid or Grid/Adaptive (12-col) to a Page content frame and Grid/Viewport (adaptive) to a Blanket. All three follow the frame mode.'],
+        ['Grid styles', 'Grid and Grid/Adaptive (12-col) are the content grid: stretch, 12 columns, gutter 16, offset Page/pad. Grid/Viewport (adaptive) is the screen grid: centered, 12 columns, gutter 16.', 'Apply Grid or Grid/Adaptive (12-col) to a Page content frame and Grid/Viewport (adaptive) to a Backdrop. All three follow the frame mode.'],
     ]}
 />
 
@@ -128,7 +135,7 @@ Each layer owns one part of the layout:
 - The **template** owns the width (`Screen/width-screen`) and the `spacing / layout` mode.
 - **Frame** fills it: the Sidebar beside the Page. The Page carries the content grid and the Content slot.
 - The **Sidebar** docks by `Sidebar/sidebar-docked` (false · true · true across Medium · Large · X-Large).
-- The **Blanket** sits above the Frame and carries the screen grid, which shows and hides with it.
+- The **Backdrop** sits above the Frame and carries the screen grid, which shows and hides with it.
 
 </FoundationSection>
 
@@ -159,7 +166,6 @@ row with the sidebar and the Page.
         { token: '--frame-topbar-height', figma: 'Topbar/height-topbar', value: '32 · 32 · 32' },
         { token: '--frame-sidebar-width', figma: 'Sidebar/width-sidebar', value: '240 · 240 · 240' },
         { token: '--page-pad', figma: 'Page/pad', value: '24 · 24 · 24' },
-        { token: '--page-radius', figma: 'Page/radius', value: '8 · 8 · 8' },
         { token: '--panel-min-width', value: '320 · 320 · 320', use: 'The narrowest the splitter allows a Panel' },
         { token: '--panel-width-default', value: '400 · 400 · 400', use: 'The width a Panel opens at' },
         { token: '--panel-max-width', value: '640 · 640 · 640', use: 'The widest the splitter allows a Panel' },
@@ -168,7 +174,7 @@ row with the sidebar and the Page.
 
 The Frame has no seams, no pad and no stack: the Page runs to the window edges, with no pad or gap around it or between it and the topbar, and meets the sidebar at a hairline. A Panel opens at 400, and its splitter holds it between 320 and 640. The topbar is 32 with no vertical pad. Below
 1024 the sidebar opens over the page: 240 wide, full height, with a shadow and
-no Blanket. An outside click closes it, and the page never reflows. The dock is a
+no Backdrop. An outside click closes it, and the page never reflows. The dock is a
 step: at 1023 the content is 975 wide, and at 1024 the sidebar docks and it is
 736, so cards reflow there while modals keep their width.
 
@@ -219,8 +225,8 @@ Pass `width="6-col"`, `"8-col"` or `"10-col"` to Modal; a fixed pixel width igno
         { token: '--modal-width-sm', figma: 'Modal/width-modal-sm', value: '384 · 512 · 640' },
         { token: '--modal-width-md', figma: 'Modal/width-modal-md', value: '507 · 677 · 848' },
         { token: '--modal-width-lg', figma: 'Modal/width-modal-lg', value: '629 · 843 · 1056' },
-        { token: '--blanket-pad-x', figma: 'Blanket/pad-x', value: '16' },
-        { token: '--blanket-pad-y', figma: 'Blanket/pad-y', value: '64' },
+        { token: '--blanket-pad-x', figma: 'Backdrop/pad-x', value: '16' },
+        { token: '--blanket-pad-y', figma: 'Backdrop/pad-y', value: '64' },
     ]}
 />
 
@@ -258,7 +264,7 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
 <RefTable
     head={['Role', 'Values', 'Tokens', 'Use']}
     rows={[
-        ['Control', '24 · 32', <><C>--item-height-sm</C> · <C>-md</C></>, 'Anything you click or type into. Buttons and tabs are 32, 24 compact; fields and menu rows are 40, 32 compact. Compact only inside table rows and inline toolbars.'],
+        ['Control', '24 · 32', <><C>--item-height-sm</C> · <C>-md</C></>, 'Anything you click or type into. Buttons and tabs are 32, 24 compact; fields are 40, 32 compact; menu rows are 32, 24 compact. Compact only inside table rows and inline toolbars.'],
         ['Row', '32 · 40 · 48', <><C>--row-height-sm</C> · <C>-md</C> · <C>-lg</C></>, 'One record in a table or list. A minimum: rows grow with their content.'],
         ['Label', '16 · 20 · max 160', <><C>--label-height-sm</C> · <C>-md</C> · <C>--label-max-width</C></>, 'Tag, Status and Count.'],
         ['Media', '16 · 20 · 24 · 32 · 40 · 48', <><C>--image-xxs</C> … <C>--image-xl</C></>, 'Avatar, Tile and logos. Images keep their ratio (1:1, 4:3, 16:9, 3:2) and take their width from the grid or the card.'],
@@ -332,7 +338,7 @@ Minimum and maximum sizes the patterns carry. Frame and modal sizes are under Th
 <Do caption="A form at 40 and 32: the field is 40 (compact 32), the button 32 (compact 24).">
 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)' }}>
     <span style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 'var(--row-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)', font: 'var(--body-default)', color: 'var(--ds-text-subtlest)' }}>Search students</span>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
 </div>
 </Do>
 <Dont caption="A compact 24 button beside a 40 field. Compact is for table rows and inline toolbars only.">
@@ -384,7 +390,7 @@ and avatars never stretch to columns. Cards have no inner grid.
 Never keep a copy of the page per breakpoint with hand-edited grids. The copies
 drift, and the variable bindings stop working.
 
-**Put the screen grid on the Blanket layer only.** In a design file the screen grid is set on the Blanket, so it shows when the Blanket shows and hides with it. A page frame carries only the content grid.
+**Put the screen grid on the Backdrop layer only.** In a design file the screen grid is set on the Backdrop, so it shows when the Backdrop shows and hides with it. A page frame carries only the content grid.
 
 **Design from 768 up.** PLUS has no small-screen tier. Never design below 768,
 and never drop to 6 or 2 columns: a four-card row at X-Large is still a
@@ -417,14 +423,14 @@ Every box either hugs its content or fills the space it is given. The container 
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
     <span style={{ flex: 1, fontWeight: 'var(--type-weight-medium)' }}>Maya Chen</span>
     <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
-    <span style={{ padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center' }}>View</span>
+    <span style={{ padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center' }}>View</span>
 </div>
 </Do>
 <Dont caption="The button fills the leftover space, so an action becomes a wide bar and the name crowds the edge.">
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
     <span style={{ fontWeight: 'var(--type-weight-medium)' }}>Maya Chen</span>
     <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
-    <span style={{ flex: 1, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View</span>
+    <span style={{ flex: 1, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View</span>
 </div>
 </Dont>
 </DoDont>

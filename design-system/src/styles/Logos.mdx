@@ -1,8 +1,7 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -25,12 +24,20 @@ export const Ground = ({ token, children, caption }) => (
 
 <Meta title="Foundations/Logos" tags={['!dev']} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-logos"
+    eyebrow="Foundation"
     title="Logos"
-    summary="A logo is the visual representation of PLUS. It is one mark, shown with or without the wordmark."
+    purpose="A logo is the visual representation of PLUS. It is one mark, shown with or without the wordmark."
+    links={{
+        label: 'Specs',
+        items: [
+            { title: 'Construction', href: '#foundation-construction' },
+            { title: 'Color options', href: '#foundation-color-options' },
+            { title: 'Clearance', href: '#foundation-logo-clearance' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

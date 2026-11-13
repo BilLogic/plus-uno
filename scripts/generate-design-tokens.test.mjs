@@ -5,8 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { artifacts, run } from './generate-design-tokens.mjs';
-import { variablesPayload } from './lib/tokens/build.mjs';
-import { TOKEN_LADDER } from './lib/tokens/plan.mjs';
+import { motionPayload, variablesPayload } from './lib/tokens/build.mjs';
+import { MOTION_SEMANTICS, TOKEN_LADDER } from './lib/tokens/plan.mjs';
+import { measureSpring } from '../design-system/src/tokens/spring.js';
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 
 test('the committed token ladder files match the plan', () => {
@@ -42,20 +43,10 @@ test('no ladder token is declared twice', () => {
   assert.ok(names.size > 0);
 });
 
-test('motion durations are zeroed under reduced motion, exactly the set declared at :root', () => {
-  const { content: motion } = artifacts().find(({ path }) => path.endsWith('_motion.scss'));
-  const [rootBlock, reducedBlock] = motion.split('@media (prefers-reduced-motion: reduce)');
-  const rootDurations = [...rootBlock.matchAll(/--motion-duration-[a-z]+(?=:)/g)].map((m) => m[0]);
-  const reducedDurations = [...reducedBlock.matchAll(/--motion-duration-[a-z]+(?=:)/g)].map((m) => m[0]);
-  assert.ok(rootDurations.length > 0);
-  assert.deepEqual([...reducedDurations].sort(), [...rootDurations].sort());
-  assert.match(reducedBlock, /0ms/);
-});
-
-test('the payload has exactly the collections the ladder names, motion among them', () => {
+test('the payload has exactly the collections the ladder names, and no motion', () => {
   assert.deepEqual(
     variablesPayload().collections.map((c) => c.name),
-    ['spacing / semantics', 'spacing / patterns', 'spacing / components', 'layers', 'motion'],
+    ['spacing / semantics', 'spacing / patterns', 'spacing / components', 'layers'],
   );
 });
 
@@ -248,8 +239,53 @@ test('the springs add no variable to the Figma payload', () => {
   assert.doesNotMatch(payload, /spring|spatial|appearance/);
 });
 
-test('the old motion duration and easing tokens are untouched', () => {
-  const { content } = artifacts().find(({ path }) => path.endsWith('ladder/_motion.scss'));
-  assert.match(content, /--motion-duration-short: 100ms/);
-  assert.match(content, /--motion-easing-standard: cubic-bezier/);
+test('the first-pass duration and easing tokens are gone from every artifact', () => {
+  assert.ok(!artifacts().some(({ path }) => path.endsWith('ladder/_motion.scss')), 'no _motion.scss');
+  for (const { path, content } of artifacts()) {
+    assert.doesNotMatch(content, /--motion-(duration|easing)/, path);
+  }
+});
+
+/** motion-payload.json: the Figma motion collection and animation styles (#2281). */
+test('motion payload: deletes the old motion collection and leaves variables-payload alone', () => {
+  assert.deepEqual(motionPayload().delete, ['motion']);
+  assert.ok(!JSON.stringify(variablesPayload()).includes('Spring/'));
+  assert.ok(artifacts().some(({ path }) => path.endsWith('figma/motion-payload.json')));
+});
+
+test('motion payload: every semantic aliases an existing primitive in both modes', () => {
+  const { collection } = motionPayload();
+  assert.deepEqual(collection.modes, ['Productive', 'Expressive']);
+  const primitives = new Set(collection.variables.filter((v) => v.values).map((v) => v.name));
+  const semantics = collection.variables.filter((v) => v.aliases);
+  assert.equal(semantics.length, MOTION_SEMANTICS.length * 3);
+  for (const v of semantics) for (const mode of collection.modes) assert.ok(primitives.has(v.aliases[mode]), `${v.name} ${mode}`);
+  const fast = semantics.find((v) => v.name === 'spatial/fast/stiffness');
+  assert.equal(fast.aliases.Productive, 'Spring/880/stiffness');
+  assert.equal(fast.aliases.Expressive, 'Spring/800-r60/stiffness');
+  assert.equal(semantics.find((v) => v.name === 'appearance/fast/stiffness').aliases.Expressive, 'Spring/3800/stiffness');
+});
+
+test('motion payload: scopes are empty and code syntax is set on every variable', () => {
+  for (const v of motionPayload().collection.variables) {
+    assert.equal(v.resolvedType, 'FLOAT');
+    assert.deepEqual(v.scopes, [], v.name);
+    assert.match(v.codeSyntax.WEB, v.aliases ? /^var\(--ds-motion-[a-z-]+\)$/ : /^var\(--motion-spring-[0-9a-r-]+\)$/, v.name);
+  }
+});
+
+test('motion payload: animation styles carry the settle time and the Figma bounce', () => {
+  const styles = new Map(motionPayload().animationStyles.map((s) => [s.name, s.entries[0]]));
+  const { settle } = measureSpring({ stiffness: 440, ratio: 1 });
+  const dflt = styles.get('spatial/default');
+  assert.equal(dflt.styleId, 'Position');
+  assert.equal(dflt.props.duration, Math.round(settle * 1000) / 1000);
+  assert.deepEqual(dflt.props.easing, { type: 'CUSTOM_SPRING', easingFunctionSpring: { bounce: 0 } });
+  const expressive = styles.get('spatial/fast (Expressive)');
+  assert.ok(Math.abs(expressive.props.easing.easingFunctionSpring.bounce - 0.4) < 1e-9);
+  assert.equal(styles.get('appearance/slow').styleId, 'Opacity');
+  assert.ok(styles.has('spatial/exit'));
+  assert.ok(!styles.has('spatial/exit (Expressive)') && !styles.has('appearance/fast (Expressive)'));
+  assert.ok(![...styles.keys()].some((n) => n.startsWith('loop')), 'loop is skipped');
+  assert.ok(motionPayload().skipped.some((s) => s.semantic === 'loop'));
 });

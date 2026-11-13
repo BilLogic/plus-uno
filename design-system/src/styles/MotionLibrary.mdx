@@ -1,0 +1,33 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    FoundationSection,
+} from '@/storybook-docs/foundation-page.jsx';
+import MotionLibrary from '@/storybook-docs/motion-library.jsx';
+
+<Meta title="Foundations/Motion/Library" tags={['!dev', 'manifest']} />
+
+<DocsLanding
+    page="foundations-motion-library"
+    eyebrow="Foundation · Motion"
+    title="Library"
+    purpose="Every template's, pattern's and component's enter, exit and change motion in one table, to compare them in one pass."
+    links={{
+        items: [
+            { title: 'Principles', href: '?path=/docs/foundations-motion-principles--docs' },
+            { title: 'Physics', href: '?path=/docs/foundations-motion-physics--docs' },
+            { title: 'Transitions', href: '?path=/docs/foundations-motion-transitions--docs' },
+            { title: 'Choreography', href: '?path=/docs/foundations-motion-choreography--docs' },
+            { title: 'Playground', href: '?path=/docs/foundations-motion-playground--docs' },
+            { title: 'Library', href: '?path=/docs/foundations-motion-library--docs', current: true },
+        ],
+    }}
+/>
+
+<FoundationSection title="Every row">
+
+Each row is a template's, pattern's or component's entry in the motion registry, and the same text sits in that page's Motion section. Rows are grouped by tier: templates first, then patterns, then components. A page absent from the table does not move: it is static, or its motion is the Update a value or state change on its own page. The Sound column names the sound an event plays, when it plays and its condition; an empty cell is silent (Foundations · Sound · When to play).
+
+<MotionLibrary />
+
+</FoundationSection>

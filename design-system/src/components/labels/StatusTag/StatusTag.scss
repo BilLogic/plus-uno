@@ -1,7 +1,7 @@
 /*
  * Status tag — the condition something is in.
  *
- * THE BOX. Default is 20 tall (B3 12, icon 12, radius 4); spacious is 32 (B2 14, icon 16, radius 6). The two heights have no semantic token yet
+ * THE BOX. Default is 20 tall (B3 12, icon 12, radius 4); spacious is 32 (B2 14, icon 16, radius 8). The two heights have no semantic token yet
  * (label heights 20/22/32 are a token follow-up), so they are local custom
  * properties set from `_label-heights.scss`, which Skeleton reads too.
  *
@@ -11,8 +11,7 @@
  * nested count is the outer box's last child, so it sits at the outer right
  * padding — 2 in default, 6 in spacious — which, centered in the height, is the
  * same inset from the top. The 2 and 6 have no Element token, so they take the
- * spacing primitives Figma binds; the 6 radius is the radius-150 primitive for
- * the same reason.
+ * spacing primitives Figma binds.
  *
  * THE BORDER IS AN INSET SHADOW. A 1px inside border that takes no layout, as
  * a Figma inside stroke does, so the height and the padding stay exact.
@@ -55,7 +54,7 @@
 
     padding: 0 var(--tag-pad-end) 0 var(--pad-x-md);
     gap: 0;
-    border-radius: var(--radius-h24);
+    border-radius: var(--radius-lg);
 
     .plus-status__content {
         padding-right: var(--tag-pad-end);

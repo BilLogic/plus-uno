@@ -68,7 +68,7 @@ Don't: Everything in the label, and the time is cut off.
 - Sidebar tab for one row.
 - For a count on a row, the Sidebar uses `CountTag`.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternTable`
+Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternTable`
 
 ## Parts
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StatusTag } from '@/components';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 
 /**
  * Building blocks for the Foundations docs pages: token tables whose values are
@@ -183,20 +184,6 @@ export const DoDont = ({ children }) => (
     </div>
 );
 
-/** The page's contrast mode, followed as the toolbar changes it. */
-const usePageContrast = () => {
-    const read = () => (typeof document === 'undefined'
-        ? null
-        : document.documentElement.getAttribute('data-contrast-mode'));
-    const [contrast, setContrast] = useState(read);
-    useEffect(() => {
-        const observer = new MutationObserver(() => setContrast(read()));
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-contrast-mode'] });
-        return () => observer.disconnect();
-    }, []);
-    return contrast;
-};
-
 const MODES = [
     { id: 'both', label: 'Light and dark' },
     { id: 'light', label: 'Light' },
@@ -225,7 +212,7 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
                         style={{
                             height: 'var(--item-height-md)',
                             padding: '0 var(--pad-x-md)',
-                            borderRadius: 'var(--radius-h32)',
+                            borderRadius: 'var(--radius-control-md)',
                             border: 'var(--border-default) solid var(--ds-border)',
                             background: mode === m.id ? 'var(--ds-background-selected)' : 'var(--ds-background-neutral-subtle)',
                             color: mode === m.id ? 'var(--ds-text-selected)' : 'var(--ds-text-subtle)',

@@ -4,19 +4,16 @@
     "main": {
       "entries": {
         "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss": {
-          "count": 8
+          "count": 6
         },
         "design-system/src/components/forms-and-inputs/Comment/Comment.scss": {
-          "count": 11
+          "count": 10
         },
         "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.scss": {
           "count": 1
         },
-        "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss": {
-          "count": 1
-        },
         "design-system/src/components/forms-and-inputs/Radio/Radio.scss": {
-          "count": 7
+          "count": 6
         },
         "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.scss": {
           "count": 2
@@ -25,9 +22,6 @@
           "count": 1
         },
         "design-system/src/components/forms-and-inputs/Rating/Rating.scss": {
-          "count": 1
-        },
-        "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": {
           "count": 1
         },
         "design-system/src/components/forms-and-inputs/Select/Select.scss": {
@@ -40,7 +34,7 @@
           "count": 2
         },
         "design-system/src/components/forms-and-inputs/_internal/FieldBox.scss": {
-          "count": 2
+          "count": 1
         },
         "design-system/src/components/labels/CountTag/CountTag.scss": {
           "count": 1
@@ -58,22 +52,13 @@
           "count": 1
         },
         "design-system/src/components/messaging/Spotlight/Spotlight.scss": {
-          "count": 14
+          "count": 8
         },
         "design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss": {
           "count": 4
         },
-        "design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss": {
-          "count": 1
-        },
         "design-system/src/components/text-and-data-display/Table/Table.scss": {
           "count": 2
-        },
-        "design-system/src/patterns/PageTemplates/PageTemplateExamples.jsx": {
-          "count": 6
-        },
-        "design-system/src/patterns/PatternModal/PatternModal.scss": {
-          "count": 1
         },
         "design-system/src/patterns/PatternSection/PatternSection.scss": {
           "count": 1

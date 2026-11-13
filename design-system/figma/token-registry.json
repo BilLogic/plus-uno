@@ -109,8 +109,9 @@
     "elevation": {
       "Raised surface (cards)": "var(--ds-surface-raised)",
       "Raised shadow (cards; a clickable card lifts to the overlay shadow on hover or drag)": "var(--ds-shadow-raised)",
-      "Overlay surface (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar)": "var(--ds-surface-overlay)",
-      "Overlay shadow (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar)": "var(--ds-shadow-overlay)"
+      "Overlay surface (Popups, menus, listboxes, Flags, the floating Sidebar and Panel; the Modal too)": "var(--ds-surface-overlay)",
+      "Overlay shadow (Popups, menus, listboxes, Flags, the floating Sidebar and Panel; the Tooltip takes none)": "var(--ds-shadow-overlay)",
+      "Blocking shadow (the Modal on its Backdrop, only)": "var(--ds-shadow-blocking)"
     }
   },
   "figmaVariableMappings": {
@@ -144,12 +145,10 @@
     "spacing / primitives": {
       "Radius/radius-0125": "var(--radius-0125)",
       "Radius/radius-025": "var(--radius-025)",
-      "Radius/radius-03125": "var(--radius-03125)",
       "Radius/radius-0375": "var(--radius-0375)",
       "Radius/radius-050": "var(--radius-050)",
       "Radius/radius-0625": "var(--radius-0625)",
       "Radius/radius-075": "var(--radius-075)",
-      "Radius/radius-0875": "var(--radius-0875)",
       "Radius/radius-100": "var(--radius-100)",
       "Radius/radius-full": "var(--radius-full)",
       "Size/size-075": "var(--size-075)",
@@ -266,7 +265,6 @@
       "Card/min-width-md": "var(--card-min-width-md)",
       "Card/min-width-sm": "var(--card-min-width-sm)",
       "Card/radius": "var(--card-radius)",
-      "Card/radius-sm": "var(--card-radius-sm)",
       "Card/stack-lg": "var(--card-stack-lg)",
       "Card/stack-md": "var(--card-stack-md)",
       "Card/stack-sm": "var(--card-stack-sm)",
@@ -282,11 +280,8 @@
       "Popover/Menu/max-width-menu": "var(--popover-max-width-menu)",
       "Popover/Menu/min-width-menu": "var(--popover-min-width-menu)",
       "Popover/Menu/pad-menu": "var(--popover-pad-menu)",
-      "Popover/Menu/radius-menu-md": "var(--popover-radius-menu-md)",
-      "Popover/Menu/radius-menu-sm": "var(--popover-radius-menu-sm)",
       "Popover/Placement/gap-screen": "var(--popover-gap-screen)",
       "Popover/Popup and flag/pad": "var(--popover-pad)",
-      "Popover/Popup and flag/radius": "var(--popover-radius)",
       "Popover/Popup and flag/stack-flag": "var(--popover-stack-flag)",
       "Popover/Popup and flag/width-flag": "var(--popover-width-flag)",
       "Popover/Popup and flag/width-lg": "var(--popover-width-lg)",
@@ -294,7 +289,6 @@
       "Popover/Popup and flag/width-sm": "var(--popover-width-sm)",
       "Popover/Tooltip/max-width-tooltip": "var(--popover-max-width-tooltip)",
       "Popover/Tooltip/pad-y-tooltip": "var(--popover-pad-y-tooltip)",
-      "Popover/Tooltip/radius-tooltip": "var(--popover-radius-tooltip)",
       "Section/min-width-main": "var(--section-min-width-main)",
       "Section/min-width-side": "var(--section-min-width-side)",
       "Section/stack-lg": "var(--section-stack-lg)",
@@ -306,9 +300,7 @@
       "Table/pad-x-footer": "var(--table-pad-x-footer)",
       "Table/pad-y-cell": "var(--table-pad-y-cell)",
       "Table/radius": "var(--table-radius)",
-      "Table/stack": "var(--table-stack)",
-      "Tile/radius-lg": "var(--tile-radius-lg)",
-      "Tile/radius-sm": "var(--tile-radius-sm)"
+      "Table/stack": "var(--table-stack)"
     },
     "color / patterns": {},
     "color / foundations": {
@@ -851,12 +843,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1183,
+    "scssTokenCount": 1159,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 759,
-      "resolved": 723,
-      "percent": 95,
+      "resolved": 714,
+      "percent": 94,
       "unresolved": [
         {
           "collection": "typography",
@@ -870,6 +862,20 @@
           "figmaVariable": "Family/icon-brands",
           "tried": [
             "--type-family-icon-brands"
+          ]
+        },
+        {
+          "collection": "spacing / primitives",
+          "figmaVariable": "Radius/radius-03125",
+          "tried": [
+            "--radius-03125"
+          ]
+        },
+        {
+          "collection": "spacing / primitives",
+          "figmaVariable": "Radius/radius-0875",
+          "tried": [
+            "--radius-0875"
           ]
         },
         {
@@ -1079,6 +1085,13 @@
         },
         {
           "collection": "spacing / patterns",
+          "figmaVariable": "Card/radius-sm",
+          "tried": [
+            "--card-radius-sm"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
           "figmaVariable": "Overlay/pad-x",
           "tried": [
             "--overlay-pad-x"
@@ -1093,6 +1106,34 @@
         },
         {
           "collection": "spacing / patterns",
+          "figmaVariable": "Popover/Menu/radius-menu-md",
+          "tried": [
+            "--popover-radius-menu-md"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Popover/Menu/radius-menu-sm",
+          "tried": [
+            "--popover-radius-menu-sm"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Popover/Popup and flag/radius",
+          "tried": [
+            "--popover-radius"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Popover/Tooltip/radius-tooltip",
+          "tried": [
+            "--popover-radius-tooltip"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
           "figmaVariable": "Surface container/pad",
           "tried": [
             "--surface-container-pad"
@@ -1103,6 +1144,20 @@
           "figmaVariable": "Surface container/stack",
           "tried": [
             "--surface-container-stack"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Tile/radius-lg",
+          "tried": [
+            "--tile-radius-lg"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Tile/radius-sm",
+          "tried": [
+            "--tile-radius-sm"
           ]
         },
         {

@@ -12,10 +12,21 @@ Also asked as: rows and columns, grid.
 
 **Storybook page:** `design-system/src/components/text-and-data-display/Table/StaticTable.mdx`
 
+**Motion:** change `spatial.fast` + `appearance.fast` · roster `spatial.fast` + `appearance.fast`, sound `sound.roster`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `StaticTable` for a grid people only read: a record, a summary, a rate
 card. A table people sort, filter, select or page is a Dynamic table.
+
+## Motion
+
+Table reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Rows are added, removed and reordered; sort is Reorder, a filter is Swap content. Ticking rows cross-fades the head row into the bulk bar, same height, nothing slides. |  |
+| roster | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A student joins or leaves the session roster: the row is added or removed. | `sound.roster` on land: in a session; changes within 2 s play once |
 
 ## Best practices
 
@@ -122,7 +133,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--focus-ring-width` · `--heading-xxsmall` · `--icon-md` · `--icon-sm` · `--inline-md` · `--plus-table-cell-max-width` · `--plus-table-row-height` · `--row-height-lg` · `--row-height-md` · `--row-height-sm` · `--space-0625` · `--table-cell-max-width` · `--table-pad-x-cell` · `--table-pad-y-cell` · `--table-radius` · `--type-weight-semibold`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--focus-ring-width` · `--heading-xxsmall` · `--icon-md` · `--icon-sm` · `--inline-md` · `--plus-table-cell-max-width` · `--plus-table-row-height` · `--radius-md` · `--row-height-lg` · `--row-height-md` · `--row-height-sm` · `--space-0625` · `--table-cell-max-width` · `--table-pad-x-cell` · `--table-pad-y-cell` · `--table-radius` · `--type-weight-semibold`
 
 From `design-system/src/components/text-and-data-display/Table/Table.scss`. Override these through the token layer, never with a literal.
 

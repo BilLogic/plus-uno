@@ -2,7 +2,8 @@ import React, { createContext, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Popover } from '@base-ui/react/popover';
-import Icon from '../../images-and-icons/Icon';
+import { Button } from '../../forms-and-inputs/Button/Button';
+import { IconButton } from '../../forms-and-inputs/IconButton/IconButton';
 import './Spotlight.scss';
 
 export const SPOTLIGHT_PLACEMENTS = [
@@ -55,19 +56,27 @@ const SpotlightHeader = ({ headline, dismissControl }) => (
 
 SpotlightHeader.propTypes = { headline: PropTypes.node, dismissControl: PropTypes.node };
 
-/** Each appearance's class, spelled out so a search for it finds it. */
-const ACTION_CLASS = {
-    primary: 'plus-spotlight-action--primary',
-    secondary: 'plus-spotlight-action--secondary',
+/** Each action's Button appearance and its inverse-ground class, spelled out so a search for either finds it. */
+const ACTION = {
+    primary: { appearance: 'default', className: 'plus-spotlight-action--primary' },
+    secondary: { appearance: 'subtle', className: 'plus-spotlight-action--secondary' },
 };
 
-/** SpotlightAction: a footer action, a link when `href` is given and a button otherwise. */
+/** SpotlightAction: a footer Button, a link when `href` is given and a button otherwise. */
 export const SpotlightAction = ({ appearance = 'primary', href, onClick, children, ...props }) => {
-    const className = clsx('plus-spotlight-action', ACTION_CLASS[appearance]);
-    if (href) {
-        return <a href={href} className={className} onClick={onClick} {...props}>{children}</a>;
-    }
-    return <button type="button" className={className} onClick={onClick} {...props}>{children}</button>;
+    const action = ACTION[appearance] ?? ACTION.primary;
+    return (
+        <Button
+            appearance={action.appearance}
+            className={clsx('plus-spotlight-action', action.className)}
+            href={href}
+            role={href ? 'link' : undefined}
+            onClick={onClick}
+            {...props}
+        >
+            {children}
+        </Button>
+    );
 };
 
 SpotlightAction.propTypes = {
@@ -101,9 +110,14 @@ export const Spotlight = ({
     const [side, align] = PLACEMENT_TO_SIDE_ALIGN[placement] ?? PLACEMENT_TO_SIDE_ALIGN.bottom;
 
     const dismissControl = dismissible && (
-        <button type="button" className="plus-spotlight-dismiss-button" aria-label="Dismiss" onClick={onDismiss}>
-            <Icon name="xmark" />
-        </button>
+        <IconButton
+            icon="xmark"
+            label="Dismiss"
+            appearance="subtle"
+            isTooltipDisabled
+            className="plus-spotlight-dismiss-button"
+            onClick={onDismiss}
+        />
     );
 
     return (

@@ -28,7 +28,7 @@ beyond that.
 
 The tooltip is a floating layer: the Popup pattern's surface
 (`--ds-surface-overlay`), overlay shadow (`--ds-shadow-overlay`), radius
-(`--popover-radius`) and padding (`--popover-pad`), plus the shared
+(`--popup-radius`) and padding (`--popover-pad`), plus the shared
 `--layer-popup` z-index. `useHTML` alone only moves the tooltip's TEXT into a
 foreignObject — the box Highcharts draws around it is always its own SVG
 `<path>`, and `background`/`border-radius`/`box-shadow` are no-ops there, so
@@ -79,10 +79,9 @@ own `title` option (every chart sets `title: { text: null }`).
 
 ## Motion
 
-Series entrance and hover transitions take the motion tokens in
-`design-system/src/tokens/ladder/_motion.scss`
-(`--motion-duration-short/medium/long`). `prefers-reduced-motion` is handled
-once, globally, at `:root` — every duration token collapses to `0ms` under it
+Series entrance and hover transitions take the `--ds-motion-appearance-*` tokens
+(`design-system/src/tokens/ladder/_springs.scss`). `prefers-reduced-motion` is
+handled once, globally, at `:root` — every spatial token becomes a fade under it
 — so a chart that reads the token needs no reduced-motion branch of its own. A
 chart's `animationDuration`-style prop should default to
 `CHART_ANIMATION_DURATION_MS` (exported from `chartTheme.js`), not a literal

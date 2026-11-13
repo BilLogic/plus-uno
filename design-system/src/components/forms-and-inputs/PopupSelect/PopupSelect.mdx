@@ -8,6 +8,7 @@ import {
     DocsTable,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={PopupSelectStories} />
 
@@ -50,6 +51,14 @@ or sets one filter from a button, with no field and no Apply.
 ## Behavior
 
 <ComponentExample of={PopupSelectStories.Keyboard} title="Keyboard" description="Enter or Space opens it on the current value. Arrow keys move, Enter picks and closes, Escape closes and keeps the value. Focus goes back to the trigger." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="PopupSelect" />
 
 </div>
 
@@ -137,7 +146,7 @@ actions, not values, is a `DropdownMenu`.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Surface</td><td>Those of <code>Popup</code>: <code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popover-radius</code>.</td></tr>
+<tr><td>Surface</td><td>Those of <code>Popup</code>: <code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popup-radius</code>.</td></tr>
 <tr><td>Inset of the rows</td><td>4: <code>--popover-pad-menu</code>.</td></tr>
 <tr><td>Width</td><td><code>--popup-min-width</code> to <code>--popup-max-width</code>, and at least the trigger.</td></tr>
 <tr><td>Height of the list</td><td>Scrolls past 320: <code>--popover-max-height-menu</code>.</td></tr>

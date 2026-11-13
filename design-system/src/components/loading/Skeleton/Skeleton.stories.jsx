@@ -97,7 +97,7 @@ export const LabelPresets = () => (
         </span>
         <span style={pair}>
             <Skeleton preset="tag" data-testid="tag" />
-            <Tag text="Algebra" />
+            <Tag text="Lincoln Middle" />
         </span>
         <span style={pair}>
             <Skeleton preset="tag-person" data-testid="tag-person" />
@@ -108,7 +108,7 @@ export const LabelPresets = () => (
 LabelPresets.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const [status, statusLarge] = canvas.getAllByText('Completed').map(labelOf);
-    const tag = labelOf(canvas.getByText('Algebra'));
+    const tag = labelOf(canvas.getByText('Lincoln Middle'));
 
     const pairs = [
         ['status', status],
@@ -129,7 +129,7 @@ LabelPresets.play = async ({ canvasElement }) => {
     await expect(box(canvas.getByTestId('status')).height).toBe(20);
     await expect(radius(canvas.getByTestId('status'))).toBe(4);
     await expect(box(canvas.getByTestId('status-spacious')).height).toBe(32);
-    await expect(radius(canvas.getByTestId('status-spacious'))).toBe(6);
+    await expect(radius(canvas.getByTestId('status-spacious'))).toBe(8);
     const count = canvas.getByTestId('count');
     await expect(box(count).width, 'count is 24 wide').toBe(24);
     await expect(box(canvas.getByTestId('tag')).height).toBe(22);
@@ -160,8 +160,8 @@ export const TagGroupPreset = () => (
     <div style={{ display: 'grid', gap: '16px' }}>
         <Skeleton preset="tag-group" data-testid="group" />
         <TagGroup>
-            <Tag text="Algebra" />
-            <Tag text="Geometry" />
+            <Tag text="Lincoln Middle" />
+            <Tag text="Roosevelt K-8" />
             <Tag text="Fractions" />
         </TagGroup>
     </div>
@@ -172,7 +172,7 @@ TagGroupPreset.play = async ({ canvasElement }) => {
     const shapes = [...group.children];
     await expect(shapes, 'three tag shapes').toHaveLength(3);
 
-    const realTags = ['Algebra', 'Geometry'].map((text) => labelOf(canvas.getByText(text)));
+    const realTags = ['Lincoln Middle', 'Roosevelt K-8'].map((text) => labelOf(canvas.getByText(text)));
     const tagBox = realTags[0];
 
     for (const shape of shapes) {
@@ -418,7 +418,7 @@ export const LoadingTable = () => {
                                 <>
                                     <span className="body-default" style={{ width }}>{name}</span>
                                     <StatusTag appearance="success">Active</StatusTag>
-                                    <Tag text="Algebra" />
+                                    <Tag text="Lincoln Middle" />
                                 </>
                             ) : (
                                 <>
@@ -481,7 +481,7 @@ export const LoadingCard = () => {
                     width: '294px',
                     padding: '16px',
                     border: '1px solid var(--ds-border)',
-                    borderRadius: 'var(--card-radius-sm)',
+                    borderRadius: 'var(--card-radius-compact)',
                 }}
             >
                 {loaded ? (

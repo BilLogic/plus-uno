@@ -31,7 +31,7 @@ To look a name, prop, token or rule up without reading files, ask the `ds` comma
 
 | Folder | Holds | Start at |
 |--------|-------|----------|
-| [`foundations/`](foundations/overview.md) | The fourteen foundations — tokens, color, type, spacing, grid, elevation, iconography, accessibility, content, and the five not yet authored | `foundations/overview.md` |
+| [`foundations/`](foundations/overview.md) | The fifteen foundations — tokens, color, type, spacing, grid, elevation, motion, sound, iconography, accessibility, content, and the five not yet authored | `foundations/overview.md` |
 | [`components/`](components/overview.md) | Per-component guidance: when to use, correct and incorrect, accessibility | `components/overview.md` |
 | [`composition/`](composition/overview.md) | How components combine — layout, hierarchy, surfaces, forms | `composition/overview.md` |
 | [`figma/`](figma/overview.md) | Design-to-code: registries, the load gate, token mapping, MCP workflows | `figma/overview.md` |
@@ -42,7 +42,7 @@ To look a name, prop, token or rule up without reading files, ask the `ds` comma
 **Build UI with components**
 → `agent-views/components/index.md` (does it exist?) → the component's generated doc, linked from that index (props, variants, tokens touched) → `agent-views/tokens/tokens.md` if styling beyond them
 
-**Start a page or a container from a pattern**: a template (`Frame` with the PLUS `Sidebar` and a breadcrumb, or the focused `Frame` with no sidebar) for every full page; `Frame`, `PatternSidebar`, `Page`, `PatternSection`, `PatternCard`, `PatternTable`, `PatternModal`, `PatternDrawer`, `Blanket` and `AiChat` from `@/patterns`; the Popups (`DropdownMenu`, `Popup`, `Flag`, `Tooltip`) from `@/components`. When to reach for each: `agent-views/components/index.md` § Patterns.
+**Start a page or a container from a pattern**: a template (`Frame` with the PLUS `Sidebar` and a breadcrumb, or the focused `Frame` with no sidebar) for every full page; `Frame`, `PatternSidebar`, `Page`, `PatternSection`, `PatternCard`, `PatternTable`, `PatternModal`, `Backdrop` and `AiChat` from `@/patterns`; the Popups (`DropdownMenu`, `Popup`, `Flag`, `Tooltip`) from `@/components`. When to reach for each: `agent-views/components/index.md` § Patterns.
 
 **Build a page or dashboard**
 → `agent-views/components/index.md` § Patterns (the Frame and the Section, Card and Table shells, with their imports) → `composition/layout.md` → `composition/hierarchy.md` → `src/styles/Grid.mdx`
@@ -50,7 +50,7 @@ To look a name, prop, token or rule up without reading files, ask the `ds` comma
 **Build a form**
 → `composition/forms.md` → `agent-views/components/index.md` → `src/styles/Spacing.mdx`
 
-**Dialog, modal, drawer, card, table, empty or loading state**
+**Dialog, modal, floating panel, card, table, empty or loading state**
 → `agent-views/components/index.md` § Patterns (the shell and its import) → `composition/surfaces.md`
 
 **Style something**

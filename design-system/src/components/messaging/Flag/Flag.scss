@@ -11,6 +11,24 @@
 @use '../../../styles/icon-glyph' as *;
 @use '../../../styles/state' as *;
 
+@keyframes plus-flag-fade {
+    to { opacity: 0; }
+}
+
+@keyframes plus-flag-slide-in {
+    from { transform: translate(var(--flag-offset), calc(-1 * var(--flag-offset))); }
+    to { transform: none; }
+}
+
+@keyframes plus-flag-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes plus-flag-exit {
+    to { transform: translate(calc(100% + var(--popover-gap-screen)), calc(-100% - var(--popover-gap-screen))); }
+}
+
 .plus-flag {
     display: flex;
     align-items: flex-start;
@@ -20,8 +38,39 @@
     max-width: calc(100vw - 2 * var(--popover-gap-screen));
     padding: var(--popover-pad);
     background-color: var(--ds-surface-overlay);
-    border-radius: var(--popover-radius);
+    border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
+
+    // Enters from the top-right corner on `spatial.default` while it fades in on
+    // `appearance.default`; Notify sounds as it lands. It travels its own
+    // offset, `--flag-offset`. Only transform and opacity move.
+    animation:
+        plus-flag-slide-in var(--ds-motion-spatial-default-duration) var(--ds-motion-spatial-default),
+        plus-flag-fade-in var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
+
+    // Leaves the way it came, toward the top-right corner, on `spatial.exit`.
+    &[data-leaving] {
+        pointer-events: none;
+    }
+
+    &[data-leaving='timeout'] {
+        animation: plus-flag-exit var(--ds-motion-spatial-exit-duration) var(--ds-motion-spatial-exit) forwards;
+    }
+
+    // Closed by hand: a quick fade in place.
+    &[data-leaving='hand'] {
+        animation: plus-flag-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+    }
+
+    // Reduced motion: never a cut, never a move. Enter is the fade alone; both exits are the quick fade.
+    // Flag.jsx sets `data-reduced` from the one value the sound reads too: the prop, then FlagGroup, then the OS setting.
+    &[data-reduced='true'] {
+        animation: plus-flag-fade-in var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
+
+        &[data-leaving] {
+            animation: plus-flag-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+        }
+    }
 
     // --- ICON: 16, in a box one title line tall ---
     .plus-flag-icon {
@@ -98,7 +147,7 @@
         height: var(--label-height-md);
     }
 
-    // --- ACTIONS: link buttons under the description ---
+    // --- ACTIONS: links under the description on a default flag, Buttons on a bold one ---
     .plus-flag-actions {
         display: flex;
         flex-wrap: wrap;
@@ -106,7 +155,8 @@
         margin-top: var(--stack-sm);
     }
 
-    .plus-flag-action {
+    // The link action of a default flag. A bold flag's actions are PLUS Buttons.
+    .plus-flag-action:not(.plus-btn) {
         padding: 0;
         border: 0;
         background: none;
@@ -156,7 +206,7 @@
         // bold fill that is nearly invisible. It takes the inverse partners the
         // × takes (CloseButton's inverse tone), glyph, steps and ring.
         .plus-flag-expand {
-            // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold --ds-background-information-bold
+            // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold
             color: var(--ds-text-inverse);
 
             .fa-solid {
@@ -179,10 +229,26 @@
 
         .plus-flag-title,
         .plus-flag-body,
-        .plus-flag-timestamp,
-        .plus-flag-action {
-            // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold --ds-background-information-bold
+        .plus-flag-timestamp {
+            // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold
             color: var(--ds-text-inverse);
+        }
+
+        // The action Buttons are the subtle appearance, which reads on a surface, not a fill:
+        // their label takes the inverse text and their steps the inverse interaction tokens.
+        .plus-flag-action.plus-btn {
+            // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold
+            --_button-fg: var(--ds-text-inverse);
+            --_button-icon: var(--ds-icon-inverse);
+            color: var(--ds-text-inverse);
+
+            @include plus-state(
+                $states: (
+                    hovered: (background-color: var(--ds-interaction-inverse-hovered)),
+                    pressed: (background-color: var(--ds-interaction-inverse-pressed)),
+                ),
+                $ring-token: --ds-border-focused-inverse
+            );
         }
 
         .plus-flag-icon {
@@ -191,18 +257,10 @@
                 color: var(--ds-icon-inverse);
             }
         }
-
-        .plus-flag-action {
-            @include plus-state((), $ring-token: --ds-border-focused-inverse);
-        }
-    }
-
-    &.plus-flag--bold.plus-flag--normal {
-        background-color: var(--ds-background-neutral-bold);
     }
 
     &.plus-flag--bold.plus-flag--information {
-        background-color: var(--ds-background-information-bold);
+        background-color: var(--ds-background-neutral-bold);
     }
 
     &.plus-flag--bold.plus-flag--success {
@@ -219,8 +277,14 @@
 
         .plus-flag-title,
         .plus-flag-body,
-        .plus-flag-timestamp,
-        .plus-flag-action {
+        .plus-flag-timestamp {
+            color: var(--ds-text-warning-inverse);
+        }
+
+        .plus-flag-action.plus-btn {
+            // @grounds: --ds-background-warning-bold
+            --_button-fg: var(--ds-text-warning-inverse);
+            --_button-icon: var(--ds-icon-warning-inverse);
             color: var(--ds-text-warning-inverse);
         }
 

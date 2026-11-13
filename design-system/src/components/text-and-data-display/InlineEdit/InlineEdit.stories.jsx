@@ -158,7 +158,7 @@ export const Validation = (args) => (
     <div style={column}>
         <InlineEditableTextfield
             label="Course name"
-            defaultValue="Algebra I"
+            defaultValue="Lincoln Middle"
             validate={refuse}
             onConfirm={args.onConfirm}
         />
@@ -169,7 +169,7 @@ Validation.args = { onConfirm: fn() };
 Validation.play = async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
 
-    await userEvent.click(canvas.getByRole('button', { name: 'Course name Algebra I' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Course name Lincoln Middle' }));
     const field = canvas.getByRole('textbox', { name: 'Course name' });
     await userEvent.clear(field);
     await userEvent.keyboard('{Enter}');
@@ -180,11 +180,11 @@ Validation.play = async ({ canvasElement, args }) => {
     await expect(args.onConfirm).not.toHaveBeenCalled();
 
     // Typing clears the message.
-    await userEvent.type(field, 'Geometry');
+    await userEvent.type(field, 'Roosevelt K-8');
     await expect(canvas.queryByRole('alert')).toBeNull();
     await userEvent.keyboard('{Enter}');
     await waitFor(() => expect(canvas.queryByRole('textbox')).toBeNull());
-    await expect(args.onConfirm).toHaveBeenCalledWith('Geometry');
+    await expect(args.onConfirm).toHaveBeenCalledWith('Roosevelt K-8');
 };
 
 export const FailedConfirm = () => (

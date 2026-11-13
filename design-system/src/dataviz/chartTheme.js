@@ -53,8 +53,8 @@ export const CHART_SPACING_COMPACT = tokenNumber('--pad-y-md', 6);
 /** The near-zero inset a micro-chart (e.g. Sparkline) renders at — tight, but still a named step, not a bare `4`. */
 export const CHART_SPACING_MICRO = tokenNumber('--pad-x-xs', 4);
 
-/** Series-entrance and hover-transition duration: the standard motion token, already 0 under `prefers-reduced-motion`. */
-const CHART_ANIMATION_DURATION = tokenNumber('--motion-duration-medium', 200);
+/** Series-entrance and hover-transition duration: the appearance.default motion token (a fade under `prefers-reduced-motion`). */
+const CHART_ANIMATION_DURATION = tokenNumber('--ds-motion-appearance-default-duration', 160);
 
 /**
  * Stroke widths: SVG presentation attributes (how Highcharts draws lines and

@@ -56,10 +56,10 @@ const emptyStateSlot = (
     </>
 );
 
-const wideColumns = ['Name', 'Role', 'Status', 'School', 'Subject', 'Sessions', 'Last session', 'Mentor'];
+const wideColumns = ['Name', 'Role', 'Status', 'School', 'Platform', 'Sessions', 'Last session', 'Mentor'];
 const wideRows = Array.from({ length: 12 }, (_, i) => [
     `Tutor ${i + 1}`, i % 2 ? 'Coach' : 'Tutor', i % 3 ? 'Active' : 'Invited',
-    'Lincoln High', 'Algebra', `${10 + i}`, `Oct ${i + 1}`, 'Avery Kim',
+    'Lincoln Middle', 'Zoom', `${10 + i}`, `Oct ${i + 1}`, 'Avery Kim',
 ]);
 
 /** Eight columns and twelve rows, the third selected: enough to scroll both ways. */
@@ -200,6 +200,10 @@ export const Interactive = {
             {tableContent}
         </PatternTable>
     ),
+    play: async ({ canvasElement }) => {
+        const scroll = canvasElement.querySelector('.plus-pattern-table-scroll');
+        await expect(getComputedStyle(scroll).borderTopLeftRadius, 'Table radius is 12').toBe('12px');
+    },
 };
 
 /**

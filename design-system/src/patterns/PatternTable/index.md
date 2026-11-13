@@ -14,6 +14,8 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 **Storybook page:** `design-system/src/patterns/PatternTable/PatternTable.mdx`
 
+**Motion:** selection `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters and the record count use the toolbar type, and saved views use the tabs type. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the toolbar stays put. Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable. Paging stays under the rows, inside the same Section.
@@ -29,6 +31,14 @@ Pick the type from what people do with the rows. Ask the questions in order, and
 | Otherwise, people only read it. | Static table |
 
 Search, filters and actions sit in the Section header: `<PatternSection toolbar={<PatternSection.Toolbar />}>`.
+
+## Motion
+
+PatternTable reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| selection | Update a value or state | `--ds-motion-appearance-fast` | Ticking a row turns the head row into the bulk bar: labels cross-fade, same row, same height, nothing slides. Selected rows take the selected fill. The view bar above never moves. |
 
 ## Best practices
 
@@ -77,7 +87,7 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 - Card: a table never sits inside a card.
 - Templates: the dashboard content shows a Students table in a Section at every breakpoint.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar`
+Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar`
 
 ## Parts
 
@@ -109,6 +119,7 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-border-bold` | color | The rule under the head row. |
 | `--ds-text`, `--body-default` | 14/20 | Body cells. |
 | `--ds-text-subtle`, `--heading-xxsmall` | color, type | Head cells and the message row. |
+| `--table-radius` | 12 | The corner of the table and of its scroll region. |
 | `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding and the gap inside a cell. |
 | `--ds-background-neutral-subtle-hovered`, `-pressed` | color | A hovered and a pressed row. |
 | `--ds-background-selected`, `-hovered`, `-pressed` | color | A selected row. |

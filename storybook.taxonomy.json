@@ -120,16 +120,17 @@
   "$rootSourcesComment": "Source folders (or file prefixes) of each shared root. A page titled under one of these roots sits in one of its sources, and a page in a source is titled under that root (check:storybook-categories).",
   "rootSources": {
     "Templates": [
+      "design-system/src/patterns/Form/",
       "design-system/src/patterns/Frame/",
       "design-system/src/patterns/Page/",
       "design-system/src/patterns/PageTemplates/",
       "design-system/src/patterns/PatternSection/",
       "design-system/src/patterns/PatternCard/",
       "design-system/src/patterns/PatternTable/",
-      "design-system/src/patterns/Blanket/",
+      "design-system/src/patterns/Backdrop/",
       "design-system/src/patterns/PatternModal/",
-      "design-system/src/patterns/PatternDrawer/",
-      "design-system/src/patterns/PopupFamily/",
+      "design-system/src/patterns/Panel/",
+      "design-system/src/patterns/Popup/",
       "design-system/src/patterns/HeadingOutline",
       "design-system/src/storybook-docs/templates/"
     ],
@@ -178,6 +179,23 @@
       "Color",
       "Typography",
       "Motion",
+      [
+        "Principles",
+        "Physics",
+        "Choreography",
+        "Playground",
+        "Transitions",
+        "Library",
+        "Stage never blank"
+      ],
+      "Sound",
+      [
+        "Overview",
+        "Sounds",
+        "When to play",
+        "With motion",
+        "Settings and accessibility"
+      ],
       "Iconography",
       "Illustrations",
       "Logos",
@@ -201,6 +219,7 @@
         "Card",
         "Table"
       ],
+      "Form",
       "Modal",
       [
         "Modal",
@@ -217,7 +236,32 @@
     ],
     "Patterns",
     [
-      "Overview"
+      "Overview",
+      "Actions and input",
+      [
+        "Common actions",
+        "Forms"
+      ],
+      "States",
+      [
+        "Empty",
+        "Loading",
+        "Errors",
+        "Overflow",
+        "Disabled",
+        "Read-only"
+      ],
+      "Notifications and indicators",
+      [
+        "Notifications",
+        "Indicators"
+      ],
+      "Finding things",
+      [
+        "Navigation",
+        "Search",
+        "Filtering"
+      ]
     ],
     "Components",
     [

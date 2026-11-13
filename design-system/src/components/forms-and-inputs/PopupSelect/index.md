@@ -12,6 +12,8 @@ Popup select: one list in a Popup, applied the moment a row is picked. - **One l
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `PopupSelect` when one pick from one list changes what the page shows:
@@ -25,6 +27,15 @@ The pick applies at once and the menu closes, so there is no Apply and no
 Reset. A menu of several filter categories, staged and applied together, is
 a `FilterMenu`. A value that belongs to a form is a `Select` field; a list of
 actions, not values, is a `DropdownMenu`.
+
+## Motion
+
+PopupSelect reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
 
 ## Best practices
 
@@ -54,7 +65,7 @@ actions, not values, is a `DropdownMenu`.
 - For a menu of actions, use `DropdownMenu`.
 - For several filter categories applied together, use `FilterMenu`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -83,7 +94,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Surface | Those of `Popup`: `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popover-radius`. |
+| Surface | Those of `Popup`: `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`. |
 | Inset of the rows | 4: `--popover-pad-menu`. |
 | Width | `--popup-min-width` to `--popup-max-width`, and at least the trigger. |
 | Height of the list | Scrolls past 320: `--popover-max-height-menu`. |
@@ -100,6 +111,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `container` | object | — | Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. |
 | `options` | arrayOf | `[]` | Strings, or objects with `value`, `label`, `description`, `disabled` and `group`, as Select takes. |
 | `value` | string or number | — | The picked option's `value`. Leave it out to let the menu keep its own. |
 | `defaultValue` | string or number | — | The value it starts with, when `value` is left out. |
@@ -113,7 +125,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `defaultOpen` | bool | `false` | Opens the menu on first render, when `open` is left out. |
 | `onOpenChange` | func | — | `(open)`. |
 | `marker` | enum | `'radio'` | `radio` (default) marks the picked row with a radio before its label; `check` puts a check at the row's end. |
-| `spacing` | enum | `'default'` | `default` draws 40 rows and a 32 trigger; `compact` draws 32 rows and a 24 trigger. |
+| `spacing` | enum | `'default'` | `default` draws 32 rows and a 32 trigger; `compact` draws 24 rows and a 24 trigger. |
 | `emptyMessage` | node | `'No results'` | Shown when the search matches nothing. |
 | `className` | string | `''` | Extra classes on the popup. |
 | `id` | string | — | The popup's id; the list's id is this plus `-listbox`. |

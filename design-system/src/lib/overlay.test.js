@@ -25,53 +25,50 @@ afterEach(() => {
 });
 
 describe('openOverlay', () => {
-    it('stacks two overlays: a modal (or drawer) and the confirm it raises', () => {
-        expect(open()).not.toBeNull();
-        expect(open()).not.toBeNull();
-        expect(openOverlayCount()).toBe(2);
-    });
-
-    it('refuses a third and warns in development', () => {
+    it('refuses a Modal while one is open, and warns in development', () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        open();
-        open();
+        expect(open()).not.toBeNull();
         expect(open()).toBeNull();
-        expect(openOverlayCount()).toBe(2);
+        expect(openOverlayCount()).toBe(1);
         expect(warn).toHaveBeenCalledTimes(1);
-        expect(warn.mock.calls[0][0]).toMatch(/At most 2 overlays stack/);
+        expect(warn.mock.calls[0][0]).toMatch(/never opens on another Modal/);
     });
 
-    it('frees a place when one closes, and a release is idempotent', () => {
+    it('lets a Modal open again once the first closes, and a release is idempotent', () => {
+        const first = open();
+        first.release();
+        first.release();
+        expect(openOverlayCount()).toBe(0);
+        expect(open()).not.toBeNull();
+        expect(openOverlayCount()).toBe(1);
+    });
+
+    it('refuses the second Modal through the hook and calls onRefused', () => {
         vi.spyOn(console, 'warn').mockImplementation(() => {});
         open();
-        const second = open();
-        second.release();
-        second.release();
-        expect(openOverlayCount()).toBe(1);
-        expect(open()).not.toBeNull();
-        expect(openOverlayCount()).toBe(2);
+        const onRefused = vi.fn();
+        const { result } = renderHook(() => useOverlaySlot(true, onRefused));
+        expect(result.current[0]).toBe(false);
+        expect(onRefused).toHaveBeenCalledTimes(1);
     });
 });
 
 describe('subscribeOverlays', () => {
-    it('tells a subscriber when an overlay opens and closes, with the count', () => {
+    it('tells a subscriber when a Modal opens and closes, with the count', () => {
         const events = [];
         const unsubscribe = subscribeOverlays((event) => events.push(event));
         const first = open();
-        open();
         first.release();
         unsubscribe();
         open();
         expect(events).toEqual([
             { type: 'open', count: 1 },
-            { type: 'open', count: 2 },
-            { type: 'close', count: 1 },
+            { type: 'close', count: 0 },
         ]);
     });
 
-    it('says nothing for a refused overlay', () => {
+    it('says nothing for a refused Modal', () => {
         vi.spyOn(console, 'warn').mockImplementation(() => {});
-        open();
         open();
         const events = [];
         const unsubscribe = subscribeOverlays((event) => events.push(event));
@@ -96,14 +93,14 @@ describe('getOverlayPortalRoot', () => {
 });
 
 describe('overlayMountOf', () => {
-    it('mounts in the nearest .plus-pattern-blanket ancestor, when there is one', () => {
-        const blanket = document.createElement('div');
-        blanket.className = 'plus-pattern-blanket';
+    it('mounts in the nearest .plus-pattern-backdrop ancestor, when there is one', () => {
+        const backdrop = document.createElement('div');
+        backdrop.className = 'plus-pattern-backdrop';
         const trigger = document.createElement('button');
-        blanket.appendChild(trigger);
-        document.body.appendChild(blanket);
-        expect(overlayMountOf(trigger)).toBe(blanket);
-        blanket.remove();
+        backdrop.appendChild(trigger);
+        document.body.appendChild(backdrop);
+        expect(overlayMountOf(trigger)).toBe(backdrop);
+        backdrop.remove();
     });
 
     it('falls back to the shared portal root outside a modal', () => {
@@ -130,15 +127,14 @@ describe('useOverlaySlot', () => {
         expect(openOverlayCount()).toBe(0);
     });
 
-    it('refuses a third slot and calls onRefused, leaving the caller unplaced', () => {
+    it('refuses a second slot and calls onRefused, leaving the caller unplaced', () => {
         vi.spyOn(console, 'warn').mockImplementation(() => {});
-        open();
         open();
         const onRefused = vi.fn();
         const { result } = renderHook(() => useOverlaySlot(true, onRefused));
         expect(result.current[0]).toBe(false);
         expect(onRefused).toHaveBeenCalledTimes(1);
-        expect(openOverlayCount()).toBe(2);
+        expect(openOverlayCount()).toBe(1);
     });
 
     it('takes no slot while inactive', () => {
@@ -163,7 +159,7 @@ describe('isPressInRaisedOverlay', () => {
         document.body.innerHTML = `
             <button id="chat"></button>
             <div id="popup"><span id="popup-text"></span></div>
-            <div class="plus-pattern-blanket" id="blanket">
+            <div class="plus-pattern-backdrop" id="backdrop">
                 <div role="dialog"><p id="modal-text"></p><button id="inner"></button></div>
             </div>
             <main id="page"></main>`;
@@ -175,7 +171,7 @@ describe('isPressInRaisedOverlay', () => {
     it('is true for a press in a Modal the owner sits outside of', () => {
         const el = build();
         expect(isPressInRaisedOverlay(el('modal-text'), el('chat'))).toBe(true);
-        expect(isPressInRaisedOverlay(el('blanket'), el('popup'))).toBe(true);
+        expect(isPressInRaisedOverlay(el('backdrop'), el('popup'))).toBe(true);
     });
 
     it('is false for a press on the page or in the popup itself', () => {
@@ -205,7 +201,7 @@ describe('isOverlayRaisedOver', () => {
     });
 
     it('is true for an owner outside the open Modal, false for one inside it', () => {
-        document.body.innerHTML = '<button id="chat"></button><div class="plus-pattern-blanket"><button id="inner"></button></div>';
+        document.body.innerHTML = '<button id="chat"></button><div class="plus-pattern-backdrop"><button id="inner"></button></div>';
         open();
         expect(isOverlayRaisedOver(document.getElementById('chat'))).toBe(true);
         expect(isOverlayRaisedOver(document.getElementById('inner'))).toBe(false);

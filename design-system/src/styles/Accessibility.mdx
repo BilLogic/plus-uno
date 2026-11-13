@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -14,12 +13,20 @@ import * as AccessibilityStories from './Accessibility.stories.jsx';
 
 <Meta of={AccessibilityStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-accessibility"
+    eyebrow="Foundation"
     title="Accessibility"
-    summary="The rules every PLUS screen meets, built into the tokens and patterns."
+    purpose="The rules every PLUS screen meets, built into the tokens and patterns."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Contrast', href: '#foundation-contrast' },
+            { title: 'Focus', href: '#foundation-focus' },
+            { title: 'Disabled', href: '#foundation-disabled' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 
@@ -110,7 +117,7 @@ See Do and don't for the ring beside the fill-only mistake.
 
 <FoundationSubsection title="Focus in overlays">
 
-Opening a `Modal` or a `PatternDrawer` moves focus inside it and keeps Tab
+Opening a `Modal` or a floating `Panel` moves focus inside it and keeps Tab
 there; closing it returns focus to the control that opened it. Both do this
 themselves, and a new overlay gets the same behavior by building on Base UI.
 
@@ -217,7 +224,7 @@ npx vitest --project=storybook --run <path>
         { title: "Color", description: "Contrast pairs for every token.", href: "?path=/docs/foundations-color--docs" },
         { title: "Typography", description: "Heading levels and text styles.", href: "?path=/docs/foundations-typography--docs" },
         { title: "Border", description: "The focus ring.", href: "?path=/docs/foundations-border--docs" },
-        { title: "Motion", description: "Reduced motion.", href: "?path=/docs/foundations-motion--docs" },
+        { title: "Motion", description: "Reduced motion.", href: "?path=/docs/foundations-motion-physics--docs" },
     ]}
 />
 

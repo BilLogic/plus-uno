@@ -4,19 +4,25 @@
  * Popover/pad-y-tooltip 4, pad-x Element/pad-x-sm 8, radius
  * Popover/radius-tooltip 6, and it wraps past Popover/max-width-tooltip 240.
  * Its fill is color.background.neutral.bold with color.text.inverse, so it
- * flips with the mode. No arrow: it sits Popover/offset 4 from its trigger,
- * lifted by elevation.shadow.overlay like every floating layer without a blanket.
+ * flips with the mode. No arrow: it sits Popover/offset 4 from its trigger.
+ * It is a label, not something you act on, so it takes no shadow; under
+ * forced colors the fill is dropped, so an outline keeps the chip's edge.
  */
 
 .plus-tooltip {
     box-sizing: border-box;
     padding: var(--popover-pad-y-tooltip) var(--pad-x-sm);
     max-width: var(--popover-max-width-tooltip);
-    border-radius: var(--popover-radius-tooltip);
+    border-radius: var(--radius-control-sm);
     background-color: var(--ds-background-neutral-bold);
     color: var(--ds-text-inverse);
     font: var(--body-small);
     text-align: left;
-    box-shadow: var(--ds-shadow-overlay);
-    z-index: var(--layer-popup);
+    z-index: var(--layer-tooltip);
+}
+
+@media (forced-colors: active) {
+    .plus-tooltip {
+        outline: 1px solid CanvasText;
+    }
 }

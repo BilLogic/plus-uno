@@ -1,318 +1,228 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
-import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { C, ModeCompare } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
-    FoundationExample,
-    TokenSwatches,
 } from '@/storybook-docs/foundation-page.jsx';
-import { ModeCompare } from '@/storybook-docs/foundation-blocks.jsx';
+import { LevelTiles } from '@/storybook-docs/elevation-demos.jsx';
 import * as ElevationStories from './Elevation.stories.jsx';
 
 
 <Meta of={ElevationStories} />
 
-export const LevelTiles = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad-spacious)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-sunken)' }}>
-        {[
-            ['sunken', '--ds-surface-sunken', null, 'The frame. No shadow.'],
-            ['default', '--ds-surface', null, 'The page and flat content. No shadow.'],
-            ['raised', '--ds-surface-raised', '--ds-shadow-raised', 'Cards at rest. The 1px ring is the edge.'],
-            ['overlay', '--ds-surface-overlay', '--ds-shadow-overlay', 'Menus, popups, flags, modals and dragged cards.'],
-            ['overflow', null, '--ds-shadow-overflow', 'Content scrolling under a sticky part. A shadow only.'],
-        ].map(([name, surface, shadow, note]) => (
-            <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: surface ? `var(${surface})` : 'var(--ds-surface)', boxShadow: shadow ? `var(${shadow})` : undefined, color: 'var(--ds-text)', font: 'var(--body-small)' }}>
-                <strong style={{ font: 'var(--heading-xsmall)' }}>{name}</strong>
-                <code style={{ font: 'var(--code)', wordBreak: 'break-word' }}>{[surface, shadow].filter(Boolean).join(' + ')}</code>
-                <span style={{ color: 'var(--ds-text-subtle)' }}>{note}</span>
-            </div>
-        ))}
-    </div>
-);
-
-export const Kard = ({ children = 'Sessions this week', value = '24', style }) => (
-    <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)', ...style }}>
-        <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{children}</span>
-        <span style={{ font: 'var(--metric-medium)', color: 'var(--ds-text)' }}>{value}</span>
-    </div>
-);
-
-
-<FoundationHero
+<DocsLanding
+    page="foundations-elevation"
+    eyebrow="Foundation"
     title="Elevation"
-    summary="A surface lifts by its shadow, never by a darker fill."
+    purpose="What sits above what, and whether it blocks. Shadow and surface color show it."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Levels', href: '#foundation-the-levels' },
+            { title: 'Shadow', href: '#foundation-shadow-anatomy' },
+            { title: 'Surface color', href: '#foundation-surface-color-and-dark-mode' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 
-Elevation is how far a surface sits above the page. Each level is a pair of tokens, a surface color and its shadow, and the two always travel together. A raised card or a menu keeps the page color and lifts by its shadow; only the sunken frame changes fill. In dark, raised and overlay surfaces get lighter as they rise, because a shadow is hard to see on a dark page.
+**Elevation** is the order of layers: which surface sits above which, and whether it blocks the one below. **Shadow** is one way to show that order; surface color does the rest. Collapse the stack to see the screen as a person sees it.
 
-```css
-background: var(--ds-surface-raised);
-box-shadow: var(--ds-shadow-raised);
-```
-
-Figma holds `elevation/surface/*` in `color / foundations` and the `elevation/shadow/*` effect styles. Code reads them as `--ds-surface-*` with `--ds-shadow-*`.
-
-<Canvas of={ElevationStories.Overview} sourceState="none" />
-
-</FoundationSection>
-
-<FoundationSection title="About elevation">
-
-Elevations are the layered surfaces that form the foundation of the UI. They are the blank canvas where text, icons, backgrounds and borders sit. Most elevations are a surface and a shadow; together they give the impression of lift or depth, and they guide focus through layering or show that a surface can be scrolled, slid or dragged.
-
-Elevations use design tokens to apply the surface levels. The highest two, raised and overlay, are paired with shadows to create more depth.
-
-In dark mode a shadow is harder to see, so the surfaces change too: imagine them lit from the front, so the higher the elevation, the lighter the surface. Raised and overlay keep their shadows in dark mode for depth and consistency.
+<Canvas of={ElevationStories.Stack} sourceState="none" />
 
 </FoundationSection>
 
 <FoundationSection title="The levels">
 
-Five levels, lowest to highest. Pick the level by what the surface is, never
-by how strong a shadow looks.
+Six levels, lowest first. A surface and its shadow always travel together.
 
-<RefTable
-    head={['Level', 'Surface', 'Shadow', 'What sits there']}
-    rows={[
-        ['Sunken', <C>--ds-surface-sunken</C>, 'none', 'The frame: the topbar and the docked sidebar, behind the work.'],
-        ['Default', <C>--ds-surface</C>, 'none', 'The page itself, and flat content on it: sections and tables.'],
-        ['Raised', <C>--ds-surface-raised</C>, <C>--ds-shadow-raised</C>, 'Cards.'],
-        ['Overlay', <C>--ds-surface-overlay</C>, <C>--ds-shadow-overlay</C>, 'Anything over the interface: menus, popups, flags, the sidebar when it opens over the page, modals, and a card while it is dragged.'],
-        ['Overflow', 'none: a shadow only', <C>--ds-shadow-overflow</C>, 'Where content scrolls under other content, such as a sticky table column. Overflow is a shadow only and sits on whatever surface is beneath it.'],
-    ]}
-/>
+<ModeCompare>{() => <LevelTiles />}</ModeCompare>
 
-`--ds-surface-container` is not a level. It is a translucent fill for a
-recessed area inside a surface, such as a summary strip in a card, so it works
-on any surface beneath it.
-
-Raised and overlay surfaces have `-hovered` and `-pressed` steps for a
-surface that can be clicked, such as a clickable card.
+Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked. `--ds-surface-container` is a translucent well inside a surface, and it is not a level.
 
 </FoundationSection>
 
-<FoundationSection title="Surface and shadow pairs">
+<FoundationSection title="Choose by behavior">
 
-Raised and overlay share the default fill; only the shadow lifts them. The tiles sit on the sunken docs ground so the lift is visible.
+Pick the level by what the surface does, never by how strong a shadow looks. Answer the questions to land on a row.
 
-<LevelTiles />
+<Canvas of={ElevationStories.Behavior} sourceState="none" />
 
-<FoundationSubsection title="In dark mode">
+</FoundationSection>
 
-The same five levels with the Dark mode set on `color / foundations`. Higher is lighter, and the shadows stay on raised and overlay.
+<FoundationSection title="Shadow anatomy">
 
-<ModeCompare initial="dark">{() => <LevelTiles />}</ModeCompare>
+Every shadow is three slots: **edge**, **key** and **ambient**. A new shadow fills all three, or says why one is empty. Switch each slot off to see what it carries.
+
+<Canvas of={ElevationStories.Composer} sourceState="none" />
+
+<FoundationSubsection title="Cross-section">
+
+How dark the ground is at each px below a surface's edge, computed from the tokens on this page. The tick on the axis is each shadow's reach.
+
+<Canvas of={ElevationStories.CrossSectionChart} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Every slot">
+
+Each value reads offset x and y, blur, spread, then ink opacity. In dark the ambient is a tight dark halo: a wide soft shadow does not show on a dark ground.
+
+<Canvas of={ElevationStories.SlotTable} sourceState="none" />
 
 </FoundationSubsection>
 
 </FoundationSection>
 
-<FoundationSection title="Cards">
+<FoundationSection title="Surface color and dark mode">
 
-A card rests on the raised pair, `--ds-surface-raised` with
-`--ds-shadow-raised`, and has no border. The raised shadow is a 1px ring at 5%
-with a faint blur, so a resting card still reads almost flat in light. In dark,
-the ring is light, so the card keeps an edge.
+Higher is lighter. In light the lifted surfaces share the page color and the shadow lifts them; in dark the surface itself steps up.
 
-A clickable card lifts to `--ds-shadow-overlay` on hover and while it is
-dragged. Pressed, it settles back to `--ds-shadow-raised` on
-`--ds-surface-raised-pressed`. A card that cannot be clicked never lifts.
+<Canvas of={ElevationStories.Ladder} sourceState="none" />
 
-<Canvas of={ElevationStories.Cards} sourceState="none" />
-
-</FoundationSection>
-
-<FoundationSection title="Each pattern's level">
-
-Every pattern takes exactly one level, so nobody picks a shadow by eye.
-
-<RefTable
-    head={['Pattern', 'Surface and shadow']}
-    rows={[
-        ['Frame (topbar and docked sidebar)', <><C>--ds-surface-sunken</C>, no shadow</>],
-        ['Page (the box that holds the content)', <><C>--ds-surface</C>, no border</>],
-        ['Section, Table', 'No fill of their own: they sit on the page'],
-        ['Card', <><C>--ds-surface-raised</C> + <C>--ds-shadow-raised</C>; clickable cards lift to <C>--ds-shadow-overlay</C></>],
-        ['Menu (DropdownMenu and a Select\'s listbox), Popup, Flag', <><C>--ds-surface-overlay</C> + <C>--ds-shadow-overlay</C></>],
-        ['Sidebar, opened over the page below 1024', <><C>--ds-surface-overlay</C> + <C>--ds-shadow-overlay</C>, no Blanket</>],
-        ['Tooltip', <><C>--ds-background-neutral-bold</C> with <C>--ds-text-inverse</C></>],
-        ['Modal', <><C>--ds-surface-overlay</C> + <C>--ds-shadow-overlay</C>, over the <C>--ds-blanket</C> Blanket</>],
-    ]}
-/>
-
-A modal and a menu share the overlay level. The Blanket under the modal is what
-sets it apart.
-
-</FoundationSection>
-
-<FoundationSection title="Choosing a surface">
-
-- Sunken is the lowest level, a backdrop or well where other content sits, such as a column on a board. Use it only on the default surface, never on raised or overlay; to separate other areas, use whitespace or a border.
-- `elevation/surface/sunken` is opaque and darkens in both light and dark. `color/background/neutral` is transparent: it darkens in light and lightens in dark, so it adapts to whatever elevation it sits on. Use sunken to group content on the default surface and neutral when the fill must follow the elevation.
-- Default is the baseline, a flat surface with no lift. Pair it with a border to make a flat card.
-- Elevation surfaces use neutral palettes. When a different color is needed, swap the surface for a solid `color/background/*` token and follow that token's hovered and pressed behavior.
-
-<TokenTable
-    rows={[
-        { token: '--ds-surface-sunken', figma: 'elevation/surface/sunken', use: 'The frame' },
-        { token: '--ds-surface', figma: 'elevation/surface/default', use: 'The page' },
-        { token: '--ds-surface-raised', figma: 'elevation/surface/raised', use: 'A card; pair with the raised shadow' },
-        { token: '--ds-surface-overlay', figma: 'elevation/surface/overlay', use: 'A layer over the interface; pair with the overlay shadow' },
-        { token: '--ds-surface-container', figma: 'elevation/surface/container', use: 'A recessed well inside a surface' },
-    ]}
-    swatch
-/>
-
-</FoundationSection>
-
-<FoundationSection title="Interaction states and scrolling">
-
-Elevations use surface color changes for hovered and pressed. Use the hovered and pressed tokens of the level the surface is on.
-
-<RefTable
-    head={['Level', 'Background', 'Hovered', 'Pressed', 'Shadow']}
-    rows={[
-        ['Default', <C>elevation/surface</C>, <C>elevation/surface/hovered</C>, <C>elevation/surface/pressed</C>, 'none (add color/border/default for a flat card)'],
-        ['Raised', <C>elevation/surface/raised/default</C>, <C>elevation/surface/raised/hovered</C>, <C>elevation/surface/raised/pressed</C>, <C>elevation/shadow/raised</C>],
-        ['Overlay', <C>elevation/surface/overlay/default</C>, <C>elevation/surface/overlay/hovered</C>, <C>elevation/surface/overlay/pressed</C>, <C>elevation/shadow/overlay</C>],
-    ]}
-/>
-
-- Hovered and pressed can instead be shown by moving between elevations, only for default and raised surfaces and never for overlays. Use it sparingly and not on very small UI, where a color change reads better than a lift.
-- Use the hovered and pressed tokens or an elevation transition, not both.
-- Dragged: a surface being dragged takes the overlay elevation and returns to its own level when dropped.
-- Scrolled: use a border at the cut-off first, as in modal sticky headers and footers and the navigation. Use the overflow shadow only where a border could be missed, such as very small UI or tables with borders between cells. Overflow is a shadow only: it sits on whatever surface is beneath it, and there is no overflow surface variable, by design.
-
-<TokenTable
-    rows={[
-        { token: '--ds-shadow-raised', figma: 'elevation/shadow/raised', value: 'a 1px ring and a faint blur', use: 'Cards' },
-        { token: '--ds-shadow-overlay', figma: 'elevation/shadow/overlay', value: 'a 1px ring and a soft drop', use: 'Every layer over the interface' },
-        { token: '--ds-shadow-overflow', figma: 'elevation/shadow/overflow', value: 'a short spread on both sides', use: 'Content scrolling under a sticky part' },
-    ]}
-    valueHeader="Shape"
-/>
+Dark blocking is the same as dark overlay. On the dark Backdrop a shadow barely shows, so the lighter overlay surface is what lifts the Modal.
 
 </FoundationSection>
 
 <FoundationSection title="Layering">
 
-Surfaces that overlap need a stacking order. A higher layer covers a lower one, and overlays can stack on overlays. Each layer is a z-index token set in code.
+Each layer is a `--layer-*` z-index token, set in code only. Components name the token, never a number.
 
-<TokenTable
-    showFigma={false}
-    rows={[
-        { token: '--layer-card', use: 'Cards and sticky headers.' },
-        { token: '--layer-navigation', use: 'Sidebars and floating page navigation.' },
-        { token: '--layer-popup', use: 'Popups and menus.' },
-        { token: '--layer-blanket', use: 'The Blanket under a modal.' },
-        { token: '--layer-modal', use: 'A modal, over its Blanket.' },
-        { token: '--layer-flag', use: 'Flags, above a modal.' },
-        { token: '--layer-spotlight', use: 'Onboarding spotlights.' },
-        { token: '--layer-tooltip', use: 'Tooltips, above everything.' },
-    ]}
-/>
+<Canvas of={ElevationStories.Layers} sourceState="none" />
 
-Components use these tokens, never raw z-index numbers. They are code-only, so there are no Figma variables for stacking.
+- **A confirm Modal may open over a Panel, a Popup or a focused task,** with its own Backdrop.
+- **Never a Modal on a Modal.** A Modal confirms inside itself, with a warning SectionMessage and the danger button.
+- **A Panel never has a Backdrop.** It floats beside a usable page.
+- **Popups and Tooltips open over a Modal.** A Popup opened inside a Modal portals into it.
+- **A Flag sits above all of it**, so a message is never hidden.
+- **`--layer-dialog`** holds a view that replaces the page: Frame · focused and AiChat full screen.
 
-<FoundationSubsection title="Layering stack">
+</FoundationSection>
 
-Bottom to top: the Page, a sticky header, a Popup, the Blanket with its Modal, then a Flag. Each layer sits over the one before it.
+<FoundationSection title="Elevation in the system">
 
-1. **Page.** No z-index of its own; the base every other layer sits on.
-2. **Sticky header.** Shares the card index. Stays at the top of the Page while content scrolls.
-3. **Popup.** Menus and popups open over the header and the Page.
-4. **Blanket and Modal.** The Blanket dims everything below and the Modal sits on it.
-5. **Flag.** A Flag stays visible above the Modal, so a message is never hidden.
+<FoundationSubsection title="Card">
+
+Raised at rest; a clickable Card lifts to overlay on hover and while dragged.
+
+<Canvas of={ElevationStories.CardLevels} sourceState="none" />
 
 </FoundationSubsection>
 
-<FoundationSubsection title="Sticky header, at rest and scrolled">
+<FoundationSubsection title="Popup and an open Select">
 
-At the top the header has no shadow. Once content scrolls under it, the overflow shadow shows where the content is cut off.
+<Canvas of={ElevationStories.OpenPopup} sourceState="none" />
 
-<FoundationExample caption="At the top: no shadow. Scrolled: the overflow shadow.">
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
-    <div style={{ padding: 'var(--card-pad-compact)', background: 'var(--ds-surface)', font: 'var(--heading-xsmall)' }}>Sessions</div>
-    <div style={{ padding: 'var(--card-pad-compact)', background: 'var(--ds-surface)', boxShadow: 'var(--ds-shadow-overflow)', font: 'var(--heading-xsmall)' }}>Sessions</div>
-</div>
-</FoundationExample>
+<Canvas of={ElevationStories.OpenSelect} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Floating Sidebar and floating Panel">
+
+Both take the overlay pair, with no Backdrop: the page beside them stays usable.
+
+<Canvas of={ElevationStories.FloatingSidebar} sourceState="none" />
+
+<Canvas of={ElevationStories.FloatingPanel} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Modal over its Backdrop">
+
+<Canvas of={ElevationStories.ModalOnBackdrop} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Sticky header, scrolled">
+
+A border marks the cut first; the overflow shadow is for where a border would be missed.
+
+<Canvas of={ElevationStories.StickyHeaderScrolled} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Tooltip">
+
+A label, so it has no shadow: the dark fill sets it apart.
+
+<Canvas of={ElevationStories.OpenTooltip} sourceState="none" />
 
 </FoundationSubsection>
 
 </FoundationSection>
 
-<FoundationSection title="Tooltip">
+<FoundationSection title="Motion">
 
-A tooltip is the one floating layer that is not on the overlay pair. It reads as a label, so it takes the dark neutral fill and the inverse text.
+Three rules for a shadow that moves. A shadow moves on the appearance springs, the `--ds-motion-appearance-*` tokens; the springs themselves are in [Motion](?path=/docs/foundations-motion-physics--docs).
 
-- Use `color/background/neutral/bold` with `color/text/inverse`, up to 240 wide and 8 from the screen edge.
-- Menus, popups, flags and the floating sidebar take the overlay surface and shadow. A tooltip does not.
+<FoundationSubsection title="A shadow changes with its fill">
 
-**Keep the tooltip dark.** A tooltip on the Reschedule button.
+It moves on `--ds-motion-appearance-default`, together with the surface. Click the Card.
 
-<DoDont>
-<Do caption="Dark neutral fill with inverse text. It stays a quiet label.">
-<span style={{ display: 'inline-block', padding: 'var(--popover-pad-y-tooltip) var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-neutral-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-small)' }}>Reschedule this session</span>
-</Do>
-<Dont caption="The overlay pair and a shadow make it look like a menu, so people try to click it.">
-<span style={{ display: 'inline-block', padding: 'var(--popover-pad-y-tooltip) var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)', color: 'var(--ds-text)', font: 'var(--body-small)' }}>Reschedule this session</span>
-</Dont>
-</DoDont>
+<Canvas of={ElevationStories.Lift} sourceState="none" />
 
-</FoundationSection>
+</FoundationSubsection>
 
-<FoundationSection title="Do and don't">
+<FoundationSubsection title="A clip never cuts a shadow">
 
-How to lift a surface, and what not to do.
+A clip-path open runs on `--ds-motion-appearance-default` and rests past the shadow's reach, drawn dashed.
 
-**Lift with shadow, not with a darker fill.** A raised card keeps the page color and takes its shadow. A gray fill reads as a recessed area, so it makes a card look pressed in.
+<Canvas of={ElevationStories.Clip} sourceState="none" />
 
-<Canvas of={ElevationStories.LiftWithShadow} sourceState="none" />
+</FoundationSubsection>
 
-**No border on a card.** The ring in the raised shadow is the edge. Adding a border doubles it and makes the card look outlined rather than lifted.
+<FoundationSubsection title="A scroll shadow tracks the scroll">
 
-<Canvas of={ElevationStories.NoCardBorder} sourceState="none" />
+It grows one to one with the scroll position, with no spring token of its own.
 
-**Name the shadow token.** A shadow is always one of the `--ds-shadow-*` tokens, never a literal value, so it follows the color mode and the contrast setting.
+<Canvas of={ElevationStories.ScrollShadow} sourceState="none" />
 
-**Always pair the surface with its shadow.** A surface and its shadow travel together. A menu on the overlay surface with no shadow melts into the page behind it.
-
-<Canvas of={ElevationStories.AlwaysPair} sourceState="none" />
-
-**Raise one focal point.** Use raised intentionally. If it is for emphasis, limit it to one section or focal point of the screen; a border or whitespace is enough to group the rest.
-
-<DoDont>
-<Do caption="One raised card marks the next session.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-    <Kard value="Next session" />
-    <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-small)' }}>Past session</div>
-    <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-small)' }}>Past session</div>
-</div>
-</Do>
-<Dont caption="Every card raised: visual noise, and nothing stands out.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-    <Kard value="Next session" /><Kard value="Past session" /><Kard value="Past session" />
-</div>
-</Dont>
-</DoDont>
-
-**Limit overlays.** When controls must sit over other UI, group related actions in one floating toolbar rather than several overlay buttons. One overlay toolbar holds the related actions; separate floating buttons side by side pile up shadows.
+</FoundationSubsection>
 
 </FoundationSection>
 
 <FoundationSection title="Accessibility">
 
-- A shadow is never the only thing that tells two surfaces apart. Content on a card or a menu still has its own heading, and a modal sits on a Blanket.
-- Under increased contrast, the ring in the raised and overlay shadows darkens to a 3:1 line, so cards and menus keep a visible edge. In light increased contrast the frame turns white, and the Page draws a border so its edge stays.
-- Text on any of the five surfaces uses the text tokens from Color, which clear 4.5:1 on all of them.
-- Check contrast on overlay surfaces in dark mode: raised and overlay surfaces get lighter, so text and icons that pass in light mode may need a different token there.
+- **A shadow is never the boundary.** The edge slot is: under increased contrast it becomes a 3:1 line. Turn it on below.
+- **Forced colors keep an edge.** Shadows disappear there, so a lifted surface carries a transparent border that the system paints.
+- **Text clears 4.5:1 on every level**, in light and dark. Check a new pairing on the overlay surface in dark, where it is lightest.
+
+<Canvas of={ElevationStories.Contrast} sourceState="none" />
+
+</FoundationSection>
+
+<FoundationSection title="Do and don't">
+
+<FoundationSubsection title="Lift with shadow, not a darker fill">
+<Canvas of={ElevationStories.LiftWithShadow} sourceState="none" />
+</FoundationSubsection>
+
+<FoundationSubsection title="No border on a lifted surface">
+<Canvas of={ElevationStories.NoBorder} sourceState="none" />
+</FoundationSubsection>
+
+<FoundationSubsection title="Pair the surface with its shadow">
+<Canvas of={ElevationStories.AlwaysPair} sourceState="none" />
+</FoundationSubsection>
+
+<FoundationSubsection title="Blocking only on the Backdrop">
+<Canvas of={ElevationStories.BlockingOnBackdrop} sourceState="none" />
+</FoundationSubsection>
+
+<FoundationSubsection title="Sunken never floats">
+<Canvas of={ElevationStories.SunkenNeverFloats} sourceState="none" />
+</FoundationSubsection>
+
+<FoundationSubsection title="Keep the Tooltip flat">
+<Canvas of={ElevationStories.TooltipFlat} sourceState="none" />
+</FoundationSubsection>
+
+<FoundationSubsection title="Raise one focal point">
+<Canvas of={ElevationStories.OneFocalPoint} sourceState="none" />
+</FoundationSubsection>
 
 </FoundationSection>
 
@@ -321,9 +231,9 @@ How to lift a surface, and what not to do.
 <FoundationRelated
     items={[
         { title: "Color", description: "The surface and text tokens each level sits with.", href: "?path=/docs/foundations-color--docs" },
+        { title: "Motion", description: "The springs a shadow moves on.", href: "?path=/docs/foundations-motion-physics--docs" },
         { title: "Templates", description: "The Frame, Card and Modal, which bake their level in.", href: "?path=/docs/templates-overview--docs" },
-        { title: "Spacing", description: "The pad inside a lifted surface.", href: "?path=/docs/foundations-spacing--docs" },
-        { title: "Radius", description: "The corners of a lifted surface.", href: "?path=/docs/foundations-radius--docs" },
+        { title: "Border", description: "The line a sticky part draws before any shadow.", href: "?path=/docs/foundations-border--docs" },
     ]}
 />
 

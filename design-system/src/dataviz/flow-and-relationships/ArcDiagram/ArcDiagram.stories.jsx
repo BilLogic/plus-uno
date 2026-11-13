@@ -65,11 +65,11 @@ Shows **nodes and links along a single axis** to visualize connections.
 
 const connectionData = {
     data: [
-        ['Math', 'Physics', 10],
-        ['Math', 'Programming', 15],
-        ['Physics', 'Chemistry', 8],
-        ['Programming', 'Math', 5],
-        ['English', 'History', 12]
+        ['CMU', 'Lincoln Middle', 10],
+        ['CMU', 'Roosevelt K-8', 15],
+        ['Pitt', 'North High', 8],
+        ['Pitt', 'Lincoln Middle', 5],
+        ['Duquesne', 'South High', 12]
     ]
 };
 

@@ -195,6 +195,9 @@ export const Cells = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        // The loading bar rounds at radius-md, not the table's corner.
+        const bar = canvasElement.querySelector('.plus-table-cell--loading .plus-table-cell-inner');
+        await expect(px(getComputedStyle(bar, '::after').borderTopLeftRadius), 'loading bar radius').toBe(4);
         const note = canvas.getByText(/A very long single-line note/);
         await waitFor(() => expect(note.scrollWidth).toBeGreaterThan(note.clientWidth));
         await expect(getComputedStyle(note).textOverflow).toBe('ellipsis');

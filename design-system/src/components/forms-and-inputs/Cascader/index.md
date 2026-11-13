@@ -12,12 +12,24 @@ Cascader: a field that picks one path through nested options, one level at a tim
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Cascader` when a choice is naturally made one level at a time, in
 sequence — a region, then a city, then a neighborhood. For a hierarchy where
 someone might pick or see several nodes at once rather than one path, use
 `TreeSelect` instead. For a flat list, use `Select`.
+
+## Motion
+
+Cascader reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
+| change | Expand and collapse | `--ds-motion-spatial-fast` | Columns and branches expand. |
 
 ## Best practices
 
@@ -60,7 +72,7 @@ Don't: A failed pick still draws the normal border, so nothing marks the error.
 - For a hierarchy where several nodes can be picked or seen at once, use `TreeSelect`.
 - For a flat list with no hierarchy, use `Select`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -86,11 +98,11 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
 | Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
 | Side padding | `--pad-x-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
-| Menu | `--ds-surface-overlay` with a `--ds-border` edge, `--popover-radius-menu-md` and `--ds-shadow-overlay`. |
+| Menu | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | Column rule | `--border-default` in `--ds-border` between columns. |
 | Option | `--item-height-md` high; hovered `--ds-background-neutral-subtle-hovered`, chosen `--ds-background-selected` with `--ds-text-selected`. |
 

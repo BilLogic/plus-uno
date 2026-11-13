@@ -5,8 +5,12 @@ import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { compare, refusals } from './token-generation.mjs';
 import { FRAME_LAYER_COLLECTIONS, frameLayerFile, frameLayerFolder, frameLayerToken } from './lib/frame-layer-collections.mjs';
-import { dropRetired } from './lib/tokens/retire.mjs';
+import { dropRetired, planOwnedTokens } from './lib/tokens/retire.mjs';
+import { RETIRED_TOKENS } from './lib/tokens/plan.mjs';
 import { TYPOGRAPHY_FILE, TYPOGRAPHY_FOLDERS, typographyFolder, typographyToken } from './lib/typography-collection.mjs';
+
+/** Names dropped from the SCSS the Figma exports write: retired ones, and the ones the token plan now owns. */
+const DROPPED = new Set([...RETIRED_TOKENS, ...planOwnedTokens()]);
 
 /**
  * The Figma exports the SCSS is generated FROM, and where the SCSS lands.
@@ -192,8 +196,8 @@ const CODE_ONLY_FRAME_LAYERS = {
     'frame-layer-edge': { value: 'calc(var(--layer-navigation) - 1)', note: 'the hover strips that peek a closed Sidebar or Panel', figmaName: 'Layer/frame-edge' },
     'frame-layer-sidebar': { value: 'var(--layer-navigation)', note: 'the raised Sidebar', figmaName: 'Layer/frame-sidebar' },
     'frame-layer-topbar-start': { value: 'calc(var(--layer-navigation) + 1)', note: 'the Topbar start, above a raised Sidebar', figmaName: 'Layer/frame-topbar-start' },
-    'frame-layer-blanket': { value: 'calc(var(--layer-navigation) + 2)', note: "the overlay Panel's Blanket", figmaName: 'Layer/frame-blanket' },
-    'frame-layer-panel-peek': { value: 'calc(var(--layer-navigation) + 3)', note: 'a peeking or overlay Panel, above its Blanket', figmaName: 'Layer/frame-panel-peek' },
+    'frame-layer-blanket': { value: 'calc(var(--layer-navigation) + 2)', note: "the overlay Panel's Backdrop", figmaName: 'Layer/frame-blanket' },
+    'frame-layer-panel-peek': { value: 'calc(var(--layer-navigation) + 3)', note: 'a peeking or overlay Panel, above its Backdrop', figmaName: 'Layer/frame-panel-peek' },
     'frame-layer-splitter': { value: '1', note: "local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip", figmaName: 'Layer/frame-splitter' },
     'frame-layer-docked-edge': { value: '1', note: "local to the Frame's row, not a step on the navigation scale: lifts a docked Sidebar so its 1px edge lies over the Page's first pixel", figmaName: 'Layer/frame-docked-edge' },
 };
@@ -208,8 +212,7 @@ function generateFrameLayersSCSS() {
     for (const { file } of SCALE_COLLECTIONS) {
         for (const v of readSource(file).json.variables) scaleName[v.id] = webName(v.codeSyntax?.WEB);
     }
-    // A frame or layer token may also alias another one, as Drawer/width-drawer-*
-    // alias Modal/width-modal-*: it is written as a var() of that token, so it
+    // A frame or layer token may also alias another one, by name: it is written as a var() of that token, so it
     // follows the target at every mode.
     const frameLayerName = {};
     for (const { name: collection } of FRAME_LAYER_COLLECTIONS) {
@@ -511,8 +514,8 @@ const OUT_DIR = TOKEN_DIR;
 let generated;
 try {
     generated = [
-        { file: '_scales.scss', generated: dropRetired(generateScalesSCSS()) },
-        { file: '_frame_layers.scss', generated: dropRetired(generateFrameLayersSCSS()) },
+        { file: '_scales.scss', generated: dropRetired(generateScalesSCSS(), DROPPED) },
+        { file: '_frame_layers.scss', generated: dropRetired(generateFrameLayersSCSS(), DROPPED) },
         { file: '_type.scss', generated: generateTypeSCSS() },
     ];
 } catch (error) {

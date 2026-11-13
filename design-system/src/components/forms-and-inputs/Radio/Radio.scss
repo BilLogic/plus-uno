@@ -31,7 +31,7 @@
     padding: 0;
     margin: 0;
     border: var(--stroke-2, 2px) solid var(--ds-border-input);
-    border-radius: var(--radius-full, 9999px);
+    border-radius: var(--radius-full);
     background-color: var(--ds-background-input);
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
@@ -91,7 +91,7 @@
     margin: auto;
     width: 42%;
     height: 42%;
-    border-radius: var(--radius-full, 9999px);
+    border-radius: var(--radius-full);
     background-color: var(--ds-icon-inverse);
     transform: scale(0);
     transition: transform 0.2s;
@@ -143,7 +143,7 @@
 .plus-choice-card {
     padding: var(--space-0375) var(--pad-x-md);
     border: var(--stroke-1) solid var(--ds-border);
-    border-radius: var(--radius-025);
+    border-radius: var(--radius-lg);
     background-color: var(--ds-surface);
 
     .plus-form-radio[data-checked] {

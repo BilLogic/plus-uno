@@ -381,3 +381,8 @@ export const InvalidFocus = {
         await expect(style.borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
     },
 };
+
+const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
+Overview.play = async ({ canvasElement }) => {
+    await expect(radiusOf(canvasElement, '.plus-file-upload-container'), 'Drop zone radius is 12').toBe('12px');
+};

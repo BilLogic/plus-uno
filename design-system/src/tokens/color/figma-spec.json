@@ -19945,7 +19945,7 @@
  "effectStyles": [
   {
    "name": "elevation/shadow/raised",
-   "description": "Box shadow of a raised card. Pair with elevation.surface.raised.",
+   "description": "Box shadow of a Card: one object a person can act on. Pair with elevation.surface.raised.",
    "layers": [
     {
      "type": "DROP_SHADOW",
@@ -19984,7 +19984,7 @@
   },
   {
    "name": "elevation/shadow/overlay",
-   "description": "Box shadow of anything over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay.",
+   "description": "Box shadow of a layer that floats while the page stays usable: a Popup, a Select list, a floating Sidebar or Panel, a Flag, a dragged Card. Pair with elevation.surface.overlay.",
    "layers": [
     {
      "type": "DROP_SHADOW",
@@ -20023,7 +20023,7 @@
   },
   {
    "name": "elevation/shadow/blocking",
-   "description": "Box shadow of a modal that blocks the page behind a Backdrop. Pair with elevation.surface.overlay.",
+   "description": "Box shadow of the Modal on its Backdrop, the one surface that blocks the page. Pair with elevation.surface.overlay.",
    "layers": [
     {
      "type": "DROP_SHADOW",
@@ -20062,7 +20062,7 @@
   },
   {
    "name": "elevation/shadow/overflow",
-   "description": "Shadow where content scrolls under other content, such as a table's sticky column.",
+   "description": "Shadow where content scrolls under a part that stays put, such as a table's sticky header or column. A border marks the cut first.",
    "layers": [
     {
      "type": "DROP_SHADOW",

@@ -52,6 +52,7 @@ Basic.play = async () => {
     await expect(headline).toHaveTextContent('Create a new board');
     const dismiss = document.querySelector('.plus-spotlight-dismiss-button');
     await expect(dismiss).toBeTruthy();
+    await expect(getComputedStyle(document.querySelector('.plus-spotlight')).borderTopLeftRadius, 'Spotlight radius is 12').toBe('12px');
 };
 
 export const WithMedia = () => (
@@ -116,6 +117,8 @@ const actionStory = (appearance, label) => ({
     ),
     play: async ({ canvasElement }) => {
         await expect(canvasElement.querySelector('.plus-spotlight-action')).toHaveClass(`plus-spotlight-action--${appearance}`);
+        // A real Button: it takes Button's own 6 corners, no override.
+        await expect(getComputedStyle(canvasElement.querySelector('.plus-spotlight-action')).borderTopLeftRadius).toBe('6px');
     },
 });
 

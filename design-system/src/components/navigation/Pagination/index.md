@@ -14,6 +14,8 @@ Also asked as: paging, pager, next page, page numbers.
 
 **Storybook page:** `design-system/src/components/navigation/Pagination/Pagination.mdx`
 
+**Motion:** change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Pagination` when a list is split into numbered pages and the user needs to
@@ -27,6 +29,14 @@ a search's matches, a long history.
 The window of numbers is computed for you. `max` (default 5) centers the
 window on the current page, and first and last pages are pinned with an ellipsis
 whenever the window does not reach them.
+
+## Motion
+
+Pagination reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Step to the next or previous | `--ds-motion-spatial-default` | A page change is Step. |
 
 ## Best practices
 
@@ -206,7 +216,7 @@ Implemented as `PaginationNavigator`.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-disabled` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-surface` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--item-height-md` · `--item-height-sm` · `--motion-duration-short` · `--motion-easing-standard` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium` · `--type-weight-semibold`
+`--body-default` · `--border-default` · `--ds-background-disabled` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-surface` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--item-height-md` · `--item-height-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium` · `--type-weight-semibold`
 
 From `design-system/src/components/navigation/Pagination/Pagination.scss`. Override these through the token layer, never with a literal.
 

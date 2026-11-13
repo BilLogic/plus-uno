@@ -12,11 +12,23 @@ Split button: a primary action joined to a chevron that opens a menu of related 
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.mdx`
 
+**Motion:** change `appearance.fast` · enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `SplitButton` when one action is clearly primary and a few related
 actions belong beside it in a menu — "Send" with "Send and close," "Save" as
 a draft. For actions with no clear primary, use `ButtonGroup` instead.
+
+## Motion
+
+SplitButton reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | As Button; its menu is a Popup. |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The menu clips open from its trigger. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | The menu fades. |
 
 ## Best practices
 
@@ -73,7 +85,7 @@ a `Popup` or `DropdownMenu` positioned under it.
 - For actions with no clear primary, use `ButtonGroup`.
 - For the menu the chevron opens, see `Popup` and `DropdownMenu`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 

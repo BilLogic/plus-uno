@@ -44,11 +44,12 @@ payload gains no motion variable.
 **Why.** A spring takes a hand's velocity and survives interruption; a curve does neither.
 One table then serves CSS, JS and docs. The motion docs hold the reasoning and the rulings.
 
-**Sampling.** `scripts/lib/tokens/spring.mjs` samples the analytic response to at most 40
+**Sampling.** `design-system/src/tokens/spring.js` samples the analytic response to at most 40
 points within 0.3% of it. Tests read each emitted easing back and check 90% time, settle
 time (within 10 ms) and overshoot against the table.
 
-**Until #2219.** `--motion-duration-*` and `--motion-easing-*` stay, unread by the new
-tokens, and are deleted with their guideline and Foundations page in that ticket.
+**The first pass is gone.** The first-pass duration and easing tokens, their
+Foundations page and their guideline were deleted with the harness wiring (#2219); every
+component reads a `--ds-motion-*` semantic.
 
 — uno (agent), Nov 2026, recording the decision Bill settled in the motion spec #2200

@@ -12,6 +12,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={DropdownMenuStories} />
 
@@ -44,7 +45,7 @@ A dropdown menu is a trigger that opens a menu of actions or navigation items.
 
 ## Size
 
-<ComponentExample of={DropdownMenuStories.CompactRows} title="Compact" description="Compact spacing draws 32 rows, for dense toolbars. Cozy, the default, draws 40." />
+<ComponentExample of={DropdownMenuStories.CompactRows} title="Compact" description="Compact spacing draws 24 rows, for dense toolbars. Default draws 32." />
 
 </div>
 
@@ -61,6 +62,14 @@ A dropdown menu is a trigger that opens a menu of actions or navigation items.
 <ComponentExample of={DropdownMenuStories.Loading} title="Loading" description="One Loading options row, with a spinner, replaces the rows while the options are still being fetched." />
 
 <ComponentExample of={DropdownMenuStories.LoadFailed} title="Load failed" description="Couldn't load options, with a Retry row that asks again and leaves the menu open." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="DropdownMenu" />
 
 </div>
 
@@ -94,7 +103,7 @@ A dropdown menu is a trigger that opens a menu of actions or navigation items.
 
 Use a dropdown menu for a trigger that opens a list of actions or navigation links. Its rows are Section, Button item, Link item and Custom item, all exported from Dropdown menu. For picking one value from a list of options, use Select: a dropdown menu is for actions, a select is for a value.
 
-`trigger` is the element that opens it, `children` are its rows. `isOpen` and `onOpenChange` make it controlled; left uncontrolled it opens and closes on its own. `placement` and `shouldFlip` govern where it opens and whether it flips when there is no room. `spacing` is `cozy` (40 rows, the default) or `compact` (32). `loading` swaps the rows for one Loading options row while its options are still being fetched; after a failure, `hasError` shows Couldn't load options with a Retry row that calls `onRetry`. A menu never draws skeleton rows.
+`trigger` is the element that opens it, `children` are its rows. `isOpen` and `onOpenChange` make it controlled; left uncontrolled it opens and closes on its own. `placement` and `shouldFlip` govern where it opens and whether it flips when there is no room. `spacing` is `default` (32 rows) or `compact` (24). `loading` swaps the rows for one Loading options row while its options are still being fetched; after a failure, `hasError` shows Couldn't load options with a Retry row that calls `onRetry`. A menu never draws skeleton rows.
 
 </div>
 
@@ -104,7 +113,7 @@ Use a dropdown menu for a trigger that opens a list of actions or navigation lin
 
 1. **Trigger.** Any element that opens the menu, usually a Button with a chevron.
 2. **Menu.** A floating list 4px from the trigger, on the raised surface.
-3. **Rows.** Button items, Link items or Custom items, 40 tall at cozy and 32 at compact.
+3. **Rows.** Button items, Link items or Custom items, 32 tall at default and 24 at compact.
 4. **Section title and separator** (optional). Group related rows.
 
 ### Menu items

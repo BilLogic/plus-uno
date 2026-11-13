@@ -10,12 +10,13 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const popupSurface = {
     width: 'var(--popup-max-width)',
     padding: 'var(--popover-pad)',
     backgroundColor: 'var(--ds-surface-overlay)',
-    borderRadius: 'var(--popover-radius)',
+    borderRadius: 'var(--popup-radius)',
     boxShadow: 'var(--ds-shadow-overlay)',
 };
 
@@ -86,6 +87,14 @@ secondary note out of the page's reading order until someone asks for it.
 <ComponentExample of={InlineMessageStories.Pressed} title="Pressed" description="The trigger takes the subtle pressed fill." />
 
 <ComponentExample of={InlineMessageStories.Focused} title="Focused" description="The 2px ring, 2px off the trigger; Enter opens the popup." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="InlineMessage" />
 
 </div>
 

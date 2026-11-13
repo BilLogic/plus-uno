@@ -1,0 +1,222 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    FoundationSection,
+    FoundationSubsection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as ChoreographyStories from './MotionChoreography.stories.jsx';
+
+<Meta of={ChoreographyStories} />
+
+<DocsLanding
+    page="foundations-motion-choreography"
+    eyebrow="Foundation · Motion"
+    title="Choreography"
+    purpose="How several moving parts stay coherent: one direction, no collisions, a set order, and a clear cause."
+    links={{
+        items: [
+            { title: 'Principles', href: '?path=/docs/foundations-motion-principles--docs' },
+            { title: 'Physics', href: '?path=/docs/foundations-motion-physics--docs' },
+            { title: 'Transitions', href: '?path=/docs/foundations-motion-transitions--docs' },
+            { title: 'Choreography', href: '?path=/docs/foundations-motion-choreography--docs', current: true },
+            { title: 'Playground', href: '?path=/docs/foundations-motion-playground--docs' },
+            { title: 'Library', href: '?path=/docs/foundations-motion-library--docs' },
+        ],
+    }}
+/>
+
+<FoundationSection title="How to read the figures">
+
+Every transition is built from three blocks (something enters, something leaves, something changes) and a short list of atoms. The rules below decide direction, space, order and cause. Each rule has one figure, and where there is a wrong way it is the same scene with one rule broken, played beside the right way from the same start and for the same length.
+
+Before a move plays, the screen dims and the path each part takes is drawn from where it starts, marked with a dot, to where it lands, marked with an arrowhead. A round trip is one line. Where the lesson is order, a strip under the screen shows when each part starts. Use a figure's speed control to watch at ½× or ¼×.
+
+</FoundationSection>
+
+<FoundationSection title="Direction">
+
+<FoundationSubsection title="Unify direction">
+
+When several parts move together, they move along one axis: each goes from where it is to where it lands, all heading the same general way, so no path crosses another and none scatters. What cannot share that axis fades in place instead of traveling. Indicators that track position are exempt: a tab indicator tracks the place while the content makes its own move. Step indicators don't travel at all: they change state in place.
+
+<Canvas of={ChoreographyStories.Direction} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Move along the grid">
+
+Across, then up or down, round the corner. Never diagonal. A size change is the same: width, then height.
+
+<Canvas of={ChoreographyStories.Grid} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Direction follows where it lives">
+
+Everything comes from where it lives and goes back there.
+
+- A menu grows out of its trigger and shrinks back into it.
+- A row grows into its page, and the page shrinks back into the row.
+- A Panel and the Sidebar slide from and to their own edge.
+- A section collapses up into the header that stays.
+- A Flag slides in from the top-right corner along x and leaves the same way.
+- On a bar anchored to the right, a control that grows (Search, the Filter count) grows to the left.
+- A chevron points where the view will move.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Back the way it came">
+
+Closing retraces the opening in reverse, one speed faster. A round trip draws one line, not two.
+
+<Canvas of={ChoreographyStories.Retrace} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Space">
+
+<FoundationSubsection title="Keep space">
+
+Nothing collides with a neighbor or shares its place mid-move. What leaves fades out first; only then does anything move into its space.
+
+<Canvas of={ChoreographyStories.KeepSpace} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Clean fades">
+
+The old content is fully gone before the new starts: the new content begins when the old is about 90% out, which is the 90% time of <C>appearance.fast</C> in the Physics table (about 70 ms). A true crossfade is kept for non-text content: an image, the Blanket, content arriving over a Skeleton.
+
+<Canvas of={ChoreographyStories.CleanFades} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Stable layouts">
+
+A Skeleton holds the layout while content loads, so nothing shifts when it arrives.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Transition every change">
+
+Every change is shown, at a volume set by how often it happens. The floor is a quiet fade, never a cut.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Continuity">
+
+A shared container connects two views: the row becomes the record, so the person sees the change rather than working it out. It ends with the important content in place; if the content is ready before the container has settled, the content wins.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Order">
+
+<FoundationSubsection title="Sequence and stagger">
+
+When several items arrive, they arrive in order, 20 ms apart, or 500 ms ÷ items if that is shorter, so the whole set is in within half a second. The strip under each figure shows when each row starts. A stagger leads the eye where all-at-once does not, and the gap stays tight so the set reads as one arrival: the fifth row lands 80 ms after the first. At 150 ms apart each row becomes its own event.
+
+The stagger and the clean-fade gap live in the composites, not as tokens.
+
+<Canvas of={ChoreographyStories.Stagger} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Opening a page, by moment">
+
+Two entrances. The order is always stable first, important last, top to bottom. Nothing arrives by rising; a settle of 4 px or less downward is fine, and so is a mark growing to its value.
+
+- **Routine** (dozens a day): the old page fades out, the new one fades in, in place, all at once.
+- **Hero** (a milestone: onboarding complete, first session done, a goal reached, term start, term end): stable parts first, 20 ms apart, each settling 4 px or less downward. Expressive on the one PatternCard.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Load order">
+
+Shell and navigation, then headings and text, then data, then the primary action, then charts, which may wait until scrolled to, because a person scrolling toward a chart is asking for it.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Many or one">
+
+A few items change: each one moves (Add or remove, Reorder). About a third or more: swap the whole list (Swap content). A third is a default, not a law.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Cause">
+
+<FoundationSubsection title="Same meaning, same motion">
+
+A row expanding and a Select opening are one reveal from a seam; size sets the speed. Visually similar things that live in different places get different motion, so the place is clear: a Panel on the page's layer pushes; one above it slides over.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Forward is confirm, reverse is cancel">
+
+Cancel reverses the entrance one speed faster. Confirm fades the layer and carries the change forward: a status changes, a Flag confirms, a new record opens.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Who started it">
+
+Input is answered at once. A system change is quieter, arrives where the system speaks (the top-right corner, a message slot above the work), and never moves what a person is touching.
+
+<Canvas of={ChoreographyStories.WhoStartedIt} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Breakpoints">
+
+A resize is the person's own move, so the layout follows the hand: each change is a single jump, the instant the edge crosses a breakpoint. A filter side hides at 960, quick filters fold into a menu at 768, and a tablet rotating does the same. The layout never plays a motion of its own afterward, because the person's hand is the only clock.
+
+The figure steps through the three layouts of the Illustration kit: 1280 with the Sidebar docked, 960 with it collapsed, and 768 with it as an overlay.
+
+<Canvas of={ChoreographyStories.Breakpoints} sourceState="none" />
+
+</FoundationSubsection>
+
+Also:
+
+- **Several properties, one element:** spatial and appearance run together.
+- **Overlay to a level:** a quick look grows from the floating Panel into its record.
+
+</FoundationSection>
+
+<FoundationSection title="Atoms">
+
+Every motion is built from these atoms, each on a family.
+
+<RefTable
+    head={['Atom', 'Family', 'Where PLUS uses it']}
+    rows={[
+        ['Opacity', <C>appearance</C>, 'Fades everywhere; Swap content; Tooltip'],
+        ['Scale', <C>spatial</C>, 'Floating layers only: a Modal entering, and shrinking 2% as it leaves'],
+        ['Position', <C>spatial</C>, 'Panel, Sidebar, Step, indicators, Reorder'],
+        ['Mask (clip)', <C>spatial</C>, 'Popup opening from its trigger; a row opening from its seam'],
+        ['Position and mask', <C>spatial</C>, 'A number rolling once, downward; use sparingly'],
+        ['Scale and opacity', 'spatial with appearance', 'Modal'],
+        ['Reveal from under another element', <C>spatial</C>, 'Breadcrumb row opening above the title'],
+        ['Position and opacity', 'spatial with appearance', 'Flag; a milestone settle'],
+        ['Corner radius, moving with size', <C>spatial</C>, 'Drill into and climb back out: corners square off as the row becomes a page'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Physics', description: 'The springs these moves are built on, and the token table.', href: '?path=/docs/foundations-motion-physics--docs' },
+        { title: 'Playground', description: 'Tune a spring by hand and feel it.', href: '?path=/docs/foundations-motion-playground--docs' },
+    ]}
+/>
+
+</FoundationSection>

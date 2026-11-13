@@ -86,7 +86,7 @@ Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Illustration` ·
 | --- | --- |
 | Square | `--image-xxs` to `--image-xl` for 16 to 48. |
 | Icon size | `--icon-sm` to `--icon-lg`, by step. |
-| Radius | A quarter of the square; `--tile-radius-lg` at 40. Logo inset `--radius-sm`. |
+| Radius | A quarter of the square; `--radius-control-lg` at 40. Logo inset `--radius-sm`. |
 | Icon ground and glyph, subtle | Per color: the subtler accent background and the accent icon of that color; gray uses `--ds-background-neutral` and `--ds-icon-subtle`. |
 | Icon ground and glyph, bold | Per color: the bolder accent background and `--ds-icon-inverse`; gray uses `--ds-background-neutral-bold` and `--ds-icon-inverse`. |
 | Logo ground | The color's subtler accent background; white is `--ds-surface`. |
@@ -128,7 +128,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-background-accent-blue-bolder` · `--ds-background-accent-blue-subtler` · `--ds-background-accent-green-bolder` · `--ds-background-accent-green-subtler` · `--ds-background-accent-magenta-bolder` · `--ds-background-accent-magenta-subtler` · `--ds-background-accent-purple-bolder` · `--ds-background-accent-purple-subtler` · `--ds-background-accent-teal-bolder` · `--ds-background-accent-teal-subtler` · `--ds-background-accent-yellow-bolder` · `--ds-background-accent-yellow-subtler` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-border` · `--ds-icon-accent-blue` · `--ds-icon-accent-green` · `--ds-icon-accent-magenta` · `--ds-icon-accent-purple` · `--ds-icon-accent-teal` · `--ds-icon-accent-yellow` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-surface` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--image-lg` · `--image-md` · `--image-sm` · `--image-xl` · `--image-xs` · `--image-xxs` · `--radius-sm` · `--tile-inner` · `--tile-radius` · `--tile-radius-lg` · `--tile-size`
+`--border-default` · `--ds-background-accent-blue-bolder` · `--ds-background-accent-blue-subtler` · `--ds-background-accent-green-bolder` · `--ds-background-accent-green-subtler` · `--ds-background-accent-magenta-bolder` · `--ds-background-accent-magenta-subtler` · `--ds-background-accent-purple-bolder` · `--ds-background-accent-purple-subtler` · `--ds-background-accent-teal-bolder` · `--ds-background-accent-teal-subtler` · `--ds-background-accent-yellow-bolder` · `--ds-background-accent-yellow-subtler` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-border` · `--ds-icon-accent-blue` · `--ds-icon-accent-green` · `--ds-icon-accent-magenta` · `--ds-icon-accent-purple` · `--ds-icon-accent-teal` · `--ds-icon-accent-yellow` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-surface` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--image-lg` · `--image-md` · `--image-sm` · `--image-xl` · `--image-xs` · `--image-xxs` · `--radius-control-lg` · `--radius-sm` · `--tile-inner` · `--tile-radius` · `--tile-size`
 
 From `design-system/src/components/images-and-icons/Tile/Tile.scss`. Override these through the token layer, never with a literal.
 

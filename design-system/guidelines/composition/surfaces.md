@@ -20,25 +20,25 @@ Cards are the primary bounded container for grouping related information.
 | Data Card | Metrics, KPIs, aggregate stats | `Universal/Cards` |
 | Info Card | Read-only detail display | `Universal/Cards` |
 
-`Card` takes a `title` and an optional `actionButton` (`{ text, onClick }`) for a
-header action.
+`PatternCard` (from `@/patterns`) takes a `title`, an optional `description`,
+and `actions` at the end of its header row.
 
 ## Tables
 
-Use `<Table>` inside a `<Card>`. Never write raw `<table>` HTML.
+Use `<Table>` inside a `<PatternCard>`, or through `PatternTable`. Never write raw `<table>` HTML.
 
 ```jsx
 /* correct — Table takes arrays of arrays */
-<Card title="Student Roster" actionButton={{ text: 'Add', onClick: handleAdd }}>
+<PatternCard title="Student Roster">
   <Table
     headers={['Student Name', 'Status']}
-    rows={[['John Doe', <Badge style="success" text="Active" />]]}
+    rows={[['John Doe', <StatusTag appearance="success">Active</StatusTag>]]}
     onRowClick={(row) => openDetail(row)}
   />
-</Card>
+</PatternCard>
 
 /* incorrect — `columns` and `data` are not Table props and render nothing.
-   Verified against design-system/src/.../Table/Table.jsx propTypes. */
+   Verified against design-system/src/components/text-and-data-display/Table/Table.jsx propTypes. */
 <Table columns={columns} data={data} />
 ```
 
@@ -65,16 +65,23 @@ Three variants, one component:
 
 All use `<Modal show={bool} onClose={fn} title="…">`. For wider content, set
 `width` to a wider step of `MODAL_WIDTHS` (`6-col` is the default, then `8-col`
-and `10-col`). A press on the Blanket and Escape both close.
+and `10-col`). A press on the Backdrop and Escape both close.
 
 ## Empty states
 
-When a view has no data, show three things — never a blank panel and never a bare
-"No results" string:
+A view, panel, card or table with nothing to show fills its slot with
+`EmptyState` — never a blank panel or a bare "No results". Pick the kind by
+why it is empty:
 
-1. A centered illustration (PLUS icon set or a simple SVG).
-2. A short descriptive message, e.g. "No students enrolled yet".
-3. A single primary action, e.g. "Add Student".
+| The view is | The slot says |
+|---|---|
+| empty | what goes here, and the one primary action that fills it ("No students yet", Add student) |
+| failed to load | what failed, and a filled Try again ("Couldn't load sessions") |
+| no access | the plain reason and who can help, with no action |
+
+`spacing="compact"` fits a table body or a card. A rejected form submit and a
+background failure are messages, not empty states:
+`design-system/guidelines/components/messaging.md`.
 
 `Table` draws no empty state on its own. Pass `emptyState` and, when `rows` is empty, the header stays and the message takes the body as one row spanning every column; without it the table renders only its header.
 

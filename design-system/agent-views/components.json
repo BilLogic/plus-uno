@@ -110,7 +110,7 @@
         "--body-large",
         "--border-default",
         "--card-pad-default",
-        "--card-radius-sm",
+        "--card-radius-compact",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
         "--ds-background-selected",
@@ -365,7 +365,7 @@
         "--pad-x-md",
         "--pad-y-sm",
         "--page-pad",
-        "--popover-radius",
+        "--popup-radius",
         "--radius-md",
         "--stack-lg",
         "--stack-md",
@@ -584,15 +584,14 @@
         "--body-small",
         "--code",
         "--ds-background-neutral",
+        "--ds-motion-loop",
+        "--ds-motion-loop-duration",
         "--ds-text",
         "--ds-text-subtle",
         "--heading-xsmall",
         "--icon-md",
         "--inline-md",
         "--inline-sm",
-        "--motion-duration-long",
-        "--motion-duration-medium",
-        "--motion-easing-standard",
         "--pad-x-lg",
         "--pad-x-sm",
         "--pad-x-xs",
@@ -783,6 +782,7 @@
         "--image-sm",
         "--image-xxs",
         "--radius-full",
+        "--radius-xxl",
         "--type-weight-semibold"
       ]
     },
@@ -882,6 +882,96 @@
       ]
     },
     {
+      "name": "Backdrop",
+      "kind": "pattern",
+      "import": "import { Backdrop } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Backdrop/Backdrop.jsx",
+      "summary": "The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token.",
+      "props": [
+        {
+          "name": "inline",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.",
+          "deprecated": null
+        },
+        {
+          "name": "screenWidth",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440.",
+          "deprecated": null
+        },
+        {
+          "name": "screenHeight",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline only: the screen height (px); a layer inside caps at it less Backdrop/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do.",
+          "deprecated": null
+        },
+        {
+          "name": "onBackdropClick",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called for a click on the backdrop, not on the layer it holds.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The layer it holds: a PatternModal, or a confirm over one.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Inline",
+        "ConfirmOverPanel",
+        "Layers",
+        "Pads",
+        "ScreenGrid",
+        "Interactive"
+      ],
+      "tokens": [
+        "--blanket-pad-x",
+        "--blanket-pad-y",
+        "--ds-blanket",
+        "--layer-blanket",
+        "--layer-modal",
+        "--plus-overlay-screen",
+        "--plus-overlay-screen-height"
+      ]
+    },
+    {
       "name": "Banner",
       "kind": "component",
       "import": "import { Banner } from '@/components';",
@@ -967,123 +1057,6 @@
         "--pad-x-md",
         "--pad-y-md",
         "--type-weight-medium"
-      ]
-    },
-    {
-      "name": "Blanket",
-      "kind": "pattern",
-      "import": "import { Blanket } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Blanket/Blanket.jsx",
-      "summary": "The full-screen layer that holds the blanket fill and a modal, so a modal is placed, not drawn. It fills with the blanket, pads 16 at the sides and 64 above and below, centers its child, and sits on the blanket layer (500) with its child on the modal layer (510). With `placement` `start` or `end` it drops the pad and holds its child full height at that edge of the screen, for a drawer. Modal, Drawer and the overlay Panel all draw this one Blanket, so the fill and the layer order are the same under each. The Panel's is `contained`: it covers its Frame, not the screen. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and blanket token; PatternDrawer brings its own focus handling.",
-      "props": [
-        {
-          "name": "placement",
-          "type": "enum",
-          "required": false,
-          "default": "'center'",
-          "values": [
-            "center",
-            "start",
-            "end"
-          ],
-          "description": "`center` (default) for a modal; `start` or `end` holds the layer full height at that edge, with no pad.",
-          "deprecated": null
-        },
-        {
-          "name": "inline",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.",
-          "deprecated": null
-        },
-        {
-          "name": "contained",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the overlay Panel's Blanket over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones.",
-          "deprecated": null
-        },
-        {
-          "name": "screenWidth",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440.",
-          "deprecated": null
-        },
-        {
-          "name": "screenHeight",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the screen height (px); a layer inside caps at it less Blanket/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do.",
-          "deprecated": null
-        },
-        {
-          "name": "onBlanketClick",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called for a click on the blanket, not on the layer it holds.",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The layer it holds: a PatternModal, a confirm over one, or a drawer at an edge.",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Inline",
-        "NestedConfirm",
-        "Layers",
-        "Pads",
-        "ScreenGrid",
-        "Placements",
-        "PlacementCenter",
-        "PlacementEnd",
-        "PlacementStart",
-        "Interactive"
-      ],
-      "tokens": [
-        "--blanket-contained-layer",
-        "--blanket-pad-x",
-        "--blanket-pad-y",
-        "--ds-blanket",
-        "--layer-blanket",
-        "--layer-modal",
-        "--plus-overlay-screen",
-        "--plus-overlay-screen-height"
       ]
     },
     {
@@ -1422,6 +1395,7 @@
         "--pad-x-sm",
         "--pad-x-xs",
         "--pad-y-sm",
+        "--radius-full",
         "--type-weight-medium"
       ]
     },
@@ -1481,6 +1455,7 @@
       ],
       "stories": [
         "Overview",
+        "Seams",
         "Appearances",
         "Spacing",
         "IconOnly",
@@ -1734,7 +1709,6 @@
       "tokens": [
         "--body-default",
         "--border-selected",
-        "--card-radius",
         "--carousel-aspect",
         "--carousel-edge-fade",
         "--carousel-neighbor-dim",
@@ -1754,6 +1728,14 @@
         "--control-lg",
         "--ds-background-brand-bold",
         "--ds-border",
+        "--ds-motion-appearance-default",
+        "--ds-motion-appearance-default-duration",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-appearance-slow",
+        "--ds-motion-appearance-slow-duration",
+        "--ds-motion-spatial-default",
+        "--ds-motion-spatial-default-duration",
         "--ds-shadow-raised",
         "--ds-surface",
         "--ds-surface-raised",
@@ -1761,13 +1743,8 @@
         "--ds-text-subtle",
         "--inline-lg",
         "--inline-md",
-        "--motion-duration-long",
-        "--motion-duration-medium",
-        "--motion-duration-short",
-        "--motion-easing-entrance",
-        "--motion-easing-exit",
-        "--motion-easing-standard",
         "--page-stack-md",
+        "--radius-xxl",
         "--section-stack-lg",
         "--section-stack-md",
         "--stack-md",
@@ -2065,15 +2042,14 @@
         "--ds-background-neutral-pressed",
         "--ds-background-success",
         "--ds-background-success-pressed",
+        "--ds-motion-appearance-default",
+        "--ds-motion-appearance-default-duration",
         "--ds-text",
         "--ds-text-danger",
         "--ds-text-subtle",
         "--ds-text-success",
         "--icon-sm",
         "--inline-sm",
-        "--motion-duration-medium",
-        "--motion-easing-entrance",
-        "--motion-easing-standard",
         "--pad-x-xs",
         "--plus-change-tag-edge",
         "--plus-change-tag-fill",
@@ -2319,7 +2295,8 @@
         "--item-height-sm",
         "--pad-x-md",
         "--plus-choice-indent",
-        "--radius-025",
+        "--radius-lg",
+        "--radius-md",
         "--space-025",
         "--space-0375",
         "--space-050",
@@ -2481,7 +2458,7 @@
         "--ds-text-subtle",
         "--pad-x-md",
         "--pad-y-md",
-        "--radius-md"
+        "--radius-xl"
       ]
     },
     {
@@ -2710,7 +2687,7 @@
         "--pad-y-lg",
         "--plus-code-block-digits",
         "--plus-code-block-gutter",
-        "--radius-md"
+        "--radius-xl"
       ]
     },
     {
@@ -2871,7 +2848,7 @@
         "--ds-background-selected",
         "--ds-border",
         "--ds-text-subtle",
-        "--radius-050",
+        "--radius-xl",
         "--space-025",
         "--space-050",
         "--space-075",
@@ -3059,7 +3036,7 @@
         "--plus-count-min",
         "--plus-count-size",
         "--radius-full",
-        "--radius-sm",
+        "--radius-md",
         "--stroke-2"
       ]
     },
@@ -3367,7 +3344,7 @@
         "--plus-date-tag-height",
         "--plus-date-tag-icon-box",
         "--plus-date-tag-max",
-        "--radius-h24",
+        "--radius-lg",
         "--radius-md",
         "--stack-sm",
         "--tag-gap",
@@ -3779,12 +3756,12 @@
           "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'cozy'",
+          "default": "'default'",
           "values": [
-            "cozy",
+            "default",
             "compact"
           ],
-          "description": "`cozy` draws 40px rows (default), `compact` draws 32px.",
+          "description": "`default` draws 32px rows, `compact` draws 24px.",
           "deprecated": null
         },
         {
@@ -3885,12 +3862,12 @@
         "DisabledRow",
         "DisabledRowWithReason",
         "HoveredState",
-        "KeyboardFocus"
+        "KeyboardFocus",
+        "OpenMenuEdge"
       ],
       "tokens": [
         "--body-default",
         "--border-default",
-        "--ds-border",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text-subtle",
@@ -3899,7 +3876,7 @@
         "--pad-y-md",
         "--popover-max-height-menu",
         "--popover-max-width-menu",
-        "--popover-radius-menu-md",
+        "--popup-radius",
         "--stack-md"
       ]
     },
@@ -4322,7 +4299,7 @@
         "--icon-sm",
         "--pad-x-md",
         "--pad-y-md",
-        "--radius-md",
+        "--radius-xl",
         "--stack-md",
         "--stack-sm"
       ]
@@ -4459,6 +4436,15 @@
       "source": "design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.jsx",
       "summary": "Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Reset** clears every box in the menu without applying. Apply then applies the empty set. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.",
       "props": [
+        {
+          "name": "container",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region.",
+          "deprecated": null
+        },
         {
           "name": "categories",
           "type": "arrayOf",
@@ -4615,8 +4601,10 @@
         "Interactive"
       ],
       "tokens": [
+        "--border-default",
         "--heading-xsmall",
         "--inline-lg",
+        "--plus-filter-menu-bleed",
         "--plus-filter-menu-columns",
         "--popover-max-height-menu",
         "--popover-pad",
@@ -4629,7 +4617,7 @@
       "import": "import { Flag } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Flag/Flag.jsx",
-      "summary": "The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: a 16 icon in the appearance's icon color on the title's first line, the title and its optional description, actions, and the dismiss button. `bold` expands the surface to the appearance's bold fill.",
+      "summary": "The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: a 16 icon on the title's first line, the title and its optional description, actions, and the controls. `appearance` alone decides the kind: `normal` is the default flag (overlay surface, a status icon or an avatar, always the dismiss ×, actions as links); every other appearance is bold (its bold fill, no ×, collapsed to its title behind a chevron, actions as buttons).",
       "props": [
         {
           "name": "id",
@@ -4679,16 +4667,16 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": "Link-button actions under the description, in the order given. Avoid more than two.",
+          "description": "Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag draws a button that navigates.",
           "deprecated": null
         },
         {
-          "name": "bold",
-          "type": "bool",
+          "name": "icon",
+          "type": "string or node",
           "required": false,
-          "default": "false",
+          "default": null,
           "values": null,
-          "description": "The appearance's bold fill. A bold flag starts collapsed to its title, with a toggle that expands the description and actions.",
+          "description": "The default flag's leading icon: a status icon name, or an element such as an Avatar. Unset, the information icon in the subtle icon color. Ignored on a bold flag, which shows its appearance's icon.",
           "deprecated": null
         },
         {
@@ -4698,15 +4686,6 @@
           "default": "false",
           "values": null,
           "description": "Whether a bold flag starts expanded.",
-          "deprecated": null
-        },
-        {
-          "name": "dismissible",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Shows the dismiss button. Defaults to true; set false to leave it out.",
           "deprecated": null
         },
         {
@@ -4733,7 +4712,7 @@
           "required": false,
           "default": "FLAG_AUTO_CLOSE_MS",
           "values": null,
-          "description": "How long it stays before closing itself, in ms. 8000 by default.",
+          "description": "How long it stays before closing itself, in ms. 8000 by default; keep it at 8000 or more so a slow reader is not cut off.",
           "deprecated": null
         },
         {
@@ -4742,7 +4721,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Close itself after `delay`. Defaults to true for normal, information and success, false for warning and error.",
+          "description": "Close itself after `delay`. Defaults to true for normal, information and success; warning and error never close themselves.",
           "deprecated": null
         },
         {
@@ -4780,6 +4759,24 @@
           "values": null,
           "description": "Small text beside the title, such as \"11 mins ago\".",
           "deprecated": null
+        },
+        {
+          "name": "sound",
+          "type": "string or enum",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The sound token it plays as it lands, through the app's sound setting, or `false` for none. Unset, an `error` flag plays `error` and every other appearance plays `notify`. Pass `false` when a flag should stay quiet, such as during a session.",
+          "deprecated": null
+        },
+        {
+          "name": "reducedMotion",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting.",
+          "deprecated": null
         }
       ],
       "stories": [
@@ -4795,17 +4792,20 @@
         "Dismiss",
         "FlagContent",
         "UnknownAppearance",
+        "ActionKinds",
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "LandsWithNotify",
+        "StackClosesUp",
+        "StackClosesUpReduced"
       ],
       "tokens": [
         "--body-default",
         "--body-small",
         "--border-default",
         "--ds-background-danger-bold",
-        "--ds-background-information-bold",
         "--ds-background-neutral-bold",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
@@ -4822,6 +4822,14 @@
         "--ds-icon-warning-inverse",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
+        "--ds-motion-appearance-default",
+        "--ds-motion-appearance-default-duration",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-default",
+        "--ds-motion-spatial-default-duration",
+        "--ds-motion-spatial-exit",
+        "--ds-motion-spatial-exit-duration",
         "--ds-shadow-overlay",
         "--ds-surface",
         "--ds-surface-overlay",
@@ -4841,9 +4849,9 @@
         "--layer-flag",
         "--popover-gap-screen",
         "--popover-pad",
-        "--popover-radius",
         "--popover-stack-flag",
         "--popover-width-flag",
+        "--popup-radius",
         "--radius-md",
         "--stack-sm",
         "--type-weight-medium"
@@ -4855,7 +4863,7 @@
       "import": "import { Frame } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Frame/Frame.jsx",
-      "summary": "There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal (or drawer) closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it opens over the Page on a Blanket that covers the Page and the Sidebar, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under the Blanket are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
+      "summary": "There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay` and no Backdrop. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay fill and shadow, with no Backdrop, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
       "props": [
         {
           "name": "id",
@@ -4998,7 +5006,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Hovering the Frame's right edge peeks a closed Panel over the Page, with no Blanket. Off by default.",
+          "description": "Hovering the Frame's right edge peeks a closed Panel over the Page, with no Backdrop. Off by default.",
           "deprecated": null
         },
         {
@@ -5145,13 +5153,22 @@
         "StatePanelWidest",
         "StateSidebarAndPanel",
         "StatePanelCollapsesSidebar",
-        "StatePanelOnBlanket",
+        "StatePanelOnBackdrop",
         "StateWithModal",
         "StateModalClosesFloating",
-        "StateWithDrawer",
         "StateAt768",
         "StateAt1024",
-        "StateAt1440"
+        "StateAt1440",
+        "TypeDefault",
+        "TypeFocused",
+        "TypeBare",
+        "AnatomyDefault",
+        "AnatomyFocused",
+        "FocusedStepsDown",
+        "FocusedStepsAcross",
+        "ResponsiveWidth",
+        "KeyPanelCollapsesSidebar",
+        "KeyUnder1024"
       ],
       "tokens": [
         "--border-default",
@@ -5164,7 +5181,6 @@
         "--ds-surface-overlay",
         "--ds-surface-sunken",
         "--ds-text",
-        "--frame-layer-blanket",
         "--frame-layer-docked-edge",
         "--frame-layer-edge",
         "--frame-layer-panel-peek",
@@ -5212,7 +5228,10 @@
             "radius-050",
             "radius-075",
             "radius-100",
-            "radius-full"
+            "radius-full",
+            "radius-control-sm",
+            "radius-control-md",
+            "radius-control-lg"
           ],
           "description": "The radius token the ring follows. Match the wrapped content.",
           "deprecated": null
@@ -5671,15 +5690,15 @@
       ],
       "tokens": [
         "--border-default",
+        "--ds-motion-appearance-default",
+        "--ds-motion-appearance-default-duration",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--ds-text-subtlest",
         "--icon-md",
         "--inline-sm",
         "--item-height-md",
-        "--item-height-sm",
-        "--motion-duration-medium",
-        "--motion-duration-short",
-        "--motion-easing-entrance",
-        "--motion-easing-standard"
+        "--item-height-sm"
       ]
     },
     {
@@ -6069,7 +6088,7 @@
         "--height-250",
         "--item-height-md",
         "--pad-x-md",
-        "--radius-0625",
+        "--radius-control-lg",
         "--radius-md",
         "--stack-sm"
       ]
@@ -6487,7 +6506,7 @@
         "--ds-text-inverse",
         "--icon-sm",
         "--inline-md",
-        "--radius-lg"
+        "--radius-md"
       ]
     },
     {
@@ -6866,7 +6885,7 @@
       "import": "import { Modal } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Modal/Modal.jsx",
-      "summary": "Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Blanket`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the blanket close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `PatternDrawer`: at most two stack, a third stays closed and calls `onClose`. A follow-up about the dialog itself — \"discard these edits?\" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A confirm raised as a second Modal is allowed too; it is the most that stacks.",
+      "summary": "Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Backdrop`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the backdrop close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`): a second Modal stays closed and calls `onClose`. A follow-up about the dialog itself — \"discard these edits?\" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A Modal never opens on another Modal.",
       "props": [
         {
           "name": "id",
@@ -6996,7 +7015,7 @@
           "values": [
             "static"
           ],
-          "description": "`true` (default): a click on the blanket closes. `static`: the blanket shows but refuses to close on a click. `false`: no close on a click.",
+          "description": "`true` (default): a click on the backdrop closes. `static`: the backdrop shows but refuses to close on a click. `false`: no close on a click.",
           "deprecated": null
         },
         {
@@ -7044,7 +7063,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `backdrop` blocks it). The parent sets `show` to false.",
+          "description": "Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the backdrop (unless `backdrop` blocks it). The parent sets `show` to false.",
           "deprecated": null
         },
         {
@@ -7099,7 +7118,7 @@
         "Overview",
         "ConfirmView",
         "ConfirmViewEscape",
-        "TwoOverlayLimit",
+        "ModalOverModalRefused",
         "BlockingShadow",
         "SelectKeepsOverlayShadow",
         "Rest",
@@ -7110,28 +7129,17 @@
       "tokens": [
         "--blanket-max-height-modal",
         "--body-default",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
         "--ds-border",
-        "--ds-border-focused",
-        "--ds-icon",
-        "--ds-icon-subtle",
         "--ds-shadow-blocking",
         "--ds-surface-overlay",
         "--ds-text",
         "--ds-text-subtle",
-        "--focus-ring-width",
         "--heading-medium",
-        "--icon-md",
         "--inline-sm",
-        "--item-height-md",
         "--modal-inline-sm",
         "--modal-pad-x-default",
         "--modal-radius",
         "--modal-stack-md",
-        "--motion-duration-short",
-        "--motion-easing-standard",
-        "--radius-md",
         "--stack-md",
         "--stack-sm",
         "--stroke-1"
@@ -7327,7 +7335,16 @@
         "WithTitle",
         "ColorModes",
         "MediumPad",
-        "Interactive"
+        "Interactive",
+        "TypeDefault",
+        "TypeFullWidth",
+        "AnatomyRecord",
+        "ScenarioArea",
+        "ScenarioSeveralSections",
+        "ScenarioRecordTabs",
+        "ScenarioTwoLevels",
+        "KeyBanner",
+        "ResponsiveWidth"
       ],
       "tokens": [
         "--ds-border-bold",
@@ -7346,10 +7363,10 @@
         "--page-pad-x-spacious",
         "--page-pad-y-compact",
         "--page-pad-y-spacious",
-        "--page-radius-md",
         "--page-stack-md",
         "--radius-lg",
-        "--section-radius"
+        "--radius-xl",
+        "--radius-xxl"
       ]
     },
     {
@@ -7580,6 +7597,8 @@
         "--ds-border-focused",
         "--ds-icon-disabled",
         "--ds-icon-subtle",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--ds-surface",
         "--ds-text-disabled",
         "--ds-text-selected",
@@ -7588,8 +7607,6 @@
         "--icon-sm",
         "--item-height-md",
         "--item-height-sm",
-        "--motion-duration-short",
-        "--motion-easing-standard",
         "--pad-x-md",
         "--pad-x-sm",
         "--radius-full",
@@ -7922,7 +7939,7 @@
         "--card-pad-default",
         "--card-pad-spacious",
         "--card-radius",
-        "--card-radius-sm",
+        "--card-radius-compact",
         "--card-stack-lg",
         "--card-stack-md",
         "--card-stack-sm",
@@ -7938,196 +7955,12 @@
       ]
     },
     {
-      "name": "PatternDrawer",
-      "kind": "pattern",
-      "import": "import { PatternDrawer } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/PatternDrawer/PatternDrawer.jsx",
-      "summary": "Drawer pattern for PLUS design system. A full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters, a short edit. It places itself in `Blanket` at that edge, over the same blanket a modal takes. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), the Modal width steps. The title, description and close button follow the Modal rules. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), Drawer/pad 16, Drawer/stack-md 16 and Drawer/inline-sm 8, no radius. Mirrors \"Pattern/Drawer\" in the Figma design system file. It is a real dialog: opening it moves focus inside and Tab cycles there, Escape, the close button and a click on the blanket call `onClose`, and closing returns focus to what had it. An `inline` drawer, drawn in the page flow for docs, leaves focus where it is. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `Modal`: at most two stack (a drawer and the confirm it raises), a third stays closed and calls `onClose`, and opening either closes a floating sidebar. An `inline` drawer takes no slot.",
-      "props": [
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "open",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Whether the drawer shows. Closing it returns focus to what had it before it opened.",
-          "deprecated": null
-        },
-        {
-          "name": "title",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The title in the header row: the dialog's h1, at Heading/medium 20, and its name",
-          "deprecated": null
-        },
-        {
-          "name": "description",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "One line under the title, in the subtle text color; it describes the dialog",
-          "deprecated": null
-        },
-        {
-          "name": "onClose",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called by the close button, Escape and a click on the blanket; renders the close button",
-          "deprecated": null
-        },
-        {
-          "name": "footer",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Footer slot, pinned to the bottom edge (typically action buttons, the primary last)",
-          "deprecated": null
-        },
-        {
-          "name": "width",
-          "type": "oneOf",
-          "required": false,
-          "default": "'sm'",
-          "values": [
-            "sm",
-            "md",
-            "lg"
-          ],
-          "description": "`sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the drawer pad (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440), the Modal width steps. Grows with the screen, never shrinks, ignores the sidebar.",
-          "deprecated": null
-        },
-        {
-          "name": "placement",
-          "type": "enum",
-          "required": false,
-          "default": "'end'",
-          "values": [
-            "end",
-            "start"
-          ],
-          "description": "`end` (default) holds it at the right edge of a left-to-right page; `start` at the left.",
-          "deprecated": null
-        },
-        {
-          "name": "inline",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Draw in the page flow at a stand-in screen, for docs and previews; focus stays where it is.",
-          "deprecated": null
-        },
-        {
-          "name": "screenWidth",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the stand-in screen width (px), such as 768, 1024 or 1440.",
-          "deprecated": null
-        },
-        {
-          "name": "screenHeight",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the stand-in screen height (px); the drawer runs its full height.",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "onKeyDown",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Runs before the drawer's own Escape and Tab handling; preventing the default on Escape keeps the drawer open.",
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Body content slot; it scrolls once it outgrows the screen",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "Widths",
-        "Placements",
-        "LongContent",
-        "Footer",
-        "KeyboardAndFocus",
-        "DrawerSharesTheTwoOverlayLimit",
-        "WidthSmall",
-        "WidthMedium",
-        "WidthLarge",
-        "PlacementEnd",
-        "PlacementStart",
-        "NoFooter",
-        "LongContentStill",
-        "OpenAndClose",
-        "Interactive"
-      ],
-      "tokens": [
-        "--body-default",
-        "--drawer-inline-sm",
-        "--drawer-pad",
-        "--drawer-stack-md",
-        "--ds-border-focused",
-        "--ds-shadow-overlay",
-        "--ds-surface-overlay",
-        "--ds-text",
-        "--ds-text-subtle",
-        "--focus-ring-width",
-        "--heading-medium",
-        "--stack-sm"
-      ]
-    },
-    {
       "name": "PatternModal",
       "kind": "pattern",
       "import": "import { PatternModal } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternModal/PatternModal.jsx",
-      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (backdrop, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
+      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Backdrop`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (backdrop, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
       "props": [
         {
           "name": "id",
@@ -8296,14 +8129,29 @@
         "HugLong",
         "HeightFill",
         "TabsStill",
-        "Interactive"
+        "Interactive",
+        "TypePassive",
+        "TypeActive",
+        "TypeAcknowledge",
+        "TypeSteps",
+        "AnatomyActive",
+        "WidthStrip",
+        "ResponsiveWidth",
+        "TierActive",
+        "TierDanger",
+        "TierTypeName",
+        "FooterOne",
+        "FooterTwo",
+        "FooterThree",
+        "KeyLongContent",
+        "KeyLoading",
+        "KeyConfirmInside",
+        "StackConfirmOverPanel",
+        "StackModalOnModalRefused"
       ],
       "tokens": [
         "--border-default",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
         "--ds-border",
-        "--ds-icon-subtle",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
@@ -8313,9 +8161,6 @@
         "--modal-radius",
         "--modal-stack-md",
         "--modal-stack-sm",
-        "--pad-x-sm",
-        "--radius-md",
-        "--space-025",
         "--stack-lg",
         "--stack-md"
       ]
@@ -8665,6 +8510,7 @@
         "LayoutSplit",
         "LayoutSubsections",
         "FillSubtle",
+        "CardNesting",
         "Footer",
         "Anatomy",
         "Levels",
@@ -8681,18 +8527,36 @@
         "DetailWithPanelNoSectionDetail",
         "DetailSplitAt1440",
         "DetailSplitHoldsWithPanelAt1440",
-        "DetailReplacesListBelow960"
+        "DetailReplacesListBelow960",
+        "TypeList",
+        "TypeQueue",
+        "TypeCards",
+        "TypeStats",
+        "TypeDetails",
+        "TypeMainAndSide",
+        "TypeForm",
+        "TypeSubsections",
+        "HeaderTypeTitle",
+        "HeaderTypeTitleAndActions",
+        "HeaderTypeViewBarOneView",
+        "HeaderTypeViewBarSeveralViews",
+        "HeaderTypeFormatSwitch",
+        "HeaderTypeViewBarAlone",
+        "HeaderTypeUnderPageTabs",
+        "HeaderTypeSubsection",
+        "SideAtEnd",
+        "FilterSideAtStart",
+        "ResponsiveWidth",
+        "RowsSelected",
+        "EmptyInTable",
+        "AnatomyQueue"
       ],
       "tokens": [
         "--body-default",
         "--body-small",
-        "--border-default",
-        "--ds-background-input",
-        "--ds-border-input",
         "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
-        "--field-width-md",
         "--grid-gutter",
         "--heading-large",
         "--heading-large-tracking",
@@ -8702,9 +8566,6 @@
         "--inline-md",
         "--inline-sm",
         "--item-height-md",
-        "--motion-duration-medium",
-        "--motion-easing-standard",
-        "--radius-h32",
         "--section-min-width-main",
         "--section-min-width-side",
         "--section-pad-x-default",
@@ -8758,11 +8619,6 @@
               "description": null
             }
           ]
-        },
-        {
-          "name": "Search",
-          "impl": "SectionSearch",
-          "props": []
         }
       ]
     },
@@ -9372,6 +9228,9 @@
         "WidthColumns",
         "OpensWithAClip",
         "KeyboardOpenIsInstant",
+        "OpensAndCloses",
+        "OpensOnTheMotionTokens",
+        "ReducedMotion",
         "BodyOnly",
         "TriggerClick",
         "TriggerHover",
@@ -9381,15 +9240,18 @@
       "tokens": [
         "--anchor-width",
         "--body-default",
+        "--border-default",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-exit",
+        "--ds-motion-spatial-exit-duration",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
         "--heading-xsmall",
         "--layer-popup",
-        "--motion-duration-medium",
-        "--motion-duration-short",
-        "--motion-easing-entrance",
-        "--motion-easing-exit",
         "--plus-popup-clip-bottom",
         "--plus-popup-clip-left",
         "--plus-popup-clip-right",
@@ -9397,11 +9259,11 @@
         "--plus-popup-reach",
         "--popover-offset",
         "--popover-pad",
-        "--popover-radius",
         "--popup-clip-reach",
         "--popup-max-width",
         "--popup-min-width",
         "--popup-pad",
+        "--popup-radius",
         "--stack-md"
       ]
     },
@@ -9413,6 +9275,15 @@
       "source": "design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx",
       "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker=\"check\"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
       "props": [
+        {
+          "name": "container",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region.",
+          "deprecated": null
+        },
         {
           "name": "options",
           "type": "arrayOf",
@@ -9545,7 +9416,7 @@
             "default",
             "compact"
           ],
-          "description": "`default` draws 40 rows and a 32 trigger; `compact` draws 32 rows and a 24 trigger.",
+          "description": "`default` draws 32 rows and a 32 trigger; `compact` draws 24 rows and a 24 trigger.",
           "deprecated": null
         },
         {
@@ -9812,12 +9683,13 @@
         "--ds-icon-inverse",
         "--ds-icon-subtle",
         "--ds-icon-subtlest",
+        "--ds-motion-appearance-default",
+        "--ds-motion-appearance-default-duration",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--focus-ring-width",
         "--inline-md",
         "--inline-sm",
-        "--motion-duration-medium",
-        "--motion-duration-short",
-        "--motion-easing-standard",
         "--progress-indicator-dot",
         "--progress-indicator-dot-size-12",
         "--progress-indicator-dot-size-8",
@@ -9915,8 +9787,8 @@
         "--inline-sm",
         "--item-height-md",
         "--pad-x-md",
+        "--radius-control-md",
         "--radius-full",
-        "--radius-h32",
         "--space-050",
         "--space-150",
         "--stack-lg",
@@ -9932,7 +9804,7 @@
       "import": "import { PromptInput } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.jsx",
-      "summary": "Where a person writes to the AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `Button` and `GenerativeBorder`.",
+      "summary": "Where a person writes to the AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `IconButton` and `GenerativeBorder`.",
       "props": [
         {
           "name": "id",
@@ -10084,6 +9956,9 @@
       ],
       "stories": [
         "Default",
+        "ButtonInside",
+        "ButtonStaysBottom",
+        "RingFollowsField",
         "EnterSends",
         "ShiftEnterStartsALine",
         "CannotSendWhenEmpty",
@@ -10095,10 +9970,14 @@
         "Interactive"
       ],
       "tokens": [
+        "--border-default",
         "--height-250",
+        "--item-height-md",
         "--line-height-125",
+        "--pad-x-md",
+        "--pad-x-xs",
+        "--pad-y-md",
         "--plus-prompt-input-max-height",
-        "--space-0375",
         "--stack-md",
         "--stack-sm"
       ]
@@ -10391,8 +10270,8 @@
         "--pad-x-md",
         "--plus-choice-indent",
         "--radio-control-size",
-        "--radius-025",
         "--radius-full",
+        "--radius-lg",
         "--space-025",
         "--space-0375",
         "--space-050",
@@ -10957,6 +10836,7 @@
         "--icon-lg",
         "--icon-md",
         "--item-height-md",
+        "--radius-full",
         "--space-0625",
         "--stack-md",
         "--stack-sm",
@@ -11187,6 +11067,7 @@
         "BlockStyleMenu",
         "Empty",
         "Filled",
+        "BoxRadius",
         "Focused",
         "ReadOnly",
         "DisabledState",
@@ -11212,7 +11093,7 @@
         "--pad-x-xs",
         "--pad-y-lg",
         "--pad-y-md",
-        "--radius-0625",
+        "--radius-control-lg",
         "--rte-content-pad-x",
         "--rte-content-pad-y",
         "--stack-md",
@@ -11298,6 +11179,356 @@
         "--ds-border-bold",
         "--radius-md",
         "--scroll-bar-size"
+      ]
+    },
+    {
+      "name": "SearchField",
+      "kind": "component",
+      "import": "import { SearchField } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/SearchField/SearchField.jsx",
+      "summary": "Search field: find a record by typing. It is a TextField with a search icon before the text and a clear button after it, and its label is hidden: the placeholder names the scope (\"Search students\"). `mode=\"active\"` reports the text on every keystroke through `onValueChange`. Hold the rows yourself and filter them (sync), or give `loadResults` for a list on a server (async): it is asked after a short pause, and what it returns goes to `onResults`. Results show in the results area, never under the field. While results load, a Spinner takes the search icon's place. `isCollapsible` starts as an icon button that grows into the field and collapses when left empty. Esc clears the text; a second Esc closes the field and returns focus to the icon. `scopes` puts a scope filter before the field, with \"All\" first and selected. `mode=\"basic\"` runs `onSearch(text)` on Enter and does no work per keystroke. `mode=\"focused\"` opens a panel (a Popup) under the field. On focus with no text it lists `recent` searches; while typing it lists matches grouped by type, then a last \"See all\" row that acts as a basic search. Arrow keys move through the rows, Enter chooses, Esc closes the panel. A `SearchFieldAction` child is the optional last row.",
+      "props": [
+        {
+          "name": "placeholder",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Names the scope (\"Search students\"). Required: the label is hidden, so this is what a sighted person reads, and it names the collapsed icon and its tooltip.",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The accessible name, when it should differ from the placeholder.",
+          "deprecated": null
+        },
+        {
+          "name": "mode",
+          "type": "enum",
+          "required": false,
+          "default": "'active'",
+          "values": [
+            "active",
+            "basic",
+            "focused"
+          ],
+          "description": "`active` filters on each keystroke through `onValueChange`. `basic` runs `onSearch` on Enter and nothing per keystroke. `focused` adds the results panel.",
+          "deprecated": null
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The search text, when the caller holds it. Pair with `onValueChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Starting text when the field holds its own.",
+          "deprecated": null
+        },
+        {
+          "name": "onValueChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(text)`: called on every edit, on Esc and on the clear button.",
+          "deprecated": null
+        },
+        {
+          "name": "loadResults",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(text, { offset, limit, scope })` → `Promise<{ results, total }>`. Asked on first render (so `onResults` fires without typing) and after a short pause in typing; an older answer never replaces a newer one. `scope` is sent when `scopes` is set.",
+          "deprecated": null
+        },
+        {
+          "name": "onResults",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`({ results, total })`: called with each answer of `loadResults`.",
+          "deprecated": null
+        },
+        {
+          "name": "onSearch",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(text)`: the search to run. Called on Enter in `basic`, and on Enter or the \"See all\" row in `focused`.",
+          "deprecated": null
+        },
+        {
+          "name": "results",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`focused` panel: groups of matches, `{ value, label, count?, items: [{ value, label, description?, icon? }] }`. Feed it from `onResults`, or filter your own rows.",
+          "deprecated": null
+        },
+        {
+          "name": "recent",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`focused` panel: recent searches shown when the field is focused and empty.",
+          "deprecated": null
+        },
+        {
+          "name": "onSelect",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`focused` panel: `(item, group)` called when a match is chosen.",
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`focused` panel: the optional last row, as `<SearchFieldAction onSelect>`. It is a slot, not a prop.",
+          "deprecated": null
+        },
+        {
+          "name": "isLoading",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A search is running. A Spinner takes the search icon's place. `loadResults` sets this by itself.",
+          "deprecated": null
+        },
+        {
+          "name": "isCollapsible",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Starts as an icon button that grows into the field and collapses when left empty.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "With `isCollapsible`, starts open.",
+          "deprecated": null
+        },
+        {
+          "name": "scopes",
+          "type": "arrayOf",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Scope filter before the field: `{ value, label, count? }`. \"All\" is added first and selected unless given.",
+          "deprecated": null
+        },
+        {
+          "name": "scope",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The chosen scope value, when the caller holds it. Pair with `onScopeChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultScope",
+          "type": "string",
+          "required": false,
+          "default": "ALL",
+          "values": null,
+          "description": "Starting scope when the field holds its own. `all` by default.",
+          "deprecated": null
+        },
+        {
+          "name": "onScopeChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(value)`: called when another scope is chosen.",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "`default` draws 40; `compact` draws 32. Bars pass `compact`.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Dims the field and blocks typing.",
+          "deprecated": null
+        },
+        {
+          "name": "clearLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Clear search'",
+          "values": null,
+          "description": "The clear button's name.",
+          "deprecated": null
+        },
+        {
+          "name": "panelLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Suggestions'",
+          "values": null,
+          "description": "The focused panel's accessible name.",
+          "deprecated": null
+        },
+        {
+          "name": "recentLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Recent searches'",
+          "values": null,
+          "description": "The group heading over recent searches.",
+          "deprecated": null
+        },
+        {
+          "name": "noMatchesLabel",
+          "type": "string",
+          "required": false,
+          "default": "'No matches for'",
+          "values": null,
+          "description": "Starts the empty-results line; the typed text follows in quotes.",
+          "deprecated": null
+        },
+        {
+          "name": "seeAllLabel",
+          "type": "string",
+          "required": false,
+          "default": "'See all results for'",
+          "values": null,
+          "description": "Starts the last row's label; the typed text follows in quotes.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultPanelOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "`focused` panel: starts open without focus, for a picture of the open panel.",
+          "deprecated": null
+        },
+        {
+          "name": "panelContainer",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`focused` panel: the element the panel mounts in instead of the page, so a picture keeps it inside its frame.",
+          "deprecated": null
+        },
+        {
+          "name": "scopeLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Search scope'",
+          "values": null,
+          "description": "The scope filter's accessible name.",
+          "deprecated": null
+        },
+        {
+          "name": "inputRef",
+          "type": "func or shape or any",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Ref to the underlying `<input>`.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class on the outer wrapper.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid` on the input.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Active",
+        "Spacing",
+        "Filled",
+        "ButtonInside",
+        "Disabled",
+        "Loading",
+        "Async",
+        "Collapsible",
+        "Scopes",
+        "CollapsibleScopes",
+        "Basic",
+        "Focused",
+        "FocusedKeyboard",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-default",
+        "--border-default",
+        "--ds-background-input",
+        "--ds-border-input",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
+        "--ds-text-subtle",
+        "--field-width-md",
+        "--inline-sm",
+        "--item-height-md",
+        "--pad-x-md",
+        "--pad-y-md",
+        "--popover-max-height-menu",
+        "--popover-pad-menu",
+        "--radius-control-md"
       ]
     },
     {
@@ -11442,7 +11673,7 @@
         "--heading-small",
         "--icon-lg",
         "--item-height-md",
-        "--radius-md",
+        "--radius-xl",
         "--stack-md",
         "--type-weight-medium"
       ]
@@ -11887,7 +12118,8 @@
         "FieldDisabled",
         "FieldInvalid",
         "FieldReadOnly",
-        "FieldReadOnlyLongValue"
+        "FieldReadOnlyLongValue",
+        "OpenListEdge"
       ],
       "tokens": [
         "--body-default",
@@ -12229,9 +12461,8 @@
         "--plus-skeleton-radius",
         "--plus-skeleton-width",
         "--radius-full",
-        "--radius-h24",
+        "--radius-lg",
         "--radius-md",
-        "--radius-sm",
         "--skeleton-circle-size",
         "--skeleton-height",
         "--skeleton-status-width",
@@ -12373,6 +12604,7 @@
       "tokens": [
         "--ds-icon-inverse",
         "--plus-spinner-size",
+        "--radius-full",
         "--spinner-size-lg",
         "--spinner-size-md",
         "--spinner-size-sm"
@@ -12572,7 +12804,6 @@
       "tokens": [
         "--body-default",
         "--body-small",
-        "--border-default",
         "--ds-background-brand-bold",
         "--ds-icon-inverse",
         "--ds-interaction-inverse-hovered",
@@ -12582,11 +12813,8 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-small",
-        "--radius-050",
-        "--radius-100",
-        "--radius-md",
-        "--space-025",
-        "--space-050",
+        "--radius-lg",
+        "--radius-xl",
         "--space-075",
         "--space-100",
         "--space-150",
@@ -12749,7 +12977,7 @@
         "--plus-status-height",
         "--plus-status-icon-box",
         "--plus-status-max",
-        "--radius-h24",
+        "--radius-lg",
         "--radius-md",
         "--stack-sm",
         "--tag-gap",
@@ -13080,6 +13308,7 @@
         "--inline-md",
         "--plus-table-cell-max-width",
         "--plus-table-row-height",
+        "--radius-md",
         "--row-height-lg",
         "--row-height-md",
         "--row-height-sm",
@@ -13197,6 +13426,7 @@
         "Layout",
         "Alignment",
         "Appearance",
+        "UnderlineRadius",
         "WithPanels",
         "InteractionStates",
         "Interactive",
@@ -13220,6 +13450,8 @@
         "--ds-border",
         "--ds-border-focused",
         "--ds-border-selected",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--ds-text",
         "--ds-text-disabled",
         "--ds-text-selected",
@@ -13227,14 +13459,14 @@
         "--inline-lg",
         "--item-height-md",
         "--item-height-sm",
-        "--motion-duration-short",
-        "--motion-easing-standard",
         "--pad-x-lg",
         "--pad-x-md",
+        "--radius-control-md",
+        "--radius-control-sm",
         "--radius-full",
-        "--radius-md",
         "--section-stack-sm",
         "--stack-md",
+        "--tab-radius",
         "--type-weight-medium"
       ],
       "subComponents": [
@@ -14930,10 +15162,10 @@
         "--image-xl",
         "--image-xs",
         "--image-xxs",
+        "--radius-control-lg",
         "--radius-sm",
         "--tile-inner",
         "--tile-radius",
-        "--tile-radius-lg",
         "--tile-size"
       ]
     },
@@ -15427,13 +15659,12 @@
       "tokens": [
         "--body-small",
         "--ds-background-neutral-bold",
-        "--ds-shadow-overlay",
         "--ds-text-inverse",
-        "--layer-popup",
+        "--layer-tooltip",
         "--pad-x-sm",
         "--popover-max-width-tooltip",
         "--popover-pad-y-tooltip",
-        "--popover-radius-tooltip"
+        "--radius-control-sm"
       ]
     },
     {

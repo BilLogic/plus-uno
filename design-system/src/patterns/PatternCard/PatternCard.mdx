@@ -2,6 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternCardStories from './PatternCard.stories.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -104,6 +105,14 @@ The examples on this page follow the toolbar's Color mode switch.
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="PatternCard" tier="template" />
+
+</div>
+
 </div>
 
 </DocsTab>
@@ -190,7 +199,7 @@ The image sits above a padded frame, and the header, body and footer sit inside 
 </thead>
 <tbody>
 <tr><td><code>--card-pad-compact</code>, <code>-default</code>, <code>-spacious</code></td><td>16 · 20 · 24</td><td>The pad of a small, medium and large card.</td></tr>
-<tr><td><code>--card-radius-sm</code></td><td>12</td><td>The radius of a small card.</td></tr>
+<tr><td><code>--card-radius-compact</code></td><td>12</td><td>The radius of a small card, and of a card inside a filled Section.</td></tr>
 <tr><td><code>--card-radius</code></td><td>16</td><td>The radius of medium and large cards.</td></tr>
 <tr><td><code>--card-stack-sm</code>, <code>-md</code>, <code>-lg</code></td><td>4 · 8 · 12</td><td>Title to description; header to body, set by <code>gap</code>; body to footer.</td></tr>
 <tr><td><code>--card-inline-md</code></td><td>8</td><td>Items on a row, such as actions in the header.</td></tr>
@@ -257,7 +266,7 @@ A card that holds actions that commit a change gets a footer, and its actions st
 </thead>
 <tbody>
 <tr><td>Title the card with the object it holds, in sentence case: "Ana Ruiz", "Sessions this week".</td><td>A generic title such as "Details" or "Info".</td></tr>
-<tr><td>Keep the description to one line that adds something, such as "Algebra I · Thu 4:00 PM".</td><td>A description that repeats the title.</td></tr>
+<tr><td>Keep the description to one line that adds something, such as "Lincoln Middle · Thu 4:00 PM".</td><td>A description that repeats the title.</td></tr>
 <tr><td>Name a footer action for what it does: "Save note", "View session".</td><td>"OK" or "Submit".</td></tr>
 </tbody>
 </DocsTable>

@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as PaginationStories from './Pagination.stories.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import { Pagination } from '@/components';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -69,6 +70,14 @@ export const figmaMeta = {
 <ComponentExample of={PaginationStories.Disabled} title="Disabled" description={<>Previous on the first page keeps its tab stop, takes the disabled ground and ink, and does nothing.</>} />
 
 <ComponentExample of={PaginationStories.InteractionStates} title="First, middle and last page" description={<>Previous is disabled on the first page and Next on the last; both are enabled between.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Pagination" />
 
 </div>
 

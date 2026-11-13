@@ -31,16 +31,17 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Radius | `--radius-sm` |  |
 | Radius | `--radius-md` |  |
 | Radius | `--radius-lg` |  |
+| Radius | `--radius-xl` |  |
+| Radius | `--radius-xxl` |  |
 | Radius | `--radius-full` | Figma Radius/full; the code name is the --radius-full primitive, so no second declaration |
-| Radius | `--radius-h24` | control height 24; 24÷4 = 6 |
-| Radius | `--radius-h32` | control height 32; 32÷4 = 8 |
-| Radius | `--radius-h40` | new step; control height 40; 40÷4 = 10 |
+| Radius / Control | `--radius-control-sm` | pairs with --control-sm; height 24, 24÷4 = 6 |
+| Radius / Control | `--radius-control-md` | pairs with --control-md; height 32, 32÷4 = 8 |
+| Radius / Control | `--radius-control-lg` | pairs with --control-lg; height 40, 40÷4 = 10 |
 | Border | `--border-default` (declared elsewhere) |  |
 | Border | `--border-selected` (declared elsewhere) |  |
 | Border | `--border-focused` (declared elsewhere) |  |
 | Focus | `--focus-ring-width` | matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive |
 | Focus | `--focus-ring-offset` | defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both |
-| Focus | `--focus-ring-radius` | first pass, no existing source; a family PR refines it |
 | Grid | `--grid-gutter` |  |
 | Grid | `--grid-columns` |  |
 | Grid | `--grid-width-column` |  |
@@ -102,7 +103,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Page | `--page-stack-sm` (declared elsewhere) |  |
 | Page | `--page-stack-md` (declared elsewhere) |  |
 | Page | `--page-stack-lg` (declared elsewhere) |  |
-| Page | `--page-radius` (declared elsewhere) |  |
 | Panel | `--panel-min-width` | the narrowest the splitter allows (320) |
 | Panel | `--panel-width-default` | the width a Panel opens at (400) |
 | Panel | `--panel-max-width` | the widest the splitter allows (640) |
@@ -130,15 +130,15 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Card | `--card-min-width-sm` (declared elsewhere) |  |
 | Card | `--card-min-width-md` (declared elsewhere) |  |
 | Card | `--card-min-width-lg` (declared elsewhere) |  |
-| Card | `--card-radius` (declared elsewhere) |  |
-| Card | `--card-radius-sm` (declared elsewhere) |  |
+| Card | `--card-radius` |  |
+| Card | `--card-radius-compact` |  |
 | Card | `--card-max-height-sm` (declared elsewhere) |  |
 | Card | `--card-max-height-md` (declared elsewhere) |  |
 | Card | `--card-max-height-lg` (declared elsewhere) |  |
 | Table | `--table-pad-x-cell` (declared elsewhere) |  |
 | Table | `--table-pad-y-cell` (declared elsewhere) |  |
 | Table | `--table-indent` (declared elsewhere) |  |
-| Table | `--table-radius` (declared elsewhere) |  |
+| Table | `--table-radius` |  |
 | Table | `--table-stack` (declared elsewhere) |  |
 | Table | `--table-pad-x-footer` (declared elsewhere) |  |
 | Table | `--table-min-width-title` (declared elsewhere) |  |
@@ -159,11 +159,10 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Modal | `--modal-inline-sm` (declared elsewhere) |  |
 | Modal | `--modal-inline-md` (declared elsewhere) |  |
 | Modal | `--modal-inline-lg` (declared elsewhere) |  |
-| Modal | `--modal-radius` (declared elsewhere) |  |
+| Modal | `--modal-radius` |  |
 | Modal | `--modal-width-sm` | lifted out of spacing / layout, beside the pattern’s pad/stack tokens |
 | Modal | `--modal-width-md` |  |
 | Modal | `--modal-width-lg` |  |
-| Page | `--page-radius-md` |  |
 | Page | `--page-border-width` |  |
 | Table | `--table-overflow-reach` |  |
 | Modal | `--modal-body-min-height` |  |
@@ -173,28 +172,15 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Popover | `--popover-width-lg` (declared elsewhere) |  |
 | Popover | `--popover-width-flag` (declared elsewhere) |  |
 | Popover | `--popover-stack-flag` (declared elsewhere) |  |
-| Popover | `--popover-radius` (declared elsewhere) |  |
+| Popover | `--popup-radius` |  |
 | Popover | `--popover-pad-menu` (declared elsewhere) |  |
 | Popover | `--popover-min-width-menu` (declared elsewhere) |  |
 | Popover | `--popover-max-width-menu` (declared elsewhere) |  |
 | Popover | `--popover-max-height-menu` (declared elsewhere) |  |
-| Popover | `--popover-radius-menu-sm` (declared elsewhere) |  |
-| Popover | `--popover-radius-menu-md` (declared elsewhere) |  |
 | Popover | `--popover-pad-y-tooltip` (declared elsewhere) |  |
 | Popover | `--popover-max-width-tooltip` (declared elsewhere) |  |
-| Popover | `--popover-radius-tooltip` (declared elsewhere) |  |
 | Popover | `--popover-gap-screen` (declared elsewhere) |  |
 | Popover | `--popover-offset` (declared elsewhere) |  |
-| Drawer | `--drawer-pad` (declared elsewhere) |  |
-| Drawer | `--drawer-stack-sm` (declared elsewhere) |  |
-| Drawer | `--drawer-stack-md` (declared elsewhere) |  |
-| Drawer | `--drawer-stack-lg` (declared elsewhere) |  |
-| Drawer | `--drawer-inline-sm` (declared elsewhere) |  |
-| Drawer | `--drawer-inline-md` (declared elsewhere) |  |
-| Drawer | `--drawer-inline-lg` (declared elsewhere) |  |
-| Drawer | `--drawer-width-sm` |  |
-| Drawer | `--drawer-width-md` |  |
-| Drawer | `--drawer-width-lg` |  |
 | Focused page | `--focused-page-pad-x` (declared elsewhere) |  |
 | Focused page | `--focused-page-pad-y` (declared elsewhere) |  |
 | Focused page | `--focused-page-stack-sm` (declared elsewhere) |  |
@@ -207,8 +193,8 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 
 | Group | Token | Note |
 |---|---|---|
-| Button | `--button-radius-default` | 32-high control, radius 6 |
-| Button | `--button-radius-compact` | 24-high control, radius 4 |
+| Button | `--button-radius-default` | nests in a 40-high field: its radius 10 minus the 4 slot inset = 6 |
+| Button | `--button-radius-compact` | nests in a 32-high field: its radius 8 minus the 4 slot inset = 4 |
 | Calendar | `--calendar-day-sm` |  |
 | Calendar | `--calendar-day-md` |  |
 | Calendar | `--calendar-day-lg` |  |
@@ -287,8 +273,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Table | `--table-cell-max-width` |  |
 | Avatar | `--avatar-size-96` |  |
 | Avatar | `--avatar-size-128` |  |
-| Tile | `--tile-radius-sm` (declared elsewhere) |  |
-| Tile | `--tile-radius-lg` (declared elsewhere) |  |
 | Spinner | `--spinner-size-sm` |  |
 | Spinner | `--spinner-size-md` |  |
 | Spinner | `--spinner-size-lg` |  |

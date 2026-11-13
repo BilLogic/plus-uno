@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -14,12 +13,22 @@ import * as ColorsStories from './Colors.stories.jsx';
 
 <Meta of={ColorsStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-color"
+    eyebrow="Foundation"
     title="Color"
-    summary="Every color is a --ds token named for its job."
+    purpose="Every color is a --ds token named for its job."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Naming', href: '#foundation-how-the-tokens-are-built' },
+            { title: 'Roles', href: '#foundation-roles' },
+            { title: 'Surfaces', href: '#foundation-surfaces' },
+            { title: 'States', href: '#foundation-states' },
+            { title: 'Chart', href: '#foundation-data-viz-color' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 
@@ -54,7 +63,7 @@ A name reads from the general to the specific: property, role, emphasis, state. 
     head={['Part', 'In `color/background/danger/bold/hovered`', 'What it says']}
     rows={[
         ['color', 'Namespace', 'Dropped in CSS. Surface and shadow tokens start with elevation.'],
-        ['background', 'Property', 'What it paints: text, icon, border, background, link, chart, blanket, skeleton or interaction.'],
+        ['background', 'Property', 'What it paints: text, icon, border, background, link, chart, backdrop, skeleton or interaction.'],
         ['danger', 'Role', 'What it means. Left out for the default neutral.'],
         ['bold', 'Emphasis', 'How far it stands from the surface. Only the steps a role defines exist.'],
         ['hovered', 'State', 'hovered, pressed or visited. Interactive backgrounds and links only.'],
@@ -64,7 +73,7 @@ A name reads from the general to the specific: property, role, emphasis, state. 
 <RefTable
     head={['Part', 'Values', 'What it says']}
     rows={[
-        ['property', <><C>text</C> · <C>icon</C> · <C>border</C> · <C>background</C> · <C>link</C> · <C>surface</C> · <C>shadow</C> · <C>blanket</C> · <C>skeleton</C> · <C>interaction</C> · <C>chart</C></>, 'What the color paints. Always there.'],
+        ['property', <><C>text</C> · <C>icon</C> · <C>border</C> · <C>background</C> · <C>link</C> · <C>surface</C> · <C>shadow</C> · <C>backdrop</C> · <C>skeleton</C> · <C>interaction</C> · <C>chart</C></>, 'What the color paints. Always there.'],
         ['role', <><C>brand</C> · <C>neutral</C> · <C>selected</C> · <C>input</C> · <C>inverse</C> · <C>disabled</C> · <C>focused</C> · <C>danger</C> · <C>warning</C> · <C>success</C> · <C>information</C> · <C>discovery</C> · <C>accent-teal</C> · <C>smart-advocacy</C></>, 'What it means. Left out for the default neutral.'],
         ['emphasis', <><C>subtlest</C> · <C>subtler</C> · <C>subtle</C> · (default) · <C>bold</C> · <C>bolder</C> · <C>boldest</C></>, 'How far it stands from the surface.'],
         ['state', <><C>hovered</C> · <C>pressed</C> · <C>visited</C></>, 'Interactive backgrounds and links only.'],
@@ -85,7 +94,7 @@ Pick the family by job:
 PLUS has two color modes, light and dark, and each has an increased contrast version for people who need stronger text and edges. That makes four modes. A fifth setting, auto, follows the operating system: `prefers-color-scheme` picks light or dark, and `prefers-contrast` turns increased contrast on.
 
 - Dark is not light inverted. Raised and overlay surfaces get lighter as they rise, because a shadow is hard to see on a dark page.
-- Increased contrast darkens text and meaningful borders in light and lightens them in dark. Text then reaches 7:1, and borders, icons and the focus ring reach 4.5:1. Tints, surfaces and the Blanket stay as they are.
+- Increased contrast darkens text and meaningful borders in light and lightens them in dark. Text then reaches 7:1, and borders, icons and the focus ring reach 4.5:1. Tints, surfaces and the Backdrop stay as they are.
 - Tokens map per theme. Design in dark mode by choosing the same token, and never map your own values.
 - In code, the page sets `data-color-mode` (light, dark or auto) and `data-contrast-mode` (no-preference, more or auto). No attribute means light at standard contrast.
 - In Figma, set the mode on the frame: Light, Dark, Light IC or Dark IC. Each swatch below shows the value the page resolves for its token right now, so switching the toolbar changes it at once.
@@ -434,14 +443,14 @@ Attendance for one class against a 90% target.
 
 <DoDont>
 <Do caption="A green tick at 90 and a green outline on the track.">
-<div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--stack-sm)' }}>Algebra 1 · 86% attended</div>
+<div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended</div>
 <div style={{ position: 'relative', height: 'var(--icon-md)', borderRadius: 'var(--radius-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-chart-success)' }}>
     <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-brand)' }} />
     <span style={{ position: 'absolute', insetBlock: '-25%', insetInlineStart: '90%', width: 'var(--stroke-2)', background: 'var(--ds-chart-success-bold)' }} />
 </div>
 </Do>
 <Dont caption="A shaded band and a value beside the bar. The band hides the bar's own end and the text repeats the tooltip.">
-<div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--stack-sm)' }}>Algebra 1 · 86% attended · Target 90%</div>
+<div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended · Target 90%</div>
 <div style={{ position: 'relative', height: 'var(--icon-md)', background: 'var(--ds-chart-success)' }}>
     <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', background: 'var(--ds-chart-brand)' }} />
 </div>
@@ -486,7 +495,7 @@ A filled field looks selected or disabled. The focus ring is the one signal for 
 <div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', color: 'var(--ds-text-subtlest)', boxShadow: '0 0 0 var(--stroke-2) var(--ds-border-focused)' }}>Placeholder</div>
 </Do>
 <Dont caption="A brand fill on the field to show focus. It reads as a selected value and hides what is typed.">
-<div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Algebra I review</div>
+<div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Lincoln Middle Thursday</div>
 </Dont>
 </DoDont>
 
@@ -527,10 +536,10 @@ The Reschedule button after the session has ended.
 
 <DoDont>
 <Do caption="Disabled takes color/text/disabled on color/background/disabled.">
-<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
+<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
 </Do>
 <Dont caption="Opacity on the primary button. It still looks clickable and the gray is not the system one.">
-<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
+<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
 </Dont>
 </DoDont>
 
@@ -615,10 +624,10 @@ Pick the role for the job. A failed payment is danger; an accent has no meaning,
 
 <DoDont>
 <Do caption="color/text/inverse on a bold danger fill.">
-<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text-inverse)' }}>Delete session</span>
+<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text-inverse)' }}>Delete session</span>
 </Do>
 <Dont caption="color/text/default on a bold fill loses contrast.">
-<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text)' }}>Delete session</span>
+<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text)' }}>Delete session</span>
 </Dont>
 </DoDont>
 

@@ -14,6 +14,8 @@ Also asked as: enable disable, on/off setting.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx`
 
+**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a toggle to let a person turn something on or off instantly, such as making a resource public. If a physical switch would work for the action, a toggle is the right component.
@@ -21,6 +23,14 @@ Use a toggle to let a person turn something on or off instantly, such as making 
 A toggle never waits for a button. For an option that needs a button press to apply, such as a field in a form with a Save button, use a checkbox.
 
 Pick the size by the page. Use 16 where the page has many toggles, such as a settings list. Use 20 to call attention to one setting, such as the single switch in a modal.
+
+## Motion
+
+Toggle reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Color carries the feedback; the thumb follows. |
 
 ## Best practices
 
@@ -75,7 +85,7 @@ The native input is a checkbox with `role="switch"`, the markup the W3C switch p
 - To choose one option from a longer list, use Select.
 - To explain what flipping a toggle does, add a Tooltip.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 

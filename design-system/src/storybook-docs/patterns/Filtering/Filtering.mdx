@@ -1,0 +1,271 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+
+import * as FilteringStories from './Filtering.stories.jsx';
+import { STAGE } from './filteringDemo.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    TagRow,
+    CountOnIcon,
+    FiltersAmongViews,
+    FiltersAtEnd,
+    OneTier,
+    TwoTiers,
+} from '@/storybook-docs/illustrations/filtering.jsx';
+
+<Meta title="Patterns/Finding things/Filtering" tags={['!dev', 'manifest']} />
+
+<DocsLanding
+    page="patterns-finding-things-filtering"
+    eyebrow="Pattern · Finding things"
+    title="Filtering"
+    purpose="How a person narrows a collection: a table, a list, a calendar or a card grid. Filters sit at the end of the Section's view bar, and the start stays for views. Five tiers by how much filtering the content needs, one tier per bar."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Filter menu', href: './?path=/docs/components-forms-and-inputs-filter-menu--docs' },
+            { title: 'Popup select', href: './?path=/docs/components-forms-and-inputs-popup-select--docs' },
+            { title: 'Icon button', href: './?path=/docs/components-forms-and-inputs-button-icon-button--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Popup', href: './?path=/docs/templates-popup-popup--docs' },
+        ],
+    }}
+/>
+
+<DocsTabs of={FilteringStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Tiers
+
+Pick by how many categories there are and how long their lists run. When a Section outgrows tier 1, all of its filters move into the menu.
+
+<TypeGrid>
+<TypeCard of={FilteringStories.TierQuickFilters} title="1 · Quick filters" stage={STAGE}>One to three categories, each a short list: a FilterButton per category, applied as you pick.</TypeCard>
+<TypeCard of={FilteringStories.TierOneList} title="2a · Menu, one category" stage={STAGE}>The Filter icon opens one list, applied as you pick. No footer.</TypeCard>
+<TypeCard of={FilteringStories.TierSideBySide} title="2b · Menu, side by side" stage={STAGE}>Two or three categories with short lists in columns, with Reset and Apply full bleed.</TypeCard>
+<TypeCard of={FilteringStories.TierStacked} title="2c · Menu, stacked" stage={STAGE}>Four or more categories, or long lists, stacked, with Reset and Apply full bleed.</TypeCard>
+<TypeCard of={FilteringStories.TierFilterSide} title="3 · Filter side" stage={STAGE}>Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## What is on
+
+The control that holds a filter shows it: the FilterButton's count, or the Filter icon's own count on the selected fill. No row of tags under the bar.
+
+<ComponentExample of={FilteringStories.FilterCount} title="The Filter icon's count" description="Open the menu, tick two and press Apply. The button widens and the count fades in on the selected fill, and the icon reads &quot;Filters, 2 applied&quot;. The result count above the rows narrows in words. Reset in the menu clears the ticks; Apply then clears the count." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key cases
+
+<ComponentExample of={FilteringStories.UnderPageTabs} title="Under page tabs" description="The view picker at the bar's start picks a view, not a filter, and its menu meets the trigger's start edge. The filters stay at the end, where a menu meets its trigger's end edge. Both hang 4 below their trigger." />
+
+<DocsInteractivePlayground of={FilteringStories.NarrowWidth} description="Below 768, tier 1 folds into a stacked menu behind the Filter icon, which carries every count. Drag the Section's width." />
+
+<ComponentExample of={FilteringStories.NoMatches} title="No matches" description="The empty state replaces the table, names the filters that are on and offers &quot;Reset filters&quot;. The count stays on the icon until they are reset." />
+
+### Below 960, the filter side
+
+The side hides and the Filter icon returns with its count. Pressing it gives the filters the Section's whole width, and "Show results" goes back. The Section owns this behavior: <a target="_top" href="./?path=/docs/templates-section-section--docs#width-behavior">Section › Width behavior</a>.
+
+### Widths
+
+A one-list menu is auto: at least the trigger, 160 to 320, truncating with a tooltip. Side by side takes 3-col; stacked takes 3-col and never goes past 4-col. The widths are the <a target="_top" href="./?path=/docs/templates-popup-popup--docs">Popup</a> template's.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Filtering" tier="pattern" />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Filtering when a person narrows a collection by its attributes. Filters live at the end of the view bar, in the bar's order: a format switch if any, Search, then the filters, then More and the Primary. Views at the start are not filters: a view is one of a fixed set, and filters combine.
+
+<DocsTable>
+<thead>
+<tr><th>Tier</th><th>Use when</th><th>Controls</th><th>Applies</th><th>Shows it is on</th></tr>
+</thead>
+<tbody>
+<tr><td>1 · Quick filters</td><td>One to three categories, each a short list</td><td>A FilterButton per category</td><td>As you pick</td><td>The button's selected fill and count</td></tr>
+<tr><td>2a · Menu, one category</td><td>One category, and the bar has no room for a button</td><td>The Filter icon, one list</td><td>As you pick</td><td>The Filter icon's count</td></tr>
+<tr><td>2b · Menu, side by side</td><td>Two or three categories with short lists, applied together</td><td>The Filter icon, columns, Reset and Apply</td><td>On Apply</td><td>The Filter icon's count</td></tr>
+<tr><td>2c · Menu, stacked</td><td>Four or more categories, or long lists</td><td>The Filter icon, stacked categories, Reset and Apply</td><td>On Apply</td><td>The Filter icon's count</td></tr>
+<tr><td>3 · Filter side</td><td>Filtering is the main job, such as browsing a long catalog</td><td>A side at the Section's start</td><td>As you pick, or on "Apply filters" for a batch</td><td>A count beside each category</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For finding rows by name, use the Search pattern: its icon sits before the filters.
+- For switching between fixed views of the rows, use `Tabs` as pill views.
+- For sorting, use the `Table` column header: sorting is not a filter.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Use one tier per bar.
+
+<RuleTag kind="automatic" />
+
+Quick filters and a filter menu never share a bar: some filters outside and some inside read as two systems. When a Section outgrows tier 1, all of its filters move into the menu. Where the filters sit in the bar, and the bar's order: <a target="_top" href="./?path=/docs/templates-section-section--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary">Section › Order the end of the bar</a>.
+
+<DoDontPair
+    doExample={<OneTier />}
+    doCaption="One tier: three quick filters, all in the bar."
+    dontExample={<TwoTiers />}
+    dontCaption="Two quick filters plus a Filter icon: two systems in one bar."
+/>
+
+### Keep the filters at the end of the bar.
+
+<RuleTag kind="automatic" />
+
+The start of the bar is for views. The filters come after Search and before More and the Primary, so a person finds them in one place on every Section.
+
+<DoDontPair
+    doExample={<FiltersAtEnd />}
+    doCaption="Views at the start; Search, then the filters, at the end."
+    dontExample={<FiltersAmongViews />}
+    dontCaption="The filters squeezed in beside the views."
+/>
+
+### Show what is on through the control that holds it.
+
+<RuleTag kind="automatic" />
+
+A FilterButton's count, the Filter icon's count on the selected fill, or a count beside each category in a side. No separate count tag, and no row of tags under the bar.
+
+<DoDontPair
+    doExample={<CountOnIcon />}
+    doCaption="The count on the Filter icon, on the selected fill."
+    dontExample={<TagRow />}
+    dontCaption="A row of tags under the bar, repeating what is on."
+/>
+
+### Apply one list as you pick and several categories on Apply.
+
+<RuleTag kind="automatic" />
+
+A one-list menu is a <a target="_top" href="./?path=/docs/components-forms-and-inputs-popup-select--docs">Popup select</a>: radios for one choice, not searchable for a short list. Checkboxes for several choices in one list are Planned on it <PlannedTag />. A multi-category menu is a <a target="_top" href="./?path=/docs/components-forms-and-inputs-filter-menu--docs">Filter menu</a> that holds values until Apply; Apply closes it and updates the content once, and Reset clears the choices without applying. Where a menu opens and how wide it is: <a target="_top" href="./?path=/docs/templates-popup-popup--docs">Popup</a>.
+
+### Say Reset in a menu and Reset filters everywhere else.
+
+<RuleTag kind="automatic" />
+
+"Reset filters" at the top of a side clears them all, and the "No matches" state offers it too; both clear the search. "Apply filters" appears only for batch filtering in a side.
+
+### Hide the filter side below 960 and fold quick filters below 768.
+
+<RuleTag kind="automatic" />
+
+Below 960 the side hides and the Filter icon returns with its count; pressing it gives the filters the Section's whole width, with "Show results" to go back: <a target="_top" href="./?path=/docs/templates-section-section--docs#drop-the-filter-icon-while-a-filter-side-shows">Section › Drop the Filter icon while a filter side shows</a>. Below 768 quick filters become a stacked menu.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name categories as nouns: "Grade", "School", "Subject".</td><td>"Filter by grade", "Choose a school".</td></tr>
+<tr><td>Label the menu footer "Reset" and "Apply".</td><td>"Clear", "OK", "Done".</td></tr>
+<tr><td>Put "Reset filters" at the top of a side; "Apply filters" only for a batch.</td><td>"Clear all", "Submit".</td></tr>
+<tr><td>Name the Filter icon with filters on: "Filters, 2 applied".</td><td>"Filters (2)".</td></tr>
+<tr><td>Count the results in words: "1 of 8 students".</td><td>"1 result".</td></tr>
+<tr><td>Go back from the filters on a narrow Section with "Show results".</td><td>"Done", "Close".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- The Filter icon's name is "Filters"; with a count it reads "Filters, 2 applied". Apply returns focus to it, so its new name is read.
+- A FilterButton's name is its text plus its count. Its list is a listbox the arrow keys move through; Escape closes it and returns focus to the button.
+- The result count is a polite live region: it is read as the rows narrow.
+- Reset and Apply are the last tab stops in a menu.
+- A filter side is a region named "Filters", and each category is a group named by its legend.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Component</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>Quick filter</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-filter-button--docs">Filter button</a></td><td>A count only when a value is on; it hugs its label and opens its list at bottom-end.</td></tr>
+<tr><td>Filter icon</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a></td><td>The `filter` icon, tooltip "Filters"; its `trailingMetric` draws the count on the selected fill.</td></tr>
+<tr><td>One list (tier 1 lists, 2a)</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-popup-select--docs">Popup select</a></td><td>Applies as you pick, radios for one. <PlannedTag /> Checkboxes for several are Planned.</td></tr>
+<tr><td>Filter menu (2b, 2c)</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-filter-menu--docs">Filter menu</a></td><td>Holds values until Apply; columns side by side or stacked; Reset and Apply full bleed.</td></tr>
+<tr><td>Placement and width</td><td><a target="_top" href="./?path=/docs/templates-popup-popup--docs">Popup</a></td><td>bottom-end at the end of a bar, bottom-start at its start; 4 from the trigger.</td></tr>
+<tr><td>Filter side</td><td><a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a> side</td><td>Composed at the start today. <PlannedTag /> A start placement prop is Planned.</td></tr>
+<tr><td>No matches</td><td><a target="_top" href="./?path=/docs/components-messaging-empty-state--docs">Empty state</a></td><td>Replaces the table and offers "Reset filters".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use when the question is the view bar the filters sit in.
+- <a target="_top" href="./?path=/docs/templates-popup-popup--docs">Popup</a>: use when the question is where a menu opens or how wide it is.
+- <a target="_top" href="./?path=/docs/components-forms-and-inputs-filter-menu--docs">Filter menu</a>: use when building a tier 2b or 2c menu.
+- <a target="_top" href="./?path=/docs/patterns-finding-things-search--docs">Search</a>: use for finding by name.
+- <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a>: use for No matches.
+- <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a>: use for views.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

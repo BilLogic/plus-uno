@@ -20,14 +20,14 @@
     grid-template-columns: 1fr;
     overflow: hidden;
     color: var(--ds-text-subtlest);
-    animation: plus-icon-btn-metric-open var(--motion-duration-medium) var(--motion-easing-standard);
+    animation: plus-icon-btn-metric-open var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
 }
 
 .plus-icon-btn__metric-value {
     min-width: 0;
     padding-inline-start: var(--inline-sm);
     // A new count fades in over the old one's place; it never counts up.
-    animation: plus-icon-btn-metric-fade var(--motion-duration-short) var(--motion-easing-entrance);
+    animation: plus-icon-btn-metric-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 }
 
 .plus-btn--selected .plus-icon-btn__metric,
@@ -35,7 +35,7 @@
     color: inherit;
 }
 
-// Reduced motion needs no branch: the --motion-duration-* tokens collapse to 0ms under it.
+// Reduced motion needs no branch: the --ds-motion-* tokens already fall back to a fade under it.
 @keyframes plus-icon-btn-metric-open {
     from { grid-template-columns: 0fr; }
     to { grid-template-columns: 1fr; }

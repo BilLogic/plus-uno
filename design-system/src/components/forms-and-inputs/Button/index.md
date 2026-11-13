@@ -14,6 +14,8 @@ Also asked as: cta, submit.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a button for an action on the current page: submit a form, mark attendance, close a dialog. For navigation to another page, use Link button.
@@ -29,6 +31,14 @@ Use a button for an action on the current page: submit a form, mark attendance, 
 | Danger | The final confirmation of a destructive, irreversible action such as deleting. Example: "Delete session recording". |
 | Discovery | The call to action for a new experience. Example: "Try the new schedule view". |
 | AI | The one primary AI action in a region. Draws the sparkle before its label. Example: "Generate summary". |
+
+## Motion
+
+Button reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Hover and press change color, 90% by about 110 ms. |
 
 ## Best practices
 
@@ -78,7 +88,7 @@ Right-align buttons in focused tasks and modal dialogs, with the primary on the 
 - For a menu of actions behind one trigger, use `DropdownMenu`.
 - To show that work is under way on the page rather than in the control, use `ProgressBar`.
 
-Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -162,7 +172,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--button-radius-compact` · `--button-radius-default` · `--button-vertical-size` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--item-height-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-sm` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--border-default` · `--button-radius-compact` · `--button-radius-default` · `--button-vertical-size` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--item-height-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-sm` · `--radius-full` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 

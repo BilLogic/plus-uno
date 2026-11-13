@@ -20,7 +20,6 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --control-md  /* Height of a default control: 32px high. */
 --control-sm  /* Height of a small control: 24px high. */
 --focus-ring-offset  /* Gap between an element and its focus ring, when it must differ from the ring width. */
---focus-ring-radius  /* Corner rounding of the keyboard focus ring. */
 --focus-ring-width  /* Width of the keyboard focus ring; also its offset unless the offset must differ. */
 --grid-columns  /* Column count of the page grid. */
 --grid-gutter  /* Gap between columns of the page grid. */
@@ -36,12 +35,14 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --pad-y-lg  /* Vertical padding inside a large control or a roomy row. */
 --pad-y-md  /* Vertical padding inside a default control: a Button, a field, a menu item. */
 --pad-y-sm  /* Vertical padding inside a compact control, such as a compact Button or a Sidebar tab. */
---radius-h24  /* Corner rounding for a control 24px high. */
---radius-h32  /* Corner rounding for a control 32px high. */
---radius-h40  /* Corner rounding for a control 40px high. */
+--radius-control-lg  /* Corner rounding for a control 40px high: a default field. */
+--radius-control-md  /* Corner rounding for a control 32px high: a compact field, a tab, a menu row. */
+--radius-control-sm  /* Corner rounding for a control 24px high: a compact field, a Tooltip, a Sidebar row. */
 --radius-lg  /* Corner rounding for larger containers that are not a pattern, such as a tile or image. */
 --radius-md  /* Corner rounding for controls and small containers. */
---radius-sm  /* Corner rounding for small marks: a checkbox, a focus ring, a small tag. */
+--radius-sm  /* Corner rounding for small marks: a checkbox, a small tag. */
+--radius-xl  /* Corner rounding for a floating or compact surface, such as a Popup or a compact card. */
+--radius-xxl  /* Corner rounding for a top-level surface, such as a Section or a card. */
 --screen-max-width  /* Widest the screen frame gets at the current breakpoint. */
 --screen-min-width  /* Narrowest the screen frame gets at the current breakpoint. */
 --screen-pad-x  /* Horizontal padding between the screen edge and the page content. */
@@ -52,7 +53,7 @@ Start here for space, size and radius (ADR-038). A component reads its component
 ```
 
 ## Ladder Patterns
-Space owned by a pattern: page, section, card, table, modal, drawer, popover. Inside a pattern, read its token before a semantics step.
+Space owned by a pattern: page, section, card, table, modal, popover. Inside a pattern, read its token before a semantics step.
 
 ```css
 --blanket-fill  /* Fill of the Blanket that dims the page behind a Modal. */
@@ -62,9 +63,8 @@ Space owned by a pattern: page, section, card, table, modal, drawer, popover. In
 --card-pad-compact  /* Padding inside a PatternCard with compact spacing. */
 --card-pad-default  /* Padding inside a PatternCard with default spacing. */
 --card-pad-spacious  /* Padding inside a PatternCard with spacious spacing. */
---drawer-width-lg  /* Width of a wide PatternDrawer. */
---drawer-width-md  /* Width of a default PatternDrawer. */
---drawer-width-sm  /* Width of a narrow PatternDrawer. */
+--card-radius  /* Corner rounding of a PatternCard. */
+--card-radius-compact  /* Corner rounding of a compact PatternCard or a card nested in another surface. */
 --frame-sidebar-group-gap  /* Vertical gap between two groups of rows in the Sidebar. */
 --frame-sidebar-pad  /* Padding on every side inside the Sidebar. */
 --frame-sidebar-row-gap  /* Vertical gap between two rows in the Sidebar. */
@@ -79,6 +79,7 @@ Space owned by a pattern: page, section, card, table, modal, drawer, popover. In
 --modal-pad-y-compact  /* Vertical padding of a Modal with compact spacing. */
 --modal-pad-y-default  /* Vertical padding of a Modal with default spacing. */
 --modal-pad-y-spacious  /* Vertical padding of a Modal with spacious spacing. */
+--modal-radius  /* Corner rounding of a Modal. */
 --modal-width-lg  /* Width of a large Modal, such as a table or a long form. */
 --modal-width-md  /* Width of a default Modal, such as a short form. */
 --modal-width-sm  /* Width of a small Modal, such as a confirmation. */
@@ -89,10 +90,10 @@ Space owned by a pattern: page, section, card, table, modal, drawer, popover. In
 --page-pad-y-compact  /* Vertical padding of a Page with compact spacing. */
 --page-pad-y-default  /* Vertical padding of a Page with default spacing. */
 --page-pad-y-spacious  /* Vertical padding of a Page with spacious spacing. */
---page-radius-md  /* Corner rounding of a Page frame. */
 --panel-max-width  /* Widest the Panel may be dragged. */
 --panel-min-width  /* Narrowest the Panel may be dragged. */
 --panel-width-default  /* Width the Panel opens at. */
+--popup-radius  /* Corner rounding of a Popup. */
 --section-pad-x-compact  /* Horizontal padding of a PatternSection with compact spacing. */
 --section-pad-x-default  /* Horizontal padding of a PatternSection with default spacing. */
 --section-pad-x-spacious  /* Horizontal padding of a PatternSection with spacious spacing. */
@@ -101,6 +102,7 @@ Space owned by a pattern: page, section, card, table, modal, drawer, popover. In
 --section-pad-y-spacious  /* Vertical padding of a PatternSection with spacious spacing. */
 --section-radius  /* Corner rounding of a PatternSection that has a fill. */
 --table-overflow-reach  /* How far a PatternTable lets a row's overflow, such as a focus ring, reach past its clip. */
+--table-radius  /* Corner rounding of a PatternTable. */
 ```
 
 ## Ladder Components
@@ -201,23 +203,62 @@ Stacking order: `z-index: var(--layer-modal)`.
 --layer-card  /* Stacking order of a card raised above page content, such as a sticky table part. */
 --layer-dialog  /* Stacking order of a non-modal dialog over the page, below popups. */
 --layer-flag  /* Stacking order of a Flag, above any Modal. */
---layer-modal  /* Stacking order of a Modal, above its Blanket. */
+--layer-modal  /* Stacking order of a Modal, above its Backdrop. */
 --layer-navigation  /* Stacking order of the Frame's top bar and Sidebar. */
 --layer-popup  /* Stacking order of a Popup, DropdownMenu or listbox. */
 --layer-spotlight  /* Stacking order of a Spotlight, above Flags. */
 --layer-tooltip  /* Stacking order of a Tooltip, above everything else. */
 ```
 
-## Motion
-Durations and easings; reduced motion is handled at this layer.
+## Motion Springs (`--ds-motion-`)
+How things move (ADR-041). Each semantic is an easing with its settle time beside it: `transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast)`. Spatial is for position and size, appearance for fades and color, `exit` for leaving, `loop` for work in progress. A component names its own enter, exit and change in the motion registry; read Foundations / Motion, then the component's Motion section.
 
 ```css
---motion-duration-long
---motion-duration-medium
---motion-duration-short
---motion-easing-entrance
---motion-easing-exit
---motion-easing-standard
+--ds-motion-appearance-default  /* A fade or color change at default weight. */
+--ds-motion-appearance-default-duration  /* The settle time of --ds-motion-appearance-default. A fade or color change at default weight. */
+--ds-motion-appearance-fast  /* The quickest fade and color change; also what every spatial token becomes in Reduced motion. */
+--ds-motion-appearance-fast-duration  /* The settle time of --ds-motion-appearance-fast. The quickest fade and color change; also what every spatial token becomes in Reduced motion. */
+--ds-motion-appearance-slow  /* A deliberate fade, such as a large surface appearing. */
+--ds-motion-appearance-slow-duration  /* The settle time of --ds-motion-appearance-slow. A deliberate fade, such as a large surface appearing. */
+--ds-motion-linear  /* Time and position that follow the work or the hand one to one: a progress fill, a spinner turn, a scroll-linked fade. No spring. */
+--ds-motion-loop  /* Work in progress: loading, thinking, typing. Alternating, one cycle every 1.2 s. */
+--ds-motion-loop-duration  /* The settle time of --ds-motion-loop. Work in progress: loading, thinking, typing. Alternating, one cycle every 1.2 s. */
+--ds-motion-spatial-default  /* Mid-size layers over short travel: a Modal, a Flag, the Sidebar opening, content changing in place. */
+--ds-motion-spatial-default-duration  /* The settle time of --ds-motion-spatial-default. Mid-size layers over short travel: a Modal, a Flag, the Sidebar opening, content changing in place. */
+--ds-motion-spatial-exit  /* A thing that is gone for good, leaving on the system's say, or thrown by the hand. */
+--ds-motion-spatial-exit-duration  /* The settle time of --ds-motion-spatial-exit. A thing that is gone for good, leaving on the system's say, or thrown by the hand. */
+--ds-motion-spatial-fast  /* Small things over short distances: a toggle thumb, a Popup, a row, a tab indicator. */
+--ds-motion-spatial-fast-duration  /* The settle time of --ds-motion-spatial-fast. Small things over short distances: a toggle thumb, a Popup, a row, a tab indicator. */
+--ds-motion-spatial-slow  /* Large layers and long travel: a floating Panel, a docking Panel, a whole page that slides. */
+--ds-motion-spatial-slow-duration  /* The settle time of --ds-motion-spatial-slow. Large layers and long travel: a floating Panel, a docking Panel, a whole page that slides. */
+```
+
+## Motion Spring Primitives
+The raw springs, named by stiffness (`-r<percent>` when the damping ratio is not 1). A semantic aliases one; never name a primitive in a component.
+
+```css
+--motion-spring-1600
+--motion-spring-1600-duration
+--motion-spring-190
+--motion-spring-190-duration
+--motion-spring-200-r80
+--motion-spring-200-r80-duration
+--motion-spring-25
+--motion-spring-25-duration
+--motion-spring-27-r0
+--motion-spring-27-r0-duration
+--motion-spring-380-r80
+--motion-spring-380-r80-duration
+--motion-spring-3800
+--motion-spring-3800-duration
+--motion-spring-440
+--motion-spring-440-duration
+--motion-spring-800
+--motion-spring-800-duration
+--motion-spring-800-r60
+--motion-spring-800-r60-duration
+--motion-spring-880
+--motion-spring-880-duration
 ```
 
 ## Scale Tokens
@@ -283,18 +324,9 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --card-min-width-lg  /* Narrowest a large PatternCard may shrink in a grid. */
 --card-min-width-md  /* Narrowest a default PatternCard may shrink in a grid. */
 --card-min-width-sm  /* Narrowest a small PatternCard may shrink in a grid. */
---card-radius  /* Corner rounding of a PatternCard. */
---card-radius-sm  /* Corner rounding of a small PatternCard or a card nested in another container. */
 --card-stack-lg  /* Vertical gap between a PatternCard's header, body and footer. */
 --card-stack-md  /* Vertical gap between blocks in a PatternCard. */
 --card-stack-sm  /* Vertical gap between tightly related lines in a PatternCard, such as a title and its meta. */
---drawer-inline-lg  /* Horizontal gap between columns in a PatternDrawer. */
---drawer-inline-md  /* Horizontal gap between the actions in a PatternDrawer footer. */
---drawer-inline-sm  /* Horizontal gap between small items in a PatternDrawer row. */
---drawer-pad  /* Padding inside a PatternDrawer. */
---drawer-stack-lg  /* Vertical gap between a PatternDrawer's header, body and footer. */
---drawer-stack-md  /* Vertical gap between blocks in a PatternDrawer's body. */
---drawer-stack-sm  /* Vertical gap between a PatternDrawer's title and its description. */
 --focused-page-inline-md  /* Horizontal gap between the actions on a focused page. */
 --focused-page-inline-sm  /* Horizontal gap between small items in a focused page row. */
 --focused-page-pad-x  /* Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step. */
@@ -313,12 +345,10 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --modal-inline-md  /* Horizontal gap between the actions in a Modal footer. */
 --modal-inline-sm  /* Horizontal gap between small items in a Modal row. */
 --modal-pad  /* Padding inside a Modal at the current breakpoint. */
---modal-radius  /* Corner rounding of a Modal. */
 --modal-stack-lg  /* Vertical gap between a Modal's header, body and footer. */
 --modal-stack-md  /* Vertical gap between blocks in a Modal's body. */
 --modal-stack-sm  /* Vertical gap between a Modal's title and its description. */
 --page-pad  /* Padding around a Page's content at the current breakpoint. */
---page-radius  /* Corner rounding of a Page inside the Frame. */
 --page-stack-lg  /* Vertical gap between major regions of a Page. */
 --page-stack-md  /* Vertical gap between sections on a Page. */
 --page-stack-sm  /* Vertical gap between closely related blocks on a Page, such as a header and its subtitle. */
@@ -331,10 +361,6 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --popover-pad  /* Padding inside a Popup. */
 --popover-pad-menu  /* Padding inside a DropdownMenu or listbox. */
 --popover-pad-y-tooltip  /* Vertical padding inside a Tooltip. */
---popover-radius  /* Corner rounding of a Popup. */
---popover-radius-menu-md  /* Corner rounding of a default DropdownMenu. */
---popover-radius-menu-sm  /* Corner rounding of a compact DropdownMenu. */
---popover-radius-tooltip  /* Corner rounding of a Tooltip. */
 --popover-stack-flag  /* Vertical gap between stacked Flags. */
 --popover-width-flag  /* Width of a Flag. */
 --popover-width-lg  /* Width of a large Popup. */
@@ -350,10 +376,7 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --table-pad-x-cell  /* Horizontal padding inside a PatternTable cell. */
 --table-pad-x-footer  /* Horizontal padding of a PatternTable footer, such as its Pagination row. */
 --table-pad-y-cell  /* Vertical padding inside a PatternTable cell. */
---table-radius  /* Corner rounding of a PatternTable. */
 --table-stack  /* Vertical gap between a PatternTable and its toolbar or footer. */
---tile-radius-lg  /* Corner rounding of a large Tile. */
---tile-radius-sm  /* Corner rounding of a small Tile. */
 ```
 
 ## Type Scale
@@ -947,17 +970,17 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 ```
 
 ## Elevation and Opacity Tokens (`--ds-`)
-Shadows pair with the surface of the same level (`--ds-shadow-raised` with `--ds-surface-raised`); opacity dims a whole element.
+Pick the level by what the surface does (Foundations/Elevation § Choose by behavior). Each shadow is edge + key + ambient and pairs with its level's surface (`--ds-shadow-raised` with `--ds-surface-raised`); a Tooltip takes none. Opacity dims a whole element.
 
 ```css
 --ds-opacity-disabled  /* Images and whole elements in a disabled state. */
 --ds-opacity-loading  /* Content under a loading spinner. */
---ds-shadow-blocking  /* Box shadow of a modal that blocks the page behind a Backdrop. Pair with --ds-surface-overlay. */
---ds-shadow-overflow  /* Shadow where content scrolls under other content, such as a table's sticky column. */
+--ds-shadow-blocking  /* Box shadow of the Modal on its Backdrop, the one surface that blocks the page. Pair with --ds-surface-overlay. */
+--ds-shadow-overflow  /* Shadow where content scrolls under a part that stays put, such as a table's sticky header or column. A border marks the cut first. */
 --ds-shadow-overflow-perimeter  /* Fallback for overflow when a box shadow is not feasible; pair with .spread. */
 --ds-shadow-overflow-spread  /* Fallback for overflow when a box shadow is not feasible; pair with .perimeter. */
---ds-shadow-overlay  /* Box shadow of anything over the UI: menus, popups, tooltips, flags, modals, dragged items. Pair with --ds-surface-overlay. */
---ds-shadow-raised  /* Box shadow of a raised card. Pair with --ds-surface-raised. */
+--ds-shadow-overlay  /* Box shadow of a layer that floats while the page stays usable: a Popup, a Select list, a floating Sidebar or Panel, a Flag, a dragged Card. Pair with --ds-surface-overlay. */
+--ds-shadow-raised  /* Box shadow of a Card: one object a person can act on. Pair with --ds-surface-raised. */
 ```
 
 ## Color Primitives (`--palette-`)
@@ -1174,12 +1197,10 @@ The primitives (spacing / primitives), named by rem × 100; point semantic token
 ```css
 --radius-0125
 --radius-025
---radius-03125
 --radius-0375
 --radius-050
 --radius-0625
 --radius-075
---radius-0875
 --radius-100
 --radius-full
 --size-075

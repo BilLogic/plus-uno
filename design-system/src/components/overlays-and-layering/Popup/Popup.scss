@@ -27,7 +27,7 @@
 
 // ===== MAIN CONTAINER =====
 // The Popups pattern's Popup (Figma Pattern/Popup): one surface, no overlay
-// backdrop and no arrow. Pad 16 (`--popover-pad`), radius 12 (`--popover-radius`).
+// backdrop and no arrow. Pad 16 (`--popover-pad`), radius 12 (`--popup-radius`).
 // The title and body stack Element/stack-md 8 apart on the popup's own fill.
 //
 // WIDTH. `auto` hugs one list: at least the trigger (Base UI's
@@ -36,10 +36,10 @@
 // columns plus the pad, worked out by the same mixin as Modal's widths.
 //
 // MOTION. It opens by clipping out from the trigger's corner on the side it
-// opens on (`data-side` + `data-align`), and closes with a fade. Only
-// clip-path and opacity move; the width never animates. A keyboard open
-// (`data-instant="click"`) is instant, and reduced motion zeroes every
-// duration in the token layer.
+// opens on (`data-side` + `data-align`) and folds back to it on the way out,
+// with a fade both ways; the tokens are the Popup row of the motion registry.
+// Only clip-path and opacity move; the width never animates. A keyboard open
+// (`data-instant="click"`) is instant, and reduced motion is the fade alone.
 .plus-popup {
     display: flex;
     flex-direction: column;
@@ -52,10 +52,11 @@
     z-index: var(--layer-popup);
 
     // The overlay pair. Its shadow carries the 1px edge ring (firmer under
-    // increased contrast), so the popup draws no border of its own.
+    // increased contrast), so the popup paints no border of its own; the
+    // transparent one keeps an edge in forced colors, where shadows are dropped.
     background-color: var(--ds-surface-overlay);
-    border: none;
-    border-radius: var(--popover-radius);
+    border: var(--border-default) solid transparent;
+    border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
 
     &.plus-popup--3-col,
@@ -101,17 +102,38 @@
         &[data-align='center'] { --plus-popup-clip-top: 50%; --plus-popup-clip-bottom: 50%; }
     }
 
+    // Enter: the clip on `spatial.fast` with a fade on `appearance.fast`.
     &[data-open] {
-        animation: plus-popup-clip-open var(--motion-duration-medium) var(--motion-easing-entrance);
+        animation:
+            plus-popup-clip-open var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast),
+            plus-popup-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
     }
 
     &[data-open][data-instant='click'] {
         animation: none;
     }
 
+    // Exit runs one speed faster: the clip folds back on `spatial.exit` while
+    // the fade runs on `appearance.fast`.
     &[data-ending-style] {
-        opacity: 0;
-        transition: opacity var(--motion-duration-short) var(--motion-easing-exit);
+        animation:
+            plus-popup-clip-close var(--ds-motion-spatial-exit-duration) var(--ds-motion-spatial-exit) forwards,
+            plus-popup-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) reverse forwards;
+    }
+
+    // Reduced motion: the `appearance.fast` fade only, no clip.
+    @media (prefers-reduced-motion: reduce) {
+        &[data-open] {
+            animation: plus-popup-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+        }
+
+        &[data-open][data-instant='click'] {
+            animation: none;
+        }
+
+        &[data-ending-style] {
+            animation: plus-popup-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) reverse forwards;
+        }
     }
 
     // ===== TITLE: heading.xsmall 14/20, on the popup's surface =====
@@ -124,6 +146,24 @@
     .plus-popup-body {
         color: var(--ds-text);
         font: var(--body-default);
+    }
+}
+
+@keyframes plus-popup-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes plus-popup-clip-close {
+    from {
+        clip-path: inset(var(--plus-popup-reach));
+    }
+
+    to {
+        clip-path: inset(
+            var(--plus-popup-clip-top) var(--plus-popup-clip-right)
+            var(--plus-popup-clip-bottom) var(--plus-popup-clip-left)
+        );
     }
 }
 

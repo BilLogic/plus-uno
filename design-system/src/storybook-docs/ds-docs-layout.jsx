@@ -229,7 +229,7 @@ export function DocsPreviewCard({ children, innerClassName = '' }) {
             className="sb-ds-docs-preview-well"
             style={{
                 overflow: 'visible',
-                borderRadius: 'var(--card-radius-sm)',
+                borderRadius: 'var(--card-radius-compact)',
                 backgroundColor: 'var(--ds-surface-container)',
                 border: 'var(--border-default) solid var(--ds-border)',
             }}
@@ -482,7 +482,7 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                 className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel"
                 style={{
                     overflow: 'visible',
-                    borderRadius: 'var(--card-radius-sm)',
+                    borderRadius: 'var(--card-radius-compact)',
                     backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--border-default) solid var(--ds-border)',
                 }}
@@ -513,8 +513,8 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                         // The panel is overflow-visible (Controls popovers), so this
                         // last child's own background must follow the panel's curve
                         // or it squares off the bottom corners.
-                        borderBottomLeftRadius: 'calc(var(--card-radius-sm) - var(--border-default))',
-                        borderBottomRightRadius: 'calc(var(--card-radius-sm) - var(--border-default))',
+                        borderBottomLeftRadius: 'calc(var(--card-radius-compact) - var(--border-default))',
+                        borderBottomRightRadius: 'calc(var(--card-radius-compact) - var(--border-default))',
                     }}
                 >
                     <Controls of={ofStory} />

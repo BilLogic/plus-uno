@@ -190,3 +190,72 @@ test('the committed router passes', () => {
   const { failures } = sweep();
   assert.deepEqual(failures, [], failures.join('\n'));
 });
+
+// ── Cross-links between template and pattern pages ─────────────────────────
+// A pattern page points at the exact rule another page owns:
+// `?path=/docs/<page id>--docs#<rule slug>`. Moving the page or renaming the
+// rule leaves a link that opens the wrong place, so both halves are checked.
+
+const SECTION_PAGE = `import { Meta } from '@storybook/addon-docs/blocks';
+import * as SectionStories from './Section.stories.jsx';
+
+<Meta of={SectionStories} />
+
+## Best practices
+
+### Order the end of the bar: format switch, Search, filters, More, Primary.
+
+### Drop the Filter icon while a filter side shows.
+`;
+const SECTION_STORIES = "export default { title: 'Templates/Section/Section' };\n";
+const pattern = (href) => `import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Patterns/Finding things/Filtering" />
+
+Where the filters sit: <a target="_top" href="./?path=/docs/${href}">Section</a>.
+`;
+const crossRepo = (href) => repo('# Router\n', {
+  'design-system/src/patterns/Section/Section.mdx': SECTION_PAGE,
+  'design-system/src/patterns/Section/Section.stories.jsx': SECTION_STORIES,
+  'design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx': pattern(href),
+});
+
+test('a cross-link to a rule another page owns resolves, by page id and rule slug', () => {
+  const r = crossRepo('templates-section-section--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary');
+  try {
+    const { failures, crossLinks } = sweep(r.root);
+    assert.deepEqual(failures, []);
+    assert.equal(crossLinks, 1);
+  } finally { r.done(); }
+});
+
+test('a cross-link to a page titled by its Meta resolves too', () => {
+  const r = crossRepo('patterns-finding-things-filtering--docs');
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});
+
+test('a cross-link to a template or pattern page that does not exist fails and names it', () => {
+  const r = crossRepo('templates-section--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary');
+  try {
+    const { failures } = sweep(r.root);
+    assert.equal(failures.length, 1);
+    assert.match(failures[0], /Filtering\.mdx/);
+    assert.match(failures[0], /templates-section--docs/);
+    assert.match(failures[0], /no page/);
+  } finally { r.done(); }
+});
+
+test('a cross-link to a rule that was renamed fails and names the anchor', () => {
+  const r = crossRepo('templates-section-section--docs#order-the-right-side');
+  try {
+    const { failures } = sweep(r.root);
+    assert.equal(failures.length, 1);
+    assert.match(failures[0], /#order-the-right-side/);
+    assert.match(failures[0], /no heading/);
+  } finally { r.done(); }
+});
+
+test('a link outside the Templates and Patterns roots is left to check:storybook-links', () => {
+  const r = crossRepo('components-forms-and-inputs-filter-menu--docs');
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});

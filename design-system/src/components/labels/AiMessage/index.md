@@ -12,6 +12,8 @@ An assistant reply, marked as AI by the small AI icon at its start (named "AI" f
 
 **Storybook page:** `design-system/src/components/labels/AiMessage/AiMessage.mdx`
 
+**Motion:** change `appearance.fast` · ready `appearance.fast`, sound `sound.ai.ready` · strong `appearance.fast`, sound `sound.ai.strong` · refine `appearance.fast`, sound `sound.ai.refine`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `AiMessage` for every reply an assistant writes: in the AI chat, in a panel,
@@ -26,6 +28,17 @@ sent until the first text arrives, `streaming` while text arrives, then
 | Thinking | From the moment a message is sent until the first text arrives. The typing indicator, with no text. |
 | Streaming | While text arrives. A caret follows the last character, and the message is busy for assistive technology. |
 | Complete | The default: a finished reply. Only a complete reply shows its sources and its thumbs. |
+
+## Motion
+
+AiMessage reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Load content | `--ds-motion-appearance-fast` | Sources fade in place 20 ms apart, each tied to real work; the answer streams in chunks with no fade. |  |
+| ready | Load content | `--ds-motion-appearance-fast` | Feedback fades in over its Spinner. | `sound.ai.ready` on land: the feedback took over 1 s, so a Spinner showed |
+| strong | Load content | `--ds-motion-appearance-fast` | Strong feedback fades in over its Spinner. | `sound.ai.strong` on land: the feedback took over 1 s, so a Spinner showed |
+| refine | Load content | `--ds-motion-appearance-fast` | Refine feedback fades in over its Spinner. | `sound.ai.refine` on land: the feedback took over 1 s, so a Spinner showed |
 
 ## Best practices
 
@@ -111,7 +124,7 @@ Same group: `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 | Icon to text | `--inline-md`; the icon centers on the first line against `--icon-md`. |
 | Between parts | `--stack-md`. |
 | Typing dots | `--ds-text-subtle`, `--radius-full`, `--stack-sm` apart. |
-| Caret and dots motion | `--motion-duration-long`, `--motion-duration-medium` between dots, `--motion-easing-standard`. |
+| Caret and dots motion | `--ds-motion-loop`, with the dots offset by a quarter and a half cycle. |
 | Sources | Heading `--heading-xxsmall` in `--ds-text-subtle`; type `--body-small` in `--ds-text-subtle`; rows `--stack-sm` apart. |
 | Feedback | Thanks `--body-small` in `--ds-text-subtle`; buttons `--inline-sm` apart. |
 
@@ -149,7 +162,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--code` · `--ds-background-neutral` · `--ds-text` · `--ds-text-subtle` · `--heading-xsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--pad-x-lg` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--code` · `--ds-background-neutral` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--ds-text` · `--ds-text-subtle` · `--heading-xsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
 

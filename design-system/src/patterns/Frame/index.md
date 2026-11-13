@@ -2,7 +2,7 @@
 
 # Frame
 
-There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal (or drawer) closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it opens over the Page on a Blanket that covers the Page and the Sidebar, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under the Blanket are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.
+There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay` and no Backdrop. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay fill and shadow, with no Backdrop, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.
 
 Also asked as: page template, page shell, page layout, full page, new page, surface container.
 
@@ -10,94 +10,166 @@ Also asked as: page template, page shell, page layout, full page, new page, surf
 
 **Source:** `design-system/src/patterns/Frame/Frame.jsx`
 
-**Stories:** `design-system/src/patterns/Frame/Frame.stories.jsx` — Overview, ColorModes, Reading, DocsOverview, DocsReading, DocsContentGrid, PairWithSidebar, PairWithoutSidebar, PairTitleInHeader, Interactive, Floating, Medium768, Large1024, CtrlBracketToggle, CtrlBracketAt768, SidebarMeetsPage, XLarge1440, Wide1600, ReadingAt1440, ContentGrid, ModalClosesFloatingSidebar, ModalFromFloatingSidebar, ModalLeavesDockedSidebar, ModalClosesOverlaySidebarAt768, PanelDockedAt1440, PanelAutoCollapsesSidebarAt1200, PanelOverlayAt1100, SidebarByHandWinsAt1300, ModalLeavesPanelOpen, ModalOverOverlayPanelAt1100, OverlayPanelIsModalAt1100, DockedPanelIsNotModalAt1440, PanelFieldKeepsEscapeAt1100, DockedPanelLeavesEscapeAt1200, DockedPanelTakesLostFocusAt1200, HeaderTriggerTogglesOverlayAt1100, OverlaySplitterKeepsSidebarAt1100, OneOverlayAt768, FullWidthUnder768, SplitterKeyboardAt1440, SplitterDragAt1440, PanelRememberedForTheTab, PanelPeek, NoPanelPeekByDefault, SectionDetailKeepsSplitAt1440, SectionDetailSplitterKeepsSplitAt1440, StateSidebarDocked, StateSidebarClosed, StateSidebarPeek, StateSidebarFloating, StatePanelDocked, StatePanelPeek, StatePanelOverlay, StatePanelFullWidth, StatePanelNarrowest, StatePanelWidest, StateSidebarAndPanel, StatePanelCollapsesSidebar, StatePanelOnBlanket, StateWithModal, StateModalClosesFloating, StateWithDrawer, StateAt768, StateAt1024, StateAt1440
+**Stories:** `design-system/src/patterns/Frame/Frame.stories.jsx` — Overview, ColorModes, Reading, DocsOverview, DocsReading, DocsContentGrid, PairWithSidebar, PairWithoutSidebar, PairTitleInHeader, Interactive, Floating, Medium768, Large1024, CtrlBracketToggle, CtrlBracketAt768, SidebarMeetsPage, XLarge1440, Wide1600, ReadingAt1440, ContentGrid, ModalClosesFloatingSidebar, ModalFromFloatingSidebar, ModalLeavesDockedSidebar, ModalClosesOverlaySidebarAt768, PanelDockedAt1440, PanelAutoCollapsesSidebarAt1200, PanelOverlayAt1100, SidebarByHandWinsAt1300, ModalLeavesPanelOpen, ModalOverOverlayPanelAt1100, OverlayPanelIsModalAt1100, DockedPanelIsNotModalAt1440, PanelFieldKeepsEscapeAt1100, DockedPanelLeavesEscapeAt1200, DockedPanelTakesLostFocusAt1200, HeaderTriggerTogglesOverlayAt1100, OverlaySplitterKeepsSidebarAt1100, OneOverlayAt768, FullWidthUnder768, SplitterKeyboardAt1440, SplitterDragAt1440, PanelRememberedForTheTab, PanelPeek, NoPanelPeekByDefault, SectionDetailKeepsSplitAt1440, SectionDetailSplitterKeepsSplitAt1440, StateSidebarDocked, StateSidebarClosed, StateSidebarPeek, StateSidebarFloating, StatePanelDocked, StatePanelPeek, StatePanelOverlay, StatePanelFullWidth, StatePanelNarrowest, StatePanelWidest, StateSidebarAndPanel, StatePanelCollapsesSidebar, StatePanelOnBackdrop, StateWithModal, StateModalClosesFloating, StateAt768, StateAt1024, StateAt1440, TypeDefault, TypeFocused, TypeBare, AnatomyDefault, AnatomyFocused, FocusedStepsDown, FocusedStepsAcross, ResponsiveWidth, KeyPanelCollapsesSidebar, KeyUnder1024
 
 **Storybook page:** `design-system/src/patterns/Frame/Frame.mdx`
+
+**Motion:** sidebar-open `spatial.default` · sidebar-close `spatial.fast` · panel-dock `spatial.slow` + `appearance.fast` · panel-undock `spatial.default` · focused-open `appearance.default` · focused-close `appearance.fast` · step `spatial.default` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
 Use Frame for every page of the app. It owns the frame sizes and the Sidebar's behavior, so a page only supplies its Sidebar, its breadcrumb and its content.
 
-For a whole page with the PLUS Sidebar and breadcrumb already filled in, start from a template. For a bare fill and elevation, use Page. For a region inside the content, use Section.
-
 The Frame decides what docks from its own width, not the window's, through one layout resolver, so the content never drops under 720:
 
-- **Sidebar.** It docks from 1024 and never docks below that. Under 1024, opened by hand, it floats over the Page as an overlay and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Blanket. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
-- **Panel.** It opens from anything inside the Frame through `usePanelControl()`. A Sidebar opened by hand stays docked, and the Panel opens as an overlay if both do not fit. Both dock when the Sidebar, the Panel and 720 fit: with a 400 Panel that is from 1408. Otherwise a Sidebar left open by default collapses, and comes back when the Panel closes; with a 400 Panel the Panel docks alone from 1168. Otherwise the Panel opens as an overlay, on a Blanket that covers the Page and the Sidebar.
-- **Under 1024** the Panel is an overlay 320 wide, and only one overlay is open at a time: opening the Sidebar closes the Panel, and opening the Panel closes the Sidebar. Under 768 the Panel is full width.
-- **`sectionDetail`** collapses the Sidebar first, so a list and its detail keep 960 side by side. If a collapsed Sidebar still leaves under 960, the Panel stays docked and the detail replaces the list.
-- **Modals.** Opening a modal closes a peeking or overlay Sidebar, and a docked Sidebar stays. While a modal is open the Sidebar does not peek, and Escape closes the modal only. A modal leaves the Panel open under its Blanket.
+- **Sidebar.** It docks from 1024 and never docks below that. Under 1024, opened by hand, it floats over the Page and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Backdrop. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
+- **AI panel.** It opens from anything inside the Frame through `usePanelControl()`. Both dock when the Sidebar, the panel and 720 fit: with a 400 panel that is from 1408. Otherwise a Sidebar left open by default collapses, and comes back when the panel closes; with a 400 panel the panel docks alone from 1168. Below that, the panel floats over the Page and the Sidebar on the overlay fill and shadow, with no Backdrop.
+- **Under 1024** the panel is 320 wide, and only one layer is open at a time: opening the Sidebar closes the panel, and opening the panel closes the Sidebar. Under 768 the panel is full width.
+- **`sectionDetail`** collapses the Sidebar first, so a list and its detail keep 960 side by side. If a collapsed Sidebar still leaves under 960, the panel stays docked and the detail replaces the list.
+- **Modals.** Opening a Modal closes a peeking or floating Sidebar, and a docked Sidebar stays. While a Modal is open the Sidebar does not peek, and Escape closes the Modal only. A Modal leaves the panel open under its Backdrop.
 
-Docked, the Panel meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar: a drag resists past the limit and springs back, and it never collapses the Sidebar. The width and whether the Panel is open are kept for the tab in sessionStorage. The `panelPeek` option, off by default, peeks a closed Panel when a pointer rests on the right edge, with no Blanket.
+Docked, the panel meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar. The width and whether the panel is open are kept for the tab.
+
+## Motion
+
+Frame reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| sidebar-open | Dock and undock a panel | `--ds-motion-spatial-default` | The Sidebar opens on spatial.default while the Page narrows on the same clock. The Sidebar never moves when the Page changes. |
+| sidebar-close | Dock and undock a panel | `--ds-motion-spatial-fast` | It closes on spatial.fast to its edge and leaves nothing behind: no rail. |
+| panel-dock | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | The AI Panel docks on the right and the Page makes room; its content fades in once the page is about 90% done. |
+| panel-undock | Dock and undock a panel | `--ds-motion-spatial-default` | It reverses and stays at the edge. |
+| focused-open | Drill into and climb back out | `--ds-motion-appearance-default` | Focused opens as a change of frame: the page and the Sidebar fade out together on appearance.fast, then the task fades in, in place. A focused task fades; it does not grow or slide. Bare frames, such as sign-in, do not move. |
+| focused-close | Drill into and climb back out | `--ds-motion-appearance-fast` | Close and Cancel reverse the entrance one speed faster: the task fades out, then the page and Sidebar fade back in, asking first in a Modal if anything is unsaved. |
+| step | Step to the next or previous | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` | The body slides on the same axis as the step list: up with the steps down the left, across with four or fewer across the top. Step states change in place. Placement is set once, when the task opens, by the longest path the flow can take. |
+
+## Alternatives
+
+- For a bare fill and elevation, use `Page`.
+- For a region inside the content, use `PatternSection`.
+- For a short task that keeps the page in view behind it, use `PatternModal`. A focused Frame is for a task that blocks the page until it is done, or has five or more steps.
 
 ## Best practices
 
-### Give every app page its Sidebar. {#give-every-app-page-its-sidebar}
+### Give a focused task the whole window. {#give-a-focused-task-the-whole-window}
 
-A page supplies its Sidebar, its breadcrumb and its content, and the Frame does the rest. Without `sidebar` there is no navigation and no toggle.
+**Checked:** Review
 
-Do: An app page passes its Sidebar, which docks from 1024.
-Don't: The same page with no Sidebar: no navigation and no toggle.
+A focused Frame has no Sidebar and no breadcrumb. Close leads the title row, so the way out is one control, not a menu of other places.
 
-### Put the place in the header as a breadcrumb. {#put-the-place-in-the-header-as-a-breadcrumb}
+Do: The task fills the window: no Sidebar, nothing to invite the person away.
+Don't: The Sidebar left docked beside a focused task, one click from leaving it.
 
-The header row is the breadcrumb. A page's title belongs to its content, in a Section with `level="page"`.
+### Put Cancel at the start of the bar and Back and Next at the end. {#put-cancel-at-the-start-of-the-bar-and-back-and-next-at-the-end}
 
-Do: The header row is a breadcrumb: "Home / Dashboard".
-Don't: A page title in the header row in place of the breadcrumb.
+**Checked:** Review
+
+The bottom bar is fixed along the bottom, one row high (`--space-300`). Cancel (Subtle) is at the start; Back and Next sit together at the end, Next last and Primary. Back on the first step is disabled and needs no reason.
+
+Do: Cancel alone at the start, then Back and the primary Next together at the end.
+Don't: Cancel between Back and Next: one run of three buttons, with the way out beside the way on.
+
+### Keep the AI panel docked as its own region. {#keep-the-ai-panel-docked-as-its-own-region}
+
+**Checked:** Review
+
+The AI panel is a region of the Frame, not a floating Panel, so it stays put as a person moves between pages. The Page makes room for it; below `FRAME_LAYOUT.dockMin` it floats over the Page, with no Backdrop.
+
+Do: The panel docked at the right edge, the Page narrowing beside it.
+Don't: The panel floating over the Page, hiding the rows beneath it.
+
+### Keep a bare Frame to one column. {#keep-a-bare-frame-to-one-column}
+
+**Checked:** Review
+
+Sign-in, errors and welcome have one job and no account yet, so the Frame carries no Sidebar, header row or Panel.
+
+Do: One centered column: the form and its button.
+Don't: The Sidebar beside a sign-in: navigation for a person who has not signed in.
+
+### Show steps by how many there are. {#show-steps-by-how-many-there-are}
+
+**Checked:** Review
+
+Five or more go down a left side sized to the longest label. Four or fewer run across the top.
 
 ### Pass sectionDetail for a list and its detail. {#pass-sectiondetail-for-a-list-and-its-detail}
 
-Do: With sectionDetail and the Panel open at 1440, the Sidebar collapses and the list keeps its detail beside it.
-Don't: Without it, the Sidebar and the Panel both dock, the content drops under 960 and the detail replaces the list.
+**Checked:** Review
+
+With `sectionDetail` and the panel open on a wide Frame, the Sidebar collapses and the list keeps its detail beside it. Without it, both dock and the detail replaces the list.
+
+### Put the place in the header as a breadcrumb. {#put-the-place-in-the-header-as-a-breadcrumb}
+
+**Checked:** Review
+
+The header row is the breadcrumb, shown only after drilling into a record; area pages and focused tasks have none. A page's title belongs to its content, in a Section with `level="page"`.
+
+Elevation and fills follow Elevation.
 
 ## Accessibility
 
-- The Page is the `main` landmark, and the `nav` inside the Sidebar is the navigation landmark. The box around that `nav` is not a landmark of its own. Pass `contentAs="div"` when the page supplies its own `main`.
-- The toggle is a button. Open, it ends the Sidebar's logo row as "Close sidebar"; closed, it sits at the Page's top left as "Open sidebar". It reports whether the Sidebar is showing, points at it while it is open, and announces its shortcut, Ctrl+[ (Cmd+[ on a Mac). Focus follows a press to the toggle that is left.
-- A peeking or overlay Sidebar closes on Escape, and focus returns to the toggle. A control that handles its own Escape, such as a menu, keeps it.
-- Opening a modal from the peeking Sidebar returns focus to the toggle when the modal closes, because the trigger left with the Sidebar.
-- Docked or peeking, the Panel is a complementary landmark named by `panelLabel`, after the Page in reading order, and it leaves focus where it is. When opening it collapses the Sidebar that held focus, focus moves into the Panel; closing it returns focus to what opened it.
-- As an overlay, the Panel is a modal dialog named by `panelLabel`. Opening it moves focus to its first control and Tab stays inside it; the Page and the Sidebar under the Blanket are inert, so a keyboard or screen reader cannot reach what a pointer cannot. Closing it, by Escape, a press on the Blanket or its Close button, returns focus to what opened it.
-- The splitter is a vertical separator named "Resize panel" that reports its width as its value. The left arrow widens the Panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
-- In light increased contrast the page draws its edge ring in `--ds-border-surface`, so it stays distinct from the frame behind it.
+- The Page is the `main` landmark, and the `nav` inside the Sidebar is the navigation landmark. Pass `contentAs="div"` when the page supplies its own `main`.
+- The toggle is a button. Open, it ends the Sidebar's logo row as "Close sidebar"; closed, it sits at the Page's top left as "Open sidebar". It reports whether the Sidebar is showing and announces its shortcut, Ctrl+[ (Cmd+[ on a Mac).
+- A peeking or floating Sidebar closes on Escape, and focus returns to the toggle.
+- Docked, the AI panel is a complementary landmark named by `panelLabel`, after the Page in reading order. Below `FRAME_LAYOUT.dockMin` it is a Modal-style layer: focus moves to its first control, Tab stays inside it, the Page and the Sidebar under it are inert, and closing returns focus to what opened it.
+- The splitter is a vertical separator named "Resize panel" that reports its width. The left arrow widens the panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
+- A focused task's steps are a navigation named "Steps"; the current step is marked, and the bar's buttons follow the body in the tab order.
 
 ## Related
 
-- Page for the bare fill-and-elevation primitive the content box is built on.
-- Sidebar for the part the frame places beside the Page.
-- Section for a region inside the content.
-- Templates for a whole page, Frame with its content slot filled, and the focused frame for one task.
-- Grid for the column math the frame is sized by.
+- Page: use when you need the bare fill-and-elevation the content box is built on.
+- Sidebar: use when choosing what the Frame places beside the Page.
+- Section: use when the content needs a region under its own heading.
+- Modal: use when the task is short and the page should stay in view behind it.
+- Panel: use when the work should float beside the page, not replace it.
+- Grid: use when you need the column math the Frame is sized by.
 
-Same group: `AiChat` · `Blanket` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Backdrop` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
-## Parts
+## Types
 
-1. **Header.** The Page's first row, 32 high on the Sidebar logo row's center line: the breadcrumb. While the Sidebar is closed, the toggle leads it at the Page's top left. A focused page passes `onBack` or `backHref` and `onClose`, and the row leads with Back and ends with Close.
-2. **Page.** The content box on `--ds-surface`, running the full height to the window edges, flush, with no corner radius. It is the Page's `main` landmark.
-3. **Content.** The slot where Sections go: a 12-column grid, centered and capped at 1232 (864 with `width="reading"`). Each child spans all 12 columns unless it sets its own span.
-4. **Sidebar.** The part passed as `sidebar`: the logo row with the toggle, the groups and the account row. Without it there is no Sidebar and no toggle.
-5. **Panel.** The area on the right, full height, passed as `panel` and filled with the Panel parts (`PanelContainer`, header, body, footer). AI chat goes here first. Its splitter sits on its left hairline.
+Every page of the app sits in one of three, each shown in a browser window. A Frame with its slots filled for one page is a Screen, and Screens in order are a Flow; both live with the flows, not here.
 
-There is no footer row. A page that needs actions at its foot places them inside the Page. The Sidebar and Page have their own pages.
+- **Default.** Pages people move among: the Sidebar, the Page, and the AI panel as its own region on the right.
+- **Focused.** One task a person finishes or leaves: the whole window, Close beside the title, no Sidebar.
+- **Bare.** Sign-in, errors and welcome: one centered column, with no Sidebar and no header row.
 
-### States
+## Anatomy
 
-| Part | State | What changes |
-| --- | --- | --- |
-| Sidebar | Docked | In flow beside the Page, 240 wide, with a 1px `--ds-border` edge on the Page side. From 1024. |
-| Sidebar | Collapsed | No rail. The toggle sits at the Page's top left and shows bars. |
-| Sidebar | Peeking | A collapsed Sidebar floated over the Page with the overlay fill and shadow, while a pointer rests on the toggle or the left edge. No Blanket. |
-| Sidebar | Overlay | Under 1024, opened by hand: over the Page, closed by an outside press or Escape. |
-| Panel | None | Closed, or no `panel` passed. |
-| Panel | Docked | Beside the Page, on the Page's fill, meeting it at a hairline, with the splitter on its edge. |
-| Panel | Overlay | Over the Page on a Blanket that covers the Page and the Sidebar. |
-| Splitter | Focused, dragged | The line takes `--ds-border-focused`. |
+### Default
 
-The Frame has no hover, pressed or disabled state of its own: those belong to the toggle and the controls on the Page.
+The default type at 1440 with the AI panel docked.
 
-### Tokens
+1. **Sidebar.** 240 wide, docked from 1024, with the toggle ending its logo row.
+2. **Header row.** The Page's first row, 32 high on the logo row's center line: the breadcrumb, once a person has drilled into a record.
+3. **Content.** The Page's content box: no corner radius, a 24 pad, and a 12-column grid capped at 1232 (864 at reading width).
+4. **AI panel.** A Frame region on the right, 320 to 640 and opening at 400, with its splitter on the left hairline. It is docked wherever it shows.
+
+### Focused
+
+A task with five steps. No Sidebar and no breadcrumb: nothing invites the person away.
+
+1. **Title row.** Close at the start, then the task's name as the page's one h1.
+2. **Steps.** A Section side at the start, 256 wide (320 for long labels), for five or more.
+3. **Body.** The task's Sections at reading width, 864, centered.
+4. **Bar**, fixed along the bottom and 48 high. Cancel (Subtle) at the start; Back and Next at the end, full bleed. Back on the first step is disabled and needs no reason.
+
+## Slots
+
+| Slot or prop | Holds |
+| --- | --- |
+| `sidebar` | The Sidebar. Without it there is no Sidebar and no toggle. |
+| `header` | The Page's header row: the breadcrumb, or a focused task's Close and title. |
+| `children` | The content: Sections in a 12-column grid. `width="reading"` caps it at 864. |
+| `panel` · `panelLabel` · `panelOpen` | The AI panel region at the right, named for its content, filled with the Panel parts. |
+| `onBack` · `onClose` | A Back and a Close icon button in the header row. A focused page leads its title row with its own Close instead. |
+| `surfaceDirect` | Children go straight into the Page with no content box, for a bare column or a full-bleed view. |
+| `bar` | Planned. The focused bottom bar, 48 high, with Cancel, Back and Next. Today the page places the bar. |
+| `banner` | Planned. System news across the whole width above the Sidebar and the Page. |
+
+## Sizes
 
 Lengths are in pixels. Where the layout mode changes a value, the columns read Medium (768), Large (1024) and X-Large (1440).
 
@@ -111,9 +183,10 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 
 | Do | Don't |
 | --- | --- |
-| Put the place in the header as a breadcrumb: "Home / Dashboard". | A page title in the header row. |
-| Name the Panel for its content with `panelLabel`: "AI chat". | A generic name such as "Panel". |
-| Keep Back and Close named for what they do; the defaults are "Back" and "Close". | Icon buttons with no name. |
+| Name the focused task for what it does: "Plan a tutoring term". | A generic title such as "Wizard". |
+| Name the panel for its content with `panelLabel`: "AI chat". | A generic name such as "Panel". |
+| Name steps with one noun each: "Student", "Schedule", "Review". | A sentence for a step. |
+| Keep Cancel, Back and Next named for what they do. | Icon buttons with no name. |
 
 ## Props
 
@@ -134,7 +207,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 | `defaultPanelOpen` | bool | `false` | Uncontrolled: whether the Panel starts open when the tab has nothing remembered. |
 | `onPanelOpenChange` | func | — | Called with the next open state whenever the Panel opens or closes. |
 | `panelDefaultWidth` | number | `FRAME_LAYOUT.panelDefault` | The width (px) the Panel opens at when the tab has nothing remembered: 320 to 640, default 400. |
-| `panelPeek` | bool | `false` | Hovering the Frame's right edge peeks a closed Panel over the Page, with no Blanket. Off by default. |
+| `panelPeek` | bool | `false` | Hovering the Frame's right edge peeks a closed Panel over the Page, with no Backdrop. Off by default. |
 | `panelStorageKey` | string | `PANEL_STORAGE_KEY` | The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. |
 | `sectionDetail` | bool | `false` | A Section detail layout is on the Page: the Sidebar collapses first to keep the 960 split. |
 | `width` | enum | `'content'` | Content cap: content 1232, reading 864 |
@@ -153,7 +226,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--content-max-width` · `--content-max-width-reading` · `--content-min-width` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--frame-layer-blanket` · `--frame-layer-docked-edge` · `--frame-layer-edge` · `--frame-layer-panel-peek` · `--frame-layer-sidebar` · `--frame-layer-splitter` · `--frame-panel-width` · `--frame-sidebar-pad` · `--frame-sidebar-width` · `--grid-columns` · `--grid-gutter` · `--inline-md` · `--item-height-md` · `--pad-x-sm` · `--pad-x-xs` · `--page-pad` · `--page-stack-md` · `--page-stack-sm` · `--panel-width-default`
+`--border-default` · `--content-max-width` · `--content-max-width-reading` · `--content-min-width` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--frame-layer-docked-edge` · `--frame-layer-edge` · `--frame-layer-panel-peek` · `--frame-layer-sidebar` · `--frame-layer-splitter` · `--frame-panel-width` · `--frame-sidebar-pad` · `--frame-sidebar-width` · `--grid-columns` · `--grid-gutter` · `--inline-md` · `--item-height-md` · `--pad-x-sm` · `--pad-x-xs` · `--page-pad` · `--page-stack-md` · `--page-stack-sm` · `--panel-width-default`
 
 From `design-system/src/patterns/Frame/Frame.scss`. Override these through the token layer, never with a literal.
 

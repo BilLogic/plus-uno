@@ -87,7 +87,7 @@ Types.play = async ({ canvasElement }) => {
 /** Beside a Tag, in the row where an accepted value lands. */
 export const InATagRow = () => (
     <div style={row} data-testid="row">
-        <Tag color="blue" data-testid="tag">Algebra</Tag>
+        <Tag color="blue" data-testid="tag">Lincoln Middle</Tag>
         <Suggestion label="Relationships" onAccept={() => {}} />
     </div>
 );
@@ -116,7 +116,7 @@ InATagRow.play = async ({ canvasElement }) => {
     const tagBox = tag.getBoundingClientRect();
     const box = suggestion.getBoundingClientRect();
     await expect(box.top).toBeCloseTo(tagBox.top, 1);
-    const tagWords = within(tag).getByText('Algebra').getBoundingClientRect();
+    const tagWords = within(tag).getByText('Lincoln Middle').getBoundingClientRect();
     const words = within(suggestion).getByText('Relationships').getBoundingClientRect();
     await expect(words.bottom, 'the words share a baseline').toBeCloseTo(tagWords.bottom, 1);
     await expect(words.height).toBeCloseTo(tagWords.height, 1);
@@ -258,7 +258,7 @@ export const DisabledBesideTags = {
         <div style={row}>
             <Button>Before</Button>
             <TagContext.Provider value={{ isDisabled: true }}>
-                <Tag color="blue" data-testid="tag">Algebra</Tag>
+                <Tag color="blue" data-testid="tag">Lincoln Middle</Tag>
                 <Tag isRemovable color="blue" onAfterRemoveAction={() => {}}>Advocacy</Tag>
                 <Suggestion label="Relationships" onAccept={onAccept} />
                 <Suggestion type="prompt" label="Summarize" onAccept={onAccept} />
@@ -326,7 +326,7 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
  * the suggestion, so the value lands in the row where it was offered.
  */
 export const AcceptIntoTags = () => {
-    const [tags, setTags] = useState(['Algebra', 'Advocacy']);
+    const [tags, setTags] = useState(['Lincoln Middle', 'Advocacy']);
     const [offered, setOffered] = useState(['Relationships', 'Fractions']);
     const accept = (value) => {
         setTags((prev) => [...prev, value]);

@@ -2,6 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternTableStories from './PatternTable.stories.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -84,6 +85,14 @@ The examples on this page follow the toolbar's Color mode switch.
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="PatternTable" tier="template" />
+
+</div>
+
 </div>
 
 </DocsTab>
@@ -157,6 +166,7 @@ Row states are layered over each cell's fill, never swapped for it.
 <tr><td><code>--ds-border-bold</code></td><td>color</td><td>The rule under the head row.</td></tr>
 <tr><td><code>--ds-text</code>, <code>--body-default</code></td><td>14/20</td><td>Body cells.</td></tr>
 <tr><td><code>--ds-text-subtle</code>, <code>--heading-xxsmall</code></td><td>color, type</td><td>Head cells and the message row.</td></tr>
+<tr><td><code>--table-radius</code></td><td>12</td><td>The corner of the table and of its scroll region.</td></tr>
 <tr><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code>, <code>--stack-md</code></td><td>length</td><td>Cell padding and the gap inside a cell.</td></tr>
 <tr><td><code>--ds-background-neutral-subtle-hovered</code>, <code>-pressed</code></td><td>color</td><td>A hovered and a pressed row.</td></tr>
 <tr><td><code>--ds-background-selected</code>, <code>-hovered</code>, <code>-pressed</code></td><td>color</td><td>A selected row.</td></tr>

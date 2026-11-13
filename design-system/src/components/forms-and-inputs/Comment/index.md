@@ -70,7 +70,7 @@ Don't: No action named.
 - For the person shown beside the comment, use Avatar.
 - For a single text field with no thread context, use Text area.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -135,7 +135,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-selected` · `--ds-border` · `--ds-text-subtle` · `--radius-050` · `--space-025` · `--space-050` · `--space-075` · `--space-100` · `--space-150` · `--type-weight-semibold`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-selected` · `--ds-border` · `--ds-text-subtle` · `--radius-xl` · `--space-025` · `--space-050` · `--space-075` · `--space-100` · `--space-150` · `--type-weight-semibold`
 
 From `design-system/src/components/forms-and-inputs/Comment/Comment.scss`. Override these through the token layer, never with a literal.
 

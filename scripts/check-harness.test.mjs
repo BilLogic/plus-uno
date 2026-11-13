@@ -296,7 +296,7 @@ const BASELINE_ROWS = ALL.filter((row) => row.baseline);
 const rootScripts = () => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8')).scripts;
 
 test('every baseline row reaches its record and offers exactly the flag its table names', () => {
-  assert.equal(BASELINE_ROWS.length, 18);
+  assert.equal(BASELINE_ROWS.length, 20);
   for (const row of BASELINE_ROWS) {
     assert.deepEqual(
       registryGenerator.baselineFindings(row, rootScripts()).map((f) => f.message),
@@ -417,7 +417,7 @@ test('a sentinel the check enforces but the row does not declare is a finding', 
     messages.join('\n'),
   );
   assert.ok(
-    messages.some((m) => /MIN_RULES = 34 as a private constant/.test(m)),
+    messages.some((m) => /MIN_RULES = 32 as a private constant/.test(m)),
     messages.join('\n'),
   );
 });

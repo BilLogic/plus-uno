@@ -14,12 +14,23 @@ Also asked as: steps, stepper, wizard, multi-step, checkout steps.
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.mdx`
 
+**Motion:** change `appearance.fast` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `ProgressTracker` when each step of a journey has its own name people
 need to see and, often, jump back to — a multi-page form, a setup flow, a
 reflection with named sections. When position alone is enough and the steps
 have no names to show, use `ProgressIndicator` instead.
+
+## Motion
+
+ProgressTracker reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Step states change in place: the step left becomes visited, the next current. |  |
+| success | Update a value or state | `--ds-motion-appearance-fast` | The last step changes to done in place. | `sound.done.step` on land: a module or lesson is done |
 
 ## Best practices
 
@@ -136,7 +147,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-brand` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--radius-full` · `--radius-h32` · `--space-050` · `--space-150` · `--stack-lg` · `--stack-md` · `--stack-sm` · `--stroke-1` · `--type-weight-medium`
+`--body-default` · `--border-default` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-brand` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--radius-control-md` · `--radius-full` · `--space-050` · `--space-150` · `--stack-lg` · `--stack-md` · `--stack-sm` · `--stroke-1` · `--type-weight-medium`
 
 From `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss`. Override these through the token layer, never with a literal.
 

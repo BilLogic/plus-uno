@@ -2,13 +2,13 @@
  * PromptInput — a Field that grows with its text, wrapped in a
  * GenerativeBorder while loading.
  *
- * The control starts at one line, as tall as a single-line field (40), and grows to five (`--plus-prompt-input-max-height`,
- * five lines of body text plus the box's own vertical padding), then scrolls.
- * The send and attach buttons are the Button's compact (24) icon-only size, so
- * they sit inside the field the same way a stepper does.
+ * One line is as tall as a single-line field (40). The send button is a default
+ * IconButton (32, radius 6): it sits 4 from the edge on every side, and stays
+ * 4 above the bottom edge as the text grows to five lines
+ * (`--plus-prompt-input-max-height`), then scrolls.
  */
 .plus-prompt-input {
-    --plus-prompt-input-max-height: calc(var(--line-height-125) * 5 + var(--space-0375) * 2);
+    --plus-prompt-input-max-height: calc(var(--line-height-125) * 5 + var(--pad-y-md) * 2);
 
     display: block;
     min-width: 0;
@@ -33,18 +33,27 @@
 }
 
 // A prompt starts as one line, not a Text area's 80: a chat question is usually one.
+// The box pads 4 around the 32 button; the text area pads itself 6 so a line of
+// text centers in that 32.
 .plus-prompt-input .plus-prompt-input__field.plus-field--multiline {
     min-height: var(--height-250);
+    padding-block: calc(var(--pad-x-xs) - var(--border-default));
 }
 
-// The buttons stay on the last line as the text grows.
-.plus-prompt-input__trailing-group {
+.plus-prompt-input .plus-prompt-input__control {
+    box-sizing: border-box;
+    min-height: var(--item-height-md);
+    padding-block: var(--pad-y-md);
+}
+
+// The buttons stay on the last line as the text grows, 4 from the edge.
+.plus-prompt-input .plus-field__trailing:has(> .plus-prompt-input__trailing-group) {
     align-self: flex-end;
+    margin-inline-end: calc(var(--pad-x-xs) - var(--pad-x-md));
+}
+
+.plus-prompt-input__trailing-group {
     display: inline-flex;
     align-items: center;
     gap: var(--stack-sm);
-}
-
-.plus-prompt-input__send.plus-btn--icon-only {
-    align-self: flex-end;
 }

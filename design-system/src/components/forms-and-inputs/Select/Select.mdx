@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as SelectStories from './Select.stories.jsx';
 import { Select } from '@/components';
 import { DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const lengths = [
     { value: '30', label: '30 minutes' },
@@ -106,6 +107,14 @@ type. A short list, such as a filter menu's, turns typing off with
 
 <div className="sb-ds-doc-section">
 
+## Motion
+
+<MotionSection component="Select" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -196,11 +205,11 @@ holds a few choices, applied as you pick, has nothing to search: pass
 <tbody>
 <tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>.</td></tr>
 <tr><td>Height</td><td>40: <code>--height-250</code>. Compact 32: <code>--item-height-md</code>.</td></tr>
-<tr><td>Radius</td><td>10: <code>--radius-0625</code>. Compact 8: <code>--radius-h32</code>.</td></tr>
+<tr><td>Radius</td><td>10: <code>--radius-0625</code>. Compact 8: <code>--radius-control-md</code>.</td></tr>
 <tr><td>Text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
 <tr><td>Caret</td><td><code>--ds-icon-subtle</code>; the clear button <code>--ds-icon-subtlest</code>, hovered <code>--ds-icon-subtle</code>.</td></tr>
 <tr><td>Label and caption</td><td><code>--body-small</code>; label <code>--ds-text</code>, caption <code>--ds-text-subtle</code>, error <code>--ds-text-danger</code>.</td></tr>
-<tr><td>List</td><td><code>--ds-surface-overlay</code> with a <code>--ds-border</code> edge, <code>--popover-radius-menu-md</code> and <code>--ds-shadow-overlay</code>.</td></tr>
+<tr><td>List</td><td><code>--ds-surface-overlay</code> with a <code>--ds-border</code> edge, <code>--popup-radius</code> and <code>--ds-shadow-overlay</code>.</td></tr>
 <tr><td>Option</td><td><code>--pad-y-md</code> <code>--pad-x-md</code>, <code>--body-default</code>; hovered <code>--ds-background-neutral-subtle-hovered</code>, picked <code>--ds-background-selected</code>.</td></tr>
 <tr><td>Select all mark</td><td><code>--ds-background-input</code> with a <code>--ds-border-input</code> edge and <code>--radius-md</code>; checked <code>--ds-background-selected-bold</code>, <code>--ds-border-selected</code>, <code>--ds-icon-inverse</code>.</td></tr>
 <tr><td>Search hint</td><td>"Type to search" above a long list: <code>--body-small</code> in <code>--ds-text-subtle</code>, <code>--space-025</code> <code>--pad-x-md</code>.</td></tr>
@@ -329,7 +338,7 @@ footer. Options fade in one after another, 20 ms apart, the wait capped at
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Write each option as the thing itself: "Algebra I".</td><td>A sentence or an instruction: "Choose this for algebra".</td></tr>
+<tr><td>Write each option as the thing itself: "Lincoln Middle".</td><td>A sentence or an instruction: "Choose this for algebra".</td></tr>
 <tr><td>Order options by how often they are picked, or alphabetically for a long list.</td><td>A random order that makes people scan.</td></tr>
 <tr><td>Use a placeholder that names the action: "Select a school".</td><td>The label repeated as the placeholder.</td></tr>
 <tr><td>Say what to do in an error: "Select a school".</td><td>"Required" or "Invalid".</td></tr>

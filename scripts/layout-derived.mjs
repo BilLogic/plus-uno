@@ -16,7 +16,7 @@
  * - Content is the Page's inner width, capped at 1232 and never under 720:
  *   the width, less the docked Sidebar, less two Page pads.
  * - The grid is 12 columns with gutter 16.
- * - The screen grid (Modals and Drawers, the Page grid with the Sidebar
+ * - The screen grid (Modals and the Panel, the Page grid with the Sidebar
  *   closed) has its own pad, 24 · 24 · 32, so it does not move when the Page
  *   pad does. It is 12 columns with gutter 16, centered, and capped at 1232
  *   like content.

@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -18,12 +17,20 @@ export const Sample = ({ font, weight, children = 'Tutors plan the week from her
 
 <Meta of={TypographyStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-typography"
+    eyebrow="Foundation"
     title="Typography"
-    summary="Heading, Body, Metric and Code are the text styles for all work."
+    purpose="Heading, Body, Metric and Code are the text styles for all work."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Type scale', href: '#foundation-type-scale' },
+            { title: 'In code', href: '#foundation-in-code' },
+            { title: 'Heading levels', href: '#foundation-heading-levels' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 
@@ -180,10 +187,10 @@ A Sidebar tab is a navigation row, not a tab in a Tab group: its label is Body/d
 
 <DoDont>
 <Do caption="Body/default/medium on a button or tab label.">
-<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Save changes</span>
+<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Save changes</span>
 </Do>
 <Dont caption="Regular or bold weight, or a heading style, on a button or tab label.">
-<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Save changes</span>
+<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Save changes</span>
 </Dont>
 </DoDont>
 
@@ -291,13 +298,13 @@ A student name in a roster row.
 <DoDont>
 <Do caption="One line with an ellipsis. The Status keeps its place.">
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
-<span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Algebra 1</span>
+<span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Lincoln Middle</span>
 <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
 </div>
 </Do>
 <Dont caption="The name wraps onto extra lines and makes the row taller than its neighbors.">
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
-<span style={{ flex: 1, minWidth: 0, font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Algebra 1</span>
+<span style={{ flex: 1, minWidth: 0, font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Lincoln Middle</span>
 <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
 </div>
 </Dont>

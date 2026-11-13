@@ -38,23 +38,10 @@
     align-self: stretch;
 }
 
-.plus-calendar-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+// The month buttons are IconButtons; only their size follows the calendar.
+.plus-calendar-nav.plus-btn {
     width: var(--calendar-nav-size);
     height: var(--calendar-nav-size);
-    background: transparent;
-    border: none;
-    border-radius: var(--radius-md);
-    color: var(--ds-icon-subtle);
-    cursor: pointer;
-
-    @include plus-state(
-        $states: (
-            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
-        ),
-    );
 }
 
 .plus-calendar-month {

@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const card = { padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' };
 
@@ -55,6 +56,14 @@ The border that shows the AI is generating content: a 2px rounded stroke in two 
 <ComponentExample of={GenerativeBorderStories.Pressed} title="Pressed" description="No change." />
 
 <ComponentExample of={GenerativeBorderStories.Focused} title="Focused" description="Not a control, so Tab skips it." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="GenerativeBorder" />
 
 </div>
 
@@ -124,7 +133,7 @@ Use `GenerativeBorder` only while the AI is generating into a piece of content, 
 <tbody>
 <tr><td>Segments</td><td><code>--ds-border-brand</code> and <code>--ds-border-discovery</code>.</td></tr>
 <tr><td>Stroke</td><td><code>--stroke-2</code>, through <code>--generative-border-width</code>.</td></tr>
-<tr><td>Corner</td><td><code>--generative-border-radius</code>, set to the radius token named by <code>radius</code>: <code>--radius-025</code>, <code>--radius-050</code>, <code>--radius-075</code>, <code>--radius-100</code> or <code>--radius-full</code>.</td></tr>
+<tr><td>Corner</td><td><code>--generative-border-radius</code>, set to the radius token named by <code>radius</code>: <code>--radius-025</code>, <code>--radius-050</code>, <code>--radius-075</code>, <code>--radius-100</code>, <code>--radius-full</code>, or a control radius (<code>--radius-control-sm</code>, <code>--radius-control-md</code>, <code>--radius-control-lg</code>) to follow a field.</td></tr>
 <tr><td>Turn</td><td><code>--generative-border-angle</code>, from a rest of <code>--generative-border-rest</code>.</td></tr>
 </tbody>
 </DocsTable>

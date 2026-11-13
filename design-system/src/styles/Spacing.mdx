@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -14,12 +13,20 @@ import * as SpacingStories from './Spacing.stories.jsx';
 
 <Meta of={SpacingStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-spacing"
+    eyebrow="Foundation"
     title="Spacing"
-    summary="The kind of box sets its pad; the pattern it sits in sets its stack and inline."
+    purpose="The kind of box sets its pad; the pattern it sits in sets its stack and inline."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Tokens', href: '#foundation-tokens' },
+            { title: 'Padding', href: '#foundation-padding' },
+            { title: 'Stack and inline', href: '#foundation-stack-and-inline' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 
@@ -30,7 +37,7 @@ padding: var(--card-pad-default);
 gap: var(--card-stack-md);
 ```
 
-Figma holds them in `spacing / foundations` (Element, Border, Size), `spacing / patterns` (Frame, Section, Card, Table, Blanket, Modal, Popup, Tile), `spacing / layout` (Page, Grid, Content, Screen) and the hidden `spacing / primitives`.
+Figma holds them in `spacing / foundations` (Element, Border, Size), `spacing / patterns` (Frame, Section, Card, Table, Backdrop, Modal, Popup, Tile), `spacing / layout` (Page, Grid, Content, Screen) and the hidden `spacing / primitives`.
 
 </FoundationSection>
 
@@ -135,7 +142,7 @@ call a page margin is the Page pad, `--page-pad`.
     rows={[
         ['Primitives', 'The raw scale, named rem × 100', <><C>--space-*</C> · <C>--radius-*</C> · <C>--stroke-*</C> · <C>--size-*</C></>, 'Never'],
         ['Semantics', 'Steps shared by anything: pad, stack, inline, radius, border, focus ring, grid, screen, content and size roles', <><C>--pad-x-md</C> · <C>--stack-sm</C> · <C>--inline-lg</C> · <C>--radius-md</C> · <C>--focus-ring-width</C> · <C>--control-md</C> · <C>--icon-sm</C></>, <>Never: steps <C>xs</C> · <C>sm</C> · <C>md</C> · <C>lg</C> only</>],
-        ['Patterns', 'A layout pattern’s own pad, stack, radius and widths: Frame, Page, Section, Card, Table, Blanket, Modal, Popup, Drawer, Focused page', <><C>--card-pad-default</C> · <C>--section-pad-x-compact</C> · <C>--modal-width-md</C></>, <><C>default</C> · <C>compact</C> · <C>spacious</C></>],
+        ['Patterns', 'A layout pattern’s own pad, stack, radius and widths: Frame, Page, Section, Card, Table, Backdrop, Modal, Popup, floating Panel, Focused page', <><C>--card-pad-default</C> · <C>--section-pad-x-compact</C> · <C>--modal-width-md</C></>, <><C>default</C> · <C>compact</C> · <C>spacious</C></>],
         ['Components', 'A value exactly one component needs that no shared tier covers', <><C>--button-radius-compact</C> · <C>--calendar-day-md</C> · <C>--listbox-max-height</C></>, <><C>default</C> · <C>compact</C> · <C>spacious</C></>],
     ]}
 />
@@ -241,8 +248,8 @@ Card pad of its size: a Section message and File upload take 16.
         { token: '--modal-pad', figma: 'Modal/pad', use: 'Every side, at every width' },
         { token: '--popover-pad', figma: 'Popup and flag/pad', use: 'Popup and flag' },
         { token: '--popover-pad-menu', figma: 'Menu/pad-menu', use: 'The outer box of a menu' },
-        { token: '--blanket-pad-x', figma: 'Blanket/pad-x', use: 'The Blanket’s side pad' },
-        { token: '--blanket-pad-y', figma: 'Blanket/pad-y', use: 'The Blanket’s top and bottom pad' },
+        { token: '--blanket-pad-x', figma: 'Backdrop/pad-x', use: 'The Backdrop’s side pad' },
+        { token: '--blanket-pad-y', figma: 'Backdrop/pad-y', use: 'The Backdrop’s top and bottom pad' },
         { token: '--page-pad', figma: 'Page/pad', value: '24', use: 'Inside the Page, at every width' },
     ]}
 />
@@ -385,15 +392,15 @@ Plain and full-span by default.
 
 </FoundationSubsection>
 
-<FoundationSubsection title="Blanket and Modal">
+<FoundationSubsection title="Backdrop and Modal">
 
 
-The Blanket pads the screen. A modal pads 16 on every side at every width.
+The Backdrop pads the screen. A modal pads 16 on every side at every width.
 
 <TokenTable
     rows={[
-        { token: '--blanket-pad-x', figma: 'Blanket/pad-x' },
-        { token: '--blanket-pad-y', figma: 'Blanket/pad-y' },
+        { token: '--blanket-pad-x', figma: 'Backdrop/pad-x' },
+        { token: '--blanket-pad-y', figma: 'Backdrop/pad-y' },
         { token: '--modal-pad', figma: 'Modal/pad' },
         { token: '--modal-stack-sm', figma: 'Modal/stack-sm' },
         { token: '--modal-stack-md', figma: 'Modal/stack-md', use: 'Between related fields' },
@@ -409,7 +416,7 @@ The Blanket pads the screen. A modal pads 16 on every side at every width.
 <FoundationSubsection title="Popup, menu and tooltip">
 
 
-Menu, popup, flag and tooltip float without a Blanket. The outer box of a menu
+Menu, popup, flag and tooltip float without a Backdrop. The outer box of a menu
 pads 4, and a popup or flag pads 16.
 
 <TokenTable

@@ -3,7 +3,6 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ModalStories from './Modal.stories.jsx';
 import { Modal, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS } from '@/components';
-import { MAX_STACKED_OVERLAYS } from '@/lib/overlay';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -11,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -103,6 +103,14 @@ The width examples are drawn at the 1024 screen.
 
 <div className="sb-ds-doc-section">
 
+## Motion
+
+<MotionSection component="Modal" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -156,11 +164,11 @@ many columns of the screen grid plus the modal pad.
 </DocsTable>
 
 The Modal draws `--ds-surface-overlay` with `--ds-shadow-blocking`, in every
-type and width: it is the one surface that sits on a Blanket, so it lifts higher
+type and width: it is the one surface that sits on a Backdrop, so it lifts higher
 than a menu. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
 
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
-height hugs its content up to the cap the Blanket sets
+height hugs its content up to the cap the Backdrop sets
 (`--blanket-max-height-modal`); `height="fill"` sits at that cap.
 
 </div>
@@ -171,7 +179,7 @@ height hugs its content up to the cap the Blanket sets
 
 - For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
 - For a task that takes more than a screen or has sections, use `Frame`: the focused template, with no sidebar.
-- For a task that keeps the page in view, use `PatternDrawer`: a row's details, filters, a short edit.
+- For a task that keeps the page in view, use `Panel`, floating: a row's details, filters, a short edit.
 - For a small aside anchored to a control, use `Popup`.
 - For a list of actions or a value to pick, use `DropdownMenu` or `Select`.
 
@@ -181,7 +189,7 @@ height hugs its content up to the cap the Blanket sets
 
 ## Parts
 
-1. **Blanket.** Dims the page and holds focus inside.
+1. **Backdrop.** Dims the page and holds focus inside.
 2. **Header.** Title, optional description, header actions and the close button.
 3. **Body.** Text or any content; scrolls when it overflows.
 4. **Footer.** Appears only when a button or `footer` is given: a secondary and a primary.
@@ -231,9 +239,9 @@ An informational Modal keeps its close button; `showCloseButton={false}` is for
 a decision that has to be answered from the footer.
 
 <DoDontPair
-    doExample={<div style={narrowScreen}><Modal show renderAs="inline" title="Session details" description="Monday, 4:00 PM" body="Algebra with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
+    doExample={<div style={narrowScreen}><Modal show renderAs="inline" title="Session details" description="Monday, 4:00 PM" body="Lincoln Middle with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
     doCaption="Close stays on an informational dialog."
-    dontExample={<div style={narrowScreen}><Modal show renderAs="inline" showCloseButton={false} title="Session details" description="Monday, 4:00 PM" body="Algebra with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
+    dontExample={<div style={narrowScreen}><Modal show renderAs="inline" showCloseButton={false} title="Session details" description="Monday, 4:00 PM" body="Lincoln Middle with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
     dontCaption="No way out of an informational dialog."
 />
 
@@ -255,13 +263,12 @@ short body reads cleaner without them.
 `primaryButton`, `secondaryButton` or `footer` is given; describe the actions as
 objects and the component renders the Button pair.
 
-### Show a follow-up decision in the same Modal, or stack its confirm as a second Modal.
+### Show a follow-up decision in the same Modal; a Modal never opens on another Modal.
 
 The confirm view swaps the same Modal's title, body and footer, and Back returns
-to the form with what was typed. A confirm raised as a second Modal stacks over
-the first: at most `MAX_STACKED_OVERLAYS`{` (${MAX_STACKED_OVERLAYS})`} overlays
-stack, a `PatternDrawer` counted among them, and one more stays closed and calls
-its `onClose`.
+to the form with what was typed. A Modal raised from an open Modal stays closed
+and calls its `onClose`; a confirm Modal may open over a Panel, a Popup or a
+focused task, each with its own Backdrop.
 
 ```jsx
 <Modal
@@ -298,7 +305,7 @@ its `onClose`.
 
 ## Accessibility
 
-- **Escape and a press on the Blanket close the Modal by default.** `keyboard`
+- **Escape and a press on the Backdrop close the Modal by default.** `keyboard`
   and `backdrop` both default to `true`. Turning either off leaves the close
   button as the exit, so keep that button. The header, and its close button, is
   left out only when the Modal has no `title`, no `description`, no
@@ -317,14 +324,14 @@ its `onClose`.
 - **Opening traps focus inside the dialog and closing returns it to the
   trigger.** Tab cycles within the dialog; a view change (the confirm view
   swapping in) moves focus into the dialog again.
-- **Turn off the Blanket click for an inline confirmation of a destructive
+- **Turn off the Backdrop click for an inline confirmation of a destructive
   action.** Set `backdrop="static"` (or `false`) while the confirmation shows,
   so a stray click outside cannot destroy something by accident; Close, Escape
   or the footer's Back still work.
 - **Focus order is Close, then the content, then the secondary action, then
   the primary action.**
 - **`renderAs="inline"` is for docs previews only.** It draws the panel with no
-  Blanket, no focus trap and no Escape, so a live dialog keeps the default
+  Backdrop, no focus trap and no Escape, so a live dialog keeps the default
   `renderAs="modal"`.
 
 </div>
@@ -334,7 +341,7 @@ its `onClose`.
 ## Related
 
 - `PatternModal`: use when a docs page or a mockup draws the Modal shell inline, with no focus trap.
-- `Blanket`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
+- `Backdrop`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
 - Templates: use when choosing between a Modal and a focused page; its Usage section weighs the two.
 
 </div>

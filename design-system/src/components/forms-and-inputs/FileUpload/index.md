@@ -14,11 +14,22 @@ Also asked as: attach file, dropzone, drag and drop file.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.mdx`
 
+**Motion:** change `appearance.fast` · progress `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a file upload where a form needs a document from the user: a report, an avatar, a signed form. It is a real `input type="file"` with the platform picker behind a styled button; it does not drag and drop and it does not upload.
 
 `acceptedFormats` does two jobs from one array: it becomes the input's `accept` filter and, unless you pass your own `description`, the line of help text under the label. `onChange` is the file input's own change event, so the files are at `event.target.files`.
+
+## Motion
+
+FileUpload reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | The drag-over highlight. |
+| progress | Load content | `--ds-motion-linear` | Progress fills with the work. |
 
 ## Best practices
 
@@ -83,7 +94,7 @@ The picker offers the listed types first and every platform lets the user overri
 - For the outcome of an upload, use Section message for something the user must act on and Flag for something they only need to know.
 - For progress while the file is going up, use Progress bar.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -155,7 +166,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-subtler` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border-danger` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-subtler` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border-danger` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-xl` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.scss`. Override these through the token layer, never with a literal.
 

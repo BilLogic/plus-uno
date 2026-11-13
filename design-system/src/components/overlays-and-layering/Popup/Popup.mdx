@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -115,6 +116,16 @@ A small panel of secondary content that hangs off a control: a definition, a pre
 
 <div className="sb-ds-doc-section">
 
+## Motion
+
+<ComponentExample of={PopupStories.OpensWithAClip} title="Opens with a clip" description={<>It clips open from the trigger's corner on the side it is aligned to, and folds back to it with a fade on the way out.</>} />
+
+<MotionSection component="Popup" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -150,16 +161,14 @@ less than a `Modal`, and unlike a modal it does not take the page.
 title. `triggerType` is `click` (the default), `hover`, `focus`, an array of
 those, or `manual` for a popup you drive with `show`.
 
-It is the Popups pattern's Popup: one surface padded 16, with the title in
+It is the Popup template's layer: one surface padded 16, with the title in
 heading.xsmall over the body, and no arrow. `width` is `auto` (the default),
 which hugs its content between 160 and 320 and is never narrower than the
 trigger, or a column step, `3-col` or `4-col`, for a menu of several
 categories. It opens 4 from its trigger and never comes nearer than 8 to the
 screen's edge.
 
-It opens by clipping out from the trigger's corner on the side it opens on,
-and closes with a fade. Its width never animates, and opened from the
-keyboard it appears at once.
+Its width never animates, and opened from the keyboard it appears at once.
 
 </div>
 
@@ -196,10 +205,10 @@ keyboard it appears at once.
 </thead>
 <tbody>
 <tr><td>Surface</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td></tr>
-<tr><td>Radius, padding</td><td><code>--popover-radius</code>, <code>--popover-pad</code></td></tr>
+<tr><td>Radius, padding</td><td><code>--popup-radius</code>, <code>--popover-pad</code></td></tr>
 <tr><td>Width, auto</td><td><code>--popup-min-width</code>, <code>--popup-max-width</code></td></tr>
 <tr><td>Width, column steps</td><td><code>--grid-columns</code>, <code>--grid-gutter</code>, <code>--content-min-width</code>, <code>--content-max-width</code></td></tr>
-<tr><td>Motion</td><td><code>--motion-duration-medium</code>, <code>--motion-easing-entrance</code> to open; <code>--motion-duration-short</code>, <code>--motion-easing-exit</code> to close</td></tr>
+<tr><td>Motion</td><td>The Popup row of the motion registry, read through <code>--ds-motion-*</code></td></tr>
 <tr><td>Gap between title and body</td><td><code>--stack-md</code></td></tr>
 <tr><td>Title, body</td><td><code>--ds-text</code>, <code>--heading-xsmall</code>, <code>--body-default</code></td></tr>
 <tr><td>Offset from the trigger</td><td><code>--popover-offset</code></td></tr>

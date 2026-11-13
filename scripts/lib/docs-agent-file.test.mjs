@@ -99,3 +99,79 @@ test('a template or pattern page without the manifest tag is named, since the MC
   const root = fixture({ [PAGE_PATH]: PAGE.replace(", 'manifest'", ''), 'design-system/src/storybook-docs/patterns/Ok.mdx': PAGE });
   assert.deepEqual(pagesMissingManifestTag(root), [PAGE_PATH]);
 });
+
+test('a page titled by a <Title> block keeps its name, and the pointer that opens Best practices reaches the file', () => {
+  const page = PAGE.replace('# Disabled', '<Title>Disabled</Title>').replace('## Best practices\n', '## Best practices\n\nThe rules live in Patterns, Forms.\n');
+  const text = renderDocsAgentFile(page, { file: PAGE_PATH, kind: 'Pattern' });
+  assert.match(text, /^# Disabled$/m);
+  assert.match(text, /## Best practices\n\nThe rules live in Patterns, Forms\.\n\n### Give every/);
+});
+
+test('a page with a MotionSection gets its registry row as a Motion section, once', () => {
+  const registry = [
+    { name: 'Shell', tier: 'component', events: { enter: { spatial: 'spatial.fast' } } },
+    { name: 'Shell', tier: 'template', events: { enter: { transition: 'Dock', spatial: 'spatial.slow', note: 'Slides in.' } } },
+  ];
+  const source = PAGE.replace('## Best practices', `## Motion\n\n<MotionSection component="Shell" tier="template" />\n\n## Best practices`);
+  const text = renderDocsAgentFile(source, { file: 'x.mdx', kind: 'Template', registry });
+  assert.equal(text.match(/^## Motion$/gm).length, 1);
+  assert.match(text, /\| enter \| Dock \| `--ds-motion-spatial-slow` \| Slides in\. \|/);
+  assert.ok(text.indexOf('## Motion') < text.indexOf('## Best practices'));
+  assert.doesNotMatch(renderDocsAgentFile(PAGE, { file: 'x.mdx', kind: 'Template', registry }), /## Motion/);
+});
+
+test('a MotionSection naming a row the registry lacks fails the render', () => {
+  const source = PAGE.replace('## Best practices', `## Motion\n\n<MotionSection component="Ghost" tier="template" />\n\n## Best practices`);
+  assert.throws(() => renderDocsAgentFile(source, { file: 'x.mdx', kind: 'Template', registry: [] }), /Ghost/);
+});
+
+// ── Foundations · Motion through get-documentation ──
+
+const MOTION_MDX = (name) => `import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title="Foundations/Motion/${name}" tags={['!dev', 'manifest']} />\n\n# ${name}\n`;
+const MOTION_STORIES = (name, tags) => `export default {\n    title: 'Foundations/Motion/${name}',\n    tags: [${tags}],\n};\n`;
+
+test('a Foundations · Motion page without the manifest tag is named, whether its Meta or its stories file carries the title', () => {
+  const root = fixture({
+    'design-system/src/styles/MotionLibrary.mdx': MOTION_MDX('Library').replace(", 'manifest'", ''),
+    'design-system/src/styles/MotionPhysics.mdx': `import * as S from './MotionPhysics.stories.jsx';\n\n<Meta of={S} />\n`,
+    'design-system/src/styles/MotionPhysics.stories.jsx': MOTION_STORIES('Physics', "'!dev'"),
+    'design-system/src/styles/MotionPrinciples.mdx': `import * as S from './MotionPrinciples.stories.jsx';\n\n<Meta of={S} />\n`,
+    'design-system/src/styles/MotionPrinciples.stories.jsx': MOTION_STORIES('Principles', "'!dev', 'manifest'"),
+  });
+  assert.deepEqual(pagesMissingManifestTag(root).sort(), [
+    'design-system/src/styles/MotionLibrary.mdx',
+    'design-system/src/styles/MotionPhysics.mdx',
+  ]);
+});
+
+test('on the real repo every Foundations · Motion page is served, and a component with a motion row carries its Motion section', () => {
+  const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+  assert.deepEqual(pagesMissingManifestTag(root), []);
+  const served = fs.readdirSync(path.join(root, 'design-system/src/styles')).filter((f) => /^Motion[A-Z].*\.mdx$/.test(f));
+  assert.ok(served.length >= 6, `expected the six Foundations · Motion pages, found ${served.length}`);
+  const popup = fs.readFileSync(path.join(root, 'design-system/src/components/overlays-and-layering/Popup/index.md'), 'utf8');
+  assert.match(popup, /^## Motion$/m);
+  assert.match(popup, /--ds-motion-spatial-fast/);
+});
+
+test('a Foundations · Sound page without the manifest tag is named', () => {
+  const root = fixture({
+    'design-system/src/styles/SoundOverview.mdx': MOTION_MDX('Overview').replace('Motion', 'Sound').replace(", 'manifest'", ''),
+    'design-system/src/styles/SoundSettings.mdx': MOTION_MDX('Settings').replace('Motion', 'Sound'),
+  });
+  assert.deepEqual(pagesMissingManifestTag(root), ['design-system/src/styles/SoundOverview.mdx']);
+});
+
+test('on the real repo every Foundations · Sound page is served, and a component with a sound cell carries it in its Motion section', () => {
+  const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+  assert.deepEqual(pagesMissingManifestTag(root), []);
+  const flag = fs.readdirSync(path.join(root, 'design-system/src/components'), { recursive: true }).find((f) => String(f).endsWith('Flag/index.md'));
+  assert.match(fs.readFileSync(path.join(root, 'design-system/src/components', String(flag)), 'utf8'), /`sound\.notify` on land/);
+});
+
+test('a Best practices section that opens straight on its first rule prints that rule once, with its id', () => {
+  const text = renderDocsAgentFile(PAGE, { file: PAGE_PATH, kind: 'Pattern' });
+  const best = text.slice(text.indexOf('## Best practices'));
+  assert.equal(best.match(/### Give every disabled control a reason in visible text\./g).length, 1);
+  assert.match(best, /^## Best practices\n\n### Give every disabled control/);
+});

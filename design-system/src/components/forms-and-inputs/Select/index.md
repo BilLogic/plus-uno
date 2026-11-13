@@ -4,15 +4,17 @@
 
 Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
 
-Also asked as: combobox, picklist, option list.
+Also asked as: combobox, picklist, option list, async select.
 
 **Import:** `import { Select } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyLongValue
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyLongValue, OpenListEdge
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
+
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -36,6 +38,15 @@ options belong in view as a `RadioGroup` (one pick) or a Checkbox group
 Typing is on because most lists are long enough to need it. A menu that
 holds a few choices, applied as you pick, has nothing to search: pass
 `isSearchable={false}` so the field stays a plain trigger and Space opens it.
+
+## Motion
+
+Select reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
 
 ## Best practices
 
@@ -148,7 +159,7 @@ Don't: Disabled fades a value people need to read.
 - For hierarchical options, use `TreeSelect` or `Cascader`.
 - For free-form tags rather than a fixed option list, use `TagInput`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -176,11 +187,11 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
 | Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Caret | `--ds-icon-subtle`; the clear button `--ds-icon-subtlest`, hovered `--ds-icon-subtle`. |
 | Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
-| List | `--ds-surface-overlay` with a `--ds-border` edge, `--popover-radius-menu-md` and `--ds-shadow-overlay`. |
+| List | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | Option | `--pad-y-md` `--pad-x-md`, `--body-default`; hovered `--ds-background-neutral-subtle-hovered`, picked `--ds-background-selected`. |
 | Select all mark | `--ds-background-input` with a `--ds-border-input` edge and `--radius-md`; checked `--ds-background-selected-bold`, `--ds-border-selected`, `--ds-icon-inverse`. |
 | Search hint | "Type to search" above a long list: `--body-small` in `--ds-text-subtle`, `--space-025` `--pad-x-md`. |
@@ -189,7 +200,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Do | Don't |
 | --- | --- |
-| Write each option as the thing itself: "Algebra I". | A sentence or an instruction: "Choose this for algebra". |
+| Write each option as the thing itself: "Lincoln Middle". | A sentence or an instruction: "Choose this for algebra". |
 | Order options by how often they are picked, or alphabetically for a long list. | A random order that makes people scan. |
 | Use a placeholder that names the action: "Select a school". | The label repeated as the placeholder. |
 | Say what to do in an error: "Select a school". | "Required" or "Invalid". |

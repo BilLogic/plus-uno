@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const DemoSlide = ({ children }) => (
     <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-background-accent-blue-subtlest)', color: 'var(--ds-text-subtle)', font: 'var(--heading-xsmall)' }}>
@@ -70,6 +71,14 @@ A centered stage of slides in a flat row: the active one full size, a smaller, f
 <ComponentExample of={CarouselStories.FewSlides} title="Two slides" description="With two slides nothing wraps round, so one side of the stage stays open." />
 
 <ComponentExample of={CarouselStories.ReducedMotion} title="Reduced motion" description="When the viewer asks for less motion: no autoplay, no play button, arrows shown, and every move in one step." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Carousel" />
 
 </div>
 
@@ -152,7 +161,7 @@ with `aria-label` or `aria-labelledby`.
 <tr><td>Neighbors</td><td>Faded under <code>--ds-surface</code> at 45%, <code>--section-stack-lg</code> apart (<code>--inline-lg</code> on a narrow stage).</td></tr>
 <tr><td>Ring</td><td><code>--control-lg</code> across, <code>--border-selected</code> wide. Track <code>--ds-border</code>; progress <code>--ds-background-brand-bold</code>.</td></tr>
 <tr><td>Progress indicator</td><td>The default <code>ProgressIndicator</code>: dots <code>--progress-indicator-dot-size-8</code>, the bar <code>--control-md</code> long, each dot a <code>--control-sm</code> target.</td></tr>
-<tr><td>Motion</td><td>A move takes <code>--motion-duration-long</code> on <code>--motion-easing-standard</code>. The caption lifts out over <code>--motion-duration-short</code> and rises in over <code>--motion-duration-medium</code>.</td></tr>
+<tr><td>Motion</td><td>A move takes <code>--ds-motion-spatial-default</code>, fading on <code>--ds-motion-appearance-slow</code>. The caption lifts out over <code>--ds-motion-appearance-fast</code> and rises in over <code>--ds-motion-appearance-default</code>.</td></tr>
 <tr><td>Caption</td><td><code>Heading</code> size small; line in <code>--body-default</code> and <code>--ds-text-subtle</code>; at most <code>--content-max-width-reading</code> wide.</td></tr>
 <tr><td>Spacing</td><td><code>--section-stack-md</code> between the stage, the controls and the caption; <code>--inline-md</code> between controls.</td></tr>
 </tbody>

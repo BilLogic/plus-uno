@@ -1,0 +1,254 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+import * as NavigationStories from './Navigation.stories.jsx';
+import { SIDEBAR_STAGE, SMALL_STAGE, STAGE, OpenItemsDont, OpenItemsPicture } from './navigationDemo.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import { AreaPageTitleAlone, BreadcrumbOnAreaPage, OneTabSystem, TwoTabSystems } from '@/storybook-docs/illustrations/page.jsx';
+import { BreadcrumbOnRecordPage } from '@/storybook-docs/illustrations/navigation.jsx';
+
+<Meta title="Patterns/Finding things/Navigation" tags={['!dev', 'manifest']} />
+
+<DocsLanding
+    page="patterns-finding-things-navigation"
+    eyebrow="Pattern · Finding things"
+    title="Navigation"
+    purpose="How a person moves: between areas in the Sidebar, to the items they opened, between views of one collection, down into a record and back out. Each move has one control and one motion."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Frame', href: './?path=/docs/templates-frame-frame--docs' },
+            { title: 'Page', href: './?path=/docs/templates-page-page--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+        ],
+    }}
+/>
+
+<DocsTabs of={NavigationStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## The tiers
+
+Four tiers, from the whole app down to one record. A quick look is a layer, not a tier; steps move within a level.
+
+<TypeGrid>
+<TypeCard of={NavigationStories.TierAreas} title="1 · Areas" stage={SIDEBAR_STAGE}>Go to: the Sidebar's fixed items. The selected row takes the selected fill.</TypeCard>
+<TypeCard of={NavigationStories.TierOpenItems} title="1b · Open items" stage={SIDEBAR_STAGE}>Records the person opened, a session or a student, as temporary items in the Sidebar: add and remove, then go to.</TypeCard>
+<TypeCard of={NavigationStories.TierViews} title="2 · Views" stage={SMALL_STAGE}>Pill views in a Section's view bar, or page tabs under the page title. Content swaps in place.</TypeCard>
+<TypeCard of={NavigationStories.TierDrill} title="3 · Drill in and climb out" stage={STAGE}>A record page with a breadcrumb: the record's place, parents only. Climb out through the breadcrumb.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key cases
+
+<ComponentExample of={NavigationStories.TierPageTabs} title="Page tabs" description="Views of one record, at the bottom of the page header. Only the selected indicator glides; content swaps in place." />
+
+<ComponentExample of={NavigationStories.KeyOneTabSystem} title="One tab system per page" description={<>Under page tabs a Section has no pill views: its views become one Select at the start of the bar, picking a view and not a filter. A visible label on it, "Status: Upcoming", is Planned <PlannedTag />.</>} />
+
+<ComponentExample of={NavigationStories.KeyAreaPage} title="An area page" description="Nothing to climb out of, so no breadcrumb. The collection's add action is the Primary at the end of its view bar." />
+
+<ComponentExample of={NavigationStories.KeyFocusedTask} title="A focused task" description={<>A long task leaves the Sidebar: Close at the start of the title row, no breadcrumb, the steps down the left from five. Its layout is on <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a>.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Navigation" tier="pattern" />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Navigation when deciding how a person gets from here to there. Name the tier first: the control, the place and the motion follow from it. There is no Topbar in the design and no global search; the Sidebar and the page carry every move.
+
+<DocsTable>
+<thead>
+<tr><th>Tier</th><th>The move</th><th>Control</th><th>Motion</th></tr>
+</thead>
+<tbody>
+<tr><td>1 · Areas</td><td>To another part of the app</td><td>A Sidebar item</td><td>Go to</td></tr>
+<tr><td>1b · Open items</td><td>To a session or student opened earlier</td><td>A temporary item in the Sidebar, named by when and who</td><td>Add and remove, then Go to</td></tr>
+<tr><td>2 · Views</td><td>Between views of one collection or record</td><td>Pill views in the view bar; page tabs under the title</td><td>Switch views: content in place, the indicator glides</td></tr>
+<tr><td>3 · Drill in and climb out</td><td>Into one record and back</td><td>A row, then the breadcrumb</td><td>Drill in, Climb out</td></tr>
+<tr><td>Within a level</td><td>Through a task's steps</td><td>Back and Next in the bottom bar; the step rail</td><td>Step</td></tr>
+<tr><td>A layer</td><td>A quick look without leaving</td><td>A Details Panel or a Modal</td><td>Open and Close</td></tr>
+</tbody>
+</DocsTable>
+
+### Opening a record
+
+Least room to most. Pick the lowest step that fits. The picture is on <a target="_top" href="./?path=/docs/templates-overview--docs">Templates</a>.
+
+<DocsTable>
+<thead>
+<tr><th>Step</th><th>Use it for</th></tr>
+</thead>
+<tbody>
+<tr><td>1 · Expand the row</td><td>A few more lines, links at most.</td></tr>
+<tr><td>2 · Section detail</td><td>On a queue page, the record opens beside its list.</td></tr>
+<tr><td>3 · Details Panel</td><td>A quick look or a short edit from a table on any other page.</td></tr>
+<tr><td>4 · Modal</td><td>A rare, critical task with fewer than five fields.</td></tr>
+<tr><td>5 · Its own page</td><td>Complex or stepped work, or anything worth a URL. The breadcrumb appears.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For narrowing a collection rather than switching views, follow <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>; filters combine, views do not.
+- For more pills than fit, fold the extras into "More" <PlannedTag />; keep page tabs to five.
+- For a decision that blocks the page, use a <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>, not a page.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Show the breadcrumb only after drilling into a record.
+
+<RuleTag kind="automatic" />
+
+Never on an area page or a focused task. It sits above the title in the page header and shows the record's place: parents only, never history. It never wraps. Folding five or more items into "…" is Planned <PlannedTag />.
+
+<DoDontPair
+    doExample={<BreadcrumbOnRecordPage />}
+    doCaption="A breadcrumb on the record page, parents only."
+    dontExample={<BreadcrumbOnAreaPage />}
+    dontCaption="A breadcrumb on an area page: there is nothing to climb out of."
+/>
+
+### Keep one tab system per page.
+
+<RuleTag kind="review" />
+
+Page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section's views become one Select at the start of its bar. It picks a view, not a filter.
+
+<DoDontPair
+    doExample={<OneTabSystem />}
+    doCaption="Under page tabs the Section's views are one Select at the start of its bar."
+    dontExample={<TwoTabSystems />}
+    dontCaption="Page tabs and pill views on one page: two tab systems."
+/>
+
+### Make views a fixed set the product defines.
+
+<RuleTag kind="review" />
+
+Two to five views of the same rows, named by short parallel nouns. Nobody adds or edits views. One pill stays even with one view, so nothing moves when a second arrives.
+
+### Swap content in place between views and tabs.
+
+<RuleTag kind="automatic" />
+
+Only the selected indicator glides. Nothing slides between views.
+
+### Open a record at the lowest step that fits.
+
+<RuleTag kind="review" />
+
+Expand the row, then Section detail, then the Details Panel, then a Modal, then its own page. Section detail and the Details Panel both stay: the detail for a queue, the Panel for a table on any other page.
+
+### Give a long task its own focused Frame.
+
+<RuleTag kind="automatic" />
+
+Close at the start of the title row, no Sidebar, no breadcrumb. How the steps, the title row and the bar sit is on <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a>.
+
+### Name an open item by when and who.
+
+<RuleTag kind="automatic" />
+
+"4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more". Removing one is Add and remove; opening one is Go to.
+
+<DoDontPair
+    doExample={<OpenItemsPicture />}
+    doCaption="Each item names the session by its time and the teacher."
+    dontExample={<OpenItemsDont />}
+    dontCaption="Each item carries everything, and the time it is found by is cut off."
+/>
+
+### Put the collection's add action in its view bar, not the page header.
+
+<RuleTag kind="automatic" />
+
+"Add student" is the Primary at the end of the Students view bar. Page actions sit at the end of the title row and are only about the page.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Views as short parallel nouns: "Upcoming", "Past".</td><td>"Show upcoming sessions", "History".</td></tr>
+<tr><td>Page tabs name views of one subject: "Overview", "Sessions", "Notes".</td><td>Counts or status in the tab label.</td></tr>
+<tr><td>The view Select is labeled: "Status: Upcoming" <PlannedTag />.</td><td>A bare "Upcoming".</td></tr>
+<tr><td>Breadcrumb levels by the page's own title.</td><td>"Back", "Home" as a level.</td></tr>
+<tr><td>Open item: "4:00 PM · Ms. Ortiz".</td><td>"Session #1028".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- The Sidebar is a navigation landmark; the selected item carries `aria-current="page"`. The selected row is a fill, not color on the icon alone.
+- Views and page tabs are a real tab widget: one tab stop, Left and Right move selection, the panel is named by its tab.
+- The breadcrumb is a `nav` around an `ol`; the last item is plain text with `aria-current="page"`.
+- Leaving a focused task returns focus to the control that opened it <PlannedTag />.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-states-overflow--docs">Overflow</a>: use for the breadcrumb middle and open-item names.
+- <a target="_top" href="./?path=/docs/patterns-finding-things-search--docs">Search</a>: use for narrowing as you type inside a view.
+- <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>: use for narrowing a view by attributes.
+- <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-indicators--docs">Indicators</a>: use for counts on Sidebar items.
+- <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a>, <a target="_top" href="./?path=/docs/templates-page-page--docs">Page</a>, <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use for the drawn shells.
+- `Sidebar`, `Breadcrumb`, `Tabs`, `PageHeader`, `Select`: the components.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

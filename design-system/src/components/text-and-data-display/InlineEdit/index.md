@@ -12,6 +12,8 @@ InlineEdit — text that reads as text and becomes a field when it is pressed. T
 
 **Storybook page:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.mdx`
 
+**Motion:** change `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `InlineEdit` for a value that is read far more often than it is changed and
@@ -22,6 +24,15 @@ Use `TextField` inside a form, where a Save button submits every field together.
 inline edit saves when it is confirmed and has no say in the form's submit, so
 placing one in a form leaves two ways to save. Use a subtle `TextField` where
 leaving the field should save with no buttons at all.
+
+## Motion
+
+InlineEdit reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Swap content in place | `--ds-motion-appearance-fast` | Read and edit states swap in place. |
+| rejected | Call attention | `--ds-motion-spatial-fast` | A blocked save shakes the field and its button once. |
 
 ## Best practices
 
@@ -150,7 +161,7 @@ The edit view takes the field's own tokens: see Text field.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--height-250` · `--item-height-md` · `--pad-x-md` · `--radius-0625` · `--radius-md` · `--stack-sm`
+`--body-default` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--height-250` · `--item-height-md` · `--pad-x-md` · `--radius-control-lg` · `--radius-md` · `--stack-sm`
 
 From `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss`. Override these through the token layer, never with a literal.
 

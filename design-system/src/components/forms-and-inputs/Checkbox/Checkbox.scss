@@ -35,7 +35,7 @@
     padding: 0;
     margin: 0;
     border: var(--stroke-2) solid var(--ds-border-input);
-    border-radius: var(--radius-025);
+    border-radius: var(--radius-md);
     background-color: var(--ds-background-input);
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
@@ -160,7 +160,7 @@
 .plus-choice-card {
     padding: var(--space-0375) var(--pad-x-md);
     border: var(--stroke-1) solid var(--ds-border);
-    border-radius: var(--radius-025);
+    border-radius: var(--radius-lg);
     background-color: var(--ds-surface);
 
     .plus-form-checkbox[data-checked],

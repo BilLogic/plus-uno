@@ -4,7 +4,7 @@
 
 PanelContainer: the panel's own surface, at a fixed or the provider's width.
 
-Also asked as: right panel, detail panel, side pane, right sidebar, inspector.
+Also asked as: right panel, detail panel, side pane, slide-over, sheet, side sheet, off-canvas, right sidebar, side panel, inspector.
 
 > Implemented as `PanelContainer` in the source and exported as `Panel`. Import the exported name; read the source under the implementation name.
 
@@ -15,6 +15,8 @@ Also asked as: right panel, detail panel, side pane, right sidebar, inspector.
 **Stories:** `design-system/src/components/layout-and-structure/Panel/Panel.stories.jsx` — FullComposition, MinimalHeaderAndBody, WidthFromProvider, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Panel/Panel.mdx`
+
+**Motion:** enter `spatial.slow` · exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -28,6 +30,15 @@ Fixed action components cover the common icons: `PanelBackAction`,
 `PanelCloseAction`, `PanelMoreAction`, `PanelUpAction`, `PanelDownAction`,
 `PanelNewTabAction` and `PanelViewSwitcher`, each a labeled `IconButton` with
 its glyph and accessible name already set.
+
+## Motion
+
+Panel reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Dock and undock a panel | `--ds-motion-spatial-slow` | Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Backdrop. |
+| exit | Dock and undock a panel | `--ds-motion-spatial-default` | Floating panels leave on spatial.fast. |
 
 ## Best practices
 

@@ -128,7 +128,7 @@ Styles.play = async ({ canvasElement }) => {
             const el = canvas.getByTestId(name);
             const s = getComputedStyle(el);
             await expect(el.getBoundingClientRect().height, `${name} height`).toBe(SIZE[size]);
-            await expect(px(s.borderRadius), `${name} radius`).toBe(size === 'spacious' ? 6 : 4);
+            await expect(px(s.borderRadius), `${name} radius`).toBe(size === 'spacious' ? 8 : 4);
 
             const label = within(el).getByText(style);
             await expect(px(getComputedStyle(label).fontSize), `${name} text size`).toBe(size === 'spacious' ? 14 : 12);

@@ -53,12 +53,12 @@ const imagePlaceholder = (ratio) => (
 /** A row of cards at three content widths: the most that keeps each card at its minimum. */
 function PatternCardRowsDemo() {
     const people = [
-        ['Ana Ruiz', 'Algebra I · Thu 4:00 PM'],
-        ['Marcus Lee', 'Geometry · Thu 5:00 PM'],
-        ['Priya Shah', 'Biology · Fri 3:30 PM'],
-        ['Jordan Kim', 'Chemistry · Fri 4:15 PM'],
-        ['Ana Ruiz', 'Algebra I · Thu 4:00 PM'],
-        ['Marcus Lee', 'Geometry · Thu 5:00 PM'],
+        ['Ana Ruiz', 'Lincoln Middle · Thu 4:00 PM'],
+        ['Marcus Lee', 'Roosevelt K-8 · Thu 5:00 PM'],
+        ['Priya Shah', 'North High · Fri 3:30 PM'],
+        ['Jordan Kim', 'South High · Fri 4:15 PM'],
+        ['Ana Ruiz', 'Lincoln Middle · Thu 4:00 PM'],
+        ['Marcus Lee', 'Roosevelt K-8 · Thu 5:00 PM'],
     ];
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-300)' }}>
@@ -237,7 +237,7 @@ export const Anatomy = () => (
         <PatternCard
             image={imagePlaceholder('16:9')}
             title="Ana Ruiz"
-            description="Algebra I · Thu 4:00 PM"
+            description="Lincoln Middle · Thu 4:00 PM"
             actions={<IconButton icon="ellipsis-vertical" appearance="subtle" spacing="compact" label="More actions" onClick={() => {}} />}
             footer={viewSession}
         >
@@ -255,7 +255,7 @@ const sizedCard = (size) => (
         padding={size}
         minWidth={`var(--card-min-width-${size})`}
         title="Ana Ruiz"
-        description="Algebra I · Thu 4:00 PM"
+        description="Lincoln Middle · Thu 4:00 PM"
         footer={viewSession}
     >
         {sessionBody}
@@ -269,7 +269,7 @@ export const SizeLarge = { name: 'Large', render: () => sizedCard('lg') };
 
 /** One image ratio per story, edge to edge above the padded content. */
 const imageCard = (ratio) => (
-    <PatternCard image={imagePlaceholder(ratio)} title="Ana Ruiz" description="Algebra I · Thu 4:00 PM" style={{ width: 'var(--card-min-width-md)' }}>
+    <PatternCard image={imagePlaceholder(ratio)} title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" style={{ width: 'var(--card-min-width-md)' }}>
         {sessionBody}
     </PatternCard>
 );

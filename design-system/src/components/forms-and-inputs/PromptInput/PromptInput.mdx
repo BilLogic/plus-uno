@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as PromptInputStories from './PromptInput.stories.jsx';
 import { PromptInput } from '@/components';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={PromptInputStories} />
 
@@ -60,6 +61,14 @@ action after it.
 
 <div className="sb-ds-doc-section">
 
+## Motion
+
+<MotionSection component="PromptInput" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -103,7 +112,7 @@ under its input; any other consumer shows the same line under the field itself.
 2. **Start slot** (optional). One quiet control before the text, such as an attach button.
 3. **Text area.** Grows from one line to five, then scrolls. Named by `label`.
 4. **Actions** (optional). Extra controls beside the send button.
-5. **Send.** A compact primary icon button; while loading it becomes Stop.
+5. **Send.** A default (32) primary icon button, 4 from the edge on every side and on the last line as the text grows; while loading it becomes Stop.
 
 ### States
 
@@ -128,13 +137,13 @@ under its input; any other consumer shows the same line under the field itself.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>, <code>--radius-0625</code>.</td></tr>
+<tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>, <code>--radius-control-lg</code>.</td></tr>
 <tr><td>Height</td><td>Starts at one line, <code>--height-250</code> (40, a single-line field), and grows to five lines: <code>--line-height-125</code> × 5 plus <code>--space-0375</code> top and bottom, then scrolls.</td></tr>
 <tr><td>Padding</td><td><code>--pad-y-md</code> top and bottom, <code>--pad-x-md</code> either side.</td></tr>
 <tr><td>Text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
 <tr><td>Attachments</td><td><code>--stack-md</code> between files and under the row.</td></tr>
 <tr><td>Actions and send</td><td><code>--stack-sm</code> between them.</td></tr>
-<tr><td>Loading ring</td><td>GenerativeBorder at <code>radius-075</code>.</td></tr>
+<tr><td>Loading ring</td><td>GenerativeBorder at <code>radius-control-lg</code>, the field's own radius.</td></tr>
 </tbody>
 </DocsTable>
 

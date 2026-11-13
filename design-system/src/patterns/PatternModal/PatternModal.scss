@@ -2,8 +2,8 @@
  * Modal pattern (Patterns/Modal)
  * Inline modal shell, drawn as the Modal component draws one: the overlay
  * pair (elevation.surface.overlay with elevation.shadow.overlay, the level
- * every floating layer takes; the blanket under a real modal sets it apart),
- * Modal/pad 16, Modal/stack-md 16 and Modal/radius 12. Width is a step of the
+ * every floating layer takes; the backdrop under a real modal sets it apart),
+ * Modal/pad 16, Modal/stack-md 16 and Modal/radius 16. Width is a step of the
  * screen grid and height hugs or fills to the screen less 128, both from the
  * Overlay pattern it is placed in.
  */
@@ -60,25 +60,9 @@
     min-width: 0;
 }
 
+// The close button is an IconButton; the header only pushes it to the end.
 .plus-pattern-modal-close {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-025) var(--pad-x-sm);
     margin-left: auto;
-    background: transparent;
-    border: none;
-    border-radius: var(--radius-md);
-    color: var(--ds-icon-subtle);
-    cursor: pointer;
-
-    @include plus-state(
-        (
-            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
-            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
-        ),
-        $ring: false
-    );
 }
 
 /* Body: takes what the header and footer leave and scrolls past the cap */
@@ -108,4 +92,5 @@
     justify-content: flex-end;
     gap: var(--stack-md);
     flex-shrink: 0;
+    border-radius: 0; // full bleed: the Modal's own radius clips the outer corners
 }

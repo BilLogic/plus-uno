@@ -1,0 +1,259 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+import * as NotificationsStories from './Notifications.stories.jsx';
+import { FLOAT_STAGE } from '../../../patterns/Panel/panelDemo.jsx';
+import { PLACE_STAGE, STAGE, BannerDo, BannerDont, FlagDo, FlagDont } from './notificationsDemo.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+
+<Meta title="Patterns/Notifications and indicators/Notifications" tags={['!dev', 'manifest']} />
+
+<DocsLanding
+    page="patterns-notifications-and-indicators-notifications"
+    eyebrow="Pattern · Notifications and indicators"
+    title="Notifications"
+    purpose="What the product says back, and where. A Flag at the top right for something that happened; a Banner at one of three tiers for a condition; a SectionMessage in the page for something to read or act on; the Inbox for what arrived while you were away."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Flag', href: './?path=/docs/components-messaging-flag--docs' },
+            { title: 'Banner', href: './?path=/docs/components-messaging-banner--docs' },
+            { title: 'Section message', href: './?path=/docs/components-messaging-section-message--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+            { title: 'Page', href: './?path=/docs/templates-page-page--docs' },
+        ],
+    }}
+/>
+
+<DocsTabs of={NotificationsStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## The carriers
+
+Four components carry every message. Each component page holds its appearances; this pattern picks the carrier and the place. A Modal is the fifth, for the one message that must be answered first.
+
+<TypeGrid>
+<TypeCard of={NotificationsStories.CarrierFlag} title="Flag" stage={PLACE_STAGE}>A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and error stay until acted on.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierBanner} title="Banner" stage={STAGE}>A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierSectionMessage} title="SectionMessage" stage={PLACE_STAGE}>Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierInbox} title="The Inbox" stage={FLOAT_STAGE}>Notifications that arrived over time, in a <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>. The Bell that carries its count, and the Panel growing out of the Sidebar, are Planned <PlannedTag />.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Banner tiers
+
+One banner at a time, scrolling with its content. The Frame tier is system news and pins only during an active outage. The Page tier is about this page. The Section tier is about this collection. The Frame and Page `banner` slots are Planned <PlannedTag />: today a Banner goes in the content, set where its tier says.
+
+<TypeGrid>
+<TypeCard of={NotificationsStories.TierFrameStory} title="Frame" stage={STAGE}>System news across the whole width, above the Sidebar and the page.</TypeCard>
+<TypeCard of={NotificationsStories.TierPageStory} title="Page" stage={STAGE}>Under the page header, about this page.</TypeCard>
+<TypeCard of={NotificationsStories.TierSectionStory} title="Section" stage={STAGE}>At the top of one collection, about that collection.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Severity
+
+<ComponentExample of={NotificationsStories.Severity} title="Four statuses, the words first" description="Information, success, warning, danger. The fill and icon show it; the words say it, because the icon is hidden from screen readers. Each component names an appearance in its own word: Flag says error where SectionMessage and Banner say danger." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key cases
+
+<ComponentExample of={NotificationsStories.KeyFlagStack} title="A stack of Flags" description="Newest on top, each one its own message. A stack is all default flags, each with its ×." />
+
+<ComponentExample of={NotificationsStories.KeyFlagWithAction} title="A Flag with an action" description="Up to two verbs: Undo and View sessions. It keeps autohide only when the action is optional." />
+
+<ComponentExample of={NotificationsStories.KeyMustStay} title="A message that must stay" description="A SectionMessage with dismiss turned off, placed by the action it informs." />
+
+<ComponentExample of={NotificationsStories.KeyAcknowledge} title="Something to answer first" description={<>A <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a> of the Acknowledge type, for the one message the person must accept before going on.</>} />
+
+<ComponentExample of={NotificationsStories.KeyFlagOnPage} title="A Flag on the page" description="The person has moved on to another page; the Flag finds them at the top right." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Notifications" tier="pattern" />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Notifications when the product needs to tell someone something: an action finished, a condition holds, a decision is needed. Match the disruption to the urgency: a Flag passes, a SectionMessage stays in the page, a Banner holds for a condition, a Modal interrupts. Keep notifications to what is needed; when every message shouts, none does.
+
+<DocsTable>
+<thead>
+<tr><th>The message is about…</th><th>Carrier</th><th>Where</th><th>Leaves</th></tr>
+</thead>
+<tbody>
+<tr><td>Something that already happened and needs no reply: saved, sent, copied</td><td>`Flag`</td><td>Top right</td><td>On its own after 8 s, or Dismiss on a default flag; a bold warning or error when its action resolves it</td></tr>
+<tr><td>A job that finished or failed after the person moved on</td><td>`Flag` with an action, `autohide={false}`</td><td>Top right</td><td>Dismiss, or the action</td></tr>
+<tr><td>Something to read or act on in this part of the page</td><td>`SectionMessage`</td><td>Top of the Section or form</td><td>Resolved or dismissed</td></tr>
+<tr><td>Guidance before a task that must not be missed</td><td>`SectionMessage`, dismiss off</td><td>By the action it informs</td><td>When it stops applying</td></tr>
+<tr><td>A condition that holds for everything in a Frame, page or Section</td><td>`Banner` at that tier</td><td>Top of the tier</td><td>When the condition ends</td></tr>
+<tr><td>A note beside one thing that most people never need</td><td>`InlineMessage`</td><td>Beside the field or value</td><td>On close</td></tr>
+<tr><td>Something that must be answered before going on</td><td>`Modal`, Acknowledge or Active</td><td>Centered over a Backdrop</td><td>On the button</td></tr>
+<tr><td>What arrived over time</td><td>The Inbox, a Panel of the Notifications type</td><td>A floating Panel, no Backdrop</td><td>When read</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For an error about one field, put it on the field; see <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a>.
+- For a state on one object, use a `StatusTag`; see <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-indicators--docs">Indicators</a>.
+- For a copy confirmation, use the "Copied" tooltip; see <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Place Flags at the top right, two lines at most.
+
+<RuleTag kind="review" />
+
+A title that names the event and one line for the next step. A `FlagGroup` stacks them in the order you pass them, so pass the newest first, and renders with the page so each one is announced. `FlagGroup` takes `position="top-end"` today; the top right as its default is Planned <PlannedTag />.
+
+### Put nothing important only in a Flag.
+
+<RuleTag kind="review" />
+
+A Flag can be dismissed before it is read. A failure that needs a decision stays on the page in a SectionMessage; a decision that blocks the task is a Modal.
+
+<DoDontPair
+    doExample={<FlagDo />}
+    doCaption="A finished action as a success Flag: the event in the title, the next step below."
+    dontExample={<FlagDont />}
+    dontCaption="A decision in a Flag, which is gone before it is answered."
+/>
+
+### Let routine Flags leave and keep warning and error until acted on.
+
+<RuleTag kind="automatic" />
+
+Normal, information and success close after 8 s. Warning and error never close themselves and offer a next action. A Flag with an action keeps autohide only when the action is optional: set `autohide={false}` when the person must act. The × and the rest of the dismiss rule are on the Flag page.
+
+### Show one Banner at a time, one line, at the tier it concerns, for as long as the condition holds.
+
+<RuleTag kind="automatic" />
+
+Frame for system news, pinned only during an active outage <PlannedTag />; Page for this page; Section for this collection. A Banner has no dismiss and no timeout, so it is mounted only while the condition is true, and it scrolls with the content.
+
+<DoDontPair
+    doExample={<BannerDo />}
+    doCaption="One Banner, one line, at the tier it concerns."
+    dontExample={<BannerDont />}
+    dontCaption="Two Banners stacked, pushing the page down."
+/>
+
+### Keep a SectionMessage in the page until it is resolved or dismissed.
+
+<RuleTag kind="automatic" />
+
+The fill and icon carry the appearance, with no border and no side stripe. A blocking message turns dismiss off. Put up to two actions after the body. Field errors stay on the field.
+
+### Match the appearance to the meaning and say it in the words.
+
+<RuleTag kind="review" />
+
+Success for a finished action, warning for a caution, danger only when something failed. The icon is hidden from screen readers, so the title says "saved", "couldn't", "due".
+
+### Keep routine news on the default Flag.
+
+<RuleTag kind="review" />
+
+A bold fill competes with the page; it is for what must be seen. Routine news stays on the default Flag, which the person can clear.
+
+### Send what arrived over time to the Inbox.
+
+<RuleTag kind="review" />
+
+A Flag is for now; the Inbox is for later. The Inbox is the Panel's Notifications type: items by time, each unread one marked with a dot and the word. The Bell in the Sidebar carrying the count, and the Panel growing out of the Sidebar from the left, are Planned <PlannedTag />.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Flag title names the event: "Session logged."</td><td>"Success!"</td></tr>
+<tr><td>Flag line gives the next step: "Maya's supervisor will see it Friday."</td><td>A bare title with no next step.</td></tr>
+<tr><td>Banner is one sentence: "Scheduled maintenance Saturday 2–4 AM ET."</td><td>A paragraph in the Banner.</td></tr>
+<tr><td>Own the problem: "We lost the connection. Your work is kept on this device."</td><td>"Connection lost by client."</td></tr>
+<tr><td>Actions are verbs: "Undo", "View sessions".</td><td>"Click here", "OK".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- Warning and error Flags are alerts and interrupt; every other Flag is a polite status. Each is read as one message.
+- A `SectionMessage` announces assertively when it appears; one present at first paint is ordinary content.
+- A `Banner` is a status that never traps focus and sits in the reading order.
+- The timeout on a Flag is a timing limit; the dismiss × on a default Flag satisfies it (see the Flag page).
+- The appearance icon is decorative; the words carry the severity.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a>: use for where a failure shows.
+- <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a>: use for the Flag past 10 s.
+- <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-indicators--docs">Indicators</a>: use for the count on the Bell.
+- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use for the Inbox.
+- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use for what must be answered first.
+- <a target="_top" href="./?path=/docs/templates-page-page--docs">Page</a>: use for where a Page banner sits.
+- `Flag`, `Banner`, `SectionMessage`, `InlineMessage`, `Modal`: the components.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

@@ -10,9 +10,11 @@ Also asked as: popover, flyout, inline dialog.
 
 **Source:** `design-system/src/components/overlays-and-layering/Popup/Popup.jsx`
 
-**Stories:** `design-system/src/components/overlays-and-layering/Popup/Popup.stories.jsx` — Layout, Content, InteractionStates, Overview, Interactive, Rest, Hovered, Pressed, Focused, Open, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, WidthAuto, WidthAutoCaps, WidthColumns, OpensWithAClip, KeyboardOpenIsInstant, BodyOnly, TriggerClick, TriggerHover, TriggerFocus, TriggerHoverAndClick
+**Stories:** `design-system/src/components/overlays-and-layering/Popup/Popup.stories.jsx` — Layout, Content, InteractionStates, Overview, Interactive, Rest, Hovered, Pressed, Focused, Open, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, WidthAuto, WidthAutoCaps, WidthColumns, OpensWithAClip, KeyboardOpenIsInstant, OpensAndCloses, OpensOnTheMotionTokens, ReducedMotion, BodyOnly, TriggerClick, TriggerHover, TriggerFocus, TriggerHoverAndClick
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Popup/Popup.mdx`
+
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.exit` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -25,16 +27,23 @@ less than a `Modal`, and unlike a modal it does not take the page.
 title. `triggerType` is `click` (the default), `hover`, `focus`, an array of
 those, or `manual` for a popup you drive with `show`.
 
-It is the Popups pattern's Popup: one surface padded 16, with the title in
+It is the Popup template's layer: one surface padded 16, with the title in
 heading.xsmall over the body, and no arrow. `width` is `auto` (the default),
 which hugs its content between 160 and 320 and is never narrower than the
 trigger, or a column step, `3-col` or `4-col`, for a menu of several
 categories. It opens 4 from its trigger and never comes nearer than 8 to the
 screen's edge.
 
-It opens by clipping out from the trigger's corner on the side it opens on,
-and closes with a fade. Its width never animates, and opened from the
-keyboard it appears at once.
+Its width never animates, and opened from the keyboard it appears at once.
+
+## Motion
+
+Popup reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. From the keyboard it opens with no animation. |
+| exit | Close | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | The clip folds back to the same corner while it fades. Under reduced motion it is the fade alone. |
 
 ## Best practices
 
@@ -138,10 +147,10 @@ Same group: `Tooltip`
 | Part | Token |
 | --- | --- |
 | Surface | `--ds-surface-overlay`, `--ds-shadow-overlay` |
-| Radius, padding | `--popover-radius`, `--popover-pad` |
+| Radius, padding | `--popup-radius`, `--popover-pad` |
 | Width, auto | `--popup-min-width`, `--popup-max-width` |
 | Width, column steps | `--grid-columns`, `--grid-gutter`, `--content-min-width`, `--content-max-width` |
-| Motion | `--motion-duration-medium`, `--motion-easing-entrance` to open; `--motion-duration-short`, `--motion-easing-exit` to close |
+| Motion | The Popup row of the motion registry, read through `--ds-motion-*` |
 | Gap between title and body | `--stack-md` |
 | Title, body | `--ds-text`, `--heading-xsmall`, `--body-default` |
 | Offset from the trigger | `--popover-offset` |
@@ -186,7 +195,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--anchor-width` · `--body-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--motion-duration-medium` · `--motion-duration-short` · `--motion-easing-entrance` · `--motion-easing-exit` · `--plus-popup-clip-bottom` · `--plus-popup-clip-left` · `--plus-popup-clip-right` · `--plus-popup-clip-top` · `--plus-popup-reach` · `--popover-offset` · `--popover-pad` · `--popover-radius` · `--popup-clip-reach` · `--popup-max-width` · `--popup-min-width` · `--popup-pad` · `--stack-md`
+`--anchor-width` · `--body-default` · `--border-default` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-exit` · `--ds-motion-spatial-exit-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--plus-popup-clip-bottom` · `--plus-popup-clip-left` · `--plus-popup-clip-right` · `--plus-popup-clip-top` · `--plus-popup-reach` · `--popover-offset` · `--popover-pad` · `--popup-clip-reach` · `--popup-max-width` · `--popup-min-width` · `--popup-pad` · `--popup-radius` · `--stack-md`
 
 From `design-system/src/components/overlays-and-layering/Popup/Popup.scss`. Override these through the token layer, never with a literal.
 

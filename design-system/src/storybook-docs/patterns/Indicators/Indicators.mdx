@@ -1,0 +1,241 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+import * as IndicatorsStories from './Indicators.stories.jsx';
+import { NARROW, ROLL_UP_STAGE, STAGE } from './indicatorsDemo.jsx';
+import { ChangeTag, StatusTag } from '@/components';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+
+<Meta title="Patterns/Notifications and indicators/Indicators" tags={['!dev', 'manifest']} />
+
+<DocsLanding
+    page="patterns-notifications-and-indicators-indicators"
+    eyebrow="Pattern · Notifications and indicators"
+    title="Indicators"
+    purpose="The small labels that say how something is: a Status tag for its state, a Count tag for how many, a Change tag for how much it moved. The words carry the meaning; color never carries it alone."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Status tag', href: './?path=/docs/components-labels-status-tag--docs' },
+            { title: 'Count tag', href: './?path=/docs/components-labels-count-tag--docs' },
+            { title: 'Change tag', href: './?path=/docs/components-labels-change-tag--docs' },
+            { title: 'Tag', href: './?path=/docs/components-labels-tag--docs' },
+            { title: 'Flag', href: './?path=/docs/components-messaging-flag--docs' },
+            { title: 'Section message', href: './?path=/docs/components-messaging-section-message--docs' },
+        ],
+    }}
+/>
+
+<DocsTabs of={IndicatorsStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## The three tags
+
+Three jobs, three components. A category with a color is a Tag, not an indicator.
+
+<ComponentExample of={IndicatorsStories.ThreeTags} title="State, how many, how much it moved" description="A Status tag is the condition something is in, with six appearances that each mean one thing. A Count tag is a number on its own, quiet by default. A Change tag is how much a number moved, signed, with a good direction so a rise can be bad." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key cases
+
+<TypeGrid>
+<TypeCard of={IndicatorsStories.StatusInARow} title="Status in a row" stage={STAGE}>Default spacing in a table cell. One status per object; the label is one or two words.</TypeCard>
+<TypeCard of={IndicatorsStories.StatusBesideHeading} title="Status beside a heading" stage={STAGE}>Spacious beside the page title, after the text.</TypeCard>
+<TypeCard of={IndicatorsStories.CountsOnNavigation} title="Counts on navigation" stage={NARROW}>A count beside an item's name. At zero the component renders nothing; bold asks for action now, at most one per area.</TypeCard>
+<TypeCard of={IndicatorsStories.WhereColorIsNotEnough} title="Where color is not enough" stage={NARROW}>A leading icon joins the color on a status that must be told apart at a glance, such as Missed.</TypeCard>
+<TypeCard of={IndicatorsStories.ChangeWhereUpIsBad} title="Change where up is bad" stage={NARROW}>Absences rose by 3: the value is up and the tone is danger, because the good direction is down.</TypeCard>
+<TypeCard of={IndicatorsStories.RollUpShowsWorst} title="A roll-up" stage={ROLL_UP_STAGE}>A group's status shows the worst state among its children: danger over warning over information.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Indicators" tier="pattern" />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Indicators when something needs a small label that says how it is. Ask what the label says: a number is a Count tag; a condition that can change is a Status tag; how much a number moved is a Change tag; a subject, a person or a category is a Tag. Skip an indicator when no action follows from it; past five or six states, use text.
+
+<DocsTable>
+<thead>
+<tr><th>The label says</th><th>Component</th><th>Looks</th><th>Example</th></tr>
+</thead>
+<tbody>
+<tr><td>The condition something is in, and it can change</td><td>Status tag</td><td>Fill by meaning: neutral not started, information in progress, success done, warning needs attention, danger failed or missed, discovery new</td><td>"Needs review"</td></tr>
+<tr><td>How many</td><td>Count tag</td><td>Subtle neutral; bold for action now; nothing at 0; a cap past `max` with "+"</td><td>"12", "99+"</td></tr>
+<tr><td>How much it moved</td><td>Change tag</td><td>Signed value, arrow, tone from the good direction; neutral when there is no judgment</td><td>"+3 vs last week"</td></tr>
+<tr><td>A category, a subject, a person</td><td>Tag</td><td>Outline and text; a leading visual is optional</td><td>"Lincoln Middle"</td></tr>
+<tr><td>The shape of a trend <PlannedTag /></td><td>Sparkline (Planned)</td><td>A word-sized line beside the number</td><td>Attendance over eight weeks</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a message about the thing, use a <a target="_top" href="./?path=/docs/components-messaging-section-message--docs">Section message</a> or a <a target="_top" href="./?path=/docs/components-messaging-flag--docs">Flag</a>; the Notifications pattern picks between them.
+- For a due or event date, use `DateTag`.
+- For a competency, use `SmartTag`.
+- For something the AI proposes, use `Suggestion`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Never let color carry the meaning alone.
+
+<RuleTag kind="review" />
+
+The words say the state; the fill repeats it. A state that must be told apart at a glance adds a leading icon. A Change tag's arrow is decorative and its hidden text reads "Up 3 vs last week". A dot with no label is announced as nothing.
+
+### Give each appearance one meaning.
+
+<RuleTag kind="review" />
+
+Neutral is not started, info is in progress, success is done, warning needs attention, danger failed or missed, discovery is new. Success never labels a problem. There is no color prop; a category with a color is a Tag.
+
+<DoDontPair
+    doExample={<StatusTag appearance="danger">Missed</StatusTag>}
+    doCaption="Danger on a missed session: the word and the fill agree."
+    dontExample={<StatusTag appearance="success">Missed</StatusTag>}
+    dontCaption="Success on a missed session: the fill says good about bad news."
+/>
+
+### Show one status per object.
+
+<RuleTag kind="review" />
+
+Two statuses force people to decide which is true. A roll-up shows the worst child state.
+
+### Keep a status to one or two words.
+
+<RuleTag kind="review" />
+
+A status is read at a glance; a sentence belongs in the row text. A Status tag truncates at 200 with its full text in a Tooltip.
+
+### Keep most counts quiet and show nothing at zero.
+
+<RuleTag kind="automatic" />
+
+Subtle neutral is the default. Bold asks for action now, so at most one bold count per area. Pass the raw number: the component renders nothing at 0 and caps past `max` with a "+". No skeleton on a count; it appears when the number arrives.
+
+### Set the Change tag's good direction so up can be bad.
+
+<RuleTag kind="automatic" />
+
+The sign gives the direction; the good direction gives the tone: up, down or none. Absences rising is danger; sessions held rising is success; a change with no judgment stays neutral. The value is always signed.
+
+<DoDontPair
+    doExample={<ChangeTag value={3} goodDirection="down" comparison="vs last week" />}
+    doCaption="A rise in absences in danger: the good direction is down."
+    dontExample={<ChangeTag value={3} goodDirection="up" comparison="vs last week" />}
+    dontCaption="A rise in absences in success: the color says good about bad news."
+/>
+
+### Edit a status in the field, not on the label.
+
+<RuleTag kind="review" />
+
+A Status tag never opens a menu. Where a status can be changed, the field around it becomes an inline Select.
+
+### Nest a count in a status instead of placing one beside it.
+
+<RuleTag kind="review" />
+
+"Needs review 3" reads as one label; two labels side by side read as unrelated.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Status in one or two words: "Scheduled", "Needs review", "Missed".</td><td>"This session has been missed".</td></tr>
+<tr><td>Count as the bare number: "4", "12", "99+".</td><td>"4 items", "Count: 4".</td></tr>
+<tr><td>Change signed, with the comparison: "+3 vs last week", "−12%".</td><td>"3 more", "went up".</td></tr>
+<tr><td>Hidden text reads the whole thing: "Up 3 vs last week".</td><td>Nothing for the screen reader.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- A tag is read as its text; nothing suggests it can be pressed. A clipped tag becomes a tab stop so the Tooltip opens on focus.
+- A count's meaning is in the label it sits on: "Inbox, 3 unread". A bare number announces nothing useful.
+- A Change tag's arrow and value are hidden from assistive technology and its words read the direction and the comparison.
+- A Status tag, Tag and Change tag keep an inside border, so a pale fill stays visible on any background and in forced colors.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Component</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>State</td><td><a target="_top" href="./?path=/docs/components-labels-status-tag--docs">Status tag</a></td><td>Six appearances; `trailingMetric` nests a count inside it.</td></tr>
+<tr><td>How many</td><td><a target="_top" href="./?path=/docs/components-labels-count-tag--docs">Count tag</a></td><td>`max` caps it, `isBold` asks for action, `label` names it for a screen reader.</td></tr>
+<tr><td>How much it moved</td><td><a target="_top" href="./?path=/docs/components-labels-change-tag--docs">Change tag</a></td><td>`goodDirection` sets the tone; `comparison` names what it is measured against.</td></tr>
+<tr><td>Category</td><td><a target="_top" href="./?path=/docs/components-labels-tag--docs">Tag</a></td><td>Not an indicator: a subject, a person or a category.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a>: use for the count on the bell and the Inbox.
+- <a target="_top" href="./?path=/docs/patterns-states-overflow--docs">Overflow</a>: use for a tag that clips.
+- <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a>: use for counts on Sidebar items and tabs.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

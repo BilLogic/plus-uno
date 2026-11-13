@@ -62,16 +62,14 @@ describe('Sidebar under 1024', () => {
     it('never docks by default', () => {
         expect(resolve({ frameWidth: 1023, sidebar: byDefault }).sidebar).toBe('collapsed');
     });
-    it('opened by hand is an overlay without a Blanket, never docked', () => {
+    it('opened by hand is an overlay, never docked', () => {
         const r = resolve({ frameWidth: 1023, sidebar: byHand });
         expect(r.sidebar).toBe('overlay');
-        expect(r.blanket).toBe(false);
         expect(r.contentWidth).toBe(975);
     });
-    it('peeks on hover when collapsed, without a Blanket', () => {
+    it('peeks on hover when collapsed', () => {
         const r = resolve({ frameWidth: 900, sidebar: byDefault, sidebarPeek: true });
         expect(r.sidebar).toBe('peeking');
-        expect(r.blanket).toBe(false);
     });
     it('does not peek while docked', () => {
         expect(resolve({ frameWidth: 1440, sidebarPeek: true }).sidebar).toBe('docked');
@@ -105,7 +103,6 @@ describe('Panel thresholds, Sidebar by default', () => {
         expect(r.panel).toBe(panel);
         expect(r.contentWidth).toBe(content);
         expect(r.panelWidth).toBe(panelWidth);
-        expect(r.blanket).toBe(panel === 'overlay');
     });
 
     it('collapses the default Sidebar one pixel under 1408, and docks it at 1408', () => {
@@ -123,7 +120,6 @@ describe('Panel with the Sidebar opened by hand', () => {
         const r = resolve({ frameWidth: 1407, chatMode: 'panel', sidebar: byHand });
         expect(r.sidebar).toBe('docked');
         expect(r.panel).toBe('overlay');
-        expect(r.blanket).toBe(true);
     });
     it('both dock when they fit', () => {
         const r = resolve({ frameWidth: 1408, chatMode: 'panel', sidebar: byHand });
@@ -141,7 +137,6 @@ describe('Panel under 1024 and under 768', () => {
         const r = resolve({ frameWidth: 1023, panelWidth: 640, chatMode: 'panel' });
         expect(r.panel).toBe('overlay');
         expect(r.panelWidth).toBe(320);
-        expect(r.blanket).toBe(true);
     });
     it('takes the full width under 768', () => {
         const r = resolve({ frameWidth: 767, panelWidth: 400, chatMode: 'panel' });
@@ -238,23 +233,10 @@ describe('docked Panel maximum (the splitter)', () => {
     });
 });
 
-describe('the Blanket', () => {
-    it('is true only for an overlay Panel', () => {
-        for (const frameWidth of [900, 1023, 1024, 1167, 1407, 1440]) {
-            for (const sidebar of [byDefault, byHand, closedByHand]) {
-                for (const chatMode of ['popup', 'panel', 'fullscreen']) {
-                    const r = resolve({ frameWidth, sidebar, chatMode });
-                    expect(r.blanket, `${frameWidth} ${sidebar.setBy} ${sidebar.open} ${chatMode}`).toBe(r.panel === 'overlay');
-                }
-            }
-        }
-    });
-});
-
 describe('outputs', () => {
     it('are exactly the ones the Frame reads', () => {
         expect(Object.keys(resolveFrameLayout({ frameWidth: 1440 })).sort())
-            .toEqual(['blanket', 'panel', 'panelWidth', 'sidebar', 'splitHolds']);
+            .toEqual(['panel', 'panelWidth', 'sidebar', 'splitHolds']);
     });
 });
 

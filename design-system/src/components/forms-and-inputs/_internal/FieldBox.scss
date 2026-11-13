@@ -35,7 +35,7 @@
     width: 100%;
     box-sizing: border-box;
     border: var(--border-default) solid var(--ds-border-input);
-    border-radius: var(--radius-0625);
+    border-radius: var(--radius-control-lg);
     background-color: var(--ds-background-input);
     color: var(--ds-text);
     cursor: text;
@@ -51,7 +51,7 @@
     // first line sits where a single-line field's text does.
     &--compact {
         height: var(--item-height-md);
-        border-radius: var(--radius-h32);
+        border-radius: var(--radius-control-md);
     }
 
     &--multiline {

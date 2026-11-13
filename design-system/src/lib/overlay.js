@@ -18,30 +18,29 @@ import { useRef, useState, useLayoutEffect } from 'react';
  *   with no portal or stack entry: it draws from `--layer-flag`, the
  *   top of the scale in `design-system/src/tokens/ladder/_layers.scss`, so it layers
  *   above a modal wherever its `FlagGroup` is placed.
- * - **At most two overlays stack**: a modal (or drawer) and the confirm it
- *   raises. A third is refused by `useOverlaySlot`: it does not open,
- *   development builds warn, and the caller's `onRefused` runs so its owner's
- *   state says closed. `Modal` and `PatternDrawer` are the two stack
- *   participants — Base UI already owns Escape and focus return for `Popup`
- *   and `Tooltip`, which is what keeps them out of this count.
- * - **Opening a stacked overlay closes a floating sidebar.** `Frame`
- *   subscribes and closes a peeking sidebar when the count leaves zero. A
- *   module-level count rather than a React context, because a modal or
- *   drawer does not have to sit under the frame in the tree, and a page
- *   should not have to thread a callback from the frame to each one.
+ * - **A Modal never opens on another Modal.** A confirm Modal may open over a
+ *   Panel, a Popup or a focused task, a Modal brings its own Backdrop, a Panel has none; a Modal that
+ *   needs a confirm holds it inside itself (a warning SectionMessage and the
+ *   danger button). `useOverlaySlot(active, onRefused)` refuses a Modal while
+ *   one is open: it does not open, development builds warn, and the caller's
+ *   `onRefused` runs so its owner's state says closed. `Modal` is the only
+ *   participant: a Panel floats and takes no slot, and Base UI already owns
+ *   Escape and focus return for `Popup` and `Tooltip`.
+ * - **Opening a Modal closes a floating sidebar.** `Frame` subscribes and
+ *   closes a peeking sidebar when the count leaves zero. A module-level count
+ *   rather than a React context, because a Modal does not have to sit under the
+ *   frame in the tree, and a page should not have to thread a callback from
+ *   the frame to it.
  *
  * - **A Modal never dismisses what raised it.** The Panel and the AI popup
- *   stay open under a Modal's Blanket. The Panel is excluded in `Frame` by
+ *   stay open under a Modal's Backdrop. The Panel is excluded in `Frame` by
  *   the open count; a popup is a Base UI popover that hears a press in the
  *   Modal as "outside", so it asks `isPressInRaisedOverlay` and keeps
- *   itself open when the press landed in a Modal or Drawer it sits outside.
+ *   itself open when the press landed in a Modal it sits outside.
  *
  * The `--layer-*` scale itself stays in `ladder/_layers.scss` — this module
  * coordinates who uses the scale, it does not duplicate its values in JS.
  */
-
-/** A modal (or drawer) raised from one is the most that stacks: a nested confirm. */
-export const MAX_STACKED_OVERLAYS = 2;
 
 let count = 0;
 const listeners = new Set();
@@ -52,14 +51,14 @@ const emit = (type) => {
 };
 
 /**
- * Takes a stack slot if there is room.
- * @returns {{ release: () => void } | null} null when two are already open
+ * Takes the Modal slot if it is free.
+ * @returns {{ release: () => void } | null} null when a Modal is already open
  */
 export function openOverlay() {
-    if (count >= MAX_STACKED_OVERLAYS) {
+    if (count > 0) {
         if (process.env.NODE_ENV !== 'production') {
             // eslint-disable-next-line no-console
-            console.warn(`[overlay] At most ${MAX_STACKED_OVERLAYS} overlays stack: a modal (or drawer) and the confirm it raises. This one did not open.`);
+            console.warn('[overlay] A Modal never opens on another Modal: confirm inside the open one with a warning SectionMessage and the danger button. This one did not open.');
         }
         return null;
     }
@@ -76,7 +75,7 @@ export function openOverlay() {
     };
 }
 
-/** How many overlays are open. */
+/** How many Modals are open: zero or one. */
 export const openOverlayCount = () => count;
 
 /**
@@ -110,23 +109,21 @@ export function getOverlayPortalRoot() {
 }
 
 /**
- * Where a trigger's floating surface mounts: the Blanket a Modal or
- * PatternDrawer placed it in, or the shared portal root. The one rule
+ * Where a trigger's floating surface mounts: the Backdrop a Modal placed it in, or the shared portal root. The one rule
  * `popupMountOf` (Popup) and `popupLayerOf` (the field-anchored popups) both
  * resolve through, so there is one spelling of it rather than two copies of
- * `.closest('.plus-pattern-blanket') ?? document.body`.
+ * `.closest('.plus-pattern-backdrop') ?? document.body`.
  *
  * @param {Element | null | undefined} fromNode a node inside the trigger
  * @returns {Element | null} `null` only without a `document` (SSR)
  */
 export function overlayMountOf(fromNode) {
-    return fromNode?.closest?.('.plus-pattern-blanket') ?? getOverlayPortalRoot();
+    return fromNode?.closest?.('.plus-pattern-backdrop') ?? getOverlayPortalRoot();
 }
 
 /**
- * Takes a stack slot while `active`, for a dialog-like overlay (`Modal`,
- * `PatternDrawer`). Opening tells any `subscribeOverlays` listener (`Frame`
- * closes a floating sidebar); a third gets no slot and stays closed, calling
+ * Takes the Modal slot while `active`. Opening tells any `subscribeOverlays` listener (`Frame`
+ * closes a floating sidebar); a second Modal gets no slot and stays closed, calling
  * `onRefused` so its owner's state says closed too. The element that had
  * focus when the slot was taken is kept, so a trigger that left the page
  * (the sidebar `Frame` just closed) can be reported through
@@ -162,9 +159,9 @@ export function useOverlaySlot(active, onRefused) {
 }
 
 /**
- * Whether a press landed inside a Modal or Drawer that the surface owning
+ * Whether a press landed inside a Modal that the surface owning
  * `ownerNode` sits outside of: the one case where an "outside press" is not a
- * dismissal. The AI popup and the Panel stay open under the Blanket of a
+ * dismissal. The AI popup and the Panel stay open under the Backdrop of a
  * Modal they raised, so a click in that Modal must not close them. A surface
  * that is itself inside the Modal (a popup opened in a dialog) still closes
  * on a press elsewhere in that dialog.
@@ -174,13 +171,13 @@ export function useOverlaySlot(active, onRefused) {
  * @returns {boolean}
  */
 export function isPressInRaisedOverlay(target, ownerNode) {
-    const blanket = target?.closest?.('.plus-pattern-blanket');
-    if (!blanket) return false;
-    return !blanket.contains(ownerNode ?? null);
+    const backdrop = target?.closest?.('.plus-pattern-backdrop');
+    if (!backdrop) return false;
+    return !backdrop.contains(ownerNode ?? null);
 }
 
 /**
- * Whether a Modal or Drawer is open that the surface owning `ownerNode` sits
+ * Whether a Modal is open that the surface owning `ownerNode` sits
  * outside of. While one is, the surface is not dismissed by Escape (which
  * belongs to the Modal) or by focus moving into the Modal.
  *
@@ -189,5 +186,5 @@ export function isPressInRaisedOverlay(target, ownerNode) {
  */
 export function isOverlayRaisedOver(ownerNode) {
     if (count === 0) return false;
-    return !ownerNode?.closest?.('.plus-pattern-blanket');
+    return !ownerNode?.closest?.('.plus-pattern-backdrop');
 }

@@ -50,7 +50,7 @@ export const CardJobs = () => (
             </div>
         </PatternCard>
         <PatternCard
-            title="Algebra I · Thursday"
+            title="Lincoln Middle · Thursday"
             description="4:30 to 5:15 PM"
             minWidth="var(--card-min-width-md)"
             footer={<Button text="View session" spacing="compact" onClick={() => {}} />}

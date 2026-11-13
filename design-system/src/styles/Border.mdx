@@ -1,8 +1,7 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -28,12 +27,20 @@ export const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle
 
 <Meta title="Foundations/Border" tags={['!dev']} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-border"
+    eyebrow="Foundation"
     title="Border"
-    summary="A border is a width token paired with a color token."
+    purpose="A border is a width token paired with a color token."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Width tokens', href: '#foundation-width-tokens' },
+            { title: 'Color pairing', href: '#foundation-pair-width-with-color' },
+            { title: 'Focus ring', href: '#foundation-focus-ring' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 
@@ -128,17 +135,17 @@ The focus ring shows keyboard users where they are. It is a ring, never a fill: 
 
 <FoundationExample caption="A ring, drawn 2 away from the control in the focused border color, with the field's own fill unchanged.">
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)', padding: 'var(--pad-x-md)' }}>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Button</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Button</span>
     <span style={field({ minWidth: 'var(--field-width-md)', outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)', color: 'var(--ds-text-subtlest)' })}>Placeholder</span>
 </div>
 </FoundationExample>
 
 <DoDont>
 <Do caption="The field keeps its fill and gains the ring.">
-<span style={field({ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)' })}>Algebra I review</span>
+<span style={field({ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)' })}>Lincoln Middle Thursday</span>
 </Do>
 <Dont caption="A filled field reads as selected and hides what is typed.">
-<span style={field({ background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', boxShadow: 'none' })}>Algebra I review</span>
+<span style={field({ background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', boxShadow: 'none' })}>Lincoln Middle Thursday</span>
 </Dont>
 </DoDont>
 
@@ -234,10 +241,10 @@ The sidebar ends in a 1 divider in `color/border/default`. The topbar has no bor
 
 <DoDont>
 <Do caption="The 2 outline wraps the whole row.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Algebra 1</div>
+<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Lincoln Middle</div>
 </Do>
 <Dont caption="A colored stripe on one edge marks nothing the system recognizes. Use the full outline, a fill or an icon.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', borderInlineStart: 'var(--border-selected) solid var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Algebra 1</div>
+<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', borderInlineStart: 'var(--border-selected) solid var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Lincoln Middle</div>
 </Dont>
 </DoDont>
 
@@ -245,10 +252,10 @@ The sidebar ends in a 1 divider in `color/border/default`. The topbar has no bor
 
 <DoDont>
 <Do caption="Resting rows and cards keep Border/default.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-default)' }}>Algebra 1</div>
+<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-default)' }}>Lincoln Middle</div>
 </Do>
 <Dont caption="The 2 width on a resting row reads as selected, so users cannot tell what is chosen.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Algebra 1</div>
+<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Lincoln Middle</div>
 </Dont>
 </DoDont>
 

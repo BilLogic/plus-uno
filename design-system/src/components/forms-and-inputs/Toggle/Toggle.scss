@@ -43,7 +43,7 @@
     padding: 0;
     margin: 0;
     border: 0;
-    border-radius: var(--radius-full, 999px);
+    border-radius: var(--radius-full);
     cursor: pointer;
     transition: background-color 0.2s ease;
     position: relative;
@@ -88,7 +88,7 @@
     left: var(--_toggle-pad);
     width: var(--_toggle-thumb);
     height: var(--_toggle-thumb);
-    border-radius: var(--radius-full, 999px);
+    border-radius: var(--radius-full);
     background-color: var(--ds-icon-inverse);
     transition: transform 0.2s ease;
     display: block;

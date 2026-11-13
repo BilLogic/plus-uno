@@ -33,9 +33,9 @@ export const Kinds = () => (
     <div role="listbox" aria-label="Kinds" style={frame}>
         <div role="group" aria-labelledby="or-kinds-heading">
             <OptionRow kind="group" id="or-kinds-heading" label="Recent" />
-            <OptionRow label="Algebra" />
-            <OptionRow label="Biology" selected />
-            <OptionRow label="Chemistry" highlighted />
+            <OptionRow label="Lincoln Middle" />
+            <OptionRow label="North High" selected />
+            <OptionRow label="South High" highlighted />
             <OptionRow label="Physics" disabled />
         </div>
         <OptionRow kind="create" label="Music" />
@@ -53,6 +53,20 @@ Kinds.play = async ({ canvasElement }) => {
     await expect(canvas.getByRole('option', { name: 'Create Music' })).toBeInTheDocument();
 };
 
+/** A default row is 32 high and a compact row 24, matching the field each belongs to. */
+export const Spacing = () => (
+    <div role="listbox" aria-label="Spacing" style={frame}>
+        <OptionRow label="Default row" />
+        <OptionRow label="Compact row" spacing="compact" />
+    </div>
+);
+
+Spacing.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('option', { name: 'Default row' }).getBoundingClientRect().height).toBe(32);
+    await expect(canvas.getByRole('option', { name: 'Compact row' }).getBoundingClientRect().height).toBe(24);
+};
+
 /**
  * What the Leading slot takes: tree indent and caret, a checkbox (including
  * partly checked), a radio, an icon or a drag handle. Trailing takes a Count,
@@ -61,7 +75,7 @@ Kinds.play = async ({ canvasElement }) => {
 export const LeadingAndTrailing = () => (
     <div role="listbox" aria-label="Slots" aria-multiselectable="true" style={frame}>
         <OptionRow
-            label="Algebra"
+            label="Lincoln Middle"
             check={false}
             elemBefore={[
                 <OptionRow.Indent key="i" level={0} />,
@@ -161,11 +175,11 @@ LongLabelsTruncate.play = async ({ canvasElement }) => {
  */
 export const Colors = () => (
     <div role="listbox" aria-label="Colors" aria-multiselectable="true" style={frame}>
-        <OptionRow label="Algebra" />
-        <OptionRow label="Biology" highlighted />
-        <OptionRow label="Chemistry" selected description="Grade 9" />
+        <OptionRow label="Lincoln Middle" />
+        <OptionRow label="North High" highlighted />
+        <OptionRow label="South High" selected description="Grade 9" />
         <OptionRow label="Physics" check={false} selected elemBefore={<OptionRow.Checkbox checked />} />
-        <OptionRow label="Geometry" dragging />
+        <OptionRow label="Roosevelt K-8" dragging />
         <OptionRow label="History" dropIndicator="before" />
     </div>
 );
@@ -174,17 +188,17 @@ Colors.play = async ({ canvasElement }) => {
     const row = (name) => within(canvasElement).getByRole('option', { name: new RegExp(`^${name}`) });
     const style = (el, pseudo) => getComputedStyle(el, pseudo);
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
-        await expect(style(row('Algebra')).color, `${mode}: row text`).toBe(token('--ds-text'));
-        await expect(style(row('Biology')).backgroundColor, `${mode}: highlighted row`).toBe(token('--ds-background-neutral-subtle-hovered'));
-        await expect(style(row('Chemistry')).backgroundColor, `${mode}: selected row`).toBe(token('--ds-background-selected'));
-        await expect(style(row('Chemistry')).color, `${mode}: selected text`).toBe(token('--ds-text-selected'));
-        await expect(style(row('Chemistry').querySelector('.plus-option-row-description')).color, `${mode}: selected description`).toBe(token('--ds-text-selected'));
-        await expect(style(row('Chemistry').querySelector('.plus-option-row-selected-mark')).color, `${mode}: the check`).toBe(token('--ds-icon-selected'));
+        await expect(style(row('Lincoln Middle')).color, `${mode}: row text`).toBe(token('--ds-text'));
+        await expect(style(row('North High')).backgroundColor, `${mode}: highlighted row`).toBe(token('--ds-background-neutral-subtle-hovered'));
+        await expect(style(row('South High')).backgroundColor, `${mode}: selected row`).toBe(token('--ds-background-selected'));
+        await expect(style(row('South High')).color, `${mode}: selected text`).toBe(token('--ds-text-selected'));
+        await expect(style(row('South High').querySelector('.plus-option-row-description')).color, `${mode}: selected description`).toBe(token('--ds-text-selected'));
+        await expect(style(row('South High').querySelector('.plus-option-row-selected-mark')).color, `${mode}: the check`).toBe(token('--ds-icon-selected'));
         const mark = row('Physics').querySelector('.plus-option-row-check');
         await expect(style(mark).backgroundColor, `${mode}: checked mark`).toBe(token('--ds-background-selected-bold'));
         await expect(style(mark).borderTopColor, `${mode}: checked mark edge`).toBe(token('--ds-border-selected'));
         await expect(style(mark.querySelector('i')).color, `${mode}: checked mark's check`).toBe(token('--ds-icon-inverse'));
-        await expect(style(row('Geometry')).backgroundColor, `${mode}: lifted row`).toBe(token('--ds-surface-overlay'));
+        await expect(style(row('Roosevelt K-8')).backgroundColor, `${mode}: lifted row`).toBe(token('--ds-surface-overlay'));
         await expect(style(row('History'), '::before').backgroundColor, `${mode}: drop line`).toBe(token('--ds-border-selected'));
     });
 };

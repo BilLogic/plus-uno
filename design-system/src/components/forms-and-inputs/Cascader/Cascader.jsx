@@ -369,7 +369,7 @@ const Cascader = ({
                     className="plus-cascader-field"
                     {...tones.field}
                     onClick={handleInputClick}
-                    trailing={(
+                    elemAfter={(
                         <Icon name="caret-down" className={`plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} />
                     )}
                 >

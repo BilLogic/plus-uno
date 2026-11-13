@@ -14,6 +14,8 @@ Also asked as: summary card, object card.
 
 **Storybook page:** `design-system/src/patterns/PatternCard/PatternCard.mdx`
 
+**Motion:** change `appearance.fast` · milestone `spatial.default`, sound `sound.done.milestone`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a card when one object needs its own container on the page. A card holds a heading, some content and, when people can act on it, a footer. This pattern is the shell: you fill its slots with your own parts.
@@ -41,6 +43,15 @@ In a row, place the most cards that keep each card at its minimum width. Each ro
 | Medium, 768 | 720 | 3 | 2 | 1 |
 | Large, 1024 | 736 | 3 | 2 | 1 |
 | X-Large, 1440 | 1152 | 4 | 3 | 2 |
+
+## Motion
+
+PatternCard reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | It changes color on hover and press like a Button. Opening a clickable card is Drill. |  |
+| milestone | Opening a page | `--ds-motion-spatial-default` | The one card in a milestone page entrance is Expressive and leaves by the exit rules. | `sound.done.milestone` on land: onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it |
 
 ## Best practices
 
@@ -83,7 +94,7 @@ A card that holds actions that commit a change gets a footer, and its actions st
 - Page for a fill and an elevation with no slots.
 - Modal for something that must be decided before the page can continue.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 
@@ -111,7 +122,7 @@ The image sits above a padded frame, and the header, body and footer sit inside 
 | Token | Value | Used for |
 | --- | --- | --- |
 | `--card-pad-compact`, `-default`, `-spacious` | 16 · 20 · 24 | The pad of a small, medium and large card. |
-| `--card-radius-sm` | 12 | The radius of a small card. |
+| `--card-radius-compact` | 12 | The radius of a small card, and of a card inside a filled Section. |
 | `--card-radius` | 16 | The radius of medium and large cards. |
 | `--card-stack-sm`, `-md`, `-lg` | 4 · 8 · 12 | Title to description; header to body, set by `gap`; body to footer. |
 | `--card-inline-md` | 8 | Items on a row, such as actions in the header. |
@@ -128,7 +139,7 @@ The image sits above a padded frame, and the header, body and footer sit inside 
 | Do | Don't |
 | --- | --- |
 | Title the card with the object it holds, in sentence case: "Ana Ruiz", "Sessions this week". | A generic title such as "Details" or "Info". |
-| Keep the description to one line that adds something, such as "Algebra I · Thu 4:00 PM". | A description that repeats the title. |
+| Keep the description to one line that adds something, such as "Lincoln Middle · Thu 4:00 PM". | A description that repeats the title. |
 | Name a footer action for what it does: "Save note", "View session". | "OK" or "Submit". |
 
 ## Props
@@ -162,7 +173,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-sm` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current`
+`--body-default` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-compact` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current`
 
 From `design-system/src/patterns/PatternCard/PatternCard.scss`. Override these through the token layer, never with a literal.
 

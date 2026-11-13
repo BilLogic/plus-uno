@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { createPageFinder, exportedValue, importedConstants, literalValue, pagesUnder, readDocsPage, sectionText, topLevelEntries } from './docs-page.mjs';
+import { createPageFinder, exportedValue, importedConstants, literalValue, pagesUnder, pageText, readDocsPage, sectionText, topLevelEntries } from './docs-page.mjs';
 
 const COMPONENT_PAGE = `import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import * as ModalStories from './Modal.stories.jsx';
@@ -147,6 +147,14 @@ test('each ### under Best practices is one rule, its id the slug', () => {
   );
 });
 
+test('a rule carries the RuleTag under its heading, or null', () => {
+  const { rules } = readDocsPage('## Best practices\n\n### Keep it short.\n\n<RuleTag kind="automatic" />\n\nOne line.\n\n### Say why.\n\nOne reason.\n');
+  assert.deepEqual(rules.map(({ id, tag }) => ({ id, tag })), [
+    { id: 'keep-it-short', tag: 'automatic' },
+    { id: 'say-why', tag: null },
+  ]);
+});
+
 test('Alternatives routes name the component each one sends to', () => {
   assert.deepEqual(readDocsPage(COMPONENT_PAGE).alternatives, [
     { text: 'For a message the user only has to read, use `SectionMessage`.', routesTo: 'SectionMessage' },
@@ -248,6 +256,15 @@ A card has no border.
 
 </FoundationSection>
 `;
+
+test('a page opening with DocsLanding reads its title and purpose like a FoundationHero page', () => {
+  const landing = FOUNDATION_PAGE.replace(/<FoundationHero[\s\S]*?\/>\n\n<FoundationContents \/>/, '<DocsLanding\n    page="foundations-border"\n    eyebrow="Foundation"\n    title="Border"\n    purpose="A border is a width token paired with a color token."\n    links={{ label: \'Tokens\', items: [] }}\n/>');
+  assert.ok(landing.includes('<DocsLanding'), 'the fixture swap applied');
+  const page = readDocsPage(landing);
+  assert.equal(page.title, 'Border');
+  assert.equal(page.intro, 'A border is a width token paired with a color token.');
+  assert.equal(pageText(page).startsWith('# Border\n\nA border is a width token'), true);
+});
 
 test('a foundation page reads its foundation sections as sections', () => {
   const page = readDocsPage(FOUNDATION_PAGE, { kind: 'foundation' });

@@ -6,42 +6,42 @@ import TreeSelect from './TreeSelect';
 
 const SUBJECTS = [
     {
-        label: 'Mathematics',
-        value: 'maths',
+        label: 'Middle schools',
+        value: 'middle-schools',
         children: [
-            { label: 'Algebra', value: 'algebra' },
-            { label: 'Geometry', value: 'geometry' },
+            { label: 'Lincoln Middle', value: 'lincoln-middle' },
+            { label: 'Roosevelt K-8', value: 'roosevelt-k8' },
         ],
     },
-    { label: 'Science', value: 'science' },
+    { label: 'High schools', value: 'high-schools' },
 ];
 
 const Harness = ({ initial, isMulti = false }) => {
     const [value, setValue] = useState(initial);
     return (
-        <TreeSelect id="ts" label="Subject" options={SUBJECTS} value={value} onChange={setValue} isMulti={isMulti} />
+        <TreeSelect id="ts" label="Site" options={SUBJECTS} value={value} onChange={setValue} isMulti={isMulti} />
     );
 };
 
 const open = async (user) => {
-    await user.click(screen.getByRole('combobox', { name: 'Subject' }));
+    await user.click(screen.getByRole('combobox', { name: 'Site' }));
     return screen.getByRole('tree');
 };
 
 describe('TreeSelect', () => {
     it('draws its trigger in the shared field', () => {
         render(<Harness initial="" />);
-        const trigger = screen.getByRole('combobox', { name: 'Subject' });
+        const trigger = screen.getByRole('combobox', { name: 'Site' });
         expect(trigger.closest('.plus-field')).not.toBeNull();
     });
 
     it('opens a flat list of option rows, each a treeitem', async () => {
         const user = userEvent.setup();
-        render(<Harness initial="algebra" />);
+        render(<Harness initial="lincoln-middle" />);
         const tree = await open(user);
 
         const items = within(tree).getAllByRole('treeitem');
-        expect(items.map((item) => item.textContent)).toEqual(['Mathematics', 'Algebra', 'Geometry', 'Science']);
+        expect(items.map((item) => item.textContent)).toEqual(['Middle schools', 'Lincoln Middle', 'Roosevelt K-8', 'High schools']);
         items.forEach((item) => {
             expect(item).toHaveClass('plus-option-row');
             // Flat: no treeitem nests inside another.
@@ -52,7 +52,7 @@ describe('TreeSelect', () => {
 
     it('puts the indent, then the toggle, in the row\'s Leading slot', async () => {
         const user = userEvent.setup();
-        render(<Harness initial="algebra" />);
+        render(<Harness initial="lincoln-middle" />);
         const tree = await open(user);
         const [maths, algebra] = within(tree).getAllByRole('treeitem');
 
@@ -68,16 +68,16 @@ describe('TreeSelect', () => {
 
     it('marks the chosen node selected in single mode', async () => {
         const user = userEvent.setup();
-        render(<Harness initial="science" />);
+        render(<Harness initial="high-schools" />);
         const tree = await open(user);
-        const science = within(tree).getByRole('treeitem', { name: 'Science' });
+        const science = within(tree).getByRole('treeitem', { name: 'High schools' });
         expect(science).toHaveAttribute('aria-selected', 'true');
         expect(science).toHaveClass('is-selected');
     });
 
     it('draws a checkbox after the toggle, partly checked on a parent with some children picked', async () => {
         const user = userEvent.setup();
-        render(<Harness initial={['algebra']} isMulti />);
+        render(<Harness initial={['lincoln-middle']} isMulti />);
         const tree = await open(user);
         const [maths, algebra] = within(tree).getAllByRole('treeitem');
 
@@ -94,25 +94,25 @@ describe('TreeSelect', () => {
         const user = userEvent.setup();
         render(<Harness initial="" />);
         const tree = await open(user);
-        const maths = within(tree).getByRole('treeitem', { name: 'Mathematics' });
+        const maths = within(tree).getByRole('treeitem', { name: 'Middle schools' });
         await user.click(maths.querySelector('.plus-option-row-toggle'));
         expect(maths).toHaveAttribute('aria-expanded', 'true');
         expect(within(tree).getAllByRole('treeitem')).toHaveLength(4);
-        expect(screen.getByRole('combobox', { name: 'Subject' })).toHaveValue('');
+        expect(screen.getByRole('combobox', { name: 'Site' })).toHaveValue('');
     });
 
     it('draws the error border and announces errorMessage when isInvalid', () => {
         render(
-            <TreeSelect id="ts2" label="Subject" options={SUBJECTS} isInvalid errorMessage="Pick a subject" />
+            <TreeSelect id="ts2" label="Site" options={SUBJECTS} isInvalid errorMessage="Pick a site" />
         );
-        const trigger = screen.getByRole('combobox', { name: 'Subject' });
+        const trigger = screen.getByRole('combobox', { name: 'Site' });
         expect(trigger.closest('.plus-field')).toHaveClass('plus-field--invalid');
-        expect(screen.getByRole('alert')).toHaveTextContent('Pick a subject');
+        expect(screen.getByRole('alert')).toHaveTextContent('Pick a site');
     });
 
     it('draws rows at 32 with spacing="compact"', async () => {
         const user = userEvent.setup();
-        render(<TreeSelect id="ts3" label="Subject" options={SUBJECTS} spacing="compact" />);
+        render(<TreeSelect id="ts3" label="Site" options={SUBJECTS} spacing="compact" />);
         const tree = await open(user);
         expect(within(tree).getAllByRole('treeitem')[0]).toHaveClass('plus-option-row--compact');
     });
@@ -127,33 +127,33 @@ describe('TreeSelect', () => {
         it('opens on ArrowDown and walks the visible rows with Up, Down, Home and End', async () => {
             const user = userEvent.setup();
             render(<Harness initial="" />);
-            const trigger = screen.getByRole('combobox', { name: 'Subject' });
+            const trigger = screen.getByRole('combobox', { name: 'Site' });
             trigger.focus();
             await user.keyboard('{ArrowDown}');
             expect(screen.getByRole('tree')).toBeInTheDocument();
             await user.keyboard('{ArrowDown}');
-            expect(activeName(trigger)).toBe('Science');
+            expect(activeName(trigger)).toBe('High schools');
             await user.keyboard('{Home}');
-            expect(activeName(trigger)).toBe('Mathematics');
+            expect(activeName(trigger)).toBe('Middle schools');
             await user.keyboard('{End}');
-            expect(activeName(trigger)).toBe('Science');
+            expect(activeName(trigger)).toBe('High schools');
             await user.keyboard('{ArrowUp}');
-            expect(activeName(trigger)).toBe('Mathematics');
+            expect(activeName(trigger)).toBe('Middle schools');
         });
 
         it('ArrowRight opens a branch then steps in; ArrowLeft closes it then steps out', async () => {
             const user = userEvent.setup();
             render(<Harness initial="" />);
-            const trigger = screen.getByRole('combobox', { name: 'Subject' });
+            const trigger = screen.getByRole('combobox', { name: 'Site' });
             await user.click(trigger);
-            const branch = screen.getByRole('treeitem', { name: /Mathematics/ });
+            const branch = screen.getByRole('treeitem', { name: /Middle schools/ });
             branch.focus();
             await user.keyboard('{ArrowRight}');
             expect(branch).toHaveAttribute('aria-expanded', 'true');
             await user.keyboard('{ArrowRight}');
-            expect(activeName(trigger)).toBe('Algebra');
+            expect(activeName(trigger)).toBe('Lincoln Middle');
             await user.keyboard('{ArrowLeft}');
-            expect(activeName(trigger)).toBe('Mathematics');
+            expect(activeName(trigger)).toBe('Middle schools');
             await user.keyboard('{ArrowLeft}');
             expect(branch).toHaveAttribute('aria-expanded', 'false');
         });
@@ -161,11 +161,11 @@ describe('TreeSelect', () => {
         it('Enter picks the row, and Escape closes and returns focus to the field', async () => {
             const user = userEvent.setup();
             render(<Harness initial="" />);
-            const trigger = screen.getByRole('combobox', { name: 'Subject' });
+            const trigger = screen.getByRole('combobox', { name: 'Site' });
             await user.click(trigger);
-            screen.getByRole('treeitem', { name: /Science/ }).focus();
+            screen.getByRole('treeitem', { name: /High schools/ }).focus();
             await user.keyboard('{Enter}');
-            expect(trigger).toHaveValue('Science');
+            expect(trigger).toHaveValue('High schools');
             await user.click(trigger);
             await user.keyboard('{Escape}');
             expect(screen.queryByRole('tree')).toBeNull();

@@ -10,95 +10,163 @@ Also asked as: surface.
 
 **Source:** `design-system/src/patterns/Page/Page.jsx`
 
-**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepSmall, StepMedium, StepLarge, Bordered, WithTitle, ColorModes, MediumPad, Interactive
+**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepSmall, StepMedium, StepLarge, Bordered, WithTitle, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth
 
 **Storybook page:** `design-system/src/patterns/Page/Page.mdx`
 
+**Motion:** title `linear` · anchor `linear` · tabs-shadow `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
-Use Page for a block that needs a fill at one of the four levels. The frame draws its own content box with the same fill and edge, so a page does not place a Page inside it. For the page frame, use Frame.
+Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at its content width; full width is the only fluid option and is for a page that fills it.
 
-### Level guidance
+## Motion
 
-| Level | When to use |
-| --- | --- |
-| Sunken | The frame's backdrop, behind everything else. |
-| Default | The page. |
-| Raised | A card. For one object with a shape agreed, use Card itself. |
-| Overlay | Anything over the UI: a floating sidebar, a modal. |
+Page reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| title | Scroll to a spot on the page | `--ds-motion-linear` | The header is scroll-linked: the small title fades in at the end of the Breadcrumb row, its opacity mapped to the next 24 px of scroll. No spring, no timer, no snap when scrolling stops. |
+| anchor | Scroll to a spot on the page | `--ds-motion-linear` | The actions and the tabs ride up with the page and anchor: the actions at the end of the Breadcrumb row, the tabs under it. One copy of every control. A focused task header just sticks. |
+| tabs-shadow | Update a value or state | `--ds-motion-appearance-fast` | The tabs' shadow appears when they stick, a single moment. In Reduced mode nothing changes: every movement is the person's own scroll. |
+
+## Alternatives
+
+- For one task that takes the whole window, use `Frame` in its focused type.
+- For a region of the page with its own heading, use `PatternSection`.
+- For one object with an agreed shape, use `PatternCard` inside a Section.
 
 ## Best practices
 
-### Keep the Page pad on every side. {#keep-the-page-pad-on-every-side}
+### Make the page header the page's one h1. {#make-the-page-header-the-page-s-one-h1}
 
-Content stays 24 from the edge, so nothing touches the chrome.
+**Checked:** Automatic
 
-Do: Keep the Page pad on all sides.
-Don't: Run content to the Page edge.
+A Section never stands in for it. Sections inside open at h2.
 
-### Put sections in the content column. {#put-sections-in-the-content-column}
+Do: The page header is the one h1; the Section under it opens at h2.
+Don't: Sections standing in for the page title: two page-title-sized headings and no page header.
 
-Sections stack inside the column and share its width.
+### Show the breadcrumb by the Navigation pattern. {#show-the-breadcrumb-by-the-navigation-pattern}
 
-Do: Stack sections in one column.
-Don't: Nest a Page inside a Page.
+**Checked:** Review
 
-### Match the width to the content. {#match-the-width-to-the-content}
+When it shows and what it holds: the Navigation pattern.
 
-Use the reading width for prose and the content width for grids and tables. A Page takes its width from where it sits, so set it on the Frame: `width="reading"`.
+Do: An area page: the title alone.
+Don't: A breadcrumb on a top-level area page, repeating the Sidebar's place.
 
-### Use Card for one object. {#use-card-for-one-object}
+### Place page actions and the add action by the Navigation pattern. {#place-page-actions-and-the-add-action-by-the-navigation-pattern}
 
-Do: A Card, raised and ready to fill, with its title in the header.
-Don't: A raised Page with a hand-made title drifts from the Card pattern.
+**Checked:** Review
+
+Page actions sit at the end of the title row and are about the page only. Where an add action goes: the Navigation pattern.
+
+Do: "Add" ends the collection's view bar; the header carries only page actions.
+Don't: The same Primary twice: in the page header and in the Section's view bar.
+
+### Keep the description to one line. {#keep-the-description-to-one-line}
+
+**Checked:** Review
+
+Anything longer moves into the first Section.
+
+Do: One detail line under the title.
+Don't: A paragraph under the title pushes the first Section down.
+
+### Keep one tab system per page. {#keep-one-tab-system-per-page}
+
+**Checked:** Review
+
+The rule and its reasons: the Navigation pattern. Page tabs name views of one subject; the Section's views become one labeled Select.
+
+Do: Under page tabs the Section's views are one labeled Select at the start of its bar.
+Don't: Pill views under page tabs: two tab systems on one page.
+
+### Shrink the scrolled header to one sticky row. {#shrink-the-scrolled-header-to-one-sticky-row}
+
+**Checked:** Review
+
+The breadcrumb with the title at its end, then the page actions; page tabs stick under it. The Section view bar scrolls away. This state is planned.
+
+### Show one banner at a time, scrolling with the content. {#show-one-banner-at-a-time-scrolling-with-the-content}
+
+**Checked:** Review
+
+Which tier a message belongs to: the Notifications pattern.
 
 ## Accessibility
 
-- A Page has no role of its own. Use `as="main"` for the page's content box and `as="section"` for a labeled block.
-- Pass `title` on the page's own Page only. It renders the page's one h1, and Sections inside it open at h2.
+- The Page is the `main` landmark. Its header's title is the one h1; Sections open at h2.
+- The breadcrumb is a `nav` named "Breadcrumb".
+- Page tabs are a tablist; the selected tab names its panel. Views swap in place and are announced.
+- The StatusTag is text, never color alone.
+- A title that truncates keeps its full text in a Tooltip on hover and focus.
 - Text on a Page uses `--ds-text` at every level, in every color mode.
-- In light increased contrast the default Page draws its edge ring, so it stays distinct from the frame behind it.
 
 ## Related
 
-- Card for a content box with a shape already agreed: pad, radius and slots.
-- Elevation for which shadow goes with which level.
-- Color for which fill to reach for, under surface roles.
-- Frame for the page frame, the 12-column grid and the content pad.
+- Frame: use when deciding which type the page sits in.
+- Section: use when a region needs its own heading, view bar or detail.
+- Card: use when one object has a shape already agreed.
+- Elevation: use when picking which shadow goes with which level.
+- Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
-Same group: `AiChat` · `Blanket` · `Frame` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Backdrop` · `Frame` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
-## Parts
+## Types
 
-1. **Page.** The container. It carries the level's fill and shadow, the pad and the radius.
-2. **Title** (optional). A Page that holds a whole page can carry the page's one h1, at Heading/large 24, above the content.
-3. **Content.** The slot. Sections go here.
+"Fluid" means only the full-width type; everything else adapts inside the cap.
 
-In the frame, the content box is a 12-column grid with a 16 gutter, capped at 1232 (reading 864) and never under 720. In Figma the Page part has one property, width, with the values content and reading; code sets it on the Frame.
+- **Default.** The content grid, centered and capped at its content width. Nearly every page.
+- **Full width.** The content runs to the pad with no cap, for a page that fills it, such as chat or a board.
 
-### States
+## Anatomy
 
-A Page has no states of its own: it does not respond to hover, press or focus, and it is never disabled.
+A record page, one level down, with everything the header can carry. Each marker sits in the gutter beside its part.
 
-### Tokens
+1. **Breadcrumb** (optional). The record's parents on their own row, above the title.
+2. **Title.** The page's one h1, with its StatusTag after the text when the page is one record.
+3. **Description** (optional). One line under the title.
+4. **Page actions** (optional). At the end of the title row, about the page only.
+5. **Page tabs** (optional). At the bottom of the header; they switch the whole page.
+6. **Banner** (optional). Under the header, one at a time.
+7. **Content.** Sections on the grid, under the header.
 
-| Part | Token |
+## Slots
+
+| Slot or prop | Holds |
 | --- | --- |
-| Fill and shadow: sunken | `--ds-surface-sunken`, no shadow. |
-| Fill and edge: default | `--ds-surface`, edged by `--ds-border-surface` at `--stroke-2`. |
-| Fill and shadow: raised | `--ds-surface-raised`, `--ds-shadow-raised`. |
-| Fill and shadow: overlay | `--ds-surface-overlay`, `--ds-shadow-overlay`. |
-| Text | `--ds-text` at every level. |
-| Padding | sm: `--page-pad-y-compact` and `--page-pad-x-compact` (16 by 24). md: `--page-pad` (24). lg: `--page-pad-y-spacious` and `--page-pad-x-spacious` (32 by 40). |
-| Radius | sm: `--radius-lg` (8). md: `--radius-075` (12). lg: `--section-radius` (16). |
-| Border | `--stroke-2` (2) in `--ds-border-bold`. |
+| `title` | The page's one h1, at the heading-large size, above the content. |
+| `children` | The page header, the banner and the Sections, in order. Today the `PageHeader` goes first in `children`. |
+| `header` | Planned. One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. |
+| `description` · `status` | Planned. `PageHeader` has neither slot; the title block holds them. |
+| `banner` | Planned. The page banner, one at a time. Today it goes in `children` under the header. |
+| `width` | Planned. `default` or `full`; today the Frame's `width` sets `content` or `reading`. |
+| Scrolled header | Planned. The sticky one-row header. |
+| `level` · `padding` · `radius` · `border` · `as` | The container: its fill and shadow as a pair, its pad and corner, and its element. |
+
+## Sizes
+
+| Token | Used for |
+| --- | --- |
+| `--stack-sm` | Breadcrumb to title; title to description. |
+| `--section-stack-sm` | Header to page tabs. |
+| `--page-stack-md` | Header to the first Section; between Sections. |
+| `--page-stack-sm` | Between related Sections. |
+| `--heading-large`, `--body-default`, `--body-small` | The title, the description, the breadcrumb. |
+| `--content-max-width`, `--content-min-width` | The cap and the floor of the content grid. |
+| `--grid-columns`, `--grid-gutter`, `--page-pad` | The 12-column grid, its gutter and the pad. |
+| `--ds-surface-sunken`, `--ds-surface`, `--ds-surface-raised`, `--ds-surface-overlay` | The four levels' fills, each with its shadow from Elevation. |
 
 ## Content guidelines
 
 | Do | Don't |
 | --- | --- |
-| Title a whole page with what it holds, in sentence case: "Sessions". | Title case, or a title on a Page that is only a block. |
-| Fill the content slot with Sections. | Loose text and controls straight in the Page. |
+| Title an area with what it holds, in sentence case: "Sessions". | Title case, or a title that repeats the breadcrumb. |
+| Title a record with its name: "Maya Rodriguez". | "Student details". |
+| One detail line: "Grade 8 · Math · Lincoln Middle School". | A paragraph under the title. |
+| Page tab labels of one or two words: "Overview", "Sessions". | Numbered tabs, or tabs that wrap. |
 
 ## Props
 
@@ -127,7 +195,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-border-bold` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-sunken` · `--ds-text` · `--heading-large` · `--heading-large-tracking` · `--page-border-width` · `--page-pad` · `--page-pad-x-compact` · `--page-pad-x-spacious` · `--page-pad-y-compact` · `--page-pad-y-spacious` · `--page-radius-md` · `--page-stack-md` · `--radius-lg` · `--section-radius`
+`--ds-border-bold` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-sunken` · `--ds-text` · `--heading-large` · `--heading-large-tracking` · `--page-border-width` · `--page-pad` · `--page-pad-x-compact` · `--page-pad-x-spacious` · `--page-pad-y-compact` · `--page-pad-y-spacious` · `--page-stack-md` · `--radius-lg` · `--radius-xl` · `--radius-xxl`
 
 From `design-system/src/patterns/Page/Page.scss`. Override these through the token layer, never with a literal.
 

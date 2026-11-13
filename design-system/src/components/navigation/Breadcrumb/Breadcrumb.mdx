@@ -5,6 +5,7 @@ import * as BreadcrumbStories from './Breadcrumb.stories.jsx';
 import * as BreadcrumbSubStories from './Breadcrumb.Subcomponents.stories.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import { Breadcrumb } from '@/components';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -69,6 +70,14 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 <ComponentExample of={BreadcrumbStories.Pressed} title="Pressed" description={<>A link takes no pressed step of its own; the trail does not change under the pointer.</>} />
 
 <ComponentExample of={BreadcrumbStories.Focused} title="Focused" description={<>The 2px ring, 2px off an ancestor link. The current page is not focusable.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Breadcrumb" />
 
 </div>
 

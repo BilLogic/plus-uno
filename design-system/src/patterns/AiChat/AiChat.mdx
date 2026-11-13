@@ -44,7 +44,7 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 <ComponentExample of={AiChatStories.Popup} title="Popup" description="The default mode: the popup opens anchored to the button, over the Page." />
 
-<ComponentExample of={AiChatStories.PanelMode} title="Panel" description="The same chat docked beside the Page, or over it on a Blanket when there is no room." />
+<ComponentExample of={AiChatStories.PanelMode} title="Panel" description="The same chat docked beside the Page, or over it on a Backdrop when there is no room." />
 
 Full screen covers the window, so it is not drawn inline here. Under 768 the popup is shown full screen. Replying starts only when a prompt is sent and ends when the reply arrives, so it is not drawn inline either; its typing indicator is the <a href="?path=/docs/ai-ui-components-ai-message--docs">AI message</a>'s `thinking` status. How a reply carries the AI icon, its sources and its thumbs is under Best practices.
 
@@ -86,7 +86,7 @@ AI chat is the one way to ask AI about the page in front of you. Pick the mode f
 </thead>
 <tbody>
 <tr><td>Popup</td><td>The default. A quick ask that keeps the page in view.</td></tr>
-<tr><td>Panel</td><td>Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Blanket when there is no room.</td></tr>
+<tr><td>Panel</td><td>Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Backdrop when there is no room.</td></tr>
 <tr><td>Full screen</td><td>Long answers that need room. It covers the window.</td></tr>
 </tbody>
 </DocsTable>
@@ -128,7 +128,7 @@ The same surface fills every mode; the mode only changes which header controls s
 <tbody>
 <tr><td>Closed</td><td>Only the button shows.</td></tr>
 <tr><td>Popup</td><td>The popup opens anchored to the button, over the Page. The button stays.</td></tr>
-<tr><td>Panel</td><td>Chat docks in the Frame's Panel, or opens over the Page on a Blanket. The button hides.</td></tr>
+<tr><td>Panel</td><td>Chat docks in the Frame's Panel, or opens over the Page on a Backdrop. The button hides.</td></tr>
 <tr><td>Full screen</td><td>Chat covers the window, in a column capped at the reading width. The button hides.</td></tr>
 <tr><td>Replying</td><td>A typing indicator stands in for the reply, and the prompt input's send button becomes Stop.</td></tr>
 </tbody>
@@ -145,7 +145,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 <tbody>
 <tr><td>Button</td><td><code>--height-300</code> square, <code>--page-pad</code> from the Page's bottom and right edges, <code>--ds-shadow-overlay</code>.</td></tr>
 <tr><td>Popup</td><td>Twice <code>--height-2000</code> wide and high; without the button it floats <code>--stack-md</code> above where the button would be.</td></tr>
-<tr><td>Floating popup fill</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popover-radius</code>.</td></tr>
+<tr><td>Floating popup fill</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popup-radius</code>.</td></tr>
 <tr><td>Full screen</td><td><code>--ds-surface</code>, on <code>--layer-dialog</code>; the conversation is capped at <code>--content-max-width-reading</code>.</td></tr>
 <tr><td>Conversation</td><td><code>--stack-md</code> between messages, <code>--body-default</code> in <code>--ds-text</code>.</td></tr>
 <tr><td>The person's message</td><td><code>--ds-surface-sunken</code>, <code>--pad-y-sm</code> by <code>--pad-x-md</code>, <code>--radius-md</code>.</td></tr>
@@ -237,7 +237,7 @@ Full screen gives long answers room. A docked Panel squeezes them.
 ## Related
 
 - <a href="?path=/docs/templates-frame-frame--docs">Frame</a> places the Panel the chat docks in.
-- <a href="?path=/docs/templates-modal-backdrop--docs">Blanket</a> sits under the Panel when it opens over the Page.
+- <a href="?path=/docs/templates-modal-backdrop--docs">Backdrop</a> sits under the Panel when it opens over the Page.
 - For one reply on its own, use `AiMessage`.
 - For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
 

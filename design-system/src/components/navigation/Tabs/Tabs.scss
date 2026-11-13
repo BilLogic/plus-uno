@@ -89,7 +89,7 @@
     // One line, always: a tab label never wraps into a two-line tab.
     white-space: nowrap;
     cursor: pointer;
-    transition: border-color var(--motion-duration-short) var(--motion-easing-standard), color var(--motion-duration-short) var(--motion-easing-standard), background-color var(--motion-duration-short) var(--motion-easing-standard);
+    transition: border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     @include plus-state((
         disabled: (color: var(--ds-text-disabled)),
@@ -112,20 +112,24 @@
 
 // Sizing
 .plus-tabs--spacing-default .plus-tab {
+    --tab-radius: var(--radius-control-md);
     height: var(--item-height-md);
     padding: 0 var(--pad-x-lg);
 }
 
 .plus-tabs--spacing-compact .plus-tab {
+    --tab-radius: var(--radius-control-sm);
     height: var(--item-height-sm);
     padding: 0 var(--pad-x-md);
 }
+
 
 // Default (underline) appearance
 .plus-tabs--appearance-default .plus-tab {
     margin-bottom: calc(-1 * var(--border-default));
     border-bottom: var(--border-default) solid var(--ds-border);
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    // Tab tops round by the tab's height (Radius / Control): 32 md, 24 sm.
+    border-radius: var(--tab-radius) var(--tab-radius) 0 0;
 
     &:disabled,
     &[data-disabled] {

@@ -12,12 +12,22 @@ Link: an inline navigation anchor.
 
 **Storybook page:** `design-system/src/components/navigation/Link/Link.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Link` for navigation inside a sentence or a block of text — "see the
 session report," "read more." For a standalone action styled like a button,
 use `Button` or `LinkButton` instead; `Link`'s appearances are for text, not
 for a control that stands on its own.
+
+## Motion
+
+Link reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Color only, on the fast fade. |
 
 ## Best practices
 
@@ -86,7 +96,7 @@ Same group: `Breadcrumb` · `Pagination` · `Sidebar` · `Tabs`
 | Default | `--ds-link`, `--ds-link-visited`, `--ds-link-pressed` |
 | Subtle | `--ds-text`, `--ds-link-pressed` |
 | Inverse | `--ds-text-inverse`, ring `--ds-border-focused-inverse` |
-| Corners | `--radius-lg` |
+| Corners | `--radius-md` |
 | New-window glyph | `--icon-sm`, `--inline-md` |
 
 ## Content guidelines
@@ -118,7 +128,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-link` · `--ds-link-pressed` · `--ds-link-visited` · `--ds-text` · `--ds-text-inverse` · `--icon-sm` · `--inline-md` · `--radius-lg`
+`--ds-link` · `--ds-link-pressed` · `--ds-link-visited` · `--ds-text` · `--ds-text-inverse` · `--icon-sm` · `--inline-md` · `--radius-md`
 
 From `design-system/src/components/navigation/Link/Link.scss`. Override these through the token layer, never with a literal.
 

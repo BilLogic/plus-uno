@@ -21,7 +21,7 @@ AI chat is the one way to ask AI about the page in front of you. Pick the mode f
 | Mode | When to use |
 | --- | --- |
 | Popup | The default. A quick ask that keeps the page in view. |
-| Panel | Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Blanket when there is no room. |
+| Panel | Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Backdrop when there is no room. |
 | Full screen | Long answers that need room. It covers the window. |
 
 AI chat applies the six AI rules from the AI overview.
@@ -78,11 +78,11 @@ Don't: An answer from records with nothing to check it against.
 ## Related
 
 - Frame places the Panel the chat docks in.
-- Blanket sits under the Panel when it opens over the Page.
+- Backdrop sits under the Panel when it opens over the Page.
 - For one reply on its own, use `AiMessage`.
 - For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
 
-Same group: `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 
@@ -101,7 +101,7 @@ The same surface fills every mode; the mode only changes which header controls s
 | --- | --- |
 | Closed | Only the button shows. |
 | Popup | The popup opens anchored to the button, over the Page. The button stays. |
-| Panel | Chat docks in the Frame's Panel, or opens over the Page on a Blanket. The button hides. |
+| Panel | Chat docks in the Frame's Panel, or opens over the Page on a Backdrop. The button hides. |
 | Full screen | Chat covers the window, in a column capped at the reading width. The button hides. |
 | Replying | A typing indicator stands in for the reply, and the prompt input's send button becomes Stop. |
 
@@ -113,7 +113,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 | --- | --- |
 | Button | `--height-300` square, `--page-pad` from the Page's bottom and right edges, `--ds-shadow-overlay`. |
 | Popup | Twice `--height-2000` wide and high; without the button it floats `--stack-md` above where the button would be. |
-| Floating popup fill | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popover-radius`. |
+| Floating popup fill | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`. |
 | Full screen | `--ds-surface`, on `--layer-dialog`; the conversation is capped at `--content-max-width-reading`. |
 | Conversation | `--stack-md` between messages, `--body-default` in `--ds-text`. |
 | The person's message | `--ds-surface-sunken`, `--pad-y-sm` by `--pad-x-md`, `--radius-md`. |
@@ -160,7 +160,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ai-chat-width` · `--body-default` · `--body-small` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popover-radius` · `--radius-md` · `--stack-lg` · `--stack-md` · `--stack-sm`
+`--ai-chat-width` · `--body-default` · `--body-small` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popup-radius` · `--radius-md` · `--stack-lg` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/patterns/AiChat/AiChat.scss`. Override these through the token layer, never with a literal.
 

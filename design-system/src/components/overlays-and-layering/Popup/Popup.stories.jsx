@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Popup from './Popup';
 import Button from '@/components/forms-and-inputs/Button/Button';
@@ -217,7 +218,7 @@ const StatePopup = () => (
     </div>
 );
 
-/** Rest: one surface on the overlay fill, lifted by the overlay shadow, with no border of its own. */
+/** Rest: one surface on the overlay fill, lifted by the overlay shadow, with no painted border (a transparent one keeps an edge in forced colors). */
 export const Rest = {
     render: () => <StatePopup />,
     play: async ({ canvasElement }) => {
@@ -225,7 +226,7 @@ export const Rest = {
         const style = getComputedStyle(popup);
         await expect(style.backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-overlay'));
         await expect(style.boxShadow).not.toBe('none');
-        await expect(parseFloat(style.borderTopWidth)).toBe(0);
+        await expect(style.borderTopColor).toBe('rgba(0, 0, 0, 0)');
     },
 };
 
@@ -374,7 +375,7 @@ export const OpensWithAClip = {
         await userEvent.click(within(canvasElement).getByRole('button', { name: 'Details' }));
         const popup = await openedPopup(canvasElement, 'popup-motion-pointer');
         const style = getComputedStyle(popup);
-        await expect(style.animationName, 'opens with the clip').toBe('plus-popup-clip-open');
+        await expect(style.animationName, 'opens with the clip').toContain('plus-popup-clip-open');
         // The width never animates: no transition that covers it runs for any time.
         const properties = style.transitionProperty.split(',').map((p) => p.trim());
         const durations = style.transitionDuration.split(',').map((d) => parseFloat(d));
@@ -402,6 +403,63 @@ export const KeyboardOpenIsInstant = {
         const popup = await openedPopup(canvasElement, 'popup-motion-keyboard');
         await expect(popup).toHaveAttribute('data-instant', 'click');
         await expect(getComputedStyle(popup).animationName, 'no clip from the keyboard').toBe('none');
+        await userEvent.keyboard('{Escape}');
+    },
+};
+
+const MotionStory = ({ id }) => (
+    <div style={{ padding: 'calc(var(--space-400) * 4) var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+        <Popup id={id} trigger={<Button appearance="primary" text="Details" />} title="Session 12" placement="bottom-start">
+            Ran 45 minutes over.
+        </Popup>
+    </div>
+);
+
+/**
+ * The motion's end states: after a click it is open and focus is inside it;
+ * after Escape it is gone. Only the settled state is read, never a frame between.
+ */
+export const OpensAndCloses = {
+    render: () => <MotionStory id="popup-motion-ends" />,
+    play: async ({ canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Details' }));
+        const popup = await openedPopup(canvasElement, 'popup-motion-ends');
+        await waitFor(() => expect(popup.contains(doc.activeElement)).toBe(true));
+        await waitFor(() => expect(popup).toBeVisible());
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(doc.getElementById('popup-motion-ends')).toBeNull());
+    },
+};
+
+/** It opens on the Popup motion tokens: the fast spatial spring, read from `--ds-motion-*`. */
+export const OpensOnTheMotionTokens = {
+    render: () => <MotionStory id="popup-motion-tokens" />,
+    play: async ({ canvasElement }) => {
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Details' }));
+        const popup = await openedPopup(canvasElement, 'popup-motion-tokens');
+        const style = getComputedStyle(popup);
+        const root = getComputedStyle(canvasElement.ownerDocument.documentElement);
+        const raw = root.getPropertyValue('--ds-motion-spatial-fast-duration').trim();
+        const seconds = parseFloat(raw) / (raw.endsWith('ms') ? 1000 : 1);
+        await expect(style.animationName).toContain('plus-popup-clip-open');
+        await expect(parseFloat(style.animationDuration)).toBeCloseTo(seconds, 3);
+        await userEvent.keyboard('{Escape}');
+    },
+};
+
+/** Under reduced motion it still opens to visible, as a fade with no clip. */
+export const ReducedMotion = {
+    render: () => <MotionStory id="popup-motion-reduced" />,
+    beforeEach: async () => async () => { await emulateReducedMotion(null); },
+    play: async ({ canvasElement }) => {
+        if (!(await emulateReducedMotion('reduce'))) return;
+        const doc = canvasElement.ownerDocument;
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Details' }));
+        const popup = await openedPopup(canvasElement, 'popup-motion-reduced');
+        await expect(getComputedStyle(popup).animationName, 'a fade, not the clip').not.toContain('plus-popup-clip-open');
+        await waitFor(() => expect(popup.contains(doc.activeElement)).toBe(true));
+        await waitFor(() => expect(popup).toBeVisible());
         await userEvent.keyboard('{Escape}');
     },
 };

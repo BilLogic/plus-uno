@@ -32,7 +32,7 @@ export default {
     },
 };
 
-const SUBJECTS = ['Algebra', 'Biology', 'Chemistry', 'Economics', 'Geometry', 'History', 'Physics'];
+const SITES = ['Lincoln Middle', 'North High', 'Riverside Academy', 'Roosevelt K-8', 'South High', 'Jefferson Elementary', 'Washington Middle'];
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' };
 
 /**
@@ -42,7 +42,7 @@ const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-st
  * @param {object} props
  * @returns {JSX.Element}
  */
-const ComboboxDemo = ({ label = 'Subject', options = SUBJECTS, mode = 'single', creatable = false, fieldStyle }) => {
+const ComboboxDemo = ({ label = 'Site', options = SITES, mode = 'single', creatable = false, fieldStyle }) => {
     const inputRef = useRef(null);
     const anchorRef = useRef(null);
     const listRef = useRef(null);
@@ -102,7 +102,7 @@ export const ArrowKeysHomeAndEnd = () => {
     const [value, setValue] = useState(null);
     return (
         <div style={stack}>
-            <Listbox aria-label="Subject" options={SUBJECTS} value={value} onChange={setValue} />
+            <Listbox aria-label="Site" options={SITES} value={value} onChange={setValue} />
             <p data-testid="value">{value ?? 'none'}</p>
         </div>
     );
@@ -110,7 +110,7 @@ export const ArrowKeysHomeAndEnd = () => {
 
 ArrowKeysHomeAndEnd.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const listbox = canvas.getByRole('listbox', { name: 'Subject' });
+    const listbox = canvas.getByRole('listbox', { name: 'Site' });
     const options = within(listbox).getAllByRole('option');
     const active = () => listbox.getAttribute('aria-activedescendant');
 
@@ -260,27 +260,27 @@ export const TypingFiltersAndEscClearsTheFilter = () => <ComboboxDemo />;
 TypingFiltersAndEscClearsTheFilter.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
-    const input = canvas.getByRole('combobox', { name: 'Subject' });
+    const input = canvas.getByRole('combobox', { name: 'Site' });
 
     await userEvent.click(input);
-    const listbox = await body.findByRole('listbox', { name: 'Subject options' });
+    const listbox = await body.findByRole('listbox', { name: 'Site options' });
     await expect(input).toHaveAttribute('aria-activedescendant', within(listbox).getAllByRole('option')[0].id);
 
     // Pick one first, so Esc can be seen to leave it alone.
     await userEvent.keyboard('{ArrowDown}{Enter}');
-    await expect(canvas.getByTestId('value').textContent).toBe('Biology');
+    await expect(canvas.getByTestId('value').textContent).toBe('North High');
 
     await userEvent.click(input);
-    await userEvent.type(input, 'ry');
-    const filtered = await body.findByRole('listbox', { name: 'Subject options' });
+    await userEvent.type(input, 'id');
+    const filtered = await body.findByRole('listbox', { name: 'Site options' });
     await waitFor(() => expect(within(filtered).getAllByRole('option').map((o) => o.textContent))
-        .toEqual(['Chemistry', 'Geometry', 'History']));
+        .toEqual(['Lincoln Middle', 'Riverside Academy', 'Washington Middle']));
     await waitFor(() => expect(body.getByRole('status')).toHaveTextContent('3 results'));
 
     await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(body.queryByRole('listbox', { name: 'Subject options' })).toBeNull());
+    await waitFor(() => expect(body.queryByRole('listbox', { name: 'Site options' })).toBeNull());
     await expect(input).toHaveValue('');
-    await expect(canvas.getByTestId('value').textContent).toBe('Biology');
+    await expect(canvas.getByTestId('value').textContent).toBe('North High');
     await expect(document.activeElement).toBe(input);
 };
 
@@ -318,7 +318,7 @@ export const InsideAModal = () => {
     const [show, setShow] = useState(true);
     return (
         <Modal show={show} onClose={() => setShow(false)} title="Add a student" showBottomButtons={false} width={360}>
-            <ComboboxDemo label="School" options={SUBJECTS} />
+            <ComboboxDemo label="School" options={SITES} />
         </Modal>
     );
 };
@@ -333,7 +333,7 @@ InsideAModal.play = async ({ canvasElement }) => {
     const listbox = await body.findByRole('listbox', { name: 'School options' });
     // Outside the dialog's panel, which clips, and inside its overlay.
     await expect(dialog.contains(listbox)).toBe(false);
-    await expect(listbox.closest('.plus-pattern-blanket')).toBe(dialog.closest('.plus-pattern-blanket'));
+    await expect(listbox.closest('.plus-pattern-backdrop')).toBe(dialog.closest('.plus-pattern-backdrop'));
 
     const field = input.getBoundingClientRect();
     const surface = listbox.closest('.plus-listbox').getBoundingClientRect();
@@ -341,18 +341,18 @@ InsideAModal.play = async ({ canvasElement }) => {
     await expect(surface.width).toBeGreaterThanOrEqual(Math.floor(field.width));
     await expect(surface.height).toBeLessThanOrEqual(320);
 
-    const physics = within(listbox).getByRole('option', { name: 'Physics' });
-    physics.scrollIntoView({ block: 'nearest' });
-    const box = physics.getBoundingClientRect();
-    await expect(doc.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2).closest('[role="option"]')).toBe(physics);
+    const lastSite = within(listbox).getByRole('option', { name: 'Washington Middle' });
+    lastSite.scrollIntoView({ block: 'nearest' });
+    const box = lastSite.getBoundingClientRect();
+    await expect(doc.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2).closest('[role="option"]')).toBe(lastSite);
 
-    await userEvent.click(physics);
-    await expect(within(dialog).getByTestId('value').textContent).toBe('Physics');
+    await userEvent.click(lastSite);
+    await expect(within(dialog).getByTestId('value').textContent).toBe('Washington Middle');
 };
 
 /** Without room below the field, the list opens above it. */
 export const FlipsAboveWithoutRoom = () => (
-    <ComboboxDemo label="Grade" options={SUBJECTS} fieldStyle={{ position: 'fixed', left: 16, right: 16, bottom: 8, maxWidth: 360 }} />
+    <ComboboxDemo label="Grade" options={SITES} fieldStyle={{ position: 'fixed', left: 16, right: 16, bottom: 8, maxWidth: 360 }} />
 );
 
 FlipsAboveWithoutRoom.play = async ({ canvasElement }) => {
@@ -399,7 +399,7 @@ AThousandOptions.play = async ({ canvasElement }) => {
 };
 
 /**
- * The list's surface is the overlay pair with a `color.border` edge, its
+ * The list's surface is the overlay pair, its edge the shadow's ring, its
  * header rule `color.border`, a failed load `text.danger`. A field in the
  * header keeps its 2px-off focus ring inside the list's clip: the header's
  * own padding is the ring's room.
@@ -408,11 +408,11 @@ export const Colors = () => (
     <div style={stack}>
         <Listbox
             aria-label="Topic"
-            options={[{ value: 'a', label: 'Algebra' }, { value: 'b', label: 'Biology' }]}
+            options={[{ value: 'a', label: 'Lincoln Middle' }, { value: 'b', label: 'North High' }]}
             value="a"
             header={(
                 <div className="plus-tag-input__rename">
-                    <TextField label="Name" isLabelHidden spacing="compact" defaultValue="Algebra" />
+                    <TextField label="Name" isLabelHidden spacing="compact" defaultValue="Lincoln Middle" />
                 </div>
             )}
         />
@@ -427,7 +427,7 @@ Colors.play = async ({ canvasElement }) => {
     const error = within(canvas.getByRole('listbox', { name: 'Failed' }).closest('.plus-listbox')).getByText(/Couldn't load schools/).closest('.plus-listbox-message');
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         await expect(getComputedStyle(surface).backgroundColor, `${mode}: surface`).toBe(token('--ds-surface-overlay'));
-        await expect(getComputedStyle(surface).borderTopColor, `${mode}: edge`).toBe(token('--ds-border'));
+        await expect(getComputedStyle(surface).borderTopColor, `${mode}: no painted edge`).toBe('rgba(0, 0, 0, 0)');
         await expect(getComputedStyle(header).borderBottomColor, `${mode}: header rule`).toBe(token('--ds-border'));
         await expect(getComputedStyle(error).color, `${mode}: failed load`).toBe(token('--ds-text-danger'));
     });

@@ -15,7 +15,7 @@ A designer links a frame, a prototype, a spec or a coded component and asks what
 1. **Take the manifest.** Fidelity (low · mid · high · coded), tools used, PRD link. Ask once for what is missing. Design QA on a card at Ready for QA starts from the file whose title carries the card's number and its 📐 Specs pages instead. Done when fidelity and PRD are known, or asked for.
 2. **Read the artifact.** `source_read` the frame (the rendered screen, text layers, annotations, fills, comments) and the PRD; for what changed since a date, pass that date as `since`. Annotations are the designer's own spec: quote the ones a finding rests on, word for word, with the layer they sit on. `github_read` a coded artifact's source and the rule docs a lens applies, such as `design-system/src/styles/Accessibility.mdx`. The artifact is in hand only when the read returns its own content; a page that loads with none of it in it is unread. Done when you can quote what is in the artifact, or have said plainly what failed to load.
 3. **Apply the lenses one at a time**, at the manifest's fidelity:
-   - **DS:** components, tokens, layout, the constitution's hard rules. Fills come back as rendered hex; the token behind one is unread.
+   - **DS:** components, tokens, layout, the constitution's hard rules. Fills come back as rendered hex; the token behind one is unread. A disabled action is checked against `design-system/guidelines/composition/form-behavior.md` § Unavailable actions and fields (explain on press).
    - **Product:** the artifact against its PRD and the `search_blueprint` rows for the flow.
    - **Access:** contrast, target size, keyboard and focus, semantics, color carrying meaning alone, motion.
 

@@ -1,0 +1,236 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+
+import * as ErrorsStories from './Errors.stories.jsx';
+import { PLACE_STAGE } from './errorsDemo.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    BorderAndTooltip,
+    FailureInModal,
+    FailureInSlot,
+    MessageOnField,
+} from '@/storybook-docs/illustrations/errors.jsx';
+
+<Meta title="Patterns/States/Errors" tags={['!dev', 'manifest']} />
+
+<DocsLanding
+    page="patterns-states-errors"
+    eyebrow="Pattern · States"
+    title="Errors"
+    purpose="Where a failure shows and what it says. The place follows what failed: a field, a form, a view, a background job, or the whole page. The message is words, never a code, never in a tooltip, never color alone."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Flag', href: './?path=/docs/components-messaging-flag--docs' },
+            { title: 'Banner', href: './?path=/docs/components-messaging-banner--docs' },
+            { title: 'Section message', href: './?path=/docs/components-messaging-section-message--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+        ],
+    }}
+/>
+
+<DocsTabs of={ErrorsStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## By what failed
+
+Each failure has one home, as close to its cause as it can sit. A submit has two cases, drawn under Key cases: blocked and rejected.
+
+<TypeGrid>
+<TypeCard of={ErrorsStories.PlaceField} title="A field" stage={PLACE_STAGE}>The error on the field, after blur. It clears once the rule is met: <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceLoadFailure} title="A view that could not load" stage={PLACE_STAGE}>The error in the empty-state slot, with Try again. The view bar stays.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceNoAccess} title="No access" stage={PLACE_STAGE}>The same slot, saying who can help. No action the person cannot take.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceBackgroundJob} title="A background job" stage={PLACE_STAGE}>A danger Flag that stays, with Try again.</TypeCard>
+<TypeCard of={ErrorsStories.PlacePageCondition} title="The whole page" stage={PLACE_STAGE}>A danger Banner for a condition that applies to everything on the page, for as long as it holds.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceMenu} title="A menu's options" stage={PLACE_STAGE}>A "Couldn't load options" row with Retry, in the menu itself.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key cases
+
+<ComponentExample of={ErrorsStories.KeyBlockedSubmit} title="Blocked submit" description={<>A missing field: the error on the field and focus on the first one. The Modal stays open; never a second dialog. A single shake is Planned <PlannedTag />.</>} />
+
+<ComponentExample of={ErrorsStories.KeyRejectedSubmit} title="Rejected submit" description={<>The server said no: a danger SectionMessage at the top of the form, announced when it appears, plus the field errors it names. Scrolling it into view is Planned <PlannedTag />.</>} />
+
+<ComponentExample of={ErrorsStories.KeySectionFailed} title="A Section that could not load" description="The rest of the page works. The Section's body shows the error in its empty-state slot with Try again; the view bar stays." />
+
+<ComponentExample of={ErrorsStories.KeyFlagOnPage} title="A failed save in the background" description="The person moved on; the Flag finds them at the top right, stays until dismissed, and offers Try again." />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Errors whenever something failed and the person needs to know. Put the message where the cause is, say what happened and what to do, and leave the rest of the page working. Severity comes from the component that carries the message, not from louder words.
+
+<DocsTable>
+<thead>
+<tr><th>What failed</th><th>Where it shows</th><th>Stays until</th><th>Offers</th></tr>
+</thead>
+<tbody>
+<tr><td>One field's value</td><td>On the field, after blur</td><td>The rule is met</td><td>What to fix</td></tr>
+<tr><td>A submit with fields missing</td><td>On each field; focus moves to the first; a Modal stays open</td><td>The fields are fixed</td><td>What to fix</td></tr>
+<tr><td>A submit the server rejected</td><td>Danger `SectionMessage` at the top of the form, plus field errors</td><td>Dismissed or fixed</td><td>What happened, what to do</td></tr>
+<tr><td>A view's content could not load</td><td>The empty-state slot</td><td>It loads</td><td>Try again</td></tr>
+<tr><td>This person has no access</td><td>The empty-state slot</td><td>Access changes</td><td>Who can help</td></tr>
+<tr><td>A job in the background</td><td>Danger `Flag`, top right, no autohide</td><td>Dismissed</td><td>Try again</td></tr>
+<tr><td>A condition on the whole page</td><td>Danger `Banner` at its tier</td><td>The condition ends</td><td>A link if there is one</td></tr>
+<tr><td>A menu's options</td><td>A "Couldn't load options" row in the menu</td><td>Retry succeeds</td><td>Retry</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a caution before something goes wrong, use a warning `SectionMessage`; see <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a>.
+- For a view that is simply empty, follow the Empty pattern; it holds the slot a load failure takes.
+- For a decision the person must make before going on, use <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>, not an error.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Validate a field when it loses focus and clear the error once the rule is met.
+
+<RuleTag kind="automatic" />
+
+The error sits on the field and says what to fix. <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> holds when a field is checked.
+
+### Say what to fix on the field, in words.
+
+<RuleTag kind="automatic" />
+
+The message sits right under the invalid field and names the fix. The red border supports the words and never replaces them.
+
+<DoDontPair
+    doExample={<MessageOnField />}
+    doCaption="Say what to fix, on the field, in words."
+    dontExample={<BorderAndTooltip />}
+    dontCaption="A red border alone, with its words in a tooltip."
+/>
+
+### Keep a blocked submit in the same Modal.
+
+<RuleTag kind="automatic" />
+
+Mark the field and move focus to it; never a second dialog for the error. A single shake is Planned <PlannedTag />. <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> holds the whole rule.
+
+### Show a rejected submit as a danger SectionMessage at the top of the form.
+
+<RuleTag kind="automatic" />
+
+It says what happened and what to do, and the field errors it names sit on their fields. It is announced when it appears. Scrolling it into view is Planned <PlannedTag />.
+
+### Put a load failure in the empty-state slot with Try again.
+
+<RuleTag kind="automatic" />
+
+Content that fails to load takes the place an empty view would, in the Section's body, so the view bar and the rest of the page keep working. No access uses the same slot and names who can help.
+
+<DoDontPair
+    doExample={<FailureInSlot />}
+    doCaption="The failure in the Section's slot; the rest of the page works."
+    dontExample={<FailureInModal />}
+    dontCaption="A Modal over the whole page to report one Section's failure."
+/>
+
+### Make a failed background job a danger Flag that stays.
+
+<RuleTag kind="automatic" />
+
+The person has moved on, so the Flag finds them at the top right. A danger Flag does not hide on its own; it offers Try again and leaves on dismiss. `Flag` names the appearance `error`.
+
+### Use a Banner only for a condition on the whole page.
+
+<RuleTag kind="review" />
+
+An outage, a lost connection, an account-wide block: one Banner at its tier, danger only when action is needed now, mounted only while the condition holds. A Banner has no dismiss.
+
+### Say what happened and what to do, with no codes.
+
+<RuleTag kind="review" />
+
+Own the problem: "Couldn't add the student. Check the fields below and try again." The words carry the severity, because the icon is hidden from screen readers and color never carries the meaning alone.
+
+### Keep every error in visible text where the cause is.
+
+<RuleTag kind="automatic" />
+
+A tooltip is absent on touch and gone on blur. An error is text on the page, next to what failed.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Field: "Enter a full email, like name@school.org".</td><td>"Invalid", "Required field", "Error 422".</td></tr>
+<tr><td>Rejected: "Couldn't add the student. Check the fields below and try again."</td><td>"Something went wrong."</td></tr>
+<tr><td>Load: "Couldn't load this week's sessions." with "Try again".</td><td>"Failed to fetch /sessions".</td></tr>
+<tr><td>No access: "Only Lincoln's supervisor can open these notes."</td><td>"403 Forbidden", "You don't have permission".</td></tr>
+<tr><td>Flag: "Couldn't save your session note." with "Try again".</td><td>"Save failed!"</td></tr>
+<tr><td>Own it: "We lost the connection."</td><td>"The connection was lost by the user."</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- A field error is announced and sets `aria-invalid`; a group's one error is announced once.
+- A `SectionMessage` announces assertively when it appears; a danger `Flag` is an alert. A `Banner` is a status.
+- Move focus to the first field that needs fixing when a submit is blocked.
+- The error icon is decorative; the words say "couldn't", "missing" or "failed".
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>: use for when a field is checked.
+- <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a>: use for the slot a load failure takes.
+- <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-notifications--docs">Notifications</a>: use for the Flag and Banner tiers.
+- <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a>: use for a menu's Loading row before it fails.
+- <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a>: use for a caution before something goes wrong.
+- `SectionMessage`, `Flag`, `Banner`, `EmptyState`, `TextField`: the components.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

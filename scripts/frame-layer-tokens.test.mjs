@@ -93,7 +93,6 @@ const FIXED = {
   '--page-stack-sm': '16px',
   '--page-stack-md': '24px',
   '--page-stack-lg': '40px',
-  '--page-radius': '8px',
   '--panel-min-width': '320px',
   '--panel-width-default': '400px',
   '--panel-max-width': '640px',
@@ -112,14 +111,13 @@ const FIXED = {
   '--card-min-width-md': '304px',
   '--card-min-width-lg': '480px',
   '--card-radius': '16px',
-  '--card-radius-sm': '12px',
   '--card-max-height-sm': '304px',
   '--card-max-height-md': '400px',
   '--card-max-height-lg': '640px',
   '--table-pad-x-cell': '8px',
   '--table-pad-y-cell': '4px',
   '--table-indent': '24px',
-  '--table-radius': '8px',
+  '--table-radius': '12px',
   '--table-stack': '8px',
   '--blanket-pad-x': '16px',
   '--blanket-pad-y': '64px',
@@ -129,7 +127,7 @@ const FIXED = {
   '--modal-inline-sm': '8px',
   '--modal-inline-md': '16px',
   '--modal-inline-lg': '24px',
-  '--modal-radius': '12px',
+  '--modal-radius': '16px',
   '--focused-page-pad-x': '8px',
   '--focused-page-pad-y': '8px',
   '--focused-page-stack-sm': '8px',
@@ -143,16 +141,12 @@ const FIXED = {
   '--popover-width-lg': '480px',
   '--popover-width-flag': '400px',
   '--popover-stack-flag': '16px',
-  '--popover-radius': '12px',
   '--popover-pad-menu': '4px',
   '--popover-min-width-menu': '160px',
   '--popover-max-width-menu': '320px',
   '--popover-max-height-menu': '320px',
-  '--popover-radius-menu-sm': '10px',
-  '--popover-radius-menu-md': '12px',
   '--popover-pad-y-tooltip': '4px',
   '--popover-max-width-tooltip': '240px',
-  '--popover-radius-tooltip': '6px',
   '--popover-gap-screen': '8px',
   '--popover-offset': '4px',
 };
@@ -180,24 +174,6 @@ test('the screen pad aliases the space scale per mode, its own rule apart from t
     const actual = Object.keys(LAYOUT_MODES).map((mode) => rawAtMode(name, mode));
     assert.deepEqual(actual, raws, name);
   }
-});
-
-test('a drawer takes the Modal width steps: each Drawer width aliases its Modal width at every mode', () => {
-  for (const size of ['sm', 'md', 'lg']) {
-    for (const mode of Object.keys(LAYOUT_MODES)) {
-      assert.equal(rawAtMode(`--drawer-width-${size}`, mode), `var(--modal-width-${size})`, `${size} at ${mode}`);
-    }
-  }
-});
-
-test('the Drawer pattern tokens alias the same space steps as Modal, and there is no Drawer radius', () => {
-  for (const leaf of ['stack-sm', 'stack-md', 'stack-lg', 'inline-sm', 'inline-md', 'inline-lg']) {
-    assert.equal(corpus.get(`--drawer-${leaf}`)?.raw, corpus.get(`--modal-${leaf}`)?.raw, leaf);
-  }
-  // Modal's own pad moved to the role token `--modal-pad-x-default` (ADR-038,
-  // declared in tokens/ladder, outside this file's corpus); Drawer still aliases the same step.
-  assert.equal(corpus.get('--drawer-pad')?.raw, 'var(--space-100)', 'pad');
-  assert.equal(corpus.get('--drawer-radius'), undefined);
 });
 
 test('no modal width is fractional at any mode', () => {
@@ -326,8 +302,7 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
     '--table-stack': 'var(--space-050)',
     '--screen-pad-x': 'var(--space-150)',
     '--section-min-width-main': 'var(--width-3000)',
-    '--modal-radius': 'var(--radius-075)',
-    '--popover-radius-menu-sm': 'var(--radius-0625)',
+    '--modal-radius': 'var(--radius-xxl)',
     '--popover-max-height-menu': 'var(--height-2000)',
     '--popover-offset': 'var(--space-025)',
   };
@@ -353,7 +328,7 @@ const MODAL_PAD_PX = 16;
 
 /*
  * The screen grid (`styles/_screen-grid.scss`) is the one rule every
- * floating layer takes its column steps from: Modal, the Blanket patterns and
+ * floating layer takes its column steps from: Modal, the Backdrop patterns and
  * Popup. At the three mode widths it has to land on Figma's Modal/width-modal-*.
  */
 const SCREEN_GRID_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/styles/_screen-grid.scss'), 'utf8');
@@ -430,7 +405,7 @@ test('the Frame stacks its layers by name: no arithmetic on --layer-navigation a
   assert.doesNotMatch(scss, /z-index:\s*-?\d/);
 });
 
-test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start < Blanket < Panel peek', () => {
+test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start < Backdrop < Panel peek', () => {
   const order = ['edge', 'sidebar', 'topbar-start', 'blanket', 'panel-peek'].map((n) => `--frame-layer-${n}`);
   const values = order.map((n) => {
     const token = corpus.get(n);

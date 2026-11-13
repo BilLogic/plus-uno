@@ -1,0 +1,8 @@
+{
+  "why": "Interactive components with no motion row in scripts/lib/tokens/motion-registry.mjs yet (spec #2200). The list may only shrink. Regenerate with `npm run check:motion-registry -- --update`; never edit by hand.",
+  "sets": {
+    "main": {
+      "entries": {}
+    }
+  }
+}

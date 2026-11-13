@@ -29,6 +29,7 @@ export { default as RadioGroup } from '@/components/forms-and-inputs/RadioGroup'
 export { default as Range } from '@/components/forms-and-inputs/Range';
 export { default as Rating } from '@/components/forms-and-inputs/Rating';
 export { default as RichTextEditor } from '@/components/forms-and-inputs/RichTextEditor';
+export { default as SearchField, SEARCH_DEBOUNCE_MS, SEARCH_FIELD_MODES, SEARCH_FIELD_SPACINGS, SearchFieldAction } from '@/components/forms-and-inputs/SearchField';
 export { default as Select, SEARCH_FIRST_ABOVE, SELECT_SPACINGS } from '@/components/forms-and-inputs/Select';
 export { default as SplitButton } from '@/components/forms-and-inputs/SplitButton';
 export { default as TagInput } from '@/components/forms-and-inputs/TagInput';
@@ -98,5 +99,6 @@ export { default as InlineEdit } from '@/components/text-and-data-display/Inline
 export { default as Table, DynamicTable, HeadCell, StaticTable, TableBulkActions, TableCell, TableFooter, TableMessageRow, TableRow, TableSummaryRow, TreeTable } from '@/components/text-and-data-display/Table';
 export { default as VisuallyHidden } from '@/components/text-and-data-display/VisuallyHidden';
 
-// A sibling of components/, not a group inside it.
+// Siblings of components/, not groups inside it.
 export * from '@/dataviz';
+export * from '@/sound';

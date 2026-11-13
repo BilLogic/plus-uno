@@ -14,6 +14,8 @@ Also asked as: hover hint, hover text.
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx`
 
+**Motion:** enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Tooltip` for a short label on a control whose purpose is not obvious from
@@ -21,10 +23,19 @@ what you can see — an icon-only `Button`, a truncated cell, an abbreviation. I
 wraps a single trigger element and shows on hover and focus by default, after
 250ms, hiding 400ms after you leave.
 
-It is the Popups pattern's Tooltip: body.small 12/16 in `--ds-text-inverse` on
+It is the Tooltip of the Popup layers: body.small 12/16 in `--ds-text-inverse` on
 `--ds-background-neutral-bold`, so it flips with the color mode,
 padded 4 · 8, wrapping past 240, with no arrow. It opens 4 from its trigger
 and never comes nearer than 8 to the screen's edge.
+
+## Motion
+
+Tooltip reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fade only, after 250 ms. A second Tooltip soon after shows at once. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades 100 ms after the pointer leaves. |
 
 ## Best practices
 
@@ -149,9 +160,8 @@ Same group: `Popup`
 | Part | Token |
 | --- | --- |
 | Fill, text | `--ds-background-neutral-bold`, `--ds-text-inverse` |
-| Shadow | `--ds-shadow-overlay` |
 | Padding | `--popover-pad-y-tooltip`, `--pad-x-sm` |
-| Radius | `--popover-radius-tooltip` |
+| Radius | `--radius-control-sm` |
 | Maximum width | `--popover-max-width-tooltip` |
 | Type | `--body-small` |
 
@@ -186,7 +196,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--ds-background-neutral-bold` · `--ds-shadow-overlay` · `--ds-text-inverse` · `--layer-popup` · `--pad-x-sm` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--popover-radius-tooltip`
+`--body-small` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-tooltip` · `--pad-x-sm` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--radius-control-sm`
 
 From `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss`. Override these through the token layer, never with a literal.
 

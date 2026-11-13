@@ -209,7 +209,6 @@
  {
   "q": "side panel that slides in",
   "want": [
-   "PatternDrawer",
    "Panel"
   ],
   "kind": "intent"

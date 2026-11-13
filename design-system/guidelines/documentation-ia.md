@@ -19,17 +19,17 @@ and regenerate rather than touching the literal.
 
 - **Top level:** Get started · Foundations · Templates · Patterns · Components · AI UI, then our own Data visualizations and Libraries. Templates and Patterns come before Components because a page is composed from them first, and Templates come before the guidance that points at them. `npm run check:storybook-categories` holds the sort to that order, fails any page under `design-system/src/` titled under a root the sort does not list, and fails a page placed in the wrong one of Templates and Patterns: the taxonomy's `rootSources` lists each root's source folders.
 - **Get started:** Design · Develop · With AI · Content design · About. About is the old Introduction page; the other four are short landing pages that point into the tree (`design-system/src/storybook-docs/landing/`).
-- **Foundations:** Overview · Tokens · Accessibility · Spacing · Grid · Color · Typography · Motion · Iconography · Illustrations · Logos · Elevation · Border · Radius. Source lives in `design-system/src/styles/`. A foundation that also ships a component keeps guidance here and the component's API under Components: Iconography and `Components/Images and icons/Icon`, Illustrations and `Components/Images and icons/Illustration`.
-- **Templates:** Templates and patterns (the shared opening page: the three layers, the tie-break, Frame → Screen → Flow) · Overview · Page templates · Frame · Page (Page, Heading outline) · Section (Section, Card, Table) · Overlays (Blanket, Modal, Panel) · Popup, broadest first. A template is an arrangement of components with slots. Sources live in `design-system/src/patterns/` and `design-system/src/storybook-docs/templates/`. Each template page documents its own level only and links to the level above or below for the rest: the browser window is drawn on Page templates alone, and every Frame state (Sidebar, Panel, overlays, breakpoints) is on Frame.
+- **Foundations:** Overview · Tokens · Accessibility · Spacing · Grid · Color · Typography · Motion · Sound · Iconography · Illustrations · Logos · Elevation · Border · Radius. Source lives in `design-system/src/styles/`. Motion is a folder of pages, each filed as `Motion<Page>.mdx` with its demos in `Motion<Page>.stories.jsx`; it draws with the illustration kit's motion layer, `design-system/src/storybook-docs/illustrations/motion.jsx`. The folder's Library page (`MotionLibrary.mdx`) is generated: it renders every row of the motion registry through `motion-library.jsx`, with its agent file at `design-system/agent-views/motion/library.md`, and holds no hand-written table. Sound is a folder of pages filed as `Sound<Page>.mdx`, its Sounds page backed by `Sound.stories.jsx`. A foundation that also ships a component keeps guidance here and the component's API under Components: Iconography and `Components/Images and icons/Icon`, Illustrations and `Components/Images and icons/Illustration`.
+- **Templates:** Templates and patterns (the shared opening page: the three layers, the tie-break, Frame → Screen → Flow) · Overview · Page templates · Frame · Page (Page, Heading outline) · Section (Section, Card, Table) · Overlays (Backdrop, Modal, Panel) · Popup, broadest first. A template is an arrangement of components with slots. Sources live in `design-system/src/patterns/` and `design-system/src/storybook-docs/templates/`. Each template page documents its own level only and links to the level above or below for the rest: the browser window is drawn on Page templates alone, and every Frame state (Sidebar, Panel, overlays, breakpoints) is on Frame.
 - **Patterns:** Overview, then the guidance pages. A pattern is code-free guidance whose examples are templates, and it holds a rule that applies across two or more templates. Sources live in `design-system/src/storybook-docs/patterns/`.
 - **AI UI:** About AI UI · AI interaction guidelines · Foundations (Color, Elevation, Motion, Voice and tone) · Components (Button, Icon, Illustration, Generative border, Prompt input, Prompt starters, Suggestion, Skills tag, AI message with AI sources and AI feedback nested) · Patterns (AI chat), named as the Figma AI dividers name them. Everything AI sits here, as on the Figma AI pages. A page with nothing defined yet says so in one line rather than being left out. An AI component is listed in the taxonomy's `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays under its category. Its pages live in `design-system/src/storybook-docs/ai/`.
 - **Test harnesses** such as `DocumentedContract.stories.jsx` carry the `!dev` tag: the Storybook tests run them and the sidebar leaves them out. The generators and checks behind the docs are listed on Get started › Develop.
 - **Components groups** are Atlassian's component categories, in Atlassian's order, and only those with members: ten groups, each with a kebab-case folder under `design-system/src/components/` (`forms-and-inputs`, `images-and-icons`, `labels`, `layout-and-structure`, `loading`, `messaging`, `navigation`, `overlays-and-layering`, `status-indicators`, `text-and-data-display`). The Storybook group is the category in sentence case. A story outside `components/` may also sit in a group: Logo, whose source is in `design-system/src/assets/`, is under Images and icons, and the Navigation system (the Sidebar, source in `design-system/src/patterns/Sidebar/`) is under Navigation with Sidebar tab nested in it, as on the Figma page list. Button sits in Forms and inputs, as on atlassian.design. Undocumented internal composites live in `_internal/` until they graduate; a story there may sit in any category. `npm run check:storybook-categories` holds folders, titles and the taxonomy to this.
-- **Pages follow the BS4 Foundation library's page list.** Inside each group the sidebar shows Figma's pages in Figma's order, named as Figma names them. A Figma page that holds several components becomes a folder of the same name, with one docs page per component in the page's section order: `Button/` (Button, Close button), `Status, count & tag/` (Status, Count, Tag, Tag group), `Loading/` (Spinner, Skeleton), `Tabs, nav pills & navbar/` (Tabs, Nav pills, Navbar). A Figma page with no code has no Storybook page; the gap is recorded where the change is reviewed, not as an empty page. Foundations follow Figma's foundation pages the same way.
+- **Pages follow the BS4 Foundation library's page list.** Inside each group the sidebar shows Figma's pages in Figma's order, named as Figma names them. A Figma page that holds several components becomes a folder of the same name, with one docs page per component in the page's section order: `Button/` (Button, Close button), `Status, count & tag/` (Status, Count, Tag, Tag group), `Loading/` (Spinner, Skeleton). A Figma page with no code has no Storybook page; the gap is recorded where the change is reviewed, not as an empty page. Foundations follow Figma's foundation pages the same way.
 - **Libraries:** Overview · Base UI · Font Awesome · Highcharts · Motion. One short page per library PLUS builds on: what it is for, which component wraps it and what not to do. Source lives in `design-system/src/storybook-docs/libraries/`. A library with no component yet, such as drag and drop, is named on Overview and gets its page when a component wraps it.
 - **Data viz** lives in `design-system/src/dataviz/<purpose>/` — comparison, correlation, distribution, flow-and-relationships, part-to-whole, temporal.
 - **Specs** left `main` for their rebuild; the old code is on the `archive/legacy-ds` branch. When they return, the grammar is `Specs/<Area>/(<Phase>/)<Type>/<Component>`, with Type order Overview → Elements → Cards → Tables → Modals → Sections → Pages. Title Case phases and types, PascalCase component folders, no spaces in folder names. Every area (and Admin sub-area) leads with an `Overview.mdx` featuring its flagship page.
-- **Naming:** sentence-case display names in titles ("Button group"), using Atlassian's name where Atlassian has the component ("Text field" for `TextField`, "Popup" for `Popover`); the label family keeps its own names (Status, Count, Tag, Tag group, Suggestion). PascalCase code exports never change with the display name. A spec composes core components; a local organism reached from 2+ areas gets promoted into `components/` instead of being re-implemented.
+- **Naming:** sentence-case display names in titles ("Button group"), using the display name people say ("Text field" for `TextField`); the label family keeps its own names (Status, Count, Tag, Tag group, Suggestion). PascalCase code exports never change with the display name. A spec composes core components; a local organism reached from 2+ areas gets promoted into `components/` instead of being re-implemented.
 
 ## The benchmark: Atlassian
 
@@ -125,6 +125,26 @@ behavior; a known gap lives in a GitHub issue, so the page carries no `TODO`,
 fails on a stale marker, and fails a page in its strict list (`STRICT_PAGES`,
 `Modal` first) on every rule.
 
+## Examples
+
+This section owns how every docs example and drawing is made — Storybook pages,
+Figma docs and the review checklists point here.
+
+**Example fidelity.** If an example's lesson depends on a component's look,
+states or wording, show the real component with real labels. If the lesson
+still holds with every word removed, draw blocked-out shapes from the
+illustration kit, with no words inside the figure.
+
+**One illustration kit.** Every docs diagram and animation, abstract or
+specific, is drawn from the shared illustration kit
+(`design-system/src/storybook-docs/illustrations/`, the Illustration kit page in
+Storybook). A shape the kit lacks is added to the kit the way its Contributing
+section says — reuse or extend a primitive first, each part painted by its
+real component's role token, one accent, correct in light and dark, with a
+gallery entry and its story test green — in its own PR, which the templates and
+patterns session, the kit's owner, reviews before merge. A figure on a page is
+always a kit composition, so one-off SVGs and hand-drawn figures have no home.
+
 ## Spacing
 
 A docs page groups its content the way a PLUS page does, on the app's Page and Section token roles (Spacing foundation). The rules live in one file, `design-system/src/storybook-docs/docs-rhythm.css`, and apply to component, foundation and prose pages alike:
@@ -139,6 +159,10 @@ A docs page groups its content the way a PLUS page does, on the app's Page and S
 | A heading and its body; blocks in one group | `--section-stack-md` | heading to body |
 
 A heading is a real heading: a sub-topic is a `FoundationSubsection` or an `###`, never a bold paragraph, so it takes the subsection gap and appears in the page outline. Demos render inside their canvas (Modal `renderAs="inline"`, `FlagGroup containerPosition="static"`, or a frame); the Storybook tests fail a docs story whose demo covers the page.
+
+## The landing
+
+A covered Foundations, Templates or Patterns page opens with `<DocsLanding page eyebrow title purpose links />` (`design-system/src/storybook-docs/docs-landing/`), in this order: eyebrow, the page's one `h1`, its purpose, one row of quick links, then the hero. The hero is chosen by `page` from the hero registry (`hero-registry.jsx`), which also holds the sentence that is its accessible name; a hero draws no text. `npm run check:docs-landing` fails a covered page with no landing or no registry hero, and a later page joins by adding itself to `PAGES` in that script.
 
 ## Related
 

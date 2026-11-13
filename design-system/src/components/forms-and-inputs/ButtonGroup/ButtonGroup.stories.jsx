@@ -42,6 +42,31 @@ export const Overview = {
     },
 };
 
+/** Joined: outer corners keep the button radius, inner seams are square. */
+export const Seams = {
+    render: () => (
+        <ButtonGroup label="Seams">
+            <Button text="Day" />
+            <Button text="Week" />
+            <Button text="Month" />
+        </ButtonGroup>
+    ),
+    play: async ({ canvasElement }) => {
+        const [a, b, c] = within(canvasElement).getAllByRole('button').map((el) => getComputedStyle(el));
+        await expect(a.borderTopLeftRadius).toBe('6px');
+        await expect(a.borderBottomLeftRadius).toBe('6px');
+        await expect(a.borderTopRightRadius).toBe('0px');
+        await expect(a.borderBottomRightRadius).toBe('0px');
+        for (const side of ['TopLeft', 'TopRight', 'BottomLeft', 'BottomRight']) {
+            await expect(b[`border${side}Radius`], `middle ${side}`).toBe('0px');
+        }
+        await expect(c.borderTopLeftRadius).toBe('0px');
+        await expect(c.borderBottomLeftRadius).toBe('0px');
+        await expect(c.borderTopRightRadius).toBe('6px');
+        await expect(c.borderBottomRightRadius).toBe('6px');
+    },
+};
+
 export const Appearances = {
     render: () => (
         <ButtonGroup label="Appearances">

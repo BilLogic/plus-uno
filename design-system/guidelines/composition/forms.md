@@ -25,10 +25,10 @@ Group labeled inputs, selection controls, and actions into a coherent data-entry
 | Multi-line | `TextArea` | `@/components` |
 | Pick one | `Select`, `Radio` | `@/components` |
 | Pick many | `Checkbox`, `Select mode="multi"` | `@/components` |
-| Toggle | `Switch` | `@/components` |
+| Setting that applies now | `Toggle` | `@/components` |
 | Date/time | `DatePicker`, `DateTimePicker` | `@/components` |
 | Submit / cancel | `Button` | `@/components` |
-| Section container | `Card` | `@/components` |
+| Section container | `PatternCard` | `@/patterns` |
 
 See `design-system/agent-views/components/index.md` for the full component index — form elements moved into `components/forms-and-inputs/` in the 2026-07 reorg.
 

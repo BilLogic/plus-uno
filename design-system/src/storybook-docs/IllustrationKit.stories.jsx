@@ -10,7 +10,7 @@ import { expect } from 'storybook/test';
 
 import { IllustrationKitGallery, PRIMITIVE_NAMES } from './illustrations/IllustrationKitGallery.jsx';
 import { IllustrationFigure } from './illustrations/Illustration.jsx';
-import { ThreeLayers, OpeningARecord } from './illustrations/compositions.jsx';
+import { ThreeLayers, OpeningARecord, ResponsiveReflow } from './illustrations/compositions.jsx';
 
 export default {
   // A test harness, not a page: `!dev` keeps it out of the sidebar while the
@@ -78,5 +78,37 @@ export const OpeningPageDrawings = {
     const accentCount = (svg) => svg.outerHTML.split('--ds-background-brand-bold').length - 1;
     await expect(accentCount(figures[0].querySelector("svg"))).toBe(3);
     await expect(accentCount(figures[1].querySelector('svg'))).toBeGreaterThanOrEqual(4);
+  },
+};
+
+export const ResponsiveReflowDrawings = {
+  render: () => (
+    <>
+      {[1280, 960, 768].map((width) => (
+        <IllustrationFigure key={width} caption={`${width} wide`}>
+          <ResponsiveReflow width={width} />
+        </IllustrationFigure>
+      ))}
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const figures = [...canvasElement.querySelectorAll('figure')];
+    await expect(figures.length).toBe(3);
+    const svgs = figures.map((figure) => figure.querySelector('svg[role="img"]'));
+    for (const svg of svgs) {
+      await expect(svg.querySelectorAll('text').length).toBe(0);
+      await expect(everyPaintIsAToken(svg)).toBe(true);
+    }
+    // The Sidebar docks at 1280 (an edge line), collapses at 960, and floats on a Backdrop at 768.
+    const has = (svg, token) => svg.outerHTML.includes(token);
+    await expect(has(svgs[0], '--ds-blanket')).toBe(false);
+    await expect(has(svgs[1], '--ds-blanket')).toBe(false);
+    await expect(has(svgs[2], '--ds-blanket')).toBe(true);
+    await expect(has(svgs[2], '--ds-shadow-overlay')).toBe(true);
+    // The Section's side column sits beside the body only at 1280: one Section fewer below.
+    const sections = (svg) => svg.querySelectorAll('[data-part="section"]').length;
+    await expect(sections(svgs[0])).toBe(2);
+    await expect(sections(svgs[1])).toBe(1);
+    await expect(sections(svgs[2])).toBe(1);
   },
 };

@@ -30,28 +30,28 @@ export default {
 const POPUP_MAX_WIDTH = 320;
 
 const SHORT = [
-    { value: 'a', label: 'Algebra' },
-    { value: 'b', label: 'Biology' },
+    { value: 'a', label: 'Lincoln Middle' },
+    { value: 'b', label: 'North High' },
 ];
 const LONG = [
-    { value: 'a', label: 'Algebra and the long road through quadratic equations for beginners' },
-    { value: 'b', label: 'Biology' },
+    { value: 'a', label: 'Lincoln Middle after-school tutoring block with the long Thursday Zoom schedule' },
+    { value: 'b', label: 'North High' },
 ];
 const TREE = [
-    { label: 'Mathematics and the long road through quadratic equations', value: 'maths', children: [{ label: 'Algebra', value: 'algebra' }] },
-    { label: 'Science', value: 'science' },
+    { label: 'Middle schools across the whole Pittsburgh tutoring network', value: 'middle-schools', children: [{ label: 'Lincoln Middle', value: 'lincoln-middle' }] },
+    { label: 'High schools', value: 'high-schools' },
 ];
 const SHORT_TREE = [
-    { label: 'Maths', value: 'maths' },
-    { label: 'Science', value: 'science' },
+    { label: 'Middle schools', value: 'middle-schools' },
+    { label: 'High schools', value: 'high-schools' },
 ];
 const CASCADE = [
     {
-        label: 'Mathematics and its many branches',
-        value: 'maths',
-        children: [{ label: 'Algebra and the long road through quadratic equations', value: 'algebra' }],
+        label: 'Middle schools and their many tutoring blocks',
+        value: 'middle-schools',
+        children: [{ label: 'Lincoln Middle after-school tutoring block with the long Thursday Zoom schedule', value: 'lincoln-middle' }],
     },
-    { label: 'Science', value: 'science' },
+    { label: 'High schools', value: 'high-schools' },
 ];
 
 /* ---------------------------------------------------------------- probes */
@@ -128,28 +128,28 @@ const AtRightEdge = ({ children }) => (
 
 /* --------------------------------------------------------- Select (Listbox) */
 
-export const SelectBelow = () => <AtTop><Select label="Subject" options={SHORT} /></AtTop>;
+export const SelectBelow = () => <AtTop><Select label="Site" options={SHORT} /></AtTop>;
 SelectBelow.play = async ({ canvasElement }) => expectBelow(await openPopup(canvasElement, 'select'));
 
-export const SelectFlipsAbove = () => <AtBottom><Select label="Subject" options={SHORT} /></AtBottom>;
+export const SelectFlipsAbove = () => <AtBottom><Select label="Site" options={SHORT} /></AtBottom>;
 SelectFlipsAbove.play = async ({ canvasElement }) => expectAbove(await openPopup(canvasElement, 'select'));
 
-export const SelectRightAligns = () => <AtRightEdge><Select label="Subject" options={LONG} /></AtRightEdge>;
+export const SelectRightAligns = () => <AtRightEdge><Select label="Site" options={LONG} /></AtRightEdge>;
 SelectRightAligns.play = async ({ canvasElement }) => expectRightAligned(await openPopup(canvasElement, 'select'));
 
-export const SelectWidthIsTheFieldsWhenContentIsShort = () => <AtTop width={240}><Select label="Subject" options={SHORT} /></AtTop>;
+export const SelectWidthIsTheFieldsWhenContentIsShort = () => <AtTop width={240}><Select label="Site" options={SHORT} /></AtTop>;
 SelectWidthIsTheFieldsWhenContentIsShort.play = async ({ canvasElement }) => {
     const { field, popup } = await openPopup(canvasElement, 'select');
     await expect(popup.width, 'as wide as the field').toBeCloseTo(field.width, 0);
 };
 
-export const SelectWidthCapsLongContent = () => <AtTop width={120}><Select label="Subject" options={LONG} /></AtTop>;
+export const SelectWidthCapsLongContent = () => <AtTop width={120}><Select label="Site" options={LONG} /></AtTop>;
 SelectWidthCapsLongContent.play = async ({ canvasElement }) => {
     const { popup } = await openPopup(canvasElement, 'select');
     await expect(popup.width, 'long content stops at the cap').toBeCloseTo(POPUP_MAX_WIDTH, 0);
 };
 
-export const SelectWidthFollowsAWideField = () => <AtTop width={360}><Select label="Subject" options={LONG} /></AtTop>;
+export const SelectWidthFollowsAWideField = () => <AtTop width={360}><Select label="Site" options={LONG} /></AtTop>;
 SelectWidthFollowsAWideField.play = async ({ canvasElement }) => {
     const { field, popup } = await openPopup(canvasElement, 'select');
     await expect(popup.width, 'a field past the cap keeps its width').toBeCloseTo(field.width, 0);
@@ -207,7 +207,7 @@ CascaderRightAligns.play = async ({ canvasElement }) => expectRightAligned(await
 export const CascaderColumnsPassTheCap = () => <AtTop width={120}><Cascader options={CASCADE} /></AtTop>;
 CascaderColumnsPassTheCap.play = async ({ canvasElement }) => {
     const { field } = await openPopup(canvasElement, 'cascader');
-    await userEvent.click(within(canvasElement).getByRole('option', { name: /Mathematics/ }));
+    await userEvent.click(within(canvasElement).getByRole('option', { name: /Middle schools/ }));
     await waitFor(() => expect(canvasElement.querySelectorAll('.plus-cascader-column').length, 'two columns open').toBe(2));
     const popup = canvasElement.querySelector('.plus-cascader-menu').getBoundingClientRect();
     await expect(popup.width, 'at least the field').toBeGreaterThanOrEqual(field.width);
@@ -236,12 +236,12 @@ export const TreeSelectClosesOnAnOutsidePress = () => <WithOutside><TreeSelect o
 TreeSelectClosesOnAnOutsidePress.play = async ({ canvasElement }) => expectOutsidePressCloses(
     canvasElement,
     'treeSelect',
-    (canvas) => canvas.getByRole('treeitem', { name: /Mathematics/ }).querySelector('.plus-option-row-toggle'),
+    (canvas) => canvas.getByRole('treeitem', { name: /Middle schools/ }).querySelector('.plus-option-row-toggle'),
 );
 
 export const CascaderClosesOnAnOutsidePress = () => <WithOutside><Cascader options={CASCADE} /></WithOutside>;
 CascaderClosesOnAnOutsidePress.play = async ({ canvasElement }) => expectOutsidePressCloses(
     canvasElement,
     'cascader',
-    (canvas) => canvas.getByRole('option', { name: /Mathematics/ }),
+    (canvas) => canvas.getByRole('option', { name: /Middle schools/ }),
 );

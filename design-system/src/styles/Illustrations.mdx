@@ -1,8 +1,7 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -24,12 +23,19 @@ export const Captioned = ({ caption, children }) => (
 
 <Meta title="Foundations/Illustrations" tags={['!dev']} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-illustrations"
+    eyebrow="Foundation"
     title="Illustrations"
-    summary="Illustrations help a page say something simply, and reflect the mood and context of the tutor or student looking at it."
+    purpose="Illustrations help a page say something simply, and reflect the mood and context of the tutor or student looking at it."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Color mapping', href: '#foundation-color-and-smart-mapping' },
+            { title: 'Characters', href: '#foundation-characters' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

@@ -1,0 +1,255 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+import * as OverflowStories from './Overflow.stories.jsx';
+import { FOLD_STAGE, NARROW, TABLE_STAGE } from './overflowDemo.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    ClippedCellNoText,
+    ClippedCellOpensText,
+    ClippedSectionTitle,
+    FadedList,
+    ShowMoreWithCount,
+    WrappedSectionTitle,
+} from '@/storybook-docs/illustrations/overflow.jsx';
+
+<Meta title="Patterns/States/Overflow" tags={['!dev', 'manifest']} />
+
+<DocsLanding
+    page="patterns-states-overflow"
+    eyebrow="Pattern · States"
+    title="Overflow"
+    purpose="What happens when text or a list is longer than its room. Titles and messages wrap; cells and tags truncate with the full text in a Tooltip; lists fold; tables page. No fades."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Tooltip', href: './?path=/docs/components-overlays-and-layering-tooltip--docs' },
+            { title: 'Dynamic table', href: './?path=/docs/components-text-and-data-display-dynamic-table--docs' },
+            { title: 'Pagination', href: './?path=/docs/components-navigation-pagination--docs' },
+            { title: 'Breadcrumbs', href: './?path=/docs/components-navigation-breadcrumbs--docs' },
+            { title: 'Tag group', href: './?path=/docs/components-labels-tag-group--docs' },
+            { title: 'Tag', href: './?path=/docs/components-labels-tag--docs' },
+            { title: 'Status tag', href: './?path=/docs/components-labels-status-tag--docs' },
+        ],
+    }}
+/>
+
+<DocsTabs of={OverflowStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## The four answers
+
+Pick by what the text is. Wrap when it must be read whole; truncate when the room is fixed and the full text can be reached; fold a list; page a table.
+
+<TypeGrid>
+<TypeCard of={OverflowStories.WrapTitlesAndErrors} title="Wrap" stage={NARROW}>Titles, headers, labels, errors and notifications take more lines. They never end in an ellipsis.</TypeCard>
+<TypeCard of={OverflowStories.TruncatedCell} title="Truncate with a Tooltip" stage={TABLE_STAGE}>A cell ends in an ellipsis on one line. Its full text opens on hover and focus, only while it is clipped.</TypeCard>
+<TypeCard of={OverflowStories.FoldedTagGroup} title="Fold a list" stage={FOLD_STAGE}>A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are Planned <PlannedTag />.</TypeCard>
+<TypeCard of={OverflowStories.PagedInFooter} title="Page a table" stage={TABLE_STAGE}>A table pages instead of growing: the pager sits at the end of the Section footer.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key cases
+
+<ComponentExample of={OverflowStories.TruncatedTags} title="A tag" description="A Tag stops at its maxWidth, 180 by default, and a Status tag at 200. A clipped tag becomes a tab stop so its Tooltip opens on focus." />
+
+<ComponentExample of={OverflowStories.TruncatedCell} title="A cell" description="A table cell stays one line and ends in an ellipsis. A short cell in the same column is not a tab stop and has no Tooltip." />
+
+The three cases below are Planned <PlannedTag />: no component carries them yet.
+
+- **The breadcrumb middle.** Five or more levels fold the middle into a "…" that opens a menu of the hidden levels. The Breadcrumb never wraps.
+- **An open item in the Sidebar.** Named by when and who, "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more".
+- **A file name.** The one mid-line truncation: a file name or an id keeps its start and its end, because the end tells them apart.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Overflow" tier="pattern" />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Overflow whenever a value may be longer than the space it has. The answer follows the element, so the same text behaves the same way on every page, and the full text is always reachable.
+
+<DocsTable>
+<thead>
+<tr><th>Element</th><th>Answer</th><th>Full text</th></tr>
+</thead>
+<tbody>
+<tr><td>Page title, Section title</td><td>Wrap</td><td>Always visible</td></tr>
+<tr><td>Field error, Section message, Flag, Banner</td><td>Wrap</td><td>Always visible</td></tr>
+<tr><td>Column header <PlannedTag /></td><td>Planned: wrap</td><td>Always visible</td></tr>
+<tr><td>Table cell</td><td>Truncate at the end, one line</td><td>Tooltip on hover and focus when clipped</td></tr>
+<tr><td>Tag (180), Status tag (200)</td><td>Truncate at the end</td><td>Tooltip when clipped; the tag becomes focusable</td></tr>
+<tr><td>Tags in a group</td><td>Fold into +n</td><td>The +n menu lists the hidden tags</td></tr>
+<tr><td>A table</td><td>Page</td><td>The range and the pager in the footer</td></tr>
+<tr><td>Breadcrumb with five or more levels <PlannedTag /></td><td>Planned: fold the middle into "…"</td><td>The "…" opens a menu of the hidden levels</td></tr>
+<tr><td>Open item in the Sidebar <PlannedTag /></td><td>Planned: truncate at the end</td><td>Tooltip with the school</td></tr>
+<tr><td>Auto-width Popup row <PlannedTag /></td><td>Planned: truncate at the end at 320</td><td>Tooltip when clipped</td></tr>
+<tr><td>File name, id <PlannedTag /></td><td>Planned: truncate mid-line</td><td>Tooltip when clipped</td></tr>
+<tr><td>A list of items, tags or notes <PlannedTag /></td><td>Planned: "Show n more", "Show less"</td><td>Expanded in place</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a long paragraph, let it wrap; a paragraph is read, not scanned.
+- For a trail too long to show, follow Navigation; the Breadcrumb's fold is described there.
+- For more views than fit a row of pills, fold the extra pills into "More"; Navigation describes the views.
+- For more controls than fit a bar, the extras go into the More icon button, five controls at most.
+- For narrowing a long list of rows instead of folding it, follow <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Wrap titles, headers, labels, errors and notifications.
+
+<RuleTag kind="automatic" />
+
+They must be read whole, so they take more lines. Nothing that tells a person what something is, or what went wrong, is ever clipped.
+
+<DoDontPair
+    doExample={<WrappedSectionTitle />}
+    doCaption="A long Section title takes a second line."
+    dontExample={<ClippedSectionTitle />}
+    dontCaption="A clipped Section title: the one thing that names the content is the one thing cut."
+/>
+
+### Truncate cells, tags and names at the end, on one line.
+
+<RuleTag kind="automatic" />
+
+An ellipsis stands for three or more characters. A cell stays one line. Mid-line truncation is only for file names and ids, where the end tells them apart; it is Planned <PlannedTag />. Truncating from the front is not used.
+
+### Open the full text in a Tooltip only when it is clipped.
+
+<RuleTag kind="automatic" />
+
+The Tooltip opens on hover and on focus, and the clipped element becomes a tab stop only while it is clipped. Never the browser's `title` attribute. An unclipped value has no Tooltip.
+
+<DoDontPair
+    doExample={<ClippedCellOpensText />}
+    doCaption="A clipped cell opens its full text in a Tooltip."
+    dontExample={<ClippedCellNoText />}
+    dontCaption="A clipped cell with nothing to open: the rest of the text cannot be read."
+/>
+
+### Make a bare ellipsis open a menu.
+
+<RuleTag kind="review" />
+
+A "…" that stands for hidden items, such as the breadcrumb middle, is a button that opens them. A "…" at the end of a value is not a control.
+
+### Fold a list behind Show n more and page a table.
+
+<RuleTag kind="review" />
+
+"Show n more" carries the count and "Show less" closes; both are Planned <PlannedTag />. A Tag group folds into +n today. A table pages in its footer instead of growing. No gradients, fades or inner scroll.
+
+<DoDontPair
+    doExample={<ShowMoreWithCount />}
+    doCaption="A button under the list that names how many more it holds, and the list grows in place."
+    dontExample={<FadedList />}
+    dontCaption="A fade over the list, hiding how much is there."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>"Show 4 more" and "Show less" (Planned). <PlannedTag /></td><td>"Load more", "See all", "…".</td></tr>
+<tr><td>Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip (Planned). <PlannedTag /></td><td>The whole title in the Sidebar.</td></tr>
+<tr><td>Breadcrumb levels by the page's own title: "Lincoln Middle School".</td><td>"Back", "Up one level".</td></tr>
+<tr><td>File name mid-line: "reflection_…_week12.pdf" (Planned). <PlannedTag /></td><td>"reflection_maya_rodrig…".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- The full text is always in the DOM, so a screen reader hears all of it whether or not it is clipped.
+- A clipped element is a tab stop so a keyboard user can reach the Tooltip; an unclipped one is not.
+- The +n button of a Tag group names how many tags it holds, "+3 more tags", and opens a menu the arrow keys move through.
+- The breadcrumb's "…" button is named "Show hidden levels" <PlannedTag />.
+- "Show n more" announces the new count when the list expands <PlannedTag />.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Component</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>Full text</td><td><a target="_top" href="./?path=/docs/components-overlays-and-layering-tooltip--docs">Tooltip</a></td><td>Switched on only while the text is clipped.</td></tr>
+<tr><td>Label</td><td><a target="_top" href="./?path=/docs/components-labels-tag--docs">Tag</a>, <a target="_top" href="./?path=/docs/components-labels-status-tag--docs">Status tag</a></td><td>`maxWidth` caps the tag; a clipped label ends in an ellipsis.</td></tr>
+<tr><td>Folded tags</td><td><a target="_top" href="./?path=/docs/components-labels-tag-group--docs">Tag group</a></td><td>`overflow="collapse"` keeps one line and folds the rest into +n.</td></tr>
+<tr><td>Cell</td><td><a target="_top" href="./?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a></td><td>A cell's `overflow` is `truncate` by default; `wrap` takes more lines.</td></tr>
+<tr><td>Trail</td><td><a target="_top" href="./?path=/docs/components-navigation-breadcrumbs--docs">Breadcrumb</a></td><td>The fold is Planned <PlannedTag />; the component never folds its middle yet.</td></tr>
+<tr><td>Pager</td><td><a target="_top" href="./?path=/docs/components-navigation-pagination--docs">Pagination</a></td><td>Fills the Section's footer slot, aligned to the end.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-finding-things-navigation--docs">Navigation</a>: use for the breadcrumb and the Sidebar's open items.
+- <a target="_top" href="./?path=/docs/patterns-notifications-and-indicators-indicators--docs">Indicators</a>: use for tags that clip.
+- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use for the footer a table pages in.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

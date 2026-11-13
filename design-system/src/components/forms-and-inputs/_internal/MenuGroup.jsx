@@ -18,7 +18,7 @@ function useRoving() {
 /**
  * MenuGroup: the scrollable list a menu's sections sit in.
  */
-export const MenuGroup = ({ density = 'regular', maxHeight, maxWidth, minWidth, testId, className, children, ...props }) => {
+export const MenuGroup = ({ density = 'default', maxHeight, maxWidth, minWidth, testId, className, children, ...props }) => {
     const itemsRef = useRef([]);
 
     const register = useCallback((node) => {
@@ -54,8 +54,8 @@ export const MenuGroup = ({ density = 'regular', maxHeight, maxWidth, minWidth, 
 };
 
 MenuGroup.propTypes = {
-    /** `regular` (default) or `compact`, the row height. */
-    density: PropTypes.oneOf(['regular', 'compact']),
+    /** `default` (32 rows) or `compact` (24), the row height. */
+    density: PropTypes.oneOf(['default', 'compact']),
     maxHeight: PropTypes.string,
     maxWidth: PropTypes.string,
     minWidth: PropTypes.string,

@@ -12,20 +12,22 @@ Generated facts are in
 containers; none of them decide page layout, which is
 `design-system/guidelines/composition/layout.md`.
 
+<!-- retired-names-ok: names the retired containers this table maps -->
 `Card`, `Divider`, `Collapse`, `Jumbotron`, `ListGroup`, `MediaObject`,
 `Scrollspy`, `NavPills` and `Navbar` are retired — they are no longer in this
 library (Figma keeps them under Retired). Their replacements:
 
+<!-- retired-names-ok: maps each retired container to its replacement -->
 | Retired | Reach for |
 |---|---|
 | `Card` | the Card/Section frame patterns and slots (`design-system/src/patterns/PatternCard`, `PatternSection`) |
 | `Divider` | a token-bound border or rule, styled inline on `--ds-border` / `--ds-border-bold` |
 | `Collapse` | `Accordion`, or a Base UI expand behavior |
-| `Jumbotron` | `PatternSection` with `level="page"`, or a Banner/Section message |
-| `ListGroup` | a list built from current components — the Menu/Dropdown item, or `Table` |
+| `Jumbotron` | `PatternSection` with `level="page"`, or `Banner` / `SectionMessage` |
+| `ListGroup` | `DropdownMenu` for actions, or `Table` |
 | `MediaObject` | `Avatar` / `Tile` with the text layout primitives |
-| `Scrollspy` | `NavTabs` or `ProgressTracker` |
-| `NavPills` | `NavTabs` |
+| `Scrollspy` | `Tabs` or `ProgressTracker` |
+| `NavPills` | `Tabs` |
 | `Navbar` | the Sidebar pattern (`design-system/src/patterns/Sidebar`), inside `Frame` |
 
 ## The choice
@@ -47,8 +49,8 @@ several of them would clutter the landmark list.
 **`Carousel` hides content behind motion.** It autoplays by default; set
 `autoplay={false}` for anything a user has to read. Autoplay holds on hover,
 keyboard focus and when out of view, and never runs under reduced motion.
-`design-system/src/styles/Motion.mdx` requires that essential information never
-depend on motion.
+Foundations · Motion (`design-system/src/styles/MotionPrinciples.mdx`) keeps
+Reduced mode to a short fade, so essential information never depends on motion.
 
 ## Related
 

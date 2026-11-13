@@ -4,6 +4,7 @@ import { expect, within } from 'storybook/test';
 import Logo, { LOGO_SIZES, LOGO_APPEARANCES, LOCKUP_MIN_SIZE } from './Logo';
 import LogoClearSpace from './LogoClearSpace';
 import LogoConstruction, { CONSTRUCTION_RADII } from './LogoConstruction';
+import { CORNER_CENTERS } from './logoConstructionGeometry.js';
 
 /**
  * `Logo` — the PLUS mark and lockup.
@@ -168,8 +169,7 @@ export const Construction = {
         const guides = canvasElement.querySelector('[data-testid="construction-guides"]');
         const radii = [...guides.querySelectorAll('circle[r]:not(.plus-logo-construction__dot)')].map((c) => parseFloat(c.getAttribute('r')));
         await expect(radii.sort((a, b) => a - b)).toEqual([
-            CONSTRUCTION_RADII.corner,
-            CONSTRUCTION_RADII.corner,
+            ...CORNER_CENTERS.map(() => CONSTRUCTION_RADII.corner),
             CONSTRUCTION_RADII.inner,
             CONSTRUCTION_RADII.outer,
         ]);

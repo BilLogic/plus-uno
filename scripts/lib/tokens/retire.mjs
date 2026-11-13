@@ -9,7 +9,7 @@
  * and so does a `@media` block or `:root` block left empty.
  */
 
-import { RETIRED_TOKENS } from './plan.mjs';
+import { RETIRED_TOKENS, TOKEN_LADDER } from './plan.mjs';
 
 const DECLARATION = /^\s*(--[\w-]+)\s*:[^;]*;.*$/;
 const COMMENT_ONLY = /^\s*\/\*.*\*\/\s*$/;
@@ -59,4 +59,13 @@ export function dropRetired(scss, retired = RETIRED_TOKENS) {
   if (lines.length && COMMENT_ONLY.test(lines[lines.length - 1]) && !lines[lines.length - 1].startsWith(' ')) lines.pop();
   while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
   return `${lines.join('\n')}\n`;
+}
+
+/**
+ * Every name the ladder's own generated files declare. A Figma export that
+ * still carries one (a pattern token whose value the plan now owns) is
+ * dropped from the SCSS generated from it, so a name is declared once.
+ */
+export function planOwnedTokens() {
+  return new Set(TOKEN_LADDER.filter((row) => row.old !== row.new && !row.primitive).map((row) => row.new));
 }

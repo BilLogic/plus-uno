@@ -4,7 +4,7 @@
  * Import via main.scss so any app using the design system gets correct modal appearance.
  *
  * Matches the Figma pattern Modal and its Overlay: pad Modal/pad 16, stack
- * Modal/stack-md 16, radius Modal/radius 12, centered in an overlay that pads
+ * Modal/stack-md 16, radius Modal/radius 16, centered in an overlay that pads
  * Overlay/pad-x 16 at the sides and Overlay/pad-y 64 above and below.
  */
 @use '../../../styles/screen-grid' as *;
@@ -22,7 +22,7 @@
     @include screen-grid-width(var(--modal-pad-x-default));
     --plus-overlay-span: 6;
 
-    /* The overlay fill, with the blocking shadow: the Modal is the one surface on a blanket, so it lifts higher than a menu or Select list (those keep the overlay shadow). The shadow reaches about 80px below; the Modal has no clip-path open or close, so nothing cuts it. */
+    /* The overlay fill, with the blocking shadow: the Modal is the one surface on a backdrop, so it lifts higher than a menu or Select list (those keep the overlay shadow). The shadow reaches about 80px below; the Modal has no clip-path open or close, so nothing cuts it. */
     background-color: var(--ds-surface-overlay);
     color: var(--ds-text);
     border-radius: var(--modal-radius);
@@ -102,40 +102,9 @@
     flex-shrink: 0;
 }
 
-/* Close button 32 (Item/height-md) holding a 16 icon. */
+/* The close button is an IconButton (32); the header only keeps it from shrinking. */
 .plus-modal-close-btn {
     flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--item-height-md);
-    height: var(--item-height-md);
-    padding: 0;
-    border: none;
-    border-radius: var(--radius-md);
-    background-color: transparent;
-    color: var(--ds-icon-subtle);
-    font-size: var(--icon-md);
-    cursor: pointer;
-    transition: background-color var(--motion-duration-short) var(--motion-easing-standard), color var(--motion-duration-short) var(--motion-easing-standard);
-}
-
-.plus-modal-close-btn {
-    @include plus-state((
-        hovered: (
-            background-color: var(--ds-background-neutral-subtle-hovered),
-            color: var(--ds-icon),
-        ),
-        pressed: (
-            background-color: var(--ds-background-neutral-subtle-pressed),
-            color: var(--ds-icon),
-        ),
-    ), $ring: false);
-}
-
-.plus-modal-close-btn:focus-visible {
-    outline: var(--focus-ring-width) solid var(--ds-border-focused);
-    outline-offset: var(--focus-ring-width);
 }
 
 .plus-modal-divider {
@@ -174,6 +143,7 @@
     justify-content: flex-end;
     align-items: center;
     gap: var(--modal-inline-sm);
+    border-radius: 0; // full bleed: the Modal's own radius clips the outer corners
 }
 
 .plus-modal-button-row {

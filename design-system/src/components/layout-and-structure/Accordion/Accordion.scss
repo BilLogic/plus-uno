@@ -14,7 +14,7 @@
 
 .plus-accordion {
     width: 100%;
-    border-radius: var(--card-radius-sm);
+    border-radius: var(--card-radius-compact);
 
     // --- ACCORDION ITEM ---
     .plus-accordion-item {
@@ -22,22 +22,22 @@
         border: var(--border-default) solid var(--ds-border);
 
         &:first-of-type {
-            border-top-left-radius: var(--card-radius-sm);
-            border-top-right-radius: var(--card-radius-sm);
+            border-top-left-radius: var(--card-radius-compact);
+            border-top-right-radius: var(--card-radius-compact);
 
             .plus-accordion-trigger {
-                border-top-left-radius: var(--card-radius-sm);
-                border-top-right-radius: var(--card-radius-sm);
+                border-top-left-radius: var(--card-radius-compact);
+                border-top-right-radius: var(--card-radius-compact);
             }
         }
 
         &:last-of-type {
-            border-bottom-left-radius: var(--card-radius-sm);
-            border-bottom-right-radius: var(--card-radius-sm);
+            border-bottom-left-radius: var(--card-radius-compact);
+            border-bottom-right-radius: var(--card-radius-compact);
 
             .plus-accordion-trigger:not([data-panel-open]) {
-                border-bottom-left-radius: var(--card-radius-sm);
-                border-bottom-right-radius: var(--card-radius-sm);
+                border-bottom-left-radius: var(--card-radius-compact);
+                border-bottom-right-radius: var(--card-radius-compact);
             }
         }
 

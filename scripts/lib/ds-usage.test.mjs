@@ -201,14 +201,6 @@ test('ds/no-raw-literal: a value match prefers tokens named for the property rol
   assert.equal(f.fix, 'use var(--pad-x-sm)');
 });
 
-test('ds/prefer-plus-component: a react-bootstrap name the barrel also exports (warn)', () => {
-  const found = escapesIn({ path: 'p/App.jsx', text: "import { Button, Row } from 'react-bootstrap';\nimport Modal from 'react-bootstrap/Modal';" }, ctx);
-  assert.deepEqual(found.map((f) => [f.rule, f.level]), [
-    ['ds/prefer-plus-component', 'warn'],
-    ['ds/prefer-plus-component', 'warn'],
-  ]);
-});
-
 test('ds/no-retired-name: a deprecated prop (warn)', () => {
   const found = escapesIn({ path: 'p/App.jsx', text: DS + '<Button size="small" />' }, ctx);
   assert.deepEqual(found.map((f) => [f.rule, f.level]), [['ds/no-retired-name', 'warn']]);

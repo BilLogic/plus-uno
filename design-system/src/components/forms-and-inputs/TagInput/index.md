@@ -12,6 +12,8 @@ TagInput — a field of Tags with a text entry after them, modeled on Notion's m
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.mdx`
 
+**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `TagInput` when a field's value is a set of short labels the person picks
@@ -23,6 +25,14 @@ focusing it opens the list of options under it.
 - For one value from a list, use `Select`.
 - For several values from a fixed list nobody adds to, use `Select` with `isMulti`.
 - For fewer than 5 options, use a Checkbox group (`Fieldset` + `Checkbox`).
+
+## Motion
+
+TagInput reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A chip is added or removed. |
 
 ## Best practices
 
@@ -175,7 +185,7 @@ On a row's handle and in its menu:
 - For the set without a field around it, use `TagGroup`.
 - For several values from a fixed list, use `Select` with `isMulti`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -203,10 +213,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
 | Height | Starts at 40: `--height-250`. Compact 32: `--item-height-md`. Grows as tags wrap. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
 | Tags and entry | `--stack-md` between them; with focus, up to three rows of tags before the content scrolls. |
 | Entry text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
-| List | `--ds-surface-overlay` with a `--ds-border` edge, `--popover-radius-menu-md` and `--ds-shadow-overlay`. |
+| List | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | List hint | `--body-small` in `--ds-text-subtle`, `--space-025` `--pad-x-md`. |
 | Row handle | `--ds-icon-subtle`. |
 | Option menu | `--option-menu-width` wide; the name field `--space-025` `--pad-x-sm`; a `--border-default` rule in `--ds-border` above the colors. |

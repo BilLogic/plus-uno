@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../Button/Button';
+import { IconButton } from '../IconButton/IconButton';
 import useFieldId from '../useFieldId';
 import FieldBox from '../_internal/FieldBox';
 import { FieldFrame } from '../_internal/FieldFrame';
@@ -24,7 +24,7 @@ import './PromptInput.scss';
  *   button. **attachments** renders a row of staged files above the text.
  *   **actions** is a slot for extra controls beside the send button.
  *
- * A PLUS composition of `FieldBox`, `Button` and `GenerativeBorder`.
+ * A PLUS composition of `FieldBox`, `IconButton` and `GenerativeBorder`.
  */
 const PromptInput = ({
     id,
@@ -83,23 +83,19 @@ const PromptInput = ({
     };
 
     const sendAction = isLoading ? (
-        <Button
-            spacing="compact"
-            iconBefore="stop"
-            title="Stop generating"
-            aria-label="Stop generating"
+        <IconButton
+            icon="stop"
+            label="Stop generating"
             className="plus-prompt-input__send plus-prompt-input__send--stop"
             // Stop is never held back by `isDisabled`: a generation must stay cancelable.
             isDisabled={!onStop}
             onClick={() => onStop?.()}
         />
     ) : (
-        <Button
-            spacing="compact"
+        <IconButton
+            icon="paper-plane"
+            label="Send"
             appearance="primary"
-            iconBefore="paper-plane"
-            title="Send"
-            aria-label="Send"
             className="plus-prompt-input__send"
             isDisabled={!canSend}
             onClick={submit}
@@ -116,7 +112,7 @@ const PromptInput = ({
     return (
         <GenerativeBorder
             isActive={isLoading}
-            radius="radius-075"
+            radius="radius-control-lg"
             className={['plus-prompt-input', className].filter(Boolean).join(' ')}
         >
             <FieldFrame disabled={isDisabled} className="plus-prompt-input__frame">
@@ -127,7 +123,7 @@ const PromptInput = ({
                     state={state === 'focus' ? 'focus' : undefined}
                     className="plus-prompt-input__field"
                     elemBefore={startSlot}
-                    trailing={trailing}
+                    elemAfter={trailing}
                 >
                     <textarea
                         id={fieldId}

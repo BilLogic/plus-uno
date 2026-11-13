@@ -39,6 +39,11 @@
  *      Templates and Patterns: a page titled under one of those roots sits in
  *      one of that root's sources, and a page in one of a root's sources is
  *      titled under that root.
+ *   9. Foundations · Motion is exactly the pages the sidebar sort lists under
+ *      Foundations > Motion, Library among them: a page titled
+ *      `Foundations/Motion/<name>` is listed, and a listed name has a page.
+ *      This is where the first-pass "Durations and easings" page was caught.
+ *      Foundations · Sound follows the same rule, with no required Library page.
  *
  * An AI component (Icon, Prompt input) is listed in the taxonomy's
  * `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays
@@ -128,6 +133,22 @@ export function docsTitle(src) {
 /** The sidebar sort's roots, in order, without the `*` catch-all. */
 const sortRoots = (taxonomy) =>
   (taxonomy.storySortOrder ?? []).filter((e) => typeof e === 'string' && e !== '*');
+
+/** Where Foundations · Motion pages live, and the page the component docs link to. */
+export const MOTION_ROOT = 'Foundations/Motion';
+export const MOTION_LIBRARY = 'Library';
+
+/** Where Foundations · Sound pages live. */
+export const SOUND_ROOT = 'Foundations/Sound';
+
+/** The Foundations > `name` entries of the sidebar sort, or null when it lists none. */
+function sortFoundation(taxonomy, name) {
+  const order = taxonomy.storySortOrder ?? [];
+  const foundations = order[order.indexOf('Foundations') + 1];
+  if (!Array.isArray(foundations)) return null;
+  const nested = foundations[foundations.indexOf(name) + 1];
+  return Array.isArray(nested) ? nested.filter((e) => typeof e === 'string') : null;
+}
 
 /** The Components entries of the sidebar sort, groups only. */
 function sortGroups(taxonomy) {
@@ -274,6 +295,35 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       );
     }
   }
+
+  // (9) Foundations · Motion and Foundations · Sound: the listed pages, and no others.
+  const listed = (name, rootPath) => {
+    const entries = sortFoundation(taxonomy, name);
+    if (!entries) return;
+    const titled = new Set(
+      pages.filter(({ title }) => title?.startsWith(`${rootPath}/`)).map(({ title }) => title.split('/')[2]),
+    );
+    for (const { rel, title } of pages) {
+      if (!title?.startsWith(`${rootPath}/`)) continue;
+      if (!entries.includes(title.split('/')[2])) {
+        found.push(
+          `${rel}  is titled "${title}", a Foundations · ${name} page the sidebar sort does not list.\n` +
+            `      -> List it under Foundations > ${name} in storybook.taxonomy.json, or delete the page.`,
+        );
+      }
+    }
+    for (const entry of entries) {
+      if (!titled.has(entry)) {
+        found.push(`storybook.taxonomy.json  Foundations > ${name} lists "${entry}", but no page is titled ${rootPath}/${entry}.`);
+      }
+    }
+    return entries;
+  };
+  const motion = listed('Motion', MOTION_ROOT);
+  if (motion && !motion.includes(MOTION_LIBRARY)) {
+    found.push(`storybook.taxonomy.json  Foundations > Motion does not list ${MOTION_LIBRARY}.`);
+  }
+  listed('Sound', SOUND_ROOT);
 
   // (5) Retired paths.
   const self = new Set(['scripts/check-storybook-categories.mjs', 'scripts/check-storybook-categories.test.mjs']);

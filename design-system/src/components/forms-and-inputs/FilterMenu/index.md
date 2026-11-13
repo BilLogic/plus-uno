@@ -4,6 +4,8 @@
 
 Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Reset** clears every box in the menu without applying. Apply then applies the empty set. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.
 
+Also asked as: filter dropdown.
+
 **Import:** `import { FilterMenu } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.jsx`
@@ -11,6 +13,8 @@ Filter menu: several filter categories in a Popup, held until Apply. - **Held un
 **Stories:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.stories.jsx` — Overview, Staging, Stacked, Placement, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.mdx`
+
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -25,6 +29,15 @@ rather than a button per category.
 One category in a menu, applied as you pick, is a `PopupSelect`. One to
 three short categories with room in the bar are a `FilterButton` each. A bar
 holds one or the other, never quick filters and a filter menu together.
+
+## Motion
+
+FilterMenu reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
 
 ## Best practices
 
@@ -49,7 +62,7 @@ holds one or the other, never quick filters and a filter menu together.
 - For one category applied as you pick, use `PopupSelect`.
 - For quick filters in the bar, use `FilterButton`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -79,7 +92,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Surface | Those of `Popup`: `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popover-radius`. |
+| Surface | Those of `Popup`: `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`. |
 | Pad, and the gap above the footer | 16: `--popover-pad`. |
 | Gap between categories | `--inline-lg` across, `--stack-lg` down. |
 | Height of the categories | Scroll past 320: `--popover-max-height-menu`. |
@@ -96,6 +109,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `container` | object | — | Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. |
 | `categories` | arrayOf (required) | `[]` | The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, disabled }`. Each category is a list of checkboxes; pick as many as apply. |
 | `value` | objectOf | — | The applied values, `{ [categoryId]: value[] }`. Leave it out to let the menu keep its own. |
 | `defaultValue` | objectOf | — | The values applied at first, when `value` is left out. |
@@ -126,7 +140,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--heading-xsmall` · `--inline-lg` · `--plus-filter-menu-columns` · `--popover-max-height-menu` · `--popover-pad` · `--stack-lg`
+`--border-default` · `--heading-xsmall` · `--inline-lg` · `--plus-filter-menu-bleed` · `--plus-filter-menu-columns` · `--popover-max-height-menu` · `--popover-pad` · `--stack-lg`
 
 From `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.scss`. Override these through the token layer, never with a literal.
 

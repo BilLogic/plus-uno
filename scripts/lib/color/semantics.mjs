@@ -485,11 +485,11 @@ function shadows(pal) {
   const blockingW = 'Light geometry comes from the plan. Dark equals dark overlay: on the 60% black Backdrop any shadow measures 1 to 4 gray levels.';
   const CARD = ' Cards rest on surface.raised with this ring; a clickable card moves to shadow.overlay on hover.';
   const SHADOWS = [
-    ['elevation.shadow.raised', raisedL, raisedD, 'Box shadow of a raised card. Pair with elevation.surface.raised.', `${rw}${CARD} In dark, the ring is paper at 10%, so cards keep an edge.`],
-    ['elevation.shadow.overlay', overlayL, overlayD, 'Box shadow of anything over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay.', `${ow} Modals join this level.`],
-    ['elevation.shadow.blocking', blockingL, overlayD, 'Box shadow of a modal that blocks the page behind a Backdrop. Pair with elevation.surface.overlay.', blockingW],
+    ['elevation.shadow.raised', raisedL, raisedD, 'Box shadow of a Card: one object a person can act on. Pair with elevation.surface.raised.', `${rw}${CARD} In dark, the ring is paper at 10%, so cards keep an edge.`],
+    ['elevation.shadow.overlay', overlayL, overlayD, 'Box shadow of a layer that floats while the page stays usable: a Popup, a Select list, a floating Sidebar or Panel, a Flag, a dragged Card. Pair with elevation.surface.overlay.', ow],
+    ['elevation.shadow.blocking', blockingL, overlayD, 'Box shadow of the Modal on its Backdrop, the one surface that blocks the page. Pair with elevation.surface.overlay.', blockingW],
     ['elevation.shadow.overflow', `0px 0px 8px ${a(I, 16)}, 0px 0px 1px ${a(I, 12)}`, `0px 0px 12px ${a(K, 56)}, 0px 0px 1px ${a(K, 50)}`,
-      "Shadow where content scrolls under other content, such as a table's sticky column.", null],
+      "Shadow where content scrolls under a part that stays put, such as a table's sticky header or column. A border marks the cut first.", null],
     ['elevation.shadow.overflow.spread', a(I, 16), a(K, 56), 'Fallback for overflow when a box shadow is not feasible; pair with .perimeter.', null],
     ['elevation.shadow.overflow.perimeter', a(I, 12), a(K, 50), 'Fallback for overflow when a box shadow is not feasible; pair with .spread.', null],
   ];

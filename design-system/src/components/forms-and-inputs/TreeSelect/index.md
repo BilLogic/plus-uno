@@ -12,12 +12,24 @@ TreeSelect: a field that picks from options that nest, at any level of the tree.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `TreeSelect` when the options genuinely nest and someone may need to see
 or pick at more than one level — a curriculum with units and lessons, a
 category tree. For options that nest but are chosen one level at a time in
 sequence, use `Cascader` instead. For a flat list, use `Select`.
+
+## Motion
+
+TreeSelect reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
+| change | Expand and collapse | `--ds-motion-spatial-fast` | Columns and branches expand. |
 
 ## Best practices
 
@@ -61,9 +73,9 @@ subtree is complete.
     value={topics}
     onChange={setTopics}
     options={[
-        { value: 'geometry', label: 'Geometry', children: [
-            { value: 'triangles', label: 'Triangles' },
-            { value: 'circles', label: 'Circles' },
+        { value: 'roosevelt-k8', label: 'Roosevelt K-8', children: [
+            { value: 'roosevelt-mon', label: 'Monday 3:30 PM' },
+            { value: 'roosevelt-wed', label: 'Wednesday 3:30 PM' },
         ] },
     ]}
 />
@@ -84,7 +96,7 @@ subtree is complete.
 - For options chosen one level at a time in sequence, use `Cascader`.
 - For a flat list with no hierarchy, use `Select`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `VerticalButton`
 
 ## Parts
 
@@ -110,17 +122,17 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
 | Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
-| Tree panel | `--ds-surface-overlay` with a `--ds-border` edge, `--popover-radius-menu-md` and `--ds-shadow-overlay`. |
+| Tree panel | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | Row | `--item-height-md` high; hovered `--ds-background-neutral-subtle-hovered`, picked `--ds-background-selected` with `--ds-text-selected`; the expand toggle `--ds-icon-subtle`. |
 
 ## Content guidelines
 
 | Do | Don't |
 | --- | --- |
-| Name each node by what it is: "Algebra". | A node that only reads right under its parent. |
+| Name each node by what it is: "Lincoln Middle". | A node that only reads right under its parent. |
 | Keep branches shallow, two or three levels. | A tree deeper than people can hold in mind. |
 | Say what to do in an error: "Pick a topic". | "Required" or "Invalid". |
 | Use the same label form at every level. | Mix a category name with a full sentence. |

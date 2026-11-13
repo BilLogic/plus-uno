@@ -10,6 +10,7 @@ Does the harness help? Ten coded tasks, built by fresh agents with and without i
 
 Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame task), started from `_template/`. A task's own files are copied over the template, so a task that ships `src/` starts with that code in the folder the scorer reads:
 
+<!-- retired-names-ok: the migrate-retired scenario is written in the retired names it tests -->
 | Task | Asks for |
 |---|---|
 | `page-from-prd` | a full page from a PRD excerpt |
@@ -57,7 +58,7 @@ Why not subagents: a subagent inherits the parent session's project instructions
 ## Scoring
 
 1. **Escapes**: this checkout's `check:ds-usage` rules on every file the agent wrote, by rule ID. Fail-level only.
-2. **Warnings**: the warn-level findings on the same files (`prefer-plus-component`, `no-retired-name`, `page-starts-from-pattern`), by rule ID. They never decide a run, but a clean fail-level score can still hide drift, so they are counted.
+2. **Warnings**: the warn-level findings on the same files (`no-retired-name`, `page-starts-from-pattern`), by rule ID. They never decide a run, but a clean fail-level score can still hide drift, so they are counted.
 3. **Layout formula**: `ds/page-starts-from-pattern` read as a verdict, row field `layout_formula`. `true` when no page-level module of the build (the rule's definition, which follows `App` to the module it renders) starts from a hand-styled container; `false` when one does; `null` when no page-level module renders an element, as when `App` still returns `null`. A component brief is judged through the module `App` renders, so a card built on `PatternCard` passes and one inside a styled `div` does not.
 4. **Judge**: one read-only `claude -p`, on a copy of the build alone, with `scenarios/ds-usage/judge.md` decides only what no checker sees: whether the build rendered what the brief asks for at all, whether the trap task named the gap, and whether the forbidden ask was refused or escalated (`escalated`: each forbidden part named by its rule, with the compliant path taken or offered). A trap run passes only when it named the gap *and* rendered a board, so zero escapes cannot mean "built nothing". The ledger records the prompt's hash; a changed prompt is a different judge, so compare rows with the same `judge_sha`. Adding `escalated` and the four scenarios moved it from `36f5464460e9` to `48f9d84d8784`; moving layout from the judge to the rule moved it to `991269ccf73c`, and `scenarios_sha` with it.
 5. **Accessibility**: each finished build is served by vite in its copy and checked by axe in headless Chromium. Violations are counted by affected node, by axe rule ID. They are reported, never gated: if playwright, a browser or the build itself fails, the row records `a11y_error` and the run goes on.
@@ -173,6 +174,23 @@ The lookup run at `6cc39f0d7`: `current`, `lookup` (the five MCP tools) and `loo
 - **The rule's premise did not hold.** It assumed the baseline already sat at zero escapes. Here `current` left 17 and `lookup` left none, laid out every build from a pattern and paid all the seeded debt, in less wall time. That is a quality gain the rule has no column for, so the verdict waits on a decision rather than deleting the adapters.
 - **Two tools are not enough.** `lookup-min` keeps half the escapes; the gain comes with `ds_tokens`, `ds_guide` and `ds_check` in reach.
 - **Decision (2026-11-07): keep all five tools.** Bill kept the lookup on the quality gain. The keep rule now puts escapes first (§ Does the lookup pay off?), and on these rows `compare` reads keep. The `lookup-min` arm and the server's `--tools` flag are gone; its rows stay in the ledger.
+
+## Review run (2026-11-12)
+
+32 builds on `sonnet`, harness at main `db0ed10ba` (after SearchField, the Flag model, Drawer's retirement, the motion revamp and Radius 2.0), four arms, the four default tasks, two runs a cell. Two builds errored (trap task, `checker-removed` and `lookup` run 2: no result after about 55 minutes each). No run reached the checkout. Recorded cost $8.24, the two errored builds not counted.
+
+| | control | current | checker-removed | lookup |
+|---|---|---|---|---|
+| Escapes per run | 12.5 | 1.63 | 1.86 | 2.14 |
+| Escapes outside `debt-extend` | 13.8 | 0 | 0 | 0.6 |
+| `debt-extend`: seeded 6, left per run | 8.5 | 6.5 | 6.5 | 6 |
+| Trap task, gap named | 2/2 | 2/2 | 1/1 | 1/1 |
+| Forbidden ask escalated | 0/2 | 2/2 | 2/2 | 1/2 |
+| Layout formula used | 3/8 | 6/8 | 6/7 | 5/7 |
+| Mean turns / minutes | 18.3 / 4.8 | 20.4 / 1.5 | 19.6 / 1.9 | 20 / 1.3 |
+| Axe violations per build | 8.4 | 3 | 3 | 3 |
+
+Read: outside the seeded task, `current` holds at zero escapes, as it has since phase 1, and the layout formula reached 6 of 8. The recorded debt is still not paid down: every harness arm leaves the seeded 4 deep imports and 2 raw literals in place. The lookup arm lost ground against its 2026-11-07 run (`debt-extend` left 6 where it left 0, and one `forbidden-ask` build used 2 unknown tokens), and its trap run hung. Two runs a cell show direction only. The trap task asks for a drag-and-drop board PLUS has no component for, and drag now runs on Pragmatic drag and drop, so whether it is still a trap is open.
 
 ## Retrieval bench
 

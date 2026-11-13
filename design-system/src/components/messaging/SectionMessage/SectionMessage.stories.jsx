@@ -402,10 +402,10 @@ GroundAndText.play = async ({ canvasElement }) => {
         }
 
         // --radius-md corners and the role's named background ground.
-        const radius = tokenLength(canvasElement, '--radius-md');
-        await expect(radius, 'the radius token is 4px, as Figma draws it').toBe(4);
+        const radius = tokenLength(canvasElement, '--radius-xl');
+        await expect(radius, 'the radius token is 12px').toBe(12);
         for (const corner of ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft']) {
-            await expect(px(s[`border${corner}Radius`]), `${id}: ${corner} radius is the modal-radius-sm token`).toBe(radius);
+            await expect(px(s[`border${corner}Radius`]), `${id}: ${corner} radius is the section message radius token`).toBe(radius);
         }
         await expect(s.backgroundColor, `${id}: ground is the role's named background token`)
             .toBe(tokenColor(canvasElement, GROUND_TOKEN[appearance]));
@@ -493,4 +493,9 @@ export const Focused = {
         await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
         action.blur();
     },
+};
+
+const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
+Overview.play = async ({ canvasElement }) => {
+    await expect(radiusOf(canvasElement, '.plus-section-message'), 'Section message radius is 12').toBe('12px');
 };

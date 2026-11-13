@@ -1,0 +1,75 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import { SoundPlayers } from '@/storybook-docs/sound-docs.jsx';
+
+export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-sound-${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
+
+<Meta title="Foundations/Sound/Overview" tags={['!dev', 'manifest']} />
+
+<FoundationHero
+    title="Sound"
+    summary="Sound marks the few moments worth hearing, and lands with the motion that shows them."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Overview">
+
+A sound plays where a moment matters and a tutor may be looking elsewhere: a Flag arriving, a step done, a sign-up confirmed. Every sound is synthesized in the browser from one material, a dry abacus bead, so there are no audio files.
+
+</FoundationSection>
+
+<FoundationSection title="Principles">
+
+<FoundationSubsection title="Rare">
+
+Most moments are silent. A sound plays only where its registry row names one: <Page id="when-to-play">When to play</Page>.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Paired">
+
+Every sound has an on-screen change that says the same thing, so turning sound off loses nothing: <Page id="settings-and-accessibility">Settings and accessibility</Page>.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Landed">
+
+A sound lands when its motion lands: <Page id="with-motion">With motion</Page>.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="In key">
+
+Every sound is in one key, so any two can play back to back: <Page id="sounds">Sounds</Page>.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="The nine sounds">
+
+Press one to hear it. The switch is the same setting the app reads.
+
+<SoundPlayers />
+
+AI feedback adds three more, on the Sounds page.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Motion', description: 'The springs every sound lands with.', href: '?path=/docs/foundations-motion-physics--docs' },
+        { title: 'Flag', description: 'The first component that plays a sound.', href: '?path=/docs/components-messaging-flag--docs' },
+    ]}
+/>
+
+</FoundationSection>
