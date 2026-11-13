@@ -66,7 +66,7 @@ export const Placements = () => (
 
 export const Spacing = () => (
     <div style={{ display: 'flex', gap: 'var(--space-300)', padding: 'var(--space-150) var(--space-150) var(--size-1500)' }}>
-        <DropdownMenu trigger={<Button>Cozy</Button>} spacing="cozy">
+        <DropdownMenu trigger={<Button>Default</Button>} spacing="default">
             {basicMenu}
         </DropdownMenu>
         <DropdownMenu trigger={<Button>Compact</Button>} spacing="compact">
@@ -79,14 +79,14 @@ Spacing.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
 
-    await userEvent.click(canvas.getByRole('button', { name: 'Cozy' }));
-    const cozyRow = await body.findByRole('menuitem', { name: 'Action' });
-    await expect(Math.round(cozyRow.getBoundingClientRect().height), 'cozy rows are 40').toBe(40);
+    await userEvent.click(canvas.getByRole('button', { name: 'Default' }));
+    const defaultRow = await body.findByRole('menuitem', { name: 'Action' });
+    await expect(Math.round(defaultRow.getBoundingClientRect().height), 'default rows are 32').toBe(32);
     await userEvent.keyboard('{Escape}');
 
     await userEvent.click(canvas.getByRole('button', { name: 'Compact' }));
     const compactRow = await body.findByRole('menuitem', { name: 'Action' });
-    await expect(Math.round(compactRow.getBoundingClientRect().height), 'compact rows are 32').toBe(32);
+    await expect(Math.round(compactRow.getBoundingClientRect().height), 'compact rows are 24').toBe(24);
 };
 
 export const WithSections = () => (
@@ -201,7 +201,7 @@ MenuKeyboardNavigation.play = async ({ canvasElement }) => {
 export const Interactive = {
     args: {
         placement: 'bottom-start',
-        spacing: 'cozy',
+        spacing: 'default',
         shouldFlip: true,
     },
     render: (args) => (
@@ -256,7 +256,7 @@ export const CompactRows = {
     ),
     play: async ({ canvasElement }) => {
         const row = await body(canvasElement).findByRole('menuitem', { name: 'Action' });
-        await expect(Math.round(row.getBoundingClientRect().height)).toBe(32);
+        await expect(Math.round(row.getBoundingClientRect().height)).toBe(24);
     },
 };
 

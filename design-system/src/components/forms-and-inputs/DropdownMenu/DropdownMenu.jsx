@@ -43,7 +43,7 @@ const DropdownMenu = ({
     onOpenChange,
     placement = 'bottom-start',
     shouldFlip = true,
-    spacing = 'cozy',
+    spacing = 'default',
     loading = false,
     hasError = false,
     onRetry,
@@ -123,7 +123,7 @@ const DropdownMenu = ({
                         onClick={handleRowPick}
                     >
                         {hasError && !loading ? (
-                            <MenuGroup density={spacing === 'compact' ? 'compact' : 'regular'} minWidth={minWidth}>
+                            <MenuGroup density={spacing} minWidth={minWidth}>
                                 <CustomItem elemBefore={<Icon name="circle-exclamation" />}>Couldn't load options</CustomItem>
                                 <ButtonItem onClick={onRetry} data-keep-open="true">Retry</ButtonItem>
                             </MenuGroup>
@@ -137,7 +137,7 @@ const DropdownMenu = ({
                                 <span>Loading options</span>
                             </div>
                         ) : (
-                            <MenuGroup density={spacing === 'compact' ? 'compact' : 'regular'} maxHeight={maxHeight} minWidth={minWidth}>
+                            <MenuGroup density={spacing} maxHeight={maxHeight} minWidth={minWidth}>
                                 {children}
                             </MenuGroup>
                         )}
@@ -163,8 +163,8 @@ DropdownMenu.propTypes = {
     placement: PropTypes.oneOf(PLACEMENTS),
     /** Flips to the opposite side when there isn't room. */
     shouldFlip: PropTypes.bool,
-    /** `cozy` draws 40px rows (default), `compact` draws 32px. */
-    spacing: PropTypes.oneOf(['cozy', 'compact']),
+    /** `default` draws 32px rows, `compact` draws 24px. */
+    spacing: PropTypes.oneOf(['default', 'compact']),
     /** Shows one "Loading options" row, with a spinner, in place of the menu's rows while its options load. Never skeleton rows. */
     loading: PropTypes.bool,
     /** Shows "Couldn't load options" with a Retry row in place of the menu's rows, after loading failed. */

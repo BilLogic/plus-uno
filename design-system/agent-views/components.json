@@ -3756,12 +3756,12 @@
           "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'cozy'",
+          "default": "'default'",
           "values": [
-            "cozy",
+            "default",
             "compact"
           ],
-          "description": "`cozy` draws 40px rows (default), `compact` draws 32px.",
+          "description": "`default` draws 32px rows, `compact` draws 24px.",
           "deprecated": null
         },
         {
