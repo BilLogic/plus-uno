@@ -227,7 +227,8 @@ const preview = {
               "Typography",
               "Spacing and size",
               "Elevation and layers",
-              "Motion"
+              "Motion",
+              "Library"
             ]
           ],
           "Components",

@@ -58,6 +58,7 @@ export const PAGES = [
   { file: 'design-system/src/styles/TokensSpacingAndSize.mdx', id: 'foundations-tokens-spacing-and-size' },
   { file: 'design-system/src/styles/TokensElevationAndLayers.mdx', id: 'foundations-tokens-elevation-and-layers' },
   { file: 'design-system/src/styles/TokensMotion.mdx', id: 'foundations-tokens-motion' },
+  { file: 'design-system/src/styles/TokensLibrary.mdx', id: 'foundations-tokens-library' },
   { file: 'design-system/src/styles/Typography.mdx', id: 'foundations-visual-typography' },
   { file: 'design-system/src/storybook-docs/patterns/PatternsOverview.mdx', id: 'patterns-overview' },
   { file: 'design-system/src/storybook-docs/patterns/CommonActions/CommonActions.mdx', id: 'patterns-common-actions' },
