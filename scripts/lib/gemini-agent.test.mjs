@@ -95,9 +95,9 @@ test('Vertex estimates use separate uncached, cached and billable output counts'
 });
 
 test('Vertex budget reserves the next run and stops on missing usage', () => {
-  const rows = [{ model: 'sonnet', cost_usd: 100 }, { model: 'gemini-3.8-flash', estimated_cost_usd: 39.5 }];
+  const rows = [{ model: 'sonnet', cost_usd: 100 }, { model: 'gemini-3.8-flash', estimated_cost_usd: 34.5 }];
   assert.equal(vertexBudget(rows).can_start, true);
   assert.equal(vertexBudget([...rows, { model: 'gemini-3.8-flash', estimated_cost_usd: 1 }]).can_start, false);
   assert.equal(vertexBudget([{ model: 'gemini-3.8-flash', input_tokens: null, output_tokens: null }]).can_start, false);
-  assert.equal(vertexBudget(rows).spent, 39.5);
+  assert.equal(vertexBudget(rows).spent, 34.5);
 });

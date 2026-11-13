@@ -37,9 +37,9 @@ export function estimateGeminiCost(usage) {
 
 /** Ledger-based stop before another metered run; unknown usage holds the batch.
  * A $45 operating ceiling leaves $5 outside it for pre-study/incomplete receipts.
- * Each new run also reserves $5 inside that ceiling before it starts.
+ * Each new run reserves $10 inside that ceiling, covering two in-flight runs.
  */
-export function vertexBudget(rows, limit = 45, reserve = 5) {
+export function vertexBudget(rows, limit = 45, reserve = 10) {
   let spent = 0;
   let unknown = 0;
   for (const row of rows.filter((r) => r.model === 'gemini-3.8-flash')) {
