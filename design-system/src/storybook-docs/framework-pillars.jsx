@@ -55,11 +55,10 @@ const Pillar = ({ name, axis, art, promise }) => (
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 'var(--stack-sm)',
-                minHeight: 180,
                 padding: 'var(--card-pad-spacious)',
                 textAlign: 'center',
                 background: 'var(--ds-surface-sunken)',
-                borderRadius: 'var(--ds-radius-medium)',
+                borderRadius: 'var(--card-radius)',
                 color: 'var(--ds-text-subtle)',
             }}
         >
