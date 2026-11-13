@@ -35,12 +35,12 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/forms-and-inputs/DatePicker/",
     "DatePicker",
-    "components-forms-and-inputs-date-time-picker-date-picker--docs"
+    "components-forms-and-inputs-date-time-picker-date-picker-date-picker--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/DateTimePicker/",
     "DateTimePicker",
-    "components-forms-and-inputs-date-time-picker--docs"
+    "components-forms-and-inputs-date-time-picker-date-time-picker--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/FileUpload/",
@@ -70,7 +70,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/forms-and-inputs/Radio/",
     "Radio",
-    "components-forms-and-inputs-radio--docs"
+    "components-forms-and-inputs-radio-radio--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/Range/",
@@ -155,7 +155,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/labels/Tag/",
     "Tag",
-    "components-labels-tag--docs"
+    "components-labels-tag-tag--docs"
   ],
   [
     "design-system/src/components/labels/TagGroup/",
@@ -233,11 +233,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-navigation-link--docs"
   ],
   [
-    "design-system/src/components/navigation/MenuGroup/",
-    "MenuGroup",
-    "components-navigation-menu--docs"
-  ],
-  [
     "design-system/src/components/navigation/Pagination/",
     "Pagination",
     "components-navigation-pagination--docs"
@@ -285,6 +280,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/patterns/Sidebar/",
     "Sidebar",
-    "components-navigation-navigation-system--docs"
+    "components-navigation-navigation-system-navigation-system--docs"
   ]
 ];

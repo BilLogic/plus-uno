@@ -363,6 +363,55 @@
 
 # Storybook static files — serve as-is
 [[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-forms-and-inputs-radio--docs" }
+  to = "/storybook/?path=/docs/components-forms-and-inputs-radio-radio--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-forms-and-inputs-select--docs" }
+  to = "/storybook/?path=/docs/components-forms-and-inputs-select-select--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-forms-and-inputs-date-time-picker--docs" }
+  to = "/storybook/?path=/docs/components-forms-and-inputs-date-time-picker-date-time-picker--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-labels-tag--docs" }
+  to = "/storybook/?path=/docs/components-labels-tag-tag--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-text-and-data-display-code--docs" }
+  to = "/storybook/?path=/docs/components-text-and-data-display-code-code--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-navigation-navigation-system--docs" }
+  to = "/storybook/?path=/docs/components-navigation-navigation-system-navigation-system--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/ai-ui-components-ai-message--docs" }
+  to = "/storybook/?path=/docs/ai-ui-components-ai-message-ai-message--docs"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/storybook/*"
   to = "/storybook/:splat"
   status = 200

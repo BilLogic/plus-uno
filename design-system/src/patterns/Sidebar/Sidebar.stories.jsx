@@ -135,7 +135,7 @@ const Live = ({ view = 'supervisor', tabSet = 'few', boxHeight, account, ...args
 };
 
 export default {
-    title: 'Components/Navigation/Navigation system',
+    title: 'Components/Navigation/Navigation system/Navigation system',
     component: PatternSidebar,
     tags: ['!dev', '!autodocs'],
     render: (args) => <Live {...args} />,
