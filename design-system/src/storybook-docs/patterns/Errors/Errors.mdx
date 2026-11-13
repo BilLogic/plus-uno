@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as ErrorsStories from './Errors.stories.jsx';
 import { PLACE_STAGE } from './errorsDemo.jsx';
@@ -15,8 +16,21 @@ import {
 
 <Meta title="Patterns/States/Errors" tags={['!dev', 'manifest']} />
 
-<Title>Errors</Title>
-Where a failure shows and what it says. The place follows what failed: a field, a form, a view, a background job, or the whole page. The message is words, never a code, never in a tooltip, never color alone.
+<DocsLanding
+    page="patterns-states-errors"
+    eyebrow="Pattern · States"
+    title="Errors"
+    purpose="Where a failure shows and what it says. The place follows what failed: a field, a form, a view, a background job, or the whole page. The message is words, never a code, never in a tooltip, never color alone."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Flag', href: './?path=/docs/components-messaging-flag--docs' },
+            { title: 'Banner', href: './?path=/docs/components-messaging-banner--docs' },
+            { title: 'Section message', href: './?path=/docs/components-messaging-section-message--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={ErrorsStories}>
 

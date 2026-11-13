@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FilteringStories from './Filtering.stories.jsx';
 import { STAGE } from './filteringDemo.jsx';
@@ -18,8 +19,22 @@ import {
 
 <Meta title="Patterns/Finding things/Filtering" tags={['!dev', 'manifest']} />
 
-<Title>Filtering</Title>
-How a person narrows a collection: a table, a list, a calendar or a card grid. Filters sit at the end of the Section's view bar, and the start stays for views. Five tiers by how much filtering the content needs, one tier per bar.
+<DocsLanding
+    page="patterns-finding-things-filtering"
+    eyebrow="Pattern · Finding things"
+    title="Filtering"
+    purpose="How a person narrows a collection: a table, a list, a calendar or a card grid. Filters sit at the end of the Section's view bar, and the start stays for views. Five tiers by how much filtering the content needs, one tier per bar."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Filter menu', href: './?path=/docs/components-forms-and-inputs-filter-menu--docs' },
+            { title: 'Popup select', href: './?path=/docs/components-forms-and-inputs-popup-select--docs' },
+            { title: 'Icon button', href: './?path=/docs/components-forms-and-inputs-button-icon-button--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Popup', href: './?path=/docs/templates-popup-popup--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={FilteringStories}>
 

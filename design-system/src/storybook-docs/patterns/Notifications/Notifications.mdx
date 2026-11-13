@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as NotificationsStories from './Notifications.stories.jsx';
@@ -11,8 +12,23 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 
 <Meta title="Patterns/Notifications and indicators/Notifications" tags={['!dev', 'manifest']} />
 
-<Title>Notifications</Title>
-What the product says back, and where. A Flag at the top right for something that happened; a Banner at one of three tiers for a condition; a SectionMessage in the page for something to read or act on; the Inbox for what arrived while you were away.
+<DocsLanding
+    page="patterns-notifications-and-indicators-notifications"
+    eyebrow="Pattern · Notifications and indicators"
+    title="Notifications"
+    purpose="What the product says back, and where. A Flag at the top right for something that happened; a Banner at one of three tiers for a condition; a SectionMessage in the page for something to read or act on; the Inbox for what arrived while you were away."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Flag', href: './?path=/docs/components-messaging-flag--docs' },
+            { title: 'Banner', href: './?path=/docs/components-messaging-banner--docs' },
+            { title: 'Section message', href: './?path=/docs/components-messaging-section-message--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+            { title: 'Page', href: './?path=/docs/templates-page-page--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={NotificationsStories}>
 

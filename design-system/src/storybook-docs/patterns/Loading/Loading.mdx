@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as LoadingStories from './Loading.stories.jsx';
 import { KIND_STAGE } from './loadingDemo.jsx';
@@ -15,8 +16,22 @@ import {
 
 <Meta title="Patterns/States/Loading" tags={['!dev', 'manifest']} />
 
-<Title>Loading</Title>
-What to show while PLUS fetches or saves something. Two inputs decide it: what is loading, and how long it has taken. The bands are 1 s and 10 s.
+<DocsLanding
+    page="patterns-states-loading"
+    eyebrow="Pattern · States"
+    title="Loading"
+    purpose="What to show while PLUS fetches or saves something. Two inputs decide it: what is loading, and how long it has taken. The bands are 1 s and 10 s."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Skeleton', href: './?path=/docs/components-loading-skeleton--docs' },
+            { title: 'Spinner', href: './?path=/docs/components-loading-spinner--docs' },
+            { title: 'Progress bar', href: './?path=/docs/components-loading-progress-bar--docs' },
+            { title: 'Dropdown menu', href: './?path=/docs/components-forms-and-inputs-dropdown-menu--docs' },
+            { title: 'Flag', href: './?path=/docs/components-messaging-flag--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={LoadingStories}>
 

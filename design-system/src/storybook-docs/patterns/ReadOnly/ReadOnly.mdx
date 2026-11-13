@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as ReadOnlyStories from './ReadOnly.stories.jsx';
 import { CARD_STAGE } from './readOnlyDemo.jsx';
@@ -15,8 +16,19 @@ import {
 
 <Meta title="Patterns/States/Read-only" tags={['!dev', 'manifest']} />
 
-<Title>Read-only</Title>
-A value someone could change but this person cannot right now. It stays in the tab order at full contrast, can be selected and copied, and says why in its caption.
+<DocsLanding
+    page="patterns-states-read-only"
+    eyebrow="Pattern · States"
+    title="Read-only"
+    purpose="A value someone could change but this person cannot right now. It stays in the tab order at full contrast, can be selected and copied, and says why in its caption."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Select', href: './?path=/docs/components-forms-and-inputs-select--docs' },
+            { title: 'Checkbox', href: './?path=/docs/components-forms-and-inputs-checkbox--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={ReadOnlyStories}>
 

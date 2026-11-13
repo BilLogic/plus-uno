@@ -1,5 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import { FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { ChooserDot, HIDDEN } from '@/storybook-docs/templates/overview-parts.jsx';
@@ -11,13 +12,18 @@ import * as NavigationStories from './Navigation/Navigation.stories.jsx';
 
 <Meta title="Patterns/Overview" tags={['!dev', 'manifest']} />
 
-<FoundationHero
-    kind="Overview"
+<DocsLanding
+    page="patterns-overview"
+    eyebrow="Pattern"
     title="Patterns"
-    summary="Code-free guidance for a situation, shown on templates used as they are or tweaked."
+    purpose="Code-free guidance for a situation, shown on templates used as they are or tweaked."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Templates and patterns', href: './?path=/docs/templates-templates-and-patterns--docs' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="The thirteen patterns">
 

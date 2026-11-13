@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as NavigationStories from './Navigation.stories.jsx';
@@ -12,8 +13,21 @@ import { BreadcrumbOnRecordPage } from '@/storybook-docs/illustrations/navigatio
 
 <Meta title="Patterns/Finding things/Navigation" tags={['!dev', 'manifest']} />
 
-<Title>Navigation</Title>
-How a person moves: between areas in the Sidebar, to the items they opened, between views of one collection, down into a record and back out. Each move has one control and one motion.
+<DocsLanding
+    page="patterns-finding-things-navigation"
+    eyebrow="Pattern · Finding things"
+    title="Navigation"
+    purpose="How a person moves: between areas in the Sidebar, to the items they opened, between views of one collection, down into a record and back out. Each move has one control and one motion."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Frame', href: './?path=/docs/templates-frame-frame--docs' },
+            { title: 'Page', href: './?path=/docs/templates-page-page--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={NavigationStories}>
 

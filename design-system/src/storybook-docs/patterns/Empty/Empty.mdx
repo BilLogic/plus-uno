@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as EmptyStories from './Empty.stories.jsx';
 import { STAGE, SMALL_STAGE, TYPE_STAGE } from './emptyDemo.jsx';
@@ -15,8 +16,21 @@ import {
 
 <Meta title="Patterns/States/Empty" tags={['!dev', 'manifest']} />
 
-<Title>Empty</Title>
-What a view shows when it has nothing to show. It says what belongs here, why it is empty, and what to do next; it never leaves a blank area and never apologizes.
+<DocsLanding
+    page="patterns-states-empty"
+    eyebrow="Pattern · States"
+    title="Empty"
+    purpose="What a view shows when it has nothing to show. It says what belongs here, why it is empty, and what to do next; it never leaves a blank area and never apologizes."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Empty state', href: './?path=/docs/components-messaging-empty-state--docs' },
+            { title: 'Button', href: './?path=/docs/components-forms-and-inputs-button-button--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={EmptyStories}>
 

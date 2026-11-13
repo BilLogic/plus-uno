@@ -17,7 +17,7 @@
  * own tests and the page's screenshots do that.
  *
  * THE ALLOW-LIST GROWS. `PAGES` below is the set of pages the check covers. It
- * starts with Color; each ticket that moves another page onto DocsLanding adds
+ * started with Color; each ticket that moves another page onto DocsLanding adds
  * its row here and its hero to the registry in the same change. A registry
  * entry for a page that is not in `PAGES` fails, so the two cannot drift apart.
  */
@@ -37,9 +37,25 @@ export const REGISTRY = 'design-system/src/storybook-docs/docs-landing/hero-regi
  * The pages covered: the MDX file and the page id, which is the Storybook id of
  * the page (its title, lower-cased and joined with dashes).
  */
-export const PAGES = [{ file: 'design-system/src/styles/Colors.mdx', id: 'foundations-color' }];
+export const PAGES = [
+  { file: 'design-system/src/styles/Colors.mdx', id: 'foundations-color' },
+  { file: 'design-system/src/storybook-docs/patterns/PatternsOverview.mdx', id: 'patterns-overview' },
+  { file: 'design-system/src/storybook-docs/patterns/CommonActions/CommonActions.mdx', id: 'patterns-actions-and-input-common-actions' },
+  { file: 'design-system/src/storybook-docs/patterns/Forms/Forms.mdx', id: 'patterns-actions-and-input-forms' },
+  { file: 'design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx', id: 'patterns-finding-things-filtering' },
+  { file: 'design-system/src/storybook-docs/patterns/Navigation/Navigation.mdx', id: 'patterns-finding-things-navigation' },
+  { file: 'design-system/src/storybook-docs/patterns/Search/Search.mdx', id: 'patterns-finding-things-search' },
+  { file: 'design-system/src/storybook-docs/patterns/Indicators/Indicators.mdx', id: 'patterns-notifications-and-indicators-indicators' },
+  { file: 'design-system/src/storybook-docs/patterns/Notifications/Notifications.mdx', id: 'patterns-notifications-and-indicators-notifications' },
+  { file: 'design-system/src/storybook-docs/patterns/Disabled/Disabled.mdx', id: 'patterns-states-disabled' },
+  { file: 'design-system/src/storybook-docs/patterns/Empty/Empty.mdx', id: 'patterns-states-empty' },
+  { file: 'design-system/src/storybook-docs/patterns/Errors/Errors.mdx', id: 'patterns-states-errors' },
+  { file: 'design-system/src/storybook-docs/patterns/Loading/Loading.mdx', id: 'patterns-states-loading' },
+  { file: 'design-system/src/storybook-docs/patterns/Overflow/Overflow.mdx', id: 'patterns-states-overflow' },
+  { file: 'design-system/src/storybook-docs/patterns/ReadOnly/ReadOnly.mdx', id: 'patterns-states-read-only' },
+];
 
-const OLD_OPENER = /<FoundationHero\b/;
+const OLD_OPENER = /<FoundationHero\b|<Title\b/;
 const LANDING = /<DocsLanding\b/;
 const LANDING_PAGE = /<DocsLanding\b[^>]*?\bpage="([^"]+)"/s;
 
@@ -70,7 +86,7 @@ export function checkPage({ file, source, id, heroes }) {
       found.push(`${file}: <DocsLanding> has page="${named ?? ''}" but this page's id is ${id}.`);
     }
     if (OLD_OPENER.test(source)) {
-      found.push(`${file}: still renders <FoundationHero> beside the landing; the landing replaces it.`);
+      found.push(`${file}: still renders <FoundationHero> or <Title> beside the landing; the landing replaces it.`);
     }
   }
   if (!heroes.includes(id)) {

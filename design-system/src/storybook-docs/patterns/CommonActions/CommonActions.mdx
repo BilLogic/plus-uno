@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as CommonActionsStories from './CommonActions.stories.jsx';
@@ -17,8 +18,21 @@ import {
 
 <Meta title="Patterns/Actions and input/Common actions" tags={['!dev', 'manifest']} />
 
-<Title>Common actions</Title>
-Which button, in which look, in which place, with which word. Cancel, Close, Reset, copy, edit, remove, the destructive tiers, and acting on many rows at once.
+<DocsLanding
+    page="patterns-actions-and-input-common-actions"
+    eyebrow="Pattern · Actions and input"
+    title="Common actions"
+    purpose="Which button, in which look, in which place, with which word. Cancel, Close, Reset, copy, edit, remove, the destructive tiers, and acting on many rows at once."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Button', href: './?path=/docs/components-forms-and-inputs-button-button--docs' },
+            { title: 'Icon button', href: './?path=/docs/components-forms-and-inputs-button-icon-button--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={CommonActionsStories}>
 

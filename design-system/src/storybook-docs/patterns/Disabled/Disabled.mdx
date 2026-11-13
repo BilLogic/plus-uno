@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as DisabledStories from './Disabled.stories.jsx';
 import { CARD_STAGE } from './disabledDemo.jsx';
@@ -15,8 +16,21 @@ import {
 
 <Meta title="Patterns/States/Disabled" tags={['!dev', 'manifest']} />
 
-<Title>Disabled</Title>
-When a control cannot be used yet, or by this person. Actions stay enabled and explain; a field or option disables only for a prerequisite fixable on the same screen, with the reason as visible text; what a role can never use is hidden.
+<DocsLanding
+    page="patterns-states-disabled"
+    eyebrow="Pattern · States"
+    title="Disabled"
+    purpose="When a control cannot be used yet, or by this person. Actions stay enabled and explain; a field or option disables only for a prerequisite fixable on the same screen, with the reason as visible text; what a role can never use is hidden."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Button', href: './?path=/docs/components-forms-and-inputs-button-button--docs' },
+            { title: 'Checkbox', href: './?path=/docs/components-forms-and-inputs-checkbox--docs' },
+            { title: 'Select', href: './?path=/docs/components-forms-and-inputs-select--docs' },
+            { title: 'Section message', href: './?path=/docs/components-messaging-section-message--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={DisabledStories}>
 

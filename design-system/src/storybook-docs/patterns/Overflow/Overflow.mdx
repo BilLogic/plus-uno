@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as OverflowStories from './Overflow.stories.jsx';
@@ -18,8 +19,24 @@ import {
 
 <Meta title="Patterns/States/Overflow" tags={['!dev', 'manifest']} />
 
-<Title>Overflow</Title>
-What happens when text or a list is longer than its room. Titles and messages wrap; cells and tags truncate with the full text in a Tooltip; lists fold; tables page. No fades.
+<DocsLanding
+    page="patterns-states-overflow"
+    eyebrow="Pattern · States"
+    title="Overflow"
+    purpose="What happens when text or a list is longer than its room. Titles and messages wrap; cells and tags truncate with the full text in a Tooltip; lists fold; tables page. No fades."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Tooltip', href: './?path=/docs/components-overlays-and-layering-tooltip--docs' },
+            { title: 'Dynamic table', href: './?path=/docs/components-text-and-data-display-dynamic-table--docs' },
+            { title: 'Pagination', href: './?path=/docs/components-navigation-pagination--docs' },
+            { title: 'Breadcrumbs', href: './?path=/docs/components-navigation-breadcrumbs--docs' },
+            { title: 'Tag group', href: './?path=/docs/components-labels-tag-group--docs' },
+            { title: 'Tag', href: './?path=/docs/components-labels-tag--docs' },
+            { title: 'Status tag', href: './?path=/docs/components-labels-status-tag--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={OverflowStories}>
 
