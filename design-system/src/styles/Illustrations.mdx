@@ -29,7 +29,6 @@ export const Captioned = ({ caption, children }) => (
     title="Illustrations"
     purpose="Illustrations help a page say something simply, and reflect the mood and context of the tutor or student looking at it."
     links={{
-        label: 'Tokens',
         items: [
             { title: 'Color mapping', href: '#foundation-color-and-smart-mapping' },
             { title: 'Characters', href: '#foundation-characters' },
@@ -113,7 +112,7 @@ All 12 bodies sit at one mid strength, so the set reads equally light in Light a
 
 <FoundationSection title="Usage">
 
-Use an illustration where the page has room to breathe: empty states, onboarding, and success and completion moments. Decide first that it is needed; it supports the copy and never replaces it. Keep it out of dense working surfaces.
+Use an illustration where the page has room to breathe: empty states, onboarding, and success and completion moments. Decide first that it is needed.
 
 <FoundationSubsection title="When to use">
 
@@ -137,7 +136,6 @@ Use an illustration where the page has room to breathe: empty states, onboarding
 - Pick a size from the scale, and scale uniformly. The sizes and the room a character needs around it are on the <a href="?path=/docs/components-images-and-icons-illustration--docs">Illustration</a> component.
 - The math characters do not stand for a SMART area. Their accent hues are free choices; never reuse a SMART character's color on them.
 - Reuse the existing characters first. A new character, or a new kind of illustration, is a design lead's call.
-- Keep illustrations decorative, and never put the only copy of information in one. How to name one that carries meaning is on the component page.
 - An illustration works with the copy and never replaces it. Art with no job to do stays out of working surfaces; too much of it adds to what a reader has to take in.
 - Other visual aids have their own homes: Avatar for people, Icon for actions with labels, Logo for brand, Image for photos.
 
@@ -202,6 +200,14 @@ A single character carries the mood; a crowd competes with the message.
 
 </FoundationSection>
 
+<FoundationSection title="Accessibility">
+
+- Keep an illustration decorative, hidden from assistive technology, wherever the copy beside it says the same thing.
+- Name an illustration that carries meaning on its own, using the component's `title`, and say what it shows in a few words.
+- Never put the only copy of information in an illustration. The words carry it.
+
+</FoundationSection>
+
 <FoundationSection title="Related">
 
 <FoundationRelated
@@ -210,6 +216,7 @@ A single character carries the mood; a crowd competes with the message.
         { title: 'Tile', description: 'A square frame for an icon, logo or image.', href: '?path=/docs/components-images-and-icons-tile--docs' },
         { title: 'Logos', description: 'The PLUS mark.', href: '?path=/docs/foundations-logos--docs' },
         { title: 'Iconography', description: 'Icons for actions and objects.', href: '?path=/docs/foundations-iconography--docs' },
+        { title: 'Illustration kit', description: 'The shared shapes every illustration is drawn from.', href: '?path=/docs/get-started-illustration-kit--docs' },
     ]}
 />
 

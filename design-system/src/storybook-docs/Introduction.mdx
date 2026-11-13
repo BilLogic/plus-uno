@@ -1,4 +1,6 @@
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import { FoundationSection } from '@/storybook-docs/foundation-page.jsx';
 import LinkTo from '@storybook/addon-links/react';
 import StatusTag from '@/components/labels/StatusTag';
 import CountTag from '@/components/labels/CountTag';
@@ -17,11 +19,21 @@ import Button from '@/components/forms-and-inputs/Button';
   }}
 />
 
-<Title />
+<DocsLanding
+  page="get-started-about"
+  eyebrow="Get started"
+  title="About"
+  purpose="How this Storybook is organized, how its pages are classified, and where the foundations live."
+  links={{
+    items: [
+      { title: 'Components', href: '#foundation-how-are-components-organized' },
+      { title: 'Tokens', href: '#foundation-what-are-tokens' },
+    ],
+  }}
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page sb-plus-intro-page not-prose">
-  <div className="sb-ds-doc-section">
-    <h1 className="sb-plus-intro-overview-title">Overview</h1>
+<FoundationSection title="Overview">
 
     <p>
       PLUS Storybook is a practical implementation handbook for the design system. It combines
@@ -38,7 +50,7 @@ import Button from '@/components/forms-and-inputs/Button';
         components.
       </li>
       <li>
-        <strong>Shared docs structure:</strong> Components and Forms generally
+        <strong>Shared docs structure:</strong> components generally
         follow the same spine for predictable scanning.
       </li>
       <li>
@@ -50,24 +62,25 @@ import Button from '@/components/forms-and-inputs/Button';
       Start here to orient quickly, then branch into detailed component and style pages for deeper
       implementation decisions.
     </p>
-  </div>
+</FoundationSection>
 
-  <div className="sb-ds-doc-section">
-    ### Who this is for
+<FoundationSection title="Who this is for">
+
 
     <ul>
       <li>Designers reviewing visual and interaction patterns</li>
       <li>Engineers implementing or extending shared UI</li>
       <li>PMs and partners orienting to what the system already provides</li>
     </ul>
-  </div>
+</FoundationSection>
 
-  <div className="sb-ds-doc-section">
-    ### How are components organized?
+<FoundationSection title="How are components organized?">
+
 
     <p>
-      Components and controls live under <strong>Components</strong> and{' '}
-      <strong>Forms</strong>. Most entries are docs-first for scanning, and
+      Components live under <strong>Components</strong>, beside <strong>Patterns</strong>,{' '}
+      <strong>Templates</strong>, <strong>Data visualizations</strong>, <strong>AI UI</strong> and{' '}
+      <strong>Libraries</strong>. Most entries are docs-first for scanning, and
       Canvas is where interaction and Controls live.
     </p>
 
@@ -133,7 +146,7 @@ import Button from '@/components/forms-and-inputs/Button';
       </div>
 
       <div className="sb-plus-intro-mini-card">
-        <h4 className="sb-plus-intro-mini-title">Spacing</h4>
+        <h4 className="sb-plus-intro-mini-title">Sizes</h4>
         <p className="sb-plus-intro-mini-copy">Default and compact heights that fit a component to its surroundings.</p>
         <div className="sb-plus-intro-mini-canvas">
           <div className="sb-plus-intro-row">
@@ -174,10 +187,10 @@ import Button from '@/components/forms-and-inputs/Button';
         </div>
       </div>
     </div>
-  </div>
+</FoundationSection>
 
-  <div className="sb-ds-doc-section">
-    ### What are tokens?
+<FoundationSection title="What are tokens?">
+
 
     <p>
       Tokens are the shared design values (color, spacing, type, radius, elevation) consumed by PLUS
@@ -194,7 +207,7 @@ import Button from '@/components/forms-and-inputs/Button';
       </li>
       <li>
         <LinkTo title="Foundations/Color" name="Docs">
-          Colors
+          Color
         </LinkTo>{' '}
         - palette and semantic color usage
       </li>
@@ -214,7 +227,7 @@ import Button from '@/components/forms-and-inputs/Button';
 
     <ul>
       <li>Do not hardcode color, spacing, typography, radius, or elevation values in component code.</li>
-      <li>Use semantic token names rather than raw values whenever possible.</li>
+      <li>Use semantic token names rather than raw values.</li>
       <li>Generated PLUS token outputs are the canonical implementation source of truth.</li>
     </ul>
 
@@ -256,10 +269,10 @@ import Button from '@/components/forms-and-inputs/Button';
         </div>
       </div>
     </div>
-  </div>
+</FoundationSection>
 
-  <div className="sb-ds-doc-section">
-    ### Previous version
+<FoundationSection title="Previous version">
+
 
     <p>
       <a
@@ -268,26 +281,7 @@ import Button from '@/components/forms-and-inputs/Button';
       >
         Previous version
       </a>{' '}
-      is a read-only archive of the previous library (React-Bootstrap, the previous tokens), kept for
-      before/after comparison only. It is frozen and does not rebuild from main.
+      is a read-only archive, kept for before/after comparison. It does not rebuild from main.
     </p>
-  </div>
-
-  <div className="sb-ds-doc-section">
-    ### Run Storybook locally
-
-    <ul>
-      <li>
-        Install and start Storybook: <code>npm install</code>{' '}
-        then <code>npm run storybook</code>
-      </li>
-      <li>
-        Storybook runs on <code>http://localhost:4200</code>
-      </li>
-      <li>
-        For app + Storybook together, run <code>npm run dev</code>{' '}
-        (Vite on 4100, Storybook on 4200)
-      </li>
-    </ul>
-  </div>
+</FoundationSection>
 </div>

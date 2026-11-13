@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { RefTable, C, Do, Dont, DoDont, Callout } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
@@ -7,17 +7,15 @@ import {
     FoundationRelated,
     FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
-import { Banner } from '@/components';
 
 <Meta title="Foundations/Tokens" tags={['!dev']} />
 
 <DocsLanding
     page="foundations-tokens"
     eyebrow="Foundation"
-    title="Design tokens"
+    title="Tokens"
     purpose="Design tokens are a single source of truth to name and store design decisions for the PLUS apps."
     links={{
-        label: 'Tokens',
         items: [
             { title: 'Collections', href: '#foundation-collections' },
             { title: 'Four tiers', href: '#foundation-the-four-tier-ladder' },
@@ -30,10 +28,9 @@ import { Banner } from '@/components';
 
 Tokens are how the tutor and student apps apply color, type, spacing, radius, borders and elevation. A token has a name that says how to use it and a value that can change by theme, so one choice is made once and every screen follows.
 
-<Banner appearance="announcement">
-<strong>Two name notations</strong><br />
-PLUS writes a token with slashes in Figma (`color/text/subtle`) and as `--ds-text-subtle` in code. To start by task: use tokens in code (Using tokens in code), or choose a token in design (Choose a layer).
-</Banner>
+<Callout title="Two name notations">
+PLUS writes a token with slashes in Figma (`color/text/subtle`) and as `--ds-text-subtle` in code. To start by task: [use tokens in code](#foundation-using-tokens-in-code), or [choose a layer in design](#foundation-choose-a-layer).
+</Callout>
 
 Code reads `--ds-*` for color and elevation, `--pad-*`, `--stack-*`, `--inline-*` and the other semantic prefixes for shared steps, `--card-*`, `--table-*`, `--modal-*` and the other pattern prefixes for patterns, and `--space-*`, `--radius-*` for primitives. Figma reads local variables grouped into the collections below.
 
@@ -43,7 +40,7 @@ Code reads `--ds-*` for color and elevation, `--pad-*`, `--stack-*`, `--inline-*
 
 - Color, spacing, typography, radius and elevation come from compile-ready tokens, such as `var(--ds-text)`: never raw values, and never Figma literal names.
 - Never hardcode a color, spacing, typography, radius or elevation value when a token exists.
-- Choose the tier first (component, then pattern, then semantics, then primitives; see The four-tier ladder), then pick the token.
+- Choose the tier first (component, then pattern, then semantics, then primitives; see [Collections](#foundation-collections)), then pick the token.
 - Use primitives only for token-definition work, never in feature implementation.
 
 </FoundationSection>
@@ -65,16 +62,9 @@ For example, instead of picking one of many grays for helper text under a field,
 
 <FoundationSection title="What are themes?">
 
-A theme is a collection of token values designed to achieve a certain look. In Figma a theme is a variable mode: switching the mode re-resolves every token bound on the frame. `color / semantics` was named `color / foundations`, and `spacing / layout` is dissolved: its breakpoint values now sit on the semantics or patterns token that owns them.
+A theme is a collection of token values designed to achieve a certain look. In Figma a theme is a variable mode: switching the mode re-resolves every token bound on the frame.
 
-<RefTable
-    head={['Collection', 'Modes', 'What changes']}
-    rows={[
-        [<C>color / semantics</C>, 'Light · Dark · Light IC · Dark IC', 'Color and elevation values. IC is the high-contrast version of each.'],
-        [<><C>spacing / semantics</C> · <C>spacing / patterns</C></>, '768 · 1024 · 1440', 'Grid, screen, content, Frame sidebar, Page and Modal values per breakpoint, on whichever collection owns the token.'],
-        ['All others', 'Value', 'One value, no theme.'],
-    ]}
-/>
+Color and elevation switch by mode: Light, Dark, Light IC and Dark IC, where IC is the high-contrast version of each. Grid, screen, content, Frame, Page and Modal values switch by breakpoint (768, 1024, 1440). Every other collection has one value. The [Collections](#foundation-collections) table lists the modes of each.
 
 </FoundationSection>
 
@@ -91,27 +81,31 @@ A theme is a collection of token values designed to achieve a certain look. In F
 
 Primitives are the raw palette and scale. Every tier above them gives a step a job. Features only ever use those tiers, never a primitive.
 
-- Primitives live in `color / primitives` and `spacing / primitives`. They are hidden from publishing and used only to define the tiers above. They have no meaning, so a primitive cannot respond to a theme.
-- Semantic, pattern and component tokens live in `color / semantics`, `color / opacity`, `typography`, `spacing / semantics`, `spacing / patterns` and `spacing / components`. Each aliases a primitive, and in `color / semantics` each mode aliases a different one.
+- Primitives are hidden from publishing and used only to define the tiers above. They have no meaning, so a primitive cannot respond to a theme.
+- Semantic, pattern and component tokens each alias a primitive, and in `color / semantics` each mode aliases a different one.
 - The one exception is the Logo: its brand artwork reads palette primitives so it looks the same on every surface.
 
 </FoundationSection>
 
 <FoundationSection title="Collections">
 
+Every token sits on one of four tiers, most general to most specific, one Figma collection each and the same in code.
+
 <RefTable
-    head={['Collection', 'Layer', 'Modes']}
+    head={['Tier', 'Figma collection', 'Modes', 'Holds', 'Code']}
     rows={[
-        [<C>color / primitives</C>, 'Primitive, hidden', 'Value'],
-        [<C>color / semantics</C>, 'Semantic', 'Light, Dark, Light IC, Dark IC'],
-        [<C>color / opacity</C>, 'Semantic', 'Value'],
-        [<C>typography</C>, 'Semantic', 'Value'],
-        [<C>spacing / primitives</C>, 'Primitive, hidden', 'Value'],
-        [<C>spacing / semantics</C>, 'Semantic', 'Value · 768 · 1024 · 1440'],
-        [<C>spacing / patterns</C>, 'Pattern', 'Value · 768 · 1024 · 1440'],
-        [<C>spacing / components</C>, 'Component', 'Value'],
+        ['Primitives', <><C>color / primitives</C> · <C>spacing / primitives</C></>, 'Value (hidden)', 'The palette, and the Space, Radius, Stroke and Size ladders, ×16 numbering', <><C>--space-*</C> · <C>--radius-*</C> · <C>--stroke-*</C> · <C>--size-*</C></>],
+        ['Semantics', <C>color / semantics</C>, 'Light · Dark · Light IC · Dark IC', 'Color and elevation roles', <C>--ds-*</C>],
+        ['Semantics', <><C>color / opacity</C> · <C>typography</C></>, 'Value', 'Opacity steps and type styles', <><C>--ds-opacity-*</C> · <C>--heading-*</C> · <C>--body-*</C></>],
+        ['Semantics', <C>spacing / semantics</C>, 'Value · 768 · 1024 · 1440', 'Pad, Stack, Inline, Radius (steps only, no density), Border, Focus, Grid, Screen, Content and Size roles', <><C>--pad-*</C> · <C>--stack-*</C> · <C>--inline-*</C> · <C>--radius-*</C> · <C>--border-*</C> · <C>--focus-ring-*</C> · <C>--grid-*</C> · <C>--screen-*</C> · <C>--content-*</C></>],
+        ['Patterns', <C>spacing / patterns</C>, 'Value · 768 · 1024 · 1440', 'Frame (Sidebar), Page, Section, Card, Table, Backdrop, Modal, Popup, Panel, Focused page. Density (default, compact, spacious) lives here.', <><C>--frame-*</C> · <C>--page-*</C> · <C>--card-*</C> · <C>--modal-*</C> · <C>--blanket-*</C> · …</>],
+        ['Components', <C>spacing / components</C>, 'Value', 'A value exactly one component needs that no shared token covers (Button radius, Calendar day sizes, Checkbox and Radio control sizes, Listbox limits). Density here too.', <><C>{'--<component>-*'}</C>, e.g. <C>--button-radius-default</C></>],
     ]}
 />
+
+`layers` (z-index) is its own family outside spacing: `--layer-*` (card, dialog, flag, modal, navigation, popup, backdrop, spotlight, tooltip).
+
+**Fallback rule.** Reach for a component token first; if none fits, the pattern collection; failing that, semantics. The test for a pattern token: would the value change if the pattern changed? If yes, it belongs to the pattern (or the component); if the value is a shared step nothing specific owns, it is semantics.
 
 </FoundationSection>
 
@@ -138,28 +132,6 @@ Knowing how to read token names helps you find the right token faster in a desig
 />
 
 Names look different in different tools. In code a color token drops its foundation and a trailing default and gains the `ds` prefix; a pattern token lowercases the collection and joins with dashes.
-
-</FoundationSection>
-
-<FoundationSection title="The four-tier ladder">
-
-Every token sits on one of four tiers, most general to most specific, one Figma collection each and the same in code. One plan per family defines them (`scripts/lib/tokens/plan.mjs` for spacing), and `architecture/token-tiers-name-map.md` lists every token by tier.
-
-<RefTable
-    head={['Tier', 'Figma collection', 'Holds', 'Code']}
-    rows={[
-        ['Primitives', <C>spacing / primitives</C>, 'Space, Radius, Stroke and Size ladders, ×16 numbering', <><C>--space-*</C> · <C>--radius-*</C> · <C>--stroke-*</C> · <C>--size-*</C></>],
-        ['Semantics', <C>spacing / semantics</C>, 'Pad, Stack, Inline, Radius (the safety net: steps only, no density), Border, Focus, Grid, Screen, Content and Size roles', <><C>--pad-*</C> · <C>--stack-*</C> · <C>--inline-*</C> · <C>--radius-*</C> · <C>--border-*</C> · <C>--focus-ring-*</C> · <C>--grid-*</C> · <C>--screen-*</C> · <C>--content-*</C></>],
-        ['Patterns', <C>spacing / patterns</C>, 'Frame (Sidebar), Page, Section, Card, Table, Backdrop, Modal, Popup, Panel, Focused page. Density (default, compact, spacious) lives here.', <><C>--frame-*</C> · <C>--page-*</C> · <C>--card-*</C> · <C>--modal-*</C> · <C>--blanket-*</C> · …</>],
-        ['Components', <C>spacing / components</C>, 'A value exactly one component needs that no shared token covers (Button radius, Calendar day sizes, Checkbox and Radio control sizes, Listbox limits). Density here too.', <><C>{'--<component>-*'}</C>, e.g. <C>--button-radius-default</C></>],
-    ]}
-/>
-
-`layers` (z-index) is its own family outside spacing: `--layer-*` (card, dialog, flag, modal, navigation, popup, backdrop, spotlight, tooltip).
-
-**Fallback rule.** Reach for a component token first; if none fits, the pattern collection; failing that, semantics. The test for a pattern token: would the value change if the pattern changed? If yes, it belongs to the pattern (or the component); if the value is a shared step nothing specific owns, it is semantics.
-
-**Current names only.** Outside `specs/` the code reads only the names on this ladder, and `npm run check:old-system` keeps it that way.
 
 </FoundationSection>
 
@@ -205,22 +177,6 @@ Bind the token and nothing else. A token never takes a fallback, and the layer c
 <FoundationSubsection title="Using tokens in design">
 
 Bind a variable instead of a style value: select the layer, open the fill, stroke, radius or gap field and pick the variable by name. Set the mode on the frame to see another theme; every bound token re-resolves. Search the picker with the Figma name (`color/text/subtle`).
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Design token examples">
-
-<RefTable
-    head={['Family', 'Example', 'Page']}
-    rows={[
-        ['Color', <C>color/text/subtle</C>, 'Color'],
-        ['Elevation', <C>elevation/surface/raised</C>, 'Elevation'],
-        ['Space', <C>Card/pad-default</C>, 'Spacing'],
-        ['Typography', <C>Heading/medium</C>, 'Typography'],
-        ['Radius', <C>Radius/lg</C>, 'Radius'],
-        ['Border', <C>Border/focused</C>, 'Border'],
-    ]}
-/>
 
 </FoundationSubsection>
 

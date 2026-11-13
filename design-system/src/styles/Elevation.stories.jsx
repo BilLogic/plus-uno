@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { Button, Modal, PanelBody, PanelContainer, PanelHeader, Popup, Select, Tooltip } from '@/components';
+import { Button, HeadingContextProvider, Modal, PanelBody, PanelContainer, PanelHeader, Popup, Select, Tooltip } from '@/components';
 import { Backdrop, PatternCard, PatternSection, PatternTable } from '@/patterns';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
@@ -318,10 +318,12 @@ export const FloatingPanel = {
             panelLabel="Session notes"
             panelPeek
             panel={(
-                <PanelContainer>
-                    <PanelHeader title="Session notes" />
-                    <PanelBody>Thursday with Ana Ruiz: factoring went well; review the quadratic formula next time.</PanelBody>
-                </PanelContainer>
+                <HeadingContextProvider value={2}>
+                    <PanelContainer>
+                        <PanelHeader title="Session notes" />
+                        <PanelBody>Thursday with Ana Ruiz: factoring went well; review the quadratic formula next time.</PanelBody>
+                    </PanelContainer>
+                </HeadingContextProvider>
             )}
         />
     ),
@@ -482,10 +484,12 @@ export const BlockingOnBackdrop = () => (
         <Dont caption="A Panel with the blocking shadow and no Backdrop. If it needs full attention, make it a Modal.">
             <div style={ground}>
                 <div style={{ boxShadow: 'var(--ds-shadow-blocking)', borderRadius: 'var(--card-radius)' }}>
-                    <PanelContainer width="100%">
-                        <PanelHeader title="Session notes" />
-                        <PanelBody>Factoring went well.</PanelBody>
-                    </PanelContainer>
+                    <HeadingContextProvider value={2}>
+                        <PanelContainer width="100%">
+                            <PanelHeader title="Session notes" />
+                            <PanelBody>Factoring went well.</PanelBody>
+                        </PanelContainer>
+                    </HeadingContextProvider>
                 </div>
             </div>
         </Dont>

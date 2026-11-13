@@ -160,6 +160,25 @@ A docs page groups its content the way a PLUS page does, on the app's Page and S
 
 A heading is a real heading: a sub-topic is a `FoundationSubsection` or an `###`, never a bold paragraph, so it takes the subsection gap and appears in the page outline. Demos render inside their canvas (Modal `renderAs="inline"`, `FlagGroup containerPosition="static"`, or a frame); the Storybook tests fail a docs story whose demo covers the page.
 
+## Which Foundations page owns what
+
+One home per fact: the owning page states it, and every other page links to it. Restating a fact on a second page is how two pages come to disagree.
+
+| Fact | Owner | Others |
+|---|---|---|
+| The four token tiers, their Figma collections and modes, the fallback rule | Tokens | Spacing, Grid, Color link to Tokens |
+| Pad, stack, inline and the per-pattern spacing tables | Spacing | Grid links for pattern sizes |
+| Breakpoints, "desktop only from 768", gutter 16, page pad 24, content caps, size roles | Grid | Everything else links |
+| The focus ring's color, width and offset | Border | Accessibility, Color, Radius link; Radius owns the corner arithmetic (radius + 2) |
+| The no-colored-side-stripe rule | Border | None restates it |
+| Heading levels and the one `h1` per page | Typography | Accessibility links |
+| How disabled looks | Color | Accessibility keeps the behavior rules (not a focus target, a visible reason) |
+| Icon sizes 12, 16, 24 | Iconography | Typography, Grid link |
+| Contrast pairs and chart color | Color | Accessibility links |
+| Alt text for the logo | Logos, under Accessibility | None |
+
+A rule that is not a status is shown as a neutral `Callout`, never a Banner; a do and don't pair is `DoDont`. Developer-only text (`check:*` commands, the token plan, SCSS mixins, test files) is kept off these pages, one short "In code" snippet at most, and lives in `docs/engineering/foundation-docs.md`.
+
 ## The landing
 
 A covered Foundations, Templates or Patterns page opens with `<DocsLanding page eyebrow title purpose links />` (`design-system/src/storybook-docs/docs-landing/`), in this order: eyebrow, the page's one `h1`, its purpose, one row of quick links, then the hero. The hero is chosen by `page` from the hero registry (`hero-registry.jsx`), which also holds the sentence that is its accessible name; a hero draws no text. `npm run check:docs-landing` fails a covered page with no landing or no registry hero, and a later page joins by adding itself to `PAGES` in that script. The check also fails a landing page that still renders a body Contents block (the right rail lists the contents), and an overview card whose `hero` names no registry page.

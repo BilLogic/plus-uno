@@ -125,6 +125,7 @@ Adding a doc changes this file; editing this file changes nothing.
 |-----|---------|
 | [`docs/engineering/coding.md`](docs/engineering/coding.md) | How to write code in this repo — barrel imports, tokens over literals, styling conventions, and what not to reach for. |
 | [`docs/engineering/ds-usage-rules.md`](docs/engineering/ds-usage-rules.md) | The escape rules `check:ds-usage` holds consumer code to — one section per rule ID, each saying what fails and what to write instead. |
+| [`docs/engineering/foundation-docs.md`](docs/engineering/foundation-docs.md) | Code-side notes behind the Foundations docs pages — the checks, helpers and generated files a designer page does not carry. |
 | [`docs/engineering/measurement-window.md`](docs/engineering/measurement-window.md) | How to run uno-bot's measurement window each week and close it — the five numbers, where each comes from, where it is recorded, and what stays private. |
 | [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, owner and a link to its home. |
 | [`docs/engineering/setup.md`](docs/engineering/setup.md) | Aliases, package structure, prototype conventions, token workflow, local preview. |
@@ -217,6 +218,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-146 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+147 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

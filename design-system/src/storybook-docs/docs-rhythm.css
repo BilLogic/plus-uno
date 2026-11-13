@@ -159,9 +159,21 @@
     margin-block-start: 0 !important;
 }
 
-/* The reading measure: prose and the purpose line stop at 72 characters. */
-.sbdocs .sb-docs-measure {
-    max-inline-size: 72ch;
+/*
+ * The reading measure, one number for every docs page. `ch` runs a third wide
+ * in this face (the advance of "0" is about 10.8px against a 7.9px average
+ * glyph), so 76ch holds a line near 106 characters and about 800px: three
+ * quarters of the 1140px docs column, where 55ch left the right half of the
+ * page empty beside every paragraph. The cap stays on the text, not the column,
+ * so canvases and tables keep the full width. It overrides the 55ch in
+ * storybook-overrides.css, which is why it carries !important.
+ */
+.sbdocs .sb-docs-measure,
+.sbdocs .sbdocs-content :is(p, ul, ol):not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
+.sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
+.sbdocs p.sb-ds-canvas-description {
+    max-inline-size: 76ch !important;
+    max-width: 76ch !important;
 }
 
 .sbdocs .sb-docs-landing__eyebrow {

@@ -1,5 +1,5 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
-import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
@@ -19,7 +19,6 @@ import * as AccessibilityStories from './Accessibility.stories.jsx';
     title="Accessibility"
     purpose="The rules every PLUS screen meets, built into the tokens and patterns."
     links={{
-        label: 'Tokens',
         items: [
             { title: 'Contrast', href: '#foundation-contrast' },
             { title: 'Focus', href: '#foundation-focus' },
@@ -32,60 +31,13 @@ import * as AccessibilityStories from './Accessibility.stories.jsx';
 
 WCAG 2.1 AA is the minimum bar for every PLUS screen. Tutors use PLUS on laptops during live sessions, often while sharing their screen with a student, so a screen stays legible at any zoom level and works under assistive technology.
 
-These are the accessibility rules every PLUS screen meets. Most of them are built into the tokens and the patterns, so a screen built from them meets the rules by default. Each component page adds the rules for its own name, role and keyboard behavior. Each foundation page owns the rules for its own subject: contrast in Color, heading order in Typography, the focus ring in Border and Radius, reduced motion in Motion.
+Most rules are built into the tokens and the patterns, so a screen built from them meets them by default. Each foundation page owns the rules for its subject: contrast in Color, heading levels in Typography, the focus ring in Border and Radius, reduced motion in Motion. Each component page adds the rules for its own name, role and keyboard behavior.
 
 </FoundationSection>
 
 <FoundationSection title="Heading levels">
 
-**A heading's tag is its place in the outline. Its style is its look.** Choose
-the two separately. A heading that has to look small but sits high in the
-page's outline is an `h2` set in a small style, never an `h4` picked for its
-size.
-
-- The tag comes from where the heading sits in its own page: one level below
-  the heading it belongs to, never skipping a level.
-- The style comes from **Typography**: `--heading-medium` for a section,
-  `--heading-xsmall` for a card title, and so on.
-- A component that can land at different depths, such as a card, takes its
-  heading level from where it sits.
-- Text that only looks like a heading, such as a metric, is not a heading. Set
-  it in its style on a paragraph, so it takes no place in the outline.
-- Removing a heading can create a skip: `h2, h3, h4` with the `h3` taken out
-  becomes `h2` → `h4`. Read the outline before you remove or re-tag one.
-
-**For developers.** A heading's look comes from its text style, not its tag:
-`<h2 className="heading-large">` draws the same at any level, and so does a
-rule that sets `font: var(--heading-large)`. Re-tag a heading for the outline
-and keep its style, and select it by its class, not its tag.
-
-In the docs, the `.sbdocs hN` rules apply to MDX prose only: each is fenced
-with `:not(:where(.docs-story *))`, so a story's own headings draw at their
-real size. A new rule of that kind needs the same fence.
-
-</FoundationSection>
-
-<FoundationSection title="The top of the outline">
-
-**Every page's outline starts with an `h1`.** The rule above places a heading
-within the outline; this one says the outline has a top.
-
-- A page with a visible title marks that title up as the `h1`.
-- A page whose name sits only in the topbar still has an `h1`, hidden
-  visually but kept for assistive technology.
-- A visually hidden heading is moved off-screen, never hidden with
-  `display: none`, which would remove it for screen readers too.
-- A modal's title is the dialog's own `h1`.
-- A fragment is not a page. A card or a label never carries an `h1`.
-
-Adding the `h1` moves everything under it: a page that ran `h4 → h4` becomes
-`h2 → h3`, with the look unchanged.
-
-**For developers.** axe's `heading-order` rule cannot see a missing top, because the first heading
-has no predecessor, and its `page-has-heading-one` rule does not run when the
-check is scoped to a story. In the default template the page-level Section
-header's title is the `h1`; in the focused template it is the task's name in
-the Frame's header row.
+Every page's outline starts with one `h1`, and a heading's tag is its place in the outline, never its size. A page whose name sits only in the topbar still has an `h1`, hidden visually but kept for assistive technology: moved off-screen, never `display: none`. Typography owns the rules: [Heading levels](?path=/docs/foundations-typography--docs#foundation-heading-levels).
 
 </FoundationSection>
 
@@ -107,11 +59,9 @@ surface. **Color** shows every pair, measured, in both modes.
 
 Focus is shown by the **focus ring**, never by a fill.
 
-- The ring is 2px of `--ds-border-focused`, drawn 2px outside a control's
-  edge, at the control's radius + 2. Inside a row or a tab, it is drawn inset.
+- The ring is the same on every interactive element, including cards, table rows and list items, and it clears 3:1 against what it sits on.
 - The control's fill stays as it is, and its opacity stays at 100%.
-- The ring clears 3:1 against what it sits on, so every interactive element,
-  including cards, table rows and list items, has the same visible indicator.
+- Border owns the ring's color, width and offset, and Radius owns its corner: [Focus ring](?path=/docs/foundations-border--docs).
 
 See Do and don't for the ring beside the fill-only mistake.
 
@@ -151,13 +101,7 @@ Every interactive element can be reached and operated from the keyboard.
 
 <FoundationSection title="Disabled">
 
-A disabled component is dimmed to `--ds-opacity-disabled` (0.4), and it keeps
-its label so people can still tell what is unavailable. Disabled elements are
-not focus targets, and none stands in with `aria-disabled` to stay focusable.
-The reason a field or option is disabled is visible text beside it, at full
-contrast, and never a tooltip on the disabled control. An action stays enabled
-and explains what is missing when it is pressed; a button disables only while
-it is sending.
+A disabled component keeps its label so people can still tell what is unavailable. Color owns how disabled looks. Disabled elements are not focus targets, and none stands in with `aria-disabled` to stay focusable. The reason a field or option is disabled is visible text beside it, at full contrast, and never a tooltip on the disabled control. An action stays enabled and explains what is missing when it is pressed; a button disables only while it is sending.
 
 </FoundationSection>
 
@@ -184,24 +128,12 @@ a labeled group inside its section, not a landmark of its own, so a dashboard
 of six charts does not add six entries to the landmark menu. Give every chart
 a title or a label, and never carry a series by color alone.
 
-**For developers.** The charts share `chartTheme`, which turns on the Highcharts accessibility
-module and sets `landmarkVerbosity: 'disabled'`. A chart that builds its own
-options carries `accessibility: chartTheme.accessibility` itself. Never wrap a
-chart in `aria-hidden` to quiet a labeling warning: that hides the keyboard
-proxies the module creates.
-
 </FoundationSection>
 
 <FoundationSection title="Automated checks">
 
 Every story runs axe in the Storybook test suite, and a story may not add a
 violation, so a component that breaks a rule here is caught before it ships.
-
-**For developers.** Run the checks for a set of stories with:
-
-```bash
-npx vitest --project=storybook --run <path>
-```
 
 </FoundationSection>
 
