@@ -209,7 +209,7 @@ export const TableHero = () => {
             {cols.map((cx, i) => (
                 <SkeletonBar key={cx} x={cx} y={t.y + 12} w={i === 0 ? 40 : 26} h={4} heading />
             ))}
-            <Rect x={t.x} y={rowY(1)} w={t.w} h={17} fill={PAINT.rowSelected} />
+            <Rect x={t.x + 4} y={rowY(1)} w={t.w - 8} h={17} fill={PAINT.rowSelected} corner="tab" />
             {[0, 1, 2, 3, 4, 5].map((i) => (
                 <React.Fragment key={i}>
                     <Rule x1={left} x2={right} y1={rowY(i)} y2={rowY(i)} stroke={PAINT.rowDivider} />
