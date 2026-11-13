@@ -125,11 +125,11 @@ const ROLES = {
   // A blocked-out object in a motion principle figure: a shape, not a component
   shape: ['--ds-background-neutral', null],
   annotation: ['--ds-border-bold', null],
-  // The edge of a surface drawn on the hero ground (--ds-surface-sunken). The real edge roles
-  // (`pageEdge` is transparent outside increased contrast, `--ds-border` is 1.1:1 on the
-  // ground) vanish at illustration scale, so a hero surface takes the bold border, which
-  // reads at about 4:1 in light and dark. HeroEdges.test.jsx holds it to 1.5:1 (base modes).
-  illustrationEdge: ['--ds-border-bold', null],
+  // The edge of a surface drawn on the hero ground (--ds-surface-sunken), as the approved covers
+  // draw it: a hairline in the field border. The real edge roles (`pageEdge` is transparent
+  // outside increased contrast, `--ds-border` is 1.1:1 on the ground) vanish at illustration
+  // scale. HeroEdges.test.jsx holds it to 1.5:1 (base modes).
+  illustrationEdge: ['--ds-border-input', null],
   // The one drawn letterform: the Typography specimen's glyphs, in the text ink.
   glyph: ['--ds-text', null],
 };
@@ -190,8 +190,15 @@ export const CORNER = {
   ...Object.fromEntries(Object.entries(CORNERS).map(([role, [token]]) => [role, `calc(var(${token}) / 2)`])),
 };
 
-/** The hairline every outline and divider draws with. */
-export const HAIRLINE = { strokeWidth: 'var(--stroke-1)' };
+/**
+ * The hairline every outline and divider draws with. A hero draws one unit as 2px,
+ * so `HeroDrawing` sets `--illustration-hairline` to half a stroke and every kit
+ * outline inside a hero renders 1 device px; elsewhere docs-rhythm.css leaves it the stroke token.
+ */
+export const HAIRLINE = { strokeWidth: 'var(--illustration-hairline)' };
+
+/** The hairline a hero sets on its drawing: half a stroke, since one unit is 2px there. */
+export const HERO_HAIRLINE = 'calc(var(--stroke-1) / 2)';
 
 /** A selected tab's underline: the Tabs component's selected-border width, halved. */
 export const TAB_UNDERLINE = { strokeWidth: 'var(--border-selected)' };

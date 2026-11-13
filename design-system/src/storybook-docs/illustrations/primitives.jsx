@@ -123,6 +123,8 @@ const SIDEBAR_ROW_H = 16;
 const SIDEBAR_ROW_PITCH = SIDEBAR_ROW_H + 1;
 
 export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => {
+  // On the hero ground the icons are soft placeholder squares, like the text bars beside them.
+  const icon = useContext(HeroGround) ? PAINT.placeholderText : PAINT.sidebarIcon;
   const rowCount = Math.max(1, Math.min(5, Math.floor((h - 28) / SIDEBAR_ROW_PITCH)));
   return (
     <g>
@@ -134,7 +136,7 @@ export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => {
           <Rule x1={x + w} x2={x + w} y1={y} y2={y + h} />
         </>
       )}
-      <Rect x={x + 6} y={y + 4} w={12} h={12} fill={accent ? PAINT.accent : PAINT.sidebarIcon} corner="sidebarRow" />
+      <Rect x={x + 6} y={y + 4} w={12} h={12} fill={accent ? PAINT.accent : icon} corner="sidebarRow" />
       {Array.from({ length: rowCount }, (_, i) => {
         const ry = y + 24 + i * SIDEBAR_ROW_PITCH;
         const selected = i === (rowCount > 1 ? 1 : 0);
@@ -151,7 +153,7 @@ export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => {
                 opacity={accent ? 0.25 : 1}
               />
             )}
-            <Rect x={x + 8} y={ry + 4} w={8} h={8} fill={PAINT.sidebarIcon} corner="icon" />
+            <Rect x={x + 8} y={ry + 4} w={8} h={8} fill={icon} corner="icon" />
             <SkeletonBar x={x + 20} y={ry + SIDEBAR_ROW_H / 2 - 2} w={w - 32} />
           </React.Fragment>
         );

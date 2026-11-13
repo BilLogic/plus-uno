@@ -199,6 +199,12 @@
     color: var(--ds-text);
 }
 
+/* The illustration kit's hairline: the stroke token. A hero drawing overrides it
+   with half a stroke (HeroDrawing.jsx), since one kit unit is 2px there. */
+:root {
+    --illustration-hairline: var(--stroke-1);
+}
+
 /* The hero frame: full column at 5:2, sunken, on a dot ground (one dot per
    Stack/md step, 16px). Its drawing is composed on a centered stage
    (HeroDrawing.jsx). A split hero lays two panes, each its own color mode,

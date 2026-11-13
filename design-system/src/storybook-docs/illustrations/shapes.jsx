@@ -16,7 +16,7 @@ import { chime, isoMatrix, pathGeometry, springStills, waveHeights } from './sha
  */
 
 /** A stroke that stays a hairline however its group is scaled or skewed. */
-const FIXED = { ...HAIRLINE, vectorEffect: 'non-scaling-stroke' };
+const FIXED = { strokeWidth: 'var(--stroke-1)', vectorEffect: 'non-scaling-stroke' };
 
 /**
  * A timeline: two tracks, a clip on the first, keyframes along the second and a

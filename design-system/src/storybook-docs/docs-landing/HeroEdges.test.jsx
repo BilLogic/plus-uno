@@ -123,3 +123,17 @@ describe('the Indicators hero chips on the ground show their edge', () => {
         for (const chip of chips) expect(chip.getAttribute('stroke')).toBe(PAINT.illustrationEdge);
     });
 });
+
+describe('hero line weight', () => {
+    it('every registered hero draws its hairlines at half a stroke (1 device px)', () => {
+        for (const [id, { Hero }] of Object.entries(HEROES)) {
+            const { container } = render(React.createElement(Hero));
+            const svg = container.querySelector('svg');
+            expect(svg?.style.getPropertyValue('--illustration-hairline'), id).toBe('calc(var(--stroke-1) / 2)');
+        }
+    });
+
+    it('the edge role is the field border the approved covers draw', () => {
+        expect(PAINT.illustrationEdge).toBe('var(--ds-border-input)');
+    });
+});
