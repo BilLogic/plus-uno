@@ -72,7 +72,11 @@ test('npm pack, install in a scratch project, `npx ds find Button` answers from 
     const verdict = JSON.parse(bad.stdout);
     assert.ok(verdict.failing >= 2 && verdict.findings.every((f) => f.file.startsWith('src/')), 'findings name the project file');
     assert.equal(spawnSync('npx', ['--no-install', 'ds', 'check', 'src/Clean.jsx'], { cwd: project }).status, 0);
-    assert.equal(spawnSync('npx', ['--no-install', 'ds', 'check', 'nope.jsx'], { cwd: project }).status, 1, 'a missing path is a usage error, not a pass');
+    const missing = spawnSync('npx', ['--no-install', 'ds', 'check', 'nope.jsx'], { cwd: project, encoding: 'utf8' });
+    assert.equal(missing.status, 2, 'a missing path is a usage error, not a pass');
+    assert.match(missing.stderr, /no such path: nope\.jsx/);
+    fs.mkdirSync(path.join(project, 'empty'));
+    assert.equal(spawnSync('npx', ['--no-install', 'ds', 'check'], { cwd: path.join(project, 'empty') }).status, 2, 'no files to check is not a pass');
 
     // `ds mcp`: the stdio server from the installed tarball lists its five tools.
     const tools = mcpTools(project);

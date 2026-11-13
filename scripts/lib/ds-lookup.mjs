@@ -598,11 +598,14 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
 
   function check({ code, path: file, paths } = {}) {
     let found;
+    let checked = null;
     if (typeof code === 'string' && code.trim()) {
       found = escapesIn({ path: file ?? 'prototypes/snippet.jsx', text: code }, contextOf(root));
     } else if (paths?.length || consumerRoot !== root) {
       if (!readPaths) throw new PathsRefused();
-      found = escapes(consumerRoot, expandPaths(consumerRoot, paths?.length ? paths : ['.']), root);
+      const files = expandPaths(consumerRoot, paths?.length ? paths : ['.']);
+      checked = files.length;
+      found = escapes(consumerRoot, files, root);
     } else {
       return { findings: [], next: 'Pass code (with a file name for its language) or paths.' };
     }
@@ -611,6 +614,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     return {
       findings,
       failing,
+      ...(checked === null ? {} : { checked }),
       next: failing
         ? 'Fix each finding as its fix says; ds_guide(<rule>) explains a rule. Then ds_check again.'
         : findings.length

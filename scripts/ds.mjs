@@ -12,7 +12,7 @@
  *   ds check --code '<jsx>' [--path f.jsx]
  *   --json                           the answer as data
  *
- * Exit 1 when check finds a fail-level escape or the subcommand is unknown.
+ * Exit 1 when check finds a fail-level escape or the subcommand is unknown; 2 when it has nothing to check (a missing path, or no files).
  */
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { createLookup, render } from './lib/ds-lookup.mjs';
@@ -55,7 +55,18 @@ export function cli(argv, root = REPO_ROOT, { consumerRoot = root } = {}) {
     console.error(USAGE);
     return 1;
   }
-  const result = calls[op]();
+  let result;
+  try {
+    result = calls[op]();
+  } catch (e) {
+    // A path that does not exist is a usage error, told apart from findings (1) for CI.
+    console.error(e.message);
+    return 2;
+  }
+  if (op === 'check' && result.checked === 0) {
+    console.error('ds check: no files to check here (a .jsx .js .mjs .tsx .ts .scss .css .html file outside node_modules); run it from the project root or name the paths.');
+    return 2;
+  }
   console.log(flags.json ? JSON.stringify(result, null, 2) : render(op, result));
   return op === 'check' && result.failing ? 1 : 0;
 }
