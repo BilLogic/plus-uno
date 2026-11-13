@@ -11,11 +11,13 @@ import { accentGroups, chartGroups, typeGroups } from './lib/token-data.mjs';
  */
 
 const Palette = ({ groups }) => (
-    <ColorPalette>
-        {groups.map((g) => (
-            <ColorItem key={g.title} title={g.title} subtitle={g.subtitle} colors={g.colors} />
-        ))}
-    </ColorPalette>
+    <div className="sb-docs-scroll">
+        <ColorPalette>
+            {groups.map((g) => (
+                <ColorItem key={g.title} title={g.title} subtitle={g.subtitle} colors={g.colors} />
+            ))}
+        </ColorPalette>
+    </div>
 );
 
 /** The eleven accent hues, each with its four background fills. */
