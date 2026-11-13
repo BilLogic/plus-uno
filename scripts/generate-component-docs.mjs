@@ -32,7 +32,7 @@ import { createPageFinder, readDocsPage } from './lib/docs-page.mjs';
 import { resolveNamedOneOf } from './doc-identifiers.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 import { readBarrel } from './lib/ds-facts.mjs';
-import { aliasInputs, searchAliases } from './lib/ds-vocabulary.mjs';
+import { DS_GLOSSARY, aliasInputs, searchAliases } from './lib/ds-vocabulary.mjs';
 import { buildComponentsManifest, serializeManifest } from './lib/agent-manifests.mjs';
 import { AGENT_ROOT } from './agent-views-paths.js';
 import { enumValuesOf } from './lib/enum-values.mjs';
@@ -554,7 +554,7 @@ const registry = JSON.parse(readIf(path.join(REPO_ROOT, 'design-system/figma/com
 const findPage = createPageFinder(REPO_ROOT, registry);
 /** The words each component is asked by: `agent-views/_aliases.json`, then the glossary's design-system avoid-words. */
 const { rows: aliasRows } = searchAliases(
-  readIf(path.join(REPO_ROOT, 'GLOSSARY.md')) || '',
+  readIf(path.join(REPO_ROOT, DS_GLOSSARY)) || '',
   aliasInputs(AGENT_ROOT, manifest.components.map((c) => c.name)),
 );
 const docsOf = (record) => {

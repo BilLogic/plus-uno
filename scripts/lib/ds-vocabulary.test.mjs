@@ -169,7 +169,7 @@ test('find: a product avoid-word does not route to a design-system term through 
   const lookup = createLookup(REPO_ROOT);
   const all = Object.values(lookup.vocabulary().aliases).flat();
   for (const word of ['alert', 'report', 'incident', 'class', 'meeting']) assert.ok(!all.includes(word), word);
-  assert.ok(fs.existsSync(path.join(REPO_ROOT, 'GLOSSARY.md')));
+  assert.ok(fs.existsSync(path.join(REPO_ROOT, 'docs/conventions/design-system-glossary.md')));
 });
 
 test('aliasInputs reads the not-here names and hand-kept aliases from an agent-views folder, empty when a file is missing', () => {

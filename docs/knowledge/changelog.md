@@ -73,6 +73,10 @@ define `--color-scrim` may keep the word until token removal is decided.
 
 The audit of Figma Core's docs pages (clipping, section hugging, absolute layout, unbound spacing, hand-built blocks) landed with the fix runs. Its one durable lesson, how to run a bulk Figma fix safely (node-count guard, saved before and after shots, per-minute limit), went to `design-system/guidelines/figma/mcp-guide.md` § Bulk fix runs. The findings file stays only as the receipt; the next sweep deletes it.
 
+## 2026-11-13 — DS vocabulary loads on demand
+
+Design-system terms moved from GLOSSARY.md to `docs/conventions/design-system-glossary.md`, disclosed through read_reference for uno-bot and pointed to by the root glossary and DS entry guide. The root keeps product, estate and harness terms; existing component definitions are retained and missing foundation vocabulary is sourced to its owning pages.
+
 ## 2026-11-13 — existing DS decisions in the ADR trail
 
 The harness round records the merged Panel, Radius and drag decisions in ADR-044 through ADR-046. ADR-036 points to the Bootstrap removal; ADR-038 marks its historical pattern and radius names as corrected. No component behavior or ruling changes.

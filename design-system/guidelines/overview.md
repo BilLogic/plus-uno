@@ -37,6 +37,8 @@ To look a name, prop, token or rule up without reading files, ask the `ds` comma
 | [`figma/`](figma/overview.md) | Design-to-code: registries, the load gate, token mapping, MCP workflows | `figma/overview.md` |
 | [`documentation-ia.md`](documentation-ia.md) | The documentation IA contract — the shared tree and the MDX page shell | read it before adding a story or renaming a folder |
 
+**Design-system terminology** → `docs/conventions/design-system-glossary.md` (on demand; product and harness terms stay in `GLOSSARY.md`).
+
 ## Common task routes
 
 **Build UI with components**
