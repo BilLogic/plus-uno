@@ -4,6 +4,7 @@ import { Story } from '@storybook/addon-docs/blocks';
 
 import { Tag } from '@/components';
 import { useFitScale } from './use-fit-scale.js';
+import { HeroCard } from '../docs-landing/HeroCard.jsx';
 
 /**
  * The blocks a template page is built from (Section first; Frame, Page, Form,
@@ -72,8 +73,8 @@ export const TypeGrid = ({ children }) => (
 
 TypeGrid.propTypes = { children: PropTypes.node };
 
-/** One type: its live story on the raised card, then its name and one line. */
-export const TypeCard = ({ of, thumb, title, stage = TYPE_STAGE, to, thumbRatio, children }) => (
+/** One type: its live story (or, with `hero`, a page's registry hero) on the raised card, then its name and one line. */
+export const TypeCard = ({ of, thumb, hero, title, stage = TYPE_STAGE, to, thumbRatio, children }) => (
     <figure
         style={{
             margin: 0,
@@ -87,10 +88,14 @@ export const TypeCard = ({ of, thumb, title, stage = TYPE_STAGE, to, thumbRatio,
         }}
     >
         {/* A fixed ratio crops the picture to one height, so cards that sit side by side match. */}
-        <div data-type-thumb style={thumbRatio ? { aspectRatio: thumbRatio, overflow: 'hidden' } : undefined}>
-            <ScaledStory width={stage}>
-                {thumb ?? <Story of={of} inline />}
-            </ScaledStory>
+        <div data-type-thumb style={!hero && thumbRatio ? { aspectRatio: thumbRatio, overflow: 'hidden' } : undefined}>
+            {hero ? (
+                <HeroCard page={hero} />
+            ) : (
+                <ScaledStory width={stage}>
+                    {thumb ?? <Story of={of} inline />}
+                </ScaledStory>
+            )}
         </div>
         <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)' }}>
             <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>
@@ -106,6 +111,8 @@ TypeCard.propTypes = {
     of: PropTypes.any,
     /** A node drawn in place of the story, at the same stage. */
     thumb: PropTypes.node,
+    /** A hero-registry page id: the card shows that page's hero, cropped from its stage, in place of a story. */
+    hero: PropTypes.string,
     title: PropTypes.string.isRequired,
     /** The width the story lays out at, when the type needs more than the shared stage (a Frame docks its Sidebar from 1024 of its own width, inside the window's border). */
     stage: PropTypes.number,

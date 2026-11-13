@@ -2,7 +2,8 @@
 /**
  * `npm run check:docs-landing` — every covered Foundations, Templates or
  * Patterns docs page opens with the DocsLanding block, and its page id has a
- * hero in the hero registry.
+ * hero in the hero registry, carries no body Contents block, and any overview
+ * card's `hero="..."` names a registry hero.
  *
  * WHY IT EXISTS. The pages used to open three different ways (a Foundation
  * header, Storybook's title and a lead, or nothing), so a reader could not tell
@@ -93,6 +94,10 @@ export const PAGES = [
 
 const OLD_OPENER = /<FoundationHero\b|<Title\b/;
 const LANDING = /<DocsLanding\b/;
+/** A body Contents block: the right rail lists each page's contents, so the page does not list them twice. */
+const BODY_CONTENTS = /<FoundationContents\b|<Contents\b|aria-label="Contents"|^#{1,4}\s+Contents\s*$/m;
+/** An overview card's hero: `<TypeCard hero="page-id" ...>`. */
+const CARD_HERO = /<TypeCard\b[^>]*?\bhero="([a-z0-9-]+)"/g;
 const LANDING_PAGE = /<DocsLanding\b[^>]*?\bpage="([^"]+)"/s;
 
 /**
@@ -123,6 +128,14 @@ export function checkPage({ file, source, id, heroes }) {
     }
     if (OLD_OPENER.test(source)) {
       found.push(`${file}: still renders <FoundationHero> or <Title> beside the landing; the landing replaces it.`);
+    }
+    if (BODY_CONTENTS.test(source)) {
+      found.push(`${file}: renders a body Contents block beside the landing; drop it, the right rail lists the page's contents.`);
+    }
+    for (const [, card] of source.matchAll(CARD_HERO)) {
+      if (!heroes.includes(card)) {
+        found.push(`${file}: a card shows hero="${card}", which has no hero in the registry (${REGISTRY}).`);
+      }
     }
   }
   if (!heroes.includes(id)) {

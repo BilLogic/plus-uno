@@ -77,3 +77,19 @@ test('a Patterns page still opening with <Title> fails', () => {
   const found = checkPage({ file: 'Empty.mdx', source, id: 'patterns-states-empty', heroes: ['patterns-states-empty'] });
   assert.ok(found.some((m) => /<Title>/.test(m)), found.join('\n'));
 });
+
+test('a landing page with a body Contents block fails; without one it is silent', () => {
+  const heroes = ['foundations-color'];
+  for (const block of ['<FoundationContents />', '<Contents />', '<nav aria-label="Contents">x</nav>', '## Contents']) {
+    const found = checkPage({ file: COLOR, source: `${landing()}\n${block}\n`, id: 'foundations-color', heroes });
+    assert.ok(found.some((m) => /body Contents block/.test(m)), `${block}: ${found.join('\n')}`);
+  }
+  assert.deepEqual(checkPage({ file: COLOR, source: `${landing()}\nThe right rail lists the contents.\n`, id: 'foundations-color', heroes }), []);
+});
+
+test('an overview card naming a hero the registry lacks fails', () => {
+  const source = `${landing('templates-overview')}\n<TypeCard hero="templates-ghost" title="Ghost" />\n<TypeCard hero="templates-overview" title="Real" />\n`;
+  const found = checkPage({ file: 'Overview.mdx', source, id: 'templates-overview', heroes: ['templates-overview'] });
+  assert.equal(found.length, 1, found.join('\n'));
+  assert.match(found[0], /hero="templates-ghost"/);
+});
