@@ -24,12 +24,20 @@ on:
     paths:
       - packages/cli/**
       - scripts/build-cli-package.mjs
+      - scripts/generate-registry.mjs
+      - scripts/lib/registry.mjs
       - scripts/publish-cli.mjs
       - scripts/lib/cli-release.mjs
       - .github/workflows/publish-cli.yml
 
 permissions:
   contents: read
+
+# One publish at a time: a release event and the deploy's dispatch can both fire for one tag;
+# the second waits, finds the version on the registry and skips.
+concurrency:
+  group: publish-cli
+  cancel-in-progress: false
 
 jobs:
   dry-run:
@@ -38,7 +46,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version-file: .nvmrc
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org
       - name: Pack and dry-run the publish
         run: npm publish --dry-run
@@ -52,10 +60,13 @@ jobs:
       contents: read
       id-token: write
     steps:
+      # The version is the tag, so the code is the tag's code, not the branch head a dispatch ran from.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+        with:
+          ref: refs/tags/${{ github.event.release.tag_name || inputs.tag }}
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version-file: .nvmrc
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org
       # Trusted publishing needs npm 11.5.1 or newer; the Node floor in .nvmrc ships an older npm.
       - name: Use an npm that supports trusted publishing

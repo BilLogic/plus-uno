@@ -46,6 +46,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | Usage record upkeep | end-of-day run: `team-roles-sync` (third, before every job that tags someone), `usage-classify`, `ask-resolution`, `proposal-expiry`; both runs: `usage-text-purge` | Bill | [`agents/uno-bot/README.md`](../../agents/uno-bot/README.md) (usage record) |
 | Figma tidy-up | Monday's morning run: `figma-tidy-read` jobs, then `figma-tidy-post` | Bill | [`src/figma-tidy/`](../../agents/uno-bot/src/figma-tidy/) |
 | Blueprint embeddings refresh | nightly cron (07:00 UTC) | Bill | [`uno-bot-embed-blueprint.yml`](../../.github/workflows/uno-bot-embed-blueprint.yml) |
+| `@plus-uno/cli` publish | a published release, `workflow_dispatch` with a tag, or the production deploy run with a `tag`; pull requests touching the package run the dry run only. Trusted publishing over OIDC: Bill links the publisher to this file name on npmjs.com | Bill | [`publish-cli.yml`](../../.github/workflows/publish-cli.yml) |
 | Harness gate | every `pull_request` + on demand | Bill | [`check-harness.yml`](../../.github/workflows/check-harness.yml) → [`scripts/check-harness.mjs`](../../scripts/check-harness.mjs) |
 | uno-bot Worker checks | every `pull_request` + on demand | Bill | [`uno-bot-checks.yml`](../../.github/workflows/uno-bot-checks.yml) |
 | Storybook gate | every `pull_request` + on demand | Bill | [`storybook-gate.yml`](../../.github/workflows/storybook-gate.yml) |

@@ -1,4 +1,4 @@
-// The publish seam for @plus-uno/cli (#2404): the version is the release tag, an
+// The publish seam for @plus-uno/cli: the version is the release tag, an
 // already-published version skips cleanly, and the workflow publishes by OIDC only.
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -72,4 +72,10 @@ test('the production deploy dispatches the publish only when given a tag', () =>
   assert.match(deploy, /publish-cli:[\s\S]*needs: deploy/);
   assert.match(deploy, /if: inputs\.tag != ''/);
   assert.match(deploy, /gh workflow run publish-cli\.yml/);
+});
+
+test('the publish job builds the tagged commit, and the package names its repository for provenance', () => {
+  assert.match(live.match(/\n  publish:[\s\S]*$/)[0], /ref: refs\/tags\/\$\{\{ github\.event\.release\.tag_name \|\| inputs\.tag \}\}/);
+  const pkg = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/cli/package.json'), 'utf8'));
+  assert.equal(pkg.repository.url, 'git+https://github.com/BilLogic/plus-uno.git');
 });
