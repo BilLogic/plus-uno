@@ -40,7 +40,17 @@ Pick the family by the property that changes.
 
 Each family is shown first as a shape on a flat stage, then in the app.
 
-<Canvas of={PhysicsStories.Families} sourceState="none" />
+**<C>spatial</C>:** position, size, scale, rotation, corner radius, clip. Overshoot only in Expressive.
+
+<Canvas of={PhysicsStories.FamilySpatial} sourceState="none" />
+
+**<C>appearance</C>:** opacity, color, blur, shadow. Never overshoots: a spring with no bounce, so it can still be interrupted.
+
+<Canvas of={PhysicsStories.FamilyAppearance} sourceState="none" />
+
+**<C>linear</C>:** anything that follows time or the pointer one to one: progress, countdowns, Skeleton shimmer, scrolling, dragging. Never overshoots: it is not a spring.
+
+<Canvas of={PhysicsStories.FamilyLinear} sourceState="none" />
 
 The page header on scroll is linear too: its small title, actions and tabs follow the scroll position one to one, and stay put when scrolling stops.
 

@@ -1,9 +1,9 @@
 import React from 'react';
 import { PAINT } from './paint.js';
-import { ButtonShape, CardBox, Flag, Frame, PageHeader, Popup, Rect, Row, Section, SkeletonBar } from './primitives.jsx';
+import { CardBox, Flag, Frame, PageHeader, Popup, Rect, Row, Section, SkeletonBar } from './primitives.jsx';
 import { Pointer, SequenceStrip } from './primitives-motion.jsx';
 import { ReflowScreen } from './compositions.jsx';
-import { measure, springFor } from './motion.jsx';
+import { measure, pair, springFor } from './motion.jsx';
 import { travel } from './trails.js';
 
 /**
@@ -38,18 +38,17 @@ const FADE_MS = Math.round(FADE.settle * 1000);
 
 // ---------- Direction: unify ----------
 
-// Five parts of one screen, each landing in its place. Every part's start is
-// offset from its landing; `UNIFIED` offsets all point the same way (down and
-// right, so each travels up and left), `SCATTERED` ones each point their own way.
+// Three parts of one screen, each landing in its place. Every part's start is
+// offset from its landing; `UNIFIED` offsets are one and the same (so all three
+// rise up and to the left together, side by side), `SCATTERED` ones each point
+// their own way. Three parts and short moves keep the pair calm enough to read.
 const PARTS = [
-  { rect: { x: 16, y: 14, w: 52, h: 36 }, card: true },
-  { rect: { x: 76, y: 18, w: 44, h: 6 }, heading: true },
-  { rect: { x: 76, y: 30, w: 30, h: 4 } },
-  { rect: { x: 16, y: 58, w: 128, h: 14 }, row: true },
-  { rect: { x: 16, y: 80, w: 28, h: 8 }, button: true },
+  { rect: { x: 16, y: 18, w: 52, h: 36 }, card: true },
+  { rect: { x: 76, y: 22, w: 44, h: 6 }, heading: true },
+  { rect: { x: 16, y: 64, w: 128, h: 14 }, row: true },
 ];
-const UNIFIED = [[40, 24], [30, 18], [30, 18], [20, 12], [16, 10]];
-const SCATTERED = [[60, 0], [-30, 30], [-30, 0], [0, -45], [60, -60]];
+const UNIFIED = [[16, 10], [16, 10], [16, 10]];
+const SCATTERED = [[44, 0], [-40, 30], [30, -40]];
 
 const unifyScene = ({ id, title, caption, offsets, crossing }) => ({
   id,
@@ -63,14 +62,12 @@ const unifyScene = ({ id, title, caption, offsets, crossing }) => ({
   draw: ({ p }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />
-      {PARTS.map(({ rect, card, heading, row, button }, i) => (
+      {PARTS.map(({ rect, card, heading, row }, i) => (
         <Moved key={i} x={offsets[i][0] * (1 - p)} y={offsets[i][1] * (1 - p)}>
           {card ? (
             <CardBox {...rect} accent />
           ) : row ? (
             <Row x={rect.x} y={rect.y} w={rect.w} />
-          ) : button ? (
-            <ButtonShape {...rect} />
           ) : (
             <SkeletonBar {...rect} heading={heading} />
           )}
@@ -83,18 +80,26 @@ const unifyScene = ({ id, title, caption, offsets, crossing }) => ({
 const unify = unifyScene({
   id: 'direction-unify',
   title: 'Every part heads the same way',
-  caption: 'Five parts, each from where it is to where it lands, all up and to the left: none crosses another.',
+  caption: 'Three parts, each from where it is to where it lands, all up and to the left: none crosses another.',
   offsets: UNIFIED,
 });
 const scatter = unifyScene({
   id: 'direction-scatter',
   title: 'Each part its own way',
-  caption: 'The same five parts, each arriving from a different side: the paths cross and the eye has nowhere to follow.',
+  caption: 'The same three parts, each arriving from a different side: the paths cross and the eye has nowhere to follow.',
   offsets: SCATTERED,
   crossing: true,
 });
 
 // ---------- Move along the grid ----------
+
+// A dashboard of cards, three across and two down, with one slot free. The
+// person moves the first card into it: a real reorder, not a lone shape.
+const SLOT = { w: 40, h: 28 };
+const SLOTS = [[16, 26], [60, 26], [104, 26], [16, 58], [60, 58], [104, 58]];
+const [FROM, TO] = [SLOTS[0], SLOTS[5]];
+const GRID_MOVE = { x: TO[0] - FROM[0], y: TO[1] - FROM[1] };
+const center = ([x, y]) => [x + SLOT.w / 2, y + SLOT.h / 2];
 
 const gridScene = ({ id, title, caption, diagonal }) => ({
   id,
@@ -102,35 +107,40 @@ const gridScene = ({ id, title, caption, diagonal }) => ({
   caption,
   viewBox: VIEW,
   initial: { x: 0, y: 0 },
-  landing: { x: 96, y: 40 },
-  arrows: [diagonal ? [[28, 32], [124, 72]] : [[28, 32], [124, 32], [124, 72]]],
+  landing: GRID_MOVE,
+  arrows: [
+    diagonal
+      ? { points: [center(FROM), center(TO)], ghost: { x: TO[0], y: TO[1], ...SLOT } }
+      : { points: [center(FROM), [center(TO)[0], center(FROM)[1]], center(TO)], ghost: { x: TO[0], y: TO[1], ...SLOT } },
+  ],
   draw: ({ x, y }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />
-      {[0, 1, 2].map((i) => (
-        <Row key={i} x={16} y={44 + i * 14} w={128} />
+      {SLOTS.slice(1, 5).map(([sx, sy]) => (
+        <CardBox key={`${sx}-${sy}`} x={sx} y={sy} {...SLOT} />
       ))}
-      <CardBox x={16 + x} y={24 + y} w={24} h={16} accent />
+      <CardBox x={FROM[0] + x} y={FROM[1] + y} {...SLOT} accent />
     </>
   ),
   play: async (ctx) => {
+    await ctx.hold(1);
     if (diagonal) {
-      await Promise.all([ctx.spring('x', 96, 'spatial.default'), ctx.spring('y', 40, 'spatial.default')]);
+      await Promise.all([ctx.spring('x', GRID_MOVE.x, 'spatial.default'), ctx.spring('y', GRID_MOVE.y, 'spatial.default')]);
     } else {
-      await ctx.spring('x', 96, 'spatial.default');
-      await ctx.spring('y', 40, 'spatial.default');
+      await ctx.spring('x', GRID_MOVE.x, 'spatial.default');
+      await ctx.spring('y', GRID_MOVE.y, 'spatial.default');
     }
   },
 });
 const gridDo = gridScene({
   id: 'grid-along',
-  title: 'Across, then down',
-  caption: 'Along the grid and round the corner. A size change is the same: width, then height.',
+  title: 'Across the row, then down',
+  caption: 'A card moves to the free slot along the grid and round the corner. A size change is the same: width, then height.',
 });
 const gridDont = gridScene({
   id: 'grid-diagonal',
   title: 'Straight across the corner',
-  caption: 'The same start and landing, on a diagonal the grid never draws.',
+  caption: 'The same card and slot, on a diagonal the grid never draws.',
   diagonal: true,
 });
 
@@ -199,11 +209,8 @@ const spaceScene = ({ id, title, caption, collide }) => ({
   viewBox: VIEW,
   initial: { f: 1, m: 0, clash: 0 },
   landing: { f: 0, m: 1, clash: collide ? 1 : 0 },
-  // The two rows below close up together: each from where it is to where it lands, side by side.
-  arrows: [
-    travel({ x: 16, y: 44, w: 128, h: 14 }, 0, 14, { lane: { x: 52 } }),
-    travel({ x: 16, y: 58, w: 128, h: 14 }, 0, 14, { lane: { x: 108 } }),
-  ],
+  // The rows below close up as one group: one path, one outline where the whole group lands.
+  arrows: [travel({ x: 16, y: 44, w: 128, h: 28 }, 0, 14)],
   draw: ({ f, m }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />
@@ -355,10 +362,8 @@ const causeScene = ({ id, title, caption, pushes }) => ({
   viewBox: VIEW,
   initial: { sel: 0, flag: 0, shift: 0 },
   landing: { sel: 1, flag: pushes ? 0 : 1, shift: pushes ? 1 : 0 },
-  // A push moves every row under the hand, so each one's path is drawn, side by side.
-  arrows: pushes
-    ? [0, 1, 2].map((i) => travel({ x: 16, y: 44 + i * 14, w: 128, h: 14 }, 0, -14, { lane: { x: 40 + i * 40 } }))
-    : [[[150, 20], [128, 20]]],
+  // A push moves the rows under the hand as one group: one path, one outline where the group lands.
+  arrows: pushes ? [travel({ x: 16, y: 44, w: 128, h: 42 }, 0, -14)] : [[[150, 20], [128, 20]]],
   draw: ({ sel, flag, shift }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />
@@ -418,8 +423,9 @@ const bpScene = ({ id, title, caption, lags }) => ({
   arrows: [[[168, 56], [104, 56]]],
   draw: ({ w, shown, blend }) => (
     <>
+      {/* The window follows the hand; the layout inside is the breakpoint's. */}
       <g opacity={blend}>
-        <ReflowScreen width={shown} neutral />
+        <ReflowScreen width={w} layout={shown} neutral resizing />
       </g>
       <Pointer x={8 + w / 8} y={52} />
     </>
@@ -459,12 +465,12 @@ const bpLags = bpScene({
 // ---------- The demos, in page order ----------
 
 export const CHOREOGRAPHY_DEMOS = {
-  direction: { title: 'Unify direction', scenes: [unify, scatter] },
-  grid: { title: 'Move along the grid', scenes: [gridDo, gridDont] },
-  retrace: { title: 'Back the way it came', scenes: [retraceDo, retraceDont] },
-  space: { title: 'Keep space', scenes: [spaceClear, spaceCollide] },
-  fades: { title: 'Clean fades', scenes: [fadeClean, fadeCross] },
-  stagger: { title: 'Sequence and stagger', scenes: [staggerTight, staggerFlat, staggerLoose] },
-  cause: { title: 'Who started it', scenes: [causeQuiet, causePushes] },
-  breakpoints: { title: 'Breakpoints', scenes: [bpFollows, bpLags] },
+  direction: { title: 'Unify direction', scenes: pair(unify, scatter) },
+  grid: { title: 'Move along the grid', scenes: pair(gridDo, gridDont) },
+  retrace: { title: 'Back the way it came', scenes: pair(retraceDo, retraceDont) },
+  space: { title: 'Keep space', scenes: pair(spaceClear, spaceCollide) },
+  fades: { title: 'Clean fades', scenes: pair(fadeClean, fadeCross) },
+  stagger: { title: 'Sequence and stagger', scenes: pair(staggerTight, staggerFlat, staggerLoose) },
+  cause: { title: 'Who started it', scenes: pair(causeQuiet, causePushes) },
+  breakpoints: { title: 'Breakpoints', scenes: pair(bpFollows, bpLags) },
 };

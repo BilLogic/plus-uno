@@ -60,14 +60,17 @@ export const stillAtItsLanding = (demo) => async ({ canvasElement }) => {
 
 // A test does not need to watch a pass in real time: it plays at 8×, so a slow
 // CI browser still settles well inside the test timeout. The landing is the same.
+// A docs page shows these same stories through `<Canvas of>`, and the reader
+// must see the product's speed, so a story on a docs page plays at 1×.
 const TEST_SPEED = 8;
+export const speedFor = (viewMode) => (viewMode === 'docs' ? 1 : TEST_SPEED);
 
 // `reduced={false}` pins the demo to its animated pass. Left unset, MotionDemo
 // follows the device's `prefers-reduced-motion`, and CI's Chromium reports
 // `reduce`: the demo would sit at `still`, never reach `arrows`/`settled`, and
 // the wait would time out. The Reduced twins cover the reduced path.
 export const story = (demo) => ({
-  render: () => <MotionDemo {...demo} reduced={false} fastForward={TEST_SPEED} />,
+  render: (_args, { viewMode } = {}) => <MotionDemo {...demo} reduced={false} fastForward={speedFor(viewMode)} />,
   play: playsToItsLanding(demo),
 });
 export const reducedStory = (demo) => ({ render: () => <MotionDemo {...demo} reduced />, play: stillAtItsLanding(demo) });

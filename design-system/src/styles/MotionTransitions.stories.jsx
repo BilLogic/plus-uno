@@ -45,6 +45,8 @@ export const SwitchViews = story(TRANSITION_DEMOS.switch);
 export const SwitchViewsReduced = reducedStory(TRANSITION_DEMOS.switch);
 export const Step = story(TRANSITION_DEMOS.step);
 export const StepReduced = reducedStory(TRANSITION_DEMOS.step);
+export const StepDown = story(TRANSITION_DEMOS.stepDown);
+export const StepDownReduced = reducedStory(TRANSITION_DEMOS.stepDown);
 
 // ---------- Within a place ----------
 export const ScrollToSpot = story(TRANSITION_DEMOS.scroll);

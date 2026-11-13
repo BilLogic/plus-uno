@@ -109,7 +109,7 @@ describe('DocsLanding', () => {
         render(<DocsLanding page="foundations-motion-physics" section="foundations-motion" eyebrow="Foundation · Motion" title="Physics" purpose="p" />);
         const nav = screen.getByRole('navigation', { name: 'Physics pages' });
         const names = within(nav).getAllByText(/./).map((n) => n.textContent);
-        expect(names).toEqual(['Principles', 'Physics', 'Transitions', 'Choreography', 'Playground', 'Library']);
+        expect(names).toEqual(['Principles', 'Physics', 'Transitions', 'Choreography', 'Library', 'Playground']);
         expect(within(nav).getByText('Physics')).toHaveAttribute('aria-current', 'page');
         expect(within(nav).getByText('Library')).toHaveAttribute('href', '?path=/docs/foundations-motion-library--docs');
     });

@@ -125,8 +125,17 @@ const pairCard = {
     overflow: 'hidden',
 };
 
-const Verdict = ({ tone, caption, children }) => {
+/** The Do or Don’t tag a verdict carries; the motion demos label their pairs with it too. */
+export const VerdictTag = ({ tone }) => {
     const isDo = tone === 'do';
+    return (
+        <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} iconBefore={isDo ? 'circle-check' : 'circle-xmark'}>
+            {isDo ? 'Do' : 'Don’t'}
+        </StatusTag>
+    );
+};
+
+const Verdict = ({ tone, caption, children }) => {
     return (
         <figure style={{ ...pairCard, margin: 0 }} data-verdict={tone}>
             <div
@@ -154,9 +163,7 @@ const Verdict = ({ tone, caption, children }) => {
                 }}
             >
                 <span>
-                    <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} iconBefore={isDo ? 'circle-check' : 'circle-xmark'}>
-                        {isDo ? 'Do' : 'Don’t'}
-                    </StatusTag>
+                    <VerdictTag tone={tone} />
                 </span>
                 <span>{caption}</span>
             </figcaption>

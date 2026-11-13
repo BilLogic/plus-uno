@@ -6,7 +6,7 @@ import {
   Backdrop, ButtonShape, CardBox, Flag, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule, Section, SkeletonBar,
 } from './primitives.jsx';
 import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
-import { BEAT, LOOP_PERIOD, measure, projectedRest, ratioOf, resisted, springFor, springWithRatio, stepOf } from './motion.jsx';
+import { BEAT, LOOP_PERIOD, measure, pair, projectedRest, ratioOf, resisted, springFor, springWithRatio, stepOf } from './motion.jsx';
 
 /**
  * The Physics page's figures (Foundations/Motion/Physics). Each is a principle,
@@ -41,11 +41,12 @@ const Clip = ({ x, y, w, h, children }) => {
 };
 
 /** The blocked-out screen most app examples sit in: a frame, a header and rows. */
-const Screen = ({ rows = 4, header = true }) => (
+const Screen = ({ rows = 3, header = true }) => (
   <>
     <Frame x={8} y={6} w={144} h={88} />
     {header && <PageHeader x={16} y={24} w={128} />}
-    {Array.from({ length: rows }, (_, i) => (
+    {/* Never more rows than fit above the Frame's bottom edge. */}
+    {Array.from({ length: Math.min(rows, Math.floor((94 - 44) / 14)) }, (_, i) => (
       <Row key={i} x={16} y={44 + i * 14} w={128} />
     ))}
   </>
@@ -92,7 +93,8 @@ const popupOpening = ({ id, title, caption, token }) => ({
     <>
       <Screen rows={3} header={false} />
       <ButtonShape x={112} y={22} w={28} />
-      <Clip x={140 - 74 * p} y={34} w={74 * p} h={52 * p}>
+      {/* The reveal reaches one unit past the Popup's top and right, so its ring is never sliced. */}
+      <Clip x={140 - 74 * p} y={33} w={74 * p + 1} h={52 * p + 1}>
         <Popup x={68} y={34} w={72} h={48} accent />
       </Clip>
     </>
@@ -360,12 +362,10 @@ const exitReverse = {
   title: 'It can come back: reverse, one speed faster',
   caption: 'The Panel opens on spatial.default and closes on spatial.fast, held at its edge.',
   viewBox: VIEW,
-  initial: { x: PANEL.w },
+  // Only the exit is drawn and played: the Panel starts open.
+  initial: { x: 0 },
   landing: { x: PANEL.w },
-  arrows: [
-    [[150, 36], [100, 36]],
-    [[100, 76], [150, 76]],
-  ],
+  arrows: [[[100, 56], [150, 56]]],
   draw: ({ x }) => (
     <>
       <Screen rows={3} />
@@ -373,9 +373,7 @@ const exitReverse = {
     </>
   ),
   play: async (ctx) => {
-    await ctx.tap(...HEADER_BUTTON);
-    await ctx.spring('x', 0, 'spatial.default');
-    await ctx.hold(2);
+    await ctx.hold(1);
     await ctx.tap(104, 24);
     await ctx.spring('x', PANEL.w, 'spatial.fast');
   },
@@ -390,7 +388,8 @@ const flagExit = ({ id, title, caption, arrows, landing, leave }) => ({
   title,
   caption,
   viewBox: VIEW,
-  initial: { x: 24, o: 0, ptr: 0 },
+  // Only the exit is drawn and played: the Flag starts in place.
+  initial: { x: 0, o: 1, ptr: 0 },
   landing,
   arrows,
   draw: ({ x, o, ptr }) => (
@@ -405,8 +404,7 @@ const flagExit = ({ id, title, caption, arrows, landing, leave }) => ({
     </>
   ),
   play: async (ctx) => {
-    await arrive(ctx, 'spatial.default');
-    await ctx.hold(2);
+    await ctx.hold(1);
     await leave(ctx);
   },
 });
@@ -415,7 +413,7 @@ const exitSystem = flagExit({
   id: 'exit-system',
   title: 'Gone, the system decided: spatial.exit',
   caption: 'A Flag timing out is aimed 3.8× past the edge, so it is still speeding up as it leaves.',
-  arrows: [FLAG_IN, FLAG_OUT],
+  arrows: [FLAG_OUT],
   landing: { x: FLAG_GONE },
   leave: (ctx) => ctx.exit('x', FLAG_GONE),
 });
@@ -424,7 +422,7 @@ const exitClick = flagExit({
   id: 'exit-click',
   title: 'Gone, the person clicked: a fade',
   caption: 'Closing by hand is a quick appearance.fast fade, with no travel.',
-  arrows: [FLAG_IN],
+  arrows: [],
   landing: { x: 0, o: 0 },
   leave: async (ctx) => {
     await ctx.tap(132, 30);
@@ -439,7 +437,7 @@ const exitFlick = flagExit({
   id: 'exit-flick',
   title: 'Gone, the person flicked: the hand’s speed',
   caption: 'spatial.exit starts from the release velocity instead of from rest.',
-  arrows: [FLAG_IN, FLAG_OUT],
+  arrows: [FLAG_OUT],
   landing: { x: FLAG_GONE, ptr: 0 },
   leave: async (ctx) => {
     await ctx.spring('ptr', 1, 'appearance.fast');
@@ -815,7 +813,7 @@ const drillScene = ({ id, title, caption, reduced }) => ({
       <Frame x={8} y={6} w={144} h={88} />
       <g opacity={list}>
         <PageHeader x={16} y={24} w={128} />
-        {[0, 1, 2, 3].map((i) => (
+        {[0, 1, 2].map((i) => (
           <Row key={i} x={16} y={44 + i * 14} w={128} />
         ))}
       </g>
@@ -865,17 +863,19 @@ const drillReduced = drillScene({
 // ---------- The demos, in page order ----------
 
 export const PHYSICS_DEMOS = {
-  families: { title: 'Three families', scenes: [spatialShape, spatialApp, appearanceShape, appearanceApp, linearShape, linearApp] },
+  spatial: { title: 'spatial', scenes: [spatialShape, spatialApp] },
+  appearance: { title: 'appearance', scenes: [appearanceShape, appearanceApp] },
+  linear: { title: 'linear', scenes: [linearShape, linearApp] },
   modes: { title: 'Productive and Expressive', scenes: [plotProductive, plotExpressive, flagProductive, flagExpressive] },
   size: { title: 'Speed follows size', scenes: [sizeFast, sizeDefault, sizeSlow] },
   exits: { title: 'Four ways to leave', scenes: [exitReverse, exitSystem, exitClick, exitFlick] },
   loops: { title: 'A loop and its reduced fallback', scenes: [loopThinking, loopReduced] },
   damping: { title: 'One stiffness, four ratios', scenes: dampScenes },
-  throw: { title: 'A throw keeps the hand’s speed', scenes: [throwKeeps, throwDrops] },
+  throw: { title: 'A throw keeps the hand’s speed', scenes: pair(throwKeeps, throwDrops) },
   decision: { title: 'Where it would land decides', scenes: [decideFlick, decideDrag] },
-  interruption: { title: 'Interrupted mid-motion', scenes: [interruptTurns, interruptWaits] },
+  interruption: { title: 'Interrupted mid-motion', scenes: pair(interruptTurns, interruptWaits) },
   carry: { title: 'What you carry', scenes: [carryChip, carryCard] },
-  limit: { title: 'Dragged past a limit', scenes: [limitResists, limitWall] },
+  limit: { title: 'Dragged past a limit', scenes: pair(limitResists, limitWall) },
   reducedMotion: { title: 'Reduced motion is a fade, never a cut', scenes: [drillProductive, drillReduced] },
 };
 

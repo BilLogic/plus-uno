@@ -3,10 +3,12 @@ import { animate } from 'motion';
 import { useReducedMotion } from 'motion/react';
 
 import { Button, IconButton } from '@/components';
+import { VerdictTag } from '@/storybook-docs/foundation-blocks.jsx';
 
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { measureSpring, springStep } from '@/tokens/spring.js';
 import { Illustration } from './Illustration.jsx';
+import { HERO_HAIRLINE } from './paint.js';
 import { Trail, TapRing } from './primitives-motion.jsx';
 import { crossings, ghostOf, pointsOf } from './trails.js';
 
@@ -31,6 +33,15 @@ import { crossings, ghostOf, pointsOf } from './trails.js';
  * `trails.js`). There are no timings here: every move reads a
  * spring token, and every pause is counted in beats.
  */
+
+/**
+ * A right way and its wrong ways, side by side: the first scene is the Do, every
+ * other one a Don't, and each tile carries the tag the docs' Do/Don't pairs use.
+ */
+export const pair = (doScene, ...donts) => [
+  { ...doScene, verdict: 'do' },
+  ...donts.map((scene) => ({ ...scene, verdict: 'dont' })),
+];
 
 /** The speed control's steps, and how each reads. */
 export const SPEEDS = [1, 0.5, 0.25];
@@ -81,6 +92,8 @@ export const projectedRest = (position, velocity) => position + (((velocity * 2)
 
 /** Resistance past a limit: the square root of the extra distance, × 4 px, in kit units. */
 export const resisted = (extra) => (Math.sqrt(Math.max(0, extra) * 2) * 4) / 2;
+/** The extra distance past a limit that `resisted()` turns into `travel`: its inverse. */
+export const unresisted = (travel) => (Math.max(0, travel) ** 2) / 8;
 
 const round = (v) => (typeof v === 'number' ? Math.round(v * 100) / 100 : v);
 const roundState = (state) => Object.fromEntries(Object.entries(state).map(([k, v]) => [k, round(v)]));
@@ -328,7 +341,17 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
       style={{ margin: 0, display: 'grid', gridTemplateRows: 'subgrid', gridRow: 'span 3', gap: 'var(--stack-sm)', minInlineSize: 0 }}
     >
       <div style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text)' }}>{scene.title}</div>
-      <div style={{ borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', overflow: 'hidden' }}>
+      <div
+        style={{
+          borderRadius: 'var(--radius-lg)',
+          background: 'var(--ds-surface)',
+          overflow: 'hidden',
+          // Vertical room around the drawing: a frame never sits against the tile edge.
+          paddingBlock: 'var(--card-pad-default)',
+          // One viewBox unit is 2px, so every kit outline here is half a stroke: 1px, as in the heroes.
+          '--stroke-hairline': HERO_HAIRLINE,
+        }}
+      >
         <Illustration viewBox={scene.viewBox} title={scene.label ?? `${scene.title}. ${scene.caption}`}>
           <g opacity={round(1 - dim * VEIL)}>
             {resetting && <g>{scene.draw(startStates([scene])[scene.id])}</g>}
@@ -346,8 +369,19 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
           )}
         </Illustration>
       </div>
-      <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)', marginBlockEnd: 'var(--stack-md)' }}>
-        {scene.caption}
+      <figcaption
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: 'var(--stack-sm)',
+          font: 'var(--body-small)',
+          color: 'var(--ds-text-subtle)',
+          marginBlockEnd: 'var(--stack-md)',
+        }}
+      >
+        {scene.verdict && <VerdictTag tone={scene.verdict} />}
+        <span>{scene.caption}</span>
       </figcaption>
     </figure>
   );
@@ -475,7 +509,8 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
   const cycleSpeed = () => {
     const next = (speedIndex + 1) % SPEEDS.length;
     setSpeedIndex(next);
-    setSpeed(SPEEDS[next]);
+    // The control scales the demo's own rate: ½× of a fast-forwarded test is still half of it.
+    setSpeed(SPEEDS[next] * fastForward);
   };
   const togglePause = () => {
     setPaused(!paused);
@@ -522,7 +557,9 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))`,
+          // Two tiles a row at most: a drawing keeps its natural size (two px a unit) instead of
+          // shrinking to a fractional scale that blurs its hairlines.
+          gridTemplateColumns: `repeat(auto-fit, minmax(max(min(100%, var(--card-min-width-sm)), calc((100% - var(--grid-gutter)) / 2)), 1fr))`,
           columnGap: 'var(--grid-gutter)',
           rowGap: 'var(--stack-sm)',
           alignItems: 'start',

@@ -7,6 +7,7 @@ import {
 import { TreeEdge, TreeNode } from './primitives-motion.jsx';
 import { Clip, Moved, VIEW, mix } from './motion-parts.jsx';
 import { travel } from './trails.js';
+import { pair } from './motion.jsx';
 import { ABOVE_DEMOS, FEEDBACK_DEMOS, WITHIN_DEMOS } from './motion-transitions-place.jsx';
 
 /**
@@ -442,10 +443,44 @@ const step = ({ id, title, caption, side, axis }) => {
 
 // ---------- Trees ----------
 
-const N = { w: 16, h: 12 };
-const at = (x, y) => ({ x: x - N.w / 2, y: y - N.h / 2 });
-/** A node centered on (`cx`, `cy`). */
-const Node = ({ cx, cy, ...props }) => <TreeNode {...at(cx, cy)} {...N} {...props} />;
+// One tree of the product, drawn the same in every category: two areas with no
+// line between them; area A holds two records, the second of which has three
+// views hanging from it as peers; area B holds a task whose three steps are a
+// chain. Each category lights its own part of this one tree.
+const N = { w: 14, h: 10 };
+const NODES = {
+  a: [40, 14], b: [120, 14],
+  r1: [24, 44], r2: [56, 44], task: [120, 44],
+  v1: [36, 76], v2: [56, 76], v3: [76, 76],
+  t1: [96, 76], t2: [120, 76], t3: [144, 76],
+};
+const TREE_EDGES = [['a', 'r1'], ['a', 'r2'], ['r2', 'v1'], ['r2', 'v2'], ['r2', 'v3'], ['b', 'task'], ['task', 't1'], ['task', 't2'], ['task', 't3']];
+const CHAIN = [['t1', 't2'], ['t2', 't3']];
+const edgeKey = ([from, to]) => `${from}-${to}`;
+
+/** A link from the bottom of one node to the top of the one below, or across a chain from side to side. */
+const ends = ([from, to], across) => {
+  const [x1, y1] = NODES[from];
+  const [x2, y2] = NODES[to];
+  return across
+    ? { x1: x1 + N.w / 2, y1, x2: x2 - N.w / 2, y2 }
+    : { x1, y1: y1 + N.h / 2, x2, y2: y2 - N.h / 2 };
+};
+
+/** The tree, with nodes lit by `lit[key]`, marked by `done[key]`, and links drawn by `progress[key]`. */
+const IATree = ({ lit = {}, done = {}, progress = {} }) => (
+  <>
+    {TREE_EDGES.map((e) => (
+      <TreeEdge key={edgeKey(e)} {...ends(e)} progress={progress[edgeKey(e)] ?? 0} accent />
+    ))}
+    {CHAIN.map((e) => (
+      <TreeEdge key={edgeKey(e)} {...ends(e, true)} progress={progress[edgeKey(e)] ?? 0} accent />
+    ))}
+    {Object.entries(NODES).map(([key, [cx, cy]]) => (
+      <TreeNode key={key} x={cx - N.w / 2} y={cy - N.h / 2} {...N} lit={lit[key] ?? 0} done={(done[key] ?? 0) > 0.5} />
+    ))}
+  </>
+);
 
 const treeScene = ({ id, title, caption, initial, landing, draw, play }) => ({
   id,
@@ -465,19 +500,7 @@ const go = treeScene({
   caption: 'Separate trees: one area lights, then another. No line joins them.',
   initial: { a: 1, b: 0 },
   landing: { a: 0, b: 1 },
-  draw: ({ a, b }) => (
-    <>
-      {[[40, 20, 20, 62, 60, 62, a], [120, 20, 100, 62, 140, 62, b]].map(([rx, ry, lx, ly, mx, my, lit], i) => (
-        <g key={i}>
-          <TreeEdge x1={rx} y1={ry + 6} x2={lx} y2={ly - 6} />
-          <TreeEdge x1={rx} y1={ry + 6} x2={mx} y2={my - 6} />
-          <Node cx={rx} cy={ry} lit={lit} />
-          <Node cx={lx} cy={ly} />
-          <Node cx={mx} cy={my} />
-        </g>
-      ))}
-    </>
-  ),
+  draw: ({ a, b }) => <IATree lit={{ a, b }} />,
   play: async (ctx) => {
     await ctx.hold(1);
     await ctx.spring('a', 0, 'appearance.fast');
@@ -491,17 +514,7 @@ const drillTree = treeScene({
   caption: 'The path lights one level down into the chosen record, then back up to its parent.',
   initial: { s: 1, r: 0, e: 0, seen: 0 },
   landing: { s: 1, r: 0, e: 0, seen: 1 },
-  draw: ({ s, r, e }) => (
-    <>
-      <TreeEdge x1={80} y1={26} x2={40} y2={58} />
-      <TreeEdge x1={80} y1={26} x2={80} y2={58} progress={e} accent />
-      <TreeEdge x1={80} y1={26} x2={120} y2={58} />
-      <Node cx={80} cy={20} lit={s} />
-      <Node cx={40} cy={64} />
-      <Node cx={80} cy={64} lit={r} />
-      <Node cx={120} cy={64} />
-    </>
-  ),
+  draw: ({ s, r, e }) => <IATree lit={{ a: s, r2: r }} progress={{ 'a-r2': e }} />,
   play: async (ctx) => {
     await ctx.hold(1);
     await ctx.spring('e', 1, 'spatial.default');
@@ -519,17 +532,7 @@ const switchTree = treeScene({
   caption: 'The record stays; the light moves between its views, which hang from it as peers.',
   initial: { v1: 0, v2: 1, v3: 0 },
   landing: { v1: 0, v2: 0, v3: 1 },
-  draw: ({ v1, v2, v3 }) => (
-    <>
-      {[40, 80, 120].map((x) => (
-        <TreeEdge key={x} x1={80} y1={26} x2={x} y2={58} />
-      ))}
-      <Node cx={80} cy={20} lit={0.35} />
-      <Node cx={40} cy={64} lit={v1} />
-      <Node cx={80} cy={64} lit={v2} />
-      <Node cx={120} cy={64} lit={v3} />
-    </>
-  ),
+  draw: ({ v1, v2, v3 }) => <IATree lit={{ r2: 0.35, v1, v2, v3 }} />,
   play: async (ctx) => {
     await ctx.hold(1);
     await Promise.all([ctx.spring('v2', 0, 'appearance.fast'), ctx.spring('v3', 1, 'appearance.default')]);
@@ -543,13 +546,7 @@ const stepTree = treeScene({
   initial: { n1: 1, n2: 0, n3: 0, e1: 0, e2: 0, d1: 0, d2: 0 },
   landing: { n1: 0, n2: 1, n3: 0, e1: 1, e2: 0, d1: 1, d2: 0 },
   draw: ({ n1, n2, n3, e1, e2, d1, d2 }) => (
-    <>
-      <TreeEdge x1={32} y1={50} x2={72} y2={50} progress={e1} accent />
-      <TreeEdge x1={88} y1={50} x2={128} y2={50} progress={e2} accent />
-      <Node cx={24} cy={50} lit={n1} done={d1 > 0.5} />
-      <Node cx={80} cy={50} lit={n2} done={d2 > 0.5} />
-      <Node cx={136} cy={50} lit={n3} />
-    </>
+    <IATree lit={{ task: 0.35, t1: n1, t2: n2, t3: n3 }} done={{ t1: d1, t2: d2 }} progress={{ 't1-t2': e1, 't2-t3': e2 }} />
   ),
   play: async (ctx) => {
     await ctx.hold(1);
@@ -580,10 +577,10 @@ export const TRANSITION_TREES = {
 export const TRANSITION_DEMOS = {
   go: {
     title: 'Go to another area',
-    scenes: [
+    scenes: pair(
       goTo({ id: 'go-fade', title: 'A clean fade in place', caption: 'The Sidebar highlight moves; the old page fades out, then the new page fades in, in place. The Sidebar itself does not move.' }),
       goTo({ id: 'go-slide', title: 'The pages slide', slide: true, caption: 'A slide says the two areas sit side by side. They are unrelated, so nothing should slide.' }),
-    ],
+    ),
   },
   drill: {
     title: 'Depth 1: the row grows into the record',
@@ -593,34 +590,39 @@ export const TRANSITION_DEMOS = {
   },
   deeper: {
     title: 'Deeper levels: the same rule',
-    scenes: [
+    scenes: pair(
       drill({ id: 'deeper-grow', title: 'Depth 2: the row grows again', crumbs: 2, caption: 'Whatever was chosen becomes the page, at any depth, and the Breadcrumb arrives one level longer.' }),
       drill({ id: 'deeper-slide', title: 'Depth 2: a page slides in from the right', mode: 'slide', crumbs: 2, caption: 'Beside a docked Sidebar a sliding page reads as a floating Panel opening, not a deeper place.' }),
-    ],
+    ),
   },
   climb: { title: 'Climbing back out', scenes: [climbOne, climbTwo] },
   focused: {
     title: 'A focused task',
-    scenes: [
+    scenes: pair(
       focused({ id: 'focused-fade', title: 'The frame fades, the task fades in', caption: 'The task changes the frame itself, so it is a clean fade in place: the page and Sidebar fade out, then the task fades in. Close reverses it.' }),
       focused({ id: 'focused-slide', title: 'The task slides in from the side', slide: true, caption: 'A slide says the task sits beside the page. It replaces the frame, so it fades.' }),
-    ],
+    ),
   },
   switch: {
     title: 'Switch views',
-    scenes: [
+    scenes: pair(
       switchViews({ id: 'switch-slide', title: 'Both bodies slide together', caption: 'The views are peers in a row: the indicator moves on spatial.fast and both bodies slide as one flat sheet, no fade.' }),
       switchViews({ id: 'switch-fade', title: 'A fade on the slide', fade: true, caption: 'A fade on top of the slide reads as going deeper, and tabs are not deeper.' }),
-    ],
+    ),
   },
   step: {
-    title: 'Step to the next or previous',
-    scenes: [
+    title: 'Steps across the top',
+    scenes: pair(
       step({ id: 'step-across', title: 'Steps across the top: the body slides across', axis: 'x', caption: 'The row runs across, so the body moves across with it. Visited, current and unvisited change in place.' }),
       step({ id: 'step-across-wrong', title: 'Steps across the top: the body slides up', axis: 'y', caption: 'The row says across and the body says up: two axes for one move.' }),
+    ),
+  },
+  stepDown: {
+    title: 'Steps down a side',
+    scenes: pair(
       step({ id: 'step-down', title: 'Steps down a side: the body slides up', side: true, axis: 'y', caption: 'The list runs down, so Next brings the new step up from below and Back brings it down from above.' }),
       step({ id: 'step-down-wrong', title: 'Steps down a side: the body slides across', side: true, axis: 'x', caption: 'The list says down and the body says across: two axes for one move.' }),
-    ],
+    ),
   },
   ...WITHIN_DEMOS,
   ...ABOVE_DEMOS,
