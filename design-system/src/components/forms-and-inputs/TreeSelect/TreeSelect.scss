@@ -22,7 +22,7 @@
 }
 
 .plus-tree-select-arrow {
-    transition: transform 0.15s ease-in-out;
+    transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
 
     &.plus-tree-select-arrow-open {
         transform: rotate(180deg);

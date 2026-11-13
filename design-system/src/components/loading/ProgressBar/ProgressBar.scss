@@ -29,7 +29,7 @@
     height: 100%;
     background-color: var(--plus-progressbar-fill-color);
     border-radius: var(--radius-full);
-    transition: width 0.3s ease;
+    transition: width var(--ds-motion-spatial-fast-duration) var(--ds-motion-linear);
 }
 
 .plus-progressbar--success .plus-progressbar-fill {
@@ -48,7 +48,7 @@
 
 .plus-progressbar--indeterminate .plus-progressbar-fill {
     width: 40%;
-    animation: plus-progressbar-sweep 1.4s ease-in-out infinite;
+    animation: plus-progressbar-sweep var(--ds-motion-loop-duration) var(--ds-motion-loop) infinite alternate;
 }
 
 @keyframes plus-progressbar-sweep {

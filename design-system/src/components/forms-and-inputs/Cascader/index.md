@@ -144,7 +144,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-border` · `--plus-listbox-viewport-width`
+`--border-default` · `--ds-border` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--plus-listbox-viewport-width`
 
 From `design-system/src/components/forms-and-inputs/Cascader/Cascader.scss`. Override these through the token layer, never with a literal.
 

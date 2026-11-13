@@ -140,7 +140,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-background-brand-bold` · `--ds-background-inverse-subtle` · `--ds-background-inverse-subtle-pressed` · `--ds-background-neutral` · `--ds-background-success-bold` · `--plus-progressbar-fill-color` · `--progress-bar-height` · `--radius-full`
+`--ds-background-brand-bold` · `--ds-background-inverse-subtle` · `--ds-background-inverse-subtle-pressed` · `--ds-background-neutral` · `--ds-background-success-bold` · `--ds-motion-linear` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--ds-motion-spatial-fast-duration` · `--plus-progressbar-fill-color` · `--progress-bar-height` · `--radius-full`
 
 From `design-system/src/components/loading/ProgressBar/ProgressBar.scss`. Override these through the token layer, never with a literal.
 

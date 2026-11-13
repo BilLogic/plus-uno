@@ -150,7 +150,7 @@ button.plus-pattern-sidebar__title {
 
     i {
         font-size: var(--icon-sm);
-        transition: transform 0.15s ease;
+        transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
     }
 }
 
@@ -323,7 +323,7 @@ button.plus-pattern-sidebar__title {
 
     i {
         font-size: var(--icon-sm);
-        transition: transform 0.15s ease;
+        transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
     }
 }
 

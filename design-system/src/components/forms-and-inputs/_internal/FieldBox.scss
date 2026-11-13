@@ -39,7 +39,7 @@
     background-color: var(--ds-background-input);
     color: var(--ds-text);
     cursor: text;
-    transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+    transition: border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     // One height per spacing: the content centers in it, so nothing pads the
     // top and bottom.

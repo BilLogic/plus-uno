@@ -138,7 +138,9 @@ test('every check that scopes consumer code composes its roots from the facts mo
   const { CONSUMER_ROOTS: consumer, SOURCE_ROOTS, LIBRARY_ROOT, STORYBOOK_ROOT } = facts;
   assert.deepEqual(SOURCE_ROOTS, [LIBRARY_ROOT, ...consumer]);
   const roots = async (file, name) => (await import(`../${file}`))[name];
-  assert.equal(await roots('check-ds-usage.mjs', 'SCOPE'), consumer);
+  assert.deepEqual(await roots('check-ds-usage.mjs', 'SCOPE'), [
+    ...consumer, 'design-system/src/components', 'design-system/src/patterns', 'design-system/src/templates',
+  ]);
   assert.equal(await roots('check-ads-language.mjs', 'SEARCH_ROOTS'), SOURCE_ROOTS);
   // The old-system ban reads the source roots and the docs that teach the system.
   const oldSystem = await import('../check-old-system.mjs');

@@ -45,7 +45,7 @@
         -webkit-mask-composite: xor;
         mask: linear-gradient(currentColor 0 0) content-box, linear-gradient(currentColor 0 0);
         mask-composite: exclude;
-        animation: plus-generative-border-turn 6s linear infinite;
+        animation: plus-generative-border-turn var(--ds-motion-loop-duration) var(--ds-motion-loop) infinite alternate;
     }
 }
 

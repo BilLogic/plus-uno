@@ -23,7 +23,7 @@
     text-align: left;
     text-decoration: none;
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     // A link row keeps its own color on hover: without this, the link hover
     // color wins over the row's rest color. The selected and

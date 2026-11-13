@@ -111,7 +111,7 @@
         transition:
             transform var(--ds-motion-spatial-default-duration) var(--ds-motion-spatial-default),
             opacity var(--ds-motion-appearance-slow-duration) var(--ds-motion-appearance-slow),
-            visibility 0s linear var(--ds-motion-appearance-slow-duration);
+            visibility var(--ds-motion-appearance-slow-duration) steps(1, end);
     }
 }
 

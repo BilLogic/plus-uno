@@ -140,7 +140,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-icon-inverse` · `--plus-spinner-size` · `--radius-full` · `--spinner-size-lg` · `--spinner-size-md` · `--spinner-size-sm`
+`--ds-icon-inverse` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--plus-spinner-size` · `--radius-full` · `--spinner-size-lg` · `--spinner-size-md` · `--spinner-size-sm`
 
 From `design-system/src/components/loading/Spinner/Spinner.scss`. Override these through the token layer, never with a literal.
 

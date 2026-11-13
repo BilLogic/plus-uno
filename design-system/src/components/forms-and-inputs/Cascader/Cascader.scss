@@ -22,7 +22,7 @@
 }
 
 .plus-cascader-arrow {
-    transition: transform 0.15s ease-in-out;
+    transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
 
     &.plus-cascader-arrow-open {
         transform: rotate(180deg);

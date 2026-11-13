@@ -24,6 +24,7 @@ export const RULES = {
   'ds/no-deep-import': { level: 'fail' },
   'ds/no-unknown-prop': { level: 'fail' },
   'ds/no-raw-literal': { level: 'fail' },
+  'ds/no-raw-motion': { level: 'fail' },
   'ds/no-unknown-token': { level: 'fail' },
   'ds/no-primitive-read': { level: 'fail' },
   'ds/fa-free-only': { level: 'fail' },
@@ -36,6 +37,7 @@ export const docLink = (rule) => `${RULES_DOC}#${rule.replace('/', '')}`;
 
 const SCRIPT = /\.(jsx|js|mjs|cjs|tsx|ts)$/;
 const STYLE = /\.(scss|css)$/;
+export const isDsStyle = (path) => /^design-system\/src\/(?:components|patterns|templates)\/.+\.(?:scss|css)$/.test(path);
 const MARKUP = /\.html$/;
 
 /**
@@ -190,7 +192,20 @@ export function escapesIn({ path, text: raw, page = isPageModule(path) }, ctx) {
     found.push({ rule, level: RULES[rule].level, file: path, line, col, message, fix });
   };
 
-  if (SCRIPT.test(path)) {
+  // DS implementation styles own their dimensions and colors. Only motion is
+  // checked here; the other usage rules apply to consumers of the system.
+  if (isDsStyle(path)) {
+    for (const m of blankAtRules(text).matchAll(DECLARATION)) {
+      const [, lead, property, value] = m;
+      // Stagger delays have their own documented cadence (Listbox: 20 ms,
+      // capped at 500 ms); this rule guards duration and easing only.
+      if (!/^(?:transition|animation)(?:-(?:duration|timing-function))?$/.test(property)) continue;
+      if (!/(?<![\w-])(?:\d*\.)?\d+(?:ms|s)\b|\bease(?:-in-out|-in|-out)?\b|\bcubic-bezier\s*\(/.test(value)) continue;
+      add('ds/no-raw-motion', m.index + lead.length,
+        `\`${property}: ${value.trim()}\` hardcodes motion`,
+        'use the matching --ds-motion-* easing and duration; loops use --ds-motion-loop and progress uses --ds-motion-linear');
+    }
+  } else if (SCRIPT.test(path)) {
     scriptEscapes(text, ctx, add);
     iconEscapes(text, ctx, add);
     tokenEscapes(text, ctx, add);

@@ -12,6 +12,16 @@
 // rules (inline styles, stray `!important`) still win over every layer.
 @layer base, tokens, components;
 
+// A shared exit from CSS movement, including pseudo-elements and component
+// styles loaded outside these layers. State changes still reach their target.
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @layer base {
   @include meta.load-css("base");
 }

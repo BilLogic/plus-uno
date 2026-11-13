@@ -147,7 +147,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-brand` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--radius-control-md` · `--radius-full` · `--space-050` · `--space-150` · `--stack-lg` · `--stack-md` · `--stack-sm` · `--stroke-1` · `--type-weight-medium`
+`--body-default` · `--border-default` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-brand` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--radius-control-md` · `--radius-full` · `--space-050` · `--space-150` · `--stack-lg` · `--stack-md` · `--stack-sm` · `--stroke-1` · `--type-weight-medium`
 
 From `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss`. Override these through the token layer, never with a literal.
 
