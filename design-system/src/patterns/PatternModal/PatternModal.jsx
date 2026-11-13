@@ -1,3 +1,4 @@
+import { useMotionReduced } from '@/lib/motionPreference';
 import { useOverlayPresence, useOverlayOrigin } from '@/lib/overlayMotion';
 import { BackdropOpenContext } from '../Backdrop/Backdrop';
 import React from 'react';
@@ -55,6 +56,7 @@ const PatternModal = ({
     children,
     ...props
 }) => {
+    const reduced = useMotionReduced();
     const backdropOpen = React.useContext(BackdropOpenContext);
     const open = show && backdropOpen;
     const surface = React.useRef(null);
@@ -125,6 +127,7 @@ const PatternModal = ({
     if (!present) return null;
     return (
         <div
+            data-reduced={reduced ? 'true' : undefined}
             ref={surface}
             data-ending-style={!open ? '' : undefined}
             aria-hidden={!open ? true : undefined}

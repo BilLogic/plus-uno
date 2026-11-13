@@ -1,4 +1,4 @@
-import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
+import { withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
@@ -251,9 +251,6 @@ const tooltipMotionPlay = async ({ canvasElement }, reduced = false) => {
 export const MotionOpenClose = { render: MotionTooltip, play: tooltipMotionPlay };
 export const MotionReduced = {
     render: MotionTooltip,
-    beforeEach: async () => {
-        await emulateReducedMotion('reduce');
-        return async () => { await emulateReducedMotion(null); };
-    },
+    decorators: [withReducedMotion],
     play: (context) => tooltipMotionPlay(context, true),
 };

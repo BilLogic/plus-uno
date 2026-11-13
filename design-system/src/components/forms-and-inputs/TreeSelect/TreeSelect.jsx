@@ -1,5 +1,6 @@
+import { useMotionReduced } from '@/lib/motionPreference';
 import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
-import { useOverlayPresence } from '@/lib/overlayMotion';
+import { useOverlayPresence, useKeyboardOpen } from '@/lib/overlayMotion';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import useFieldId from '../useFieldId';
 import PropTypes from 'prop-types';
@@ -148,12 +149,14 @@ const TreeSelect = ({
     style,
     ...props
 }) => {
+    const reduced = useMotionReduced();
     const [isOpen, setIsOpen] = useState(false);
     const [expandedValues, setExpandedValues] = useState(() => new Set());
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
     const menuRef = useRef(null);
     const close = useCallback(() => setIsOpen(false), []);
+    const keyboardOpen = useKeyboardOpen(isOpen);
     const present = useOverlayPresence(isOpen, menuRef);
     const place = useAnchoredPopup({ open: present, anchorRef: wrapperRef, popupRef: menuRef, onClose: close });
     /**
@@ -515,8 +518,10 @@ const TreeSelect = ({
 
                 {present && (
                     <div
+                        data-reduced={reduced ? 'true' : undefined}
                         ref={menuRef}
-                        data-ending-style={!isOpen ? '' : undefined}
+                        data-instant={keyboardOpen ? 'keyboard' : undefined}
+            data-ending-style={!isOpen ? '' : undefined}
             aria-hidden={!isOpen ? true : undefined}
                         inert={!isOpen ? true : undefined}
                         className="plus-listbox plus-listbox--anchored plus-tree-select-menu"

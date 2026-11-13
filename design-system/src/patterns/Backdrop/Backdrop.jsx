@@ -1,3 +1,4 @@
+import { useMotionReduced } from '@/lib/motionPreference';
 import React, { createContext, useRef } from 'react';
 import { useOverlayPresence } from '@/lib/overlayMotion';
 import PropTypes from 'prop-types';
@@ -39,6 +40,7 @@ const Backdrop = ({
     children,
     ...props
 }) => {
+    const reduced = useMotionReduced();
     const surface = useRef(null);
     const present = useOverlayPresence(show, surface);
     const classes = [
@@ -67,6 +69,7 @@ const Backdrop = ({
         // dialog from inside it, so the backdrop takes no role or key handler.
         <BackdropOpenContext.Provider value={show}>
             <div
+                data-reduced={reduced ? 'true' : undefined}
                 ref={surface}
                 data-ending-style={!show ? '' : undefined}
                 aria-hidden={!show ? true : undefined}

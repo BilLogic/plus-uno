@@ -1,10 +1,8 @@
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
-import { emulateReducedMotion } from './test-viewport';
+import React from 'react';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 
-export const reducedMotionSetup = async () => {
-    await emulateReducedMotion('reduce');
-    return async () => { await emulateReducedMotion(null); };
-};
+export const withReducedMotion = (Story) => React.createElement(MotionPreferenceContext.Provider, { value: true }, React.createElement(Story));
 
 /** Assert the public surface stays for its exit, then leaves the document. */
 export async function expectOverlayExit(surface, close, reduced) {

@@ -1,4 +1,4 @@
-import { expectOverlayExit, reducedMotionSetup } from '@/storybook-docs/lib/overlay-motion-plays';
+import { expectOverlayExit, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
@@ -583,7 +583,7 @@ const flagMotionPlay = (reduced = false) => async ({ canvasElement }) => {
     await expectOverlayExit(flag, () => canvas.getByRole('button', { name: 'Dismiss flag' }).click(), reduced);
 };
 export const MotionOpenClose = { render: MotionFlag, play: flagMotionPlay() };
-export const MotionReduced = { ...MotionOpenClose, beforeEach: reducedMotionSetup, play: flagMotionPlay(true) };
+export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: flagMotionPlay(true) };
 
 /** A paused exit outlives the old timer, and removal follows completion. */
 export const MotionExitCompletes = {

@@ -1,7 +1,8 @@
+import { useMotionReduced } from '@/lib/motionPreference';
 import { useOverlayPresence } from '@/lib/overlayMotion';
 import React, { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { animate, motion, useReducedMotion } from 'motion/react';
+import { animate, motion } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import Button from '@/components/forms-and-inputs/Button';
@@ -157,7 +158,7 @@ export const Flag = ({
      * fade into the new place on `appearance.fast`, never a cut.
      */
     const group = useContext(FlagGroupContext);
-    const osReduced = useReducedMotion();
+    const osReduced = useMotionReduced();
     const reduced = reducedMotion ?? group ?? osReduced;
     const surface = useRef(null);
     const present = useOverlayPresence(show, surface);

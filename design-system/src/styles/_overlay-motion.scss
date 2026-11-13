@@ -14,19 +14,14 @@
     &[data-leaving='hand'] {
         animation: #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
     }
-    &[data-reduced='true'] {
-        animation: #{$fade-in} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
-        &[data-ending-style], &[data-leaving] {
-            animation: #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
-        }
-    }
+    &[data-reduced='true'] { animation: none; }
     @media (prefers-reduced-motion: reduce) {
         animation: #{$fade-in} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
         &[data-ending-style], &[data-leaving] {
             animation: #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
         }
     }
-    &[data-open][data-instant='click'] { animation: none; }
+    &[data-open][data-instant='click'], &[data-instant='keyboard'] { animation: none; }
 }
 
 @keyframes plus-overlay-fade { from { opacity: 0; } to { opacity: 1; } }

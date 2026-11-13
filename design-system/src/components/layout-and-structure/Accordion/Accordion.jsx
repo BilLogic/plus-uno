@@ -112,13 +112,15 @@ const AccordionItem = ({
                 </BaseAccordion.Trigger>
             </BaseAccordion.Header>
             <BaseAccordion.Panel keepMounted render={(panelProps, state) => (
-                <AnimatePresence initial={false}>
-                    {state.open && (
-                        <HeightSurface key="body" className="plus-accordion-panel">
-                            <div {...panelProps} hidden={undefined} className="plus-accordion-body">{children}</div>
-                        </HeightSurface>
-                    )}
-                </AnimatePresence>
+                <div {...panelProps} hidden={undefined} className="plus-accordion-region" aria-hidden={!state.open ? true : undefined} inert={!state.open ? true : undefined}>
+                    <AnimatePresence initial={false}>
+                        {state.open && (
+                            <HeightSurface key="body" className="plus-accordion-panel">
+                                <div className="plus-accordion-body">{children}</div>
+                            </HeightSurface>
+                        )}
+                    </AnimatePresence>
+                </div>
             )} />
         </BaseAccordion.Item>
     );

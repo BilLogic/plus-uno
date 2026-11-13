@@ -1,4 +1,4 @@
-import { expectOverlayExit, reducedMotionSetup, settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
+import { expectOverlayExit, withReducedMotion, settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import PatternModal from '@/patterns/PatternModal';
@@ -807,4 +807,4 @@ const overlayMotionPlay = (reduced = false) => async ({ canvasElement }) => {
     await expect(canvasElement.querySelector('.plus-pattern-backdrop')).toBeNull();
 };
 export const MotionOpenClose = { render: MotionOverlay, play: overlayMotionPlay() };
-export const MotionReduced = { ...MotionOpenClose, beforeEach: reducedMotionSetup, play: overlayMotionPlay(true) };
+export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: overlayMotionPlay(true) };

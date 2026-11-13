@@ -1,4 +1,4 @@
-import { reducedMotionSetup, selectMotionPlay } from '@/storybook-docs/lib/overlay-motion-plays';
+import { withReducedMotion, selectMotionPlay } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useEffect, useState } from 'react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -565,4 +565,22 @@ export const MotionOpenClose = {
     render: () => <Select label="Student" options={['Ana Ruiz', 'Daniel Lee']} />,
     play: selectMotionPlay(),
 };
-export const MotionReduced = { ...MotionOpenClose, beforeEach: reducedMotionSetup, play: selectMotionPlay(true) };
+export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: selectMotionPlay(true) };
+
+export const MotionKeyboardOpen = {
+    ...MotionOpenClose,
+    play: async ({ canvasElement }) => {
+        const field = within(canvasElement).getByRole('combobox');
+        field.focus();
+        await userEvent.keyboard('{ArrowDown}');
+        const surface = await waitFor(() => {
+            const element = canvasElement.ownerDocument.querySelector('.plus-listbox');
+            expect(element).not.toBeNull();
+            return element;
+        });
+        await expect(getComputedStyle(surface).animationName).toBe('none');
+        await expect(surface).toBeVisible();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(surface.isConnected).toBe(false));
+    },
+};

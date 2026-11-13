@@ -8,7 +8,7 @@ TreeSelect: a field that picks from options that nest, at any level of the tree.
 
 **Source:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.stories.jsx` — Overview, SingleSelect, MultiSelect, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, MotionOpenClose, MotionReduced
+**Stories:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.stories.jsx` — Overview, SingleSelect, MultiSelect, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, MotionOpenClose, MotionReduced, MotionKeyboardOpen
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.mdx`
 

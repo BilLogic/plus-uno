@@ -33,3 +33,23 @@ export function useOverlayOrigin(open, ref) {
         surface.style.setProperty('--plus-overlay-origin', `${a.left + a.width / 2 - b.left}px ${a.top + a.height / 2 - b.top}px`);
     }, [open, ref]);
 }
+
+/** Latch the opening input method; keys used inside an open menu do not restart it. */
+export function useKeyboardOpen(open) {
+    const keyboard = useRef(false);
+    const opening = useRef(false);
+    const wasOpen = useRef(false);
+    useLayoutEffect(() => {
+        const onKey = () => { keyboard.current = true; };
+        const onPointer = () => { keyboard.current = false; };
+        document.addEventListener('keydown', onKey, true);
+        document.addEventListener('pointerdown', onPointer, true);
+        return () => {
+            document.removeEventListener('keydown', onKey, true);
+            document.removeEventListener('pointerdown', onPointer, true);
+        };
+    }, []);
+    if (open && !wasOpen.current) opening.current = keyboard.current;
+    wasOpen.current = open;
+    return open && opening.current;
+}

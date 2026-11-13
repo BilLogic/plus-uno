@@ -12167,7 +12167,8 @@
         "FieldReadOnlyLongValue",
         "OpenListEdge",
         "MotionOpenClose",
-        "MotionReduced"
+        "MotionReduced",
+        "MotionKeyboardOpen"
       ],
       "tokens": [
         "--body-default",
@@ -15907,7 +15908,8 @@
         "FieldDisabled",
         "FieldInvalid",
         "MotionOpenClose",
-        "MotionReduced"
+        "MotionReduced",
+        "MotionKeyboardOpen"
       ],
       "tokens": [
         "--ds-motion-spatial-fast",

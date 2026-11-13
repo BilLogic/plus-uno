@@ -1,5 +1,6 @@
+import { useMotionReduced } from './motionPreference';
 import React, { createContext, useContext } from 'react';
-import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion, useIsPresent } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 
 export { AnimatePresence };
@@ -7,7 +8,7 @@ export const HeightRowContext = createContext(false);
 
 /** Height follows the row spring; Reduced holds its final size and fades. */
 export function HeightSurface({ children, className, ...props }) {
-    const reduced = useReducedMotion();
+    const reduced = useMotionReduced();
     const present = useIsPresent();
     return (
         <motion.div

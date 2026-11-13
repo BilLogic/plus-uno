@@ -1,4 +1,4 @@
-import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
+import { withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { Button } from '@/components';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -336,6 +336,6 @@ export const MotionOpenClose = {
 };
 export const MotionReduced = {
     ...MotionOpenClose,
-    beforeEach: async () => { await emulateReducedMotion('reduce'); return async () => { await emulateReducedMotion(null); }; },
+    decorators: [withReducedMotion],
     play: (context) => expansionPlay(context, true),
 };

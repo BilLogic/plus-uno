@@ -1,4 +1,4 @@
-import { reducedMotionSetup } from '@/storybook-docs/lib/overlay-motion-plays';
+import { withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { TreeTable } from '@/components';
@@ -203,4 +203,4 @@ const treeHeightPlay = (reduced = false) => async ({ canvasElement }) => {
     await waitFor(() => expect(child.isConnected).toBe(false));
 };
 export const MotionOpenClose = { render: () => <TreeTable label="Students" head={{ cells: [{ key: 'name', content: 'Name' }] }} items={motionTreeItems} />, play: treeHeightPlay() };
-export const MotionReduced = { ...MotionOpenClose, beforeEach: reducedMotionSetup, play: treeHeightPlay(true) };
+export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: treeHeightPlay(true) };

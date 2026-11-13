@@ -97,6 +97,7 @@
 }
 
 .plus-pattern-modal {
+    --plus-overlay-origin: center;
     @include overlay-motion(plus-overlay-scale-in, plus-overlay-scale-out, default, default);
     transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
 }

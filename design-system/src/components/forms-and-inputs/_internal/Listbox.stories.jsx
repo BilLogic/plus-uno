@@ -1,5 +1,5 @@
 import { Button } from '@/components';
-import { expectOverlayExit, reducedMotionSetup, settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
+import { expectOverlayExit, withReducedMotion, settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useRef, useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
@@ -457,4 +457,4 @@ const listboxMotionPlay = (reduced = false) => async ({ canvasElement }) => {
     await expectOverlayExit(list.closest('.plus-listbox'), () => canvas.getByRole('button', { name: 'Pick student' }).click(), reduced);
 };
 export const MotionOpenClose = { render: MotionListbox, play: listboxMotionPlay() };
-export const MotionReduced = { ...MotionOpenClose, beforeEach: reducedMotionSetup, play: listboxMotionPlay(true) };
+export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: listboxMotionPlay(true) };

@@ -1,4 +1,5 @@
-import { useOverlayPresence } from '@/lib/overlayMotion';
+import { useMotionReduced } from '@/lib/motionPreference';
+import { useOverlayPresence, useKeyboardOpen } from '@/lib/overlayMotion';
 import React, {
     useCallback,
     useEffect,
@@ -247,6 +248,8 @@ const Listbox = ({
     const surfaceRef = useRef(null);
     const bodyRef = useRef(null);
     // Placed against the field; a press outside the field and the list closes it.
+    const keyboardOpen = useKeyboardOpen(open);
+    const reduced = useMotionReduced();
     const present = useOverlayPresence(open, surfaceRef);
     const place = useAnchoredPopup({ open: present, anchorRef, popupRef: surfaceRef, align, onClose: open ? onClose : undefined });
 
@@ -406,7 +409,9 @@ const Listbox = ({
     const surface = (
         <div
             ref={surfaceRef}
+            data-reduced={reduced ? 'true' : undefined}
             className={surfaceClasses}
+            data-instant={keyboardOpen ? 'keyboard' : undefined}
             data-ending-style={!open ? '' : undefined}
             aria-hidden={!open ? true : undefined}
             inert={!open ? true : undefined}
