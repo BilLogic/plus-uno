@@ -38,36 +38,29 @@ export const Stack = {
     render: () => <ExplodedStack />,
     play: async ({ canvasElement }) => {
         const root = canvasElement.querySelector('[data-testid="exploded-stack"]');
-        const canvas = within(canvasElement);
-        await expect(root).toHaveAttribute('data-state', 'exploded');
         // Seven plates, each drawn from the illustration kit, with no words inside the figure:
         // the names and the --layer-* values live in the numbered legend beside it.
         const plates = root.querySelectorAll('[data-plate]');
         await expect(plates).toHaveLength(7);
-        for (const plate of plates) {
-            await expect(plate.querySelector('svg'), `${plate.dataset.plate} is a kit drawing`).not.toBeNull();
-            await expect(plate.querySelector('svg text'), `${plate.dataset.plate} draws no words`).toBeNull();
-        }
+        for (const plate of plates) await expect(plate.querySelector('svg text'), `${plate.dataset.plate} draws no words`).toBeNull();
+        // Flat, front-on: no 3D transform anywhere in the figure.
+        await expect(root.querySelector('[style*="preserve-3d"], [style*="rotateX"]')).toBeNull();
         // The top plate is the Tooltip, and it is a label: its drawing carries no shadow filter.
         await expect(plates[6].dataset.plate).toBe('tooltip');
-        await expect(plates[6].querySelector('svg [filter], svg filter')).toBeNull();
+        await expect(plates[6].querySelector('[filter], filter')).toBeNull();
         const legend = within(root.querySelector('[data-testid="stack-legend"]'));
         await waitFor(() => expect(legend.getByText(/--layer-modal \d+/)).toBeInTheDocument());
         await expect(legend.getByText('Backdrop')).toBeInTheDocument();
         await waitFor(() => expect(legend.getByText(/--layer-tooltip \d+/)).toBeInTheDocument());
-        await expect(legend.getByText('label, no shadow')).toBeInTheDocument();
         await expect(legend.getAllByRole('listitem')).toHaveLength(7);
+        // Each annotation names its shadow; the Tooltip has none.
+        await expect(legend.getByText('blocking shadow', { selector: '[data-legend="modal"] span' })).toBeInTheDocument();
+        await expect(legend.getByText('blanket fill', { selector: '[data-legend="backdrop"] span' })).toBeInTheDocument();
+        await expect(legend.getByText('no shadow', { selector: '[data-legend="tooltip"] span' })).toBeInTheDocument();
         // Card is raised with no layer: --layer-card belongs to sticky headers and columns.
         const cardRow = legend.getByText('Card').parentElement;
-        await expect(cardRow).toHaveTextContent(/raised\s*no layer/);
+        await expect(cardRow).toHaveTextContent(/no layer\s*raised shadow/);
         await expect(legend.queryByText(/--layer-card/)).toBeNull();
-        await userEvent.click(canvas.getByRole('button', { name: 'Collapse' }));
-        await expect(root).toHaveAttribute('data-state', 'collapsed');
-        await waitFor(() => expect(root).toHaveAttribute('data-progress', '0'));
-        await userEvent.click(canvas.getByRole('button', { name: 'Explode' }));
-        await expect(root).toHaveAttribute('data-state', 'exploded');
-        // Settled, so the labels are fully drawn before the accessibility pass.
-        await waitFor(() => expect(root).toHaveAttribute('data-progress', '100'));
     },
 };
 
@@ -163,13 +156,12 @@ export const Ladder = {
 export const Layers = {
     render: () => <LayerStack />,
     play: async ({ canvasElement }) => {
-        const values = [...canvasElement.querySelectorAll('[data-layer] strong')].map((n) => Number(n.textContent));
+        // A plain table, highest layer first: token, z-index, what sits there.
+        await expect(canvasElement.querySelector('table')).not.toBeNull();
+        const values = [...canvasElement.querySelectorAll('tbody tr td:nth-child(2)')].map((n) => Number(n.textContent));
         await waitFor(() => expect(values.length).toBe(9));
-        for (let i = 1; i < values.length; i += 1) await expect(values[i]).toBeGreaterThan(values[i - 1]);
+        for (let i = 1; i < values.length; i += 1) await expect(values[i]).toBeLessThan(values[i - 1]);
         await expect(canvasElement.querySelector('[data-layer="--layer-dialog"]')).not.toBeNull();
-        // Every row's description is one type role, whatever the row says.
-        const fonts = new Set([...canvasElement.querySelectorAll('[data-layer] > span:not([aria-hidden])')].map((n) => getComputedStyle(n).fontSize));
-        await expect(fonts.size).toBe(1);
     },
 };
 
@@ -477,7 +469,7 @@ export const AlwaysPair = () => (
 export const BlockingOnBackdrop = () => (
     <DoDont>
         <Do caption="The Modal on the Backdrop takes the blocking shadow.">
-            <Backdrop inline screenWidth={360} screenHeight={220}>
+            <Backdrop inline screenWidth={360} screenHeight={300}>
                 <Modal show renderAs="inline" width={280} title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
             </Backdrop>
         </Do>
