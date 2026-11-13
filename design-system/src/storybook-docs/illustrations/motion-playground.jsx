@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { animate } from 'motion';
 import { useReducedMotion } from 'motion/react';
 
@@ -7,7 +7,7 @@ import { Illustration } from './Illustration.jsx';
 import { HERO_HAIRLINE, PAINT } from './paint.js';
 import { Backdrop, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule } from './primitives.jsx';
 import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
-import { SPEEDS, SPEED_LABELS, measure, ratioOf, resisted, springFor, stepOf } from './motion.jsx';
+import { SPEEDS, SPEED_LABELS, measure, ratioOf, resisted, springFor, stepOf, unresisted } from './motion.jsx';
 import { PHYSICS_DEMOS } from './motion-physics.jsx';
 
 /**
@@ -16,7 +16,8 @@ import { PHYSICS_DEMOS } from './motion-physics.jsx';
  * numbers in Physics are the only source of a token.
  */
 
-const VIEW = '0 0 160 100';
+const VIEW_W = 160;
+const VIEW = `0 0 ${VIEW_W} 100`;
 const lerp = (a, b, t) => a + (b - a) * t;
 const round2 = (n) => Math.round(n * 100) / 100;
 
@@ -283,6 +284,7 @@ const LIMIT_W = LIMIT_PANEL.rest + LIMIT_PANEL.extra;
 export const limitWidth = (d) => LIMIT_PANEL.rest + Math.min(Math.max(0, d), LIMIT_PANEL.extra) + resisted(d - LIMIT_PANEL.extra);
 /** Where a let-go Panel comes to rest: where it was, held to the limit. */
 export const limitRest = (w) => Math.min(Math.max(w, LIMIT_PANEL.rest), LIMIT_W);
+// One key press pulls the edge 6 units (12 px): far enough to feel the resistance within a few presses.
 const KEY_STEP = 6;
 
 /**
@@ -302,15 +304,13 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
   const controls = useRef(null);
   useEffect(() => () => controls.current?.stop(), []);
 
-  const unitsPerPx = () => 160 / svgRef.current.getBoundingClientRect().width;
+  // Measured on the drawing itself, so a pixel of pointer travel is converted at the drawing's own scale.
+  const drawing = () => svgRef.current.querySelector('svg');
+  const unitsPerPx = () => VIEW_W / drawing().getBoundingClientRect().width;
   const grab = (startW) => {
     controls.current?.stop();
     // The pull that gives the current width, so a second grab picks up where the Panel is.
-    let d = startW - LIMIT_PANEL.rest;
-    if (startW > LIMIT_W) {
-      const over = startW - LIMIT_W;
-      d = LIMIT_PANEL.extra + (over * over) / 8;
-    }
+    const d = startW > LIMIT_W ? LIMIT_PANEL.extra + unresisted(startW - LIMIT_W) : startW - LIMIT_PANEL.rest;
     drag.current = { d, last: { w: startW, t: performance.now() }, v: 0 };
     setPhase('dragging');
   };
@@ -331,7 +331,8 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
     const from = g.last.w;
     const to = limitRest(from);
     if (from === to) return setPhase('rest');
-    // Under reduced motion the hand still drives the drag, but the return does not travel.
+    // Under reduced motion the hand still drives the drag (it is the person's own motion, resistance
+    // included), but the return is not played: the Panel is simply at the limit.
     if (reduced) {
       setW(to);
       return setPhase('rest');
@@ -351,16 +352,22 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
     const g = drag.current;
     if (!g || g.x0 === undefined) return;
     const d = g.d0 + (g.x0 - e.clientX) * unitsPerPx();
-    const rect = svgRef.current.getBoundingClientRect();
+    const rect = drawing().getBoundingClientRect();
     setHand({ x: (e.clientX - rect.left) * unitsPerPx(), y: (e.clientY - rect.top) * unitsPerPx() });
     pull(d);
   };
+  // ArrowLeft and ArrowUp pull the edge out (wider), ArrowRight and ArrowDown push it back.
+  const WIDER = { ArrowLeft: 1, ArrowUp: 1, ArrowRight: -1, ArrowDown: -1 };
   const onKeyDown = (e) => {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (!(e.key in WIDER)) return;
     e.preventDefault();
     if (!drag.current) grab(w);
-    pull(drag.current.d + (e.key === 'ArrowLeft' ? KEY_STEP : -KEY_STEP));
+    pull(drag.current.d + WIDER[e.key] * KEY_STEP);
   };
+  const onKeyUp = (e) => {
+    if (e.key in WIDER) letGo();
+  };
+  const describedBy = `${useId()}-how`;
 
   const edge = LIMIT_FRAME_RIGHT - w;
   return (
@@ -392,19 +399,21 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
           ref={svgRef}
           role="slider"
           tabIndex={0}
-          aria-label="Panel width: drag left or hold ArrowLeft to pull it wider, let go to release"
+          aria-label="Panel width"
+          aria-describedby={describedBy}
           aria-orientation="horizontal"
           aria-valuemin={LIMIT_PANEL.rest}
           aria-valuemax={LIMIT_W}
           aria-valuenow={Math.round(Math.min(w, LIMIT_W))}
+          aria-valuetext={w > LIMIT_W + 0.5 ? 'Pulled past the limit' : w >= LIMIT_W - 0.5 ? 'At the limit' : 'Below the limit'}
           data-grab
-          style={{ maxInlineSize: 320, marginInline: 'auto', cursor: 'ew-resize', borderRadius: 'var(--radius-lg)' }}
+          style={{ cursor: 'ew-resize', borderRadius: 'var(--radius-lg)' }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={letGo}
           onPointerCancel={letGo}
           onKeyDown={onKeyDown}
-          onKeyUp={letGo}
+          onKeyUp={onKeyUp}
           onBlur={letGo}
         >
           <Illustration viewBox={VIEW} title="A docked Panel whose edge you drag left, past a dashed limit">
@@ -420,6 +429,9 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
           </Illustration>
         </div>
       </div>
+      <p id={describedBy} style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+        Drag the edge left, or focus it and hold ArrowLeft; let go to release.
+      </p>
     </section>
   );
 };

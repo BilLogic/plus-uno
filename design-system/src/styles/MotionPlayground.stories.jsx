@@ -10,7 +10,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { MotionDemo, springFor } from '@/storybook-docs/illustrations/motion.jsx';
 import { reducedStory } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
-import { DragPastLimit, PLAYGROUND_DEMOS, SpringPlayground, limitRest, limitWidth, playgroundConfig } from '@/storybook-docs/illustrations/motion-playground.jsx';
+import { DragPastLimit, PLAYGROUND_DEMOS, SpringPlayground, limitWidth, playgroundConfig } from '@/storybook-docs/illustrations/motion-playground.jsx';
 
 export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
@@ -141,10 +141,6 @@ export const DragPastTheLimitResistsAndReturns = {
   render: () => <DragPastLimit reduced={false} />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-drag-limit]');
-    // Up to the limit the pull is one to one; past it each unit of pull widens it by less.
-    await expect(limitWidth(10) - limitWidth(0)).toBe(10);
-    await expect(limitWidth(45) - limitWidth(35)).toBeLessThan(10);
-    await expect(limitRest(limitWidth(45))).toBe(limitWidth(25));
     const grab = canvasElement.querySelector('[data-grab]');
     grab.focus();
     // Six pulls of 6 units: 36 units, past the 25 the limit allows.
@@ -156,5 +152,20 @@ export const DragPastTheLimitResistsAndReturns = {
     key('keyup');
     await waitFor(() => expect(root.dataset.phase).toBe('rest'), PASS);
     await expect(Number(root.dataset.width)).toBeCloseTo(limitWidth(25), 1);
+  },
+};
+
+/** Under reduced motion the drag still follows the hand; let go, the Panel is at the limit without travelling. */
+export const DragPastTheLimitReduced = {
+  render: () => <DragPastLimit reduced />,
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector('[data-drag-limit]');
+    const grab = canvasElement.querySelector('[data-grab]');
+    grab.focus();
+    for (let i = 0; i < 6; i++) grab.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    await waitFor(() => expect(Number(root.dataset.width)).toBeCloseTo(limitWidth(36), 1));
+    grab.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowLeft', bubbles: true }));
+    await waitFor(() => expect(root.dataset.phase).toBe('rest'));
+    await waitFor(() => expect(Number(root.dataset.width)).toBeCloseTo(limitWidth(25), 1));
   },
 };

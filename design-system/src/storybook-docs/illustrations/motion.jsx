@@ -92,6 +92,8 @@ export const projectedRest = (position, velocity) => position + (((velocity * 2)
 
 /** Resistance past a limit: the square root of the extra distance, × 4 px, in kit units. */
 export const resisted = (extra) => (Math.sqrt(Math.max(0, extra) * 2) * 4) / 2;
+/** The extra distance past a limit that `resisted()` turns into `travel`: its inverse. */
+export const unresisted = (travel) => (Math.max(0, travel) ** 2) / 8;
 
 const round = (v) => (typeof v === 'number' ? Math.round(v * 100) / 100 : v);
 const roundState = (state) => Object.fromEntries(Object.entries(state).map(([k, v]) => [k, round(v)]));
