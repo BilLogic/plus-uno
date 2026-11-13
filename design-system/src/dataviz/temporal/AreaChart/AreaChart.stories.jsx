@@ -74,22 +74,27 @@ An area chart fills the space below a line, emphasizing **volume and magnitude o
     }
 };
 
+const quarters = ['Fall 2024', 'Spring 2025', 'Fall 2025', 'Spring 2026'];
+const months = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 const revenueData = {
-    xAxisLabel: 'Quarter',
-    yAxisLabel: 'Revenue',
+    categories: quarters,
+    xAxisLabel: 'Term',
+    yAxisLabel: 'Sessions',
     data: [
-        { name: 'Product A', data: [500, 700, 800, 1000] },
-        { name: 'Product B', data: [300, 400, 500, 600] }
+        { name: 'Math', data: [500, 700, 800, 1000] },
+        { name: 'Reading', data: [300, 400, 500, 600] }
     ]
 };
 
 const stackedData = {
-    xAxisLabel: 'Quarter',
-    yAxisLabel: 'Revenue',
+    categories: quarters,
+    xAxisLabel: 'Term',
+    yAxisLabel: 'Sessions',
     stacking: 'normal',
     data: [
-        { name: 'Product A', data: [500, 700, 800, 1000] },
-        { name: 'Product B', data: [300, 400, 500, 600] }
+        { name: 'Math', data: [500, 700, 800, 1000] },
+        { name: 'Reading', data: [300, 400, 500, 600] }
     ]
 };
 
@@ -121,8 +126,9 @@ export const Overview = () => (
  */
 export const Interactive = {
     args: {
-        xAxisLabel: 'Period',
-        yAxisLabel: 'Value',
+        xAxisLabel: 'Month',
+        yAxisLabel: 'Sessions',
+        categories: months,
         stacking: null,
         height: 300,
         data: [

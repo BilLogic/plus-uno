@@ -132,11 +132,31 @@ export const HEROES = {
     description:
       'The scale itself: each step a square its own size.',
   },
-  'foundations-tokens-color': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
-  'foundations-tokens-typography': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
-  'foundations-tokens-spacing-and-size': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
-  'foundations-tokens-elevation-and-layers': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
-  'foundations-tokens-motion': { Hero: TokensHero, description: 'Chips repeat; one value threads through them.' },
+  'foundations-tokens-color': {
+    Hero: ColorHero,
+    description:
+      'One card painted by its role tokens, shown in light on the left and dark on the right; the primary button is the subject.',
+  },
+  'foundations-tokens-typography': {
+    Hero: TypographyHero,
+    description:
+      'Serif and sans on one set of guides: cap height, x-height, and the baseline in the brand color.',
+  },
+  'foundations-tokens-spacing-and-size': {
+    Hero: SpacingHero,
+    description:
+      'The scale itself: each step a square its own size.',
+  },
+  'foundations-tokens-elevation-and-layers': {
+    Hero: ElevationHero,
+    description:
+      'The layers lifted apart, light on the left and dark on the right.',
+  },
+  'foundations-tokens-motion': {
+    Hero: PhysicsHero,
+    description:
+      'One shape drawn at equal time steps, fast at first, then settling past its target and back.',
+  },
   'foundations-tokens-library': { Hero: TokensHero, description: 'Every token in one list, found by name or by filter.' },
   'foundations-visual-typography': {
     Hero: TypographyHero,

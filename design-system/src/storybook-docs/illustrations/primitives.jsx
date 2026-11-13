@@ -32,8 +32,8 @@ const Rect = ({ x, y, w, h, fill, stroke, corner, opacity }) => {
     <rect
       x={x}
       y={y}
-      width={w}
-      height={h}
+      width={Math.max(0, w)}
+      height={Math.max(0, h)}
       fill={fill ?? 'none'}
       stroke={stroke}
       opacity={opacity}
@@ -62,8 +62,8 @@ export const SkeletonBar = ({ x, y, w, h = 4, accent = false, heading = false, t
   <rect
     x={x}
     y={y}
-    width={w}
-    height={h}
+    width={Math.max(0, w)}
+    height={Math.max(0, h)}
     rx={h / 2}
     ry={h / 2}
     fill={tone ?? (accent ? PAINT.accent : heading ? PAINT.placeholderHeading : PAINT.placeholderText)}
@@ -121,7 +121,7 @@ export const PageSheet = ({ x, y, w, h, accent = false, corner = 'window' }) => 
  */
 const AccentRing = ({ x, y, w, h, corner }) => {
   const radius = clampedCorner(CORNER[corner], w, h);
-  return <rect x={x} y={y} width={w} height={h} fill="none" stroke={PAINT.accent} style={{ ...HAIRLINE, rx: radius, ry: radius }} />;
+  return <rect x={x} y={y} width={Math.max(0, w)} height={Math.max(0, h)} fill="none" stroke={PAINT.accent} style={{ ...HAIRLINE, rx: radius, ry: radius }} />;
 };
 
 export const Frame = ({ x, y, w, h, accent = false }) => {
