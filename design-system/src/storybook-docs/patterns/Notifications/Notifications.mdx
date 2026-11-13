@@ -16,7 +16,7 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
     page="patterns-notifications-and-indicators-notifications"
     eyebrow="Pattern · Notifications and indicators"
     title="Notifications"
-    purpose="What the product says back, and where. A Flag at the top right for something that happened; a Banner at one of three tiers for a condition; a SectionMessage in the page for something to read or act on; the Inbox for what arrived while you were away."
+    purpose="What the product says back, and where: a Flag for what happened, a Banner for a condition, a SectionMessage for something to act on."
     links={{
         label: 'Uses',
         items: [
@@ -117,7 +117,8 @@ Use Notifications when the product needs to tell someone something: an action fi
 </thead>
 <tbody>
 <tr><td>Something that already happened and needs no reply: saved, sent, copied</td><td>`Flag`</td><td>Top right</td><td>On its own after 8 s, or Dismiss on a default flag; a bold warning or error when its action resolves it</td></tr>
-<tr><td>A job that finished or failed after the person moved on</td><td>`Flag` with an action, `autohide={false}`</td><td>Top right</td><td>Dismiss, or the action</td></tr>
+<tr><td>A job that finished after the person moved on</td><td>Default `Flag` with an action, `autohide={false}`</td><td>Top right</td><td>Dismiss, or the action</td></tr>
+<tr><td>A job that failed after the person moved on</td><td>Bold error `Flag` with Try again</td><td>Top right</td><td>When Try again resolves it; no Dismiss</td></tr>
 <tr><td>Something to read or act on in this part of the page</td><td>`SectionMessage`</td><td>Top of the Section or form</td><td>Resolved or dismissed</td></tr>
 <tr><td>Guidance before a task that must not be missed</td><td>`SectionMessage`, dismiss off</td><td>By the action it informs</td><td>When it stops applying</td></tr>
 <tr><td>A condition that holds for everything in a Frame, page or Section</td><td>`Banner` at that tier</td><td>Top of the tier</td><td>When the condition ends</td></tr>
@@ -157,7 +158,7 @@ A Flag can be dismissed before it is read. A failure that needs a decision stays
 
 <DoDontPair
     doExample={<FlagDo />}
-    doCaption="A finished action as a success Flag: the event in the title, the next step below."
+    doCaption="A finished action on the default Flag: the event in the title, the next step below."
     dontExample={<FlagDont />}
     dontCaption="A decision in a Flag, which is gone before it is answered."
 />
@@ -166,7 +167,7 @@ A Flag can be dismissed before it is read. A failure that needs a decision stays
 
 <RuleTag kind="automatic" />
 
-Normal, information and success close after 8 s. Warning and error never close themselves and offer a next action. A Flag with an action keeps autohide only when the action is optional: set `autohide={false}` when the person must act. The × and the rest of the dismiss rule are on the Flag page.
+Normal, information and success close after 8 s. Warning and error never close themselves and offer a next action. On a default, information or success Flag with an action, set `autohide={false}` when the person must act; warning and error ignore it. The × and the rest of the dismiss rule are on the Flag page.
 
 ### Show one Banner at a time, one line, at the tier it concerns, for as long as the condition holds.
 

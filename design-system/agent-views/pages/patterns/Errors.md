@@ -2,7 +2,7 @@
 
 # Errors
 
-Where a failure shows and what it says. The place follows what failed: a field, a form, a view, a background job, or the whole page. The message is words, never a code, never in a tooltip, never color alone.
+Where a failure shows and what it says: the place follows what failed, and the message is words, never a code or color alone.
 
 **Kind:** Pattern
 
@@ -32,7 +32,7 @@ Use Errors whenever something failed and the person needs to know. Put the messa
 | A submit the server rejected | Danger `SectionMessage` at the top of the form, plus field errors | Dismissed or fixed | What happened, what to do |
 | A view's content could not load | The empty-state slot | It loads | Try again |
 | This person has no access | The empty-state slot | Access changes | Who can help |
-| A job in the background | Danger `Flag`, top right, no autohide | Dismissed | Try again |
+| A job in the background | Danger `Flag`, top right, no autohide | Try again resolves it | Try again |
 | A condition on the whole page | Danger `Banner` at its tier | The condition ends | A link if there is one |
 | A menu's options | A "Couldn't load options" row in the menu | Retry succeeds | Retry |
 
@@ -111,7 +111,7 @@ Don't: A Modal over the whole page to report one Section's failure.
 
 **Checked:** Automatic
 
-The person has moved on, so the Flag finds them at the top right. A danger Flag does not hide on its own; it offers Try again and leaves on dismiss. `Flag` names the appearance `error`.
+The person has moved on, so the Flag finds them at the top right. A danger Flag does not hide on its own; it offers Try again and stays until Try again resolves it. `Flag` names the appearance `error`.
 
 ### Use a Banner only for a condition on the whole page. {#use-a-banner-only-for-a-condition-on-the-whole-page}
 

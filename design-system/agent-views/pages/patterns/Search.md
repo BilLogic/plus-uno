@@ -2,7 +2,7 @@
 
 # Search
 
-How a person finds a record by typing. Every search is a Search field in one of three modes, picked by where the answer lands: active filters the rows in place, focused opens a panel of matches, basic runs on Enter.
+How a person finds a record by typing, with a Search field in one of three modes: active, focused or basic.
 
 **Kind:** Pattern
 
@@ -13,7 +13,7 @@ How a person finds a record by typing. Every search is a Search field in one of 
 Three modes, one field. Pick by how much data there is and how costly it is to search.
 
 - **Active.** Small or on-screen data. The rows narrow in place as the person types.
-- **Focused.** A person's own work, found from anywhere. A panel under the field lists recent searches, then matches grouped by type, and widens with "See all results".
+- **Focused.** A person's own work, found from the page they are on. A panel under the field lists recent searches, then matches grouped by type, and widens with "See all results".
 - **Basic.** Large or costly data. Nothing runs while typing; Enter takes the person to a results page.
 
 ## Active search
@@ -37,7 +37,7 @@ Use Search when a person knows what a record is called. Search finds by name; Fi
 | Mode | Use when | Where the answer lands |
 | --- | --- | --- |
 | Active | The data is small or already on screen. | The rows in place, as you type. |
-| Focused | A person finds their own work from anywhere. | A panel under the field; "See all results" widens it. |
+| Focused | A person finds their own work from the page they are on. | A panel under the field; "See all results" widens it. |
 | Basic | The data is large or costly to search. | A results page, after Enter. |
 
 | Key or action | With text | Empty |
@@ -112,7 +112,7 @@ Search reads these motion tokens and no literal duration or curve.
 
 **Checked:** Review
 
-Active when the rows are in hand and few, focused when the person jumps to a record from anywhere, basic when the search is heavy enough to wait for Enter. One mode per field.
+Active when the rows are in hand and few, focused when the person jumps to a record from the page they are on, basic when the search is heavy enough to wait for Enter. One mode per field.
 
 ### Name the scope in the placeholder. {#name-the-scope-in-the-placeholder}
 
@@ -160,4 +160,4 @@ Esc empties the text and keeps the field. In focused, the first Esc closes the p
 
 **Checked:** Review
 
-The view bar and the top bar hold controls of one height, so the field takes `spacing="compact"` there. A search in a page body takes the default spacing and stays open.
+The view bar holds controls of one height, so the field takes `spacing="compact"` there. A search in a page body takes the default spacing and stays open.

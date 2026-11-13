@@ -103,7 +103,7 @@ On a quick move keep the previous page until the next is ready. Past 1 s the Fra
 
 **Checked:** Review
 
-A Flag explains the wait and that the person can keep working or leave; a Flag confirms when the work finishes. A long job with a known length, such as importing a roster, gets a labeled progress bar instead.
+A Flag, kept up with `autohide={false}` until the work ends, explains the wait and that the person can keep working or leave; a Flag confirms when the work finishes. A long job with a known length, such as importing a roster, gets a labeled progress bar instead.
 
 ### Keep a menu, Popup, Flag or Modal free of skeletons. {#keep-a-menu-popup-flag-or-modal-free-of-skeletons}
 

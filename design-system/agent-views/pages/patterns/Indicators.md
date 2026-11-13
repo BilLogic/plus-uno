@@ -2,7 +2,7 @@
 
 # Indicators
 
-The small labels that say how something is: a Status tag for its state, a Count tag for how many, a Change tag for how much it moved. The words carry the meaning; color never carries it alone.
+The small labels that say how something is: its state, how many, how much it moved; the words carry the meaning.
 
 **Kind:** Pattern
 

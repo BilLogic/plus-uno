@@ -196,11 +196,10 @@ export const DisabledHero = () => (
         <SkeletonBar x={66} y={12} w={110} />
         <Field x={66} y={30} w={168} />
         <Rule x1={50} x2={250} y1={112} y2={112} />
-        <ButtonShape x={160} y={126} w={34} />
         <Rect x={198} y={126} w={36} h={8} fill={PAINT.shape} corner="button" />
         <Ring x={198} y={126} w={36} h={8} />
-        <Rect x={170} y={98} w={64} h={14} fill={PAINT.popupSurface} stroke={PAINT.illustrationEdge} corner="popup" />
-        <SkeletonBar x={178} y={103} w={44} />
+        <SkeletonBar x={66} y={129} w={70} />
+        <SkeletonBar x={66} y={138} w={48} />
         <Pointer x={226} y={130} />
     </HeroDrawing>
 );

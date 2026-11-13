@@ -2,7 +2,7 @@
 
 # Disabled
 
-When a control cannot be used yet, or by this person. Actions stay enabled and explain; a field or option disables only for a prerequisite fixable on the same screen, with the reason as visible text; what a role can never use is hidden.
+When a control cannot be used yet, or by this person: actions stay enabled and explain, and what a role can never use is hidden.
 
 **Kind:** Pattern
 
@@ -62,7 +62,7 @@ Use Disabled when something on the page cannot be used right now. Reach for it l
 - Forms: use for the enabled submit.
 - Common actions: use for the sending button.
 - Navigation: use for the Sidebar's locked Toolkit.
-- `Button`, `IconButton`, `Select`, `Checkbox`, `RadioGroup`, `Toggle`, `DropdownMenu`, `SectionMessage`: the components.
+- `Button`, `IconButton`, `Select`, `Checkbox`, `RadioGroup`, `DropdownMenu`, `SectionMessage`: the components.
 
 ## Best practices
 

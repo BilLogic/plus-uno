@@ -131,7 +131,7 @@ export const TierSection = () => (
     </BrowserWindow>
 );
 
-/** Do: a finished action as a success Flag, the event in the title and the next step below. */
+/** Do: a finished action on the default Flag, the event in the title and the next step below. */
 export const FlagDo = () => (
     <TopRight>
         <Flag icon="circle-check" title="Session logged" autohide={false} show>Maya's supervisor will see it Friday.</Flag>

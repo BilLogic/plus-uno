@@ -2,7 +2,7 @@
 
 # Notifications
 
-What the product says back, and where. A Flag at the top right for something that happened; a Banner at one of three tiers for a condition; a SectionMessage in the page for something to read or act on; the Inbox for what arrived while you were away.
+What the product says back, and where: a Flag for what happened, a Banner for a condition, a SectionMessage for something to act on.
 
 **Kind:** Pattern
 
@@ -36,7 +36,8 @@ Use Notifications when the product needs to tell someone something: an action fi
 | The message is about… | Carrier | Where | Leaves |
 | --- | --- | --- | --- |
 | Something that already happened and needs no reply: saved, sent, copied | `Flag` | Top right | On its own after 8 s, or Dismiss on a default flag; a bold warning or error when its action resolves it |
-| A job that finished or failed after the person moved on | `Flag` with an action, `autohide={false}` | Top right | Dismiss, or the action |
+| A job that finished after the person moved on | Default `Flag` with an action, `autohide={false}` | Top right | Dismiss, or the action |
+| A job that failed after the person moved on | Bold error `Flag` with Try again | Top right | When Try again resolves it; no Dismiss |
 | Something to read or act on in this part of the page | `SectionMessage` | Top of the Section or form | Resolved or dismissed |
 | Guidance before a task that must not be missed | `SectionMessage`, dismiss off | By the action it informs | When it stops applying |
 | A condition that holds for everything in a Frame, page or Section | `Banner` at that tier | Top of the tier | When the condition ends |
@@ -105,14 +106,14 @@ A title that names the event and one line for the next step. A `FlagGroup` stack
 
 A Flag can be dismissed before it is read. A failure that needs a decision stays on the page in a SectionMessage; a decision that blocks the task is a Modal.
 
-Do: A finished action as a success Flag: the event in the title, the next step below.
+Do: A finished action on the default Flag: the event in the title, the next step below.
 Don't: A decision in a Flag, which is gone before it is answered.
 
 ### Let routine Flags leave and keep warning and error until acted on. {#let-routine-flags-leave-and-keep-warning-and-error-until-acted-on}
 
 **Checked:** Automatic
 
-Normal, information and success close after 8 s. Warning and error never close themselves and offer a next action. A Flag with an action keeps autohide only when the action is optional: set `autohide={false}` when the person must act. The × and the rest of the dismiss rule are on the Flag page.
+Normal, information and success close after 8 s. Warning and error never close themselves and offer a next action. On a default, information or success Flag with an action, set `autohide={false}` when the person must act; warning and error ignore it. The × and the rest of the dismiss rule are on the Flag page.
 
 ### Show one Banner at a time, one line, at the tier it concerns, for as long as the condition holds. {#show-one-banner-at-a-time-one-line-at-the-tier-it-concerns-for-as-long-as-the-condition-holds}
 

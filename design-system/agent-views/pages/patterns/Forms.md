@@ -2,7 +2,7 @@
 
 # Forms
 
-How a form takes and checks what someone types: which host it lives in, when to validate, what a blocked submit does, how required and optional are marked, and what happens on leaving with edits.
+How a form takes and checks what someone types: its host, when it validates, what a blocked submit does.
 
 **Kind:** Pattern
 
@@ -113,7 +113,7 @@ A disabled submit gives no direction and leaves the tab order. Pressing it marks
 
 **Checked:** Automatic
 
-Mark the field, say what to fix inline, scroll the body to it, shake once. Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: Errors.
+Mark the field, say what to fix inline, scroll the body to it, and shake once . Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: Errors.
 
 Do: The message under the field, in the same Modal.
 Don't: A second dialog over the first, with the field left unexplained.
@@ -137,7 +137,7 @@ Don't: Help only in a tooltip: gone on touch, gone after typing.
 
 **Checked:** Automatic
 
-Close, Cancel and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A confirm view prop on the Modal is Planned . A form with no edits leaves at once. In a focused task, Close and Cancel play the opening backwards once the person confirms.
+Close, Cancel and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a focused task, Close and Cancel play the opening backwards once the person confirms.
 
 ### Prefer a bound input to a free one. {#prefer-a-bound-input-to-a-free-one}
 

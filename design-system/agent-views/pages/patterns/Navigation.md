@@ -2,7 +2,7 @@
 
 # Navigation
 
-How a person moves: between areas in the Sidebar, to the items they opened, between views of one collection, down into a record and back out. Each move has one control and one motion.
+How a person moves: between areas, between views, and down into a record and back out, one control and one motion each.
 
 **Kind:** Pattern
 
