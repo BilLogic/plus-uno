@@ -101,6 +101,22 @@ test('npm pack, install in a scratch project, `npx ds find Button` answers from 
     const after = spawnSync('npx', ['--no-install', 'ds', 'check', 'src', '--json'], { cwd: project, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
     assert.equal(JSON.parse(after.stdout).failing, 0, `ds check finds no fail-level escape: ${after.stdout.slice(0, 400)}`);
 
+    // A page template and a chart: patterns and the chart theme come along, and the project builds.
+    const more = JSON.parse(sh('npx', ['--no-install', 'ds', 'add', 'ListPage', 'BarChart', '--json'], project));
+    for (const name of ['ListPage', 'Frame', 'PatternSection', 'PatternTable', 'BarChart', 'chart-theme']) assert.ok(more.items.includes(name), `${name} comes along`);
+    assert.ok(more.added.includes('highcharts'), 'the chart brings highcharts');
+    fs.writeFileSync(path.join(project, 'src/main.jsx'), [
+      "import { createRoot } from 'react-dom/client';",
+      "import './plus-ds/styles/main.scss';",
+      "import ListPage from './plus-ds/templates/ListPage/ListPage';",
+      "import BarChart from './plus-ds/dataviz/comparison/BarChart/BarChart';",
+      "createRoot(document.getElementById('root')).render(<><ListPage /><BarChart categories={['A', 'B']} series={[{ name: 'Sessions', data: [3, 5] }]} /></>);",
+      '',
+    ].join('\n'));
+    sh('npx', ['--no-install', 'vite', 'build'], project);
+    const final = spawnSync('npx', ['--no-install', 'ds', 'check', 'src', '--json'], { cwd: project, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    assert.equal(JSON.parse(final.stdout).failing, 0, `ds check finds no fail-level escape: ${final.stdout.slice(0, 400)}`);
+
     // `ds mcp`: the stdio server from the installed tarball lists its five tools.
     const tools = mcpTools(project);
     assert.deepEqual(tools.map((t) => t.name), ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check']);
