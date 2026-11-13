@@ -109,12 +109,10 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/figma/parity-2026-07.md`](design-system/guidelines/figma/parity-2026-07.md) | Full-inventory sweep across both Figma files and the Storybook docs after the IA overhaul and BS4 library publish |
 | [`design-system/guidelines/figma/registry-load-gate.md`](design-system/guidelines/figma/registry-load-gate.md) | Agents MUST read both files below before |
 | [`design-system/guidelines/figma/token-mapping.md`](design-system/guidelines/figma/token-mapping.md) | For quick machine lookups, agents may read token-registry.json (read-only); use this doc for the authoritative tables, extended cases, and notes |
-| [`design-system/guidelines/foundations/content/date-and-time.md`](design-system/guidelines/foundations/content/date-and-time.md) | How dates, times, durations, and time zones are written in the product |
-| [`design-system/guidelines/foundations/content/inclusive-language.md`](design-system/guidelines/foundations/content/inclusive-language.md) | Words to prefer and words to retire, so copy reads as written for everyone |
-| [`design-system/guidelines/foundations/content/language-and-grammar.md`](design-system/guidelines/foundations/content/language-and-grammar.md) | Active voice, contractions, sentence case, and the punctuation conventions product copy follows |
-| [`design-system/guidelines/foundations/content/message-design.md`](design-system/guidelines/foundations/content/message-design.md) | Error, warning, success, and empty-state copy — what each says and how long it runs |
-| [`design-system/guidelines/foundations/content/overview.md`](design-system/guidelines/foundations/content/overview.md) | Product copy rules |
-| [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | Warm, direct, encouraging |
+| [`design-system/guidelines/foundations/content/language.md`](design-system/guidelines/foundations/content/language.md) | Words, people, sentences and mechanics for product copy |
+| [`design-system/guidelines/foundations/content/messages.md`](design-system/guidelines/foundations/content/messages.md) | Message anatomy, type to component, and how to write each type |
+| [`design-system/guidelines/foundations/content/overview.md`](design-system/guidelines/foundations/content/overview.md) | Product copy rules, one file per Brand › Content page |
+| [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | The four voice words, when to dial them, and tone by reader |
 | [`design-system/guidelines/foundations/data-visualization.md`](design-system/guidelines/foundations/data-visualization.md) | A chart's foundations other than color come from the same component tokens as the rest of the design system |
 | [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fifteen foundations, in the order they are documented |
 | [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | says where design knowledge lives |
@@ -223,6 +221,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-152 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+150 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
