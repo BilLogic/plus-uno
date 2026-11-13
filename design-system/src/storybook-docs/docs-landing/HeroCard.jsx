@@ -5,7 +5,7 @@ import { HEROES } from './hero-registry.jsx';
 /**
  * A page's hero as the picture on an overview card: the registry's own drawing,
  * cropped to the 300 x 160-unit stage the drawing is composed on, in the same
- * tile (ground, radius, hairline edge) as the landing. Nothing is redrawn, so a
+ * tile (ground and radius) as the landing. Nothing is redrawn, so a
  * change to a hero reaches its card.
  *
  * - `page`: the page's id, as `DocsLanding` takes it.
