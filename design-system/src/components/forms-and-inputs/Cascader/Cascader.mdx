@@ -6,7 +6,7 @@ import { Cascader } from '@/components';
 import { DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
-export const regionOptions = [
+export const locationOptions = [
     { text: 'North District', value: 'north', children: [
         { text: 'Lincoln Middle', value: 'lincoln', children: [
             { text: 'Grade 6', value: 'grade-6' },
@@ -181,9 +181,9 @@ A dependent field stays disabled until its earlier answer exists.
 A filled field shows the choice; an empty one cannot confirm it. `value` is the whole path, outermost value first, and `onChange` fires with the path as each column is chosen. Pass and read the whole array, since the levels between are part of the answer.
 
 <DoDontPair
-    doExample={<Cascader label="Location" value={['north', 'lincoln', 'grade-6']} options={regionOptions} onChange={() => {}} />}
+    doExample={<Cascader label="Location" value={['north', 'lincoln', 'grade-6']} options={locationOptions} onChange={() => {}} />}
     doCaption="The field shows the whole chosen path."
-    dontExample={<Cascader label="Location" value={[]} options={regionOptions} onChange={() => {}} />}
+    dontExample={<Cascader label="Location" value={[]} options={locationOptions} onChange={() => {}} />}
     dontCaption="An empty field after a choice cannot confirm it."
 />
 
@@ -192,9 +192,9 @@ A filled field shows the choice; an empty one cannot confirm it. `value` is the 
 With `isInvalid`, the field draws the danger border and `errorMessage` replaces the caption.
 
 <DoDontPair
-    doExample={<Cascader label="Location" value={[]} options={regionOptions} onChange={() => {}} isInvalid errorMessage="Pick a location." />}
+    doExample={<Cascader label="Location" value={[]} options={locationOptions} onChange={() => {}} isInvalid errorMessage="Pick a location." />}
     doCaption="A failed pick draws the danger border, so the error is seen at the field."
-    dontExample={<Cascader label="Location" value={[]} options={regionOptions} onChange={() => {}} caption="Pick a location." />}
+    dontExample={<Cascader label="Location" value={[]} options={locationOptions} onChange={() => {}} caption="Pick a location." />}
     dontCaption="A failed pick still draws the normal border, so nothing marks the error."
 />
 
