@@ -31,6 +31,7 @@ import { FREE_REGULAR_ICONS } from '@/lib/icon-regular.generated.js';
 import { SPEEDS, SPEED_LABELS, springFor } from '@/storybook-docs/illustrations/motion.jsx';
 import { DragReorder } from '@/storybook-docs/illustrations/motion-drag.jsx';
 import { DragPastLimit } from '@/storybook-docs/illustrations/motion-playground.jsx';
+import './library-gallery.css';
 
 /**
  * The live gallery that opens each Libraries page: the PLUS components a
@@ -49,20 +50,11 @@ export const LibraryGallery = ({ label, children }) => (
     </div>
 );
 
-/** One category of tiles, under a small heading. `wide` gives each tile a wider column, for a chart or a search. */
-export const GalleryGroup = ({ title, wide = false, children }) => (
-    <section data-gallery-group={title} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+/** One category of tiles, under a small heading, laid out on the full-width grid in library-gallery.css. */
+export const GalleryGroup = ({ title, children }) => (
+    <section className="sb-gallery-group" data-gallery-group={title} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
         <h3 style={{ margin: 0, font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>{title}</h3>
-        <ul
-            style={{
-                margin: 0,
-                padding: 0,
-                listStyle: 'none',
-                display: 'grid',
-                gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, var(${wide ? '--card-min-width-md' : '--card-min-width-sm'})), 1fr))`,
-                gap: 'var(--grid-gutter)',
-            }}
-        >
+        <ul className="sb-gallery-tiles" style={{ margin: 0, padding: 0, listStyle: 'none' }}>
             {children}
         </ul>
     </section>
@@ -71,13 +63,20 @@ export const GalleryGroup = ({ title, wide = false, children }) => (
 /**
  * One live example. `docsId` is the Storybook docs id the name links to;
  * `cues` are what to try. `bare` drops the stage's own padding and centering
- * for a demo that draws its own ground.
+ * for a demo that draws its own ground. `wide` spans two columns, for a chart,
+ * a search or a tab set. Stages share the row's height, so every label row
+ * starts on one line.
  */
-export const GalleryTile = ({ name, docsId, cues = [], bare = false, children }) => (
-    <li data-gallery-tile={name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', minWidth: 0 }}>
+export const GalleryTile = ({ name, docsId, cues = [], bare = false, wide = false, children }) => (
+    <li
+        data-gallery-tile={name}
+        className={wide ? 'sb-gallery-tile--wide' : undefined}
+        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', minWidth: 0, margin: 0 }}
+    >
         <div
             data-gallery-stage
             style={{
+                flex: '1 0 auto',
                 position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
@@ -98,16 +97,18 @@ export const GalleryTile = ({ name, docsId, cues = [], bare = false, children })
             {/* A tile sits under the group's h3, so a heading inside it is an h4. */}
             <HeadingContextProvider value={3}>{children}</HeadingContextProvider>
         </div>
-        <Link href={docsHref(docsId)}>{name}</Link>
-        {cues.length > 0 && (
-            <ul aria-label={`Try on ${name}`} style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-sm)' }}>
-                {cues.map((cue) => (
-                    <li key={cue}>
-                        <Tag text={cue} />
-                    </li>
-                ))}
-            </ul>
-        )}
+        <div data-gallery-label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', alignItems: 'flex-start' }}>
+            <Link href={docsHref(docsId)}>{name}</Link>
+            {cues.length > 0 && (
+                <ul aria-label={`Try on ${name}`} style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-sm)' }}>
+                    {cues.map((cue) => (
+                        <li key={cue} style={{ margin: 0 }}>
+                            <Tag text={cue} />
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
     </li>
 );
 
@@ -285,8 +286,8 @@ export const BaseUiGallery = () => (
                 <RangeTile />
             </GalleryTile>
         </GalleryGroup>
-        <GalleryGroup title="Disclosure and navigation" wide>
-            <GalleryTile name="Tabs" docsId="components-navigation-tabs" cues={['click', 'arrows']}>
+        <GalleryGroup title="Disclosure and navigation">
+            <GalleryTile wide name="Tabs" docsId="components-navigation-tabs" cues={['click', 'arrows']}>
                 <TabsTile />
             </GalleryTile>
             <GalleryTile name="Accordion" docsId="components-layout-and-structure-accordion" cues={['click', 'Enter']}>
@@ -459,8 +460,8 @@ const chartBox = { width: '100%', alignSelf: 'stretch' };
 /** Highcharts: the chart components, each with its own tooltip and legend. */
 export const HighchartsGallery = () => (
     <LibraryGallery label="Highcharts">
-        <GalleryGroup title="Chart types" wide>
-            <GalleryTile name="Bar chart" docsId="data-visualizations-comparison-bar-chart" cues={['hover', 'legend toggle']}>
+        <GalleryGroup title="Chart types">
+            <GalleryTile wide name="Bar chart" docsId="data-visualizations-comparison-bar-chart" cues={['hover', 'legend toggle']}>
                 <div style={chartBox}>
                     <BarChart
                         categories={['Fractions', 'Ratios', 'Equations', 'Graphs']}
@@ -474,7 +475,7 @@ export const HighchartsGallery = () => (
                     />
                 </div>
             </GalleryTile>
-            <GalleryTile name="Line chart" docsId="data-visualizations-temporal-line-chart" cues={['hover', 'legend toggle']}>
+            <GalleryTile wide name="Line chart" docsId="data-visualizations-temporal-line-chart" cues={['hover', 'legend toggle']}>
                 <div style={chartBox}>
                     <LineChart
                         data={[
@@ -581,8 +582,8 @@ export const IconSizes = () => (
 /** Font Awesome: the Free set, searched and sized through Icon. */
 export const FontAwesomeGallery = () => (
     <LibraryGallery label="Font Awesome">
-        <GalleryGroup title="Icons" wide>
-            <GalleryTile name="Icon" docsId="components-images-and-icons-icon" cues={['type to filter', 'hover for the name']}>
+        <GalleryGroup title="Icons">
+            <GalleryTile wide name="Icon" docsId="components-images-and-icons-icon" cues={['type to filter', 'hover for the name']}>
                 <IconSearch />
             </GalleryTile>
             <GalleryTile name="Icon sizes" docsId="foundations-visual-iconography" cues={['12', '16', '24']}>
