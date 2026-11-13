@@ -254,12 +254,12 @@ export const HEROES = {
     description:
       'The templates pulled apart: Frame, Page, Section ringed, Modal on top.',
   },
-  'templates-frame-frame': {
+  'templates-frame': {
     Hero: FrameHero,
     description:
       'The app frame: sidebar ringed, top bar, panel.',
   },
-  'templates-page-page': {
+  'templates-page': {
     Hero: PageHero,
     description:
       'The page header and its Sections, the page ringed.',

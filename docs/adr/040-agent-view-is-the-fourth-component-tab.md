@@ -7,6 +7,8 @@ verified: 2026-11-08
 
 # ADR-040: Agent view is the fourth component tab (2026-11-08)
 
+**Renamed 2026-11-13: the tab is now labeled Harness; the decision below stands.**
+
 **Decision.** A component docs page shows four tabs: **Examples · Code · Usage ·
 Agent view**. Agent view shows the component's generated file — the text
 `npm run generate:component-docs` writes and `ds_get` returns — exactly: rendered

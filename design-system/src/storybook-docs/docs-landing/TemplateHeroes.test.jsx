@@ -5,8 +5,8 @@ import { HEROES } from './hero-registry.jsx';
 
 const TEMPLATE_IDS = [
     'templates-overview',
-    'templates-frame-frame',
-    'templates-page-page',
+    'templates-frame',
+    'templates-page',
     'templates-section-section',
     'templates-card',
     'templates-table',

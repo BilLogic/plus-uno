@@ -2,14 +2,14 @@
  * The component tabs' contract — everything the tabs know that does not need a
  * browser to be true (#168, moved in-page by ADR-025).
  *
- * Four tabs over one component docs page: Examples · Code · Usage · Agent view.
+ * Four tabs over one component docs page: Examples · Code · Usage · Harness.
  * All four are rendered by `../docs-tabs.jsx` INSIDE
  * the docs page, below the title. They used to be Storybook `types.TAB` addons
  * in the manager's preview toolbar; that toolbar lives in a different document
  * from `<Title />`, so it could never sit below the title, which is the whole
  * reason for the move. See docs/adr/025.
  *
- * Agent view shows the agent-facing file per component — the one flat file
+ * Harness shows the agent-facing file per component — the one flat file
  * `npm run generate:component-docs` writes — byte for byte (ADR-040). The tabs
  * read that file; nothing here writes to it or splits it.
  *
@@ -38,7 +38,7 @@ export const TAB_IDS = {
  *
  * `title` is the DEFAULT label. A page may rename its first tab when its first
  * face is not examples, as a token page's would read "All tokens" where Button
- * reads "Examples". Only the first tab is renameable: Code, Usage and Agent view
+ * reads "Examples". Only the first tab is renameable: Code, Usage and Harness
  * mean the same thing everywhere.
  *
  * `id` is `null` for Examples because Examples is the default tab and carries no
@@ -49,7 +49,7 @@ export const TABS = [
   { key: 'examples', id: null, title: 'Examples' },
   { key: 'code', id: TAB_IDS.code, title: 'Code' },
   { key: 'usage', id: TAB_IDS.usage, title: 'Usage' },
-  { key: 'agent', id: TAB_IDS.agent, title: 'Agent view' },
+  { key: 'agent', id: TAB_IDS.agent, title: 'Harness' },
 ];
 
 /**
@@ -76,7 +76,7 @@ const PATTERNS_ROOT = 'design-system/src/patterns';
 
 /**
  * Where a docs-only pattern page lives: `storybook-docs/patterns/<Name>/<Name>.mdx`,
- * beside its stories. It has no component, so its Agent view is the file
+ * beside its stories. It has no component, so its Harness is the file
  * `generate:docs-agent-files` writes for it under `agent-views/pages/patterns/`.
  */
 const PATTERN_PAGES_ROOT = 'design-system/src/storybook-docs/patterns';
@@ -171,7 +171,7 @@ export function componentIdentity(entry) {
  * so it shows no import line rather than an import that does not resolve.
  *
  * @param {{importPath?: string}} [entry] The page's meta entry.
- * @param {boolean} [hasGeneratedDoc] Whether the page has an Agent view.
+ * @param {boolean} [hasGeneratedDoc] Whether the page has a Harness tab.
  * @returns {'@/patterns' | '@/components' | null}
  */
 export function importSourceFor(entry, hasGeneratedDoc = true) {
@@ -193,7 +193,7 @@ export function importLineFor(name, from = '@/components') {
 }
 
 /**
- * The generated file an Agent view shows, as a repo path, or `null` when the
+ * The generated file a Harness tab shows, as a repo path, or `null` when the
  * entry has none.
  *
  * Found through the docs page's Storybook meta: `importPath` is the stories
@@ -261,7 +261,7 @@ export function agentViewEntry(modules, entry) {
  * @returns {string}
  */
 export function reportProblemUrl(name, path) {
-  const title = `Agent view: ${name} — `;
+  const title = `Harness: ${name} — `;
   const body = [
     `Component: ${name}`,
     `Generated file: \`${path}\``,
@@ -284,7 +284,7 @@ export const RULE_ID_CLASS = 'sb-ds-agent-view__rule-id';
 const RULE_ID_LABEL = new RegExp(`class="${RULE_ID_CLASS}">#([a-z0-9-]+)<`);
 
 /**
- * The generated file prepared for the rendered Agent view: each rule heading's
+ * The generated file prepared for the rendered Harness: each rule heading's
  * `{#rule-id}` becomes a quiet id label under the heading text, so the reader
  * sees the rule id agents cite without the literal braces. The raw view and
  * Copy keep the file's own bytes; only this rendering changes.
@@ -297,7 +297,7 @@ export function agentViewMarkdown(text) {
 }
 
 /**
- * The heading anchor for the rendered Agent view: a rule heading's anchor is
+ * The heading anchor for the rendered Harness: a rule heading's anchor is
  * its rule id, the one agents cite; any other heading keeps the renderer's own.
  *
  * @param {string} heading The heading's source text.

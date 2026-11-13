@@ -41,8 +41,8 @@ section: one short page per library PLUS builds on, from
 
 ## What to check on a page
 
-- **Four tabs**, in order: Examples · Code · Usage · Agent view. Code and Agent
-  view are generated; a hand-written props table or agent text is a finding.
+- **Four tabs**, in order: Examples · Code · Usage · Harness. Code and Harness
+  are generated; a hand-written props table or agent text is a finding.
 - **Examples:** one `ComponentExample` per appearance, state and size, then the
   interactive playground. Each example follows the example-fidelity and
   illustration-kit rules in `documentation-ia.md` § Examples.

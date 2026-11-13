@@ -165,7 +165,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMes
 5. **Dividers.** Optional rules under the header and over the footer.
 
 The tokens each part draws are read from `Modal.scss` and listed under Tokens
-touched in the Agent view tab.
+touched in the Harness tab.
 
 ### States
 

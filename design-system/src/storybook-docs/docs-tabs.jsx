@@ -1,5 +1,5 @@
 /**
- * The component and pattern docs pages' tab strip — Examples · Code · Usage · Agent view,
+ * The component and pattern docs pages' tab strip — Examples · Code · Usage · Harness,
  * rendered INSIDE the page, below the title (ADR-025, ADR-040).
  *
  * WHY THIS IS NOT A STORYBOOK ADDON. It was, until #168's `types.TAB`
@@ -46,7 +46,7 @@ import {
 /**
  * Every generated agent file, through ONE raw glob (ADR-040), so no MDX page
  * carries agent text and the tab cannot show anything but the committed bytes.
- * Lazy: each file is its own chunk, fetched when its Agent view opens, so the
+ * Lazy: each file is its own chunk, fetched when its Harness opens, so the
  * docs bundle does not carry a hundred files to show one.
  *
  * The patterns match what `npm run generate:component-docs` writes: nested
@@ -186,7 +186,7 @@ function CodeTabPanel({ of, importName, importFrom, children }) {
 const AGENT_VIEW_MARKDOWN = { slugify: agentViewSlug };
 
 /**
- * The Agent view tab: the component's generated file, exactly as agents read
+ * The Harness tab: the component's generated file, exactly as agents read
  * it. Rendered as markdown by default for reading; "Show raw text" shows the
  * bytes themselves, and Copy puts them on the clipboard unchanged.
  *
@@ -277,7 +277,7 @@ function AgentViewPanel({ entry }) {
  *   Supplies the props table.
  * @param {string} [props.examplesTitle] Renames the FIRST tab only, for a page
  *   whose first face is not examples ("All tokens" where Button reads
- *   "Examples"); Code, Usage and Agent view mean the same thing on every page
+ *   "Examples"); Code, Usage and Harness mean the same thing on every page
  *   and are not renameable.
  * @param {React.ReactNode} props.children One `<DocsTab tab="examples">` and, when
  *   the page has usage content, one `<DocsTab tab="usage">`. A template page adds
@@ -298,7 +298,7 @@ export function DocsTabs({ of, examplesTitle, children }) {
   /**
    * The generated file for this page, found through its Storybook meta:
    * Storybook records the stories file as the meta's `parameters.fileName`.
-   * No file, no Agent view tab.
+   * No file, no Harness tab.
    */
   const importPath = resolved?.csfFile?.meta?.parameters?.fileName ?? resolved?.preparedMeta?.parameters?.fileName;
   const agentEntry = useMemo(() => agentViewEntry(AGENT_DOCS, { importPath }), [importPath]);
