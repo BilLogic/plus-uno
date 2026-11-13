@@ -62,6 +62,20 @@ test('frame tokens sit on Spacing and size and layer tokens on Elevation and lay
   assert.equal(placeToken('--card-pad-default', 'ladder/_patterns.scss').scope, 'components');
 });
 
+test('scope follows the family: page-level tokens are Templates, card, modal, popover and table are Components', () => {
+  const scopeOf = (family) => {
+    const scopes = new Set();
+    for (const [name, entry] of corpus) {
+      if (!name.startsWith(`--${family}-`)) continue;
+      const p = placeToken(name, entry.file);
+      if (p.collection === 'spacing') scopes.add(p.scope);
+    }
+    return [...scopes];
+  };
+  for (const f of ['page', 'focused-page', 'section']) assert.deepEqual(scopeOf(f), ['templates'], f);
+  for (const f of ['card', 'modal', 'popover', 'table']) assert.deepEqual(scopeOf(f), ['components'], f);
+});
+
 test('the audit names no token twice and gives each a proposed name', () => {
   const rows = tokenNamingAudit(corpus);
   assert.equal(new Set(rows.map((r) => r.token)).size, rows.length);
