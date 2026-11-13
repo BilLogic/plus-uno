@@ -49,39 +49,50 @@ const contrast = (a, b) => {
     const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
     return (hi + 0.05) / (lo + 0.05);
 };
-const name = (cssVar) => cssVar.match(/var\((--[\w-]+)\)/)[1];
+const tokenName = (cssVar) => cssVar.match(/var\((--[\w-]+)\)/)[1];
 
 describe('the hero edge role', () => {
     it.each(['light', 'dark'])('reads against the hero ground in %s at 1.5:1 or more', (mode) => {
         const ground = resolveToken('--ds-surface-sunken', mode);
-        const edge = resolveToken(name(PAINT.illustrationEdge), mode);
+        const edge = resolveToken(tokenName(PAINT.illustrationEdge), mode);
         expect(contrast(over(edge, ground), ground.rgb)).toBeGreaterThanOrEqual(1.5);
     });
 });
 
 /**
- * Fills that are a layer or page, not a mark on one. The sunken fills (`frameSunken`,
- * `sectionSubtleSurface`) are the hero ground itself, so they have no edge to show,
- * and the Logo mark's tile is a gray that already clears the ground.
+ * The fills that need an edge on the ground: a layer or a page. Gray fills
+ * (`countSurface`, `shape`) also mark things inside a layer, so the generic check
+ * cannot tell them apart; the Indicators hero's chips on the ground are held by
+ * name below. The sunken fills (`frameSunken`, `sectionSubtleSurface`) are the ground
+ * itself, so they have no edge to show, and the Logo mark's tile is a gray that
+ * already clears the ground. A new surface role goes in this list.
  */
 const SURFACES = new Set(
-    ['pageSurface', 'cardSurface', 'popupSurface', 'sidebarOverlaySurface', 'panelSurface', 'flagSurface', 'modalSurface', 'dangerSurface'].map((r) => PAINT[r]),
+    [
+        'pageSurface',
+        'cardSurface',
+        'popupSurface',
+        'sidebarOverlaySurface',
+        'panelSurface',
+        'flagSurface',
+        'modalSurface',
+        'dangerSurface',
+    ].map((role) => PAINT[role]),
 );
-/** Every stroke role that itself reads on the ground, light and dark: derived, not listed. */
-const EDGES = new Set(
-    Object.values(PAINT).filter((value) => {
-        if (!/^var\(--ds-/.test(value)) return false;
-        try {
-            return ['light', 'dark'].every((mode) => {
-                const ground = resolveToken('--ds-surface-sunken', mode);
-                return contrast(over(resolveToken(name(value), mode), ground), ground.rgb) >= 1.5;
-            });
-        } catch {
-            return false;
-        }
-    }),
-);
+/** The stroke roles that count as an edge. Each one is held to the contrast check below. */
+const EDGE_ROLES = ['illustrationEdge', 'accent', 'fieldBorder', 'fieldBorderInvalid', 'buttonDefaultBorder'];
+const EDGES = new Set(EDGE_ROLES.map((role) => PAINT[role]));
 const same = (a, b) => ['x', 'y', 'width', 'height'].every((k) => a.getAttribute(k) === b.getAttribute(k));
+const fillOf = (el) => el.getAttribute('fill') || el.style.fill;
+
+describe('every edge role reads against the hero ground', () => {
+    it.each(EDGE_ROLES)('%s, in light and dark', (role) => {
+        for (const mode of ['light', 'dark']) {
+            const ground = resolveToken('--ds-surface-sunken', mode);
+            expect(contrast(over(resolveToken(tokenName(PAINT[role]), mode), ground), ground.rgb), `${role} in ${mode}`).toBeGreaterThanOrEqual(1.5);
+        }
+    });
+});
 
 describe('every hero surface shows its edge', () => {
     it.each(Object.keys(HEROES))('%s', (id) => {
@@ -90,8 +101,8 @@ describe('every hero surface shows its edge', () => {
         for (const el of container.querySelectorAll('rect,circle,path,ellipse')) {
             // The Logo mark's own parts: the white plus and grid on its tile.
             if (el.closest('[data-shape="logo-construction"]')) continue;
-            if (SURFACES.has(el.getAttribute('fill')) && !EDGES.has(el.getAttribute('stroke'))) {
-                bare.push(`${el.tagName} ${el.getAttribute('fill')}`);
+            if (SURFACES.has(fillOf(el)) && !EDGES.has(el.getAttribute('stroke') || el.style.stroke)) {
+                bare.push(`${el.tagName} ${fillOf(el)}`);
             }
         }
         for (const fo of container.querySelectorAll('foreignObject')) {
@@ -101,5 +112,14 @@ describe('every hero surface shows its edge', () => {
             if (fill && !edged) bare.push(`layer ${fill}`);
         }
         expect(bare).toEqual([]);
+    });
+});
+
+describe('the Indicators hero chips on the ground show their edge', () => {
+    it('every neutral count chip carries the edge', () => {
+        const { container } = render(React.createElement(HEROES['patterns-notifications-and-indicators-indicators'].Hero));
+        const chips = [...container.querySelectorAll('rect,circle')].filter((el) => fillOf(el) === PAINT.countSurface);
+        expect(chips.length).toBeGreaterThan(0);
+        for (const chip of chips) expect(chip.getAttribute('stroke')).toBe(PAINT.illustrationEdge);
     });
 });

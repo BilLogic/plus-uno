@@ -72,29 +72,31 @@ export const SkeletonBar = ({ x, y, w, h = 4, accent = false, heading = false, t
  * `--ds-shadow-*` token and radius token. The box is laid out at twice the size
  * and scaled by half, so the shadow and corner are the real tokens at the kit's
  * scale (one unit is 2px) rather than twice too big. With no `shadow` it is a
- * plain fill.
+ * plain fill. Inside a hero it also draws the hairline edge (`illustrationEdge`,
+ * or the accent ring when `accent` marks the layer as the subject, so the two
+ * never overprint).
  */
-const Layer = ({ x, y, w, h, fill, shadow, corner }) => {
+const Layer = ({ x, y, w, h, fill, shadow, corner, accent = false }) => {
   const onHeroGround = useContext(HeroGround);
   return (
-  <>
-  <foreignObject x={x} y={y} width={w} height={h} style={{ overflow: 'visible' }}>
-    <div
-      xmlns="http://www.w3.org/1999/xhtml"
-      style={{
-        boxSizing: 'border-box',
-        width: w * 2,
-        height: h * 2,
-        transform: 'scale(0.5)',
-        transformOrigin: '0 0',
-        background: fill,
-        boxShadow: shadow,
-        borderRadius: corner ? CORNER_TOKEN[corner] : undefined,
-      }}
-    />
-  </foreignObject>
-  {onHeroGround && <Rect x={x} y={y} w={w} h={h} stroke={PAINT.illustrationEdge} corner={corner} />}
-  </>
+    <>
+      <foreignObject x={x} y={y} width={w} height={h} style={{ overflow: 'visible' }}>
+        <div
+          xmlns="http://www.w3.org/1999/xhtml"
+          style={{
+            boxSizing: 'border-box',
+            width: w * 2,
+            height: h * 2,
+            transform: 'scale(0.5)',
+            transformOrigin: '0 0',
+            background: fill,
+            boxShadow: shadow,
+            borderRadius: corner ? CORNER_TOKEN[corner] : undefined,
+          }}
+        />
+      </foreignObject>
+      {onHeroGround && <Rect x={x} y={y} w={w} h={h} stroke={accent ? PAINT.accent : PAINT.illustrationEdge} corner={corner} />}
+    </>
   );
 };
 
@@ -104,14 +106,14 @@ const AccentRing = ({ x, y, w, h, corner }) => <Rect x={x} y={y} w={w} h={h} str
 export const Frame = ({ x, y, w, h, accent = false }) => {
   const onHeroGround = useContext(HeroGround);
   return (
-  <g>
-    <Rect x={x} y={y} w={w} h={h} fill={PAINT.frameSunken} stroke={accent ? PAINT.accent : onHeroGround ? PAINT.illustrationEdge : PAINT.frameDivider} corner="window" />
-    {[0, 1, 2].map((i) => (
-      <circle key={i} cx={x + 8 + i * 7} cy={y + 6} r={2} fill={PAINT.windowDot} />
-    ))}
-    <SkeletonBar x={x + 34} y={y + 4} w={w * 0.35} />
-    <Rule x1={x} x2={x + w} y1={y + 12} y2={y + 12} />
-  </g>
+    <g>
+      <Rect x={x} y={y} w={w} h={h} fill={PAINT.frameSunken} stroke={accent ? PAINT.accent : onHeroGround ? PAINT.illustrationEdge : PAINT.frameDivider} corner="window" />
+      {[0, 1, 2].map((i) => (
+        <circle key={i} cx={x + 8 + i * 7} cy={y + 6} r={2} fill={PAINT.windowDot} />
+      ))}
+      <SkeletonBar x={x + 34} y={y + 4} w={w * 0.35} />
+      <Rule x1={x} x2={x + w} y1={y + 12} y2={y + 12} />
+    </g>
   );
 };
 
@@ -123,38 +125,38 @@ const SIDEBAR_ROW_PITCH = SIDEBAR_ROW_H + 1;
 export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => {
   const rowCount = Math.max(1, Math.min(5, Math.floor((h - 28) / SIDEBAR_ROW_PITCH)));
   return (
-  <g>
-    {overlay ? (
-      <Layer x={x} y={y} w={w} h={h} fill={PAINT.sidebarOverlaySurface} shadow={PAINT.sidebarOverlayShadow} />
-    ) : (
-      <>
-        <Rect x={x} y={y} w={w} h={h} fill={PAINT.frameSunken} />
-        <Rule x1={x + w} x2={x + w} y1={y} y2={y + h} />
-      </>
-    )}
-    <Rect x={x + 6} y={y + 4} w={12} h={12} fill={accent ? PAINT.accent : PAINT.sidebarIcon} corner="sidebarRow" />
-    {Array.from({ length: rowCount }, (_, i) => {
-      const ry = y + 24 + i * SIDEBAR_ROW_PITCH;
-      const selected = i === (rowCount > 1 ? 1 : 0);
-      return (
-        <React.Fragment key={i}>
-          {selected && (
-            <Rect
-              x={x + 4}
-              y={ry}
-              w={w - 8}
-              h={SIDEBAR_ROW_H}
-              fill={accent ? PAINT.accent : PAINT.sidebarSelected}
-              corner="sidebarRow"
-              opacity={accent ? 0.25 : 1}
-            />
-          )}
-          <Rect x={x + 8} y={ry + 4} w={8} h={8} fill={PAINT.sidebarIcon} corner="icon" />
-          <SkeletonBar x={x + 20} y={ry + SIDEBAR_ROW_H / 2 - 2} w={w - 32} />
-        </React.Fragment>
-      );
-    })}
-  </g>
+    <g>
+      {overlay ? (
+        <Layer x={x} y={y} w={w} h={h} fill={PAINT.sidebarOverlaySurface} shadow={PAINT.sidebarOverlayShadow} />
+      ) : (
+        <>
+          <Rect x={x} y={y} w={w} h={h} fill={PAINT.frameSunken} />
+          <Rule x1={x + w} x2={x + w} y1={y} y2={y + h} />
+        </>
+      )}
+      <Rect x={x + 6} y={y + 4} w={12} h={12} fill={accent ? PAINT.accent : PAINT.sidebarIcon} corner="sidebarRow" />
+      {Array.from({ length: rowCount }, (_, i) => {
+        const ry = y + 24 + i * SIDEBAR_ROW_PITCH;
+        const selected = i === (rowCount > 1 ? 1 : 0);
+        return (
+          <React.Fragment key={i}>
+            {selected && (
+              <Rect
+                x={x + 4}
+                y={ry}
+                w={w - 8}
+                h={SIDEBAR_ROW_H}
+                fill={accent ? PAINT.accent : PAINT.sidebarSelected}
+                corner="sidebarRow"
+                opacity={accent ? 0.25 : 1}
+              />
+            )}
+            <Rect x={x + 8} y={ry + 4} w={8} h={8} fill={PAINT.sidebarIcon} corner="icon" />
+            <SkeletonBar x={x + 20} y={ry + SIDEBAR_ROW_H / 2 - 2} w={w - 32} />
+          </React.Fragment>
+        );
+      })}
+    </g>
   );
 };
 
@@ -168,16 +170,16 @@ export const pageBody = ({ x, y, w, h, header }) => ({ x: x + 8, y: y + (header 
 export const Page = ({ x, y, w, h, accent = false, header = false, children }) => {
   const onHeroGround = useContext(HeroGround);
   return (
-  <g>
-    <Rect x={x} y={y} w={w} h={h} fill={PAINT.pageSurface} stroke={accent ? PAINT.accent : onHeroGround ? PAINT.illustrationEdge : PAINT.pageEdge} />
-    {header && (
-      <>
-        <SkeletonBar x={x + 8} y={y + 8} w={w * 0.3} h={6} heading />
-        <SkeletonBar x={x + 8} y={y + 18} w={w * 0.5} />
-      </>
-    )}
-    {children}
-  </g>
+    <g>
+      <Rect x={x} y={y} w={w} h={h} fill={PAINT.pageSurface} stroke={accent ? PAINT.accent : onHeroGround ? PAINT.illustrationEdge : PAINT.pageEdge} />
+      {header && (
+        <>
+          <SkeletonBar x={x + 8} y={y + 8} w={w * 0.3} h={6} heading />
+          <SkeletonBar x={x + 8} y={y + 18} w={w * 0.5} />
+        </>
+      )}
+      {children}
+    </g>
   );
 };
 
@@ -241,7 +243,7 @@ export const Section = ({ x, y, w, h, accent = false, rows = 3, subtle = false }
 
 export const Card = ({ x, y, w, h, accent = false }) => (
   <g>
-    <Layer x={x} y={y} w={w} h={h} fill={PAINT.cardSurface} shadow={PAINT.cardShadow} corner="card" />
+    <Layer x={x} y={y} w={w} h={h} fill={PAINT.cardSurface} shadow={PAINT.cardShadow} corner="card" accent={accent} />
     {accent && <AccentRing x={x} y={y} w={w} h={h} corner="card" />}
     <Rect x={x + 6} y={y + 6} w={w - 12} h={h * 0.4} fill={PAINT.placeholderText} corner="cardImage" />
     <SkeletonBar x={x + 6} y={y + h * 0.4 + 12} w={w * 0.6} accent={accent} heading />
@@ -252,7 +254,7 @@ export const Card = ({ x, y, w, h, accent = false }) => (
 /** A bare Card box: the raised surface and its shadow, no contents. */
 export const CardBox = ({ x, y, w, h, accent = false }) => (
   <g>
-    <Layer x={x} y={y} w={w} h={h} fill={PAINT.cardSurface} shadow={PAINT.cardShadow} corner="card" />
+    <Layer x={x} y={y} w={w} h={h} fill={PAINT.cardSurface} shadow={PAINT.cardShadow} corner="card" accent={accent} />
     {accent && <AccentRing x={x} y={y} w={w} h={h} corner="card" />}
   </g>
 );
@@ -330,7 +332,7 @@ export const ButtonShape = ({ x, y, w, appearance = 'default', label }) => {
 
 export const Popup = ({ x, y, w, h, accent = false, lines = true }) => (
   <g>
-    <Layer x={x} y={y} w={w} h={h} fill={PAINT.popupSurface} shadow={PAINT.popupShadow} corner="popup" />
+    <Layer x={x} y={y} w={w} h={h} fill={PAINT.popupSurface} shadow={PAINT.popupShadow} corner="popup" accent={accent} />
     {accent && <AccentRing x={x} y={y} w={w} h={h} corner="popup" />}
     {lines && [0, 1, 2, 3].map((i) => (
       <SkeletonBar key={i} x={x + 8} y={y + 8 + i * 10} w={w * (0.7 - i * 0.1)} />
@@ -372,7 +374,7 @@ export const Modal = ({ x, y, w, h, accent = false }) => {
   const bw = Math.min(28, (w - 24) / 2);
   return (
     <g>
-      <Layer x={x} y={y} w={w} h={h} fill={PAINT.modalSurface} shadow={PAINT.modalShadow} corner="modal" />
+      <Layer x={x} y={y} w={w} h={h} fill={PAINT.modalSurface} shadow={PAINT.modalShadow} corner="modal" accent={accent} />
       {accent && <AccentRing x={x} y={y} w={w} h={h} corner="modal" />}
       <SkeletonBar x={x + 10} y={y + 10} w={w * 0.45} h={5} accent={accent} heading />
       <SkeletonBar x={x + 10} y={y + 24} w={w * 0.75} />
@@ -491,7 +493,7 @@ const FLAG_ICON = {
 /** A floating notification card: the icon carries the `tone`, the lines stand in for its words. */
 export const Flag = ({ x, y, w, h, tone = 'neutral', accent = false }) => (
   <g>
-    <Layer x={x} y={y} w={w} h={h} fill={PAINT.flagSurface} shadow={PAINT.flagShadow} corner="flag" />
+    <Layer x={x} y={y} w={w} h={h} fill={PAINT.flagSurface} shadow={PAINT.flagShadow} corner="flag" accent={accent} />
     {accent && <AccentRing x={x} y={y} w={w} h={h} corner="flag" />}
     <circle cx={x + 10} cy={y + 11} r={4} fill={FLAG_ICON[tone]} />
     <SkeletonBar x={x + 20} y={y + 8} w={w * 0.4} heading />
@@ -501,13 +503,16 @@ export const Flag = ({ x, y, w, h, tone = 'neutral', accent = false }) => (
 );
 
 /** A small count pill. The accent is an outline, since CountTag has no brand tone. */
-export const CountTag = ({ x, y, w = 14, h = 10, accent = false }) => (
-  <g>
-    <Rect x={x} y={y} w={w} h={h} fill={PAINT.countSurface} corner="count" />
-    <SkeletonBar x={x + w * 0.3} y={y + h / 2 - 1} w={w * 0.4} h={2} tone={PAINT.countText} />
-    {accent && <AccentRing x={x - 1.5} y={y - 1.5} w={w + 3} h={h + 3} corner="count" />}
-  </g>
-);
+export const CountTag = ({ x, y, w = 14, h = 10, accent = false }) => {
+  const onHeroGround = useContext(HeroGround);
+  return (
+    <g>
+      <Rect x={x} y={y} w={w} h={h} fill={PAINT.countSurface} stroke={onHeroGround ? PAINT.illustrationEdge : undefined} corner="count" />
+      <SkeletonBar x={x + w * 0.3} y={y + h / 2 - 1} w={w * 0.4} h={2} tone={PAINT.countText} />
+      {accent && <AccentRing x={x - 1.5} y={y - 1.5} w={w + 3} h={h + 3} corner="count" />}
+    </g>
+  );
+};
 
 /**
  * A numbered-part marker for the gutter of an anatomy drawing: a disc with no

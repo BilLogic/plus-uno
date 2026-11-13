@@ -24,7 +24,8 @@
  *   brand tone.
  * - Hero surfaces: on the hero ground a layer carries a hairline in `illustrationEdge`
  *   as well as its real shadow, since the real edge and shadow roles are too faint on
- *   the sunken ground. Layers and the Page take it inside `HeroGround`.
+ *   the sunken ground. The primitives that draw a surface (Layer, Page, Frame, Isometric
+ *   stack) take it inside `HeroGround`; a surface a hero draws by hand sets it itself.
  * - Panel: docked, its SCSS has an edge line and no shadow, so the kit draws the
  *   same; floating, Frame's overlay fill and shadow, and no edge line.
  */
@@ -127,7 +128,7 @@ const ROLES = {
   // The edge of a surface drawn on the hero ground (--ds-surface-sunken). The real edge roles
   // (`pageEdge` is transparent outside increased contrast, `--ds-border` is 1.1:1 on the
   // ground) vanish at illustration scale, so a hero surface takes the bold border, which
-  // reads at 3:1 or more in light and dark. HeroEdges.test.jsx holds it to 1.5:1.
+  // reads at about 4:1 in light and dark. HeroEdges.test.jsx holds it to 1.5:1 (base modes).
   illustrationEdge: ['--ds-border-bold', null],
   // The one drawn letterform: the Typography specimen's glyphs, in the text ink.
   glyph: ['--ds-text', null],

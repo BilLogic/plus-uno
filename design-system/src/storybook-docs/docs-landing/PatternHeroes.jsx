@@ -1,5 +1,5 @@
 import React from 'react';
-import { PAINT } from '../illustrations/paint.js';
+import { HAIRLINE, PAINT } from '../illustrations/paint.js';
 import {
     Breadcrumb,
     ButtonShape,
@@ -65,7 +65,7 @@ export const OverviewHero = () => (
         ))}
         <Field x={22} y={22} w={100} accent />
         <Rect x={168} y={20} w={56} h={14} fill={PAINT.fieldSurface} stroke={PAINT.fieldBorder} corner="field" />
-        <Rect x={168} y={38} w={72} h={24} fill={PAINT.popupSurface} stroke={PAINT.buttonDefaultBorder} corner="popup" />
+        <Rect x={168} y={38} w={72} h={24} fill={PAINT.popupSurface} stroke={PAINT.illustrationEdge} corner="popup" />
         <SkeletonBar x={176} y={45} w={48} />
         <SkeletonBar x={176} y={53} w={34} />
         <Rect x={61} y={102} w={32} h={32} fill={PAINT.accent} opacity={0.2} corner="full" />
@@ -159,7 +159,7 @@ export const IndicatorsHero = () => {
     const { x0, x1 } = VIEW;
     return (
         <HeroDrawing>
-            <circle cx={x1 - 8} cy={14} r={8} fill={PAINT.countSurface} />
+            <circle cx={x1 - 8} cy={14} r={8} fill={PAINT.countSurface} stroke={PAINT.illustrationEdge} style={HAIRLINE} />
             <CountTag x={x1 - 6} y={2} accent />
             <Rule x1={x0} x2={x1} y1={30} y2={30} stroke={PAINT.rowDivider} />
             {[0, 1, 2, 3].map((i) => {
@@ -169,7 +169,7 @@ export const IndicatorsHero = () => {
                     <React.Fragment key={i}>
                         <SkeletonBar x={x0} y={y + 6} w={70} />
                         <SkeletonBar x={x0 + 100} y={y + 6} w={50} />
-                        <Rect x={x1 - 56} y={y + 3} w={56} h={12} fill={hot ? PAINT.accent : PAINT.countSurface} opacity={hot ? 0.2 : 1} corner="count" />
+                        <Rect x={x1 - 56} y={y + 3} w={56} h={12} fill={hot ? PAINT.accent : PAINT.countSurface} stroke={hot ? PAINT.accent : PAINT.illustrationEdge} opacity={hot ? 0.2 : 1} corner="count" />
                         <circle cx={x1 - 49} cy={y + 9} r={2} fill={hot ? PAINT.accent : PAINT.trackerDot} />
                         <SkeletonBar x={x1 - 42} y={y + 7} w={30} tone={hot ? PAINT.accent : undefined} />
                         <Rule x1={x0} x2={x1} y1={y + 20} y2={y + 20} stroke={PAINT.rowDivider} />
@@ -199,7 +199,7 @@ export const DisabledHero = () => (
         <ButtonShape x={160} y={126} w={34} />
         <Rect x={198} y={126} w={36} h={8} fill={PAINT.shape} corner="button" />
         <Ring x={198} y={126} w={36} h={8} />
-        <Rect x={170} y={98} w={64} h={14} fill={PAINT.popupSurface} stroke={PAINT.buttonDefaultBorder} corner="popup" />
+        <Rect x={170} y={98} w={64} h={14} fill={PAINT.popupSurface} stroke={PAINT.illustrationEdge} corner="popup" />
         <SkeletonBar x={178} y={103} w={44} />
         <Pointer x={226} y={130} />
     </HeroDrawing>
