@@ -13,11 +13,11 @@ import {
     Row,
     Rule,
     Section,
-    Sidebar,
     SkeletonBar,
     StickyHeader,
 } from '../illustrations/primitives.jsx';
 import { HeroDrawing, HERO_SIDEBAR_W } from './HeroDrawing.jsx';
+import { AppWindow } from './HeroWindow.jsx';
 
 /**
  * The Patterns heroes: each pattern's situation, cropped to its one cue, drawn
@@ -131,17 +131,22 @@ export const FilteringHero = () => {
 };
 
 export const NavigationHero = () => {
-    const sb = { x: 10, y: -12, w: HERO_SIDEBAR_W, h: 190 };
-    const selectedY = sb.y + 24 + 17;
+    const w = { x: -20, y: -6, w: 340, h: 172 };
+    // The selected row: the second row, 24 below the logo row, one 17 pitch down.
+    const selectedY = w.y + 24 + 17;
     return (
         <HeroDrawing>
-            <Sidebar x={sb.x} y={sb.y} w={sb.w} h={sb.h} />
-            <Ring x={sb.x + 4} y={selectedY} w={sb.w - 8} h={16} corner="sidebarRow" />
-            <PageSheet x={sb.x + sb.w} y={-20} w={230} h={200} />
-            <Breadcrumb x={90} y={10} w={120} count={3} accent />
-            <SkeletonBar x={90} y={30} w={70} h={6} heading />
-            <SkeletonBar x={90} y={42} w={110} />
-            <Rows x={90} w={190} y={60} n={7} />
+            <AppWindow {...w}>
+                {(page) => (
+                    <>
+                        <Breadcrumb x={page.x + 12} y={w.y + 10} w={120} count={3} accent />
+                        <SkeletonBar x={page.x + 12} y={w.y + 30} w={70} h={6} heading />
+                        <SkeletonBar x={page.x + 12} y={w.y + 42} w={110} />
+                        <Rows x={page.x + 12} w={page.w - 24} y={w.y + 60} n={7} />
+                    </>
+                )}
+            </AppWindow>
+            <Ring x={w.x + 4} y={selectedY} w={HERO_SIDEBAR_W - 8} h={16} corner="sidebarRow" />
         </HeroDrawing>
     );
 };
