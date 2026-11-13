@@ -1,8 +1,7 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -13,12 +12,20 @@ export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-${id
 
 <Meta title="Foundations/Overview" tags={['!dev']} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-overview"
+    eyebrow="Foundation"
     title="Overview"
-    summary="Foundations create consistent experiences across the tutor and student apps."
+    purpose="Foundations create consistent experiences across the tutor and student apps."
+    links={{
+        label: 'Start with',
+        items: [
+            { title: 'The foundations', href: '#foundation-the-fifteen-foundations' },
+            { title: 'Page anatomy', href: '#foundation-page-anatomy' },
+            { title: 'Accessibility', href: '#foundation-accessibility' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

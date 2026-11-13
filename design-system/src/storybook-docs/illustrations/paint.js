@@ -121,6 +121,8 @@ const ROLES = {
   // A blocked-out object in a motion principle figure: a shape, not a component
   shape: ['--ds-background-neutral', null],
   annotation: ['--ds-border-bold', null],
+  // The one drawn letterform: the Typography specimen's glyphs, in the text ink.
+  glyph: ['--ds-text', null],
 };
 
 /**

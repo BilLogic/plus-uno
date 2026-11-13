@@ -1,8 +1,7 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -28,12 +27,20 @@ export const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle
 
 <Meta title="Foundations/Border" tags={['!dev']} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-border"
+    eyebrow="Foundation"
     title="Border"
-    summary="A border is a width token paired with a color token."
+    purpose="A border is a width token paired with a color token."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Width tokens', href: '#foundation-width-tokens' },
+            { title: 'Color pairing', href: '#foundation-pair-width-with-color' },
+            { title: 'Focus ring', href: '#foundation-focus-ring' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

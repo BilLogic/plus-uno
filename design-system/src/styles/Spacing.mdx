@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -14,12 +13,20 @@ import * as SpacingStories from './Spacing.stories.jsx';
 
 <Meta of={SpacingStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-spacing"
+    eyebrow="Foundation"
     title="Spacing"
-    summary="The kind of box sets its pad; the pattern it sits in sets its stack and inline."
+    purpose="The kind of box sets its pad; the pattern it sits in sets its stack and inline."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Tokens', href: '#foundation-tokens' },
+            { title: 'Padding', href: '#foundation-padding' },
+            { title: 'Stack and inline', href: '#foundation-stack-and-inline' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

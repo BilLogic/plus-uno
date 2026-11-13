@@ -1,8 +1,7 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -12,12 +11,20 @@ import { Banner } from '@/components';
 
 <Meta title="Foundations/Tokens" tags={['!dev']} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-tokens"
+    eyebrow="Foundation"
     title="Design tokens"
-    summary="Design tokens are a single source of truth to name and store design decisions for the PLUS apps."
+    purpose="Design tokens are a single source of truth to name and store design decisions for the PLUS apps."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Collections', href: '#foundation-collections' },
+            { title: 'Four tiers', href: '#foundation-the-four-tier-ladder' },
+            { title: 'In code', href: '#foundation-using-tokens-in-code' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

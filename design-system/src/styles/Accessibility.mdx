@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -14,12 +13,20 @@ import * as AccessibilityStories from './Accessibility.stories.jsx';
 
 <Meta of={AccessibilityStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-accessibility"
+    eyebrow="Foundation"
     title="Accessibility"
-    summary="The rules every PLUS screen meets, built into the tokens and patterns."
+    purpose="The rules every PLUS screen meets, built into the tokens and patterns."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Contrast', href: '#foundation-contrast' },
+            { title: 'Focus', href: '#foundation-focus' },
+            { title: 'Disabled', href: '#foundation-disabled' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

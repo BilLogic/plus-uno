@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -18,12 +17,20 @@ export const Sample = ({ font, weight, children = 'Tutors plan the week from her
 
 <Meta of={TypographyStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-typography"
+    eyebrow="Foundation"
     title="Typography"
-    summary="Heading, Body, Metric and Code are the text styles for all work."
+    purpose="Heading, Body, Metric and Code are the text styles for all work."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Type scale', href: '#foundation-type-scale' },
+            { title: 'In code', href: '#foundation-in-code' },
+            { title: 'Heading levels', href: '#foundation-heading-levels' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 

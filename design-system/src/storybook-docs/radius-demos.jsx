@@ -2,7 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { IconButton } from '@/components';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { PAINT, HAIRLINE } from '@/storybook-docs/illustrations/paint.js';
-import { ButtonShape, Card, Frame, Rule, Screen, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
+import { ButtonShape, Frame, Rule, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
 
 /**
  * Figures for Foundations/Radius. Every corner reads a radius token, and every
@@ -164,49 +164,8 @@ const Legended = ({ testid, title, stage, parts, children }) => {
     );
 };
 
-/* ----------------------------------------------------------------- cover */
-
-const COVER = { w: 320, h: 200 };
-
 /** A menu row inset in a Popup: the Popup's radius minus its inset. */
 const ROW_CORNER = 'calc(var(--popup-radius) - var(--popover-pad-menu))';
-
-/**
- * One screen with every rule on it: the Page at the window edge, a Section and
- * a Card, a Popup with its rows nested inside, a field with its button, and a
- * pill that keeps its shape inside the Section.
- */
-export const RadiusCover = () => (
-    <Legended
-        testid="radius-cover"
-        title="A screen whose parts each round by their own radius token"
-        stage={COVER}
-        parts={[
-            { id: 'page', title: 'Page at the window edge', value: '0', at: [306, 188] },
-            { id: 'section', title: 'Section with a fill', token: '--section-radius', at: [54, 46] },
-            { id: 'card', title: 'Card', token: '--card-radius', at: [308, 46] },
-            { id: 'popup', title: 'Popup', token: '--popup-radius', at: [284, 126] },
-            { id: 'row', title: 'Row inside the Popup', token: '--radius-control-md', at: [200, 145] },
-            { id: 'field', title: 'Field, 40 high', token: '--radius-control-lg', at: [54, 136] },
-            { id: 'button', title: 'Button in the field', token: '--button-radius-default', at: [168, 156] },
-            { id: 'pill', title: 'Pill', token: '--radius-full', at: [172, 50] },
-        ]}
-    >
-        <Screen x={0} y={0} w={COVER.w} h={COVER.h}>
-            <TokenRect x={54} y={46} w={124} h={70} token="--section-radius" scale="kit" fill={PAINT.sectionSubtleSurface} />
-            <SkeletonBar x={62} y={54} w={40} h={5} heading />
-            <TokenRect x={146} y={53} w={24} h={8} token="--radius-full" scale="kit" fill={PAINT.countSurface} />
-            {[0, 1, 2].map((i) => <SkeletonBar key={i} x={62} y={70 + i * 12} w={96 - i * 20} />)}
-            <Card x={188} y={46} w={120} h={70} />
-            <TokenRect x={54} y={130} w={124} h={20} token="--radius-control-lg" scale="kit" fill={PAINT.fieldSurface} stroke={PAINT.fieldBorder} />
-            <SkeletonBar x={60} y={138} w={50} />
-            <TokenRect x={160} y={132} w={16} h={16} token="--button-radius-default" scale="kit" fill={PAINT.shape} />
-            <RaisedBox x={188} y={124} w={96} h={52} token="--popup-radius" fill={PAINT.popupSurface} shadow={PAINT.popupShadow} />
-            <TokenRect x={190} y={126} w={92} h={16} token={ROW_CORNER} scale="kit" fill={PAINT.rowSelected} />
-            {[0, 1, 2].map((i) => <SkeletonBar key={i} x={196} y={132 + i * 16} w={44 - i * 8} />)}
-        </Screen>
-    </Legended>
-);
 
 /* ----------------------------------------------------------------- scale */
 

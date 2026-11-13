@@ -1,8 +1,7 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
-    FoundationHero,
-    FoundationContents,
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
@@ -17,12 +16,19 @@ export const Glyph = ({ name, family }) => (
 
 <Meta of={IconsStories} />
 
-<FoundationHero
+<DocsLanding
+    page="foundations-iconography"
+    eyebrow="Foundation"
     title="Iconography"
-    summary="Icons are small symbols that help people find their way and act faster."
+    purpose="Icons are small symbols that help people find their way and act faster."
+    links={{
+        label: 'Tokens',
+        items: [
+            { title: 'Sizes', href: '#foundation-sizes-12-16-and-24' },
+            { title: 'Color', href: '#foundation-font-awesome-free-and-color-tokens' },
+        ],
+    }}
 />
-
-<FoundationContents />
 
 <FoundationSection title="Overview">
 
