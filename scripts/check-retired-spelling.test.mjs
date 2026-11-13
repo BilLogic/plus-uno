@@ -199,7 +199,7 @@ test('an error that is NOT a missing file still stops the sweep', () => {
 // ── Foundations IA (#2429): the retired story ids and titles ──
 test('a retired Foundations id or title is caught, the new ids pass', () => {
   const retired = [
-    'open ?path=/docs/foundations-basics-overview--docs',
+    'open the foundations-basics-overview story',
     'story foundations-motion-principles',
     'story foundations-sound-overview',
     'Foundations · Motion is the page',
