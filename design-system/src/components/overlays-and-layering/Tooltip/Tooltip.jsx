@@ -1,3 +1,4 @@
+import { useMotionReduced } from '@/lib/motionPreference';
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
@@ -29,6 +30,7 @@ const Tooltip = ({
     delayShow = 250,
     delayHide = 400,
 }) => {
+    const reduced = useMotionReduced();
     const baseTriggerElement = React.isValidElement(children) ? children : <span>{children}</span>;
     const disabled = Array.isArray(trigger) ? trigger.length === 0 : !trigger;
 
@@ -57,6 +59,7 @@ const Tooltip = ({
             <BaseTooltip.Portal container={containerRef}>
                 <BaseTooltip.Positioner side={placement} sideOffset={4} collisionPadding={8}>
                     <BaseTooltip.Popup
+                        data-reduced={reduced ? 'true' : undefined}
                         id={id}
                         role="tooltip"
                         className={`plus-tooltip ${className}`}

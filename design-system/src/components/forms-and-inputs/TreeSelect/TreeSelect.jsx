@@ -1,3 +1,6 @@
+import { useMotionReduced } from '@/lib/motionPreference';
+import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
+import { useOverlayPresence, useKeyboardOpen } from '@/lib/overlayMotion';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import useFieldId from '../useFieldId';
 import PropTypes from 'prop-types';
@@ -146,13 +149,16 @@ const TreeSelect = ({
     style,
     ...props
 }) => {
+    const reduced = useMotionReduced();
     const [isOpen, setIsOpen] = useState(false);
     const [expandedValues, setExpandedValues] = useState(() => new Set());
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
     const menuRef = useRef(null);
     const close = useCallback(() => setIsOpen(false), []);
-    const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef, onClose: close });
+    const keyboardOpen = useKeyboardOpen(isOpen);
+    const present = useOverlayPresence(isOpen, menuRef);
+    const place = useAnchoredPopup({ open: present, anchorRef: wrapperRef, popupRef: menuRef, onClose: close });
     /**
      * Focus moves between real elements rather than through
      * `aria-activedescendant`: every treeitem is in the DOM already, so a
@@ -510,9 +516,14 @@ const TreeSelect = ({
                     />
                 </FieldBox>
 
-                {isOpen && (
+                {present && (
                     <div
+                        data-reduced={reduced ? 'true' : undefined}
                         ref={menuRef}
+                        data-instant={keyboardOpen ? 'keyboard' : undefined}
+            data-ending-style={!isOpen ? '' : undefined}
+            aria-hidden={!isOpen ? true : undefined}
+                        inert={!isOpen ? true : undefined}
                         className="plus-listbox plus-listbox--anchored plus-tree-select-menu"
                         data-placement={place?.placement}
                         data-side={place?.side}
@@ -524,7 +535,11 @@ const TreeSelect = ({
                                 id={treeId}
                                 aria-multiselectable={isMulti || undefined}
                             >
-                                {visibleNodes.map(renderRow)}
+                                <AnimatePresence initial={false}>
+                                    {visibleNodes.map((node) => (
+                                        <HeightSurface key={node.value} role="presentation">{renderRow(node)}</HeightSurface>
+                                    ))}
+                                </AnimatePresence>
                             </div>
                         </div>
                     </div>

@@ -1,7 +1,8 @@
+import { withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { Button } from '@/components';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Accordion from './Accordion';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { probe, tokenColor } from '@/storybook-docs/lib/style-probes.js';
@@ -313,4 +314,28 @@ export const Disabled = {
         await userEvent.click(el, { pointerEventsCheck: 0 });
         await expect(el).toHaveAttribute('aria-expanded', 'false');
     },
+};
+
+const expansionPlay = async ({ canvasElement }, reduced = false) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Session notes' });
+    await userEvent.click(trigger);
+    const detail = await canvas.findByText('Notes from the session');
+    const panel = detail.closest('.plus-accordion-panel');
+    await expect(panel).not.toBeNull();
+    await waitFor(() => expect(panel.getBoundingClientRect().height).toBeGreaterThan(0));
+    if (reduced) await expect(panel.style.height).toBe('auto');
+    await userEvent.click(trigger);
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(detail.isConnected).toBe(true);
+    await waitFor(() => expect(detail.isConnected).toBe(false));
+};
+export const MotionOpenClose = {
+    render: () => <Accordion items={[{ eventKey: 'notes', header: 'Session notes', body: 'Notes from the session' }]} />,
+    play: expansionPlay,
+};
+export const MotionReduced = {
+    ...MotionOpenClose,
+    decorators: [withReducedMotion],
+    play: (context) => expansionPlay(context, true),
 };

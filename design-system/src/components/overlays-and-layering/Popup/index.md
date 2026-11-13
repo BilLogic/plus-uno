@@ -195,7 +195,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--anchor-width` · `--body-default` · `--border-default` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-exit` · `--ds-motion-spatial-exit-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--plus-popup-clip-bottom` · `--plus-popup-clip-left` · `--plus-popup-clip-right` · `--plus-popup-clip-top` · `--plus-popup-reach` · `--popover-offset` · `--popover-pad` · `--popup-clip-reach` · `--popup-max-width` · `--popup-min-width` · `--popup-pad` · `--popup-radius` · `--stack-md`
+`--anchor-width` · `--body-default` · `--border-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--popover-offset` · `--popover-pad` · `--popup-max-width` · `--popup-min-width` · `--popup-pad` · `--popup-radius` · `--stack-md`
 
 From `design-system/src/components/overlays-and-layering/Popup/Popup.scss`. Override these through the token layer, never with a literal.
 

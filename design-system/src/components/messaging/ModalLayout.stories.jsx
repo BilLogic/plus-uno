@@ -1,3 +1,4 @@
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -248,6 +249,7 @@ MenuInsideModal.play = async ({ canvasElement }) => {
     // The menu is drawn above the modal it opened from: the topmost element
     // at the option's center is the option, not the dialog under it.
     const box = option.getBoundingClientRect();
+    await settleAnimations(canvasElement.ownerDocument.body);
     const hit = canvasElement.ownerDocument.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
     await expect(option.contains(hit)).toBe(true);
 };

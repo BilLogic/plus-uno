@@ -1,5 +1,6 @@
+import { withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
-import { expect, waitFor, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
@@ -230,4 +231,26 @@ export const Wrapping = {
             </Tooltip>
         </div>
     ),
+};
+
+// Open and close at the component seam, including retained exit and OS reduction.
+const MotionTooltip = () => <Tooltip text="Session details" delayShow={0} delayHide={0}><Button text="Details" /></Tooltip>;
+const tooltipMotionPlay = async ({ canvasElement }, reduced = false) => {
+    const trigger = within(canvasElement).getByRole('button', { name: 'Details' });
+    await userEvent.hover(trigger);
+    const tooltip = await within(canvasElement.ownerDocument.body).findByRole('tooltip');
+    if (!reduced) await expect(getComputedStyle(tooltip).animationName).toContain('plus-overlay-fade');
+    if (reduced) await expect(getComputedStyle(tooltip).animationName).not.toContain('scale');
+    await userEvent.unhover(trigger);
+    if (!reduced) {
+        await waitFor(() => expect(tooltip).toHaveAttribute('data-ending-style'));
+        await expect(tooltip.isConnected).toBe(true);
+    }
+    await waitFor(() => expect(tooltip.isConnected).toBe(false));
+};
+export const MotionOpenClose = { render: MotionTooltip, play: tooltipMotionPlay };
+export const MotionReduced = {
+    render: MotionTooltip,
+    decorators: [withReducedMotion],
+    play: (context) => tooltipMotionPlay(context, true),
 };

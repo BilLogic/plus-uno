@@ -10,11 +10,11 @@ Also asked as: dialog layout, confirm layout.
 
 **Source:** `design-system/src/patterns/PatternModal/PatternModal.jsx`
 
-**Stories:** `design-system/src/patterns/PatternModal/PatternModal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthSmall, WidthMedium, WidthLarge, HugLong, HeightFill, TabsStill, Interactive, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused
+**Stories:** `design-system/src/patterns/PatternModal/PatternModal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthSmall, WidthMedium, WidthLarge, HugLong, HeightFill, TabsStill, Interactive, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, MotionOpenClose, MotionReduced
 
 **Storybook page:** `design-system/src/patterns/PatternModal/PatternModal.mdx`
 
-**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast` · swap `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.exit` + `appearance.fast` · swap `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -34,7 +34,7 @@ PatternModal reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Scales from 96% and fades in; the Backdrop dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts. |
-| exit | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Leaves at 98%, fading. |
+| exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Leaves at 98%, fading; stays mounted until the exit completes. |
 | swap | Swap content in place | `--ds-motion-appearance-fast` | One Modal at a time: a confirm replaces the content in place, never a second Modal. |
 | rejected | Call attention | `--ds-motion-spatial-fast` | A blocked submit shakes it once; never in reduced motion. |
 
@@ -173,6 +173,7 @@ The Modal's maximum height is the screen less `--space-400` above and below.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `show` | bool | `true` | Keep mounted and set false to finish the exit before removal; also follows its Backdrop. |
 | `id` | string | — | — |
 | `title` | node | — | Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name |
 | `header` | node | — | Custom header slot, Figma's `_Modal header` type=custom. It replaces the title row (the title and the close button), so name the dialog with `aria-label`. |
@@ -200,7 +201,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-medium` · `--modal-body-min-height` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--modal-stack-sm` · `--stack-lg` · `--stack-md`
+`--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-medium` · `--modal-body-min-height` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--modal-stack-sm` · `--plus-overlay-origin` · `--stack-lg` · `--stack-md` · `--transform-origin`
 
 From `design-system/src/patterns/PatternModal/PatternModal.scss`. Override these through the token layer, never with a literal.
 
