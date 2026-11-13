@@ -192,6 +192,13 @@ export default defineConfig({
               },
               // The OS color scheme and contrast, for the `auto` color and
               // contrast modes. Same rule: pass `null` for each to restore.
+              // A real mouse drag between two CSS selectors in the story frame,
+              // which is what native drag-and-drop needs (a synthetic pointer
+              // sequence never starts one). MotionTransitions' reorder stories use it.
+              dragAndDrop: async (context, from, to) => {
+                const frame = await context.frame();
+                await frame.dragAndDrop(from, to);
+              },
               emulateColorPreferences: async ({ page }, colorScheme, contrast) => {
                 await page.emulateMedia({ colorScheme, contrast });
               }
