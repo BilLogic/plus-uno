@@ -4,7 +4,7 @@ import { Button, Fieldset, PanelBody, PanelCloseAction, PanelContainer, PanelFoo
 import { Backdrop, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { CELL, FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
+import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { BAR_TOKEN, FocusedType, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 
 /**
@@ -108,8 +108,8 @@ export const PageFooter = ({ sending, onSave }) => (
  */
 export const FullBleedFooter = ({ sending, onSave, onCancel, primary = 'Save session', cancel = 'Cancel', cancelAppearance = 'default', bleed }) => (
     <FooterCells bleed={bleed} radius={HOST_RADIUS}>
-        <Button text={cancel} appearance={cancelAppearance} shouldFitContainer onClick={onCancel} style={CELL} />
-        <Button text={primary} appearance="primary" shouldFitContainer isLoading={sending} onClick={onSave} style={CELL} />
+        <Button text={cancel} appearance={cancelAppearance} shouldFitContainer onClick={onCancel} />
+        <Button text={primary} appearance="primary" shouldFitContainer isLoading={sending} onClick={onSave} />
     </FooterCells>
 );
 

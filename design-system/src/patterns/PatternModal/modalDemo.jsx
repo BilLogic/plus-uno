@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
 import { Backdrop, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { CELL, FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
+import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { stepItems } from '@/storybook-docs/lib/focused-task.jsx';
 import { FormFields, FILLED } from '../Form/formDemo.jsx';
 
@@ -32,24 +32,24 @@ export const ModalStage = ({ children, width = 'sm', height = SCREEN.height, scr
 /** Full-bleed cells: Cancel (Default) left, the action (Primary or Danger) right, half each. */
 export const TwoCells = ({ cancel = 'Cancel', action, appearance = 'primary', isDisabled = false, onAction, onCancel }) => (
     <FooterCells bleed={MODAL_PAD}>
-        <Button text={cancel} shouldFitContainer style={CELL} onClick={onCancel} />
-        <Button text={action} appearance={appearance} isDisabled={isDisabled} shouldFitContainer style={CELL} onClick={onAction} />
+        <Button text={cancel} shouldFitContainer onClick={onCancel} />
+        <Button text={action} appearance={appearance} isDisabled={isDisabled} shouldFitContainer onClick={onAction} />
     </FooterCells>
 );
 
 /** One button fills the whole footer. */
 export const OneCell = ({ action, onAction }) => (
     <FooterCells bleed={MODAL_PAD} columns="1fr">
-        <Button text={action} appearance="primary" shouldFitContainer style={CELL} onClick={onAction} />
+        <Button text={action} appearance="primary" shouldFitContainer onClick={onAction} />
     </FooterCells>
 );
 
 /** A third each; only the last is Primary. */
 export const ThreeCells = ({ labels = ['Cancel', 'Save draft', 'Schedule'] }) => (
     <FooterCells bleed={MODAL_PAD} columns="1fr 1fr 1fr">
-        <Button text={labels[0]} shouldFitContainer style={CELL} onClick={() => {}} />
-        <Button text={labels[1]} shouldFitContainer style={CELL} onClick={() => {}} />
-        <Button text={labels[2]} appearance="primary" shouldFitContainer style={CELL} onClick={() => {}} />
+        <Button text={labels[0]} shouldFitContainer onClick={() => {}} />
+        <Button text={labels[1]} shouldFitContainer onClick={() => {}} />
+        <Button text={labels[2]} appearance="primary" shouldFitContainer onClick={() => {}} />
     </FooterCells>
 );
 
@@ -83,9 +83,9 @@ export const Steps = ({ start = 1 }) => {
             title="Schedule a session"
             footer={(
                 <FooterCells bleed={MODAL_PAD} columns="2fr 1fr 1fr">
-                    <Button text="Cancel" appearance="subtle" shouldFitContainer style={CELL} onClick={() => {}} />
-                    <Button text="Back" isDisabled={at === 0} shouldFitContainer style={CELL} onClick={() => setAt(at - 1)} />
-                    <Button text={last ? 'Schedule' : 'Next'} appearance="primary" shouldFitContainer style={CELL} onClick={() => setAt(Math.min(at + 1, STEP_LABELS.length - 1))} />
+                    <Button text="Cancel" appearance="subtle" shouldFitContainer onClick={() => {}} />
+                    <Button text="Back" isDisabled={at === 0} shouldFitContainer onClick={() => setAt(at - 1)} />
+                    <Button text={last ? 'Schedule' : 'Next'} appearance="primary" shouldFitContainer onClick={() => setAt(Math.min(at + 1, STEP_LABELS.length - 1))} />
                 </FooterCells>
             )}
         >
@@ -218,8 +218,8 @@ export const ConfirmOverPanel = () => {
                             onClose={close}
                             footer={(
                                 <FooterCells bleed={MODAL_PAD}>
-                                    <Button text="Cancel" shouldFitContainer style={CELL} onClick={close} />
-                                    <Button text="Delete student" appearance="danger" shouldFitContainer style={CELL} onClick={close} />
+                                    <Button text="Cancel" shouldFitContainer onClick={close} />
+                                    <Button text="Delete student" appearance="danger" shouldFitContainer onClick={close} />
                                 </FooterCells>
                             )}
                         >

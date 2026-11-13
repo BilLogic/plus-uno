@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, ButtonItem, DropdownMenu, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
 import { PatternCard, PatternSection } from '@/patterns';
 import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
-import { CELL, FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
+import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
 import { FormFields, FILLED, PageFooter } from '../../../patterns/Form/formDemo.jsx';
 import { ModalStage, TwoCells } from '../../../patterns/PatternModal/modalDemo.jsx';
@@ -160,8 +160,8 @@ export const Sending = ({ sending: started = false }) => {
             title="Log a session"
             footer={(
                 <FooterCells bleed="--modal-pad-x-default">
-                    <Button text="Cancel" shouldFitContainer style={CELL} onClick={() => {}} />
-                    <Button text="Save session" appearance="primary" shouldFitContainer isLoading={sending} style={CELL} onClick={() => setSending(true)} />
+                    <Button text="Cancel" shouldFitContainer onClick={() => {}} />
+                    <Button text="Save session" appearance="primary" shouldFitContainer isLoading={sending} onClick={() => setSending(true)} />
                 </FooterCells>
             )}
         >

@@ -20,6 +20,16 @@ export const BAR_TOKEN = '--space-300';
 /** Four or fewer steps run across the top; five or more go down the left. */
 export const STEPS_ACROSS_MAX = 4;
 
+/** The Page's reading column, as the Frame caps its header row and content: the bar's actions share its edges. */
+const READING_COLUMN = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    inlineSize: '100%',
+    maxInlineSize: 'var(--content-max-width-reading)',
+    marginInline: 'auto',
+};
+
 export const TASK_STEPS = ['Student', 'Schedule', 'Goals', 'Materials', 'Review'];
 
 /** One step list for the focused type: visited steps come back, the rest wait. */
@@ -77,14 +87,19 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
                     justifyContent: 'space-between',
                     blockSize: `var(${BAR_TOKEN})`,
                     flex: '0 0 auto',
+                    boxSizing: 'border-box',
+                    paddingInline: 'var(--page-pad)',
                     background: 'var(--ds-surface)',
                     borderBlockStart: 'var(--border-default) solid var(--ds-border)',
                 }}
             >
-                <Button text="Cancel" appearance="subtle" onClick={() => {}} />
-                <div style={{ display: 'flex' }}>
-                    <Button text="Back" isDisabled={at === 0} onClick={() => setAt(at - 1)} />
-                    <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => setAt(Math.min(at + 1, labels.length - 1))} />
+                {/* The bar's actions sit on the Page's reading column, the same edges as Close, the title and the body. */}
+                <div data-probe="bar-column" style={READING_COLUMN}>
+                    <Button text="Cancel" appearance="subtle" onClick={() => {}} />
+                    <div style={{ display: 'flex', gap: 'var(--stack-md)' }}>
+                        <Button text="Back" isDisabled={at === 0} onClick={() => setAt(at - 1)} />
+                        <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => setAt(Math.min(at + 1, labels.length - 1))} />
+                    </div>
                 </div>
             </div>
         </div>
