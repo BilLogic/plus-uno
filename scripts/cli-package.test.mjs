@@ -34,9 +34,10 @@ test('package name is held in one constant', () => {
 });
 
 test('the README install lines read the constant', () => {
-  const readme = fs.readFileSync(path.join(PKG, 'README.md'), 'utf8');
-  const named = readme.match(/@plus-uno\/[\w-]+/g) ?? [];
-  assert.ok(named.length > 0 && named.every((n) => n === PACKAGE_NAME), `README names ${[...new Set(named)]}, not only ${PACKAGE_NAME}`);
+  for (const file of [path.join(PKG, 'README.md'), path.join(PKG, '..', '..', 'README.md')]) {
+    const named = fs.readFileSync(file, 'utf8').match(/@plus-uno\/[\w-]+/g) ?? [];
+    assert.ok(named.length > 0 && named.every((n) => n === PACKAGE_NAME), `${file} names ${[...new Set(named)]}, not only ${PACKAGE_NAME}`);
+  }
 });
 
 test('npm pack, install in a scratch project, `npx ds find Button` answers from the snapshot', { timeout: 300_000 }, () => {

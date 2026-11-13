@@ -67,7 +67,7 @@ The designer chooses; UNO routes — no gold-plating past the ask.
 | concept image | spec → GPT / Gemini image gen | `references/deliverables/concept-image.md` |
 | storyboard | spec → sequenced image prompts + captions | `references/deliverables/storyboard.md` |
 | interactive · functional prototype | spec → Claude design / Figma Make / Stitch / v0 / AI Studio | `references/deliverables/interactive.md` |
-| hi-fi build (approved PRD, settled direction) | UNO builds on the DS in `prototypes/` | `references/deliverables/coded-build.md` |
+| hi-fi build (approved PRD, settled direction) | UNO builds on the DS in `prototypes/`, or outside this repo with the `@plus-uno/cli` registry | `references/deliverables/coded-build.md` |
 
 WIP ladder: flow map → ASCII → concept image / storyboard → Figma wireframe →
 interactive → coded build. Each rung optional; WIP artifacts exist to converge

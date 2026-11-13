@@ -79,7 +79,15 @@ Cursor config and key handling: [`docs/connectors/ds-mcp.md`](docs/connectors/ds
 
 **Storybook MCP.** `npm run storybook` also serves the Storybook MCP at `localhost:4200/mcp`, for component docs and story previews ([`docs/connectors/storybook-mcp.md`](docs/connectors/storybook-mcp.md)).
 
-**npm package: not yet.** Installing the design system and the `ds` tools outside this repo is a work in progress. Until then, code in this repo imports from the barrel, `import { Button } from '@/components'`, and other projects use the hosted MCP or Storybook.
+**npm package.** Outside this repo, the design system ships as `@plus-uno/cli` (command `ds`), a registry of copy-in components plus the lookup tools, over a snapshot baked into the package. Code in this repo still imports from the barrel, `import { Button } from '@/components'`.
+
+```bash
+npx @plus-uno/cli find Button      # what exists, and the item to add
+npx @plus-uno/cli add Button       # copy the component, its tokens and styles into your project
+npx @plus-uno/cli check src        # hold your files to the design system
+```
+
+For the MCP server, a config reads `npx -y @plus-uno/cli mcp` (`ds_find`, `ds_get`, `ds_tokens`, `ds_guide`, `ds_check`). Options and exit codes: [`packages/cli/README.md`](packages/cli/README.md); the decision: [ADR-047](docs/adr/047-the-design-system-ships-outside-the-repo.md).
 
 ## uno skills
 
