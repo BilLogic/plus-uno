@@ -72,3 +72,7 @@ define `--color-scrim` may keep the word until token removal is decided.
 ## 2026-11-12 — Figma Core clipping and layout audit
 
 The audit of Figma Core's docs pages (clipping, section hugging, absolute layout, unbound spacing, hand-built blocks) landed with the fix runs. Its one durable lesson, how to run a bulk Figma fix safely (node-count guard, saved before and after shots, per-minute limit), went to `design-system/guidelines/figma/mcp-guide.md` § Bulk fix runs. The findings file stays only as the receipt; the next sweep deletes it.
+
+## 2026-11-13 — touched-file debt at review
+
+`skills/uno-review/references/method.md` now makes recorded escapes in edited files review blockers until the build pays them down. Review still diagnoses; the artifact workflow repairs. Stale examples and the blueprint instance count were corrected at their sources.

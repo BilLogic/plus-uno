@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **125,820 chars from 9 files**, against an assembled budget of 175,500 (49,680 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,436 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **125,839 chars from 9 files**, against an assembled budget of 175,500 (49,661 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,455 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -28,9 +28,9 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 89,004 | — |
 | 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 109,965 | — |
 | 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 113,433 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 119,991 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 124,964 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 125,820 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 120,010 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 124,983 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 125,839 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -1450,7 +1450,7 @@ retriever to a scope. With filters and no `q` it returns the complete matching
 set in structural order — the honest way to say "every exception path" or
 "all of Discovery". `granularity` picks the level: phase, scenario, path,
 step, lane or cell. Every row carries `matched_by` and `total_matched`, so
-answer with the count behind the top-k: "113 cells mention Zoom; here are 15."
+answer with the returned `total_matched` count behind the top-k, and say how many rows are shown.
 Direct selects, embed hints and service-key routes are in
 [`blueprint-direct-access.md`](blueprint-direct-access.md).
 

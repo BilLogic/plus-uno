@@ -4,6 +4,8 @@
 
 A full-height layer on the right with no Backdrop: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame.
 
+Panel is the layout-and-structure component imported from `@/components`; this template page documents its place in the Frame.
+
 **Kind:** Template
 
 **Storybook page:** `design-system/src/patterns/Panel/Panel.mdx`
