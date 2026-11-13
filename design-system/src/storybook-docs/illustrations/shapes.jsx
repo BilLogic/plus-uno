@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { PAINT, HAIRLINE } from './paint.js';
-import { Rect, SkeletonBar } from './primitives.jsx';
+import { HeroGround, Rect, SkeletonBar } from './primitives.jsx';
 import {
   BOX, CENTER, CIRCLES, CONSTRUCTION_RADII, CORNER_CENTERS, DIAGONALS, GRID, MARK_CORNER, PLUS_ARMS, PLUS_BOX, PLUS_CENTER,
 } from '../../assets/Logo/logoConstructionGeometry.js';
@@ -81,6 +81,7 @@ export const Waveform = ({ x, y, w, h, accent = false, n = 20, envelope = chime 
  */
 export const IsoStack = ({ x, y, w, h, accent = false, layers = 3 }) => {
   const [a, b, c, d] = isoMatrix();
+  const planeEdge = useContext(HeroGround) ? PAINT.illustrationEdge : PAINT.axis;
   const size = Math.min(w, h * 1.6) * 0.5;
   const lift = h / (layers + 2);
   const cx = x + w / 2;
@@ -89,7 +90,7 @@ export const IsoStack = ({ x, y, w, h, accent = false, layers = 3 }) => {
     const top = i === layers - 1;
     return (
       <g key={i} transform={`translate(${cx} ${bottom - i * lift}) matrix(${a} ${b} ${c} ${d} 0 0)`}>
-        <Rect x={-size / 2} y={-size / 2} w={size} h={size} fill={PAINT.cardSurface} stroke={PAINT.axis} corner="section" />
+        <Rect x={-size / 2} y={-size / 2} w={size} h={size} fill={PAINT.cardSurface} stroke={planeEdge} corner="section" />
         <SkeletonBar x={-size / 2 + size * 0.14} y={-size / 2 + size * 0.16} w={size * 0.5} h={size * 0.09} heading />
         <SkeletonBar x={-size / 2 + size * 0.14} y={-size / 2 + size * 0.34} w={size * 0.7} h={size * 0.07} />
         {top && accent && (

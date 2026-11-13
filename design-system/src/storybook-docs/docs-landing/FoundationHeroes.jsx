@@ -112,7 +112,7 @@ const Layers = () => (
       w={250}
       h={75}
       fill={PAINT.pageSurface}
-      stroke={PAINT.pageEdge}
+      stroke={PAINT.illustrationEdge}
       corner="section"
     />
     <CardBox x={50} y={55} w={200} h={65} />
@@ -240,7 +240,7 @@ export const IllustrationsHero = () => (
         w={210}
         h={130}
         fill={PAINT.frameSunken}
-        stroke={PAINT.frameDivider}
+        stroke={PAINT.illustrationEdge}
         corner="card"
       />
       <CardBox x={130} y={47} w={90} h={70} accent />
@@ -266,7 +266,7 @@ export const RadiusHero = () => (
       rx={80}
       ry={80}
       fill={PAINT.cardSurface}
-      stroke={PAINT.pageEdge}
+      stroke={PAINT.illustrationEdge}
       style={HAIRLINE}
     />
     <circle
@@ -375,7 +375,7 @@ export const TokensHero = () => (
                 w={w}
                 h={32}
                 fill={PAINT.cardSurface}
-                stroke={PAINT.frameDivider}
+                stroke={PAINT.illustrationEdge}
                 corner="full"
               />
             )}
