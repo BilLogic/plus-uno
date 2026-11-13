@@ -3,6 +3,7 @@
 import { geminiConfigured, geminiGenerate } from "../../gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "../../vertex/claude";
 import { CLAUDE_MODELS } from "../../agent/providers/claude";
+import { GEMINI_TIERS, type ThinkingLevel } from "../../agent/gemini-tiers";
 import { buildSystemBlocks } from "../../agent/skills";
 import { ensureHarnessCache } from "../../gemini/cache";
 import { BUILD } from "../../version";
@@ -29,10 +30,10 @@ export const geminiProbe: ProbeRun = async (env, url) => {
   const result = await geminiGenerate(env, {
     prompt: "Reply with exactly: uno-bot gemini link ok",
     maxTokens: 100,
-    // ?level= too: gemini-3.1-pro rejects MINIMAL outright, so a probe with a
+    // ?level= too: flash and pro reject MINIMAL outright, so a probe with a
     // hardcoded level cannot tell "model absent" from "level unsupported".
-    thinkingLevel: (url.searchParams.get("level") ?? "minimal") as
-      | "minimal" | "low" | "medium" | "high",
+    // Without it, the probe sends what a normal turn sends: the default tier's level.
+    thinkingLevel: (url.searchParams.get("level") ?? GEMINI_TIERS.default.level) as ThinkingLevel,
     ...(probeModel ? { model: probeModel } : {}),
   });
   return { body: { auth: mode, ...result, text: result.text?.slice(0, 100) } };
