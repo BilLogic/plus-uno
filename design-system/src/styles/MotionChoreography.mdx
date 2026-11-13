@@ -6,6 +6,7 @@ import {
     FoundationSubsection,
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
+import { SpringMs } from '@/storybook-docs/illustrations/motion-physics.jsx';
 import * as ChoreographyStories from './MotionChoreography.stories.jsx';
 
 <Meta of={ChoreographyStories} />
@@ -80,7 +81,7 @@ Nothing collides with a neighbor or shares its place mid-move. What leaves fades
 
 <FoundationSubsection title="Clean fades">
 
-The old content is fully gone before the new starts: the new content begins when the old is about 90% out, which is the 90% time of <C>appearance.fast</C> in the Physics table (about 70 ms). A true crossfade is kept for non-text content: an image, the Blanket, content arriving over a Skeleton.
+The old content is fully gone before the new starts: the new content begins when the old is about 90% out, which is the 90% time of <C>appearance.fast</C> in the Physics table (about <SpringMs token="appearance.fast" />). A true crossfade is kept for non-text content: an image, the Blanket, content arriving over a Skeleton.
 
 <Canvas of={ChoreographyStories.CleanFades} sourceState="none" />
 
@@ -195,7 +196,7 @@ Every motion is built from these atoms, each on a family.
         ['Scale and opacity', 'spatial with appearance', 'Modal'],
         ['Reveal from under another element', <C>spatial</C>, 'Breadcrumb row opening above the title'],
         ['Position and opacity', 'spatial with appearance', 'Flag; a milestone settle'],
-        ['Corner radius, moving with size', <C>spatial</C>, 'Drill into and climb back out: corners square off as the row becomes a page'],
+        ['Corner radius, moving with size', <C>spatial</C>, <>Drill into and climb back out (<a href="?path=/docs/foundations-motion-transitions--docs">Transitions</a>): corners square off as the row becomes a page</>],
     ]}
 />
 

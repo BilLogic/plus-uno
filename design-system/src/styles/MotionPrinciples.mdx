@@ -5,7 +5,9 @@ import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
+    DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
+import { SpringMs } from '@/storybook-docs/illustrations/motion-physics.jsx';
 import * as PrinciplesStories from './MotionPrinciples.stories.jsx';
 
 <Meta of={PrinciplesStories} />
@@ -36,7 +38,7 @@ Where it came from, where it went, and where you are now.
 
 <FoundationSubsection title="Always responsive">
 
-Something answers the person at once. The first visible answer to a press, hover or toggle is its color or press state. It starts in the same frame and is 90% done by about 110 ms. A moving part, such as a Toggle's thumb, follows on `spatial.fast`.
+Something answers the person at once. The first visible answer to a press, hover or toggle is its color or press state. It starts in the same frame and is 90% done by about <SpringMs token="appearance.fast" />. A moving part, such as a Toggle's thumb, follows on `spatial.fast`.
 
 Nothing waits for an animation to finish. Any motion can be interrupted mid-way, switched to Reduced mode by the system setting, and paused if it runs longer than 5 s.
 
@@ -72,13 +74,7 @@ Expressive marks the end of something worth finishing, a few times a week at mos
 
 <FoundationSection title="Sound">
 
-Sound is rare and never the only signal.
-
-- No sound for field errors, saves, live counts or anything frequent. A burst of the same sound plays once, never per field or per keystroke.
-- A sound only for a few confirmations and critical errors, matched to how serious they are.
-- Never a negative sound where a student can hear it.
-- Loudness follows importance.
-- Every sound has something on screen that says the same thing, and the person can switch sound off.
+Sound is rare and never the only signal. The rules are on <DocsLink id="foundations-sound-when-to-play">Sound · When to play</DocsLink> and <DocsLink id="foundations-sound-settings-and-accessibility">Settings and accessibility</DocsLink>.
 
 </FoundationSection>
 
@@ -98,6 +94,7 @@ If the answer to the first question is "nothing", leave it out. A new kind of mo
 <FoundationRelated
     items={[
         { title: 'Physics', description: 'The springs these principles are built on, and the token table.', href: '?path=/docs/foundations-motion-physics--docs' },
+        { title: 'Choreography', description: 'Direction, space, order and cause: how several moving parts stay coherent.', href: '?path=/docs/foundations-motion-choreography--docs' },
         { title: 'Transitions', description: 'The fourteen transitions, picked by the relationship between two screens.', href: '?path=/docs/foundations-motion-transitions--docs' },
     ]}
 />

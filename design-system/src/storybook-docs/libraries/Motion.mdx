@@ -5,20 +5,20 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 
 <FoundationHero
     title="Motion"
-    summary="Components animate with CSS that reads the motion tokens. No component imports an animation library."
+    summary="Components animate with CSS that reads the motion tokens. One component, Flag, also uses the motion package for its entrance and exit."
 />
 
 <FoundationContents />
 
 <FoundationSection title="What it is for">
 
-PLUS motion is springs on four tiers, written once in the token ladder as `--ds-motion-*` semantics. A component names a spatial or appearance token and its duration and adds nothing else. Under reduced motion every spatial token becomes a fade, so a component needs no branch of its own. The values and when to use each are on <DocsLink id="foundations-motion-physics">Physics</DocsLink>.
+PLUS motion is springs in three families (spatial, appearance and linear) plus a loop, written once in the token ladder as `--ds-motion-*` semantics. A component names a spatial or appearance token and its duration and adds nothing else. Under reduced motion every spatial token becomes a fade, so a component needs no branch of its own. The values and when to use each are on <DocsLink id="foundations-motion-physics">Physics</DocsLink>.
 
 </FoundationSection>
 
 <FoundationSection title="What wraps it">
 
-Components that appear and disappear, such as <DocsLink id="components-overlays-and-layering-popup">Popup</DocsLink> and <DocsLink id="components-messaging-modal-dialog">Modal dialog</DocsLink>, transition on the `data-starting-style` and `data-ending-style` attributes that <DocsLink id="libraries-base-ui">Base UI</DocsLink> sets, using the tokens. The `motion` package drives only the Storybook illustrations, and drag uses Pragmatic drag and drop. No component imports a JavaScript animation library. Which token each component takes is on <DocsLink id="foundations-motion-library">Motion · Library</DocsLink>.
+Components that appear and disappear, such as <DocsLink id="components-overlays-and-layering-popup">Popup</DocsLink> and <DocsLink id="components-messaging-modal-dialog">Modal dialog</DocsLink>, transition on the `data-starting-style` and `data-ending-style` attributes that <DocsLink id="libraries-base-ui">Base UI</DocsLink> sets, using the tokens. The `motion` package drives the Storybook illustrations and one component, <DocsLink id="components-messaging-flag">Flag</DocsLink>, whose entrance and exit need an interruptible JavaScript spring; drag uses Pragmatic drag and drop. No other component imports a JavaScript animation library. Which token each component takes is on <DocsLink id="foundations-motion-library">Motion · Library</DocsLink>.
 
 </FoundationSection>
 
