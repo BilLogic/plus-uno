@@ -21,8 +21,8 @@ const OVERVIEW_ID = 'patterns-overview--docs';
 const PATTERNS = Object.keys(docsIndex(ROOT)).filter((id) => id.startsWith('patterns-') && id !== OVERVIEW_ID);
 const STATES = ['empty', 'loading', 'errors', 'overflow', 'disabled', 'read-only'].map((s) => `patterns-states-${s}--docs`);
 
-const LINK = /path=\/docs\/([a-z0-9-]+--docs)|<DocsLink id="([a-z0-9-]+)"|<TypeCard\b[^>]*?\bto="([a-z0-9-]+)"/g;
-const linksIn = (text) => [...text.matchAll(LINK)].map((m) => m[1] ?? `${m[2] ?? m[3]}--docs`);
+const LINK = /path=\/docs\/([a-z0-9-]+--docs)|<DocsLink id="([a-z0-9-]+)"|<TypeCard\b[^>]*?\bto="([a-z0-9-]+)"|<ThumbTile\b[^>]*?\bhero="([a-z0-9-]+)"/g;
+const linksIn = (text) => [...text.matchAll(LINK)].map((m) => m[1] ?? `${m[2] ?? m[3] ?? m[4]}--docs`);
 
 /** The text of one `<FoundationSection title="…">`. */
 const section = (source, title) => {
@@ -41,9 +41,9 @@ const templates = readFileSync(resolve(DOCS, 'templates/TemplatesOverview.mdx'),
 describe('the Patterns overview', () => {
     it('finds the thirteen pattern pages', () => expect(PATTERNS).toHaveLength(13));
 
-    it('links each pattern from exactly one card', () => {
-        const cards = section(patterns, 'The patterns').match(/<TypeCard[\s\S]*?<\/TypeCard>/g) ?? [];
-        expect(cards, 'seven page cards and the States group card').toHaveLength(8);
+    it('links each pattern from exactly one thumbnail', () => {
+        const cards = section(patterns, 'The patterns').match(/<ThumbTile[\s\S]*?<\/ThumbTile>/g) ?? [];
+        expect(cards, 'one thumbnail per pattern page').toHaveLength(13);
         const linked = cards.flatMap(linksIn);
         expect([...linked].sort()).toEqual([...PATTERNS].sort());
     });

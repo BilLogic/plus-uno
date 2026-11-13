@@ -12,14 +12,19 @@ Code-free guidance for a situation, shown on templates used as they are or tweak
 
 Seven pages and one group of six States pages. Each pattern is one page: its situations first, then the key cases drawn on templates, then the usage spine. Reach for one when you are unsure of a choice or challenging it; Templates and patterns says how the layers fit together.
 
-- **Common actions.** Which button, in which look, in which place, with which word, and acting on many rows at once.
-- **Forms.** How a form takes and checks what someone types, and what happens on leaving with edits.
-- **Filtering.** How a person narrows a collection to the rows that matter, in five tiers.
 - **Navigation.** How a person moves between areas, views and records, with one control and one motion per move.
+- **Common actions.** Which button, in which look, in which place, with which word, and acting on many rows at once.
+- **Filtering.** How a person narrows a collection to the rows that matter, in five tiers.
+- **Forms.** How a form takes and checks what someone types, and what happens on leaving with edits.
 - **Search.** How a person finds a record by typing, in one of three modes.
 - **Indicators.** The small labels that say how something is: its state, how many, how much it moved.
 - **Notifications.** What the product says back, and where: a Flag, a Banner, a SectionMessage, the Inbox.
-- **States.** What a view shows when it has nothing, is still working, has failed, has too much, or cannot be changed right now. Empty · Loading · Errors · Overflow · Disabled · Read-only
+- **States · Empty.** What a view shows when it has nothing to show.
+- **States · Overflow.** What happens when text or a list is longer than its room: titles wrap, cells truncate, lists fold, tables page.
+- **States · Loading.** What to show while PLUS fetches or saves something.
+- **States · Errors.** Where a failure shows and what it says.
+- **States · Disabled.** When a control cannot be used yet, or by this person.
+- **States · Read-only.** A value someone could change but this person cannot right now.
 
 ## Which pattern for which situation
 

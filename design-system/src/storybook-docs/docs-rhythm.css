@@ -261,6 +261,8 @@
     container-type: inline-size;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* Dense: a one-cell tile fills the cell a wide tile leaves, so the source stays in page order. */
+    grid-auto-flow: dense;
     column-gap: var(--section-stack-md);
     row-gap: var(--card-stack-md);
 }

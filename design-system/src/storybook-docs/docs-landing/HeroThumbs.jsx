@@ -13,7 +13,9 @@ import { HeroFit } from './HeroDrawing.jsx';
  *
  * Layout lives in `docs-rhythm.css` (`.sb-docs-thumbs`): every picture is at
  * least one cell's 8:5 tall, so the cells of one row line up and a tall tile
- * grows to fill its two rows. In a narrow column the grid is one column.
+ * grows to fill its two rows. The grid packs densely, so tiles stay in page
+ * order in the source and a one-cell tile fills the cell a wide one leaves. In
+ * a narrow column the grid is one column.
  */
 export const ThumbGrid = ({ children }) => <div className="sb-docs-thumbs not-prose">{children}</div>;
 
