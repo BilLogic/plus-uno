@@ -116,7 +116,7 @@ TypeCard.propTypes = {
     title: PropTypes.string.isRequired,
     /** The width the story lays out at, when the type needs more than the shared stage (a Frame docks its Sidebar from 1024 of its own width, inside the window's border). */
     stage: PropTypes.number,
-    /** A docs id (`templates-frame-frame`): the title links to that page. */
+    /** A docs id (`templates-frame`): the title links to that page. */
     to: PropTypes.string,
     /** A CSS aspect ratio (`16 / 10`) that crops every thumbnail to one height. */
     thumbRatio: PropTypes.string,

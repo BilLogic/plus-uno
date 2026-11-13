@@ -204,7 +204,7 @@ test('Templates and Patterns sit above Components, Templates first, and there is
 
 test('a template page and a pattern page in their own roots are green', () => {
   const root = fixture({
-    'design-system/src/patterns/Frame/Frame.stories.jsx': story('Templates/Frame/Frame'),
+    'design-system/src/patterns/Frame/Frame.stories.jsx': story('Templates/Frame'),
     'design-system/src/storybook-docs/templates/Overview.mdx': '<Meta title="Templates/Overview" />\n',
     'design-system/src/storybook-docs/patterns/Overview.mdx': '<Meta title="Patterns/Overview" />\n',
   });

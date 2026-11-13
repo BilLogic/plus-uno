@@ -56,4 +56,29 @@
     opacity: 0 !important;
     pointer-events: none !important;
   }
+
+  /*
+   * Storybook pads a leaf row for its TypeIcon (14) as well as its depth. The icon is
+   * out of layout above, so a leaf under a folder sat 14 right of where its depth puts
+   * it, deeper than the folder rows beside it. Pull its content back by the icon's
+   * width. A leaf straight under a top-level section keeps the gap: it already reads
+   * as a child of the section label. Those sections are listed by id, so a new
+   * top-level section with its own pages joins the list.
+   */
+  .sidebar-container .sidebar-item[data-nodetype='document']:not(
+      :is(
+        [data-parent-id='get-started'],
+        [data-parent-id='foundations'],
+        [data-parent-id='components'],
+        [data-parent-id='patterns'],
+        [data-parent-id='templates'],
+        [data-parent-id='ai-ui'],
+        [data-parent-id='data-visualizations'],
+        [data-parent-id='libraries']
+      )
+    )
+    > a
+    > div:first-child {
+    margin-left: -14px;
+  }
 </style>

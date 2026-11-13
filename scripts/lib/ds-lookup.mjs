@@ -185,9 +185,10 @@ export class PathsRefused extends Error {
 
 /**
  * `readPaths: false` is the hosted server's; `aliases: false` zeroes the alias field (the retrieval bench's second arm);
+ * `consumerRoot` is where `check` reads `paths` from when that is not the facts' tree (the packaged `ds check` reads the caller's project);
  * `iconMetadata` stands in for the committed Free icon lists (the `icons.json` shape), for a test that needs a small set.
  */
-export function createLookup(root, { readPaths = true, aliases = true, iconMetadata = null } = {}) {
+export function createLookup(root, { readPaths = true, aliases = true, iconMetadata = null, consumerRoot = root } = {}) {
   const facts = loadFacts(root);
   const registry = JSON.parse(readIf(path.join(root, 'design-system/figma/component-registry.json')) ?? '{"components":{},"patterns":{}}');
   const records = facts.manifests.components.components;
@@ -597,11 +598,14 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
 
   function check({ code, path: file, paths } = {}) {
     let found;
+    let checked = null;
     if (typeof code === 'string' && code.trim()) {
       found = escapesIn({ path: file ?? 'prototypes/snippet.jsx', text: code }, contextOf(root));
-    } else if (paths?.length) {
+    } else if (paths?.length || consumerRoot !== root) {
       if (!readPaths) throw new PathsRefused();
-      found = escapes(root, expandPaths(root, paths));
+      const files = expandPaths(consumerRoot, paths?.length ? paths : ['.']);
+      checked = files.length;
+      found = escapes(consumerRoot, files, root);
     } else {
       return { findings: [], next: 'Pass code (with a file name for its language) or paths.' };
     }
@@ -610,6 +614,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     return {
       findings,
       failing,
+      ...(checked === null ? {} : { checked }),
       next: failing
         ? 'Fix each finding as its fix says; ds_guide(<rule>) explains a rule. Then ds_check again.'
         : findings.length

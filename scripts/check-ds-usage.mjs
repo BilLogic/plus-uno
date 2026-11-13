@@ -191,9 +191,13 @@ function entriesBeside(repoRoot, files) {
   return [...entries].map((rel) => read(repoRoot, rel));
 }
 
-/** Every escape in the files, fail and warn. */
-export function escapes(repoRoot, files) {
-  const ctx = contextOf(repoRoot);
+/**
+ * Every escape in the files, fail and warn. `factsRoot` is where the design-system facts live when
+ * that is not `repoRoot`: the packaged `ds check` reads the consumer's files from their project
+ * and the facts from its baked snapshot.
+ */
+export function escapes(repoRoot, files, factsRoot = repoRoot) {
+  const ctx = contextOf(factsRoot);
   const texts = files.map((rel) => read(repoRoot, rel));
   const pages = pagesOf([...texts, ...entriesBeside(repoRoot, files)]);
   return texts.flatMap((file) => escapesIn({ ...file, page: pages.has(file.path) }, ctx));

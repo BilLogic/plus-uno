@@ -1,11 +1,12 @@
 {
   "name": "@plus-uno/cli",
   "version": "0.0.0",
-  "description": "The PLUS design system from a shell: find, get, tokens and guide over a baked snapshot.",
+  "description": "The PLUS design system from a shell: find, get, tokens and guide over a baked snapshot, and `ds mcp`, the same lookup as a stdio MCP server.",
   "type": "module",
   "license": "ISC",
   "bin": { "ds": "bin/ds.mjs" },
   "files": ["bin", "dist", "src"],
+  "dependencies": { "@modelcontextprotocol/sdk": "1.32.2" },
   "engines": { "node": ">=22" },
   "publishConfig": { "access": "public", "provenance": true },
   "scripts": { "prepack": "node ../../scripts/build-cli-package.mjs" }
