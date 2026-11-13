@@ -14,7 +14,7 @@ Also asked as: percent complete, determinate loading.
 
 **Storybook page:** `design-system/src/components/loading/ProgressBar/ProgressBar.mdx`
 
-**Motion:** change `linear` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

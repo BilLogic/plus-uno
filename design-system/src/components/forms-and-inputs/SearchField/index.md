@@ -12,7 +12,7 @@ Search field: find a record by typing. It is a TextField with a search icon befo
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.mdx`
 
-**Motion:** enter `spatial.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

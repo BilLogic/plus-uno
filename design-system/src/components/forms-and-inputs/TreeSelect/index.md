@@ -12,7 +12,7 @@ TreeSelect: a field that picks from options that nest, at any level of the tree.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

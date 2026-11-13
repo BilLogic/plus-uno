@@ -12,7 +12,7 @@ Link: an inline navigation anchor.
 
 **Storybook page:** `design-system/src/components/navigation/Link/Link.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

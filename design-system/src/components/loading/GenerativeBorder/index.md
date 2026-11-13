@@ -12,7 +12,7 @@ The border that shows the AI is generating content: a 2px rounded stroke in two 
 
 **Storybook page:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.mdx`
 
-**Motion:** change `linear` · pulse `loop`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear` · pulse `loop`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

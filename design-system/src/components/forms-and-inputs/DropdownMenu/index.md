@@ -14,7 +14,7 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

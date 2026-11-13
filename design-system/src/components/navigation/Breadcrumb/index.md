@@ -14,7 +14,7 @@ Also asked as: path, navigation trail.
 
 **Storybook page:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.mdx`
 
-**Motion:** enter `spatial.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

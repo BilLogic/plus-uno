@@ -14,7 +14,7 @@ Also asked as: multi-select, checklist, tick box.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx`
 
-**Motion:** change `appearance.fast` · goal `appearance.fast`, sound `sound.goal`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · goal `appearance.fast`, sound `sound.goal`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

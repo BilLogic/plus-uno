@@ -14,7 +14,7 @@ Also asked as: attach file, dropzone, drag and drop file.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.mdx`
 
-**Motion:** change `appearance.fast` · progress `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · progress `linear`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

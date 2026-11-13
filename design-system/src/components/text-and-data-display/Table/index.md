@@ -12,7 +12,7 @@ Also asked as: rows and columns, grid.
 
 **Storybook page:** `design-system/src/components/text-and-data-display/Table/StaticTable.mdx`
 
-**Motion:** change `spatial.fast` + `appearance.fast` · roster `spatial.fast` + `appearance.fast`, sound `sound.roster`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast` + `appearance.fast` · roster `spatial.fast` + `appearance.fast`, sound `sound.roster`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

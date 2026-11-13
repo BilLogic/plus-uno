@@ -14,7 +14,7 @@ Also asked as: loading, busy indicator, wait indicator, loading indicator.
 
 **Storybook page:** `design-system/src/components/loading/Spinner/Spinner.mdx`
 
-**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

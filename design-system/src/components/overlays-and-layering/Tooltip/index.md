@@ -14,7 +14,7 @@ Also asked as: hover hint, hover text.
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx`
 
-**Motion:** enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

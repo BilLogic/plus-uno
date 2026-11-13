@@ -14,7 +14,7 @@ Also asked as: multi-line, multiline text, long text input, notes field, comment
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.mdx`
 
-**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

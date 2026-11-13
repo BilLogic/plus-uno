@@ -14,7 +14,7 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Storybook page:** `design-system/src/components/navigation/Tabs/Tabs.mdx`
 
-**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

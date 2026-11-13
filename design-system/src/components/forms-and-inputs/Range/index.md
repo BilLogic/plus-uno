@@ -14,7 +14,7 @@ Also asked as: slider, range slider.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Range/Range.mdx`
 
-**Motion:** change `spatial.fast` + `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast` + `linear`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

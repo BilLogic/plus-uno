@@ -12,7 +12,7 @@ Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

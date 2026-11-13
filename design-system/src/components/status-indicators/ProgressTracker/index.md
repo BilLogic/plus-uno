@@ -14,7 +14,7 @@ Also asked as: steps, stepper, wizard, multi-step, checkout steps.
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.mdx`
 
-**Motion:** change `appearance.fast` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

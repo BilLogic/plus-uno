@@ -14,7 +14,7 @@ Also asked as: paging, pager, next page, page numbers.
 
 **Storybook page:** `design-system/src/components/navigation/Pagination/Pagination.mdx`
 
-**Motion:** change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

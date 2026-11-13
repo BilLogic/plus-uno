@@ -14,7 +14,7 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 **Storybook page:** `design-system/src/patterns/PatternTable/PatternTable.mdx`
 
-**Motion:** selection `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** selection `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

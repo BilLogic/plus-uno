@@ -12,7 +12,7 @@ An assistant reply, marked as AI by the small AI icon at its start (named "AI" f
 
 **Storybook page:** `design-system/src/components/labels/AiMessage/AiMessage.mdx`
 
-**Motion:** change `appearance.fast` · ready `appearance.fast`, sound `sound.ai.ready` · strong `appearance.fast`, sound `sound.ai.strong` · refine `appearance.fast`, sound `sound.ai.refine`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · ready `appearance.fast`, sound `sound.ai.ready` · strong `appearance.fast`, sound `sound.ai.strong` · refine `appearance.fast`, sound `sound.ai.refine`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

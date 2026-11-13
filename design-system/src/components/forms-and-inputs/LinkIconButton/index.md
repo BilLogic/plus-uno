@@ -12,7 +12,7 @@ Link icon button: an icon that navigates. It renders an anchor with an accessibl
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/LinkIconButton/LinkIconButton.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

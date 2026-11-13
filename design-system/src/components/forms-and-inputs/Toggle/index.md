@@ -14,7 +14,7 @@ Also asked as: enable disable, on/off setting.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx`
 
-**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

@@ -265,7 +265,7 @@ test('the illustration kit is a Get started page, not a Templates source', () =>
   assert.equal(docsTitle(mdx), 'Get started/Illustration kit');
 });
 
-/** Lists the Foundations · Motion pages in the fixture's sidebar sort. */
+/** Lists the Foundations › Expression › Motion pages in the fixture's sidebar sort. */
 function listMotion(root, entries) {
   const file = path.join(root, 'storybook.taxonomy.json');
   const taxonomy = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -277,31 +277,31 @@ const motionPage = (name) => `<Meta title="Foundations/Expression/Motion/${name}
 const motionFiles = (...names) =>
   Object.fromEntries(names.map((n) => [`design-system/src/styles/Motion${n.replace(/ /g, '')}.mdx`, motionPage(n)]));
 
-test('Foundations · Motion pages that the sort lists, Library among them, are green', () => {
+test('Foundations › Expression › Motion pages that the sort lists, Library among them, are green', () => {
   const root = fixture(motionFiles('Physics', 'Library'));
   listMotion(root, ['Physics', 'Library']);
   assert.deepEqual(messages(root), []);
 });
 
-test('a Foundations · Motion page the sort does not list goes red', () => {
+test('a Foundations › Expression › Motion page the sort does not list goes red', () => {
   const root = fixture(motionFiles('Physics', 'Library', 'Durations and easings'));
   listMotion(root, ['Physics', 'Library']);
   assert.match(messages(root).join('\n'), /Durations and easings/);
 });
 
-test('a Foundations · Motion entry in the sort with no page, Library included, goes red', () => {
+test('a Foundations › Expression › Motion entry in the sort with no page, Library included, goes red', () => {
   const root = fixture(motionFiles('Physics'));
   listMotion(root, ['Physics', 'Library']);
   assert.match(messages(root).join('\n'), /Library/);
 });
 
-test('a Foundations · Motion list without Library goes red', () => {
+test('a Foundations › Expression › Motion list without Library goes red', () => {
   const root = fixture(motionFiles('Physics'));
   listMotion(root, ['Physics']);
   assert.match(messages(root).join('\n'), /Library/);
 });
 
-// ── Foundations · Sound ──
+// ── Foundations › Expression › Sound ──
 
 const soundFiles = (...names) =>
   Object.fromEntries(names.map((n) => [`design-system/src/styles/Sound${n.replace(/ /g, '')}.mdx`, `<Meta title="Foundations/Expression/Sound/${n}" />\n`]));
@@ -313,19 +313,19 @@ function listSound(root, entries) {
   fs.writeFileSync(file, JSON.stringify(taxonomy));
 }
 
-test('Foundations · Sound pages that the sort lists are green', () => {
+test('Foundations › Expression › Sound pages that the sort lists are green', () => {
   const root = fixture(soundFiles('Overview', 'With motion'));
   listSound(root, ['Overview', 'With motion']);
   assert.deepEqual(messages(root), []);
 });
 
-test('a Foundations · Sound page the sort does not list goes red', () => {
+test('a Foundations › Expression › Sound page the sort does not list goes red', () => {
   const root = fixture(soundFiles('Overview', 'Extra'));
   listSound(root, ['Overview']);
-  assert.match(messages(root).join('\n'), /a Foundations · Sound page the sidebar sort does not list/);
+  assert.match(messages(root).join('\n'), /a Foundations › Expression › Sound page the sidebar sort does not list/);
 });
 
-test('a Foundations · Sound entry in the sort with no page goes red', () => {
+test('a Foundations › Expression › Sound entry in the sort with no page goes red', () => {
   const root = fixture(soundFiles('Overview'));
   listSound(root, ['Overview', 'Sounds']);
   assert.match(messages(root).join('\n'), /Foundations > Expression > Sound lists "Sounds", but no page is titled Foundations\/Expression\/Sound\/Sounds/);

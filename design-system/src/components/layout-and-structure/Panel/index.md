@@ -16,7 +16,7 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Panel/Panel.mdx`
 
-**Motion:** enter `spatial.slow` · exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.slow` · exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

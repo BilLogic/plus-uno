@@ -37,11 +37,11 @@
  *      Templates and Patterns: a page titled under one of those roots sits in
  *      one of that root's sources, and a page in one of a root's sources is
  *      titled under that root.
- *   9. Foundations · Motion is exactly the pages the sidebar sort lists under
+ *   9. Foundations › Expression › Motion is exactly the pages the sidebar sort lists under
  *      Foundations > Expression > Motion, Library among them: a page titled
  *      `Foundations/Expression/Motion/<name>` is listed, and a listed name has a page.
  *      This is where the first-pass "Durations and easings" page was caught.
- *      Foundations · Sound follows the same rule, with no required Library page.
+ *      Foundations › Expression › Sound follows the same rule, with no required Library page.
  *
  * An AI component (Icon, Prompt input) is listed in the taxonomy's
  * `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays
@@ -132,11 +132,11 @@ export function docsTitle(src) {
 const sortRoots = (taxonomy) =>
   (taxonomy.storySortOrder ?? []).filter((e) => typeof e === 'string' && e !== '*');
 
-/** Where Foundations · Motion pages live, and the page the component docs link to. */
+/** Where Foundations › Expression › Motion pages live, and the page the component docs link to. */
 export const MOTION_ROOT = 'Foundations/Expression/Motion';
 export const MOTION_LIBRARY = 'Library';
 
-/** Where Foundations · Sound pages live. */
+/** Where Foundations › Expression › Sound pages live. */
 export const SOUND_ROOT = 'Foundations/Expression/Sound';
 
 /** The Foundations > Expression > `name` entries of the sidebar sort, or null when it lists none. */
@@ -296,7 +296,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     }
   }
 
-  // (9) Foundations · Motion and Foundations · Sound: the listed pages, and no others.
+  // (9) Foundations › Expression › Motion and Foundations › Expression › Sound: the listed pages, and no others.
   const listed = (name, rootPath) => {
     const entries = sortFoundation(taxonomy, name);
     if (!entries) return;
@@ -307,7 +307,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       if (!title?.startsWith(`${rootPath}/`)) continue;
       if (!entries.includes(title.split('/')[3])) {
         found.push(
-          `${rel}  is titled "${title}", a Foundations · ${name} page the sidebar sort does not list.\n` +
+          `${rel}  is titled "${title}", a Foundations › Expression › ${name} page the sidebar sort does not list.\n` +
             `      -> List it under Foundations > Expression > ${name} in storybook.taxonomy.json, or delete the page.`,
         );
       }

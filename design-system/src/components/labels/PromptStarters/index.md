@@ -12,7 +12,7 @@ A few things a person could ask the AI, as a wrapping row of prompt `Suggestion`
 
 **Storybook page:** `design-system/src/components/labels/PromptStarters/PromptStarters.mdx`
 
-**Motion:** enter `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

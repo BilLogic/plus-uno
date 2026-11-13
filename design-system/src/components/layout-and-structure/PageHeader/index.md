@@ -14,7 +14,7 @@ Also asked as: heading with buttons, header actions, page heading.
 
 **Storybook page:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.mdx`
 
-**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
