@@ -70,26 +70,26 @@ export default {
 const sampleItems = [
     {
         eventKey: '0',
-        header: 'Accordion Item #1',
-        body: 'This is the first accordion item\'s content. It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element.'
+        header: 'Session notes',
+        body: 'Worked through two-step equations. Maya explained each step back before moving on.'
     },
     {
         eventKey: '1',
-        header: 'Accordion Item #2',
-        body: 'This is the second accordion item\'s content. Clicking on the header will toggle its visibility.'
+        header: 'Goals',
+        body: 'Solve multi-step equations without a worked example by the end of the month.'
     },
     {
         eventKey: '2',
-        header: 'Accordion Item #3',
-        body: 'This is the third accordion item\'s content. You can have as many items as needed.'
+        header: 'Progress',
+        body: 'Three of four practice sets finished, up from one last week.'
     }
 ];
 
 // A second header set for any demo that sits open on the same page as
 // another open accordion — a panel's accessible name is its own header, so
-// two open panels literally titled "Accordion Item #1" collide under the
+// two open panels both titled "Session notes" collide under the
 // a11y "landmark-unique" rule even though they belong to different accordions.
-const flushSampleItems = sampleItems.map((item) => ({ ...item, header: `Flush ${item.header}` }));
+const flushSampleItems = sampleItems.map((item) => ({ ...item, header: `${item.header} (flush)` }));
 
 const accordionPage = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' };
 
@@ -97,14 +97,12 @@ function AccordionVariantsDemos() {
     return (
         <>
             <section>
-                <DemoLabel>DEFAULT ACCORDION</DemoLabel>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                     Standard accordion with borders and one item open at a time.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey="0" />
             </section>
             <section>
-                <DemoLabel>FLUSH ACCORDION</DemoLabel>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                     Borderless accordion for seamless integration with surrounding content.
                 </p>

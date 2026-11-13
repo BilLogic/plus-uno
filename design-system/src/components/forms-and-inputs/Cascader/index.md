@@ -17,7 +17,7 @@ Cascader: a field that picks one path through nested options, one level at a tim
 ## Usage
 
 Use `Cascader` when a choice is naturally made one level at a time, in
-sequence — a region, then a city, then a neighborhood. For a hierarchy where
+sequence — a district, then a school, then a grade. For a hierarchy where
 someone might pick or see several nodes at once rather than one path, use
 `TreeSelect` instead. For a flat list, use `Select`.
 
@@ -110,9 +110,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid
 
 | Do | Don't |
 | --- | --- |
-| Name each level by what it is: "Region", "City". | Names that only make sense at one level. |
+| Name each level by what it is: "District", "School". | Names that only make sense at one level. |
 | Keep each level's options short and parallel. | Mixed kinds of option in one column. |
-| Say what to do in an error: "Pick a region". | "Required" or "Invalid". |
+| Say what to do in an error: "Pick a location". | "Required" or "Invalid". |
 | Label the field with the whole path's subject: "Location". | A label for just the first level. |
 
 ## Props

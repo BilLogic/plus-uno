@@ -121,77 +121,6 @@ export function ResourcesCard({ href, icon, title }) {
 }
 
 /**
- * Build a Figma node URL from a file key + node id (e.g. "33:2470" → node-id=33-2470).
- * Falls back to a provided explicit url when available.
- */
-function figmaNodeUrl({ url, fileKey, componentSetNodeId, nodeId }) {
-    if (url) return url;
-    const node = componentSetNodeId || nodeId;
-    if (!fileKey || !node) return null;
-    return `https://www.figma.com/design/${fileKey}/?node-id=${String(node).replace(':', '-')}`;
-}
-
-/**
- * Pick the rows worth showing in the Figma nodes table.
- * Drops the generic "storybook-resources" docs-page entry when real component
- * sets (variants/styles) exist; otherwise keeps the single available entry.
- */
-function figmaVariantRows(sets) {
-    if (!Array.isArray(sets) || sets.length === 0) return [];
-    const variants = sets.filter((set) => set && set.id !== 'storybook-resources');
-    return variants.length ? variants : sets;
-}
-
-/**
- * Maps each Figma component set (style/variant) of a component to its node id + link.
- * Sourced from the component MDX `figmaMeta.sets`.
- */
-export function FigmaNodesTable({ sets, fileKey }) {
-    const rows = figmaVariantRows(sets);
-    if (rows.length === 0) return null;
-
-    return (
-        <div className="sb-ds-figma-nodes not-prose">
-            <div className="sb-ds-figma-nodes__label">Figma nodes</div>
-            <DocsTable>
-                <thead>
-                    <tr>
-                        <th>Style / variant</th>
-                        <th>Node ID</th>
-                        <th>Figma link</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows.map((set, index) => {
-                        const nodeId = set.componentSetNodeId || set.nodeId || '—';
-                        const href = figmaNodeUrl({
-                            url: set.url,
-                            fileKey: set.fileKey || fileKey,
-                            componentSetNodeId: set.componentSetNodeId,
-                            nodeId: set.nodeId,
-                        });
-                        return (
-                            <tr key={set.id || nodeId || index}>
-                                <td>{set.name || set.id || '—'}</td>
-                                <td><code>{nodeId}</code></td>
-                                <td>
-                                    {href ? (
-                                        <a href={href} target="_blank" rel="noreferrer noopener">
-                                            Open in Figma{' '}
-                                            <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
-                                        </a>
-                                    ) : '—'}
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </DocsTable>
-        </div>
-    );
-}
-
-/**
  * Catalog / states table for MDX inside `.not-prose` wrappers.
  * Prefer this over Markdown pipe tables — those do not style under `not-prose` and look malformed.
  *
@@ -212,12 +141,9 @@ export function DocsTable({ children, className = '' }) {
  * Design + repo links above the docs body.
  * Figma: specs and tokens. GitHub: full source tree, history, and PR context — unlike the Overview code snippet,
  * which is usually a curated web-app/JSP-style excerpt, not the whole React implementation.
- *
- * When `sets` is provided (a component's `figmaMeta.sets`), a table mapping each
- * style/variant to its Figma node id + link is rendered below the resource cards.
  */
-export function ResourcesBlock({ figmaLink, githubLink, sets, figmaFileKey }) {
-    if (!figmaLink && !githubLink && (!sets || sets.length === 0)) return null;
+export function ResourcesBlock({ figmaLink, githubLink }) {
+    if (!figmaLink && !githubLink) return null;
     return (
         <div className="sb-ds-resources sb-docs-section">
             <h2>Resources</h2>
@@ -237,7 +163,6 @@ export function ResourcesBlock({ figmaLink, githubLink, sets, figmaFileKey }) {
                     />
                 )}
             </div>
-            <FigmaNodesTable sets={sets} fileKey={figmaFileKey} />
         </div>
     );
 }
