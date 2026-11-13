@@ -11,7 +11,7 @@ import { pair } from './motion.jsx';
 import { ABOVE_DEMOS, FEEDBACK_DEMOS, WITHIN_DEMOS } from './motion-transitions-place.jsx';
 
 /**
- * The Transitions page's figures (Foundations/Motion/Transitions), Between places.
+ * The Transitions page's figures (Foundations/Expression/Motion/Transitions), Between places.
  * Each transition is structure across screens, so it is blocked out in kit shapes
  * with no words; Step draws the kit's ProgressTracker. Every scene lands at
  * `landing`; the stories assert it. A Don't is the same scene with one rule broken.

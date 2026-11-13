@@ -127,8 +127,8 @@ test('a MotionSection naming a row the registry lacks fails the render', () => {
 
 // ── Foundations · Motion through get-documentation ──
 
-const MOTION_MDX = (name) => `import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title="Foundations/Motion/${name}" tags={['!dev', 'manifest']} />\n\n# ${name}\n`;
-const MOTION_STORIES = (name, tags) => `export default {\n    title: 'Foundations/Motion/${name}',\n    tags: [${tags}],\n};\n`;
+const MOTION_MDX = (name) => `import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title="Foundations/Expression/Motion/${name}" tags={['!dev', 'manifest']} />\n\n# ${name}\n`;
+const MOTION_STORIES = (name, tags) => `export default {\n    title: 'Foundations/Expression/Motion/${name}',\n    tags: [${tags}],\n};\n`;
 
 test('a Foundations · Motion page without the manifest tag is named, whether its Meta or its stories file carries the title', () => {
   const root = fixture({

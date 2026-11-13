@@ -13,7 +13,7 @@ import { story } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
 import { TRANSITION_DEMOS } from '@/storybook-docs/illustrations/motion-transitions.jsx';
 
 export default {
-  title: 'Foundations/Motion/Engine speed',
+  title: 'Foundations/Expression/Motion/Engine speed',
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };

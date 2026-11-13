@@ -273,7 +273,7 @@ function listMotion(root, entries) {
   taxonomy.storySortOrder.splice(1, 1);
   fs.writeFileSync(file, JSON.stringify(taxonomy));
 }
-const motionPage = (name) => `<Meta title="Foundations/Motion/${name}" />\n`;
+const motionPage = (name) => `<Meta title="Foundations/Expression/Motion/${name}" />\n`;
 const motionFiles = (...names) =>
   Object.fromEntries(names.map((n) => [`design-system/src/styles/Motion${n.replace(/ /g, '')}.mdx`, motionPage(n)]));
 
@@ -304,7 +304,7 @@ test('a Foundations · Motion list without Library goes red', () => {
 // ── Foundations · Sound ──
 
 const soundFiles = (...names) =>
-  Object.fromEntries(names.map((n) => [`design-system/src/styles/Sound${n.replace(/ /g, '')}.mdx`, `<Meta title="Foundations/Sound/${n}" />\n`]));
+  Object.fromEntries(names.map((n) => [`design-system/src/styles/Sound${n.replace(/ /g, '')}.mdx`, `<Meta title="Foundations/Expression/Sound/${n}" />\n`]));
 function listSound(root, entries) {
   const file = path.join(root, 'storybook.taxonomy.json');
   const taxonomy = JSON.parse(fs.readFileSync(file, 'utf8'));

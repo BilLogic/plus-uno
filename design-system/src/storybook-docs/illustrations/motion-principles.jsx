@@ -7,7 +7,7 @@ import { Clip, VIEW, mix } from './motion-parts.jsx';
 import { drillScene } from './motion-transitions.jsx';
 
 /**
- * The Principles page's Do/Don't pairs (Foundations/Motion/Principles). Each pair
+ * The Principles page's Do/Don't pairs (Foundations/Expression/Motion/Principles). Each pair
  * is one scene with one rule broken, so the difference is the lesson, and the
  * arrows before the move are the same in both tiles. Blocked out in kit shapes,
  * no words.

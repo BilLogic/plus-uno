@@ -7,7 +7,7 @@ import { measure, pair, springFor } from './motion.jsx';
 import { travel } from './trails.js';
 
 /**
- * The Choreography page's figures (Foundations/Motion/Choreography). Each is a
+ * The Choreography page's figures (Foundations/Expression/Motion/Choreography). Each is a
  * principle, so it animates blocked-out kit shapes with no words. Every pair is
  * the same scene with one rule broken, so the difference is the lesson, and
  * every scene lands at `landing`; the stories assert it.

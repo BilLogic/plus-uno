@@ -11,10 +11,28 @@ const rules = [...toml.matchAll(/from = "\/storybook\/"\n\s+query = \{ path = "\
 const ids = new Set(PAGES.map((p) => p.id));
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 27);
+  assert.equal(rules.length, 38);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
     assert.ok(ids.has(r.to), `${r.from} redirects to ${r.to}, which is not a page`);
+  }
+});
+
+test('every pre-regroup Foundations id lands on its page in the new groups', () => {
+  const to = Object.fromEntries(rules.map((r) => [r.from, r.to]));
+  const expected = {
+    'foundations-basics-overview': 'foundations-overview',
+    'foundations-basics-tokens': 'foundations-tokens',
+    'foundations-basics-accessibility': 'foundations-accessibility',
+    'foundations-motion-principles': 'foundations-expression-motion-principles',
+    'foundations-motion-library': 'foundations-expression-motion-library',
+    'foundations-sound-overview': 'foundations-expression-sound-overview',
+    'foundations-sound-settings-and-accessibility': 'foundations-expression-sound-settings-and-accessibility',
+    'foundations-color': 'foundations-visual-color',
+  };
+  for (const [from, target] of Object.entries(expected)) {
+    assert.equal(to[from], target, `${from} should redirect to ${target}`);
+    assert.ok(ids.has(target), `${target} is not a page`);
   }
 });
 

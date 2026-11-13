@@ -14,8 +14,8 @@ import { PASS, reducedStory, story } from '@/storybook-docs/illustrations/motion
 
 export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
-  // The page itself is Foundations/Motion/Principles (MotionPrinciples.mdx).
-  title: 'Foundations/Motion/Principles',
+  // The page itself is Foundations/Expression/Motion/Principles (MotionPrinciples.mdx).
+  title: 'Foundations/Expression/Motion/Principles',
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };

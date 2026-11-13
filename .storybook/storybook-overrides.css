@@ -166,7 +166,7 @@ body,
 }
 
 /*
- * Measure. The longest paragraph on Foundations/Basics/Accessibility ran 134 characters
+ * Measure. The longest paragraph on Foundations/Accessibility ran 134 characters
  * per line at a 1140px docs column, against a comfortable 45–75. The cap is on
  * the text, not on the column: canvases stay full-bleed at 864px while prose
  * narrows, and splitting the two is what lets both be right.

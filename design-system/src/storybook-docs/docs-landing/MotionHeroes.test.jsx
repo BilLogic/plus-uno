@@ -7,7 +7,7 @@ import { crossings } from '../illustrations/trails.js';
 import { SpringTrail } from '../illustrations/shapes.jsx';
 import { pathGeometry } from '../illustrations/shapes-geometry.js';
 
-const IDS = ['principles', 'physics', 'transitions', 'choreography', 'playground', 'library'].map((n) => `foundations-motion-${n}`);
+const IDS = ['principles', 'physics', 'transitions', 'choreography', 'playground', 'library'].map((n) => `foundations-expression-motion-${n}`);
 const ACCENT = 'var(--ds-background-brand-bold)';
 const paints = (root) =>
     [...root.querySelectorAll('[fill],[stroke]')].flatMap((el) => [el.getAttribute('fill'), el.getAttribute('stroke')]).filter((v) => v && v !== 'none');
@@ -31,7 +31,7 @@ describe('Motion heroes', () => {
     });
 
     it('Physics is one shape at equal time steps on a time grid', () => {
-        const c = draw('foundations-motion-physics');
+        const c = draw('foundations-expression-motion-physics');
         expect(c.querySelectorAll('[data-shape="spring-trail"] rect')).toHaveLength(11);
         expect(c.querySelectorAll('[data-time-grid] line').length).toBeGreaterThan(5);
         const xs = [...c.querySelectorAll('[data-shape="spring-trail"] rect')].map((r) => +r.getAttribute('x') + +r.getAttribute('width') / 2);
@@ -40,7 +40,7 @@ describe('Motion heroes', () => {
     });
 
     it('Transitions draws three paths from the before row to the after card, ring to arrowhead', () => {
-        const c = draw('foundations-motion-transitions');
+        const c = draw('foundations-expression-motion-transitions');
         expect(c.querySelectorAll('[data-shape="path"]')).toHaveLength(3);
         expect(c.querySelectorAll('[data-shape="path"] circle')).toHaveLength(3);
         expect(c.querySelectorAll('[data-shape="path"] polygon')).toHaveLength(3);
@@ -58,7 +58,7 @@ describe('Motion heroes', () => {
     });
 
     it('Choreography: three burst clips that do not overlap, and the playhead on two live clips', () => {
-        const c = draw('foundations-motion-choreography');
+        const c = draw('foundations-expression-motion-choreography');
         const burst = [...c.querySelectorAll('[data-track="row"]')][1];
         const clips = [...burst.querySelectorAll('[data-clip]')].map((g) => {
             const r = g.querySelector('rect');
@@ -71,13 +71,13 @@ describe('Motion heroes', () => {
     });
 
     it('Principles is four scenes, one per card', () => {
-        const c = draw('foundations-motion-principles');
+        const c = draw('foundations-expression-motion-principles');
         expect(c.querySelectorAll('[data-time-grid]')).toHaveLength(0);
         expect(c.querySelectorAll('foreignObject')).toHaveLength(4);
     });
 
     it('Playground draws one target line, the spring trail\'s own', () => {
-        expect(draw('foundations-motion-playground').querySelectorAll('line[stroke-dasharray]')).toHaveLength(1);
+        expect(draw('foundations-expression-motion-playground').querySelectorAll('line[stroke-dasharray]')).toHaveLength(1);
     });
 });
 

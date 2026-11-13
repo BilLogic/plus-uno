@@ -11,7 +11,7 @@ import { SPEEDS, SPEED_LABELS, measure, ratioOf, resisted, springFor, stepOf, un
 import { PHYSICS_DEMOS } from './motion-physics.jsx';
 
 /**
- * The Playground page's figures (Foundations/Motion/Playground): a spring you
+ * The Playground page's figures (Foundations/Expression/Motion/Playground): a spring you
  * can tune by hand, and the feel checks. Everything here is for feel only; the
  * numbers in Physics are the only source of a token.
  */

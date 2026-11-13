@@ -8,19 +8,19 @@ const strip = (pages) => pages.map(([page, title]) => ({ page, title, href: `?pa
 
 export const SECTIONS = {
     'foundations-motion': strip([
-        ['foundations-motion-principles', 'Principles'],
-        ['foundations-motion-physics', 'Physics'],
-        ['foundations-motion-transitions', 'Transitions'],
-        ['foundations-motion-choreography', 'Choreography'],
-        ['foundations-motion-library', 'Library'],
-        ['foundations-motion-playground', 'Playground'],
+        ['foundations-expression-motion-principles', 'Principles'],
+        ['foundations-expression-motion-physics', 'Physics'],
+        ['foundations-expression-motion-transitions', 'Transitions'],
+        ['foundations-expression-motion-choreography', 'Choreography'],
+        ['foundations-expression-motion-library', 'Library'],
+        ['foundations-expression-motion-playground', 'Playground'],
     ]),
     'foundations-sound': strip([
-        ['foundations-sound-overview', 'Overview'],
-        ['foundations-sound-when-to-play', 'When to play'],
-        ['foundations-sound-with-motion', 'With motion'],
-        ['foundations-sound-sounds', 'Sounds'],
-        ['foundations-sound-settings-and-accessibility', 'Settings and accessibility'],
+        ['foundations-expression-sound-overview', 'Overview'],
+        ['foundations-expression-sound-when-to-play', 'When to play'],
+        ['foundations-expression-sound-with-motion', 'With motion'],
+        ['foundations-expression-sound-sounds', 'Sounds'],
+        ['foundations-expression-sound-settings-and-accessibility', 'Settings and accessibility'],
     ]),
 };
 

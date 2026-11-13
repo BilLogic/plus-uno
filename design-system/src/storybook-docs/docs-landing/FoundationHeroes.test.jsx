@@ -5,8 +5,8 @@ import { HEROES } from './hero-registry.jsx';
 import { PAINT } from '../illustrations/paint.js';
 
 const FOUNDATION_IDS = [
-    'foundations-basics-overview',
-    'foundations-basics-accessibility',
+    'foundations-overview',
+    'foundations-accessibility',
     'foundations-visual-border',
     'foundations-visual-elevation',
     'foundations-layout-grid',
@@ -15,7 +15,7 @@ const FOUNDATION_IDS = [
     'foundations-brand-logos',
     'foundations-visual-radius',
     'foundations-layout-spacing',
-    'foundations-basics-tokens',
+    'foundations-tokens',
     'foundations-visual-typography',
 ];
 
@@ -29,7 +29,7 @@ describe('Foundations heroes', () => {
         expect(HEROES[id].description).toMatch(/^[A-Z].*\.$/);
     });
 
-    it.each(FOUNDATION_IDS.filter((id) => !['foundations-visual-typography', 'foundations-basics-overview'].includes(id)))('%s draws no text', (id) => {
+    it.each(FOUNDATION_IDS.filter((id) => !['foundations-visual-typography', 'foundations-overview'].includes(id)))('%s draws no text', (id) => {
         const { container } = render(React.createElement(HEROES[id].Hero));
         expect(container.querySelector('text')).toBeNull();
         expect(container.textContent).toBe('');
@@ -88,7 +88,7 @@ describe('Foundations heroes', () => {
 });
 
 describe('Foundations Overview: a bento of the foundations', () => {
-    const draw = () => render(React.createElement(HEROES['foundations-basics-overview'].Hero)).container;
+    const draw = () => render(React.createElement(HEROES['foundations-overview'].Hero)).container;
     const ACCENT_RING = ':scope > g > rect[stroke="' + ACCENT + '"]';
 
     it('draws six cells: color tall, type, grid, elevation ringed, icons and motion small', () => {

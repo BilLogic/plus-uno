@@ -19,7 +19,7 @@ import { TRANSITION_DEMOS } from '@/storybook-docs/illustrations/motion-transiti
 import { ABOVE_DEMOS, FEEDBACK_DEMOS, WITHIN_DEMOS } from '@/storybook-docs/illustrations/motion-transitions-place.jsx';
 
 export default {
-  title: 'Foundations/Motion/Stage never blank',
+  title: 'Foundations/Expression/Motion/Stage never blank',
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };

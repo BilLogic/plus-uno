@@ -39,7 +39,7 @@
  *      titled under that root.
  *   9. Foundations · Motion is exactly the pages the sidebar sort lists under
  *      Foundations > Motion, Library among them: a page titled
- *      `Foundations/Motion/<name>` is listed, and a listed name has a page.
+ *      `Foundations/Expression/Motion/<name>` is listed, and a listed name has a page.
  *      This is where the first-pass "Durations and easings" page was caught.
  *      Foundations · Sound follows the same rule, with no required Library page.
  *
