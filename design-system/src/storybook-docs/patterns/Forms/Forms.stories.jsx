@@ -1,3 +1,4 @@
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -222,6 +223,7 @@ export const Sending = {
     name: 'Test: Sending',
     render: () => staged(<FormInModal initial={FILLED} sendingForever />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         const width = rect(save).width;
