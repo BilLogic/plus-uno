@@ -111,6 +111,9 @@ export const GalleryTile = ({ name, docsId, cues = [], bare = false, children })
     </li>
 );
 
+/** The tile named `name` inside `root`, for the stories' play tests. */
+export const galleryTile = (root, name) => root.querySelector(`[data-gallery-tile="${name}"]`);
+
 /* ================================================================ Base UI */
 
 const ModalTile = () => {

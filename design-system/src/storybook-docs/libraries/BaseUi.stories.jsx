@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { BaseUiGallery } from './library-gallery.jsx';
+import { BaseUiGallery, galleryTile as tileOf } from './library-gallery.jsx';
 
 /**
  * The live gallery on Libraries/Base UI. The play test opens, uses and closes
@@ -11,7 +11,6 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
-const tileOf = (root, name) => root.querySelector(`[data-gallery-tile="${name}"]`);
 
 export const Gallery = {
     render: () => <BaseUiGallery />,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, userEvent, waitFor } from 'storybook/test';
-import { HighchartsGallery } from './library-gallery.jsx';
+import { HighchartsGallery, galleryTile as tileOf } from './library-gallery.jsx';
 
 /** The live gallery on Libraries/Highcharts: each chart's tooltip and legend answer. */
 export default {
@@ -8,7 +8,6 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
-const tileOf = (root, name) => root.querySelector(`[data-gallery-tile="${name}"]`);
 /** The chart theme draws its tooltip `outside`, in a layer on the page body: any one saying `text`. */
 const tooltipSays = (doc, text) => [...doc.querySelectorAll('.highcharts-tooltip')].some((t) => t.textContent.includes(text));
 /**

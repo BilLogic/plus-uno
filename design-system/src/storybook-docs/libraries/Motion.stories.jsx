@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { MotionGallery } from './library-gallery.jsx';
+import { MotionGallery, galleryTile as tileOf } from './library-gallery.jsx';
 
 /**
  * The live gallery on Libraries/Motion. Reorder and the resisted drag are the
@@ -12,7 +12,6 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
-const tileOf = (root, name) => root.querySelector(`[data-gallery-tile="${name}"]`);
 
 export const Gallery = {
     render: () => <MotionGallery />,

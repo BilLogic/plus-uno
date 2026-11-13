@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { FontAwesomeGallery } from './library-gallery.jsx';
+import { FontAwesomeGallery, galleryTile as tileOf } from './library-gallery.jsx';
 
 /** The live gallery on Libraries/Font Awesome: the search filters as you type. */
 export default {
@@ -11,7 +11,7 @@ export default {
 export const Gallery = {
     render: () => <FontAwesomeGallery />,
     play: async ({ canvasElement }) => {
-        const tile = canvasElement.querySelector('[data-gallery-tile="Icon"]');
+        const tile = tileOf(canvasElement, 'Icon');
         const field = within(tile).getByRole('textbox', { name: 'Search the Free icons' });
         await userEvent.clear(field);
         await userEvent.type(field, 'arrow down');
