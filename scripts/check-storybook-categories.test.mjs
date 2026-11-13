@@ -247,12 +247,12 @@ test('a sidebar sort that lists Patterns before Templates goes red', () => {
   assert.ok(messages(root).some((m) => m.includes('roots must lead with')));
 });
 
-test('the real Templates tree is flat: eight templates, no Overlays folder', () => {
+test('the real Templates tree is flat: ten pages, no Overlays folder', () => {
   const tax = JSON.parse(fs.readFileSync(new URL('../storybook.taxonomy.json', import.meta.url), 'utf8'));
   const at = tax.storySortOrder.indexOf('Templates');
   const order = tax.storySortOrder[at + 1];
   assert.deepEqual(order.filter((x) => typeof x === 'string'), [
-    'Overview', 'Frame', 'Page', 'Section', 'Form', 'Modal', 'Panel', 'Popup',
+    'Overview', 'Frame', 'Page', 'Section', 'Card', 'Table', 'Form', 'Modal', 'Panel', 'Popup',
   ]);
   assert.ok(!order.includes('Overlays'));
   assert.ok(!order.includes('Page templates'));

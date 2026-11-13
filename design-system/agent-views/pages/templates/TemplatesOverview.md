@@ -8,13 +8,15 @@ A template is an arrangement of components with slots. Grab one, fill the slots,
 
 **Storybook page:** `design-system/src/storybook-docs/templates/TemplatesOverview.mdx`
 
-## The seven templates
+## The nine templates
 
 Broadest first. Each page opens with its types, then the anatomy and key states of each type, then the usage spine. The Templates and patterns section below says how the layers fit together.
 
 - **Frame.** The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare.
 - **Page.** The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width.
 - **Section.** A span of the page grid under one heading: a header, a body, and an optional side, detail and footer.
+- **Card.** A raised container for one object on a page, such as a student, a session or a metric: an optional image, a header over a body, and an optional footer.
+- **Table.** How a table sits on a page: the Section header carries the title and toolbar, and the table spans the section under it.
 - **Form.** A stack of fields with a footer, in one of four places: in a page, in a Panel, in a Modal, or in steps.
 - **Modal.** One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps.
 - **Panel.** A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications.

@@ -26,15 +26,16 @@ import {
 <Meta of={PatternTableStories} />
 
 <DocsLanding
-    page="templates-section-table"
-    eyebrow="Template · Section"
+    page="templates-table"
+    eyebrow="Template"
     title="Table"
     purpose="The table pattern is how a table sits on a page. A Section holds the table, and the Section header carries the title and the toolbar. The table spans the section under it, plain, with no card around it and no padding of its own. The shell takes your head and rows, and adds a pagination slot and an empty-state slot."
     links={{
+        label: 'Uses',
         items: [
             { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
-            { title: 'Card', href: './?path=/docs/templates-section-card--docs' },
-            { title: 'Table', current: true },
+            { title: 'Table component', href: './?path=/docs/components-text-and-data-display-static-table--docs' },
+            { title: 'Pagination', href: './?path=/docs/components-navigation-pagination--docs' },
         ],
     }}
 />
@@ -283,7 +284,7 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 - <DocsLink id="templates-section-section">Section</DocsLink>: the header types, toolbar and tabs, that sit above every table.
 - <DocsLink id="components-text-and-data-display-static-table">Table component</DocsLink>: the table components, with a set of headers and rows.
 - <DocsLink id="components-navigation-pagination">Pagination</DocsLink>: the pager that fills the pagination slot.
-- <DocsLink id="templates-section-card">Card</DocsLink>: a table never sits inside a card.
+- <DocsLink id="templates-card">Card</DocsLink>: a table never sits inside a card.
 
 </div>
 

@@ -213,10 +213,10 @@ const preview = {
             ],
             "Section",
             [
-              "Section",
-              "Card",
-              "Table"
+              "Section"
             ],
+            "Card",
+            "Table",
             "Form",
             "Modal",
             [

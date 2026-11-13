@@ -269,12 +269,12 @@ export const HEROES = {
     description:
       'Header, view bar, body and side, ringed.',
   },
-  'templates-section-card': {
+  'templates-card': {
     Hero: CardHero,
     description:
       'A Section as a card: media, title, one action.',
   },
-  'templates-section-table': {
+  'templates-table': {
     Hero: TableHero,
     description:
       'A Section as a table: header, rows, one selected.',
