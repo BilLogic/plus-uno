@@ -8,6 +8,8 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import Flag, { FlagGroup, FLAG_APPEARANCES } from './Flag';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import { SoundProvider, useSound } from '@/sound';
+import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
+import { Screen, Section } from '@/storybook-docs/illustrations/primitives.jsx';
 
 export default {
     title: 'Components/Messaging/Flag',
@@ -424,14 +426,33 @@ export const Focused = {
     },
 };
 
+/*
+ * The page at rest, drawn behind the real buttons so the canvas reads before anyone presses:
+ * a Screen with two Sections on its Page, soft skeleton bars for text. One drawing unit is 2px.
+ */
+const REST_W = 240;
+const REST_H = 120;
+
+const RestingPage = () => (
+    <Illustration width={REST_W} height={REST_H} capped={false} title="A page at rest: a window with a Sidebar and two Sections">
+        <Screen x={0} y={0} w={REST_W} h={REST_H} header={false}>
+            <Section x={52} y={42} w={80} h={60} rows={4} />
+            <Section x={144} y={42} w={80} h={60} rows={4} />
+        </Screen>
+    </Illustration>
+);
+
 const LandsWithNotifyStory = () => {
     const [shown, setShown] = useState(false);
     const { enabled, setEnabled } = useSound();
     return (
         <SoundProvider>
-            <div style={{ position: 'relative', minHeight: 'calc(var(--space-500) * 3)', padding: 'var(--space-150)', display: 'flex', alignItems: 'flex-start', gap: 'var(--inline-md)' }}>
-                <Button appearance="primary" text="Show flag" onClick={() => setShown(true)} />
-                <Button appearance="default" text={enabled ? 'Sound on' : 'Sound off'} onClick={() => setEnabled(!enabled)} />
+            <div data-testid="lands-with-notify-stage" style={{ position: 'relative', aspectRatio: `${REST_W} / ${REST_H}`, overflow: 'hidden' }}>
+                <RestingPage />
+                <div style={{ position: 'absolute', insetBlockStart: `${(20 / REST_H) * 100}%`, insetInlineStart: `${(52 / REST_W) * 100}%`, display: 'flex', alignItems: 'flex-start', gap: 'var(--inline-md)' }}>
+                    <Button appearance="primary" text="Show flag" onClick={() => setShown(true)} />
+                    <Button appearance="default" text={enabled ? 'Sound on' : 'Sound off'} onClick={() => setEnabled(!enabled)} />
+                </div>
                 <FlagGroup position="top-end" containerPosition="absolute">
                     <Flag id="flag-lands-with-notify" show={shown} onDismiss={() => setShown(false)} appearance="success" title="Plan saved">
                         Your session plan is saved for Monday.
@@ -452,6 +473,15 @@ export const LandsWithNotify = {
     parameters: { layout: 'fullscreen' },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        // Never blank: before any press the stage already paints the page at rest, buttons on it.
+        const stage = canvas.getByTestId('lands-with-notify-stage');
+        const painted = [...stage.querySelectorAll('svg rect, svg path')].filter((el) => {
+            const fill = el.getAttribute('fill');
+            return fill && fill !== 'none';
+        });
+        await expect(painted.length, 'the resting page paints shapes before any press').toBeGreaterThan(10);
+        await expect(canvas.getByRole('button', { name: 'Sound on' })).toBeVisible();
+        await expect(canvasElement.ownerDocument.getElementById('flag-lands-with-notify')).toBeNull();
         await userEvent.click(canvas.getByRole('button', { name: 'Show flag' }));
         const flag = await waitFor(() => {
             const el = canvasElement.ownerDocument.getElementById('flag-lands-with-notify');
