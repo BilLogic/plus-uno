@@ -26,6 +26,9 @@ const STAGE_ORIGIN = {
     y: (FRAME_UNITS.h - STAGE_UNITS.h) / 2,
 };
 
+/** One unit is 2px here, so half of `--stroke-1` draws a 1px line (see `HAIRLINE` in paint.js). */
+const HERO_STROKE = { '--hero-stroke': 'calc(var(--stroke-1) / 2)' };
+
 /**
  * An SVG the size of the whole frame, with the stage's origin at (0, 0) of its
  * children. Hidden from assistive tech: the frame carries the description.
