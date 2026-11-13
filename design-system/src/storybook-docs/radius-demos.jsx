@@ -2,7 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { IconButton } from '@/components';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { PAINT, HAIRLINE } from '@/storybook-docs/illustrations/paint.js';
-import { ButtonShape, Frame, Rule, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
+import { ButtonShape, Card, Frame, Rule, Screen, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
 
 /**
  * Figures for Foundations/Radius. Every corner reads a radius token, and every
