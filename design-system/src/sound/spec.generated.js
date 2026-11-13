@@ -481,3 +481,157 @@ export const SOUND_SPEC = {
     }
   }
 };
+
+// Sound moments from scripts/lib/tokens/motion-registry.mjs.
+export const SOUND_MOMENTS = [
+  {
+    "row": "PatternCard",
+    "tier": "template",
+    "event": "milestone",
+    "transition": "Opening a page",
+    "token": "done.milestone",
+    "at": "land",
+    "when": "onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it",
+    "spring": "spatial.default"
+  },
+  {
+    "row": "Common actions",
+    "tier": "pattern",
+    "event": "confirm",
+    "transition": "Open and close an overlay",
+    "token": "done.sent",
+    "at": "land",
+    "when": "only a call-off or lead request sent; other confirms stay silent",
+    "spring": "appearance.fast"
+  },
+  {
+    "row": "Forms",
+    "tier": "pattern",
+    "event": "failed",
+    "transition": "Call attention",
+    "token": "error",
+    "at": "land",
+    "when": "the person's own submit was rejected (a danger SectionMessage)",
+    "spring": "spatial.fast"
+  },
+  {
+    "row": "Forms",
+    "tier": "pattern",
+    "event": "success",
+    "transition": "Update a value or state",
+    "token": "commit",
+    "at": "land",
+    "when": "a sign-up is confirmed: one-time, recurring or fill-in",
+    "spring": "appearance.fast"
+  },
+  {
+    "row": "Checkbox",
+    "tier": "component",
+    "event": "goal",
+    "transition": "Update a value or state",
+    "token": "goal",
+    "at": "land",
+    "when": "only the session goal check-in done together, shared with the student; other checkboxes stay silent",
+    "spring": "appearance.fast"
+  },
+  {
+    "row": "Flag",
+    "tier": "component",
+    "event": "enter",
+    "transition": "Open and close an overlay",
+    "token": "notify",
+    "at": "land",
+    "when": "outside a session; any appearance but error, which plays Error (the failed event); Flags that arrive together play once",
+    "spring": "spatial.default"
+  },
+  {
+    "row": "Flag",
+    "tier": "component",
+    "event": "milestone",
+    "transition": "Open and close an overlay",
+    "token": "done.step",
+    "at": "land",
+    "when": "a reflection is complete",
+    "spring": "spatial.fast"
+  },
+  {
+    "row": "Flag",
+    "tier": "component",
+    "event": "prompt",
+    "transition": "Open and close an overlay",
+    "token": "prompt",
+    "at": "land",
+    "when": "session link ready, a lead with an empty tutor, wrap-up, few students at 10 min; an app passes sound=\"prompt\"; plays when the tab is hidden",
+    "spring": "spatial.default"
+  },
+  {
+    "row": "Flag",
+    "tier": "component",
+    "event": "failed",
+    "transition": "Open and close an overlay",
+    "token": "error",
+    "at": "land",
+    "when": "an error Flag, the default for that appearance: a background job the person started failed",
+    "spring": "spatial.default"
+  },
+  {
+    "row": "Table",
+    "tier": "component",
+    "event": "roster",
+    "transition": "Add or remove an item",
+    "token": "roster",
+    "at": "land",
+    "when": "in a session; changes within 2 s play once",
+    "spring": "spatial.fast"
+  },
+  {
+    "row": "AiMessage",
+    "tier": "component",
+    "event": "ready",
+    "transition": "Load content",
+    "token": "ai.ready",
+    "at": "land",
+    "when": "the feedback took over 1 s, so a Spinner showed",
+    "spring": "appearance.fast"
+  },
+  {
+    "row": "AiMessage",
+    "tier": "component",
+    "event": "strong",
+    "transition": "Load content",
+    "token": "ai.strong",
+    "at": "land",
+    "when": "the feedback took over 1 s, so a Spinner showed",
+    "spring": "appearance.fast"
+  },
+  {
+    "row": "AiMessage",
+    "tier": "component",
+    "event": "refine",
+    "transition": "Load content",
+    "token": "ai.refine",
+    "at": "land",
+    "when": "the feedback took over 1 s, so a Spinner showed",
+    "spring": "appearance.fast"
+  },
+  {
+    "row": "ProgressBar",
+    "tier": "component",
+    "event": "success",
+    "transition": "Update a value or state",
+    "token": "done.step",
+    "at": "land",
+    "when": "a module or lesson is done",
+    "spring": "appearance.fast"
+  },
+  {
+    "row": "ProgressTracker",
+    "tier": "component",
+    "event": "success",
+    "transition": "Update a value or state",
+    "token": "done.step",
+    "at": "land",
+    "when": "a module or lesson is done",
+    "spring": "appearance.fast"
+  }
+];

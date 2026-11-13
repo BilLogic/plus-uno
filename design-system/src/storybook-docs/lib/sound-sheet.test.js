@@ -43,15 +43,13 @@ describe('soundFamiliesOf', () => {
 
 describe('soundCellsOf', () => {
   it('lists every registry event with a sound cell', () => {
-    expect(soundCellsOf(MOTION_REGISTRY)).toContainEqual(
+    expect(soundCellsOf()).toHaveLength(MOTION_REGISTRY.flatMap((r) => Object.values(r.events)).filter((e) => e.sound).length);
+    expect(soundCellsOf()).toContainEqual(
       expect.objectContaining({ row: 'Flag', event: 'enter', token: 'notify', at: 'land' }),
     );
   });
 
-  it('defaults at to land and skips silent events', () => {
-    const registry = [{ name: 'X', tier: 'component', events: { enter: { sound: { token: 'goal' } }, exit: {} } }];
-    expect(soundCellsOf(registry)).toEqual([{ row: 'X', tier: 'component', event: 'enter', transition: '', token: 'goal', at: 'land', when: '' }]);
-  });
+
 });
 
 describe('silentGroupsOf', () => {
