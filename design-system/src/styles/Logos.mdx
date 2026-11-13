@@ -15,9 +15,9 @@ import LogoClearSpace from '@/assets/Logo/LogoClearSpace';
 
 export const Mark = ({ color = 'colored', size = 64, wordmark = false }) => <Logo appearance={color} size={size} wordmark={wordmark} />;
 
-export const Ground = ({ token, children, caption }) => (
+export const Ground = ({ token, mode, children, caption }) => (
     <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'var(--card-min-width-sm)', padding: 'var(--card-pad-spacious)', borderRadius: 'var(--card-radius)', background: `var(${token})`, color: 'var(--ds-text-inverse)' }}>{children}</div>
+        <div data-color-mode={mode} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'var(--card-min-width-sm)', padding: 'var(--card-pad-spacious)', borderRadius: 'var(--card-radius)', background: `var(${token})`, color: 'var(--ds-text-inverse)' }}>{children}</div>
         {caption && <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
     </figure>
 );
@@ -110,11 +110,11 @@ Logos come in six color options to suit different grounds. Choose by the ground 
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
     <Ground token="--ds-surface" caption="Colored, on a light surface."><Mark color="colored" size={64} wordmark /></Ground>
-    <Ground token="--ds-background-neutral-bold" caption="Colored dark, with stronger glows, on a dark ground."><Mark color="colored-dark" size={64} wordmark /></Ground>
+    <Ground token="--ds-surface" mode="dark" caption="Colored dark, with stronger glows, on a dark ground."><Mark color="colored-dark" size={64} wordmark /></Ground>
     <Ground token="--ds-surface" caption="Filled, on a light ground."><Mark color="filled" size={64} wordmark /></Ground>
-    <Ground token="--ds-background-neutral-bold" caption="Dark, on a dark ground."><Mark color="dark" size={64} wordmark /></Ground>
+    <Ground token="--ds-surface-overlay" mode="dark" caption="Dark, on a dark ground."><Mark color="dark" size={64} wordmark /></Ground>
     <Ground token="--ds-surface" caption="Outlined, on a light ground."><Mark color="outlined" size={64} wordmark /></Ground>
-    <Ground token="--ds-background-accent-blue-bolder" caption="Outlined reversed, on a photo or busy ground."><Mark color="outlined-reversed" size={64} wordmark /></Ground>
+    <Ground token="--ds-background-brand-bold" caption="Outlined reversed, on a photo or busy ground."><Mark color="outlined-reversed" size={64} wordmark /></Ground>
 </div>
 
 <RefTable
