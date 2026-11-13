@@ -4,7 +4,6 @@ import { Checkbox, DatePicker, RadioGroup, Select, TextArea, TextField, Toggle }
 import { PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
 
 /**
  * The Read-only pattern's examples, drawn with the real fields in their
@@ -75,8 +74,6 @@ export const OwnedForm = () => (
         </InAppFrame>
     </BrowserWindow>
 );
-
-export { PAGE_WIDTH };
 
 /** Docs geometry: rows enough to show the whole note; a read-only TextArea does not size itself to its value today. */
 const LONG_ROWS = 6; // docs-literal
