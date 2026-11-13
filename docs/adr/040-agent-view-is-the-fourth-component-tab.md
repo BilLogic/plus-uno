@@ -1,6 +1,6 @@
 ---
 embodiment: ide
-summary: Component docs pages gain a 4th tab, Agent view, that shows the component's generated file byte for byte through one raw glob in the tabs module; amends ADR-025, whose tabs were a human affordance only (2026-11-08)
+summary: Component docs pages gain a 4th tab, Agent view (now labeled Harness), that shows the component's generated file byte for byte through one raw glob in the tabs module; amends ADR-025, whose tabs were a human affordance only (2026-11-08)
 status: active
 verified: 2026-11-08
 ---
