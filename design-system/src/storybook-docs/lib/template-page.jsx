@@ -4,6 +4,7 @@ import { Story } from '@storybook/addon-docs/blocks';
 
 import { Tag } from '@/components';
 import { useFitScale } from './use-fit-scale.js';
+import { ANATOMY_REGIONS, isOwnRegion } from './anatomy-regions.js';
 import { HeroCard } from '../docs-landing/HeroCard.jsx';
 
 /**
@@ -187,12 +188,23 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
         const read = () => {
             const origin = root.getBoundingClientRect();
             setBoxWidth(origin.width);
-            setMarks(placeMarkers(parts.map(({ selector }) => {
-                const el = root.querySelector(selector);
-                if (!el) return null;
+            const regions = [...root.querySelectorAll(ANATOMY_REGIONS)];
+            const placed = parts.map((part) => {
+                const el = root.querySelector(part.selector);
+                if (!el) return { part, rect: null };
                 const r = el.getBoundingClientRect();
-                return { top: r.top - origin.top, left: r.left - origin.left, width: r.width, height: r.height };
-            }), parts));
+                // A leader runs from the part to its marker's gutter. When a region it does not label (the Sidebar, the AI Panel) sits in that run, the marker moves to the other gutter if that run is clear.
+                const crossed = (toStart) => regions.some((region) => {
+                    if (isOwnRegion(region, el)) return false;
+                    const g = region.getBoundingClientRect();
+                    const level = g.bottom > r.top + 1 && g.top < r.bottom - 1;
+                    return toStart ? level && g.right <= r.left + 1 && g.right > origin.left : level && g.left >= r.right - 1 && g.left < origin.right;
+                });
+                const side = part.side ?? 'start';
+                const flipped = side === 'start' ? crossed(true) && !crossed(false) : side === 'end' ? crossed(false) && !crossed(true) : false;
+                return { part: flipped ? { ...part, side: side === 'start' ? 'end' : 'start' } : part, rect: { top: r.top - origin.top, left: r.left - origin.left, width: r.width, height: r.height } };
+            });
+            setMarks(placeMarkers(placed.map((p) => p.rect), placed.map((p) => p.part)));
         };
         read();
         if (typeof ResizeObserver === 'undefined') return undefined;
