@@ -20,7 +20,7 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 Use a dropdown menu for a trigger that opens a list of actions or navigation links. Its rows are Section, Button item, Link item and Custom item, all exported from Dropdown menu. For picking one value from a list of options, use Select: a dropdown menu is for actions, a select is for a value.
 
-`trigger` is the element that opens it, `children` are its rows. `isOpen` and `onOpenChange` make it controlled; left uncontrolled it opens and closes on its own. `placement` and `shouldFlip` govern where it opens and whether it flips when there is no room. `spacing` is `cozy` (40 rows, the default) or `compact` (32). `loading` swaps the rows for one Loading options row while its options are still being fetched; after a failure, `hasError` shows Couldn't load options with a Retry row that calls `onRetry`. A menu never draws skeleton rows.
+`trigger` is the element that opens it, `children` are its rows. `isOpen` and `onOpenChange` make it controlled; left uncontrolled it opens and closes on its own. `placement` and `shouldFlip` govern where it opens and whether it flips when there is no room. `spacing` is `default` (32 rows) or `compact` (24). `loading` swaps the rows for one Loading options row while its options are still being fetched; after a failure, `hasError` shows Couldn't load options with a Retry row that calls `onRetry`. A menu never draws skeleton rows.
 
 ## Motion
 
@@ -101,7 +101,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 1. **Trigger.** Any element that opens the menu, usually a Button with a chevron.
 2. **Menu.** A floating list 4px from the trigger, on the raised surface.
-3. **Rows.** Button items, Link items or Custom items, 40 tall at cozy and 32 at compact.
+3. **Rows.** Button items, Link items or Custom items, 32 tall at default and 24 at compact.
 4. **Section title and separator** (optional). Group related rows.
 
 ### Menu items
@@ -150,7 +150,7 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 | `onOpenChange` | func | — | Called with the next open state (a boolean) when the menu opens or closes: trigger press, outside click, Escape or picking a row. |
 | `placement` | enum | `'bottom-start'` | Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side. |
 | `shouldFlip` | bool | `true` | Flips to the opposite side when there isn't room. |
-| `spacing` | enum | `'cozy'` | `cozy` draws 40px rows (default), `compact` draws 32px. |
+| `spacing` | enum | `'default'` | `default` draws 32px rows, `compact` draws 24px. |
 | `loading` | bool | `false` | Shows one "Loading options" row, with a spinner, in place of the menu's rows while its options load. Never skeleton rows. |
 | `hasError` | bool | `false` | Shows "Couldn't load options" with a Retry row in place of the menu's rows, after loading failed. |
 | `onRetry` | func | — | Called when Retry is pressed. The menu stays open. |
@@ -165,7 +165,7 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 
 **`placement`** — `bottom-start` · `bottom` · `bottom-end` · `top-start` · `top` · `top-end` · `right-start` · `right` · `right-end` · `left-start` · `left` · `left-end`
 
-**`spacing`** — `cozy` · `compact`
+**`spacing`** — `default` · `compact`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
