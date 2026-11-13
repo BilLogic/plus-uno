@@ -9,6 +9,9 @@ import './PatternCard.scss';
  * an optional footer, on Atlassian's raised pair: the raised surface and its
  * shadow, whose 1px ring is the card's edge.
  *
+ * - **Layout**: `stacked` (default) puts the image above the content. `image-start` and
+ *   `image-end` put it beside the content, content two thirds and image one third, for wide
+ *   cards; below the md breakpoint (768) a side card stacks. One layout per row of cards.
  * - **Header** (`_Card header`): `title` (the card title type, shared with Card
  *   in `styles/_card-title.scss`, one heading level below its section) over an
  *   optional `description` (Body/default 14), with
@@ -32,6 +35,7 @@ const PatternCard = ({
     header,
     image,
     footer,
+    layout = 'stacked',
     padding = 'md',
     gap = 'md',
     minWidth,
@@ -43,6 +47,7 @@ const PatternCard = ({
 }) => {
     const classes = [
         'plus-pattern-card',
+        `plus-pattern-card--${layout}`,
         `plus-pattern-card-pad-${padding}`,
         `plus-pattern-card-gap-${gap}`,
         props.onClick ? 'plus-pattern-card--clickable' : '',
@@ -91,8 +96,14 @@ PatternCard.propTypes = {
     actions: PropTypes.node,
     /** Custom header that replaces title, description and actions (tabs, a toolbar) */
     header: PropTypes.node,
-    /** Image slot above the content, full bleed */
+    /** Image slot, full bleed: above the content, or at the start or end edge per `layout` */
     image: PropTypes.node,
+    /**
+     * Where the image sits. `stacked` puts it above the content. `image-start` and `image-end`
+     * put it beside the content at one third of the width, full height, bleeding to the card's
+     * top, bottom and that side's edge; for wide cards, and below the md breakpoint they stack.
+     */
+    layout: PropTypes.oneOf(['stacked', 'image-start', 'image-end']),
     /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body */
     footer: PropTypes.node,
     /** Padding scale: Card/pad-sm · md · lg (16 · 20 · 24) */
