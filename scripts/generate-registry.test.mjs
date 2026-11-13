@@ -113,3 +113,56 @@ test('check:registry fails on an injected unshippable import', () => {
   // Run the real check script against the fixture by pointing it at the fixture's root.
   assert.throws(() => execFileSync('node', ['scripts/generate-registry.mjs', '--check'], { cwd: REPO_ROOT, env: { ...process.env, REGISTRY_ROOT: root }, stdio: 'pipe' }));
 });
+
+const withPatternsAndCharts = (extra = {}) => fixture({
+  [`${L}/patterns/index.js`]: "export { default as Frame } from './Frame';\nexport { default as PatternSection } from './PatternSection';\n",
+  'design-system/agent-views/_patterns.json': JSON.stringify({ patterns: [{ group: 'Templates', name: 'Frame', use: 'x' }, { group: 'Section', name: 'PatternSection', use: 'x' }] }),
+  [`${L}/patterns/Frame/index.js`]: "export { default } from './Frame';\n",
+  [`${L}/patterns/Frame/Frame.jsx`]: "import { Button } from '@/components';\nimport PatternSection from '../PatternSection';\nimport './Frame.scss';\nexport default () => [Button, PatternSection];\n",
+  [`${L}/patterns/Frame/Frame.scss`]: '.f { color: red; }\n',
+  [`${L}/patterns/Frame/Frame.examples.jsx`]: "import x from '@/storybook-docs/x';\nexport default x;\n",
+  [`${L}/storybook-docs/x.js`]: 'export {};\n',
+  [`${L}/patterns/PatternSection/index.js`]: "export { default } from './PatternSection';\n",
+  [`${L}/patterns/PatternSection/PatternSection.jsx`]: 'export default 1;\n',
+  [`${L}/templates/ListPage/ListPage.jsx`]: "import { Frame, PatternSection } from '@/patterns';\nexport default () => [Frame, PatternSection];\n",
+  [`${L}/dataviz/index.js`]: "export { default as BarChart } from './comparison/BarChart/BarChart';\n",
+  [`${L}/dataviz/chartTheme.js`]: "import { seriesColor } from './palette';\nexport default seriesColor;\n",
+  [`${L}/dataviz/palette.js`]: 'export const seriesColor = 1;\n',
+  [`${L}/dataviz/comparison/BarChart/BarChart.jsx`]: "import chartTheme from '@/dataviz/chartTheme';\nimport Highcharts from 'highcharts';\nexport default () => [chartTheme, Highcharts];\n",
+  'package-lock.json': JSON.stringify({ packages: { 'node_modules/clsx': { version: '2.1.1' }, 'node_modules/react': { version: '19.0.0' }, 'node_modules/sass': { version: '1.108.1' }, 'node_modules/highcharts': { version: '13.0.0' } } }),
+  ...extra,
+});
+
+test('a pattern item carries its folder, not its examples, and depends on the components and patterns it imports', () => {
+  const { items, problems } = generate(withPatternsAndCharts(), 'v1');
+  assert.deepEqual(problems, []);
+  const frame = item(items, 'Frame');
+  assert.equal(frame.type, 'registry:component');
+  assert.deepEqual(frame.files.map((f) => f.target), ['plus-ds/patterns/Frame/Frame.jsx', 'plus-ds/patterns/Frame/Frame.scss', 'plus-ds/patterns/Frame/index.js']);
+  assert.deepEqual(frame.registryDependencies, ['Button', 'PatternSection']);
+  assert.deepEqual(item(items, 'PatternSection').registryDependencies, ['foundation'], 'a leaf item takes the foundation itself');
+});
+
+test('a page template item brings its pattern items', () => {
+  const { items } = generate(withPatternsAndCharts(), 'v1');
+  const tpl = item(items, 'ListPage');
+  assert.equal(tpl.type, 'registry:page');
+  assert.deepEqual(tpl.registryDependencies, ['Frame', 'PatternSection']);
+  assert.deepEqual(tpl.files.map((f) => f.target), ['plus-ds/templates/ListPage/ListPage.jsx']);
+});
+
+test('a chart item depends on the shared chart theme, which carries the helpers and the npm versions', () => {
+  const { items, problems } = generate(withPatternsAndCharts(), 'v1');
+  assert.deepEqual(problems, []);
+  const chart = item(items, 'BarChart');
+  assert.equal(chart.type, 'registry:component');
+  assert.deepEqual(chart.registryDependencies, ['chart-theme']);
+  assert.deepEqual(chart.dependencies, ['highcharts@13.0.0']);
+  const theme = item(items, 'chart-theme');
+  assert.ok(theme.files.some((f) => f.target === 'plus-ds/dataviz/chartTheme.js') && theme.files.some((f) => f.target === 'plus-ds/dataviz/palette.js'));
+});
+
+test('a template that imports a retired part is refused', () => {
+  const root = withPatternsAndCharts({ [`${L}/patterns/retired/Old.jsx`]: 'export const Old = 1;\n', [`${L}/templates/ListPage/ListPage.jsx`]: "import { Old } from '../../patterns/retired/Old';\nexport default Old;\n" });
+  assert.ok(generate(root, 'v1').problems.some((p) => /ListPage\.jsx: imports .*retired\/Old/.test(p)));
+});

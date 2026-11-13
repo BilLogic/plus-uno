@@ -15,6 +15,7 @@ import path from 'node:path';
 export const LIBRARY = 'design-system/src';
 export const TARGET = 'plus-ds';
 export const COMPONENT_INDEX = 'design-system/agent-views/components/index.md';
+export const PATTERN_INDEX = 'design-system/agent-views/_patterns.json';
 /** Foundation owns these folders of the library; a component imports them, so it depends on the foundation. */
 const FOUNDATION_DIRS = ['tokens', 'styles', 'lib'];
 const EXTS = ['', '.jsx', '.js', '.mjs', '.scss', '.css', '/index.jsx', '/index.js'];
@@ -189,15 +190,46 @@ export function lockVersions(root, names) {
 const PEERS = new Set(['react', 'react-dom']);
 const target = (file) => `${TARGET}/${file.slice(LIBRARY.length + 1)}`;
 
+const FILE_TYPES = [['components/', 'registry:ui'], ['patterns/', 'registry:component'], ['dataviz/', 'registry:component'], ['templates/', 'registry:page']];
+
 function fileEntry(root, file) {
   const content = rewriteImports(file, stripComponentStyles(file, expandBarrelImports(root, read(root, file))));
-  return { path: file, type: file.endsWith('.scss') || file.endsWith('.css') ? 'registry:file' : file.startsWith(`${LIBRARY}/components/`) ? 'registry:ui' : 'registry:lib', content, target: target(file) };
+  const type = file.endsWith('.scss') || file.endsWith('.css') ? 'registry:file' : FILE_TYPES.find(([d]) => file.startsWith(`${LIBRARY}/${d}`))?.[1] ?? 'registry:lib';
+  return { path: file, type, content, target: target(file) };
 }
 
-/** Where a file belongs: a component's folder (its item), the foundation, or nowhere in particular (copied with whoever imports it). */
-export function ownerOf(file, components, foundation) {
+/** Where a file belongs: an item's folder or listed files, the foundation, or nowhere in particular (copied with whoever imports it). */
+export function ownerOf(file, units, foundation) {
   if (foundation.has(file)) return 'foundation';
-  return components.find((c) => c.dir && file.startsWith(`${c.dir}/`))?.name ?? components.find((c) => c.main === file)?.name ?? null;
+  return units.find((c) => c.dir && file.startsWith(`${c.dir}/`))?.name ?? units.find((c) => c.main === file || c.files?.includes(file))?.name ?? null;
+}
+
+/** Patterns, as the hand-kept pattern index names them, each at the folder its barrel export comes from. */
+export function patternList(root) {
+  if (!isFile(root, PATTERN_INDEX) || !isFile(root, `${LIBRARY}/patterns/index.js`)) return [];
+  const map = barrelMap(root, `${LIBRARY}/patterns/index.js`);
+  // A name the patterns barrel does not export is a component the index points at (Popup), already an item.
+  return JSON.parse(read(root, PATTERN_INDEX)).patterns.filter(({ name }) => map.has(name)).map(({ name }) => ({ name, dir: `${LIBRARY}/${map.get(name).spec.slice(2)}`, type: 'registry:component', title: name }));
+}
+
+/** Page templates: one folder under `templates/` per item, named for its folder. */
+export function templateList(root) {
+  const dir = `${LIBRARY}/templates`;
+  if (!fs.existsSync(path.join(root, dir))) return [];
+  return fs.readdirSync(path.join(root, dir), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => ({ name: e.name, dir: `${dir}/${e.name}`, type: 'registry:page', title: e.name }));
+}
+
+const CHART_THEME = 'chart-theme';
+const chartFile = (f) => /\.(jsx?|css)$/.test(f) && !NOT_SOURCE.test(f) && !/^index\.js$/.test(f);
+
+/** Charts: every export of the data-viz barrel, plus one shared theme item holding the helpers each imports. */
+export function chartList(root) {
+  const barrel = `${LIBRARY}/dataviz/index.js`;
+  if (!isFile(root, barrel)) return [];
+  const rootFiles = fs.readdirSync(path.join(root, `${LIBRARY}/dataviz`)).filter(chartFile).map((f) => `${LIBRARY}/dataviz/${f}`);
+  const charts = [...read(root, barrel).matchAll(/export\s*\{\s*default as (\w+)\s*\}\s*from\s*'\.\/([^']+)'/g)]
+    .map((m) => ({ name: m[1], dir: `${LIBRARY}/dataviz/${path.posix.dirname(m[2])}`, type: 'registry:component', title: m[1] }));
+  return [{ name: CHART_THEME, files: rootFiles, type: 'registry:lib', title: 'PLUS chart theme', description: 'The data-viz theme, palette and Highcharts setup every PLUS chart shares.' }, ...charts];
 }
 
 /** The foundation's files: tokens, the stylesheet entry and its partials, and the lib helpers that stay inside the foundation. */
@@ -240,23 +272,38 @@ export function buildRegistry(root, release) {
     meta: stamp,
   }];
 
-  for (const c of components) {
-    const entries = c.dir ? walkSource(root, c.dir) : [c.main, c.main.replace(/\.jsx$/, '.scss')].filter((f) => isFile(root, f));
+  const units = [...components.map((c) => ({ ...c, type: 'registry:ui', title: c.name })), ...patternList(root), ...templateList(root), ...chartList(root)];
+  const seen = new Set(['foundation']);
+  for (const u of units) {
+    if (seen.has(u.name)) refusals.push(`${u.name}: more than one registry item has this name`);
+    seen.add(u.name);
+  }
+  for (const c of units) {
+    const entries = c.files ?? (c.dir ? walkSource(root, c.dir, c.type !== 'registry:ui') : [c.main, c.main.replace(/\.jsx$/, '.scss')].filter((f) => isFile(root, f)));
     const own = closure(root, entries);
     refusals.push(...own.refusals.map((r) => `${c.name}: ${r}`));
+    // Walk from the item's own files, stopping at another item's: a shared helper no item owns travels with whoever imports it.
     const owned = new Set();
     const needs = new Set();
-    for (const f of own.files) {
-      const o = ownerOf(f, components, fnames);
-      if (o === c.name || o === null) owned.add(f);
-      else needs.add(o);
+    const walk = [...entries];
+    while (walk.length) {
+      const f = walk.pop();
+      if (owned.has(f)) continue;
+      owned.add(f);
+      for (const d of own.edges.get(f) ?? []) {
+        const o = ownerOf(d, units, fnames);
+        if (o === null || o === c.name) walk.push(d);
+        else needs.add(o);
+      }
     }
+    // Every item styles itself on the foundation's tokens: directly, or through an item that does.
+    if (!needs.size || c.name === CHART_THEME) needs.add('foundation');
     const deps = lockVersions(root, own.packages.filter((p) => !PEERS.has(p)));
-    const depFiles = [...needs];
     items.push({
-      name: c.name, type: 'registry:ui', title: c.name,
+      name: c.name, type: c.type, title: c.title,
+      ...(c.description ? { description: c.description } : {}),
       dependencies: Object.entries(deps).map(([n, v]) => `${n}@${v}`),
-      registryDependencies: [...new Set(depFiles.map((n) => (n === 'foundation' ? 'foundation' : n)))].sort(),
+      registryDependencies: [...needs].sort(),
       files: [...owned].sort().map((f) => fileEntry(root, f)),
       meta: stamp,
     });
@@ -264,11 +311,14 @@ export function buildRegistry(root, release) {
   return { items, refusals: [...new Set(refusals)] };
 }
 
-function walkSource(root, dir) {
+/** A pattern's folder also holds docs examples and demos built on the docs chrome; they stay behind (`bare`). */
+const EXAMPLE = /\.examples\.|[dD]emo\.jsx$|Cases\.jsx$/;
+
+function walkSource(root, dir, bare = false) {
   const out = [];
   for (const e of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {
     const rel = `${dir}/${e.name}`;
-    if (e.isDirectory()) { if (e.name !== '_internal') out.push(...walkSource(root, rel)); } else if (!NOT_SOURCE.test(rel) && /\.(jsx?|scss)$/.test(e.name) && !/\.d\./.test(e.name)) out.push(rel);
+    if (e.isDirectory()) { if (e.name !== '_internal') out.push(...walkSource(root, rel, bare)); } else if (!NOT_SOURCE.test(rel) && !(bare && EXAMPLE.test(rel)) && /\.(jsx?|scss)$/.test(e.name) && !/\.d\./.test(e.name)) out.push(rel);
   }
   return out;
 }
