@@ -218,7 +218,8 @@ const reorder = scene({
 
 // ---------- Expand and collapse ----------
 
-const DETAIL = 30;
+// The detail is short enough that the first row below stays in view as it moves down.
+const DETAIL = 16;
 const Chevron = ({ x, y, open }) => (
   <path
     d={`M${x - 3} ${y - 1.5} L${x} ${y + 1.5} L${x + 3} ${y - 1.5}`}
@@ -246,8 +247,7 @@ const expand = ({ id, title, caption, closing }) =>
           <Clip x={60} y={62} w={83} h={DETAIL * h}>
             <g opacity={c}>
               <CardBox x={60} y={62} w={83} h={DETAIL - 2} />
-              <SkeletonBar x={68} y={70} w={40} />
-              <SkeletonBar x={68} y={78} w={56} />
+              <SkeletonBar x={68} y={67} w={50} />
             </g>
           </Clip>
           <Row x={60} y={62 + DETAIL * h} w={83} />
@@ -271,20 +271,23 @@ const expand = ({ id, title, caption, closing }) =>
 
 // ---------- Load content ----------
 
-const LOAD_ROWS = [38, 52, 66];
-const LOAD_KEYS = ['r1', 'r2', 'r3'];
+// Two rows, then the chart below them, so a part never lands on another.
+const LOAD_ROWS = [38, 52];
+const LOAD_ROW_W = 83;
+const CHART = { x: 62, y: 70, w: 44, h: 20 };
+const LOAD_KEYS = ['r1', 'r2'];
 const load = ({ id, title, caption, skeleton }) =>
   scene({
     id,
     title,
     caption,
-    initial: { sk: skeleton ? 1 : 0, sh: 0, hd: 0, r1: 0, r2: 0, r3: 0, pri: 0, ch: 0 },
-    landing: { sk: 0, hd: 1, r1: 1, r2: 1, r3: 1, pri: 1, ch: 1 },
+    initial: { sk: skeleton ? 1 : 0, sh: 0, hd: 0, r1: 0, r2: 0, pri: 0, ch: 0 },
+    landing: { sk: 0, hd: 1, r1: 1, r2: 1, pri: 1, ch: 1 },
     // With no Skeleton, the three rows are pushed down as one group when the header arrives.
     arrows: skeleton
       ? []
-      : [travel({ x: 60, y: LOAD_ROWS[0], w: 83, h: LOAD_ROWS[LOAD_ROWS.length - 1] + 14 - LOAD_ROWS[0] }, 0, -12)],
-    draw: ({ sk, sh, hd, r1, r2, r3, pri, ch }) => {
+      : [travel({ x: 60, y: LOAD_ROWS[0], w: LOAD_ROW_W, h: LOAD_ROWS[LOAD_ROWS.length - 1] + 14 - LOAD_ROWS[0] }, 0, -12)],
+    draw: ({ sk, sh, hd, r1, r2, pri, ch }) => {
       // With no Skeleton to hold the room, the rows sit high until the header arrives and push them down.
       const rise = skeleton ? 0 : 12 * (1 - hd);
       return (
@@ -293,27 +296,27 @@ const load = ({ id, title, caption, skeleton }) =>
           <g opacity={hd}>
             <SkeletonBar x={60} y={26} w={30} h={6} heading />
           </g>
-          {[r1, r2, r3].map((o, i) => (
+          {[r1, r2].map((o, i) => (
             <g key={i} opacity={o}>
-              <Row x={60} y={LOAD_ROWS[i] - rise} w={83} />
+              <Row x={60} y={LOAD_ROWS[i] - rise} w={LOAD_ROW_W} />
             </g>
           ))}
           <g opacity={pri}>
             <ButtonShape x={120} y={24} w={23} appearance="primary" />
           </g>
           <g opacity={ch}>
-            {[10, 18, 14, 22].map((bh, i) => (
-              <Rect key={i} x={62 + i * 12} y={90 - bh} w={8} h={bh} fill={PAINT.shape} corner="shape" />
+            {[8, 16, 12, 20].map((bh, i) => (
+              <Rect key={i} x={CHART.x + i * 12} y={CHART.y + CHART.h - bh} w={8} h={bh} fill={PAINT.shape} corner="shape" />
             ))}
           </g>
           {skeleton && (
             <g opacity={sk}>
               <SkeletonBar x={60} y={26} w={30} h={6} heading />
               {LOAD_ROWS.map((y) => (
-                <SkeletonBar key={y} x={60} y={y + 2} w={83} h={10} />
+                <SkeletonBar key={y} x={60} y={y + 2} w={LOAD_ROW_W} h={10} />
               ))}
               <SkeletonBar x={120} y={24} w={23} h={8} />
-              <SkeletonBar x={62} y={70} w={44} h={20} />
+              <Rect {...CHART} fill={PAINT.placeholderText} corner="shape" />
               <Clip {...BODY}>
                 <Rect x={mix(40, 150, sh)} y={20} w={14} h={74} fill={PAINT.pageSurface} opacity={0.5} />
               </Clip>
@@ -333,7 +336,7 @@ const load = ({ id, title, caption, skeleton }) =>
         ]);
         await Promise.all(
           LOAD_KEYS.map(async (key, i) => {
-            await ctx.hold(i * stagger(3));
+            await ctx.hold(i * stagger(LOAD_KEYS.length));
             await ctx.spring(key, 1, 'appearance.default');
           }),
         );
@@ -342,7 +345,7 @@ const load = ({ id, title, caption, skeleton }) =>
         return;
       }
       // The same order with nothing holding the room: each part pops in and the rest jumps.
-      ctx.set({ r1: 1, r2: 1, r3: 1 });
+      ctx.set({ r1: 1, r2: 1 });
       await ctx.hold(1);
       ctx.set({ hd: 1 });
       await ctx.hold(1);
