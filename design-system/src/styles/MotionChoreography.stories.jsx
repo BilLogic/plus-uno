@@ -154,3 +154,37 @@ export const BreakpointsFollowTheHand = {
     await expect(lags.waited).toBe(1);
   },
 };
+
+/**
+ * Unify direction: every part is drawn, as a real shape, at its start from the
+ * first frame, so a loop never opens on an empty window with only landing outlines.
+ */
+export const DirectionPartsVisibleAtStart = {
+  render: () => (
+    <div>
+      {CHOREOGRAPHY_DEMOS.direction.scenes.map((scene) => (
+        <svg key={scene.id} data-start-scene={scene.id} viewBox={scene.viewBox} width={320}>
+          {scene.draw(scene.initial)}
+        </svg>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const scenes = CHOREOGRAPHY_DEMOS.direction.scenes;
+    await expect(scenes.length).toBe(2);
+    for (const scene of scenes) {
+      const svg = canvasElement.querySelector(`[data-start-scene="${scene.id}"]`);
+      const parts = [...svg.querySelectorAll('g[transform]')];
+      await expect(parts.length).toBe(scene.arrows.length);
+      for (const part of parts) {
+        await expect(Number(part.getAttribute('opacity') ?? 1)).toBeGreaterThanOrEqual(0.5);
+        const shapes = [...part.querySelectorAll('*')].filter((el) => {
+          if (typeof el.getBBox !== 'function' || el.tagName === 'g') return false;
+          const b = el.getBBox();
+          return b.width > 0 && b.height > 0;
+        });
+        await expect(shapes.length).toBeGreaterThan(0);
+      }
+    }
+  },
+};

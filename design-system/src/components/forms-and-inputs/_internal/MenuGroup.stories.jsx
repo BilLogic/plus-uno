@@ -11,7 +11,7 @@ export default {
     component: MenuGroup,
     tags: ['!dev', '!autodocs'],
     argTypes: {
-        density: { control: 'select', options: ['regular', 'compact'], table: { category: 'Design' } },
+        density: { control: 'select', options: ['default', 'compact'], table: { category: 'Design' } },
     },
 };
 
@@ -77,10 +77,10 @@ export const CustomRowExample = () => (
     </MenuGroup>
 );
 
-/** Density: regular rows and compact rows. */
+/** Density: default rows (32) and compact rows (24). */
 export const Density = () => (
     <div style={{ display: 'flex', gap: 'var(--inline-lg)', flexWrap: 'wrap' }}>
-        {['regular', 'compact'].map((density) => (
+        {['default', 'compact'].map((density) => (
             <MenuGroup key={density} density={density} id={`menu-density-${density}`}>
                 <ButtonItem>{density} one</ButtonItem>
                 <ButtonItem>{density} two</ButtonItem>
@@ -90,7 +90,7 @@ export const Density = () => (
 );
 
 export const Interactive = {
-    args: { density: 'regular' },
+    args: { density: 'default' },
     render: (args) => (
         <MenuGroup {...args}>
             <ButtonItem>Item one</ButtonItem>

@@ -7,9 +7,10 @@
     min-width: var(--menu-group-min-width);
     padding: var(--pad-y-lg) 0;
 
+    // The same rows as OptionRow: Item 32 by default, Item 24 compact.
     &--compact .plus-menu-item {
-        // 20px of body-default line-height + 6px top and bottom = a 32px row.
-        padding-block: var(--pad-y-md);
+        min-height: var(--item-height-sm);
+        padding-block: var(--pad-y-sm);
     }
 }
 
@@ -33,8 +34,9 @@
     align-items: center;
     width: 100%;
     gap: var(--menu-group-gap);
-    // 20px of body-default line-height + 10px top and bottom = a 40px row.
-    padding: var(--menu-group-item-pad-y) var(--menu-group-pad-x);
+    box-sizing: border-box;
+    min-height: var(--item-height-md);
+    padding: var(--pad-y-md) var(--menu-group-pad-x);
     border: none;
     background: none;
     border-radius: var(--radius-lg);
