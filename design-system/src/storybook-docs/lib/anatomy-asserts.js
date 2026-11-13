@@ -46,7 +46,7 @@ export const leadersCrossNoOtherPart = (canvasElement, parts) => {
         // Nor a Sidebar or Panel the leader does not label.
         const target = canvasElement.querySelector(parts[i].selector);
         canvasElement.querySelectorAll(ANATOMY_REGIONS).forEach((region) => {
-            if (isOwnRegion(region, target)) return;
+            if (!target || isOwnRegion(region, target)) return;
             const box = rect(region);
             const inside = line.right > box.left + 1 && line.left < box.right - 1 && line.bottom > box.top + 1 && line.top < box.bottom - 1;
             expect(inside, `leader ${i + 1} (${label}) does not cross the ${region.className.split(' ')[0]}`).toBe(false);

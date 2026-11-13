@@ -193,13 +193,16 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                 const el = root.querySelector(part.selector);
                 if (!el) return { part, rect: null };
                 const r = el.getBoundingClientRect();
-                // A start leader runs left from the part to the gutter: when a region it does not label (the Sidebar) sits in that run, the marker moves to the end gutter, nearest the part.
-                const blocked = (part.side ?? 'start') === 'start' && regions.some((region) => {
+                // A leader runs from the part to its marker's gutter. When a region it does not label (the Sidebar, the AI Panel) sits in that run, the marker moves to the other gutter if that run is clear.
+                const crossed = (toStart) => regions.some((region) => {
                     if (isOwnRegion(region, el)) return false;
                     const g = region.getBoundingClientRect();
-                    return g.right <= r.left + 1 && g.right > origin.left && g.bottom > r.top + 1 && g.top < r.bottom - 1;
+                    const level = g.bottom > r.top + 1 && g.top < r.bottom - 1;
+                    return toStart ? level && g.right <= r.left + 1 && g.right > origin.left : level && g.left >= r.right - 1 && g.left < origin.right;
                 });
-                return { part: blocked ? { ...part, side: 'end' } : part, rect: { top: r.top - origin.top, left: r.left - origin.left, width: r.width, height: r.height } };
+                const side = part.side ?? 'start';
+                const flipped = side === 'start' ? crossed(true) && !crossed(false) : side === 'end' ? crossed(false) && !crossed(true) : false;
+                return { part: flipped ? { ...part, side: side === 'start' ? 'end' : 'start' } : part, rect: { top: r.top - origin.top, left: r.left - origin.left, width: r.width, height: r.height } };
             });
             setMarks(placeMarkers(placed.map((p) => p.rect), placed.map((p) => p.part)));
         };
