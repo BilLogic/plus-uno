@@ -13,6 +13,7 @@ import {
 } from '@/components';
 import { Frame, PatternCard, PatternSection } from '@/patterns';
 import { ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
+import { ReflowStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 /**
  * Page-template docs helpers: the page header assembled from its parts, a
@@ -124,11 +125,15 @@ export const ViewSelect = () => (
  * token to none on the content box).
  */
 export const PageStage = ({ full = false, width = SCENARIO_STAGE, height = STAGE_HEIGHT, children }) => (
-    <div data-page-stage style={{ inlineSize: width, height }}>
-        <Frame style={full ? { '--content-max-width': 'none' } : undefined}>
-            {children}
-        </Frame>
-    </div>
+    <ReflowStage width={width}>
+        {(layout) => (
+            <div data-page-stage style={{ inlineSize: layout, height }}>
+                <Frame style={full ? { '--content-max-width': 'none' } : undefined}>
+                    {children}
+                </Frame>
+            </div>
+        )}
+    </ReflowStage>
 );
 
 PageStage.propTypes = { full: PropTypes.bool, width: PropTypes.number, height: PropTypes.number, children: PropTypes.node };

@@ -132,6 +132,8 @@ const ROLES = {
   illustrationEdge: ['--ds-border-input', null],
   // The one drawn letterform: the Typography specimen's glyphs, in the text ink.
   glyph: ['--ds-text', null],
+  // An icon drawn as an icon (the Iconography set): the Icon component's default subtle ink.
+  iconGlyph: ['--ds-icon-subtle', 'components/images-and-icons/Icon/Icon.scss'],
 };
 
 /**

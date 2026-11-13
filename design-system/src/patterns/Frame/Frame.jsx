@@ -564,7 +564,7 @@ const Frame = ({
         <IconButton className="plus-frame__close" appearance="subtle" icon="xmark" label={closeLabel} onClick={onClose} type="button" />
     ) : null;
     const pageHead = pageToggle || header || backButton || closeButton ? (
-        <div className={['plus-frame__head', pageToggle ? 'plus-frame__head--toggle' : ''].filter(Boolean).join(' ')}>
+        <div className={['plus-frame__head', width === 'reading' ? 'plus-frame__head--reading' : '', pageToggle ? 'plus-frame__head--toggle' : ''].filter(Boolean).join(' ')}>
             {backButton}
             {pageToggle}
             {header}

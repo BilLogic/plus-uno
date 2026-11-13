@@ -110,6 +110,16 @@
     margin-bottom: var(--page-stack-sm);
 }
 
+// A reading-width page (the focused type) caps its header row with its content,
+// so Close, the title and the body share one pair of column edges.
+.plus-frame__head--reading {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: var(--content-min-width);
+    max-width: var(--content-max-width-reading);
+    margin-inline: auto;
+}
+
 .plus-frame__back,
 .plus-frame__close {
     flex-shrink: 0;

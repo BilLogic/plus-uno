@@ -26,7 +26,11 @@ const HEADER_BUTTON = [128, 34];
 
 // ---------- Drill into and climb back out ----------
 
-/** The list a record is opened from: a header (or a Breadcrumb) and three rows. The middle row is what gets pressed, so it stays neutral. */
+/**
+ * The list a record is opened from: a header (or a Breadcrumb) and three rows.
+ * The middle row is the one pressed: it is the subject, so it takes the
+ * selected fill and the accent ring, and the record grows out of exactly it.
+ */
 const ListLayer = ({ crumbs }) => (
   <>
     {crumbs ? (
@@ -38,10 +42,18 @@ const ListLayer = ({ crumbs }) => (
       <PageHeader x={60} y={26} w={83} />
     )}
     <Row x={BODY.x} y={BODY.y} w={BODY.w} />
+    <Rect x={ROW.x} y={ROW.y} w={ROW.w} h={ROW.h} fill={PAINT.rowSelected} corner="shape" />
     <Row x={ROW.x} y={ROW.y} w={ROW.w} />
+    <Rect x={ROW.x} y={ROW.y} w={ROW.w} h={ROW.h} stroke={PAINT.accent} corner="shape" />
     <Row x={BODY.x} y={76} w={BODY.w} />
   </>
 );
+
+/** Where the row goes: from its corners to the record's, the same two paths before either tile moves. */
+const GROW_ARROWS = [
+  [[ROW.x + 2, ROW.y + 2], [PAGE.x + 4, PAGE.y + 4]],
+  [[ROW.x + ROW.w - 2, ROW.y + ROW.h - 2], [PAGE.x + PAGE.w - 4, PAGE.y + PAGE.h - 4]],
+];
 
 /** The record: its Breadcrumb one level longer, a heading and two cards. */
 const RecordLayer = ({ crumbs }) => (
@@ -55,7 +67,8 @@ const RecordLayer = ({ crumbs }) => (
 
 /**
  * A row growing into its record. `g` is the container (position, size and
- * corner together), `l` the list, `c` the record's content. `cut` replaces the
+ * corner together), `l` the list, `c` the record's content. The change is the
+ * subject: the pressed row and the container it grows into carry the accent. `cut` replaces the
  * grow with a jump; `slide` brings the record in from the right edge instead.
  */
 const drill = ({ id, title, caption, crumbs = 0, mode = 'grow' }) => ({
@@ -65,7 +78,7 @@ const drill = ({ id, title, caption, crumbs = 0, mode = 'grow' }) => ({
   viewBox: VIEW,
   initial: mode === 'slide' ? { x: 1, l: 1, c: 1 } : { g: 0, l: 1, c: 0 },
   landing: mode === 'slide' ? { x: 0, l: 1, c: 1 } : { g: 1, l: 0, c: 1 },
-  arrows: mode === 'slide' ? [[[148, 56], [101, 56]]] : [[[101, 69], [101, 52]]],
+  arrows: mode === 'slide' ? [[[148, 56], [101, 56]]] : GROW_ARROWS,
   draw: ({ g = 0, l, c, x = 0 }) => (
     <>
       <Screen x={8} y={6} w={144} h={88} header={false}>
@@ -80,7 +93,7 @@ const drill = ({ id, title, caption, crumbs = 0, mode = 'grow' }) => ({
               w={mix(ROW.w, PAGE.w, g)}
               h={mix(ROW.h, PAGE.h, g)}
               fill={PAGE_FILL}
-              stroke={PAGE_EDGE}
+              stroke={PAINT.accent}
               corner={g > 0.5 ? undefined : 'shape'}
             />
             <g opacity={c}>

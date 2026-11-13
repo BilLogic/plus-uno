@@ -2,7 +2,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import { FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
-import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { ThumbGrid, ThumbTile } from '@/storybook-docs/docs-landing/HeroThumbs.jsx';
 import { ChooserDot, HIDDEN } from '@/storybook-docs/templates/overview-parts.jsx';
 
 <Meta title="Patterns/Overview" tags={['manifest']} />
@@ -24,16 +24,21 @@ import { ChooserDot, HIDDEN } from '@/storybook-docs/templates/overview-parts.js
 
 Seven pages and one group of six States pages. Each pattern is one page: its situations first, then the key cases drawn on templates, then the usage spine. Reach for one when you are unsure of a choice or challenging it; <a target="_top" href="./?path=/docs/templates-overview--docs">Templates and patterns</a> says how the layers fit together.
 
-<TypeGrid>
-<TypeCard hero="patterns-common-actions" title="Common actions" to="patterns-common-actions">Which button, in which look, in which place, with which word, and acting on many rows at once.</TypeCard>
-<TypeCard hero="patterns-forms" title="Forms" to="patterns-forms">How a form takes and checks what someone types, and what happens on leaving with edits.</TypeCard>
-<TypeCard hero="patterns-filtering" title="Filtering" to="patterns-filtering">How a person narrows a collection to the rows that matter, in five tiers.</TypeCard>
-<TypeCard hero="patterns-navigation" title="Navigation" to="patterns-navigation">How a person moves between areas, views and records, with one control and one motion per move.</TypeCard>
-<TypeCard hero="patterns-search" title="Search" to="patterns-search">How a person finds a record by typing, in one of three modes.</TypeCard>
-<TypeCard hero="patterns-indicators" title="Indicators" to="patterns-indicators">The small labels that say how something is: its state, how many, how much it moved.</TypeCard>
-<TypeCard hero="patterns-notifications" title="Notifications" to="patterns-notifications">What the product says back, and where: a Flag, a Banner, a SectionMessage, the Inbox.</TypeCard>
-<TypeCard hero="patterns-states-empty" title="States">What a view shows when it has nothing, is still working, has failed, has too much, or cannot be changed right now. <span style={{ display: 'block' }}><a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a> · <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a> · <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a> · <a target="_top" href="./?path=/docs/patterns-states-overflow--docs">Overflow</a> · <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a> · <a target="_top" href="./?path=/docs/patterns-states-read-only--docs">Read-only</a></span></TypeCard>
-</TypeGrid>
+<ThumbGrid>
+<ThumbTile hero="patterns-navigation" title="Navigation" span="wide">How a person moves between areas, views and records, with one control and one motion per move.</ThumbTile>
+<ThumbTile hero="patterns-common-actions" title="Common actions">Which button, in which look, in which place, with which word, and acting on many rows at once.</ThumbTile>
+<ThumbTile hero="patterns-filtering" title="Filtering" span="wide">How a person narrows a collection to the rows that matter, in five tiers.</ThumbTile>
+<ThumbTile hero="patterns-forms" title="Forms" span="tall">How a form takes and checks what someone types, and what happens on leaving with edits.</ThumbTile>
+<ThumbTile hero="patterns-search" title="Search" span="wide">How a person finds a record by typing, in one of three modes.</ThumbTile>
+<ThumbTile hero="patterns-indicators" title="Indicators">The small labels that say how something is: its state, how many, how much it moved.</ThumbTile>
+<ThumbTile hero="patterns-notifications" title="Notifications">What the product says back, and where: a Flag, a Banner, a SectionMessage, the Inbox.</ThumbTile>
+<ThumbTile hero="patterns-states-empty" title="States · Empty">What a view shows when it has nothing to show.</ThumbTile>
+<ThumbTile hero="patterns-states-overflow" title="States · Overflow" span="wide">What happens when text or a list is longer than its room: titles wrap, cells truncate, lists fold, tables page.</ThumbTile>
+<ThumbTile hero="patterns-states-loading" title="States · Loading">What to show while PLUS fetches or saves something.</ThumbTile>
+<ThumbTile hero="patterns-states-errors" title="States · Errors">Where a failure shows and what it says.</ThumbTile>
+<ThumbTile hero="patterns-states-disabled" title="States · Disabled">When a control cannot be used yet, or by this person.</ThumbTile>
+<ThumbTile hero="patterns-states-read-only" title="States · Read-only">A value someone could change but this person cannot right now.</ThumbTile>
+</ThumbGrid>
 
 </FoundationSection>
 

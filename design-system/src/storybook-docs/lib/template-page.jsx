@@ -61,17 +61,21 @@ ScaledStory.propTypes = {
 /** The stage a type card's story lays out at, so every card shows one scale; wide enough for a list beside its detail. */
 const TYPE_STAGE = 1024;
 
-/** The opening grid of a template's types: two across, a Section group apart. */
-export const TypeGrid = ({ children }) => (
+/**
+ * The opening grid of a template's types: two across, a Section group apart.
+ * `wide` puts one type per row, for types that each show a whole screen, so
+ * the screen draws at a size that reads.
+ */
+export const TypeGrid = ({ wide = false, children }) => (
     <div
         className="not-prose"
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, var(--card-min-width-lg)), 1fr))', gap: 'var(--section-stack-md)' }}
+        style={{ display: 'grid', gridTemplateColumns: wide ? 'minmax(0, 1fr)' : 'repeat(auto-fill, minmax(min(100%, var(--card-min-width-lg)), 1fr))', gap: 'var(--section-stack-md)' }}
     >
         {children}
     </div>
 );
 
-TypeGrid.propTypes = { children: PropTypes.node };
+TypeGrid.propTypes = { wide: PropTypes.bool, children: PropTypes.node };
 
 /** One type: its live story (or, with `hero`, a page's registry hero) on the raised card, then its name and one line. */
 export const TypeCard = ({ of, thumb, hero, title, stage = TYPE_STAGE, to, thumbRatio, children }) => (
@@ -309,10 +313,11 @@ export const BrowserWindow = ({ address = 'app.plus.org', height, fill = false, 
             border: 'var(--border-default) solid var(--ds-border)',
             borderRadius: 'var(--radius-md)',
             overflow: 'hidden',
-            background: 'var(--ds-surface-sunken)',
+            // The body is the Page's surface: a window that holds a Frame shows the Frame's own sunken fill.
+            background: 'var(--ds-surface)',
         }}
     >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)', padding: 'var(--space-050) var(--space-100)', borderBottom: 'var(--border-default) solid var(--ds-border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)', background: 'var(--ds-surface-sunken)', padding: 'var(--space-050) var(--space-100)', borderBottom: 'var(--border-default) solid var(--ds-border)' }}>
             <span aria-hidden="true" style={{ display: 'flex', gap: 'var(--space-050)' }}>
                 {[0, 1, 2].map((i) => (
                     <span key={i} style={{ inlineSize: 'var(--space-075)', blockSize: 'var(--space-075)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)' }} />

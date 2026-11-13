@@ -1682,6 +1682,11 @@ export const FocusedStepsDown = {
         await expect(rect(back).right, 'Back comes before Next').toBeLessThanOrEqual(rect(next).left);
         await expect(back, 'Back is disabled on the first step').toHaveAttribute('aria-disabled', 'true');
         await expect(canvas.getByRole('button', { name: 'Close' }), 'Close leads the title row').toBeInTheDocument();
+        // One column: the title row, the body and the bar's actions share the Page's reading edges.
+        const close = canvas.getByRole('button', { name: 'Close' });
+        await expect(rect(close).left, 'Close starts on the body’s left edge').toBeCloseTo(rect(steps).left, 0);
+        await expect(rect(cancel).left, 'Cancel starts on the body’s left edge').toBeCloseTo(rect(steps).left, 0);
+        await expect(rect(next).right, 'Next ends on the body’s right edge').toBeCloseTo(rect(layout).right, 0);
         await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no Sidebar').toBeNull();
         await userEvent.click(next);
         await expect(back, 'Back works from the second step').not.toHaveAttribute('aria-disabled');

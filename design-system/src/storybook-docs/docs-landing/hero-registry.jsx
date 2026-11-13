@@ -92,7 +92,7 @@ export const HEROES = {
   'foundations-visual-iconography': {
     Hero: IconographyHero,
     description:
-      'One glyph on its keyline grid, neighbors cropped.',
+      'Ten different icons in one style; the bell ringed, drawn on its keyline.',
   },
   'foundations-brand-illustrations': {
     Hero: IllustrationsHero,
@@ -187,7 +187,7 @@ export const HEROES = {
   'patterns-common-actions': {
     Hero: CommonActionsHero,
     description:
-      'The end of a view bar: a More menu open, a default button, and the Primary button ringed.',
+      'The button group itself: the secondary Default button and the Primary, ringed.',
   },
   'patterns-forms': {
     Hero: FormsHero,
@@ -197,7 +197,7 @@ export const HEROES = {
   'patterns-filtering': {
     Hero: FilteringHero,
     description:
-      'The filter menu open from the end of the view bar, two options checked.',
+      'A view bar with two filter buttons; Grade has picks and is open, its menu below it with two options checked.',
   },
   'patterns-navigation': {
     Hero: NavigationHero,
@@ -207,22 +207,22 @@ export const HEROES = {
   'patterns-search': {
     Hero: SearchHero,
     description:
-      'The search field open with its results below it.',
+      'The search field, focused with a word typed, and its results open under it.',
   },
   'patterns-indicators': {
     Hero: IndicatorsHero,
     description:
-      'A status column cropped big; the new status and the count are in the brand color.',
+      'Three status tags, the new one ringed; counts and a change beneath them.',
   },
   'patterns-notifications': {
     Hero: NotificationsHero,
     description:
-      'Flags stacked at the corner, the newest ringed.',
+      'One Flag, whole where it lands and ringed; the one before it peeks out behind.',
   },
   'patterns-states-disabled': {
     Hero: DisabledHero,
     description:
-      'A Primary button you cannot press yet, with the reason in text beside it.',
+      'A settings card: two rows faded because they cannot be used yet, the Primary faded with the pointer refusing it, and the reason in words.',
   },
   'patterns-states-empty': {
     Hero: EmptyHero,
@@ -257,12 +257,12 @@ export const HEROES = {
   'templates-frame': {
     Hero: FrameHero,
     description:
-      'The app frame: sidebar ringed, top bar, panel.',
+      'The app frame ringed whole: the docked Sidebar, the Page and a docked Panel.',
   },
   'templates-page': {
     Hero: PageHero,
     description:
-      'The page header and its Sections, the page ringed.',
+      'The page header and its Sections; the Page ringed beside the docked Sidebar.',
   },
   'templates-section-section': {
     Hero: SectionHero,

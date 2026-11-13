@@ -177,53 +177,85 @@ export const GridHero = () => (
   </HeroDrawing>
 );
 
-const KEYLINES = Array.from({ length: 17 }, (_, i) => 90 + i * 7.5);
+/**
+ * Ten stroke glyphs on a 24 grid, each a different object, so the set reads as
+ * one family: the same stroke, the same corners, the same live area.
+ */
+const GLYPHS = {
+  calendar: (
+    <>
+      <rect x="3" y="5" width="18" height="16" rx="2.5" />
+      <path d="M3 10H21M8 3v4M16 3v4" />
+    </>
+  ),
+  user: (
+    <>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
+    </>
+  ),
+  bell: <path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4" />,
+  search: (
+    <>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="M15.5 15.5L21 21" />
+    </>
+  ),
+  chat: <path d="M4 5h16v11H9l-5 4z" />,
+  check: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8 12l3 3 5-6" />
+    </>
+  ),
+  star: <path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4 6.5 20.3l1-6.2L3 9.7l6.2-.9z" />,
+  folder: <path d="M3 6h7l2 2h9v11H3z" />,
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </>
+  ),
+  book: <path d="M4 4h7a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4zM20 4h-7a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h7z" />,
+};
 
-export const IconographyHero = () => (
-  <HeroDrawing>
-    {[-130, -50, 290, 370].map((x) => (
-      <g key={x}>
-        <CardBox x={x} y={45} w={70} h={70} />
-        <Rect
-          x={x + 23}
-          y={68}
-          w={24}
-          h={24}
-          fill={PAINT.shape}
-          corner="icon"
-        />
-      </g>
-    ))}
-    <CardBox x={80} y={10} w={140} h={140} />
-    {KEYLINES.map((v, i) => (
-      <g key={v}>
-        <Rule x1={v} x2={v} y1={20} y2={140} stroke={PAINT.axis} />
-        <Rule
-          x1={90}
-          x2={210}
-          y1={20 + i * 7.5}
-          y2={20 + i * 7.5}
-          stroke={PAINT.axis}
-        />
-      </g>
-    ))}
-    <circle
-      cx={150}
-      cy={80}
-      r={48}
-      fill="none"
-      stroke={PAINT.annotation}
-      strokeDasharray="2 2"
-      style={HAIRLINE}
-    />
-    <path
-      d="M126 104 L126 73 Q126 50 150 50 Q174 50 174 73 L174 104 Z"
-      fill={PAINT.accent}
-    />
-    <Rect x={117} y={103} w={66} h={8} fill={PAINT.accent} corner="full" />
-    <circle cx={150} cy={121} r={7} fill={PAINT.accent} />
-  </HeroDrawing>
-);
+/** The set, five across and two down; the bell is the subject. */
+const ICON_SET = ["calendar", "user", "bell", "search", "chat", "check", "star", "folder", "clock", "book"];
+
+export const IconographyHero = () => {
+  const cell = 48;
+  const gap = 10;
+  const x0 = (300 - (5 * cell + 4 * gap)) / 2;
+  const y0 = (160 - (2 * cell + gap)) / 2;
+  return (
+    <HeroDrawing>
+      {ICON_SET.map((name, i) => {
+        const x = x0 + (i % 5) * (cell + gap);
+        const y = y0 + Math.floor(i / 5) * (cell + gap);
+        const subject = name === "bell";
+        return (
+          <g key={name}>
+            <CardBox x={x} y={y} w={cell} h={cell} accent={subject} />
+            {/* The bell's 24 keyline: the live area the glyph is drawn in. */}
+            {subject && (
+              <rect x={x + 12} y={y + 12} width={24} height={24} fill="none" stroke={PAINT.annotation} strokeDasharray="1.5 1.5" style={HAIRLINE} />
+            )}
+            <g
+              transform={`translate(${x + 12} ${y + 12})`}
+              fill="none"
+              stroke={subject ? PAINT.accent : PAINT.iconGlyph}
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              {GLYPHS[name]}
+            </g>
+          </g>
+        );
+      })}
+    </HeroDrawing>
+  );
+};
 
 export const IllustrationsHero = () => (
   <HeroDrawing>

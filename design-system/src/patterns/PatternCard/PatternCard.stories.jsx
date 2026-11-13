@@ -6,6 +6,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternCard from '@/patterns/PatternCard';
 import { Skeleton, Button, IconButton } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
+import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 const bodyCopy = (
     <p className="body-large" style={{ margin: 0 }}>
@@ -63,23 +64,26 @@ function PatternCardRowsDemo() {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-300)' }}>
             {[['Medium', 720], ['Large', 736], ['X-Large', 1152]].map(([mode, width]) => (
-                <div key={mode} style={{ overflowX: 'auto' }}>
+                <div key={mode}>
                     <DemoCaption>{`${mode} · content ${width}`}</DemoCaption>
-                    <div
-                        data-row={mode}
-                        style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-md), 1fr))',
-                            gap: 'var(--grid-gutter)',
-                            width,
-                        }}
-                    >
-                        {people.map(([name, detail], i) => (
-                            <PatternCard key={`${name}-${i}`} title={name} description={detail}>
-                                {sessionBody}
-                            </PatternCard>
-                        ))}
-                    </div>
+                    {/* Each row is a picture of one content width: scaled to fit, never reflowed. */}
+                    <FitStage width={width} reflow={false}>
+                        <div
+                            data-row={mode}
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-md), 1fr))',
+                                gap: 'var(--grid-gutter)',
+                                width,
+                            }}
+                        >
+                            {people.map(([name, detail], i) => (
+                                <PatternCard key={`${name}-${i}`} title={name} description={detail}>
+                                    {sessionBody}
+                                </PatternCard>
+                            ))}
+                        </div>
+                    </FitStage>
                 </div>
             ))}
         </div>

@@ -93,3 +93,10 @@ test('an overview card naming a hero the registry lacks fails', () => {
   assert.equal(found.length, 1, found.join('\n'));
   assert.match(found[0], /hero="templates-ghost"/);
 });
+
+test('an overview thumbnail naming a hero the registry lacks fails', () => {
+  const source = `${landing('patterns-overview')}\n<ThumbTile hero="patterns-ghost" title="Ghost" span="wide" />\n<ThumbTile hero="patterns-overview" title="Real" />\n`;
+  const found = checkPage({ file: 'Overview.mdx', source, id: 'patterns-overview', heroes: ['patterns-overview'] });
+  assert.equal(found.length, 1, found.join('\n'));
+  assert.match(found[0], /hero="patterns-ghost"/);
+});
