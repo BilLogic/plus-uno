@@ -328,7 +328,7 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
       style={{ margin: 0, display: 'grid', gridTemplateRows: 'subgrid', gridRow: 'span 3', gap: 'var(--stack-sm)', minInlineSize: 0 }}
     >
       <div style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text)' }}>{scene.title}</div>
-      <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)' }}>
+      <div style={{ borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', overflow: 'hidden' }}>
         <Illustration viewBox={scene.viewBox} title={scene.label ?? `${scene.title}. ${scene.caption}`}>
           <g opacity={round(1 - dim * VEIL)}>
             {resetting && <g>{scene.draw(startStates([scene])[scene.id])}</g>}
@@ -485,6 +485,7 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
   return (
     <section
       data-motion-demo
+      data-docs-stage
       data-phase={phase}
       data-speed={String(SPEEDS[speedIndex])}
       aria-labelledby={title ? titleId : undefined}

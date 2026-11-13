@@ -172,6 +172,8 @@ const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)'
 const label = { font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' };
 const small = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 const codeText = { font: 'var(--code)', color: 'var(--ds-text)', wordBreak: 'break-word' };
+/** A value that never breaks mid-value: a narrow table scrolls in its own container instead. */
+const valueText = { ...codeText, whiteSpace: 'nowrap', wordBreak: 'normal' };
 const well = {
     position: 'relative',
     padding: 'var(--card-pad-spacious)',
@@ -257,7 +259,7 @@ export const ExplodedStack = () => {
                 <span style={small}>{exploded ? 'Each layer lifted by its place in the stack.' : 'The screen as a person sees it.'}</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
-                <div ref={stage} style={{ ...well, perspective: 'calc(var(--image-xl) * 14)', paddingBlockStart: `calc(var(--card-pad-spacious) + ${p} * var(--image-xl) * 2)`, paddingBlockEnd: `calc(var(--card-pad-spacious) + ${p} * var(--image-xl) / 2)` }}>
+                <div ref={stage} data-docs-stage style={{ ...well, perspective: 'calc(var(--image-xl) * 14)', paddingBlockStart: `calc(var(--card-pad-spacious) + ${p} * var(--image-xl) * 2)`, paddingBlockEnd: `calc(var(--card-pad-spacious) + ${p} * var(--image-xl) / 2)` }}>
                     <div
                         style={{
                             position: 'relative',
@@ -396,7 +398,7 @@ export const BehaviorGuide = () => {
 
     return (
         <div style={stack} data-testid="behavior-guide">
-            <div style={{ ...well, ...stack }}>
+            <div data-docs-stage style={{ ...well, ...stack }}>
                 {path.filter((step) => QUESTIONS[step]).map((step, depth) => {
                     const q = QUESTIONS[step];
                     const picked = path[depth + 1];
@@ -508,7 +510,7 @@ export const ShadowComposer = () => {
                     ref={ground}
                     data-color-mode={mode}
                     {...(contrast ? { 'data-contrast-mode': contrast } : {})}
-                    style={{ ...well, display: 'grid', placeItems: 'center', minHeight: 'calc(var(--image-xl) * 3.5)', background: levelId === 'blocking' ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : 'var(--ds-surface)' }}
+                    data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center', minHeight: 'calc(var(--image-xl) * 3.5)', background: levelId === 'blocking' ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : 'var(--ds-surface)' }}
                 >
                     <div
                         data-testid="composer-surface"
@@ -591,7 +593,7 @@ export const CrossSection = () => {
                 </ul>
                 <Choice name="Color mode" options={MODE_OPTIONS} value={mode} onChange={setMode} />
             </div>
-            <div ref={ref} data-color-mode={mode} {...(contrast ? { 'data-contrast-mode': contrast } : {})} style={well}>
+            <div ref={ref} data-color-mode={mode} {...(contrast ? { 'data-contrast-mode': contrast } : {})} data-docs-stage style={well}>
                 <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="elevation-cross-title" style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}>
                     <title id="elevation-cross-title">
                         {`Darkness of the ground below the edge. ${series.map((s) => `${s.level.name} reaches ${Math.round(s.reach)} px`).join(', ')}.`}
@@ -630,7 +632,7 @@ const slotCell = (layer) => (layer ? `${px(layer.x)} ${px(layer.y)} · ${px(laye
 export const ShadowSlotTable = () => {
     const [values, probes] = useModeVars(SLOTTED_LEVELS.map((l) => l.shadow));
     return (
-        <div data-testid="shadow-slot-table">
+        <div data-testid="shadow-slot-table" data-docs-stage style={{ overflowX: 'auto' }}>
             {probes}
             <DocsTable>
                 <thead>
@@ -646,8 +648,8 @@ export const ShadowSlotTable = () => {
                             <tr key={`${l.id}-${slot}`} data-row={`${l.id}-${slot}`}>
                                 {i === 0 && <th scope="rowgroup" rowSpan={3}><C>{l.shadow}</C></th>}
                                 <td>{slot}</td>
-                                <td style={codeText}>{slotCell(light.find((x) => x.slot === slot))}</td>
-                                <td style={codeText}>{slotCell(dark.find((x) => x.slot === slot))}</td>
+                                <td style={valueText}>{slotCell(light.find((x) => x.slot === slot))}</td>
+                                <td style={valueText}>{slotCell(dark.find((x) => x.slot === slot))}</td>
                             </tr>
                         ));
                     })}
@@ -691,7 +693,7 @@ const LadderPane = ({ mode }) => {
         return () => observer.disconnect();
     }, [contrast]);
     return (
-        <div data-color-mode={mode} {...(contrast ? { 'data-contrast-mode': contrast } : {})} style={{ ...well, ...stack }} data-ladder={mode}>
+        <div data-color-mode={mode} {...(contrast ? { 'data-contrast-mode': contrast } : {})} data-docs-stage style={{ ...well, ...stack }} data-ladder={mode}>
             <span style={label}>{mode === 'light' ? 'Light' : 'Dark'}</span>
             <div style={{ display: 'grid', gridTemplateColumns: `repeat(${LADDER.length}, minmax(0, 1fr))`, alignItems: 'end', gap: 'var(--inline-md)' }}>
                 {LADDER.map((l, i) => (
@@ -736,7 +738,7 @@ export const LayerStack = () => {
         '--layer-flag': 'A Flag stays in view over the Modal.',
     };
     return (
-        <div ref={ref} style={{ ...well, display: 'flex', flexDirection: 'column-reverse', gap: 'var(--stack-sm)' }} data-testid="layer-stack">
+        <div ref={ref} data-docs-stage style={{ ...well, display: 'flex', flexDirection: 'column-reverse', gap: 'var(--stack-sm)' }} data-testid="layer-stack">
             <div style={{ padding: 'var(--pad-y-md) var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-default)' }}>
                 <strong>Page</strong> <span style={small}>no layer: the ground every layer sits on</span>
             </div>
@@ -746,6 +748,7 @@ export const LayerStack = () => {
                     data-layer={l.token}
                     style={{
                         marginInlineStart: `calc(${i + 1} * var(--pad-x-md))`,
+                        minInlineSize: 0,
                         display: 'flex',
                         flexWrap: 'wrap',
                         alignItems: 'baseline',
@@ -763,7 +766,7 @@ export const LayerStack = () => {
                     )}
                     <code style={codeText}>{l.token}</code>
                     <strong>{values[l.token]}</strong>
-                    <span>{l.who}</span>
+                    <span style={small}>{l.who}</span>
                     {notes[l.token] && <span style={small}>{notes[l.token]}</span>}
                 </div>
             ))}
@@ -797,7 +800,7 @@ export const LiftDemo = () => {
     const to = parseShadow(values['--ds-shadow-overlay']);
     const shadow = from.length ? composeShadow(slotted(lerpLayers(from, to, t))) : 'var(--ds-shadow-raised)';
     return (
-        <div ref={ref} style={{ ...well, display: 'grid', placeItems: 'center' }} data-testid="lift-demo" data-lifted={lifted}>
+        <div ref={ref} data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center' }} data-testid="lift-demo" data-lifted={lifted}>
             <div style={{ width: 'min(100%, var(--card-min-width-md))' }}>
                 <PatternCard
                     title="Session with Ana"
@@ -824,7 +827,7 @@ export const ClipDemo = () => {
     const reach = shadowReach(parseShadow(values['--ds-shadow-overlay']));
     const reachLen = `${reach}px`;
     return (
-        <div ref={ref} style={{ ...well, ...stack }} data-testid="clip-demo" data-reach={reach}>
+        <div ref={ref} data-docs-stage style={{ ...well, ...stack }} data-testid="clip-demo" data-reach={reach}>
             <div style={row}>
                 <Button text={open ? 'Close' : 'Open'} spacing="compact" isSelected={open} onClick={() => setOpen((o) => !o)} />
                 <span style={small}>Clip edge sits {reach} past the Popup, the reach of <C>--ds-shadow-overlay</C>.</span>
@@ -869,7 +872,7 @@ export const ScrollShadowDemo = () => {
     const t = Math.min(1, scroll / reach);
     const shadow = full.length ? composeShadow(slotted(full.map((l) => ({ ...l, color: { ...l.color, a: l.color.a * t } })))) : 'none';
     return (
-        <div style={well} data-testid="scroll-demo" data-progress={Math.round(t * 100)}>
+        <div data-docs-stage style={well} data-testid="scroll-demo" data-progress={Math.round(t * 100)}>
             <div
                 ref={ref}
                 data-scroller
@@ -907,7 +910,7 @@ export const ContrastDemo = () => {
             <div
                 data-color-mode={mode}
                 data-contrast-mode={more ? 'more' : 'no-preference'}
-                style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)' }}
+                data-docs-stage style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)' }}
             >
                 <PatternCard title="Card" description="The raised ring." />
                 <div className="plus-popup" style={{ position: 'relative', width: 'auto' }}>
