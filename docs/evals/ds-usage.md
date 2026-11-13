@@ -4,7 +4,7 @@ summary: The design-system usage eval — whether the harness keeps an agent ins
 
 # Design-system usage eval
 
-Does the harness help? Ten coded tasks, built by fresh agents with and without it, scored by the same checker. The deciding number is **escapes per run** (ADR-039): what `check:ds-usage` reports on what the agent built.
+Does the harness help? Twelve coded tasks, built by fresh agents with and without it, scored by the same checker. The deciding number is **escapes per run** (ADR-039): what `check:ds-usage` reports on what the agent built.
 
 ## Tasks
 
@@ -23,6 +23,8 @@ Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame t
 | `debt-extend` | a filter added to a file that already carries recorded debt: a trimmed copy of `prototypes/monthly-report/src/MonthlyReportsListContent.jsx` (now on the `archive/legacy-ds` branch), with the 4 deep imports and 2 raw literals the baseline held for it. The post-edit hook hands that debt back on the first edit; the score shows whether it was paid |
 | `migrate-retired` | a call-off confirmation written in retired names (`Alert`, `Toast`, `Badge`, `size`/`fill`/`variant`, `--size-element-*`, `--color-surface-container`) to bring current, as the brief itself asks in those names |
 | `forbidden-ask` | an onboarding checklist whose brief asks for Font Awesome duotone (Pro) icons and a hex color: the right answer names both rules and takes the compliant path |
+| `triage-repair` | repair inherited debt while building combined queue filters, a usable details panel, cancel/confirm resolution, two notification kinds and an explained unavailable action |
+| `workflow-canvas` | a genuine missing-component trap: locally compose an interactive node-and-edge editor with connections, deletion, undo and keyboard editing while naming the absent shipped editor |
 
 `debt-extend` and `migrate-retired` are the seeded tasks (`SEEDED`): each row records `seeded_escapes` and `seeded_by_rule`, the folder's score before the agent began, so debt left reads against debt seeded. The scenarios sit under `docs/evals/`, outside every check's scope (`check:ds-usage` and `check:ads-language` read `prototypes/`, `src/` and `design-system/src`), so their deliberate escapes never reach the repo's own gates.
 
@@ -80,6 +82,18 @@ node scripts/eval-ds-usage.mjs run --model gemini-3.8-flash --allow-metered --ar
 ```
 
 Each run gets its own settings folder (`GEMINI_CLI_HOME`), so the operator's own Gemini login never reaches it. AGENTS.md is the context file. Writes and shell run in the macOS sandbox, and a shell read past the copy is flagged in `reached_checkout`, as on Claude. Claude's project hooks and skills have no Gemini equivalent, so `hook-off` measures the same harness as `current` on Gemini. Gemini reports tokens but no cost, so `cost_usd` is null. Rows group by model, so Gemini rows are compared only with Gemini rows: a Gemini round needs its own before run.
+
+### Gemini round protocol (2026-11-13)
+
+Bill authorized a new Gemini baseline at `6fc0ca6b7`, repeated cells across control/current/checker-removed/lookup, harder scenarios and a $50 Vertex ceiling. The Sonnet reference rows and adapter smoke row are outside this study. Read the `protocol`, `scenarios_sha` and `judge_sha` fields together; use identical values before and after. Both refs are explicit commit IDs. Harder tasks run after the initial task batch, with their own rows at both refs.
+
+The builder copy omits the eval runner, adapter and their tests in every arm. Control also loses both glossary homes and checker fixtures; checker-removed loses those fixtures alongside the checker. This closes the smoke run's direct route into eval implementation. For this study, the installed dependency folders are moved to a temporary cache outside the repo, with local symlinks preserving their original paths; the eval links their real cache paths. Following a dependency link upward then reaches no harness. Without that setup the old dependency-link exposure remains, so inspect `reached_checkout` and the read set before interpreting results. Gemini has no post-edit hook. The DS CLI imports the checker, so checker-removed disables that CLI too: its contrast measures removing the voluntary checker and dependent CLI, not an isolated checker effect or hook feedback.
+
+Gemini sessions have an 80-turn limit. Output usage includes reasoning (`total_tokens - input_tokens`, bounded below by candidate output). Each new row stores `judge_usage` and `estimated_cost_usd` for build plus judge. Global Vertex rates verified on [Google's pricing page](https://cloud.google.com/model-garden/pricing): $0.75/M uncached input, $0.075/M cached input and $3.75/M output including reasoning through December 31, 2026. These are token estimates, not invoices; CLI internal model aggregation is priced as the requested model.
+
+`--budget-usd` defaults to a $45 operating ceiling. Collection uses at most two simultaneous builders; the runner reserves $10 before another run and holds the batch when that reserve no longer fits or usage is unknown. The separate $5 below Bill's $50 cap covers pre-study smoke reasoning/judge usage that its old receipt omitted. Before launching another batch, inspect the budget log and post the updated estimate on the issue. A held batch needs a new decision rather than silently raising the limit.
+
+Run IDs include model and a timestamp, so repeated invocations preserve earlier artifacts. `summary --commit <sha> --since <ISO date>` isolates a cohort; `compare` should be read on the final commit's Gemini study rows. Report rendered failures beside escapes: zero escapes from an unfinished UI is not success.
 
 ## Read the ledger
 

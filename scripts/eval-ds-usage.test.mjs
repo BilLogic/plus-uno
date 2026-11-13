@@ -303,7 +303,10 @@ test('seedScore: the debt scenario starts with recorded debt, the migration with
   assert.ok(migration.byRule['ds/no-unknown-token'] >= 1, JSON.stringify(migration));
 
   for (const task of TASKS.filter((t) => !SEEDED.includes(t))) assert.equal(seedScore({ task }).escapes, 0, task);
-  assert.deepEqual(SEEDED, ['debt-extend', 'migrate-retired']);
+  const triage = seedScore({ task: 'triage-repair' });
+  assert.equal(triage.byRule['ds/no-deep-import'], 2);
+  assert.equal(triage.byRule['ds/no-raw-literal'], 3);
+  assert.deepEqual(SEEDED, ['debt-extend', 'migrate-retired', 'triage-repair']);
 });
 
 test('judge.md scopes each task-specific field to its brief by title', () => {
@@ -495,4 +498,16 @@ test('options: compare reads a baseline arm and a commit', () => {
   assert.deepEqual([o.baseline, o.commit], ['control', 'abc']);
   assert.equal(options([]).baseline, 'current');
   assert.throws(() => options(['--baseline', 'bogus']), /unknown bogus/);
+});
+
+test('prepare hides the eval implementation from builders, and control has no glossary or checker fixtures', () => {
+  const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-isolation-'));
+  try {
+    for (const arm of ['current', 'control', 'checker-removed']) {
+      const { root } = prepare({ ref: 'HEAD', arm, task: 'forbidden-ask', into: path.join(into, arm) });
+      for (const rel of ['scripts/eval-ds-usage.mjs', 'scripts/eval-ds-usage.test.mjs']) assert.equal(fs.existsSync(path.join(root, rel)), false, `${arm}: ${rel}`);
+      if (arm === 'control') assert.equal(fs.existsSync(path.join(root, 'GLOSSARY.md')), false);
+      if (arm !== 'current') assert.equal(fs.existsSync(path.join(root, 'scripts/lib/__fixtures__/ds-usage')), false);
+    }
+  } finally { fs.rmSync(into, { recursive: true, force: true }); }
 });

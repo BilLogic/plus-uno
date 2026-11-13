@@ -40,7 +40,7 @@ import { REPO_ROOT } from './lib/corpus.mjs';
 import { escapesIn, pageRootOf, pagesOf } from './lib/ds-usage.mjs';
 import { blankComments } from './lib/jsx-scan.mjs';
 import { isEntry } from './lib/findings.mjs';
-import { isGemini, runGemini, vertexMissing } from './lib/gemini-agent.mjs';
+import { estimateGeminiCost, GEMINI_PRICE, isGemini, runGemini, vertexBudget, vertexMissing } from './lib/gemini-agent.mjs';
 
 export const SCENARIOS = 'docs/evals/scenarios/ds-usage';
 export const LEDGER = 'docs/evals/ds-usage-ledger.jsonl';
@@ -55,6 +55,8 @@ export const TASKS = [
   'debt-extend',
   'migrate-retired',
   'forbidden-ask',
+  'triage-repair',
+  'workflow-canvas',
 ];
 /**
  * Tasks whose folder starts with code in it, escapes included: recorded debt
@@ -62,7 +64,7 @@ export const TASKS = [
  * what the folder held before the agent began, so debt left reads against
  * debt seeded.
  */
-export const SEEDED = ['debt-extend', 'migrate-retired'];
+export const SEEDED = ['debt-extend', 'migrate-retired', 'triage-repair'];
 export const ARMS = ['control', 'current', 'hook-off', 'checker-removed', 'lookup'];
 /** The arms that add the design-system lookup to current, and the tools each serves (by `ds` subcommand). */
 export const LOOKUP_ARMS = ['lookup'];
@@ -87,6 +89,11 @@ export const OUTPUTS = path.join(os.homedir(), 'Documents/Claude/Projects/PLUS/e
 
 /** Paths the control arm removes: the harness's design-system surface. */
 export const CONTROL_REMOVED = [
+  'GLOSSARY.md',
+  'docs/conventions/design-system-glossary.md',
+  'scripts/check-ds-usage.test.mjs',
+  'scripts/lib/ds-usage.test.mjs',
+  'scripts/lib/__fixtures__/ds-usage',
   'design-system/agent-views',
   'design-system/guidelines',
   'design-system/figma',
@@ -107,7 +114,7 @@ export const CONTROL_REMOVED = [
  * its baseline and the copy's own post-edit hook, which could no longer load
  * a checker. The hook that runs instead lives in this checkout.
  */
-export const CHECKER_REMOVED = ['scripts/check-ds-usage.mjs', 'scripts/lib/ds-usage.mjs', 'scripts/baselines/ds-usage.json', '.cursor/hooks/ds-usage'];
+export const CHECKER_REMOVED = ['scripts/check-ds-usage.test.mjs', 'scripts/lib/ds-usage.test.mjs', 'scripts/lib/__fixtures__/ds-usage', 'scripts/check-ds-usage.mjs', 'scripts/lib/ds-usage.mjs', 'scripts/baselines/ds-usage.json', '.cursor/hooks/ds-usage'];
 
 /**
  * The control arm's AGENTS.md: the title and the Identity section, without
@@ -243,6 +250,8 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
     const hook = path.join(repoRoot, '.cursor/hooks/ds-usage/post-edit.mjs');
     rewireDsHook(into, (h) => ({ ...h, command: `DS_USAGE_ROOT="$CLAUDE_PROJECT_DIR" node "${hook}"` }));
   }
+  // Eval implementation and tests are answer-key material in every arm.
+  for (const rel of ['scripts/eval-ds-usage.mjs', 'scripts/eval-ds-usage.test.mjs', 'scripts/lib/gemini-agent.mjs', 'scripts/lib/gemini-agent.test.mjs']) fs.rmSync(path.join(into, rel), { recursive: true, force: true });
   // The scenarios are the answer key's neighbors; neither arm sees them.
   fs.rmSync(path.join(into, 'docs/evals'), { recursive: true, force: true });
   const folder = path.join(into, 'prototypes', `eval-${task}`);
@@ -636,7 +645,7 @@ export function summarize(rows) {
     add(a.byRule, row.by_rule);
     a.warnings += row.warnings ?? 0;
     add(a.warnByRule, row.warn_by_rule);
-    if (row.task === 'trap-missing-component') {
+    if (['trap-missing-component', 'workflow-canvas'].includes(row.task)) {
       a.trap.runs += 1;
       if (row.judge.rendered === true) a.trap.rendered += 1;
       if (row.judge.rendered === true && row.judge.gap_named === true) a.trap.passed += 1;
@@ -793,6 +802,7 @@ export function options(argv) {
   const runs = Number(value('runs', '2'));
   if (!Number.isInteger(runs) || runs < 1) throw new Error('--runs takes a whole number from 1');
   return {
+    budgetUsd: Number(value('budget-usd', '45')),
     arms: list('arms', DEFAULT_ARMS, ARMS),
     tasks: list('tasks', DEFAULT_TASKS, TASKS),
     allowMetered: argv.includes('--allow-metered'),
@@ -825,10 +835,13 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
     // The judge reads a copy of the build alone, so nothing beside it is in reach.
     const bench = path.join(copy, '..', `${id}-judge`);
     let judged = { gap_named: null, escalated: null, rendered: null, reason: 'build errored; not judged', judge_error: false };
+    let judgeUsage = null;
     if (!failed) {
       try {
         copyDir(folder, bench);
-        judged = parseJudge(agent({ cwd: bench, prompt: judge.text, model: opts.model, readOnly: true }).result.result);
+        const judgment = agent({ cwd: bench, prompt: judge.text, model: opts.model, readOnly: true }).result;
+        judgeUsage = usageOf(judgment);
+        judged = parseJudge(judgment.result);
       } finally {
         fs.rmSync(bench, { recursive: true, force: true });
       }
@@ -839,6 +852,9 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
     fs.rmSync(kept, { recursive: true, force: true });
     copyDir(folder, kept);
     fs.writeFileSync(path.join(kept, 'agent-result.json'), JSON.stringify(build.result, null, 2));
+    const buildUsage = usageOf(build.result);
+    const buildEstimate = isGemini(opts.model) ? estimateGeminiCost(buildUsage) : null;
+    const judgeEstimate = judgeUsage ? estimateGeminiCost(judgeUsage) : 0;
     append({
       date: new Date().toISOString(),
       model: opts.model,
@@ -857,7 +873,8 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
       scored_at: scorerCommit(),
       judge: judged,
       judge_sha: judge.sha,
-      ...usageOf(build.result),
+      ...buildUsage,
+      ...(isGemini(opts.model) ? { judge_usage: judgeUsage, estimated_cost_usd: buildEstimate == null || judgeEstimate == null ? null : Number((buildEstimate + judgeEstimate).toFixed(8)), vertex_price: GEMINI_PRICE, protocol: 'gemini-r1-isolated-v1' } : {}),
       wall_ms: build.wallMs,
       agent_error: failed,
       reached_checkout: build.reached,
@@ -880,9 +897,15 @@ async function runAll(opts) {
     for (let n = 1; n <= opts.runs; n += 1) {
       for (const task of opts.tasks) {
         for (const arm of opts.arms) {
-          const id = `${new Date().toISOString().slice(0, 10)}-${commit}-${arm}-${task}-${n}`;
+          if (isGemini(opts.model)) {
+            const budget = vertexBudget(readLedger(), opts.budgetUsd);
+            console.log('[vertex budget]', JSON.stringify(budget));
+            if (!budget.can_start) throw new Error(`Vertex budget holds batch: ${JSON.stringify(budget)}`);
+          }
+          const id = `${new Date().toISOString().slice(0, 10)}-${commit}-${opts.model}-${arm}-${task}-${n}-${Date.now()}`;
           console.log(`[ds-usage eval] ${id}`);
-          await runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch });
+          await runOne({ id, arm, task, n, opts: { ...opts, ref: commit }, commit, judge, scenarios, scratch });
+          if (isGemini(opts.model)) console.log('[vertex budget after run]', JSON.stringify(vertexBudget(readLedger(), opts.budgetUsd)));
         }
       }
     }
@@ -916,7 +939,7 @@ if (isEntry(import.meta.url)) {
     } else if (command === 'compare') {
       const arms = rest.includes('--arms') ? opts.arms : LOOKUP_ARMS;
       console.log(JSON.stringify(compare(readLedger(), { arms, baseline: opts.baseline, commit: opts.commit }), null, 2));
-    } else if (command === 'summary') console.log(JSON.stringify(summarize(readLedger().filter((r) => r.date >= opts.since)), null, 2));
+    } else if (command === 'summary') console.log(JSON.stringify(summarize(readLedger().filter((r) => r.date >= opts.since && (!opts.commit || r.harness_commit === opts.commit))), null, 2));
     else throw new Error('usage: node scripts/eval-ds-usage.mjs run|summary|rescore|compare [options] (docs/evals/ds-usage.md)');
   } catch (error) {
     console.error(error.message);
