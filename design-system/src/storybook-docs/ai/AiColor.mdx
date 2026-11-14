@@ -6,14 +6,14 @@ import { FoundationHero, FoundationContents, FoundationSection, TokenSwatches, D
 <FoundationHero
     kind="AI UI"
     title="Color"
-    summary="Color marks the AI at work: one ground for the primary AI action, and two hues on the generative border."
+    summary="One background for AI actions; two border colors for generation."
 />
 
 <FoundationContents />
 
 <FoundationSection title="AI action">
 
-The ground of the one primary AI action in a region, the <DocsLink id="ai-ui-components-button">Button</DocsLink>'s AI appearance. Its label and icon take `--ds-text-inverse` and `--ds-icon-inverse`. Use it for actions that call the AI, never to emphasize an ordinary action.
+See <DocsLink id="ai-ui-components-button">Button's AI appearance</DocsLink> for when to use the AI action background. Its label uses `--ds-text-inverse`; its icon uses `--ds-icon-inverse`.
 
 <TokenSwatches
     items={[
@@ -27,7 +27,7 @@ The ground of the one primary AI action in a region, the <DocsLink id="ai-ui-com
 
 <FoundationSection title="Generative border">
 
-The <DocsLink id="ai-ui-components-generative-border">Generative border</DocsLink> draws hard-edged segments of the brand and discovery border colors. Color here is a signal that the AI is generating, so it appears only while it is.
+The <DocsLink id="ai-ui-components-generative-border">Generative border</DocsLink> alternates hard-edged brand and discovery segments. See its Usage tab for when to show it.
 
 <TokenSwatches
     items={[

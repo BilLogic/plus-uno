@@ -14,7 +14,7 @@ An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or st
 
 ## Usage
 
-Use `AiIcon` to mark an action that the AI performs. For any other action, use a Font Awesome Free glyph. Stop generating has no sparkle on purpose, because stopping is not generative.
+Use `AiIcon` for AI actions. For other actions, use a plain Font Awesome Free glyph.
 
 ## Best practices
 

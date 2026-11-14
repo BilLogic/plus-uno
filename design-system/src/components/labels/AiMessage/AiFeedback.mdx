@@ -5,13 +5,14 @@ import * as AiFeedbackStories from './AiFeedback.stories.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
+    DocsTable,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={AiFeedbackStories} />
 
 <Title />
-Thumbs up and down on an AI answer. A press reports the rating, a second press on the same thumb clears it, and thumbs down asks for an optional comment.
+Thumbs up and down for rating a finished AI answer, with an optional comment on thumbs down.
 
 <DocsTabs of={AiFeedbackStories}>
 
@@ -70,7 +71,20 @@ Thumbs up and down on an AI answer. A press reports the rating, a second press o
 
 ## Usage
 
-Place `AiFeedback` under a finished AI message. Leave `value` unset to let it hold the rating, starting from `defaultValue`, or pass `value` to own it. `onFeedback` receives `{ rating }` on a press, with `rating` set to `up`, `down` or null, and `{ rating: 'down', comment }` when a comment is sent.
+Place `AiFeedback` under a finished AI message. Leave `value` unset to manage
+the rating internally, starting from `defaultValue`, or pass `value` to control it.
+
+<DocsTable>
+<thead>
+<tr><th>Action</th><th>Result</th><th><code>onFeedback</code> receives</th></tr>
+</thead>
+<tbody>
+<tr><td>Press a thumb</td><td>Choose one rating; thumbs down opens an optional comment.</td><td><code>{'{ rating: \'up\' }'}</code> or <code>{'{ rating: \'down\' }'}</code></td></tr>
+<tr><td>Press the selected thumb</td><td>Clear the rating.</td><td><code>{'{ rating: null }'}</code></td></tr>
+<tr><td>Send a comment</td><td>Submit the comment and close the popup.</td><td><code>{'{ rating: \'down\', comment }'}</code></td></tr>
+<tr><td>Skip the comment</td><td>Close the popup and keep the rating.</td><td>No additional callback.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -78,8 +92,9 @@ Place `AiFeedback` under a finished AI message. Leave `value` unset to let it ho
 
 ## Accessibility
 
-- The two thumbs are buttons named "Good answer" and "Bad answer". Both are toggle buttons and report `aria-pressed`, true on the chosen one. Thumbs down is not the comment popup's trigger, so it never reports `aria-expanded`: the popup opens after the pick, anchored to the thumb, focus moves into it, and focus returns to the thumb on close.
-- A rating, and a change of rating, is confirmed in a status message a screen reader hears.
+- The thumbs form a group named "Rate this answer". Its toggle buttons, "Good answer" and "Bad answer", report `aria-pressed`, true on the chosen one.
+- Thumbs down never reports `aria-expanded`: the popup opens after rating, anchored to the thumb. Focus enters it and returns to the thumb on close.
+- A polite status announces each rating and change of rating, such as "Thanks. Marked as a good answer." No animation.
 
 </div>
 

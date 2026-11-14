@@ -16,7 +16,7 @@ Also asked as: chat, assistant, chatbot, conversation.
 
 ## Usage
 
-AI chat is the one way to ask AI about the page in front of you. Pick the mode for the size of the ask.
+Use AI chat to ask about the current page. Choose a mode for the task.
 
 | Mode | When to use |
 | --- | --- |
@@ -24,18 +24,19 @@ AI chat is the one way to ask AI about the page in front of you. Pick the mode f
 | Panel | Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Backdrop when there is no room. |
 | Full screen | Long answers that need room. It covers the window. |
 
-AI chat applies the six AI rules from the AI overview.
-
-1. **One AI identity, unnamed.** The chat is called AI chat and carries the AI icon. It has no persona name or avatar.
-2. **Every answer is marked.** Each reply is an AI message, which leads with the AI icon.
-3. **Fallibility, once.** "AI can make mistakes. Check important info." sits under the prompt input, never on each message.
-4. **Sources when it draws on data.** A reply that used records lists them under the message: `respond` returns `{ text, sources }` instead of text.
-5. **People confirm actions.** The chat proposes changes; anything that changes data waits for the person's confirm.
-6. **Feedback on every answer.** Each reply offers thumbs up and thumbs down, and `onFeedback` receives the reply with its rating. The rating stays on the reply as chat moves between modes.
+Follow the six AI interaction guidelines for identity, answer marking, fallibility, sources, confirmation and feedback.
+Call the chat "AI chat". Return `{ text, sources }` from `respond` for answers
+based on records; `linkTarget` controls where source links open. `onFeedback`
+receives the reply and its rating, which persists across modes.
 
 ### Storybook variant
 
-`variant="storybook"` is the chat in the Storybook docs. The docs' floating button opens it through its AI chat action, so the chat's own button is left out with `launcher={false}`: the popup floats above the bottom right corner instead. `respond` may return `{ text, sources }`, and the sources list under the answer, opening in `linkTarget`. The docs' answerer calls a server-side function that answers from the design-system index and holds the credentials, so none reaches the browser; when it errors or is rate limited, the chat searches the site's pages and the component index instead and says so.
+`variant="storybook"` uses the docs' floating button's AI chat action to open chat.
+Set `launcher={false}` to omit chat's own button; the popup floats above the bottom right corner.
+
+The docs answerer uses a server-side function grounded in the design-system index.
+Credentials stay on the server. On errors or rate limits, it searches site pages
+and the component index and names that fallback.
 
 ## Best practices
 

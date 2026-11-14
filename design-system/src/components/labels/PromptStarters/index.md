@@ -16,10 +16,8 @@ A few things a person could ask the AI, as a wrapping row of prompt `Suggestion`
 
 ## Usage
 
-Use `PromptStarters` to offer a few things a person could ask an AI feature,
-before they've typed anything: an empty chat, a fresh reflection, a blank
-prompt field. Once a conversation is underway, use `Suggestion` directly for
-a single follow-up prompt instead of a full row of starters.
+Use `PromptStarters` before a person types into an empty chat, new reflection or
+blank prompt field. For a single follow-up during a conversation, use `Suggestion`.
 
 ## Motion
 
@@ -33,8 +31,7 @@ PromptStarters reads these motion tokens and no literal duration or curve.
 
 ### Keep the label short, and put the prompt in `text`. {#keep-the-label-short-and-put-the-prompt-in-text}
 
-A chip sits in a row, so its `label` is a few words that read as a request;
-the full prompt it stands for goes in `text`.
+Use a few words for `label` and put the full request in `text`.
 
 Do: A short label for a longer prompt.
 Don't: The whole prompt as the label.
@@ -55,14 +52,13 @@ Don't: Topic names that don't say what will be asked.
 
 ### Let `onSelect` decide what happens. {#let-onselect-decide-what-happens}
 
-The component never sends on its own. The common pattern is putting the
-starter's `text` into a `PromptInput` so a person can read and edit it before
-sending, not sending it immediately on their behalf.
+Use `onSelect` to fill a `PromptInput` with the starter's `text` so the person
+can read, edit and send it. Never send it on their behalf.
 
 ### Pass an empty list rather than a guard. {#pass-an-empty-list-rather-than-a-guard}
 
-Don't guard the component with your own conditional: passing an empty
-`starters` array already renders nothing, with no empty group left behind.
+Pass an empty `starters` array to render nothing, including no empty group;
+no conditional wrapper is needed.
 
 ## Accessibility
 

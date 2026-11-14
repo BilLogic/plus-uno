@@ -37,9 +37,7 @@ export const figmaMeta = {
 <Meta of={SuggestionStories} />
 
 <Title />
-A value the system proposes that a person can accept, such as an AI-suggested
-focus area. A button, not a label: it has the same height, padding and radius
-as Tag, so it sits in the tag row where the value will land.
+A button for accepting a proposed value or prompt, such as an AI-suggested focus area.
 
 <DocsTabs of={SuggestionStories}>
 
@@ -191,7 +189,7 @@ that is not a proposed value.
 <tr><td>Hovered, pressed</td><td><code>--ds-background-discovery</code> and <code>--ds-background-discovery-hovered</code>.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-background-disabled</code>, <code>--ds-text-disabled</code>, <code>--ds-icon-disabled</code>.</td></tr>
-<tr><td>Box</td><td>22 tall, <code>--pad-x-xs</code> padding, <code>--radius-md</code> corner.</td></tr>
+<tr><td>Box</td><td>The same height (22), padding (<code>--pad-x-xs</code>) and radius (<code>--radius-md</code>) as Tag, so it fits the row where the value will land.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -203,9 +201,8 @@ that is not a proposed value.
 
 ### Name the action.
 
-A suggestion is a verb people can trust at a glance, not a sentence. It sits in
-a tag row, so its label is a value's name; for a prompt, pass the full words as
-`text` and a short `label`.
+Name an insert suggestion for its value. Start a prompt label with a short verb
+and pass the full request as `text`.
 
 <DoDontPair
     doExample={<Suggestion label="Shorten" onAccept={() => {}} />}
@@ -227,10 +224,8 @@ Insert changes the content in place; prompt starts a conversation.
 
 ### Show an unavailable action as disabled.
 
-A disabled suggestion stays visible so people know it exists. `isDisabled`
-disables one suggestion; a disabled field or `TagGroup` disables every
-suggestion in it through `TagContext`, the same value a Tag reads, so a
-suggestion is disabled with the tags beside it.
+Keep unavailable suggestions visible and disabled. `isDisabled` disables one;
+a disabled field or `TagGroup` disables all through `TagContext`, shared with Tag.
 
 <DoDontPair
     doExample={<Suggestion label="Shorten" isDisabled onAccept={() => {}} />}
@@ -241,9 +236,9 @@ suggestion is disabled with the tags beside it.
 
 ### Let the field decide what happens next.
 
-`onAccept` hands back the value (insert) or the text (prompt). The suggestion
-does not change itself; the field that owns the value adds a Tag, sends the
-message or fills the text box, and stops offering the suggestion.
+`onAccept` returns the value (insert) or text (prompt). The field adds a Tag,
+sends a message or fills the text box, then removes the suggestion; the suggestion
+does not change itself.
 
 <DoDontPair
     doExample={<Suggestion label="Relationships" value="focus-relationships" onAccept={() => {}} />}
