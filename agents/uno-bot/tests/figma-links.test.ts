@@ -363,7 +363,8 @@ describe("only registry components", () => {
     // 58: FileItem gained its Core component set and figmaMeta (+1).
     // 60: CheckboxGroup and RadioGroup gained their Core component sets and
     // figmaMeta (+2).
-    assert.equal(names.length, 60);
+    // 61: SettingRow gained its Core component set and figmaMeta (+1).
+    assert.equal(names.length, 61);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

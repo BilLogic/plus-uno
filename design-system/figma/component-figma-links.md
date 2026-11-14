@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-57 docs-page links + 63 style/variant entries across 60 components.
+57 docs-page links + 64 style/variant entries across 61 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -122,6 +122,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | RichTextEditor | Rich Text Editor | `20009:85516` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-85516) | verified |
 | Components | ScrollBar | Scrollbar | `20095:7615` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7615) | verified |
 | Components | SectionMessage | Section message | `20967:3641` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20967-3641) | verified |
+| Components | SettingRow | SettingRow | `22307:158` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=22307-158) | verified |
 | Components | Skeleton | Skeleton | `20095:8179` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8179) | verified |
 | Components | Spinner | Spinner | `20117:5249` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5249) | verified |
 | Components | Spotlight | Spotlight | `20630:74` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-74) | verified |

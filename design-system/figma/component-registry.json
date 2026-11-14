@@ -1383,6 +1383,29 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
       }
     },
+    "SettingRow": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/SettingRow/SettingRow.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/SettingRow",
+        "source": "design-system/src/components/forms-and-inputs/SettingRow/SettingRow.jsx",
+        "storybookId": "components-forms-and-inputs-setting-row--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "setting-row",
+            "name": "SettingRow",
+            "componentSetNodeId": "22307:158",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
+      }
+    },
     "Sidebar": {
       "code": {
         "import": "@/patterns/Sidebar/Sidebar",

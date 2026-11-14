@@ -128,4 +128,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 From `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.scss`. Override these through the token layer, never with a literal.
 
+## Figma
+
+- "SettingRow" node 22307:158 in file zAecJNRdvJzAUOcjV32tRX
+
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
