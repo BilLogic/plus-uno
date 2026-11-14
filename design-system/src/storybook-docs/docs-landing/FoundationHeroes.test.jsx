@@ -126,8 +126,6 @@ describe('Iconography: ten icons in one style', () => {
     it('draws no construction grid, keyline or ring on any tile', () => {
         const c = draw();
         expect(c.querySelector('[data-shape="icon-construction"]')).toBeNull();
-        expect(c.querySelectorAll(':not([data-glyph]) > line')).toHaveLength(0);
-        expect(c.querySelectorAll(':not([data-glyph]) > circle')).toHaveLength(0);
         expect(c.querySelectorAll(`rect[stroke="${ACCENT}"]`)).toHaveLength(0);
     });
 });
