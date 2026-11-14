@@ -41,6 +41,7 @@ import { escapesIn, pageRootOf, pagesOf } from './lib/ds-usage.mjs';
 import { blankComments } from './lib/jsx-scan.mjs';
 import { isEntry } from './lib/findings.mjs';
 import { estimateGeminiCost, GEMINI_PRICE, isGemini, runGemini, vertexBudget, vertexMissing } from './lib/gemini-agent.mjs';
+import { headLinks } from './lib/registry.mjs';
 
 export const SCENARIOS = 'docs/evals/scenarios/ds-usage';
 export const LEDGER = 'docs/evals/ds-usage-ledger.jsonl';
@@ -164,8 +165,56 @@ function filesUnder(dir) {
 export function scenariosSha(repoRoot = REPO_ROOT) {
   const root = path.join(repoRoot, SCENARIOS);
   const hash = createHash('sha256');
-  for (const file of filesUnder(root)) hash.update(path.relative(root, file)).update(fs.readFileSync(file));
+  for (const file of filesUnder(root).filter((f) => path.basename(f) !== 'expected.json')) {
+    hash.update(path.relative(root, file)).update(fs.readFileSync(file));
+  }
   return hash.digest('hex').slice(0, 12);
+}
+
+/**
+ * Inject the shared font and Font Awesome Free `<link>` tags from
+ * `.storybook/preview-head.html` into an HTML document's `<head>`.
+ */
+export function withHeadLinks(html, repoRoot = REPO_ROOT) {
+  const links = headLinks(repoRoot).filter((link) => !html.includes(link));
+  if (!links.length) return html;
+  const block = links.map((link) => `    ${link}`).join('\n');
+  return /<\/head>/i.test(html) ? html.replace(/([ \t]*)<\/head>/i, (_, indent) => `${block}\n${indent}</head>`) : `${block}\n${html}`;
+}
+
+/** Ensure `folder/index.html` loads the shared fonts and Font Awesome Free links. */
+export function ensureHeadLinks(folder, repoRoot = REPO_ROOT) {
+  const index = path.join(folder, 'index.html');
+  if (!fs.existsSync(index)) return;
+  const current = fs.readFileSync(index, 'utf8');
+  const next = withHeadLinks(current, repoRoot);
+  if (next !== current) fs.writeFileSync(index, next);
+}
+
+/**
+ * Load a task's answer key (`expected.json`), or `null` when the task has none.
+ */
+export function expectedFor(task, repoRoot = REPO_ROOT) {
+  if (!task) return null;
+  const file = path.join(repoRoot, SCENARIOS, task, 'expected.json');
+  if (!fs.existsSync(file)) return null;
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  for (const key of ['screens', 'patterns', 'required_placements', 'against_placements']) {
+    if (!Array.isArray(data[key])) throw new Error(`${task}/expected.json: missing ${key} array`);
+  }
+  return data;
+}
+export const loadExpected = expectedFor;
+
+/** Every expected item in an answer key, in section order. */
+export function expectedItems(expected) {
+  if (!expected) return [];
+  return [
+    ...(expected.screens ?? []).map((s) => ({ ...s, section: 'screen' })),
+    ...(expected.patterns ?? []).map((p) => ({ ...p, section: 'pattern' })),
+    ...(expected.required_placements ?? []).map((r) => ({ ...r, section: 'required_placement' })),
+    ...(expected.against_placements ?? []).map((a) => ({ ...a, section: 'against_placement' })),
+  ];
 }
 
 function copyDir(from, to) {
@@ -258,6 +307,8 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
   const folder = path.join(into, 'prototypes', `eval-${task}`);
   copyDir(path.join(repoRoot, SCENARIOS, '_template'), folder);
   copyDir(path.join(repoRoot, SCENARIOS, task), folder);
+  fs.rmSync(path.join(folder, 'expected.json'), { force: true });
+  ensureHeadLinks(folder, repoRoot);
   return { root: into, folder };
 }
 
@@ -300,6 +351,8 @@ export function seedScore({ repoRoot = REPO_ROOT, task }) {
   try {
     copyDir(path.join(repoRoot, SCENARIOS, '_template'), dir);
     copyDir(path.join(repoRoot, SCENARIOS, task), dir);
+    fs.rmSync(path.join(dir, 'expected.json'), { force: true });
+    ensureHeadLinks(dir, repoRoot);
     return score({ repoRoot, folder: dir, label: `eval-${task}` });
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -409,16 +462,145 @@ export function readSet(stdout, root) {
   };
   const files = [];
   const lookups = [];
+  const afterFiles = [];
+  const afterLookups = [];
+  let wrote = false;
   for (const { name, input = {} } of toolCalls(stdout)) {
-    if (name === 'Read') {
+    if (name === 'Write' || name === 'Edit' || name === 'NotebookEdit') {
+      wrote = true;
+    } else if (name === 'Read') {
       const file = rel(input.file_path);
-      if (!/^prototypes\/eval-/.test(file) && !files.includes(file)) files.push(file);
-    } else if (name === 'Grep') lookups.push(`Grep ${input.pattern}${input.path ? ` in ${rel(input.path)}` : ''}`);
-    else if (name === 'Glob') lookups.push(`Glob ${input.pattern}${input.path ? ` in ${rel(input.path)}` : ''}`);
-    else if (name === 'Bash') lookups.push(`Bash ${String(input.command ?? '').slice(0, 160)}`);
-    else if (name.startsWith('mcp__plus-ds__')) lookups.push(`${name.slice('mcp__plus-ds__'.length)} ${JSON.stringify(input).slice(0, 160)}`);
+      if (!/^prototypes\/eval-/.test(file) && !files.includes(file)) {
+        files.push(file);
+        if (wrote) afterFiles.push(file);
+      }
+    } else if (name === 'Grep') {
+      const entry = `Grep ${input.pattern}${input.path ? ` in ${rel(input.path)}` : ''}`;
+      lookups.push(entry);
+      if (wrote) afterLookups.push(entry);
+    } else if (name === 'Glob') {
+      const entry = `Glob ${input.pattern}${input.path ? ` in ${rel(input.path)}` : ''}`;
+      lookups.push(entry);
+      if (wrote) afterLookups.push(entry);
+    } else if (name === 'Bash') {
+      const entry = `Bash ${String(input.command ?? '').slice(0, 160)}`;
+      lookups.push(entry);
+      if (wrote) afterLookups.push(entry);
+    } else if (name.startsWith('mcp__plus-ds__')) {
+      const entry = `${name.slice('mcp__plus-ds__'.length)} ${JSON.stringify(input).slice(0, 160)}`;
+      lookups.push(entry);
+      if (wrote) afterLookups.push(entry);
+    }
   }
-  return { files, lookups };
+  return afterFiles.length || afterLookups.length
+    ? { files, lookups, after_write: { files: afterFiles, lookups: afterLookups } }
+    : { files, lookups };
+}
+
+const normPage = (p = '') =>
+  String(p)
+    .replace(/^\/+/, '')
+    .replace(/^design-system\/agent-views\/pages\//, 'design-system/agent-views/')
+    .replace(/^design-system\/src\/templates\//, 'design-system/src/patterns/');
+
+const pageMatchesFile = (expectedPage, file) => {
+  const exp = normPage(expectedPage);
+  const got = normPage(file);
+  if (exp === got) return true;
+  // Also match the authored MDX source for the same template or pattern page.
+  const patMdx = /^design-system\/agent-views\/patterns\/([A-Za-z0-9]+)\.md$/.exec(exp);
+  if (patMdx && got === `design-system/src/storybook-docs/patterns/${patMdx[1]}/${patMdx[1]}.mdx`) return true;
+  const tplMdx = /^design-system\/agent-views\/templates\/([A-Za-z0-9]+)\.md$/.exec(exp);
+  if (tplMdx && (got === `design-system/src/storybook-docs/templates/${tplMdx[1]}.mdx` || got === `design-system/src/patterns/${tplMdx[1]}/${tplMdx[1]}.mdx`)) return true;
+  const compTpl = /^design-system\/src\/patterns\/([A-Za-z0-9]+)\/index\.md$/.exec(exp);
+  if (compTpl && got === `design-system/src/patterns/${compTpl[1]}/${compTpl[1]}.mdx`) return true;
+  return false;
+};
+
+const guideTopicsFromLookup = (lookup = '') => {
+  const s = String(lookup);
+  if (s.startsWith('ds_guide ')) {
+    try {
+      const arg = JSON.parse(s.slice('ds_guide '.length));
+      if (arg?.topic) return [String(arg.topic).trim().toLowerCase()];
+    } catch {
+      const m = /"topic"\s*:\s*"([^"]+)"/.exec(s);
+      if (m) return [m[1].trim().toLowerCase()];
+    }
+  }
+  const bash = /^Bash\s+.*\b(?:ds(?:\.mjs)?|plus-ds)(?:\s+--)?\s+guide\s+["']?([a-z0-9-]+)["']?/i.exec(s);
+  return bash ? [bash[1].toLowerCase()] : [];
+};
+
+/**
+ * Deterministic reach from `read_set` against the task's answer key (`expected`):
+ * did the run open (`Read`) or `ds guide` the expected Template and Pattern
+ * pages, and was that before its first write. Returns `null` when no answer
+ * key exists.
+ */
+export function reach(read, expected) {
+  if (!expected || !read) return null;
+  const files = read.files ?? [];
+  const lookups = read.lookups ?? [];
+  const afterFileSet = new Set(read.after_write?.files ?? []);
+  const beforeFiles = read.before_write?.files ?? files.filter((f) => !afterFileSet.has(f));
+  let beforeLookups;
+  if (read.before_write?.lookups) {
+    beforeLookups = read.before_write.lookups;
+  } else if (read.after_write?.lookups) {
+    const afterCount = read.after_write.lookups.length;
+    beforeLookups = afterCount ? lookups.slice(0, Math.max(0, lookups.length - afterCount)) : lookups;
+  } else {
+    // Legacy rows without `after_write`: slice before the first build or inline-code check.
+    const firstWriteIdx = lookups.findIndex((l) => /^Write\b|^Edit\b|\bvite build\b|\besbuild\b|^ds_check\s+\{.*"code"/.test(l));
+    beforeLookups = firstWriteIdx === -1 ? lookups : lookups.slice(0, firstWriteIdx);
+  }
+  const allTopics = new Set(lookups.flatMap(guideTopicsFromLookup));
+  const beforeTopics = new Set(beforeLookups.flatMap(guideTopicsFromLookup));
+
+  const templateSpecs = [];
+  for (const s of expected.screens ?? []) {
+    const pages = s.pages ?? (s.page ? [s.page] : []);
+    const guides = (s.guides ?? (s.guide ? [s.guide] : [])).map((g) => String(g).toLowerCase());
+    for (const p of pages) {
+      if (!templateSpecs.some((t) => t.page === p)) {
+        const stem = path.basename(p, '.md') === 'index' ? path.basename(path.dirname(p)).replace(/^Pattern/, '').toLowerCase() : path.basename(p, '.md').toLowerCase();
+        templateSpecs.push({ page: p, topics: [...new Set([stem, ...guides])] });
+      }
+    }
+  }
+  const patternSpecs = [];
+  for (const p of expected.patterns ?? []) {
+    if (!p.page) continue;
+    const topics = [p.guide, ...(p.aliases ?? [])].filter(Boolean).map((g) => String(g).toLowerCase());
+    if (!patternSpecs.some((x) => x.page === p.page)) patternSpecs.push({ page: p.page, topics });
+  }
+
+  const checkGroup = (specs) => {
+    const exp = specs.map((s) => s.page);
+    const hit = specs
+      .filter((s) => files.some((f) => pageMatchesFile(s.page, f)) || s.topics.some((t) => allTopics.has(t)))
+      .map((s) => s.page);
+    const before = specs
+      .filter((s) => beforeFiles.some((f) => pageMatchesFile(s.page, f)) || s.topics.some((t) => beforeTopics.has(t)))
+      .map((s) => s.page);
+    return { expected: exp, reached: hit, before_first_write: before };
+  };
+
+  const templates = checkGroup(templateSpecs);
+  const patterns = checkGroup(patternSpecs);
+  const allExpected = [...templates.expected, ...patterns.expected];
+  const allReached = [...templates.reached, ...patterns.reached];
+  const allBefore = [...templates.before_first_write, ...patterns.before_first_write];
+  return {
+    expected: allExpected,
+    reached: allReached,
+    before_first_write: allBefore,
+    templates,
+    patterns,
+    hit: allReached.length > 0,
+    all_before_write: allReached.length > 0 && allBefore.length === allReached.length,
+  };
 }
 
 /**
@@ -507,7 +689,7 @@ const loadBrowserTools = async () => ({ chromium: (await import('playwright')).c
  * goes on. `folder` must still sit in its copy, where the vite config's
  * relative design-system and node_modules paths resolve.
  */
-export async function a11y({ folder, load = loadBrowserTools }) {
+export async function a11y({ folder, screenshotPath, load = loadBrowserTools }) {
   let server;
   let browser;
   try {
@@ -524,8 +706,11 @@ export async function a11y({ folder, load = loadBrowserTools }) {
     const url = server.resolvedUrls?.local?.[0];
     if (!url) throw new Error('vite gave no local URL');
     browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+    await page.setViewportSize?.({ width: 1440, height: 960 });
     await page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 });
+    await page.evaluate(() => document.fonts?.ready);
+    if (screenshotPath) await page.screenshot?.({ path: screenshotPath });
     await page.addScriptTag({ path: createRequire(import.meta.url).resolve('axe-core/axe.min.js') });
     const results = await page.evaluate(() => globalThis.axe.run(document));
     return { a11y_violations: a11ySummary(results), a11y_error: null };
@@ -534,6 +719,113 @@ export async function a11y({ folder, load = loadBrowserTools }) {
   } finally {
     await browser?.close().catch(() => {});
     await server?.close().catch(() => {});
+  }
+}
+
+/**
+ * Render `folder` at 1440x960 with fonts loaded and write `screenshot.png`.
+ * If `folder` is a standalone kept build outside a repo copy, stages it in a
+ * temporary directory with `design-system` and `node_modules` linked from
+ * `repoRoot` so its `vite.config.js` resolves.
+ */
+export async function screenshot({ folder, screenshotPath = path.join(folder, 'screenshot.png'), repoRoot = REPO_ROOT, load = loadBrowserTools }) {
+  ensureHeadLinks(folder, repoRoot);
+  const inCopy = fs.existsSync(path.resolve(folder, '../../design-system/src'));
+  const stage = inCopy ? null : fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-shot-'));
+  let server;
+  let browser;
+  try {
+    let target = folder;
+    if (stage) {
+      for (const link of ['design-system', 'node_modules']) {
+        const src = path.join(repoRoot, link);
+        if (fs.existsSync(src)) fs.symlinkSync(fs.realpathSync(src), path.join(stage, link));
+      }
+      target = path.join(stage, 'prototypes', path.basename(folder));
+      copyDir(folder, target);
+      ensureHeadLinks(target, repoRoot);
+    }
+    const { chromium, vite } = await load();
+    server = await vite.createServer({
+      configFile: path.join(target, 'vite.config.js'),
+      root: target,
+      logLevel: 'silent',
+      server: { port: 0, strictPort: false },
+      css: { preprocessorOptions: { scss: { logger: { warn() {}, debug() {} } } } },
+    });
+    await server.listen();
+    const url = server.resolvedUrls?.local?.[0];
+    if (!url) throw new Error('vite gave no local URL');
+    browser = await chromium.launch();
+    const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+    await page.setViewportSize?.({ width: 1440, height: 960 });
+    await page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 });
+    await page.evaluate(() => document.fonts?.ready);
+    await page.screenshot({ path: screenshotPath });
+    return screenshotPath;
+  } finally {
+    await browser?.close().catch(() => {});
+    await server?.close().catch(() => {});
+    if (stage) fs.rmSync(stage, { recursive: true, force: true });
+  }
+}
+
+export const FIT_VERDICTS = ['followed', 'partly', 'ignored', 'n/a'];
+
+/** Prompt for judging a build's per-item fit against `expected.json`. */
+export function fitPrompt(expected) {
+  const ids = expectedItems(expected).map((item) => item.id);
+  return [
+    'You are scoring one prototype an agent built against its task answer key (`expected.json`).',
+    'Read `BRIEF.md`, `NOTES.md` (if present), `expected.json` and every file under `src/` in the current folder. Use no other files.',
+    'For every item id in `expected.json` (`screens`, `patterns`, `required_placements`, `against_placements`), judge whether the build followed that expectation:',
+    '- `"followed"`: the build implements the expected template, pattern variant or required placement (or, for `against_placements`, avoided the anti-pattern).',
+    '- `"partly"`: the build partially follows the expectation but misses part of the variant or placement.',
+    '- `"ignored"`: the build ignores the expected template, pattern variant or required placement (or, for `against_placements`, committed the anti-pattern).',
+    '- `"n/a"`: the item does not apply.',
+    `Reply with one JSON object keyed by item id (${ids.map((id) => `"${id}"`).join(', ')}) and nothing else:`,
+    `{${ids.map((id) => `"${id}": {"verdict": "followed"|"partly"|"ignored"|"n/a", "reason": "<one sentence>"}`).join(', ')}}`,
+  ].join('\n\n');
+}
+
+/** Parse the judge's per-item `fit` JSON against `expected`. */
+export function parseFit(text, expected) {
+  const items = expectedItems(expected);
+  if (!items.length) return null;
+  const s = String(text ?? '');
+  for (let start = s.indexOf('{'); start !== -1; start = s.indexOf('{', start + 1)) {
+    for (let end = s.lastIndexOf('}'); end > start; end = s.lastIndexOf('}', end - 1)) {
+      try {
+        const j = JSON.parse(s.slice(start, end + 1));
+        if (!j || typeof j !== 'object' || !items.some((item) => item.id in j)) continue;
+        return Object.fromEntries(
+          items.map(({ id }) => {
+            const entry = j[id];
+            const v = FIT_VERDICTS.includes(entry?.verdict) ? entry.verdict : 'ignored';
+            return [id, { verdict: v, reason: String(entry?.reason ?? '') }];
+          }),
+        );
+      } catch {
+        // keep narrowing
+      }
+    }
+  }
+  return Object.fromEntries(items.map(({ id }) => [id, { verdict: 'ignored', reason: 'judge gave no JSON' }]));
+}
+
+/** Judge a kept build folder against its task's answer key (`expected`). */
+export function fitJudge({ folder, expected, model, runAgent = agent }) {
+  if (!expected) return { fit: null, usage: null };
+  const bench = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-fit-judge-'));
+  try {
+    copyDir(folder, bench);
+    // Gemini on Vertex rejects a turn that reads an image back ("Requests ending with a model turn"), so the judge reads source only.
+    fs.rmSync(path.join(bench, 'screenshot.png'), { force: true });
+    writeJson(path.join(bench, 'expected.json'), expected);
+    const out = runAgent({ cwd: bench, prompt: fitPrompt(expected), model, readOnly: true }).result;
+    return { fit: parseFit(out.result, expected), usage: usageOf(out) };
+  } finally {
+    fs.rmSync(bench, { recursive: true, force: true });
   }
 }
 
@@ -583,6 +875,7 @@ export function rescore(rows, { scorer, repoRoot = REPO_ROOT }) {
   return rows.map((row) => {
     if (!row.output || !fs.existsSync(row.output)) return row;
     const scored = score({ repoRoot, folder: row.output, label: `eval-${row.task}` });
+    const expected = expectedFor(row.task, repoRoot);
     const out = {
       ...row,
       escapes: scored.escapes,
@@ -590,6 +883,7 @@ export function rescore(rows, { scorer, repoRoot = REPO_ROOT }) {
       warnings: scored.warnings,
       warn_by_rule: scored.warnByRule,
       layout_formula: scored.layoutFormula,
+      reach: reach(row.read_set, expected),
       scored_at: scorer,
     };
     // The seed is re-scored only from the scenarios the run started from.
@@ -599,6 +893,46 @@ export function rescore(rows, { scorer, repoRoot = REPO_ROOT }) {
     }
     return out;
   });
+}
+
+/**
+ * Re-score kept builds at `commit` (default `d4d96b1cb`): writes `reach`, a
+ * 1440x960 `screenshot.png` with fonts loaded, and a per-item `fit` from the
+ * task's answer key (`null` where no answer key exists) as new rows marked
+ * `rejudge: true`. Only judge tokens are spent.
+ */
+export async function rejudge(
+  rows,
+  { commit = 'd4d96b1cb', scorer = scorerCommit(), repoRoot = REPO_ROOT, judgeFn = fitJudge, screenshotFn = screenshot } = {},
+) {
+  const targets = rows.filter((r) => r.harness_commit === commit && !r.rejudge && r.output && fs.existsSync(r.output));
+  const out = [];
+  for (const row of targets) {
+    const scored = score({ repoRoot, folder: row.output, label: `eval-${row.task}` });
+    const expected = expectedFor(row.task, repoRoot);
+    const reachResult = reach(row.read_set, expected);
+    const shotPath = path.join(row.output, 'screenshot.png');
+    await screenshotFn({ folder: row.output, screenshotPath: shotPath, repoRoot });
+    const { fit, usage } = expected ? await judgeFn({ folder: row.output, expected, model: row.model }) : { fit: null, usage: null };
+    const judgeCost = isGemini(row.model) ? (usage ? estimateGeminiCost(usage) : 0) : null;
+    out.push({
+      ...row,
+      date: new Date().toISOString(),
+      rejudge: true,
+      escapes: scored.escapes,
+      by_rule: scored.byRule,
+      warnings: scored.warnings,
+      warn_by_rule: scored.warnByRule,
+      layout_formula: scored.layoutFormula,
+      scored_at: scorer,
+      reach: reachResult,
+      screenshot: shotPath,
+      fit,
+      judge_usage: usage,
+      ...(isGemini(row.model) ? { estimated_cost_usd: judgeCost } : {}),
+    });
+  }
+  return out;
 }
 
 /**
@@ -742,10 +1076,10 @@ export function compare(rows, { arms = LOOKUP_ARMS, baseline = 'current', commit
   const at =
     commit ??
     rows
-      .filter((r) => arms.includes(r.arm))
+      .filter((r) => arms.includes(r.arm) && !r.rejudge)
       .reduce((latest, r) => (!latest || r.date > latest.date ? r : latest), null)?.harness_commit ??
     null;
-  const done = rows.filter((r) => r.harness_commit === at && !r.agent_error);
+  const done = rows.filter((r) => r.harness_commit === at && !r.agent_error && !r.rejudge);
   const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
   const stats = (group) => {
     const input = group.map((r) => r.total_input_tokens ?? totalInput(r)).filter((n) => n !== null);
@@ -848,11 +1182,15 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
       }
     }
     // axe runs on the build while it still sits in its copy, where its vite config resolves.
-    const checked = failed ? { a11y_violations: null, a11y_error: 'build errored; not checked' } : await a11y({ folder });
+    const checked = failed
+      ? { a11y_violations: null, a11y_error: 'build errored; not checked' }
+      : await a11y({ folder, screenshotPath: path.join(folder, 'screenshot.png') });
     const kept = path.join(OUTPUTS, id);
     fs.rmSync(kept, { recursive: true, force: true });
     copyDir(folder, kept);
     fs.writeFileSync(path.join(kept, 'agent-result.json'), JSON.stringify(build.result, null, 2));
+    const expected = expectedFor(task);
+    const shotPath = path.join(kept, 'screenshot.png');
     const buildUsage = usageOf(build.result);
     const buildEstimate = isGemini(opts.model) ? estimateGeminiCost(buildUsage) : null;
     const judgeEstimate = judgeUsage ? estimateGeminiCost(judgeUsage) : 0;
@@ -880,6 +1218,8 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
       agent_error: failed,
       reached_checkout: build.reached,
       read_set: build.read,
+      reach: reach(build.read, expected),
+      screenshot: fs.existsSync(shotPath) ? shotPath : null,
       ...checked,
       output: kept,
     });
@@ -937,11 +1277,15 @@ if (isEntry(import.meta.url)) {
       const rows = rescore(readLedger(), { scorer: scorerCommit() });
       fs.writeFileSync(path.join(REPO_ROOT, LEDGER), rows.map((r) => `${JSON.stringify(r)}\n`).join(''));
       console.log(JSON.stringify(summarize(rows), null, 2));
+    } else if (command === 'rejudge') {
+      const rows = await rejudge(readLedger(), { commit: opts.commit ?? 'd4d96b1cb', scorer: scorerCommit() });
+      for (const row of rows) append(row);
+      console.log(JSON.stringify(rows, null, 2));
     } else if (command === 'compare') {
       const arms = rest.includes('--arms') ? opts.arms : LOOKUP_ARMS;
       console.log(JSON.stringify(compare(readLedger(), { arms, baseline: opts.baseline, commit: opts.commit }), null, 2));
     } else if (command === 'summary') console.log(JSON.stringify(summarize(readLedger().filter((r) => r.date >= opts.since && (!opts.commit || r.harness_commit === opts.commit))), null, 2));
-    else throw new Error('usage: node scripts/eval-ds-usage.mjs run|summary|rescore|compare [options] (docs/evals/ds-usage.md)');
+    else throw new Error('usage: node scripts/eval-ds-usage.mjs run|summary|rescore|rejudge|compare [options] (docs/evals/ds-usage.md)');
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;
