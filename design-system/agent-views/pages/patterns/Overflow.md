@@ -27,7 +27,7 @@ The three cases below are Planned : no component carries them yet.
 
 ## Usage
 
-Use Overflow whenever a value may be longer than the space it has. The answer follows the element, so the same text behaves the same way on every page, and the full text is always reachable.
+Use Overflow when a value may exceed its space. Choose by element so it behaves consistently across pages, with the full text always reachable.
 
 | Element | Answer | Full text |
 | --- | --- | --- |

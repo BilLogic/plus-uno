@@ -18,9 +18,12 @@ Also asked as: summary card, object card.
 
 ## Usage
 
-Use a card when one object needs its own container on the page. A card holds a heading, some content and, when people can act on it, a footer. This template is the shell: you fill its slots with your own parts.
+Use a card when one object needs its own container on the page. It uses the raised fill and shadow with no border. A card holds a heading, content and an optional footer for actions. Fill its slots with your own parts.
 
-Build a card in four steps. Pick the size by what it holds. Choose the header, or turn it off when the body carries its own title. Fill the body slot, spacing only inside the slot content with the Card stack tokens. Add the footer only for actions that commit.
+1. Pick the size by what the card holds.
+2. Choose a header, or omit it when the body carries its own title.
+3. Fill the body slot. Add spacing only inside slot content, using Card stack tokens.
+4. Add a footer only for actions that commit.
 
 ### Size guidance
 

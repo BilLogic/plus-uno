@@ -10,7 +10,7 @@ When a control cannot be used yet, or by this person: actions stay enabled and e
 
 ## The four answers
 
-From most to least often. Disabling is the exception, not the default.
+Try these options in order; disable only when the earlier options do not fit.
 
 - **Enabled, and it explains.** An action stays pressable and says what is missing when pressed. It disables only while sending.
 - **Disabled with a visible reason.** A field or option that waits on a prerequisite the person can fix here. The reason is the caption or the option's description line.

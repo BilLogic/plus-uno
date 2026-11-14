@@ -10,7 +10,7 @@ Where a failure shows and what it says: the place follows what failed, and the m
 
 ## By what failed
 
-Each failure has one home, as close to its cause as it can sit. A submit has two cases, drawn under Key cases: blocked and rejected.
+Give each failure one home near its cause. Key cases shows the two submit failures: blocked and rejected.
 
 - **A field.** The error on the field, after blur. It clears once the rule is met: Forms.
 - **A view that could not load.** The error in the empty-state slot, with Try again. The view bar stays.
