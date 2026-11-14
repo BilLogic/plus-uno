@@ -51,9 +51,7 @@
     }
 
     .plus-tab[data-active] {
-        border-bottom-color: var(--ds-border);
-        border-bottom-width: var(--border-default);
-        margin-bottom: calc(-1 * var(--border-default));
+        border-image: linear-gradient(transparent, transparent) 1;
     }
 }
 
