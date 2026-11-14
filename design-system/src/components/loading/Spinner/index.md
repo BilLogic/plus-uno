@@ -90,7 +90,7 @@ Don't: A loose spinner beside a button that can still be pressed.
 - For a button that is busy, set its `isLoading`; the `Button` renders this Spinner at 16, the button icon size, in both spacings.
 - For a wait under about 300ms, show nothing. The spinner appears and vanishes as a flicker, which reads as a glitch rather than as work.
 
-Same group: `GenerativeBorder` · `ProgressBar` · `Skeleton`
+Same group: `GenerativeBorder` · `ProgressBar` · `ProgressRing` · `Skeleton`
 
 ## Parts
 

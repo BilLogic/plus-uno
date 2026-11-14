@@ -65,7 +65,7 @@ Don't: Two rings nested around the same content.
 - For the icons that start an AI action, use `AiIcon`.
 - For a general wait, use `Spinner`, `Skeleton` or `ProgressBar`.
 
-Same group: `ProgressBar` · `Skeleton` · `Spinner`
+Same group: `ProgressBar` · `ProgressRing` · `Skeleton` · `Spinner`
 
 ## Parts
 

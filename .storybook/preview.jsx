@@ -328,6 +328,7 @@ const preview = {
             "Loading",
             [
               "Progress bar",
+              "Progress ring",
               "Skeleton",
               "Spinner"
             ],

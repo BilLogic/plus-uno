@@ -9754,6 +9754,110 @@
       ]
     },
     {
+      "name": "ProgressRing",
+      "kind": "component",
+      "import": "import { ProgressRing } from '@/components';",
+      "group": "loading",
+      "source": "design-system/src/components/loading/ProgressRing/ProgressRing.jsx",
+      "summary": "`ProgressRing` — a determinate ring for a known amount of progress in a small slot. `value` is a percent (0 to 100); the drawn arc and the announced `aria-valuenow` clamp together to 0 to 100. A ring is never indeterminate; unknown time is `Spinner`'s job.",
+      "props": [
+        {
+          "name": "value",
+          "type": "number",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Percent complete, from 0 to 100",
+          "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "required": false,
+          "default": "20",
+          "values": [
+            "16",
+            "20",
+            "24"
+          ],
+          "description": "Diameter in pixels: 16, 20 or 24",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Accessible name describing what the ring measures",
+          "deprecated": null
+        },
+        {
+          "name": "appearance",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "inverse"
+          ],
+          "description": "default draws a brand fill on a neutral track; inverse reads on a bold background",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names on the root element.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Element id on the root progressbar.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Default",
+        "Inverse",
+        "Zero",
+        "Partial",
+        "Complete",
+        "Values",
+        "Sizes",
+        "Size16",
+        "Size20",
+        "Size24",
+        "WithInlineText",
+        "OutOfRangeValuesAreClamped",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "ReducedMotion"
+      ],
+      "tokens": [
+        "--ds-background-brand-bold",
+        "--ds-background-inverse-subtle",
+        "--ds-background-neutral",
+        "--ds-icon-inverse",
+        "--ds-motion-linear",
+        "--ds-motion-spatial-fast-duration",
+        "--icon-lg",
+        "--icon-md",
+        "--image-xs",
+        "--progress-ring-stroke"
+      ]
+    },
+    {
       "name": "ProgressTracker",
       "kind": "component",
       "import": "import { ProgressTracker } from '@/components';",

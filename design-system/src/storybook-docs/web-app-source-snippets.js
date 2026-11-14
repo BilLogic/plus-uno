@@ -195,6 +195,9 @@ export const webAppSourceSnippets = {
     progressBar: snippet([
         '<ProgressBar value={50} />'
     ]),
+    progressRing: snippet([
+        '<ProgressRing value={64} label="Uploading session recording" />'
+    ]),
     richTextEditor: snippet([
         '<RichTextEditor',
         '  placeholder="Type something..."',
