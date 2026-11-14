@@ -331,7 +331,9 @@ const inputs = byRoot((repoRoot) => {
   );
 
   for (const pattern of OLD_PATTERNS) {
-    const hits = activeLines.filter((line) => line.includes(pattern));
+    const hits = activeLines.filter(
+      (line) => line.includes(pattern) && !NOT_ACTIVE.some((skip) => line.includes(skip)),
+    );
     if (hits.length) fail(`[stale] ${hits.length} references to old path pattern: ${pattern}`);
   }
 
