@@ -57,6 +57,7 @@ export const TASKS = [
   'forbidden-ask',
   'triage-repair',
   'workflow-canvas',
+  'session-review-queue',
 ];
 /**
  * Tasks whose folder starts with code in it, escapes included: recorded debt
@@ -76,7 +77,7 @@ const LOOKUP_TOOLS = ['find', 'get', 'tokens', 'guide', 'check'];
  * when a small run leaves the answer unclear.
  */
 export const DEFAULT_ARMS = ['control', 'current', 'checker-removed'];
-export const DEFAULT_TASKS = ['page-from-prd', 'trap-missing-component', 'debt-extend', 'forbidden-ask'];
+export const DEFAULT_TASKS = ['page-from-prd', 'trap-missing-component', 'debt-extend', 'session-review-queue'];
 /** Variables that send `claude -p` to metered billing instead of the subscription login. */
 export const METERED = ['ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'CLAUDE_CODE_USE_VERTEX', 'CLAUDE_CODE_USE_BEDROCK'];
 

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { claudeToolUse, estimateGeminiCost, excludesOf, geminiSettings, isGemini, runGemini, toClaudeStream, vertexBudget, vertexMissing } from './gemini-agent.mjs';
+import { claudeToolUse, estimateGeminiCost, excludesOf, geminiSettings, isGemini, MAX_TURNS, runGemini, toClaudeStream, vertexBudget, vertexMissing } from './gemini-agent.mjs';
 
 const line = (o) => JSON.stringify(o);
 
@@ -25,11 +25,13 @@ test('Claude denials become Gemini excludes; read denials drop out', () => {
   ]);
 });
 
-test('settings load AGENTS.md, skip folder trust, and carry the lookup server', () => {
+test('settings load AGENTS.md, skip folder trust, pin the 120-turn hard-task cap, and carry the lookup server', () => {
   const s = geminiSettings({ mcpConfig: JSON.stringify({ mcpServers: { 'plus-ds': { type: 'stdio', command: 'node', args: ['/c/scripts/ds-mcp.mjs'] } } }), exclude: ['web_fetch'] });
   assert.deepEqual(s.context.fileName, ['AGENTS.md']);
   assert.equal(s.security.auth.selectedType, 'vertex-ai');
   assert.equal(s.security.folderTrust.enabled, false);
+  assert.equal(MAX_TURNS, 120);
+  assert.equal(s.model.maxSessionTurns, 120);
   assert.deepEqual(s.mcpServers, { 'plus-ds': { command: 'node', args: ['/c/scripts/ds-mcp.mjs'] } });
   assert.deepEqual(s.tools.exclude, ['web_fetch']);
 });

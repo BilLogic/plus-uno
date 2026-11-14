@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { compare, DEFAULT_ARMS, LOOKUP_ARMS, lookupWiring, meteredIn, rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
+import { compare, DEFAULT_ARMS, DEFAULT_TASKS, LOOKUP_ARMS, lookupWiring, meteredIn, rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -204,6 +204,9 @@ test('a11y: a missing browser or server is recorded as a11y_error, never thrown'
 test('options: the default run is small; one arm and a model are taken as given', () => {
   const d = options([]);
   assert.deepEqual([d.runs, d.arms, d.tasks.length, d.allowMetered], [2, ['control', 'current', 'checker-removed'], 4, false]);
+  assert.ok(!DEFAULT_TASKS.includes('forbidden-ask'), 'forbidden-ask is retired from the default active task set');
+  assert.ok(DEFAULT_TASKS.includes('session-review-queue'), 'session-review-queue is in the default active task set');
+  assert.deepEqual(options(['--tasks', 'forbidden-ask']).tasks, ['forbidden-ask']);
   assert.equal(options(['--allow-metered']).allowMetered, true);
   assert.equal(options(['--runs', '2']).runs, 2);
   const o = options(['run', '--arms', 'control', '--model', 'haiku']);
@@ -269,8 +272,8 @@ test('scenariosSha is stable for the same tree, and a seeded file is part of it'
   }
 });
 
-test('the four harder scenarios are tasks, each prepared with its brief and its seeded files in the scored folder', () => {
-  for (const task of ['two-page-flow', 'debt-extend', 'migrate-retired', 'forbidden-ask']) assert.ok(TASKS.includes(task), task);
+test('the harder scenarios are tasks, each prepared with its brief and its seeded files in the scored folder', () => {
+  for (const task of ['two-page-flow', 'debt-extend', 'migrate-retired', 'forbidden-ask', 'triage-repair', 'workflow-canvas', 'session-review-queue']) assert.ok(TASKS.includes(task), task);
   const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-harder-'));
   try {
     const seeded = {
@@ -278,6 +281,7 @@ test('the four harder scenarios are tasks, each prepared with its brief and its 
       'debt-extend': ['src/App.jsx', 'src/MonthlyReviews.jsx'],
       'migrate-retired': ['src/App.jsx', 'src/CallOffConfirmation.jsx'],
       'forbidden-ask': [],
+      'session-review-queue': [],
     };
     for (const [task, files] of Object.entries(seeded)) {
       const { folder } = prepare({ ref: 'HEAD', arm: 'current', task, into: path.join(into, task) });
@@ -316,6 +320,9 @@ test('judge.md scopes each task-specific field to its brief by title', () => {
     const line = judge.split('\n').find((l) => l.includes(`**${field}**`));
     assert.ok(line, field);
     assert.ok(line.includes(`"${title(task)}"`), `${field} names "${title(task)}"`);
+  }
+  for (const task of ['triage-repair', 'workflow-canvas', 'session-review-queue']) {
+    assert.ok(judge.includes(`"${title(task)}" passes rendered only when`), `rendered names "${title(task)}"`);
   }
   assert.match(judge, /"escalated": true\|false\|null/);
 });
