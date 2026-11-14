@@ -85,7 +85,7 @@ Don't: A paragraph in the banner.
 - For a timed confirmation that something already happened, use `Flag`.
 - For a short note tied to one object on the page, use `InlineMessage`.
 
-Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
+Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 

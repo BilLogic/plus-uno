@@ -672,6 +672,13 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'NotificationItem',
+    tier: 'component',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Row fill and Mark as read fade on hover, press and read state changes.' },
+    },
+  },
+  {
     name: 'Carousel',
     tier: 'component',
     events: {

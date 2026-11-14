@@ -4,8 +4,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as NotificationsStories from './Notifications.stories.jsx';
-import { FLOAT_STAGE } from '../../../patterns/Panel/panelDemo.jsx';
-import { PLACE_STAGE, STAGE, BannerDo, BannerDont, FlagDo, FlagDont } from './notificationsDemo.jsx';
+import { INBOX_STAGE, PLACE_STAGE, STAGE, BannerDo, BannerDont, FlagDo, FlagDont } from './notificationsDemo.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -16,13 +15,14 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
     page="patterns-notifications"
     eyebrow="Pattern"
     title="Notifications"
-    purpose="What the product says back, and where: a Flag for what happened, a Banner for a condition, a SectionMessage for something to act on."
+    purpose="What the product says back, and where: a Flag for what happened, a Banner for a condition, a SectionMessage for something to act on, and the Inbox for what arrived over time."
     links={{
         label: 'Uses',
         items: [
             { title: 'Flag', href: './?path=/docs/components-messaging-flag--docs' },
             { title: 'Banner', href: './?path=/docs/components-messaging-banner--docs' },
             { title: 'Section message', href: './?path=/docs/components-messaging-section-message--docs' },
+            { title: 'Notification item', href: './?path=/docs/components-messaging-notification-item--docs' },
             { title: 'Panel', href: './?path=/docs/templates-panel--docs' },
             { title: 'Modal', href: './?path=/docs/templates-modal--docs' },
             { title: 'Page', href: './?path=/docs/templates-page--docs' },
@@ -46,7 +46,7 @@ Four components carry every message. Each component page holds its appearances; 
 <TypeCard of={NotificationsStories.CarrierFlag} title="Flag" stage={PLACE_STAGE}>A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and error stay until acted on.</TypeCard>
 <TypeCard of={NotificationsStories.CarrierBanner} title="Banner" stage={STAGE}>A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.</TypeCard>
 <TypeCard of={NotificationsStories.CarrierSectionMessage} title="SectionMessage" stage={PLACE_STAGE}>Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.</TypeCard>
-<TypeCard of={NotificationsStories.CarrierInbox} title="The Inbox" stage={FLOAT_STAGE}>Notifications that arrived over time, in a <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a>. The Bell that carries its count, and the Panel growing out of the Sidebar, are Planned <PlannedTag />.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierInbox} title="The Inbox" stage={INBOX_STAGE}>Updates that arrived over time, in a 360-wide (`--inbox-width`) <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a> beside the Sidebar with `Unread` and `All` tabs and `NotificationItem` rows grouped by day.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -89,6 +89,8 @@ One banner at a time, scrolling with its content. The Frame tier is system news 
 
 <ComponentExample of={NotificationsStories.KeyFlagOnPage} title="A Flag on the page" description="The person has moved on to another page; the Flag finds them at the top right." />
 
+<ComponentExample of={NotificationsStories.KeyInboxCaughtUp} title="All caught up in the Inbox" description="When every unread update has been cleared, the Unread tab renders a compact EmptyState saying You are all caught up. while All preserves the history." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -126,7 +128,7 @@ Use Notifications when the product needs to tell someone something: an action fi
 <tr><td>A condition that holds for everything in a Frame, page or Section</td><td>`Banner` at that tier</td><td>Top of the tier</td><td>When the condition ends</td></tr>
 <tr><td>A note beside one thing that most people never need</td><td>`InlineMessage`</td><td>Beside the field or value</td><td>On close</td></tr>
 <tr><td>Something that must be answered before going on</td><td>`Modal`, Acknowledge or Active</td><td>Centered over a Backdrop</td><td>On the button</td></tr>
-<tr><td>What arrived over time</td><td>The Inbox, a Panel of the Notifications type</td><td>A floating Panel, no Backdrop</td><td>When read</td></tr>
+<tr><td>What arrived over time</td><td>The Inbox, a 360-wide (`--inbox-width`) Panel beside the Sidebar</td><td>Start of the page, over content, no Backdrop</td><td>Escape, outside click, or Close</td></tr>
 </tbody>
 </DocsTable>
 
@@ -212,7 +214,7 @@ A bold fill competes with the page; it is for what must be seen. Routine news st
 
 <RuleTag kind="review" />
 
-A Flag is for now; the Inbox is for later. The Inbox is the Panel's Notifications type: items by time, each unread one marked with a dot and the word. The Bell in the Sidebar carrying the count, and the Panel growing out of the Sidebar from the left, are Planned <PlannedTag />.
+A Flag is for now; the Inbox is for later. The Inbox opens from the Sidebar at `--inbox-width` over the start of the page with no Backdrop, carrying `Mark all as read`, settings and close in the header, `Unread` (with count) and `All` tabs, and `NotificationItem` rows grouped by day. Clearing every unread item shows `"You are all caught up."` in `EmptyState`; pressing `Escape` or clicking outside closes the panel.
 
 </div>
 
@@ -244,6 +246,7 @@ A Flag is for now; the Inbox is for later. The Inbox is the Panel's Notification
 - A `Banner` is a status that never traps focus and sits in the reading order.
 - The timeout on a Flag is a timing limit; the dismiss × on a default Flag satisfies it (see the Flag page).
 - The appearance icon is decorative; the words carry the severity.
+- Each `NotificationItem` in the Inbox is one link whose accessible name announces `"Unread"` while unread, with `"Mark as read"` as a sibling button outside the link.
 
 </div>
 
@@ -257,7 +260,7 @@ A Flag is for now; the Inbox is for later. The Inbox is the Panel's Notification
 - <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a>: use for the Inbox.
 - <a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a>: use for what must be answered first.
 - <a target="_top" href="./?path=/docs/templates-page--docs">Page</a>: use for where a Page banner sits.
-- `Flag`, `Banner`, `SectionMessage`, `InlineMessage`, `Modal`: the components.
+- `Flag`, `Banner`, `SectionMessage`, `InlineMessage`, `NotificationItem`, `Modal`: the components.
 
 </div>
 
