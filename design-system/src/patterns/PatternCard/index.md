@@ -102,7 +102,7 @@ Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternModal` · `Pa
 ## Parts
 
 1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. On top, give the image you pass an aspect ratio of 16:9, 4:3 or 1:1; beside the content it fills the full height at one third or one half of the width and crops to cover.
-2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. The title is 14/20 at every level, over a 14/20 description. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
+2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. The title uses Heading xsmall at every heading level, stepping up to Heading medium for a half side image. The description uses Body default. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
 3. **Body.** A slot for text, a list or media.
 4. **Footer** (optional). A left-aligned slot for actions that commit a change.
 
@@ -134,7 +134,8 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 | `--ds-surface-raised`, `--ds-shadow-raised` | color pair | The card at rest. |
 | `--ds-surface-raised-hovered`, `--ds-surface-raised-pressed` | color | A clickable card while hovered and pressed. |
 | `--ds-surface-overlay`, `--ds-shadow-overlay` | color pair | A dragged card, and the hover lift's shadow. |
-| `--heading-xsmall`, `--body-default` | 14/20 | The title and the description. |
+| `--heading-xsmall`, `--body-default` | type | The regular title and the description. |
+| `--heading-medium` | type | The title beside a half-width side image. |
 | `--ds-text`, `--ds-text-subtle` | color | The title and the description. |
 
 ## Content guidelines
