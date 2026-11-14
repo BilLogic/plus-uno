@@ -21,6 +21,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 export const isGemini = (model) => /^gemini/i.test(String(model ?? ''));
+export const MAX_TURNS = 120;
 
 /** Global Vertex introductory rates, verified 2026-11-13; estimates, not invoices.
  * https://cloud.google.com/model-garden/pricing (through 2026-12-31).
@@ -91,7 +92,7 @@ export function geminiSettings({ mcpConfig = '{"mcpServers":{}}', exclude = [] }
   return {
     security: { auth: { selectedType: 'vertex-ai' }, folderTrust: { enabled: false } },
     context: { fileName: ['AGENTS.md'] },
-    model: { maxSessionTurns: 80 },
+    model: { maxSessionTurns: MAX_TURNS },
     mcpServers: servers,
     tools: { exclude },
     telemetry: { enabled: false },
