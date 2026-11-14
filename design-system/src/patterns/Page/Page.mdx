@@ -162,23 +162,7 @@ The outline keeps a page's headings in one order, so a reader and assistive tech
     <DsCanvasQuiet of={HeadingOutlineStories.PageSectionSubsection} />
 </DocsCanvasShell>
 
-Use one h1 per page. Each Section opens with an h2, and a subsection inside it with an h3. Do not skip a level to get a different size: the size follows from the level.
-
-### Container titles
-
-Container titles are fixed whatever level they sit at.
-
-<DocsCanvasShell description={<>A card's tag is one level below its section; its title and description sizes are on <DocsLink id="templates-card">Card</DocsLink>.</>}>
-    <DsCanvasQuiet of={HeadingOutlineStories.CardTitles} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A modal's title is 20. It is the dialog's own h1 and names it.</>}>
-    <DsCanvasQuiet of={HeadingOutlineStories.ModalTitle} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A popup's and a flag's titles are 14.</>}>
-    <DsCanvasQuiet of={HeadingOutlineStories.PopupAndFlagTitles} />
-</DocsCanvasShell>
+Use one h1 per page. Each Section opens with an h2, and a subsection inside it with an h3. Do not skip a level to get a different size: the size follows from the level. Container titles keep their own sizes on their templates: <DocsLink id="templates-card">Card</DocsLink>, <DocsLink id="templates-modal">Modal</DocsLink> and <DocsLink id="templates-popup">Popup</DocsLink>.
 
 ### Group labels
 
@@ -191,7 +175,6 @@ A menu's label names a group, and a table's labels are column headers. Neither j
 ### Heading outline accessibility
 
 - **Tags follow nesting.** Heading levels are real `h1` to `h3` elements, not styled text, so screen reader users can move by heading.
-- **A modal names itself.** Its title is the dialog's accessible name.
 
 </div>
 

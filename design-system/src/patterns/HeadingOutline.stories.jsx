@@ -9,10 +9,10 @@ import { PatternCard, PatternSection, Page } from '@/patterns';
  * nesting: the page's one h1 is Heading/large 24, a section's h2 is
  * Heading/medium 20, a subsection's h3 is Heading/small 16.
  *
- * Container titles are fixed whatever level they sit at: a modal's is 20 (the
- * dialog's own h1, which names it), and a card's, a popup's and a flag's are
- * 14. A card's title sits over a 14 description, and its tag is one level
- * below its section.
+ * Container titles are fixed whatever level they sit at, and each is
+ * documented on its own template: a modal's is 20 (the dialog's own h1, which
+ * names it), and a card's, a popup's and a flag's are 14. A card's title sits
+ * over a 14 description, and its tag is one level below its section.
  *
  * Group labels are 12 semibold and are not headings: a menu's label names a
  * group, and a table's labels are column headers.
@@ -108,25 +108,30 @@ ModalTitle.play = async ({ canvasElement }) => {
     await expectStyle(inside.getByRole('heading', { level: 2, name: 'When' }), 'section in a modal', HEADING_MEDIUM);
 };
 
-/** A popup's title and a flag's title are 14. */
-export const PopupAndFlagTitles = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
-        <Popup
-            title="Session notes"
-            triggerType="manual"
-            show
-            placement="right"
-            trigger={<Button>Notes</Button>}
-        >
-            Shared with the student.
-        </Popup>
-        <Flag title="Session moved" show onDismiss={() => {}}>Now Thursday at 4:00 PM.</Flag>
-    </div>
+/** A popup's title is 14. */
+export const PopupTitle = () => (
+    <Popup
+        title="Session notes"
+        triggerType="manual"
+        show
+        placement="right"
+        trigger={<Button>Notes</Button>}
+    >
+        Shared with the student.
+    </Popup>
 );
 
-PopupAndFlagTitles.play = async ({ canvasElement }) => {
+PopupTitle.play = async ({ canvasElement }) => {
     const body = within(document.body);
     await expectStyle(await body.findByText('Session notes'), 'popup title', HEADING_XSMALL);
+};
+
+/** A flag's title is 14. */
+export const FlagTitle = () => (
+    <Flag title="Session moved" show onDismiss={() => {}}>Now Thursday at 4:00 PM.</Flag>
+);
+
+FlagTitle.play = async ({ canvasElement }) => {
     await expectStyle(within(canvasElement).getByText('Session moved'), 'flag title', HEADING_XSMALL);
 };
 
