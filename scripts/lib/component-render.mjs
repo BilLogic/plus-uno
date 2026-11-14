@@ -132,6 +132,8 @@ const FILTERING_GOVERNED = new Set(['SearchField', 'FilterButton', 'FilterMenu',
 const FILTERING_LINE =
   'Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.';
 
+export const governedNamesOf = (name, edges = {}) => [...new Set([...(FILTERING_GOVERNED.has(name) ? ['Filtering'] : []), ...(edges.governedBy ?? []).map((p) => p.name)])];
+
 export function governedByOf(name, edges = {}) {
   const tracer = FILTERING_GOVERNED.has(name) ? FILTERING_LINE : null;
   const derived = (edges?.governedBy ?? []).filter((p) => !tracer || p.name !== 'Filtering').map(contextLabel);

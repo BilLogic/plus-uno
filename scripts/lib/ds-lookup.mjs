@@ -57,7 +57,7 @@ import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
 import { INSTALL_FOLDER } from './ds-add.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
-import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, governedByOf, renderComponent, sectionsOf } from './component-render.mjs';
+import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, governedByOf, governedNamesOf, renderComponent, sectionsOf } from './component-render.mjs';
 
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
 
@@ -564,7 +564,11 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     const next = kit ? `These fill ${kit.template.name}. Start from that template: ${kit.template.next}; ds_get for the components.` : out.length
       ? 'Next: ds_get with the names you will use (section "props" first); ds_tokens for a styling role.'
       : `Nothing matches "${q}". Try one plain word (card, table, date); ds_tokens for a token role; ${topics.length ? `ds_guide(${topics.map((t) => `"${t}"`).join(', ')})` : 'ds_guide for a guideline topic'}.`;
-    const backEdges = Object.fromEntries(results.filter((r) => contexts().edges[r.aliasOf ?? r.name]).map((r) => [r.name, Object.fromEntries(Object.entries(contexts().edges[r.aliasOf ?? r.name]).map(([key, pages]) => [key, contextList(pages.map((p) => p.name), 48)]))]));
+    const backEdges = Object.fromEntries(results.filter((r) => contexts().edges[r.aliasOf ?? r.name]).map((r) => {
+      const name = r.aliasOf ?? r.name;
+      const edges = contexts().edges[name];
+      return [r.name, { usedIn: contextList(edges.usedIn.map((p) => p.name), 48), governedBy: contextList(governedNamesOf(name, edges), 48) }];
+    }));
     return { query: q, results, backEdges, ...(kit ? { kit } : {}), next };
   }
 

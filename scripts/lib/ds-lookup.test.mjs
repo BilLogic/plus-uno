@@ -344,6 +344,7 @@ test('component lookups expose capped template and pattern back-edges in every a
   const line = render('find', lookup.find('SearchField')).split('\n')[0];
   assert.match(line, /Used in:.*Section/);
   assert.match(line, /Governed by:.*Search/);
+  assert.match(line, /Governed by:.*Filtering/);
   assert.ok(line.length <= 160);
   for (const line of full.text.split('\n').filter((l) => /^\*\*(Used in|Governed by):/.test(l))) assert.ok(line.length <= 400);
 });
