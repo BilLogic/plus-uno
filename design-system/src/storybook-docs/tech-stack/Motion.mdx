@@ -19,14 +19,14 @@ Most components animate in CSS with `--ds-motion-*` tokens. The `motion` package
 
 <FoundationSection title="What wraps it">
 
-<DocsLink id="components-messaging-flag">Flag</DocsLink> uses `motion` for interruptible enter, exit and stack reflow. `HeightSurface` (`design-system/src/lib/heightMotion.jsx`) wraps `AnimatePresence` and `motion.div` for disclosure height transitions in <DocsLink id="components-layout-and-structure-accordion">Accordion</DocsLink>, <DocsLink id="components-forms-and-inputs-select-tree-select">Tree select</DocsLink> and <DocsLink id="components-text-and-data-display-tree-table">Tree table</DocsLink>.
+<DocsLink id="components-messaging-flag">Flag</DocsLink> uses `motion` for interruptible enter, exit and stack reflow. `HeightSurface` (`design-system/src/lib/heightMotion.jsx`) wraps `AnimatePresence` and `motion.div` for disclosure height transitions in <DocsLink id="components-layout-and-structure-accordion">Accordion</DocsLink>, <DocsLink id="components-forms-and-inputs-select-tree-select">Tree select</DocsLink> and <DocsLink id="components-text-and-data-display-tree-table">Tree table</DocsLink>. Template and pattern transitions and choreography are exported from `@/patterns`: `AreaStage`, `DrillStack`, `useDrillStack`, `SlideViews`, `StepStage`, `FocusedFrameSwitch`, `scrollToSpot`, `callAttention`, `SwapInPlace`, `LoadThenReveal`, `LoadRevealSlot`, `PresenceSlot`, `useMotionReduced` and `SPRINGS`.
 
 </FoundationSection>
 
 <FoundationSection title="What not to do">
 
-- Do not import `motion` for a transition that CSS `--ds-motion-*` tokens can handle.
-- Do not pass a literal duration or `cubic-bezier()` easing; read springs from `SPRINGS` (`@/tokens/ladder/springs.generated.js`).
-- Do not skip reduced motion; pair `SPRINGS` with `useMotionReduced()` so spatial moves collapse to an opacity fade.
+- Do not import `motion` for a transition that CSS `--ds-motion-*` tokens or the `@/patterns` motion helpers can handle.
+- Do not pass a literal duration or `cubic-bezier()` easing; read springs from `SPRINGS` (`@/patterns`).
+- Do not skip reduced motion; pair `SPRINGS` with `useMotionReduced()` (`@/patterns`) so spatial moves collapse to an opacity fade.
 
 </FoundationSection>

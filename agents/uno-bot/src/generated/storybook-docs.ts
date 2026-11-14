@@ -23,6 +23,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-checkbox-checkbox--docs"
   ],
   [
+    "design-system/src/components/forms-and-inputs/CheckboxGroup/",
+    "CheckboxGroup",
+    "components-forms-and-inputs-checkbox-checkbox-group--docs"
+  ],
+  [
     "design-system/src/components/forms-and-inputs/ChoiceGrid/",
     "ChoiceGrid",
     "components-forms-and-inputs-radio-choice-grid--docs"
@@ -41,6 +46,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/forms-and-inputs/DateTimePicker/",
     "DateTimePicker",
     "components-forms-and-inputs-date-time-picker-date-time-picker--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/FileItem/",
+    "FileItem",
+    "components-forms-and-inputs-file-upload-file-item--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/FileUpload/",
@@ -73,6 +83,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-radio-radio--docs"
   ],
   [
+    "design-system/src/components/forms-and-inputs/RadioGroup/",
+    "RadioGroup",
+    "components-forms-and-inputs-radio-radio-group--docs"
+  ],
+  [
     "design-system/src/components/forms-and-inputs/Range/",
     "Range",
     "components-forms-and-inputs-range--docs"
@@ -86,6 +101,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/forms-and-inputs/RichTextEditor/",
     "RichTextEditor",
     "components-forms-and-inputs-rich-text-editor--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/SettingRow/",
+    "SettingRow",
+    "components-forms-and-inputs-setting-row--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/TagInput/",
@@ -193,6 +213,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-loading-progress-bar--docs"
   ],
   [
+    "design-system/src/components/loading/ProgressRing/",
+    "ProgressRing",
+    "components-loading-progress-ring--docs"
+  ],
+  [
     "design-system/src/components/loading/Skeleton/",
     "Skeleton",
     "components-loading-skeleton--docs"
@@ -211,6 +236,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/messaging/Modal/",
     "Modal",
     "components-messaging-modal-dialog--docs"
+  ],
+  [
+    "design-system/src/components/messaging/NotificationItem/",
+    "NotificationItem",
+    "components-messaging-notification-item--docs"
   ],
   [
     "design-system/src/components/messaging/SectionMessage/",
