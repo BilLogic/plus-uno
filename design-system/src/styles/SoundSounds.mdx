@@ -1,5 +1,4 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { C } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
@@ -79,12 +78,5 @@ playSound('done.step');
         { title: 'When to play', description: 'The moments each sound belongs to.', href: '?path=/docs/foundations-expression-sound-when-to-play--docs' },
     ]}
 />
-
-</FoundationSection>
-
-<FoundationSection title="References">
-
-- ADR-043 records why sound is synthesized in the browser and how it is tokened.
-- The sheet is read from `design-system/src/sound/spec.generated.js`, generated from `scripts/lib/tokens/sound-plan.mjs`; `check:sound-spec` fails when it is stale.
 
 </FoundationSection>

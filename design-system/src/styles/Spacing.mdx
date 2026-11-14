@@ -5,8 +5,6 @@ import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
-    FoundationExample,
-    TokenSwatches,
 } from '@/storybook-docs/foundation-page.jsx';
 import * as SpacingStories from './Spacing.stories.jsx';
 
@@ -29,7 +27,7 @@ import * as SpacingStories from './Spacing.stories.jsx';
 
 <FoundationSection title="Overview">
 
-Spacing tokens name a job, not a size. Pick the pattern you are in (Page, Section, Card, Modal, Popup, Table or a control), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Primitives hold the raw numbers and stay hidden: designers and code bind the semantic token, never a primitive and never a typed number.
+Spacing tokens name a job, not a size. Pick the pattern you are in (Page, Section, Card, Modal, Popup, Table or a control), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Bind the semantic token, never a primitive or a typed number.
 
 ```css
 padding: var(--card-pad-default);
@@ -42,15 +40,9 @@ Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Con
 
 <FoundationSection title="Principles">
 
-Five principles decide which tier a gap takes. Similar things share one gap,
-a new group gets a bigger one, tiers grow from the component to the page,
-headings and actions get room, and a modal breathes before its footer.
-
 <FoundationSubsection title="Similarity">
 
-
-Items of equal weight, such as the fields of one form group, sit close
-together with one stack.
+Items of equal weight, such as the fields of one form group, sit close together with one stack.
 
 <Canvas of={SpacingStories.Similarity} sourceState="none" />
 
@@ -58,9 +50,7 @@ together with one stack.
 
 <FoundationSubsection title="Differentiation">
 
-
-When the content changes kind, from a suggestion to the form controls, step
-up a tier so the change reads at a glance.
+When the content changes kind, from a suggestion to the form controls, step up a tier so the change reads at a glance.
 
 <Canvas of={SpacingStories.Differentiation} sourceState="none" />
 
@@ -68,10 +58,7 @@ up a tier so the change reads at a glance.
 
 <FoundationSubsection title="Rhythm">
 
-
-Gaps grow with the box: a control and a Card 4 · 8 · 12 px inside a component,
-Section and Modal 8 · 16 · 24 px inside a region, Page 16 · 24 · 40 px between
-regions.
+Gaps grow with the box: 4 · 8 · 12 px inside a control or Card, 8 · 16 · 24 px inside a Section or Modal, and 16 · 24 · 40 px between Page sections.
 
 <Canvas of={SpacingStories.Rhythm} sourceState="none" />
 
@@ -79,9 +66,7 @@ regions.
 
 <FoundationSubsection title="Hierarchy">
 
-
-The heading and the main action read first because they have space around
-them. Give them the larger stack of their tier, and never add space by hand.
+Give headings and primary actions the larger stack of their tier, and never add space by hand.
 
 <Canvas of={SpacingStories.Hierarchy} sourceState="none" />
 
@@ -89,9 +74,7 @@ them. Give them the larger stack of their tier, and never add space by hand.
 
 <FoundationSubsection title="White space">
 
-
-Pad the modal on every side, and leave the largest gap of its tier between the
-content and the footer buttons.
+Pad the modal on every side, and leave the largest gap of its tier between the content and the footer buttons.
 
 <Canvas of={SpacingStories.WhiteSpace} sourceState="none" />
 
@@ -101,17 +84,7 @@ content and the footer buttons.
 
 <FoundationSection title="Tokens">
 
-Every spacing, size and radius value comes from the four-tier ladder listed on [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs). A token is used bare, and a typed px value never appears.
-
-- **Primitives** are the raw scale, named rem × 100: `--space-100` is 16 px,
-  `--space-050` is 8 px. They are hidden in Figma, and nothing binds them.
-- **Every other tier** points at a primitive and names a job, as
-  `Collection/property-variant` in Figma, and the same words joined by dashes
-  in code: `Section/pad-x-default` is `--section-pad-x-default`. A collection with a
-  single property skips the variant (`--table-stack`).
-
-Name the relationship first, then pick the token. If you cannot name the
-context a value belongs to, step back to the box that holds it.
+Name the relationship first, then pick the token from the four-tier ladder on [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs). If you cannot name the context a value belongs to, step back to the box that holds it.
 
 <RefTable
     head={['Word', 'Means', 'Example']}
@@ -121,18 +94,12 @@ context a value belongs to, step back to the box that holds it.
         [<C>stack</C>, 'The vertical gap between rows, chosen by use, never by the size of the box', <><C>--section-stack-md</C> 16</>],
         [<C>inline</C>, 'The horizontal gap between things side by side', <><C>--modal-inline-sm</C> 8</>],
         [<C>gutter</C>, 'The gap between grid columns, and between cards side by side on the grid', <><C>--grid-gutter</C> 16</>],
-        [<C>radius</C>, 'Corner radius, set per component (see Radius)', <><C>--card-radius</C> 16</>],
-        [<><C>height</C> · <C>width</C> · <C>min</C> · <C>max</C></>, 'Size roles (see Size roles)', <><C>--item-height-md</C> 32</>],
+        [<C>radius</C>, <>Corner radius, set per component (<a href="?path=/docs/foundations-visual-radius--docs">Radius</a>)</>, <><C>--card-radius</C> 16</>],
+        [<><C>height</C> · <C>width</C> · <C>min</C> · <C>max</C></>, <>Size roles (<a href="?path=/docs/foundations-layout-grid--docs#foundation-size-roles">Grid</a>)</>, <><C>--item-height-md</C> 32</>],
     ]}
 />
 
-Margin, slot and viewport are never token words. What other systems
-call a page margin is the Page pad, `--page-pad`.
-
-<TokenTable
-    showFigma={false}
-    rows={['0', '00625', '0125', '025', '03125', '0375', '050', '0625', '075', '0875', '100', '125', '150', '200', '250', '300', '400', '500'].map((s) => ({ token: `--space-${s}` }))}
-/>
+Margin, slot and viewport are never token words. What other systems call a page margin is the Page pad, `--page-pad`.
 
 </FoundationSection>
 
@@ -141,10 +108,8 @@ call a page margin is the Page pad, `--page-pad`.
 Every box on a page is one of three kinds, and the kind decides its padding.
 
 - An **Item** has a minimum height, and its pad-x is larger than its pad-y.
-- A **Container** has a background and one pad on every side, and its height
-  hugs its content.
-- A **Wrapper** has no fill and no pad. It only arranges its children with a
-  gap or a grid.
+- A **Container** has a background and one pad on every side, and its height hugs its content.
+- A **Wrapper** has no fill and no pad. It only arranges its children with a gap or a grid.
 
 <Canvas of={SpacingStories.ThreeKinds} sourceState="none" />
 
@@ -152,17 +117,9 @@ Every box on a page is one of three kinds, and the kind decides its padding.
 
 <FoundationSection title="Padding">
 
-An Item pads by its height, a Container pads by its size, and a Wrapper has no
-pad.
-
 <FoundationSubsection title="Items: height first">
 
-
-The label stays 14/20 at every size, so pad-y is (height − 20) ÷ 2: 2 at 24
-and 6 at 32. Pad-x is always the larger: 8 at 24 and 12 at 32. Buttons, tabs and menu rows come in
-32, or 24 compact inside table rows and inline toolbars. Fields come
-in 40, or 32 compact, with pad-y 10 at 40. Buttons round 6 (4 compact); every
-other control rounds to its height ÷ 4. Labels (Tag, Status, Count) pad 4 across.
+The label stays 14/20 at every size, so pad-y is (height − 20) ÷ 2: 2 at 24 and 6 at 32. Pad-x is always the larger: 8 at 24 and 12 at 32. Buttons, tabs and menu rows come in 32, or 24 compact inside table rows and inline toolbars. Fields come in 40, or 32 compact, with pad-y 10 at 40. Labels (Tag, Status, Count) pad 4 across. Corner rounding is in [Radius](?path=/docs/foundations-visual-radius--docs).
 
 <Canvas of={SpacingStories.ItemHeights} sourceState="none" />
 
@@ -180,22 +137,13 @@ other control rounds to its height ÷ 4. Labels (Tag, Status, Count) pad 4 acros
 
 <FoundationSubsection title="Containers: one pad on every side">
 
-
-A pattern carries its own pad. A container that is not a pattern takes the
-Card pad of its size: a Section message and File upload take 16.
-
-The tokens are listed under [Pattern tokens](#foundation-pattern-tokens): Card, Modal, Popup, Backdrop and Page.
+A pattern carries its own pad ([Pattern tokens](#foundation-pattern-tokens)). A container that is not a pattern takes the Card pad of its size: a Section message and File upload take 16.
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Table cells">
 
-
-Cells pad 4 top and bottom and 8 across. The row height is a minimum, and the
-row grows with its content. On a plain table, the first and last cells sit
-flush with the table's edge.
-
-The tokens are listed under Table in [Pattern tokens](#foundation-pattern-tokens).
+Cells pad 4 top and bottom and 8 across (`--table-pad-y-cell`, `--table-pad-x-cell`). The row height is a minimum, and the row grows with its content. On a plain table, the first and last cells sit flush with the table's edge.
 
 </FoundationSubsection>
 
@@ -203,9 +151,7 @@ The tokens are listed under Table in [Pattern tokens](#foundation-pattern-tokens
 
 <FoundationSection title="Stack and inline">
 
-Gaps come in tiers that grow with the box. The space between sections is two
-to three times the space inside them. A card stacks its parts 8 apart at every
-size: stack follows use, not the size of the box.
+Gaps come in tiers that grow with the box. Stack follows use, not the size of the box: a Card stacks its parts 8 apart at every size.
 
 <RefTable
     head={['Group', 'sm (px)', 'md (px)', 'lg (px)', 'Used between']}
@@ -238,10 +184,7 @@ Every pattern has its own tokens, so a value is read from where it sits.
 
 <FoundationSubsection title="Frame and Page">
 
-
-The Frame is the whole screen: the topbar above a row holding the sidebar and
-the Page. The Page is the rounded box that holds the content, and its pad is
-the content grid's margin.
+The Frame is the whole screen: the topbar above a row holding the sidebar and the Page. The Page holds the content, and its pad is the content grid's margin.
 
 <TokenTable
     rows={[
@@ -256,9 +199,7 @@ the content grid's margin.
 
 <FoundationSubsection title="Section">
 
-
-A span of the page grid under one heading. A section has no fill, no pad and
-no size options.
+A span of the page grid under one heading. A plain section has no fill, no pad and no size options.
 
 <TokenTable
     rows={[
@@ -273,7 +214,6 @@ no size options.
 </FoundationSubsection>
 
 <FoundationSubsection title="Card">
-
 
 Pad and radius follow the card's size; stack and inline follow use.
 
@@ -301,7 +241,6 @@ Pad and radius follow the card's size; stack and inline follow use.
 
 <FoundationSubsection title="Table">
 
-
 Plain and full-span by default.
 
 <TokenTable
@@ -318,7 +257,6 @@ Plain and full-span by default.
 </FoundationSubsection>
 
 <FoundationSubsection title="Backdrop and Modal">
-
 
 The Backdrop pads the screen. A modal pads 16 on every side at every width.
 
@@ -340,9 +278,7 @@ The Backdrop pads the screen. A modal pads 16 on every side at every width.
 
 <FoundationSubsection title="Popup, menu and tooltip">
 
-
-Menu, popup, flag and tooltip float without a Backdrop. The outer box of a menu
-pads 4, and a popup or flag pads 16.
+Menu, popup, flag and tooltip float without a Backdrop. The outer box of a menu pads 4, and a popup or flag pads 16.
 
 <TokenTable
     rows={[
@@ -368,63 +304,51 @@ pads 4, and a popup or flag pads 16.
 
 <FoundationSection title="Usage">
 
-How to build a feature that spaces like the rest of PLUS.
+<FoundationSubsection title="Group first, then assign tokens">
 
-**Group first, then assign tokens.** Grouping is the first step to hierarchy.
-Before you pick a token, group the content from the inside out; each step out
-is one tier up. In a modal form:
+Before picking a token, group the content from the inside out; each step out is one tier up. In a modal form:
 
-1. Pair a control with what it changes, such as a field and its "Repeats
-   weekly" toggle: `--stack-md` (8).
+1. Pair a control with what it changes, such as a field and its "Repeats weekly" toggle: `--stack-md` (8).
 2. Gather related fields: `--modal-stack-md` (16) between them.
 3. Separate unrelated groups: `--modal-stack-lg` (24).
-4. Separate the header from the body, and the body from the footer:
-   `--modal-stack-lg` (24).
+4. Separate the header from the body, and the body from the footer: `--modal-stack-lg` (24).
 5. Set the actions side by side: `--modal-inline-sm` (8).
 
-**Pick by context, not by number.** A Card token inside a card, a Section
-token inside a section, Stack and Inline tokens inside a component. Never borrow a
-token because its number happens to match. When the card's tokens change, the
-borrowed one does not follow.
+</FoundationSubsection>
 
-**Never hand-space.** If a gap still looks wrong with the right tokens, step
-to the next tier of the same group, such as `--section-stack-md` to
-`--section-stack-lg`. If no tier fits, raise it as a token or pattern question
-rather than adding space by hand.
+<FoundationSubsection title="Pick by context, not by number">
+
+Use a Card token inside a card, a Section token inside a section, and Stack or Inline tokens inside a component. Never borrow a token because its number happens to match.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Never hand-space">
+
+If a gap looks wrong with the right tokens, step to the next tier of the same group, such as `--section-stack-md` to `--section-stack-lg`.
 
 <Canvas of={SpacingStories.NeverHandSpace} sourceState="none" />
 
-**Bind the semantic token, never a primitive or a number.** Primitives are
-hidden so nothing binds them, and a typed number breaks the moment a token
-changes. A one-off value takes the nearest semantic token of its context, or
-becomes a proposed token.
+</FoundationSubsection>
 
-**Build features from patterns and slots.** Start from the pattern (Section,
-Card, Modal, Popup) and keep it attached; never detach it. The pattern owns
-the pad, the stacks and the size, and you add content only inside its slots.
-If you copy a layout to get a variation, it needs a slot, not a new variant.
+<FoundationSubsection title="Build from templates and slots">
 
-**No card inside a card.** A card groups one thing. Tiers inside it are
-stacks and dividers in the card body, not more cards.
+Start from the template (Section, Card, Modal, Popup) and keep it attached. The template owns the pad, the stacks and the size; add content only inside its slots.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="No card inside a card">
+
+A card groups one thing. Tiers inside it are stacks and dividers in the card body, not more cards.
 
 <Canvas of={SpacingStories.NoCardInCard} sourceState="none" />
 
-**Let the content pick the size.** Visible empty space means a smaller size;
-overflow or clipping means a larger one. Cards hug their content, with an
-optional maximum height that scrolls the body. Modals hug or fill. Tables,
-sections and tab groups grow to fit.
+</FoundationSubsection>
 
 </FoundationSection>
 
 <FoundationSection title="Space never speaks alone">
 
-A gap tells the eye there is a boundary, but it cannot say what the boundary is. Pair it with a heading, a label or a divider.
-
-- Group first, then space: related fields sit close and each group takes a bigger gap than the one inside it.
-- Pick one stack tier for the context and keep it across the container. All three metric cards on Home take the same stack.
-- An optical nudge is allowed where the eye needs it, such as an icon beside an all-caps label. Note it on the layer; never leave a silent hard-code. Keep the nudge on a scale unit.
-
-**Name the groups the space separates.** The create-session form has student fields, then schedule fields.
+A gap tells the eye there is a boundary, but it cannot say what the boundary is. Pair a group gap with a heading, label, fieldset legend or divider.
 
 <DoDont>
 <Do caption="A 24 gap and a subsection heading say the same thing twice.">
@@ -450,9 +374,7 @@ A gap tells the eye there is a boundary, but it cannot say what the boundary is.
 
 <FoundationSection title="Do and don't">
 
-Group by proximity, match the token to the container you are in, and take every value from a variable.
-
-**Group by proximity.** Elements placed close together read as related. Keep a label near its own field and put the larger gap between groups.
+<FoundationSubsection title="Group by proximity">
 
 <DoDont>
 <Do caption="Label to field 8 (Stack/stack-md), group to group 24 (Modal/stack-lg), so each label attaches to its field.">
@@ -469,7 +391,9 @@ Group by proximity, match the token to the container you are in, and take every 
 </Dont>
 </DoDont>
 
-**Match the token to the context.** Pad tokens for controls, card tokens for cards.
+</FoundationSubsection>
+
+<FoundationSubsection title="Match the token to the context">
 
 <DoDont>
 <Do caption="A card pads with a card token, so the content breathes at the card scale.">
@@ -480,20 +404,24 @@ Group by proximity, match the token to the container you are in, and take every 
 </Dont>
 </DoDont>
 
-**Never hardcode spacing.** Always use the variable; the code token is the same name with `var()`.
+</FoundationSubsection>
+
+<FoundationSubsection title="Never hardcode spacing">
 
 <DoDont>
 <Do caption="Bound to the variable, so the pad follows the system."><C>padding: var(--card-pad-default)</C></Do>
 <Dont caption="A literal 13 matches no step on the scale and will not follow a token change."><C>padding: 13px</C></Dont>
 </DoDont>
 
+</FoundationSubsection>
+
 </FoundationSection>
 
 <FoundationSection title="Accessibility">
 
-- Spacing groups content: related items sit closer (a tighter stack) than unrelated ones (a looser stack), so a reader can tell what belongs together without reading every label. Pick one stack tier for the context and keep it across the container.
-- Spacing never carries meaning alone. If a gap separates two groups, a heading, label or fieldset legend says so as well.
-- Keep the focus ring's room: the ring is drawn outside a control, so a control never sits flush against a clipping edge ([Border](?path=/docs/foundations-visual-border--docs) owns the ring).
+- Keep one stack tier per context across a container so readers can see what belongs together without reading every label.
+- Spacing never carries meaning alone. Pair a group break with a heading, label or fieldset legend.
+- Leave room for the focus ring: the ring sits outside a control, so a control never sits flush against a clipping edge ([Border](?path=/docs/foundations-visual-border--docs)).
 
 </FoundationSection>
 

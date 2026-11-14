@@ -1,4 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { Icon } from '@/components';
 import { RefTable, TokenTable, C, Do, Dont, DoDont, Callout } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
@@ -42,7 +43,7 @@ export const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle
 
 <FoundationSection title="Overview">
 
-Borders mark a boundary, separate neighbors and show state. The width token sets how heavy the line is, and the color token says what it means, so always choose them as a pair. A divider is a border, not a component.
+Borders mark a boundary, separate neighbors and show state. The width token sets how heavy the line is and the color token says what it means, so always choose them as a pair.
 
 ```css
 border-width: var(--border-default);
@@ -50,17 +51,17 @@ border-width: var(--border-selected);
 border-width: var(--border-focused);
 ```
 
-Figma holds Border/default, Border/selected and Border/focused in `spacing / semantics`, built on Stroke/stroke-1 and stroke-2 in `spacing / primitives`. Pair them with `color/border/*` in `color / semantics`.
+Figma holds `Border/default`, `Border/selected` and `Border/focused` in `spacing / semantics`, paired with `color/border/*` in `color / semantics`.
 
 <Callout title="Border rules">
-A card has no border: its edge comes from elevation. A divider is a border, not a component.
+A card has no border: its edge comes from <a href="?path=/docs/foundations-visual-elevation--docs" style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>Elevation</a>. A divider is a border, not a component.
 </Callout>
 
 </FoundationSection>
 
 <FoundationSection title="Width tokens">
 
-Three widths cover every border. Pick by what the line says, never by how heavy you want it to look. Values are indicative; the tokens are the contract.
+Three widths cover every border. Pick by what the line says, never by how heavy you want it to look.
 
 <TokenTable
     rows={[
@@ -75,7 +76,7 @@ Three widths cover every border. Pick by what the line says, never by how heavy 
 
 <FoundationSection title="Pair width with color">
 
-Width controls how visible a border is; color gives it meaning. Take both from this table.
+Take both width and color from this table.
 
 <RefTable
     head={['Width', 'Color', 'Where']}
@@ -97,7 +98,7 @@ Width controls how visible a border is; color gives it meaning. Take both from t
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <span style={field({ boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-danger)' })}>Value</span>
-        <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-danger)' }}><i className="fa-solid fa-triangle-exclamation" aria-hidden="true" /> Validation message</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-small)', color: 'var(--ds-text-danger)' }}><Icon name="triangle-exclamation" size={12} color="danger" /> Validation message</span>
         <span style={caption}>Invalid: Border/default + color/border/danger</span>
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
@@ -121,7 +122,7 @@ The focus ring shows keyboard users where they are. It is a ring, never a fill: 
     head={['Fact', 'Rule']}
     rows={[
         ['Width', <>2 px, <C>--border-focused</C></>],
-        ['Distance', '2 px away from the control'],
+        ['Distance', <>2 px away from the control (<C>--focus-ring-width</C>)</>],
         ['Color', <><C>color/border/focused</C> (<C>--ds-border-focused</C>); <C>color/border/focused/inverse</C> on a dark surface</>],
         ['Radius', <>The control’s radius plus 2 px. <a href="?path=/docs/foundations-visual-radius--docs">Radius</a> owns the pairs.</>],
         ['Containers', 'Cards and modals draw no ring of their own'],
@@ -148,30 +149,15 @@ The focus ring shows keyboard users where they are. It is a ring, never a fill: 
 
 <FoundationSection title="Selected states">
 
-A selected option takes the 2 px selected width in `color/border/selected` on every side, and a second cue such as a check or a fill. An active tab and a selected row use the same pair.
-
-State and emphasis use the whole shape. A selected, active or flagged row, card, banner, quote or nav item shows its state with its fill, text, icon or weight, or with a border or ring on every side.
-
-<RefTable
-    head={['Where', 'Width', 'Color']}
-    rows={[
-        ['Active tab', <C>Border/selected</C>, <C>color/border/selected</C>],
-        ['Selected tile or row', <C>Border/selected</C>, <C>color/border/selected</C>],
-    ]}
-/>
+A selected option, active tab or chosen tile takes `Border/selected` (2 px) in `color/border/selected` on every side, paired with a second cue such as a check or a fill. State and emphasis use the whole shape, never a colored stripe on one edge.
 
 </FoundationSection>
 
 <FoundationSection title="Dividers">
 
-<Callout title="There is no Divider component">
-A divider is a 1 px line in `color/border/default`: a border, not a component.
-</Callout>
-
-- Space comes first. Add a line only when spacing alone does not separate two groups.
-- A horizontal rule spans the content width of its container. A vertical one sits between controls and takes their height.
-- A divider uses Border/default and `color/border/default`. A heavier or colored line is a state, not a divider.
-- A card gets its edge from elevation, not from a border: see Elevation.
+- Space comes first. Add a 1 px line (`Border/default` in `color/border/default`) only when spacing alone does not separate two groups.
+- A horizontal rule spans the content width of its container. A vertical rule sits between controls and takes their height.
+- A heavier or colored line is a state, not a divider.
 
 <FoundationExample>
 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
@@ -192,7 +178,7 @@ A divider is a 1 px line in `color/border/default`: a border, not a component.
 
 <FoundationSection title="Borders in patterns">
 
-Patterns draw their edges with the same three widths. Take the line from this table rather than adding one of your own.
+Take pattern borders from this table rather than adding one of your own.
 
 <RefTable
     head={['Pattern', 'Line', 'Token', 'Note']}
@@ -205,8 +191,6 @@ Patterns draw their edges with the same three widths. Take the line from this ta
 />
 
 <FoundationSubsection title="Give the sidebar one edge and the topbar none">
-
-The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no border.
 
 <DoDont>
 <Do caption="One hairline on the sidebar edge.">
@@ -231,7 +215,7 @@ The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no 
 
 <FoundationSection title="Do and don't">
 
-**Show selection with the whole outline.** A selected row takes the 2 px selected border on every side, in `color/border/selected`.
+<FoundationSubsection title="Show selection with the whole outline">
 
 <DoDont>
 <Do caption="The 2 px outline wraps the whole row.">
@@ -242,7 +226,9 @@ The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no 
 </Dont>
 </DoDont>
 
-**Use the selected width only for selection.** Border/default is the width for everything that is not a state.
+</FoundationSubsection>
+
+<FoundationSubsection title="Use the selected width only for selection">
 
 <DoDont>
 <Do caption="Resting rows and cards keep Border/default.">
@@ -253,14 +239,16 @@ The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no 
 </Dont>
 </DoDont>
 
+</FoundationSubsection>
+
 </FoundationSection>
 
 <FoundationSection title="Accessibility">
 
-- A border that is the only cue for a control's edge is held to 3:1 against its surround (WCAG 1.4.11). Use `color/border/input` for fields.
-- The focus ring is the one signal for keyboard focus, clears 3:1 against what it sits on, and is described under Focus ring.
+- A border that is the only cue for a control's edge clears 3:1 against its surround (WCAG 1.4.11). Use `color/border/input` for fields.
+- The focus ring is the one signal for keyboard focus and clears 3:1 against what it sits on.
 - Selection never rests on color alone: the 2 px width is the second cue beside `color/border/selected`.
-- A subtle accent background needs an accent border to reach 3:1 against the surface, because the tint alone is too close to the page.
+- A subtle accent background needs an accent border to reach 3:1 against the surface.
 
 </FoundationSection>
 
