@@ -89,10 +89,12 @@ const stop = () => {
   if (server && !server.killed) server.kill('SIGTERM');
 };
 process.on('exit', stop);
-process.on('SIGINT', () => {
-  stop();
-  process.exit(130);
-});
+for (const [sig, code] of [['SIGINT', 130], ['SIGTERM', 143]]) {
+  process.on(sig, () => {
+    stop();
+    process.exit(code);
+  });
+}
 
 let index;
 try {
@@ -106,7 +108,7 @@ try {
 const docsIds = Object.values(index.entries)
   .filter((e) => e.type === 'docs')
   .map((e) => e.id);
-const registryIds = [...fs.readFileSync(REGISTRY, 'utf8').matchAll(/^ {2}'([a-z0-9-]+)': \{$/gm)].map((m) => m[1]);
+const registryIds = [...fs.readFileSync(REGISTRY, 'utf8').matchAll(/^ {2}'([a-z0-9-]+)':/gm)].map((m) => m[1]);
 const covered = new Set(registryIds.map((id) => `${id}--docs`));
 const pages = docsIds.filter((id) => all || covered.has(id) || /overview--docs$/.test(id) || id.startsWith('templates-'));
 
@@ -136,6 +138,13 @@ try {
 }
 
 const failures = heroFitFailures(measurements);
+// Coverage: every page the registry names must have shown a hero at every width.
+// A page that never loaded or lost its selector would otherwise pass by having nothing to measure.
+const seen = new Set(measurements.map((m) => `${m.page}@${m.width}`));
+const mustShow = pages.filter((id) => covered.has(id));
+for (const width of WIDTHS) {
+  for (const id of mustShow) if (!seen.has(`${id}@${width}`)) failures.push(`${id} @${width}: no hero found to measure`);
+}
 const heroCount = measurements.reduce((n, m) => n + m.heroes.length, 0);
 const distinct = new Set(measurements.flatMap((m) => overflowing(m.heroes).map((h) => `${m.page}|${h.label}`)));
 console.log(

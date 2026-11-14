@@ -20,7 +20,7 @@ test('a hero wider than its card is named with the sides it pokes past', () => {
   const wide = hero(rect(-226, -50, 527, 251), rect(0, 0, 300, 160));
   const lines = heroFitFailures([{ page: 'foundations-overview--docs', width: 1280, heroes: [wide] }]);
   assert.equal(lines.length, 1);
-  assert.match(lines[0], /foundations-overview--docs @1280: card:x svg extends past its card/);
+  assert.match(lines[0], /foundations-overview--docs @1280: card:x svg extends past its holder/);
   assert.match(lines[0], /left 226px/);
 });
 
@@ -31,4 +31,11 @@ test('every failing hero is reported, not the first', () => {
     { page: 'b', width: 1024, heroes: [bad] },
   ]);
   assert.equal(lines.length, 3);
+});
+
+test('an svg that slices is a failure even when its box fits', () => {
+  const h = { ...hero(rect(0, 0, 300, 100), rect(0, 0, 300, 100)), slice: true };
+  const lines = heroFitFailures([{ page: 'a', width: 1280, heroes: [h] }]);
+  assert.equal(lines.length, 1);
+  assert.match(lines[0], /slice/);
 });
