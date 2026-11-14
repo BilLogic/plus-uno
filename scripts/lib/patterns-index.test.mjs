@@ -43,7 +43,7 @@ test('a pattern the facts hold and the list leaves out fails', () => {
 
 test('rendering takes the import line and the doc from the facts', () => {
   const out = renderPatterns([row('Frame', 'Templates'), row('PatternCard')], { from: 'design-system/agent-views/components', lookup });
-  assert.match(out, /^## Patterns: start a page, section, card, table or overlay here/m);
+  assert.match(out, /^## Templates: start a page, section, card, table or overlay here/m);
   assert.match(out, /\| Templates \| \[`Frame`\]\(\.\.\/\.\.\/\.\.\/p\/Frame\.mdx\) \| `import \{ Frame \} from '@\/patterns';` \| x \|/);
   assert.match(out, /\| Card \| \[`PatternCard`\]/);
 });

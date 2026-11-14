@@ -35,7 +35,7 @@ sits on a bold or colored background. It renders `role="status"` with its
 
 `Skeleton`'s rules — composed to the real content's dimensions, with
 `aria-busy` on the loading region — are on its docs page and in
-`design-system/guidelines/composition/surfaces.md`.
+`design-system/agent-views/pages/patterns/Loading.md`.
 
 ## A spinner in a button
 
@@ -43,8 +43,7 @@ A busy button is `Button isLoading`, never a `Spinner` placed by hand. The
 spinner takes the button's icon size, 16 in both spacings, on the icon-size
 token (`--icon-md`, which is `--size-100`), and replaces the label and icons in
 the label color, so the button keeps its width and height while it sends.
-Disabled states: `design-system/guidelines/composition/form-behavior.md`
-§ Unavailable actions and fields.
+Disabled states: `design-system/agent-views/pages/patterns/Disabled.md`.
 
 ## Announcing change
 

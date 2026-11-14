@@ -167,8 +167,9 @@ test('tokens returns steps with intent and leaves primitives out', () => {
 
 test('guide returns the orientation, a guideline and a rule section', () => {
   assert.equal(lookup.guide().text, ORIENTATION);
+  assert.match(ORIENTATION, /Template, then blocks, then pieces/);
   assert.equal(lookup.guide('layout').path, 'design-system/agent-views/pages/templates/TemplatesOverview.md');
-  assert.equal(lookup.guide('layout formulas').path, 'design-system/guidelines/composition/layout.md');
+  assert.equal(lookup.guide('layout formulas').path, 'design-system/agent-views/pages/templates/TemplatesOverview.md');
   assert.equal(lookup.guide('a11y').path, 'design-system/src/styles/Accessibility.mdx');
   assert.match(lookup.guide('no-raw-literal').text, /^## ds\/no-raw-literal/);
   assert.ok(lookup.guide('nope').topics.includes('layout'));
@@ -255,7 +256,7 @@ test('guide survives a guideline folder that is empty or missing', () => {
     const bare = createLookup(tmp);
     assert.equal(bare.guide('color').path, 'design-system/src/styles/Colors.mdx');
     assert.ok(bare.guide('nope').topics.includes('typography'));
-    assert.equal(bare.guide('layout formulas').text, null);
+    assert.equal(bare.guide('data-visualization').text, null);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

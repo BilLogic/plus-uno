@@ -28,7 +28,7 @@ import { TURN, turnTransform } from '../lib/iso-turn.js';
  * from the stage's corner. Every surface on the hero ground carries a hairline
  * in `illustrationEdge`, so none blends into the sunken ground.
  *
- * Alignment, from `guidelines/composition/layout.md`: a view bar's controls
+ * Alignment, from `src/patterns/PatternSection/PatternSection.mdx`: a view bar's controls
  * share the content's left and right edges, so a Section's heading starts at
  * the rows' left edge and its last control ends at the content's right edge. A
  * Popup opens bottom-end: its end edge meets its trigger's end edge and it sits

@@ -692,7 +692,7 @@ function pageEscapes(text, add) {
   add(
     'ds/page-starts-from-pattern',
     root.index,
-    `the page's outer element is a hand-styled \`<${root.name}>\`, not a template or a pattern`,
-    "start the page from a template, `Frame` with the PLUS `Sidebar` (import { Frame } from '@/patterns'), or from a pattern such as `Page` or `PatternCard` (@/patterns)",
+    `the page's outer element is a hand-styled \`<${root.name}>\`, not a template`,
+    "start the page from a template: `Frame` with the PLUS `Sidebar` (import { Frame } from '@/patterns'), or `Page` or `PatternCard` (@/patterns)",
   );
 }

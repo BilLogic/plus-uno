@@ -78,7 +78,7 @@ Use the replacement the fix names.
 
 ## ds/page-starts-from-pattern
 
-**warn.** A page-level module whose outer element is a hand-styled container: a `<div>`, `<main>` or `<section>` carrying a `className`, or a `style` with layout in it (display, grid, flex, gap, padding, margin, a width or a height), where a template or a pattern belongs.
+**warn.** A page-level module whose outer element is a hand-styled container: a `<div>`, `<main>` or `<section>` carrying a `className`, or a `style` with layout in it (display, grid, flex, gap, padding, margin, a width or a height), where a template belongs.
 
 A module is page-level by its path, and nothing else is checked:
 
@@ -89,7 +89,7 @@ A module is page-level by its path, and nothing else is checked:
 
 The outer element is what the default-exported component returns last at its shallowest indent. A fragment and a `*Provider` are stepped through to the child written directly inside; a child behind a condition (`{open && <Fab />}`) is not outermost, and neither is a router or any other component. A bare `<div>` with no class or style carries no layout of its own and passes.
 
-Start the page from a template (`Frame` with the PLUS `Sidebar`; `import { Frame } from '@/patterns';`) or a pattern from `@/patterns` (`Page`, `PatternCard` and the rest), and put the hand-made layout inside it if any is still needed.
+Start the page from a template (`Frame` with the PLUS `Sidebar`; `import { Frame } from '@/patterns';`, or `Page`, `PatternCard` and the rest from `@/patterns`), and put the hand-made layout inside it if any is still needed.
 
 ## ds/placement
 

@@ -9,7 +9,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 **New here, any role** → [`README.md`](README.md) → [`SETUP.md`](SETUP.md) → [`GLOSSARY.md`](GLOSSARY.md)
 
-**Designer building UI** → [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) → [`design-system/agent-views/components/index.md`](design-system/agent-views/components/index.md) → [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md)
+**Designer building UI** → [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) → [`design-system/agent-views/components/index.md`](design-system/agent-views/components/index.md) → [`design-system/agent-views/pages/templates/TemplatesOverview.md`](design-system/agent-views/pages/templates/TemplatesOverview.md)
 
 **Agent, any task** → [`AGENTS.md`](AGENTS.md) → [`INDEX.md`](INDEX.md)
 
@@ -95,12 +95,6 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Five navigation components sorted by what the user is moving between |
 | [`design-system/guidelines/components/overlays-and-layering.md`](design-system/guidelines/components/overlays-and-layering.md) | Tooltip or Popup — hover description versus click-triggered content, and where every popup opens |
 | [`design-system/guidelines/components/overview.md`](design-system/guidelines/components/overview.md) | What each component is for, when to reach for it, and how it composes |
-| [`design-system/guidelines/composition/form-behavior.md`](design-system/guidelines/composition/form-behavior.md) | How a PLUS form behaves — when it validates, how errors surface on submit, required fields, disabled vs read-only, unsaved changes, dependent fields, and subtle vs standard fields |
-| [`design-system/guidelines/composition/forms.md`](design-system/guidelines/composition/forms.md) | How PLUS form elements compose inside surfaces |
-| [`design-system/guidelines/composition/hierarchy.md`](design-system/guidelines/composition/hierarchy.md) | Every PLUS surface sits at one of four context levels |
-| [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md) | If you are building a full page (like a dashboard, student list, or toolkit), you MUST build it on a template — the Frame with the PLUS Sidebar and a breadcrumb |
-| [`design-system/guidelines/composition/overview.md`](design-system/guidelines/composition/overview.md) | How components combine |
-| [`design-system/guidelines/composition/surfaces.md`](design-system/guidelines/composition/surfaces.md) | Cards, tables, modals, and the empty and loading states they fall into |
 | [`design-system/guidelines/documentation-ia.md`](design-system/guidelines/documentation-ia.md) | The documentation IA contract — the shared tree Storybook titles, repo folders and Figma all speak, plus the MDX page shell. |
 | [`design-system/guidelines/figma/component-alignment.md`](design-system/guidelines/figma/component-alignment.md) | How to keep Figma component instances and PLUS code imports (@/components/) consistent when implementing designs in Cursor or writing prototypes back to Figma |
 | [`design-system/guidelines/figma/mcp-guide.md`](design-system/guidelines/figma/mcp-guide.md) | The registry load gate is design-system/guidelines/figma/registry-load-gate.md — MANDATORY, registries first, not restated here |
@@ -115,7 +109,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | The four voice words, when to dial them, and tone by reader |
 | [`design-system/guidelines/foundations/data-visualization.md`](design-system/guidelines/foundations/data-visualization.md) | A chart's foundations other than color come from the same component tokens as the rest of the design system |
 | [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fifteen foundations, in the order they are documented |
-| [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | says where design knowledge lives |
+| [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | The staged build — Template, Blocks, Pieces, Polish, Motion — and where each stage's answer comes from |
 
 ## Engineering
 
@@ -192,6 +186,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/045-radius-follows-role-not-size.md`](docs/adr/045-radius-follows-role-not-size.md) | Radius tokens follow a corner’s role and nesting; controls follow their height, and templates own a radius token. |
 | [`docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md`](docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md) | Pragmatic drag and drop owns pointer drag; Base UI supplies the grab handle and Motion supplies spring travel. |
 | [`docs/adr/047-the-design-system-ships-outside-the-repo.md`](docs/adr/047-the-design-system-ships-outside-the-repo.md) | The design system ships outside the repo as one package, @plus-uno/cli, a copy-in registry plus the ds lookup and MCP over one baked snapshot. |
+| [`docs/adr/048-agents-build-in-stages-and-a-ds-fact-has-one-home.md`](docs/adr/048-agents-build-in-stages-and-a-ds-fact-has-one-home.md) | Agents build a screen in five stages (Template, Blocks, Pieces, Polish, Motion) and each design-system fact has one authored home; guidelines/composition/ is retired. |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -221,6 +216,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-150 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

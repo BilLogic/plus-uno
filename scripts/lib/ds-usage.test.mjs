@@ -236,6 +236,7 @@ test('ds/page-starts-from-pattern: a page whose outer element is a hand-styled c
   const [f, ...rest] = escapesIn({ path: 'p/src/App.jsx', text: SHELL }, patternCtx);
   assert.equal(rest.length, 0);
   assert.deepEqual([f.rule, f.level, f.line, f.col], ['ds/page-starts-from-pattern', 'warn', 3, 5]);
+  assert.equal(f.message, "the page's outer element is a hand-styled `<div>`, not a template");
   assert.match(f.fix, /Frame/);
   assert.deepEqual(pageRules('p/pages/Home.jsx', 'const Home = () => (\n  <main className="home-grid"><p>x</p></main>\n);\nexport default Home;\n'), [
     ['ds/page-starts-from-pattern', 'warn'],

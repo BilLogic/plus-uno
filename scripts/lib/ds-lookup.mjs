@@ -59,20 +59,26 @@ import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, governedByO
 
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
 
-export const ORIENTATION = `PLUS design system: the React components, patterns and tokens every PLUS prototype is built from. A name the lookup does not know does not exist here: propose it rather than write it.
+export const ORIENTATION = `PLUS design system: the React components, templates, patterns and tokens every PLUS prototype is built from. A name the lookup does not know does not exist here: propose it rather than write it.
 
 Barrels (import only from these):
-- ${BARRELS[1]}: the shells (Frame, which every full page starts from, PatternCard, PatternSection, PatternTable, overlays)
+- ${BARRELS[1]}: the templates (Frame, which every full page starts from, Page, PatternSection, PatternCard, PatternTable, overlays)
 - ${BARRELS[0]}: the components (Button, TextField, SectionMessage...)
 
-Order: ds_find (what exists for the task) → ds_get (props, usage, practices, a11y, figma) → ds_tokens (steps for a role) → ds_guide (layout, content, a rule) → write → ds_check (findings to zero).
+Build in five stages:
+1. Template — which template each screen sits in and what fills its slots: ds_find (a brief or component list returns the kit), ds_guide("templates")
+2. Blocks — the Sections and Cards on the grid, and which pattern governs each situation: ds_guide("patterns"), then ds_guide("<pattern>")
+3. Pieces — the components in each slot and their props: ds_find → ds_get
+4. Polish — spacing, type, color, radius and elevation tokens by role: ds_tokens("<role>")
+5. Motion — which state changes animate and with which transition: ds_guide("motion")
 
 Hard rules:
-- Patterns first, then components; build new interactive behavior on @base-ui/react styled with tokens.
+- Template, then blocks, then pieces; build new interactive behavior on @base-ui/react styled with tokens.
 - Props and values come from ds_get, never from memory.
 - Style with semantic, pattern or component tokens (ds_tokens); never a literal, never a primitive (--palette-*, --space-<n>).
 - Icons are Font Awesome Free: fa-solid, fa-regular, fa-brands.
-- A full page starts from a template: Frame with the PLUS Sidebar (ds_guide layout).`;
+- A full page starts from a template: Frame with the PLUS Sidebar (ds_guide("templates")).
+- Run ds_check once at the end.`;
 
 const FIND_LIMIT = 10;
 const PER_KIND = { token: 3, icon: 3 };
@@ -101,8 +107,9 @@ const CONSTANT = /^[A-Z0-9_]+$/;
 const TOPIC_ALIASES = {
   __proto__: null,
   a11y: 'accessibility',
-  'layout formulas': 'layout-formulas',
-  formulas: 'layout-formulas',
+  'layout formulas': 'layout',
+  formulas: 'layout',
+  'form-behavior': 'forms',
   page: 'layout',
   pages: 'layout',
   icons: 'iconography',
@@ -606,11 +613,9 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       }
     }
     if (map.templates) map.layout = map.templates;
-    for (const dir of ['foundations', 'composition']) {
-      for (const f of mdIn(`${GUIDELINES}/${dir}`)) {
-        const key = f === 'layout.md' ? 'layout-formulas' : f.replace(/\.md$/, '');
-        map[key] ??= `${GUIDELINES}/${dir}/${f}`;
-      }
+    for (const f of mdIn(`${GUIDELINES}/foundations`)) {
+      const key = f.replace(/\.md$/, '');
+      map[key] ??= `${GUIDELINES}/foundations/${f}`;
     }
     if (fs.existsSync(path.join(root, GUIDELINES, 'foundations/content/overview.md'))) map.content = `${GUIDELINES}/foundations/content/overview.md`;
     for (const f of mdIn(`${GUIDELINES}/foundations/content`)) map[f.replace(/\.md$/, '')] = `${GUIDELINES}/foundations/content/${f}`;
