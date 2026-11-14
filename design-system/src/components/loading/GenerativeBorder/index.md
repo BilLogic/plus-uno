@@ -31,7 +31,7 @@ GenerativeBorder reads these motion tokens and no literal duration or curve.
 
 ### Animate one thing at a time. {#animate-one-thing-at-a-time}
 
-The moving border marks where the AI is working; three at once means none of them is the focus.
+One moving border keeps attention on the content being generated.
 
 Do: One active border.
 Don't: Every border active.
@@ -45,7 +45,7 @@ Don't: A pill around a rectangle.
 
 ### Stop animating when the work ends. {#stop-animating-when-the-work-ends}
 
-An idle border should read as finished, not as still thinking. Set `isActive` back to false.
+Set `isActive` to false when generation ends.
 
 Do: Inactive once done.
 Don't: Still animating after completion.
@@ -58,7 +58,7 @@ Don't: Two rings nested around the same content.
 ## Accessibility
 
 - **`aria-busy` says content is changing.** The wrapper sets it from `isActive`; the ring itself is decorative and hidden from assistive technology.
-- **Motion respects the user.** The segments turn slowly while active and hold still under reduced motion.
+- **Reduced motion.** The ring keeps its colors without moving; see States above.
 
 ## Related
 
@@ -69,17 +69,17 @@ Same group: `ProgressBar` · `ProgressRing` · `Skeleton` · `Spinner`
 
 ## Parts
 
-1. **Content.** What is being generated into, unchanged by the border.
-2. **Ring.** A 2px stroke over the edge while `isActive`, so layout never moves.
-3. **Segments.** Four flat segments, brand and discovery alternating, turning clockwise.
+1. **Content.** The content being generated, unchanged by the border.
+2. **Ring.** A stroke over the edge while `isActive`, so layout never moves. Its 2-unit width comes from `--border-selected`.
+3. **Segments.** Four hard-edged, flat segments alternating brand and discovery colors.
 
 ### States
 
 | State | What changes |
 | --- | --- |
 | Rest | Idle: no ring. `aria-busy` is false. |
-| Generating | The ring is on and turns once every 6s. `aria-busy` is true. |
-| Reduced motion | The ring stays at its still frame. |
+| Generating | The ring alternates clockwise and counterclockwise turns on the `--ds-motion-loop` spring. Each turn takes `--ds-motion-loop-duration` (600 ms). `aria-busy` is true. |
+| Reduced motion | The ring holds still and keeps its colors, so the generating state remains visible. |
 | Hovered | None. It is not a control. |
 | Pressed | None. |
 | Focused | None. It is not in the tab order. |
@@ -90,7 +90,7 @@ Same group: `ProgressBar` · `ProgressRing` · `Skeleton` · `Spinner`
 | Part | Token |
 | --- | --- |
 | Segments | `--ds-border-brand` and `--ds-border-discovery`. |
-| Stroke | `--stroke-2`, through `--generative-border-width`. |
+| Stroke | `--border-selected`, through `--generative-border-width`. |
 | Corner | `--generative-border-radius`, set to the radius token named by `radius`: `--radius-025`, `--radius-050`, `--radius-075`, `--radius-100`, `--radius-full`, or a control radius (`--radius-control-sm`, `--radius-control-md`, `--radius-control-lg`) to follow a field. |
 | Turn | `--generative-border-angle`, from a rest of `--generative-border-rest`. |
 

@@ -9,9 +9,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 <Meta of={PromptInputStories} />
 
 <Title />
-Where a person writes to the AI: a text area that grows from one line to
-five, then scrolls, with an optional control before the text and one send
-action after it.
+A growing text area for AI prompts, with an optional leading control and a send action.
 
 <DocsTabs of={PromptInputStories}>
 
@@ -96,12 +94,11 @@ action after it.
 
 ## Usage
 
-Use `PromptInput` as the one place a person writes to the AI — a chat panel,
-a feature that drafts from a free-text ask. For a plain multi-line field with
-no AI behavior (no send-on-Enter, no loading state), use `TextArea` instead.
+Use `PromptInput` for AI chat or a feature that drafts from a free-text request.
+For a plain multiline field without send-on-Enter or loading behavior, use `TextArea`.
 
-`PromptInput` does not carry the fallibility line. `AiChat` shows it once
-under its input; any other consumer shows the same line under the field itself.
+`PromptInput` does not include the <a href="?path=/docs/ai-ui-ai-interaction-guidelines--docs#foundation-identity-and-trust">fallibility line</a>.
+`AiChat` supplies it; other consumers must place it under the field.
 
 </div>
 
@@ -156,7 +153,7 @@ under its input; any other consumer shows the same line under the field itself.
 
 ### Keep the field visible while generating.
 
-The loading state shows progress inside the field. Pair `isLoading` with `onStop` rather than disabling the field: the question stays in view, and Stop stays reachable.
+Pair `isLoading` with `onStop` to show progress while keeping the question visible and Stop reachable. Keep the field enabled.
 
 <DoDontPair
     doExample={<PromptInput label="Message to AI chat" defaultValue="Summarize Maya's last two sessions" isLoading onStop={() => {}} />}
@@ -191,7 +188,7 @@ A disabled field blocks follow-up questions.
 
 ### Send only real text.
 
-`onSubmit` fires only when there is text to act on: never for an empty, disabled or loading field, and never on a mid-composition Enter.
+`onSubmit` never fires for an empty, disabled or loading field, or on Enter during IME composition.
 
 ```jsx
 <PromptInput

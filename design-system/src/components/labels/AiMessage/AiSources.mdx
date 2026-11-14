@@ -11,7 +11,7 @@ import {
 <Meta of={AiSourcesStories} />
 
 <Title />
-What an AI answer read: a compact list under the message, one row per source with its title as a link and its type beside it.
+Sources an AI answer read, collapsed under the message. Each row links the title and shows its type.
 
 <DocsTabs of={AiSourcesStories}>
 
@@ -60,7 +60,12 @@ What an AI answer read: a compact list under the message, one row per source wit
 
 ## Usage
 
-Place `AiSources` under the AI message it belongs to, and pass one `{ title, href, type }` per source the answer read. With no sources it renders nothing. Inside a frame, pass `target` (such as `_top`) so the links leave it; without it, outside links open in a new window.
+Place `AiSources` under its AI message with one `{ title, href, type }` per source.
+Duplicate addresses appear once; no sources renders nothing. The toggle shows
+the count and starts closed.
+
+Inside a frame, pass `target`, such as `_top`, to open links outside it.
+Without `target`, external links open in a new window.
 
 </div>
 
@@ -68,8 +73,8 @@ Place `AiSources` under the AI message it belongs to, and pass one `{ title, hre
 
 ## Accessibility
 
-- The list is named by its "Sources" heading.
-- The toggle is a button that reports `aria-expanded`.
+- The list has the accessible name "Sources".
+- The counted toggle is a button that reports `aria-expanded`.
 
 </div>
 
