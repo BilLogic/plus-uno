@@ -19,13 +19,13 @@ import { ChooserDot, HIDDEN } from '@/storybook-docs/templates/overview-parts.js
         items: [
             { title: 'Frame', href: './?path=/docs/templates-frame--docs' },
             { title: 'Page', href: './?path=/docs/templates-page--docs' },
-            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section--docs' },
             { title: 'Card', href: './?path=/docs/templates-card--docs' },
             { title: 'Table', href: './?path=/docs/templates-table--docs' },
             { title: 'Form', href: './?path=/docs/templates-form--docs' },
-            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
-            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
-            { title: 'Popup', href: './?path=/docs/templates-popup-popup--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel--docs' },
+            { title: 'Popup', href: './?path=/docs/templates-popup--docs' },
         ],
     }}
 />
@@ -37,13 +37,13 @@ Broadest first. Each page opens with its types, then the anatomy and key states 
 <ThumbGrid>
 <ThumbTile hero="templates-frame" title="Frame" span="wide">The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare.</ThumbTile>
 <ThumbTile hero="templates-page" title="Page" span="wide">The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width.</ThumbTile>
-<ThumbTile hero="templates-section-section" title="Section" span="wide">A span of the page grid under one heading: a header, a body, and an optional side, detail and footer.</ThumbTile>
+<ThumbTile hero="templates-section" title="Section" span="wide">A span of the page grid under one heading: a header, a body, and an optional side, detail and footer.</ThumbTile>
 <ThumbTile hero="templates-card" title="Card">A raised container for one object on a page, such as a student, a session or a metric: an optional image, a header over a body, and an optional footer.</ThumbTile>
 <ThumbTile hero="templates-table" title="Table">How a table sits on a page: the Section header carries the title and toolbar, and the table spans the section under it.</ThumbTile>
 <ThumbTile hero="templates-form" title="Form">A stack of fields with a footer, in one of four places: in a page, in a Panel, in a Modal, or in steps.</ThumbTile>
-<ThumbTile hero="templates-modal-modal" title="Modal">One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps.</ThumbTile>
-<ThumbTile hero="templates-panel-panel" title="Panel">A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications.</ThumbTile>
-<ThumbTile hero="templates-popup-popup" title="Popup">A floating layer that hangs off its trigger and closes on an outside click. Six types, from menu to stacked filter menu.</ThumbTile>
+<ThumbTile hero="templates-modal" title="Modal">One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps.</ThumbTile>
+<ThumbTile hero="templates-panel" title="Panel">A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications.</ThumbTile>
+<ThumbTile hero="templates-popup" title="Popup">A floating layer that hangs off its trigger and closes on an outside click. Six types, from menu to stacked filter menu.</ThumbTile>
 </ThumbGrid>
 
 </FoundationSection>
@@ -95,17 +95,17 @@ A suggested starting point for each scenario, with the patterns to consult and t
 <tr><th>Scenario</th><th>Template</th><th>Patterns</th><th>Components</th></tr>
 </thead>
 <tbody>
-<tr><td>An area page with one collection</td><td><DocsLink id="templates-page">Page</DocsLink> · default, with a <DocsLink id="templates-section-section">Section</DocsLink> view bar alone</td><td><DocsLink id="patterns-filtering">Filtering</DocsLink> · <DocsLink id="patterns-search">Search</DocsLink> · <DocsLink id="patterns-common-actions">Common actions</DocsLink></td><td><code>PageHeader</code>, <code>Tabs</code> (pill), <code>FilterButton</code>, <code>IconButton</code>, <code>Button</code>, <code>Table</code></td></tr>
+<tr><td>An area page with one collection</td><td><DocsLink id="templates-page">Page</DocsLink> · default, with a <DocsLink id="templates-section">Section</DocsLink> view bar alone</td><td><DocsLink id="patterns-filtering">Filtering</DocsLink> · <DocsLink id="patterns-search">Search</DocsLink> · <DocsLink id="patterns-common-actions">Common actions</DocsLink></td><td><code>PageHeader</code>, <code>Tabs</code> (pill), <code>FilterButton</code>, <code>IconButton</code>, <code>Button</code>, <code>Table</code></td></tr>
 <tr><td>A home page with several Sections</td><td><DocsLink id="templates-page">Page</DocsLink> · default, titled Sections, cards</td><td><DocsLink id="patterns-states-empty">Empty</DocsLink> · <DocsLink id="patterns-states-loading">Loading</DocsLink></td><td><code>PageHeader</code>, <code>Card</code>, <code>Button</code></td></tr>
 <tr><td>A record page, one level down</td><td><DocsLink id="templates-page">Page</DocsLink> with a breadcrumb and page tabs</td><td><DocsLink id="patterns-navigation">Navigation</DocsLink> · <DocsLink id="patterns-indicators">Indicators</DocsLink></td><td><code>Breadcrumb</code>, <code>PageHeader</code>, <code>StatusTag</code>, <code>Tabs</code>, <code>PopupSelect</code></td></tr>
-<tr><td>Working through a queue</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a detail</td><td><DocsLink id="patterns-navigation">Navigation</DocsLink> · <DocsLink id="patterns-common-actions">Common actions</DocsLink></td><td><code>Table</code>, <code>Button</code></td></tr>
-<tr><td>A quick look at one row</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Details</td><td><DocsLink id="patterns-navigation">Navigation</DocsLink></td><td><DocsLink id="components-layout-and-structure-panel"><code>Panel</code></DocsLink>, <code>Button</code></td></tr>
-<tr><td>A short decision before going on</td><td><DocsLink id="templates-modal-modal">Modal</DocsLink> · Active, confirm width</td><td><DocsLink id="patterns-common-actions">Common actions</DocsLink> · <DocsLink id="patterns-states-errors">Errors</DocsLink></td><td><DocsLink id="components-messaging-modal-dialog"><code>Modal</code></DocsLink>, <code>Button</code></td></tr>
+<tr><td>Working through a queue</td><td><DocsLink id="templates-section">Section</DocsLink> with a detail</td><td><DocsLink id="patterns-navigation">Navigation</DocsLink> · <DocsLink id="patterns-common-actions">Common actions</DocsLink></td><td><code>Table</code>, <code>Button</code></td></tr>
+<tr><td>A quick look at one row</td><td><DocsLink id="templates-panel">Panel</DocsLink> · Details</td><td><DocsLink id="patterns-navigation">Navigation</DocsLink></td><td><DocsLink id="components-layout-and-structure-panel"><code>Panel</code></DocsLink>, <code>Button</code></td></tr>
+<tr><td>A short decision before going on</td><td><DocsLink id="templates-modal">Modal</DocsLink> · Active, confirm width</td><td><DocsLink id="patterns-common-actions">Common actions</DocsLink> · <DocsLink id="patterns-states-errors">Errors</DocsLink></td><td><DocsLink id="components-messaging-modal-dialog"><code>Modal</code></DocsLink>, <code>Button</code></td></tr>
 <tr><td>A long task with steps</td><td><DocsLink id="templates-frame">Frame</DocsLink> · focused, with a <DocsLink id="templates-form">Form</DocsLink> in steps</td><td><DocsLink id="patterns-forms">Forms</DocsLink> · <DocsLink id="patterns-navigation">Navigation</DocsLink></td><td><code>ProgressTracker</code>, <code>Fieldset</code>, <code>Button</code></td></tr>
 <tr><td>Settings saved as a group</td><td><DocsLink id="templates-form">Form</DocsLink> in a page, on the Page under its page-level header; subsections for several groups</td><td><DocsLink id="patterns-forms">Forms</DocsLink> · <DocsLink id="patterns-states-read-only">Read-only</DocsLink> · <DocsLink id="patterns-states-disabled">Disabled</DocsLink></td><td><code>Fieldset</code>, <code>TextField</code>, <code>PopupSelect</code>, <code>Toggle</code>, <code>Button</code></td></tr>
-<tr><td>Narrowing a long catalog</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a filter side</td><td><DocsLink id="patterns-filtering">Filtering</DocsLink></td><td><code>Checkbox</code>, <code>PopupSelect</code>, <code>Button</code></td></tr>
+<tr><td>Narrowing a long catalog</td><td><DocsLink id="templates-section">Section</DocsLink> with a filter side</td><td><DocsLink id="patterns-filtering">Filtering</DocsLink></td><td><code>Checkbox</code>, <code>PopupSelect</code>, <code>Button</code></td></tr>
 <tr><td>Signing in</td><td><DocsLink id="templates-frame">Frame</DocsLink> · bare</td><td><DocsLink id="patterns-forms">Forms</DocsLink> · <DocsLink id="patterns-states-errors">Errors</DocsLink></td><td><code>Logo</code>, <code>TextField</code>, <code>Button</code></td></tr>
-<tr><td>Notifications</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Notifications (the Inbox)</td><td><DocsLink id="patterns-notifications">Notifications</DocsLink></td><td><DocsLink id="components-layout-and-structure-panel"><code>Panel</code></DocsLink>, <code>Avatar</code>, <code>PopupSelect</code></td></tr>
+<tr><td>Notifications</td><td><DocsLink id="templates-panel">Panel</DocsLink> · Notifications (the Inbox)</td><td><DocsLink id="patterns-notifications">Notifications</DocsLink></td><td><DocsLink id="components-layout-and-structure-panel"><code>Panel</code></DocsLink>, <code>Avatar</code>, <code>PopupSelect</code></td></tr>
 <tr><td>AI chat</td><td><DocsLink id="templates-frame">Frame</DocsLink>, the AI panel region</td><td><DocsLink id="ai-ui-ai-interaction-guidelines">AI interaction guidelines</DocsLink></td><td><code>AiChat</code>, <code>PromptInput</code>, <code>AiMessage</code></td></tr>
 </tbody>
 </DocsTable>

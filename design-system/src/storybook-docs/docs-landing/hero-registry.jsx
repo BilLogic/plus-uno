@@ -303,7 +303,7 @@ export const HEROES = {
     description:
       'The page header and its Sections; the Page ringed beside the docked Sidebar.',
   },
-  'templates-section-section': {
+  'templates-section': {
     Hero: SectionHero,
     description:
       'Header, view bar, body and side, ringed.',
@@ -323,17 +323,17 @@ export const HEROES = {
     description:
       'Fields in a column, the commit at the end.',
   },
-  'templates-modal-modal': {
+  'templates-modal': {
     Hero: ModalHero,
     description:
       'One task over a Backdrop; the Modal ringed.',
   },
-  'templates-panel-panel': {
+  'templates-panel': {
     Hero: PanelHero,
     description:
       'A full-height layer beside the page, ringed.',
   },
-  'templates-popup-popup': {
+  'templates-popup': {
     Hero: PopupHero,
     description:
       'A Popup opening bottom-end from its trigger at the bar end, 4 below it, ringed.',

@@ -26,7 +26,7 @@ export const WithoutSidebar = () => <Picture storyId="templates-frame--pair-with
 export const TitleInHeader = () => <Picture storyId="templates-frame--pair-title-in-header" width={1024} title="Frame with a title in the header" />;
 
 /** Do: `sectionDetail` with the Panel open at 1440: the Sidebar collapses and the split holds. */
-export const WithSectionDetail = () => <Picture storyId="templates-section-section--detail-with-panel" width={1440} height={640} title="Frame with sectionDetail" />;
+export const WithSectionDetail = () => <Picture storyId="templates-section--detail-with-panel" width={1440} height={640} title="Frame with sectionDetail" />;
 
 /** Don't: the same page without `sectionDetail`: the Sidebar stays and the detail replaces the list. */
-export const WithoutSectionDetail = () => <Picture storyId="templates-section-section--detail-with-panel-no-section-detail" width={1440} height={640} title="Frame without sectionDetail" />;
+export const WithoutSectionDetail = () => <Picture storyId="templates-section--detail-with-panel-no-section-detail" width={1440} height={640} title="Frame without sectionDetail" />;
