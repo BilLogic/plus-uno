@@ -6,6 +6,7 @@
 
 @use '../../styles/surface-edge' as *;
 @use '../../styles/state' as *;
+@use '../../styles/overlay-motion' as *;
 
 .plus-frame {
     position: relative;
@@ -27,6 +28,8 @@
     display: flex;
     flex: 1 1 auto;
     min-height: 0;
+    // A Sidebar or Panel moving in or out of the row's flow is cut at its edge, never drawn outside it.
+    overflow: clip;
 }
 
 /* ------------------------------------------------------------- sidebar */
@@ -67,6 +70,36 @@
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
 }
+
+// Space motion. The Sidebar keeps its width and moves by its margin, so the Page beside it
+// narrows on the same clock and nothing inside the Sidebar reflows. Opening settles on
+// spatial.default, closing on spatial.fast to the edge. Floating, it slides over the Page.
+// What starts open on mount stays put; reduced motion (the person's setting or `data-reduced`) is instant.
+@keyframes plus-frame-sidebar-dock-in { from { margin-inline-start: calc(-1 * var(--frame-sidebar-width)); } }
+@keyframes plus-frame-sidebar-dock-out { to { margin-inline-start: calc(-1 * var(--frame-sidebar-width)); } }
+@keyframes plus-frame-sidebar-float-in { from { translate: -100% 0; } }
+@keyframes plus-frame-sidebar-float-out { to { translate: -100% 0; } }
+
+@mixin frame-space-motion(
+    $enter,
+    $exit,
+    $enter-duration: var(--ds-motion-spatial-default-duration),
+    $enter-easing: var(--ds-motion-spatial-default),
+    $exit-duration: var(--ds-motion-spatial-fast-duration),
+    $exit-easing: var(--ds-motion-spatial-fast)
+) {
+    &[data-entering='true'] {
+        animation: #{$enter} #{$enter-duration} #{$enter-easing};
+    }
+    &[data-leaving='true'], &[data-ending-style] {
+        pointer-events: none;
+        animation: #{$exit} #{$exit-duration} #{$exit-easing} forwards;
+    }
+    &[data-reduced='true'] { animation: none; }
+}
+
+.plus-frame__sidebar--docked { @include frame-space-motion(plus-frame-sidebar-dock-in, plus-frame-sidebar-dock-out); }
+.plus-frame__sidebar--raised { @include frame-space-motion(plus-frame-sidebar-float-in, plus-frame-sidebar-float-out); }
 
 // The hover strip that peeks a closed sidebar: the frame's left edge, under
 // the toggle's row, so a pointer resting on the toggle opens nothing.
@@ -175,11 +208,57 @@
         @include plus-ring-reset;
     }
 
+    // The Panel's content keeps its full height and its target width while the Panel's edge moves,
+    // so it is revealed, never squeezed.
     > .plus-panel {
         flex: 1 1 auto;
+        width: calc(var(--frame-panel-width, var(--panel-width-default)) - var(--border-default));
         height: auto;
         min-height: 0;
     }
+}
+
+// Space motion. Docked, the Panel grows from its edge while the Page makes room on the same
+// clock (spatial.slow), and leaves on spatial.default; its content fades in once the Page is
+// about 90% done (60% of the spring's settle time). Floating, it slides over the Page:
+// spatial.default in, spatial.fast out; under 1024, spatial.slow in and spatial.default out.
+// Reduced motion is instant.
+@keyframes plus-frame-panel-dock-in { from { width: 0; } }
+@keyframes plus-frame-panel-dock-out { to { width: 0; } }
+@keyframes plus-frame-panel-float-in { from { translate: 100% 0; } }
+@keyframes plus-frame-panel-float-out { to { translate: 100% 0; } }
+
+.plus-frame__panel--docked {
+    @include frame-space-motion(
+        plus-frame-panel-dock-in,
+        plus-frame-panel-dock-out,
+        var(--ds-motion-spatial-slow-duration),
+        var(--ds-motion-spatial-slow),
+        var(--ds-motion-spatial-default-duration),
+        var(--ds-motion-spatial-default)
+    );
+
+    &[data-entering='true'] > .plus-panel {
+        animation: plus-overlay-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast)
+            calc(var(--ds-motion-spatial-slow-duration) * 0.6) backwards;
+    }
+    &[data-ending-style] > .plus-panel,
+    &[data-reduced='true'] > .plus-panel { animation: none; }
+}
+
+.plus-frame__panel--overlay,
+.plus-frame__panel--peek {
+    @include frame-space-motion(plus-frame-panel-float-in, plus-frame-panel-float-out);
+}
+.plus-frame__panel--narrow {
+    @include frame-space-motion(
+        plus-frame-panel-float-in,
+        plus-frame-panel-float-out,
+        var(--ds-motion-spatial-slow-duration),
+        var(--ds-motion-spatial-slow),
+        var(--ds-motion-spatial-default-duration),
+        var(--ds-motion-spatial-default)
+    );
 }
 
 // Docked: in flow beside the Page, which it meets at the hairline; the same

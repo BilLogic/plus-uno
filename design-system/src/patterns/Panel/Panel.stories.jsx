@@ -9,6 +9,7 @@ import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/st
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFrame, SessionsBehind } from './panelDemo.jsx';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
  * Panel: the template page's examples, run in the Storybook tests. They compose
@@ -18,7 +19,11 @@ import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFr
  *
  * Run: npx vitest run --project=storybook design-system/src/patterns/Panel/Panel.stories.jsx
  */
+/** These stories read settled layouts, so the Frame's space motion is held off; its own motion stories live in Frame.stories. */
+const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>;
+
 export default {
+    decorators: [settledLayout],
     // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Templates/Panel (Panel.mdx).
     title: 'Templates/Panel/Examples',
     tags: ['!dev', '!autodocs'],
