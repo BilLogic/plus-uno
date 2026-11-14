@@ -87,7 +87,7 @@ export default {
         children: { table: { disable: true } },
         style: { table: { disable: true } },
         toolbar: { table: { disable: true } },
-        pagination: { table: { disable: true } },
+        footer: { table: { disable: true } },
         emptyState: { table: { disable: true } },
         empty: {
             control: 'boolean',
@@ -118,7 +118,7 @@ export default {
 
 export const Overview = () => (
     <PatternSection title="Team members" actions={sectionActions}>
-        <PatternTable pagination={paginationSlot}>
+        <PatternTable footer={paginationSlot}>
             {tableContent}
         </PatternTable>
     </PatternSection>
@@ -133,7 +133,7 @@ export const Overview = () => (
 export const EmptyState = {
     render: () => (
         <PatternSection title="Team members" actions={sectionActions}>
-            <PatternTable empty emptyState={emptyStateSlot} pagination={paginationSlot}>
+            <PatternTable empty emptyState={emptyStateSlot} footer={paginationSlot}>
                 {tableContent}
             </PatternTable>
         </PatternSection>
@@ -189,7 +189,7 @@ export const Interactive = {
     },
     render: (args) => (
         <PatternTable
-            pagination={paginationSlot}
+            footer={paginationSlot}
             emptyState={emptyStateSlot}
             empty={args.empty}
             stickyHeader={args.stickyHeader}

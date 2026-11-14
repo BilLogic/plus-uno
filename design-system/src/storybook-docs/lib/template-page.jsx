@@ -150,31 +150,54 @@ const ELBOW = 8; // docs-literal: how far outside a part's edge an elbow leader 
 const GUTTER = 'var(--control-lg)';
 
 /**
- * Each marker's place, in order. Start and end markers sit level with their part
- * (moved down past an earlier marker on the same side, never below the part);
- * top markers sit above it, `at` choosing where along its top edge, nudged
- * apart from an earlier top marker. `markerTop` / `markerLeft` are the marker's
- * own corner in the figure box's coordinates, and `lead` the leader's start.
+ * Each marker's place, in Parts-list order. Top markers sit above their part,
+ * `at` choosing where along its top edge, nudged apart from an earlier top
+ * marker. A start or end marker takes a slot in its gutter: its centre stays
+ * within its part's height (`at` picks where, the top by default), moves down
+ * past any marker already in that gutter, and the leader along that line must
+ * cross no other part or region (`blockers`). When the preferred gutter has no
+ * slot that meets both, the other gutter is tried, so two parts on one row each
+ * get a marker and a leader of their own. `markerTop` / `markerLeft` are the
+ * marker's own corner in the figure box's coordinates.
+ *
+ * @param {{rect: object|null, part: object, blockers: object[]}[]} items  rects are in the figure box's coordinates
+ * @param {number} boxWidth
  */
-const placeMarkers = (rects, parts) => {
+const placeMarkers = (items, boxWidth) => {
     const taken = { start: [], end: [], top: [] };
-    return rects.map((r, i) => {
+    return items.map(({ rect: r, part, blockers }) => {
         if (!r) return null;
-        const side = parts[i].side === 'end' || parts[i].side === 'top' ? parts[i].side : 'start';
-        const at = parts[i].at;
-        if (side === 'top') {
+        const preferred = part.side === 'end' || part.side === 'top' ? part.side : 'start';
+        const at = part.at;
+        if (preferred === 'top') {
             // `end` drops the leader in the strip just outside the part's trailing edge, then turns into the edge: the way down to a part that sits under another.
             const elbow = at === 'end';
             let left = elbow ? r.left + r.width + ELBOW - MARKER / 2 : at === 'middle' ? r.left + (r.width - MARKER) / 2 : r.left + MARKER / 2;
             taken.top.forEach((l) => { if (Math.abs(l - left) < MARKER * 1.5) left = l + MARKER * 1.5; });
             taken.top.push(left);
-            return { ...r, side, markerLeft: left, elbow };
+            return { ...r, side: 'top', markerLeft: left, elbow };
         }
-        let top = at === 'end' ? r.top + r.height - MARKER : at === 'middle' ? r.top + (r.height - MARKER) / 2 : r.top;
-        taken[side].forEach((t) => { if (Math.abs(t - top) < MARKER) top = t + MARKER; });
-        top = Math.min(top, r.top + r.height - MARKER);
-        taken[side].push(top);
-        return { ...r, side, markerTop: top };
+        // The marker's centre may sit anywhere from the part's top (a part shorter than a marker gives up the half-marker it would hang above) to its bottom.
+        const low = r.height < MARKER ? r.top : r.top + MARKER / 2;
+        const high = r.top + r.height;
+        const wanted = at === 'end' ? Math.max(low, high - MARKER / 2) : at === 'middle' ? Math.max(low, r.top + r.height / 2) : low;
+        const slot = (side) => {
+            let center = wanted;
+            taken[side].slice().sort((x, y) => x - y).forEach((t) => { if (Math.abs(t - center) < MARKER) center = t + MARKER; });
+            const clear = !blockers.some((g) => {
+                const level = g.bottom > center + 1 && g.top < center - 1;
+                return side === 'start' ? level && g.left < r.left - 1 && g.right > 0 : level && g.right > r.left + r.width + 1 && g.left < boxWidth;
+            });
+            return { center, fits: center <= high + 0.5, clear };
+        };
+        const sides = [preferred, preferred === 'start' ? 'end' : 'start'];
+        const slots = sides.map(slot);
+        const pick = slots.findIndex((x) => x.fits && x.clear);
+        // No gutter meets both: keep the clear leader over the free slot (a leader through a part misreads), the preferred gutter last.
+        const chosen = pick >= 0 ? pick : slots.findIndex((x) => x.clear) >= 0 ? slots.findIndex((x) => x.clear) : 0;
+        const side = sides[chosen];
+        taken[side].push(slots[chosen].center);
+        return { ...r, side, markerTop: slots[chosen].center - MARKER / 2 };
     });
 };
 
@@ -189,22 +212,20 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
             const origin = root.getBoundingClientRect();
             setBoxWidth(origin.width);
             const regions = [...root.querySelectorAll(ANATOMY_REGIONS)];
-            const placed = parts.map((part) => {
-                const el = root.querySelector(part.selector);
-                if (!el) return { part, rect: null };
+            const els = parts.map((part) => root.querySelector(part.selector));
+            const placed = parts.map((part, i) => {
+                const el = els[i];
+                if (!el) return { part, rect: null, blockers: [] };
                 const r = el.getBoundingClientRect();
-                // A leader runs from the part to its marker's gutter. When a region it does not label (the Sidebar, the AI Panel) sits in that run, the marker moves to the other gutter if that run is clear.
-                const crossed = (toStart) => regions.some((region) => {
-                    if (isOwnRegion(region, el)) return false;
-                    const g = region.getBoundingClientRect();
-                    const level = g.bottom > r.top + 1 && g.top < r.bottom - 1;
-                    return toStart ? level && g.right <= r.left + 1 && g.right > origin.left : level && g.left >= r.right - 1 && g.left < origin.right;
+                // A leader must cross no region it does not label (the Sidebar, the AI Panel) and no other part, unless that part holds this one or sits inside it.
+                const others = [...regions, ...parts.flatMap((other, j) => (j === i || other.holds || !els[j] ? [] : [els[j]]))];
+                const blockers = others.filter((o) => !isOwnRegion(o, el)).map((o) => {
+                    const g = o.getBoundingClientRect();
+                    return { top: g.top - origin.top, bottom: g.bottom - origin.top, left: g.left - origin.left, right: g.right - origin.left };
                 });
-                const side = part.side ?? 'start';
-                const flipped = side === 'start' ? crossed(true) && !crossed(false) : side === 'end' ? crossed(false) && !crossed(true) : false;
-                return { part: flipped ? { ...part, side: side === 'start' ? 'end' : 'start' } : part, rect: { top: r.top - origin.top, left: r.left - origin.left, width: r.width, height: r.height } };
+                return { part, rect: { top: r.top - origin.top, left: r.left - origin.left, width: r.width, height: r.height }, blockers };
             });
-            setMarks(placeMarkers(placed.map((p) => p.rect), placed.map((p) => p.part)));
+            setMarks(placeMarkers(placed, origin.width));
         };
         read();
         if (typeof ResizeObserver === 'undefined') return undefined;

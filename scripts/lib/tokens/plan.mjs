@@ -249,6 +249,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Table', new: '--table-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a PatternTable.' },
   { tier: 'patterns', group: 'Table', new: '--table-stack', old: '--table-stack', use: 'Vertical gap between a PatternTable and its toolbar or footer.' },
   { tier: 'patterns', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a PatternTable footer, such as its Pagination row.' },
+  { tier: 'patterns', group: 'Table', new: '--table-footer-height', old: null, ref: 'var(--space-300)', use: 'Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line.' },
   { tier: 'patterns', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
 
   // ─── Patterns / Backdrop (renamed from Overlay) ───────────────────────

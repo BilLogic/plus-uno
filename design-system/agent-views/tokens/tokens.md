@@ -101,6 +101,7 @@ Space owned by a pattern: page, section, card, table, modal, popover. Inside a p
 --section-pad-y-default  /* Vertical padding of a PatternSection with default spacing. */
 --section-pad-y-spacious  /* Vertical padding of a PatternSection with spacious spacing. */
 --section-radius  /* Corner rounding of a PatternSection that has a fill. */
+--table-footer-height  /* Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line. */
 --table-overflow-reach  /* How far a PatternTable lets a row's overflow, such as a focus ring, reach past its clip. */
 --table-radius  /* Corner rounding of a PatternTable. */
 ```

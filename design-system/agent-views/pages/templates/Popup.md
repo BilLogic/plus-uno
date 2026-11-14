@@ -24,7 +24,7 @@ Each is a composition on the Popup component, which owns placement, the outside 
 A filter menu off the Filter icon. Every part once; the layer is padded 16 and rounded 12 on the overlay pair.
 
 1. **Trigger.** The control it hangs off. It shows the open state and, for the Filter icon, the count.
-2. **Layer.** Hangs 4 below the trigger, aligned to the trigger's end edge because the trigger sits at the end of the bar.
+2. **Layer.** Hangs 4 below the trigger, aligned to the trigger's end edge because the trigger sits at the end of the bar. A titled layer's title is 14, whatever level the page around it is at.
 3. **Rows or categories.** Menu rows; a list of checkboxes or radios; columns or stacked categories.
 4. **Footer** (filter menu only). Reset (Default) and Apply (Primary), full bleed, half each.
 

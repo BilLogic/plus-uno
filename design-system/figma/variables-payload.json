@@ -497,6 +497,13 @@
           }
         },
         {
+          "name": "Table/footer-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-footer-height)"
+          }
+        },
+        {
           "name": "Blanket/pad-x",
           "resolvedType": "FLOAT",
           "codeSyntax": {

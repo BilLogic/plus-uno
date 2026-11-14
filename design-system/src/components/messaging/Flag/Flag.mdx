@@ -2,11 +2,14 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as FlagStories from './Flag.stories.jsx';
+import * as HeadingOutlineStories from '../../../patterns/HeadingOutline.stories.jsx';
 import { Flag } from '@/components';
 import {
     ComponentExample,
+    DocsCanvasShell,
     DocsInteractivePlayground,
     DocsTable,
+    DsCanvasQuiet,
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
@@ -168,12 +171,16 @@ A flag plays a sound as it lands: Error for an error flag, Notify for every othe
 ## Parts
 
 1. **Icon.** On a default flag the `icon` (the information icon unless set); on a bold flag the appearance glyph. Decorative.
-2. **Title.** What happened, in a few words.
+2. **Title.** What happened, in a few words, at 14 whatever level the page around it is at.
 3. **Timestamp.** Optional, subtle, after the title.
 4. **Description.** At most one line.
 5. **Actions.** At most two, under the description: links on a default flag, compact Buttons on a bold one; an action with an `href` navigates either way.
 6. **Expand toggle.** Only on a bold flag that has a description or actions; it starts collapsed to its title.
 7. **Dismiss.** The shared CloseButton, named "Dismiss flag", on default flags only.
+
+<DocsCanvasShell description="A flag with its title.">
+    <DsCanvasQuiet of={HeadingOutlineStories.FlagTitle} />
+</DocsCanvasShell>
 
 ### States
 

@@ -122,7 +122,7 @@ Picked by what the person has to do. The component page holds every prop and sta
 An Active Modal at 8-col with a short form. Every part once; the pad is 16 on every side, the radius 16, and the parts sit 16 apart.
 
 1. **Backdrop.** Dims the page and holds the Modal centered.
-2. **Header.** The title at 20/24 and the Close icon button. With tabs, the tab group sits 8 under the title.
+2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 80 tall.
 4. **Footer** (optional). Full-bleed buttons; Cancel (Default) left, Primary right.
 

@@ -4,6 +4,8 @@ import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PatternModalStories from './PatternModal.stories.jsx';
+import * as HeadingOutlineStories from '../HeadingOutline.stories.jsx';
+import { DocsCanvasShell, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 import * as BackdropStories from '../Backdrop/Backdrop.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
@@ -76,9 +78,13 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 16 on ev
 <Story of={PatternModalStories.AnatomyActive} inline />
 
 1. **Backdrop.** Dims the page and holds the Modal centered.
-2. **Header.** The title at 20/24 and the Close icon button. With tabs, the tab group sits 8 under the title.
+2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 80 tall.
 4. **Footer** (optional). Full-bleed buttons; Cancel (Default) left, Primary right.
+
+<DocsCanvasShell description="A modal with its title, description and a section.">
+    <DsCanvasQuiet of={HeadingOutlineStories.ModalTitle} />
+</DocsCanvasShell>
 
 </div>
 

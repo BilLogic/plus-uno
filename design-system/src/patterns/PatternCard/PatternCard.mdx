@@ -4,6 +4,8 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PatternCardStories from './PatternCard.stories.jsx';
+import * as HeadingOutlineStories from '../HeadingOutline.stories.jsx';
+import { DocsCanvasShell, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -188,11 +190,15 @@ In a row, place the most cards that keep each card at its minimum width. Each ro
 ## Parts
 
 1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. Stacked, give the image you pass an aspect ratio of 16:9, 4:3 or 1:1; beside the content it fills the full height at one third of the width and crops to cover.
-2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
+2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. The title is 14/20 at every level, over a 14/20 description. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
 3. **Body.** A slot for text, a list or media.
 4. **Footer** (optional). A left-aligned slot for actions that commit a change.
 
 The image sits above (or, in a side layout, beside) a padded frame, and the header, body and footer sit inside it.
+
+<DocsCanvasShell description="A card in a section and in a subsection.">
+    <DsCanvasQuiet of={HeadingOutlineStories.CardTitles} />
+</DocsCanvasShell>
 
 ### States
 

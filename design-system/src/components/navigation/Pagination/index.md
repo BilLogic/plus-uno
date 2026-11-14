@@ -10,7 +10,7 @@ Also asked as: paging, pager, next page, page numbers.
 
 **Source:** `design-system/src/components/navigation/Pagination/Pagination.jsx`
 
-**Stories:** `design-system/src/components/navigation/Pagination/Pagination.stories.jsx` — Content, Spacing, InteractionStates, Overview, Interactive, Accessibility, Rest, Hovered, Pressed, Focused, Current, Disabled
+**Stories:** `design-system/src/components/navigation/Pagination/Pagination.stories.jsx` — Content, Spacing, InteractionStates, Overview, Interactive, Accessibility, Rest, Hovered, Pressed, Focused, Current, Disabled, OuterHeight
 
 **Storybook page:** `design-system/src/components/navigation/Pagination/Pagination.mdx`
 
