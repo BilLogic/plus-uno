@@ -323,10 +323,14 @@ function walkSource(root, dir, bare = false) {
   return out;
 }
 
-/** The two stylesheet links the project's HTML head needs: the fonts and Font Awesome Free. Read from Storybook's preview head. */
-function headSnippet(root) {
+/** The stylesheet links the project's HTML head needs: the fonts and Font Awesome Free. Read from Storybook's preview head. */
+export function headLinks(root) {
   const head = isFile(root, '.storybook/preview-head.html') ? read(root, '.storybook/preview-head.html') : '';
-  const links = [...head.matchAll(/<link[^>]*(?:fonts\.googleapis\.com|fontawesome-free)[^>]*>/g)].map((m) => m[0]);
+  return [...head.matchAll(/<link[^>]*(?:fonts\.googleapis\.com|fontawesome-free)[^>]*>/g)].map((m) => m[0]);
+}
+
+function headSnippet(root) {
+  const links = headLinks(root);
   return { path: `${LIBRARY}/head.html`, type: 'registry:file', target: `${TARGET}/head.html`, content: `<!-- Paste into <head>: the PLUS fonts and Font Awesome Free. -->\n${links.join('\n')}\n` };
 }
 

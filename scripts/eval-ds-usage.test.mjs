@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { compare, DEFAULT_ARMS, DEFAULT_TASKS, LOOKUP_ARMS, lookupWiring, meteredIn, rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
+import { compare, DEFAULT_ARMS, DEFAULT_TASKS, expectedFor, expectedItems, FIT_VERDICTS, LOOKUP_ARMS, lookupWiring, meteredIn, parseFit, reach, rejudge, rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf, withHeadLinks } from './eval-ds-usage.mjs';
+import { headLinks } from './lib/registry.mjs';
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -518,3 +519,194 @@ test('prepare hides the eval implementation from builders, and control has no gl
     }
   } finally { fs.rmSync(into, { recursive: true, force: true }); }
 });
+
+test('scaffold head: prepare writes index.html with fonts and Font Awesome 7.2 from preview-head.html, without a second copy in _template', () => {
+  const templateHtml = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, '_template/index.html'), 'utf8');
+  assert.doesNotMatch(templateHtml, /fonts\.googleapis\.com|fontawesome-free/, '_template/index.html holds no second copy of head links');
+  const shared = headLinks(REPO_ROOT);
+  assert.ok(shared.some((l) => /fonts\.googleapis\.com.*Noto\+Sans/.test(l)), 'shared head links include Noto fonts');
+  assert.ok(shared.some((l) => /@fortawesome\/fontawesome-free@7\.2\.0/.test(l)), 'shared head links include Font Awesome Free 7.2');
+
+  const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-head-'));
+  try {
+    const { folder } = prepare({ ref: 'HEAD', arm: 'current', task: 'session-review-queue', into });
+    const html = fs.readFileSync(path.join(folder, 'index.html'), 'utf8');
+    for (const link of shared) assert.ok(html.includes(link), `scaffold index.html includes ${link}`);
+    assert.equal(withHeadLinks(html, REPO_ROOT), html, 'withHeadLinks is idempotent');
+  } finally {
+    fs.rmSync(into, { recursive: true, force: true });
+  }
+});
+
+test('expectedFor: loads session-review-queue answer key, removes it from the agent copy, and returns null where none exists', () => {
+  const expected = expectedFor('session-review-queue');
+  assert.ok(expected, 'session-review-queue has an answer key');
+  assert.ok(expected.screens.length >= 3, 'lists template per screen');
+  assert.ok(expected.patterns.some((p) => p.id === 'filtering' && p.variant === '1 · Quick filters'), 'lists Filtering variant');
+  assert.ok(expected.required_placements.length >= 3, 'lists required placements');
+  assert.ok(expected.against_placements.length >= 3, 'lists placements that count against');
+  assert.equal(expectedFor('triage-repair'), null, 'tasks without an answer key return null');
+
+  const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-expected-'));
+  try {
+    const { root, folder } = prepare({ ref: 'HEAD', arm: 'current', task: 'session-review-queue', into });
+    assert.equal(fs.existsSync(path.join(folder, 'expected.json')), false, 'expected.json is removed from the task folder');
+    assert.equal(fs.existsSync(path.join(root, SCENARIOS, 'session-review-queue/expected.json')), false, 'expected.json is removed with docs/evals');
+  } finally {
+    fs.rmSync(into, { recursive: true, force: true });
+  }
+});
+
+test('reach: deterministically scores opened and ds-guided template/pattern pages and whether they were before the first write', () => {
+  const expected = expectedFor('session-review-queue');
+  assert.equal(reach({ files: [], lookups: [] }, null), null);
+
+  const none = reach({ files: ['design-system/guidelines/composition/layout.md'], lookups: ['ds_guide {"topic":"layout"}'] }, expected);
+  assert.equal(none.hit, false);
+  assert.deepEqual(none.reached, []);
+  assert.deepEqual(none.before_first_write, []);
+
+  const call = (name, input) => JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name, input }] } });
+  const stdout = [
+    call('Read', { file_path: '/c/design-system/src/patterns/Frame/index.md' }),
+    call('mcp__plus-ds__ds_guide', { topic: 'filtering' }),
+    call('Write', { file_path: '/c/prototypes/eval-session-review-queue/src/App.jsx', content: 'export default () => null;' }),
+    call('Read', { file_path: '/c/design-system/agent-views/pages/patterns/CommonActions.md' }),
+    call('Bash', { command: 'npm run ds -- guide notifications' }),
+  ].join('\n');
+  const rs = readSet(stdout, '/c');
+  const r = reach(rs, expected);
+  assert.equal(r.hit, true);
+  assert.equal(r.all_before_write, false, 'some pages were reached only after the first write');
+  assert.deepEqual(r.templates.reached, ['design-system/src/patterns/Frame/index.md']);
+  assert.deepEqual(r.templates.before_first_write, ['design-system/src/patterns/Frame/index.md']);
+  assert.deepEqual(r.patterns.reached, [
+    'design-system/agent-views/pages/patterns/Filtering.md',
+    'design-system/agent-views/pages/patterns/CommonActions.md',
+    'design-system/agent-views/pages/patterns/Notifications.md',
+  ]);
+  assert.deepEqual(r.patterns.before_first_write, ['design-system/agent-views/pages/patterns/Filtering.md']);
+});
+
+test('a11y: captures screenshot.png at 1440x960 after fonts load', async () => {
+  const events = [];
+  const out = await a11y({
+    folder: '/fake',
+    screenshotPath: '/fake/screenshot.png',
+    load: async () => ({
+      axePath: '/fake/axe.min.js',
+      vite: {
+        createServer: async () => ({
+          listen: async () => {},
+          resolvedUrls: { local: ['http://127.0.0.1:4173/'] },
+          close: async () => {},
+        }),
+      },
+      chromium: {
+        launch: async () => ({
+          newPage: async (opts) => {
+            events.push(['newPage', opts]);
+            return {
+              setViewportSize: async (vp) => events.push(['viewport', vp]),
+              goto: async (url) => events.push(['goto', url]),
+              evaluate: async (fn) => {
+                events.push(['evaluate', String(fn).includes('fonts') ? 'fonts' : 'axe']);
+                return { violations: [] };
+              },
+              screenshot: async (sOpts) => events.push(['screenshot', sOpts]),
+              addScriptTag: async () => events.push(['axeScript']),
+            };
+          },
+          close: async () => {},
+        }),
+      },
+    }),
+  });
+  assert.deepEqual(out, { a11y_violations: { count: 0, by_rule: {} }, a11y_error: null });
+  assert.deepEqual(events[0], ['newPage', { viewport: { width: 1440, height: 960 } }]);
+  const fontIdx = events.findIndex((e) => e[0] === 'evaluate' && e[1] === 'fonts');
+  const shotIdx = events.findIndex((e) => e[0] === 'screenshot');
+  const axeIdx = events.findIndex((e) => e[0] === 'axeScript');
+  assert.ok(fontIdx !== -1 && shotIdx > fontIdx && axeIdx > shotIdx, 'waits for fonts, then screenshots before injecting axe');
+  assert.deepEqual(events[shotIdx][1], { path: '/fake/screenshot.png' });
+});
+
+test('rejudge: writes reach, screenshot and per-item fit as new rows marked rejudge, and fit is null where no answer key exists', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-rejudge-'));
+  try {
+    const srqDir = path.join(dir, 'srq');
+    const trDir = path.join(dir, 'tr');
+    for (const d of [srqDir, trDir]) {
+      fs.mkdirSync(path.join(d, 'src'), { recursive: true });
+      fs.writeFileSync(
+        path.join(d, 'src/App.jsx'),
+        "import { Frame } from '@/patterns';\nexport default function App() { return <Frame />; }\n",
+      );
+    }
+    const expected = expectedFor('session-review-queue');
+    const fakeJudgeJson = JSON.stringify(
+      Object.fromEntries(expectedItems(expected).map((item, i) => [item.id, { verdict: FIT_VERDICTS[i % 3], reason: `reason for ${item.id}` }])),
+    );
+    const rows = [
+      {
+        date: '2026-11-14T15:17:22.946Z',
+        model: 'gemini-3.8-flash',
+        harness_commit: 'd4d96b1cb',
+        scenarios_sha: '58d50ccb7403',
+        arm: 'current',
+        task: 'session-review-queue',
+        run: 1,
+        read_set: { files: ['design-system/agent-views/pages/patterns/Filtering.md'], lookups: [] },
+        output: srqDir,
+      },
+      {
+        date: '2026-11-14T14:49:25.301Z',
+        model: 'gemini-3.8-flash',
+        harness_commit: 'd4d96b1cb',
+        scenarios_sha: '58d50ccb7403',
+        arm: 'current',
+        task: 'triage-repair',
+        run: 1,
+        read_set: { files: ['design-system/agent-views/pages/patterns/Disabled.md'], lookups: [] },
+        output: trDir,
+      },
+    ];
+    const shots = [];
+    const out = await rejudge(rows, {
+      commit: 'd4d96b1cb',
+      scorer: 'testsha',
+      screenshotFn: async ({ screenshotPath }) => {
+        shots.push(screenshotPath);
+        fs.writeFileSync(screenshotPath, 'PNG');
+        return screenshotPath;
+      },
+      judgeFn: async ({ expected: exp }) => ({
+        fit: parseFit(fakeJudgeJson, exp),
+        usage: { input_tokens: 1000, output_tokens: 200, cache_read_tokens: 0, cache_creation_tokens: 0, total_input_tokens: 1000, turns: 2, cost_usd: null },
+      }),
+    });
+    assert.equal(out.length, 2);
+    const [srq, tr] = out;
+    assert.equal(srq.rejudge, true);
+    assert.equal(srq.scored_at, 'testsha');
+    assert.equal(srq.screenshot, path.join(srqDir, 'screenshot.png'));
+    assert.equal(srq.reach.hit, true);
+    assert.deepEqual(srq.reach.patterns.before_first_write, ['design-system/agent-views/pages/patterns/Filtering.md']);
+    assert.ok(srq.fit, 'session-review-queue gets per-item fit');
+    for (const item of expectedItems(expected)) {
+      assert.ok(FIT_VERDICTS.includes(srq.fit[item.id]?.verdict), `fit verdict for ${item.id}`);
+      assert.match(srq.fit[item.id]?.reason ?? '', /reason for/);
+    }
+    assert.ok(srq.estimated_cost_usd > 0 && srq.estimated_cost_usd < 0.01, 'records judge token cost only');
+
+    assert.equal(tr.rejudge, true);
+    assert.equal(tr.reach, null, 'no answer key -> reach is null');
+    assert.equal(tr.fit, null, 'no answer key -> fit is null');
+    assert.equal(tr.judge_usage, null);
+    assert.equal(tr.estimated_cost_usd, 0);
+    assert.equal(shots.length, 2);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
