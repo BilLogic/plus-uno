@@ -15,7 +15,7 @@ A form lives in one of four hosts. The Form template draws each; this pattern sa
 - **In a page.** Settings and anything saved as a group. Buttons left-aligned under the fields.
 - **In a Panel.** A short edit from a table, with the page in view. Cancel and Save full bleed at the bottom.
 - **In a Modal.** A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col.
-- **In steps.** A long task on Frame · focused: steps down the left side when there are five or more.
+- **In steps.** A stepped task on Frame · focused: dots above one question under five steps, or the left step list at five or more.
 
 ## Marks and help
 
@@ -35,12 +35,13 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 | is a short edit of a row, with the page still in view | In a Panel · Details | Cancel and Save full bleed at the bottom |
 | is rare and critical, with fewer than five fields | In a Modal, 8-col | Cancel (Default) and the action, full bleed |
 | is long, or has sections someone works through | In steps on Frame · focused | Cancel (Subtle) left; Back and Next full bleed right |
+| asks one big question per step (sign-up, check-in, site setup) | In steps on Frame · focused | Back (Subtle) and Continue (Primary) centered under the tiles |
 | asks for one value read far more than changed | Inline edit on the record | None; it saves on its own |
 
 ## Alternatives
 
 - For one value on a record page, use `InlineEdit`; it saves on its own.
-- For a setting that applies at once, use `Toggle`; it never waits for Save.
+- For settings that apply at once, group `SettingRow` items under section headings on the page; a `Toggle` never waits for Save.
 - For a filter, follow Filtering: filters are not a form.
 - For a decision with no fields, use Modal · Active.
 
@@ -69,7 +70,9 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 | --- | --- | --- |
 | Fields | Form template | There is no Form component: a Fieldset groups the fields inside a host. |
 | Rejection at the top | `SectionMessage` | A danger message, scrolled into view. |
-| Choices | `RadioGroup`, `Select`, `DatePicker` | A control that cannot be wrong. |
+| Choices | `RadioGroup`, `CheckboxGroup`, `Select`, `DatePicker` | A control that cannot be wrong; pictured tiles for one big question per step. |
+| Settings rows | `SettingRow`, `Toggle`, `Select`, `StatusTag`, `Flag` | Divided rows under section headings with no card per row; flipping a toggle confirms via Flag. |
+| Step progress | `ProgressIndicator`, `ProgressTracker` | Dots centered above a single-question step under five steps; the left step list at five or more. |
 | Hosts | Frame, Panel, Modal | A page (on the Page itself, no Section around it), a Panel, a Modal, or steps on Frame · focused. |
 | Confirm view | Modal | Swapped in place today. A confirm view prop is Planned. |
 
@@ -156,3 +159,9 @@ The form's title is the page, Panel or Modal heading. Groups take a `Fieldset` l
 **Checked:** Automatic
 
 `autoComplete` on name, email, phone and address fields. Prefill what is already known, such as the student picked from a row.
+
+### Center dots above a single-question step under five steps. {#center-dots-above-a-single-question-step-under-five-steps}
+
+**Checked:** Automatic
+
+When the In steps host asks one focal question per step with two to four pictured `RadioGroup` or `CheckboxGroup` tiles, center `ProgressIndicator` dots above the heading while there are fewer than five steps, and center Back (Subtle) and Continue (Primary) under the tiles. At five steps or more, switch to the host's left step list. Continue stays enabled and validates on press.

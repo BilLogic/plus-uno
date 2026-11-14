@@ -3,26 +3,30 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 
 <Meta title="Tech stack/Font Awesome" />
 
-<FoundationHero kind="Tech stack" title="Font Awesome" summary="Icon glyphs, Free styles only." />
+<FoundationHero
+    kind="Tech stack"
+    title="Font Awesome"
+    summary="Icon glyphs, Free styles only."
+/>
 
 <FoundationContents />
 
 <FoundationSection title="What it is for">
 
-Every icon is a Font Awesome Free glyph in `fa-solid`, `fa-regular` or `fa-brands`. The stylesheet loads once for the whole app.
+Every icon is a Font Awesome Free glyph in `fa-solid`, `fa-regular` or `fa-brands`. Sizing and usage rules live in <DocsLink id="foundations-visual-iconography">Iconography</DocsLink>.
 
 </FoundationSection>
 
 <FoundationSection title="What wraps it">
 
-The <DocsLink id="components-images-and-icons-icon">Icon</DocsLink> component draws a glyph from its name. Components that show an icon, such as Button and Tag, draw it through Icon. The stylesheet loads in `.storybook/preview-head.html`.
+The <DocsLink id="components-images-and-icons-icon">Icon</DocsLink> component renders a glyph from its name. Components that take an icon prop, such as <DocsLink id="components-forms-and-inputs-button-button">Button</DocsLink> and <DocsLink id="components-labels-tag-tag">Tag</DocsLink>, render it through `Icon`. The stylesheet loads once in `.storybook/preview-head.html`.
 
 </FoundationSection>
 
 <FoundationSection title="What not to do">
 
-- Do not use a Pro family or Pro-only name (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`). They render blank.
-- Do not write `<i class="fa-solid ...">` by hand. Use Icon.
-- Do not draw an icon from another set or import an SVG as one.
+- Do not use a Pro family or Pro-only icon (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`). Unlicensed styles render blank.
+- Do not write `<i className="fa-solid ...">` in product code. Use `Icon`.
+- Do not import a custom SVG or another icon library as an icon.
 
 </FoundationSection>

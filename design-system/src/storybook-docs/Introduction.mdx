@@ -1,287 +1,53 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
-import { FoundationSection } from '@/storybook-docs/foundation-page.jsx';
-import LinkTo from '@storybook/addon-links/react';
-import StatusTag from '@/components/labels/StatusTag';
-import CountTag from '@/components/labels/CountTag';
-import Pagination from '@/components/navigation/Pagination';
-import Button from '@/components/forms-and-inputs/Button';
+import { FoundationHero, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 
-<Meta
-  title="Get started/About"
-  parameters={{
-    docs: {
-      description: {
-        story:
-          'Start here for how this Storybook is organized, how docs sections are classified, and where token foundations live.',
-      },
-    },
-  }}
+<Meta title="Get started/About" />
+
+<FoundationHero
+    kind="Get started"
+    title="About"
+    summary="How this Storybook is organized and where each part of the design system lives."
 />
 
-<DocsLanding
-  page="get-started-about"
-  eyebrow="Get started"
-  title="About"
-  purpose="How this Storybook is organized, how its pages are classified, and where the foundations live."
-  links={{
-    items: [
-      { title: 'Components', href: '#foundation-how-are-components-organized' },
-      { title: 'Tokens', href: '#foundation-what-are-tokens' },
-    ],
-  }}
+<FoundationSection title="Sections">
+
+The sidebar matches the repo folders and the Figma library.
+
+<RefTable
+    head={['Section', 'Holds']}
+    rows={[
+        ['Get started', <>Role guides for <DocsLink id="get-started-design">Design</DocsLink>, <DocsLink id="get-started-develop">Develop</DocsLink> and <DocsLink id="get-started-with-ai">With AI</DocsLink>, plus the <DocsLink id="get-started-illustration-kit">Illustration kit</DocsLink>.</>],
+        [<DocsLink id="foundations-overview">Foundations</DocsLink>, 'Brand, visual, layout, expression, accessibility and token references.'],
+        ['Components', <>Interactive UI building blocks in ten categories, starting with <DocsLink id="components-forms-and-inputs-button-button">Button</DocsLink>.</>],
+        [<DocsLink id="patterns-overview">Patterns</DocsLink>, 'Code-free guidance for common actions, forms, filtering, navigation, search, indicators, notifications and states.'],
+        [<DocsLink id="templates-overview">Templates</DocsLink>, 'Arrangements of components with slots, from Frame and Page down to Section, Card, Table, Form, Modal, Panel and Popup.'],
+        [<DocsLink id="ai-ui-about-ai-ui">AI UI</DocsLink>, 'Guidelines, foundations, components and patterns for AI features.'],
+        [<DocsLink id="data-visualizations-overview">Data visualizations</DocsLink>, 'Charts grouped by the question they answer, plus chart color and foundations.'],
+        [<DocsLink id="tech-stack-overview">Tech stack</DocsLink>, 'The packages PLUS builds on and the component that wraps each.'],
+    ]}
 />
 
-<div className="sb-ds-component-docs sb-ds-component-docs--page sb-plus-intro-page not-prose">
-<FoundationSection title="Overview">
-
-    <p>
-      PLUS Storybook is a practical implementation handbook for the design system. It combines
-      foundation references, shared component guidance, and product-spec examples so teams can move
-      from design intent to shippable UI quickly.
-    </p>
-    <ul>
-      <li>
-        <strong>Docs-first reading:</strong> scan usage patterns, intent, and
-        implementation guidance.
-      </li>
-      <li>
-        <strong>Canvas validation:</strong> inspect behavior in real rendered
-        components.
-      </li>
-      <li>
-        <strong>Shared docs structure:</strong> components generally
-        follow the same spine for predictable scanning.
-      </li>
-      <li>
-        <strong>Foundation alignment:</strong> tokenized typography, color,
-        and layout conventions keep UI consistent across teams.
-      </li>
-    </ul>
-    <p>
-      Start here to orient quickly, then branch into detailed component and style pages for deeper
-      implementation decisions.
-    </p>
 </FoundationSection>
 
-<FoundationSection title="Who this is for">
+<FoundationSection title="Component pages">
 
+Every component page has four tabs below its title:
 
-    <ul>
-      <li>Designers reviewing visual and interaction patterns</li>
-      <li>Engineers implementing or extending shared UI</li>
-      <li>PMs and partners orienting to what the system already provides</li>
-    </ul>
-</FoundationSection>
+- **Examples:** live stories for each appearance, state and size, followed by the interactive playground.
+- **Code:** the barrel import line and props table, generated from the component source.
+- **Usage:** when to use the component, alternatives, best practices, accessibility, parts, content guidelines and related components.
+- **Harness:** the generated markdown file that coding agents read, with copy and issue links.
 
-<FoundationSection title="How are components organized?">
-
-
-    <p>
-      Components live under <strong>Components</strong>, beside <strong>Patterns</strong>,{' '}
-      <strong>Templates</strong>, <strong>Data visualizations</strong>, <strong>AI UI</strong> and{' '}
-      <strong>Tech stack</strong>. Most entries are docs-first for scanning, and
-      Canvas is where interaction and Controls live.
-    </p>
-
-    <p>
-      Default section spine (omit anything that does not apply):
-    </p>
-    <ol>
-      <li>
-        <strong>Content</strong> - baseline shape and meaning.
-      </li>
-      <li>
-        <strong>Styles</strong> - visual treatments that keep meaning stable.
-      </li>
-      <li>
-        <strong>Sizes</strong> - scale comparisons.
-      </li>
-      <li>
-        <strong>Interaction States</strong> - hover, focus, selected, disabled,
-        loading, validation.
-      </li>
-      <li>
-        <strong>Layout</strong> - composition and spacing rules.
-      </li>
-      <li>
-        <strong>Interactive</strong> - controlled sandbox for prop checks.
-      </li>
-    </ol>
-
-    <ul>
-      <li>
-        If meaning or affordance changes, place it in <strong>Content</strong>.
-      </li>
-      <li>
-        If only visual skin changes, place it in <strong>Styles</strong>.
-      </li>
-      <li>
-        If composition or placement rules change, place it in <strong>Layout</strong>.
-      </li>
-    </ul>
-
-    <div className="sb-plus-intro-sections-stack">
-      <div className="sb-plus-intro-mini-card">
-        <h4 className="sb-plus-intro-mini-title">Content</h4>
-        <p className="sb-plus-intro-mini-copy">What the component communicates and what actions it supports.</p>
-        <div className="sb-plus-intro-mini-canvas">
-          <div className="sb-plus-intro-row">
-            <StatusTag appearance="success" iconBefore="check">Success</StatusTag>
-            <CountTag value={12} />
-          </div>
-        </div>
-      </div>
-
-      <div className="sb-plus-intro-mini-card">
-        <h4 className="sb-plus-intro-mini-title">Styles</h4>
-        <p className="sb-plus-intro-mini-copy">Visual treatments for emphasis and semantic intent.</p>
-        <div className="sb-plus-intro-mini-canvas">
-          <div className="sb-plus-intro-row">
-            <Button text="Primary" appearance="primary" spacing="compact" />
-            <Button text="Default" spacing="compact" />
-            <Button text="Danger" appearance="danger" spacing="compact" />
-          </div>
-        </div>
-      </div>
-
-      <div className="sb-plus-intro-mini-card">
-        <h4 className="sb-plus-intro-mini-title">Sizes</h4>
-        <p className="sb-plus-intro-mini-copy">Default and compact heights that fit a component to its surroundings.</p>
-        <div className="sb-plus-intro-mini-canvas">
-          <div className="sb-plus-intro-row">
-            <Button text="Compact" spacing="compact" />
-            <Button text="Default" />
-          </div>
-        </div>
-      </div>
-
-      <div className="sb-plus-intro-mini-card">
-        <h4 className="sb-plus-intro-mini-title">Interaction States</h4>
-        <p className="sb-plus-intro-mini-copy">Disabled, hover, focus, and active behavior for usability.</p>
-        <div className="sb-plus-intro-mini-canvas">
-          <div className="sb-plus-intro-row">
-            <Button text="Disabled" spacing="compact" isDisabled />
-            <Button text="Loading" appearance="primary" spacing="compact" isLoading />
-          </div>
-        </div>
-      </div>
-
-      <div className="sb-plus-intro-mini-card">
-        <h4 className="sb-plus-intro-mini-title">Layout</h4>
-        <p className="sb-plus-intro-mini-copy">Composition and spacing rules within surrounding UI structures.</p>
-        <div className="sb-plus-intro-mini-canvas">
-          <div className="sb-plus-intro-box">
-            <p className="body-default" style={{ marginBottom: 'var(--section-stack-sm)' }}>Section A</p>
-            <div style={{ height: 'var(--border-default)', background: 'var(--ds-border)' }} />
-            <p className="body-default" style={{ marginTop: 'var(--section-stack-sm)' }}>Section B</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="sb-plus-intro-mini-card">
-        <h4 className="sb-plus-intro-mini-title">Interactive</h4>
-        <p className="sb-plus-intro-mini-copy">Use Controls in component docs to validate prop combinations quickly.</p>
-        <div className="sb-plus-intro-mini-canvas">
-          <Pagination currentPage={1} totalPages={4} navigator="icon" spacing="default" onPageChange={() => {}} />
-        </div>
-      </div>
-    </div>
-</FoundationSection>
-
-<FoundationSection title="What are tokens?">
-
-
-    <p>
-      Tokens are the shared design values (color, spacing, type, radius, elevation) consumed by PLUS
-      styles and components. Prefer semantic tokens over raw values so intent survives future theme and
-      brand updates.
-    </p>
-
-    <ul>
-      <li>
-        <LinkTo title="Foundations/Visual/Typography" name="Docs">
-          Typography
-        </LinkTo>{' '}
-        - type scale and font stacks
-      </li>
-      <li>
-        <LinkTo title="Foundations/Visual/Color" name="Docs">
-          Color
-        </LinkTo>{' '}
-        - palette and semantic color usage
-      </li>
-      <li>
-        <LinkTo title="Foundations/Layout/Spacing" name="Docs">
-          Spacing
-        </LinkTo>{' '}
-        - spacing token scale and per-context values
-      </li>
-      <li>
-        <LinkTo title="Foundations/Layout/Grid" name="Docs">
-          Grid
-        </LinkTo>{' '}
-        - the 12-column grid, breakpoints, and layout regions
-      </li>
-    </ul>
-
-    <ul>
-      <li>Do not hardcode color, spacing, typography, radius, or elevation values in component code.</li>
-      <li>Use semantic token names rather than raw values.</li>
-      <li>Generated PLUS token outputs are the canonical implementation source of truth.</li>
-    </ul>
-
-    <div className="sb-plus-intro-token-grid">
-      <div className="sb-plus-intro-mini-card">
-        <p className="sb-plus-intro-mini-title">Typography tokens</p>
-        <p className="sb-plus-intro-mini-copy">
-          Type ramps and semantic text classes create consistent reading hierarchy.
-        </p>
-        <div className="sb-plus-intro-mini-canvas">
-          <div className="sb-plus-intro-stack">
-            <p className="heading-small" style={{ margin: 0 }}>Heading scale sample</p>
-            <p className="body-large" style={{ margin: 0 }}>Body large text for core reading content.</p>
-            <p className="body-default" style={{ margin: 0 }}>Body default text for helper and contextual copy.</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="sb-plus-intro-mini-card">
-        <p className="sb-plus-intro-mini-title">Color tokens</p>
-        <p className="sb-plus-intro-mini-copy">
-          Semantic color roles preserve intent across themes and surfaces.
-        </p>
-        <div className="sb-plus-intro-mini-canvas">
-          <div className="sb-plus-intro-stack">
-            <div className="sb-plus-intro-row">
-              <span className="sb-plus-intro-swatch" style={{ backgroundColor: 'var(--ds-background-brand-bold)' }} />
-              <span className="body-small">--ds-background-brand-bold</span>
-            </div>
-            <div className="sb-plus-intro-row">
-              <span className="sb-plus-intro-swatch" style={{ backgroundColor: 'var(--ds-surface-container)' }} />
-              <span className="body-small">--ds-surface-container</span>
-            </div>
-            <div className="sb-plus-intro-row">
-              <span className="sb-plus-intro-swatch" style={{ backgroundColor: 'var(--ds-border)' }} />
-              <span className="body-small">--ds-border</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 </FoundationSection>
 
 <FoundationSection title="Previous version">
 
+<p>
+  <a href={import.meta.env.VITE_ARCHIVE_STORYBOOK_URL ?? '#'}>
+    Previous version
+  </a>{' '}
+  is a read-only archive kept for comparison. It does not rebuild from <code>main</code>.
+</p>
 
-    <p>
-      <a
-       
-        href={import.meta.env.VITE_ARCHIVE_STORYBOOK_URL ?? '#'}
-      >
-        Previous version
-      </a>{' '}
-      is a read-only archive, kept for before/after comparison. It does not rebuild from main.
-    </p>
 </FoundationSection>
-</div>

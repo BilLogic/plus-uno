@@ -16,6 +16,7 @@ export { default as DatePicker } from '@/components/forms-and-inputs/DatePicker'
 export { default as DateTimePicker } from '@/components/forms-and-inputs/DateTimePicker';
 export { default as DropdownMenu, ButtonItem, CustomItem, LinkItem, Section } from '@/components/forms-and-inputs/DropdownMenu';
 export { default as Fieldset } from '@/components/forms-and-inputs/Fieldset';
+export { default as FileItem, FILE_ITEM_KINDS, FILE_ITEM_REMOVALS, FILE_ITEM_STATUSES } from '@/components/forms-and-inputs/FileItem';
 export { default as FileUpload } from '@/components/forms-and-inputs/FileUpload';
 export { default as FilterButton, FILTER_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/FilterButton';
 export { default as FilterMenu, FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WIDTHS } from '@/components/forms-and-inputs/FilterMenu';
@@ -32,6 +33,7 @@ export { default as Rating } from '@/components/forms-and-inputs/Rating';
 export { default as RichTextEditor } from '@/components/forms-and-inputs/RichTextEditor';
 export { default as SearchField, SEARCH_DEBOUNCE_MS, SEARCH_FIELD_MODES, SEARCH_FIELD_SPACINGS, SearchFieldAction } from '@/components/forms-and-inputs/SearchField';
 export { default as Select, SEARCH_FIRST_ABOVE, SELECT_SPACINGS } from '@/components/forms-and-inputs/Select';
+export { default as SettingRow } from '@/components/forms-and-inputs/SettingRow';
 export { default as SplitButton } from '@/components/forms-and-inputs/SplitButton';
 export { default as TagInput } from '@/components/forms-and-inputs/TagInput';
 export { default as TextArea } from '@/components/forms-and-inputs/TextArea';

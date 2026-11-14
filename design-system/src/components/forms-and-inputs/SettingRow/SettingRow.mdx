@@ -1,0 +1,266 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import { Button, Select, SettingRow, StatusTag, Toggle } from '@/components';
+import * as SettingRowStories from './SettingRow.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+<Meta of={SettingRowStories} />
+
+<Title />
+A setting row places a setting's name and description at the start and its control at the end, dividing rows under a group heading with no card per row.
+
+<DocsTabs of={SettingRowStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/SettingRow"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Grouped rows and controls
+
+<ComponentExample of={SettingRowStories.Overview} title="Grouped settings" description="Rows sit directly under a group heading and divide with a 1px line at `--setting-row-pad-y` vertical padding, with no card around each row." />
+
+<ComponentExample of={SettingRowStories.ToggleControl} title="Toggle" description="Pass a `Toggle` with no `label` prop; the row's `label` names the switch through `aria-labelledby`." />
+
+<ComponentExample of={SettingRowStories.SelectControl} title="Compact Select" description="Use `spacing=&quot;compact&quot;` on `Select` when a setting picks from a short list of options." />
+
+<ComponentExample of={SettingRowStories.ConnectionRow} title="Button with status" description="A connection row puts `StatusTag` in `status` beside the label and keeps `Button` alone in the end slot." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<ComponentExample of={SettingRowStories.Rest} title="Rest" description="Strong body label over a subtle one-line description, with the control top-aligned at the end." />
+
+<ComponentExample of={SettingRowStories.Saving} title="Saving" description="`isLoading` on `Toggle` shows a spinner while a network save is in flight and blocks repeat presses." />
+
+<ComponentExample of={SettingRowStories.Saved} title="Saved" description="Flipping a setting applies immediately and confirms with a `Flag`." />
+
+<ComponentExample of={SettingRowStories.ErrorState} title="Error" description="`error` renders an inline error message under the description and marks the control invalid." />
+
+<ComponentExample of={SettingRowStories.DisabledWithReason} title="Disabled with a reason" description="Dims the label and disables the control while keeping `description` at full contrast to state why." />
+
+<ComponentExample of={SettingRowStories.ReadOnly} title="Read-only" description="Keeps full contrast and focus while preventing edits to supervisor-managed settings." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="SettingRow" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SettingRowStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `SettingRow` on settings and preference pages where each row adjusts one independent setting or external connection that takes effect immediately. Stack related rows directly under a section heading: adjacent `SettingRow` elements divide with a `1px` border at `--setting-row-pad-y` (`12px`) vertical padding, with no card per row.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For fields edited and submitted together with a Save button, use stacked form fields inside `Fieldset` (see <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a>).
+- For an option inside a submitted form, use `Checkbox` rather than `Toggle` or `SettingRow`.
+- For one value on a record page read far more often than edited, use `InlineEdit`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Label (`label`) and status (`status`).** Strong `--body-default` setting name at the start, with an optional `StatusTag` beside it so the end slot holds only the interactive control.
+2. **Description (`description`).** One line of `--body-small` subtle context under the label, or the visible prerequisite/permission reason when disabled or read-only.
+3. **Inline error (`error`).** Optional danger error message rendered directly under `description` when a background save fails.
+4. **Control (`control` at `end`).** Top-aligned to the label row: a `Toggle` (with no `label` prop), a compact `Select` (`spacing="compact"`), or a compact `Button`.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td><code>--body-default</code> medium label in <code>--ds-text</code>, <code>--body-small</code> description in <code>--ds-text-subtle</code>, and control at the end.</td></tr>
+<tr><td>Saving</td><td><code>Toggle</code> sets <code>isLoading</code>, showing its saving spinner and <code>aria-busy="true"</code> while the request completes.</td></tr>
+<tr><td>Saved</td><td>Change takes effect immediately and confirms via a <code>Flag</code> in <code>FlagGroup</code>.</td></tr>
+<tr><td>Error</td><td><code>error</code> renders under <code>description</code> with <code>role="alert"</code> in <code>--ds-text-danger</code> and sets <code>aria-invalid="true"</code> on the control.</td></tr>
+<tr><td>Disabled</td><td>Label dims to <code>--ds-text-disabled</code> and the control disables; <code>description</code> keeps <code>--ds-text-subtle</code> so the reason stays readable.</td></tr>
+<tr><td>Read-only</td><td>Full contrast and keyboard focus preserved; value controls receive <code>isReadOnly</code> and ignore changes.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Row vertical padding and gap</td><td><code>--setting-row-pad-y</code> (<code>12px</code>), horizontal gap <code>--inline-lg</code>.</td></tr>
+<tr><td>Row divider</td><td><code>--border-default</code> solid <code>--ds-border</code> between adjacent rows.</td></tr>
+<tr><td>Label and status</td><td><code>--body-default</code> with <code>--type-weight-medium</code> in <code>--ds-text</code> (<code>--ds-text-disabled</code> when disabled); status gap <code>--inline-md</code>.</td></tr>
+<tr><td>Description and error</td><td><code>--body-small</code> in <code>--ds-text-subtle</code>; error in <code>--ds-text-danger</code> with <code>--icon-sm</code> glyph.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Omit Toggle's own label inside SettingRow.
+
+`SettingRow` wires its `label` to `control` through `aria-labelledby`. Passing a second `label` on `Toggle` repeats the text visually and at the end of the row.
+
+<DoDontPair
+    doExample={<SettingRow label="Session reminders" description="Send an email before each scheduled session." control={<Toggle defaultChecked />} />}
+    doCaption="Row label at the start names the bare Toggle at the end."
+    dontExample={<SettingRow label="Session reminders" description="Send an email before each scheduled session." control={<Toggle label="Session reminders" defaultChecked />} />}
+    dontCaption="Toggle repeats its own label in the end slot."
+/>
+
+### Put connection status beside the label, never in the control slot.
+
+Pass `StatusTag` through `status` so every row's end slot holds only its action control.
+
+<DoDontPair
+    doExample={(
+        <SettingRow
+            label="Google Calendar"
+            description="Sync upcoming tutoring sessions to your calendar."
+            status={<StatusTag appearance="success">Connected</StatusTag>}
+            control={<Button spacing="compact">Disconnect</Button>}
+        />
+    )}
+    doCaption="StatusTag sits beside the label; Disconnect stands alone at the end."
+    dontExample={(
+        <SettingRow
+            label="Google Calendar"
+            description="Sync upcoming tutoring sessions to your calendar."
+            control={(
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)' }}>
+                    <StatusTag appearance="success">Connected</StatusTag>
+                    <Button spacing="compact">Disconnect</Button>
+                </span>
+            )}
+        />
+    )}
+    dontCaption="Status crowds the action at the end of the row."
+/>
+
+### State the reason in description when a setting is disabled.
+
+When a setting waits on another setting on the same page, explain how to unlock it in `description` rather than hiding it in a tooltip.
+
+<DoDontPair
+    doExample={(
+        <SettingRow
+            label="Reminder lead time"
+            description="Turn on session reminders above to choose a lead time."
+            isDisabled
+            control={<Select spacing="compact" isSearchable={false} options={[{ value: '1h', label: '1 hour before' }]} value="1h" onChange={() => {}} />}
+        />
+    )}
+    doCaption="Description names the prerequisite on the same page."
+    dontExample={(
+        <SettingRow
+            label="Reminder lead time"
+            isDisabled
+            control={<Select spacing="compact" isSearchable={false} options={[{ value: '1h', label: '1 hour before' }]} value="1h" onChange={() => {}} />}
+        />
+    )}
+    dontCaption="Disabled control gives no clue why it cannot be changed."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the setting as a noun phrase: "Session reminders", "Reminder lead time".</td><td>Phrase the row label as a question or command with punctuation.</td></tr>
+<tr><td>Keep <code>description</code> to one sentence adding context the label does not already say.</td><td>Restate the label ("Turn session reminders on or off").</td></tr>
+<tr><td>Write <code>error</code> with cause and next step: "Could not save SMS alerts. Check your connection and try again."</td><td>"Save failed" or "Error".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Label names the control.** `SettingRow` links its `label` span to `control` via `aria-labelledby`, so a `Toggle` announces `"Session reminders, switch, on"` without needing its own visible label, and `status` text beside the label does not pollute the switch's accessible name.
+- **Self-describing action buttons.** When `control` carries visible action text (such as a `Disconnect` `Button`), `SettingRow` combines the button's own id with the row label id in `aria-labelledby` (`"Disconnect Google Calendar"`), keeping multiple connection rows distinct for screen-reader users while satisfying WCAG 2.5.3 Label in Name.
+- **Readable descriptions and announced errors.** `description` and `error` link to `control` via `aria-describedby`; `error` renders with `role="alert"` and sets `aria-invalid="true"`.
+- **DOM order matches reading order.** Label, status, description, and inline error precede the end control in the DOM so Tab and virtual-cursor order match visual reading order.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `Toggle`: use as `control` when a setting turns on or off and applies immediately.
+- `Select`: use with `spacing="compact"` as `control` when a setting picks one option from a short list.
+- `StatusTag`: pass to `status` to show connection or feature state beside the setting name.
+- `Flag`: use in `FlagGroup` to confirm background saves on a settings page.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

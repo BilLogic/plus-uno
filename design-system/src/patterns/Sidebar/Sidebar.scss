@@ -65,6 +65,7 @@ $inset-24: calc((var(--item-height-md) - var(--icon-lg)) / 2);
 /* ------------------------------------------------------------- nav and groups */
 
 .plus-pattern-sidebar__nav {
+    position: relative;
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
@@ -75,6 +76,32 @@ $inset-24: calc((var(--item-height-md) - var(--icon-lg)) / 2);
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: none;
+}
+
+.plus-pattern-sidebar__glide {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: var(--frame-sidebar-row-radius);
+    background-color: var(--ds-background-selected);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.plus-pattern-sidebar__nav[data-gliding='true'] {
+    > .plus-pattern-sidebar__glide {
+        display: block;
+    }
+
+    [aria-current='page'] {
+        background-color: transparent;
+    }
+}
+
+.plus-pattern-sidebar__group {
+    position: relative;
+    z-index: 1;
 }
 
 .plus-pattern-sidebar__group,

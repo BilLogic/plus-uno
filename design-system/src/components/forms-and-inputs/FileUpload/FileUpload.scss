@@ -1,7 +1,9 @@
+@use "../../../styles/state" as *;
+
 /**
  * FileUpload Component Styles
- * Implements file upload component with all states, validation, and styling
- * using Design System tokens to match Figma specifications exactly.
+ * Implements file upload drop zone, batch status header, and file list framing
+ * using PLUS Design System tokens.
  */
 
 .plus-file-upload-wrapper {
@@ -11,15 +13,32 @@
     width: 100%;
 }
 
+.plus-file-upload-label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--inline-md);
+}
+
+.plus-file-upload-batch-status {
+    margin-left: auto;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+    white-space: nowrap;
+}
+
 .plus-file-upload-container {
     display: flex;
     flex-direction: column;
     gap: var(--stack-md);
     padding: var(--pad-y-md) var(--pad-x-md);
     border-radius: var(--card-radius-compact);
-    transition: border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), box-shadow var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    transition:
+        background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast),
+        border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast),
+        box-shadow var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
-    border: var(--border-default) solid transparent;
+    border: var(--border-default) solid var(--ds-border);
 
     &.plus-file-upload-invalid {
         border-color: var(--ds-border-danger);
@@ -29,6 +48,11 @@
     &.plus-file-upload-valid {
         border-color: var(--ds-border-success);
         box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-background-success-subtler);
+    }
+
+    &.plus-file-upload-drag-over {
+        background-color: var(--ds-background-brand-subtlest);
+        border-color: var(--ds-border-brand);
     }
 
     // Focus comes last so the ring stays visible on an invalid or valid field;
@@ -43,7 +67,8 @@
 
     &.plus-file-upload-disabled {
         cursor: not-allowed;
-        border-color: transparent;
+        background-color: var(--ds-background-disabled);
+        border-color: var(--ds-border-disabled);
     }
 
     // Read-only: the field box reads as a fixed value, like the Input read-only state.
@@ -57,7 +82,7 @@
     margin-bottom: 0;
     color: var(--ds-text);
     font: var(--body-default);
-    
+
     .plus-file-upload-required {
         color: var(--ds-text-danger);
         margin-left: var(--stack-sm);
@@ -84,6 +109,43 @@
     width: fit-content;
 }
 
+.plus-file-upload-drop-line {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--ds-text);
+}
+
+.plus-file-upload-disabled .plus-file-upload-drop-line {
+    color: var(--ds-text-subtle);
+}
+
+.plus-file-upload-inline-action.plus-btn {
+    --_button-fg: var(--ds-text-brand);
+    display: inline;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    font: inherit;
+    color: var(--ds-text-brand);
+    text-decoration: underline;
+    vertical-align: baseline;
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: transparent, color: var(--ds-text-brand)),
+            pressed: (background-color: transparent, color: var(--ds-text-brand)),
+        ),
+        $ring: false
+    );
+
+    &:disabled {
+        background-color: transparent;
+        color: var(--ds-text-disabled);
+    }
+}
+
 .plus-file-upload-input {
     position: absolute;
     width: 0;
@@ -93,7 +155,7 @@
     pointer-events: none;
 }
 
-// Uploaded-file list, below the framed field
+// Uploaded-file list, below the framed drop zone
 .plus-file-upload-files {
     display: flex;
     flex-direction: column;
@@ -106,7 +168,7 @@
     align-items: center;
     gap: var(--stack-sm);
     font: var(--body-small);
-    
+
     i {
         font-size: var(--icon-sm);
         flex-shrink: 0;
@@ -115,7 +177,7 @@
 
 .plus-file-upload-validation-invalid {
     color: var(--ds-text-danger);
-    
+
     i {
         color: var(--ds-icon-danger);
     }
@@ -123,7 +185,7 @@
 
 .plus-file-upload-validation-valid {
     color: var(--ds-text-success);
-    
+
     i {
         color: var(--ds-icon-success);
     }
@@ -132,4 +194,3 @@
 .plus-file-upload-validation-message {
     flex: 1;
 }
-

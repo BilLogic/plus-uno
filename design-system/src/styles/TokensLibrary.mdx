@@ -1,4 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import { FoundationSection, FoundationRelated } from '@/storybook-docs/foundation-page.jsx';
 import { TokenLibrary } from '@/storybook-docs/token-library-blocks.jsx';
@@ -15,9 +16,17 @@ import { TokenLibrary } from '@/storybook-docs/token-library-blocks.jsx';
 
 <FoundationSection title="Overview">
 
-Tokens form a ladder. A primitive is a raw value, such as a palette step or a spacing step, and is never used in a feature. A semantic token names a job and points at a primitive: Global tokens apply anywhere, Components tokens belong to one component, and Templates tokens belong to the page frame. A screen binds the semantic token whose job matches, so one decision is made once and every mode follows.
+Tokens form a ladder. A screen binds the semantic token whose job matches, never a primitive, so one decision is made once and every mode follows.
 
-Search matches part of a name; turn on Exact match to find one whole name. The filters and the search combine, and the count shows how many tokens remain. Select a name to copy it. A color role shows its Light and Dark value.
+<RefTable
+    head={['Tier / scope', 'Holds', 'Bound by']}
+    rows={[
+        ['Primitive', 'Raw palette hues, rem scales and spring curves', 'Semantic tokens only; hidden from features'],
+        ['Semantic · Global', 'Roles that apply anywhere: text, surface, border, space, radius, shadow, motion', 'Any feature or component'],
+        ['Semantic · Templates', 'Frame, Page, Section, Card, Table, Backdrop, Modal and Popup tokens', 'The template and the layout inside it'],
+        ['Semantic · Components', 'Tokens owned by one component (Button radius, chart colors, Skeleton)', 'That component only'],
+    ]}
+/>
 
 </FoundationSection>
 

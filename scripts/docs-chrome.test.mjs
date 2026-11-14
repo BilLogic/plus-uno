@@ -311,3 +311,97 @@ test('openAtTopFailures: a page scrolled on mount is named with its offset', () 
 test('openAtTopFailures: a missing reading fails rather than passing silently', () => {
   assert.equal(openAtTopFailures([{ page: 'x--docs', scrollY: undefined }]).length, 1);
 });
+
+/* --------------------------------------- surviving a dev-server reload */
+
+import { isContextDestroyedError, measureWithReloadRetry } from './docs-chrome.mjs';
+
+test('measureWithReloadRetry: settles and retries up to 2 times when navigation destroys the context', async () => {
+  let attempts = 0;
+  let settles = 0;
+  const scrollY = await measureWithReloadRetry(
+    async () => {
+      attempts++;
+      if (attempts <= 2) {
+        throw new Error('page.evaluate: Execution context was destroyed, most likely because of a navigation.');
+      }
+      return 0;
+    },
+    async () => {
+      settles++;
+    },
+  );
+  assert.equal(scrollY, 0);
+  assert.equal(attempts, 3);
+  assert.equal(settles, 2);
+});
+
+test('measureWithReloadRetry: rethrows once the 2 retries are exhausted', async () => {
+  let attempts = 0;
+  let settles = 0;
+  await assert.rejects(
+    () =>
+      measureWithReloadRetry(
+        async () => {
+          attempts++;
+          throw new Error('page.evaluate: Execution context was destroyed, most likely because of a navigation.');
+        },
+        async () => {
+          settles++;
+        },
+      ),
+    /Execution context was destroyed/,
+  );
+  assert.equal(attempts, 3);
+  assert.equal(settles, 2);
+});
+
+test('measureWithReloadRetry: does not retry unrelated errors', async () => {
+  let attempts = 0;
+  let settles = 0;
+  await assert.rejects(
+    () =>
+      measureWithReloadRetry(
+        async () => {
+          attempts++;
+          throw new Error('page.waitForSelector: Timeout 60000ms exceeded.');
+        },
+        async () => {
+          settles++;
+        },
+      ),
+    /Timeout 60000ms exceeded/,
+  );
+  assert.equal(attempts, 1);
+  assert.equal(settles, 0);
+});
+
+test('measureWithReloadRetry: still fails on a real mismatch, with or without a reload', async () => {
+  let settles = 0;
+  const direct = await measureWithReloadRetry(async () => 420, async () => { settles++; });
+  assert.equal(settles, 0);
+  assert.equal(openAtTopFailures([{ page: 'a--docs', scrollY: direct }]).length, 1);
+
+  let reloadedOnce = false;
+  const afterReload = await measureWithReloadRetry(
+    async () => {
+      if (!reloadedOnce) {
+        reloadedOnce = true;
+        throw new Error('Execution context was destroyed');
+      }
+      return 5383;
+    },
+    async () => { settles++; },
+  );
+  assert.equal(settles, 1);
+  assert.match(openAtTopFailures([{ page: 'spotlight--docs', scrollY: afterReload }])[0], /opened 5383px down/);
+});
+
+test('isContextDestroyedError matches navigation-destroyed context errors only', () => {
+  assert.equal(isContextDestroyedError(new Error('page.evaluate: Execution context was destroyed, most likely because of a navigation.')), true);
+  assert.equal(isContextDestroyedError(new Error('Cannot find context with specified id')), true);
+  assert.equal(isContextDestroyedError(new Error('page.goto: Navigation to "http://localhost:4300" is interrupted by another navigation')), true);
+  assert.equal(isContextDestroyedError(new Error('Target page, context or browser has been closed')), false);
+  assert.equal(isContextDestroyedError(new Error('Timeout 30000ms exceeded')), false);
+});
+

@@ -4,6 +4,7 @@ import { Dialog } from '@base-ui/react/dialog';
 import { openOverlayCount, subscribeOverlays } from '@/lib/overlay';
 import { useOverlayPresence } from '@/lib/overlayMotion';
 import { useMotionReduced } from '@/lib/motionPreference';
+import { AreaStage } from '@/lib/navigationMotion';
 import { IconButton, LinkIconButton, PanelHostContext } from '@/components';
 import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
@@ -105,6 +106,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  */
 const Frame = ({
     id,
+    areaKey,
     header,
     onBack,
     backHref,
@@ -650,18 +652,22 @@ const Frame = ({
                     {dockedPresent && hasSidebar ? sidebarPanel(false, !docked, dockedEnteringRef.current) : null}
                     {/* Under an overlay Panel's Backdrop the Page is out of reach for keyboards too. */}
                     <SurfaceTag className="plus-frame__surface" inert={panelModal}>
-                        {pageHead}
-                        {surfaceDirect ? children : (
-                            <Content
-                                className={[
-                                    'plus-frame__content',
-                                    `plus-frame__content--${width}`,
-                                    contentClassName,
-                                ].filter(Boolean).join(' ')}
-                            >
-                                {children}
-                            </Content>
-                        )}
+                        {(() => {
+                            const body = surfaceDirect ? children : (
+                                <Content
+                                    className={[
+                                        'plus-frame__content',
+                                        `plus-frame__content--${width}`,
+                                        contentClassName,
+                                    ].filter(Boolean).join(' ')}
+                                >
+                                    {children}
+                                </Content>
+                            );
+                            if (areaKey === undefined) return <>{pageHead}{body}</>;
+                            if (pageToggle) return <>{pageHead}<AreaStage areaKey={areaKey}>{body}</AreaStage></>;
+                            return <AreaStage areaKey={areaKey}>{pageHead}{body}</AreaStage>;
+                        })()}
                     </SurfaceTag>
                 </div>
                 {/* One place in the tree for every Panel state, so docking or overlaying never remounts its content. */}
@@ -685,6 +691,8 @@ const Frame = ({
 
 Frame.propTypes = {
     id: PropTypes.string,
+    /** Current Sidebar area key: changing it fades the old page out on `appearance.fast`, then fades the new page in on `appearance.default`. */
+    areaKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     /** The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle. */
     header: PropTypes.node,
     /** A focused page: called when Back is pressed. With it the header row leads with a Back icon button. */

@@ -275,6 +275,10 @@ const preview = {
               "Dropdown menu",
               "Fieldset",
               "File upload",
+              [
+                "File upload",
+                "File item"
+              ],
               "Filter menu",
               "Form",
               "Popup select",
@@ -293,6 +297,7 @@ const preview = {
                 "Cascader",
                 "Tree select"
               ],
+              "Setting row",
               "Tag input",
               "Text area",
               "Text field",

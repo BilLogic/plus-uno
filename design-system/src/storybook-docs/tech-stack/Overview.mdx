@@ -4,13 +4,17 @@ import { TechStackTable } from './tech-stack-table.jsx';
 
 <Meta title="Tech stack/Overview" />
 
-<FoundationHero kind="Tech stack" title="Tech stack" summary="The packages PLUS builds on, and the component that wraps each." />
+<FoundationHero
+    kind="Tech stack"
+    title="Tech stack"
+    summary="The packages PLUS builds on, and the component that wraps each."
+/>
 
 <FoundationContents />
 
 <FoundationSection title="Packages">
 
-Product code imports the PLUS component from `@/components`, never the package.
+Product code imports the PLUS component from `@/components`, never the underlying package.
 
 <TechStackTable />
 

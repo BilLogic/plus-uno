@@ -24,9 +24,60 @@
  */
 
 .plus-tabs {
+    position: relative;
     display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
+}
+
+.plus-tabs-indicator {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.plus-tabs[data-gliding='true'] > .plus-tabs-indicator {
+    display: block;
+}
+
+.plus-tabs--appearance-default[data-gliding='true'] {
+    > .plus-tabs-indicator {
+        // Sits on the bottom edge of the tab row; y tracks the tab's top, so margin-top places it at the baseline.
+        height: var(--border-selected);
+        background-color: var(--ds-border-selected);
+        z-index: 2;
+    }
+
+    .plus-tab[data-active] {
+        border-image: linear-gradient(transparent, transparent) 1;
+    }
+}
+
+.plus-tabs--spacing-default.plus-tabs--appearance-default[data-gliding='true'] > .plus-tabs-indicator {
+    margin-top: calc(var(--item-height-md) - var(--border-selected));
+}
+
+.plus-tabs--spacing-compact.plus-tabs--appearance-default[data-gliding='true'] > .plus-tabs-indicator {
+    margin-top: calc(var(--item-height-sm) - var(--border-selected));
+}
+
+.plus-tabs--appearance-pill[data-gliding='true'] {
+    > .plus-tabs-indicator {
+        border-radius: var(--radius-full);
+        background-color: var(--ds-background-neutral);
+        z-index: 0;
+    }
+
+    .plus-tabs-list {
+        position: relative;
+        z-index: 1;
+    }
+
+    .plus-tab[data-active] {
+        background-color: transparent;
+    }
 }
 
 // Justified tabs share the full row: the root takes the row's width rather

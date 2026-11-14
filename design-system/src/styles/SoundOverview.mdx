@@ -4,10 +4,9 @@ import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
+    DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
 import { SoundPlayers } from '@/storybook-docs/sound-docs.jsx';
-
-export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-expression-sound-${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
 
 <Meta title="Foundations/Expression/Sound/Overview" tags={['manifest']} />
 
@@ -29,25 +28,25 @@ A sound plays where a moment matters and a tutor may be looking elsewhere: a Fla
 
 <FoundationSubsection title="Rare">
 
-Most moments are silent. A sound plays only where its registry row names one: <Page id="when-to-play">When to play</Page>.
+Most moments are silent. A sound plays only where its registry row names one: <DocsLink id="foundations-expression-sound-when-to-play">When to play</DocsLink>.
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Paired">
 
-Every sound has an on-screen change that says the same thing, so turning sound off loses nothing: <Page id="settings-and-accessibility">Settings and accessibility</Page>.
+Every sound has an on-screen change that says the same thing, so turning sound off loses nothing: <DocsLink id="foundations-expression-sound-settings-and-accessibility">Settings and accessibility</DocsLink>.
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Landed">
 
-A sound lands when its motion lands: <Page id="with-motion">With motion</Page>.
+A sound lands when its motion lands: <DocsLink id="foundations-expression-sound-with-motion">With motion</DocsLink>.
 
 </FoundationSubsection>
 
 <FoundationSubsection title="In key">
 
-Every sound is in one key, so any two can play back to back: <Page id="sounds">Sounds</Page>.
+Every sound is in one key, so any two can play back to back: <DocsLink id="foundations-expression-sound-sounds">Sounds</DocsLink>.
 
 </FoundationSubsection>
 
@@ -55,11 +54,9 @@ Every sound is in one key, so any two can play back to back: <Page id="sounds">S
 
 <FoundationSection title="The nine sounds">
 
-Press one to hear it. The switch is the same setting the app reads.
+Press one to hear it. The switch is the same setting the app reads; <DocsLink id="foundations-expression-sound-sounds">Sounds</DocsLink> adds the three AI feedback sounds.
 
 <SoundPlayers />
-
-AI feedback adds three more, on the Sounds page.
 
 </FoundationSection>
 

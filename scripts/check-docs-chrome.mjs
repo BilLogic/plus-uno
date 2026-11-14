@@ -39,7 +39,15 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { chromeFailures, managerFailures, openAtTopFailures, measureScript, tocFailures, tocMeasureScript } from './docs-chrome.mjs';
+import {
+  chromeFailures,
+  managerFailures,
+  measureScript,
+  measureWithReloadRetry,
+  openAtTopFailures,
+  tocFailures,
+  tocMeasureScript,
+} from './docs-chrome.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -153,64 +161,81 @@ process.on('SIGINT', () => {
 });
 
 /**
+ * Waits for an unsolicited dev-server reload to finish across the page and any
+ * preview iframe before retrying a measurement. Yielding briefly lets CDP's
+ * frameNavigated clear the previous document's 'load' state first.
+ */
+async function settleReload(page) {
+  await page.waitForTimeout(250);
+  await Promise.all(page.frames().map((f) => f.waitForLoadState('load').catch(() => {})));
+}
+
+/**
  * Clicks a deep h3 entry (opening its section first, as a reader must), then the
  * last section's entry, and reads where each heading landed.
  */
 async function measureToc(context, baseUrl) {
   const page = await context.newPage();
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto(`${baseUrl}/iframe.html?viewMode=docs&id=${encodeURIComponent(TOC_PAGE)}`, {
-    waitUntil: 'load',
-  });
-  await page.waitForSelector('.toc-wrapper a.toc-link', { timeout: 60_000 });
-  await page.waitForLoadState('networkidle').catch(() => {});
-  // Tocbot builds the rail ~100ms after mount and the enhancer titles it a frame later.
-  await page.waitForTimeout(500);
+  try {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    return await measureWithReloadRetry(
+      async () => {
+        await page.goto(`${baseUrl}/iframe.html?viewMode=docs&id=${encodeURIComponent(TOC_PAGE)}`, {
+          waitUntil: 'load',
+        });
+        await page.waitForSelector('.toc-wrapper a.toc-link', { timeout: 60_000 });
+        await page.waitForLoadState('networkidle').catch(() => {});
+        // Tocbot builds the rail ~100ms after mount and the enhancer titles it a frame later.
+        await page.waitForTimeout(500);
 
-  const entry = (text) => page.locator('.toc-wrapper a.toc-link', { hasText: new RegExp(`^${text}$`) });
-  const settle = () => page.waitForTimeout(1800);
-  const read = (label) => page.evaluate(tocMeasureScript(label));
+        const entry = (text) => page.locator('.toc-wrapper a.toc-link', { hasText: new RegExp(`^${text}$`) });
+        const settle = () => page.waitForTimeout(1800);
+        const read = (label) => page.evaluate(tocMeasureScript(label));
 
-  // A deep entry: the third h3 of the section with the most of them.
-  const plan = await page.evaluate(() => {
-    const tops = [...document.querySelectorAll('.toc-wrapper > ul > li')];
-    if (!tops.length) return null;
-    const best = tops.reduce((a, b) => (b.querySelectorAll('ul a').length > a.querySelectorAll('ul a').length ? b : a), tops[0]);
-    if (!best.querySelector('ul a')) return null;
-    const kids = [...best.querySelectorAll('ul a')];
-    const tops2 = [...document.querySelectorAll('.toc-wrapper > ul > li > a')];
-    return {
-      section: best.querySelector(':scope > a').textContent,
-      deep: (kids[2] ?? kids[kids.length - 1]).textContent,
-      last: tops2[tops2.length - 1].textContent,
-    };
-  });
-  if (!plan) {
+        // A deep entry: the third h3 of the section with the most of them.
+        const plan = await page.evaluate(() => {
+          const tops = [...document.querySelectorAll('.toc-wrapper > ul > li')];
+          if (!tops.length) return null;
+          const best = tops.reduce((a, b) => (b.querySelectorAll('ul a').length > a.querySelectorAll('ul a').length ? b : a), tops[0]);
+          if (!best.querySelector('ul a')) return null;
+          const kids = [...best.querySelectorAll('ul a')];
+          const tops2 = [...document.querySelectorAll('.toc-wrapper > ul > li > a')];
+          return {
+            section: best.querySelector(':scope > a').textContent,
+            deep: (kids[2] ?? kids[kids.length - 1]).textContent,
+            last: tops2[tops2.length - 1].textContent,
+          };
+        });
+        if (!plan) {
+          return tocFailures({ page: TOC_PAGE, entries: 0, untitled: [], wrapped: [], clicked: { label: '', top: null, active: null }, strayNested: [], openNested: 0, last: { label: '', top: null, active: null } });
+        }
+        const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const entryOf = (t) => entry(esc(t));
+        await entryOf(plan.section).click();
+        await settle();
+        await entryOf(plan.deep).click();
+        await settle();
+        const clicked = await read(plan.deep);
+        await entryOf(plan.last).click();
+        await settle();
+        const last = await read(plan.last);
+
+        return tocFailures({
+          page: TOC_PAGE,
+          entries: clicked.entries,
+          untitled: clicked.untitled,
+          wrapped: clicked.wrapped,
+          clicked: { label: plan.deep, top: clicked.top, active: clicked.active },
+          strayNested: clicked.strayNested,
+          openNested: clicked.openNested,
+          last: { label: plan.last, top: last.top, active: last.active },
+        });
+      },
+      () => settleReload(page),
+    );
+  } finally {
     await page.close();
-    return tocFailures({ page: TOC_PAGE, entries: 0, untitled: [], wrapped: [], clicked: { label: '', top: null, active: null }, strayNested: [], openNested: 0, last: { label: '', top: null, active: null } });
   }
-  const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const entryOf = (t) => entry(esc(t));
-  await entryOf(plan.section).click();
-  await settle();
-  await entryOf(plan.deep).click();
-  await settle();
-  const clicked = await read(plan.deep);
-  await entryOf(plan.last).click();
-  await settle();
-  const last = await read(plan.last);
-  await page.close();
-
-  return tocFailures({
-    page: TOC_PAGE,
-    entries: clicked.entries,
-    untitled: clicked.untitled,
-    wrapped: clicked.wrapped,
-    clicked: { label: plan.deep, top: clicked.top, active: clicked.active },
-    strayNested: clicked.strayNested,
-    openNested: clicked.openNested,
-    last: { label: plan.last, top: last.top, active: last.active },
-  });
 }
 
 /**
@@ -321,15 +346,23 @@ async function measureOpenAtTop(context, baseUrl, index) {
   let next = 0;
   const worker = async () => {
     const page = await context.newPage();
-    await page.setViewportSize({ width: 1280, height: 800 });
-    while (next < ids.length) {
-      const id = ids[next++];
-      await page.goto(`${baseUrl}/iframe.html?viewMode=docs&id=${encodeURIComponent(id)}`, { waitUntil: 'load' });
-      await page.waitForTimeout(2500);
-      const scrollY = await page.evaluate(() => Math.max(window.scrollY, document.documentElement.scrollTop, document.scrollingElement?.scrollTop ?? 0));
-      rows.push({ page: id, scrollY });
+    try {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      while (next < ids.length) {
+        const id = ids[next++];
+        const scrollY = await measureWithReloadRetry(
+          async () => {
+            await page.goto(`${baseUrl}/iframe.html?viewMode=docs&id=${encodeURIComponent(id)}`, { waitUntil: 'load' });
+            await page.waitForTimeout(2500);
+            return page.evaluate(() => Math.max(window.scrollY, document.documentElement.scrollTop, document.scrollingElement?.scrollTop ?? 0));
+          },
+          () => settleReload(page),
+        );
+        rows.push({ page: id, scrollY });
+      }
+    } finally {
+      await page.close();
     }
-    await page.close();
   };
   await Promise.all([worker(), worker(), worker(), worker()]);
   return { pages: ids.length, failures: openAtTopFailures(rows) };
@@ -348,27 +381,35 @@ async function measureNavigation(context, baseUrl, index) {
   const story = Object.values(index.entries ?? {}).find((e) => e.type === 'story');
   if (!story || NAV_PAGES.some((id) => !index.entries?.[id])) return [];
   const page = await context.newPage();
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto(`${baseUrl}/?path=/story/${story.id}`, { waitUntil: 'load' });
-  const frame = await (await page.waitForSelector('#storybook-preview-iframe')).contentFrame();
-  await frame.waitForSelector('#storybook-root, .sbdocs-content', { state: 'attached', timeout: 60_000 });
-  const go = (id) => page.evaluate((to) => {
-    window.history.pushState({}, '', `/?path=/docs/${to}`);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  }, id);
-  const read = async () => {
-    await frame.waitForSelector('.sbdocs-content', { timeout: 60_000 });
-    await page.waitForTimeout(2500);
-    return frame.evaluate(() => Math.max(window.scrollY, document.scrollingElement?.scrollTop ?? 0));
-  };
-  const rows = [];
-  await go(NAV_PAGES[0]);
-  rows.push({ page: `story to ${NAV_PAGES[0]}`, scrollY: await read() });
-  await frame.locator('.sbdocs-content').click({ position: { x: 4, y: 4 }, force: true }).catch(() => {});
-  await go(NAV_PAGES[1]);
-  rows.push({ page: `docs to ${NAV_PAGES[1]} after a click`, scrollY: await read() });
-  await page.close();
-  return openAtTopFailures(rows);
+  try {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    return await measureWithReloadRetry(
+      async () => {
+        await page.goto(`${baseUrl}/?path=/story/${story.id}`, { waitUntil: 'load' });
+        const frame = await (await page.waitForSelector('#storybook-preview-iframe')).contentFrame();
+        await frame.waitForSelector('#storybook-root, .sbdocs-content', { state: 'attached', timeout: 60_000 });
+        const go = (id) => page.evaluate((to) => {
+          window.history.pushState({}, '', `/?path=/docs/${to}`);
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }, id);
+        const read = async () => {
+          await frame.waitForSelector('.sbdocs-content', { timeout: 60_000 });
+          await page.waitForTimeout(2500);
+          return frame.evaluate(() => Math.max(window.scrollY, document.scrollingElement?.scrollTop ?? 0));
+        };
+        const rows = [];
+        await go(NAV_PAGES[0]);
+        rows.push({ page: `story to ${NAV_PAGES[0]}`, scrollY: await read() });
+        await frame.locator('.sbdocs-content').click({ position: { x: 4, y: 4 }, force: true }).catch(() => {});
+        await go(NAV_PAGES[1]);
+        rows.push({ page: `docs to ${NAV_PAGES[1]} after a click`, scrollY: await read() });
+        return openAtTopFailures(rows);
+      },
+      () => settleReload(page),
+    );
+  } finally {
+    await page.close();
+  }
 }
 
 let exitCode = 0;
@@ -391,19 +432,27 @@ try {
   const context = await browser.newContext();
   for (const width of WIDTHS) {
     const page = await context.newPage();
-    await page.setViewportSize({ width, height: 900 });
-    for (const id of PAGES.filter((p) => !missing.includes(p))) {
-      await page.goto(`${base}/iframe.html?viewMode=docs&id=${encodeURIComponent(id)}`, {
-        waitUntil: 'load',
-      });
-      // The docs root, not networkidle: Storybook's dev server keeps a HMR socket
-      // open, so networkidle never arrives.
-      await page.waitForSelector('.sbdocs-content', { timeout: 60_000 });
-      await page.waitForLoadState('networkidle').catch(() => {});
-      const m = await page.evaluate(measureScript(id));
-      measurements.push({ ...m, width });
+    try {
+      await page.setViewportSize({ width, height: 900 });
+      for (const id of PAGES.filter((p) => !missing.includes(p))) {
+        const m = await measureWithReloadRetry(
+          async () => {
+            await page.goto(`${base}/iframe.html?viewMode=docs&id=${encodeURIComponent(id)}`, {
+              waitUntil: 'load',
+            });
+            // The docs root, not networkidle: Storybook's dev server keeps a HMR socket
+            // open, so networkidle never arrives.
+            await page.waitForSelector('.sbdocs-content', { timeout: 60_000 });
+            await page.waitForLoadState('networkidle').catch(() => {});
+            return page.evaluate(measureScript(id));
+          },
+          () => settleReload(page),
+        );
+        measurements.push({ ...m, width });
+      }
+    } finally {
+      await page.close();
     }
-    await page.close();
   }
 
   if (report) console.log(JSON.stringify(measurements, null, 2));

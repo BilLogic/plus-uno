@@ -405,3 +405,43 @@
 .sbdocs .sbdocs-preview:has([data-docs-stage]) .innerZoomElementWrapper > * {
     border-width: 0 !important;
 }
+
+/*
+ * Do and Don't example well: the live example sits centered in the sunken well,
+ * while full-width containers (banners, section messages, tables, 12-column grids)
+ * fill the well's width.
+ */
+.sbdocs .sb-ds-dodont-card__example {
+    inline-size: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.sbdocs .sb-ds-dodont-card__example > :where(
+    .plus-banner,
+    .plus-section-message,
+    .plus-accordion,
+    .plus-page-header,
+    .plus-empty-state,
+    .plus-progress-bar,
+    .plus-range,
+    .plus-file-upload,
+    .plus-prompt-input,
+    .plus-rich-text-editor,
+    .plus-comment,
+    .plus-pattern-section,
+    .plus-pattern-card,
+    .plus-pattern-table,
+    .plus-table-container,
+    .plus-dynamic-table,
+    .plus-static-table,
+    .plus-tree-table,
+    table,
+    [style*="display: grid"],
+    :has(.plus-pattern-section, .plus-pattern-card, .plus-pattern-table, .plus-banner, .plus-section-message, .plus-progress-bar, .plus-range, table)
+) {
+    align-self: stretch;
+}
+

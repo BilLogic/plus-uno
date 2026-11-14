@@ -1,0 +1,240 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import { FileItem } from '@/components';
+import * as FileItemStories from './FileItem.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+<Meta of={FileItemStories} />
+
+<Title />
+A file item shows one chosen file or folder as a fixed-height row with its upload state, metadata, and removal action.
+
+<DocsTabs of={FileItemStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/FileItem"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## List
+
+<ComponentExample of={FileItemStories.Overview} title="Bordered file list" description="Adjacent rows inside a list container share one border and divide cleanly, holding a constant `--file-item-height` in every state." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State matrix
+
+<ComponentExample of={FileItemStories.Queued} title="Queued" description="A subtle clock icon and `Waiting` tell the user the file is in line rather than stalled." />
+
+<ComponentExample of={FileItemStories.Uploading0} title="Uploading (0%)" description="`ProgressRing` at zero percent and `Uploading · 0%` as the transfer begins." />
+
+<ComponentExample of={FileItemStories.Uploading40} title="Uploading (40%)" description="`ProgressRing` and `Uploading · 40%` advance together." />
+
+<ComponentExample of={FileItemStories.Uploading80} title="Uploading (80%)" description="`ProgressRing` nears twelve o'clock with `Uploading · 80%`." />
+
+<ComponentExample of={FileItemStories.DoneRemove} title="Done (remove)" description="File-type icon, size metadata, optional link to open the file, and a compact X button for an unsaved form." />
+
+<ComponentExample of={FileItemStories.DoneDelete} title="Done (delete)" description="Saved attachments use a trash icon and ask to confirm in a `Popup` before calling `onRemove`." />
+
+<ComponentExample of={FileItemStories.ErrorWithRetry} title="Error with Retry" description="Danger icon, cause and fix in danger text, and a compact `Retry` button before the X control." />
+
+<ComponentExample of={FileItemStories.FolderUploading} title="Folder uploading" description="One row represents the whole folder, pairing `ProgressRing` with the folder's file count." />
+
+<ComponentExample of={FileItemStories.FolderDone} title="Folder done" description="Folder icon and total file count in `meta` once the folder finishes." />
+
+<ComponentExample of={FileItemStories.ReadOnly} title="Read-only" description="Full contrast and openable link, with no end action." />
+
+<ComponentExample of={FileItemStories.Disabled} title="Disabled" description="Dimmed surface, text and icon, with no end action and links inert." />
+
+<ComponentExample of={FileItemStories.LongName} title="Long name" description="Truncates in the middle so the extension stays visible, and shows the full name in a tooltip." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="FileItem" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={FileItemStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `FileItem` inside `FileUpload`'s `children` slot to represent every chosen file or folder, or standalone to display attachments on session notes, comments, and messages. Every row stays locked to `--file-item-height` (`56px`) across `queued`, `uploading`, `done`, and `error` so a list never shifts height as uploads progress.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For choosing or dropping files from a device, use `FileUpload`.
+- For overall progress across a checklist or page section rather than a row's lead slot, use `ProgressBar`.
+- For a compact inline token representing a person or category rather than an attachment, use `Tag`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Lead (`start`).** A `--image-xs` (`20px`) slot: a `subtlest` clock when `queued`, a `ProgressRing` when `uploading`, a danger icon on `error`, a folder icon when `kind="folder"` is `done`, or the matching file-type icon when `kind="file"` is `done`.
+2. **Name (`label`).** Single-line name that truncates before the extension so `.mp4` or `.pdf` remains readable, wrapped in a `Tooltip` with the full name. Opens via `Link` when `href` is set on a `done` item.
+3. **Meta (`description`).** Single-line secondary status: `Waiting` when `queued`, `Uploading · <n>%` when `uploading`, `meta` (or `Uploaded`) when `done`, and the `error` message in danger text on `error`.
+4. **Actions (`end`).** Omitted when `isReadOnly` or `isDisabled`. Draws a compact subtle X `IconButton` for `cancel` and `remove`, or a trash `IconButton` that confirms via `Popup` for `delete`. On `error`, a compact subtle `Retry` `Button` precedes the X control.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Queued</td><td>Clock icon in <code>--ds-icon-subtlest</code>, <code>Waiting</code> in <code>--ds-text-subtle</code>, and Cancel X.</td></tr>
+<tr><td>Uploading</td><td><code>ProgressRing</code> at <code>--image-xs</code>, <code>Uploading · &lt;n&gt;%</code> in <code>--ds-text-subtle</code>, and Cancel X.</td></tr>
+<tr><td>Done</td><td>File-type or folder icon in <code>--ds-icon-subtle</code>, <code>meta</code> (size, count, or date), optional <code>href</code> link, and Remove X or Delete trash with confirmation.</td></tr>
+<tr><td>Error</td><td>Danger icon in <code>--ds-icon-danger</code>, cause-and-fix message in <code>--ds-text-danger</code>, and <code>Retry</code> before Remove X.</td></tr>
+<tr><td>Read-only</td><td>Full contrast and openable <code>href</code> link, with all end actions hidden.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code>, <code>--ds-border-disabled</code>, and <code>--ds-text-disabled</code>; end actions hidden and links disabled.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Row height and padding</td><td><code>--file-item-height</code>, horizontal padding <code>--pad-x-lg</code>, gap <code>--inline-lg</code>.</td></tr>
+<tr><td>Row surface and border</td><td><code>--ds-surface</code>, <code>--ds-border</code>, radius <code>--radius-control-md</code>; list dividers use <code>--border-default</code> in <code>--ds-border</code>.</td></tr>
+<tr><td>Lead slot</td><td><code>--image-xs</code>; icons use <code>--ds-icon-subtlest</code>, <code>--ds-icon-subtle</code>, and <code>--ds-icon-danger</code>.</td></tr>
+<tr><td>Name and meta</td><td><code>--body-default</code> in <code>--ds-text</code>; meta in <code>--body-small</code> and <code>--ds-text-subtle</code> (or <code>--ds-text-danger</code> on error).</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Match the removal mode to whether the file is already saved.
+
+Use `removal="cancel"` while uploading and `removal="remove"` in an unsaved form so an accidental click is reversible, and reserve `removal="delete"` for saved attachments where removing deletes stored data.
+
+<DoDontPair
+    doExample={<FileItem name="signed_consent.pdf" status="done" fileType="pdf" meta="Added Nov 12" removal="delete" />}
+    doCaption="Saved attachment uses trash and asks to confirm before deleting."
+    dontExample={<FileItem name="signed_consent.pdf" status="done" fileType="pdf" meta="Added Nov 12" removal="remove" />}
+    dontCaption="Saved attachment removed immediately with an X and no confirmation."
+/>
+
+### State both the cause and the fix on upload errors.
+
+Write `error` as one sentence naming why the upload failed and what the person can do next alongside `Retry`.
+
+<DoDontPair
+    doExample={<FileItem name="zoom_0.mp4" status="error" error="That recording is over 500 MB. Trim or compress it and retry." />}
+    doCaption="Names the limit and the next step beside Retry."
+    dontExample={<FileItem name="zoom_0.mp4" status="error" error="Upload failed" />}
+    dontCaption="Leaves the user guessing why Retry will or will not work."
+/>
+
+### Represent a chosen folder as one folder row with its file count.
+
+Keep the file list scannable by collapsing a dropped or picked folder into one `kind="folder"` row that reports its item count in `meta`.
+
+<DoDontPair
+    doExample={<FileItem name="Week 4 recordings" kind="folder" status="done" meta="6 files · 142 MB" />}
+    doCaption="One folder row with its file count in meta."
+    dontExample={<FileItem name="Week 4 recordings" kind="folder" status="done" />}
+    dontCaption="Folder row hides how many files were included."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Keep the real file name and extension intact so middle truncation preserves the type.</td><td>Strip the extension from <code>name</code>.</td></tr>
+<tr><td>Write error messages with cause and fix: "Connection dropped. Check your network and retry."</td><td>"Error" or "Failed".</td></tr>
+<tr><td>Include file count on folders: "6 files · 142 MB".</td><td>Show a folder name with no count.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Full file name stays accessible.** Visually truncated names expose a single unbroken accessible text node for screen readers and Links, and reveal the full name in a `Tooltip` on hover or focus.
+- **Determinate upload progress.** While `status="uploading"`, `ProgressRing` announces `role="progressbar"` with `aria-label="Uploading <name>"` and `aria-valuenow`.
+- **Named per-file actions.** Cancel, Remove, and Delete `IconButton` controls include the file name in their accessible label (`"Remove zoom_0.mp4"`, `"Delete signed_consent.pdf"`) so screen-reader users can distinguish rows in a batch.
+- **Keyboard-accessible delete confirmation.** `removal="delete"` opens a Base UI `Popup` dialog that traps Escape and outside clicks to cancel cleanly and returns focus to the trigger.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `FileUpload`: use when letting a user pick or drop files and folders into a form field.
+- `ProgressRing`: use when showing determinate 0–100% progress inside a compact slot.
+- `Popup`: use when anchoring lightweight confirmation or secondary detail to a trigger control.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

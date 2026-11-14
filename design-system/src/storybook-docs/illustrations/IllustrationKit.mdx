@@ -1,5 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { FoundationHero, FoundationContents, FoundationSection } from '@/storybook-docs/foundation-page.jsx';
+import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { IllustrationKitGallery } from '@/storybook-docs/illustrations/IllustrationKitGallery.jsx';
 import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { ThreeLayers, OpeningARecord, ResponsiveReflow } from '@/storybook-docs/illustrations/compositions.jsx';
@@ -7,32 +8,43 @@ import { ThreeLayers, OpeningARecord, ResponsiveReflow } from '@/storybook-docs/
 <Meta title="Get started/Illustration kit" />
 
 <FoundationHero
-    kind="Guide"
+    kind="Get started"
     title="Illustration kit"
-    summary="The building blocks every Templates and Patterns drawing is made from."
+    summary="The shared primitives and rules for every Templates, Patterns and Motion diagram."
 />
 
 <FoundationContents />
 
+<FoundationSection title="Fidelity">
+
+Pick each example's fidelity by what the lesson depends on. Remove every word in your head: if the lesson still holds, draw it blocked out.
+
+<RefTable
+    head={['Fidelity', 'When the lesson is', 'How to draw it']}
+    rows={[
+        ['Concrete', 'A component’s look, states, behavior or wording (anatomy, states, content do and don’t, interactions).', 'Render a live story with real content, not a diagram.'],
+        ['Real subject', 'One element inside a screen (which action is primary, a label, or one piece’s placement).', 'Draw that element with real words; keep the surrounding context blocked out.'],
+        ['Blocked out', 'Structure across screens (layout options, which surface opens, alignment, phases, or variants side by side).', 'Use no words inside the figure; draw buttons as flat strips and put explanations in the caption.'],
+    ]}
+/>
+
+Motion follows the same split: a component's own motion is a live story, a principle (easing, choreography, stagger) animates blocked-out shapes, and one element moving inside a screen animates the real subject over a blocked-out context.
+
+</FoundationSection>
+
 <FoundationSection title="Drawing rules">
 
-- Paint with design-system tokens only: color, stroke and corner. Each part uses the token its real component uses for that role, from the role map in `paint.js`. The kit follows light and dark on its own.
-- A surface on a hero's sunken ground always shows its edge. The real edge roles are too faint there (the page edge is transparent outside increased contrast, the divider is about 1.1:1 on the ground), so a flat layer takes one hairline in `illustrationEdge`, the input border, and a layer with a real shadow (a page, a card, a popup) reads by that shadow, as the real ones do. A hero draws a unit larger than the kit does, so `HeroDrawing` halves the hairline and every line is one device pixel. A page, screen or frame takes the `window` corner; a card, popup and modal take their own roles. `HeroEdges.test.jsx` holds the role to 1.5:1 against the ground in light and dark (the base modes) and fails any registered hero with a bare surface.
-- Pick each example's fidelity by what the lesson depends on. Remove every word in your head: if the lesson still holds, draw it abstract.
-  - **Concrete:** the lesson is a component's look, states, behavior or wording, such as anatomy, states, content do's and don'ts, or an interaction. Use a live story with real content, not a drawing.
-  - **Real subject:** the lesson is one element inside a screen, such as which action is primary, a label, or one piece's placement. Draw that element real, with its words, and keep everything around it blocked out.
-  - **Blocked out:** the lesson is structure across screens, such as layout options, which surface opens, alignment, phases, or many variants side by side. Use no words, and draw buttons as flat strips.
-  - Motion follows the same split. A component's own motion is a live story. A principle such as easing, choreography or stagger animates blocked-out shapes. One element moving inside a screen animates the real subject over a blocked-out context.
-- Draw text as soft `--ds-skeleton` bars. Black or dark text bars are outside this palette. Real text appears only on the real subject in a real-context picture; the surrounding diagram stays blocked out, and explanations go in the caption.
-- Draw buttons only in shipped appearances: primary, the brand fill, on the subject; default, the neutral fill, everywhere else.
-- Keep one scale per set and equal margins around every drawing, balanced by eye.
-- Give each drawing one accent, and place it on the subject.
+- Paint with design-system tokens only: color, stroke and corner. Each part uses the token its real component uses from the role map in `paint.js`, so diagrams follow light and dark automatically.
+- Show an edge on every surface against the hero's sunken ground. Flat layers take one hairline in `illustrationEdge` (halved in `HeroDrawing` so it stays one device pixel); layers with a shadow (Page, Card, Popup, Flag) read by that shadow. `HeroEdges.test.jsx` checks that edges meet 1.5:1 against the ground in light and dark.
+- Draw text as soft `--ds-skeleton` bars. Never use black or dark bars.
+- Draw buttons only in shipped appearances: primary (the brand fill) on the subject, and default (the neutral fill) everywhere else.
+- Keep one scale per set, equal margins around every drawing, and at most one accent per drawing, placed on the subject.
 
 </FoundationSection>
 
 <FoundationSection title="Primitives">
 
-Each primitive takes a position, a size and an `accent` flag. Every part paints with the token its real component uses: a card with the raised surface and shadow, a text line with the Skeleton bar, a Flag with the overlay shadow, a Tooltip flat with no shadow, a Sticky header with the overflow shadow over rows that scroll under it. The top drawing is neutral and the bottom one is accented. Button shows its two fidelities instead: blocked out on top, real below. Screen is a Frame, a Sidebar and a Page, with the Sidebar docked, an overlay or none. Field also takes `invalid`, which paints its border with the error token; the gallery shows only neutral and accent. Flag's `tone` is neutral, success, warning, danger or info (the accented drawing shows success). Tabs, Breadcrumb and Progress tracker take a `count`; Tabs also takes `selected` and Progress tracker `current`. The last four, Chart axis and curve, Trail, Tap ring and Pointer, are motion's own: they live in `primitives-motion.jsx`, and `motion.jsx` animates them. Six more, Timeline, Waveform, Isometric stack, Logo construction, Spring trail and Path, are the cover shapes in `shapes.jsx`: the Logo construction draws from the same geometry file as the Logo docs, the Path's arrowhead stops at its target's edge, and the arithmetic is tested in `shapes-geometry.test.js`.
+Each primitive takes a position (`x`, `y`), size (`w`, `h`) and `accent` flag. The top drawing is neutral and the bottom is accented (Button shows blocked-out above and real below). Screen combines a Frame, Sidebar and Page; Field also takes `invalid`; Flag takes `tone`; Tabs, Breadcrumb and Progress tracker take `count` and selection index. The gallery ends with the four motion primitives from `primitives-motion.jsx` and the six cover shapes from `shapes.jsx`.
 
 <IllustrationKitGallery />
 
@@ -64,11 +76,9 @@ Each primitive takes a position, a size and an `accent` flag. Every part paints 
 
 <FoundationSection title="Contributing">
 
-Every docs drawing, static or animated, comes from this one kit. Template, pattern and motion pages all draw from it and add to it.
-
-- Check the primitives above first. Extend one before you add another, the same way components grow.
-- A new primitive takes `x`, `y`, `w`, `h` and `accent`, plus `label` where it has a real fidelity. It paints from `paint.js` only.
-- Give it a gallery entry, neutral above and accented below, and keep the kit story test passing.
-- Animated drawings move kit primitives on the spring tokens and settle to a still frame under reduced motion. The motion layer lives beside the primitives in this folder.
+- Extend an existing primitive before adding a new one.
+- A new primitive takes `x`, `y`, `w`, `h` and `accent` (plus `label` when it supports real fidelity) and paints from `paint.js` only.
+- Add a gallery entry (neutral above, accented below) and keep `IllustrationKit.stories.jsx` passing.
+- Move animated primitives on the spring tokens and settle to a still frame under reduced motion.
 
 </FoundationSection>

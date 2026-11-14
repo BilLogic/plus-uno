@@ -6,7 +6,6 @@ import {
     FoundationSubsection,
     FoundationRelated,
     FoundationExample,
-    TokenSwatches,
 } from '@/storybook-docs/foundation-page.jsx';
 import * as GridStories from './Grid.stories.jsx';
 
@@ -29,11 +28,9 @@ import * as GridStories from './Grid.stories.jsx';
 
 <FoundationSection title="Overview">
 
-PLUS is desktop only, from 768 up. The screen grid spans the screen and lives on the Backdrop layer: modals and floating Panels size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its breakpoint mode, never by hand-editing its grid. The grid decides where containers sit; the spacing tokens decide everything inside them.
+PLUS is desktop only, from 768 up. The screen grid spans the screen on the Backdrop layer: modals and floating Panels size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it. The grid decides where containers sit; spacing tokens decide everything inside them.
 
 <Canvas of={GridStories.GridAnatomy} sourceState="none" />
-
-In code, a region lays itself out on the grid rather than reading column widths:
 
 ```css
 display: grid;
@@ -41,14 +38,13 @@ grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
 gap: var(--grid-gutter);
 ```
 
-Figma holds the breakpoint modes (768, 1024 and 1440) on `spacing / semantics` and `spacing / patterns`, on whichever collection owns the token. The content grid is on the Page's content frame; the screen grid is on the Backdrop only.
+Figma holds the breakpoint modes (768, 1024 and 1440) on `spacing / semantics` and `spacing / patterns`. The content grid sits on the Page's content frame; the screen grid sits on the Backdrop only.
 
 </FoundationSection>
 
 <FoundationSection title="Breakpoints">
 
-Each breakpoint is one minimum width and one mode. The column count stays 12
-and the gutter 16 at every width. The sidebar docks from 1024.
+Each breakpoint is one minimum width and one mode. The column count stays 12 and the gutter 16 at every width. The sidebar docks from 1024.
 
 <RefTable
     head={['Mode', 'From', 'Code', 'Sidebar', 'Page pad', 'Content width', 'Column']}
@@ -59,11 +55,7 @@ and the gutter 16 at every width. The sidebar docks from 1024.
     ]}
 />
 
-Nothing switches above 1440. Below 768 nothing switches either: the content holds its 720 minimum and the
-page scrolls sideways. Design at Medium and X-Large at least, so the stretch
-between them is intentional.
-
-In Figma, a breakpoint is a variable mode (768, 1024, 1440) set on the frame.
+Nothing switches above 1440 or below 768: below 768 the content holds its 720 minimum and the page scrolls sideways. Design at Medium and X-Large at least, by switching the frame's variable mode rather than resizing by hand.
 
 </FoundationSection>
 
@@ -71,21 +63,8 @@ In Figma, a breakpoint is a variable mode (768, 1024, 1440) set on the frame.
 
 Both grids are 12 columns with a 16 gutter.
 
-- **The screen grid** spans the screen inside the screen pad, centered and
-  capped at 1232: `clamp(720, screen − 2 × 24, 1232)`, which is 720 · 976 · 1232
-  at the three modes. From 1440 the screen pad is 32, but there the grid is
-  already at its cap with either pad, so its width depends on the screen alone;
-  past a 1280 screen it stops growing and centers. It ignores the sidebar, so a
-  modal sits in the same place whether the sidebar is docked or closed. Modals
-  and floating Panels size from it. In Figma it lives on the Backdrop layer only, and
-  shows and hides with it.
-- **The content grid** sits inside the Page, after the sidebar and the
-  Page pad take their share. Cards, tables, forms and text blocks align to
-  it, and it is the only grid a page frame carries. At X-Large:
-  1440 − 240 sidebar − 2 × 24 = 1152. The Frame has no seams, so only a docked Panel takes another share: content = Frame width − Sidebar (240 if docked) − Panel (if docked) − 48, never under 720, which is a 1408 Frame for a 400 Panel beside a docked Sidebar and 1168 with the Sidebar collapsed. A Section with a detail region keeps its 7 + 5 split from 960 of content. At Medium the sidebar is closed, so the Page starts at the window edge and content is 768 − 2 × 24 = 720, exactly its minimum.
-
-These tokens change with the screen, so the table gives the value at each
-breakpoint: Medium · Large · X-Large.
+- **The screen grid** spans the screen inside the screen pad, centered and capped at 1232: `clamp(720, screen − 2 × 24, 1232)`, which is 720 · 976 · 1232 at the three modes. Past a 1280 screen it stops growing and centers. It ignores the sidebar, so a modal sits in the same place whether the sidebar is docked or closed.
+- **The content grid** sits inside the Page, after the sidebar and the Page pad take their share (`Frame width − Sidebar (240 if docked) − Panel (if docked) − 48`, never under 720). A Section with a detail region keeps its 7 + 5 split from 960 of content.
 
 <TokenTable
     valueHeader="MD · LG · XL"
@@ -101,33 +80,22 @@ breakpoint: Medium · Large · X-Large.
     ]}
 />
 
-The screen pad is its own rule, not the Page pad: it stays 24 · 24 · 32 so a Modal or floating Panel keeps its width when the Page pad changes.
-
-These per-mode widths step at each breakpoint rather than follow the screen. Code that needs the exact width at any screen lays out on the grid itself, as in the Overview, instead of reading `--grid-width-column`.
+Code lays out on the CSS grid itself (as in the Overview) rather than reading `--grid-width-column`, which steps only at the three modes.
 
 </FoundationSection>
 
 <FoundationSection title="Grid in Figma">
 
-Two patterns carry the grids. Take the grid by using the pattern and setting its mode, not by drawing columns or resizing the frame.
+Take the grid from the template and set its variable mode rather than drawing columns by hand.
 
 <RefTable
     head={['Grid', 'Carried by', 'How to apply']}
     rows={[
         ['Screen grid', 'The Backdrop: 12 columns, centered, each column Grid/width-column-screen wide, gutter Grid/gutter.', 'Put the Modal in the Backdrop. Change the breakpoint with the frame’s variable mode in the appearance panel, never by resizing.'],
         ['Content grid', 'The Content frame of the Page inside the Frame: 12 columns, stretched, gutter Grid/gutter; the margin is Page/pad.', 'Build the page inside the Frame and set the mode on the frame. Place containers on the columns with auto layout.'],
-        ['Grid styles', 'Grid and Grid/Adaptive (12-col) are the content grid: stretch, 12 columns, gutter 16, offset Page/pad. Grid/Viewport (adaptive) is the screen grid: centered, 12 columns, gutter 16.', 'Apply Grid or Grid/Adaptive (12-col) to a Page content frame and Grid/Viewport (adaptive) to a Backdrop. All three follow the frame mode.'],
+        ['Grid styles', 'Grid and Grid/Adaptive (12-col) are the content grid; Grid/Viewport (adaptive) is the screen grid.', 'Apply Grid or Grid/Adaptive (12-col) to a Page content frame and Grid/Viewport (adaptive) to a Backdrop.'],
     ]}
 />
-
-Shift + G (Mac) or Control + G (Windows) shows and hides the grid.
-
-Each layer owns one part of the layout:
-
-- The **template** owns the width (`Screen/width-screen`) and the breakpoint mode.
-- **Frame** fills it: the Sidebar beside the Page. The Page carries the content grid and the Content slot.
-- The **Sidebar** docks by `Sidebar/sidebar-docked` (false · true · true across Medium · Large · X-Large).
-- The **Backdrop** sits above the Frame and carries the screen grid, which shows and hides with it.
 
 </FoundationSection>
 
@@ -149,8 +117,7 @@ Pick one width mode per page and keep it.
 
 <FoundationSection title="The frame">
 
-The Frame draws the layout the content grid is measured in: the topbar, then a
-row with the sidebar and the Page.
+The [Frame](?path=/docs/templates-frame--docs) draws the layout the content grid is measured in: the topbar above a row with the sidebar and the Page.
 
 <TokenTable
     valueHeader="MD · LG · XL"
@@ -164,17 +131,13 @@ row with the sidebar and the Page.
     ]}
 />
 
-The Frame has no seams, no pad and no stack: the Page runs to the window edges, with no pad or gap around it or between it and the topbar, and meets the sidebar at a hairline. A Panel opens at 400, and its splitter holds it between 320 and 640. The topbar is 32 with no vertical pad. Below
-1024 the sidebar opens over the page: 240 wide, full height, with a shadow and
-no Backdrop. An outside click closes it, and the page never reflows. The dock is a
-step: at 1023 the content is 975 wide, and at 1024 the sidebar docks and it is
-736, so cards reflow there while modals keep their width.
+Below 1024 the sidebar opens over the page (240 wide, full height, overlay shadow, no Backdrop), so the page never reflows when it opens. At 1024 the sidebar docks and content steps from 975 to 736, so cards reflow there while modals keep their width.
 
 </FoundationSection>
 
 <FoundationSection title="Column spans">
 
-A region takes whole columns: span n = n × column + (n − 1) × 16.
+A region takes whole columns: `span n = n × column + (n − 1) × 16`.
 
 <Canvas of={GridStories.ColumnSpans} sourceState="none" />
 
@@ -191,25 +154,13 @@ A region takes whole columns: span n = n × column + (n − 1) × 16.
     ]}
 />
 
-Cards per row is the most of 4, 3, 2 or 1 that keeps each card at its minimum
-width: `--card-min-width-sm` 224, `-md` 304, `-lg` 480. In a section narrower
-than 12 columns, only counts that divide its span apply. A split section keeps
-its main column at least 480 (`--section-min-width-main`) and its side column
-at least 224 (`--section-min-width-side`); below those, they stack.
+Cards per row is the most of 4, 3, 2 or 1 that keeps each card at its minimum width (`--card-min-width-sm` 224, `-md` 304, `-lg` 480). A split section keeps its main column at least 480 (`--section-min-width-main`) and its side column at least 224 (`--section-min-width-side`); below those, they stack.
 
 </FoundationSection>
 
 <FoundationSection title="Modal widths">
 
-A modal spans 6, 8 or 10 screen-grid columns, the gutters between them, and its
-own pad of 16 on each side. It
-grows with the screen between breakpoints, stops past a 1280 screen, never
-shrinks below its Medium width, ignores the sidebar, and never comes closer
-than 16 to the side of the screen.
-
-`width = n × --grid-width-column-screen + (n − 1) × --grid-gutter + 2 × --modal-pad-x-default`
-
-Pass `width="6-col"`, `"8-col"` or `"10-col"` to Modal; a fixed pixel width ignores the screen grid. The tokens below are each mode's width rounded to a whole pixel: `6-col` 384 · 512 · 640, `8-col` 507 · 677 · 848 and `10-col` 629 · 843 · 1056 at Medium · Large · X-Large.
+A modal spans 6, 8 or 10 screen-grid columns, the gutters between them, and its own 16 pad on each side (`width = n × --grid-width-column-screen + (n − 1) × --grid-gutter + 2 × --modal-pad-x-default`). Pass `width="6-col"`, `"8-col"` or `"10-col"` to Modal.
 
 <TokenTable
     valueHeader="MD · LG · XL"
@@ -226,7 +177,7 @@ Pass `width="6-col"`, `"8-col"` or `"10-col"` to Modal; a fixed pixel width igno
 
 <FoundationSection title="Size roles">
 
-One Size scale, used through five roles. Pick the role, then its size; the pixel leads and the token is the binding.
+One Size scale, used through five roles. Icon sizes (12, 16, 24) live on [Iconography](?path=/docs/foundations-visual-iconography--docs).
 
 <FoundationExample caption="Control, Row and Media at each size, drawn from the size tokens.">
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--section-stack-md)' }}>
@@ -256,7 +207,7 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
 <RefTable
     head={['Role', 'Values', 'Tokens', 'Use']}
     rows={[
-        ['Control', '24 · 32', <><C>--item-height-sm</C> · <C>-md</C></>, 'Anything you click or type into. Buttons and tabs are 32, 24 compact; fields are 40, 32 compact; menu rows are 32, 24 compact. Compact only inside table rows and inline toolbars.'],
+        ['Control', '24 · 32', <><C>--item-height-sm</C> · <C>-md</C></>, 'Anything you click or type into. Buttons, tabs and menu rows are 32 (24 compact); fields are 40 (32 compact). Compact only inside table rows and inline toolbars.'],
         ['Row', '32 · 40 · 48', <><C>--row-height-sm</C> · <C>-md</C> · <C>-lg</C></>, 'One record in a table or list. A minimum: rows grow with their content.'],
         ['Label', '16 · 20 · max 160', <><C>--label-height-sm</C> · <C>-md</C> · <C>--label-max-width</C></>, 'Tag, Status and Count.'],
         ['Media', '16 · 20 · 24 · 32 · 40 · 48', <><C>--image-xxs</C> … <C>--image-xl</C></>, 'Avatar, Tile and logos. Images keep their ratio (1:1, 4:3, 16:9, 3:2) and take their width from the grid or the card.'],
@@ -264,11 +215,9 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
     ]}
 />
 
-Icon sizes (12, 16, 24) are documented on Iconography. Frame sizes (topbar 32, sidebar 240) are under The frame, and the 720 minimum and the 864 and 1232 caps are under Content widths. Minimum and maximum widths come from the common width scale (`--width-1000` is 160); there is no separate list.
-
 <FoundationSubsection title="Size tokens">
 
-Category tokens point at the common height, width and size scales. Card, Section, Popup and Menu sizes are listed with their patterns on [Spacing](?path=/docs/foundations-layout-spacing--docs#foundation-pattern-tokens).
+Card, Section, Popup and Menu sizes sit with their patterns on [Spacing](?path=/docs/foundations-layout-spacing--docs#foundation-pattern-tokens), and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full scale.
 
 <TokenTable
     valueHeader="Value (px)"
@@ -316,49 +265,9 @@ Category tokens point at the common height, width and size scales. Card, Section
 
 </FoundationSection>
 
-<FoundationSection title="Usage">
-
-The grid owns where top-level containers sit; spacing owns everything inside
-them.
-
-**Keep the gutter 16 at every width.** Columns flex with the screen; the
-gutter never changes.
-
-<Canvas of={GridStories.Gutter} sourceState="none" />
-
-**Span whole columns.** A content container spans whole columns (3, 4, 6 or
-12) and can be centered by leaving the same number of columns empty on each
-side. Content never bleeds into a gutter or into the Page pad.
-
-<Canvas of={GridStories.SpanWholeColumns} sourceState="none" />
-
-**Size modals from the screen grid.** Pass `6-col`, `8-col` or `10-col`. The width comes
-from screen-grid columns, so a modal lines up with the page whenever the
-sidebar is closed.
-
-<Canvas of={GridStories.ModalFromScreenGrid} sourceState="none" />
-
-**Cap reading text at 864.** Long-form text uses the reading cap, so lines stay
-readable. Structured content, such as dashboards and tables, uses the 1232 cap.
-
-<Canvas of={GridStories.ReadingCap} sourceState="none" />
-
-**Align containers, not their parts.** Only top-level containers align to
-columns: cards, tables, forms, images, charts and text blocks. Inside a
-container the grid stops and spacing tokens take over, so buttons, icons, tags
-and avatars never stretch to columns. Cards have no inner grid.
-
-<Canvas of={GridStories.AlignContainers} sourceState="none" />
-
-**Design from 768 up.** PLUS has no small-screen tier. Never design below 768,
-and never drop to 6 or 2 columns: a four-card row at X-Large is still a
-four-card row at Medium, just narrower.
-
-</FoundationSection>
-
 <FoundationSection title="Hug and fill">
 
-Every box either hugs its content or fills the space it is given. The container decides; content never stretches just to look aligned.
+Every box either hugs its content or fills the space it is given. Content never stretches just to look aligned.
 
 <RefTable
     head={['Part', 'Hugs', 'Fills']}
@@ -369,12 +278,6 @@ Every box either hugs its content or fills the space it is given. The container 
         ['Form', 'Labels and helper text', 'Each field, across its column'],
     ]}
 />
-
-- A Button, an icon and a tag hug their label and never stretch to a column.
-- Only top-level containers align to columns; inside a card, children hug or fill the card, not a grid.
-- Choose Hug or Fill on the child after it sits inside the auto-layout parent. A wrapping text block takes a fixed width, then wraps.
-
-**Let the name column fill and the controls hug.** A roster row with a name, a Status tag and one action.
 
 <DoDont>
 <Do caption="The name fills; the tag and the button keep their own width.">
@@ -397,22 +300,44 @@ Every box either hugs its content or fills the space it is given. The container 
 
 <FoundationSection title="Do and don't">
 
-Align containers to the grid, keep the grid on the page, and build with auto layout. [Usage](#foundation-usage) shows each rule beside its picture.
+<FoundationSubsection title="Keep the gutter 16 at every width">
 
-- **Align containers, not small elements.** Cards, tables, forms and text blocks sit on columns. Buttons and icons do not.
-- **Keep the grid on the page.** The content grid starts where the Page starts, after the sidebar, and never runs under the sidebar or the topbar.
-- **Build with auto layout.** An auto layout row with a 16 px gap keeps cards on the columns when the mode changes; cards dragged into place by hand drift off the columns.
+<Canvas of={GridStories.Gutter} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Span whole columns">
+
+<Canvas of={GridStories.SpanWholeColumns} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Size modals from the screen grid">
+
+<Canvas of={GridStories.ModalFromScreenGrid} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Cap reading text at 864">
+
+<Canvas of={GridStories.ReadingCap} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Align containers, not their parts">
+
+<Canvas of={GridStories.AlignContainers} sourceState="none" />
+
+</FoundationSubsection>
 
 </FoundationSection>
 
 <FoundationSection title="Accessibility">
 
-- The grid sets line length, reflow and reading order.
 - Cap long-form text at the reading width (`--content-max-width-reading`, 864) so lines stay a readable length on wide screens.
-- Content holds a 720 minimum (`--content-min-width`); below it the page scrolls sideways instead of squeezing columns, so text never overlaps or clips when the page is zoomed. 
-- Content never sits under the sidebar or the topbar. Below 1024 the sidebar opens over the page and closes on an outside click or Escape, and focus returns to its toggle.
-- Keep the order of content in the file the same as its order on the grid, so keyboard focus and screen readers follow the sequence a reader sees.
-- Every control is at least 24 tall, and 32 or more outside a table row or an inline toolbar, so it stays an easy target. An icon-only control still needs a name.
+- Content holds a 720 minimum (`--content-min-width`); below it the page scrolls sideways instead of squeezing columns, so text never overlaps or clips when zoomed.
+- Keep DOM order the same as visual order on the grid so keyboard focus and screen readers follow what a reader sees.
+- Every control is at least 24 tall, and 32 or more outside a table row or inline toolbar.
 
 </FoundationSection>
 

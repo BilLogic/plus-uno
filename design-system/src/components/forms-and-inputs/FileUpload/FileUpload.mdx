@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import { FileUpload } from '@/components';
+import { FileItem, FileUpload } from '@/components';
 import * as FileUploadStories from './FileUpload.stories.jsx';
 import {
     ComponentExample,
@@ -30,7 +30,7 @@ export const figmaMeta = {
 <Meta of={FileUploadStories} />
 
 <Title />
-A file upload lets a person choose a file from their device.
+A file upload lets a person choose or drop files and folders from their device and review each chosen item below the drop zone.
 
 <DocsTabs of={FileUploadStories}>
 
@@ -47,9 +47,13 @@ A file upload lets a person choose a file from their device.
 
 ## Content
 
-<ComponentExample of={FileUploadStories.Default} title="Default" description="A label, the accepted formats as help text, and a button that opens the platform picker." />
+<ComponentExample of={FileUploadStories.Default} title="Empty" description="A label, the accepted formats as help text, and a button inside the drop zone that opens the platform picker. `.zip` works as an ordinary file when listed in `acceptedFormats`." />
 
-<ComponentExample of={FileUploadStories.WithFiles} title="With files" description="Pass the chosen files as children. They sit below the button, outside the frame, as on the post-session recording upload." />
+<ComponentExample of={FileUploadStories.AllowFolders} title="Folders and files" description="`allowFolders` switches the drop line to 'Choose files or a folder, or drop them here' so a folder opens the folder picker or drops as a single folder row." />
+
+<ComponentExample of={FileUploadStories.WithFiles} title="With files" description="Pass chosen files as `FileItem` rows in `children`. They sit in one bordered list below the drop zone across `done`, `uploading`, `queued`, and `error`." />
+
+<ComponentExample of={FileUploadStories.UploadingBatch} title="Uploading batch" description="While any `FileItem` child is uploading, the label row shows the batch count (`Uploading 2 of 6`) at its end, with no batch bar and no row bars." />
 
 </div>
 
@@ -57,15 +61,17 @@ A file upload lets a person choose a file from their device.
 
 ## State
 
+<ComponentExample of={FileUploadStories.DragOver} title="Drag-over" description="Dragging files or a folder over the drop zone highlights its border and background." />
+
 <ComponentExample of={FileUploadStories.Required} title="Required" description="A marker follows the label. It is decoration; the input carries no required attribute." />
 
 <ComponentExample of={FileUploadStories.Invalid} title="Invalid" description="A danger message under the field that says what to change." />
 
 <ComponentExample of={FileUploadStories.Valid} title="Valid" description="A success message under the field, once a file is accepted." />
 
-<ComponentExample of={FileUploadStories.ReadOnly} title="Read-only" description="Shows the field and the files already chosen, with no button to choose another." />
+<ComponentExample of={FileUploadStories.ReadOnly} title="Read-only" description="Shows the field and the `FileItem` rows already chosen, with no picker controls and no removal buttons." />
 
-<ComponentExample of={FileUploadStories.Disabled} title="Disabled" description="The input and the button cannot be used. Avoid it where a message would explain why." />
+<ComponentExample of={FileUploadStories.Disabled} title="Disabled" description="The input, picker controls, and child `FileItem` rows cannot be used." />
 
 </div>
 
@@ -105,9 +111,19 @@ A file upload lets a person choose a file from their device.
 
 ## Usage
 
-Use a file upload where a form needs a document from the user: a report, an avatar, a signed form. It is a real `input type="file"` with the platform picker behind a styled button; it does not drag and drop and it does not upload.
+Use `FileUpload` where a form needs documents, recordings, or archives from the user. It wraps a native `input type="file"` inside a bordered drop zone, optionally adds a directory picker via `allowFolders`, and renders chosen `FileItem` rows through `children` without taking a `files` prop.
 
-`acceptedFormats` does two jobs from one array: it becomes the input's `accept` filter and, unless you pass your own `description`, the line of help text under the label. `onChange` is the file input's own change event, so the files are at `event.target.files`.
+`acceptedFormats` sets both the input's `accept` filter (including `.zip` when archives are allowed) and, unless you pass `description`, the help text inside the drop zone. While any `FileItem` child has `status="uploading"`, the label row automatically displays `"Uploading <current> of <total>"` at its end.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a standalone attachment row without a picker, use `FileItem`.
+- For text the user types rather than a file they hold, use `TextField` or `TextArea`.
+- For a message composer that mixes typed text with inline attachments, use `PromptInput`.
 
 </div>
 
@@ -115,11 +131,11 @@ Use a file upload where a form needs a document from the user: a report, an avat
 
 ## Parts
 
-1. **Label.** Names the field. A required marker follows it.
-2. **Description.** Help text, by default the accepted formats.
-3. **Button.** A Button that opens the picker. Absent when read-only.
-4. **Files.** The chosen files, passed as children, below the frame.
-5. **Message.** The validation message, with an icon, under the field.
+1. **Label row.** Names the field, carries the required marker, and displays the batch upload status (`Uploading 2 of 6`) at its end while any `FileItem` child uploads.
+2. **Description.** Help text inside the drop zone, built from `acceptedFormats` when `description` is omitted.
+3. **Picker / drop line.** Either a primary `Button` (`buttonText`) or, with `allowFolders`, the `"Choose files or a folder, or drop them here"` line with inline file and folder triggers. Absent when `isReadOnly`.
+4. **Files (`children`).** `FileItem` rows rendered in one bordered list below the drop zone.
+5. **Message.** The field-level validation message, with an icon, under the list.
 
 ### States
 
@@ -128,15 +144,15 @@ Use a file upload where a form needs a document from the user: a report, an avat
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Focused</td><td>The container takes a <code>--ds-border-focused</code> edge and a 2px ring in the same color, drawn when either the input or the button has focus. On an invalid or valid field the ring stays and the status keeps the edge.</td></tr>
-<tr><td>Invalid</td><td>A <code>--ds-border-danger</code> edge and a <code>--ds-background-danger-subtler</code> ring; the message takes <code>--ds-text-danger</code>, and the input sets <code>aria-invalid</code>.</td></tr>
-<tr><td>Valid</td><td>A <code>--ds-border-success</code> edge and a <code>--ds-background-success-subtler</code> ring; the message takes <code>--ds-text-success</code>.</td></tr>
-<tr><td>Read-only</td><td>The container takes <code>--ds-background-neutral</code> and the button is not drawn.</td></tr>
-<tr><td>Disabled</td><td>The label and description take <code>--ds-text-subtle</code>; the input and button are disabled.</td></tr>
+<tr><td>Rest</td><td>1px <code>--ds-border</code> edge around the drop zone at <code>--card-radius-compact</code>.</td></tr>
+<tr><td>Drag-over</td><td><code>--ds-background-brand-subtlest</code> fill and <code>--ds-border-brand</code> edge while dragged items hover over the drop zone.</td></tr>
+<tr><td>Focused</td><td><code>--ds-border-focused</code> edge and a <code>--focus-ring-width</code> ring in the same color when the input or picker control holds focus.</td></tr>
+<tr><td>Invalid</td><td><code>--ds-border-danger</code> edge and a <code>--ds-background-danger-subtler</code> ring; the message takes <code>--ds-text-danger</code>, and the input sets <code>aria-invalid</code>.</td></tr>
+<tr><td>Valid</td><td><code>--ds-border-success</code> edge and a <code>--ds-background-success-subtler</code> ring; the message takes <code>--ds-text-success</code>.</td></tr>
+<tr><td>Read-only</td><td><code>--ds-background-neutral</code> fill, picker controls omitted, and child <code>FileItem</code> rows hide their end actions.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code> and <code>--ds-border-disabled</code> on the drop zone; picker controls and child <code>FileItem</code> rows are disabled.</td></tr>
 </tbody>
 </DocsTable>
-
-The button carries its own hovered and pressed steps; the container has none.
 
 ### Tokens
 
@@ -145,10 +161,10 @@ The button carries its own hovered and pressed steps; the container has none.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Label, description</td><td><code>--ds-text</code>, body default; disabled <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Label and batch status</td><td><code>--ds-text</code> in <code>--body-default</code>; batch status in <code>--body-small</code> and <code>--ds-text-subtle</code>; disabled <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Drop zone container</td><td>Padding <code>--pad-y-md</code> and <code>--pad-x-md</code>; radius <code>--card-radius-compact</code>; border <code>--ds-border</code>; drag-over <code>--ds-background-brand-subtlest</code> and <code>--ds-border-brand</code>.</td></tr>
 <tr><td>Required marker, error</td><td><code>--ds-text-danger</code>, <code>--ds-icon-danger</code>.</td></tr>
 <tr><td>Success message</td><td><code>--ds-text-success</code>, <code>--ds-icon-success</code>.</td></tr>
-<tr><td>Container</td><td>Padding <code>--pad-y-md</code> and <code>--pad-x-md</code>; radius <code>--radius-md</code>; gap <code>--stack-md</code>.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code>.</td></tr>
 </tbody>
 </DocsTable>
@@ -170,20 +186,39 @@ Say what the field takes before anyone chooses a file. Finding out from an error
     dontCaption="No types and no limit."
 />
 
-### Name the action, not the gesture.
+### Render chosen files as FileItem rows in children.
 
-"Choose a file" works for a click, a tap or a keyboard. "Click here" fails on a phone.
+Show every chosen file or folder below the drop zone as a `FileItem` so the user sees queued, uploading, completed, and failed items in place.
 
 <DoDontPair
-    doExample={<FileUpload label="Report" description="PDF or PNG, up to 10 MB." buttonText="Choose a file" />}
-    doCaption="A verb and a noun: Choose a file."
-    dontExample={<FileUpload label="Report" description="PDF or PNG, up to 10 MB." buttonText="Click here" />}
-    dontCaption="A gesture: Click here."
+    doExample={
+        <FileUpload label="Session recording" description="MP4 or ZIP, up to 500 MB.">
+            <FileItem name="zoom_0.mp4" status="done" fileType="video" meta="48.2 MB" />
+        </FileUpload>
+    }
+    doCaption="Chosen file appears below the drop zone as a FileItem row."
+    dontExample={<FileUpload label="Session recording" description="MP4 or ZIP, up to 500 MB." />}
+    dontCaption="Choosing a file leaves no visible confirmation of what will be submitted."
+/>
+
+### Enable `allowFolders` when users upload multi-file recordings.
+
+Turn on `allowFolders` when a directory of files belongs together, and collapse each chosen or dropped folder into one `FileItem` with `kind="folder"`.
+
+<DoDontPair
+    doExample={
+        <FileUpload label="Session recordings" description="MP4, M4A, TXT or ZIP." allowFolders>
+            <FileItem name="Week 4 recordings" kind="folder" status="done" meta="6 files · 142 MB" />
+        </FileUpload>
+    }
+    doCaption="Folder picker enabled and folder shown as one row."
+    dontExample={<FileUpload label="Session recordings" description="MP4, M4A, TXT or ZIP." buttonText="Click here" />}
+    dontCaption="Gesture-based button label and no folder support."
 />
 
 ### Say why an upload failed and what to do.
 
-Name the cause and the fix in one sentence. A bare "Error" sends people back to the start.
+Name the cause and the fix in one sentence, either on the failed `FileItem` row or in `validationMessage` for field-wide rules.
 
 <DoDontPair
     doExample={<FileUpload label="Report" description="PDF or PNG, up to 10 MB." validation="invalid" validationMessage="File is over 10 MB. Choose a smaller file." />}
@@ -194,25 +229,13 @@ Name the cause and the fix in one sentence. A bare "Error" sends people back to 
 
 ### `accept` is a filter, not a check.
 
-The picker offers the listed types first and every platform lets the user override it. Validate the file after it arrives (type, size and count) and report it through `validation` and `validationMessage`.
-
-### Nothing shows the chosen file. That is yours to render.
-
-```jsx
-// Incorrect: the button text never changes and the component shows no file
-// name, so after picking a file the form looks exactly as it did before.
-<FileUpload label="Report" onChange={handleFile} />
-
-// Correct.
-<FileUpload label="Report" onChange={(e) => setFile(e.target.files[0])} />
-{file && <p>{file.name}</p>}
-```
+The picker offers the listed types first and every platform lets the user override it. Validate the file after it arrives (type, size, and count) and report field errors through `validation` and `validationMessage`, or per-file failures on `FileItem`.
 
 ### `label` should be a string here.
 
 ```jsx
-// Incorrect: the label is also written to the input's aria-label, and a node
-// stringifies. The field ends up named "[object Object]".
+// Incorrect: the label is also written to the input's aria-label when a string
+// is expected. Put qualifications in description instead.
 <FileUpload label={<span>Report <em>(PDF)</em></span>} />
 
 // Correct: put the qualification in the description, which is prose.
@@ -244,10 +267,10 @@ The picker offers the listed types first and every platform lets the user overri
 
 ## Accessibility
 
-- **The control is a real file input.** The label points at it with `htmlFor`, it takes the `accept` and `disabled` attributes, and it fires a genuine change event. All the platform behavior is intact.
-- **It is one control with two tab stops.** The input is hidden at zero size rather than removed, so it stays in the tab order: the keyboard reaches the invisible input first and the visible button second. Focusing either draws the container's focus ring, so the stop is at least visible, but it is two stops, and Enter on the first opens the picker just as the second does.
-- **The description and the message are both attached.** The format rules and the validation message each carry an id and the input points at both, in that order: "PDF, up to 10 MB" is heard before "that file was too large" rather than instead of it. An invalid field also carries `aria-invalid`.
-- **`isRequired` marks the label only.** The asterisk is decorative; the input carries no `required` attribute.
+- **Real file input and keyboard picker.** The `<label>` points at the native `<input type="file">` via `htmlFor`, preserving `accept`, `disabled`, and keyboard activation while outlining the drop zone with the focus ring.
+- **Polite batch announcements.** The `"Uploading 2 of 6"` batch status in the label row carries `role="status"` and `aria-live="polite"` so progress updates are announced without stealing focus.
+- **Attached description and validation.** The format help text and the validation message each carry an id and the input references both in reading order through `aria-describedby`, alongside `aria-invalid` when `validation="invalid"`.
+- **Propagated read-only and disabled states.** `isReadOnly` and `isDisabled` flow to `FileItem` children automatically so non-editable fields expose no stray removal buttons.
 
 </div>
 
@@ -255,9 +278,10 @@ The picker offers the listed types first and every platform lets the user overri
 
 ## Related
 
-- For text the user types rather than a file they hold, use Text field or Text area.
-- For the outcome of an upload, use Section message for something the user must act on and Flag for something they only need to know.
-- For progress while the file is going up, use Progress bar.
+- `FileItem`: use when rendering each chosen file or folder inside `FileUpload` or as a standalone attachment row.
+- `ProgressRing`: use when displaying determinate upload percentage inside each uploading `FileItem`.
+- `SectionMessage`: use when an upload outcome requires prominent page-level attention.
+- `Flag`: use when confirming a completed background action without blocking the page.
 
 </div>
 

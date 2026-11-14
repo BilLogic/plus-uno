@@ -1,0 +1,96 @@
+/**
+ * SettingRow — puts a setting's name and one-line description at the start and
+ * its control (`Toggle`, compact `Select`, or `Button`) at the end, top-aligned
+ * to the label.
+ *
+ * Rows sit directly under a group heading with no card per row, dividing
+ * adjacent rows with a 1px `--ds-border` line and `--setting-row-pad-y` (12px)
+ * vertical padding.
+ */
+
+.plus-setting-row {
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--inline-lg);
+    width: 100%;
+    padding: var(--setting-row-pad-y) 0;
+    color: var(--ds-text);
+    transition: color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+}
+
+.plus-setting-row + .plus-setting-row {
+    border-top: var(--border-default) solid var(--ds-border);
+}
+
+.plus-setting-row__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-sm);
+    flex: 1 1 0%;
+    min-width: 0;
+}
+
+.plus-setting-row__label-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--inline-md);
+    min-width: 0;
+}
+
+.plus-setting-row__label {
+    font: var(--body-default);
+    font-weight: var(--type-weight-medium);
+    color: var(--ds-text);
+}
+
+// Keep description at full contrast when disabled: it carries the visible reason.
+.plus-setting-row--disabled .plus-setting-row__label {
+    color: var(--ds-text-disabled);
+}
+
+.plus-setting-row__status {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.plus-setting-row__description {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+.plus-setting-row__error {
+    display: flex;
+    align-items: center;
+    gap: var(--stack-sm);
+    font: var(--body-small);
+    color: var(--ds-text-danger);
+
+    i {
+        flex-shrink: 0;
+        font-size: var(--icon-sm);
+    }
+}
+
+.plus-setting-row__end {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: auto;
+    min-height: var(--setting-row-end-min-height);
+
+    > .plus-toggle-wrapper {
+        width: auto;
+    }
+
+    > .plus-field-stack,
+    > .plus-select-wrapper {
+        width: auto;
+        min-width: var(--setting-row-select-min-width);
+        max-width: var(--listbox-max-width);
+    }
+}

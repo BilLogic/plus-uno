@@ -28,6 +28,9 @@
     /* Choice tile */
     --choice-tile-width: var(--size-1400);
 
+    /* File item */
+    --file-item-height: calc(var(--space-300) + var(--space-050));
+
     /* Radio */
     --radio-control-size: 12px;
     --radio-control-size-10: 10px; /* RadioGroup size 10 */
@@ -52,6 +55,11 @@
     --toggle-track-width-16: 32px; /* Toggle size 16 */
     --toggle-track-width-20: 40px; /* Toggle size 20 */
     --toggle-pad: var(--space-0125); /* both sizes */
+
+    /* Setting row */
+    --setting-row-pad-y: var(--space-075);
+    --setting-row-end-min-height: var(--line-height-125);
+    --setting-row-select-min-width: var(--size-1000);
 
     /* Listbox */
     --listbox-max-width: 320px;

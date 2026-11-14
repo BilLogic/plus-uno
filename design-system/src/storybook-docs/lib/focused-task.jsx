@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { Button, IconButton, ProgressTracker, Skeleton } from '@/components';
 import { Frame } from '@/patterns';
+import { StepStage, resolveStepAxis } from '@/lib/navigationMotion';
 import { BrowserWindow } from './template-page.jsx';
 import { ScreenStage } from './fit-stage.jsx';
 
@@ -52,7 +53,8 @@ export const stepItems = (labels, at, go) => labels.map((label, i) => ({
 export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan a tutoring term', children }) => {
     const labels = given ?? TASK_STEPS.slice(0, count);
     const [at, setAt] = useState(start);
-    const down = labels.length > STEPS_ACROSS_MAX;
+    const [placement] = useState(() => resolveStepAxis({ maxSteps: labels.length, labels }));
+    const down = placement === 'down';
     const last = at === labels.length - 1;
     const tracker = (
         <ProgressTracker
@@ -76,7 +78,9 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
                 <div data-probe="steps-layout" data-steps={down ? 'down' : 'across'} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--space-200)' }}>
                     <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>{tracker}</div>
                     <div style={{ flex: '1 1 auto', minInlineSize: 0 }}>
-                        {children ?? <Skeleton preset="text" lines={4} />}
+                        <StepStage step={at} axis={placement} maxSteps={labels.length} labels={labels}>
+                            {children ?? <Skeleton preset="text" lines={4} />}
+                        </StepStage>
                     </div>
                 </div>
             </Frame>

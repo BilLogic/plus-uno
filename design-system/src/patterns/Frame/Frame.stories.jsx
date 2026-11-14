@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Button, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, TextField } from '@/components';
-import { Frame, PANEL_STORAGE_KEY, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
+import { Breadcrumb, Button, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
+import { Backdrop, Frame, PANEL_STORAGE_KEY, PatternCard, PatternModal, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy, ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
+import { FitStage, ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { DemoPageHeader } from '../Page/pageDemo.jsx';
+import { expectOverlayExit } from '@/storybook-docs/lib/overlay-motion-plays.js';
+import { AreaStage, DrillStack, FocusedFrameSwitch, StepStage, useDrillStack } from '@/lib/navigationMotion';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
-import { BAR_TOKEN, FocusedType, STEPS_RAIL, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
+import { BAR_TOKEN, FocusedType, STEPS_RAIL, TASK_STEPS, WINDOW_HEIGHT, stepItems } from '@/storybook-docs/lib/focused-task.jsx';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -2139,3 +2143,861 @@ export const BreakpointReflowMotionReduced = {
     decorators: [motionOff],
     play: breakpointPlay(true),
 };
+
+/* ------------------------------------------------------- navigation motion */
+
+const SUPERVISOR_ACCOUNT = { id: 'elena-chen', name: 'Elena Chen', role: 'Lead' };
+const DOCKED_BROWSER_STAGE = 1100; // docs-literal: keeps Frame >= 1024 inside BrowserWindow's border
+
+const AREA_PAGES = {
+    sessions: {
+        address: 'app.plus.org/sessions/this-week',
+        crumbs: [{ text: 'Sessions', href: '#sessions' }, { text: 'This week' }],
+        title: 'This week',
+        section: 'Upcoming sessions',
+        cards: [
+            ['Lincoln Middle', 'Tue 4:00 PM · 6 students'],
+            ['Roosevelt K-8', 'Wed 3:30 PM · 4 students'],
+        ],
+    },
+    tutors: {
+        address: 'app.plus.org/admin/tutors',
+        crumbs: null,
+        title: 'Tutors',
+        section: 'Active tutors',
+        cards: [
+            ['Ms. Ortiz', 'Math · 12 sessions this month'],
+            ['Mr. Patel', 'Algebra · 9 sessions this month'],
+        ],
+    },
+};
+
+const GoToAreaDemo = () => {
+    const [area, setArea] = useState('sessions');
+    const page = AREA_PAGES[area] ?? AREA_PAGES.sessions;
+    return (
+        <FitStage width={DOCKED_BROWSER_STAGE} reflow={false}>
+            <BrowserWindow address={page.address} height={WINDOW_HEIGHT}>
+                <Frame
+                    areaKey={area}
+                    header={page.crumbs ? <Breadcrumb label="Breadcrumb" items={page.crumbs} /> : undefined}
+                    sidebar={(
+                        <Sidebar
+                            user="supervisor"
+                            activeTabId={area}
+                            account={SUPERVISOR_ACCOUNT}
+                            onTabClick={(id) => { if (AREA_PAGES[id]) setArea(id); }}
+                        />
+                    )}
+                >
+                    <DemoPageHeader title={page.title} />
+                    <PatternSection title={page.section}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
+                            {page.cards.map(([title, description]) => (
+                                <PatternCard key={title} title={title} description={description} />
+                            ))}
+                        </div>
+                    </PatternSection>
+                </Frame>
+            </BrowserWindow>
+        </FitStage>
+    );
+};
+
+const goToAreaPlay = (reduced) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const nav = await canvas.findByRole('navigation', { name: 'Main' });
+    await settled(canvasElement);
+    const sidebarLeft = rect(nav.closest('.plus-frame__sidebar')).left;
+    await expect(canvas.getByRole('heading', { level: 1, name: 'This week' })).toBeInTheDocument();
+    await expect(canvas.getByRole('navigation', { name: 'Breadcrumb' })).toBeInTheDocument();
+
+    const tutorsItem = within(nav).getByRole('button', { name: 'Tutors' });
+    await userEvent.click(tutorsItem);
+
+    const areaStage = canvasElement.querySelector('[data-area-stage]');
+    await expect(areaStage).not.toBeNull();
+    if (reduced) {
+        await expect(nav, 'reduced motion does not glide the Sidebar highlight').not.toHaveAttribute('data-gliding', 'true');
+    } else {
+        await expect(nav, 'Sidebar highlight glides on spatial.fast').toHaveAttribute('data-gliding', 'true');
+        await expect(areaStage, 'old page fades out before new arrives').toHaveAttribute('data-area-phase', 'exiting');
+        await expect(canvas.getByRole('navigation', { name: 'Breadcrumb' }), 'old breadcrumb fades out with old page rather than snapping').toBeInTheDocument();
+    }
+    await expect(areaStage.querySelectorAll('[data-area-view]').length, 'clean fade: never two areas overlapping').toBe(1);
+    const viewStyle = getComputedStyle(areaStage.querySelector('[data-area-view]'));
+    await expect(viewStyle.transform === 'none' || viewStyle.transform === 'matrix(1, 0, 0, 1, 0, 0)', 'never slides').toBe(true);
+    await expect(rect(nav.closest('.plus-frame__sidebar')).left, 'the Sidebar itself never moves').toBeCloseTo(sidebarLeft, 0);
+
+    await waitFor(() => expect(canvas.getByRole('heading', { level: 1, name: 'Tutors' })).toBeInTheDocument());
+    await waitFor(() => expect(areaStage).toHaveAttribute('data-area-phase', 'settled'));
+    await expect(canvas.queryByRole('navigation', { name: 'Breadcrumb' }), 'breadcrumb replaced when entering area root').toBeNull();
+    await expect(tutorsItem).toHaveAttribute('aria-current', 'page');
+};
+
+export const MotionGoToArea = {
+    name: 'Navigation motion: Go to another area',
+    parameters: { layout: 'padded' },
+    decorators: [motionOn],
+    render: () => <GoToAreaDemo />,
+    play: goToAreaPlay(false),
+};
+
+export const MotionGoToAreaReduced = {
+    name: 'Navigation motion: Go to another area, reduced',
+    parameters: { layout: 'padded' },
+    decorators: [motionOff],
+    render: () => <GoToAreaDemo />,
+    play: goToAreaPlay(true),
+};
+
+const DRILL_STUDENTS = [
+    { id: 'ana', name: 'Ana Ruiz', detail: 'Grade 7 · Lincoln Middle', sessions: [['Oct 10 · Fractions', 'Completed'], ['Oct 17 · Ratios', 'Upcoming']] },
+    { id: 'ben', name: 'Ben Okafor', detail: 'Grade 8 · Roosevelt K-8', sessions: [['Oct 11 · Unit rates', 'Completed']] },
+    { id: 'chloe', name: 'Chloe Tran', detail: 'Grade 6 · North High', sessions: [['Oct 12 · Decimals', 'Completed']] },
+    { id: 'diego', name: 'Diego Alvarez', detail: 'Grade 8 · Lincoln Middle', sessions: [['Oct 13 · Equations', 'Completed']] },
+    { id: 'elena', name: 'Elena Morales', detail: 'Grade 7 · South High', sessions: [['Oct 14 · Proportions', 'Completed']] },
+    { id: 'maya', name: 'Maya Rodriguez', detail: 'Grade 8 · Math · Lincoln Middle', sessions: [['Oct 14 · Linear equations', 'Completed'], ['Oct 21 · Systems of equations', 'Upcoming']] },
+    { id: 'noah', name: 'Noah Kim', detail: 'Grade 7 · Roosevelt K-8', sessions: [['Oct 15 · Inequalities', 'Completed']] },
+    { id: 'priya', name: 'Priya Nair', detail: 'Grade 8 · North High', sessions: [['Oct 16 · Functions', 'Upcoming']] },
+    { id: 'sam', name: 'Sam Brooks', detail: 'Grade 6 · Lincoln Middle', sessions: [['Oct 18 · Area models', 'Upcoming']] },
+    { id: 'zoe', name: 'Zoe Carter', detail: 'Grade 8 · South High', sessions: [['Oct 19 · Slope', 'Upcoming']] },
+];
+
+const DrillDemo = ({ initialDepth = 0 }) => {
+    const maya = DRILL_STUDENTS[5];
+    const initialStack = initialDepth === 2
+        ? [{ key: 'students', originId: 'maya' }, { key: 'student', student: maya, originId: 'session-0' }, { key: 'session', student: maya, session: maya.sessions[0] }]
+        : initialDepth === 1
+            ? [{ key: 'students', originId: 'maya' }, { key: 'student', student: maya }]
+            : [{ key: 'students' }];
+    const controller = useDrillStack(initialStack);
+    const { current } = controller;
+
+    const crumbs = current.key === 'session'
+        ? [
+            { text: 'Students', href: '#students', onClick: (e) => { e.preventDefault(); controller.climbTo(0); } },
+            { text: current.student.name, href: `#${current.student.id}`, onClick: (e) => { e.preventDefault(); controller.climbTo(1); } },
+            { text: current.session[0] },
+        ]
+        : current.key === 'student'
+            ? [
+                { text: 'Students', href: '#students', onClick: (e) => { e.preventDefault(); controller.climb(); } },
+                { text: current.student.name },
+            ]
+            : null;
+
+    return (
+        <FitStage width={DOCKED_BROWSER_STAGE} reflow={false}>
+            <BrowserWindow address="app.plus.org/students" height={WINDOW_HEIGHT}>
+                <Frame
+                    header={crumbs ? <Breadcrumb label="Breadcrumb" items={crumbs} /> : undefined}
+                    sidebar={<Sidebar user="tutor" activeTabId="toolkit-students" account={SUPERVISOR_ACCOUNT} />}
+                >
+                    <DrillStack
+                        controller={controller}
+                        renderView={(entry, nav) => {
+                            if (entry.key === 'students') {
+                                return (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
+                                        <DemoPageHeader title="Students" />
+                                        <PatternSection title="All students">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+                                                {DRILL_STUDENTS.map((student) => (
+                                                    <PatternCard
+                                                        key={student.id}
+                                                        padding="sm"
+                                                        data-drill-row={student.id}
+                                                        title={student.name}
+                                                        description={student.detail}
+                                                        actions={(
+                                                            <Button
+                                                                text={`Open ${student.name}`}
+                                                                appearance="subtle"
+                                                                spacing="compact"
+                                                                onClick={(e) => nav.drill(
+                                                                    { key: 'student', student },
+                                                                    { fromElement: e.currentTarget.closest('[data-drill-row]'), originId: student.id },
+                                                                )}
+                                                            />
+                                                        )}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </PatternSection>
+                                    </div>
+                                );
+                            }
+                            if (entry.key === 'student') {
+                                return (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
+                                        <DemoPageHeader
+                                            title={entry.student.name}
+                                            status={{ appearance: 'success', text: 'Active' }}
+                                            description={entry.student.detail}
+                                        />
+                                        <PatternSection title="Sessions">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+                                                {entry.student.sessions.map((session, index) => {
+                                                    const rowId = `session-${index}`;
+                                                    return (
+                                                        <PatternCard
+                                                            key={session[0]}
+                                                            padding="sm"
+                                                            data-drill-row={rowId}
+                                                            title={session[0]}
+                                                            actions={(
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}>
+                                                                    <StatusTag appearance="neutral">{session[1]}</StatusTag>
+                                                                    <Button
+                                                                        text={`Open ${session[0]}`}
+                                                                        appearance="subtle"
+                                                                        spacing="compact"
+                                                                        onClick={(e) => nav.drill(
+                                                                            { key: 'session', student: entry.student, session },
+                                                                            { fromElement: e.currentTarget.closest('[data-drill-row]'), originId: rowId },
+                                                                        )}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
+                                        </PatternSection>
+                                    </div>
+                                );
+                            }
+                            return (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
+                                    <DemoPageHeader
+                                        title={entry.session[0]}
+                                        description={`${entry.student.name} · ${entry.student.detail}`}
+                                    />
+                                    <PatternSection title="Session summary">
+                                        <PatternCard title="Goal progress" description="Solved four linear equations independently and checked each answer." />
+                                    </PatternSection>
+                                </div>
+                            );
+                        }}
+                    />
+                </Frame>
+            </BrowserWindow>
+        </FitStage>
+    );
+};
+
+const drillAndClimbPlay = (reduced) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const surface = canvasElement.querySelector('.plus-frame__surface');
+    const stage = canvasElement.querySelector('[data-drill-stage]');
+    surface.scrollTop = 220;
+    const savedScroll = surface.scrollTop;
+    await expect(savedScroll, 'the list starts scrolled down').toBeGreaterThan(80);
+
+    const mayaRow = canvas.getByRole('button', { name: /Maya Rodriguez/i });
+    const rowWidthBefore = mayaRow.offsetWidth;
+    const rowHeightBefore = mayaRow.offsetHeight;
+    await userEvent.click(mayaRow);
+
+    if (reduced) {
+        await expect(stage, 'reduced motion fades instead of growing').toHaveAttribute('data-drill-mode', 'fade');
+        await expect(stage.querySelector('[data-drill-shell]'), 'no spatial grow shell under reduced motion').toBeNull();
+    } else {
+        await expect(stage, 'drilling grows the row into the record').toHaveAttribute('data-drill-mode', 'grow');
+        const shell = stage.querySelector('[data-drill-shell="drill"]');
+        await expect(shell, 'shared-element container shell mounts').not.toBeNull();
+        await expect(rowHeightBefore).toBeLessThan(surface.clientHeight);
+        await expect(rowWidthBefore).toBeGreaterThan(0);
+    }
+
+    await waitFor(() => expect(stage).toHaveAttribute('data-drill-phase', 'settled'));
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Maya Rodriguez' })).toBeInTheDocument();
+    const breadcrumb = canvas.getByRole('navigation', { name: 'Breadcrumb' });
+    await expect(within(breadcrumb).getByRole('link', { name: 'Students' })).toBeInTheDocument();
+
+    await userEvent.click(within(breadcrumb).getByRole('link', { name: 'Students' }));
+
+    if (reduced) {
+        await expect(stage, 'reduced motion fades back out').toHaveAttribute('data-drill-mode', 'fade');
+        await expect(stage.querySelector('[data-drill-shell]')).toBeNull();
+    } else {
+        await expect(stage, 'climbing back shrinks into the row').toHaveAttribute('data-drill-mode', 'shrink');
+        await expect(stage.querySelector('[data-drill-shell="climb"]')).not.toBeNull();
+    }
+
+    await waitFor(() => expect(stage).toHaveAttribute('data-drill-phase', 'settled'));
+    const restoredButton = canvas.getByRole('button', { name: /Maya Rodriguez/i });
+    const restoredRow = canvasElement.querySelector('[data-drill-row="maya"]');
+    await expect(surface.scrollTop, 'climbing back restores scroll position').toBeCloseTo(savedScroll, 0);
+    await expect(canvasElement.ownerDocument.activeElement, 'climbing back returns focus to the originating row').toBe(restoredButton);
+    await expect(restoredRow, 'originating row is briefly lit').toHaveAttribute('data-call-attention');
+    await waitFor(() => expect(restoredRow, 'highlight ends unmarked').not.toHaveAttribute('data-call-attention'), { timeout: 4000 });
+};
+
+export const MotionDrillAndClimb = {
+    name: 'Navigation motion: Drill in and climb out',
+    parameters: { layout: 'padded' },
+    decorators: [motionOn],
+    render: () => <DrillDemo />,
+    play: drillAndClimbPlay(false),
+};
+
+export const MotionDrillAndClimbReduced = {
+    name: 'Navigation motion: Drill in and climb out, reduced',
+    parameters: { layout: 'padded' },
+    decorators: [motionOff],
+    render: () => <DrillDemo />,
+    play: drillAndClimbPlay(true),
+};
+
+const drillDeeperPlay = (reduced) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const stage = canvasElement.querySelector('[data-drill-stage]');
+    const sessionRow = canvas.getByRole('button', { name: /Oct 14 · Linear equations/i });
+    await userEvent.click(sessionRow);
+
+    if (reduced) {
+        await expect(stage).toHaveAttribute('data-drill-mode', 'fade');
+    } else {
+        await expect(stage, 'deeper level uses the same grow rule').toHaveAttribute('data-drill-mode', 'grow');
+        await expect(stage.querySelector('[data-drill-shell="drill"]')).not.toBeNull();
+    }
+    await waitFor(() => expect(stage).toHaveAttribute('data-drill-phase', 'settled'));
+    const breadcrumb = canvas.getByRole('navigation', { name: 'Breadcrumb' });
+    await expect(within(breadcrumb).getAllByRole('link').map((a) => a.textContent), 'breadcrumb arrives one level longer').toEqual(['Students', 'Maya Rodriguez']);
+};
+
+export const MotionDrillDeeper = {
+    name: 'Navigation motion: Drill deeper',
+    parameters: { layout: 'padded' },
+    decorators: [motionOn],
+    render: () => <DrillDemo initialDepth={1} />,
+    play: drillDeeperPlay(false),
+};
+
+export const MotionDrillDeeperReduced = {
+    name: 'Navigation motion: Drill deeper, reduced',
+    parameters: { layout: 'padded' },
+    decorators: [motionOff],
+    render: () => <DrillDemo initialDepth={1} />,
+    play: drillDeeperPlay(true),
+};
+
+const climbTwoLevelsPlay = () => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const stage = canvasElement.querySelector('[data-drill-stage]');
+    const breadcrumb = canvas.getByRole('navigation', { name: 'Breadcrumb' });
+    await userEvent.click(within(breadcrumb).getByRole('link', { name: 'Students' }));
+
+    await expect(stage, 'jumping back two levels is a fade in place with no row to shrink into').toHaveAttribute('data-drill-mode', 'fade');
+    await expect(stage.querySelector('[data-drill-shell]'), 'never shrinks when skipping a level').toBeNull();
+    await waitFor(() => expect(stage).toHaveAttribute('data-drill-phase', 'settled'));
+    await expect(canvas.queryByRole('navigation', { name: 'Breadcrumb' }), 'back at area root: no breadcrumb').toBeNull();
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Students' })).toBeInTheDocument();
+};
+
+export const MotionClimbTwoLevels = {
+    name: 'Navigation motion: Climb back two levels',
+    parameters: { layout: 'padded' },
+    decorators: [motionOn],
+    render: () => <DrillDemo initialDepth={2} />,
+    play: climbTwoLevelsPlay(),
+};
+
+export const MotionClimbTwoLevelsReduced = {
+    name: 'Navigation motion: Climb back two levels, reduced',
+    parameters: { layout: 'padded' },
+    decorators: [motionOff],
+    render: () => <DrillDemo initialDepth={2} />,
+    play: climbTwoLevelsPlay(),
+};
+
+const RecordOverlayDemo = () => {
+    const controller = useDrillStack([{ key: 'students' }]);
+    const [panelStudent, setPanelStudent] = useState(null);
+    const [modalStudent, setModalStudent] = useState(null);
+    const panelTriggerRef = useRef(null);
+    const modalTriggerRef = useRef(null);
+    const frameBoxRef = useRef(null);
+
+    const closeModal = () => {
+        setModalStudent(null);
+        modalTriggerRef.current?.focus({ preventScroll: true });
+    };
+
+    const promotePanel = () => {
+        const panelEl = frameBoxRef.current?.querySelector('.plus-frame__panel');
+        const student = panelStudent;
+        setPanelStudent(null);
+        controller.drill({ key: 'student', student }, { fromElement: panelEl, originId: student.id });
+    };
+
+    const crumbs = controller.current.key === 'student'
+        ? [
+            { text: 'Students', href: '#students', onClick: (e) => { e.preventDefault(); controller.climb(); } },
+            { text: controller.current.student.name },
+        ]
+        : null;
+
+    return (
+        <FitStage width={DOCKED_BROWSER_STAGE} reflow={false}>
+            <BrowserWindow address="app.plus.org/students" height={WINDOW_HEIGHT}>
+                <div ref={frameBoxRef} style={{ position: 'relative', blockSize: '100%' }}>
+                    <Frame
+                        header={crumbs ? <Breadcrumb label="Breadcrumb" items={crumbs} /> : undefined}
+                        sidebar={<Sidebar user="tutor" activeTabId="toolkit-students" account={SUPERVISOR_ACCOUNT} />}
+                        panelLabel="Student details"
+                        panelStorageKey={null}
+                        panelOpen={Boolean(panelStudent)}
+                        onPanelOpenChange={(next) => {
+                            if (!next) {
+                                setPanelStudent(null);
+                                panelTriggerRef.current?.focus({ preventScroll: true });
+                            }
+                        }}
+                        panel={(
+                            <PanelContainer>
+                                <PanelHeader
+                                    title={panelStudent ? panelStudent.name : 'Student'}
+                                    actions={<PanelCloseAction onClick={() => {
+                                        setPanelStudent(null);
+                                        panelTriggerRef.current?.focus({ preventScroll: true });
+                                    }} />}
+                                />
+                                <PanelBody>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+                                        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                                            {panelStudent?.detail}
+                                        </p>
+                                        <div>
+                                            <Button text="Open full record" appearance="primary" onClick={promotePanel} />
+                                        </div>
+                                    </div>
+                                </PanelBody>
+                            </PanelContainer>
+                        )}
+                    >
+                        <DrillStack
+                            controller={controller}
+                            renderView={(entry) => {
+                                if (entry.key === 'student') {
+                                    return (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
+                                            <DemoPageHeader title={entry.student.name} description={entry.student.detail} />
+                                            <PatternSection title="Overview">
+                                                <PatternCard title="Current unit" description="Linear equations and slope-intercept form." />
+                                            </PatternSection>
+                                        </div>
+                                    );
+                                }
+                                return (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
+                                        <DemoPageHeader title="Students" />
+                                        <PatternSection title="All students">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+                                                {DRILL_STUDENTS.map((student) => (
+                                                    <PatternCard
+                                                        key={student.id}
+                                                        padding="sm"
+                                                        data-drill-row={student.id}
+                                                        title={student.name}
+                                                        description={student.detail}
+                                                        actions={(
+                                                            <div style={{ display: 'flex', gap: 'var(--inline-sm)' }}>
+                                                                <Button
+                                                                    text={`Quick look ${student.name}`}
+                                                                    spacing="compact"
+                                                                    onClick={(e) => {
+                                                                        panelTriggerRef.current = e.currentTarget;
+                                                                        setPanelStudent(student);
+                                                                    }}
+                                                                />
+                                                                <Button
+                                                                    text={`Edit ${student.name}`}
+                                                                    appearance="subtle"
+                                                                    spacing="compact"
+                                                                    onClick={(e) => {
+                                                                        modalTriggerRef.current = e.currentTarget;
+                                                                        setModalStudent(student);
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </PatternSection>
+                                    </div>
+                                );
+                            }}
+                        />
+                    </Frame>
+                    <Backdrop inline show={Boolean(modalStudent)}>
+                        <PatternModal
+                            title={modalStudent ? `Edit ${modalStudent.name}` : 'Edit student'}
+                            onClose={closeModal}
+                            footer={<Button text="Done" appearance="primary" onClick={closeModal} />}
+                        >
+                            <TextField label="Notes" value={modalStudent?.detail ?? ''} onChange={() => {}} />
+                        </PatternModal>
+                    </Backdrop>
+                </div>
+            </BrowserWindow>
+        </FitStage>
+    );
+};
+
+const recordOverlayPlay = (reduced) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const surface = canvasElement.querySelector('.plus-frame__surface');
+    surface.scrollTop = 220;
+    const savedScroll = surface.scrollTop;
+
+    const editBtn = canvas.getByRole('button', { name: 'Edit Maya Rodriguez' });
+    await userEvent.click(editBtn);
+    const modal = canvasElement.querySelector('.plus-pattern-modal');
+    await expect(modal, 'record opens as PatternModal via shared overlay helper').not.toBeNull();
+    await expectOverlayExit(modal, () => within(modal).getByRole('button', { name: 'Done' }).click(), reduced);
+    await expect(surface.scrollTop, 'closing Modal preserves scroll').toBeCloseTo(savedScroll, 0);
+    await expect(canvasElement.ownerDocument.activeElement, 'closing Modal returns focus to row button').toBe(editBtn);
+
+    const quickLookBtn = canvas.getByRole('button', { name: 'Quick look Maya Rodriguez' });
+    await userEvent.click(quickLookBtn);
+    const panel = await waitFor(() => {
+        const el = canvasElement.querySelector('.plus-frame__panel');
+        expect(el).not.toBeNull();
+        return el;
+    });
+    await settled(canvasElement);
+
+    await userEvent.click(within(panel).getByRole('button', { name: 'Open full record' }));
+    const stage = canvasElement.querySelector('[data-drill-stage]');
+    if (!reduced) {
+        await expect(stage, 'promoting a quick-look Panel grows into the record page').toHaveAttribute('data-drill-mode', 'grow');
+        await expect(stage.querySelector('[data-drill-shell="drill"]')).not.toBeNull();
+    }
+    await waitFor(() => expect(stage).toHaveAttribute('data-drill-phase', 'settled'));
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Maya Rodriguez' })).toBeInTheDocument();
+
+    const breadcrumb = canvas.getByRole('navigation', { name: 'Breadcrumb' });
+    await userEvent.click(within(breadcrumb).getByRole('link', { name: 'Students' }));
+    await waitFor(() => expect(stage).toHaveAttribute('data-drill-phase', 'settled'));
+    await expect(surface.scrollTop, 'climbing back restores scroll position').toBeCloseTo(savedScroll, 0);
+};
+
+export const MotionRecordOverlay = {
+    name: 'Navigation motion: Record in Panel or Modal',
+    parameters: { layout: 'padded' },
+    decorators: [motionOn],
+    render: () => <RecordOverlayDemo />,
+    play: recordOverlayPlay(false),
+};
+
+export const MotionRecordOverlayReduced = {
+    name: 'Navigation motion: Record in Panel or Modal, reduced',
+    parameters: { layout: 'padded' },
+    decorators: [motionOff],
+    render: () => <RecordOverlayDemo />,
+    play: recordOverlayPlay(true),
+};
+
+const FocusedTaskTransitionDemo = () => {
+    const [focused, setFocused] = useState(false);
+    const [notes, setNotes] = useState('');
+    const [confirmDiscard, setConfirmDiscard] = useState(false);
+
+    const requestLeave = () => {
+        if (notes.trim()) {
+            setConfirmDiscard(true);
+            return;
+        }
+        setFocused(false);
+    };
+
+    const discardAndLeave = () => {
+        setConfirmDiscard(false);
+        setNotes('');
+        setFocused(false);
+    };
+
+    return (
+        <FitStage width={DOCKED_BROWSER_STAGE} reflow={false}>
+            <BrowserWindow address={focused ? 'app.plus.org/sessions/log' : 'app.plus.org/sessions'} height={WINDOW_HEIGHT}>
+                <div style={{ position: 'relative', blockSize: '100%' }}>
+                    <FocusedFrameSwitch
+                        focused={focused}
+                        defaultFrame={(
+                            <Frame sidebar={<Sidebar user="tutor" activeTabId="sessions" account={SUPERVISOR_ACCOUNT} />}>
+                                <DemoPageHeader
+                                    title="Sessions"
+                                    actions={<Button text="Log a session" appearance="primary" onClick={() => setFocused(true)} />}
+                                />
+                                <PatternSection title="This week">
+                                    <PatternCard title="Maya Rodriguez · Oct 14" description="Ready for session reflection." />
+                                </PatternSection>
+                            </Frame>
+                        )}
+                        focusedFrame={(
+                            <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%' }}>
+                                <Frame
+                                    header={(
+                                        <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--space-100)', minInlineSize: 0 }}>
+                                            <IconButton appearance="subtle" icon="xmark" label="Close" onClick={requestLeave} />
+                                            <h1 style={{ margin: 0, font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Log a session</h1>
+                                        </div>
+                                    )}
+                                    width="reading"
+                                    style={{ flex: '1 1 auto', minBlockSize: 0 }}
+                                >
+                                    <PatternSection title="Session summary">
+                                        <TextField label="What did you cover?" value={notes} onChange={(e) => setNotes(e.target.value)} />
+                                    </PatternSection>
+                                </Frame>
+                                <div
+                                    role="group"
+                                    aria-label="Task actions"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        blockSize: `var(${BAR_TOKEN})`,
+                                        paddingInline: 'var(--page-pad)',
+                                        background: 'var(--ds-surface)',
+                                        borderBlockStart: 'var(--border-default) solid var(--ds-border)',
+                                    }}
+                                >
+                                    <Button text="Cancel" appearance="subtle" onClick={requestLeave} />
+                                    <Button text="Submit log" appearance="primary" onClick={() => { setNotes(''); setFocused(false); }} />
+                                </div>
+                            </div>
+                        )}
+                    />
+                    <Backdrop inline show={confirmDiscard}>
+                        <PatternModal
+                            title="Discard unsaved session?"
+                            onClose={() => setConfirmDiscard(false)}
+                            footer={(
+                                <div style={{ display: 'flex', gap: 'var(--inline-sm)', justifyContent: 'flex-end' }}>
+                                    <Button text="Keep editing" appearance="subtle" onClick={() => setConfirmDiscard(false)} />
+                                    <Button text="Discard" appearance="danger" onClick={discardAndLeave} />
+                                </div>
+                            )}
+                        >
+                            Your notes have not been saved yet.
+                        </PatternModal>
+                    </Backdrop>
+                </div>
+            </BrowserWindow>
+        </FitStage>
+    );
+};
+
+const focusedTaskPlay = (reduced) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const switcher = canvasElement.querySelector('[data-focused-switch]');
+    const opener = canvas.getByRole('button', { name: 'Log a session' });
+    await userEvent.click(opener);
+
+    await expect(switcher, 'focused task transitions as a clean fade, never a grow or slide').toHaveAttribute('data-focused-phase', 'exiting');
+    const frameLayer = switcher.querySelector('[data-focused-layer]');
+    const layerTransform = getComputedStyle(frameLayer).transform;
+    await expect(layerTransform === 'none' || layerTransform === 'matrix(1, 0, 0, 1, 0, 0)').toBe(true);
+
+    await waitFor(() => expect(canvas.getByRole('heading', { level: 1, name: 'Log a session' })).toBeInTheDocument());
+    await waitFor(() => expect(switcher).toHaveAttribute('data-focused-phase', 'settled'));
+    await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'Sidebar has left').toBeNull();
+
+    const field = canvas.getByLabelText('What did you cover?');
+    await userEvent.type(field, 'Linear equations');
+    await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
+
+    const modal = canvasElement.querySelector('.plus-pattern-modal');
+    await expect(modal, 'unsaved work asks first in a Modal').not.toBeNull();
+    await expectOverlayExit(modal, () => within(modal).getByRole('button', { name: 'Discard' }).click(), reduced);
+
+    await waitFor(() => expect(canvas.getByRole('heading', { level: 1, name: 'Sessions' })).toBeInTheDocument());
+    await waitFor(() => expect(switcher).toHaveAttribute('data-focused-phase', 'settled'));
+    await expect(canvasElement.ownerDocument.activeElement, 'leaving focused task returns focus to the button that opened it').toBe(canvas.getByRole('button', { name: 'Log a session' }));
+};
+
+export const MotionFocusedTask = {
+    name: 'Navigation motion: Focused task',
+    parameters: { layout: 'padded' },
+    decorators: [motionOn],
+    render: () => <FocusedTaskTransitionDemo />,
+    play: focusedTaskPlay(false),
+};
+
+export const MotionFocusedTaskReduced = {
+    name: 'Navigation motion: Focused task, reduced',
+    parameters: { layout: 'padded' },
+    decorators: [motionOff],
+    render: () => <FocusedTaskTransitionDemo />,
+    play: focusedTaskPlay(true),
+};
+
+const STEP_BODIES = [
+    ['Choose the student', 'Pick who this tutoring plan is for and confirm their grade level.'],
+    ['Set the weekly schedule', 'Confirm the recurring day, time and school room.'],
+    ['Pick learning goals', 'Choose up to three math standards to track together.'],
+    ['Attach materials', 'Link worksheets or warm-up decks for the first session.'],
+    ['Review and confirm', 'Check every detail before sending the plan to the school lead.'],
+];
+
+const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
+    const [extra, setExtra] = useState(false);
+    const activeCount = extra ? count + 1 : count;
+    const labels = TASK_STEPS.slice(0, activeCount);
+    const [at, setAt] = useState(0);
+    // Placement is decided once when the task opens, by the initial maxSteps.
+    const [placement] = useState(() => (count > 4 ? 'down' : 'across'));
+    const down = placement === 'down';
+    const last = at === labels.length - 1;
+    const [title, description] = STEP_BODIES[at] ?? STEP_BODIES[0];
+
+    return (
+        <ScreenStage width={FRAME_LAYOUT.dockMin} fluid>
+            <BrowserWindow address="app.plus.org/terms/new" height={WINDOW_HEIGHT}>
+                <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%' }}>
+                    <Frame
+                        header={(
+                            <div data-probe="step-head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: '1 1 auto', gap: 'var(--space-100)', minInlineSize: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)' }}>
+                                    <IconButton appearance="subtle" icon="xmark" label="Close" onClick={() => {}} />
+                                    <h1 style={{ margin: 0, font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Plan a tutoring term</h1>
+                                </div>
+                                <span data-probe="step-position" style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                                    {`${at + 1} of ${labels.length}`}
+                                </span>
+                            </div>
+                        )}
+                        width="reading"
+                        style={{ flex: '1 1 auto', minBlockSize: 0 }}
+                    >
+                        <div data-probe="steps-layout" data-steps={placement} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--space-200)' }}>
+                            <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>
+                                <ProgressTracker
+                                    label="Steps"
+                                    orientation={down ? 'vertical' : 'horizontal'}
+                                    items={stepItems(labels, at, setAt)}
+                                />
+                            </div>
+                            <div style={{ flex: '1 1 auto', minInlineSize: 0 }}>
+                                <StepStage step={at} axis={placement} maxSteps={count} labels={labels}>
+                                    <PatternSection title={title} description={description}>
+                                        <PatternCard title={`Step ${at + 1}: ${labels[at]}`} description={description} />
+                                        {allowExtraBranch && !extra ? (
+                                            <div style={{ marginBlockStart: 'var(--stack-md)' }}>
+                                                <Button text="Add review step" spacing="compact" onClick={() => setExtra(true)} />
+                                            </div>
+                                        ) : null}
+                                    </PatternSection>
+                                </StepStage>
+                            </div>
+                        </div>
+                    </Frame>
+                    <div
+                        role="group"
+                        aria-label="Task actions"
+                        data-probe="bar"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            blockSize: `var(${BAR_TOKEN})`,
+                            flex: '0 0 auto',
+                            boxSizing: 'border-box',
+                            paddingInline: 'var(--page-pad)',
+                            background: 'var(--ds-surface)',
+                            borderBlockStart: 'var(--border-default) solid var(--ds-border)',
+                        }}
+                    >
+                        <Button text="Cancel" appearance="subtle" onClick={() => {}} />
+                        <div style={{ display: 'flex', gap: 'var(--stack-md)' }}>
+                            <Button text="Back" isDisabled={at === 0} onClick={() => setAt(at - 1)} />
+                            <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => setAt(Math.min(at + 1, labels.length - 1))} />
+                        </div>
+                    </div>
+                </div>
+            </BrowserWindow>
+        </ScreenStage>
+    );
+};
+
+const stepMotionPlay = ({ expectedPlacement, reduced, checkBranchLock = false }) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const stage = canvasElement.querySelector('[data-step-stage]');
+    const head = canvasElement.querySelector('[data-probe="step-head"]');
+    const bar = canvasElement.querySelector('[data-probe="bar"]');
+    const headTop = rect(head).top;
+    const barTop = rect(bar).top;
+
+    await expect(stage).toHaveAttribute('data-step-placement', expectedPlacement);
+    await expect(canvasElement.querySelector('[data-probe="step-position"]')).toHaveTextContent(`1 of ${expectedPlacement === 'across' ? 4 : 5}`);
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
+    await expect(canvasElement.querySelector('[data-probe="step-position"]')).toHaveTextContent(`2 of ${expectedPlacement === 'across' ? 4 : 5}`);
+
+    if (reduced) {
+        await expect(stage, 'reduced motion swaps via fade, never sliding').not.toHaveAttribute('data-step-phase', 'sliding');
+    } else {
+        await expect(stage, 'step body slides on the same axis as the tracker').toHaveAttribute('data-step-phase', 'sliding');
+        await expect(stage).toHaveAttribute('data-step-direction', '1');
+        const current = stage.querySelector('[data-step-role="current"]');
+        const previous = stage.querySelector('[data-step-role="previous"]');
+        await expect(previous, 'previous step slides out together with new step').not.toBeNull();
+        await expect(getComputedStyle(current).opacity, 'steps slide with no fade').toBe('1');
+        await expect(getComputedStyle(previous).opacity, 'outgoing step has no fade').toBe('1');
+    }
+
+    await waitFor(() => expect(stage).toHaveAttribute('data-step-phase', 'settled'));
+    await expect(canvas.getByRole('heading', { name: 'Set the weekly schedule' })).toBeInTheDocument();
+    await expect(rect(head).top, 'header never moves').toBeCloseTo(headTop, 0);
+    await expect(rect(bar).top, 'bottom bar never moves').toBeCloseTo(barTop, 0);
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
+    if (!reduced) {
+        await expect(stage).toHaveAttribute('data-step-direction', '-1');
+    }
+    await waitFor(() => expect(stage).toHaveAttribute('data-step-phase', 'settled'));
+    await expect(canvas.getByRole('heading', { name: 'Choose the student' })).toBeInTheDocument();
+
+    if (checkBranchLock) {
+        await userEvent.click(canvas.getByRole('button', { name: 'Add review step' }));
+        await expect(stage, 'a branch adding a step mid-task never flips top to side').toHaveAttribute('data-step-placement', 'across');
+    }
+};
+
+export const MotionStepAcross = {
+    name: 'Navigation motion: Step across',
+    parameters: { layout: 'padded' },
+    decorators: [motionOn],
+    render: () => <FocusedStepMotionDemo count={4} allowExtraBranch />,
+    play: stepMotionPlay({ expectedPlacement: 'across', reduced: false, checkBranchLock: true }),
+};
+
+export const MotionStepAcrossReduced = {
+    name: 'Navigation motion: Step across, reduced',
+    parameters: { layout: 'padded' },
+    decorators: [motionOff],
+    render: () => <FocusedStepMotionDemo count={4} allowExtraBranch />,
+    play: stepMotionPlay({ expectedPlacement: 'across', reduced: true, checkBranchLock: true }),
+};
+
+export const MotionStepDown = {
+    name: 'Navigation motion: Step down',
+    parameters: { layout: 'padded' },
+    decorators: [motionOn],
+    render: () => <FocusedStepMotionDemo count={5} />,
+    play: stepMotionPlay({ expectedPlacement: 'down', reduced: false }),
+};
+
+export const MotionStepDownReduced = {
+    name: 'Navigation motion: Step down, reduced',
+    parameters: { layout: 'padded' },
+    decorators: [motionOff],
+    render: () => <FocusedStepMotionDemo count={5} />,
+    play: stepMotionPlay({ expectedPlacement: 'down', reduced: true }),
+};
+

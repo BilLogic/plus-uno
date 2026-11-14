@@ -10,6 +10,7 @@ const rules = [...toml.matchAll(/from = "\/storybook\/"\n\s+query = \{ path = "\
 );
 const ids = new Set(PAGES.map((p) => p.id));
 const FAMILIES = {
+  'components-forms-and-inputs-file-upload': 'Components/Forms and inputs/File upload/File upload',
   'components-forms-and-inputs-checkbox': 'Components/Forms and inputs/Checkbox/Checkbox',
   'components-forms-and-inputs-radio': 'Components/Forms and inputs/Radio/Radio',
   'components-forms-and-inputs-select': 'Components/Forms and inputs/Select/Select',
@@ -22,7 +23,7 @@ const FAMILIES = {
 };
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 53);
+  assert.equal(rules.length, 54);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
     if (r.from in FAMILIES) continue;

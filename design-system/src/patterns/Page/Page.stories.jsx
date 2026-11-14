@@ -1,7 +1,12 @@
-import React from 'react';
-import { expect, waitFor, within } from 'storybook/test';
-import { Button } from '@/components';
-import { Frame, PatternSection } from '@/patterns';
+import React, { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { Button, Link, Tabs } from '@/components';
+import { Frame, PatternCard, PatternSection } from '@/patterns';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
+import { SlideViews } from '@/lib/navigationMotion';
+import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
+import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import {
     CardsSection,
@@ -408,3 +413,189 @@ export const ResponsiveWidth = {
         await expect(within(canvasElement).getAllByRole('heading', { level: 1 }), 'one h1 at every width').toHaveLength(1);
     },
 };
+
+/* ------------------------------------------------------- navigation motion */
+
+const motionOn = (Story) => <MotionPreferenceContext.Provider value={false}><Story /></MotionPreferenceContext.Provider>;
+const motionOff = (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>;
+
+const RECORD_TABS = ['overview', 'sessions', 'notes'];
+
+const SwitchViewsDemo = () => {
+    const [tab, setTab] = useState('overview');
+    const views = {
+        overview: (
+            <PatternSection title="Current goals">
+                <PatternCard title="Multi-step equations" description="Target 80% accuracy by Friday." />
+            </PatternSection>
+        ),
+        sessions: (
+            <PatternSection title="Sessions" type="tabs-only" tabs={<ViewSelect />}>
+                <CardsSection title="This month" />
+            </PatternSection>
+        ),
+        notes: (
+            <PatternSection title="Tutor notes">
+                <PatternCard title="Oct 14 reflection" description="Worked through distributive property together." />
+            </PatternSection>
+        ),
+    };
+    return (
+        <ScreenStage width={FRAME_LAYOUT.dockMin} fluid>
+            <BrowserWindow address="app.plus.org/students/maya-rodriguez" height={WINDOW_HEIGHT}>
+                <Frame>
+                    <Page padding="none">
+                        <DemoPageHeader
+                            breadcrumb={[{ text: 'Students', href: '#students' }, { text: 'Maya Rodriguez' }]}
+                            title="Maya Rodriguez"
+                            description="Grade 8 · Math"
+                            actions={<PageActions />}
+                            tabs={(
+                                <Tabs activeKey={tab} onSelect={setTab} aria-label="Student views">
+                                    <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
+                                    <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
+                                    <Tabs.Tab eventKey="notes">Notes</Tabs.Tab>
+                                </Tabs>
+                            )}
+                        />
+                        <SlideViews activeKey={tab} keys={RECORD_TABS} size="page">
+                            {views[tab]}
+                        </SlideViews>
+                    </Page>
+                </Frame>
+            </BrowserWindow>
+        </ScreenStage>
+    );
+};
+
+const switchViewsPlay = (reduced) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const breadcrumb = canvas.getByRole('navigation', { name: 'Breadcrumb' });
+    await expect(canvas.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true');
+    await expect(canvas.getByRole('heading', { name: 'Current goals' })).toBeInTheDocument();
+
+    const sessionsTab = canvas.getByRole('tab', { name: 'Sessions' });
+    await userEvent.click(sessionsTab);
+    const stage = canvasElement.querySelector('[data-slide-views]');
+    const tabsRoot = canvasElement.querySelector('.plus-tabs');
+
+    if (reduced) {
+        await expect(stage, 'reduced motion never slides').not.toHaveAttribute('data-view-phase', 'sliding');
+        await expect(tabsRoot, 'indicator does not glide under reduced motion').not.toHaveAttribute('data-gliding', 'true');
+    } else {
+        await expect(tabsRoot, 'tab indicator glides on spatial.fast').toHaveAttribute('data-gliding', 'true');
+        await expect(stage, 'both peer bodies slide together').toHaveAttribute('data-view-phase', 'sliding');
+        const current = stage.querySelector('[data-view-role="current"]');
+        const previous = stage.querySelector('[data-view-role="previous"]');
+        await expect(previous, 'previous body stays mounted while sliding').not.toBeNull();
+        await expect(getComputedStyle(current).opacity, 'peer views never fade while sliding').toBe('1');
+        await expect(getComputedStyle(previous).opacity, 'outgoing peer view never fades while sliding').toBe('1');
+    }
+
+    await waitFor(() => expect(stage).toHaveAttribute('data-view-phase', 'settled'));
+    await expect(sessionsTab).toHaveAttribute('aria-selected', 'true');
+    await expect(canvas.getByRole('heading', { name: 'This month' })).toBeInTheDocument();
+    await expect(within(breadcrumb).getAllByRole('link').map((a) => a.textContent), 'breadcrumb stays unchanged').toEqual(['Students']);
+
+    sessionsTab.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await waitFor(() => expect(canvas.getByRole('tab', { name: 'Notes' })).toHaveAttribute('aria-selected', 'true'));
+    await waitFor(() => expect(stage).toHaveAttribute('data-view-phase', 'settled'));
+    await expect(canvas.getByRole('heading', { name: 'Tutor notes' })).toBeInTheDocument();
+};
+
+export const MotionSwitchViews = {
+    name: 'Navigation motion: Switch views',
+    decorators: [motionOn],
+    render: () => <SwitchViewsDemo />,
+    play: switchViewsPlay(false),
+};
+
+export const MotionSwitchViewsReduced = {
+    name: 'Navigation motion: Switch views, reduced',
+    decorators: [motionOff],
+    render: () => <SwitchViewsDemo />,
+    play: switchViewsPlay(true),
+};
+
+const ScrollSpotDemo = () => (
+    <ScreenStage width={FRAME_LAYOUT.dockMin} fluid>
+        <BrowserWindow address="app.plus.org/sessions/oct-14" height={WINDOW_HEIGHT}>
+            <Frame>
+                <Page padding="none">
+                    <DemoPageHeader
+                        breadcrumb={[{ text: 'Sessions', href: '#sessions' }, { text: 'Oct 14 · Maya Rodriguez' }]}
+                        title="Oct 14 · Maya Rodriguez"
+                        description="Grade 8 · Math · 60 minutes"
+                    />
+                    <nav aria-label="On this page" style={{ display: 'flex', gap: 'var(--inline-lg)', paddingBlock: 'var(--stack-sm)' }}>
+                        <Link href="#spot-overview">Overview</Link>
+                        <Link href="#spot-practice">Practice</Link>
+                        <Link href="#spot-escalation">Escalation</Link>
+                    </nav>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
+                        <PatternSection id="spot-overview" title="Overview">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', minBlockSize: 'var(--height-500)' }}>
+                                <PatternCard title="Goal check-in" description="Started with two warm-up problems on linear expressions." />
+                                <PatternCard title="Attendance" description="Arrived on time and stayed for the full hour." />
+                            </div>
+                        </PatternSection>
+                        <PatternSection id="spot-practice" title="Practice">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', minBlockSize: 'var(--height-500)' }}>
+                                <PatternCard title="Guided set" description="Completed four of five word problems independently." />
+                                <PatternCard title="Exit check" description="Paused on negative coefficients." />
+                            </div>
+                        </PatternSection>
+                        <PatternSection id="spot-escalation" title="Escalation">
+                            <PatternCard title="Supervisor follow-up" description="Share curriculum packet for negative rational numbers before Tuesday." />
+                        </PatternSection>
+                        <PatternSection id="spot-next" title="Next steps">
+                            <div style={{ minBlockSize: 'var(--height-500)' }}>
+                                <PatternCard title="Thursday plan" description="Revisit two-step inequalities with number lines." />
+                            </div>
+                        </PatternSection>
+                    </div>
+                </Page>
+            </Frame>
+        </BrowserWindow>
+    </ScreenStage>
+);
+
+const scrollSpotPlay = (reduced) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const surface = canvasElement.querySelector('.plus-frame__surface');
+    const target = canvasElement.querySelector('#spot-escalation');
+    await expect(surface.scrollTop).toBe(0);
+    await expect(target).not.toHaveAttribute('data-call-attention');
+
+    await userEvent.click(canvas.getByRole('link', { name: 'Escalation' }));
+
+    if (reduced) {
+        await expect(surface, 'reduced motion does not travel through intermediate scroll positions').not.toHaveAttribute('data-scroll-phase', 'scrolling');
+        await expect(surface.scrollTop, 'lands immediately at the spot').toBeGreaterThan(100);
+        await expect(target, 'reduced motion marks the destination too').toHaveAttribute('data-call-attention');
+    } else {
+        await expect(surface, 'scrolls smoothly on spatial.slow').toHaveAttribute('data-scroll-phase', 'scrolling');
+        await waitFor(() => expect(surface).not.toHaveAttribute('data-scroll-phase'), { timeout: 4000 });
+        await expect(surface.scrollTop, 'arrived at the spot').toBeGreaterThan(100);
+        await expect(target, 'Call attention marks the destination on arrival').toHaveAttribute('data-call-attention');
+    }
+
+    await expect(canvasElement.ownerDocument.activeElement, 'focus moves to the destination').toBe(target);
+    await waitFor(() => expect(target, 'Call attention plays once and ends unmarked').not.toHaveAttribute('data-call-attention'), { timeout: 4000 });
+};
+
+export const MotionScrollToSpot = {
+    name: 'Navigation motion: Scroll to a spot',
+    decorators: [motionOn],
+    render: () => <ScrollSpotDemo />,
+    play: scrollSpotPlay(false),
+};
+
+export const MotionScrollToSpotReduced = {
+    name: 'Navigation motion: Scroll to a spot, reduced',
+    decorators: [motionOff],
+    render: () => <ScrollSpotDemo />,
+    play: scrollSpotPlay(true),
+};
+
