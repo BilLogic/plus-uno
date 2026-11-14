@@ -132,6 +132,8 @@ Tokens one component owns, named for it.
 --carousel-slide-min-height-compact  /* Minimum height of a Carousel slide with compact spacing. */
 --carousel-slide-min-height-spacious  /* Minimum height of a Carousel slide with spacious spacing. */
 --checkbox-control-size  /* Size of the Checkbox box. */
+--checklist-action-min-width  /* Narrowest a checklist card's trailing action column may shrink. */
+--checklist-action-width  /* Width of the trailing action column in a checklist card, and of its header progress slot. */
 --choice-grid-control-size-10  /* Size of the control in a ChoiceGrid with size 12. */
 --choice-grid-control-size-12  /* Size of the control in a ChoiceGrid with size 14 or 16. */
 --choice-tile-width  /* Width of a choice tile in a Radio, RadioGroup, Checkbox or CheckboxGroup with tile appearance. */
