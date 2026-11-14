@@ -46,6 +46,7 @@
       "Select",
       "Cascader",
       "Tree select",
+      "Setting row",
       "Tag input",
       "Text area",
       "Text field",
@@ -289,6 +290,7 @@
           "Cascader",
           "Tree select"
         ],
+        "Setting row",
         "Tag input",
         "Text area",
         "Text field",

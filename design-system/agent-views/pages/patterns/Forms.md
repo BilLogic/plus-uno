@@ -41,7 +41,7 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 ## Alternatives
 
 - For one value on a record page, use `InlineEdit`; it saves on its own.
-- For a setting that applies at once, use `Toggle`; it never waits for Save.
+- For settings that apply at once, group `SettingRow` items under section headings on the page; a `Toggle` never waits for Save.
 - For a filter, follow Filtering: filters are not a form.
 - For a decision with no fields, use Modal · Active.
 
@@ -71,6 +71,7 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 | Fields | Form template | There is no Form component: a Fieldset groups the fields inside a host. |
 | Rejection at the top | `SectionMessage` | A danger message, scrolled into view. |
 | Choices | `RadioGroup`, `CheckboxGroup`, `Select`, `DatePicker` | A control that cannot be wrong; pictured tiles for one big question per step. |
+| Settings rows | `SettingRow`, `Toggle`, `Select`, `StatusTag`, `Flag` | Divided rows under section headings with no card per row; flipping a toggle confirms via Flag. |
 | Step progress | `ProgressIndicator`, `ProgressTracker` | Dots centered above a single-question step under five steps; the left step list at five or more. |
 | Hosts | Frame, Panel, Modal | A page (on the Page itself, no Section around it), a Panel, a Modal, or steps on Frame · focused. |
 | Confirm view | Modal | Swapped in place today. A confirm view prop is Planned. |

@@ -339,6 +339,7 @@ export const FAMILIES = [
   { family: 'choice-grid', prefix: '--choice-grid-', what: 'the Choice grid control width at each size' },
   { family: 'range', prefix: '--range-', what: 'the Range dot and track sizes' },
   { family: 'toggle', prefix: '--toggle-', what: 'the Toggle track height and width at each size, and its pad' },
+  { family: 'setting-row', prefix: '--setting-row-', what: 'SettingRow vertical padding and end-slot sizing' },
   { family: 'listbox', prefix: '--listbox-', what: 'listbox width and height limits' },
   { family: 'join-row', prefix: '--join-row-', what: 'the Home Join row width' },
   { family: 'option-menu', prefix: '--option-menu-', what: 'the option menu width' },

@@ -7,7 +7,7 @@ import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { alpha, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
-import { BoundInputs, FIVE_QUESTION_STEPS, Marks, QuestionStepInWindow, STAGE } from './formsDemo.jsx';
+import { BoundInputs, FIVE_QUESTION_STEPS, Marks, QuestionStepInWindow, SettingsPageInWindow, STAGE } from './formsDemo.jsx';
 
 /**
  * Forms: the pattern page's examples, run in the Storybook tests. The hosts and
@@ -42,6 +42,45 @@ export const HostPage = {
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         await expect(rect(save).left, 'buttons left-aligned under the fields').toBeCloseTo(rect(canvasElement.querySelector('.plus-fieldset')).left, 0);
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** Instant settings on a page: grouped SettingRows with Toggle, compact Select, and Button + StatusTag, confirming saves with a Flag. */
+export const SettingsInPage = {
+    name: 'Host: Settings on a page',
+    render: () => staged(<SettingsPageInWindow />, PAGE_WIDTH),
+    play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const canvas = within(canvasElement);
+
+        await expect(canvas.getByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
+        await expect(canvas.getByRole('heading', { level: 2, name: 'Notifications' })).toBeInTheDocument();
+        await expect(canvas.getByRole('heading', { level: 2, name: 'Connected accounts' })).toBeInTheDocument();
+        await expect(canvasElement.querySelector('.plus-pattern-card'), 'no card per row').toBeNull();
+        await expect(canvas.queryByRole('button', { name: /^Save/i }), 'instant settings need no Save button').toBeNull();
+
+        const rows = canvasElement.querySelectorAll('.plus-setting-row');
+        await expect(rows.length).toBeGreaterThanOrEqual(4);
+        await expect(tokenLength(rows[0], '--setting-row-pad-y')).toBe(12);
+        await expect(parseFloat(getComputedStyle(rows[1]).borderTopWidth), 'adjacent rows divide with --border-default').toBe(
+            tokenLength(rows[1], '--border-default')
+        );
+
+        const reminders = canvas.getByRole('switch', { name: 'Session reminders' });
+        const leadTime = canvas.getByRole('combobox', { name: 'Reminder lead time' });
+        const status = canvas.getByText('Connected');
+        const disconnect = canvas.getByRole('button', { name: 'Disconnect Google Calendar' });
+        const calendarEnd = rows[rows.length - 1].querySelector('.plus-setting-row__end');
+
+        await expect(reminders).toHaveAttribute('aria-checked', 'true');
+        await expect(leadTime).toBeInTheDocument();
+        await expect(calendarEnd.contains(status), 'StatusTag sits beside the label, never in the end slot').toBe(false);
+        await expect(disconnect).toBeInTheDocument();
+
+        await userEvent.click(reminders);
+        await expect(reminders).toHaveAttribute('aria-checked', 'false');
+        await expect(await canvas.findByText('Session reminders turned off')).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };

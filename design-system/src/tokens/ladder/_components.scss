@@ -56,6 +56,11 @@
     --toggle-track-width-20: 40px; /* Toggle size 20 */
     --toggle-pad: var(--space-0125); /* both sizes */
 
+    /* Setting row */
+    --setting-row-pad-y: var(--space-075);
+    --setting-row-end-min-height: var(--line-height-125);
+    --setting-row-select-min-width: var(--size-1000);
+
     /* Listbox */
     --listbox-max-width: 320px;
     --listbox-min-height: 140px;
