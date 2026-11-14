@@ -17,15 +17,15 @@
  * render anything, so it cannot see whether the hero draws well; the block's
  * own tests and the page's screenshots do that.
  *
- * THE ALLOW-LIST GROWS. `PAGES` below is the set of pages the check covers. It
- * started with Color; each ticket that moves another page onto DocsLanding adds
- * its row here and its hero to the registry in the same change. A registry
- * entry for a page that is not in `PAGES` fails, so the two cannot drift apart.
+ * COVERAGE. The shared Storybook page index and taxonomy select every MDX
+ * page under Foundations, Templates and Patterns. A registry hero with no
+ * covered page fails, so the pages and their heroes cannot drift apart.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { scanStorybookPages } from './lib/storybook-pages.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -34,68 +34,17 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 /** Repo-relative path of the hero registry. */
 export const REGISTRY = 'design-system/src/storybook-docs/docs-landing/hero-registry.jsx';
 
-/**
- * The pages covered: the MDX file and the page id, which is the Storybook id of
- * the page (its title, lower-cased and joined with dashes).
- */
-export const PAGES = [
-  { file: 'design-system/src/styles/Colors.mdx', id: 'foundations-visual-color' },
-  { file: 'design-system/src/styles/Accessibility.mdx', id: 'foundations-accessibility' },
-  { file: 'design-system/src/styles/Border.mdx', id: 'foundations-visual-border' },
-  { file: 'design-system/src/styles/Elevation.mdx', id: 'foundations-visual-elevation' },
-  { file: 'design-system/src/styles/FoundationsOverview.mdx', id: 'foundations-overview' },
-  { file: 'design-system/src/styles/Grid.mdx', id: 'foundations-layout-grid' },
-  { file: 'design-system/src/styles/Icons.mdx', id: 'foundations-visual-iconography' },
-  { file: 'design-system/src/styles/ContentVoiceAndTone.mdx', id: 'foundations-brand-content-voice-and-tone' },
-  { file: 'design-system/src/styles/ContentLanguage.mdx', id: 'foundations-brand-content-language' },
-  { file: 'design-system/src/styles/ContentMessages.mdx', id: 'foundations-brand-content-messages' },
-  { file: 'design-system/src/styles/Illustrations.mdx', id: 'foundations-brand-illustrations' },
-  { file: 'design-system/src/styles/Logos.mdx', id: 'foundations-brand-logos' },
-  { file: 'design-system/src/styles/Radius.mdx', id: 'foundations-visual-radius' },
-  { file: 'design-system/src/styles/Spacing.mdx', id: 'foundations-layout-spacing' },
-  { file: 'design-system/src/styles/TokensColor.mdx', id: 'foundations-tokens-color' },
-  { file: 'design-system/src/styles/TokensTypography.mdx', id: 'foundations-tokens-typography' },
-  { file: 'design-system/src/styles/TokensSpacingAndSize.mdx', id: 'foundations-tokens-spacing-and-size' },
-  { file: 'design-system/src/styles/TokensElevationAndLayers.mdx', id: 'foundations-tokens-elevation-and-layers' },
-  { file: 'design-system/src/styles/TokensMotion.mdx', id: 'foundations-tokens-motion' },
-  { file: 'design-system/src/styles/TokensLibrary.mdx', id: 'foundations-tokens-library' },
-  { file: 'design-system/src/styles/Typography.mdx', id: 'foundations-visual-typography' },
-  { file: 'design-system/src/storybook-docs/patterns/PatternsOverview.mdx', id: 'patterns-overview' },
-  { file: 'design-system/src/storybook-docs/patterns/CommonActions/CommonActions.mdx', id: 'patterns-common-actions' },
-  { file: 'design-system/src/storybook-docs/patterns/Forms/Forms.mdx', id: 'patterns-forms' },
-  { file: 'design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx', id: 'patterns-filtering' },
-  { file: 'design-system/src/storybook-docs/patterns/Navigation/Navigation.mdx', id: 'patterns-navigation' },
-  { file: 'design-system/src/storybook-docs/patterns/Search/Search.mdx', id: 'patterns-search' },
-  { file: 'design-system/src/storybook-docs/patterns/Indicators/Indicators.mdx', id: 'patterns-indicators' },
-  { file: 'design-system/src/storybook-docs/patterns/Notifications/Notifications.mdx', id: 'patterns-notifications' },
-  { file: 'design-system/src/storybook-docs/patterns/Disabled/Disabled.mdx', id: 'patterns-states-disabled' },
-  { file: 'design-system/src/storybook-docs/patterns/Empty/Empty.mdx', id: 'patterns-states-empty' },
-  { file: 'design-system/src/storybook-docs/patterns/Errors/Errors.mdx', id: 'patterns-states-errors' },
-  { file: 'design-system/src/storybook-docs/patterns/Loading/Loading.mdx', id: 'patterns-states-loading' },
-  { file: 'design-system/src/storybook-docs/patterns/Overflow/Overflow.mdx', id: 'patterns-states-overflow' },
-  { file: 'design-system/src/storybook-docs/patterns/ReadOnly/ReadOnly.mdx', id: 'patterns-states-read-only' },
-  { file: 'design-system/src/styles/MotionPrinciples.mdx', id: 'foundations-expression-motion-principles' },
-  { file: 'design-system/src/styles/MotionPhysics.mdx', id: 'foundations-expression-motion-physics' },
-  { file: 'design-system/src/styles/MotionTransitions.mdx', id: 'foundations-expression-motion-transitions' },
-  { file: 'design-system/src/styles/MotionChoreography.mdx', id: 'foundations-expression-motion-choreography' },
-  { file: 'design-system/src/styles/MotionPlayground.mdx', id: 'foundations-expression-motion-playground' },
-  { file: 'design-system/src/styles/MotionLibrary.mdx', id: 'foundations-expression-motion-library' },
-  { file: 'design-system/src/styles/SoundOverview.mdx', id: 'foundations-expression-sound-overview' },
-  { file: 'design-system/src/styles/SoundWhenToPlay.mdx', id: 'foundations-expression-sound-when-to-play' },
-  { file: 'design-system/src/styles/SoundWithMotion.mdx', id: 'foundations-expression-sound-with-motion' },
-  { file: 'design-system/src/styles/SoundSounds.mdx', id: 'foundations-expression-sound-sounds' },
-  { file: 'design-system/src/styles/SoundSettings.mdx', id: 'foundations-expression-sound-settings-and-accessibility' },
-  { file: 'design-system/src/storybook-docs/templates/TemplatesOverview.mdx', id: 'templates-overview' },
-  { file: 'design-system/src/patterns/Frame/Frame.mdx', id: 'templates-frame' },
-  { file: 'design-system/src/patterns/Page/Page.mdx', id: 'templates-page' },
-  { file: 'design-system/src/patterns/PatternSection/PatternSection.mdx', id: 'templates-section' },
-  { file: 'design-system/src/patterns/PatternCard/PatternCard.mdx', id: 'templates-card' },
-  { file: 'design-system/src/patterns/PatternTable/PatternTable.mdx', id: 'templates-table' },
-  { file: 'design-system/src/patterns/Form/Form.mdx', id: 'templates-form' },
-  { file: 'design-system/src/patterns/PatternModal/PatternModal.mdx', id: 'templates-modal' },
-  { file: 'design-system/src/patterns/Panel/Panel.mdx', id: 'templates-panel' },
-  { file: 'design-system/src/patterns/Popup/Popup.mdx', id: 'templates-popup' },
-];
+/** The covered taxonomy roots, resolved through the shared Storybook page index. */
+export function coveredPages(repoRoot) {
+  const taxonomy = JSON.parse(fs.readFileSync(path.join(repoRoot, 'storybook.taxonomy.json'), 'utf8'));
+  const roots = ['Foundations', ...Object.keys(taxonomy.rootSources ?? {})];
+  return scanStorybookPages(repoRoot)
+    .filter((p) => p.file.endsWith('.mdx') && roots.includes(p.categoryRoot))
+    .map((p) => ({ file: p.file, id: p.docsId.split('--')[0] }));
+}
+
+// Kept as a public read-only view for callers of this check.
+export const PAGES = coveredPages(REPO_ROOT);
 
 const OLD_OPENER = /<FoundationHero\b|<Title\b/;
 const LANDING = /<DocsLanding\b/;
@@ -177,14 +126,14 @@ export function checkRegistry({ heroes, pages, source }) {
 
 const inputs = byRoot((repoRoot) => {
   const source = fs.readFileSync(path.join(repoRoot, REGISTRY), 'utf8');
-  return { source, heroes: heroIds(source) };
+  return { source, heroes: heroIds(source), pages: coveredPages(repoRoot) };
 });
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { source, heroes } = inputs(repoRoot);
-  const sentences = [...checkRegistry({ heroes, pages: PAGES, source })];
-  for (const { file, id } of PAGES) {
+  const { source, heroes, pages } = inputs(repoRoot);
+  const sentences = [...checkRegistry({ heroes, pages, source })];
+  for (const { file, id } of pages) {
     const abs = path.join(repoRoot, file);
     if (!fs.existsSync(abs)) {
       sentences.push(`${file}: the page does not exist, but PAGES lists it.`);
@@ -202,11 +151,11 @@ export const REMEDY =
   '  -> Open the page with <DocsLanding page="<id>" eyebrow title purpose links />\n'
   + '     (or section="<id>" for a section tab strip), and add the\n'
   + `     page's hero to ${REGISTRY} with its one-sentence description.\n`
-  + '     A new page is also added to PAGES in scripts/check-docs-landing.mjs.';
+  + '     Coverage follows the Storybook page title and taxonomy automatically.';
 
 export function summary({ repoRoot = REPO_ROOT } = {}) {
-  const { heroes } = inputs(repoRoot);
-  return `${PAGES.length} page(s) open with DocsLanding; ${heroes.length} hero(s) in the registry.`;
+  const { heroes, pages } = inputs(repoRoot);
+  return `${pages.length} page(s) open with DocsLanding; ${heroes.length} hero(s) in the registry.`;
 }
 
 main(import.meta.url, 'check:docs-landing', { run, summary, remedy: REMEDY });

@@ -59,18 +59,8 @@ import { fileURLToPath } from 'node:url';
 
 import { byRoot, main } from './lib/findings.mjs';
 
-/**
- * The `title:` of a story file's default export. Anchored on `export default {`
- * rather than the first `title:` in the file: story files are full of `title`
- * props on sample data.
- * @returns {string | null}
- */
-export function metaTitle(src) {
-  const start = src.indexOf('export default {');
-  if (start === -1) return null;
-  const m = /(?:^|\n)\s*title:\s*['"]([^'"]+)['"]/.exec(src.slice(start));
-  return m ? m[1] : null;
-}
+import { readStorybookPage } from './lib/storybook-pages.mjs';
+export { storyMetaTitle as metaTitle, storybookTitle as docsTitle } from './lib/storybook-pages.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -122,12 +112,6 @@ export function isSentenceCase(segment) {
   return words.slice(1).every((w) => !/^[A-Z][a-z]/.test(w));
 }
 
-/** A docs file's title: a story file's default export, or an MDX page's `<Meta title>`. */
-export function docsTitle(src) {
-  const meta = /<Meta\b[^>]*?\btitle=["']([^"']+)["']/.exec(src);
-  return meta ? meta[1] : metaTitle(src);
-}
-
 /** The sidebar sort's roots, in order, without the `*` catch-all. */
 const sortRoots = (taxonomy) =>
   (taxonomy.storySortOrder ?? []).filter((e) => typeof e === 'string' && e !== '*');
@@ -169,11 +153,11 @@ const inputs = byRoot((repoRoot) => {
     .filter(Boolean);
   const stories = tracked
     .filter((rel) => rel.startsWith('design-system/src/components/') && /\.stories\.[jt]sx?$/.test(rel))
-    .map((rel) => ({ rel, title: metaTitle(fs.readFileSync(path.join(repoRoot, rel), 'utf8')) }));
+    .map((rel) => ({ rel, title: readStorybookPage(repoRoot, rel).title }));
   const pages = tracked
     .filter((rel) => rel.startsWith('design-system/src/'))
     .filter((rel) => /(\.stories\.[jt]sx?|\.mdx)$/.test(rel))
-    .map((rel) => ({ rel, title: docsTitle(fs.readFileSync(path.join(repoRoot, rel), 'utf8')) }));
+    .map((rel) => ({ rel, title: readStorybookPage(repoRoot, rel).title }));
   return { taxonomy, folders, tracked, stories, pages };
 });
 
