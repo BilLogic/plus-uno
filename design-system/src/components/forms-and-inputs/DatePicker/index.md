@@ -18,7 +18,7 @@ Also asked as: calendar input, date field, date input, date selector.
 
 ## Usage
 
-Use `DatePicker` for a single date or a date range typed or chosen from a calendar: a session date, a billing period. For a time alone, use Time picker; for a date and a time together, use Date time picker.
+Use `DatePicker` for a single date or a date range typed or chosen from a popup calendar, such as a session date or a billing period.
 
 ## Motion
 
@@ -29,6 +29,12 @@ DatePicker reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 | change | Step to the next or previous | `--ds-motion-spatial-default` | A month change slides the grid flat. |
+
+## Alternatives
+
+- For a time of day with no date, use `TimePicker`.
+- For a combined date and time answer, use `DateTimePicker`.
+- For an always-visible month grid on the page, use `Calendar`.
 
 ## Best practices
 
@@ -74,26 +80,24 @@ A range picks start and end in one field and one calendar. Two separate fields s
 Do: One range field.
 Don't: Two separate fields.
 
-### Read-only is not disabled. {#read-only-is-not-disabled}
+### Use read-only for fixed dates and disabled for unavailable ones. {#use-read-only-for-fixed-dates-and-disabled-for-unavailable-ones}
 
-`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+`isReadOnly` keeps the date focusable, selectable and at full contrast (`aria-readonly`); `isDisabled` removes the field from the tab order when it does not apply yet. Never swap one for the other, and never clip a read-only value; content nobody can edit is plain text, not a field. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: Read-only keeps the value readable, and the caption says why.
 Don't: Disabled fades a value people need to read.
 
 ## Accessibility
 
-- **The input is the named control.** `aria-label`, `aria-labelledby` and `aria-describedby` are read straight off the props and land on the text input a screen reader focuses.
-- **The popup is a labeled dialog.** It opens as `role="dialog"` with an `aria-label` of "Choose a date" or "Choose dates", not a bare list.
-- **`aria-expanded` and `aria-haspopup` track the calendar's open state** on the input itself, which is `role="combobox"`.
-- **An invalid typed date keeps the typed text** rather than silently reverting, so the person can see and correct what they entered.
-- **Invalid is not color alone:** the input sets `aria-invalid`.
+- **The input is the named control.** `aria-label`, `aria-labelledby` and `aria-describedby` are forwarded to the text input (`role="combobox"`), which tracks the popup with `aria-expanded` and `aria-haspopup`.
+- **The popup is a labeled dialog.** It opens as `role="dialog"` with `aria-label` "Choose a date" or "Choose dates".
+- **Invalid input stays editable.** An invalid typed date keeps the typed text and sets `aria-invalid` so the person can correct it.
 
 ## Related
 
-- For a time alone, use Time picker.
-- For a date and a time together, use Date time picker.
-- The month grid itself is the public Calendar component.
+- `TimePicker`: use when selecting a time of day without a date.
+- `DateTimePicker`: use when selecting a date and a time together.
+- `Calendar`: use when rendering the month grid inline on the page.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

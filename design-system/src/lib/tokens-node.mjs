@@ -343,6 +343,7 @@ export const FAMILIES = [
   { family: 'listbox', prefix: '--listbox-', what: 'listbox width and height limits' },
   { family: 'join-row', prefix: '--join-row-', what: 'the Home Join row width' },
   { family: 'option-menu', prefix: '--option-menu-', what: 'the option menu width' },
+  { family: 'checklist', prefix: '--checklist-', what: 'the checklist action column width and floor' },
   { family: 'spinner', prefix: '--spinner-', what: 'Spinner sizes' },
   { family: 'progress-bar', prefix: '--progress-bar-', what: 'Progress bar height' },
   { family: 'progress-ring', prefix: '--progress-ring-', what: 'Progress ring stroke width' },

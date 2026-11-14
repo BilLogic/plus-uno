@@ -82,12 +82,7 @@ one level to reveal the next column of choices beneath it.
 
 <DocsInteractivePlayground
     of={CascaderStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -104,10 +99,16 @@ one level to reveal the next column of choices beneath it.
 
 ## Usage
 
-Use `Cascader` when a choice is naturally made one level at a time, in
-sequence — a district, then a school, then a grade. For a hierarchy where
-someone might pick or see several nodes at once rather than one path, use
-`TreeSelect` instead. For a flat list, use `Select`.
+Use `Cascader` when a single path through a hierarchy is chosen one level at a time in sequence, such as district, then school, then grade.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a hierarchy where someone may pick or view several nodes across branches at once, use `TreeSelect`.
+- For a flat list of options with no hierarchy, use `Select`.
 
 </div>
 
@@ -235,9 +236,8 @@ With `isInvalid`, the field draws the danger border and `errorMessage` replaces 
 
 ## Related
 
-- For a hierarchy where several nodes can be picked or seen at once, use
-  `TreeSelect`.
-- For a flat list with no hierarchy, use `Select`.
+- `TreeSelect`: use when expanding branches in place or selecting multiple nodes across a tree.
+- `Select`: use when choosing from a flat list of options.
 
 </div>
 

@@ -16,9 +16,7 @@ Split button: a primary action joined to a chevron that opens a menu of related 
 
 ## Usage
 
-Use `SplitButton` when one action is clearly primary and a few related
-actions belong beside it in a menu — "Send" with "Send and close," "Save" as
-a draft. For actions with no clear primary, use `ButtonGroup` instead.
+Use `SplitButton` when one action is clearly primary and a few related variations belong in an attached menu, such as "Send" with "Send and close" or "Save as draft".
 
 ## Motion
 
@@ -29,6 +27,12 @@ SplitButton reads these motion tokens and no literal duration or curve.
 | change | Update a value or state | `--ds-motion-appearance-fast` | As Button; its menu is a Popup. |
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The menu clips open from its trigger. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | The menu fades. |
+
+## Alternatives
+
+- For a connected row of actions with no single primary, use `ButtonGroup`.
+- For a single trigger that opens a menu of actions without a separate primary button, use `DropdownMenu`.
+- For a single action with no menu, use `Button`.
 
 ## Best practices
 
@@ -82,8 +86,9 @@ a `Popup` or `DropdownMenu` positioned under it.
 
 ## Related
 
-- For actions with no clear primary, use `ButtonGroup`.
-- For the menu the chevron opens, see `Popup` and `DropdownMenu`.
+- `ButtonGroup`: use when grouping peer actions with no single primary.
+- `DropdownMenu`: use when the chevron opens a menu of action items.
+- `Popup`: use when the chevron opens a custom overlay panel.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

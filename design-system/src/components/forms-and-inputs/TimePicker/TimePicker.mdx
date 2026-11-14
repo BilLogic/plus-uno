@@ -91,12 +91,7 @@ Use a time picker when a user needs to enter a time of day.
 
 <DocsInteractivePlayground
     of={TimePickerStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -113,7 +108,16 @@ Use a time picker when a user needs to enter a time of day.
 
 ## Usage
 
-Use a time picker for a time of day alone: a reminder time, a recurring slot's start. For a date alone, use Date picker; for a date and a time together, use Date time picker.
+Use `TimePicker` to enter or choose a time of day, such as a reminder time or a recurring slot's start.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a date or date range with no time, use `DatePicker`.
+- For a combined date and time answer, use `DateTimePicker`.
 
 </div>
 
@@ -170,7 +174,7 @@ Use a time picker for a time of day alone: a reminder time, a recurring slot's s
 
 ### Show the format in the placeholder.
 
-The placeholder shows hours and minutes with a colon, so an empty field says what it holds. The field also reads bare digits, 1430 or 930a, and shows the time it picked.
+The placeholder shows hours and minutes with a colon (`__ : __`), so an empty field says what it holds. The field also parses compact typed digits (`1430` or `930a`) into the chosen time.
 
 <DoDontPair
     doExample={<TimePicker aria-label="Session start" />}
@@ -181,7 +185,7 @@ The placeholder shows hours and minutes with a colon, so an empty field says wha
 
 ### Offer round steps.
 
-Steps of 15 or 30 minutes match how sessions are booked; pass them as `times`. Odd minutes nobody books only add choices.
+Half-hour or quarter-hour steps match how sessions are booked; pass custom intervals as `times`. Odd minutes nobody books only add noise.
 
 <DoDontPair
     doExample={<TimePicker aria-label="Session start" value="02:30 PM" />}
@@ -192,11 +196,11 @@ Steps of 15 or 30 minutes match how sessions are booked; pass them as `times`. O
 
 ### Pick the period with the time.
 
-Every time in the list carries its period, so 9:30 AM and 9:30 PM are two rows, not one time and a separate switch. A typed time without AM or PM is read on the 24-hour clock: 9:30 is morning, 21:30 evening.
+Every option in the list carries `AM` or `PM` (`9:30 AM` and `9:30 PM` are separate rows). A typed time without `AM` or `PM` is read on the twenty-four-hour clock (`9:30` as morning, `21:30` as evening).
 
 ### Show a set time as read-only, not disabled.
 
-Read-only shows a time the person may read but not change. Disabled fades the field for a time that does not apply right now, and takes it out of the tab order.
+`isReadOnly` shows a time the person may read but not change; `isDisabled` fades a field that does not apply right now and removes it from the tab order. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 <DoDontPair
     doExample={<TimePicker aria-label="Session start" value="02:30 PM" isReadOnly />}
@@ -217,7 +221,7 @@ Read-only shows a time the person may read but not change. Disabled fades the fi
 </thead>
 <tbody>
 <tr><td>Name the time by its role: "Reminder time", "Session start".</td><td>A generic name: "Time".</td></tr>
-<tr><td>Say what is expected when invalid: "Enter a time such as 2:30".</td><td>"Invalid time".</td></tr>
+<tr><td>Say what is expected when invalid: "Enter a time such as 2:30 PM".</td><td>"Invalid time".</td></tr>
 <tr><td>Show the period with every time: "2:30 PM".</td><td>A bare "2:30" that could be either half of the day.</td></tr>
 <tr><td>Use sentence case in labels and messages.</td><td>Title case: "Reminder Time".</td></tr>
 </tbody>
@@ -239,8 +243,8 @@ Read-only shows a time the person may read but not change. Disabled fades the fi
 
 ## Related
 
-- For a date alone, use Date picker.
-- For a date and a time together, use Date time picker.
+- `DatePicker`: use when selecting a date or date range without a time.
+- `DateTimePicker`: use when selecting a date and a time together.
 
 </div>
 

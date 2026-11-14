@@ -18,10 +18,7 @@ Also asked as: filter chip, filter control.
 
 ## Usage
 
-Use `FilterButton` for a control that opens a filter's options or toggles a
-filter on and off, above a table or a list. For a value already chosen and
-removable, show it as a `Tag` instead; `FilterButton` is the trigger, not the
-applied result.
+Use `FilterButton` for a control in a view bar that opens a filter's options or toggles a filter on and off.
 
 ## Motion
 
@@ -30,6 +27,13 @@ FilterButton reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The count hugs the label: the button widens, the number fades in. |
+
+## Alternatives
+
+- For a single-list filter menu that applies on pick, use `PopupSelect`.
+- For several filter categories staged and applied together from one trigger, use `FilterMenu`.
+- For showing a chosen filter value that can be removed directly, use `Tag`.
+- For a general action that is not a filter, use `Button`.
 
 ## Best practices
 
@@ -60,11 +64,9 @@ Keep the natural width, so the chevron stays right after the name. Filter
 button has no prop to fill its container; don't stretch it across a wide row
 with your own styles.
 
-### Fold into one menu below 768. {#fold-into-one-menu-below-768}
+### Fold into one menu on narrow screens. {#fold-into-one-menu-on-narrow-screens}
 
-Below 768 a row of filter buttons does not fit. Fold them into one filter
-icon button whose menu stacks the filters, and give it the total applied as
-its count.
+Below the desktop breakpoint (`768px`), a row of filter buttons does not fit. Fold them into one filter `IconButton` whose `FilterMenu` stacks the categories, and pass the total applied count as `trailingMetric`.
 
 ```jsx
 <IconButton icon="filter" label="Filters" trailingMetric={applied} />
@@ -90,8 +92,10 @@ toggles directly on click, with nothing to open.
 
 ## Related
 
-- For the applied value once chosen, use `Tag`.
-- For a single action that isn't a filter, use `Button`.
+- `PopupSelect`: use when the filter button opens a single list that applies on pick.
+- `FilterMenu`: use when several filter categories stage and apply together.
+- `Tag`: use when displaying an applied filter value as a removable tag.
+- `Button`: use when the control triggers a general action rather than a filter.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

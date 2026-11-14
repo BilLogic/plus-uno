@@ -14,7 +14,12 @@ Comment: one entry in a threaded discussion, with slots for the author, time, co
 
 ## Usage
 
-Use a comment for one entry in a threaded discussion: a note on a session, a reply in a review thread. For a single text entry with no author or thread context, use Text area.
+Use `Comment` for one entry in a threaded discussion, such as a note on a session or a reply in a review thread.
+
+## Alternatives
+
+- For a plain multi-line input with no author or thread context, use `TextArea`.
+- For formatted notes with lists or links, use `RichTextEditor`.
 
 ## Best practices
 
@@ -67,8 +72,8 @@ Don't: No action named.
 
 ## Related
 
-- For the person shown beside the comment, use Avatar.
-- For a single text field with no thread context, use Text area.
+- `Avatar`: use when rendering the author's image beside the comment.
+- `TextArea`: use when collecting a plain multi-line reply or note.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

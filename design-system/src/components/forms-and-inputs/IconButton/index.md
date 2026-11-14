@@ -18,7 +18,7 @@ Also asked as: icon only button, icon action.
 
 ## Usage
 
-Use an icon button when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header. Where space allows, or the action is important, use a Button with a text label.
+Use `IconButton` when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header.
 
 ## Motion
 
@@ -27,6 +27,12 @@ IconButton reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Hover and press change color, 90% by about 110 ms. |
+
+## Alternatives
+
+- For an action where space allows a text label, use `Button`.
+- For an icon that navigates to another page or site, use `LinkIconButton`.
+- For dismissing a surface as a whole, use `CloseButton`.
 
 ## Best practices
 
@@ -37,12 +43,9 @@ Leave a gap so neighboring icon buttons read as separate targets.
 Do: A clear gap between icon buttons.
 Don't: Icon buttons touching.
 
-### Always give it an accessible name. {#always-give-it-an-accessible-name}
+### Give every icon button an accessible name. {#give-every-icon-button-an-accessible-name}
 
-Every icon button carries a `label` that is its accessible name and its
-tooltip, such as "Close panel". Name the object acted on: "Edit page", not a
-bare "Edit", which does not say what is edited. The label is never drawn, so
-the difference shows only on hover, on focus and to a screen reader.
+Every icon button carries a `label` that is its accessible name and its tooltip. Name the action and the object acted on: "Edit page", not a bare "Edit".
 
 ```jsx
 // Incorrect: a bare verb.
@@ -54,15 +57,11 @@ the difference shows only on hover, on focus and to a screen reader.
 
 ### Keep it square. {#keep-it-square}
 
-Icon buttons stay 32 or 24 square, and round only in top navigation
-(`shape="circle"`). Icon button has no prop to fill its container; never
-stretch one to fill a row. The one exception is a filter trigger's count,
-which widens the button by the count alone.
+Icon buttons stay square at `--item-height-md` (`default`) or `--item-height-sm` (`compact`), and round only in top navigation (`shape="circle"`). Never stretch one to fill a row; only a filter trigger's `trailingMetric` widens the button.
 
 ### Show the applied count on a filter trigger. {#show-the-applied-count-on-a-filter-trigger}
 
-When filters are on, pass their number as `trailingMetric`. A count above zero draws the
-selected fill by itself; zero or absent draws no count and no fill.
+When filters are on, pass their number as `trailingMetric`. A positive count draws the selected fill by itself; omit it when no filter is active.
 
 ```jsx
 <IconButton icon="filter" label="Filters" trailingMetric={applied} />
@@ -70,38 +69,36 @@ selected fill by itself; zero or absent draws no count and no fill.
 
 ### Use primary sparingly. {#use-primary-sparingly}
 
-Primary marks the main action of a small area. The other icon buttons beside
-it stay default or subtle.
+Primary marks the main action of a small area. The other icon buttons beside it stay default or subtle.
 
 Do: One primary icon button, with the other actions subtle.
 Don't: Three primary icon buttons compete for attention.
 
-### Pick a glyph people know. {#pick-a-glyph-people-know}
+### Pick a glyph people recognize at a glance. {#pick-a-glyph-people-recognize-at-a-glance}
 
-If you cannot find a suitable glyph in five seconds, it probably will not communicate the action. Check the meaning holds across cultures and languages, and do not reuse one glyph for several meanings.
+If you cannot find a suitable glyph in five seconds, it probably will not communicate the action. Check the meaning holds across cultures and languages, and do not reuse one glyph for different actions.
 
 ### Group icon buttons that act together. {#group-icon-buttons-that-act-together}
 
-Put related icon buttons in a Button group, and use `isSelected` for a choice between views.
+Put related icon buttons in a `ButtonGroup`, and use `isSelected` for a choice between views.
 
 Do: Grid and list views joined in one group, with the current view selected.
 Don't: The same two views as loose buttons read as unrelated actions.
 
 ## Accessibility
 
-- `label` is required. It is the accessible name and the tooltip. A missing label fails `check:icon-button-name`.
-- Leave an action enabled and explain what is missing when it is pressed; disable an icon button only while it is sending. A disabled icon button leaves the tab order, drops its tooltip and `title`, and takes no `aria-disabled` stand-in that keeps it focusable. Say why in visible text beside it.
-- Selected is not color alone: `isSelected` sets `aria-pressed`. A menu trigger reports `aria-expanded` only, so it never carries `aria-pressed`.
-- With `trailingMetric` the accessible name carries the count: "Filters, 2 applied". A count of zero adds nothing to the name. The drawn digits are hidden from assistive technology so the count is not read twice.
-- The focus ring is 2px in `--ds-border-focused`. Never remove it.
-- The glyph is decoration once the button has a name, so it is hidden from assistive technology.
+- `label` is required and provides both the accessible name and the tooltip (`isTooltipDisabled` suppresses the tooltip when the surface already makes the action clear). A missing label fails `check:icon-button-name`.
+- Disable an icon button only while it is sending (`isLoading`); otherwise keep it enabled and explain on press. A disabled icon button leaves the tab order, drops its tooltip and `title`, and takes no `aria-disabled` stand-in that keeps it focusable. Say why in visible text beside it. See [Disabled](?path=/docs/patterns-states-disabled--docs).
+- `isSelected` sets `aria-pressed`, never color alone. A menu trigger reports `aria-expanded` only, so it never carries `aria-pressed`.
+- The focus ring is 2px in `--ds-border-focused`. Never remove it. The glyph is decoration once the button has a name, so it is hidden from assistive technology.
+- With `trailingMetric`, the accessible name includes the count ("Filters, 2 applied"; a count of zero adds nothing) and hides the visual digits from assistive technology so the count is not read twice.
 
 ## Related
 
-- To act with a label, use Button.
-- To navigate with an icon, use Link icon button.
-- To dismiss a surface, use Close button.
-- To group related icon buttons, use Button group.
+- `Button`: use when space allows a visible text label.
+- `LinkIconButton`: use when the icon navigates to another page or URL.
+- `CloseButton`: use when dismissing a modal, message or flag.
+- `ButtonGroup`: use when grouping related icon buttons into one control.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
@@ -109,7 +106,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 1. **Container.** A square, 32 at default spacing and 24 at compact. `shape="circle"` rounds it for top navigation.
 2. **Icon.** A Font Awesome Free glyph at 16. Use an existing system glyph; do not draw custom icons.
-3. **Label.** Not drawn. It is the accessible name and the tooltip on hover and focus. `isTooltipDisabled` turns that tooltip off, for a control the surface already makes obvious, such as the close button in a Modal and a Spotlight.
+3. **Label.** Not drawn. It is the accessible name and the tooltip on hover and focus. `isTooltipDisabled` turns that tooltip off when the surface already makes the control obvious, such as the close button in a Modal or Spotlight.
 4. **Spinner** (loading only). Replaces the icon while the button is busy.
 5. **Count** (filter triggers only). `trailingMetric`, the number of filters applied, after the icon. The button keeps its height and the icon keeps its place; the count widens it.
 
@@ -118,13 +115,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Appearance | When to use |
 | --- | --- |
 | Default | Most icon buttons: an action with a clear, familiar glyph. Example: Edit page. |
-| Subtle | Icon buttons in toolbars, table rows and headers where it is already clear they are interactive. Example: More actions in a row. |
+| Subtle | Toolbars, table rows and headers where items already read as interactive. Example: More actions in a row. |
 | Primary | The main action of a small area when space allows no label. Use sparingly. Example: Send comment. |
 | Discovery | The call to action for a new experience. Example: Try the new view. |
-
-### Spacing
-
-Default spacing suits most places. Use compact in table rows and inline toolbars.
 
 ### States
 

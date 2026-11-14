@@ -90,12 +90,7 @@ A rating lets a person give one score out of five in a single gesture.
 
 <DocsInteractivePlayground
     of={RatingStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -112,9 +107,17 @@ A rating lets a person give one score out of five in a single gesture.
 
 ## Usage
 
-Use a rating for a single satisfaction score out of five: the end of a session, a piece of feedback, a quick judgment the person makes in one gesture. Five items is the whole scale; there is no other length.
+Use `Rating` for a five-point satisfaction score given in one gesture, such as end-of-session feedback. Five items is the whole scale; there is no other length. `variant` is `comments` (one caption below the row) or `numeric` (1 to 5 above each item); `icon` is `star` or `thumbs-up`.
 
-`variant` chooses what the row says about itself: `comments` puts one caption under the row, `numeric` puts 1 to 5 above each item. `icon` is `star` or `thumbs-up`.
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a continuous or wider numeric span, use `Range`.
+- For a labeled Likert scale or mutually exclusive options, use `RadioGroup`.
+- For the written feedback that accompanies a score, use `TextArea`.
 
 </div>
 
@@ -265,9 +268,9 @@ A hidden input carries the score with its form, so `name` is how a server reads 
 
 ## Related
 
-- For a value on a longer scale, use Range.
-- For a choice among labeled options rather than a score, use Radio group or Radio.
-- For the comment that usually accompanies a rating, use Text area.
+- `Range`: use when choosing an approximate value along a continuous track.
+- `RadioGroup`: use when choosing among labeled options or a custom linear scale.
+- `TextArea`: use when collecting a written comment alongside the rating.
 
 </div>
 

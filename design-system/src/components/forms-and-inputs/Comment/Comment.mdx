@@ -71,12 +71,7 @@ A comment is one entry in a threaded discussion: who wrote it, when, and what th
 
 <DocsInteractivePlayground
     of={CommentStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -93,7 +88,16 @@ A comment is one entry in a threaded discussion: who wrote it, when, and what th
 
 ## Usage
 
-Use a comment for one entry in a threaded discussion: a note on a session, a reply in a review thread. For a single text entry with no author or thread context, use Text area.
+Use `Comment` for one entry in a threaded discussion, such as a note on a session or a reply in a review thread.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a plain multi-line input with no author or thread context, use `TextArea`.
+- For formatted notes with lists or links, use `RichTextEditor`.
 
 </div>
 
@@ -233,8 +237,8 @@ Name the action and the detail. An open "Thoughts?" leaves the reader guessing.
 
 ## Related
 
-- For the person shown beside the comment, use Avatar.
-- For a single text field with no thread context, use Text area.
+- `Avatar`: use when rendering the author's image beside the comment.
+- `TextArea`: use when collecting a plain multi-line reply or note.
 
 </div>
 

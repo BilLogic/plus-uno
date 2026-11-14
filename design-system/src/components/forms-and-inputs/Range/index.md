@@ -18,9 +18,7 @@ Also asked as: slider, range slider.
 
 ## Usage
 
-Use a range in a form to let a person choose a value within a minimum and a maximum, when an approximate value is enough: a zoom level, a volume, a rough rating of effort.
-
-Do not use a range when choosing a specific value matters. A slider is less precise than typing a number or picking an option from a list. Do not use it for values that are not numeric, such as weekdays, or for spans that are extremely large (over 100 steps) or very small (1 to 3).
+Use `Range` when an approximate value between a minimum and maximum is enough, such as a zoom level or volume. Avoid it for exact numbers, non-numeric choices, or spans under four steps or over a hundred steps.
 
 ## Motion
 
@@ -30,28 +28,34 @@ Range reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-linear` | The thumb follows the pointer; on release it settles on a spring that starts from the hand's speed. |
 
+## Alternatives
+
+- For an exact numeric value, use `TextField` with `type="number"`.
+- For a five-point satisfaction score, use `Rating`.
+- For a choice among a few discrete options, use `RadioGroup` or `Select`.
+
 ## Best practices
 
-### Use size 12 by default. {#use-size-12-by-default}
+### Use the default `size={12}` in standard forms. {#use-the-default-size-12-in-standard-forms}
 
-The 12 handle and its track are easy to read and to grab in a standard form.
+The `size={12}` handle and track are easy to read and grab in a standard form.
 
-Do: Size 12 in a standard form.
-Don't: Size 8 for a primary input.
+Do: Standard `size={12}` in a form.
+Don't: Compact `size={8}` used for a primary input.
 
 ### Use one size per form. {#use-one-size-per-form}
 
 Matching sizes keep several ranges aligned.
 
-Do: Every range in the form uses size 12.
-Don't: Size 12 and size 8 in the same form.
+Do: Every range in the form uses `size={12}`.
+Don't: Mixing `size={12}` and `size={8}` in the same form.
 
-### Use size 16 for touch. {#use-size-16-for-touch}
+### Use `size={16}` for touch. {#use-size-16-for-touch}
 
-A thicker track is a larger target.
+A thicker track gives touch screens a larger target.
 
-Do: Size 16 where touch is the main input.
-Don't: Size 8 on a touch screen.
+Do: Larger `size={16}` where touch is the main input.
+Don't: Small `size={8}` on a touch screen.
 
 ### Put the label directly above the slider. {#put-the-label-directly-above-the-slider}
 
@@ -60,9 +64,9 @@ Keep it short and aligned left. Show it unless the layout already names the slid
 Do: The label sits above the slider and names it.
 Don't: The label is hidden, so nothing on screen names the slider.
 
-### `onChange` reports a number. {#onchange-reports-a-number}
+### Read the numeric value from the first argument of `onChange`. {#read-the-numeric-value-from-the-first-argument-of-onchange}
 
-The first argument is the new value as a number; the event follows. A handler that wrote `event.target.value` reads the second argument instead.
+`onChange(value, event)` passes the new number first and the event second; a handler that wrote `event.target.value` reads the second argument instead.
 
 ### In a left-to-right layout the lowest value is on the left. {#in-a-left-to-right-layout-the-lowest-value-is-on-the-left}
 
@@ -74,17 +78,15 @@ If the slider needs explaining, put one line of helper text under it rather than
 
 ## Accessibility
 
-- **Label every slider.** A range input carries its value, never its meaning: "49" says nothing about what is being set. `label` is the only thing that names it.
-- **`showLabel={false}` hides the text, not the name.** The label stays in the page for assistive technology.
-- **Arrow keys step the value by `step`; Home and End jump to `min` and `max`.**
-- **Keyboard focus is a 2px ring on `border.focused`, 2px off the handle.** A pointer focus draws none.
+- **Label every slider.** `label` names the input; `showLabel={false}` visually hides the text while keeping the accessible name.
+- **Keyboard.** Arrow keys step by `step`; `Home` and `End` jump to `min` and `max`. Focus is a 2px ring on `border.focused`, 2px off the handle; pointer focus draws none.
 - **Do not use a range where precision matters.** Offer a text field beside it, or use one instead.
 
 ## Related
 
-- For a specific numeric value, use Text field.
-- For a choice among a few options, use Radio or Select.
-- For a rating, use Rating.
+- `TextField`: use when an exact numeric value is needed (`type="number"`).
+- `Rating`: use when collecting a score out of five.
+- `RadioGroup`: use when choosing among a few discrete options.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

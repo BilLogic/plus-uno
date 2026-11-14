@@ -16,7 +16,7 @@ Link button: navigates, and looks like a button. It renders an anchor, so it has
 
 ## Usage
 
-Use a link button to open another page, a site or a place on the page. For an action that stays on the current page, use a Button.
+Use `LinkButton` to open another page, site or section when the link needs the visual weight of a button.
 
 ## Motion
 
@@ -25,6 +25,12 @@ LinkButton reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Hover and press change color, 90% by about 110 ms. |
+
+## Alternatives
+
+- For an action on the current page, use `Button`.
+- For navigation shown as an icon alone, use `LinkIconButton`.
+- For a link inside a sentence or paragraph, use `Link`.
 
 ## Best practices
 
@@ -37,17 +43,14 @@ Don't: Link buttons touching.
 
 ### Use it to go somewhere, not to act. {#use-it-to-go-somewhere-not-to-act}
 
-A link button navigates to a page or an external address, and assistive
-technology announces a link. Actions that save, delete or submit belong on a
-Button.
+`LinkButton` renders an anchor so assistive technology announces a link. Actions that save, delete or submit belong on `Button`.
 
 Do: Open session notes goes to the notes page.
 Don't: Delete session acts on the page, so it belongs on a button.
 
 ### Let it hug its label. {#let-it-hug-its-label}
 
-Keep the natural width. Reserve `shouldFitContainer` for narrow containers,
-such as a mobile sheet.
+Keep the natural width. Reserve `shouldFitContainer` for narrow containers, such as a mobile sheet.
 
 Do: Natural width.
 Don't: Stretched across a wide row.
@@ -58,26 +61,26 @@ Right-align in focused tasks and modal dialogs; left-align on full-page forms an
 
 ## Accessibility
 
-- A link button is an anchor, so assistive technology announces a link. Do not use it for actions.
-- It has no disabled state. A disabled link leaves the tab order, gets no focus or hover events and does not say why. Use validation and error messages instead, and never attach a tooltip to a disabled control.
-- `target="_blank"` adds `rel="noopener noreferrer"`. Flag the new tab in the label or with the external-link glyph.
+- Renders an `<a>` element so assistive technology announces a link and browser link shortcuts work.
+- Has no disabled state. A disabled link leaves the tab order and does not say why; omit unavailable links or use validation and error messages, and never attach a tooltip to a disabled control.
+- `target="_blank"` adds `rel="noopener noreferrer"`; indicate the new tab in the label or with an external-link icon.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 
 ## Related
 
-- To act on the current page, use Button.
-- To navigate with an icon alone, use Link icon button.
-- To link inside a sentence, use a plain text link.
-- To group related links, use Button group.
+- `Button`: use when the control performs an action on the current page.
+- `LinkIconButton`: use when navigating with an icon and no visible label.
+- `Link`: use when linking inline within text.
+- `ButtonGroup`: use when grouping related link buttons.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
-1. **Container.** An anchor drawn as a button: 32 high at default spacing and 24 at compact.
+1. **Container.** An anchor (`<a>`) drawn as a button: 32 high at default spacing and 24 at compact.
 2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
-3. **Label.** Body/default at the medium weight. It describes the destination or purpose.
-4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label, such as the external-link glyph.
+3. **Label.** Body/default at the medium weight. It names the destination.
+4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label, such as `arrow-up-right-from-square` for an external link.
 
 ### Appearance
 
@@ -95,7 +98,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 
 ### States
 
-Hover, pressed and focus are the browser's own. A link button has no disabled or loading state.
+Hover, pressed and focus are the browser's own. A link button has no `ai`, disabled or loading state.
 
 | State | What changes |
 | --- | --- |
@@ -119,7 +122,7 @@ Hover, pressed and focus are the browser's own. A link button has no disabled or
 
 | Do | Don't |
 | --- | --- |
-| Describe the destination or purpose: "View sessions". | "Click here" or "Go". |
+| Describe the destination: "View sessions". | "Click here" or "Go". |
 | Use sentence case, short and without punctuation. | Title case, or a full sentence. |
 | Match the words of the surrounding UI. | Different words for the same destination in one view. |
 

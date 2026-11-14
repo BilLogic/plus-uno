@@ -18,9 +18,7 @@ Also asked as: multi-select, checklist, tick box.
 
 ## Usage
 
-Use a checkbox when a person needs to select one or more options from a list of related items, or when a setting needs an explicit confirmation before it applies, such as accepting terms or saving a form. A group of checkboxes lets a person choose many options, or none, from a short list they can see whole; a long list goes in a `Select` with `isMulti`.
-
-Individual checkboxes have two states, selected and unselected. When checkboxes are grouped, a parent shows a third, mixed state while some, not all, of its children are selected.
+Use `Checkbox` when a person needs to select one or more options from a list of related items, or when a setting needs an explicit confirmation before it applies. Checkboxes let a person choose many options, or none, from a short list they can see whole, and a parent checkbox shows the mixed (`isIndeterminate`) state while some of its children are selected.
 
 ## Motion
 
@@ -30,6 +28,14 @@ Checkbox reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |  |
 | goal | Update a value or state | `--ds-motion-appearance-fast` | A session goal set or checked off together: the mark and fill change color, like any change. | `sound.goal` on land: only the session goal check-in done together, shared with the student; other checkboxes stay silent |
+
+## Alternatives
+
+- For a question offering a list of checkboxes under a shared legend and error, use `CheckboxGroup`.
+- For a setting that takes effect immediately without submitting a form, use `Toggle`.
+- For mutually exclusive answers where only one may be chosen, use `RadioGroup` or `Radio`.
+- For a long list of multi-select options, use `Select` with `isMulti`.
+- For a rows-by-columns matrix of checkboxes, use `ChoiceGrid`.
 
 ## Best practices
 
@@ -71,13 +77,13 @@ Don't: The label tells the person what to do with the box.
 Do: The invalid box keeps full contrast and stays in the tab order.
 Don't: A disabled box cannot be tabbed to.
 
-### Read-only is not disabled. {#read-only-is-not-disabled}
+### Use read-only for fixed answers and disabled for unavailable ones. {#use-read-only-for-fixed-answers-and-disabled-for-unavailable-ones}
 
-`isReadOnly` shows an answer the person may read but not change: the box stays in the tab order at full contrast, takes the neutral fill when unchecked, has no hover, says `aria-readonly`, and ignores clicks and Space. Say why in the description. `isDisabled` takes it out of the tab order and grays it, for a box that waits on something the person can fix on the same screen. Put the reason in `description`, which stays at full contrast, and never in a tooltip. When it blocks the main action or several boxes, add a warning Section message above that says how to turn them on.
+`isReadOnly` shows an answer that cannot be changed: the box stays in the tab order at full contrast with no hover (`aria-readonly`), ignores clicks and Space, and takes the neutral fill when unchecked. `isDisabled` removes it from the tab order and grays it when a prerequisite on the same screen is unmet. Put the reason in `description`, which stays at full contrast, never a tooltip. When it blocks the main action or several boxes, add a warning `SectionMessage` above that says how to turn them on. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
-### A description describes; the label names. {#a-description-describes-the-label-names}
+### Keep extra detail in `description`. {#keep-extra-detail-in-description}
 
-`description` renders under the label and is wired with `aria-describedby`, so it is read after the name instead of becoming part of it.
+`description` renders under the label and is wired with `aria-describedby`, so it is read after the name.
 
 ### Pick controlled or uncontrolled and stay there. {#pick-controlled-or-uncontrolled-and-stay-there}
 
@@ -90,28 +96,25 @@ Don't: A disabled box cannot be tabbed to.
 <Checkbox id="terms" label="I accept" isChecked={accepted} onChange={onAccept} />
 ```
 
-### `isIndeterminate` is display only. {#isindeterminate-is-display-only}
+### Treat `isIndeterminate` as display only. {#treat-isindeterminate-as-display-only}
 
 The underlying value is still checked or unchecked. Clicking a mixed box resolves it like any other, so it cannot be used as a third stored value.
 
 ## Accessibility
 
-- **The label is wired for you, `id` or no `id`.** The component derives an id and hands it to the input and the label, so a caller who passes neither `id` nor `name` still gets a label that names the input.
-- **A checkbox with no `label` has no accessible name.** Where the design has no room for visible text, pass `aria-label`; it is spread onto the input.
-- **Do not disable a box that must stay reachable.** Use `isInvalid` with a message linked by `aria-describedby`, so a screen reader user hears why the option cannot be chosen.
-- **Include an error message for a required or invalid box**, for example "Select an option".
+- **Label association.** The component derives an id for the input and label automatically; pass `aria-label` only when there is no visible label.
+- **Do not disable a box that must stay reachable.** Use `isInvalid` with a message linked by `aria-describedby`, so a screen reader user hears why the option cannot be chosen. Include an error message for a required or invalid box, for example "Select an option".
 - **`isRequired` reaches the input**, so native validation applies. The marker is decoration, hidden from assistive technology.
-- **`isIndeterminate` is set on the DOM node**, the only way to express it. Screen readers report it as "mixed".
-- **Keyboard focus is a 2px ring on `border.focused`, 2px off the box.** A pointer focus draws none. Space toggles the box; Enter does not.
-- **Group related boxes** in a Fieldset with a `legend`: a Checkbox group.
+- **`isIndeterminate` is set on the DOM node** and announced as "mixed".
+- **Keyboard.** `Space` toggles the focused checkbox; `Enter` does not. Keyboard focus is a 2px ring on `border.focused`, 2px off the box; pointer focus draws none.
 
 ## Related
 
-- To turn a setting on or off at once, use Toggle.
-- For one answer from several options, use Radio, or Radio group for the whole set.
-- For a group of checkboxes with a legend, value array and group error, use CheckboxGroup.
-- For a rows-by-columns matrix of choices, use Choice grid.
-- For choices in a popup, use Select.
+- `CheckboxGroup`: use when grouping checkboxes under a shared legend, value array and error.
+- `Toggle`: use when turning a setting on or off takes effect immediately.
+- `RadioGroup`: use when only one option may be chosen from a short list.
+- `ChoiceGrid`: use when asking the same checkbox question across multiple rows.
+- `Select`: use when choosing from a long list of options (`isMulti`).
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
