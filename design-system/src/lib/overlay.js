@@ -1,4 +1,4 @@
-import { useRef, useState, useLayoutEffect } from 'react';
+import { createContext, createElement, useContext, useMemo, useRef, useState, useLayoutEffect } from 'react';
 
 /**
  * The shared overlay module (B4): the one place that owns the portal
@@ -119,6 +119,44 @@ export function getOverlayPortalRoot() {
  */
 export function overlayMountOf(fromNode) {
     return fromNode?.closest?.('.plus-pattern-backdrop') ?? getOverlayPortalRoot();
+}
+
+const OverlayContainerContext = createContext(undefined);
+
+const BOUNDED_COLLISION_AVOIDANCE = {
+    side: 'none',
+    align: 'shift',
+    fallbackAxisSide: 'none',
+};
+
+/**
+ * Confines floating overlays inside `children` to `container`, keeping their
+ * requested side and bounding alignment shifts to `boundary` (defaults to `container`).
+ * Used by inline docs canvases so open examples stay inside their own preview card
+ * instead of portaling to `document.body` and flipping across prose at the viewport edge.
+ */
+export function OverlayContainer({ container, boundary = container, children }) {
+    const value = useMemo(() => ({ container, boundary }), [container, boundary]);
+    return createElement(OverlayContainerContext.Provider, { value }, children);
+}
+
+/**
+ * Bounded portal and positioner props when inside an `OverlayContainer`,
+ * yielding to an explicit `container` prop or a Modal Backdrop ancestor.
+ * Returns `null` in normal app and story rendering so real placement and collision rules stay untouched.
+ *
+ * @param {{ container?: Element | object, fromNode?: Element | null }} [options]
+ * @returns {{ container: Element | null, collisionBoundary: Element | undefined, collisionAvoidance: object } | null}
+ */
+export function useBoundedOverlay({ container, fromNode } = {}) {
+    const bounded = useContext(OverlayContainerContext);
+    if (bounded === undefined || container !== undefined) return null;
+    if (fromNode?.closest?.('.plus-pattern-backdrop')) return null;
+    return {
+        container: bounded.container,
+        collisionBoundary: bounded.boundary ?? undefined,
+        collisionAvoidance: BOUNDED_COLLISION_AVOIDANCE,
+    };
 }
 
 /**

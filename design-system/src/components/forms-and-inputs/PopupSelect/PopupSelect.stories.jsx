@@ -143,25 +143,27 @@ export const Placement = {
             const [site, setSite] = useState(null);
             const [sort, setSort] = useState('Newest');
             return (
-                <div style={{ ...pad, ...bar }}>
-                    <PopupSelect
-                        label="Site"
-                        options={SITES}
-                        value={site}
-                        onChange={setSite}
-                        placement="bottom-start"
-                        defaultOpen
-                        id="popup-select-start"
-                        trigger={<FilterButton text="Site" trailingMetric={site ? 1 : undefined} />}
-                    />
-                    <PopupSelect
-                        label="Sort"
-                        options={['Newest', 'Oldest', 'Name']}
-                        value={sort}
-                        onChange={setSort}
-                        placement="bottom-end"
-                        isSearchable={false}
-                    />
+                <div style={pad}>
+                    <div style={bar}>
+                        <PopupSelect
+                            label="Site"
+                            options={SITES}
+                            value={site}
+                            onChange={setSite}
+                            placement="bottom-start"
+                            defaultOpen
+                            id="popup-select-start"
+                            trigger={<FilterButton text="Site" trailingMetric={site ? 1 : undefined} />}
+                        />
+                        <PopupSelect
+                            label="Sort"
+                            options={['Newest', 'Oldest', 'Name']}
+                            value={sort}
+                            onChange={setSort}
+                            placement="bottom-end"
+                            isSearchable={false}
+                        />
+                    </div>
                 </div>
             );
         };

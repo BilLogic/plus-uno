@@ -10,6 +10,7 @@ import PatternSidebar, {
 } from '@/patterns/Sidebar';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
  * `PatternSidebar` — the app's side navigation.
@@ -134,7 +135,11 @@ const Live = ({ view = 'supervisor', tabSet = 'few', boxHeight, account, ...args
     );
 };
 
+/** These stories read settled layouts, so the Frame's space motion is held off; its own motion stories live in Frame.stories. */
+const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>;
+
 export default {
+    decorators: [settledLayout],
     title: 'Components/Navigation/Navigation system/Navigation system',
     component: PatternSidebar,
     tags: ['!dev', '!autodocs'],

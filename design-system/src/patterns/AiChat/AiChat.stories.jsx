@@ -7,6 +7,7 @@ import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import DocsAiAgent from '@/storybook-docs/chrome/DocsAiAgent';
 import { buildDocsEntries } from '@/storybook-docs/chrome/docsSearch';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
  * AI chat — a floating action button at the bottom right of the Page opens
@@ -59,7 +60,11 @@ const ChatPage = ({ height = '100vh', withModal = false, ...args }) => {
     );
 };
 
+/** These stories read settled layouts, so the Frame's space motion is held off; its own motion stories live in Frame.stories. */
+const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>;
+
 export default {
+    decorators: [settledLayout],
     title: 'AI UI/Patterns/AI chat',
     id: 'ai-ai-chat',
     component: AiChat,

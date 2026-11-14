@@ -2,7 +2,7 @@ import { useMotionReduced } from '@/lib/motionPreference';
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
-import { overlayMountOf } from '@/lib/overlay';
+import { overlayMountOf, useBoundedOverlay } from '@/lib/overlay';
 import './Tooltip.scss';
 
 /**
@@ -38,6 +38,7 @@ const Tooltip = ({
     // in, through the shared overlay module.
     const triggerNodeRef = useRef(null);
     const containerRef = useRef(null);
+    const bounded = useBoundedOverlay({ fromNode: triggerNodeRef.current });
     containerRef.current = overlayMountOf(triggerNodeRef.current);
     const ownRef = baseTriggerElement.props?.ref ?? baseTriggerElement.ref;
     const triggerElement = React.cloneElement(baseTriggerElement, {
@@ -56,8 +57,14 @@ const Tooltip = ({
             closeDelay={delayHide}
         >
             <BaseTooltip.Trigger render={triggerElement} />
-            <BaseTooltip.Portal container={containerRef}>
-                <BaseTooltip.Positioner side={placement} sideOffset={4} collisionPadding={8}>
+            <BaseTooltip.Portal container={bounded ? bounded.container : containerRef}>
+                <BaseTooltip.Positioner
+                    side={placement}
+                    sideOffset={4}
+                    collisionPadding={8}
+                    collisionBoundary={bounded?.collisionBoundary}
+                    collisionAvoidance={bounded?.collisionAvoidance}
+                >
                     <BaseTooltip.Popup
                         data-reduced={reduced ? 'true' : undefined}
                         id={id}

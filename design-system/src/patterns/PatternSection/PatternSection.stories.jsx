@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
     Button,
@@ -75,7 +76,11 @@ const StatCard = ({ title, body }) => (
     </PatternCard>
 );
 
+/** These stories read settled layouts, so the Frame's space motion is held off; its own motion stories live in Frame.stories. */
+const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>;
+
 export default {
+    decorators: [settledLayout],
     title: 'Templates/Section',
     component: PatternSection,
     tags: ['!dev', '!autodocs'],

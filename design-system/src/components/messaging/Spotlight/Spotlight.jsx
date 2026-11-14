@@ -2,6 +2,7 @@ import React, { createContext, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Popover } from '@base-ui/react/popover';
+import { useBoundedOverlay } from '@/lib/overlay';
 import { Button } from '../../forms-and-inputs/Button/Button';
 import CloseButton from '../../forms-and-inputs/CloseButton';
 import './Spotlight.scss';
@@ -107,6 +108,8 @@ export const Spotlight = ({
 }) => {
     const contextAnchor = useContext(SpotlightContext);
     const anchor = target ?? contextAnchor;
+    const anchorNode = typeof anchor === 'function' ? anchor() : (anchor?.current ?? anchor ?? null);
+    const bounded = useBoundedOverlay({ fromNode: anchorNode });
     const [side, align] = PLACEMENT_TO_SIDE_ALIGN[placement] ?? PLACEMENT_TO_SIDE_ALIGN.bottom;
 
     const dismissControl = dismissible && (
@@ -121,8 +124,15 @@ export const Spotlight = ({
 
     return (
         <Popover.Root open={isOpen} onOpenChange={(open) => { if (!open) onDismiss?.(); }}>
-            <Popover.Portal>
-                <Popover.Positioner anchor={anchor} side={side} align={align} sideOffset={8}>
+            <Popover.Portal container={bounded ? bounded.container : undefined}>
+                <Popover.Positioner
+                    anchor={anchor}
+                    side={side}
+                    align={align}
+                    sideOffset={8}
+                    collisionBoundary={bounded?.collisionBoundary}
+                    collisionAvoidance={bounded?.collisionAvoidance}
+                >
                     <Popover.Popup className={clsx('plus-spotlight', className)}>
                         <SpotlightHeader headline={headline} dismissControl={dismissControl} />
                         {media && <div className="plus-spotlight-media">{media}</div>}
