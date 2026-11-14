@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import Spinner from '@/components/loading/Spinner/Spinner';
 import OptionRow from './OptionRow';
 import AnchoredListboxSurface from './AnchoredListboxSurface';
+import { normalizeOption } from './optionShape';
 import Icon from '../../images-and-icons/Icon';
 import './Listbox.scss';
 
@@ -21,34 +22,6 @@ export const VIRTUALIZE_ABOVE = 100;
 const OVERSCAN = 6;
 /** A row's height before one has been measured. */
 const FALLBACK_ROW_HEIGHT = 36;
-
-/**
- * One shape for every option, whether the caller passed a string or an object.
- *
- * @param {string|object} option
- * @param {number} index Its place in the caller's array, which keeps its id stable while filtering.
- * @returns {{ value: *, label: *, text: string, description?: *, disabled: boolean, group?: string, elemBefore?: *, elemAfter?: *, index: number, source: * }}
- */
-const normalize = (option, index) => {
-    if (typeof option === 'string' || typeof option === 'number') {
-        return { value: option, label: option, text: String(option), disabled: false, index, source: option };
-    }
-    const label = option.label ?? option.text ?? String(option.value);
-    return {
-        value: option.value ?? label,
-        label,
-        text: typeof label === 'string' ? label : String(option.value ?? ''),
-        description: option.description,
-        disabled: Boolean(option.disabled),
-        group: option.group,
-        elemBefore: option.elemBefore,
-        elemAfter: option.elemAfter,
-        dragging: Boolean(option.dragging),
-        dropIndicator: option.dropIndicator,
-        index,
-        source: option,
-    };
-};
 
 /** Text fields keep their own Space, Home and End. */
 const isTextEntry = (target) => target instanceof HTMLElement
@@ -127,7 +100,7 @@ const Listbox = ({
     );
 
     /* ---------- the rows: filtered options, then the Create row ---------- */
-    const all = useMemo(() => options.map(normalize), [options]);
+    const all = useMemo(() => options.map(normalizeOption), [options]);
     const query = filter.trim().toLowerCase();
     const shown = useMemo(
         () => (query ? all.filter((option) => option.text.toLowerCase().includes(query)) : all),

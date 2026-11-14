@@ -1,5 +1,5 @@
 import { useMotionReduced } from '@/lib/motionPreference';
-import React, { useId, useState } from 'react';
+import React, { useId } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
@@ -7,6 +7,7 @@ import { FLOATING_PLACEMENTS, useFloatingOverlay } from '@/lib/overlay';
 import Icon from '@/components/images-and-icons/Icon';
 import Spinner from '@/components/loading/Spinner/Spinner';
 import { ButtonItem, CustomItem, MenuGroup } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import useOpenState from '../_internal/useOpenState';
 import './DropdownMenu.scss';
 
 /**
@@ -36,14 +37,11 @@ const DropdownMenu = ({
     className = '',
 }) => {
     const reduced = useMotionReduced();
-    const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
-    const isControlled = isOpen !== undefined;
-    const open = isControlled ? isOpen : uncontrolledOpen;
-
-    const handleOpenChange = (next) => {
-        if (!isControlled) setUncontrolledOpen(next);
-        onOpenChange?.(next);
-    };
+    const { isOpen: open, setOpen: handleOpenChange, closeList } = useOpenState({
+        open: isOpen,
+        defaultOpen,
+        onOpenChange,
+    });
 
     const floating = useFloatingOverlay({
         trigger,
@@ -72,7 +70,7 @@ const DropdownMenu = ({
             'button[role="menuitem"], a[role="menuitem"], [role="menuitem"] button, [role="menuitem"] a'
         );
         if (!interactive || interactive.closest('[data-keep-open="true"]')) return;
-        handleOpenChange(false);
+        closeList();
     };
 
     return (

@@ -6,25 +6,15 @@ import FieldBox from '../_internal/FieldBox';
 import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import OptionRow from '../_internal/OptionRow';
 import AnchoredListboxSurface from '../_internal/AnchoredListboxSurface';
+import {
+    getOptionChildren,
+    getOptionLabel,
+    getOptionValue,
+    isOptionDisabled,
+} from '../_internal/optionShape';
 import Icon from '../../images-and-icons/Icon';
 import '../_internal/Listbox.scss';
 import './TreeSelect.scss';
-
-// ---------------------------------------------------------------------------
-// Option helpers — tolerate { label | text, value, children } shapes as well
-// as plain strings, mirroring the Cascader normalization rules.
-// ---------------------------------------------------------------------------
-const getOptionValue = (option) =>
-    typeof option === 'string' ? option : (option.value ?? option.label ?? option.text);
-
-const getOptionLabel = (option) =>
-    typeof option === 'string' ? option : (option.label ?? option.text ?? String(option.value));
-
-const getOptionChildren = (option) =>
-    (typeof option === 'object' && Array.isArray(option.children)) ? option.children : [];
-
-const isOptionDisabled = (option) =>
-    typeof option === 'object' && Boolean(option.disabled);
 
 /** Collect the value of a node plus every descendant value (pre-order). */
 const collectSubtreeValues = (option) => {

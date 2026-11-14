@@ -5,19 +5,14 @@ import Icon from '../../images-and-icons/Icon';
 import { FilterButton } from '../FilterButton/FilterButton';
 import TextField from '../TextField/TextField';
 import Listbox from '../_internal/Listbox';
+import { normalizeOption } from '../_internal/optionShape';
+import useOpenState from '../_internal/useOpenState';
 import './PopupSelect.scss';
 
 /** Where the menu opens: under its trigger, lined up with the edge on the trigger's side of the bar. */
 export const POPUP_SELECT_PLACEMENTS = ['bottom-start', 'bottom-end'];
 
 export const POPUP_SELECT_SPACINGS = ['default', 'compact'];
-
-/** An option's value and the text the trigger shows for it. */
-const optionInfo = (option) => {
-    if (typeof option === 'string' || typeof option === 'number') return { value: option, text: String(option) };
-    const label = option.label ?? option.text ?? String(option.value);
-    return { value: option.value ?? label, text: typeof label === 'string' ? label : String(option.value ?? '') };
-};
 
 /**
  * Popup select: one list in a Popup, applied the moment a row is picked.
@@ -64,22 +59,20 @@ const PopupSelect = ({
     const [internalValue, setInternalValue] = useState(defaultValue ?? null);
     const current = value !== undefined ? value : internalValue;
 
-    const [internalOpen, setInternalOpen] = useState(defaultOpen);
-    const isOpen = open !== undefined ? Boolean(open) : internalOpen;
-
     const [query, setQuery] = useState('');
     const [activeId, setActiveId] = useState(undefined);
     const listRef = useRef(null);
 
-    const setOpen = (next) => {
-        if (open === undefined) setInternalOpen(next);
-        if (!next) setQuery('');
-        if (onOpenChange) onOpenChange(next);
-    };
+    const { isOpen, setOpen, closeList } = useOpenState({
+        open,
+        defaultOpen,
+        onOpenChange,
+        onClose: () => setQuery(''),
+    });
 
-    const pickedIndex = options.findIndex((option) => optionInfo(option).value === current);
+    const pickedIndex = options.findIndex((option) => normalizeOption(option).value === current);
     const picked = pickedIndex >= 0 ? options[pickedIndex] : undefined;
-    const pickedText = picked !== undefined ? optionInfo(picked).text : undefined;
+    const pickedText = picked !== undefined ? normalizeOption(picked).text : undefined;
 
     let triggerNode;
     if (typeof trigger === 'function') triggerNode = trigger({ isOpen, option: picked });
@@ -142,7 +135,7 @@ const PopupSelect = ({
                 filter={query}
                 onFilterChange={setQuery}
                 open={isOpen}
-                onClose={() => setOpen(false)}
+                onClose={closeList}
                 header={search}
                 spacing={spacing}
                 marker={marker}

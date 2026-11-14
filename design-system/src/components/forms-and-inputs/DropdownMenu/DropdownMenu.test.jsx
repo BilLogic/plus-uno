@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { Button, DropdownMenu, Modal } from '@/components';
@@ -51,6 +51,41 @@ describe('DropdownMenu floating behavior', () => {
         await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Details dialog' })).not.toBeInTheDocument());
         expect(screen.getByTestId('actions-menu')).toHaveAttribute('data-open');
         expect(onOpenChange.mock.calls).toEqual([[true]]);
+    });
+
+    it('honors controlled isOpen via useOpenState', async () => {
+        const user = userEvent.setup();
+        const onOpenChange = vi.fn();
+        const { rerender } = render(
+            <MotionPreferenceContext.Provider value={true}>
+                <DropdownMenu
+                    trigger={<Button>Controlled actions</Button>}
+                    isOpen={false}
+                    onOpenChange={onOpenChange}
+                    testId="controlled-actions-menu"
+                >
+                    <button role="menuitem" type="button">Rename</button>
+                </DropdownMenu>
+            </MotionPreferenceContext.Provider>,
+        );
+        expect(screen.queryByTestId('controlled-actions-menu')).toBeNull();
+
+        rerender(
+            <MotionPreferenceContext.Provider value={true}>
+                <DropdownMenu
+                    trigger={<Button>Controlled actions</Button>}
+                    isOpen
+                    onOpenChange={onOpenChange}
+                    testId="controlled-actions-menu"
+                >
+                    <button role="menuitem" type="button">Rename</button>
+                </DropdownMenu>
+            </MotionPreferenceContext.Provider>,
+        );
+        const menu = await screen.findByTestId('controlled-actions-menu');
+        await user.click(within(menu).getByRole('menuitem', { name: 'Rename' }));
+        expect(onOpenChange).toHaveBeenCalledWith(false);
+        expect(screen.getByTestId('controlled-actions-menu')).toBeInTheDocument();
     });
 
     it('honors an explicit container over the preview container and preserves the trigger ref', async () => {
