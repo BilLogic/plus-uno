@@ -1,6 +1,8 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import FileUpload from './FileUpload';
+import FileItem from '../FileItem';
 
 vi.mock('@fortawesome/fontawesome-free', () => ({}));
 
@@ -84,5 +86,85 @@ describe('FileUpload', () => {
         expect(label.tagName).toBe('LABEL');
         expect(label).toHaveAttribute('for', 'rec');
         expect(label).not.toHaveClass('form-label');
+    });
+
+    it('renders the folder picker control and drop line when allowFolders is true', () => {
+        const { container } = render(
+            <FileUpload label="Session recordings" allowFolders />
+        );
+
+        expect(container.textContent).toContain('Choose files or a folder, or drop them here');
+
+        const inputs = container.querySelectorAll('input[type="file"]');
+        expect(inputs.length).toBe(2);
+        const folderInput = Array.from(inputs).find((el) => el.hasAttribute('webkitdirectory'));
+        expect(folderInput).toBeTruthy();
+
+        const folderSpy = vi.spyOn(folderInput, 'click');
+        fireEvent.click(screen.getByRole('button', { name: /folder/i }));
+        expect(folderSpy).toHaveBeenCalledTimes(1);
+
+        const fileInput = Array.from(inputs).find((el) => !el.hasAttribute('webkitdirectory'));
+        const fileSpy = vi.spyOn(fileInput, 'click');
+        fireEvent.click(screen.getByRole('button', { name: /choose files/i }));
+        expect(fileSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows the batch status in the label row while any FileItem child is uploading', () => {
+        const { rerender } = render(
+            <FileUpload label="Session recordings">
+                <FileItem name="rec-1.mp4" status="done" meta="42 MB" />
+                <FileItem name="rec-2.mp4" status="uploading" progress={64} />
+                <FileItem name="rec-3.mp4" status="queued" />
+                <FileItem name="rec-4.mp4" status="queued" />
+                <FileItem name="rec-5.mp4" status="queued" />
+                <FileItem name="rec-6.mp4" status="queued" />
+            </FileUpload>
+        );
+
+        expect(screen.getByText('Uploading 2 of 6')).toBeInTheDocument();
+
+        rerender(
+            <FileUpload label="Session recordings">
+                <FileItem name="rec-1.mp4" status="done" meta="42 MB" />
+                <FileItem name="rec-2.mp4" status="done" meta="38 MB" />
+            </FileUpload>
+        );
+
+        expect(screen.queryByText(/Uploading \d+ of \d+/)).toBeNull();
+    });
+
+    it('accepts .zip as an ordinary file when included in acceptedFormats', () => {
+        const { container } = render(
+            <FileUpload label="Export" acceptedFormats={['.zip', '.mp4']} />
+        );
+        expect(container.querySelector('input[type="file"]')).toHaveAttribute('accept', '.zip,.mp4');
+    });
+
+    it('propagates isReadOnly and isDisabled to FileItem children', () => {
+        const { rerender } = render(
+            <FileUpload label="Session recordings" isReadOnly>
+                <FileItem name="zoom_0.mp4" status="done" meta="42 MB" onRemove={vi.fn()} />
+            </FileUpload>
+        );
+        expect(screen.queryAllByRole('button')).toHaveLength(0);
+
+        rerender(
+            <FileUpload label="Session recordings" isDisabled>
+                <FileItem name="zoom_0.mp4" status="done" meta="42 MB" onRemove={vi.fn()} />
+            </FileUpload>
+        );
+        expect(screen.queryByRole('button', { name: /remove/i })).toBeNull();
+    });
+
+    it('highlights the drop zone during drag-over and clears on drag-leave', () => {
+        const { container } = render(<FileUpload label="Session recordings" allowFolders />);
+        const zone = container.querySelector('.plus-file-upload-container');
+
+        fireEvent.dragEnter(zone);
+        expect(zone).toHaveClass('plus-file-upload-drag-over');
+
+        fireEvent.dragLeave(zone);
+        expect(zone).not.toHaveClass('plus-file-upload-drag-over');
     });
 });

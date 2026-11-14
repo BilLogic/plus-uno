@@ -323,6 +323,7 @@ export const TOKEN_LADDER = [
   // ─── Components / Checkbox, Radio ─────────────────────────────────────
   { tier: 'components', group: 'Checkbox', new: '--checkbox-control-size', old: '--layout-control-checkbox', ref: '18px', use: 'Size of the Checkbox box.' },
   { tier: 'components', group: 'Choice tile', new: '--choice-tile-width', old: null, ref: 'var(--size-1400)', use: 'Width of a choice tile in a Radio, RadioGroup, Checkbox or CheckboxGroup with tile appearance.' },
+  { tier: 'components', group: 'File item', new: '--file-item-height', old: null, ref: 'calc(var(--space-300) + var(--space-050))', use: 'Fixed height of a FileItem row across queued, uploading, done and error states.' },
   { tier: 'components', group: 'Radio', new: '--radio-control-size', old: '--layout-control-radio', ref: '12px', use: 'Size of the Radio circle.' },
   // The `size` prop's px values (Radio group, Choice grid, Range, Toggle) are rows too, so the
   // components read a named token and never a literal. Each name ends in the `size` step it serves.

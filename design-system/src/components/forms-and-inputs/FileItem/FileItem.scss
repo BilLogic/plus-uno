@@ -1,0 +1,152 @@
+@use "../../../styles/state" as *;
+
+.plus-file-item {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--inline-lg);
+    width: 100%;
+    height: var(--file-item-height);
+    min-height: var(--file-item-height);
+    max-height: var(--file-item-height);
+    padding: 0 var(--pad-x-lg);
+    background-color: var(--ds-surface);
+    border: var(--border-default) solid var(--ds-border);
+    border-radius: var(--radius-control-md);
+    color: var(--ds-text);
+    transition:
+        background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast),
+        border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+}
+
+.plus-file-item--disabled {
+    background-color: var(--ds-background-disabled);
+    border-color: var(--ds-border-disabled);
+    color: var(--ds-text-disabled);
+    cursor: not-allowed;
+}
+
+.plus-file-item__start {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--image-xs);
+    height: var(--image-xs);
+}
+
+.plus-file-item__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1 1 0%;
+    min-width: 0;
+}
+
+.plus-file-item__label {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    font: var(--body-default);
+}
+
+.plus-file-item__name {
+    display: inline-flex;
+    align-items: baseline;
+    max-width: 100%;
+    min-width: 0;
+    color: inherit;
+}
+
+.plus-file-item__link {
+    color: var(--ds-text);
+    text-decoration: none;
+
+    @include plus-state(
+        $states: (
+            hovered: (text-decoration: underline),
+        ),
+        $ring: false
+    );
+}
+
+.plus-file-item__name-visual {
+    display: inline-flex;
+    align-items: baseline;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.plus-file-item__name-head {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 0 1 auto;
+}
+
+.plus-file-item__name-tail {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.plus-file-item__description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+.plus-file-item--disabled .plus-file-item__description {
+    color: var(--ds-text-disabled);
+}
+
+.plus-file-item__description--error {
+    color: var(--ds-text-danger);
+}
+
+.plus-file-item__end {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--inline-sm);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.plus-file-item__confirm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-md);
+}
+
+.plus-file-item__confirm-text {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+.plus-file-item__confirm-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--inline-md);
+}
+
+// Multiple FileItem rows inside a list container sit in one bordered list with 1px dividers.
+:where(.plus-file-item-list, .plus-file-upload-files):has(> .plus-file-item) {
+    border: var(--border-default) solid var(--ds-border);
+    border-radius: var(--radius-control-md);
+    background-color: var(--ds-surface);
+    overflow: hidden;
+
+    > .plus-file-item {
+        border: 0;
+        border-radius: 0;
+    }
+
+    > .plus-file-item + .plus-file-item {
+        border-top: var(--border-default) solid var(--ds-border);
+    }
+}

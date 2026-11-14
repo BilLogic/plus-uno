@@ -122,6 +122,8 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | DateTimePicker | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
 | DropdownMenu | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | DropdownMenu | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| FileItem | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
+| FileItem | component | progress | Load content | `--ds-motion-linear` |  |
 | FileUpload | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | FileUpload | component | progress | Load content | `--ds-motion-linear` |  |
 | FilterButton | component | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |

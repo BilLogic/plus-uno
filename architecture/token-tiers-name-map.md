@@ -204,6 +204,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Progress indicator | `--progress-indicator-dot-size-12` | ProgressIndicator size 12 |
 | Checkbox | `--checkbox-control-size` |  |
 | Choice tile | `--choice-tile-width` |  |
+| File item | `--file-item-height` |  |
 | Radio | `--radio-control-size` |  |
 | Radio | `--radio-control-size-10` | RadioGroup size 10 |
 | Radio | `--radio-control-size-14` | RadioGroup size 14 |
