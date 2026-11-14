@@ -472,6 +472,7 @@ export const ExplodedStack = () => {
         </Illustration>
     );
 
+    // Top first in the DOM, as both layouts show them, so tab order follows what is seen.
     const labels = placed.map((plate, i) => {
         const on = plate.id === active;
         const tickY = point(plateAt(i), PLATE.w, TICK_Y).y;
@@ -500,11 +501,11 @@ export const ExplodedStack = () => {
                 >
                     <strong>{plate.title}</strong>
                     <code style={{ ...codeText, color: on ? 'var(--ds-text-brand)' : 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : 'no layer'}</code>
-                    <span style={{ color: on ? 'var(--ds-text-brand)' : 'var(--ds-text-subtle)' }}>{shadowNote(plate)}</span>
+                    <span style={{ ...(shadowNote(plate).startsWith('--') ? codeText : null), color: on ? 'var(--ds-text-brand)' : 'var(--ds-text-subtle)' }}>{shadowNote(plate)}</span>
                 </button>
             </li>
         );
-    });
+    }).reverse();
 
     const list = { margin: 0, padding: 0, listStyle: 'none' };
     return (
@@ -512,12 +513,12 @@ export const ExplodedStack = () => {
             {narrow ? (
                 <div style={stack}>
                     <div style={{ maxInlineSize: `${STAGE.w * 1.5}px`, marginInline: 'auto', inlineSize: '100%' }}>{figure}</div>
-                    <ol data-testid="stack-legend" aria-label="Layers, bottom first" style={{ ...list, display: 'flex', flexDirection: 'column-reverse', gap: 'var(--stack-sm)' }}>{labels}</ol>
+                    <ol data-testid="stack-legend" aria-label="Layers, top first" style={{ ...list, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>{labels}</ol>
                 </div>
             ) : (
                 <div style={{ position: 'relative', aspectRatio: `${STAGE.w + LABEL_W} / ${STAGE.h}`, maxInlineSize: `${(STAGE.w + LABEL_W) * 1.4}px`, marginInline: 'auto' }}>
                     <div style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: `${share}%` }}>{figure}</div>
-                    <ol data-testid="stack-legend" aria-label="Layers, bottom first" style={{ ...list, position: 'absolute', insetBlock: 0, insetInlineEnd: 0, width: `${100 - share}%` }}>{labels}</ol>
+                    <ol data-testid="stack-legend" aria-label="Layers, top first" style={{ ...list, position: 'absolute', insetBlock: 0, insetInlineEnd: 0, width: `${100 - share}%` }}>{labels}</ol>
                 </div>
             )}
         </div>
@@ -528,7 +529,7 @@ export const ExplodedStack = () => {
 const shadowNote = (plate) => {
     if (plate.id === 'backdrop') return 'blanket fill';
     const level = plate.level ? levelOf(plate.level) : null;
-    return level?.shadow ? level.shadow.replace('--ds-shadow-', '') + ' shadow' : 'no shadow';
+    return level?.shadow ?? 'no shadow';
 };
 
 /** One tile per level: its surface with its shadow, on the ground it sits on. */

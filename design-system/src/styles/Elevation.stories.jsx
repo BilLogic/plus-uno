@@ -72,8 +72,14 @@ export const Stack = {
                 expect(n('y1') - n('y2')).toBeCloseTo(a1[1] - a0[1], 3);
             }
         });
-        // The Tooltip is a label: its plate carries no shadow.
+        // A layer with a shadow draws it with its real token; the Tooltip is a label and has none.
+        const shadowOf = (id) => root.querySelector(`[data-plate="${id}"] foreignObject div`)?.style.boxShadow ?? '';
+        await expect(shadowOf('card')).toBe('var(--ds-shadow-raised)');
+        await expect(shadowOf('popup')).toBe('var(--ds-shadow-overlay)');
+        await expect(shadowOf('modal')).toBe('var(--ds-shadow-blocking)');
         await expect(plates[6].querySelector('[style*="box-shadow"]')).toBeNull();
+        // Labels read top first, in the DOM as on screen.
+        await expect([...root.querySelectorAll('[data-legend]')].map((li) => li.dataset.legend)).toEqual(['tooltip', 'modal', 'backdrop', 'popup', 'card', 'page', 'frame']);
 
         const legend = within(root.querySelector('[data-testid="stack-legend"]'));
         await waitFor(() => expect(legend.getByText(/--layer-modal \d+/)).toBeInTheDocument());
@@ -81,11 +87,11 @@ export const Stack = {
         await waitFor(() => expect(legend.getByText(/--layer-tooltip \d+/)).toBeInTheDocument());
         await expect(legend.getAllByRole('listitem')).toHaveLength(7);
         // Each label names its shadow; the Tooltip has none.
-        await expect(legend.getByText('blocking shadow', { selector: '[data-legend="modal"] span' })).toBeInTheDocument();
+        await expect(legend.getByText('--ds-shadow-blocking', { selector: '[data-legend="modal"] span' })).toBeInTheDocument();
         await expect(legend.getByText('blanket fill', { selector: '[data-legend="backdrop"] span' })).toBeInTheDocument();
         await expect(legend.getByText('no shadow', { selector: '[data-legend="tooltip"] span' })).toBeInTheDocument();
         // Card is raised with no layer: --layer-card belongs to sticky headers and columns.
-        await expect(root.querySelector('[data-legend="card"]')).toHaveTextContent(/no layer\s*raised shadow/);
+        await expect(root.querySelector('[data-legend="card"]')).toHaveTextContent(/no layer\s*--ds-shadow-raised/);
         await expect(legend.queryByText(/--layer-card/)).toBeNull();
 
         // One pair is active at a time, the top one by default; a label and its plate turn accent together.
