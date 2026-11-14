@@ -41,8 +41,8 @@ Six levels, lowest first. A surface and its shadow always travel together.
 <ModeCompare stacked>{() => <LevelTiles />}</ModeCompare>
 
 <RefTable
-    head={['Level', 'Surface', 'Shadow', 'Use']}
-    rows={LEVELS.map((l) => [l.name, l.surface ? <C>{l.surface}</C> : '—', l.shadow ? <C>{l.shadow}</C> : '—', l.use])}
+    head={['Level', 'Surface', 'Shadow']}
+    rows={LEVELS.map((l) => [l.name, l.surface ? <C>{l.surface}</C> : '—', l.shadow ? <C>{l.shadow}</C> : '—'])}
 />
 
 Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked. `--ds-surface-container` is a translucent well inside a surface, and it is not a level.
@@ -188,6 +188,16 @@ It grows one to one with the scroll position, with no spring token of its own.
 
 </FoundationSection>
 
+<FoundationSection title="Accessibility">
+
+- **A shadow is never the boundary.** The edge slot is: under increased contrast it becomes a 3:1 line. Turn it on below.
+- **Forced colors keep an edge.** Shadows disappear there, so a lifted surface carries a transparent border that the system paints.
+- **Text clears 4.5:1 on every level**, in light and dark. Check a new pairing on the overlay surface in dark, where it is lightest. See [Color](?path=/docs/foundations-visual-color--docs).
+
+<Canvas of={ElevationStories.Contrast} sourceState="none" />
+
+</FoundationSection>
+
 <FoundationSection title="Do and don't">
 
 <FoundationSubsection title="Lift with shadow, not a darker fill">
@@ -245,16 +255,6 @@ Raise the one object a person acts on; a page of raised cards has no focus.
 <Canvas of={ElevationStories.OneFocalPoint} sourceState="none" />
 
 </FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="Accessibility">
-
-- **A shadow is never the boundary.** The edge slot is: under increased contrast it becomes a 3:1 line. Turn it on below.
-- **Forced colors keep an edge.** Shadows disappear there, so a lifted surface carries a transparent border that the system paints.
-- **Text clears 4.5:1 on every level**, in light and dark. Check a new pairing on the overlay surface in dark, where it is lightest. See [Color](?path=/docs/foundations-visual-color--docs).
-
-<Canvas of={ElevationStories.Contrast} sourceState="none" />
 
 </FoundationSection>
 

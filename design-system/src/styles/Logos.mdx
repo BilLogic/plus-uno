@@ -62,7 +62,7 @@ The logo has two parts: the logomark and the wordmark. Together they form the lo
 
 <FoundationSection title="Logomark shape and size">
 
-The logomark ships in fixed heights: 16, 20, 24, 32, 48, 64 and 96 px. At 24 px and below it uses a heavier small-size drawing so the plus stays open. Pick a step; never scale an instance by hand.
+The logomark ships in fixed heights: 16, 20, 24, 32, 48, 64 and 96. At 24 and below it uses a heavier small-size drawing so the plus stays open. Pick a step; never scale an instance by hand.
 
 <FoundationExample>
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--section-stack-lg)' }}>
@@ -79,7 +79,7 @@ The logomark ships in fixed heights: 16, 20, 24, 32, 48, 64 and 96 px. At 24 px 
 
 <FoundationSection title="Construction">
 
-The logomark is drawn on a 12 by 12 unit square (1 unit = 8 of the 96 drawing coordinates). Two circles of 6 and 4.5 units share its center, two 2-unit corner circles sit at the top right and bottom left, and the 3-unit plus is centered 8.5 units from the left and 3.5 from the top.
+The logomark is drawn on a 12 by 12 unit square (1 unit = 8 of the 96 drawing coordinates). Two circles of 6 and 4.5 units share its center, two 2-unit corner circles sit at the top right and bottom left, and the 3-unit plus is centered 8.5 units from the left and 3.5 from the top. Use the `Logo` component; the drawing explains the shape and is not a template to redraw from.
 
 <FoundationExample>
 <LogoConstruction />
@@ -122,7 +122,7 @@ Keep clear space around the logo, measured from the logomark's edge. Align the l
     head={['Rule', 'Value', 'Note']}
     rows={[
         ['Clear space', 'Half the logomark’s height', 'On every side, measured from the logomark edge.'],
-        ['Minimum size', '24 px (lockup) · 16 px (logomark)', 'Below 24 px, use the logomark alone.'],
+        ['Minimum size', '24 (lockup) · 16 (logomark)', 'Below 24, use the logomark alone.'],
     ]}
 />
 

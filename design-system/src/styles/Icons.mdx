@@ -27,7 +27,7 @@ import * as IconsStories from './Icons.stories.jsx';
 
 <FoundationSection title="Overview">
 
-The <DocsLink id="components-images-and-icons-icon">Icon</DocsLink> component renders a single glyph; components with icon slots (`Button`'s `iconBefore` and `iconAfter`) pass the glyph name through `Icon` (`fa-regular fa-<name>`, falling back to `fa-solid` where Font Awesome Free has no regular weight).
+The <DocsLink id="components-images-and-icons-icon">Icon</DocsLink> component renders a single glyph; components with icon slots (`Button`'s `iconBefore` and `iconAfter`) pass the glyph name through `Icon` (`fa-regular fa-<name>`, falling back to `fa-solid` where Font Awesome Free has no regular weight). A React node in place of the name renders as given.
 
 ```jsx
 <Icon name="calendar-days" size={16} color="subtle" />
@@ -54,7 +54,7 @@ A label states what the icon does and names it for screen readers. Leave an icon
 
 <FoundationSection title="Sizes: 12, 16 and 24">
 
-Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set globally so every glyph fills its square box without adding line height. Add breathing room with spacing tokens, never a larger icon size.
+Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set globally so every glyph fills its square box without adding line height. Chevrons are always 12. Add breathing room with spacing tokens, never a larger icon size.
 
 <Canvas of={IconsStories.Sizes} sourceState="none" />
 
@@ -62,8 +62,8 @@ Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set 
     head={['Size (px)', 'Figma token', 'Code', 'Use']}
     rows={[
         ['12', <C>Size/Icon/sm</C>, <C>--icon-sm</C>, 'Chevrons, field validation, and compact controls such as tags, Count tags, statuses, secondary actions and table headers.'],
-        ['16', <C>Size/Icon/md</C>, <C>--icon-md</C>, 'Default beside 14 and 16 px text in buttons, menus, fields and lists.'],
-        ['24', <C>Size/Icon/lg</C>, <C>--icon-lg</C>, 'Empty states, section headers and standalone status marks. Above 24 px, use a Tile.'],
+        ['16', <C>Size/Icon/md</C>, <C>--icon-md</C>, 'Default beside 14 and 16 text in buttons, menus, fields and lists.'],
+        ['24', <C>Size/Icon/lg</C>, <C>--icon-lg</C>, 'Empty states, section headers and standalone status marks. Above 24, use a Tile.'],
     ]}
 />
 
@@ -71,7 +71,7 @@ Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set 
 
 <FoundationSection title="Above 24, use a Tile">
 
-24 px is the top of the icon scale. A larger mark, tool logo or empty-state symbol belongs in a <DocsLink id="components-images-and-icons-tile">Tile</DocsLink>, which sets its size, radius and fill together.
+24 is the top of the icon scale. A larger mark, tool logo or empty-state symbol belongs in a <DocsLink id="components-images-and-icons-tile">Tile</DocsLink>, which sets its size, radius and fill together.
 
 <Canvas of={IconsStories.LargerMeansTile} sourceState="none" />
 
@@ -79,7 +79,7 @@ Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set 
 
 <FoundationSection title="Font Awesome Free and color tokens">
 
-Use Font Awesome Free 7.2 only: `fa-solid`, `fa-regular` and `fa-brands` (such as `fa-brands fa-figma` and `fa-brands fa-github`). Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are unlicensed and render blank. Regular is the default weight; solid is used where Free has no regular glyph. Always use current glyph names rather than legacy aliases (`calendar-days`, not `calendar-alt`).
+Use Font Awesome Free 7.2 only: `fa-solid`, `fa-regular` and `fa-brands` (such as `fa-brands fa-figma` and `fa-brands fa-github`). Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are unlicensed and render blank. Regular is the default weight; solid is used where Free has no regular glyph. Where one set of icons needs a glyph Free draws only in solid, that one glyph is solid and the rest stay regular. Always use current glyph names rather than legacy aliases (`calendar-days`, not `calendar-alt`).
 
 <Canvas of={IconsStories.Families} sourceState="none" />
 
@@ -94,14 +94,14 @@ Color icons with `--ds-icon-*` tokens (`--ds-icon-success`, `--ds-icon-danger`, 
 <RefTable
     head={['Component', 'Job']}
     rows={[
-        [<DocsLink id="components-images-and-icons-icon">Icon</DocsLink>, 'Backs up a text label at 12, 16 or 24 px.'],
-        [<DocsLink id="components-images-and-icons-tile">Tile</DocsLink>, 'Frames an icon, partner/tool logo or picture at 20 to 48 px.'],
+        [<DocsLink id="components-images-and-icons-icon">Icon</DocsLink>, 'Backs up a text label at 12, 16 or 24.'],
+        [<DocsLink id="components-images-and-icons-tile">Tile</DocsLink>, 'Frames an icon, partner/tool logo or picture at 20 to 48.'],
         [<DocsLink id="components-images-and-icons-logo">Logo</DocsLink>, 'Marks PLUS itself.'],
         [<DocsLink id="components-images-and-icons-image">Image</DocsLink>, 'Places a photo or graphic in content.'],
     ]}
 />
 
-Before proposing a new glyph through Intake, verify that no existing glyph fits, that it will not conflict with another icon in the same view, and that a text label alone would not be clearer. Partner and tool marks (such as Zoom) go in a `Tile`, never in `Logo`.
+Before proposing a new glyph through Intake, verify that no existing glyph fits, that it will not conflict with another icon in the same view, and that a text label alone would not be clearer. A design lead approves new glyphs. Zoom has no Font Awesome Free glyph: a Zoom link is not an icon, and partner and tool marks go in a `Tile`, never in `Logo`.
 
 </FoundationSection>
 
@@ -137,6 +137,8 @@ Before proposing a new glyph through Intake, verify that no existing glyph fits,
 
 <FoundationSubsection title="Use Free families and Free names only">
 
+Solid, regular and brands are licensed here, including brand glyphs.
+
 <DoDont>
 <Do caption="Free families (fa-regular, fa-solid, fa-brands) render everywhere.">
 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
@@ -151,14 +153,31 @@ Before proposing a new glyph through Intake, verify that no existing glyph fits,
 
 </FoundationSubsection>
 
-<FoundationSubsection title="Use 16 px by default, 12 px for chevrons and compact parts">
+<FoundationSubsection title="Use 16 by default, 12 sparingly">
+
+Icons are 16 beside body text. Keep 12 for chevrons, validation and compact parts.
 
 <DoDont>
-<Do caption="A 16 px icon leads the label; the trailing chevron is 12 px.">
+<Do caption="A 16 icon leads the label; the trailing chevron is 12.">
 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" />Add tutor<Glyph name="chevron-down" size={12} /></span>
 </Do>
-<Dont caption="A 12 px leading icon is too small beside 14 px body text.">
+<Dont caption="A 12 leading icon is too small beside 14 body text.">
 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Icon name="plus" size={12} color="default" />Add tutor</span>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Use a symbol people recognize">
+
+Pick the glyph most people read the same way.
+
+<DoDont>
+<Do caption="A bell for notifications.">
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="bell" />Notifications</span>
+</Do>
+<Dont caption="A gear reads as settings, so it misleads here.">
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="gear" />Notifications</span>
 </Dont>
 </DoDont>
 

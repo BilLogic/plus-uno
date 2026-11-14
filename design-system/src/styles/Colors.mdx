@@ -60,6 +60,8 @@ Primitives hold raw ramps and stay hidden; bind only semantic tokens. Names read
     ]}
 />
 
+`--ds-border-<role>-subtle` is the pale edge of an outlined label, such as a Tag or a date Status.
+
 </FoundationSection>
 
 <FoundationSection title="Modes">
@@ -77,7 +79,7 @@ PLUS ships four modes: light and dark, each at standard and increased contrast. 
 
 <FoundationSection title="Roles">
 
-Pick the role for the intention, then the emphasis. Never pick a role by how the hue looks.
+Pick the role for the intention, then the emphasis. Never pick a role by how the hue looks or by a matching value: a danger fill, its border and its icon are three tokens even when two of them share a value today.
 
 <RefTable
     head={['Role', 'Default fill', 'Text', 'Use for']}
@@ -194,7 +196,7 @@ Every foreground token pairs with a ground that clears WCAG AA across all four m
 
 <FoundationSection title="Data-viz color">
 
-Charts use `--ds-chart-*` tokens (`chartPalette` from `@/components`). Never use an accent or UI role token to draw a series. See <DocsLink id="data-visualizations-color">Data visualizations › Chart color</DocsLink> for live ramps and specimens, and <DocsLink id="data-visualizations-foundations">Chart foundations</DocsLink> for container, tooltip, radius, stroke, type and motion tokens.
+Charts use `--ds-chart-*` tokens (`chartPalette` from `@/components`). Never reach for an accent hue or a UI role token to draw a series. Color is the one foundation with chart rules of its own; charts take spacing, radius, elevation, stroke, type, layers and motion from the same component tokens as the rest of the system.
 
 <RefTable
     head={['Job', 'What it encodes', 'Tokens']}
@@ -203,16 +205,20 @@ Charts use `--ds-chart-*` tokens (`chartPalette` from `@/components`). Never use
         ['Categorical', 'Distinct series', <><C>--ds-chart-categorical-1</C> to <C>-8</C>, in order</>],
         ['Sequential', 'Magnitude', <>One hue from <C>subtler</C> to <C>bold</C>, <C>bolder</C>, <C>boldest</C> (darkest = largest)</>],
         ['Diverging', 'Direction from a baseline', <>Two hues around <C>--ds-background-accent-gray-subtler</C> (orange and blue by default; never red and green)</>],
-        ['Status', 'On track, at risk, off track', <><C>--ds-chart-success</C>, <C>-warning</C>, <C>-danger</C>, <C>-information</C>, <C>-discovery</C> (plus <C>-bold</C>)</>],
+        ['Status', 'On track, at risk, off track', <><C>--ds-chart-success</C>, <C>-warning</C>, <C>-danger</C>, <C>-information</C>, <C>-discovery</C> (plus <C>-bold</C> for the more extreme level)</>],
         ['SMART subject', 'SMART area', <C>--ds-chart-smart-&lt;subject&gt;</C>],
     ]}
 />
 
 <ChartPalette />
 
+- Use five or six categories at most and group the rest into "Other".
+- Never mix categorical and status colors in one chart, and give every series or state a second cue (label, shape, pattern, icon or backing table).
+- Titles, axes, gridlines, tooltips and threshold lines wear text and border tokens, never a chart color.
+
 <FoundationSubsection title="Categorical order">
 
-Assign series in slot order without skipping. Group past 5–6 series into "Other".
+Assign series in slot order without skipping.
 
 <RefTable
     head={['Slot', 'Hue', 'Light', 'Dark', 'Light IC', 'Dark IC']}
@@ -228,14 +234,33 @@ Assign series in slot order without skipping. Group past 5–6 series into "Othe
     ]}
 />
 
-- **Brand leads:** slot 1 matches `--ds-chart-brand` so a 1-series and 6-series chart share their lead color.
-- **Neighbors alternate lightness:** adjacent slots alternate light and dark steps so series stay distinct in grayscale and under color-vision deficiency.
-- **No mixing with status:** yellow and red are reserved for warning and danger; never mix categorical and status colors in one chart.
-- **Separators and hover:** keep a gap or `--ds-border-inverse` seam between touching marks. Hovered marks take their `-hovered` token; fade unselected series with `--ds-opacity-disabled`.
+Three rules govern this sequence:
+
+- **Brand leads:** slot 1 is lagoon (`--ds-chart-brand`), so a one-series chart and the first series of a multi-series chart share their lead color.
+- **Neighbors alternate light and dark steps:** slot 2 (orange-800) sits between slot 1 (lagoon-600) and slot 3 (blue-500), alternating through slot 6 so adjacent series remain distinct in grayscale and under color-vision deficiency.
+- **Hues spread across the wheel:** lagoon, orange, blue, magenta, lime and purple never place two adjacent slots in the same hue family. Yellow (warning), red (danger) and teal (too close to brand) stay out; lime and purple-500 double as success and discovery, which is why categorical and status colors never mix.
+- **Overflow and dark mode:** slots 7 and 8 reprise orange and blue for overflow past six series. Dark mode steps one lighter except blue (3) and orange (7), which hold at 500 to preserve lightness alternation, and purple (6), which holds at 700 so it does not crowd its neighbors.
 
 </FoundationSubsection>
 
+<FoundationSubsection title="Separators, ramps, SMART subjects and hover">
+
+- **Separators:** keep a gap or `--ds-border-inverse` line where marks touch (stacked bars, histogram bins, waterfall steps). Lightness alternation identifies the series; the separator marks the boundary.
+- **Sequential and diverging ramps:** sequential runs `--ds-background-accent-<hue>-subtler` through `--ds-chart-<hue>-bold`, `-bolder` and `-boldest` (strongest tone = largest value). Diverging runs two hues around `--ds-background-accent-gray-subtler` (orange and blue by default; never red and green).
+- **SMART subjects:** each subject uses the emphasis that keeps S-M-A-R-T neighbors apart: social-emotional orange (`bold`), mastering content teal (`boldest`), advocacy lime (`bold`), relationship magenta (`boldest`), technology tools brown (`bold`). Label directly or keep the legend beside the chart.
+- **Labels and hover:** place labels beside marks; when a label must sit on a fill (heatmap cell, stacked segment), use `--ds-text` or `--ds-text-inverse`. Hovered marks take their `-hovered` token, and unselected series fade with `--ds-opacity-disabled`.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Chart order, targets and ranges">
+
+Sort categories from most to least (an ordinal set such as grades takes one hue ramp), put the strongest tone on the largest value, and mark targets and ranges without shading bands or repeating tooltip numbers beside the bar.
+
 <FoundationSubsection title="Sort biggest first and darken with the value">
+
+Students by grade in the tutoring cohort.
 
 <DoDont>
 <Do caption="Biggest at the top, darkest tone on the biggest value.">
@@ -248,7 +273,7 @@ Assign series in slot order without skipping. Group past 5–6 series into "Othe
     ))}
 </ul>
 </Do>
-<Dont caption="Unsorted categories in a single neutral tone.">
+<Dont caption="Grades in any order, one tone. The eye has to read every number to find the biggest.">
 <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
     {[['Grade 11', 27], ['Grade 9', 48], ['Grade 12', 15], ['Grade 10', 36]].map(([label, n]) => (
         <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-small)' }}>
@@ -264,15 +289,17 @@ Assign series in slot order without skipping. Group past 5–6 series into "Othe
 
 <FoundationSubsection title="Mark the target with a tick and the range with an outline">
 
+Attendance for one class against a 90% target.
+
 <DoDont>
-<Do caption="A green tick at 90% and a green outline on the track.">
+<Do caption="A green tick at 90 and a green outline on the track.">
 <div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended</div>
 <div style={{ position: 'relative', height: 'var(--icon-md)', borderRadius: 'var(--radius-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-chart-success)' }}>
     <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-brand)' }} />
     <span style={{ position: 'absolute', insetBlock: '-25%', insetInlineStart: '90%', width: 'var(--stroke-2)', background: 'var(--ds-chart-success-bold)' }} />
 </div>
 </Do>
-<Dont caption="A shaded band and inline target text that hides the bar end and repeats the tooltip.">
+<Dont caption="A shaded band and a value beside the bar. The band hides the bar's own end and the text repeats the tooltip.">
 <div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended · Target 90%</div>
 <div style={{ position: 'relative', height: 'var(--icon-md)', background: 'var(--ds-chart-success)' }}>
     <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', background: 'var(--ds-chart-brand)' }} />
@@ -286,31 +313,41 @@ Assign series in slot order without skipping. Group past 5–6 series into "Othe
 
 <FoundationSection title="Disabled">
 
-Disabled is a dedicated color token (`color/text/disabled`, `color/background/disabled`, `color/border/disabled`), not an opacity fade. `--ds-opacity-disabled` is reserved for dimmed images and de-emphasized chart series. See <DocsLink id="foundations-accessibility">Accessibility</DocsLink> for disabled behavior rules.
+Disabled is a dedicated color token (`color/text/disabled`, `color/background/disabled`, `color/border/disabled`), not an opacity fade. `--ds-opacity-disabled` is reserved for dimmed images and de-emphasized chart series. State the reason a control is disabled in nearby text (see <DocsLink id="foundations-accessibility">Accessibility</DocsLink>).
+
+<FoundationSubsection title="Disable with color tokens">
+
+The Reschedule button after the session has ended.
 
 <DoDont>
-<Do caption="Disabled uses color/text/disabled on color/background/disabled.">
+<Do caption="Disabled takes color/text/disabled on color/background/disabled.">
 <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
 </Do>
-<Dont caption="Opacity on a primary button still looks active and breaks contrast consistency.">
+<Dont caption="Opacity on the primary button. It still looks clickable and the gray is not the system one.">
 <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
 </Dont>
 </DoDont>
+
+</FoundationSubsection>
 
 </FoundationSection>
 
 <FoundationSection title="Links">
 
-Links take `color/link/default` (`--ds-link`, with `--ds-link-pressed` on press). Underline links in running text at rest and on hover; standalone navigation links, menus and buttons may omit the underline.
+Links take `color/link/default` (`--ds-link`, with `--ds-link-pressed` on press and no hovered color step). Underline links in running text at rest and on hover; standalone navigation links, menus, buttons and card titles may omit the underline. Never use brand, selected or focused colors for a link.
+
+<FoundationSubsection title="Underline links in running text">
 
 <DoDont>
-<Do caption="Link color and underline together in running text.">
+<Do caption="Link color and underline together.">
 The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>Send them to the family</a> from the link below.
 </Do>
-<Dont caption="Color alone in running text is too close to body ink.">
+<Dont caption="The color alone is too close to the body text, so the link is easy to miss.">
 The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--ds-link)', textDecoration: 'none' }}>Send them to the family</a> from the link below.
 </Dont>
 </DoDont>
+
+</FoundationSubsection>
 
 </FoundationSection>
 
@@ -324,7 +361,7 @@ The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--
         ['Progress and meter', 'Track · fill', <><C>color/background/neutral</C> · <C>color/background/brand/bold</C> (success or warning bold for status)</>],
         ['Empty state', 'Icon · message', <><C>color/icon/subtlest</C> · <C>color/text/subtle</C></>],
         ['Skeleton', 'Blocks', <><C>color/skeleton/default</C> · <C>color/skeleton/subtle</C></>],
-        ['Table', 'Grid lines · head rule · selected row', <><C>color/border/default</C> · <C>color/border/bold</C> · <C>color/background/selected</C></>],
+        ['Table', 'Grid lines · head rule · selected row', <><C>color/border/default</C> · <C>color/border/bold</C> · <C>color/background/selected</C> across the whole row</>],
         ['Sidebar item', 'Hovered · selected', <><C>color/background/neutral/subtle/hovered</C> · <C>color/background/selected</C> with <C>color/text/selected</C> and <C>color/icon/selected</C></>],
     ]}
 />
@@ -335,11 +372,13 @@ The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--
 
 <FoundationSubsection title="Use the right role">
 
+Pick the role for the job. A failed payment is danger; an accent has no meaning, so it should not carry one.
+
 <DoDont>
 <Do caption="Danger for a failed payment.">
 <span style={{ color: 'var(--ds-text-danger)' }}>Payment failed</span>
 </Do>
-<Dont caption="An accent hue where the color carries semantic meaning.">
+<Dont caption="A purple accent where the color has semantic meaning.">
 <span style={{ color: 'var(--ds-text-accent-purple)' }}>Payment failed</span>
 </Dont>
 </DoDont>
@@ -348,12 +387,50 @@ The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--
 
 <FoundationSubsection title="Pair text with its ground">
 
+Take the text color from the same role as the ground. Gray text on a bold ground falls well below 4.5:1 in both modes.
+
+<DoDont>
+<Do caption="Danger text on the subtle danger ground.">
+<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-subtler)' }}>
+    <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text-danger)' }}>Payment failed</strong>
+    <div style={{ font: 'var(--body-small)', color: 'var(--ds-text)' }}>Update your card to keep sessions booked.</div>
+</div>
+</Do>
+<Dont caption="Gray text on the bold danger ground. The role is right and the pair is wrong.">
+<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-bold)' }}>
+    <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text-subtle)' }}>Payment failed</strong>
+    <div style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Update your card to keep sessions booked.</div>
+</div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Use inverse tokens on bold backgrounds">
+
+On a bold fill, text and icons take `color/text/inverse` and `color/icon/inverse` (`color/text/warning/inverse` on bold warning).
+
 <DoDont>
 <Do caption="color/text/inverse on a bold danger fill.">
 <span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text-inverse)' }}>Delete session</span>
 </Do>
-<Dont caption="color/text/default or subtle on a bold fill loses contrast.">
+<Dont caption="color/text/default on a bold fill loses contrast.">
 <span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text)' }}>Delete session</span>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Show focus with a ring, never a fill">
+
+A filled field looks selected or disabled. The focus ring is the one signal for keyboard focus.
+
+<DoDont>
+<Do caption="The field keeps its fill and gains the focus ring, color/border/focused.">
+<RingDemo style={{ borderRadius: 'var(--radius-lg)' }}><div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', color: 'var(--ds-text-subtlest)' }}>Placeholder</div></RingDemo>
+</Do>
+<Dont caption="A brand fill on the field to show focus. It reads as a selected value and hides what is typed.">
+<div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Lincoln Middle Thursday</div>
 </Dont>
 </DoDont>
 
@@ -361,13 +438,15 @@ The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--
 
 <FoundationSubsection title="Keep selected and focused distinct">
 
+Selection uses the selected tokens and another cue such as a check mark. The focus ring is only for keyboard focus.
+
 <DoDont>
 <Do caption="Selected tokens plus a check mark.">
 <span style={{ display: 'inline-flex', gap: 'var(--inline-sm)', alignItems: 'center', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-selected)', color: 'var(--ds-text-selected)' }}>
     <i className="fa-solid fa-check" aria-hidden="true" /> Tuesday 4:00 PM
 </span>
 </Do>
-<Dont caption="The focus ring used to show selection.">
+<Dont caption="The focus ring used to mean selected.">
 <RingDemo style={{ borderRadius: 'var(--radius-md)' }}><span style={{ display: 'inline-flex', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-md)' }}>Tuesday 4:00 PM</span></RingDemo>
 </Dont>
 </DoDont>
@@ -376,13 +455,15 @@ The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--
 
 <FoundationSubsection title="One series, one color">
 
+A single series is drawn in the brand chart color. Reaching for the categorical set makes a legend that says nothing.
+
 <DoDont>
 <Do caption="Five weeks of one measure, all in color/chart/brand.">
 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
     {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-brand)' }} />)}
 </div>
 </Do>
-<Dont caption="Categorical colors on a single series imply multiple series.">
+<Dont caption="A rainbow on one measure suggests five series. The color does no job, and a reader looks for a legend that is not there.">
 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
     {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: `var(--ds-chart-categorical-${i + 1})` }} />)}
 </div>
@@ -395,10 +476,10 @@ The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--
 
 <FoundationSection title="Accessibility">
 
-- Foreground/background partner pairs clear WCAG 2.1 AA in all four modes (4.5:1 text, 3:1 UI/icons/borders; 7:1 and 4.5:1 in IC).
+- Foreground/background partner pairs clear WCAG 2.1 AA in all four modes: 4.5:1 for text smaller than 24 px (1.4.3) and 3:1 for essential UI, icons, borders, the focus ring and text 24 px or larger (1.4.11), rising to 7:1 and 4.5:1 in increased contrast.
 - Never convey meaning by color alone: pair status colors with an icon or text, selection with a check mark or 2 px border, and chart series with labels, shapes or a table.
-- Warning icons and borders use `color/icon/warning` and `color/border/warning` rather than the yellow fill so they clear 3:1 on light surfaces.
-- See <DocsLink id="foundations-accessibility">Accessibility</DocsLink> for cross-cutting contrast and focus rules.
+- Warning icons and borders use `color/icon/warning` and `color/border/warning` rather than the yellow fill (2.87:1 on the darkest surface) so they clear 3:1.
+- Check new screens in all four modes with the toolbar's Color mode and Contrast switches, and see <DocsLink id="foundations-accessibility">Accessibility</DocsLink> for cross-cutting rules.
 
 </FoundationSection>
 
