@@ -335,6 +335,42 @@ async function measureOpenAtTop(context, baseUrl, index) {
   return { pages: ids.length, failures: openAtTopFailures(rows) };
 }
 
+/**
+ * The manager swaps stories and docs pages inside one preview iframe without a
+ * reload, so the fresh-load scan above cannot see two ways to open partway down:
+ * a story shown first and a docs page second, and a docs page the reader has
+ * already clicked in followed by another. Both are walked here through the
+ * manager, with a client-side navigation between them.
+ */
+const NAV_PAGES = ['components-messaging-spotlight--docs', 'components-forms-and-inputs-filter-menu--docs'];
+
+async function measureNavigation(context, baseUrl, index) {
+  const story = Object.values(index.entries ?? {}).find((e) => e.type === 'story');
+  if (!story || NAV_PAGES.some((id) => !index.entries?.[id])) return [];
+  const page = await context.newPage();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(`${baseUrl}/?path=/story/${story.id}`, { waitUntil: 'load' });
+  const frame = await (await page.waitForSelector('#storybook-preview-iframe')).contentFrame();
+  await frame.waitForSelector('#storybook-root, .sbdocs-content', { state: 'attached', timeout: 60_000 });
+  const go = (id) => page.evaluate((to) => {
+    window.history.pushState({}, '', `/?path=/docs/${to}`);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }, id);
+  const read = async () => {
+    await frame.waitForSelector('.sbdocs-content', { timeout: 60_000 });
+    await page.waitForTimeout(2500);
+    return frame.evaluate(() => Math.max(window.scrollY, document.scrollingElement?.scrollTop ?? 0));
+  };
+  const rows = [];
+  await go(NAV_PAGES[0]);
+  rows.push({ page: `story to ${NAV_PAGES[0]}`, scrollY: await read() });
+  await frame.locator('.sbdocs-content').click({ position: { x: 4, y: 4 }, force: true }).catch(() => {});
+  await go(NAV_PAGES[1]);
+  rows.push({ page: `docs to ${NAV_PAGES[1]} after a click`, scrollY: await read() });
+  await page.close();
+  return openAtTopFailures(rows);
+}
+
 let exitCode = 0;
 const browser = await chromium.launch();
 try {
@@ -377,8 +413,9 @@ try {
   const managerProblems = missing.includes(TOC_PAGE) ? [] : await measureManager(context, base);
 
   const top = await measureOpenAtTop(context, base, index);
+  const navigation = await measureNavigation(context, base, index);
 
-  const failures = [...chromeFailures(measurements), ...tocProblems, ...managerProblems, ...top.failures];
+  const failures = [...chromeFailures(measurements), ...tocProblems, ...managerProblems, ...top.failures, ...navigation];
   if (failures.length) {
     console.error(`[docs-chrome] ${failures.length} problem(s):`);
     for (const f of failures) console.error(`  -> ${f}`);

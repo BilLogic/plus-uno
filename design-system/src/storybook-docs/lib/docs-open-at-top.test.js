@@ -1,45 +1,66 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { isDocsView, keepDocsAtTop } from './docs-open-at-top.js';
 
-describe('keepDocsAtTop', () => {
-    let release;
-    afterEach(() => release?.());
+const docsWindow = (viewMode) => ({
+    HTMLElement: window.HTMLElement,
+    addEventListener: (...a) => window.addEventListener(...a),
+    removeEventListener: (...a) => window.removeEventListener(...a),
+    location: { search: `?viewMode=${viewMode}&id=x` },
+});
 
-    it('makes focus() preventScroll until the reader acts', () => {
-        const original = HTMLElement.prototype.focus;
-        const seen = [];
+describe('keepDocsAtTop', () => {
+    let original;
+    let seen;
+    let release;
+
+    beforeEach(() => {
+        original = HTMLElement.prototype.focus;
+        seen = [];
         HTMLElement.prototype.focus = function (o) { seen.push(o); };
-        release = keepDocsAtTop();
+    });
+    afterEach(() => {
+        release?.();
+        HTMLElement.prototype.focus = original;
+    });
+
+    it('makes focus() preventScroll on a docs page, overriding preventScroll: false', () => {
+        release = keepDocsAtTop(docsWindow('docs'));
         const el = document.createElement('button');
         el.focus();
         el.focus({ focusVisible: true });
-        expect(seen[0]).toEqual({ preventScroll: true });
-        expect(seen[1]).toEqual({ focusVisible: true, preventScroll: true });
-        release();
-        HTMLElement.prototype.focus = original;
+        el.focus({ preventScroll: false });
+        expect(seen).toEqual([
+            { preventScroll: true },
+            { focusVisible: true, preventScroll: true },
+            { preventScroll: true },
+        ]);
     });
 
-    it('overrides a caller preventScroll: false', () => {
-        const original = HTMLElement.prototype.focus;
-        const seen = [];
-        HTMLElement.prototype.focus = function (o) { seen.push(o); };
-        release = keepDocsAtTop();
+    it('leaves a story alone', () => {
+        release = keepDocsAtTop(docsWindow('story'));
         document.createElement('button').focus({ preventScroll: false });
-        expect(seen[0]).toEqual({ preventScroll: true });
-        release();
-        HTMLElement.prototype.focus = original;
+        expect(seen).toEqual([{ preventScroll: false }]);
     });
 
-    it('lets go after the first user input', () => {
-        const original = HTMLElement.prototype.focus;
-        HTMLElement.prototype.focus = function () {};
-        const base = HTMLElement.prototype.focus;
-        release = keepDocsAtTop();
-        expect(HTMLElement.prototype.focus).not.toBe(base);
+    it('lets go after the reader acts, and holds again when the page changes', () => {
+        let rearm;
+        release = keepDocsAtTop(docsWindow('docs'), (fn) => { rearm = fn; });
+        const el = document.createElement('button');
         window.dispatchEvent(new Event('keydown'));
-        expect(HTMLElement.prototype.focus).toBe(base);
-        HTMLElement.prototype.focus = original;
+        el.focus({ preventScroll: false });
+        expect(seen.pop()).toEqual({ preventScroll: false });
+        rearm();
+        el.focus({ preventScroll: false });
+        expect(seen.pop()).toEqual({ preventScroll: true });
+    });
+
+    it('removes the guard on release', () => {
+        const stub = HTMLElement.prototype.focus;
+        release = keepDocsAtTop(docsWindow('docs'));
+        expect(HTMLElement.prototype.focus).not.toBe(stub);
+        release();
+        expect(HTMLElement.prototype.focus).toBe(stub);
     });
 });
 
