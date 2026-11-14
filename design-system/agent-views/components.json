@@ -5347,6 +5347,15 @@
           "deprecated": null
         },
         {
+          "name": "areaKey",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Current Sidebar area key: changing it fades the old page out on `appearance.fast`, then fades the new page in on `appearance.default`.",
+          "deprecated": null
+        },
+        {
           "name": "header",
           "type": "node",
           "required": false,
@@ -5652,7 +5661,23 @@
         "PanelPeekMotion",
         "PanelPeekMotionReduced",
         "BreakpointReflowMotion",
-        "BreakpointReflowMotionReduced"
+        "BreakpointReflowMotionReduced",
+        "MotionGoToArea",
+        "MotionGoToAreaReduced",
+        "MotionDrillAndClimb",
+        "MotionDrillAndClimbReduced",
+        "MotionDrillDeeper",
+        "MotionDrillDeeperReduced",
+        "MotionClimbTwoLevels",
+        "MotionClimbTwoLevelsReduced",
+        "MotionRecordOverlay",
+        "MotionRecordOverlayReduced",
+        "MotionFocusedTask",
+        "MotionFocusedTaskReduced",
+        "MotionStepAcross",
+        "MotionStepAcrossReduced",
+        "MotionStepDown",
+        "MotionStepDownReduced"
       ],
       "tokens": [
         "--border-default",
@@ -7841,7 +7866,11 @@
         "ScenarioRecordTabs",
         "ScenarioTwoLevels",
         "KeyBanner",
-        "ResponsiveWidth"
+        "ResponsiveWidth",
+        "MotionSwitchViews",
+        "MotionSwitchViewsReduced",
+        "MotionScrollToSpot",
+        "MotionScrollToSpotReduced"
       ],
       "tokens": [
         "--ds-border-bold",
