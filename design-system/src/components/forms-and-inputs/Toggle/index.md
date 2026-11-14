@@ -8,6 +8,10 @@ Also asked as: enable disable, on/off setting.
 
 **Import:** `import { Toggle } from '@/components';`
 
+**Used in:** Frame (`ds guide frame`)
+
+**Governed by:** Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+
 **Source:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Motion, Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled, DisabledWithReason

@@ -6,6 +6,8 @@ CheckboxGroup — one question and its checkbox answers, any number of which may
 
 **Import:** `import { CheckboxGroup } from '@/components';`
 
+**Governed by:** Forms (`ds guide forms`)
+
 **Source:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.stories.jsx` — Overview, Orientation, Descriptions, Reveal, Tiles, Unselected, Selected, Required, Invalid, ReadOnly, Disabled, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, Interactive

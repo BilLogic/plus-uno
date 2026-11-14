@@ -8,6 +8,10 @@ Also asked as: callout, inline alert, warning box.
 
 **Import:** `import { SectionMessage } from '@/components';`
 
+**Used in:** Form (`ds guide form`)
+
+**Governed by:** Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/messaging/SectionMessage/SectionMessage.jsx`
 
 **Stories:** `design-system/src/components/messaging/SectionMessage/SectionMessage.stories.jsx` — Primary, Secondary, Success, Danger, Warning, Info, Content, Overview, Interactive, DismissPlacement, LeadingIcon, GroundAndText, Actions, Rest, Hovered, Pressed, Focused

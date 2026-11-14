@@ -8,6 +8,8 @@ Also asked as: slider, range slider.
 
 **Import:** `import { Range } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/forms-and-inputs/Range/Range.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/Range/Range.stories.jsx` — Overview, Labels, Positions, Disabled, Interactive, Size, ReportsNumber, Aria, Keyboard, Rest, Hovered, Pressed, Focused, DisabledState

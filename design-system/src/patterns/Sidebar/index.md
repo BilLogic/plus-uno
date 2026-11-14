@@ -6,6 +6,10 @@ Sidebar pattern: the app's side navigation, 240 wide, padded 12, on the sunken f
 
 **Import:** `import { PatternSidebar } from '@/patterns';`
 
+**Used in:** Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`)
+
+**Governed by:** Disabled (`ds guide disabled`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/patterns/Sidebar/Sidebar.jsx`
 
 **Stories:** `design-system/src/patterns/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, Tutor, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabsClipped, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, Interactive, Light, Dark

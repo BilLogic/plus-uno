@@ -8,6 +8,10 @@ Also asked as: lozenge, pill, state label.
 
 **Import:** `import { StatusTag } from '@/components';`
 
+**Used in:** Panel (`ds guide panel`)
+
+**Governed by:** Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/labels/StatusTag/StatusTag.jsx`
 
 **Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — Styles, WithCount, TrailingMetricAppearance, IconBefore, Truncation, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled

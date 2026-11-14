@@ -48,6 +48,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { componentContext, contextLines, contextList } from './component-context.mjs';
+
 import { contextOf, escapes, expandPaths } from '../check-ds-usage.mjs';
 import { BARRELS, loadFacts } from './ds-facts.mjs';
 import { createPageFinder, pageText, readDocsPage, sectionText } from './docs-page.mjs';
@@ -55,7 +57,7 @@ import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
 import { INSTALL_FOLDER } from './ds-add.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
-import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, governedByOf, renderComponent, sectionsOf } from './component-render.mjs';
+import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, governedByOf, governedNamesOf, renderComponent, sectionsOf } from './component-render.mjs';
 
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
 
@@ -266,6 +268,8 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   const facts = loadFacts(root);
   const registry = JSON.parse(readIf(path.join(root, 'design-system/figma/component-registry.json')) ?? '{"components":{},"patterns":{}}');
   const records = facts.manifests.components.components;
+  let context;
+  const contexts = () => context ??= componentContext(root, records);
   const findPage = createPageFinder(root, registry);
   /** A component's docs page, found by its Storybook meta or the registry: `{path, page}`, or null. Read once. */
   const pages = new Map();
@@ -504,13 +508,39 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       out.push(row);
     };
 
-    for (const row of exactLane(c)) push(row);
+    const exact = exactLane(c);
+    const named = records.filter((r) => hasPhrase(c.ql, r.name.toLowerCase()));
+    const kitQuery = named.length >= 3 || (c.raw.length >= 6 && /\b(build|create|design|screen|dashboard|page|with)\b/.test(c.ql));
+    const situation = /\b(narrow|nothing|confirm|delet\w*|filter\w*|search|empty|loading|error\w*|disabled|overflow|navigation|notification\w*)\b/.test(c.ql) && !exact.length && !speaksTokens(q) && !c.raw.some((w) => ICON_WORDS.has(w)) && c.raw.length >= 2;
+    const pages = contexts().pages;
+    const pageRank = (kind) => createRanker(pages.filter((p) => p.kind === kind && p.name !== 'Overview').map((p) => ({
+      id: p.name, fields: { name: p.name, summary: p.intro, usage: p.text },
+    })), { name: 5, summary: 8, usage: 0.2 }).score(q.replace(/\byet\b/gi, '')).filter((r) => r.score > 0).map((r) => pages.find((p) => p.name === r.id && p.kind === kind));
+    const pageRow = (p) => ({ kind: p.kind, name: p.name, doc: p.doc, use: p.components.map(brief), next: `ds_guide("${p.name.toLowerCase().replace(/ /g, '-')}")` });
+    const patternPages = situation || kitQuery ? pageRank('pattern') : [];
+    const explicitPattern = topicsOf(c).map((topic) => pages.find((p) => p.kind === 'pattern' && p.name.toLowerCase().replace(/ /g, '-') === topic)).find(Boolean);
+    if (explicitPattern && patternPages.includes(explicitPattern)) {
+      patternPages.splice(patternPages.indexOf(explicitPattern), 1);
+      patternPages.unshift(explicitPattern);
+    }
+    const exactPattern = pages.find((p) => p.kind === 'pattern' && p.name.toLowerCase().replace(/ /g, '-') === c.ql.replace(/ /g, '-'));
+    if (exactPattern && !exact.length) push(pageRow(exactPattern));
+    const exactTemplate = pages.find((p) => p.kind === 'template' && p.name.toLowerCase() === c.ql);
+    if (exactTemplate && !exact.some((r) => r.kind === 'not-here')) push({ ...(exactTemplate.component ? item(exactTemplate.component) : {}), ...pageRow(exactTemplate) });
+    if (situation && patternPages.length) {
+      push(pageRow(patternPages[0]));
+    }
+    for (const row of exact) push(row);
     for (const row of notHereLane(c)) push(row);
     // The band is scored before the token lane: its best score decides how many token steps lead.
     const { top, band } = rankedBand(c);
     for (const row of tokenLane(c, top)) push(row);
     for (const row of iconLane(c)) push(row);
     for (const row of meaningLane(c, band)) push(row);
+    if (c.raw.length >= 2 && !exact.length && !speaksTokens(q) && !c.raw.some((w) => ICON_WORDS.has(w))) {
+      const template = pageRank('template')[0];
+      if (template) push(pageRow(template));
+    }
     for (const row of exportLane(c)) push(row);
 
     // Lane 7: a pointer to the guideline a query word names, always kept as the last row.
@@ -518,10 +548,28 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     const guideRow = topics.length ? [{ kind: 'guide', name: topics[0], next: `ds_guide("${topics[0]}")` }] : [];
     const results = [...out.slice(0, FIND_LIMIT - guideRow.length), ...guideRow];
 
-    const next = out.length
+    let kit;
+    if (kitQuery) {
+      const template = /\b(frame|screen|page|dashboard)\b/.test(c.ql) ? pages.find((p) => p.component === 'Frame') : pageRank('template')[0] ?? pages.find((p) => p.component === 'Frame');
+      const components = [...new Set([...named.map((r) => r.name), ...out.filter((r) => ['component', 'pattern', 'template'].includes(r.kind) && r.import).map((r) => r.name), ...(patternPages[0]?.components ?? [])])].slice(0, 16);
+      const governing = components.flatMap((name) => contexts().edges[name]?.governedBy ?? []);
+      const frequency = (page) => governing.filter((p) => p.name === page.name).length;
+      const patterns = [...new Map([...patternPages.slice(0, 3), ...governing.sort((a, b) => frequency(b) - frequency(a))].map((p) => [p.name, pageRow(p)])).values()].slice(0, 6);
+      kit = {
+        template: pageRow(template), patterns,
+        components: components.map(brief),
+        tokenRoles: ['stack', 'inline', 'pad', 'ds-text', 'ds-background', 'radius'].map((role) => ({ role, steps: tokens(role).steps.slice(0, 3) })),
+      };
+    }
+    const next = kit ? `These fill ${kit.template.name}. Start from that template: ${kit.template.next}; ds_get for the components.` : out.length
       ? 'Next: ds_get with the names you will use (section "props" first); ds_tokens for a styling role.'
       : `Nothing matches "${q}". Try one plain word (card, table, date); ds_tokens for a token role; ${topics.length ? `ds_guide(${topics.map((t) => `"${t}"`).join(', ')})` : 'ds_guide for a guideline topic'}.`;
-    return { query: q, results, next };
+    const backEdges = Object.fromEntries(results.filter((r) => contexts().edges[r.aliasOf ?? r.name]).map((r) => {
+      const name = r.aliasOf ?? r.name;
+      const edges = contexts().edges[name];
+      return [r.name, { usedIn: contextList(edges.usedIn.map((p) => p.name), 48), governedBy: contextList(governedNamesOf(name, edges), 48) }];
+    }));
+    return { query: q, results, backEdges, ...(kit ? { kit } : {}), next };
   }
 
   // ── get ─────────────────────────────────────────────────────────────────
@@ -576,10 +624,13 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     };
     // The text is the generated doc's: one render (`component-render.mjs`) from the manifest record and the page.
     const homeName = a.aliasOf ?? a.name;
-    const governedBy = governedByOf(homeName);
+    const edges = contexts().edges[homeName];
+    const { usedIn } = contextLines(edges);
+    const governedBy = governedByOf(homeName, edges);
+    if (usedIn) record.usedIn = usedIn;
     if (governedBy) record.governedBy = governedBy;
     const componentFactsOf = componentFacts(facts.manifests.components, homeName, { [homeName]: facts.lookup(homeName).aliases });
-    const text = componentFactsOf?.source ? renderComponent(componentFactsOf, docs) : null;
+    const text = componentFactsOf?.source ? renderComponent(componentFactsOf, docs, edges) : null;
     if (text) record.doc = docPathOf(componentFactsOf);
     const wanted = section ? [section] : SECTIONS;
     for (const s of wanted) {
@@ -589,7 +640,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     }
     if (text) {
       record.text = section
-        ? [`# ${a.name}`, a.import, ...(governedBy ? [`**Governed by:** ${governedBy}`] : []), sectionsOf(text, SECTION_TITLES[section]) ?? `## ${section}\n\nNone in the generated doc.`].join('\n\n') + '\n'
+        ? [`# ${a.name}`, a.import, ...(section !== 'a11y' && usedIn ? [`**Used in:** ${usedIn}`] : []), ...(section !== 'a11y' && governedBy ? [`**Governed by:** ${governedBy}`] : []), sectionsOf(text, SECTION_TITLES[section]) ?? `## ${section}\n\nNone in the generated doc.`].join('\n\n') + '\n'
         : text;
     } else record.next = 'Next: ds_tokens for the roles you style; ds_check once the code is written.';
     return record;
@@ -623,7 +674,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   // ── guide ───────────────────────────────────────────────────────────────
 
   /** A folder's `.md` files other than its overview; none when the folder is empty or gone. */
-  const mdIn = (dir) => (fs.existsSync(path.join(root, dir)) ? fs.readdirSync(path.join(root, dir)).filter((f) => f.endsWith('.md') && f !== 'overview.md') : []);
+  const mdIn = (dir) => (fs.existsSync(path.join(root, dir)) ? fs.readdirSync(path.join(root, dir)).filter((f) => f.endsWith('.md') && f !== 'overview.md' && f !== 'index.md') : []);
   /**
    * Topic → the file that answers it: generated template, pattern and
    * foundation agent views (`agent-views/<root>/<Name>.md` and component-backed
@@ -788,7 +839,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
         ? 'Fix each finding as its fix says; ds_guide(<rule>) explains a rule. Then ds_check again.'
         : findings.length
           ? 'No escapes; the warnings are worth a look.'
-          : 'Clean: no escapes.',
+          : 'Clean: no escapes. Template and pattern fit is not checked here.',
     };
   }
 
@@ -809,14 +860,23 @@ function renderFind(r) {
       return `${pad(x.status, 10)}${x.name} → ${use}${x.why ? `  (${x.why})` : ''}`;
     }
     if (x.kind === 'token') return `${pad('token', 10)}${x.name}  ${shortSummary(x.intent) ?? ''}`.trimEnd();
+    if (['template', 'pattern'].includes(x.kind) && x.doc) return `${pad(x.kind, 10)}${x.name}  → ${x.next}`;
     if (x.kind === 'guide') return `${pad('guide', 10)}${x.name}  → ${x.next}`;
     if (x.kind === 'icon') return `${pad('icon', 10)}${x.name}${x.status === 'pro' ? `  PRO: ${x.why}` : ''}`;
+    const { usedIn, governedBy } = r.backEdges?.[x.name] ?? {};
     const via = x.figma ? `  (Figma "${x.figma}")` : x.aliasOf ? `  (alias of ${x.aliasOf})` : '';
-    return `${pad(x.kind, 10)}${x.import ?? x.name}${via}${x.summary ? `  ${x.summary}` : ''}`;
+    return `${pad(x.kind, 10)}${x.import ?? x.name}${via}${!usedIn && !governedBy && x.summary ? `  ${x.summary}` : ''}${usedIn ? `  Used in: ${usedIn}` : ''}${governedBy ? `  Governed by: ${governedBy}` : ''}`.slice(0, 160);
   });
   // One line names what to install, so no result row grows past the width a find line holds.
   const add = [...new Set(r.results.map((x) => x.registryItem).filter(Boolean))];
-  return [...lines, ...(add.length ? [`Add to a project: ds add ${add.slice(0, 5).join(' ')}`] : []), r.next].join('\n');
+  const kit = r.kit ? [
+    `Template: ${r.kit.template.name} → ${r.kit.template.next}`,
+    `Patterns: ${r.kit.patterns.map((p) => `${p.name} → ${p.next}`).join('; ')}`,
+    `Components: ${r.kit.components.map((c) => c.import?.replace(/;$/, '') ?? c.name).join('; ')}`,
+    `Token roles: ${r.kit.tokenRoles.map((r) => `${r.role}: ${r.steps.map((s) => s.name).join(', ')}`).join('; ')}`,
+  ] : [];
+  const wrap = (line) => line.match(/.{1,160}(?:\s|$)|.{1,160}/g)?.map((part) => part.trimEnd()) ?? [];
+  return [...kit.flatMap(wrap), ...lines, ...(add.length ? [`Add to a project: ds add ${add.slice(0, 5).join(' ')}`] : []), r.next].join('\n');
 }
 
 function renderGet(r) {

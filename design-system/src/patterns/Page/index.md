@@ -8,6 +8,10 @@ Also asked as: surface.
 
 **Import:** `import { Page } from '@/patterns';`
 
+**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`); Modal (`ds guide modal`); Section (`ds guide section`); Popup (`ds guide popup`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); +1 more
+
 **Source:** `design-system/src/patterns/Page/Page.jsx`
 
 **Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepSmall, StepMedium, StepLarge, Bordered, WithTitle, HeaderAndBanner, OptionalSlots, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, AnatomyRecordScaledDown, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth, MotionSwitchViews, MotionSwitchViewsReduced, MotionScrollToSpot, MotionScrollToSpotReduced

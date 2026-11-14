@@ -8,6 +8,10 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Import:** `import { Tabs } from '@/components';`
 
+**Used in:** Page (`ds guide page`); Modal (`ds guide modal`); Section (`ds guide section`); Popup (`ds guide popup`)
+
+**Governed by:** Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/components/navigation/Tabs/Tabs.jsx`
 
 **Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, UnderlineRadius, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled

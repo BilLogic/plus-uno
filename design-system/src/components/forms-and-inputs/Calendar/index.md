@@ -6,6 +6,8 @@ Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar
 
 **Import:** `import { Calendar } from '@/components';`
 
+**Governed by:** Read-only (`ds guide read-only`)
+
 **Source:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Size28, Size36, Size44, PickADay, TurnMonths, Default, Selected, Range, Disabled, HoveredState, KeyboardFocus, Interactive

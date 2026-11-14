@@ -6,6 +6,10 @@ Also asked as: scrim.
 
 **Import:** `import { Backdrop } from '@/patterns';`
 
+**Used in:** Frame (`ds guide frame`); Panel (`ds guide panel`); Modal (`ds guide modal`); Popup (`ds guide popup`)
+
+**Governed by:** Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/patterns/Backdrop/Backdrop.jsx`
 
 **Stories:** `design-system/src/patterns/Backdrop/Backdrop.stories.jsx` — Inline, ConfirmOverPanel, Layers, Pads, ScreenGrid, Interactive, MotionOpenClose, MotionReduced

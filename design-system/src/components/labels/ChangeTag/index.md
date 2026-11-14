@@ -8,6 +8,8 @@ Also asked as: delta tag, trend indicator.
 
 **Import:** `import { ChangeTag } from '@/components';`
 
+**Governed by:** Indicators (`ds guide indicators`)
+
 **Source:** `design-system/src/components/labels/ChangeTag/ChangeTag.jsx`
 
 **Stories:** `design-system/src/components/labels/ChangeTag/ChangeTag.stories.jsx` — Overview, Styles, Formats, CustomIcon, ValueChange, NeverAButton, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled

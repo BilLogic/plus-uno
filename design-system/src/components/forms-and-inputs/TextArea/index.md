@@ -8,6 +8,8 @@ Also asked as: multi-line, multiline text, long text input, notes field, comment
 
 **Import:** `import { TextArea } from '@/components';`
 
+**Governed by:** Read-only (`ds guide read-only`)
+
 **Source:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.stories.jsx` — Overview, Rows, Spacing, Rows1, Rows3, Rows6, SpacingDefault, SpacingCompact, Filled, Success, Warning, FocusRing, Count, Subtle, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly

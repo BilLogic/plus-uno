@@ -8,6 +8,8 @@ Also asked as: single choice, radio buttons, single select, multiple choice, rad
 
 **Import:** `import { RadioGroup } from '@/components';`
 
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+
 **Source:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.stories.jsx` — Overview, Keyboard, Orientation, Size, LinearScale, Descriptions, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive, Tiles, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, Unanswered, Selected, Hovered, Focused, Required, Invalid, ReadOnly, Disabled

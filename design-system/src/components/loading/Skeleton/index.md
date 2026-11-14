@@ -8,6 +8,10 @@ Also asked as: loading placeholder, shimmer, ghost.
 
 **Import:** `import { Skeleton } from '@/components';`
 
+**Used in:** Card (`ds guide card`)
+
+**Governed by:** Empty (`ds guide empty`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/loading/Skeleton/Skeleton.jsx`
 
 **Stories:** `design-system/src/components/loading/Skeleton/Skeleton.stories.jsx` — LabelPresets, PresetWinsOverShape, TagGroupPreset, Shapes, Rect, Circle, Text, PresetNamesAShape, Paragraph, Shimmer, ReducedMotion, LoadingTable, LoadingCard, IgnoredPropsWarn, Interactive, Rest, Hovered, Pressed, Focused

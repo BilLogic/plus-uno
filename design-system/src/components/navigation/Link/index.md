@@ -6,6 +6,10 @@ Link: an inline navigation anchor.
 
 **Import:** `import { Link } from '@/components';`
 
+**Used in:** Modal (`ds guide modal`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/components/navigation/Link/Link.jsx`
 
 **Stories:** `design-system/src/components/navigation/Link/Link.stories.jsx` — Appearances, OpenInNewWindow, Interactive, Rest, Hovered, Pressed, Focused

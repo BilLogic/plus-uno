@@ -8,6 +8,10 @@ Also asked as: path, navigation trail.
 
 **Import:** `import { Breadcrumb } from '@/components';`
 
+**Used in:** Frame (`ds guide frame`); Page (`ds guide page`)
+
+**Governed by:** Disabled (`ds guide disabled`); Navigation (`ds guide navigation`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.jsx`
 
 **Stories:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.stories.jsx` — Standard, Short, Overview, Interactive, Rest, Hovered, Pressed, Focused
