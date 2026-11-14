@@ -4,7 +4,7 @@
 
 > **CRITICAL**: Only use components and patterns listed here. If it's not listed, it DOES NOT EXIST.
 
-Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Patterns import from `@/patterns` (§ Patterns).
+Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Templates import from `@/patterns` (§ Templates).
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
@@ -67,9 +67,9 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `--ds-on-surface` | `--ds-text`, `--ds-text-subtle` |
 | `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` (retired; these are the commonest replacements, and check:ds-usage names the exact one for each old name) |
 
-## Patterns: start a page, section, card, table or overlay here
+## Templates: start a page, section, card, table or overlay here
 
-A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leaves you slots to fill. Build a page or a container from these before writing a `div` with its own flex or grid. Each one's props are on its page (linked) and in its source.
+A template is a shell that owns the frame (fill, pad, radius, elevation) and leaves you slots to fill. Build a page or a container from these before writing a `div` with its own flex or grid. Each one's props are on its page (linked) and in its source.
 
 | Group | Name | Import | Reach for it when |
 |---|---|---|---|

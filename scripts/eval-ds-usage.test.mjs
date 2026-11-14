@@ -561,7 +561,7 @@ test('reach: deterministically scores opened and ds-guided template/pattern page
   const expected = expectedFor('session-review-queue');
   assert.equal(reach({ files: [], lookups: [] }, null), null);
 
-  const none = reach({ files: ['design-system/guidelines/composition/layout.md'], lookups: ['ds_guide {"topic":"layout"}'] }, expected);
+  const none = reach({ files: ['design-system/guidelines/overview.md'], lookups: ['ds_guide {"topic":"layout"}'] }, expected);
   assert.equal(none.hit, false);
   assert.deepEqual(none.reached, []);
   assert.deepEqual(none.before_first_write, []);

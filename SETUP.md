@@ -39,8 +39,8 @@ confusion:
 
 ## Working on the design system
 
-Read `design-system/guidelines/overview.md` first — it routes to the fourteen
-foundations, the component guidance, composition, and the Figma protocol.
+Read `design-system/guidelines/overview.md` first — it routes through the five
+build stages (Template, Blocks, Pieces, Polish, Motion) and the Figma protocol.
 Setup specifics (aliases, package structure, token workflow) are
 `docs/engineering/setup.md`.
 

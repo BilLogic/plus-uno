@@ -10,7 +10,7 @@ Four components: `Accordion`, `Carousel`, `ScrollBar`, `VisuallyHidden`.
 Generated facts are in
 `design-system/src/components/layout-and-structure/index.md`. These are
 containers; none of them decide page layout, which is
-`design-system/guidelines/composition/layout.md`.
+`design-system/agent-views/pages/templates/TemplatesOverview.md`.
 
 <!-- retired-names-ok: names the retired containers this table maps -->
 `Card`, `Divider`, `Collapse`, `Jumbotron`, `ListGroup`, `MediaObject`,
@@ -55,5 +55,4 @@ Reduced mode to a short fade, so essential information never depends on motion.
 ## Related
 
 - `design-system/src/components/layout-and-structure/index.md` — generated facts and coverage
-- `design-system/guidelines/composition/layout.md` — page-level layout
-- `design-system/guidelines/composition/surfaces.md` — surfaces and elevation
+- `design-system/agent-views/pages/templates/TemplatesOverview.md` — page-level layout and templates

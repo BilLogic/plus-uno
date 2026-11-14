@@ -43,6 +43,7 @@ Worker source, the guard script, the OAuth handler — and carry the same
 - [ADR-045](045-radius-follows-role-not-size.md): Radius follows role and nesting.
 - [ADR-046](046-drag-runs-on-pragmatic-drag-and-drop.md): the drag exception to Base UI.
 - [ADR-047](047-the-design-system-ships-outside-the-repo.md): the design system ships through the `@plus-uno/cli` package; supersedes ADR-006.
+- [ADR-048](048-agents-build-in-stages-and-a-ds-fact-has-one-home.md): agents build in five stages (`templates-first`), and each DS fact has one authored home; `guidelines/composition/` retires.
 
 ## Writing a new one
 

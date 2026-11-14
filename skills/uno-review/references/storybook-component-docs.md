@@ -50,8 +50,8 @@ section: one short page per package PLUS builds on, from
   Related, then Parts and Content guidelines; `npm run check:ds-writing` holds
   the shape.
 - **Disabled and slot names:** an example's disabled states and slot props
-  follow `design-system/guidelines/composition/form-behavior.md` § Unavailable
-  actions and fields and `docs/engineering/coding.md` § Slot names.
+  follow `design-system/agent-views/pages/patterns/Disabled.md`,
+  `design-system/agent-views/pages/patterns/Forms.md`, and `docs/engineering/coding.md` § Slot names.
 - **Names:** every component named on the page is in the index; Alternatives
   and Related route to live components.
 

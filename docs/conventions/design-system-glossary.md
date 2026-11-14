@@ -99,7 +99,7 @@ A component group name, identical in Figma pages, Storybook and code folders, su
 _Avoid_: "Actions", "group" for a category
 
 **Static table**:
-A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/guidelines/composition/surfaces.md` § Choosing a table.
+A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/patterns/PatternTable/index.md` § Type guidance.
 _Avoid_: "basic table", bare "table" for this type
 
 **Dynamic table**:
