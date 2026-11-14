@@ -121,4 +121,8 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 
 From `design-system/src/components/messaging/NotificationItem/NotificationItem.scss`. Override these through the token layer, never with a literal.
 
+## Figma
+
+- "NotificationItem" node 22315:138 in file zAecJNRdvJzAUOcjV32tRX
+
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
