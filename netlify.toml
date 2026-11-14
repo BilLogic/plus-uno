@@ -392,6 +392,13 @@
 # Storybook static files — serve as-is
 [[redirects]]
   from = "/storybook/"
+  query = { path = "/docs/components-forms-and-inputs-checkbox--docs" }
+  to = "/storybook/?path=/docs/components-forms-and-inputs-checkbox-checkbox--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
   query = { path = "/docs/components-forms-and-inputs-radio--docs" }
   to = "/storybook/?path=/docs/components-forms-and-inputs-radio-radio--docs"
   status = 301

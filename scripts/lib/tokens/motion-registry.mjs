@@ -332,6 +332,13 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'CheckboxGroup',
+    tier: 'component',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Mark and fill change color.' },
+    },
+  },
+  {
     name: 'Radio',
     tier: 'component',
     events: {

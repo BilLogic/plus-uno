@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-36 components. Each row links to the generated facts; the three columns after it are the
+37 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -11,7 +11,8 @@ authored half, counted rather than assumed.
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Calendar](Calendar/index.md) | 10 | ✅ | ✅ | ✅ |
 | [Cascader](Cascader/index.md) | 16 | ✅ | ✅ | ✅ |
-| [Checkbox](Checkbox/index.md) | 20 | ✅ | ✅ | ✅ |
+| [Checkbox](Checkbox/index.md) | 21 | ✅ | ✅ | ✅ |
+| [CheckboxGroup](CheckboxGroup/index.md) | 16 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid/index.md) | 12 | ✅ | ✅ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Comment](Comment/index.md) | 14 | ✅ | ✅ | ✅ |
@@ -28,7 +29,7 @@ authored half, counted rather than assumed.
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✅ | ✅ |
 | [PopupSelect](PopupSelect/index.md) | 18 | ✅ | ✕ | ✅ |
 | [PromptInput](PromptInput/index.md) | 16 | ✅ | ✅ | ✅ |
-| [Radio](Radio/index.md) | 20 | ✅ | ✅ | ✅ |
+| [Radio](Radio/index.md) | 21 | ✅ | ✅ | ✅ |
 | [RadioGroup](RadioGroup/index.md) | 19 | ✅ | ✅ | ✅ |
 | [Range](Range/index.md) | 14 | ✅ | ✅ | ✅ |
 | [Rating](Rating/index.md) | 13 | ✅ | ✅ | ✅ |
@@ -44,7 +45,7 @@ authored half, counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✅ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 35/36 (97%) · Correct/incorrect 33/36 (92%) · Accessibility 35/36 (97%)
+**Authored coverage:** When to use 36/37 (97%) · Correct/incorrect 34/37 (92%) · Accessibility 36/37 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

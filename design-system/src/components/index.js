@@ -8,6 +8,7 @@ export { default as ButtonGroup } from '@/components/forms-and-inputs/ButtonGrou
 export { default as Calendar } from '@/components/forms-and-inputs/Calendar';
 export { default as Cascader, CASCADER_SPACINGS } from '@/components/forms-and-inputs/Cascader';
 export { default as Checkbox } from '@/components/forms-and-inputs/Checkbox';
+export { default as CheckboxGroup } from '@/components/forms-and-inputs/CheckboxGroup';
 export { default as ChoiceGrid } from '@/components/forms-and-inputs/ChoiceGrid';
 export { default as CloseButton } from '@/components/forms-and-inputs/CloseButton';
 export { default as Comment } from '@/components/forms-and-inputs/Comment';

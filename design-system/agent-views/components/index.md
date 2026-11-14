@@ -84,7 +84,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 | Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
 | AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
-## UI components (87)
+## UI components (88)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
@@ -100,6 +100,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [Cascader](../../src/components/forms-and-inputs/Cascader/index.md)
 - [ChangeTag](../../src/components/labels/ChangeTag/index.md)
 - [Checkbox](../../src/components/forms-and-inputs/Checkbox/index.md)
+- [CheckboxGroup](../../src/components/forms-and-inputs/CheckboxGroup/index.md)
 - [ChoiceGrid](../../src/components/forms-and-inputs/ChoiceGrid/index.md)
 - [CloseButton](../../src/components/forms-and-inputs/CloseButton/index.md)
 - [Code](../../src/components/text-and-data-display/Code/index.md)

@@ -53,7 +53,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
  */
 const PAGES = [
   'components-forms-and-inputs-button-button--docs',
-  'components-forms-and-inputs-checkbox--docs',
+  'components-forms-and-inputs-checkbox-checkbox--docs',
   'foundations-tokens-color--docs',
   // The prose page. A component page is almost all canvas — one paragraph each —
   // so without this the typography assertions would run over a sample of three

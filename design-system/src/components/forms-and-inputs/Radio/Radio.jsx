@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import useFieldId from '../useFieldId';
-import { choiceClasses } from '../choiceItem';
+import { choiceClasses, activateChoiceTile } from '../choiceItem';
 import FieldFrame, { FieldLabel, FieldCaption, toneProps, fieldDescription } from '../_internal/FieldFrame';
 import './Radio.scss';
 
@@ -47,7 +47,9 @@ const Radio = ({
     isRequired = false,
     /** Secondary text under the label. It describes the option; it does not name it. */
     description,
-    /** `card` draws the option as a bordered tile. */
+    /** Decorative picture shown above the label when `appearance` is `tile`. */
+    illustration,
+    /** `card` draws the option as a bordered row; `tile` draws a centered pictured tile. */
     appearance = 'plain',
     /** Set by `RadioGroup`: renders bare inside its ambient Base UI RadioGroup instead of a private one. Not for direct use. */
     grouped = false,
@@ -62,6 +64,7 @@ const Radio = ({
 }) => {
     const fieldId = useFieldId(id);
     const isControlled = isChecked !== undefined;
+    const isTile = appearance === 'tile';
     const tone = isInvalid ? 'invalid' : undefined;
     const { control } = toneProps(tone);
     const { 'aria-describedby': describedBy, ...inputRest } = props;
@@ -103,7 +106,18 @@ const Radio = ({
     );
 
     return (
-        <FieldFrame disabled={isDisabled} invalid={isInvalid} className={wrapperClasses} style={style}>
+        <FieldFrame
+            disabled={isDisabled}
+            invalid={isInvalid}
+            className={wrapperClasses}
+            style={style}
+            onClick={isTile ? activateChoiceTile : undefined}
+        >
+            {isTile && illustration && (
+                <div className="plus-choice-tile-illustration" aria-hidden="true">
+                    {illustration}
+                </div>
+            )}
             <div className="plus-form-radio-row">
                 {grouped ? radioControl : (
                     <BaseRadioGroup
@@ -122,7 +136,7 @@ const Radio = ({
                     {label}
                 </FieldLabel>
             </div>
-            <FieldCaption messageId={messageId} message={description} tone={tone ?? 'help'} />
+            <FieldCaption messageId={messageId} message={description} tone="help" />
         </FieldFrame>
     );
 };
@@ -150,8 +164,10 @@ Radio.propTypes = {
     isRequired: PropTypes.bool,
     /** Secondary text under the label. It describes the option; it does not name it. */
     description: PropTypes.node,
-    /** `plain` (default) is a radio beside its label; `card` draws the option as a bordered tile. */
-    appearance: PropTypes.oneOf(['plain', 'card']),
+    /** Decorative picture shown above the label when `appearance` is `tile`. */
+    illustration: PropTypes.node,
+    /** `plain` (default) is a radio beside its label; `card` draws a bordered row; `tile` draws a centered pictured tile. */
+    appearance: PropTypes.oneOf(['plain', 'card', 'tile']),
     /** Set by `RadioGroup`. Not for direct use. */
     grouped: PropTypes.bool,
     /** Called with `{ target: { name, value, checked: true } }` when the option is chosen. A radio never reports being unchecked. */
