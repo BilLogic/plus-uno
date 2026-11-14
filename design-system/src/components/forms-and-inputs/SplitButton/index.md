@@ -12,7 +12,7 @@ Split button: a primary action joined to a chevron that opens a menu of related 
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.mdx`
 
-**Motion:** change `appearance.fast` · enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

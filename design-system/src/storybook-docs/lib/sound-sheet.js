@@ -1,5 +1,5 @@
 /**
- * Foundations · Sound's tables as plain rows, read from the generated sound
+ * Foundations › Expression › Sound's tables as plain rows, read from the generated sound
  * spec (`@/sound/spec.generated`), the motion registry's `sound` cells and the
  * always-silent list. Nothing here holds a value of its own: the spec is
  * drift-checked by `check:sound-spec`, the registry and the silent list by

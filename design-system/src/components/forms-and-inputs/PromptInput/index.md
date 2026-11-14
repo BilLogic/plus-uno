@@ -14,7 +14,7 @@ Also asked as: ask the assistant, prompt box, chat input.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

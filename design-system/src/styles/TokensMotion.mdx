@@ -1,0 +1,40 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    FoundationSection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import { TokenCollection } from '@/storybook-docs/token-collection-blocks.jsx';
+
+<Meta title="Foundations/Tokens/Motion" />
+
+<DocsLanding
+    page="foundations-tokens-motion"
+    eyebrow="Foundation · Tokens"
+    title="Motion"
+    purpose="The spring primitives and the named motion tokens that pick one by job."
+    section="foundations-tokens"
+/>
+
+<FoundationSection title="Overview">
+
+All motion in PLUS is a spring. A primitive is a stiffness and damping pair; a semantic token names the job, such as a fast spatial move or an appearance fade, and aliases one primitive.
+
+</FoundationSection>
+
+<TokenCollection
+    collection="motion"
+    primitives={<p>The spring primitives, each with its settle duration.</p>}
+    semantics={<p>The motion tokens a component binds, by job: spatial, appearance, exit, loop and linear.</p>}
+/>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Motion', description: 'Principles, physics and transitions.', href: '?path=/docs/foundations-expression-motion-principles--docs' },
+        { title: 'Sound', description: 'Cues that pair with motion.', href: '?path=/docs/foundations-expression-sound-overview--docs' },
+    ]}
+/>
+
+</FoundationSection>

@@ -18,7 +18,7 @@ import { LogoConstruction } from "../illustrations/shapes.jsx";
 import { usePageContrast } from "../lib/use-page-contrast.js";
 import { HeroDrawing, HeroPane } from "./HeroDrawing.jsx";
 import { BentoCell } from "./bento.jsx";
-import { Glyph, IconConstruction } from "./glyphs.jsx";
+import { Glyph } from "./glyphs.jsx";
 
 /**
  * The Foundations heroes: each foundation as one object, cropped to what
@@ -241,14 +241,10 @@ export const GridHero = () => (
   </HeroDrawing>
 );
 
-/** The set, five across and two down; the bell is the subject. */
+/** The set, five across and two down. */
 const ICON_SET = ["calendar", "user", "bell", "search", "chat", "check", "star", "folder", "clock", "book"];
 
-/**
- * Ten different icons in one style, each on its tile. The bell is the subject:
- * drawn in the brand color on its own construction (the 24 grid, the
- * diagonals, the keyline circle and square), with no ring around it.
- */
+/** Ten different icons in one style, each on its own tile; the bell, the subject, takes the brand color and nothing else. */
 export const IconographyHero = () => {
   const cell = 48;
   const gap = 10;
@@ -259,21 +255,10 @@ export const IconographyHero = () => {
       {ICON_SET.map((name, i) => {
         const x = x0 + (i % 5) * (cell + gap);
         const y = y0 + Math.floor(i / 5) * (cell + gap);
-        if (name !== "bell") {
-          return (
-            <g key={name}>
-              <CardBox x={x} y={y} w={cell} h={cell} />
-              <Glyph name={name} x={x + 12} y={y + 12} size={24} />
-            </g>
-          );
-        }
-        const size = 36;
-        const at = (cell - size) / 2;
         return (
           <g key={name}>
             <CardBox x={x} y={y} w={cell} h={cell} />
-            <IconConstruction x={x + at} y={y + at} size={size} />
-            <Glyph name={name} x={x + at} y={y + at} size={size} stroke={PAINT.accent} weight={1.5} />
+            <Glyph name={name} x={x + 12} y={y + 12} size={24} stroke={name === "bell" ? PAINT.accent : undefined} />
           </g>
         );
       })}
@@ -516,5 +501,45 @@ export const TypographyHero = () => (
       stroke={PAINT.accent}
       style={TAB_UNDERLINE}
     />
+  </HeroDrawing>
+);
+
+/** A speech bubble: a card with a tail, text drawn as soft bars. */
+const Bubble = ({ x, y, w, h, accent = false, lines = 2 }) => (
+  <g>
+    <CardBox x={x} y={y} w={w} h={h} accent={accent} />
+    {Array.from({ length: lines }, (_, i) => (
+      <SkeletonBar key={i} x={x + 10} y={y + 12 + i * 11} w={w - 20 - (i === lines - 1 ? 24 : 0)} h={5} heading={i === 0} accent={accent && i === 0} />
+    ))}
+  </g>
+);
+
+export const VoiceAndToneHero = () => (
+  <HeroDrawing>
+    <Bubble x={20} y={20} w={150} h={52} lines={2} />
+    <Bubble x={110} y={84} w={170} h={56} accent lines={3} />
+  </HeroDrawing>
+);
+
+export const LanguageHero = () => (
+  <HeroDrawing>
+    <CardBox x={50} y={25} w={200} h={110} />
+    <SkeletonBar x={66} y={43} w={90} h={6} heading />
+    <SkeletonBar x={66} y={60} w={160} h={4} />
+    <SkeletonBar x={66} y={72} w={140} h={4} />
+    <SkeletonBar x={66} y={84} w={150} h={4} />
+    <Rect x={64} y={100} w={70} h={16} fill={PAINT.rowSelected} corner="icon" />
+    <SkeletonBar x={72} y={106} w={54} h={4} accent />
+  </HeroDrawing>
+);
+
+export const MessagesHero = () => (
+  <HeroDrawing>
+    <CardBox x={60} y={30} w={180} h={96} accent />
+    <Rect x={74} y={46} w={14} h={14} fill={PAINT.accent} corner="full" />
+    <SkeletonBar x={96} y={48} w={80} h={6} heading />
+    <SkeletonBar x={74} y={70} w={150} h={4} />
+    <SkeletonBar x={74} y={82} w={120} h={4} />
+    <Rect x={74} y={98} w={54} h={16} fill={PAINT.accent} corner="icon" />
   </HeroDrawing>
 );

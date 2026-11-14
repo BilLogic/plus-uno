@@ -3,9 +3,30 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { px, probe, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Toggle from './Toggle';
+import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
+
+export const Motion = {
+    render: () => <Toggle label="Session reminders" />,
+    beforeEach: async () => async () => { await emulateReducedMotion(null); },
+    play: async ({ canvasElement }) => {
+        const toggle = within(canvasElement).getByRole('switch');
+        const thumb = toggle.querySelector('.plus-toggle-thumb');
+        const style = getComputedStyle(thumb);
+        await expect(style.transitionTimingFunction).toBe(
+            probe(thumb, 'transitionTimingFunction', 'var(--ds-motion-spatial-fast)'),
+        );
+        await userEvent.click(toggle);
+        await expect(toggle).toHaveAttribute('aria-checked', 'true');
+        if (!(await emulateReducedMotion('reduce'))) return;
+        await expect(parseFloat(getComputedStyle(thumb).transitionDuration)).toBe(0);
+        await userEvent.click(toggle);
+        await expect(toggle).toHaveAttribute('aria-checked', 'false');
+        await expect(getComputedStyle(thumb).transform).toBe('none');
+    },
+};
 
 export default {
     title: 'Components/Forms and inputs/Toggle',

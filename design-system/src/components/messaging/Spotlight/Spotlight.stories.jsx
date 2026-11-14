@@ -27,9 +27,19 @@ export default {
     },
 };
 
+// The callout is a portal, so it sits outside the canvas flow. The target is centered
+// and the canvas is tall enough for the callout below it, so it never spills onto the prose.
+const calloutCanvas = {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: 'var(--space-400)',
+    minHeight: 'var(--size-2500)',
+};
+const calloutCanvasTall = { ...calloutCanvas, minHeight: 'var(--size-3000)' };
+
 export const Basic = () => (
     <SpotlightProvider>
-        <div style={{ padding: 'var(--space-400)' }}>
+        <div style={calloutCanvas}>
             <SpotlightTarget>
                 <Button id="spotlight-target-basic" text="Create" />
             </SpotlightTarget>
@@ -56,7 +66,7 @@ Basic.play = async () => {
 
 export const WithMedia = () => (
     <SpotlightProvider>
-        <div style={{ padding: 'var(--space-400)' }}>
+        <div style={calloutCanvasTall}>
             <SpotlightTarget><Button text="Target" /></SpotlightTarget>
             <Spotlight
                 headline="See it in action"
@@ -71,7 +81,7 @@ export const WithMedia = () => (
 
 export const LinkAction = () => (
     <SpotlightProvider>
-        <div style={{ padding: 'var(--space-400)' }}>
+        <div style={calloutCanvas}>
             <SpotlightTarget><Button text="Target" /></SpotlightTarget>
             <Spotlight
                 headline="Read more"
@@ -93,7 +103,7 @@ export function Dismissible() {
     const [isOpen, setIsOpen] = useState(true);
     return (
         <SpotlightProvider>
-            <div style={{ padding: 'var(--space-400)' }}>
+            <div style={calloutCanvas}>
                 <SpotlightTarget><Button text="Target" /></SpotlightTarget>
                 {isOpen && (
                     <Spotlight headline="Dismiss me" onDismiss={() => setIsOpen(false)}>
@@ -142,7 +152,7 @@ export const Interactive = {
     },
     render: ({ primaryActionText, secondaryActionText, ...args }) => (
         <SpotlightProvider>
-            <div style={{ padding: 'var(--space-400)' }}>
+            <div style={calloutCanvas}>
                 <SpotlightTarget><Button text="Create" /></SpotlightTarget>
                 <Spotlight
                     {...args}
@@ -158,7 +168,7 @@ export const Interactive = {
 
 const StateSpotlight = ({ headline }) => (
     <SpotlightProvider>
-        <div style={{ padding: 'var(--space-400)' }}>
+        <div style={calloutCanvas}>
             <SpotlightTarget><Button text="Create" /></SpotlightTarget>
             <Spotlight
                 headline={headline}

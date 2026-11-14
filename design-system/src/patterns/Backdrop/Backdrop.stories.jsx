@@ -1,4 +1,5 @@
-import React from 'react';
+import { expectOverlayExit, withReducedMotion, settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
+import React, { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import Backdrop from '@/patterns/Backdrop';
 import PatternModal from '@/patterns/PatternModal';
@@ -25,7 +26,7 @@ const footer = (primary) => (
  * Patterns group draws them inline, at a stand-in screen.
  */
 export default {
-    title: 'Templates/Modal/Modal/Backdrop',
+    title: 'Templates/Modal/Backdrop',
     component: Backdrop,
     tags: ['!dev', '!autodocs'],
     argTypes: {
@@ -54,6 +55,7 @@ export const Inline = {
         </Backdrop>
     ),
     play: async ({ args, canvasElement }) => {
+        await settleAnimations(canvasElement);
         const overlay = canvasElement.querySelector('.plus-pattern-backdrop');
         const modal = within(canvasElement).getByRole('dialog', { name: 'Move session' });
         const box = overlay.getBoundingClientRect();
@@ -89,6 +91,7 @@ export const ConfirmOverPanel = {
         </div>
     ),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const confirm = within(canvasElement).getByRole('dialog', { name: 'Discard changes?' });
         await expect(confirm.getBoundingClientRect().width, 'width-modal-sm at 1024').toBeCloseTo(512, 0);
         const { left, top, width, height } = confirm.getBoundingClientRect();
@@ -108,6 +111,7 @@ export const Layers = {
         </Backdrop>
     ),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const overlay = canvasElement.querySelector('.plus-pattern-backdrop');
         const modal = within(canvasElement).getByRole('dialog');
         const z = (token) => probe(canvasElement, 'zIndex', `var(${token})`, { position: 'relative' });
@@ -158,6 +162,7 @@ export const Pads = {
         </div>
     ),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const overlay = canvasElement.querySelector('.plus-pattern-backdrop');
         const style = getComputedStyle(overlay);
         await expect(style.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--blanket-pad-x')}px`);
@@ -204,6 +209,7 @@ export const ScreenGrid = {
         );
     },
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const grid = canvasElement.querySelector('[data-guide="screen-grid"]');
         await expect(grid.children, '12 columns').toHaveLength(12);
         const modal = within(canvasElement).getByRole('dialog');
@@ -221,3 +227,18 @@ export const Interactive = {
         </Backdrop>
     ),
 };
+
+const MotionOverlay = () => {
+    const [open, setOpen] = useState(false);
+    return <><Button text="Session details" onClick={() => setOpen(!open)} /><Backdrop inline show={open}><div>Session details</div></Backdrop></>;
+};
+const overlayMotionPlay = (reduced = false) => async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole('button', { name: 'Session details' });
+    await userEvent.click(trigger);
+    const surface = canvasElement.querySelector('.plus-pattern-backdrop');
+    await expect(surface).not.toBeNull();
+    await expectOverlayExit(surface, () => trigger.click(), reduced);
+    await expect(canvasElement.querySelector('.plus-pattern-backdrop')).toBeNull();
+};
+export const MotionOpenClose = { render: MotionOverlay, play: overlayMotionPlay() };
+export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: overlayMotionPlay(true) };

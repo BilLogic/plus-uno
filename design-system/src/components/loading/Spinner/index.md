@@ -14,7 +14,7 @@ Also asked as: loading, busy indicator, wait indicator, loading indicator.
 
 **Storybook page:** `design-system/src/components/loading/Spinner/Spinner.mdx`
 
-**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -140,7 +140,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-icon-inverse` · `--plus-spinner-size` · `--radius-full` · `--spinner-size-lg` · `--spinner-size-md` · `--spinner-size-sm`
+`--ds-icon-inverse` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--plus-spinner-size` · `--radius-full` · `--spinner-size-lg` · `--spinner-size-md` · `--spinner-size-sm`
 
 From `design-system/src/components/loading/Spinner/Spinner.scss`. Override these through the token layer, never with a literal.
 

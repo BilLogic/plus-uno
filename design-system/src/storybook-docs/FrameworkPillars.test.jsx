@@ -6,7 +6,7 @@ import { FrameworkPillars, PILLARS } from './framework-pillars.jsx';
 
 /**
  * The Foundations Overview opens on the PLUS framework: four pillars in a fixed
- * order, each with one line of promise and a placeholder for its illustration.
+ * order, each with its axis, a name and a promise, and no illustration.
  */
 describe('FrameworkPillars', () => {
     it('renders the four pillars in order with their promises', () => {
@@ -19,9 +19,10 @@ describe('FrameworkPillars', () => {
         }
     });
 
-    it('leaves one labeled illustration placeholder per pillar', () => {
-        render(<FrameworkPillars />);
-        expect(screen.getAllByText('Illustration placeholder')).toHaveLength(4);
+    it('draws no placeholder box or image for a pillar', () => {
+        const { container } = render(<FrameworkPillars />);
+        expect(screen.queryByText('Illustration placeholder')).toBeNull();
+        expect(container.querySelector('[role="img"]')).toBeNull();
     });
 
     it('sits above the foundation cards on the Overview page', () => {

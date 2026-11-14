@@ -1,3 +1,4 @@
+import { HeightCell } from '@/lib/heightMotion';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ClippedTooltip } from '@/lib/ClippedTooltip';
@@ -88,7 +89,7 @@ export const TableCell = ({
             aria-busy={loading ? 'true' : undefined}
             {...props}
         >
-            <div className="plus-table-cell-inner">
+            <HeightCell><div className="plus-table-cell-inner">
                 {elemBefore != null && elemBefore !== false && <span className="plus-table-cell-leading">{elemBefore}</span>}
                 <span className="plus-table-cell-body">
                     {truncate
@@ -96,7 +97,7 @@ export const TableCell = ({
                         : <span className={textClass}>{children}</span>}
                     {lines === 2 && <span className="plus-table-cell-secondary">{secondary}</span>}
                 </span>
-            </div>
+            </div></HeightCell>
         </td>
     );
 };

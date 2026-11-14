@@ -69,11 +69,11 @@
     justify-content: center;
     background-color: var(--ds-background-neutral);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
     
     i {
         font-size: var(--icon-md);
-        transition: all 0.2s ease;
+        transition: all var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
     }
     
     // Hover state (only when not disabled)
@@ -122,4 +122,3 @@
         }
     }
 }
-

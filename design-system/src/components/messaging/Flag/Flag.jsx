@@ -1,8 +1,11 @@
+import { useMotionReduced } from '@/lib/motionPreference';
+import { useOverlayPresence } from '@/lib/overlayMotion';
 import React, { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { animate, motion, useReducedMotion } from 'motion/react';
+import { animate, motion } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
+import ProgressBar from '@/components/loading/ProgressBar';
 import Button from '@/components/forms-and-inputs/Button';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import { MESSAGE_APPEARANCE_ICONS } from '../messageAppearance';
@@ -17,8 +20,6 @@ import './Flag.scss';
  */
 export const FLAG_AUTO_CLOSE_MS = 8000;
 
-/** Longest an exiting flag stays mounted if `animationend` never fires. */
-const FLAG_EXIT_FALLBACK_MS = 800;
 
 /** Where the flags that stay go when one leaves: `spatial.default`, read from the generated springs. */
 const CLOSE_UP = SPRINGS['spatial.default'].productive;
@@ -84,6 +85,7 @@ export const Flag = ({
     onDismiss,
     delay = FLAG_AUTO_CLOSE_MS,
     autohide,
+    timer = false,
     className = '',
     headerClass = '',
     bodyClass = '',
@@ -130,42 +132,69 @@ export const Flag = ({
 
     // How the flag is leaving: 'timeout' flies out the way it came, 'hand' fades in place.
     const exitKind = useRef('timeout');
+    useEffect(() => { if (show) exitKind.current = 'timeout'; }, [show]);
     const dismissByHand = (event) => {
         exitKind.current = 'hand';
         onDismiss?.(event);
     };
 
+    /*
+     * The wait pauses while the flag is hovered or holds focus, so reading it never costs the
+     * chance to act, and resumes with the time that was left. Hover and focus are tracked apart:
+     * leaving one while the other holds keeps it paused.
+     */
+    const [hovered, setHovered] = useState(false);
+    const [focused, setFocused] = useState(false);
+    const paused = hovered || focused;
+    const remaining = useRef(delay);
     useEffect(() => {
-        if (!show || !closesItself || !(delay > 0)) return undefined;
-        const timer = setTimeout(() => {
+        remaining.current = delay;
+        // A flag removed under the pointer or the focus gets no leave or blur: clear both with it.
+        if (!show) {
+            setHovered(false);
+            setFocused(false);
+        }
+    }, [delay, show]);
+
+    /*
+     * The bar. Only a flag that closes itself counts down. Driven with `animate` rather than a CSS
+     * animation, so the app-wide reduced-motion rule (which turns CSS animations off) leaves the
+     * countdown running: it is information, not movement. It pauses with the wait.
+     */
+    const barRef = useRef(null);
+    const countdown = useRef(null);
+    const counts = timer && closesItself && delay > 0;
+    useEffect(() => {
+        const fill = barRef.current?.querySelector('.plus-progressbar-fill');
+        if (!show || !counts || !fill) return undefined;
+        const controls = animate(fill, { transform: ['scaleX(1)', 'scaleX(0)'] }, { duration: delay / 1000, ease: 'linear' });
+        countdown.current = controls;
+        return () => { controls.stop(); countdown.current = null; };
+    }, [show, counts, delay]);
+    useEffect(() => {
+        if (paused) countdown.current?.pause();
+        else countdown.current?.play();
+    }, [paused, show, counts, delay]);
+
+    useEffect(() => {
+        if (!show || !closesItself || !(delay > 0) || paused) return undefined;
+        const startedAt = Date.now();
+        const timeout = setTimeout(() => {
             exitKind.current = 'timeout';
             onDismissRef.current?.();
-        }, delay);
-        return () => clearTimeout(timer);
-    }, [show, closesItself, delay]);
+        }, remaining.current);
+        return () => {
+            clearTimeout(timeout);
+            remaining.current = Math.max(0, remaining.current - (Date.now() - startedAt));
+        };
+    }, [show, closesItself, delay, paused]);
 
     /*
      * Leaving. A flag that was showing keeps its place until its exit animation ends, then
      * unmounts, in every motion setting. Timed out, it flies toward the top-right on
      * `spatial.exit`; closed by hand, it fades in place on `appearance.fast`. Under reduced
-     * motion the tokens and Flag.scss turn both into that fade. The timer backs up `animationend`.
+     * motion the shared Reduced policy removes CSS movement. Removal waits for finite exit animations.
      */
-    const [leaving, setLeaving] = useState(false);
-    const wasShown = useRef(show);
-    useEffect(() => {
-        if (show) {
-            wasShown.current = true;
-            exitKind.current = 'timeout';
-            setLeaving(false);
-            return undefined;
-        }
-        if (!wasShown.current) return undefined;
-        wasShown.current = false;
-        setLeaving(true);
-        const timer = setTimeout(() => setLeaving(false), FLAG_EXIT_FALLBACK_MS);
-        return () => clearTimeout(timer);
-    }, [show]);
-
     /*
      * The stack closes up. A leaving flag drops out of the flow at once, held where it stood,
      * so the gap closes as it goes. The flags that stay glide to their new places on
@@ -173,9 +202,10 @@ export const Flag = ({
      * fade into the new place on `appearance.fast`, never a cut.
      */
     const group = useContext(FlagGroupContext);
-    const osReduced = useReducedMotion();
+    const osReduced = useMotionReduced();
     const reduced = reducedMotion ?? group ?? osReduced;
     const surface = useRef(null);
+    const present = useOverlayPresence(show, surface);
     const lastTop = useRef(null);
 
     useLayoutEffect(() => {
@@ -208,7 +238,7 @@ export const Flag = ({
         if (show && token !== false && token !== '') playOnLand(currentAppearance, token, isReduced);
     }, [show]);
 
-    if (!show && !leaving) return null;
+    if (!present) return null;
 
     return (
         <motion.div
@@ -218,13 +248,23 @@ export const Flag = ({
             id={id}
             data-reduced={reduced ? 'true' : 'false'}
             data-leaving={!show ? exitKind.current : undefined}
-            onAnimationEnd={!show ? () => setLeaving(false) : undefined}
-            className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''} ${className}`}
+            className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''}${timer ? ' plus-flag--timer' : ''} ${className}`}
+            data-paused={paused ? 'true' : undefined}
             role={liveRole}
             aria-live={livePoliteness}
             aria-atomic="true"
             {...props}
+            onMouseEnter={(event) => { setHovered(true); props.onMouseEnter?.(event); }}
+            onMouseLeave={(event) => { setHovered(false); props.onMouseLeave?.(event); }}
+            onFocus={(event) => { setFocused(true); props.onFocus?.(event); }}
+            onBlur={(event) => { setFocused(false); props.onBlur?.(event); }}
         >
+            {timer && (
+                // The top cap, decorative: it counts down over `delay` (linear) and pauses with the wait.
+                <div className="plus-flag-timer" ref={barRef} aria-hidden="true" data-counting={counts ? 'true' : undefined}>
+                    <ProgressBar value={100} ariaLabel="Time left" />
+                </div>
+            )}
             {/*
               * The icon sits on the title's first line: a box one title line
               * tall, so a wrapping title keeps it on line 1.
@@ -325,6 +365,8 @@ Flag.propTypes = {
     delay: PropTypes.number,
     /** Close itself after `delay`. Defaults to true for normal, information and success; warning and error never close themselves. */
     autohide: PropTypes.bool,
+    /** Draws a 4 px countdown bar as the flag's top cap, emptying over `delay`, and steps the corners from 12 to 4. For a timed action such as Undo: the first action undoes, `onDismiss` commits. The bar and the wait pause while the flag is hovered or focused. */
+    timer: PropTypes.bool,
     /** Extra class on the flag surface. */
     className: PropTypes.string,
     /** Extra class on the header row that holds the title and timestamp. */
@@ -340,11 +382,11 @@ Flag.propTypes = {
 };
 
 /**
- * FlagGroup: where flags sit: bottom-left by default, fixed to the screen,
+ * FlagGroup: where flags sit: top-right by default, fixed to the screen,
  * Popover/gap-screen 8 from its edges, stacking Popover/stack-flag 16 apart.
  */
 export const FlagGroup = ({
-    position = 'bottom-start', // 'top-start', 'top-center', 'top-end', 'middle-start', etc.
+    position = 'top-end', // 'top-start', 'top-center', 'top-end', 'middle-start', etc.
     containerPosition = 'fixed',
     className = '',
     reducedMotion,
@@ -364,6 +406,7 @@ export const FlagGroup = ({
 );
 
 FlagGroup.propTypes = {
+    /** Where the stack sits: `top-end` (default), `top-start`, `top-center`, `middle-*` or `bottom-*`. */
     position: PropTypes.string,
     /** `fixed` (default) holds the stack to the screen; `absolute` or `static` to a parent. */
     containerPosition: PropTypes.string,

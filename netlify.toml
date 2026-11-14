@@ -143,6 +143,34 @@
 
 [[redirects]]
   from = "/storybook/"
+  query = { path = "/docs/templates-section-section--docs" }
+  to = "/storybook/?path=/docs/templates-section--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-modal-modal--docs" }
+  to = "/storybook/?path=/docs/templates-modal--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-panel-panel--docs" }
+  to = "/storybook/?path=/docs/templates-panel--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-popup-popup--docs" }
+  to = "/storybook/?path=/docs/templates-popup--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
   query = { path = "/docs/templates-page-heading-outline--docs" }
   to = "/storybook/?path=/docs/templates-page--docs#heading-outline"
   status = 301
@@ -151,7 +179,7 @@
 [[redirects]]
   from = "/storybook/"
   query = { path = "/docs/templates-modal-backdrop--docs" }
-  to = "/storybook/?path=/docs/templates-modal-modal--docs#backdrop"
+  to = "/storybook/?path=/docs/templates-modal--docs#backdrop"
   status = 301
   force = true
 
@@ -250,6 +278,13 @@
 
 [[redirects]]
   from = "/storybook/"
+  query = { path = "/docs/get-started-content-design--docs" }
+  to = "/storybook/?path=/docs/foundations-brand-content-voice-and-tone--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
   query = { path = "/docs/foundations-basics-overview--docs" }
   to = "/storybook/?path=/docs/foundations-overview--docs"
   status = 301
@@ -258,7 +293,15 @@
 [[redirects]]
   from = "/storybook/"
   query = { path = "/docs/foundations-basics-tokens--docs" }
-  to = "/storybook/?path=/docs/foundations-tokens--docs"
+  to = "/storybook/?path=/docs/foundations-tokens-library--docs"
+  status = 301
+  force = true
+
+# Tokens became a group of collection pages on 2026-11-13; the old single page lands on the Library.
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-tokens--docs" }
+  to = "/storybook/?path=/docs/foundations-tokens-library--docs"
   status = 301
   force = true
 
@@ -347,6 +390,62 @@
   force = true
 
 # Storybook static files — serve as-is
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-forms-and-inputs-radio--docs" }
+  to = "/storybook/?path=/docs/components-forms-and-inputs-radio-radio--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-forms-and-inputs-select--docs" }
+  to = "/storybook/?path=/docs/components-forms-and-inputs-select-select--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-forms-and-inputs-date-time-picker--docs" }
+  to = "/storybook/?path=/docs/components-forms-and-inputs-date-time-picker-date-time-picker--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-labels-tag--docs" }
+  to = "/storybook/?path=/docs/components-labels-tag-tag--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-text-and-data-display-code--docs" }
+  to = "/storybook/?path=/docs/components-text-and-data-display-code-code--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-navigation-navigation-system--docs" }
+  to = "/storybook/?path=/docs/components-navigation-navigation-system-navigation-system--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/ai-ui-components-ai-message--docs" }
+  to = "/storybook/?path=/docs/ai-ui-components-ai-message-ai-message--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-forms-and-inputs-date-time-picker-date-picker--docs" }
+  to = "/storybook/?path=/docs/components-forms-and-inputs-date-time-picker-date-picker-date-picker--docs"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/storybook/*"
   to = "/storybook/:splat"

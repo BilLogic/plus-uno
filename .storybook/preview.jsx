@@ -5,6 +5,7 @@ import './storybook-overrides.css';
 import '../design-system/src/storybook-docs/docs-rhythm.css';
 import { TocDocsContainer } from './docs-toc.jsx';
 import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.js';
+import { keepDocsAtTop } from '../design-system/src/storybook-docs/lib/docs-open-at-top.js';
 import { mountInPageAnchors } from '../design-system/src/storybook-docs/lib/in-page-anchors.js';
 import BrowserFrame from '../design-system/src/storybook-docs/chrome/BrowserFrame';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
@@ -14,7 +15,7 @@ import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storyb
  */
 
 import { addons } from 'storybook/preview-api';
-import { GLOBALS_UPDATED, SET_GLOBALS } from 'storybook/internal/core-events';
+import { GLOBALS_UPDATED, SET_GLOBALS, STORY_CHANGED } from 'storybook/internal/core-events';
 import { BACKGROUND_OPTIONS, DEFAULT_BACKGROUND } from './backgrounds.js';
 import { assertContained } from '../design-system/src/storybook-docs/lib/contained-demos';
 
@@ -58,6 +59,13 @@ if (!globalThis.__PLUS_STORYBOOK_CONSOLE_PATCHED__) {
     if (shouldSuppressConsoleMessage(args)) return;
     originalError(...args);
   };
+}
+
+// A docs page opens at its top: an open-by-default demo must not scroll the page
+// when it takes focus. Docs pages only; stories keep their real focus behavior.
+// Re-armed whenever the manager moves the preview to another page.
+if (typeof window !== 'undefined' && addons.hasChannel?.()) {
+  keepDocsAtTop(window, (rearm) => addons.getChannel().on(STORY_CHANGED, rearm));
 }
 
 // ---- Color and contrast modes -----------------------------------------------
@@ -168,7 +176,6 @@ const preview = {
             "Design",
             "Develop",
             "With AI",
-            "Content design",
             "About"
           ],
           "Foundations",
@@ -177,6 +184,11 @@ const preview = {
             "Brand",
             [
               "Content",
+              [
+                "Voice and tone",
+                "Language",
+                "Messages"
+              ],
               "Logos",
               "Illustrations"
             ],
@@ -217,7 +229,15 @@ const preview = {
               ]
             ],
             "Accessibility",
-            "Tokens"
+            "Tokens",
+            [
+              "Color",
+              "Typography",
+              "Spacing and size",
+              "Elevation and layers",
+              "Motion",
+              "Library"
+            ]
           ],
           "Components",
           [
@@ -242,6 +262,9 @@ const preview = {
               [
                 "Date time picker",
                 "Date picker",
+                [
+                  "Date picker"
+                ],
                 "Time picker"
               ],
               "Dropdown menu",
@@ -443,7 +466,7 @@ const preview = {
             "Part-to-whole",
             "Temporal"
           ],
-          "Libraries",
+          "Tech stack",
           [
             "Overview",
             "Base UI",

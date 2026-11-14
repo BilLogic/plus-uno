@@ -39,7 +39,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { chromeFailures, managerFailures, measureScript, tocFailures, tocMeasureScript } from './docs-chrome.mjs';
+import { chromeFailures, managerFailures, openAtTopFailures, measureScript, tocFailures, tocMeasureScript } from './docs-chrome.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -54,7 +54,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const PAGES = [
   'components-forms-and-inputs-button-button--docs',
   'components-forms-and-inputs-checkbox--docs',
-  'foundations-tokens--docs',
+  'foundations-tokens-color--docs',
   // The prose page. A component page is almost all canvas — one paragraph each —
   // so without this the typography assertions would run over a sample of three
   // and report green having barely looked. This one carries 33.
@@ -310,6 +310,67 @@ async function measureManager(context, baseUrl) {
   });
 }
 
+/**
+ * Every docs page, at 1280 wide in light: after load and a settle, the window is
+ * still at its top. An open-by-default demo that focuses itself on mount scrolls
+ * the page and drags the sticky "On this page" rail off with it.
+ */
+async function measureOpenAtTop(context, baseUrl, index) {
+  const ids = Object.values(index.entries ?? {}).filter((e) => e.type === 'docs').map((e) => e.id);
+  const rows = [];
+  let next = 0;
+  const worker = async () => {
+    const page = await context.newPage();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    while (next < ids.length) {
+      const id = ids[next++];
+      await page.goto(`${baseUrl}/iframe.html?viewMode=docs&id=${encodeURIComponent(id)}`, { waitUntil: 'load' });
+      await page.waitForTimeout(2500);
+      const scrollY = await page.evaluate(() => Math.max(window.scrollY, document.documentElement.scrollTop, document.scrollingElement?.scrollTop ?? 0));
+      rows.push({ page: id, scrollY });
+    }
+    await page.close();
+  };
+  await Promise.all([worker(), worker(), worker(), worker()]);
+  return { pages: ids.length, failures: openAtTopFailures(rows) };
+}
+
+/**
+ * The manager swaps stories and docs pages inside one preview iframe without a
+ * reload, so the fresh-load scan above cannot see two ways to open partway down:
+ * a story shown first and a docs page second, and a docs page the reader has
+ * already clicked in followed by another. Both are walked here through the
+ * manager, with a client-side navigation between them.
+ */
+const NAV_PAGES = ['components-messaging-spotlight--docs', 'components-forms-and-inputs-filter-menu--docs'];
+
+async function measureNavigation(context, baseUrl, index) {
+  const story = Object.values(index.entries ?? {}).find((e) => e.type === 'story');
+  if (!story || NAV_PAGES.some((id) => !index.entries?.[id])) return [];
+  const page = await context.newPage();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(`${baseUrl}/?path=/story/${story.id}`, { waitUntil: 'load' });
+  const frame = await (await page.waitForSelector('#storybook-preview-iframe')).contentFrame();
+  await frame.waitForSelector('#storybook-root, .sbdocs-content', { state: 'attached', timeout: 60_000 });
+  const go = (id) => page.evaluate((to) => {
+    window.history.pushState({}, '', `/?path=/docs/${to}`);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }, id);
+  const read = async () => {
+    await frame.waitForSelector('.sbdocs-content', { timeout: 60_000 });
+    await page.waitForTimeout(2500);
+    return frame.evaluate(() => Math.max(window.scrollY, document.scrollingElement?.scrollTop ?? 0));
+  };
+  const rows = [];
+  await go(NAV_PAGES[0]);
+  rows.push({ page: `story to ${NAV_PAGES[0]}`, scrollY: await read() });
+  await frame.locator('.sbdocs-content').click({ position: { x: 4, y: 4 }, force: true }).catch(() => {});
+  await go(NAV_PAGES[1]);
+  rows.push({ page: `docs to ${NAV_PAGES[1]} after a click`, scrollY: await read() });
+  await page.close();
+  return openAtTopFailures(rows);
+}
+
 let exitCode = 0;
 const browser = await chromium.launch();
 try {
@@ -351,7 +412,10 @@ try {
 
   const managerProblems = missing.includes(TOC_PAGE) ? [] : await measureManager(context, base);
 
-  const failures = [...chromeFailures(measurements), ...tocProblems, ...managerProblems];
+  const top = await measureOpenAtTop(context, base, index);
+  const navigation = await measureNavigation(context, base, index);
+
+  const failures = [...chromeFailures(measurements), ...tocProblems, ...managerProblems, ...top.failures, ...navigation];
   if (failures.length) {
     console.error(`[docs-chrome] ${failures.length} problem(s):`);
     for (const f of failures) console.error(`  -> ${f}`);
@@ -361,7 +425,7 @@ try {
     console.log(
       `[docs-chrome] ${measurements.length} page render(s) across ${WIDTHS.length} width(s): ` +
         `no horizontal bleed, ${total('canvases')} canvas(es) closed or attached, ` +
-        `${total('tables')} table(s) contained, ${total('prose')} prose element(s) in the ` +
+        `${top.pages} docs page(s) open at the top, ${total('tables')} table(s) contained, ${total('prose')} prose element(s) in the ` +
         `design system's own type.`,
     );
     if (total('prose') === 0) {

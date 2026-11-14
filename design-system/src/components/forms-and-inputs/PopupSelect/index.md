@@ -12,7 +12,7 @@ Popup select: one list in a Popup, applied the moment a row is picked. - **One l
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

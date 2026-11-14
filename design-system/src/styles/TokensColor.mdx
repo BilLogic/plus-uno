@@ -1,0 +1,41 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    FoundationSection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import { TokenCollection } from '@/storybook-docs/token-collection-blocks.jsx';
+
+<Meta title="Foundations/Tokens/Color" />
+
+<DocsLanding
+    page="foundations-tokens-color"
+    eyebrow="Foundation · Tokens"
+    title="Color"
+    purpose="Every color a PLUS screen uses, as the palette it comes from and the named roles that follow the Color mode."
+    section="foundations-tokens"
+/>
+
+<FoundationSection title="Overview">
+
+The palette is the raw set of hues and grays. Roles such as text, surface and border give a palette step a job and switch with the Light, Dark and high-contrast modes, so a screen binds a role and never a palette step.
+
+</FoundationSection>
+
+<TokenCollection
+    collection="color" swatch
+    primitives={<p>Raw hues and grays, named by ramp and step. They define the roles below and are never used in a feature.</p>}
+    semantics={<p>Roles you bind in a feature. Global roles apply anywhere; Components holds the chart and skeleton colors, which only those components read.</p>}
+/>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Typography', description: 'Type tokens and text styles.', href: '?path=/docs/foundations-tokens-typography--docs' },
+        { title: 'Elevation and layers', description: 'Shadow, opacity and layer order.', href: '?path=/docs/foundations-tokens-elevation-and-layers--docs' },
+        { title: 'Color', description: 'Roles, surfaces and states.', href: '?path=/docs/foundations-visual-color--docs' },
+    ]}
+/>
+
+</FoundationSection>

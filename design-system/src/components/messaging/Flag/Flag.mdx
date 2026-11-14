@@ -39,8 +39,6 @@ reply. It appears over the page and goes away on its own or when dismissed.
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Flag"
-    sets={figmaMeta.sets}
-    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -68,6 +66,8 @@ reply. It appears over the page and goes away on its own or when dismissed.
 <div className="sb-ds-doc-section">
 
 ## Behavior
+
+<ComponentExample of={FlagStories.UndoTimer} title="Undo with a timer" description="`timer` adds a 4 px countdown bar as the top cap and steps the corners from 12 to 4. Undo is the first action; the change commits in `onDismiss`. Hover or focus pauses the wait for every flag, and the bar dims while it is paused." />
 
 <ComponentExample of={FlagStories.Dismiss} title="Dismiss" description="The shared CloseButton, last in a default flag's row. A bold flag has none." />
 

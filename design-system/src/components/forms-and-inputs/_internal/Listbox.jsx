@@ -1,3 +1,5 @@
+import { useMotionReduced } from '@/lib/motionPreference';
+import { useOverlayPresence, useKeyboardOpen } from '@/lib/overlayMotion';
 import React, {
     useCallback,
     useEffect,
@@ -246,7 +248,10 @@ const Listbox = ({
     const surfaceRef = useRef(null);
     const bodyRef = useRef(null);
     // Placed against the field; a press outside the field and the list closes it.
-    const place = useAnchoredPopup({ open, anchorRef, popupRef: surfaceRef, align, onClose });
+    const keyboardOpen = useKeyboardOpen(open);
+    const reduced = useMotionReduced();
+    const present = useOverlayPresence(open, surfaceRef);
+    const place = useAnchoredPopup({ open: present, anchorRef, popupRef: surfaceRef, align, onClose: open ? onClose : undefined });
 
     /* ---------- the row's own controls ---------- */
     // Drawn over one row, beside the listbox rather than inside it: an option's
@@ -404,7 +409,14 @@ const Listbox = ({
     const surface = (
         <div
             ref={surfaceRef}
+            data-reduced={reduced ? 'true' : undefined}
             className={surfaceClasses}
+            data-instant={keyboardOpen ? 'keyboard' : undefined}
+            data-ending-style={!open ? '' : undefined}
+            aria-hidden={!open ? true : undefined}
+            inert={!open ? true : undefined}
+            data-side={place?.placement ?? 'bottom'}
+            data-align={place?.side ?? 'start'}
             data-placement={anchorRef ? place?.placement ?? 'bottom' : undefined}
             style={anchorRef ? {
                 top: place?.top ?? 0,
@@ -472,7 +484,7 @@ const Listbox = ({
 
     return (
         <>
-            {open && (anchorRef ? createPortal(surface, popupLayerOf(anchorRef)) : surface)}
+            {present && (anchorRef ? createPortal(surface, popupLayerOf(anchorRef)) : surface)}
             <div className="visually-hidden" role="status" aria-live="polite">{open ? announcement : ''}</div>
         </>
     );

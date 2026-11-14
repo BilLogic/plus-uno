@@ -12,7 +12,7 @@ Vertical button: an icon stacked over a short label, one size (60 by 60). For ch
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

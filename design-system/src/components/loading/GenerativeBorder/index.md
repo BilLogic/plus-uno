@@ -12,7 +12,7 @@ The border that shows the AI is generating content: a 2px rounded stroke in two 
 
 **Storybook page:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.mdx`
 
-**Motion:** change `linear` · pulse `loop`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear` · pulse `loop`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -118,7 +118,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-selected` · `--ds-border-brand` · `--ds-border-discovery` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width`
+`--border-selected` · `--ds-border-brand` · `--ds-border-discovery` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width`
 
 From `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.scss`. Override these through the token layer, never with a literal.
 

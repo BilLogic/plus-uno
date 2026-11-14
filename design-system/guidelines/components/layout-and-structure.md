@@ -49,7 +49,7 @@ several of them would clutter the landmark list.
 **`Carousel` hides content behind motion.** It autoplays by default; set
 `autoplay={false}` for anything a user has to read. Autoplay holds on hover,
 keyboard focus and when out of view, and never runs under reduced motion.
-Foundations · Motion (`design-system/src/styles/MotionPrinciples.mdx`) keeps
+Foundations › Expression › Motion (`design-system/src/styles/MotionPrinciples.mdx`) keeps
 Reduced mode to a short fade, so essential information never depends on motion.
 
 ## Related

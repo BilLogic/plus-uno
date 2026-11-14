@@ -1,0 +1,187 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { RefTable, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import { FoundationSection, FoundationSubsection, FoundationRelated, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { VoiceTag } from '@/storybook-docs/rule-tag.jsx';
+import { Say, Sample, RuleHead } from '@/storybook-docs/content-blocks.jsx';
+
+{/* Agent twin: design-system/guidelines/foundations/content/language.md. Change the two together. */}
+
+<Meta title="Foundations/Brand/Content/Language" />
+
+<DocsLanding
+    page="foundations-brand-content-language"
+    eyebrow="Foundation"
+    title="Language"
+    purpose="How we write every word, for everyone PLUS reaches."
+    links={{
+        items: [
+            { title: 'Words', href: '#foundation-words' },
+            { title: 'People', href: '#foundation-people' },
+            { title: 'Sentences', href: '#foundation-sentences' },
+            { title: 'Mechanics', href: '#foundation-mechanics' },
+        ],
+    }}
+/>
+
+<FoundationSection title="Words">
+
+Use the word a tutor would say out loud.
+
+<FoundationSubsection title="Pick everyday words">
+
+<RuleHead><VoiceTag word="clear" /></RuleHead>
+
+Verbs over nouns. Short words over long ones.
+
+<DoDont>
+<Do caption="A verb the reader can act on."><Say>Pick a time that works for you.</Say></Do>
+<Dont caption="Correct, but “availability” is an abstract noun to decode."><Say>Choose your availability.</Say></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Spell out team terms">
+
+<RuleHead><VoiceTag word="helpful" /></RuleHead>
+
+New tutors don’t know our shorthand yet. Write the full name.
+
+<DoDont>
+<Do caption="Clear on day one."><Say>Your tutor improvement plan is ready.</Say></Do>
+<Dont caption="Fine for a lead tutor. A new tutor has to ask."><Say>Your TIP is ready.</Say></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<RefTable
+    head={['Say', 'Not']}
+    rows={[
+        ['session', 'meeting, class'],
+        ['call off', 'cancel'],
+        ['fill-in', 'sub'],
+        ['lead tutor', 'TA, captain'],
+        ['reflection', 'survey'],
+        ['student', 'kid, tutee'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="People">
+
+PLUS reaches students, families and schools who never open the app. Write so every one of them is included.
+
+<FoundationSubsection title="Describe the work">
+
+<RuleHead><VoiceTag word="honest" /></RuleHead>
+
+Say what a student is learning. Leave out labels about who they are.
+
+<DoDont>
+<Do caption="Specific, and it points forward."><Say>Leo is working on two-step equations.</Say></Do>
+<Dont caption="True, but it labels Leo and doesn’t say which skill."><Say>Leo is struggling with equations.</Say></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Don’t assume a household">
+
+<RuleHead><VoiceTag word="warm" /></RuleHead>
+
+Families look different. So do devices and quiet rooms.
+
+<DoDont>
+<Do caption="Works for every family."><Say>Ask someone at home to sign the form.</Say></Do>
+<Dont caption="Close, but leaves out a grandparent or older sibling."><Say>Ask a parent or guardian to sign the form.</Say></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Show the least you need">
+
+<RuleHead><VoiceTag word="honest" /></RuleHead>
+
+On shared screens, first name and last initial. No names in research exports.
+
+<DoDont>
+<Do caption="Enough to find her."><Say>Ana P. · Grade 7</Say></Do>
+<Dont caption="Fine in a private record. Too much on a projected screen."><Say>Ana Pérez · Grade 7</Say></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Sentences">
+
+<FoundationSubsection title="Say who acted">
+
+<RuleHead><VoiceTag word="honest" /></RuleHead>
+
+Name the person behind a change. Passive voice hides them.
+
+<DoDont>
+<Do caption="The tutor knows who to thank or ask."><Say>Your lead tutor approved the swap.</Say></Do>
+<Dont caption="Fine in a tight flag. In a notice, it hides who decided."><Say>Swap approved.</Say></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Write as “we” and “you”">
+
+<RuleHead><VoiceTag word="warm" /></RuleHead>
+
+PLUS is “we”. The reader is “you”. Use contractions.
+
+<DoDont>
+<Do caption="A promise from someone."><Say>We’ll remind you 30 min before.</Say></Do>
+<Dont caption="Accurate, but no one is making the promise."><Say>A reminder will be sent 30 min before.</Say></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Mechanics">
+
+One way to write each thing, so every screen reads the same.
+
+<RefTable
+    head={['Topic', 'Rule', 'Example']}
+    rows={[
+        ['Capitalization', 'Sentence case everywhere', 'Open session notes'],
+        ['Punctuation', 'No period in titles, buttons or labels. No exclamation marks in errors.', 'Reflection submitted'],
+        ['Numbers', 'Digits in the UI. Spell out one to nine in a sentence.', '3 sessions left'],
+        ['Dates', 'Shortest clear format. Add the year only in records.', 'Wed, Nov 13'],
+        ['Times', '12-hour, with the time zone', '3:30 PM ET'],
+        ['Ranges', 'En dash, no spaces', '3:30–4:15 PM ET'],
+        ['Recent', 'Relative under a week, then the date', '10 min ago · Yesterday · Nov 4'],
+        ['School calendar', 'Terms, not quarters', 'Fall term'],
+    ]}
+/>
+
+<FoundationSubsection title="Always add the time zone">
+
+<RuleHead><VoiceTag word="clear" /></RuleHead>
+
+Tutors and schools sit in different zones.
+
+<DoDont>
+<Do caption="Means the same thing everywhere."><Say>Wed, Nov 13 · 3:30 PM ET</Say></Do>
+<Dont caption="Reads fine, until a tutor in another zone joins an hour late."><Say>Wed, Nov 13 at 3:30 PM</Say></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated items={[
+    { title: 'Voice and tone', description: 'How PLUS sounds, and how tone shifts by reader.', href: '?path=/docs/foundations-brand-content-voice-and-tone--docs' },
+    { title: 'Messages', description: 'What to say when something happens.', href: '?path=/docs/foundations-brand-content-messages--docs' },
+    { title: 'Accessibility', description: 'Alt text, link text and screen readers.', href: '?path=/docs/foundations-accessibility--docs' },
+]} />
+
+</FoundationSection>

@@ -137,6 +137,8 @@ Tokens one component owns, named for it.
 --flag-min-height  /* Minimum height of a Flag. */
 --flag-offset  /* Distance between a Flag and the edge of the screen. */
 --flag-pad  /* Padding inside a Flag. */
+--flag-radius-timer  /* Corner radius of a Flag with a countdown bar: stepped down from the popup radius to match the bar height. */
+--flag-timer-height  /* Height of the countdown bar on a Flag. */
 --join-row-width  /* Width of the Home page join row: the Join button with its session Select beside it. */
 --listbox-max-height  /* Tallest a Select or Cascader listbox may grow before it scrolls. */
 --listbox-max-width  /* Widest a Select or Cascader listbox may grow. */

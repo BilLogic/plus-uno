@@ -14,7 +14,7 @@ Also asked as: filter dropdown.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

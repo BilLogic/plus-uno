@@ -10,11 +10,11 @@ Also asked as: collapsible, expand collapse, disclosure, expandable sections, fa
 
 **Source:** `design-system/src/components/layout-and-structure/Accordion/Accordion.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx` — Styles, Behavior, InteractionStates, Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Expanded, Disabled
+**Stories:** `design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx` — Styles, Behavior, InteractionStates, Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Expanded, Disabled, MotionOpenClose, MotionReduced
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Accordion/Accordion.mdx`
 
-**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -190,7 +190,7 @@ Implemented as `AccordionItem`.
 
 ## Tokens touched
 
-`--body-large` · `--border-default` · `--card-pad-default` · `--card-radius-compact` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text-subtle` · `--heading-small` · `--icon-md`
+`--body-large` · `--border-default` · `--card-pad-default` · `--card-radius-compact` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text-subtle` · `--heading-small` · `--icon-md`
 
 From `design-system/src/components/layout-and-structure/Accordion/Accordion.scss`. Override these through the token layer, never with a literal.
 

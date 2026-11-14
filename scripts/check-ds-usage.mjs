@@ -11,8 +11,9 @@
  * `check:harness`, the uno-prototype exit, ds-lens and the usage eval. AI
  * review advises; this blocks.
  *
- * WHAT IT READS. Consumer code: tracked `.jsx .js .mjs .tsx .ts .scss .css
- * .html` files under `prototypes/` and `src/`, tests and stories skipped. The
+ * WHAT IT READS. Consumer code under `prototypes/`, plus CSS/SCSS under
+ * design-system/src/{components,patterns,templates} for the motion rule only.
+ * Tracked `.jsx .js .mjs .tsx .ts .scss .css .html`, tests and stories skipped. The
  * facts come from the generated manifests
  * (`design-system/agent-views/components.json`, `tokens.json`), never from
  * component source. A custom property counts as defined when the manifest
@@ -43,7 +44,7 @@ import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { CONSUMER_ROOTS, SOURCE_ROOTS, loadFacts } from './lib/ds-facts.mjs';
-import { contextFrom, docLink, escapesIn, pagesOf } from './lib/ds-usage.mjs';
+import { contextFrom, docLink, escapesIn, isDsStyle, pagesOf } from './lib/ds-usage.mjs';
 import { readIconLists } from './lib/icon-lists.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
@@ -53,7 +54,7 @@ import { definitions } from './undefined-tokens.mjs';
 export { REPO_ROOT };
 
 export const BASELINE = 'scripts/baselines/ds-usage.json';
-export const SCOPE = CONSUMER_ROOTS;
+export const SCOPE = [...CONSUMER_ROOTS, 'design-system/src/components', 'design-system/src/patterns', 'design-system/src/templates'];
 export const SEARCHED = /\.(jsx|js|mjs|tsx|ts|scss|css|html)$/;
 const SKIPPED = /(?:^|\/)(?:node_modules|dist|build)\/|\.(?:test|spec|stories)\.[cm]?[jt]sx?$|\.d\.ts$/;
 const DEFINITION_ROOTS = SOURCE_ROOTS;
@@ -95,7 +96,7 @@ export function filesUnder(repoRoot, roots) {
 }
 
 /** Whether a repo-relative path is one this check reads. */
-export const inScope = (rel) => SCOPE.some((root) => rel.startsWith(`${root}/`)) && SEARCHED.test(rel) && !SKIPPED.test(rel);
+export const inScope = (rel) => (isDsStyle(rel) || CONSUMER_ROOTS.some((root) => rel.startsWith(`${root}/`))) && SEARCHED.test(rel) && !SKIPPED.test(rel);
 
 const read = (repoRoot, rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') });
 
@@ -257,7 +258,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const files = scopeFiles(repoRoot);
   const found = escapes(repoRoot, files).filter((f) => f.level === 'fail');
-  return `${found.length} recorded escape(s) across ${files.length} consumer file(s); none new`;
+  return `${found.length} recorded escape(s) across ${files.length} file(s); none new`;
 }
 
 export const REMEDY =
@@ -321,4 +322,3 @@ function cli(argv) {
 }
 
 if (isEntry(import.meta.url)) cli(process.argv.slice(2));
-

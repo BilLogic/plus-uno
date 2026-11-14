@@ -29,7 +29,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | PatternCard | template | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | PatternCard | template | milestone | Opening a page | `--ds-motion-spatial-default` | `sound.done.milestone` on land: onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it |
 | PatternModal | template | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |  |
-| PatternModal | template | exit | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| PatternModal | template | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | PatternModal | template | swap | Swap content in place | `--ds-motion-appearance-fast` |  |
 | PatternModal | template | rejected | Call attention | `--ds-motion-spatial-fast` |  |
 | PatternSection | template | view-bar | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
@@ -172,7 +172,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | SectionMessage | component | enter | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | SectionMessage | component | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Select | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| Select | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| Select | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | Sidebar | component | enter | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Sidebar | component | exit | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
 | Skeleton | component | change | Load content | `--ds-motion-linear` |  |
@@ -184,6 +184,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Spotlight | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Suggestion | component | enter | Swap content in place | `--ds-motion-appearance-fast` |  |
 | Suggestion | component | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| Table | component | expand | Expand and collapse | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Table | component | change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Table | component | roster | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | `sound.roster` on land: in a session; changes within 2 s play once |
 | Tabs | component | change | Switch views | `--ds-motion-spatial-fast` |  |
@@ -197,6 +198,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Tooltip | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Tooltip | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | TreeSelect | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| TreeSelect | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| TreeSelect | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | TreeSelect | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |
 | VerticalButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |

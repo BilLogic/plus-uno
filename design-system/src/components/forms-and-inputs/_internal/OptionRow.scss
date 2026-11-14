@@ -28,7 +28,7 @@
     text-align: left;
     cursor: pointer;
     user-select: none;
-    transition: background-color 0.15s ease;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     /* Hover is the keyboard-highlighted row; Figma draws them as one state. */
     @include plus-state(

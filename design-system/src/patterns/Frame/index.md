@@ -14,7 +14,7 @@ Also asked as: page template, page shell, page layout, full page, new page, surf
 
 **Storybook page:** `design-system/src/patterns/Frame/Frame.mdx`
 
-**Motion:** sidebar-open `spatial.default` · sidebar-close `spatial.fast` · panel-dock `spatial.slow` + `appearance.fast` · panel-undock `spatial.default` · focused-open `appearance.default` · focused-close `appearance.fast` · step `spatial.default` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** sidebar-open `spatial.default` · sidebar-close `spatial.fast` · panel-dock `spatial.slow` + `appearance.fast` · panel-undock `spatial.default` · focused-open `appearance.default` · focused-close `appearance.fast` · step `spatial.default` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

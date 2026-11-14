@@ -8,6 +8,9 @@ import {
   IconographyHero,
   IllustrationsHero,
   LogosHero,
+  VoiceAndToneHero,
+  LanguageHero,
+  MessagesHero,
   RadiusHero,
   SpacingHero,
   TokensHero,
@@ -92,12 +95,27 @@ export const HEROES = {
   'foundations-visual-iconography': {
     Hero: IconographyHero,
     description:
-      'A set of different icons in one style; the bell drawn on its construction grid.',
+      'A set of different icons in one style, each on its own tile.',
   },
   'foundations-brand-illustrations': {
     Hero: IllustrationsHero,
     description:
       'A fanned stack of heroes; the front shows the house style.',
+  },
+  'foundations-brand-content-voice-and-tone': {
+    Hero: VoiceAndToneHero,
+    description:
+      'Two speech bubbles in a conversation; the reply in the brand color.',
+  },
+  'foundations-brand-content-language': {
+    Hero: LanguageHero,
+    description:
+      'A short card of text, its action line picked out in the brand color.',
+  },
+  'foundations-brand-content-messages': {
+    Hero: MessagesHero,
+    description:
+      'A message card: an icon and title, a body, and one action in the brand color.',
   },
   'foundations-brand-logos': {
     Hero: LogosHero,
@@ -114,11 +132,32 @@ export const HEROES = {
     description:
       'The scale itself: each step a square its own size.',
   },
-  'foundations-tokens': {
-    Hero: TokensHero,
+  'foundations-tokens-color': {
+    Hero: ColorHero,
     description:
-      'Chips repeat; one value threads through them.',
+      'One card painted by its role tokens, shown in light on the left and dark on the right; the primary button is the subject.',
   },
+  'foundations-tokens-typography': {
+    Hero: TypographyHero,
+    description:
+      'Serif and sans on one set of guides: cap height, x-height, and the baseline in the brand color.',
+  },
+  'foundations-tokens-spacing-and-size': {
+    Hero: SpacingHero,
+    description:
+      'The scale itself: each step a square its own size.',
+  },
+  'foundations-tokens-elevation-and-layers': {
+    Hero: ElevationHero,
+    description:
+      'The layers lifted apart, light on the left and dark on the right.',
+  },
+  'foundations-tokens-motion': {
+    Hero: PhysicsHero,
+    description:
+      'One shape drawn at equal time steps, fast at first, then settling past its target and back.',
+  },
+  'foundations-tokens-library': { Hero: TokensHero, description: 'Every token in one list, found by name or by filter.' },
   'foundations-visual-typography': {
     Hero: TypographyHero,
     description:
@@ -264,7 +303,7 @@ export const HEROES = {
     description:
       'The page header and its Sections; the Page ringed beside the docked Sidebar.',
   },
-  'templates-section-section': {
+  'templates-section': {
     Hero: SectionHero,
     description:
       'Header, view bar, body and side, ringed.',
@@ -284,17 +323,17 @@ export const HEROES = {
     description:
       'Fields in a column, the commit at the end.',
   },
-  'templates-modal-modal': {
+  'templates-modal': {
     Hero: ModalHero,
     description:
       'One task over a Backdrop; the Modal ringed.',
   },
-  'templates-panel-panel': {
+  'templates-panel': {
     Hero: PanelHero,
     description:
       'A full-height layer beside the page, ringed.',
   },
-  'templates-popup-popup': {
+  'templates-popup': {
     Hero: PopupHero,
     description:
       'A Popup opening bottom-end from its trigger at the bar end, 4 below it, ringed.',

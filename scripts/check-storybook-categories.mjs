@@ -27,7 +27,7 @@
  *   6. The sidebar's roots lead with the benchmark site's sections plus our
  *      Patterns and Templates, in order: Get started, Foundations, Components,
  *      Patterns, Templates, AI UI. Our own extras (Data visualizations,
- *      Libraries) follow.
+ *      Tech stack) follow.
  *   7. Every docs page and story file under `design-system/src/` is titled
  *      under a root the sidebar sort lists, so a page left under a retired
  *      root (`Getting started/…`, `Foundations/Patterns/…`) cannot open a
@@ -37,11 +37,11 @@
  *      Templates and Patterns: a page titled under one of those roots sits in
  *      one of that root's sources, and a page in one of a root's sources is
  *      titled under that root.
- *   9. Foundations · Motion is exactly the pages the sidebar sort lists under
+ *   9. Foundations › Expression › Motion is exactly the pages the sidebar sort lists under
  *      Foundations > Expression > Motion, Library among them: a page titled
  *      `Foundations/Expression/Motion/<name>` is listed, and a listed name has a page.
  *      This is where the first-pass "Durations and easings" page was caught.
- *      Foundations · Sound follows the same rule, with no required Library page.
+ *      Foundations › Expression › Sound follows the same rule, with no required Library page.
  *
  * An AI component (Icon, Prompt input) is listed in the taxonomy's
  * `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays
@@ -132,11 +132,11 @@ export function docsTitle(src) {
 const sortRoots = (taxonomy) =>
   (taxonomy.storySortOrder ?? []).filter((e) => typeof e === 'string' && e !== '*');
 
-/** Where Foundations · Motion pages live, and the page the component docs link to. */
+/** Where Foundations › Expression › Motion pages live, and the page the component docs link to. */
 export const MOTION_ROOT = 'Foundations/Expression/Motion';
 export const MOTION_LIBRARY = 'Library';
 
-/** Where Foundations · Sound pages live. */
+/** Where Foundations › Expression › Sound pages live. */
 export const SOUND_ROOT = 'Foundations/Expression/Sound';
 
 /** The Foundations > Expression > `name` entries of the sidebar sort, or null when it lists none. */
@@ -296,7 +296,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     }
   }
 
-  // (9) Foundations · Motion and Foundations · Sound: the listed pages, and no others.
+  // (9) Foundations › Expression › Motion and Foundations › Expression › Sound: the listed pages, and no others.
   const listed = (name, rootPath) => {
     const entries = sortFoundation(taxonomy, name);
     if (!entries) return;
@@ -307,7 +307,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       if (!title?.startsWith(`${rootPath}/`)) continue;
       if (!entries.includes(title.split('/')[3])) {
         found.push(
-          `${rel}  is titled "${title}", a Foundations · ${name} page the sidebar sort does not list.\n` +
+          `${rel}  is titled "${title}", a Foundations › Expression › ${name} page the sidebar sort does not list.\n` +
             `      -> List it under Foundations > Expression > ${name} in storybook.taxonomy.json, or delete the page.`,
         );
       }
@@ -324,6 +324,20 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     found.push(`storybook.taxonomy.json  Foundations > Expression > Motion does not list ${MOTION_LIBRARY}.`);
   }
   listed('Sound', SOUND_ROOT);
+
+  // (10) No component page is titled a path-prefix of another: a page that is also a folder
+  // shows up in the sidebar as a "Docs" child. The parent's own page is titled Name/Name.
+  const titles = new Set(stories.map(({ title }) => title).filter(Boolean));
+  for (const { rel, title } of stories) {
+    if (!title) continue;
+    const child = [...titles].find((other) => other.startsWith(`${title}/`));
+    if (child) {
+      found.push(
+        `${rel}  is titled "${title}", which is also the folder of "${child}", so the sidebar lists it as a "Docs" entry.\n` +
+          `      -> Title the page ${title}/${title.split("/").pop()}.`,
+      );
+    }
+  }
 
   // (5) Retired paths.
   const self = new Set(['scripts/check-storybook-categories.mjs', 'scripts/check-storybook-categories.test.mjs']);

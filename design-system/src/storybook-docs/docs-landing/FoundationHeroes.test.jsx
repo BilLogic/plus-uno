@@ -13,9 +13,17 @@ const FOUNDATION_IDS = [
     'foundations-visual-iconography',
     'foundations-brand-illustrations',
     'foundations-brand-logos',
+    'foundations-brand-content-voice-and-tone',
+    'foundations-brand-content-language',
+    'foundations-brand-content-messages',
     'foundations-visual-radius',
     'foundations-layout-spacing',
-    'foundations-tokens',
+    'foundations-tokens-color',
+    'foundations-tokens-typography',
+    'foundations-tokens-spacing-and-size',
+    'foundations-tokens-elevation-and-layers',
+    'foundations-tokens-motion',
+    'foundations-tokens-library',
     'foundations-visual-typography',
 ];
 
@@ -29,7 +37,7 @@ describe('Foundations heroes', () => {
         expect(HEROES[id].description).toMatch(/^[A-Z].*\.$/);
     });
 
-    it.each(FOUNDATION_IDS.filter((id) => !['foundations-visual-typography', 'foundations-overview'].includes(id)))('%s draws no text', (id) => {
+    it.each(FOUNDATION_IDS.filter((id) => !['foundations-visual-typography', 'foundations-tokens-typography', 'foundations-overview'].includes(id)))('%s draws no text', (id) => {
         const { container } = render(React.createElement(HEROES[id].Hero));
         expect(container.querySelector('text')).toBeNull();
         expect(container.textContent).toBe('');
@@ -105,24 +113,19 @@ describe('Foundations Overview: a bento of the foundations', () => {
     });
 });
 
-describe('Iconography: ten icons, the bell on its construction', () => {
+describe('Iconography: ten icons in one style', () => {
     const draw = () => render(React.createElement(HEROES['foundations-visual-iconography'].Hero)).container;
 
     it('draws ten different icons, five by two, the bell alone in the brand color', () => {
         const glyphs = [...draw().querySelectorAll('[data-glyph]')];
         expect(new Set(glyphs.map((g) => g.dataset.glyph)).size).toBe(10);
         expect(glyphs.filter((g) => g.getAttribute('stroke') === ACCENT).map((g) => g.dataset.glyph)).toEqual(['bell']);
+        expect(new Set(glyphs.map((g) => g.getAttribute('stroke-width'))).size).toBe(1);
     });
 
-    it('draws the bell on its construction: the 24 grid, the diagonals, the keyline circle and square', () => {
-        const c = draw().querySelector('[data-shape="icon-construction"]');
-        expect(c.querySelectorAll('line')).toHaveLength(13 * 2 + 2);
-        expect(c.querySelectorAll('circle')).toHaveLength(1);
-        expect(c.querySelectorAll('rect')).toHaveLength(1);
-    });
-
-    it('puts no ring or box around the bell', () => {
-        const rings = [...draw().querySelectorAll(`rect[stroke="${ACCENT}"]`)].filter((r) => !r.closest('[data-shape="icon-construction"]'));
-        expect(rings).toEqual([]);
+    it('draws no construction grid, keyline or ring on any tile', () => {
+        const c = draw();
+        expect(c.querySelector('[data-shape="icon-construction"]')).toBeNull();
+        expect(c.querySelectorAll(`rect[stroke="${ACCENT}"]`)).toHaveLength(0);
     });
 });

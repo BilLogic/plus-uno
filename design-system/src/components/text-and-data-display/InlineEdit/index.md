@@ -12,7 +12,7 @@ InlineEdit — text that reads as text and becomes a field when it is pressed. T
 
 **Storybook page:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.mdx`
 
-**Motion:** change `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -161,7 +161,7 @@ The edit view takes the field's own tokens: see Text field.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--height-250` · `--item-height-md` · `--pad-x-md` · `--radius-control-lg` · `--radius-md` · `--stack-sm`
+`--body-default` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--height-250` · `--item-height-md` · `--pad-x-md` · `--radius-control-lg` · `--radius-md` · `--stack-sm`
 
 From `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss`. Override these through the token layer, never with a literal.
 

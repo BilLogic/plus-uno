@@ -12,12 +12,12 @@ Cascader: a field that picks one path through nested options, one level at a tim
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
 Use `Cascader` when a choice is naturally made one level at a time, in
-sequence — a region, then a city, then a neighborhood. For a hierarchy where
+sequence — a district, then a school, then a grade. For a hierarchy where
 someone might pick or see several nodes at once rather than one path, use
 `TreeSelect` instead. For a flat list, use `Select`.
 
@@ -110,9 +110,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid
 
 | Do | Don't |
 | --- | --- |
-| Name each level by what it is: "Region", "City". | Names that only make sense at one level. |
+| Name each level by what it is: "District", "School". | Names that only make sense at one level. |
 | Keep each level's options short and parallel. | Mixed kinds of option in one column. |
-| Say what to do in an error: "Pick a region". | "Required" or "Invalid". |
+| Say what to do in an error: "Pick a location". | "Required" or "Invalid". |
 | Label the field with the whole path's subject: "Location". | A label for just the first level. |
 
 ## Props
@@ -144,7 +144,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-border` · `--plus-listbox-viewport-width`
+`--border-default` · `--ds-border` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--plus-listbox-viewport-width`
 
 From `design-system/src/components/forms-and-inputs/Cascader/Cascader.scss`. Override these through the token layer, never with a literal.
 

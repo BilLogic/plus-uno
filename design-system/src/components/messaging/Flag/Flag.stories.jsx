@@ -1,3 +1,4 @@
+import { expectOverlayExit, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
@@ -36,7 +37,7 @@ export default {
         },
         position: {
             control: 'select',
-            options: ['top-start', 'top-end', 'bottom-start', 'bottom-end'],
+            options: ['top-start', 'top-center', 'top-end', 'bottom-start', 'bottom-end'],
             table: { category: 'Layout' }
         },
         title: {
@@ -292,6 +293,49 @@ Dismiss.play = async ({ canvasElement }) => {
     await userEvent.click(button);
     await expect(canvas.getByTestId('dismiss-closed')).toHaveTextContent('normal');
     await waitFor(() => expect(canvas.queryByTestId('dismiss-normal')).toBeNull());
+};
+
+/**
+ * A timed action: `timer` draws a 4 px bar as the top cap, emptying over `delay`, and steps the
+ * corners from 12 to 4. The first action is Undo; the change commits in `onDismiss`. Hover or
+ * focus pauses the wait and dims the bar.
+ */
+export const UndoTimer = () => {
+    const [state, setState] = useState('timed');
+    return (
+        <FlagGroup containerPosition="static">
+            <Flag
+                title={state === 'restored' ? 'Session restored' : 'Session archived'}
+                timer={state === 'timed'}
+                show={state !== 'committed'}
+                delay={60000}
+                actions={state === 'timed' ? [{ text: 'Undo', onClick: () => setState('restored') }] : undefined}
+                onDismiss={() => setState((current) => (current === 'timed' ? 'committed' : current))}
+                data-testid="undo-flag"
+            />
+        </FlagGroup>
+    );
+};
+
+UndoTimer.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const flag = canvas.getByTestId('undo-flag');
+    const bar = flag.querySelector('.plus-flag-timer');
+    await expect(bar, 'the bar is the top cap').toBeInTheDocument();
+    await expect(Math.round(bar.getBoundingClientRect().height), 'bar is 4').toBe(4);
+    for (const corner of ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius']) {
+        await expect(getComputedStyle(flag)[corner], corner).toBe('4px');
+    }
+    // Hover pauses and dims.
+    await userEvent.hover(flag);
+    await expect(flag).toHaveAttribute('data-paused', 'true');
+    await waitFor(() => expect(Number(getComputedStyle(bar).opacity), 'the bar dims').toBeLessThan(1));
+    await userEvent.unhover(flag);
+    await waitFor(() => expect(flag).not.toHaveAttribute('data-paused'));
+    // Undo replaces it with a plain Flag, no timer.
+    await userEvent.click(canvas.getByRole('button', { name: 'Undo' }));
+    await waitFor(() => expect(canvas.getByText('Session restored')).toBeInTheDocument());
+    await expect(canvasElement.querySelector('.plus-flag-timer')).toBeNull();
 };
 
 /**
@@ -569,4 +613,37 @@ export const StackClosesUpReduced = {
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Overview.play = async ({ canvasElement }) => {
     await expect(radiusOf(canvasElement, '.plus-flag'), 'Flag radius is 12').toBe('12px');
+};
+
+const MotionFlag = () => {
+    const [show, setShow] = useState(false);
+    return <><Button text="Show flag" onClick={() => setShow(true)} /><Flag show={show} title="Session saved" autohide={false} sound={false} onDismiss={() => setShow(false)} /></>;
+};
+const flagMotionPlay = (reduced = false) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Show flag' }));
+    const flag = await canvas.findByRole('status');
+    await expectOverlayExit(flag, () => canvas.getByRole('button', { name: 'Dismiss flag' }).click(), reduced);
+};
+export const MotionOpenClose = { render: MotionFlag, play: flagMotionPlay() };
+export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: flagMotionPlay(true) };
+
+/** A paused exit outlives the old timer, and removal follows completion. */
+export const MotionExitCompletes = {
+    render: MotionFlag,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Show flag' }));
+        const flag = await canvas.findByRole('status');
+        canvas.getByRole('button', { name: 'Dismiss flag' }).click();
+        await waitFor(() => expect(flag).toHaveAttribute('data-leaving', 'hand'));
+        const exits = flag.getAnimations();
+        await expect(exits.length).toBeGreaterThan(0);
+        exits.forEach((animation) => animation.pause());
+        // A timer must never win over an unfinished spring.
+        await new Promise((resolve) => setTimeout(resolve, 850));
+        await expect(flag.isConnected).toBe(true);
+        exits.forEach((animation) => animation.finish());
+        await waitFor(() => expect(flag.isConnected).toBe(false));
+    },
 };

@@ -17,7 +17,7 @@
     gap: var(--stack-md);
     padding: var(--pad-y-md) var(--pad-x-md);
     border-radius: var(--card-radius-compact);
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    transition: border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), box-shadow var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     border: var(--border-default) solid transparent;
 
@@ -132,5 +132,4 @@
 .plus-file-upload-validation-message {
     flex: 1;
 }
-
 

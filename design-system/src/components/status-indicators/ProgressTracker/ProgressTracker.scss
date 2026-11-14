@@ -62,7 +62,7 @@
     color: var(--ds-text-subtle);
     text-decoration: none;
     cursor: default;
-    transition: background-color 0.15s ease;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 }
 
 a.plus-progress-tracker__item,

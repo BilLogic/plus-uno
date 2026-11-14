@@ -19,7 +19,7 @@ const LEVELS = [
     ['Page title', '--heading-large', 'Heading/large · 24 · the page’s one h1'],
     ['Section title', '--heading-medium', 'Heading/medium · 20 · h2'],
     ['Subsection title', '--heading-small', 'Heading/small · 16 · h3'],
-    ['Modal title', '--heading-medium', 'Heading/medium · 20 · the dialog’s h1, named by aria-labelledby'],
+    ['Modal title', '--heading-medium', 'Heading/medium · 20 · the modal’s h1, named by aria-labelledby'],
     ['Card, popup and flag title', '--heading-xsmall', 'Heading/xsmall · 14 · one level below its section'],
     ['Group label', '--heading-xxsmall', 'Heading/xxsmall · 12 · a menu group or a head cell, never a heading'],
 ];

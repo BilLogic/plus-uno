@@ -10,11 +10,11 @@ Also asked as: enable disable, on/off setting.
 
 **Source:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled, DisabledWithReason
+**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Motion, Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled, DisabledWithReason
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx`
 
-**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -155,7 +155,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-neutral-bold` · `--ds-background-neutral-bold-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--item-height-sm` · `--radius-full` · `--stack-md` · `--toggle-pad` · `--toggle-track-height-16` · `--toggle-track-height-20` · `--toggle-track-width-16` · `--toggle-track-width-20`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral-bold` · `--ds-background-neutral-bold-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-text` · `--item-height-sm` · `--radius-full` · `--stack-md` · `--toggle-pad` · `--toggle-track-height-16` · `--toggle-track-height-20` · `--toggle-track-width-16` · `--toggle-track-width-20`
 
 From `design-system/src/components/forms-and-inputs/Toggle/Toggle.scss`. Override these through the token layer, never with a literal.
 

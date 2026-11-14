@@ -6,11 +6,11 @@ import { Cascader } from '@/components';
 import { DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
-export const regionOptions = [
-    { text: 'Zhejiang', value: 'zhejiang', children: [
-        { text: 'Hangzhou', value: 'hangzhou', children: [
-            { text: 'WestLake', value: 'westlake' },
-            { text: 'Xihu', value: 'xihu' },
+export const locationOptions = [
+    { text: 'North District', value: 'north', children: [
+        { text: 'Lincoln Middle', value: 'lincoln', children: [
+            { text: 'Grade 6', value: 'grade-6' },
+            { text: 'Grade 7', value: 'grade-7' },
         ] },
     ] },
 ];
@@ -105,7 +105,7 @@ one level to reveal the next column of choices beneath it.
 ## Usage
 
 Use `Cascader` when a choice is naturally made one level at a time, in
-sequence — a region, then a city, then a neighborhood. For a hierarchy where
+sequence — a district, then a school, then a grade. For a hierarchy where
 someone might pick or see several nodes at once rather than one path, use
 `TreeSelect` instead. For a flat list, use `Select`.
 
@@ -170,9 +170,9 @@ An open cascader shows each level beside the last, so the path stays visible. Re
 A dependent field stays disabled until its earlier answer exists.
 
 <DoDontPair
-    doExample={<Cascader label="Region" value={[]} options={[]} onChange={() => {}} isDisabled />}
+    doExample={<Cascader label="Location" value={[]} options={[]} onChange={() => {}} isDisabled />}
     doCaption="Disabled until the earlier answer is set."
-    dontExample={<Cascader label="Region" value={[]} options={[]} onChange={() => {}} />}
+    dontExample={<Cascader label="Location" value={[]} options={[]} onChange={() => {}} />}
     dontCaption="An enabled field with no options to show."
 />
 
@@ -181,9 +181,9 @@ A dependent field stays disabled until its earlier answer exists.
 A filled field shows the choice; an empty one cannot confirm it. `value` is the whole path, outermost value first, and `onChange` fires with the path as each column is chosen. Pass and read the whole array, since the levels between are part of the answer.
 
 <DoDontPair
-    doExample={<Cascader label="Region" value={['zhejiang', 'hangzhou', 'westlake']} options={regionOptions} onChange={() => {}} />}
+    doExample={<Cascader label="Location" value={['north', 'lincoln', 'grade-6']} options={locationOptions} onChange={() => {}} />}
     doCaption="The field shows the whole chosen path."
-    dontExample={<Cascader label="Region" value={[]} options={regionOptions} onChange={() => {}} />}
+    dontExample={<Cascader label="Location" value={[]} options={locationOptions} onChange={() => {}} />}
     dontCaption="An empty field after a choice cannot confirm it."
 />
 
@@ -192,9 +192,9 @@ A filled field shows the choice; an empty one cannot confirm it. `value` is the 
 With `isInvalid`, the field draws the danger border and `errorMessage` replaces the caption.
 
 <DoDontPair
-    doExample={<Cascader label="Region" value={[]} options={regionOptions} onChange={() => {}} isInvalid errorMessage="Pick a region." />}
+    doExample={<Cascader label="Location" value={[]} options={locationOptions} onChange={() => {}} isInvalid errorMessage="Pick a location." />}
     doCaption="A failed pick draws the danger border, so the error is seen at the field."
-    dontExample={<Cascader label="Region" value={[]} options={regionOptions} onChange={() => {}} caption="Pick a region." />}
+    dontExample={<Cascader label="Location" value={[]} options={locationOptions} onChange={() => {}} caption="Pick a location." />}
     dontCaption="A failed pick still draws the normal border, so nothing marks the error."
 />
 
@@ -209,9 +209,9 @@ With `isInvalid`, the field draws the danger border and `errorMessage` replaces 
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Name each level by what it is: "Region", "City".</td><td>Names that only make sense at one level.</td></tr>
+<tr><td>Name each level by what it is: "District", "School".</td><td>Names that only make sense at one level.</td></tr>
 <tr><td>Keep each level's options short and parallel.</td><td>Mixed kinds of option in one column.</td></tr>
-<tr><td>Say what to do in an error: "Pick a region".</td><td>"Required" or "Invalid".</td></tr>
+<tr><td>Say what to do in an error: "Pick a location".</td><td>"Required" or "Invalid".</td></tr>
 <tr><td>Label the field with the whole path's subject: "Location".</td><td>A label for just the first level.</td></tr>
 </tbody>
 </DocsTable>

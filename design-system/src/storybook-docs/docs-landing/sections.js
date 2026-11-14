@@ -1,5 +1,5 @@
 /**
- * The tab strips of the docs sections that have one: Motion and Sound. A page
+ * The tab strips of the docs sections that have one: Motion, Sound and Tokens. A page
  * names its section, and `DocsLanding` builds the strip from here, so the order
  * and the labels live in one place. `page` is the page's id, which is also its
  * hero key and the tail of its Storybook docs path.
@@ -14,6 +14,14 @@ export const SECTIONS = {
         ['foundations-expression-motion-choreography', 'Choreography'],
         ['foundations-expression-motion-library', 'Library'],
         ['foundations-expression-motion-playground', 'Playground'],
+    ]),
+    'foundations-tokens': strip([
+        ['foundations-tokens-color', 'Color'],
+        ['foundations-tokens-typography', 'Typography'],
+        ['foundations-tokens-spacing-and-size', 'Spacing and size'],
+        ['foundations-tokens-elevation-and-layers', 'Elevation and layers'],
+        ['foundations-tokens-motion', 'Motion'],
+        ['foundations-tokens-library', 'Library'],
     ]),
     'foundations-sound': strip([
         ['foundations-expression-sound-overview', 'Overview'],

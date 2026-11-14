@@ -1,3 +1,4 @@
+import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
@@ -110,9 +111,17 @@ const AccordionItem = ({
                     {header}
                 </BaseAccordion.Trigger>
             </BaseAccordion.Header>
-            <BaseAccordion.Panel className="plus-accordion-body">
-                {children}
-            </BaseAccordion.Panel>
+            <BaseAccordion.Panel keepMounted render={(panelProps, state) => (
+                <div {...panelProps} hidden={undefined} className="plus-accordion-region" aria-hidden={!state.open ? true : undefined} inert={!state.open ? true : undefined}>
+                    <AnimatePresence initial={false}>
+                        {state.open && (
+                            <HeightSurface key="body" className="plus-accordion-panel">
+                                <div className="plus-accordion-body">{children}</div>
+                            </HeightSurface>
+                        )}
+                    </AnimatePresence>
+                </div>
+            )} />
         </BaseAccordion.Item>
     );
 };

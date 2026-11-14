@@ -293,3 +293,21 @@ test('a sidebar stuck on light after switching to dark fails', () => {
   assert.ok(f.some((m) => /theme is "light-no-preference", expected "dark-no-preference"/.test(m)));
   assert.ok(f.some((m) => /left the sidebar the same color/.test(m)));
 });
+
+/* ------------------------------------------------- a page opens at its top */
+
+import { openAtTopFailures } from './docs-chrome.mjs';
+
+test('openAtTopFailures: pages at the top pass', () => {
+  assert.deepEqual(openAtTopFailures([{ page: 'a--docs', scrollY: 0 }, { page: 'b--docs', scrollY: 0 }]), []);
+});
+
+test('openAtTopFailures: a page scrolled on mount is named with its offset', () => {
+  const out = openAtTopFailures([{ page: 'components-messaging-spotlight--docs', scrollY: 5383 }]);
+  assert.equal(out.length, 1);
+  assert.match(out[0], /spotlight--docs: opened 5383px down/);
+});
+
+test('openAtTopFailures: a missing reading fails rather than passing silently', () => {
+  assert.equal(openAtTopFailures([{ page: 'x--docs', scrollY: undefined }]).length, 1);
+});

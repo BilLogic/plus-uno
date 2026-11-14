@@ -12,7 +12,7 @@ Link button: navigates, and looks like a button. It renders an anchor, so it has
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

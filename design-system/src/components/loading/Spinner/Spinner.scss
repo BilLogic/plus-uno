@@ -27,7 +27,7 @@
     border: calc(var(--plus-spinner-size) / 8) solid currentColor;
     border-right-color: transparent;
     color: inherit;
-    animation: plus-spinner-rotate 0.75s linear infinite;
+    animation: plus-spinner-rotate var(--ds-motion-loop-duration) var(--ds-motion-loop) infinite alternate;
 }
 
 .plus-spinner[data-size='16'] {

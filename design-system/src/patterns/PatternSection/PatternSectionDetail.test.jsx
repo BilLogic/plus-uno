@@ -9,7 +9,7 @@ import PatternSection, { SECTION_DETAIL_FLOOR, sectionDetailView } from './Patte
  * its right shows one record. The split holds from 960 of the Section's own
  * width (or the Frame's resolver); below it the detail replaces the list behind
  * a back link. `sectionDetailView` is the rule; widths and columns are asserted
- * in the browser, in the `Templates/Section/Section` stories.
+ * in the browser, in the `Templates/Section` stories.
  */
 describe('sectionDetailView', () => {
     it('splits from the floor up, with or without a selection', () => {

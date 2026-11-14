@@ -1,0 +1,28 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="Tech stack/Font Awesome" />
+
+<FoundationHero kind="Tech stack" title="Font Awesome" summary="Icon glyphs, Free styles only." />
+
+<FoundationContents />
+
+<FoundationSection title="What it is for">
+
+Every icon is a Font Awesome Free glyph in `fa-solid`, `fa-regular` or `fa-brands`. The stylesheet loads once for the whole app.
+
+</FoundationSection>
+
+<FoundationSection title="What wraps it">
+
+The <DocsLink id="components-images-and-icons-icon">Icon</DocsLink> component draws a glyph from its name. Components that show an icon, such as Button and Tag, draw it through Icon. The stylesheet loads in `.storybook/preview-head.html`.
+
+</FoundationSection>
+
+<FoundationSection title="What not to do">
+
+- Do not use a Pro family or Pro-only name (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`). They render blank.
+- Do not write `<i class="fa-solid ...">` by hand. Use Icon.
+- Do not draw an icon from another set or import an SVG as one.
+
+</FoundationSection>

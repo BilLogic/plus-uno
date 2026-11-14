@@ -14,7 +14,7 @@ Also asked as: onboarding, feature tour, coach mark, new feature highlight, walk
 
 **Storybook page:** `design-system/src/components/messaging/Spotlight/Spotlight.mdx`
 
-**Motion:** enter `spatial.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

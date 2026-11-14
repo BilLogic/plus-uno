@@ -14,7 +14,7 @@ Also asked as: dots, carousel dots, step dots, slide marker.
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

@@ -259,6 +259,8 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Flag | `--flag-min-height` |  |
 | Flag | `--flag-pad` |  |
 | Flag | `--flag-offset` |  |
+| Flag | `--flag-radius-timer` |  |
+| Flag | `--flag-timer-height` |  |
 | Spotlight | `--spotlight-width` |  |
 | Spotlight | `--spotlight-media-height` |  |
 | Menu group | `--menu-group-min-width` |  |

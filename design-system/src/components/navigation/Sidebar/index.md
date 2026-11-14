@@ -10,7 +10,7 @@ Also asked as: left nav, side nav.
 
 **Source:** `design-system/src/components/navigation/Sidebar/Sidebar.jsx`
 
-**Motion:** enter `spatial.default` · exit `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` · exit `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Motion
 

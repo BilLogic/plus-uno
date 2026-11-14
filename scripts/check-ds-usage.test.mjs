@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { REPO_ROOT, contextOf, filesUnder, inScope, tally } from './check-ds-usage.mjs';
+import { REPO_ROOT, contextOf, escapes, filesUnder, inScope, judge, scopeFiles, tally } from './check-ds-usage.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import { RULES, escapesIn } from './lib/ds-usage.mjs';
@@ -16,7 +16,7 @@ const cli = (...args) => spawnSync(process.execPath, ['scripts/check-ds-usage.mj
 test('a prototype with one escape per fail-level rule exits 1, naming file, line, column, rule and fix', () => {
   const out = cli(`${FIXTURES}/escaping`);
   assert.equal(out.status, 1);
-  const failRules = Object.entries(RULES).filter(([, r]) => r.level === 'fail').map(([id]) => id);
+  const failRules = Object.entries(RULES).filter(([id, r]) => r.level === 'fail' && id !== 'ds/no-raw-motion').map(([id]) => id);
   for (const rule of failRules) {
     assert.match(out.stderr, new RegExp(`escaping/src/App\\.jsx:\\d+:\\d+  ${rule}  `), rule);
   }
@@ -51,6 +51,47 @@ test('scope: consumer code only, tests and stories skipped', () => {
   assert.ok(!inScope('design-system/src/components/x/X.jsx'));
   assert.ok(!inScope('prototypes/x/src/App.test.jsx'));
   assert.ok(!inScope('prototypes/x/node_modules/y/index.js'));
+});
+
+test('DS styles are in scope and raw motion fails while semantic motion passes', () => {
+  const ctx = contextOf(REPO_ROOT);
+  for (const kind of ['components', 'patterns', 'templates']) {
+    const file = `design-system/src/${kind}/Example/Example.scss`;
+    assert.ok(inScope(file));
+    for (const declaration of [
+      'transition: all 0.2s ease',
+      'animation: pulse 150ms ease-in-out infinite',
+      'transition-timing-function: cubic-bezier(0, 0, 1, 1)',
+      'animation-duration: .5s',
+    ]) {
+      const found = escapesIn({ path: file, text: `.example { ${declaration}; }` }, ctx);
+      assert.equal(found.length, 1, declaration);
+      assert.equal(found[0].rule, 'ds/no-raw-motion');
+      assert.equal(found[0].level, 'fail');
+    }
+    const clean = `.example {
+      transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
+      animation: pulse var(--ds-motion-loop-duration) var(--ds-motion-loop) infinite alternate;
+    }`;
+    assert.deepEqual(escapesIn({ path: file, text: clean }, ctx), []);
+    assert.deepEqual(escapesIn({ path: file, text: '.option { animation-delay: min(calc(var(--index) * 20ms), 500ms); }' }, ctx), []);
+  }
+});
+
+test('an injected stylesheet fixture blocks the usage gate, then passes after migration', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-motion-'));
+  const rel = 'design-system/src/components/Example/Example.scss';
+  const file = path.join(root, rel);
+  try {
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, '.example { transition: all 0.2s ease; }');
+    const check = () => judge(REPO_ROOT, escapes(root, scopeFiles(root), REPO_ROOT), { held: true });
+    assert.equal(check().blocking[0]?.rule, 'ds/no-raw-motion');
+    fs.writeFileSync(file, '.example { transition: color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast); }');
+    assert.deepEqual(check().blocking, []);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('tally: fail-level findings per rule and file; warnings are not held', () => {

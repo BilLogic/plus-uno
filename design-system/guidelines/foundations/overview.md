@@ -12,7 +12,7 @@ topic, which today only `content/` does.
 
 | Foundation | Authored | Answers |
 |------------|:--------:|---------|
-| [Tokens.mdx](../../src/styles/Tokens.mdx) | ✅ | Which semantic layer does this value come from? |
+| Tokens: [Color](../../src/styles/TokensColor.mdx), [Typography](../../src/styles/TokensTypography.mdx), [Spacing and size](../../src/styles/TokensSpacingAndSize.mdx), [Elevation and layers](../../src/styles/TokensElevationAndLayers.mdx), [Motion](../../src/styles/TokensMotion.mdx) | ✅ | Which token is this value, and which tier and scope is it? |
 | [Accessibility.mdx](../../src/styles/Accessibility.mdx) | ✅ | What does WCAG 2.1 AA require here? |
 | [content/](content/overview.md) | ◐ | What does this button, error, or empty state say? |
 | [Spacing.mdx](../../src/styles/Spacing.mdx) | ✅ | How much padding, margin, gap? |
@@ -46,10 +46,19 @@ Storybook and Figma list the foundations in the same order: Overview, Tokens, Ac
 
 ## Reading order
 
-Start at [Tokens.mdx](../../src/styles/Tokens.mdx). Every other foundation names tokens, and the
-four-tier ladder there is what tells you which layer a value belongs to. Token
+Start at the Tokens pages. Every other foundation names tokens, and each token sits on one
+collection page (Color, Typography, Spacing and size, Elevation and layers, Motion) in one tier
+(primitive or semantic) and, for a semantic, one scope (global, components or templates). Token
 *names* are generated into `design-system/agent-views/tokens/tokens.md`; the
 foundations say which to reach for and why.
+
+## Token rules
+
+- Color, spacing, typography, radius and elevation come from compile-ready tokens, such as `var(--ds-text)`: never raw values, and never Figma literal names.
+- Never hardcode a color, spacing, typography, radius or elevation value when a token exists.
+- Choose the tier first (component, then pattern, then semantics, then primitives), then pick the token.
+- Use primitives only for token-definition work, never in feature implementation.
+- Fallback rule: reach for a component token first; if none fits, the pattern token; failing that, the semantic step. A pattern token is one whose value would change if the pattern changed.
 
 ## Known drift
 

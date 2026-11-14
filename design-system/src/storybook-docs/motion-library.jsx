@@ -15,14 +15,14 @@ const MotionLibrary = () => (
             <tr><th>Name</th><th>Tier</th><th>Event</th><th>Transition</th><th>Tokens</th><th>Sound</th></tr>
         </thead>
         <tbody>
-            {motionLibraryOf().flatMap((r) =>
+            {motionLibraryOf().flatMap((r, ri) =>
                 r.events.map((e, i) => (
-                    <tr key={`${r.name}-${e.event}`}>
+                    <tr key={`${ri}-${i}-${e.event}`}>
                         <td>{i === 0 ? r.name : ''}</td>
                         <td>{i === 0 ? r.tier : ''}</td>
                         <td>{e.event}</td>
                         <td>{e.transition}</td>
-                        <td>{e.tokens.map((t, j) => <React.Fragment key={t}>{j > 0 && ' · '}<code>{motionVarOf(t)}</code></React.Fragment>)}</td>
+                        <td>{e.tokens.map((t, j) => <React.Fragment key={`${j}-${t}`}>{j > 0 && ' · '}<code>{motionVarOf(t)}</code></React.Fragment>)}</td>
                         <td><SoundCell sound={e.sound} /></td>
                     </tr>
                 )),

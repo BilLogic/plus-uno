@@ -10,11 +10,11 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, ActionKinds, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, UndoTimer, FlagContent, UnknownAppearance, ActionKinds, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced, MotionOpenClose, MotionReduced, MotionExitCompletes
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
-**Motion:** enter `spatial.default` + `appearance.default`, sound `sound.notify` · exit `spatial.exit` · dismiss `appearance.fast` · change `spatial.default` · milestone `spatial.fast`, sound `sound.done.step` · prompt `spatial.default` + `appearance.default`, sound `sound.prompt` · failed `spatial.default` + `appearance.default`, sound `sound.error`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` + `appearance.default`, sound `sound.notify` · exit `spatial.exit` · dismiss `appearance.fast` · change `spatial.default` · milestone `spatial.fast`, sound `sound.done.step` · prompt `spatial.default` + `appearance.default`, sound `sound.prompt` · failed `spatial.default` + `appearance.default`, sound `sound.error`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -199,6 +199,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | `onDismiss` | func | — | Called with no arguments when the dismiss button is pressed and when the auto-close timer ends. The caller sets `show` to false. |
 | `delay` | number | `FLAG_AUTO_CLOSE_MS` | How long it stays before closing itself, in ms. 8000 by default; keep it at 8000 or more so a slow reader is not cut off. |
 | `autohide` | bool | — | Close itself after `delay`. Defaults to true for normal, information and success; warning and error never close themselves. |
+| `timer` | bool | `false` | Draws a 4 px countdown bar as the flag's top cap, emptying over `delay`, and steps the corners from 12 to 4. For a timed action such as Undo: the first action undoes, `onDismiss` commits. The bar and the wait pause while the flag is hovered or focused. |
 | `className` | string | `''` | Extra class on the flag surface. |
 | `headerClass` | string | `''` | Extra class on the header row that holds the title and timestamp. |
 | `bodyClass` | string | `''` | Extra class on the description container. |
@@ -214,7 +215,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-focused-inverse` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-motion-spatial-exit` · `--ds-motion-spatial-exit-duration` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--flag-min-height` · `--flag-offset` · `--flag-pad` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-stack-flag` · `--popover-width-flag` · `--popup-radius` · `--radius-md` · `--stack-sm` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-focused-inverse` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-opacity-disabled` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--flag-min-height` · `--flag-offset` · `--flag-pad` · `--flag-radius-timer` · `--flag-timer-height` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-stack-flag` · `--popover-width-flag` · `--popup-radius` · `--radius-md` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Flag/Flag.scss`. Override these through the token layer, never with a literal.
 

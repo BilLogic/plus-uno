@@ -10,7 +10,7 @@
     "Templates/",
     "AI UI/",
     "Data visualizations/",
-    "Libraries/"
+    "Tech stack/"
   ],
   "componentGroups": {
     "Forms and inputs": [
@@ -166,7 +166,6 @@
       "Design",
       "Develop",
       "With AI",
-      "Content design",
       "About"
     ],
     "Foundations",
@@ -175,6 +174,11 @@
       "Brand",
       [
         "Content",
+        [
+          "Voice and tone",
+          "Language",
+          "Messages"
+        ],
         "Logos",
         "Illustrations"
       ],
@@ -215,7 +219,15 @@
         ]
       ],
       "Accessibility",
-      "Tokens"
+      "Tokens",
+      [
+        "Color",
+        "Typography",
+        "Spacing and size",
+        "Elevation and layers",
+        "Motion",
+        "Library"
+      ]
     ],
     "Components",
     [
@@ -240,6 +252,9 @@
         [
           "Date time picker",
           "Date picker",
+          [
+            "Date picker"
+          ],
           "Time picker"
         ],
         "Dropdown menu",
@@ -441,7 +456,7 @@
       "Part-to-whole",
       "Temporal"
     ],
-    "Libraries",
+    "Tech stack",
     [
       "Overview",
       "Base UI",

@@ -14,7 +14,7 @@ Also asked as: ai chip.
 
 **Storybook page:** `design-system/src/components/labels/Suggestion/Suggestion.mdx`
 
-**Motion:** enter `appearance.fast` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `appearance.fast` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 

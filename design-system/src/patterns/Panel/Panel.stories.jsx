@@ -19,7 +19,7 @@ import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFr
  * Run: npx vitest run --project=storybook design-system/src/patterns/Panel/Panel.stories.jsx
  */
 export default {
-    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Templates/Panel/Panel (Panel.mdx).
+    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Templates/Panel (Panel.mdx).
     title: 'Templates/Panel/Examples',
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'padded' },
