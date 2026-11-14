@@ -13,14 +13,14 @@ import * as ColorStories from './Color.stories.jsx';
 <FoundationHero
     kind="Data visualizations"
     title="Chart color"
-    summary="Each chart color does one job — which series, how much, which side, or which state — and the categorical order is built so it still reads without hue."
+    summary="Each chart color does one job — series identity, magnitude, polarity or state — and the categorical order is built to read without hue."
 />
 
 <FoundationContents />
 
 <FoundationSection title="Families">
 
-Every chart color in the current mode, grouped by job. The color guideline below is where the rules behind each family live — this page shows what they resolve to.
+Live swatches for every chart color in the current mode, grouped by job. See [Color](?path=/docs/foundations-visual-color--docs) for the system-wide color rules.
 
 <Canvas of={ColorStories.BrandAndNeutral} sourceState="none" />
 <Canvas of={ColorStories.CategoricalOrder} sourceState="none" />
@@ -32,13 +32,13 @@ Every chart color in the current mode, grouped by job. The color guideline below
 
 <FoundationSection title="The categorical order">
 
-Series get assigned a color in the order above, numbered 1 through 8 (7 and 8 only come into play once a chart has grown past six series, which it should usually avoid — see below). The order, and why it's built this way, is the color guideline's — see Related below.
+Multi-series charts assign colors in slot order from <C>--ds-chart-categorical-1</C> through <C>-8</C>. Slots 7 and 8 are overflow for charts past six series, which you should usually avoid by grouping smaller categories into "Other". See [Color](?path=/docs/foundations-visual-color--docs) for how the sequence is constructed.
 
 </FoundationSection>
 
 <FoundationSection title="Reads the same without hue">
 
-Desaturate the sequence and the order above still holds — that's the alternation at work, not an accident of this particular hue choice.
+Lightness alternates across the categorical sequence, so the order still holds when desaturated.
 
 <Canvas of={ColorStories.CategoricalGrayscale} sourceState="none" />
 
@@ -46,7 +46,7 @@ Desaturate the sequence and the order above still holds — that's the alternati
 
 <FoundationSection title="Separators">
 
-A separator — a gap, or a line between two touching marks — and the lightness alternation solve two different problems. The alternation says *which series this is*; the separator says *where one mark ends and the next begins*. A chart needs both: someone who can't tell two close tones apart at the seam still needs the separator, and someone who can't see hue at all still needs the alternation.
+Lightness alternation identifies *which series* a mark belongs to; a separator (a gap or <C>--ds-border-inverse</C> stroke between touching marks) shows *where one mark ends and the next begins*. Include both so marks stay distinct without hue or across close tones.
 
 <Canvas of={ColorStories.SeparatorCompare} sourceState="none" />
 
@@ -57,23 +57,28 @@ A separator — a gap, or a line between two touching marks — and the lightnes
 <RefTable
     head={['Job', 'What it encodes', 'Use']}
     rows={[
-        ['Identity', 'Which series', <>The categorical order above, or one of the five SMART subject colors</>],
-        ['Magnitude', 'How much', 'One hue, light to strong'],
-        ['Polarity', 'Which side of a baseline', 'Two hues around a neutral midpoint'],
-        ['State', 'On track, at risk, off track', <>Success, warning, danger, information or discovery, each with a bolder step for the more extreme case</>],
+        ['Identity', 'Which series', <>The categorical order above (<C>--ds-chart-categorical-1</C> through <C>-8</C>), or one of the five SMART subject colors (<C>--ds-chart-smart-*</C>)</>],
+        ['Magnitude', 'How much', <>One hue's 4-step sequential ramp, light to strong (<C>--ds-background-accent-&lt;hue&gt;-subtler</C> to <C>--ds-chart-&lt;hue&gt;-boldest</C>)</>],
+        ['Polarity', 'Which side of a baseline', <>Two hues around <C>--ds-background-accent-gray-subtler</C>, orange and blue by default. Never pair red with green.</>],
+        ['State', 'On track, at risk, off track', <>Success, warning, danger, information or discovery (<C>--ds-chart-*</C>), each with a <C>-bold</C> step for extreme cases</>],
     ]}
 />
 
-A chart never mixes the categorical order with the state colors in the same chart — two of the categorical hues double as state colors, so mixing them reads as a contradiction.
+Never mix categorical and state colors in one chart; two categorical hues share hue families with state colors and read as a contradiction when mixed.
 
 </FoundationSection>
 
 <FoundationSection title="Defaults and limits">
 
-- **One color by default.** A single-series chart stays on the brand chart color — it does not borrow from the categorical order.
-- **Five or six series, then group the rest.** Past that, fold the smallest categories into "Other" rather than reaching for slots 7 and 8.
-- **Never color alone.** Every series or state also carries a shape, a pattern, a direct label, or a table a reader can check.
-- **No text on a chart color.** A label sits beside its mark, never inside or on top of it.
+<RefTable
+    head={['Rule', 'Guidance']}
+    rows={[
+        ['One color by default', <>Single-series charts use <C>--ds-chart-brand</C>, never a categorical slot. De-emphasized comparison or reference lines use <C>--ds-chart-neutral</C>.</>],
+        ['Five or six series maximum', 'Past six series, fold the smallest categories into "Other" rather than reaching for overflow slots 7 and 8.'],
+        ['Never color alone', 'Pair every series or state with a shape, pattern, direct label or table.'],
+        ['No text on a chart color', <>Place labels beside marks, never on top of them. When a label must sit on a fill, such as a heatmap cell, use <C>--ds-text</C> or <C>--ds-text-inverse</C>.</>],
+    ]}
+/>
 
 </FoundationSection>
 

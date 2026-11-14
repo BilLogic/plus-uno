@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={FunnelChartStories} />
 
 <Title />
-Shows how many people are left at each step of a process, from the widest
-stage at the top to the narrowest at the bottom.
+Shows how many people remain at each step of a sequential process, narrowing
+from top to bottom.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/FunnelChart"
@@ -31,17 +31,13 @@ stage at the top to the narrowest at the bottom.
 
 ## When to use
 
-Use `FunnelChart` for a sequence where each stage is a subset of the one before:
-tutor onboarding (applied, trained, matched, first session), student
-enrollment (referred, signed up, attended, active), or an assessment (started,
-submitted, passed).
+Use `FunnelChart` for a process of five to seven stages where each step is a
+subset of the one before, ordered largest to smallest — such as tutor
+onboarding, student enrollment or assessment completion.
 
-For stages that do not have to shrink, use `BarChart`. For flow that splits
-into several destinations, use `SankeyDiagram`. For drop-off ranked by cause,
-use `ParetoChart`.
-
-Order stages from largest to smallest, in the order they happen. Keep to five
-to seven stages.
+For stages that do not strictly shrink, use `BarChart`. For flows that split
+into multiple branches, use `SankeyDiagram`. For drop-off ranked by cause, use
+`ParetoChart`.
 
 </div>
 
@@ -52,11 +48,11 @@ to seven stages.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Stages', <>One per item in <C>data</C>, top to bottom in array order. Width follows <C>y</C> down the body of the funnel.</>],
-        ['Neck', 'The bottom quarter of the funnel keeps one width, so stages that land there no longer show their size by width.'],
-        ['Stage labels', <>Always on, beside each stage: the <C>name</C> and the count, joined to the stage by a connector line.</>],
-        ['Tooltip', <>The stage <C>name</C> and its count.</>],
-        ['Height', <>The chart is <C>height</C> pixels tall, 400 by default.</>],
+        ['Stages', <>One per item in <C>data</C>, top to bottom in array order; width tracks <C>y</C> down the body.</>],
+        ['Neck', 'Bottom quarter held at a fixed width, so stages there do not scale by width.'],
+        ['Stage labels', <>Always shown beside each stage with <C>name</C>, count and a connector line.</>],
+        ['Tooltip', <>Shows the stage <C>name</C> and count.</>],
+        ['Height', <>Pixel height from <C>height</C> (default 400).</>],
     ]}
 />
 
@@ -66,8 +62,8 @@ to seven stages.
 
 ## Data shape
 
-`data` is an array of `{ name, y }`, one per stage, in process order. `name`
-and `y` are required. A stage may carry its own `color`.
+`data` is an array of `{ name, y, color }` (`name` and `y` required) in process
+order.
 
 ```jsx
 <FunnelChart
@@ -86,11 +82,10 @@ and `y` are required. A stage may carry its own `color`.
 
 ## Color and accessibility
 
-- **Each stage takes the next categorical color**, starting at `--ds-chart-categorical-1`, unless it carries its own `color`. The colors are not a ramp and say nothing about size; they only separate neighboring stages. Past eight stages the colors repeat.
-- **The label carries the value.** Every stage is labeled with its name and count, so the chart reads without hue. Width is only a rough guide: the neck holds the last stages at one width, so read the counts, not the shape, near the bottom.
-- **State the conversion yourself.** The chart shows counts, not percentages. If the drop between two stages is the point, say it in the surrounding text.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Per-stage color.** Stages follow the [categorical order](?path=/docs/data-visualizations-color--docs) from `--ds-chart-categorical-1` (repeating past eight) unless overridden by `color`. Colors separate adjacent stages and do not encode magnitude.
+- **Labels carry the values.** Every stage prints its name and count, which is essential near the fixed-width neck. State conversion percentages in surrounding copy when drop-off rates matter.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -98,11 +93,7 @@ and `y` are required. A stage may carry its own `color`.
 
 ## States
 
-`FunnelChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`FunnelChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -119,12 +110,7 @@ and `y` are required. A stage may carry its own `color`.
 
 <DocsInteractivePlayground
     of={FunnelChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

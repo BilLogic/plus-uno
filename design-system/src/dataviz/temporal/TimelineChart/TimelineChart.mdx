@@ -7,9 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={TimelineChartStories} />
 
 <Title />
-Lays out a sequence of events in order along a line, each with a short label
-and description. It shows what happened in what order, not how long anything
-took.
+Places a sequence of events at even intervals along a line, each with a label
+and description, to show order rather than duration.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/TimelineChart"
@@ -32,14 +31,13 @@ took.
 
 ## When to use
 
-Use `TimelineChart` for a handful of milestones in order: a student's path from
-application through assessment, enrollment and midterm review to completion; a
-tutor's onboarding steps; the phases of a program term.
+Use `TimelineChart` for a short sequence of milestones in order, such as a
+student's path from application to completion, tutor onboarding steps or
+program term phases.
 
-Events sit at even spacing, in array order, with no time scale. When the gaps
-between events or the length of each one matter, use `XRangeChart`. For a
-measured value over time, use `LineChart`. For stages people drop out of
-between, use `FunnelChart`.
+Because events sit at equal spacing with no time scale, use `XRangeChart` when
+durations or time gaps matter. For a measured value over time, use `LineChart`.
+For stages with drop-off counts, use `FunnelChart`.
 
 </div>
 
@@ -50,9 +48,9 @@ between, use `FunnelChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Line', 'The path the events sit on, in array order. There is no axis or time scale.'],
-        ['Event markers', 'One point per event, each in its own color.'],
-        ['Event labels', <>A bold <C>label</C> (falling back to <C>name</C>) above its <C>description</C>. Labels that would overlap are hidden.</>],
+        ['Line', 'Connects events in array order with no axis or time scale.'],
+        ['Event markers', 'One point per event, colored in categorical order.'],
+        ['Event labels', <>Bold <C>label</C> (falling back to <C>name</C>) above <C>description</C>; colliding labels are hidden automatically.</>],
         ['Tooltip', 'Shows the hovered event.'],
     ]}
 />
@@ -63,9 +61,9 @@ between, use `FunnelChart`.
 
 ## Data shape
 
-`data` is an array of events in the order they happened, each
-`{ name, label, description }`. Only `name` is required; `label` defaults to
-`name` and `description` to empty.
+`data` is an array of `{ name, label, description }` in chronological order
+(`name` required; `label` defaults to `name` and `description` to `''`).
+`height` defaults to 400.
 
 ```jsx
 <TimelineChart
@@ -78,19 +76,16 @@ between, use `FunnelChart`.
 />
 ```
 
-`height` defaults to 400.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color follows event order and means nothing.** Each event takes the next categorical color, slot 1 first, and the order wraps after the eighth. There is no `color` field, so color cannot mark a status or a type of event.
-- **Position and text carry the meaning.** Order along the line is the sequence, and each label and description says what the event is. The chart reads the same without hue.
-- **Keep labels short.** Labels that would collide are hidden rather than moved, so a long description or a crowded timeline loses text. Keep to a handful of events, or raise `height`.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the events. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Decorative event color.** Events cycle through the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 (wrapping past eight) with no per-event `color` prop; order and text carry the meaning without hue.
+- **Keep labels concise.** Because colliding labels are hidden rather than repositioned, keep copy short and event counts modest, or increase `height`.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -98,11 +93,7 @@ between, use `FunnelChart`.
 
 ## States
 
-`TimelineChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`TimelineChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -119,12 +110,7 @@ between, use `FunnelChart`.
 
 <DocsInteractivePlayground
     of={TimelineChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={ParetoChartStories} />
 
 <Title />
-Ranks causes by count as columns and adds a line for their running share of
-the total. Where the line flattens, the few causes that matter end.
+Ranks causes by count as columns alongside a line for their cumulative share of
+the total, showing where the main contributors end.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/ParetoChart"
@@ -31,18 +31,17 @@ the total. Where the line flattens, the few causes that matter end.
 
 ## When to use
 
-Use `ParetoChart` to find the few causes behind most of a problem: support
-tickets by issue type, missed sessions by reason, the topics where students
-struggle most. Read across from the 80% mark on the right axis to see how many
-causes account for it.
+Use `ParetoChart` to isolate the few causes behind most of an outcome, such as
+support tickets by issue type, missed sessions by reason or topics where
+students struggle most. Read across from 80% on the right axis to see which
+causes account for the majority.
 
-For a ranking with no running total, use `BarChart` or `LollipopChart`. For
-shares of one total without an order, use `PieChart` or `TreemapChart`. For
-drop-off through ordered stages, use `FunnelChart`.
+For a ranking without a running total, use `BarChart` or `LollipopChart`. For
+unordered shares of a total, use `PieChart` or `TreemapChart`. For drop-off
+through ordered stages, use `FunnelChart`.
 
-The running line only means something when the columns run from largest to
-smallest. Sort the data before passing it in; the chart keeps the order it is
-given.
+Sort `data` from largest to smallest before passing it in; the chart preserves
+input order, and the cumulative line is only meaningful when descending.
 
 </div>
 
@@ -53,13 +52,13 @@ given.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Columns', <>One per value in <C>data</C>, in categorical slot 1. Height is the count; the top is rounded by <C>--chart-bar-radius</C>.</>],
-        ['Cumulative line', <>The running share of the total after each column, in categorical slot 2, drawn above the columns.</>],
-        ['Left axis', <>Scales the columns. Titled by <C>yAxisLabel</C>, which defaults to <C>Value</C>.</>],
-        ['Right axis', <>Scales the line, titled <C>Cumulative %</C>, with a maximum of 100%.</>],
-        ['Category axis', <>Names each column, from <C>categories</C>.</>],
-        ['Legend', <>Names the two series, <C>Values</C> and <C>Cumulative</C>.</>],
-        ['Tooltip', 'Shared: shows the count and the running share for the hovered category.'],
+        ['Columns', <>One per value in <C>data</C>, in categorical slot 1. Height encodes count; top rounded by <C>--chart-bar-radius</C>.</>],
+        ['Cumulative line', 'Running share of the total after each column, in categorical slot 2, drawn above the columns.'],
+        ['Left axis', <>Scales the columns; titled by <C>yAxisLabel</C> (default <C>Value</C>).</>],
+        ['Right axis', <>Scales the line, titled <C>Cumulative %</C>, capped at 100%.</>],
+        ['Category axis', <>Names each column from <C>categories</C>.</>],
+        ['Legend', <>Names the two series: <C>Values</C> and <C>Cumulative</C>.</>],
+        ['Tooltip', 'Shared: shows the count and running share for the hovered category.'],
     ]}
 />
 
@@ -69,9 +68,9 @@ given.
 
 ## Data shape
 
-`categories` is an array of strings. `data` is an array of numbers, one per
-category, in the same order, sorted from largest to smallest. The chart
-computes the cumulative line itself. `height` defaults to 400.
+`categories` is an array of strings. `data` is an array of numbers in
+`categories` order, sorted largest to smallest. The chart computes the
+cumulative line automatically. `height` defaults to 400.
 
 ```jsx
 <ParetoChart
@@ -87,11 +86,11 @@ computes the cumulative line itself. `height` defaults to 400.
 
 ## Color and accessibility
 
-- **Color is fixed.** The columns take categorical slot 1 and the line slot 2. Nothing is assigned per column.
-- **Shape tells the series apart, not just hue.** One series is columns, the other a line, each on its own axis, so the chart reads without color.
-- **Two axes, two units.** The left axis is a count and the right a percentage. Name the count in `yAxisLabel` so the two are not confused.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The legend names the series only as "Values" and "Cumulative", so say what is counted in the surrounding header. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Fixed colors.** Columns use categorical slot 1 and the cumulative line uses slot 2; no color is assigned per column.
+- **Shape separates the series.** Columns and the line sit on separate axes and read without hue.
+- **Two axes, two units.** The left axis is a count and the right is a percentage; name the count in `yAxisLabel` to keep them distinct.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Because the legend names series only as `"Values"` and `"Cumulative"`, state what is counted in the surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -99,11 +98,7 @@ computes the cumulative line itself. `height` defaults to 400.
 
 ## States
 
-`ParetoChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`ParetoChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -120,12 +115,7 @@ computes the cumulative line itself. `height` defaults to 400.
 
 <DocsInteractivePlayground
     of={ParetoChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

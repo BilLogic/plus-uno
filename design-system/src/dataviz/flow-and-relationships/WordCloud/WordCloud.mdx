@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={WordCloudStories} />
 
 <Title />
-Sizes each word by how often it appears, so the most common themes in a body of
-text are the first thing you see.
+Sizes words by frequency so the most common themes in open text stand out at a
+glance.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/WordCloud"
@@ -31,16 +31,14 @@ text are the first thing you see.
 
 ## When to use
 
-Use `WordCloud` for a quick, impressionistic read of open text: words students
-use in session feedback, themes in tutor session notes, or answers to an
-open-ended survey question.
+Use `WordCloud` for a quick, impressionistic read of open text such as student
+session feedback, tutor notes or survey responses. Strip stop words (`the`,
+`and`, `of`) beforehand and cap the list at the top 50 to 100 words so smaller
+terms remain legible.
 
-It is a shape, not a measurement. When the counts matter, or two words need
-comparing, use `BarChart`. For terms grouped by category as well as sized, use
-`PackedBubbleChart`. For which terms appear together, use `NetworkGraph`.
-
-Filter out common words (the, and, of) before passing the data, and keep to
-the top 50 to 100 words.
+When exact counts or comparisons matter, use `BarChart`. For terms grouped by
+category and sized, use `PackedBubbleChart`. For co-occurring terms, use
+`NetworkGraph`.
 
 </div>
 
@@ -51,9 +49,9 @@ the top 50 to 100 words.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Words', <>One per item in <C>data</C>. Size follows <C>weight</C>; position means nothing.</>],
-        ['Tooltip', <>The word and its <C>weight</C>.</>],
-        ['Height', <>The chart is <C>height</C> pixels tall, 400 by default.</>],
+        ['Words', <>One per item in <C>data</C>; font size scales with <C>weight</C>, while placement carries no meaning.</>],
+        ['Tooltip', <>Shows the word and its <C>weight</C>.</>],
+        ['Height', <>Pixel height from <C>height</C> (default 400).</>],
     ]}
 />
 
@@ -63,8 +61,8 @@ the top 50 to 100 words.
 
 ## Data shape
 
-`data` is an array of `{ name, weight }`. Both are required: `name` is the word,
-`weight` its count.
+`data` is an array of `{ name, weight }` (both required), where `name` is the
+word and `weight` is its count.
 
 ```jsx
 <WordCloud
@@ -84,11 +82,10 @@ the top 50 to 100 words.
 
 ## Color and accessibility
 
-- **Color is decoration here.** Words take the categorical colors in order, starting at `--ds-chart-categorical-1`, and repeat past eight. The color says nothing about the word or its count; do not describe it as a category.
-- **Size is the only encoding, and a weak one.** Long words take up more space than short words of the same weight, so a long word looks more common than it is. Give the exact counts in the tooltip, a table or the surrounding text when they matter.
-- **Too many words become illegible.** The smallest words drop below a readable size first.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Decorative color.** Words cycle through the [categorical order](?path=/docs/data-visualizations-color--docs) from `--ds-chart-categorical-1` and repeat past eight; hue encodes neither category nor count.
+- **Word length distorts perceived weight.** Longer words occupy more area than shorter words of equal weight; provide exact counts in the tooltip, a table or surrounding copy when precision matters.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -96,11 +93,7 @@ the top 50 to 100 words.
 
 ## States
 
-`WordCloud` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`WordCloud` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -117,12 +110,7 @@ the top 50 to 100 words.
 
 <DocsInteractivePlayground
     of={WordCloudStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

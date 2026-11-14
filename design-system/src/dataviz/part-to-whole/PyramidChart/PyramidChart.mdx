@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={PyramidChartStories} />
 
 <Title />
-Stacks levels into a triangle, the largest at the base and the smallest at the
-tip, each band labeled with its name and value.
+Stacks four to six shrinking levels into a triangle from the largest base to the
+smallest tip, each labeled with its name and value.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/PyramidChart"
@@ -31,14 +31,13 @@ tip, each band labeled with its name and value.
 
 ## When to use
 
-Use `PyramidChart` for a short series of levels where each is smaller than the
-one beneath it and the shape itself tells the story: students referred, then
-enrolled, then attending weekly, then meeting their goal; tutors in training,
-then certified, then leading sessions.
+Use `PyramidChart` for four to six ordered levels where each tier is smaller
+than the one beneath it, such as students referred → enrolled → attending weekly
+→ meeting their goal, or tutors in training → certified → leading sessions.
 
-For stages that narrow from top to bottom, use `FunnelChart`. For levels with
-no built-in order, or values that must be compared precisely, use `BarChart`.
-For parts of one total with no levels, use `PieChart`.
+For stages narrowing top to bottom, use `FunnelChart`. For unordered levels or
+exact comparisons, use `BarChart`. For parts of a total without levels, use
+`PieChart`.
 
 </div>
 
@@ -49,11 +48,11 @@ For parts of one total with no levels, use `PieChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Bands', <>One per item in <C>data</C>, stacked into a triangle. The first item sits at the base; band size follows <C>value</C>.</>],
-        ['Data labels', 'Each band is labeled beside the pyramid with its name and value, joined by a connector line.'],
-        ['Legend', 'None. The data labels name every band.'],
-        ['Tooltip', 'Hovering a band shows its value.'],
-        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 400.</>],
+        ['Bands', <>One per item in <C>data</C>, stacked from the base up and sized by <C>value</C>.</>],
+        ['Data labels', 'Labels each band beside the pyramid with its name, whole-number value (with thousands separators) and a connector line.'],
+        ['Legend', 'None; data labels name every band.'],
+        ['Tooltip', 'Shows the hovered band’s value.'],
+        ['Height', <>Pixel height from <C>height</C> (default 400).</>],
     ]}
 />
 
@@ -63,8 +62,8 @@ For parts of one total with no levels, use `PieChart`.
 
 ## Data shape
 
-`data` is an array of `{ name, value }`, one object per band. List it from the
-base up, largest first.
+`data` is an array of `{ name, value }`, ordered from the base up (largest
+first).
 
 ```jsx
 <PyramidChart
@@ -77,19 +76,16 @@ base up, largest first.
 />
 ```
 
-Values print with thousands separators and no decimals.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color is assigned by position.** The chart sets no colors of its own and takes no per-item `color`, so bands draw from the theme's categorical order, base first.
-- **Labels carry the value.** Every band is labeled with its name and number, so the chart reads without hue. Band size is hard to judge by eye, since a band's width changes along its height; read the labels, not the shape, for exact figures.
-- **Keep it short.** Four to six levels keep the bands tall enough for their labels.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the bands. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Color by position.** Bands take the theme's [categorical order](?path=/docs/data-visualizations-color--docs) from the base up, with no per-item `color` override.
+- **Labels carry exact figures.** Because tapered band widths distort visual area, rely on the printed name and number labels rather than shape or hue.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -97,11 +93,7 @@ Values print with thousands separators and no decimals.
 
 ## States
 
-`PyramidChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`PyramidChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -118,12 +110,7 @@ Values print with thousands separators and no decimals.
 
 <DocsInteractivePlayground
     of={PyramidChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

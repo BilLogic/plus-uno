@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={DependencyWheelStories} />
 
 <Title />
-Places items around a circle and joins related pairs with chords. Each chord is
-as wide as the connection's weight.
+Places items around a circle and connects related pairs with chords whose width
+encodes connection weight.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/DependencyWheel"
@@ -31,15 +31,14 @@ as wide as the connection's weight.
 
 ## When to use
 
-Use `DependencyWheel` for weighted connections among a set of peers where no
-item comes first: how skills support each other, how often SMART competencies
-come up together in session notes, or how topics reference one another.
+Use `DependencyWheel` for weighted, two-way connections among up to 10–15 peers
+with no fixed start or end, such as skills that reinforce each other, SMART
+competencies co-occurring in session notes or topics that cross-reference. Past
+15 items, chords become too thin to trace.
 
-For an amount moving one way through stages, use `SankeyDiagram`. For the same
-connections on a straight line, use `ArcDiagram`. For connections with no
-weight, use `NetworkGraph`.
-
-Keep to 10 to 15 items. Past that, the chords get too thin to follow.
+For one-way flow through stages, use `SankeyDiagram`. For weighted connections
+on a straight axis, use `ArcDiagram`. For unweighted connections, use
+`NetworkGraph`.
 
 </div>
 
@@ -50,11 +49,11 @@ Keep to 10 to 15 items. Past that, the chords get too thin to follow.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Segments', <>One per distinct name in <C>data</C>, generated for you around the circle. A segment's length is the total weight of its connections.</>],
-        ['Chords', <>One per <C>[from, to, weight]</C> row. Width is the <C>weight</C>.</>],
-        ['Labels', <>Name each segment, following the curve just outside the ring, in <C>--ds-text</C>.</>],
-        ['Tooltip', 'Hover a segment or chord for its name and weight.'],
-        ['Height', <>The chart is <C>height</C> pixels tall, 500 by default.</>],
+        ['Segments', <>One per distinct name in <C>data</C> around the ring; arc length equals total connection weight.</>],
+        ['Chords', <>One per <C>[from, to, weight]</C> row; width encodes <C>weight</C>.</>],
+        ['Labels', <>Curved outside each segment in <C>--ds-text</C>.</>],
+        ['Tooltip', 'Shows the hovered segment or chord name and weight.'],
+        ['Height', <>Pixel height from <C>height</C> (default 500).</>],
     ]}
 />
 
@@ -64,8 +63,8 @@ Keep to 10 to 15 items. Past that, the chords get too thin to follow.
 
 ## Data shape
 
-`data` is an array of `[from, to, weight]` rows. `from` and `to` are item
-names; `weight` sets the chord's width.
+`data` is an array of `[from, to, weight]` rows where `from` and `to` are item
+names and `weight` sets chord width.
 
 ```jsx
 <DependencyWheel
@@ -85,11 +84,10 @@ names; `weight` sets the chord's width.
 
 ## Color and accessibility
 
-- **Color tells items apart.** Segments take the categorical colors in order, starting at `--ds-chart-categorical-1`, and a chord takes the color of the item it leaves. There are eight, so past eight items the colors repeat; the labels keep them distinct.
-- **Width and labels carry the reading.** Segment length and chord width are the values, and every segment is named, so the wheel reads without hue.
-- **Angles are hard to compare.** Readers judge curved widths poorly. When exact amounts matter, give them in a table or the surrounding text, or use `BarChart`.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Per-segment color.** Segments cycle through the [categorical order](?path=/docs/data-visualizations-color--docs) from `--ds-chart-categorical-1` (repeating past eight), and each chord takes its origin segment's color.
+- **Width and labels carry the reading.** Segment lengths, chord widths and outer labels let the chart read without hue. Because curved widths are hard to compare precisely, pair with a table, surrounding copy or `BarChart` when exact amounts matter.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -97,11 +95,7 @@ names; `weight` sets the chord's width.
 
 ## States
 
-`DependencyWheel` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`DependencyWheel` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={500} />
@@ -118,12 +112,7 @@ names; `weight` sets the chord's width.
 
 <DocsInteractivePlayground
     of={DependencyWheelStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={LineChartStories} />
 
 <Title />
-Shows how a value changes over time by connecting its points with a line. The
-slope is the reading: up is growth, down is decline.
+Plots how a value changes over time by connecting points with a line whose
+slope shows growth or decline.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/LineChart"
@@ -31,17 +31,14 @@ slope is the reading: up is growth, down is decline.
 
 ## When to use
 
-Use `LineChart` for a trend over evenly spaced time: average score across a
-semester, sessions completed per week, active students per month. Several lines
-compare trends, such as two cohorts or one student against the class average.
+Use `LineChart` for trends across evenly spaced periods, such as average score
+over a semester, weekly sessions completed or monthly active students. Keep to
+four or five lines so crossings remain easy to follow.
 
-For separate categories with no order between them, use `BarChart`. When the
-quantity under the line matters, or parts stack into a total, use `AreaChart`.
-For two units on one chart, use `ComboChart`. For a trend beside a number with
-no axes, use `Sparkline`.
-
-Keep it to four or five lines. Past that the lines tangle and no one can follow
-a single trend.
+For unordered categories, use `BarChart`. When the quantity under the line
+matters or parts stack into a total, use `AreaChart`. For two units on one
+chart, use `ComboChart`. For a compact trend beside a number with no axes, use
+`Sparkline`.
 
 </div>
 
@@ -52,12 +49,12 @@ a single trend.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Lines', <>One per series, drawn at the chart line width. Each takes the series' <C>color</C> or one the chart assigns.</>],
-        ['Markers', 'A circle on every point, always shown, so each value is a target for hover and keyboard focus.'],
-        ['Time axis', <>Labels each period from the first series' <C>categories</C>. <C>xAxisLabel</C> titles it.</>],
-        ['Value axis', <><C>yAxisLabel</C> titles it. <C>yDomain</C> fixes its range as <C>[min, max]</C> and <C>yTicks</C> its tick values; without them it fits the data.</>],
-        ['Legend', 'Names each series. Always shown.'],
-        ['Tooltip', 'Hovering a point shows that series’ value.'],
+        ['Lines', <>One per series at the chart line width, in the series' <C>color</C> or an assigned slot.</>],
+        ['Markers', 'Circle on every point, always shown as a target for hover and keyboard focus.'],
+        ['Time axis', <>Labels each period from the first series' <C>categories</C>; titled by <C>xAxisLabel</C>.</>],
+        ['Value axis', <>Titled by <C>yAxisLabel</C>. <C>yDomain</C> fixes <C>[min, max]</C> and <C>yTicks</C> sets tick values; otherwise it fits the data.</>],
+        ['Legend', 'Names each series; always shown.'],
+        ['Tooltip', 'Shows the hovered point’s value.'],
     ]}
 />
 
@@ -67,9 +64,10 @@ a single trend.
 
 ## Data shape
 
-`data` is an array of series, each `{ name, data }`, where `data` holds one
-number per period. There is no separate `categories` prop: put the period
-labels on the first series as `categories`.
+`data` is an array of `{ name, data, categories, color }` series, with period
+labels passed on the first series' `categories` (there is no separate
+`categories` prop). `height` defaults to 300. Omit `color` to assign one
+automatically.
 
 ```jsx
 <LineChart
@@ -84,20 +82,17 @@ labels on the first series as `categories`.
 />
 ```
 
-A series may carry its own `color`; leave it out and the chart assigns one.
-`height` defaults to 300.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color is assigned for you.** One line takes `--ds-chart-brand`. Two or more take the categorical order, slot 1 first, never skipping a slot. Past six series, group the smallest into "Other", or split the chart.
-- **Position carries the value.** Color only tells lines apart, and every line uses the same solid stroke and circle marker, so where lines cross, color is the only thing separating them. Keep the count low enough that the legend can name each one, and say which line is which in the text around the chart when it matters.
-- **Set the domain on purpose.** Without `yDomain` the axis fits the data, which can make a small change look steep. For scores and percentages, pass the full range.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Automatic series color.** One line uses `--ds-chart-brand`; two or more follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 without skipping. Past six series, group the smallest into "Other" or split the chart.
+- **Keep line count low.** Because every line uses the same solid stroke and circle marker, crossings rely on color and the legend; name key lines in surrounding text when needed.
+- **Set `yDomain` deliberately.** Without `yDomain` the axis fits the data, which can exaggerate small changes; pass the full range for scores and percentages.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -105,11 +100,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 
 ## States
 
-`LineChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`LineChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={300} />
@@ -126,12 +117,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 
 <DocsInteractivePlayground
     of={LineChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

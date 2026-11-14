@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={RadarChartStories} />
 
 <Title />
-Plots several measures on spokes around a center and joins them into a shape.
-Use it when the profile's shape is the point, not the exact values.
+Plots several measures on spokes around a center and joins them into a closed
+shape to show balance and gaps across a profile.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/RadarChart"
@@ -31,17 +31,14 @@ Use it when the profile's shape is the point, not the exact values.
 
 ## When to use
 
-Use `RadarChart` to show a profile across a handful of measures on one scale: a
-tutor's five SMART competencies, a student's skills across subjects, one tutor
-against the cohort average. The shape shows balance and gaps at a glance.
+Use `RadarChart` to show a profile across three to eight measures on one shared
+scale, such as a tutor's five SMART competencies, a student's skills across
+subjects, or one tutor against the cohort average. Keep to two or three series
+and never mix units.
 
-Radars are hard to read precisely: values sit at different angles and the area
-grows faster than the numbers. When readers need the values, use `BarChart`.
-For two values per measure read as a gap, use `DumbbellChart`. For measures
-changing over time, use `LineChart`.
-
-Keep it to roughly three to eight spokes and two or three series, all on the
-same scale. Mixed units on one radar make the shape meaningless.
+Because angled spokes and polygon areas are hard to compare precisely, use
+`BarChart` when exact values matter. For two values per measure read as a gap,
+use `DumbbellChart`. For change over time, use `LineChart`.
 
 </div>
 
@@ -52,11 +49,11 @@ same scale. Mixed units on one radar make the shape meaningless.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Spokes', <>One per entry in <C>categories</C>. Labeled with the category name, a Font Awesome icon from <C>categoryIcons</C>, or a name tinted by <C>categoryColors</C>. <C>categoryLabelBody3Regular</C> sets the labels in the regular weight.</>],
-        ['Series', <>One closed shape per entry in <C>series</C>. With <C>filled</C> on, the first series is a filled area and the rest are lines; otherwise all are lines. A line series may set <C>dashStyle</C>.</>],
-        ['Grid', <>Polygon rings from zero out to <C>yAxisMax</C>. <C>showYAxisLabels</C> shows or hides the ring values.</>],
-        ['Data labels', <>Off by default. <C>showDataLabels</C> prints each value followed by a percent sign.</>],
-        ['Legend', <>Names each series, stacked top right. On by default; turn it off with <C>showLegend</C>.</>],
+        ['Spokes', <>One per entry in <C>categories</C>, labeled with the category name, a Font Awesome icon from <C>categoryIcons</C>, or a name tinted by <C>categoryColors</C>. <C>categoryLabelBody3Regular</C> uses regular weight.</>],
+        ['Series', <>One closed shape per entry in <C>series</C>. With <C>filled</C>, the first series is a filled area and the rest are lines; otherwise all are lines. Line series accept <C>dashStyle</C>.</>],
+        ['Grid', <>Polygon rings from zero to <C>yAxisMax</C>. <C>showYAxisLabels</C> toggles ring values.</>],
+        ['Data labels', <>Off by default; <C>showDataLabels</C> prints each value with a percent sign.</>],
+        ['Legend', <>Stacked top right; on by default and toggled by <C>showLegend</C>.</>],
         ['Tooltip', 'Shared: hovering a spoke lists every series’ value on it.'],
     ]}
 />
@@ -67,11 +64,10 @@ same scale. Mixed units on one radar make the shape meaningless.
 
 ## Data shape
 
-`categories` is an array of strings, one per spoke. `series` is an array of
-`{ name, data }`, where `data` holds one number per category in the same order.
-A series may carry its own `color`. `height` takes a number of pixels, default
-400, or `'100%'` to fill its container. `chartSpacing` is
-`[top, right, bottom, left]`.
+`categories` is an array of spoke names. `series` is an array of
+`{ name, data, color, dashStyle }`, with one number per category in `categories`
+order. `height` defaults to 400 (or `'100%'` to fill its container).
+`chartSpacing` is `[top, right, bottom, left]`.
 
 ```jsx
 <RadarChart
@@ -91,13 +87,13 @@ A series may carry its own `color`. `height` takes a number of pixels, default
 
 ## Color and accessibility
 
-- **Color is assigned for you.** One series takes `--ds-chart-brand`. Two or more take the categorical order, slot 1 first. A series' own `color` overrides that.
-- **Spoke labels can carry subject color.** `categoryColors` tints each label, as an array in category order or an object keyed by name. For the five SMART competencies, use the `--ds-chart-smart-*` tokens from `SMART` in the palette so each subject wears its own color.
-- **Distance from center carries the value.** Color tells series apart, so add a second cue when there are two: `filled` makes the first an area, and `dashStyle` can dash the comparison line.
-- **Icons need a nearby name.** With `categoryIcons`, the spoke shows only the icon. Name the categories in the surrounding text so the chart is not icon-only.
-- **Data labels always add a percent sign.** Turn on `showDataLabels` only when the values are percentages.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Automatic series color.** One series uses `--ds-chart-brand`; two or more follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 unless overridden by `color`.
+- **Subject-tinted spoke labels.** `categoryColors` tints spoke labels from an array in category order or an object keyed by name. Use `--ds-chart-smart-*` (`SMART` in the palette) for the five SMART competencies.
+- **Distance from center carries the value.** Add a non-color cue when comparing series: `filled` fills the first series, and `dashStyle` dashes comparison lines.
+- **Name icon-only spokes nearby.** `categoryIcons` replaces text labels with icons, so name the categories in surrounding copy.
+- **Percent-only data labels.** `showDataLabels` appends `%` to every value; enable it only for percentages.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -105,11 +101,7 @@ A series may carry its own `color`. `height` takes a number of pixels, default
 
 ## States
 
-`RadarChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`RadarChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -126,12 +118,7 @@ A series may carry its own `color`. `height` takes a number of pixels, default
 
 <DocsInteractivePlayground
     of={RadarChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
