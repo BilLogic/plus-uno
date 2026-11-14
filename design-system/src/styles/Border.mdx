@@ -1,11 +1,12 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { RefTable, TokenTable, C, Do, Dont, DoDont, Callout } from '@/storybook-docs/foundation-blocks.jsx';
+import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
     FoundationExample,
+    DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
 
 export const field = (extra = {}) => ({
@@ -42,7 +43,7 @@ export const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle
 
 <FoundationSection title="Overview">
 
-Borders mark a boundary, separate neighbors and show state. The width token sets how heavy the line is, and the color token says what it means, so always choose them as a pair. A divider is a border, not a component.
+Borders mark boundaries, separate neighbors and show state. Always pair a width token (`--border-default`, `--border-selected`, `--border-focused`) with a `color/border/*` token. A card gets its edge from elevation (<DocsLink id="foundations-visual-elevation">Elevation</DocsLink>), and a divider is a border rather than a component.
 
 ```css
 border-width: var(--border-default);
@@ -50,17 +51,13 @@ border-width: var(--border-selected);
 border-width: var(--border-focused);
 ```
 
-Figma holds Border/default, Border/selected and Border/focused in `spacing / semantics`, built on Stroke/stroke-1 and stroke-2 in `spacing / primitives`. Pair them with `color/border/*` in `color / semantics`.
-
-<Callout title="Border rules">
-A card has no border: its edge comes from elevation. A divider is a border, not a component.
-</Callout>
+Figma holds `Border/default`, `Border/selected` and `Border/focused` in `spacing / semantics`, built on `Stroke/stroke-1` and `stroke-2` in `spacing / primitives`. Pair them with `color/border/*` in `color / semantics`.
 
 </FoundationSection>
 
 <FoundationSection title="Width tokens">
 
-Three widths cover every border. Pick by what the line says, never by how heavy you want it to look. Values are indicative; the tokens are the contract.
+Three widths cover every border. Pick by what the line says, never by how heavy you want it to look.
 
 <TokenTable
     rows={[
@@ -75,7 +72,7 @@ Three widths cover every border. Pick by what the line says, never by how heavy 
 
 <FoundationSection title="Pair width with color">
 
-Width controls how visible a border is; color gives it meaning. Take both from this table.
+Width controls how visible a border is; color gives it meaning.
 
 <RefTable
     head={['Width', 'Color', 'Where']}
@@ -84,10 +81,12 @@ Width controls how visible a border is; color gives it meaning. Take both from t
         [<C>Border/default</C>, <C>color/border/input</C>, 'A field’s outline.'],
         [<C>Border/default</C>, <C>color/border/danger</C>, 'An invalid field.'],
         [<C>Border/default</C>, <C>color/border/disabled</C>, 'A disabled control.'],
-        [<C>Border/selected</C>, <C>color/border/selected</C>, 'The selected option in a group.'],
+        [<C>Border/selected</C>, <C>color/border/selected</C>, 'The selected option in a group (active tab, selected tile or row), paired with a second cue such as a check or fill.'],
         [<C>Border/focused</C>, <C>color/border/focused</C>, <>The focus ring. Use <C>color/border/focused/inverse</C> on a dark surface.</>],
     ]}
 />
+
+- **No colored side stripes:** state and emphasis use the whole shape (fill, text, icon, or a border or ring on all four sides), never a colored bar on one edge.
 
 <FoundationExample>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
@@ -123,7 +122,7 @@ The focus ring shows keyboard users where they are. It is a ring, never a fill: 
         ['Width', <>2 px, <C>--border-focused</C></>],
         ['Distance', '2 px away from the control'],
         ['Color', <><C>color/border/focused</C> (<C>--ds-border-focused</C>); <C>color/border/focused/inverse</C> on a dark surface</>],
-        ['Radius', <>The control’s radius plus 2 px. <a href="?path=/docs/foundations-visual-radius--docs">Radius</a> owns the pairs.</>],
+        ['Radius', <>The control’s radius plus 2 px. <DocsLink id="foundations-visual-radius">Radius</DocsLink> owns the pairs.</>],
         ['Containers', 'Cards and modals draw no ring of their own'],
     ]}
 />
@@ -135,43 +134,11 @@ The focus ring shows keyboard users where they are. It is a ring, never a fill: 
 </div>
 </FoundationExample>
 
-<DoDont>
-<Do caption="The field keeps its fill and gains the ring.">
-<span style={field({ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)' })}>Lincoln Middle Thursday</span>
-</Do>
-<Dont caption="A filled field reads as selected and hides what is typed.">
-<span style={field({ background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', boxShadow: 'none' })}>Lincoln Middle Thursday</span>
-</Dont>
-</DoDont>
-
-</FoundationSection>
-
-<FoundationSection title="Selected states">
-
-A selected option takes the 2 px selected width in `color/border/selected` on every side, and a second cue such as a check or a fill. An active tab and a selected row use the same pair.
-
-State and emphasis use the whole shape. A selected, active or flagged row, card, banner, quote or nav item shows its state with its fill, text, icon or weight, or with a border or ring on every side.
-
-<RefTable
-    head={['Where', 'Width', 'Color']}
-    rows={[
-        ['Active tab', <C>Border/selected</C>, <C>color/border/selected</C>],
-        ['Selected tile or row', <C>Border/selected</C>, <C>color/border/selected</C>],
-    ]}
-/>
-
 </FoundationSection>
 
 <FoundationSection title="Dividers">
 
-<Callout title="There is no Divider component">
-A divider is a 1 px line in `color/border/default`: a border, not a component.
-</Callout>
-
-- Space comes first. Add a line only when spacing alone does not separate two groups.
-- A horizontal rule spans the content width of its container. A vertical one sits between controls and takes their height.
-- A divider uses Border/default and `color/border/default`. A heavier or colored line is a state, not a divider.
-- A card gets its edge from elevation, not from a border: see Elevation.
+Add a divider (`Border/default` in `color/border/default`) only when spacing alone does not separate two groups. A horizontal rule spans the content width of its container; a vertical rule sits between controls and matches their height.
 
 <FoundationExample>
 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
@@ -192,8 +159,6 @@ A divider is a 1 px line in `color/border/default`: a border, not a component.
 
 <FoundationSection title="Borders in patterns">
 
-Patterns draw their edges with the same three widths. Take the line from this table rather than adding one of your own.
-
 <RefTable
     head={['Pattern', 'Line', 'Token', 'Note']}
     rows={[
@@ -204,9 +169,50 @@ Patterns draw their edges with the same three widths. Take the line from this ta
     ]}
 />
 
-<FoundationSubsection title="Give the sidebar one edge and the topbar none">
+</FoundationSection>
 
-The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no border.
+<FoundationSection title="Do and don't">
+
+<FoundationSubsection title="Show focus with a ring, never a fill">
+
+<DoDont>
+<Do caption="The field keeps its fill and gains the ring.">
+<span style={field({ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)' })}>Lincoln Middle Thursday</span>
+</Do>
+<Dont caption="A filled field reads as selected and hides what is typed.">
+<span style={field({ background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', boxShadow: 'none' })}>Lincoln Middle Thursday</span>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Show selection with the whole outline, never a side stripe">
+
+<DoDont>
+<Do caption="The 2 px outline wraps the whole row.">
+<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Lincoln Middle</div>
+</Do>
+<Dont caption="A colored stripe on one edge marks nothing the system recognizes. Use the full outline, a fill or an icon.">
+<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', borderInlineStart: 'var(--border-selected) solid var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Lincoln Middle</div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Use the selected width only for selection">
+
+<DoDont>
+<Do caption="Resting rows and cards keep Border/default.">
+<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-default)' }}>Lincoln Middle</div>
+</Do>
+<Dont caption="The 2 px width on a resting row reads as selected, so users cannot tell what is chosen.">
+<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Lincoln Middle</div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Give the sidebar one edge and the topbar none">
 
 <DoDont>
 <Do caption="One hairline on the sidebar edge.">
@@ -226,32 +232,6 @@ The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no 
 </DoDont>
 
 </FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="Do and don't">
-
-**Show selection with the whole outline.** A selected row takes the 2 px selected border on every side, in `color/border/selected`.
-
-<DoDont>
-<Do caption="The 2 px outline wraps the whole row.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Lincoln Middle</div>
-</Do>
-<Dont caption="A colored stripe on one edge marks nothing the system recognizes. Use the full outline, a fill or an icon.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', borderInlineStart: 'var(--border-selected) solid var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Lincoln Middle</div>
-</Dont>
-</DoDont>
-
-**Use the selected width only for selection.** Border/default is the width for everything that is not a state.
-
-<DoDont>
-<Do caption="Resting rows and cards keep Border/default.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-default)' }}>Lincoln Middle</div>
-</Do>
-<Dont caption="The 2 px width on a resting row reads as selected, so users cannot tell what is chosen.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Lincoln Middle</div>
-</Dont>
-</DoDont>
 
 </FoundationSection>
 

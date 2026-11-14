@@ -1,14 +1,15 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
     FoundationExample,
+    DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
 
-import { Illustration, Tile } from '@/components';
+import { Illustration } from '@/components';
 
 export const Row = ({ children }) => (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--section-stack-md)' }}>{children}</div>
@@ -27,7 +28,7 @@ export const Captioned = ({ caption, children }) => (
     page="foundations-brand-illustrations"
     eyebrow="Foundation"
     title="Illustrations"
-    purpose="Illustrations help a page say something simply, and reflect the mood and context of the tutor or student looking at it."
+    purpose="Hand-drawn characters for moments with room to breathe."
     links={{
         items: [
             { title: 'Color mapping', href: '#foundation-color-and-smart-mapping' },
@@ -38,29 +39,21 @@ export const Captioned = ({ caption, children }) => (
 
 <FoundationSection title="Overview">
 
-In PLUS the illustrations are hand-drawn characters: one for each SMART area, plus a set of math-symbol characters. Use one where a page has room to breathe, such as an empty state, onboarding or a moment of completion. Its body takes the area's color token, so the character follows Light and Dark.
-
-The characters are spot illustrations. A low-fidelity illustration of the UI uses basic shapes in mostly gray and never a real screenshot.
-
-The <a href="?path=/docs/components-images-and-icons-illustration--docs">Illustration</a> component draws a character: its props, anatomy, sizes and code are on that page. This page says which character to use, and when.
+PLUS illustrations are 12 hand-drawn spot characters: five for the SMART areas and seven math symbols. Each character's body takes its area or accent token, so it adapts to Light and Dark. See <DocsLink id="components-images-and-icons-illustration">Illustration</DocsLink> for props, sizes and code. For UI diagrams in docs, use the <DocsLink id="get-started-illustration-kit">Illustration kit</DocsLink>.
 
 </FoundationSection>
 
 <FoundationSection title="Characters">
 
-Twelve characters. The five SMART characters each stand for an area; the seven math characters stand for nothing and take a free accent hue.
-
-<FoundationSubsection title="Which character for what">
+The five SMART characters each stand for an area; the seven math characters stand for general moments and take an accent hue.
 
 <RefTable
     head={['Moment', 'Character']}
     rows={[
         ['A lesson, card or page about one SMART area', <>That area's character: <C>mastering-content</C>, <C>advocacy</C>, <C>technology</C>, <C>relationships</C> or <C>social-emotional</C>.</>],
-        ['Anything not about one SMART area: an empty state, a welcome, a completion', <>A math character: <C>dot</C>, <C>approximately-equal</C>, <C>root</C>, <C>all</C>, <C>pi</C>, <C>equal</C> or <C>divider</C>.</>],
+        ['General moments: empty state, welcome, completion', <>A math character: <C>dot</C>, <C>approximately-equal</C>, <C>root</C>, <C>all</C>, <C>pi</C>, <C>equal</C> or <C>divider</C>.</>],
     ]}
 />
-
-</FoundationSubsection>
 
 <FoundationSubsection title="SMART characters">
 
@@ -90,7 +83,7 @@ Twelve characters. The five SMART characters each stand for an area; the seven m
 
 <FoundationSection title="Color and SMART mapping">
 
-All 12 bodies sit at one mid strength, so the set reads equally light in Light and Dark. The five SMART characters take `color/background/smart/<area>/subtle`, the SMART step made for illustration bodies. The seven math characters take an accent hue at `color/background/accent/<hue>/subtle` and never a SMART hue, so they use red, blue, green and purple, and three hues repeat: red for dot and pi, blue for approximately equal and equal, green for root and divider. Line work takes `color/icon/subtle`.
+All 12 bodies sit at one mid strength so the set reads equally light in Light and Dark. SMART characters take `color/background/smart/<area>/subtle`. Math characters take `color/background/accent/<hue>/subtle` (red, blue, green or purple) and never a SMART hue. Line work takes `color/icon/subtle`.
 
 <RefTable
     head={['Character', 'Body token']}
@@ -104,7 +97,7 @@ All 12 bodies sit at one mid strength, so the set reads equally light in Light a
         ['approximately equal · equal', <C>--ds-background-accent-blue-subtle</C>],
         ['root · divider', <C>--ds-background-accent-green-subtle</C>],
         ['all', <C>--ds-background-accent-purple-subtle</C>],
-        ['Face, arms and legs, all characters', <C>--ds-icon-subtle</C>],
+        ['Face, arms and legs (all)', <C>--ds-icon-subtle</C>],
     ]}
 />
 
@@ -112,34 +105,21 @@ All 12 bodies sit at one mid strength, so the set reads equally light in Light a
 
 <FoundationSection title="Usage">
 
-Use an illustration where the page has room to breathe: empty states, onboarding, and success and completion moments. Decide first that it is needed.
-
-<FoundationSubsection title="When to use">
-
 <RefTable
     head={['Where', 'Illustration', 'Guidance']}
     rows={[
-        ['Empty state', 'Yes', 'One character above the message: 96 on a card, 160 on a page.'],
-        ['Onboarding and tours', 'Yes', 'One character for each step: 160 or 240.'],
-        ['Completion and encouragement', 'Yes', 'A finished session or a met goal: 160 or 240.'],
-        ['SMART area header', 'Yes', 'The area’s own character, at 48 or 96.'],
-        ['Tables, forms and toolbars', 'No', 'These are working surfaces. Try icons, copy or another affordance before an illustration.'],
-        ['Inline errors and buttons', 'No', 'These need words, not mood. Use a Banner.'],
+        ['Empty state', 'Yes', 'One character above the message: 96 px on a card, 160 px on a page.'],
+        ['Onboarding and tours', 'Yes', 'One character per step: 160 or 240 px.'],
+        ['Completion and encouragement', 'Yes', 'A finished session or met goal: 160 or 240 px.'],
+        ['SMART area header', 'Yes', 'The area’s own character, at 48 or 96 px.'],
+        ['Tables, forms and toolbars', 'No', 'Working surfaces. Use icons or copy instead.'],
+        ['Inline errors and buttons', 'No', 'Use a Banner, Section message or Flag.'],
     ]}
 />
 
-</FoundationSubsection>
-
-<FoundationSubsection title="Rules">
-
-- Use a Character instance; never detach it or recolor its parts. Color comes from the tokens, so Light and Dark follow.
-- Pick a size from the scale, and scale uniformly. The sizes and the room a character needs around it are on the <a href="?path=/docs/components-images-and-icons-illustration--docs">Illustration</a> component.
-- The math characters do not stand for a SMART area. Their accent hues are free choices; never reuse a SMART character's color on them.
-- Reuse the existing characters first. A new character, or a new kind of illustration, is a design lead's call.
-- An illustration works with the copy and never replaces it. Art with no job to do stays out of working surfaces; too much of it adds to what a reader has to take in.
-- Other visual aids have their own homes: Avatar for people, Icon for actions with labels, Logo for brand, Image for photos.
-
-</FoundationSubsection>
+- Use the `Illustration` component; never detach or recolor its parts.
+- Reuse existing characters first. Adding a new character requires design lead approval.
+- Other visuals have their own components: `Avatar` for people, `Icon` for actions, `Logo` for brand, `Image` for photos.
 
 </FoundationSection>
 

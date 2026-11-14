@@ -5,6 +5,7 @@ import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
+    DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
 import {
     CloseDo,
@@ -178,71 +179,27 @@ The focus ring sits 2 px outside the element (`--focus-ring-width` for both its 
     ]}
 />
 
-[Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color and width. Radius is decoration: never let a corner alone signal state or meaning.
+[Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color and width.
 
 </FoundationSection>
 
 <FoundationSection title="Tokens">
 
-Four tiers. Primitives hold the values; semantic tokens name a role; pattern tokens belong to a template; component tokens belong to one component. Values are read from the page.
-
-<FoundationSubsection title="Primitives">
-
-<TokenTable
-    showFigma={false}
-    rows={['0125', '025', '0375', '050', '0625', '075', '100', 'full'].map((s) => ({ token: `--radius-${s}` }))}
-/>
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Semantic tokens">
-
-The `Radius` group names a step by size; the `Radius / Control` group names it by control height.
+All radius primitives, control radii, pattern radii and button radii are listed on <DocsLink id="foundations-tokens-spacing-and-size">Tokens: Spacing and size</DocsLink>. The `Radius` group names a step by size; `Radius / Control` names it by control height.
 
 <TokenTable
     rows={[
-        { token: '--radius-sm', figma: 'Radius/sm', use: 'Small details.' },
-        { token: '--radius-md', figma: 'Radius/md', use: 'Tight grids and small tags.' },
-        { token: '--radius-lg', figma: 'Radius/lg', use: 'The smallest nested visual.' },
-        { token: '--radius-xl', figma: 'Radius/xl', use: 'Boxes inside a page.' },
-        { token: '--radius-xxl', figma: 'Radius/xxl', use: 'The largest templates.' },
+        { token: '--radius-sm', figma: 'Radius/sm', use: 'Small details (2 px).' },
+        { token: '--radius-md', figma: 'Radius/md', use: 'Tight grids and small tags (4 px).' },
+        { token: '--radius-lg', figma: 'Radius/lg', use: 'The smallest nested visual (8 px).' },
+        { token: '--radius-xl', figma: 'Radius/xl', use: 'Boxes inside a page (12 px).' },
+        { token: '--radius-xxl', figma: 'Radius/xxl', use: 'The largest templates (16 px).' },
         { token: '--radius-full', figma: 'Radius/full', use: 'Pills.' },
-        { token: '--radius-control-sm', figma: 'Radius/Control/sm', use: '24 high controls.' },
-        { token: '--radius-control-md', figma: 'Radius/Control/md', use: '32 high controls.' },
-        { token: '--radius-control-lg', figma: 'Radius/Control/lg', use: '40 high controls.' },
+        { token: '--radius-control-sm', figma: 'Radius/Control/sm', use: '24 px high controls.' },
+        { token: '--radius-control-md', figma: 'Radius/Control/md', use: '32 px high controls.' },
+        { token: '--radius-control-lg', figma: 'Radius/Control/lg', use: '40 px high controls.' },
     ]}
 />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Pattern tokens">
-
-<TokenTable
-    showFigma={false}
-    rows={[
-        { token: '--section-radius', use: 'A Section with a fill.' },
-        { token: '--modal-radius', use: 'A Modal.' },
-        { token: '--card-radius', use: 'A Card.' },
-        { token: '--card-radius-compact', use: 'A compact Card, and a Card inside a filled Section.' },
-        { token: '--popup-radius', use: 'A Popup, and the menus and Flags built on it.' },
-        { token: '--table-radius', use: 'A Table.' },
-        { token: '--frame-sidebar-row-radius', use: 'A Sidebar row.' },
-    ]}
-/>
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Component tokens">
-
-<TokenTable
-    showFigma={false}
-    rows={[
-        { token: '--button-radius-default', use: 'A button at the default density: the 40 field radius minus 4.' },
-        { token: '--button-radius-compact', use: 'A compact button: the 32 field radius minus 4.' },
-    ]}
-/>
-
-</FoundationSubsection>
 
 </FoundationSection>
 
@@ -297,10 +254,17 @@ The `Radius` group names a step by size; the `Radius / Control` group names it b
 
 <DoDont>
 <Do caption="The token follows the rules when a value moves.">{<C>border-radius: var(--radius-control-lg);</C>}</Do>
-<Dont caption="A literal is right today and wrong after the next change. The radius lint fails it.">{<C>border-radius: 10px;</C>}</Dont>
+<Dont caption="A literal is right today and wrong after the next change.">{<C>border-radius: 10px;</C>}</Dont>
 </DoDont>
 
 </FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Accessibility">
+
+- Corner radius is decorative: never rely on corner shape alone to convey state, role or interactivity.
+- The focus ring rounds at the element's radius + 2 px (`--focus-ring-width`) so the ring stays parallel to the corner (<DocsLink id="foundations-visual-border">Border</DocsLink>).
 
 </FoundationSection>
 
