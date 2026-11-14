@@ -69,13 +69,27 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <ComponentExample of={PatternCardStories.ImageSquare} title="Image 1:1" description="The image slot at 1:1." />
 
-<ComponentExample of={PatternCardStories.LayoutStacked} title="Stacked" description={<><code>layout="stacked"</code>, the default: the image above the content. Use it for cards in a grid or any card narrower than the large size.</>} />
+</div>
 
-<ComponentExample of={PatternCardStories.LayoutImageStart} title="Image start" description={<><code>layout="image-start"</code>: the image on the start side at one third of the width, full height, with the content beside it. Use it for a wide card that leads with a picture, one layout per row of cards.</>} />
+<div className="sb-ds-doc-section">
 
-<ComponentExample of={PatternCardStories.LayoutImageEnd} title="Image end" description={<><code>layout="image-end"</code>: the mirror, for a card whose text should be read first.</>} />
+## Image placement
 
-<ComponentExample of={PatternCardStories.LayoutStacksBelowMd} title="Below md" description="A side card stacks below the md breakpoint, so the image returns above the content." />
+`imagePlacement` is `top` (default), `start` or `end`. Side placement applies when the card itself is at least the large minimum width (480), independently of the viewport. Below that width the image returns to the top and keeps the aspect ratio supplied by the image slot. Use one placement per row of cards.
+
+`imageSplit` is `1/3` (default) or `1/2`, for side placement only. A side image fills the card height, crops to cover, has no padding and takes the card's corners on its side only. The half split steps the title up to Heading medium; top placement and narrow cards keep the regular card title.
+
+<ComponentExample of={PatternCardStories.ImageTop} title="Image on top" description="The default, for a grid or a narrow card. Give the image slot its top aspect ratio." />
+
+<ComponentExample of={PatternCardStories.ImageStart} title="Image start" description="A picture leads a wide announcement, taking one third of the card." />
+
+<ComponentExample of={PatternCardStories.ImageEnd} title="Image end" description="The text leads, with the picture at the end." />
+
+<ComponentExample of={PatternCardStories.ImageStartHalf} title="Half at the start" description="Give a finished moment equal space for its picture and words. The title uses Heading medium." />
+
+<ComponentExample of={PatternCardStories.ImageEndHalf} title="Half at the end" description="The text leads a finished moment with an equal image split." />
+
+<ComponentExample of={PatternCardStories.PlacementBoundary} title="Below large" description="Narrow cards return to an image on top, including on wide pages." />
 
 </div>
 
@@ -192,8 +206,8 @@ In a row, place the most cards that keep each card at its minimum width. Each ro
 
 ## Parts
 
-1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. Stacked, give the image you pass an aspect ratio of 16:9, 4:3 or 1:1; beside the content it fills the full height at one third of the width and crops to cover.
-2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. The title is 14/20 at every level, over a 14/20 description. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
+1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. On top, give the image you pass an aspect ratio of 16:9, 4:3 or 1:1; beside the content it fills the full height at one third or one half of the width and crops to cover.
+2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. The title uses Heading xsmall at every heading level, stepping up to Heading medium for a half side image. The description uses Body default. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
 3. **Body.** A slot for text, a list or media.
 4. **Footer** (optional). A left-aligned slot for actions that commit a change.
 
@@ -237,7 +251,8 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 <tr><td><code>--ds-surface-raised</code>, <code>--ds-shadow-raised</code></td><td>color pair</td><td>The card at rest.</td></tr>
 <tr><td><code>--ds-surface-raised-hovered</code>, <code>--ds-surface-raised-pressed</code></td><td>color</td><td>A clickable card while hovered and pressed.</td></tr>
 <tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>color pair</td><td>A dragged card, and the hover lift's shadow.</td></tr>
-<tr><td><code>--heading-xsmall</code>, <code>--body-default</code></td><td>14/20</td><td>The title and the description.</td></tr>
+<tr><td><code>--heading-xsmall</code>, <code>--body-default</code></td><td>type</td><td>The regular title and the description.</td></tr>
+<tr><td><code>--heading-medium</code></td><td>type</td><td>The title beside a half-width side image.</td></tr>
 <tr><td><code>--ds-text</code>, <code>--ds-text-subtle</code></td><td>color</td><td>The title and the description.</td></tr>
 </tbody>
 </DocsTable>

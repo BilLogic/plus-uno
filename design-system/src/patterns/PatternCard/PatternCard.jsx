@@ -4,14 +4,12 @@ import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './PatternCard.scss';
 
 /**
- * Card pattern for PLUS design system. Mirrors Figma `Pattern/Card`:
- * an optional image, then the content (the `_Card header` over the body), then
- * an optional footer, on Atlassian's raised pair: the raised surface and its
- * shadow, whose 1px ring is the card's edge.
+ * PLUS card: an optional image, content and footer on the raised surface and shadow.
  *
- * - **Layout**: `stacked` (default) puts the image above the content. `image-start` and
- *   `image-end` put it beside the content, content two thirds and image one third, for wide
- *   cards; below the md breakpoint (768) a side card stacks. One layout per row of cards.
+ * - **Image placement**: `top` (default), `start` or `end`. Side images apply
+ *   at the large card minimum width and fill the height. `imageSplit` chooses
+ *   one third (default) or one half; half uses Heading medium on a side card.
+ *   Below the large minimum width, the image returns to the top with its own ratio.
  * - **Header** (`_Card header`): `title` (the card title type, shared with Card
  *   in `styles/_card-title.scss`, one heading level below its section) over an
  *   optional `description` (Body/default 14), with
@@ -35,7 +33,8 @@ const PatternCard = ({
     header,
     image,
     footer,
-    layout = 'stacked',
+    imagePlacement = 'top',
+    imageSplit = '1/3',
     padding = 'md',
     gap = 'md',
     minWidth,
@@ -47,7 +46,8 @@ const PatternCard = ({
 }) => {
     const classes = [
         'plus-pattern-card',
-        `plus-pattern-card--${layout}`,
+        image ? `plus-pattern-card--image-${imagePlacement}` : '',
+        image && imageSplit === '1/2' ? 'plus-pattern-card--image-half' : '',
         `plus-pattern-card-pad-${padding}`,
         `plus-pattern-card-gap-${gap}`,
         props.onClick ? 'plus-pattern-card--clickable' : '',
@@ -96,15 +96,12 @@ PatternCard.propTypes = {
     actions: PropTypes.node,
     /** Custom header that replaces title, description and actions (tabs, a toolbar) */
     header: PropTypes.node,
-    /** Image slot, full bleed: above the content, or at the start or end edge per `layout` */
+    /** Image slot, full bleed: above the content, or at the start or end edge per `imagePlacement` */
     image: PropTypes.node,
-    /**
-     * Where the image sits. `stacked` puts it above the content. `image-start` and `image-end`
-     * put it beside the content at one third of the width, full height, bleeding to the card's
-     * top, bottom and that side's edge; for wide cards, and below the md breakpoint they stack. Pass one media element:
-     * it fills the cell and crops to cover.
-     */
-    layout: PropTypes.oneOf(['stacked', 'image-start', 'image-end']),
+    /** Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. */
+    imagePlacement: PropTypes.oneOf(['top', 'start', 'end']),
+    /** Side image share. One half also steps the title up to Heading medium. Ignored for top placement. */
+    imageSplit: PropTypes.oneOf(['1/3', '1/2']),
     /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body */
     footer: PropTypes.node,
     /** Padding scale: Card/pad-sm · md · lg (16 · 20 · 24) */
