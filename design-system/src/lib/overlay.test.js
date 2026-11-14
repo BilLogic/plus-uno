@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
@@ -7,6 +8,8 @@ import {
     reportFocusLost,
     getOverlayPortalRoot,
     overlayMountOf,
+    OverlayContainer,
+    useBoundedOverlay,
     useOverlaySlot,
     isPressInRaisedOverlay,
     isOverlayRaisedOver,
@@ -207,3 +210,39 @@ describe('isOverlayRaisedOver', () => {
         expect(isOverlayRaisedOver(document.getElementById('inner'))).toBe(false);
     });
 });
+
+describe('useBoundedOverlay', () => {
+    afterEach(() => { document.body.innerHTML = ''; });
+
+    it('returns null outside an OverlayContainer so real app placement and collision rules stay untouched', () => {
+        const { result } = renderHook(() => useBoundedOverlay());
+        expect(result.current).toBeNull();
+    });
+
+    it('returns the container, boundary and side-pinned collision avoidance inside an OverlayContainer', () => {
+        const canvas = document.createElement('div');
+        const card = document.createElement('div');
+        const wrapper = ({ children }) => React.createElement(OverlayContainer, { container: canvas, boundary: card }, children);
+        const { result } = renderHook(() => useBoundedOverlay(), { wrapper });
+        expect(result.current).toEqual({
+            container: canvas,
+            collisionBoundary: card,
+            collisionAvoidance: { side: 'none', align: 'shift', fallbackAxisSide: 'none' },
+        });
+    });
+
+    it('yields to an explicit container prop or a Modal Backdrop ancestor', () => {
+        const canvas = document.createElement('div');
+        const explicit = document.createElement('div');
+        const backdrop = document.createElement('div');
+        backdrop.className = 'plus-pattern-backdrop';
+        const trigger = document.createElement('button');
+        backdrop.appendChild(trigger);
+        document.body.appendChild(backdrop);
+
+        const wrapper = ({ children }) => React.createElement(OverlayContainer, { container: canvas }, children);
+        expect(renderHook(() => useBoundedOverlay({ container: explicit }), { wrapper }).result.current).toBeNull();
+        expect(renderHook(() => useBoundedOverlay({ fromNode: trigger }), { wrapper }).result.current).toBeNull();
+    });
+});
+

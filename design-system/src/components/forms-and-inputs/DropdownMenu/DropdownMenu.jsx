@@ -2,6 +2,7 @@ import React, { useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
+import { useBoundedOverlay } from '@/lib/overlay';
 import Icon from '@/components/images-and-icons/Icon';
 import Spinner from '@/components/loading/Spinner/Spinner';
 import { ButtonItem, CustomItem, MenuGroup } from '@/components/forms-and-inputs/_internal/MenuGroup';
@@ -65,6 +66,7 @@ const DropdownMenu = ({
     };
 
     const triggerNodeRef = useRef(null);
+    const bounded = useBoundedOverlay({ container, fromNode: triggerNodeRef.current });
     const ownRef = trigger.props?.ref ?? trigger.ref;
     const mergedTrigger = React.cloneElement(trigger, {
         // Base UI's Trigger sets `aria-haspopup`/`aria-controls` itself but
@@ -106,13 +108,14 @@ const DropdownMenu = ({
                 render={mergedTrigger}
                 nativeButton={isButtonLike(mergedTrigger)}
             />
-            <BaseMenu.Portal container={container}>
+            <BaseMenu.Portal container={bounded ? bounded.container : container}>
                 <BaseMenu.Positioner
                     side={side}
                     align={align}
                     sideOffset={4}
                     collisionPadding={8}
-                    collisionAvoidance={{ side: shouldFlip ? 'flip' : 'none' }}
+                    collisionBoundary={bounded?.collisionBoundary}
+                    collisionAvoidance={bounded?.collisionAvoidance ?? { side: shouldFlip ? 'flip' : 'none' }}
                 >
                     <BaseMenu.Popup
                         id={id}

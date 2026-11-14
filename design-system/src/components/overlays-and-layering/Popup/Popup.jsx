@@ -3,7 +3,7 @@ import React, { useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Popover as BasePopover } from '@base-ui/react/popover';
 import { popupMountOf } from '@/lib/popoverPlacement';
-import { isOverlayRaisedOver, isPressInRaisedOverlay } from '@/lib/overlay';
+import { isOverlayRaisedOver, isPressInRaisedOverlay, useBoundedOverlay } from '@/lib/overlay';
 import './Popup.scss';
 
 /**
@@ -137,6 +137,7 @@ const Popup = ({
     const triggerNodeRef = useRef(null);
     const containerRef = useRef(null);
     if (!hasTrigger) triggerNodeRef.current = anchor?.current ?? anchor ?? null;
+    const bounded = useBoundedOverlay({ container, fromNode: triggerNodeRef.current });
     containerRef.current = container ?? popupMountOf(triggerNodeRef);
     const ownRef = triggerElement?.props?.ref ?? triggerElement?.ref;
     const mergedTrigger = hasTrigger && React.cloneElement(triggerElement, {
@@ -167,13 +168,15 @@ const Popup = ({
                     {...(expandable ? { 'aria-haspopup': 'dialog' } : {})}
                 />
             )}
-            <BasePopover.Portal container={containerRef}>
+            <BasePopover.Portal container={bounded ? bounded.container : containerRef}>
                 <BasePopover.Positioner
                     anchor={anchor}
                     side={side}
                     align={align}
                     sideOffset={away ?? along}
                     collisionPadding={8}
+                    collisionBoundary={bounded?.collisionBoundary}
+                    collisionAvoidance={bounded?.collisionAvoidance}
                 >
                     <BasePopover.Popup
                         data-reduced={reduced ? 'true' : undefined}
