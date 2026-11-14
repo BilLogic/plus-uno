@@ -48,8 +48,8 @@ describe('DoDontPair and DoDontCard', () => {
         const doCaption = doCard.querySelector('figcaption.sb-ds-dodont-caption');
         const dontCaption = dontCard.querySelector('figcaption.sb-ds-dodont-caption');
 
-        expect(doCaption.style.backgroundColor).toBe('var(--ds-background-success-subtle)');
-        expect(dontCaption.style.backgroundColor).toBe('var(--ds-background-danger-subtle)');
+        expect(doCaption.style.backgroundColor).toBe('var(--ds-background-success-subtler)');
+        expect(dontCaption.style.backgroundColor).toBe('var(--ds-background-danger-subtler)');
 
         for (const [caption, iconClass, labelText, bodyText] of [
             [doCaption, 'fa-circle-check', 'Do', 'Use one primary action per page.'],
@@ -84,8 +84,8 @@ describe('DoDontPair and DoDontCard', () => {
         expect(container.querySelector('.sb-ds-dodont-pair')).toBeTruthy();
         const cards = container.querySelectorAll('figure.sb-ds-dodont-card');
         expect(cards).toHaveLength(2);
-        expect(cards[0].querySelector('figcaption.sb-ds-dodont-caption').style.backgroundColor).toBe('var(--ds-background-success-subtle)');
-        expect(cards[1].querySelector('figcaption.sb-ds-dodont-caption').style.backgroundColor).toBe('var(--ds-background-danger-subtle)');
+        expect(cards[0].querySelector('figcaption.sb-ds-dodont-caption').style.backgroundColor).toBe('var(--ds-background-success-subtler)');
+        expect(cards[1].querySelector('figcaption.sb-ds-dodont-caption').style.backgroundColor).toBe('var(--ds-background-danger-subtler)');
     });
 
     it('renders the shared DoDontCaption block under MotionDemo verdict tiles', () => {
@@ -115,8 +115,8 @@ describe('DoDontPair and DoDontCard', () => {
         const { container } = render(<MotionDemo title="Press response" scenes={scenes} reduced />);
         const captions = container.querySelectorAll('figcaption.sb-ds-dodont-caption');
         expect(captions).toHaveLength(2);
-        expect(captions[0].style.backgroundColor).toBe('var(--ds-background-success-subtle)');
-        expect(captions[1].style.backgroundColor).toBe('var(--ds-background-danger-subtle)');
+        expect(captions[0].style.backgroundColor).toBe('var(--ds-background-success-subtler)');
+        expect(captions[1].style.backgroundColor).toBe('var(--ds-background-danger-subtler)');
         expect(within(captions[0]).getByText('Do').tagName).toBe('STRONG');
         expect(within(captions[1]).getByText("Don't").tagName).toBe('STRONG');
     });
