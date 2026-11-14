@@ -406,6 +406,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Popup', new: '--popup-max-width', old: null, ref: 'var(--width-2000)', use: 'Widest an auto-width Popup grows to fit its content, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-clip-reach', old: null, ref: 'var(--space-300)', use: 'How far past its edges a Popup\'s opening clip stays, so the overlay shadow is never cut.' },
   { tier: 'components', group: 'AI chat', new: '--ai-chat-width', old: null, ref: 'var(--width-2500)', use: 'Width of the AI chat when it opens as a popup or floats beside the page.' },
+  { tier: 'components', group: 'Inbox', new: '--inbox-width', old: null, ref: 'calc(var(--width-2000) + var(--space-250))', note: '360px', use: 'Width of the Inbox Panel when it opens beside the Sidebar.' },
   { tier: 'components', group: 'Popup', new: '--popup-pad', old: null, ref: 'var(--space-125)', use: 'Padding inside a Popup.' },
   { tier: 'components', group: 'Table', new: '--table-cell-max-width', old: null, ref: 'var(--size-300)', use: 'Maximum width of a table cell before its text truncates.' },
   { tier: 'components', group: 'Avatar', new: '--avatar-size-96', old: null, ref: 'calc(var(--space-300) * 2)', use: 'Size of an extra-large UserAvatar, such as in a profile header.' },

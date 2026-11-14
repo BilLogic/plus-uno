@@ -1,17 +1,19 @@
 import React from 'react';
-import { expect, waitFor, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { Flag, FlagGroup } from '@/components';
-import { FLOAT_STAGE, InboxFrame } from '../../../patterns/Panel/panelDemo.jsx';
-import { Acknowledge, ModalStage } from '../../../patterns/PatternModal/modalDemo.jsx';
+import { Acknowledge } from '../../../patterns/PatternModal/modalDemo.jsx';
 import {
     FlagOnPage,
     FlagStack,
     FlagTopRight,
     FlagUndo,
     FlagWithActions,
+    INBOX_STAGE,
+    InboxInSidebar,
     MustStay,
     PLACE_STAGE,
     SeverityRow,
@@ -26,7 +28,8 @@ import {
  * is drawn in the state its heading names, from initial-state props, and
  * asserts the ruling it shows: a Flag is a passing notice with its title and a
  * next step, a Banner is one line with no dismiss, a SectionMessage that must
- * stay has dismiss off, and the words carry the severity.
+ * stay has dismiss off, the Inbox opens beside the Sidebar at 360px
+ * (`--inbox-width`), and the words carry the severity.
  *
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/Notifications/Notifications.stories.jsx
  */
@@ -76,12 +79,27 @@ export const CarrierSectionMessage = {
     },
 };
 
-/** The Inbox: what arrived over time, in the Panel template's Notifications type. */
+/** The Inbox: a 360px (--inbox-width) Panel at the start beside the Sidebar, with Unread and All tabs and NotificationItem rows grouped by day. */
 export const CarrierInbox = {
     name: 'Carrier: The Inbox',
-    render: () => staged(<InboxFrame />, FLOAT_STAGE),
+    render: () => staged(<InboxInSidebar />, INBOX_STAGE),
     play: async ({ canvasElement }) => {
-        await expect(canvasElement.querySelector('.plus-frame__panel'), 'the Inbox Panel').toHaveAccessibleName('Inbox');
+        const canvas = within(canvasElement);
+        const inbox = canvas.getByRole('region', { name: 'Inbox' });
+        await expect(inbox).toBeInTheDocument();
+        await expect(px(getComputedStyle(inbox).width)).toBe(tokenLength(canvasElement, '--inbox-width'));
+        await expect(within(inbox).getByRole('button', { name: 'Mark all as read' })).toBeInTheDocument();
+        await expect(within(inbox).getByRole('button', { name: /settings/i })).toBeInTheDocument();
+        await expect(within(inbox).getByRole('button', { name: 'Close' })).toBeInTheDocument();
+        await expect(within(inbox).getByRole('tab', { name: /Unread/i })).toHaveTextContent('3');
+        await expect(within(inbox).getByRole('tab', { name: 'All' })).toBeInTheDocument();
+        await expect(within(inbox).getByRole('heading', { name: 'Today' })).toBeInTheDocument();
+        await expect(within(inbox).getByRole('heading', { name: 'Yesterday' })).toBeInTheDocument();
+        const rows = inbox.querySelectorAll('.plus-notification-item');
+        await expect(rows).toHaveLength(3);
+        for (const row of rows) {
+            await expect(within(row).getAllByRole('link'), 'one link per row').toHaveLength(1);
+        }
         await fitsCanvas(canvasElement);
     },
 };
@@ -207,6 +225,17 @@ export const KeyFlagOnPage = {
     },
 };
 
+/** When Unread is cleared, the Inbox shows a compact EmptyState ("You are all caught up."). */
+export const KeyInboxCaughtUp = {
+    name: 'Key case: All caught up in the Inbox',
+    render: () => staged(<InboxInSidebar initialAllRead />, INBOX_STAGE),
+    play: async ({ canvasElement }) => {
+        const inbox = within(canvasElement).getByRole('region', { name: 'Inbox' });
+        await expect(within(inbox).getByRole('heading', { name: 'You are all caught up.' })).toBeInTheDocument();
+        await fitsCanvas(canvasElement);
+    },
+};
+
 /* ------------------------------------------------------------------- tests */
 
 /** A Flag that dismisses itself on its timer, and one that stays; both from a clean start. */
@@ -232,5 +261,44 @@ export const TestFlagsLeave = {
         await waitFor(() => expect(canvas.queryByText('Saved'), 'the routine Flag left on its own').toBeNull(), { timeout: 3000 });
         await expect(canvas.getByText("Couldn't save"), 'the danger Flag stays').toBeInTheDocument();
         await expect(canvas.queryByRole('button', { name: /dismiss/i }), 'a bold Flag has no ×').toBeNull();
+    },
+};
+
+/** Test: the Inbox marks one or all as read, shows EmptyState, closes on Escape and outside click, and reopens from the Sidebar. */
+export const TestInboxInteractions = {
+    name: 'Test: Inbox marks read and closes on Escape or outside click',
+    render: () => <div style={{ width: INBOX_STAGE }}><InboxInSidebar /></div>,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const inbox = canvas.getByRole('region', { name: 'Inbox' });
+
+        // Hover and mark one item read
+        const firstRow = inbox.querySelector('.plus-notification-item');
+        await userEvent.hover(firstRow);
+        await userEvent.click(within(firstRow).getByRole('button', { name: 'Mark as read' }));
+        await expect(within(inbox).getByRole('tab', { name: /Unread/i })).toHaveTextContent('2');
+
+        // Mark all as read -> EmptyState "You are all caught up."
+        await userEvent.click(within(inbox).getByRole('button', { name: 'Mark all as read' }));
+        await expect(within(inbox).getByRole('heading', { name: 'You are all caught up.' })).toBeInTheDocument();
+
+        // Switch to All -> read history remains
+        await userEvent.click(within(inbox).getByRole('tab', { name: 'All' }));
+        await expect(within(inbox).getAllByRole('link').length).toBeGreaterThan(0);
+
+        // Escape closes and returns focus to the Sidebar Inbox trigger
+        const nav = canvas.getByRole('navigation', { name: 'Main' });
+        const inboxTrigger = within(nav).getByRole('button', { name: /Inbox/i });
+        await userEvent.keyboard('{Escape}');
+        await expect(canvas.queryByRole('region', { name: 'Inbox' })).toBeNull();
+        await expect(inboxTrigger).toHaveFocus();
+
+        // Sidebar button reopens
+        await userEvent.click(inboxTrigger);
+        await expect(canvas.getByRole('region', { name: 'Inbox' })).toBeInTheDocument();
+
+        // Outside click closes
+        await userEvent.click(canvas.getByRole('heading', { name: 'Sessions' }));
+        await expect(canvas.queryByRole('region', { name: 'Inbox' })).toBeNull();
     },
 };

@@ -7696,6 +7696,169 @@
       ]
     },
     {
+      "name": "NotificationItem",
+      "kind": "component",
+      "import": "import { NotificationItem } from '@/components';",
+      "group": "messaging",
+      "source": "design-system/src/components/messaging/NotificationItem/NotificationItem.jsx",
+      "summary": "`NotificationItem` — one row for an update that arrived over time, shared by the Inbox, a Home card and a full notifications page. The whole row is a single link (`href`). When `unread` is true, the row shows the selected fill and an unread dot paired with the visually hidden word \"Unread\" so assistive technology announces it. When `onMarkRead` is also passed, a compact \"Mark as read\" `IconButton` sits as a sibling of the link over the trailing slot and appears on hover and keyboard focus. Anatomy (`__start`, `__body` [`__label`, `__description`], `__end`) matches `FileItem` and `SettingRow` so all three can lift onto a shared row base.",
+      "props": [
+        {
+          "name": "actor",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Leading actor visual: an `Avatar` for a person or a `Tile` for the system. Hidden from the link's accessible name because `title` names who acted.",
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Who did what, such as `\"Ana Ruiz moved Thursday's session\"`.",
+          "deprecated": null
+        },
+        {
+          "name": "meta",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Context and relative time on one line, such as `\"Sessions · 2m\"`.",
+          "deprecated": null
+        },
+        {
+          "name": "unread",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Marks the row unread with the selected fill, an unread dot and an announced `\"Unread\"` state.",
+          "deprecated": null
+        },
+        {
+          "name": "href",
+          "type": "string",
+          "required": false,
+          "default": "'#'",
+          "values": null,
+          "description": "Destination URL for the notification row.",
+          "deprecated": null
+        },
+        {
+          "name": "onMarkRead",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called when the user activates the `\"Mark as read\"` button on an unread item.",
+          "deprecated": null
+        },
+        {
+          "name": "onClick",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Click handler forwarded to the row link.",
+          "deprecated": null
+        },
+        {
+          "name": "onPointerEnter",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Pointer-enter handler on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "onPointerLeave",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Pointer-leave handler on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional `id` on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Extra class names on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline style on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid` on the row container.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Actors",
+        "Unread",
+        "Read",
+        "Hovered",
+        "Focused",
+        "Pressed",
+        "Motion",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--control-sm",
+        "--count-tag-dot-size",
+        "--ds-background-brand-bold",
+        "--ds-background-neutral-subtle",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-background-selected-hovered",
+        "--ds-background-selected-pressed",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--image-md",
+        "--inline-lg",
+        "--pad-x-md",
+        "--pad-y-lg",
+        "--radius-control-md",
+        "--radius-full",
+        "--stack-sm",
+        "--type-weight-medium"
+      ]
+    },
+    {
       "name": "Object",
       "kind": "component",
       "import": "import { Object } from '@/components';",

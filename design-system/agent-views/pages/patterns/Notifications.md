@@ -2,7 +2,7 @@
 
 # Notifications
 
-What the product says back, and where: a Flag for what happened, a Banner for a condition, a SectionMessage for something to act on.
+What the product says back, and where: a Flag for what happened, a Banner for a condition, a SectionMessage for something to act on, and the Inbox for what arrived over time.
 
 **Kind:** Pattern
 
@@ -15,7 +15,7 @@ Four components carry every message. Each component page holds its appearances; 
 - **Flag.** A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and error stay until acted on.
 - **Banner.** A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.
 - **SectionMessage.** Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.
-- **The Inbox.** Notifications that arrived over time, in a Panel. The Bell that carries its count, and the Panel growing out of the Sidebar, are Planned .
+- **The Inbox.** Updates that arrived over time, in a 360-wide (`--inbox-width`) Panel beside the Sidebar with `Unread` and `All` tabs and `NotificationItem` rows grouped by day.
 
 ## Banner tiers
 
@@ -43,7 +43,7 @@ Notify someone when an action finishes, a condition applies or a decision is nee
 | A condition that holds for everything in a Frame, page or Section | `Banner` at that tier | Top of the tier | When the condition ends |
 | A note beside one thing that most people never need | `InlineMessage` | Beside the field or value | On close |
 | Something that must be answered before going on | `Modal`, Acknowledge or Active | Centered over a Backdrop | On the button |
-| What arrived over time | The Inbox, a Panel of the Notifications type | A floating Panel, no Backdrop | When read |
+| What arrived over time | The Inbox, a 360-wide (`--inbox-width`) Panel beside the Sidebar | Start of the page, over content, no Backdrop | Escape, outside click, or Close |
 
 ## Alternatives
 
@@ -68,6 +68,7 @@ Notify someone when an action finishes, a condition applies or a decision is nee
 - A `Banner` is a status that never traps focus and sits in the reading order.
 - The timeout on a Flag is a timing limit; the dismiss × on a default Flag satisfies it (see the Flag page).
 - The appearance icon is decorative; the words carry the severity.
+- Each `NotificationItem` in the Inbox is one link whose accessible name announces `"Unread"` while unread, with `"Mark as read"` as a sibling button outside the link.
 
 ## Related
 
@@ -77,7 +78,7 @@ Notify someone when an action finishes, a condition applies or a decision is nee
 - Panel: use for the Inbox.
 - Modal: use for what must be answered first.
 - Page: use for where a Page banner sits.
-- `Flag`, `Banner`, `SectionMessage`, `InlineMessage`, `Modal`: the components.
+- `Flag`, `Banner`, `SectionMessage`, `InlineMessage`, `NotificationItem`, `Modal`: the components.
 
 ## Motion
 
@@ -152,4 +153,4 @@ A bold fill competes with the page; it is for what must be seen. Routine news st
 
 **Checked:** Review
 
-A Flag is for now; the Inbox is for later. The Inbox is the Panel's Notifications type: items by time, each unread one marked with a dot and the word. The Bell in the Sidebar carrying the count, and the Panel growing out of the Sidebar from the left, are Planned .
+A Flag is for now; the Inbox is for later. The Inbox opens from the Sidebar at `--inbox-width` over the start of the page with no Backdrop, carrying `Mark all as read`, settings and close in the header, `Unread` (with count) and `All` tabs, and `NotificationItem` rows grouped by day. Clearing every unread item shows `"You are all caught up."` in `EmptyState`; pressing `Escape` or clicking outside closes the panel.
