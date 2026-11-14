@@ -20,11 +20,6 @@ Use `InlineEdit` for a value that is read far more often than it is changed and
 that can be saved on its own: a title, a name or a short note on a record or a
 profile page.
 
-Use `TextField` inside a form, where a Save button submits every field together. An
-inline edit saves when it is confirmed and has no say in the form's submit, so
-placing one in a form leaves two ways to save. Use a subtle `TextField` where
-leaving the field should save with no buttons at all.
-
 ## Motion
 
 InlineEdit reads these motion tokens and no literal duration or curve.
@@ -33,6 +28,11 @@ InlineEdit reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Swap content in place | `--ds-motion-appearance-fast` | Read and edit states swap in place. |
 | rejected | Call attention | `--ds-motion-spatial-fast` | A blocked save shakes the field and its button once. |
+
+## Alternatives
+
+- For a field in a form where a Save button submits every field together, use `TextField`: an inline edit saves when confirmed and has no say in the form's submit, so placing one in a form leaves two ways to save.
+- For several lines edited in a form, use `TextArea`.
 
 ## Best practices
 
@@ -53,7 +53,7 @@ Don't: A separate Save step beside an inline edit.
 
 ### Use compact in dense lists. {#use-compact-in-dense-lists}
 
-Compact draws both views 32 high, to sit in a table cell or a dense row.
+`compact` draws both views at `--item-height-md`, to sit in a table cell or a dense row.
 
 Do: Compact rows in a dense list.
 Don't: The default height spreads a dense list out.
@@ -89,9 +89,8 @@ thought, and keep the buttons so there is a clear way out.
 
 ## Related
 
-- For a field in a form, use `TextField`.
-- For editing in place with no buttons, use `TextField` with `appearance="subtle"`.
-- For several lines edited in place, use `TextArea` with `appearance="subtle"`.
+- `TextField`: use when configuring the text input inside `InlineEditableTextfield` or editing in place with `appearance="subtle"`.
+- `TextArea`: use when passing a multi-line edit view to `InlineEdit`.
 
 Same group: `Code` · `CodeBlock` · `Heading` · `Table` · `VisuallyHidden`
 
@@ -109,7 +108,7 @@ Same group: `Code` · `CodeBlock` · `Heading` · `Table` · `VisuallyHidden`
 | Rest | The read view: text on a transparent box with a transparent `--border-default` edge. |
 | Hovered | The read view takes `--ds-background-neutral-subtle-hovered`. |
 | Pressed | Pressing the read view opens the edit view in the same box, with the caret in it. |
-| Focused | The read view draws a `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. |
+| Focused | The read view draws the focus ring; see Border. |
 | Disabled | None. An inline edit has no disabled state. |
 | Editing | The field's fill and `--border-default` input edge appear; nothing else moves. |
 | Invalid | The field stays open with the danger edge and the message in its caption. |

@@ -70,7 +70,7 @@ reply. It appears over the page and goes away on its own or when dismissed.
 
 ## Behavior
 
-<ComponentExample of={FlagStories.UndoTimer} title="Undo with a timer" description="`timer` adds a 4 px countdown bar as the top cap and steps the corners from 12 to 4. Undo is the first action; the change commits in `onDismiss`. Hover or focus pauses the wait for every flag, and the bar dims while it is paused." />
+<ComponentExample of={FlagStories.UndoTimer} title="Undo with a timer" description="`timer` adds a countdown bar as the top cap and steps the corners down. Undo is the first action; the change commits in `onDismiss`. Hover or focus pauses the wait for every flag, and the bar dims while it is paused." />
 
 <ComponentExample of={FlagStories.Dismiss} title="Dismiss" description="The shared CloseButton, last in a default flag's row. A bold flag has none." />
 
@@ -86,7 +86,7 @@ reply. It appears over the page and goes away on its own or when dismissed.
 
 <ComponentExample of={FlagStories.Pressed} title="Pressed" description="Dismiss takes the subtle pressed step." />
 
-<ComponentExample of={FlagStories.Focused} title="Focused" description="Dismiss and each action show the 2px focus ring." />
+<ComponentExample of={FlagStories.Focused} title="Focused" description="Dismiss and each action show the focus ring." />
 
 </div>
 
@@ -104,12 +104,7 @@ reply. It appears over the page and goes away on its own or when dismissed.
 
 <DocsInteractivePlayground
     of={FlagStories.Interactive}
-    description={
-        <>
-            Use the table below to change props, then press Trigger Flag. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below, then press Trigger Flag."
 />
 
 </div>
@@ -132,7 +127,7 @@ state. `FlagGroup` positions a stack of them.
 
 `appearance` alone decides the kind of flag and its controls. A **default flag**
 (`normal`) is for passive news a person can clear: the overlay surface, an `icon`
-that carries the meaning (a status icon name or an element such as an Avatar), the
+that carries the meaning (a status icon name or an element such as an `Avatar`), the
 dismiss × and actions as links. A **bold flag** (`information`, `warning`, `error`,
 `success`) takes the appearance's bold fill, starts collapsed to its title, and
 opens its description and actions behind a chevron; its actions are buttons.
@@ -152,7 +147,7 @@ opens its description and actions behind a chevron; its actions are buttons.
 <tr><th>Appearance</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td>Normal</td><td>The default flag, for passive news a person can clear. Closes itself after 8 seconds. Example: "Notes copied". Set `icon` to a status icon or an Avatar.</td></tr>
+<tr><td>Normal</td><td>The default flag, for passive news a person can clear. Closes itself after <code>delay</code> (default <code>8000</code>). Example: "Notes copied". Set <code>icon</code> to a status icon or an <code>Avatar</code>.</td></tr>
 <tr><td>Information</td><td>Bold. Something worth knowing, on the dark neutral fill. Times out.</td></tr>
 <tr><td>Success</td><td>Bold. A finished action. Times out.</td></tr>
 <tr><td>Warning</td><td>Bold. Something to check before going on. Never closes itself; offers a next action.</td></tr>
@@ -168,15 +163,25 @@ A flag plays a sound as it lands: Error for an error flag, Notify for every othe
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For something the user must read or act on in the page flow, use `SectionMessage`.
+- For a decision that blocks the task until answered, use `Modal`.
+- For help attached to a specific control, use `Tooltip` or `Popup`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
 1. **Icon.** On a default flag the `icon` (the information icon unless set); on a bold flag the appearance glyph. Decorative.
-2. **Title.** What happened, in a few words, at 14 whatever level the page around it is at.
+2. **Title.** What happened, in a few words, in `--heading-xsmall` whatever level the page around it is at.
 3. **Timestamp.** Optional, subtle, after the title.
 4. **Description.** At most one line.
-5. **Actions.** At most two, under the description: links on a default flag, compact Buttons on a bold one; an action with an `href` navigates either way.
+5. **Actions.** At most two, under the description: links on a default flag, compact `Button`s on a bold one; an action with an `href` navigates either way.
 6. **Expand toggle.** Only on a bold flag that has a description or actions; it starts collapsed to its title.
-7. **Dismiss.** The shared CloseButton, named "Dismiss flag", on default flags only.
+7. **Dismiss.** The shared `CloseButton`, named "Dismiss flag", on default flags only.
 
 <DocsCanvasShell description="A flag with its title.">
     <DsCanvasQuiet of={HeadingOutlineStories.FlagTitle} />
@@ -192,10 +197,10 @@ A flag plays a sound as it lands: Error for an error flag, Notify for every othe
 <tr><td>Rest</td><td>The appearance icon color on the overlay surface; a bold flag fills the surface instead.</td></tr>
 <tr><td>Hovered</td><td>The flag does not react; Dismiss and the toggle take the subtle hovered step.</td></tr>
 <tr><td>Pressed</td><td>Dismiss and the toggle take the subtle pressed step.</td></tr>
-<tr><td>Focused</td><td>Dismiss, the toggle and each action show the 2px ring; the ring is inverse on a bold fill.</td></tr>
+<tr><td>Focused</td><td>Dismiss, the toggle and each action show the focus ring; the ring is inverse on a bold fill.</td></tr>
 <tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Expanded</td><td>A bold flag shows its description and actions; collapsed, only the title.</td></tr>
-<tr><td>Autohide</td><td>Normal, information and success close after 8 seconds (keep any `delay` at 8000 or more); warning and error never close themselves.</td></tr>
+<tr><td>Autohide</td><td>Normal, information and success close after <code>delay</code> (default <code>8000</code>; keep any <code>delay</code> at 8000 or more); warning and error never close themselves.</td></tr>
 <tr><td>Dismissed</td><td>The flag leaves the stack.</td></tr>
 </tbody>
 </DocsTable>
@@ -270,7 +275,7 @@ flag: it takes the view's `EmptyState`.
     dontCaption="A failure with no next action."
 />
 
-### Nothing important goes only in a flag.
+### Never put required information only in a flag.
 
 The user can dismiss a flag before reading it, and that takes the only copy
 with it. A rejected form submit stays on the form, in a danger `SectionMessage`
@@ -319,8 +324,7 @@ The × is on default flags only, so a stack is all default flags or all bold.
 - **Announcement needs the region to already exist.** A flag mounted at the same
   moment as its container may not be announced at all. Render `FlagGroup`
   with the page and put flags into it.
-- **The dismiss button is the shared `CloseButton`** on a default flag's surface, with an `aria-hidden` ×. The × and its focus ring are at least
-  3:1 on that surface.
+- **The dismiss button is the shared `CloseButton`** on a default flag's surface, with an `aria-hidden` ×. The × and its focus ring are at least 3:1 on that surface.
 - **The appearance icon is decorative.** It is `aria-hidden`, so the title beside it
   carries the meaning; the color and icon should never carry it alone.
 - **The chevron reports its state.** It sets `aria-expanded`, so a screen reader
@@ -332,9 +336,8 @@ The × is on default flags only, so a stack is all default flags or all bold.
 
 ## Related
 
-- For something the user must read or act on, use `SectionMessage`.
-- For a decision that blocks the task, use `Modal`.
-- For help attached to a specific control, use `Tooltip` or `Popup`.
+- `CloseButton`: use when rendering the dismiss control on a default flag.
+- `EmptyState`: use when a whole view fails to load rather than a background sync.
 
 </div>
 

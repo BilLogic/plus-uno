@@ -96,7 +96,7 @@ category.
 
 <ComponentExample of={TagStories.Selecting} title="Selectable" description={<>A tag with <code>isSelected</code>, true or false, is a toggle that publishes <code>aria-pressed</code>; selected is a full-color border and a fill.</>} />
 
-<ComponentExample of={TagStories.AnswerChips} title="Answer chips" description="Each chip is a selectable tag, toggled with Space, Enter or a click, with the caller holding which are on." />
+<ComponentExample of={TagStories.AnswerChips} title="Answer choices" description="Each option is a selectable tag, toggled with Space, Enter or a click, with the caller holding which are on." />
 
 <ComponentExample of={TagStories.CountOnSelectable} title="Count on a selectable tag" description={<><code>trailingMetric</code> adds a compact neutral Count tag to a selectable tag, such as a filter's result count; on any other tag it is ignored.</>} />
 
@@ -120,13 +120,13 @@ category.
 
 <ComponentExample of={TagStories.StateLayers} title="State layers" description="States use the accent's own steps: hovered the subtlest, pressed the subtlest pressed, selected the subtler; on a removable tag only the × reacts." />
 
-<ComponentExample of={TagStories.FocusRing} title="Focus ring" description="A 2px focus ring 2px outside the tag, or outside the ×." />
+<ComponentExample of={TagStories.FocusRing} title="Focus ring" description="The focus ring sits outside the tag, or outside the ×." />
 
 <ComponentExample of={TagStories.PersonFocusRing} title="Person focus ring" description="On a person tag the ring follows the round shape, and a focused × is round too." />
 
 <ComponentExample of={TagStories.ElevatedDisabled} title="Elevated disabled" description="An elevated tag keeps its solid ground and shadow when disabled; only the label, the swatch, the icon and the avatar turn disabled." />
 
-<ComponentExample of={TagStories.ElevatedRemoveFocus} title="Elevated remove focus" description="Focus on an elevated link's × keeps the same 2px surface gap inside its ring as the tag's own focus." />
+<ComponentExample of={TagStories.ElevatedRemoveFocus} title="Elevated remove focus" description="Focus on an elevated link's × keeps the same surface gap inside its ring as the tag's own focus." />
 
 <ComponentExample of={TagStories.Rest} title="Rest" description="Outlined only, with the hue on the border and neutral text." />
 
@@ -134,7 +134,7 @@ category.
 
 <ComponentExample of={TagStories.Pressed} title="Pressed" description="The accent's subtlest pressed step." />
 
-<ComponentExample of={TagStories.Focused} title="Focused" description="The 2px focus ring, on the tag and on its ×." />
+<ComponentExample of={TagStories.Focused} title="Focused" description="Shows the focus ring on the tag and on its ×." />
 
 <ComponentExample of={TagStories.Disabled} title="Disabled" description="The disabled ground and words, no ×, out of the tab order." />
 
@@ -146,12 +146,7 @@ category.
 
 <DocsInteractivePlayground
     of={TagStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -168,12 +163,28 @@ category.
 
 ## Usage
 
-- **Is it a number?** Count tag.
-- **Is it the condition something is in, and can that condition change?** Status tag.
-- **Otherwise** (a subject, a focus area, a person, a category): Tag.
+Use `Tag` for a subject, a focus area, a person, an agent, a team or a
+category. A tag is outlined and a status is filled, so a reader tells a
+category from a workflow state without reading the words.
 
-Who set the value no longer decides. A tag is outlined and a status is filled,
-so a reader tells a category from a meaning without reading the words.
+- **Is it a number?** `CountTag`.
+- **Is it a due or event date?** `DateTag`.
+- **Is it the condition something is in, and can that condition change?** `StatusTag`.
+- **Otherwise** (a subject, a focus area, a person, a category): `Tag`.
+
+`color` is one of the ten tag hues (`gray`, `blue`, `green`, `purple`, `magenta`, `yellow`, `teal`, `orange`, `lime`, `brown`). `type` is `person`, `agent` or `team` for a tag that leads with an avatar. `isSelected` makes the tag a toggle button (`aria-pressed`); `isLoading` puts a spinner in the leading slot while a toggle or remove is saving.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For one of the five SMART competency areas, use `SmartTag`.
+- For the condition something is in when that condition can change, use `StatusTag`.
+- For a number on its own, use `CountTag`.
+- For a due or event date, use `DateTag`.
+- For a labeled field where the person picks and removes tags, use `TagInput`.
 
 </div>
 
@@ -181,10 +192,10 @@ so a reader tells a category from a meaning without reading the words.
 
 ## Parts
 
-1. **Lead, optional.** Nothing by default. A 10 swatch (`swatchBefore`), an icon (`elemBefore`), or for a person, an agent or a team a 16 avatar.
+1. **Lead, optional.** Nothing by default. A `10` swatch (`swatchBefore`), an icon (`elemBefore`), or for a person, an agent or a team a `16` avatar.
 2. **Label.** Neutral text; the hue never colors the words.
-3. **Trailing metric.** Optional on a selectable tag: a compact Count tag, such as a filter's result count.
-4. **Remove button.** Optional, with the 2px focus ring on the button itself and a name that says what it removes.
+3. **Trailing metric.** Optional on a selectable tag: a compact `CountTag`, such as a filter's result count.
+4. **Remove button.** Optional, with its own focus ring and a name that says what it removes.
 
 ### States
 
@@ -193,10 +204,10 @@ so a reader tells a category from a meaning without reading the words.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>Outlined, clear ground, the hue on the border. 22 tall.</td></tr>
+<tr><td>Rest</td><td>Outlined, clear ground, the hue on the border.</td></tr>
 <tr><td>Hovered, pressed</td><td>A link or a selectable tag takes the accent's subtlest and subtlest pressed steps; a link's words underline. On a removable tag only the × reacts.</td></tr>
 <tr><td>Selected</td><td>The subtler ground with a full-hue border, held under hover and press.</td></tr>
-<tr><td>Focused</td><td>A 2px ring 2px off the edge, on the tag or on the ×.</td></tr>
+<tr><td>Focused</td><td>Shows the focus ring on the tag or on the ×; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Disabled</td><td>Disabled ground and words, no ×, no link, no focus; a selected tag keeps a bold edge.</td></tr>
 </tbody>
 </DocsTable>
@@ -236,7 +247,7 @@ A color names a category; changing it inside one category reads as a different o
 
 ### Keep color for a category, never a status.
 
-Pick a color per category and keep it stable, or leave every tag gray. A condition that can change is a Status tag.
+Pick a color per category and keep it stable, or leave every tag gray. A condition that can change is a `StatusTag`.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">North High</Tag><Tag color="blue">South High</Tag></div>}
@@ -276,7 +287,7 @@ A plain tag is its outline and neutral words. Turn on `swatchBefore` for a tag t
 // Removable: a value the person can take out.
 <Tag isRemovable onAfterRemoveAction={drop}>Grade 4</Tag>
 
-// Selectable: a filter or an answer chip, with its result count.
+// Selectable: a filter or an answer choice, with its result count.
 <Tag isSelected={on} onClick={toggle} trailingMetric={12}>Science</Tag>
 
 // Link, and a link with a separate ×.
@@ -306,7 +317,6 @@ warning.
 ### Lift a tag onto an image with `isElevated`.
 
 ```jsx
-// A subject on a lesson thumbnail, 8 from the corner.
 <Tag color="blue" isElevated>Lincoln Middle</Tag>
 <Tag href="/lessons/42" color="magenta" isElevated>Open lesson</Tag>
 ```
@@ -365,7 +375,7 @@ and every tag inside follows:
 - **Selectable publishes `aria-pressed`**, so the state is not only visible.
   Selected also changes the border to the full hue, so it does not rest on a
   change of lightness alone. A selectable tag given `aria-expanded` is a button
-  that opens something, such as TagGroup's `+n`: it publishes the expanded
+  that opens something, such as `TagGroup`'s `+n`: it publishes the expanded
   state and no `aria-pressed`.
 - **A link with a × is two tab stops**, link then ×, and pressing the × never
   follows the link.
@@ -374,7 +384,7 @@ and every tag inside follows:
   but do nothing until the save lands.
 - **A × needs a name.** When the label is not text, pass `removeButtonLabel`, or the
   × is named only "Remove" and development warns.
-- **An elevated tag's focus ring has a surface gap.** The 2px between the tag
+- **An elevated tag's focus ring has a surface gap.** The gap between the tag
   (or a link's ×) and the ring is filled in the surface color, so the ring
   reads on a dark picture.
 - **Disabled tags take no focus, and say they are disabled.** They come from
@@ -396,10 +406,9 @@ and every tag inside follows:
 
 ## Related
 
-- For a set of tags, use `TagGroup`: it owns the gaps and the overflow.
-- For a number on its own, use `CountTag`.
-- For a labeled field where the person picks, creates and removes tags, use `TagInput`.
-- For a state, use `StatusTag`.
+- `TagGroup`: use when laying out a set of tags with shared spacing, alignment and overflow.
+- `SmartTag`: use when tagging one of the five SMART competency areas.
+- `Suggestion`: use when offering proposed tags for the person to accept.
 
 </div>
 

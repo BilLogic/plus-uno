@@ -112,12 +112,7 @@ a secondary conversation.
 
 <DocsInteractivePlayground
     of={PanelStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -136,9 +131,9 @@ a secondary conversation.
 
 Use `Panel` for context or a focused task beside the page's main content — a
 detail view opened from a list, a filter set, a secondary thread — where
-leaving the page behind, as a `Modal` does, would lose that context. For
-something that must be decided before the page continues, use `Modal`
-instead.
+leaving the page behind, as a `Modal` does, would lose that context. Compose it
+from `PanelHeader`, `PanelSubheader`, `PanelBody` and `PanelFooter` inside
+`PanelContainer`.
 
 Fixed action components cover the common icons: `PanelBackAction`,
 `PanelCloseAction`, `PanelMoreAction`, `PanelUpAction`, `PanelDownAction`,
@@ -149,10 +144,19 @@ its glyph and accessible name already set.
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For something that must be decided before the page continues, use `Modal`.
+- For the page's persistent navigation rail, use `Sidebar`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
-1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default` (400); inside the Frame's Panel area it fills the area instead.
-2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (close, more, …).
+1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default`; inside the Frame's Panel area it fills the area instead.
+2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (`PanelCloseAction`, `PanelMoreAction`).
 3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
 4. **Body** (`PanelBody`). The main content, which scrolls.
 5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.
@@ -193,8 +197,6 @@ its glyph and accessible name already set.
 <div className="sb-ds-doc-section">
 
 ## Best practices
-
-Use a panel for context or a focused task beside the page's main content.
 
 ### Give the panel room to read.
 
@@ -288,10 +290,8 @@ job only risks a different icon or label than the rest of the system uses.
 
 ## Related
 
-- For something that must be decided before the page continues, use `Modal`.
-- <a href="?path=/docs/templates-panel--docs">The Panel pattern</a>, for the Panel as a Frame area with its docked, peek and overlay states; this page is the component inside it.
-- For the page's persistent navigation rail, see `Sidebar`.
-- <a href="?path=/docs/templates-frame--docs">Frame</a> for where the Panel docks, peeks or opens as an overlay at each width.
+- <a href="?path=/docs/templates-panel--docs">Panel template</a>: use when placing Panel as a Frame area with its docked, peek and overlay states.
+- <a href="?path=/docs/templates-frame--docs">Frame</a>: use when configuring where the Panel docks, peeks or opens as an overlay at each width.
 
 </div>
 

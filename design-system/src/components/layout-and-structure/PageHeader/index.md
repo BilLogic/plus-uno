@@ -18,11 +18,12 @@ Also asked as: heading with buttons, header actions, page heading.
 
 ## Usage
 
-Use `PageHeader` once per page, at the top of the Page pattern's body, to
-carry the page's title and the actions that apply to the page as a whole. For
-a heading inside a region of the page, use the
-Section
-pattern's own header instead — `PageHeader` is reserved for the page level.
+Use `PageHeader` once per page layout, at the top of the Page template's body,
+to carry the page's title and primary action or page-level actions. Pass a
+`Breadcrumb` in `breadcrumbs` above the title, page-level controls in `actions`
+at the end of the title row, and `Tabs` or a filter bar in `bottomBar` below it.
+`disableTitleStyles` lets a custom node such as `InlineEdit` replace the default
+heading wrapper.
 
 ## Motion
 
@@ -31,6 +32,10 @@ PageHeader reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Scroll to a spot on the page | `--ds-motion-linear` | The small title fades over 24 px of scroll; actions and tabs travel up and pin. It follows the scroll one to one. |
+
+## Alternatives
+
+- For a heading inside a region of the page rather than the page itself, use `Heading`.
 
 ## Best practices
 
@@ -55,7 +60,7 @@ Every extra row pushes content down; add a part only when the page uses it.
 Do: Title and one action.
 Don't: Breadcrumbs, actions and bottom bar all on.
 
-### `title` or `children` — not both. {#title-or-children-not-both}
+### Pass the title through `title` or `children`, not both. {#pass-the-title-through-title-or-children-not-both}
 
 Pass the title through `title`, or through `children` when that reads more
 naturally in the surrounding code; `children` is only used when `title` is
@@ -69,25 +74,24 @@ not given.
 />
 ```
 
-### Reach for `disableTitleStyles` only when the title isn't plain text. {#reach-for-disabletitlestyles-only-when-the-title-isn-t-plain-text}
+### Reach for `disableTitleStyles` only when the title is not plain text. {#reach-for-disabletitlestyles-only-when-the-title-is-not-plain-text}
 
-The default renders the title in a `Heading`. Turn styling off when the
-title itself needs to be something other than text that a `Heading` can
-wrap — a custom element already carrying its own heading semantics.
+The default renders the title in a `Heading`. Turn styling off only when the
+title is a custom element already carrying its own heading semantics.
 
 ## Accessibility
 
 - **A real heading.** The title renders as an `h2` by default, giving the
   page one clear entry point for assistive technology navigating by
   heading.
-- **Breadcrumbs keep their own semantics.** `PageHeader` doesn't wrap
+- **Breadcrumbs keep their own semantics.** `PageHeader` does not wrap
   `breadcrumbs` in extra markup — pass a `Breadcrumb` component, which
   carries its own navigation landmark.
 
 ## Related
 
-- For a heading inside a region of the page, use the Section pattern.
-- For the trail shown above the title, use `Breadcrumb`.
+- [Section](?path=/docs/templates-section--docs): use when heading a section inside a page.
+- `Breadcrumb`: use when rendering the hierarchy trail above the page title.
 
 Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 

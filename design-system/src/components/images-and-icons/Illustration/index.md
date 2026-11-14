@@ -16,6 +16,10 @@ Also asked as: mascot.
 
 ## Usage
 
+Use `Illustration` in empty states, onboarding and feature moments where a PLUS
+character sets the tone. In an empty state, the header and action do the work; the illustration is decorative and hidden from assistive technology. Pass a `title` only when the character sits alone with no heading beside it. Which character pairs with which SMART area or math
+moment is on Illustrations.
+
 ```jsx
 import { Illustration } from '@/components';
 
@@ -23,11 +27,11 @@ import { Illustration } from '@/components';
 <Illustration character="advocacy" size={96} title="Advocacy" />
 ```
 
-| Prop | Type | Default | What it does |
-| --- | --- | --- | --- |
-| `character` | One of twelve | `mastering-content` | The SMART characters `mastering-content`, `advocacy`, `technology`, `relationships` and `social-emotional`; the math characters `dot`, `approximately-equal`, `root`, `all`, `pi`, `equal` and `divider`. |
-| `size` | Number | 96 | The frame's width and height in pixels: 48, 96, 160 or 240. |
-| `title` | String | None | Makes the character an image with this name. Without it the character is decorative and hidden. |
+## Alternatives
+
+- For a small square picture of a school or tool or lesson, use `Tile`.
+- For a person or an agent, use `Avatar`.
+- For a photo or raster screenshot, use `Image`.
 
 ## Best practices
 
@@ -36,7 +40,7 @@ import { Illustration } from '@/components';
 Do: Decorative beside a heading that already says it.
 Don't: A title that repeats the heading, so it is read twice.
 
-### Give a character room. {#give-a-character-room}
+### Give a character room for its limbs. {#give-a-character-room-for-its-limbs}
 
 Do: Room on every side the limbs reach.
 Don't: Clipping the box cuts off the limbs.
@@ -49,39 +53,23 @@ Don't: Clipping the box cuts off the limbs.
 - **`title` makes it one image with a name.** The character becomes
   `role="img"` with that name, and its parts stay hidden, so it is announced
   once. Give it a title only when it carries meaning on its own.
-- **The line ratio is a property of the source art.** The line work measures
-  about 2.6:1 on the bodies in Light and about 2.7:1 in Dark. That is under 3:1,
-  and it is fine for decoration, which has no contrast requirement. Never put
-  information in a character that a person needs to read.
+- **Never put required information in the drawing alone.** The line work is
+  decorative art; state any meaning in visible text or `title`.
 - **Every mode.** Bodies and line work take their colors from tokens alone, so
-  a character follows Light, Dark and increased contrast with nothing to set.
+  a character follows Light, Dark and increased contrast automatically.
 
 ## Related
 
-- Illustrations for which character to use, and when.
-- For a small square picture of a thing, use `Tile`.
-- For a person, use `Avatar`.
+- Illustrations: use when choosing a character or checking its safe-area clearance and body token.
+- `EmptyState`: use when pairing a character with a heading, body and action in an empty view.
 
 Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Image` · `Object` · `Tile`
-
-## Anatomy
-
-- **Frame.** A 1000 × 1000 square in Figma, scaled to `size` in code. It is the
-  layout box: what sits next to a character lines up with the frame.
-- **Body.** The textured shape, in the body token. The stipple texture is part
-  of the art, so the body reads as soft at every size.
-- **Face, arms and legs.** Line work in `--ds-icon-subtle`. Most characters
-  reach past the frame with their limbs.
-
-`character` picks one of the twelve. The galleries, and which character goes
-with which SMART area, are on
-Illustrations.
 
 ## Parts
 
 1. **Frame.** The square layout box, `size` wide and high. The limbs reach past it and are never clipped.
 2. **Body.** The textured shape, filled from a body token and masked by the stipple.
-3. **Line work.** The face, arms and legs, in one icon token.
+3. **Line work.** The face, arms and legs, in `--ds-icon-subtle`.
 
 ### States
 

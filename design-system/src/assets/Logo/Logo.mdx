@@ -1,6 +1,11 @@
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as LogoStories from './Logo.stories.jsx';
-import { ComponentExample, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -26,7 +31,7 @@ export const figmaMeta = {
 
 <Title />
 
-The application Logo. Seven sizes from 16 to 96 and six appearances. The mark alone, or the lockup with the wordmark from size 24.
+The PLUS application logo in seven sizes (`16` to `96`) and six appearances: the mark alone, or the lockup with the wordmark from size `24` up. Brand rules, clear space and construction live on [Logos](?path=/docs/foundations-brand-logos--docs).
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19592-515"
@@ -39,7 +44,7 @@ The application Logo. Seven sizes from 16 to 96 and six appearances. The mark al
 
 ## Size
 
-<ComponentExample of={LogoStories.Sizes} title="Sizes" description="The mark at 16, 20, 24, 32, 48, 64 and 96. From 24 down, a drawing made for small sizes keeps the plus open." />
+<ComponentExample of={LogoStories.Sizes} title="Sizes" description="The mark at 16, 20, 24, 32, 48, 64 and 96. From 24 down, a small-size drawing keeps the plus open." />
 
 <ComponentExample of={LogoStories.SizesDark} title="Sizes in dark mode" description="The same sizes on the dark ground, where the glows are drawn stronger." />
 
@@ -49,7 +54,7 @@ The application Logo. Seven sizes from 16 to 96 and six appearances. The mark al
 
 ## Lockup
 
-<ComponentExample of={LogoStories.Lockup} title="Lockup" description="wordmark adds the wordmark from size 24. Below 24 the mark stands alone." />
+<ComponentExample of={LogoStories.Lockup} title="Lockup" description={<><code>wordmark</code> adds the wordmark from size 24 up. Below 24 the mark stands alone.</>} />
 
 <ComponentExample of={LogoStories.LockupDark} title="Lockup in dark mode" description="The lockup on the dark ground." />
 
@@ -71,7 +76,94 @@ The application Logo. Seven sizes from 16 to 96 and six appearances. The mark al
 
 <ComponentExample of={LogoStories.ClearSpace} title="Clear space" description="Half the mark's height on every side of the lockup." />
 
-The keyline grid, circles and plus-arm measures are drawn on the Logos page under Foundations, which holds the brand guidance. See [Logos: Construction](?path=/docs/foundations-brand-logos--docs#foundation-construction).
+Keyline grid, circles, plus-arm measures and alt-text rules live on [Logos](?path=/docs/foundations-brand-logos--docs#foundation-construction).
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={LogoStories.Playground}
+    description="Change props in the table below."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `Logo` to mark PLUS in the sidebar header, sign-in, email headers and the loading screen. Brand rules, color options, clear space and construction live on <a href="?path=/docs/foundations-brand-logos--docs">Logos</a>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For partner or tool logos or school crests or lesson thumbnails, use `Tile`.
+- For a person or team or agent, use `Avatar`.
+- For an action or object glyph, use `Icon`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Logomark.** The PLUS plus-sign tile at height `size` (`16` to `96`). At `SMALL_MAX_SIZE` (`24`) and below, it uses the small-size drawing.
+2. **Wordmark** (optional). Shown beside the logomark when `wordmark` is true and `size` is at least `LOCKUP_MIN_SIZE` (`24`).
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. The logo is brand artwork, not a control.</td></tr>
+<tr><td>Hovered, pressed, focused</td><td>None on `Logo` itself; when the logo links home, the wrapping link or button carries focus and interaction states.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+The logomark's glows and fills use fixed brand palette colors (`Logo.scss`); in the colored appearance the wordmark follows `--ds-text`, so it tracks the color mode.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Pick a `LOGO_SIZES` step rather than scaling by hand.
+
+`size` takes a step from `LOGO_SIZES`; never stretch or resize the SVG with custom CSS.
+
+### Use `wordmark` from `LOCKUP_MIN_SIZE` up.
+
+Below `LOCKUP_MIN_SIZE` (`24`), `Logo` renders the mark alone even when `wordmark` is set.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Labeled SVG.** `Logo` renders an SVG with `role="img"` and `aria-label="PLUS"`.
+- **Alt-text and link rules.** When the logo sits beside a visible PLUS title or inside a home link, follow the alt-text table on <a href="?path=/docs/foundations-brand-logos--docs">Logos</a>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a href="?path=/docs/foundations-brand-logos--docs">Logos</a>: use when checking brand rules, color options, clear space or construction geometry.
+- `Sidebar`: use when rendering the application navigation rail that holds `Logo` in its header row.
+- `Tile`: use when framing a third-party tool or school logo.
 
 </div>
 

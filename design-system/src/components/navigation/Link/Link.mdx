@@ -62,7 +62,7 @@ sentence of UI copy.
 
 <ComponentExample of={LinkStories.Pressed} title="Pressed" description="Default and subtle take the pressed link ink." />
 
-<ComponentExample of={LinkStories.Focused} title="Focused" description="The 2px ring, 2px off the link; inverse draws the inverse ring color." />
+<ComponentExample of={LinkStories.Focused} title="Focused" description="Shows the focus ring on the link; inverse draws the inverse ring color." />
 
 </div>
 
@@ -80,12 +80,7 @@ sentence of UI copy.
 
 <DocsInteractivePlayground
     of={LinkStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -103,9 +98,18 @@ sentence of UI copy.
 ## Usage
 
 Use `Link` for navigation inside a sentence or a block of text — "see the
-session report," "read more." For a standalone action styled like a button,
-use `Button` or `LinkButton` instead; `Link`'s appearances are for text, not
+session report," "read more." `Link`'s appearances are for inline text, not
 for a control that stands on its own.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a standalone navigation action styled like a button, use `LinkButton`.
+- For an action that triggers in-page behavior rather than navigating to a URL, use `Button`.
+- For a trail of links showing where a page sits in a hierarchy, use `Breadcrumb`.
 
 </div>
 
@@ -127,7 +131,7 @@ for a control that stands on its own.
 <tr><td>Rest</td><td>Default in the link ink, underlined; visited in the visited ink.</td></tr>
 <tr><td>Hovered</td><td>Subtle is underlined; default keeps its ink.</td></tr>
 <tr><td>Pressed</td><td>The pressed link ink on default and subtle.</td></tr>
-<tr><td>Focused</td><td>The 2px ring, 2px off the link; the inverse ring on a dark fill.</td></tr>
+<tr><td>Focused</td><td>Shows the focus ring on the link; the inverse ring on a dark fill. See <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Disabled</td><td>Not a state. A link with nowhere to go is plain text, not a dimmed link.</td></tr>
 </tbody>
 </DocsTable>
@@ -228,8 +232,8 @@ A link is inline text. When the action stands alone, such as Save or Continue, i
 
 ## Related
 
-- For a standalone action styled like a button, use `LinkButton`.
-- For a trail of links showing where a page sits, use `Breadcrumb`.
+- `LinkButton`: use when rendering a standalone navigation control with button sizing and padding.
+- `Breadcrumb`: use when rendering a hierarchy trail of ancestor links above a page title.
 
 </div>
 

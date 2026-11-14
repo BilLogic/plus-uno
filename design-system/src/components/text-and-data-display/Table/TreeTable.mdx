@@ -86,7 +86,7 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 <ComponentExample of={TreeTableStories.Rest} title="Rest" description={<>A row is clear; a parent's title cell carries the chevron, a leaf keeps the empty box.</>} />
 
-<ComponentExample of={TreeTableStories.Focused} title="Focused" description={<>The focused row draws the 2px ring inset on the row, never a fill.</>} />
+<ComponentExample of={TreeTableStories.Focused} title="Focused" description="The focused row draws the focus ring inset on the row, never a fill." />
 
 </div>
 
@@ -110,8 +110,16 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 ## Usage
 
-Use a Tree table for records that nest: a curriculum of units and lessons, a
-folder of sessions. For a flat list, use the Static or Dynamic table instead.
+Use `TreeTable` for records that nest up to three levels: a curriculum of units
+and lessons, a folder of sessions.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a flat grid people read or sort or page, use `Table`.
 
 </div>
 
@@ -120,7 +128,7 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 ## Parts
 
 1. **Head cell.** A label, as in the other tables.
-2. **Chevron.** 12 tall in a 24 hit area, leading a parent's title cell; a spinner while children load.
+2. **Chevron.** `12` tall in a `24` hit area, leading a parent's title cell; a spinner while children load.
 3. **Indent.** One `--table-indent` step per level, up to three levels.
 4. **Count.** An optional count beside a parent's name.
 5. **Message row.** Under an open parent that is loading or has nothing in it.
@@ -134,7 +142,7 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 <tbody>
 <tr><td>Rest</td><td>Clear rows; depth shows as indentation.</td></tr>
 <tr><td>Hovered, pressed</td><td>The row takes the subtle hovered and pressed steps.</td></tr>
-<tr><td>Focused</td><td>The 2px ring inset on the row; focus is never a fill.</td></tr>
+<tr><td>Focused</td><td>Shows the focus ring inset on the row; focus is never a fill.</td></tr>
 <tr><td>Expanded, collapsed, loading</td><td>The chevron points down or right, or turns into a spinner.</td></tr>
 <tr><td>Disabled</td><td>Not applicable.</td></tr>
 </tbody>
@@ -160,8 +168,6 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 <div className="sb-ds-doc-section">
 
 ## Best practices
-
-Use a tree table for records that nest, up to three levels, where every level shares the same columns.
 
 ### Keep every column at every level.
 
@@ -226,8 +232,8 @@ Use a tree table for records that nest, up to three levels, where every level sh
 
 ## Related
 
-- For a flat grid people only read, use the Static table.
-- For a flat table people sort, filter, select or page, use the Dynamic table.
+- `DynamicTable`: use when sorting, selecting or paging flat rows on the same table shell.
+- <a href="?path=/docs/templates-table--docs">Table</a>: use when choosing between Static, Dynamic and Tree tables.
 
 </div>
 

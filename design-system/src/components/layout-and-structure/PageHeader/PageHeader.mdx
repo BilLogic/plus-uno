@@ -91,12 +91,7 @@ its side, and a bottom bar below.
 
 <DocsInteractivePlayground
     of={PageHeaderStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -113,11 +108,20 @@ its side, and a bottom bar below.
 
 ## Usage
 
-Use `PageHeader` once per page, at the top of the Page pattern's body, to
-carry the page's title and the actions that apply to the page as a whole. For
-a heading inside a region of the page, use the
-<a target="_top" href="./?path=/docs/templates-section--docs">Section</a>{' '}
-pattern's own header instead — `PageHeader` is reserved for the page level.
+Use `PageHeader` once per page layout, at the top of the Page template's body,
+to carry the page's title and primary action or page-level actions. Pass a
+`Breadcrumb` in `breadcrumbs` above the title, page-level controls in `actions`
+at the end of the title row, and `Tabs` or a filter bar in `bottomBar` below it.
+`disableTitleStyles` lets a custom node such as `InlineEdit` replace the default
+heading wrapper.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a heading inside a region of the page rather than the page itself, use `Heading`.
 
 </div>
 
@@ -165,8 +169,6 @@ pattern's own header instead — `PageHeader` is reserved for the page level.
 
 ## Best practices
 
-Use one page header per page, for the title and the actions that apply to the whole page.
-
 ### Show the trail on nested pages.
 
 Breadcrumbs tell the person where they are; on a page two levels down they are the way back.
@@ -207,7 +209,7 @@ Every extra row pushes content down; add a part only when the page uses it.
     dontCaption="Breadcrumbs, actions and bottom bar all on."
 />
 
-### `title` or `children` — not both.
+### Pass the title through `title` or `children`, not both.
 
 Pass the title through `title`, or through `children` when that reads more
 naturally in the surrounding code; `children` is only used when `title` is
@@ -221,11 +223,10 @@ not given.
 />
 ```
 
-### Reach for `disableTitleStyles` only when the title isn't plain text.
+### Reach for `disableTitleStyles` only when the title is not plain text.
 
-The default renders the title in a `Heading`. Turn styling off when the
-title itself needs to be something other than text that a `Heading` can
-wrap — a custom element already carrying its own heading semantics.
+The default renders the title in a `Heading`. Turn styling off only when the
+title is a custom element already carrying its own heading semantics.
 
 </div>
 
@@ -253,7 +254,7 @@ wrap — a custom element already carrying its own heading semantics.
 - **A real heading.** The title renders as an `h2` by default, giving the
   page one clear entry point for assistive technology navigating by
   heading.
-- **Breadcrumbs keep their own semantics.** `PageHeader` doesn't wrap
+- **Breadcrumbs keep their own semantics.** `PageHeader` does not wrap
   `breadcrumbs` in extra markup — pass a `Breadcrumb` component, which
   carries its own navigation landmark.
 
@@ -263,9 +264,8 @@ wrap — a custom element already carrying its own heading semantics.
 
 ## Related
 
-- For a heading inside a region of the page, use the
-  <a target="_top" href="./?path=/docs/templates-section--docs">Section</a> pattern.
-- For the trail shown above the title, use `Breadcrumb`.
+- [Section](?path=/docs/templates-section--docs): use when heading a section inside a page.
+- `Breadcrumb`: use when rendering the hierarchy trail above the page title.
 
 </div>
 

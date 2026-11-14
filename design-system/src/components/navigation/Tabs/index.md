@@ -18,17 +18,17 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 ## Usage
 
-Use `Tabs` for the tab bar that switches between sibling views of the same
-subject — a student's Overview / Sessions / Progress, or the sections of an
-admin page. Compose it from `Tabs.Tab` children, and declare a `Tabs.Panel`
-alongside each one when the tab's content should be owned by the component
-rather than rendered separately.
+Use `Tabs` for the tab bar that switches between sibling views on the same page
+— a student's Overview / Sessions / Progress, or the sections of an admin page.
+Compose it from `Tabs.Tab` children, and declare a `Tabs.Panel` alongside each
+one when the tab's content should be owned by the component rather than rendered
+separately.
 
 It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
 `onSelect`). `alignment` covers left, center, right and `justified`, which
 stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
-`pill` (a filled, rounded selected tab); `spacing` is `default` (32px) or
-`compact` (24px).
+`pill` (a filled, rounded selected tab); `spacing` is `default` (`--item-height-md`) or
+`compact` (`--item-height-sm`).
 
 ## Motion
 
@@ -38,9 +38,16 @@ Tabs reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Switch views | `--ds-motion-spatial-fast` | The indicator glides; both tab bodies slide together toward the chosen tab, no fade. Pill views: the fill glides and the content swaps in place. |
 
+## Alternatives
+
+- For navigating to a different page in a hierarchy, use `Breadcrumb` or `Sidebar`.
+- For more options than fit on one strip without wrapping, use `Select`.
+- For a second-level choice inside a view, use `PopupSelect`.
+- For filtering a list rather than switching between views, use `FilterMenu` or `RadioGroup`.
+
 ## Best practices
 
-### A controlled bar needs `onSelect`, or it will never move. {#a-controlled-bar-needs-onselect-or-it-will-never-move}
+### Pass `onSelect` whenever `activeKey` is controlled. {#pass-onselect-whenever-activekey-is-controlled}
 
 ```jsx
 // Incorrect — activeKey pins the bar and nothing updates it.
@@ -56,7 +63,7 @@ Tabs reads these motion tokens and no literal duration or curve.
 </Tabs>
 ```
 
-### Every `Tabs.Tab` needs an `eventKey` — selection is keyed off it. {#every-tabs-tab-needs-an-eventkey-selection-is-keyed-off-it}
+### Give every `Tabs.Tab` an `eventKey`. {#give-every-tabs-tab-an-eventkey}
 
 ```jsx
 // Incorrect — with no eventKey, there is no key to compare against activeKey,
@@ -92,18 +99,16 @@ A label names a view. A count or status in it changes the name and breaks the pa
 Do: The label names the view.
 Don't: Counts and status in the label.
 
-### Pill views are a fixed set, and a page has one tab system. {#pill-views-are-a-fixed-set-and-a-page-has-one-tab-system}
+### Keep one tab system per page and use `PopupSelect` for a second-level choice. {#keep-one-tab-system-per-page-and-use-popupselect-for-a-second-level-choice}
 
-A `pill` strip is a view switch: a fixed set of views of one subject, such as Overview, Sessions and Progress. The set is decided when the page is designed, so the strip has no add-view control and people cannot create, rename, reorder or remove a tab. A strip that must grow with the data is a list or a `Select`, not tabs.
+A `pill` strip is a fixed set of views of one subject, decided when the page is designed, so it has no add-view control and people cannot create, rename, reorder or remove a tab. A strip that must grow with the data is a list or a `Select`, not tabs. A page has one tab system: the underline strip under the page header switches the page's sections, and a pill strip inside a card switches that card's views, without stacking two strips of the same kind. For a second-level choice inside a view, use the labeled trigger of `PopupSelect` ("Status: Upcoming") in the view's toolbar.
 
-A page has one tab system. The underline strip under the page header switches the page's sections, and a pill strip inside a card switches that card's views, but a page does not stack a second strip of the same kind beside or under the first. For a second-level choice inside a view, use the labeled trigger of `PopupSelect` ("Status: Upcoming") in the view's toolbar. It reads the label and the current value, and a pick swaps the content under it in place.
-
-Do: One strip for the sections; a labeled dropdown for the choice inside one.
+Do: One strip for the sections; a labeled PopupSelect for the choice inside one.
 Don't: A second strip under the first, so two tab systems compete.
 
-### Switching is near-instant and happens in place. {#switching-is-near-instant-and-happens-in-place}
+### Swap content in place without sliding. {#swap-content-in-place-without-sliding}
 
-Switching tabs is a frequent action. The selected marker changes on the short duration and standard easing, and the content under the strip swaps in place with no slide or fade-through. Reduced motion removes the transition and the marker changes at once.
+Switching tabs is a frequent action. The selected marker transitions quickly, and the content under the strip swaps in place with no slide or fade-through. Reduced motion removes the transition and the marker changes at once.
 
 ## Accessibility
 
@@ -117,16 +122,12 @@ Switching tabs is a frequent action. The selected marker changes on the short du
   discoverable, but is never selected — `isDisabled` keeps it out of
   `activeKey` contention without removing it from the strip's keyboard path.
 - **`aria-controls` is omitted rather than dangled.** A `Tabs.Tab` with no
-  matching `Tabs.Panel` gets no pointer at all — an id that is not in the
-  document sends assistive technology to nothing, which is worse than pointing
-  nowhere.
+  matching `Tabs.Panel` gets no pointer at all.
 
 ## Related
 
-- For navigating to a different page, use the Top bar pattern or `Breadcrumb` — tabs imply the content stays in place.
-- For more tabs than fit the width, use `Select` — the strip is `flex-wrap: wrap`, so the overflow becomes a second row of tabs rather than a scroll or an overflow menu, and the row the reader is on stops being obvious.
-- For a second-level choice inside a view, use the labeled trigger of `PopupSelect`, which reads "Label: Value" and swaps the content in place; a page keeps one tab system.
-- For filtering a list rather than switching between views, use `Select` or `RadioGroup` — filters combine, tabs do not.
+- `PageHeader`: use when placing a page-level `Tabs` strip in the header's `bottomBar` slot.
+- `PopupSelect`: use when adding a second-level view choice inside a tab's toolbar.
 
 Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 
@@ -144,7 +145,7 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 | Rest | Subtle ink on a clear ground. |
 | Hovered | The subtle neutral hovered fill. |
 | Pressed | The subtle neutral pressed fill. |
-| Focused | The 2px ring, 2px off the tab; no fill. |
+| Focused | Shows the focus ring on the tab with no fill; see Border. |
 | Selected | Selected ink with the underline bar, or the neutral fill with the default ink in `pill`. |
 | Disabled | Disabled ink; the tab cannot be pressed or selected. |
 

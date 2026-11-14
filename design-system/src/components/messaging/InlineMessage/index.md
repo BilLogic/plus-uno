@@ -23,10 +23,6 @@ beside it, such as why a field is required or what a score means, without
 taking up space until someone asks. It is built on `Popup`, so placement,
 dismissal and focus return are shared with every other popup in the system.
 
-For a message that belongs to a whole page or section and should always be
-visible, use `Banner` or `SectionMessage` instead. `InlineMessage` is for
-detail that most people will never need to open.
-
 ### Appearance guidance
 
 | Appearance | When to use |
@@ -44,6 +40,11 @@ InlineMessage reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Makes room, then fades in. |
 | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Fades, then the room closes. |
+
+## Alternatives
+
+- For a message that belongs to a page or section and should always be visible, use `SectionMessage`.
+- For a short plain-text label on hover or focus over a control, use `Tooltip`.
 
 ## Best practices
 
@@ -86,8 +87,8 @@ accessible name and its tooltip. Write "Why this field is required", not
 
 ## Related
 
-- For the popup mechanics this component is built on, see `Popup`.
-- For a message that stays visible without being opened, use `SectionMessage` or `Banner`.
+- `Popup`: use when configuring the anchored overlay surface this component is built on.
+- `IconButton`: use when rendering the compact icon trigger button.
 
 Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
@@ -103,7 +104,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `NotificationItem` 
 | Rest | The icon in its appearance color; the popup closed. |
 | Hovered | The subtle neutral fill behind the icon button. |
 | Pressed | A stronger neutral fill. |
-| Focused | The 2px ring, 2px off the trigger, for keyboard focus only. |
+| Focused | Shows the focus ring on the trigger for keyboard focus; see Border. |
 | Disabled | Not supported. |
 | Open | The Popup is shown with its own fill, shadow and radius. |
 

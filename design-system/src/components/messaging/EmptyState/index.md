@@ -38,8 +38,14 @@ of the form summarizes it. A failure in the background is a `Flag`.
 
 | Spacing | When to use |
 | --- | --- |
-| Default | A whole view or panel. The header is Heading/medium 20. |
-| Compact | A table body or a card. The header is Heading/small 16, with a smaller picture. |
+| Default | A whole view or panel, with the header at `--heading-medium`. |
+| Compact | A table body or a card, with the header at `--heading-small` and a smaller picture. |
+
+## Alternatives
+
+- For a rejected form submit at the top of a form, use `SectionMessage`.
+- For a background failure such as a sync or autosave that failed out of sight, use `Flag`.
+- For a view that is still fetching its data, use `Skeleton` or `Spinner`.
 
 ## Best practices
 
@@ -92,10 +98,9 @@ Don't: An EmptyState under a Table with an empty body.
 
 ## Related
 
-- `Table`, whose `emptyState` slot takes it.
-- `Illustration`, for the image slot.
-- `Flag`, for a failure in the background that stays until closed.
-- `SectionMessage`, for a rejected form submit at the top of the form.
+- `StaticTable`: use when passing `EmptyState` into a table's `emptyState` slot.
+- `Illustration`: use when placing a PLUS character in the `image` slot.
+- Empty: use when choosing empty and error states across pages, sections and tables.
 
 Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
@@ -104,7 +109,7 @@ Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `NotificationIte
 1. **Picture.** An `image` slot or a Font Awesome Free `icon`. Decorative and hidden from assistive technology.
 2. **Header.** A heading one level below the section that holds it.
 3. **Description.** One line on what goes here and what to do.
-4. **Actions.** One primary Button and an optional secondary one.
+4. **Actions.** One primary `Button` and an optional secondary one.
 
 ### States
 

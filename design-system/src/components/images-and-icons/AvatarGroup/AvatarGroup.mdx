@@ -83,16 +83,15 @@ overlap, the ring between neighbors, and how many fit on the row.
 
 ## State
 
-<ComponentExample of={AvatarGroupStories.Rest} title="Rest" description={<>Rest. The <code>+n</code> is the only part of the group that is a control.</>} />
+<ComponentExample of={AvatarGroupStories.Rest} title="Rest" description={<>The <code>+n</code> is the only part of the group that is a control.</>} />
 
-<ComponentExample of={AvatarGroupStories.Hovered} title="Hovered" description={<>Hovered. The <code>+n</code> steps to the subtle gray fill.</>} />
+<ComponentExample of={AvatarGroupStories.Hovered} title="Hovered" description={<>The <code>+n</code> steps to the subtle gray fill.</>} />
 
-<ComponentExample of={AvatarGroupStories.Focused} title="Focused" description={<>Focused. A 2px ring, 1px off the button, for keyboard focus.</>} />
+<ComponentExample of={AvatarGroupStories.Focused} title="Focused" description={<>Shows the focus ring on the <code>+n</code> button for keyboard focus.</>} />
 
-<ComponentExample of={AvatarGroupStories.Pressed} title="Pressed" description={<>Pressed. Opens the menu of the people left out; Escape closes it.</>} />
+<ComponentExample of={AvatarGroupStories.Pressed} title="Pressed" description="Opens the menu of the people left out; Escape closes it." />
 
-<ComponentExample of={AvatarGroupStories.Disabled} title="Disabled" description={<>Disabled. With nothing to fold there is no control at all.</>} />
-
+<ComponentExample of={AvatarGroupStories.Disabled} title="Disabled" description="With nothing to fold there is no control at all." />
 
 </div>
 
@@ -102,12 +101,7 @@ overlap, the ring between neighbors, and how many fit on the row.
 
 <DocsInteractivePlayground
     of={AvatarGroupStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -128,8 +122,14 @@ Use `AvatarGroup` for a short set of people that would crowd a line: the
 attendees of a session, the members of a team. Past `max`, the rest fold into
 a `+n` menu, reachable by name.
 
-Use plain `Avatar` elements, not `AvatarGroup`, where there is room to name
-each person beside their picture.
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a single person or agent with room to name each person beside their picture, use `Avatar`.
+- For the signed-in person with a name and a role, use `Sidebar`.
 
 </div>
 
@@ -137,7 +137,7 @@ each person beside their picture.
 
 ## Parts
 
-1. **Avatars.** Up to `max`; when people overflow, `max` minus one plus the `+n`. Each the group's size and shape, overlapping by a quarter.
+1. **Avatars.** Up to `max`; when people overflow, `max` minus one plus the `+n`. Each takes the group's size and shape, overlapping by a quarter.
 2. **Ring.** A surface-colored ring around each avatar that separates neighbors.
 3. **Overflow.** A gray `+n` button that opens a menu of the people left out, by name.
 
@@ -151,7 +151,7 @@ each person beside their picture.
 <tr><td>Rest</td><td>Overlapping avatars; the <code>+n</code> in <code>--ds-background-accent-gray-subtler</code>.</td></tr>
 <tr><td>Hovered</td><td>The <code>+n</code> takes <code>--ds-background-accent-gray-subtle</code>. The avatars do not change.</td></tr>
 <tr><td>Pressed</td><td>Opens the menu and sets <code>aria-expanded</code>. Escape closes it.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> on the <code>+n</code>, for keyboard focus only.</td></tr>
+<tr><td>Focused</td><td>Shows the focus ring on the <code>+n</code> for keyboard focus; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Disabled</td><td>None. With nothing to fold there is no <code>+n</code>, only pictures.</td></tr>
 </tbody>
 </DocsTable>
@@ -188,16 +188,16 @@ row stays even even when a child sets its own.
     dontCaption="Children that set their own size and shape, which the group ignores."
 />
 
-### `max` counts the `+n` in.
+### Count the `+n` slot inside `max`.
 
-Five people with `max={5}` show all five; a sixth pushes one into `+2` —
-`max` is the most avatars the row ever shows, the `+n` included.
+Five people with `max={5}` show all five; a sixth pushes one into the overflow
+slot — `max` is the most slots the row ever shows, the `+n` included.
 
 <DoDontPair
     doExample={<AvatarGroup label="Attendees" max={3}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /><Avatar name="Ana Ruiz" /></AvatarGroup>}
-    doCaption="Three people fit in max 3, with no +n."
+    doCaption="Three people fit in the cap with no +n."
     dontExample={<AvatarGroup label="Attendees" max={3}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /><Avatar name="Ana Ruiz" /><Avatar name="Li Wei" /></AvatarGroup>}
-    dontCaption="A fourth person shows two avatars and +2, because the +n takes a slot."
+    dontCaption="A fourth person shows two avatars and +n, because the +n takes a slot."
 />
 
 ### Keep the group short.
@@ -235,8 +235,8 @@ Use it for a handful of people. For a roster, link to the list instead of foldin
 
 - **Name the group.** `label` names the group for assistive technology —
   "Session attendees" — the same way `Avatar`'s `label` names a person.
-- **The `+n` is a named button.** It reads "+3, 3 more people", opens a menu
-  of the hidden people by name, reached with Tab and closed with Escape.
+- **The `+n` is a named button.** It announces the count of hidden people and
+  opens a menu of their names, reached with Tab and closed with Escape.
 - **Every shown avatar keeps its own name.** The group changes `size` and
   `shape`, never an avatar's accessible name.
 
@@ -246,8 +246,8 @@ Use it for a handful of people. For a roster, link to the list instead of foldin
 
 ## Related
 
-- For a single person or agent, use `Avatar`.
-- For the signed-in person, with a name and a role, use the Sidebar's account row.
+- `Avatar`: use when configuring each child avatar's name, picture, initials or fallback.
+- `Popup`: use when building a custom anchored overlay outside an avatar stack.
 
 </div>
 

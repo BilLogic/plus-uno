@@ -22,9 +22,12 @@ column that holds only checkboxes, the count in a status message, a table
 caption the layout already explains.
 
 It renders the `.visually-hidden` class on a `span`, which is one pixel
-square, clipped, out of the flow and kept in the accessibility tree. Existing
-markup that writes `className="visually-hidden"` is the same thing and can move
-to the component as it is touched.
+square, clipped, out of the flow and kept in the accessibility tree. Existing markup that writes `className="visually-hidden"` is the same thing and can move to the component as it is touched.
+
+## Alternatives
+
+- For an icon-only button that already takes a required `label` prop, use `IconButton`.
+- For a short visible label on hover and focus over a control, use `Tooltip`.
 
 ## Best practices
 
@@ -49,7 +52,7 @@ Hidden text that duplicates visible text is read twice.
 Do: The visible label speaks for itself.
 Don't: The label echoed in hidden text.
 
-### Hide with this, not with `display: none`. {#hide-with-this-not-with-display-none}
+### Hide with `VisuallyHidden`, not with `display: none`. {#hide-with-visuallyhidden-not-with-display-none}
 
 `display: none` and the `hidden` attribute remove the text from the
 accessibility tree too, so nothing is announced.
@@ -95,15 +98,14 @@ appear on focus.
 
 ## Related
 
-- For an icon-only button, pair it with `Tooltip` so sighted people get the name too.
-- For a visible label on a field, see Form.
-- For a loading indicator that announces itself, `Spinner` already includes a visually hidden label.
+- `Tooltip`: use when pairing an icon-only control with a visible label on hover and focus.
+- `Spinner`: use when rendering a loading indicator, which already includes its own visually hidden label.
 
 Same group: `Code` · `CodeBlock` · `Heading` · `InlineEdit` · `Table`
 
 ## Parts
 
-1. **Span.** The only part: a one-pixel, clipped `span` of text, out of the flow, that stays in the accessibility tree and paints nothing.
+1. **Span.** The only part: a clipped `span` of text, out of the flow, that stays in the accessibility tree and paints nothing.
 
 ### States
 

@@ -161,7 +161,15 @@ A fixed grid people read. Cells accept any node, so a row can carry Status tags,
 ## Usage
 
 Use `StaticTable` for a grid people only read: a record, a summary, a rate
-card. A table people sort, filter, select or page is a Dynamic table.
+card.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a table people sort or filter or page, use `Table`.
 
 </div>
 
@@ -214,8 +222,6 @@ card. A table people sort, filter, select or page is a Dynamic table.
 
 ## Best practices
 
-A static table is a fixed grid people read. It has no hover, sort or paging; for those, use the Dynamic table.
-
 ### Right-align numbers.
 
 <DoDontPair
@@ -237,9 +243,9 @@ A static table is a fixed grid people read. It has no hover, sort or paging; for
 ### Keep a cell to one line.
 
 <DoDontPair
-    doExample={<div style={{ width: 360 }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', 'Needs a longer session on fractions and ratios this week']]} /></div>}
+    doExample={<div style={{ width: 'var(--size-2000)' }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', 'Needs a longer session on fractions and ratios this week']]} /></div>}
     doCaption="Long text truncates with an ellipsis and shows in full in a tooltip."
-    dontExample={<div style={{ width: 360 }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', { content: 'Needs a longer session on fractions and ratios this week', overflow: 'wrap' }]]} /></div>}
+    dontExample={<div style={{ width: 'var(--size-2000)' }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', { content: 'Needs a longer session on fractions and ratios this week', overflow: 'wrap' }]]} /></div>}
     dontCaption="Every cell wrapped, so rows grow uneven."
 />
 
@@ -278,10 +284,9 @@ A static table is a fixed grid people read. It has no hover, sort or paging; for
 
 ## Related
 
-- For a table people sort, filter, select or page, use the Dynamic table.
-- For records that nest, use the Tree table.
-- For splitting a long result set across pages, use `Pagination`.
-- For a status or a count inside a cell, use `StatusTag` or `CountTag`.
+- `StatusTag`: use when showing a record's condition inside a cell.
+- `CountTag`: use when showing a numeric count inside a cell.
+- <a href="?path=/docs/templates-table--docs">Table</a>: use when choosing between Static, Dynamic and Tree tables.
 
 </div>
 
