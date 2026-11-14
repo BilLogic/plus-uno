@@ -490,6 +490,29 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042"
       }
     },
+    "FileItem": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/FileItem/FileItem.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/FileItem",
+        "source": "design-system/src/components/forms-and-inputs/FileItem/FileItem.jsx",
+        "storybookId": "components-forms-and-inputs-file-upload-file-item--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "file-item",
+            "name": "FileItem",
+            "componentSetNodeId": "22249:594",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
+      }
+    },
     "FileUpload": {
       "code": {
         "import": "@/components/forms-and-inputs",

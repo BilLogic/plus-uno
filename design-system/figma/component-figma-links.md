@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-56 docs-page links + 60 style/variant entries across 57 components.
+56 docs-page links + 61 style/variant entries across 58 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -91,6 +91,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | DatePicker | Date picker | `20074:16843` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20074-16843) | verified |
 | Components | DateTimePicker | Date time picker | `20067:8922` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20067-8922) | verified |
 | Components | DynamicTable | Dynamic table | `20095:14282` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-14282) | verified |
+| Components | FileItem | FileItem | `22249:594` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=22249-594) | verified |
 | Components | FileUpload | File upload | `20007:4455` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20007-4455) | verified |
 | Components | Flag | Flag | `20095:8275` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8275) | verified |
 | Components | Heading | Heading | `20626:95` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20626-95) | verified |
