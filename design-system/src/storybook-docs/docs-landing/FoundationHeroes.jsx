@@ -18,7 +18,7 @@ import { LogoConstruction } from "../illustrations/shapes.jsx";
 import { usePageContrast } from "../lib/use-page-contrast.js";
 import { HeroDrawing, HeroPane } from "./HeroDrawing.jsx";
 import { BentoCell } from "./bento.jsx";
-import { Glyph, IconConstruction } from "./glyphs.jsx";
+import { Glyph } from "./glyphs.jsx";
 
 /**
  * The Foundations heroes: each foundation as one object, cropped to what
@@ -241,14 +241,10 @@ export const GridHero = () => (
   </HeroDrawing>
 );
 
-/** The set, five across and two down; the bell is the subject. */
+/** The set, five across and two down. */
 const ICON_SET = ["calendar", "user", "bell", "search", "chat", "check", "star", "folder", "clock", "book"];
 
-/**
- * Ten different icons in one style, each on its tile. The bell is the subject:
- * drawn in the brand color on its own construction (the 24 grid, the
- * diagonals, the keyline circle and square), with no ring around it.
- */
+/** Ten different icons in one style, each on its own tile; the bell, the subject, takes the brand color and nothing else. */
 export const IconographyHero = () => {
   const cell = 48;
   const gap = 10;
@@ -259,21 +255,10 @@ export const IconographyHero = () => {
       {ICON_SET.map((name, i) => {
         const x = x0 + (i % 5) * (cell + gap);
         const y = y0 + Math.floor(i / 5) * (cell + gap);
-        if (name !== "bell") {
-          return (
-            <g key={name}>
-              <CardBox x={x} y={y} w={cell} h={cell} />
-              <Glyph name={name} x={x + 12} y={y + 12} size={24} />
-            </g>
-          );
-        }
-        const size = 36;
-        const at = (cell - size) / 2;
         return (
           <g key={name}>
             <CardBox x={x} y={y} w={cell} h={cell} />
-            <IconConstruction x={x + at} y={y + at} size={size} />
-            <Glyph name={name} x={x + at} y={y + at} size={size} stroke={PAINT.accent} weight={1.5} />
+            <Glyph name={name} x={x + 12} y={y + 12} size={24} stroke={name === "bell" ? PAINT.accent : undefined} />
           </g>
         );
       })}
