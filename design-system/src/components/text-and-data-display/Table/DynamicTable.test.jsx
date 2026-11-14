@@ -119,6 +119,20 @@ describe('DynamicTable', () => {
         expect(onRowsPerPageChange).toHaveBeenCalledWith(25);
     });
 
+    it('below the 768 floor drops the range and uses the text navigator', () => {
+        const original = window.matchMedia;
+        window.matchMedia = (query) => ({
+            matches: true, media: query, addEventListener: () => {}, removeEventListener: () => {},
+        });
+        try {
+            render(<DynamicTable head={head} rows={rows} rowsPerPage={2} noun="students" />);
+            expect(screen.queryByText(/of 5 students/)).toBeNull();
+            expect(screen.getByRole('button', { name: 'Next' })).toHaveTextContent('Next');
+        } finally {
+            window.matchMedia = original;
+        }
+    });
+
     it('names its pager after the table, so two tables on a page have two distinct landmarks', () => {
         render(<DynamicTable head={head} rows={rows} rowsPerPage={2} label="Students" />);
         expect(screen.getByRole('navigation', { name: 'Students pages' })).toBeInTheDocument();
