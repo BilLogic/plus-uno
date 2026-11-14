@@ -160,6 +160,7 @@ Tokens one component owns, named for it.
 --progress-bar-height  /* Height of a ProgressBar track. */
 --progress-indicator-dot-size-12  /* Dot size of a ProgressIndicator with size 12. */
 --progress-indicator-dot-size-8  /* Dot size of a ProgressIndicator with size 8. */
+--progress-ring-stroke  /* Stroke width of a ProgressRing track and fill. */
 --radio-control-size  /* Size of the Radio circle. */
 --radio-control-size-10  /* Size of the circle in a RadioGroup with size 10. */
 --radio-control-size-14  /* Size of the circle in a RadioGroup with size 14. */

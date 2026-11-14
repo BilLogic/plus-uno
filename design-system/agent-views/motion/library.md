@@ -160,6 +160,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | ProgressBar | component | change | Load content | `--ds-motion-linear` |  |
 | ProgressBar | component | success | Update a value or state | `--ds-motion-appearance-fast` | `sound.done.step` on land: a module or lesson is done |
 | ProgressIndicator | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
+| ProgressRing | component | change | Load content | `--ds-motion-linear` |  |
 | ProgressTracker | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | ProgressTracker | component | success | Update a value or state | `--ds-motion-appearance-fast` | `sound.done.step` on land: a module or lesson is done |
 | PromptInput | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |

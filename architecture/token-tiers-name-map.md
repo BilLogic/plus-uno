@@ -281,6 +281,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Spinner | `--spinner-size-md` |  |
 | Spinner | `--spinner-size-lg` |  |
 | Progress bar | `--progress-bar-height` |  |
+| Progress ring | `--progress-ring-stroke` |  |
 
 ## Layers
 

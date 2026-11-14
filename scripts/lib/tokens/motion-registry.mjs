@@ -726,6 +726,13 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'ProgressRing',
+    tier: 'component',
+    events: {
+      change: { transition: 'Load content', appearance: 'linear', note: 'Fills clockwise from twelve o\'clock with the work, never ahead of it.' },
+    },
+  },
+  {
     name: 'ProgressTracker',
     tier: 'component',
     events: {

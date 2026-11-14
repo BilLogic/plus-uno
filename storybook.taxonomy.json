@@ -78,6 +78,7 @@
     ],
     "Loading": [
       "Progress bar",
+      "Progress ring",
       "Skeleton",
       "Spinner"
     ],
@@ -323,6 +324,7 @@
       "Loading",
       [
         "Progress bar",
+        "Progress ring",
         "Skeleton",
         "Spinner"
       ],
