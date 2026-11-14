@@ -76,7 +76,7 @@ const StatCard = ({ title, body }) => (
 );
 
 export default {
-    title: 'Templates/Section/Section',
+    title: 'Templates/Section',
     component: PatternSection,
     tags: ['!dev', '!autodocs'],
     argTypes: {

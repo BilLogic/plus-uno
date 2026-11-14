@@ -207,7 +207,7 @@ import * as SectionStories from './Section.stories.jsx';
 
 ### Drop the Filter icon while a filter side shows.
 `;
-const SECTION_STORIES = "export default { title: 'Templates/Section/Section' };\n";
+const SECTION_STORIES = "export default { title: 'Templates/Section' };\n";
 const pattern = (href) => `import { Meta } from '@storybook/addon-docs/blocks';
 
 <Meta title="Patterns/Filtering" />
@@ -221,7 +221,7 @@ const crossRepo = (href) => repo('# Router\n', {
 });
 
 test('a cross-link to a rule another page owns resolves, by page id and rule slug', () => {
-  const r = crossRepo('templates-section-section--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary');
+  const r = crossRepo('templates-section--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary');
   try {
     const { failures, crossLinks } = sweep(r.root);
     assert.deepEqual(failures, []);
@@ -235,18 +235,18 @@ test('a cross-link to a page titled by its Meta resolves too', () => {
 });
 
 test('a cross-link to a template or pattern page that does not exist fails and names it', () => {
-  const r = crossRepo('templates-section--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary');
+  const r = crossRepo('templates-sections--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary');
   try {
     const { failures } = sweep(r.root);
     assert.equal(failures.length, 1);
     assert.match(failures[0], /Filtering\.mdx/);
-    assert.match(failures[0], /templates-section--docs/);
+    assert.match(failures[0], /templates-sections--docs/);
     assert.match(failures[0], /no page/);
   } finally { r.done(); }
 });
 
 test('a cross-link to a rule that was renamed fails and names the anchor', () => {
-  const r = crossRepo('templates-section-section--docs#order-the-right-side');
+  const r = crossRepo('templates-section--docs#order-the-right-side');
   try {
     const { failures } = sweep(r.root);
     assert.equal(failures.length, 1);

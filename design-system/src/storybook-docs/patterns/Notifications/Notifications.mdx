@@ -23,8 +23,8 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
             { title: 'Flag', href: './?path=/docs/components-messaging-flag--docs' },
             { title: 'Banner', href: './?path=/docs/components-messaging-banner--docs' },
             { title: 'Section message', href: './?path=/docs/components-messaging-section-message--docs' },
-            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
-            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal--docs' },
             { title: 'Page', href: './?path=/docs/templates-page--docs' },
         ],
     }}
@@ -46,7 +46,7 @@ Four components carry every message. Each component page holds its appearances; 
 <TypeCard of={NotificationsStories.CarrierFlag} title="Flag" stage={PLACE_STAGE}>A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and error stay until acted on.</TypeCard>
 <TypeCard of={NotificationsStories.CarrierBanner} title="Banner" stage={STAGE}>A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.</TypeCard>
 <TypeCard of={NotificationsStories.CarrierSectionMessage} title="SectionMessage" stage={PLACE_STAGE}>Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.</TypeCard>
-<TypeCard of={NotificationsStories.CarrierInbox} title="The Inbox" stage={FLOAT_STAGE}>Notifications that arrived over time, in a <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>. The Bell that carries its count, and the Panel growing out of the Sidebar, are Planned <PlannedTag />.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierInbox} title="The Inbox" stage={FLOAT_STAGE}>Notifications that arrived over time, in a <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a>. The Bell that carries its count, and the Panel growing out of the Sidebar, are Planned <PlannedTag />.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -85,7 +85,7 @@ One banner at a time, scrolling with its content. The Frame tier is system news 
 
 <ComponentExample of={NotificationsStories.KeyMustStay} title="A message that must stay" description="A SectionMessage with dismiss turned off, placed by the action it informs." />
 
-<ComponentExample of={NotificationsStories.KeyAcknowledge} title="Something to answer first" description={<>A <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a> of the Acknowledge type, for the one message the person must accept before going on.</>} />
+<ComponentExample of={NotificationsStories.KeyAcknowledge} title="Something to answer first" description={<>A <a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a> of the Acknowledge type, for the one message the person must accept before going on.</>} />
 
 <ComponentExample of={NotificationsStories.KeyFlagOnPage} title="A Flag on the page" description="The person has moved on to another page; the Flag finds them at the top right." />
 
@@ -254,8 +254,8 @@ A Flag is for now; the Inbox is for later. The Inbox is the Panel's Notification
 - <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a>: use for where a failure shows.
 - <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a>: use for the Flag past 10 s.
 - <a target="_top" href="./?path=/docs/patterns-indicators--docs">Indicators</a>: use for the count on the Bell.
-- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use for the Inbox.
-- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use for what must be answered first.
+- <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a>: use for the Inbox.
+- <a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a>: use for what must be answered first.
 - <a target="_top" href="./?path=/docs/templates-page--docs">Page</a>: use for where a Page banner sits.
 - `Flag`, `Banner`, `SectionMessage`, `InlineMessage`, `Modal`: the components.
 

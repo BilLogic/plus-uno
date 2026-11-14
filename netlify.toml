@@ -143,6 +143,34 @@
 
 [[redirects]]
   from = "/storybook/"
+  query = { path = "/docs/templates-section-section--docs" }
+  to = "/storybook/?path=/docs/templates-section--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-modal-modal--docs" }
+  to = "/storybook/?path=/docs/templates-modal--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-panel-panel--docs" }
+  to = "/storybook/?path=/docs/templates-panel--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/templates-popup-popup--docs" }
+  to = "/storybook/?path=/docs/templates-popup--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
   query = { path = "/docs/templates-page-heading-outline--docs" }
   to = "/storybook/?path=/docs/templates-page--docs#heading-outline"
   status = 301
@@ -151,7 +179,7 @@
 [[redirects]]
   from = "/storybook/"
   query = { path = "/docs/templates-modal-backdrop--docs" }
-  to = "/storybook/?path=/docs/templates-modal-modal--docs#backdrop"
+  to = "/storybook/?path=/docs/templates-modal--docs#backdrop"
   status = 301
   force = true
 

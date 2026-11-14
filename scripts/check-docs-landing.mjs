@@ -88,13 +88,13 @@ export const PAGES = [
   { file: 'design-system/src/storybook-docs/templates/TemplatesOverview.mdx', id: 'templates-overview' },
   { file: 'design-system/src/patterns/Frame/Frame.mdx', id: 'templates-frame' },
   { file: 'design-system/src/patterns/Page/Page.mdx', id: 'templates-page' },
-  { file: 'design-system/src/patterns/PatternSection/PatternSection.mdx', id: 'templates-section-section' },
+  { file: 'design-system/src/patterns/PatternSection/PatternSection.mdx', id: 'templates-section' },
   { file: 'design-system/src/patterns/PatternCard/PatternCard.mdx', id: 'templates-card' },
   { file: 'design-system/src/patterns/PatternTable/PatternTable.mdx', id: 'templates-table' },
   { file: 'design-system/src/patterns/Form/Form.mdx', id: 'templates-form' },
-  { file: 'design-system/src/patterns/PatternModal/PatternModal.mdx', id: 'templates-modal-modal' },
-  { file: 'design-system/src/patterns/Panel/Panel.mdx', id: 'templates-panel-panel' },
-  { file: 'design-system/src/patterns/Popup/Popup.mdx', id: 'templates-popup-popup' },
+  { file: 'design-system/src/patterns/PatternModal/PatternModal.mdx', id: 'templates-modal' },
+  { file: 'design-system/src/patterns/Panel/Panel.mdx', id: 'templates-panel' },
+  { file: 'design-system/src/patterns/Popup/Popup.mdx', id: 'templates-popup' },
 ];
 
 const OLD_OPENER = /<FoundationHero\b|<Title\b/;
