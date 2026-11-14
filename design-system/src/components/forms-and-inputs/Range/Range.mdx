@@ -90,12 +90,7 @@ A range lets a person choose a value within a minimum and a maximum by moving a 
 
 <DocsInteractivePlayground
     of={RangeStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -112,9 +107,17 @@ A range lets a person choose a value within a minimum and a maximum by moving a 
 
 ## Usage
 
-Use a range in a form to let a person choose a value within a minimum and a maximum, when an approximate value is enough: a zoom level, a volume, a rough rating of effort.
+Use `Range` when an approximate value between a minimum and maximum is enough, such as a zoom level or volume. Avoid it for exact numbers, non-numeric choices, or spans under four steps or over a hundred steps.
 
-Do not use a range when choosing a specific value matters. A slider is less precise than typing a number or picking an option from a list. Do not use it for values that are not numeric, such as weekdays, or for spans that are extremely large (over 100 steps) or very small (1 to 3).
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For an exact numeric value, use `TextField` with `type="number"`.
+- For a five-point satisfaction score, use `Rating`.
+- For a choice among a few discrete options, use `RadioGroup` or `Select`.
 
 </div>
 
@@ -164,15 +167,15 @@ Do not use a range when choosing a specific value matters. A slider is less prec
 
 ## Best practices
 
-### Use size 12 by default.
+### Use the default `size={12}` in standard forms.
 
-The 12 handle and its track are easy to read and to grab in a standard form.
+The `size={12}` handle and track are easy to read and grab in a standard form.
 
 <DoDontPair
     doExample={<div style={{ width: '100%' }}><Range label="Session length" defaultValue={40} size={12} /></div>}
-    doCaption="Size 12 in a standard form."
+    doCaption="Standard `size={12}` in a form."
     dontExample={<div style={{ width: '100%' }}><Range label="Session length" defaultValue={40} size={8} /></div>}
-    dontCaption="Size 8 for a primary input."
+    dontCaption="Compact `size={8}` used for a primary input."
 />
 
 ### Use one size per form.
@@ -181,20 +184,20 @@ Matching sizes keep several ranges aligned.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', width: '100%' }}><Range label="Zoom" defaultValue={40} size={12} /><Range label="Volume" defaultValue={60} size={12} /></div>}
-    doCaption="Every range in the form uses size 12."
+    doCaption="Every range in the form uses `size={12}`."
     dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', width: '100%' }}><Range label="Zoom" defaultValue={40} size={12} /><Range label="Volume" defaultValue={60} size={8} /></div>}
-    dontCaption="Size 12 and size 8 in the same form."
+    dontCaption="Mixing `size={12}` and `size={8}` in the same form."
 />
 
-### Use size 16 for touch.
+### Use `size={16}` for touch.
 
-A thicker track is a larger target.
+A thicker track gives touch screens a larger target.
 
 <DoDontPair
     doExample={<div style={{ width: '100%' }}><Range label="Session length" defaultValue={40} size={16} /></div>}
-    doCaption="Size 16 where touch is the main input."
+    doCaption="Larger `size={16}` where touch is the main input."
     dontExample={<div style={{ width: '100%' }}><Range label="Session length" defaultValue={40} size={8} /></div>}
-    dontCaption="Size 8 on a touch screen."
+    dontCaption="Small `size={8}` on a touch screen."
 />
 
 ### Put the label directly above the slider.
@@ -208,9 +211,9 @@ Keep it short and aligned left. Show it unless the layout already names the slid
     dontCaption="The label is hidden, so nothing on screen names the slider."
 />
 
-### `onChange` reports a number.
+### Read the numeric value from the first argument of `onChange`.
 
-The first argument is the new value as a number; the event follows. A handler that wrote `event.target.value` reads the second argument instead.
+`onChange(value, event)` passes the new number first and the event second; a handler that wrote `event.target.value` reads the second argument instead.
 
 ### In a left-to-right layout the lowest value is on the left.
 
@@ -244,10 +247,8 @@ If the slider needs explaining, put one line of helper text under it rather than
 
 ## Accessibility
 
-- **Label every slider.** A range input carries its value, never its meaning: "49" says nothing about what is being set. `label` is the only thing that names it.
-- **`showLabel={false}` hides the text, not the name.** The label stays in the page for assistive technology.
-- **Arrow keys step the value by `step`; Home and End jump to `min` and `max`.**
-- **Keyboard focus is a 2px ring on `border.focused`, 2px off the handle.** A pointer focus draws none.
+- **Label every slider.** `label` names the input; `showLabel={false}` visually hides the text while keeping the accessible name.
+- **Keyboard.** Arrow keys step by `step`; `Home` and `End` jump to `min` and `max`. Focus is a 2px ring on `border.focused`, 2px off the handle; pointer focus draws none.
 - **Do not use a range where precision matters.** Offer a text field beside it, or use one instead.
 
 </div>
@@ -256,9 +257,9 @@ If the slider needs explaining, put one line of helper text under it rather than
 
 ## Related
 
-- For a specific numeric value, use Text field.
-- For a choice among a few options, use Radio or Select.
-- For a rating, use Rating.
+- `TextField`: use when an exact numeric value is needed (`type="number"`).
+- `Rating`: use when collecting a score out of five.
+- `RadioGroup`: use when choosing among a few discrete options.
 
 </div>
 

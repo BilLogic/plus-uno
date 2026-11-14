@@ -18,11 +18,9 @@ Also asked as: enable disable, on/off setting.
 
 ## Usage
 
-Use a toggle to let a person turn something on or off instantly, such as making a resource public. If a physical switch would work for the action, a toggle is the right component.
+Use `Toggle` to let a person turn a single setting on or off with immediate effect, such as making a resource public.
 
-A toggle never waits for a button. For an option that needs a button press to apply, such as a field in a form with a Save button, use a checkbox.
-
-Pick the size by the page. Use 16 where the page has many toggles, such as a settings list. Use 20 to call attention to one setting, such as the single switch in a modal.
+Pick the size by the page: `size={16}` (default) where a page has many toggles, such as a settings list, and `size={20}` to call attention to a single prominent setting.
 
 ## Motion
 
@@ -32,58 +30,60 @@ Toggle reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Color carries the feedback; the thumb follows. |
 
+## Alternatives
+
+- For an option in a form that waits for a Save or Submit button to apply, use `Checkbox`.
+- For choosing one option from a short set of labeled choices, use `RadioGroup`.
+- For choosing one option from a list of six or more, use `Select`.
+
 ## Best practices
 
 ### Label what turns on. {#label-what-turns-on}
 
-The label names the setting, not the switch position. It stays the same whether the toggle is on or off.
+The label names the setting, not the toggle position. It stays the same whether the toggle is on or off.
 
 Do: The label names the setting.
 Don't: "On" says nothing about what is on.
 
-### Match the label to the state. {#match-the-label-to-the-state}
+### Keep the label neutral across both positions. {#keep-the-label-neutral-across-both-positions}
 
-The switch and its label never disagree. A label that reads as a state, such as "Reminders on", is wrong the moment the switch is off; a noun phrase that names the setting, such as "Session reminders", reads right in both positions.
+A label that reads as a state, such as "Reminders on", contradicts the control when the toggle is off; a noun phrase such as "Session reminders" reads accurately in both positions.
 
 Do: Off, and the setting's name still reads right.
 Don't: Off, but the label says on.
 
 ### Say why a toggle is disabled. {#say-why-a-toggle-is-disabled}
 
-Disable a toggle only for something the person can fix on the same screen, and say why in text next to it. A setting a role can never use is hidden. Never put the reason in a tooltip on the disabled toggle.
+Disable a toggle only for something the person can fix on the same screen, and state the reason in text next to it, never in a tooltip. A setting a role can never use is hidden. See [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: Disabled, with the reason beside it.
 Don't: Disabled with no reason, so nothing says what to fix.
 
-### The change lands at once. {#the-change-lands-at-once}
+### Apply the change immediately. {#apply-the-change-immediately}
 
-A toggle changes the setting as the person flips it. If the change needs confirming, saving or reviewing first, use a Checkbox in a form.
+A toggle changes the setting as soon as it is flipped. If the change needs confirming or saving with a form button, use `Checkbox`.
 
-### Read-only is not disabled. {#read-only-is-not-disabled}
-
-`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast, has no hover, says `aria-readonly` and ignores clicks. Say why beside it. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now.
-
-### Name and id. {#name-and-id}
+### Name, value and id. {#name-value-and-id}
 
 `name` is a form key, not an id; two toggles may share a name. `isChecked` controls the value and needs an `onChange`; `defaultChecked` sets the start.
 
-### The role is a switch. {#the-role-is-a-switch}
+### Use read-only for fixed settings and disabled for unavailable ones. {#use-read-only-for-fixed-settings-and-disabled-for-unavailable-ones}
 
-The native input is a checkbox with `role="switch"`, the markup the W3C switch pattern ships. The platform maps the checked state, so no `aria-checked` is written. A `role` prop on the toggle replaces it.
+`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast, has no hover, says `aria-readonly` and ignores clicks. Say why beside it. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now. See [Read-only](?path=/docs/patterns-states-read-only--docs).
 
 ## Accessibility
 
-- **Label every toggle.** A visible `label` is better. Where the name sits elsewhere in the layout, pass `aria-label` so it still reaches assistive technology.
-- **Do not change the label with the state.** The label stays the same whether the toggle is on or off.
-- **Explain a disabled toggle.** Put the reason in visible text beside it, so a person who cannot reach it knows why. A disabled toggle leaves the tab order, and a tooltip on it is unreachable.
-- **Keyboard focus is a 2px ring on `border.focused`, 2px off the track.** Space flips the toggle.
+- **Label every toggle.** Use a visible `label`, or pass `aria-label` when the layout already names the setting.
+- **Native checkbox with `role="switch"`.** The platform maps the checked state, so no `aria-checked` is written; a `role` prop on the toggle replaces it. Space flips the toggle.
+- **Keyboard focus is a 2px ring on `border.focused`, 2px off the track.**
+- **Explain a disabled toggle** in visible text beside it rather than a tooltip.
 
 ## Related
 
-- For an option that needs a button press to apply, use Checkbox.
-- To choose one option from a visible set, use Radio.
-- To choose one option from a longer list, use Select.
-- To explain what flipping a toggle does, add a Tooltip.
+- `Checkbox`: use when an option requires a form button press to apply.
+- `RadioGroup`: use when choosing one option from a short visible set.
+- `Select`: use when choosing one option from a longer list.
+- `Tooltip`: use to explain what flipping a toggle does.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `TreeSelect` · `VerticalButton`
 

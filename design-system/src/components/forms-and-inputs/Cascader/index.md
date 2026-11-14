@@ -16,10 +16,7 @@ Cascader: a field that picks one path through nested options, one level at a tim
 
 ## Usage
 
-Use `Cascader` when a choice is naturally made one level at a time, in
-sequence — a district, then a school, then a grade. For a hierarchy where
-someone might pick or see several nodes at once rather than one path, use
-`TreeSelect` instead. For a flat list, use `Select`.
+Use `Cascader` when a single path through a hierarchy is chosen one level at a time in sequence, such as district, then school, then grade.
 
 ## Motion
 
@@ -30,6 +27,11 @@ Cascader reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 | change | Expand and collapse | `--ds-motion-spatial-fast` | Columns and branches expand. |
+
+## Alternatives
+
+- For a hierarchy where someone may pick or view several nodes across branches at once, use `TreeSelect`.
+- For a flat list of options with no hierarchy, use `Select`.
 
 ## Best practices
 
@@ -69,8 +71,8 @@ Don't: A failed pick still draws the normal border, so nothing marks the error.
 
 ## Related
 
-- For a hierarchy where several nodes can be picked or seen at once, use `TreeSelect`.
-- For a flat list with no hierarchy, use `Select`.
+- `TreeSelect`: use when expanding branches in place or selecting multiple nodes across a tree.
+- `Select`: use when choosing from a flat list of options.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

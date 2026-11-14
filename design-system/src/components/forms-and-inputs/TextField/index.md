@@ -18,12 +18,7 @@ Also asked as: search box, single-line, text box.
 
 ## Usage
 
-Use a Text field for single-line text entry: names, emails, search boxes and
-numbers. It owns its label, its validation state and its message, which makes it
-the right home for an error rather than a Section message at the top of the form.
-
-Use a [Text area](?path=/docs/components-forms-and-inputs-text-area--docs) for several lines, a
-Select for a value chosen from a list, and a Date picker for dates.
+Use `TextField` for single-line text entry: names, emails, search boxes and numbers. It owns its label, its validation state and its message, which makes it the right home for an error rather than a `SectionMessage` at the top of the form. Use `type="number"` only for stepped quantities; IDs, phone numbers and ZIP codes use `type="text"` with `inputMode`.
 
 ## Motion
 
@@ -32,6 +27,13 @@ TextField reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Border color changes on focus and error. An error message makes room, then fades in; it fades, then the room closes, once the field is fixed. |
+
+## Alternatives
+
+- For multi-line text, use `TextArea`.
+- For finding a record in a list by typing, use `SearchField`.
+- For picking a value from a list of options, use `Select`.
+- For dates or times, use `DatePicker`, `TimePicker` or `DateTimePicker`.
 
 ## Best practices
 
@@ -90,11 +92,11 @@ Use `default` in forms and `compact` in toolbars, filter bars and table rows.
 
 ### Use `type="number"` for quantities you step. {#use-type-number-for-quantities-you-step}
 
-Such as seats. For an ID, a phone number or a ZIP code, use `type="text"` with `inputMode`.
+Use `type="number"` for stepped quantities such as seats; for an ID, phone number or ZIP code, use `type="text"` with `inputMode`.
 
-### Read-only is not disabled. {#read-only-is-not-disabled}
+### Use read-only for fixed values and disabled for unavailable ones. {#use-read-only-for-fixed-values-and-disabled-for-unavailable-ones}
 
-`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: Read-only keeps the value readable, and the caption says why.
 Don't: Disabled fades a value people need to read.
@@ -123,10 +125,11 @@ Don't: Disabled fades a value people need to read.
 
 ## Related
 
-- For several lines of text, see Text area.
-- For a value chosen from a list, see Select.
-- For dates, see Date picker and Date time picker.
-- For the label and caption conventions, see Form.
+- `TextArea`: use when collecting several lines of plain text.
+- `SearchField`: use when searching a list or table by typing.
+- `Select`: use when choosing a value from a list of options.
+- `DatePicker`: use when selecting a date or date range.
+- [Form](?path=/docs/components-forms-and-inputs-form--docs): use when reviewing label and caption rules across fields.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

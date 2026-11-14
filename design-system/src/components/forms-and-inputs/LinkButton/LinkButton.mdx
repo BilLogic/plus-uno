@@ -120,13 +120,7 @@ A link button navigates to another page, site or place on a page, and looks like
 
 <DocsInteractivePlayground
     of={LinkButtonStories.Interactive}
-    description={
-        <>
-            Use the table in the panel below to change props. The preview is rendered{' '}
-            <strong>inline</strong> so clicks and focus work while you scroll
-            the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -143,7 +137,17 @@ A link button navigates to another page, site or place on a page, and looks like
 
 ## Usage
 
-Use a link button to open another page, a site or a place on the page. For an action that stays on the current page, use a Button.
+Use `LinkButton` to open another page, site or section when the link needs the visual weight of a button.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For an action on the current page, use `Button`.
+- For navigation shown as an icon alone, use `LinkIconButton`.
+- For a link inside a sentence or paragraph, use `Link`.
 
 </div>
 
@@ -151,10 +155,10 @@ Use a link button to open another page, a site or a place on the page. For an ac
 
 ## Parts
 
-1. **Container.** An anchor drawn as a button: 32 high at default spacing and 24 at compact.
+1. **Container.** An anchor (`<a>`) drawn as a button: 32 high at default spacing and 24 at compact.
 2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
-3. **Label.** Body/default at the medium weight. It describes the destination or purpose.
-4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label, such as the external-link glyph.
+3. **Label.** Body/default at the medium weight. It names the destination.
+4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label, such as `arrow-up-right-from-square` for an external link.
 
 ### Appearance
 
@@ -177,7 +181,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 
 ### States
 
-<p>Hover, pressed and focus are the browser's own. A link button has no disabled or loading state.</p>
+Hover, pressed and focus are the browser's own. A link button has no `ai`, disabled or loading state.
 
 <DocsTable>
 <thead>
@@ -226,9 +230,7 @@ Leave a gap so neighboring link buttons read as separate targets.
 
 ### Use it to go somewhere, not to act.
 
-A link button navigates to a page or an external address, and assistive
-technology announces a link. Actions that save, delete or submit belong on a
-Button.
+`LinkButton` renders an anchor so assistive technology announces a link. Actions that save, delete or submit belong on `Button`.
 
 <DoDontPair
     doExample={<LinkButton href="#notes" text="Open session notes" />}
@@ -239,8 +241,7 @@ Button.
 
 ### Let it hug its label.
 
-Keep the natural width. Reserve `shouldFitContainer` for narrow containers,
-such as a mobile sheet.
+Keep the natural width. Reserve `shouldFitContainer` for narrow containers, such as a mobile sheet.
 
 <DoDontPair
     doExample={<LinkButton href="#sessions" text="View sessions" />}
@@ -264,7 +265,7 @@ Right-align in focused tasks and modal dialogs; left-align on full-page forms an
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Describe the destination or purpose: "View sessions".</td><td>"Click here" or "Go".</td></tr>
+<tr><td>Describe the destination: "View sessions".</td><td>"Click here" or "Go".</td></tr>
 <tr><td>Use sentence case, short and without punctuation.</td><td>Title case, or a full sentence.</td></tr>
 <tr><td>Match the words of the surrounding UI.</td><td>Different words for the same destination in one view.</td></tr>
 </tbody>
@@ -276,9 +277,9 @@ Right-align in focused tasks and modal dialogs; left-align on full-page forms an
 
 ## Accessibility
 
-- A link button is an anchor, so assistive technology announces a link. Do not use it for actions.
-- It has no disabled state. A disabled link leaves the tab order, gets no focus or hover events and does not say why. Use validation and error messages instead, and never attach a tooltip to a disabled control.
-- `target="_blank"` adds `rel="noopener noreferrer"`. Flag the new tab in the label or with the external-link glyph.
+- Renders an `<a>` element so assistive technology announces a link and browser link shortcuts work.
+- Has no disabled state. A disabled link leaves the tab order and does not say why; omit unavailable links or use validation and error messages, and never attach a tooltip to a disabled control.
+- `target="_blank"` adds `rel="noopener noreferrer"`; indicate the new tab in the label or with an external-link icon.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 
 </div>
@@ -287,10 +288,10 @@ Right-align in focused tasks and modal dialogs; left-align on full-page forms an
 
 ## Related
 
-- To act on the current page, use Button.
-- To navigate with an icon alone, use Link icon button.
-- To link inside a sentence, use a plain text link.
-- To group related links, use Button group.
+- `Button`: use when the control performs an action on the current page.
+- `LinkIconButton`: use when navigating with an icon and no visible label.
+- `Link`: use when linking inline within text.
+- `ButtonGroup`: use when grouping related link buttons.
 
 </div>
 

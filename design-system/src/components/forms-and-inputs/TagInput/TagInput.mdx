@@ -131,12 +131,7 @@ from a list or adds, such as the topics a session covers.
 
 <DocsInteractivePlayground
     of={TagInputStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -153,15 +148,17 @@ from a list or adds, such as the topics a session covers.
 
 ## Usage
 
-Use `TagInput` when a field's value is a set of short labels the person picks
-from a list and may add to: the topics a session covered, or the languages a
-tutor teaches. It behaves like Notion's multi-select. The field holds the
-picked values as `Tag`s in a `TagGroup`, with a text entry after them, and
-focusing it opens the list of options under it.
+Use `TagInput` when a field's value is a set of short labels the person picks from a list and may create, rename, recolor or reorder in place, such as the topics a session covered. The field holds the picked values as `Tag`s in a `TagGroup`, with a text entry after them, and focusing it opens the option list under it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
 
 - For one value from a list, use `Select`.
 - For several values from a fixed list nobody adds to, use `Select` with `isMulti`.
-- For fewer than 5 options, use a Checkbox group (`Fieldset` + `Checkbox`).
+- For up to five multi-select options visible all at once, use `CheckboxGroup`.
 
 </div>
 
@@ -189,6 +186,40 @@ focusing it opens the list of options under it.
 <tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code>; every tag is disabled, with no × and no entry.</td></tr>
 <tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
 <tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill at full contrast, no hover, in the tab order with <code>aria-readonly</code>, with no × and no list.</td></tr>
+</tbody>
+</DocsTable>
+
+### Keyboard
+
+<DocsTable>
+<thead>
+<tr><th>Key</th><th>In the field</th></tr>
+</thead>
+<tbody>
+<tr><td>Typing</td><td>Filters the list and highlights the first match.</td></tr>
+<tr><td>↑ ↓</td><td>Move the highlight; opens the list when it is closed.</td></tr>
+<tr><td>Enter</td><td>Adds the highlighted option, or creates the typed text when Create is highlighted. Text matching an option, ignoring case, picks that option.</td></tr>
+<tr><td>Backspace</td><td>In an empty entry, removes the last tag.</td></tr>
+<tr><td>Esc</td><td>Closes the list and clears only the typed text. The tags stay.</td></tr>
+<tr><td>Paste</td><td>Text with commas or line breaks becomes one tag per part, trimmed.</td></tr>
+<tr><td>Tab</td><td>With a handler for the menu or reordering, moves from the entry to the highlighted row's handle, then its "…".</td></tr>
+</tbody>
+</DocsTable>
+
+On a row's handle and in its menu:
+
+<DocsTable>
+<thead>
+<tr><th>Key</th><th>Does</th></tr>
+</thead>
+<tbody>
+<tr><td>Space or Enter on the handle</td><td>Picks the row up.</td></tr>
+<tr><td>↑ ↓</td><td>Move the picked-up row.</td></tr>
+<tr><td>Space or Enter</td><td>Drops it there.</td></tr>
+<tr><td>Esc</td><td>Cancels, and the row goes back.</td></tr>
+<tr><td>Enter on the "…"</td><td>Opens the menu with focus in the name.</td></tr>
+<tr><td>Enter in the name</td><td>Renames the option. After ↑ ↓, picks the highlighted row instead.</td></tr>
+<tr><td>Esc in the menu</td><td>Closes it without renaming, and focus goes back to the "…".</td></tr>
 </tbody>
 </DocsTable>
 
@@ -321,44 +352,9 @@ A field with none of them works as before, with no "…" and no handle.
 - **Reorder** works on the whole list, so the handles hide while text is
   typed. `onReorder(fromIndex, toIndex)` gives places in `options`.
 
-### A tag's color is a Tag color.
+### Use a `Tag` color for each option.
 
-A tag is a category, so it takes a Tag color. Any other name draws gray and
-warns in development.
-
-### The keys behave as in Notion.
-
-<DocsTable>
-<thead>
-<tr><th>Key</th><th>In the field</th></tr>
-</thead>
-<tbody>
-<tr><td>Typing</td><td>Filters the list and highlights the first match.</td></tr>
-<tr><td>↑ ↓</td><td>Move the highlight; opens the list when it is closed.</td></tr>
-<tr><td>Enter</td><td>Adds the highlighted option, or creates the typed text when Create is highlighted. Text matching an option, ignoring case, picks that option.</td></tr>
-<tr><td>Backspace</td><td>In an empty entry, removes the last tag.</td></tr>
-<tr><td>Esc</td><td>Closes the list and clears only the typed text. The tags stay.</td></tr>
-<tr><td>Paste</td><td>Text with commas or line breaks becomes one tag per part, trimmed.</td></tr>
-<tr><td>Tab</td><td>With a handler for the menu or reordering, moves from the entry to the highlighted row's handle, then its "…".</td></tr>
-</tbody>
-</DocsTable>
-
-On a row's handle and in its menu:
-
-<DocsTable>
-<thead>
-<tr><th>Key</th><th>Does</th></tr>
-</thead>
-<tbody>
-<tr><td>Space or Enter on the handle</td><td>Picks the row up.</td></tr>
-<tr><td>↑ ↓</td><td>Move the picked-up row.</td></tr>
-<tr><td>Space or Enter</td><td>Drops it there.</td></tr>
-<tr><td>Esc</td><td>Cancels, and the row goes back.</td></tr>
-<tr><td>Enter on the "…"</td><td>Opens the menu with focus in the name.</td></tr>
-<tr><td>Enter in the name</td><td>Renames the option. After ↑ ↓, picks the highlighted row instead.</td></tr>
-<tr><td>Esc in the menu</td><td>Closes it without renaming, and focus goes back to the "…".</td></tr>
-</tbody>
-</DocsTable>
+A tag is a category, so it takes a `Tag` color. Any other name draws gray and warns in development.
 
 </div>
 
@@ -412,9 +408,9 @@ On a row's handle and in its menu:
 
 ## Related
 
-- For one value rather than a set, use `Tag`.
-- For the set without a field around it, use `TagGroup`.
-- For several values from a fixed list, use `Select` with `isMulti`.
+- `Tag`: use when rendering a single category or attribute label.
+- `TagGroup`: use when displaying a read-only set of tags outside a form field.
+- `Select`: use when choosing multiple values from a fixed list (`isMulti`).
 
 </div>
 

@@ -18,9 +18,9 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 ## Usage
 
-Use a dropdown menu for a trigger that opens a list of actions or navigation links. Its rows are Section, Button item, Link item and Custom item, all exported from Dropdown menu. For picking one value from a list of options, use Select: a dropdown menu is for actions, a select is for a value. `maxHeight` caps the menu's height before it scrolls, and `container` is the element the menu portals into.
+Use `DropdownMenu` for a trigger that opens a menu of actions or navigation links (`Section`, `ButtonItem`, `LinkItem`, `CustomItem`).
 
-`trigger` is the element that opens it, `children` are its rows. `isOpen` and `onOpenChange` make it controlled; left uncontrolled it opens and closes on its own. `placement` and `shouldFlip` govern where it opens and whether it flips when there is no room. `spacing` is `default` (32 rows) or `compact` (24). `loading` swaps the rows for one Loading options row while its options are still being fetched; after a failure, `hasError` shows Couldn't load options with a Retry row that calls `onRetry`. A menu never draws skeleton rows.
+`trigger` opens the menu and `children` supply its rows. Pass `isOpen` and `onOpenChange` for controlled mode, `placement` and `shouldFlip` for positioning (left uncontrolled, it opens and closes on its own), `spacing` for `default` (32 rows) or `compact` (24), `maxHeight` to cap height before scrolling, and `container` for the portal target. `loading` shows one "Loading options" row with a spinner; `hasError` shows "Couldn't load options" with a Retry row (`onRetry`). A menu never draws skeleton rows.
 
 ## Motion
 
@@ -30,6 +30,12 @@ DropdownMenu reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
+
+## Alternatives
+
+- For picking a value in a form field, use `Select`.
+- For picking a single view or filter value from a button, use `PopupSelect`.
+- For one primary action joined to a chevron menu of related actions, use `SplitButton`.
 
 ## Best practices
 
@@ -86,14 +92,13 @@ The Menu family has no submenu-trigger row. Flatten the choices or use sections.
 
 - **The trigger announces the menu.** Its trigger carries `aria-haspopup="menu"` and an `aria-expanded` that tracks the open state.
 - **Arrow keys move between rows**, Enter and Space pick the row at the cursor, and Escape closes the menu and returns focus to the trigger.
-- **A disabled row cannot be picked**, and the arrow keys skip it. Menu rows are not tab stops, so the arrow-key navigation among the enabled rows is unchanged.
-- **Disabled is not color alone:** the row sets `aria-disabled`, and its `description` says why in visible text. A disabled row carries no tooltip.
-- **Disable a row only for something the person can fix on the same screen.** Leave an action enabled and explain on press when it is merely not ready, and leave out a row the role can never use.
+- **Disabled rows.** Arrow keys skip disabled rows (`aria-disabled`), which cannot be picked and carry no tooltip; put the reason in `description`. Menu rows are not tab stops. Disable a row only for something the person can fix on the same screen: leave an action enabled and explain on press when it is merely not ready, and leave out a row the role can never use. See [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 ## Related
 
-- For picking one value from a list, use Select.
-- For a page's title row with its own actions, see Page header.
+- `Select`: use when picking a value in a form field.
+- `PopupSelect`: use when picking one view or filter value from a button.
+- `PageHeader`: use when placing page-level actions and overflow menus in a header row.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

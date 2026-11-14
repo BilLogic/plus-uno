@@ -16,17 +16,10 @@ Popup select: one list in a Popup, applied the moment a row is picked. - **One l
 
 ## Usage
 
-Use `PopupSelect` when one pick from one list changes what the page shows:
+Use `PopupSelect` when one pick from one list immediately changes what the page shows, with no field and no Apply button:
 
-- **A view switch** under page tabs, such as "Status: Upcoming". Use the
-  labeled trigger: pass `label` and no `trigger`.
-- **One filter** in a section's view bar, such as Subject. Pass the
-  `FilterButton` as `trigger`, with its count once a value is applied.
-
-The pick applies at once and the menu closes, so there is no Apply and no
-Reset. A menu of several filter categories, staged and applied together, is
-a `FilterMenu`. A value that belongs to a form is a `Select` field; a list of
-actions, not values, is a `DropdownMenu`.
+- **A view switch** under page tabs, such as "Status: Upcoming" (pass `label` and no `trigger`).
+- **One filter** in a section's view bar, such as Subject (pass a `FilterButton` as `trigger`).
 
 ## Motion
 
@@ -37,17 +30,29 @@ PopupSelect reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
 
+## Alternatives
+
+- For a value that belongs to a form field, use `Select`.
+- For several filter categories staged and applied together, use `FilterMenu`.
+- For a menu of actions rather than values, use `DropdownMenu`.
+
 ## Best practices
 
-- **Line the menu up with its trigger's side.** Start-of-bar triggers open
-  `bottom-start` and end-of-bar triggers `bottom-end`, so the menu never
-  hangs over the page past its own bar.
-- **Turn search off for a short list.** A handful of statuses reads at a
-  glance; a field above them only adds a step.
-- **Show the value on the trigger.** The labeled trigger does it for you.
-  With a trigger of your own, show the count of what is applied.
-- **Keep it to one list.** Two lists, or picks that wait for an Apply, are
-  a different menu.
+### Line the menu up with its trigger's side. {#line-the-menu-up-with-its-trigger-s-side}
+
+Start-of-bar triggers open `bottom-start` and end-of-bar triggers open `bottom-end`, so the menu never hangs past its own bar.
+
+### Turn search off for a short list. {#turn-search-off-for-a-short-list}
+
+Pass `isSearchable={false}` when a list has only a few options that scan at a glance.
+
+### Show the active value on the trigger. {#show-the-active-value-on-the-trigger}
+
+The built-in labeled trigger shows the value automatically; with a custom `FilterButton` trigger, pass the applied count as `trailingMetric`.
+
+### Keep it to one list. {#keep-it-to-one-list}
+
+Two lists, or picks that wait for an Apply, are a different menu.
 
 ## Accessibility
 
@@ -61,9 +66,9 @@ PopupSelect reads these motion tokens and no literal duration or curve.
 
 ## Related
 
-- For a value in a form, use `Select`.
-- For a menu of actions, use `DropdownMenu`.
-- For several filter categories applied together, use `FilterMenu`.
+- `Select`: use when picking a value inside a form field.
+- `FilterMenu`: use when staging and applying several filter categories together.
+- `DropdownMenu`: use when opening a menu of actions rather than values.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

@@ -14,7 +14,7 @@ import {
 <Meta of={FieldsetStories} />
 
 <Title />
-A fieldset is a legend plus the fields it groups. Radio group is built on this same composition; a checkbox group is the same shape with Checkbox instead.
+A fieldset groups related controls under one legend and one validation message.
 
 <DocsTabs of={FieldsetStories}>
 
@@ -55,12 +55,7 @@ A fieldset is a legend plus the fields it groups. Radio group is built on this s
 
 <DocsInteractivePlayground
     of={FieldsetStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -77,7 +72,17 @@ A fieldset is a legend plus the fields it groups. Radio group is built on this s
 
 ## Usage
 
-Use a fieldset wherever a set of fields shares one label and, often, one validation message: a group of radios, a group of checkboxes, related text fields asked together. For a single field with its own label, use the <a target="_top" href="./?path=/docs/components-forms-and-inputs-form--docs">label and caption</a>{' '}convention instead.
+Use `Fieldset` when a set of mixed controls shares one legend and one validation message, such as related text fields asked together.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a group of radio buttons under one question, use `RadioGroup`.
+- For a group of checkboxes under one question, use `CheckboxGroup`.
+- For a single field with its own label and caption, use `TextField` or `Select`.
 
 </div>
 
@@ -136,7 +141,7 @@ Pass `error` on the Fieldset, not on each field inside it, when the validation a
 
 ### Build on a fieldset rather than reimplementing it.
 
-Radio group already composes Fieldset with Radio children. Reach for Radio group directly for radios, and use Fieldset on its own only for a shape it does not already cover, like a checkbox group.
+`RadioGroup` and `CheckboxGroup` already compose `Fieldset` with `Radio` and `Checkbox` children. Reach for those directly for single-question choice sets, and use `Fieldset` on its own when grouping custom or mixed fields.
 
 <DoDontPair
     doExample={<Fieldset legend="Notify me by"><Checkbox label="Email" /><Checkbox label="Text" /></Fieldset>}
@@ -212,8 +217,9 @@ The legend says what the fields are. The button says what to do with them.
 
 ## Related
 
-- For the ready-made radio composition, use Radio group.
-- For a single field's label and help text, see the <a target="_top" href="./?path=/docs/components-forms-and-inputs-form--docs">label and caption</a> convention.
+- `RadioGroup`: use when grouping radio buttons under a shared legend and error.
+- `CheckboxGroup`: use when grouping checkboxes under a shared legend and error.
+- [Form](?path=/docs/components-forms-and-inputs-form--docs): use when reviewing the label and caption rules for individual fields.
 
 </div>
 
