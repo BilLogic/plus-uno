@@ -7382,6 +7382,7 @@
         "TypeDefault",
         "TypeFullWidth",
         "AnatomyRecord",
+        "AnatomyRecordScaledDown",
         "ScenarioArea",
         "ScenarioSeveralSections",
         "ScenarioRecordTabs",
@@ -7627,7 +7628,8 @@
         "Pressed",
         "Focused",
         "Current",
-        "Disabled"
+        "Disabled",
+        "OuterHeight"
       ],
       "tokens": [
         "--body-default",
@@ -7799,7 +7801,7 @@
       "import": "import { PatternCard } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternCard/PatternCard.jsx",
-      "summary": "Card pattern for PLUS design system. Mirrors Figma `Pattern/Card`: an optional image, then the content (the `_Card header` over the body), then an optional footer, on Atlassian's raised pair: the raised surface and its shadow, whose 1px ring is the card's edge. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
+      "summary": "Card pattern for PLUS design system. Mirrors Figma `Pattern/Card`: an optional image, then the content (the `_Card header` over the body), then an optional footer, on Atlassian's raised pair: the raised surface and its shadow, whose 1px ring is the card's edge. - **Layout**: `stacked` (default) puts the image above the content. `image-start` and `image-end` put it beside the content, content two thirds and image one third, for wide cards; below the md breakpoint (768) a side card stacks. One layout per row of cards. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
       "props": [
         {
           "name": "id",
@@ -7852,7 +7854,20 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Image slot above the content, full bleed",
+          "description": "Image slot, full bleed: above the content, or at the start or end edge per `layout`",
+          "deprecated": null
+        },
+        {
+          "name": "layout",
+          "type": "enum",
+          "required": false,
+          "default": "'stacked'",
+          "values": [
+            "stacked",
+            "image-start",
+            "image-end"
+          ],
+          "description": "Where the image sits. `stacked` puts it above the content. `image-start` and `image-end` put it beside the content at one third of the width, full height, bleeding to the card's top, bottom and that side's edge; for wide cards, and below the md breakpoint they stack. Pass one media element: it fills the cell and crops to cover.",
           "deprecated": null
         },
         {
@@ -7966,6 +7981,10 @@
         "ImageWide",
         "ImageStandard",
         "ImageSquare",
+        "LayoutStacked",
+        "LayoutImageStart",
+        "LayoutImageEnd",
+        "LayoutStacksBelowMd",
         "BodyOnly",
         "WithFooter",
         "CustomHeader",
@@ -8951,7 +8970,7 @@
       "import": "import { PatternTable } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternTable/PatternTable.jsx",
-      "summary": "Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a pagination slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the header stays and the empty state takes the body as one message row spanning every column, so the columns still say what will appear. The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected=\"true\"` (in a `role=\"grid\"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the \"Table\" slot component in the Figma design system file.",
+      "summary": "Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a footer slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the header stays and the empty state takes the body as one message row spanning every column, so the columns still say what will appear. The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected=\"true\"` (in a `role=\"grid\"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the \"Table\" slot component in the Figma design system file.",
       "props": [
         {
           "name": "id",
@@ -8963,12 +8982,12 @@
           "deprecated": null
         },
         {
-          "name": "pagination",
+          "name": "footer",
           "type": "node",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Pagination slot under the rows; hidden while the empty state shows",
+          "description": "Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows",
           "deprecated": null
         },
         {
@@ -9091,6 +9110,7 @@
         "--space-0625",
         "--stack-md",
         "--stack-sm",
+        "--table-footer-height",
         "--table-overflow-reach",
         "--table-pad-x-cell",
         "--table-pad-y-cell",
@@ -13485,6 +13505,7 @@
         "--row-height-sm",
         "--space-0625",
         "--table-cell-max-width",
+        "--table-footer-height",
         "--table-pad-x-cell",
         "--table-pad-y-cell",
         "--table-radius",

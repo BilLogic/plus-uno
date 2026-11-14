@@ -141,6 +141,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Table | `--table-radius` |  |
 | Table | `--table-stack` (declared elsewhere) |  |
 | Table | `--table-pad-x-footer` (declared elsewhere) |  |
+| Table | `--table-footer-height` |  |
 | Table | `--table-min-width-title` (declared elsewhere) |  |
 | Blanket | `--blanket-pad-x` |  |
 | Blanket | `--blanket-pad-y` |  |

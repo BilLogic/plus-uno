@@ -10,7 +10,6 @@ import {
     TYPE_STAGE,
     ANATOMY_PARTS,
     PageActions,
-    PageAnatomy,
     PageBanner,
     PageStage,
     PageTabs,
@@ -21,6 +20,8 @@ import Page, { PAGE_EDGE, PAGE_LEVELS } from '@/patterns/Page';
 import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { DemoLabel, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
+import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 
 const col = { display: 'flex', flexDirection: 'column', gap: '24px' };
 
@@ -264,36 +265,27 @@ const RecordPage = ({ banner = false }) => (
 export const AnatomyRecord = {
     name: 'Anatomy',
     render: () => (
-        <PageAnatomy width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
+        <LiveAnatomy width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
             <RecordPage banner />
-        </PageAnatomy>
+        </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
-        const figure = canvasElement.querySelector('[data-anatomy-figure]');
-        const origin = figure.getBoundingClientRect();
-        const rect = (el) => el.getBoundingClientRect();
-        await waitFor(() => expect(figure.querySelectorAll('[data-anatomy-marker]'), 'a marker for every part').toHaveLength(ANATOMY_PARTS.length));
-        const markers = [...figure.querySelectorAll('[data-anatomy-marker]')].map(rect);
-        markers.forEach((a, i) => markers.slice(i + 1).forEach((b, j) => {
-            const touch = a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
-            expect(touch, `markers ${i + 1} and ${i + j + 2} share no space`).toBe(false);
-        }));
-        const outlines = [...figure.querySelectorAll('[data-anatomy-outline]')].map(rect);
-        for (const [i, part] of ANATOMY_PARTS.entries()) {
-            const marker = rect(figure.querySelector(`[data-anatomy-marker="${i + 1}"]`));
-            const leader = rect(figure.querySelector(`[data-leader="${i + 1}"]`));
-            const target = outlines[i];
-            const centerY = marker.top + marker.height / 2;
-            await expect(centerY, `${part.label}: marker level with its part`).toBeGreaterThanOrEqual(target.top);
-            await expect(centerY, `${part.label}: marker level with its part`).toBeLessThanOrEqual(target.bottom);
-            await expect(marker.right <= origin.left + 1 || marker.left >= origin.right - 1, `${part.label}: marker in a gutter, over no content`).toBe(true);
-            outlines.forEach((other, j) => {
-                if (j === i) return;
-                const crosses = leader.left < other.right && leader.right > other.left && leader.top < other.bottom && leader.bottom > other.top;
-                expect(crosses, `the leader of ${part.label} crosses ${ANATOMY_PARTS[j].label}`).toBe(false);
-            });
-        }
+        await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
+        leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
     },
+};
+
+/** The same figure at the docs column's width, where the story scales down and the title and description rows sit closer than a marker is tall. */
+export const AnatomyRecordScaledDown = {
+    name: 'Anatomy, scaled down',
+    render: () => (
+        <div style={{ width: 880 }}>
+            <LiveAnatomy width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
+                <RecordPage banner />
+            </LiveAnatomy>
+        </div>
+    ),
+    play: AnatomyRecord.play,
 };
 
 /** Area page, one collection: the title alone; the collection's Primary ends its view bar. */

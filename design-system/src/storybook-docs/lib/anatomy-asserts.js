@@ -10,9 +10,19 @@ import { ANATOMY_REGIONS, isOwnRegion } from './anatomy-regions.js';
 
 const rect = (el) => el.getBoundingClientRect();
 
-/** Every marker's part exists and the marker sits level with it (above it for a top marker): its center within the part's top and bottom. */
-export const markersLevelWithParts = async (canvasElement, parts) => {
+/** No two markers touch: every part has its own marker, each in a slot of its own. */
+export const markersShareNoSpace = async (canvasElement, parts) => {
     await waitFor(() => expect(canvasElement.querySelectorAll('[data-anatomy-marker]'), 'a marker for each part').toHaveLength(parts.length));
+    const boxes = [...canvasElement.querySelectorAll('[data-anatomy-marker]')].map(rect);
+    boxes.forEach((a, i) => boxes.slice(i + 1).forEach((b, j) => {
+        const touch = a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+        expect(touch, `markers ${i + 1} (${parts[i].label}) and ${i + j + 2} (${parts[i + j + 1].label}) share no space`).toBe(false);
+    }));
+};
+
+/** Every marker's part exists and the marker sits level with it (above it for a top marker): its center within the part's top and bottom. No two markers touch. */
+export const markersLevelWithParts = async (canvasElement, parts) => {
+    await markersShareNoSpace(canvasElement, parts);
     parts.forEach(({ selector, label, side }, i) => {
         const target = canvasElement.querySelector(selector);
         expect(target, `${label}: its element exists`).not.toBeNull();
@@ -22,6 +32,9 @@ export const markersLevelWithParts = async (canvasElement, parts) => {
             expect(rect(marker).bottom, `marker ${i + 1} (${label}) sits above its part`).toBeLessThanOrEqual(box.top);
             return;
         }
+        // In a gutter, over no content: clear of the picture's box on one side.
+        const picture = rect(marker.offsetParent);
+        expect(rect(marker).right <= picture.left + 1 || rect(marker).left >= picture.right - 1, `marker ${i + 1} (${label}) sits in a gutter, over no content`).toBe(true);
         const middle = rect(marker).top + rect(marker).height / 2;
         expect(middle, `marker ${i + 1} (${label}) sits level with its part`).toBeGreaterThanOrEqual(box.top - 1);
         expect(middle, `marker ${i + 1} (${label}) sits level with its part`).toBeLessThanOrEqual(box.bottom + 1);

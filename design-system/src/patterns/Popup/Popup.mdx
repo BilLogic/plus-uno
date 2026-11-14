@@ -4,6 +4,8 @@ import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PopupStories from './Popup.stories.jsx';
+import * as HeadingOutlineStories from '../HeadingOutline.stories.jsx';
+import { DocsCanvasShell, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -75,9 +77,13 @@ A filter menu off the Filter icon. Every part once; the layer is padded 16 and r
 <Story of={PopupStories.AnatomyFilterMenu} inline />
 
 1. **Trigger.** The control it hangs off. It shows the open state and, for the Filter icon, the count.
-2. **Layer.** Hangs 4 below the trigger, aligned to the trigger's end edge because the trigger sits at the end of the bar.
+2. **Layer.** Hangs 4 below the trigger, aligned to the trigger's end edge because the trigger sits at the end of the bar. A titled layer's title is 14, whatever level the page around it is at.
 3. **Rows or categories.** Menu rows; a list of checkboxes or radios; columns or stacked categories.
 4. **Footer** (filter menu only). Reset (Default) and Apply (Primary), full bleed, half each.
+
+<DocsCanvasShell description="A popup with its title.">
+    <DsCanvasQuiet of={HeadingOutlineStories.PopupTitle} />
+</DocsCanvasShell>
 
 </div>
 

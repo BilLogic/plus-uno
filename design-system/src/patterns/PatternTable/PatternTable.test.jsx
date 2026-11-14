@@ -31,7 +31,7 @@ describe('PatternTable', () => {
 
     it('renders the empty state as a message row under the header, inside the table', () => {
         render(
-            <PatternTable empty emptyState={<span>No members yet</span>} pagination={<span>1 of 4</span>}>
+            <PatternTable empty emptyState={<span>No members yet</span>} footer={<span>1 of 4</span>}>
                 {head}
                 {body}
             </PatternTable>
@@ -81,7 +81,7 @@ describe('PatternTable', () => {
 
     it('renders the rows and pagination when not empty', () => {
         render(
-            <PatternTable emptyState={<span>No members yet</span>} pagination={<span>1 of 4</span>}>
+            <PatternTable emptyState={<span>No members yet</span>} footer={<span>1 of 4</span>}>
                 {head}
                 {body}
             </PatternTable>
