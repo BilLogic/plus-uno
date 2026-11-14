@@ -6,6 +6,7 @@ import '../design-system/src/storybook-docs/docs-rhythm.css';
 import { TocDocsContainer } from './docs-toc.jsx';
 import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.js';
 import { keepDocsAtTop } from '../design-system/src/storybook-docs/lib/docs-open-at-top.js';
+import { DocsOverlayBoundary } from '../design-system/src/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { mountInPageAnchors } from '../design-system/src/storybook-docs/lib/in-page-anchors.js';
 import BrowserFrame from '../design-system/src/storybook-docs/chrome/BrowserFrame';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
@@ -601,20 +602,19 @@ const preview = {
       </ColorModes>
     ),
     (Story, context) => {
-      // Docs-only: disable pointer interaction on static component examples so
-      // scroll stays stable. Canvas / Interactive / Overview stay fully usable
-      // (Controls, play functions, a11y checks).
-      if (
-        context.viewMode === 'docs' &&
-        context.name !== 'Interactive' &&
-        context.name !== 'Overview' &&
-        context.title.startsWith('Components/')
-      ) {
-         return (
-           <div style={{ pointerEvents: 'none' }}>
-             <Story />
-           </div>
-         );
+      // Docs-only: keep floating overlays inside their own example canvas, and
+      // disable pointer interaction on static component examples so scroll stays
+      // stable. Canvas / Interactive / Overview stay fully usable.
+      if (context.viewMode === 'docs') {
+        const staticComponentExample =
+          context.name !== 'Interactive' &&
+          context.name !== 'Overview' &&
+          context.title.startsWith('Components/');
+        return (
+          <DocsOverlayBoundary disablePointerEvents={staticComponentExample}>
+            <Story />
+          </DocsOverlayBoundary>
+        );
       }
 
       return <Story />;
