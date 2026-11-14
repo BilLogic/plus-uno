@@ -3,26 +3,30 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 
 <Meta title="Tech stack/Motion" />
 
-<FoundationHero kind="Tech stack" title="Motion" summary="The animation package, used by one component." />
+<FoundationHero
+    kind="Tech stack"
+    title="Motion"
+    summary="JavaScript spring animations when CSS transitions cannot interrupt or measure height."
+/>
 
 <FoundationContents />
 
 <FoundationSection title="What it is for">
 
-Components animate with CSS on the `--ds-motion-*` tokens. The `motion` package covers the one case CSS cannot: an entrance and exit that can be interrupted mid-flight.
+Most components animate in CSS with `--ds-motion-*` tokens. The `motion` package (`motion/react`) handles the cases CSS cannot: mid-flight interruption, exit presence and `auto`-height disclosure springs, driven by the generated `SPRINGS` table on <DocsLink id="foundations-expression-motion-physics">Physics</DocsLink>.
 
 </FoundationSection>
 
 <FoundationSection title="What wraps it">
 
-<DocsLink id="components-messaging-flag">Flag</DocsLink> is the only component that imports `motion`. Token values are on <DocsLink id="foundations-expression-motion-physics">Physics</DocsLink>.
+<DocsLink id="components-messaging-flag">Flag</DocsLink> uses `motion` for interruptible enter, exit and stack reflow. `HeightSurface` (`design-system/src/lib/heightMotion.jsx`) wraps `AnimatePresence` and `motion.div` for disclosure height transitions in <DocsLink id="components-layout-and-structure-accordion">Accordion</DocsLink>, <DocsLink id="components-forms-and-inputs-select-tree-select">Tree select</DocsLink> and <DocsLink id="components-text-and-data-display-tree-table">Tree table</DocsLink>.
 
 </FoundationSection>
 
 <FoundationSection title="What not to do">
 
-- Do not import `motion` for a transition CSS can do.
-- Do not write a literal `ms` value or `cubic-bezier()`. Read the motion tokens.
-- Do not make motion the only signal; keep the reduced-motion form.
+- Do not import `motion` for a transition that CSS `--ds-motion-*` tokens can handle.
+- Do not pass a literal duration or `cubic-bezier()` easing; read springs from `SPRINGS` (`@/tokens/ladder/springs.generated.js`).
+- Do not skip reduced motion; pair `SPRINGS` with `useMotionReduced()` so spatial moves collapse to an opacity fade.
 
 </FoundationSection>
