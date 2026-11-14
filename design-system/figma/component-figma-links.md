@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-56 docs-page links + 61 style/variant entries across 58 components.
+57 docs-page links + 63 style/variant entries across 60 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -47,6 +47,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Popup | `3497:19506` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506) |
 | Components | ProgressBar | `3497:19483` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19483) |
 | Components | Radio | `14876:12005` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005) |
+| Components | RadioGroup | `13332:2508` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13332-2508) |
 | Components | Range | `13611:6622` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6622) |
 | Components | Rating | `13266:7763` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763) |
 | Components | RichTextEditor | `9662:17308` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308) |
@@ -85,6 +86,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Calendar | Calendar | `20009:73360` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-73360) | verified |
 | Components | Carousel | Carousel | `20095:6756` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6756) | verified |
 | Components | Checkbox | Form Checkbox | `20328:63229` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20328-63229) | verified |
+| Components | CheckboxGroup | CheckboxGroup | `22266:381` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=22266-381) | verified |
 | Components | ChoiceGrid | Choice Grid | `20009:69129` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-69129) | verified |
 | Components | Comment | Comment | `20627:36` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20627-36) | verified |
 | Components | CountTag | Count tag | `20095:199` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-199) | verified |
@@ -114,6 +116,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | ProgressBar | Progress bar | `20117:5127` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5127) | verified |
 | Components | ProgressRing | ProgressRing | `22240:478` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=22240-478) | verified |
 | Components | Radio | Form Radio Button | `20328:77556` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20328-77556) | verified |
+| Components | RadioGroup | RadioGroup | `20009:71532` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=20009-71532) | verified |
 | Components | Range | Form Range Input | `20003:1536` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20003-1536) | verified |
 | Components | Rating | Rating System (disclosure) | `20003:2230` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20003-2230) | verified |
 | Components | RichTextEditor | Rich Text Editor | `20009:85516` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-85516) | verified |

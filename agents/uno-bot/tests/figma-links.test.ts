@@ -361,7 +361,9 @@ describe("only registry components", () => {
     // forms-and-inputs/_internal, and its registry row went with it (-1 net).
     // 57: ProgressRing gained its Core component set and figmaMeta (+1).
     // 58: FileItem gained its Core component set and figmaMeta (+1).
-    assert.equal(names.length, 58);
+    // 60: CheckboxGroup and RadioGroup gained their Core component sets and
+    // figmaMeta (+2).
+    assert.equal(names.length, 60);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
