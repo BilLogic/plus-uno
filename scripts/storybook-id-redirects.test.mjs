@@ -21,7 +21,7 @@ const FAMILIES = {
 };
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 48);
+  assert.equal(rules.length, 52);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
     if (r.from in FAMILIES) continue;

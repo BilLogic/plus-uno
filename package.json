@@ -127,6 +127,7 @@
     "check:storybook": "node scripts/check-storybook.mjs",
     "check:storybook-links": "node scripts/check-storybook-links.mjs",
     "check:docs-chrome": "node scripts/check-docs-chrome.mjs",
+    "check:docs-hero-fit": "node scripts/check-docs-hero-fit.mjs",
     "//check-registry:end": "END of the generated check:* block."
   },
   "keywords": [

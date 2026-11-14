@@ -26,7 +26,7 @@ const footer = (primary) => (
  * Patterns group draws them inline, at a stand-in screen.
  */
 export default {
-    title: 'Templates/Modal/Modal/Backdrop',
+    title: 'Templates/Modal/Backdrop',
     component: Backdrop,
     tags: ['!dev', '!autodocs'],
     argTypes: {
