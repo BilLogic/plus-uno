@@ -140,6 +140,7 @@ const OLD_PATTERNS = [
   '/uno:',
   'docs/product-and-service/design-system',
   'design-system/docs/',
+  'design-system/agent-views/pages/',
 ];
 
 /** History keeps the words it was written in; a build output is not authored. */
@@ -150,6 +151,7 @@ const NOT_ACTIVE = [
   'docs/adr/',
   'todos/',
   'storybook-static/',
+  'packages/cli/dist/',
   'design-system/figma/knowledge-audit.json',
 ];
 

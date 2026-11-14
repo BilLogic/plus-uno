@@ -168,53 +168,96 @@ test('tokens returns steps with intent and leaves primitives out', () => {
 test('guide returns the orientation, a guideline and a rule section', () => {
   assert.equal(lookup.guide().text, ORIENTATION);
   assert.match(ORIENTATION, /Template, then blocks, then pieces/);
-  assert.equal(lookup.guide('layout').path, 'design-system/agent-views/pages/templates/TemplatesOverview.md');
-  assert.equal(lookup.guide('layout formulas').path, 'design-system/agent-views/pages/templates/TemplatesOverview.md');
-  assert.equal(lookup.guide('a11y').path, 'design-system/src/styles/Accessibility.mdx');
+  assert.equal(lookup.guide('layout').path, 'design-system/agent-views/templates/TemplatesOverview.md');
+  assert.equal(lookup.guide('layout formulas').path, 'design-system/agent-views/templates/TemplatesOverview.md');
+  assert.equal(lookup.guide('a11y').path, 'design-system/agent-views/foundations/Accessibility.md');
   assert.match(lookup.guide('no-raw-literal').text, /^## ds\/no-raw-literal/);
   assert.ok(lookup.guide('nope').topics.includes('layout'));
 });
 
-test('guide answers pattern and template topics and their aliases', () => {
+test('guide answers pattern, template and foundation topics and situation aliases, with brief form by default and full page on request', () => {
   for (const alias of ['filtering', 'filter', 'filters']) {
     const g = lookup.guide(alias);
-    assert.equal(g.path, 'design-system/agent-views/pages/patterns/Filtering.md', alias);
+    assert.equal(g.path, 'design-system/agent-views/patterns/Filtering.md', alias);
+    assert.equal(g.brief, true, `${alias} is brief by default`);
     assert.match(g.text, /^# Filtering\n/, alias);
+    assert.match(g.text, /^## Tiers$/m, alias);
+    assert.match(g.text, /^## Usage$/m, alias);
+    assert.match(g.text, /^## Sections$/m, alias);
+    assert.doesNotMatch(g.text, /^## Best practices$/m, `${alias} brief omits full Best practices body`);
+    assert.ok(Array.isArray(g.sections) && g.sections.includes('Best practices'), alias);
   }
+  const fullFiltering = lookup.guide('filtering', { full: true });
+  assert.equal(fullFiltering.brief, false);
+  assert.match(fullFiltering.text, /^## Best practices$/m);
+  assert.equal(lookup.guide('filtering --full').text, fullFiltering.text);
+
+  for (const alias of ['layout', 'page', 'pages', 'templates', 'template']) {
+    const g = lookup.guide(alias);
+    assert.equal(g.path, 'design-system/agent-views/templates/TemplatesOverview.md', alias);
+    assert.equal(g.brief, true, `${alias} is brief by default`);
+    assert.match(g.text, /^## Which template for which job$/m, alias);
+    assert.match(g.text, /^## Sections$/m, alias);
+  }
+
+  for (const alias of ['toolbar', 'view bar', 'view-bar', 'section']) {
+    const g = lookup.guide(alias);
+    assert.equal(g.path, 'design-system/src/patterns/PatternSection/index.md', alias);
+    assert.equal(g.brief, true, `${alias} is brief by default`);
+    assert.match(g.text, /^# PatternSection\n/, alias);
+    assert.match(g.text, /^## Sections$/m, alias);
+  }
+
   const cases = [
-    ['search', 'design-system/agent-views/pages/patterns/Search.md'],
-    ['empty', 'design-system/agent-views/pages/patterns/Empty.md'],
-    ['empty state', 'design-system/agent-views/pages/patterns/Empty.md'],
-    ['error', 'design-system/agent-views/pages/patterns/Errors.md'],
-    ['errors', 'design-system/agent-views/pages/patterns/Errors.md'],
-    ['error state', 'design-system/agent-views/pages/patterns/Errors.md'],
-    ['loading', 'design-system/agent-views/pages/patterns/Loading.md'],
-    ['notification', 'design-system/agent-views/pages/patterns/Notifications.md'],
-    ['notifications', 'design-system/agent-views/pages/patterns/Notifications.md'],
-    ['toast', 'design-system/agent-views/pages/patterns/Notifications.md'],
-    ['banner', 'design-system/agent-views/pages/patterns/Notifications.md'],
-    ['action', 'design-system/agent-views/pages/patterns/CommonActions.md'],
-    ['actions', 'design-system/agent-views/pages/patterns/CommonActions.md'],
-    ['common-actions', 'design-system/agent-views/pages/patterns/CommonActions.md'],
-    ['commonactions', 'design-system/agent-views/pages/patterns/CommonActions.md'],
-    ['nav', 'design-system/agent-views/pages/patterns/Navigation.md'],
-    ['navigation', 'design-system/agent-views/pages/patterns/Navigation.md'],
-    ['disabled', 'design-system/agent-views/pages/patterns/Disabled.md'],
-    ['unavailable', 'design-system/agent-views/pages/patterns/Disabled.md'],
-    ['readonly', 'design-system/agent-views/pages/patterns/ReadOnly.md'],
-    ['read-only', 'design-system/agent-views/pages/patterns/ReadOnly.md'],
-    ['read only', 'design-system/agent-views/pages/patterns/ReadOnly.md'],
-    ['overflow', 'design-system/agent-views/pages/patterns/Overflow.md'],
-    ['truncation', 'design-system/agent-views/pages/patterns/Overflow.md'],
-    ['indicator', 'design-system/agent-views/pages/patterns/Indicators.md'],
-    ['indicators', 'design-system/agent-views/pages/patterns/Indicators.md'],
-    ['badge', 'design-system/agent-views/pages/patterns/Indicators.md'],
-    ['tag', 'design-system/agent-views/pages/patterns/Indicators.md'],
-    ['status', 'design-system/agent-views/pages/patterns/Indicators.md'],
-    ['templates', 'design-system/agent-views/pages/templates/TemplatesOverview.md'],
-    ['template', 'design-system/agent-views/pages/templates/TemplatesOverview.md'],
-    ['patterns', 'design-system/agent-views/pages/patterns/PatternsOverview.md'],
-    ['pattern', 'design-system/agent-views/pages/patterns/PatternsOverview.md'],
+    ['search', 'design-system/agent-views/patterns/Search.md'],
+    ['empty', 'design-system/agent-views/patterns/Empty.md'],
+    ['empty state', 'design-system/agent-views/patterns/Empty.md'],
+    ['error', 'design-system/agent-views/patterns/Errors.md'],
+    ['errors', 'design-system/agent-views/patterns/Errors.md'],
+    ['error state', 'design-system/agent-views/patterns/Errors.md'],
+    ['loading', 'design-system/agent-views/patterns/Loading.md'],
+    ['notification', 'design-system/agent-views/patterns/Notifications.md'],
+    ['notifications', 'design-system/agent-views/patterns/Notifications.md'],
+    ['toast', 'design-system/agent-views/patterns/Notifications.md'],
+    ['banner', 'design-system/agent-views/patterns/Notifications.md'],
+    ['action', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['actions', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['bulk', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['row actions', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['common-actions', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['commonactions', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['nav', 'design-system/agent-views/patterns/Navigation.md'],
+    ['sidebar', 'design-system/agent-views/patterns/Navigation.md'],
+    ['navigation', 'design-system/agent-views/patterns/Navigation.md'],
+    ['validation', 'design-system/agent-views/patterns/Forms.md'],
+    ['forms', 'design-system/agent-views/patterns/Forms.md'],
+    ['form-behavior', 'design-system/agent-views/patterns/Forms.md'],
+    ['disabled', 'design-system/agent-views/patterns/Disabled.md'],
+    ['unavailable', 'design-system/agent-views/patterns/Disabled.md'],
+    ['readonly', 'design-system/agent-views/patterns/ReadOnly.md'],
+    ['read-only', 'design-system/agent-views/patterns/ReadOnly.md'],
+    ['read only', 'design-system/agent-views/patterns/ReadOnly.md'],
+    ['overflow', 'design-system/agent-views/patterns/Overflow.md'],
+    ['truncation', 'design-system/agent-views/patterns/Overflow.md'],
+    ['indicator', 'design-system/agent-views/patterns/Indicators.md'],
+    ['indicators', 'design-system/agent-views/patterns/Indicators.md'],
+    ['badge', 'design-system/agent-views/patterns/Indicators.md'],
+    ['tag', 'design-system/agent-views/patterns/Indicators.md'],
+    ['status', 'design-system/agent-views/patterns/Indicators.md'],
+    ['patterns', 'design-system/agent-views/patterns/PatternsOverview.md'],
+    ['pattern', 'design-system/agent-views/patterns/PatternsOverview.md'],
+    ['frame', 'design-system/src/patterns/Frame/index.md'],
+    ['card', 'design-system/src/patterns/PatternCard/index.md'],
+    ['table', 'design-system/src/patterns/PatternTable/index.md'],
+    ['modal', 'design-system/src/patterns/PatternModal/index.md'],
+    ['form', 'design-system/agent-views/templates/Form.md'],
+    ['panel', 'design-system/agent-views/templates/Panel.md'],
+    ['popup', 'design-system/agent-views/templates/Popup.md'],
+    ['foundations', 'design-system/agent-views/foundations/FoundationsOverview.md'],
+    ['motion', 'design-system/agent-views/foundations/MotionPhysics.md'],
+    ['transitions', 'design-system/agent-views/foundations/MotionTransitions.md'],
+    ['choreography', 'design-system/agent-views/foundations/MotionChoreography.md'],
+    ['sound', 'design-system/agent-views/foundations/SoundOverview.md'],
   ];
   for (const [topic, expectedPath] of cases) {
     assert.equal(lookup.guide(topic).path, expectedPath, topic);
@@ -225,7 +268,7 @@ test('get includes Governed by: Filtering on SearchField, FilterButton, FilterMe
   const names = ['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'PatternSection'];
   const full = lookup.get(names);
   for (const r of full.records) {
-    assert.match(r.text, /\*\*Governed by:\*\* Filtering \(`design-system\/agent-views\/pages\/patterns\/Filtering\.md`/, r.name);
+    assert.match(r.text, /\*\*Governed by:\*\* Filtering \(`design-system\/agent-views\/patterns\/Filtering\.md`/, r.name);
     assert.match(r.text, /Quick filters \(1–3 categories, short lists\) use `FilterButton`, not `Select`\./, r.name);
   }
   const propsOnly = render('get', lookup.get(['SearchField'], 'props'));
@@ -234,7 +277,7 @@ test('get includes Governed by: Filtering on SearchField, FilterButton, FilterMe
 
 test('guide answers a foundation topic with no guideline file from its Storybook foundation page, as text', () => {
   const color = lookup.guide('color');
-  assert.equal(color.path, 'design-system/src/styles/Colors.mdx');
+  assert.equal(color.path, 'design-system/agent-views/foundations/Colors.md');
   assert.match(color.text, /^# Color\n/);
   assert.match(color.text, /^## Data-viz color$/m);
   assert.match(color.text, /--ds-chart-categorical-1/);
@@ -254,7 +297,7 @@ test('guide survives a guideline folder that is empty or missing', () => {
       if (e !== 'guidelines') fs.symlinkSync(path.join(REPO_ROOT, 'design-system', e), path.join(tmp, 'design-system', e));
     }
     const bare = createLookup(tmp);
-    assert.equal(bare.guide('color').path, 'design-system/src/styles/Colors.mdx');
+    assert.equal(bare.guide('color').path, 'design-system/agent-views/foundations/Colors.md');
     assert.ok(bare.guide('nope').topics.includes('typography'));
     assert.equal(bare.guide('data-visualization').text, null);
   } finally {

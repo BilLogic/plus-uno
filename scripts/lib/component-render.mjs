@@ -129,7 +129,7 @@ function usageTab(page, relatedFacts, motion) {
 
 const FILTERING_GOVERNED = new Set(['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'PatternSection']);
 const FILTERING_LINE =
-  'Filtering (`design-system/agent-views/pages/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.';
+  'Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.';
 
 export const governedByOf = (name) => (FILTERING_GOVERNED.has(name) ? FILTERING_LINE : null);
 

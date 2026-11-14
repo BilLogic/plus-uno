@@ -52,7 +52,7 @@ const NOT_ROUTABLE = [
 /** Reading paths — the one part of this file that is a judgment, not a glob. */
 const ROLE_PATHS = [
   ['New here, any role', ['README.md', 'SETUP.md', 'GLOSSARY.md']],
-  ['Designer building UI', ['design-system/guidelines/overview.md', 'design-system/agent-views/components/index.md', 'design-system/agent-views/pages/templates/TemplatesOverview.md']],
+  ['Designer building UI', ['design-system/guidelines/overview.md', 'design-system/agent-views/components/index.md', 'design-system/agent-views/templates/TemplatesOverview.md']],
   ['Agent, any task', ['AGENTS.md', 'INDEX.md']],
   ['Working on the harness', ['AGENTS.md', 'docs/adr/overview.md', 'skills/uno-maintain/SKILL.md']],
   ['Working on uno-bot', ['agents/uno-bot/AGENT.md', 'docs/connectors/slack/overview.md', 'docs/engineering/operations.md']],

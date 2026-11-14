@@ -57,7 +57,7 @@ turn it off, so a caller can attach it only while the text is clipped.
 description is not an accessible name, so an icon-only button still needs its
 own `label`; the tooltip is the second sentence, not the first. The reason a
 control is disabled is visible text, not a tooltip — the disabled-state rule is
-`design-system/agent-views/pages/patterns/Disabled.md`.
+`design-system/agent-views/patterns/Disabled.md`.
 
 ## Dialogs and what layers over them
 
@@ -74,4 +74,4 @@ everything, dialog included. Opening a dialog closes a floating sidebar.
 
 - `design-system/src/components/overlays-and-layering/index.md` — generated facts and coverage
 - `design-system/guidelines/components/messaging.md` — when the message should block
-- `design-system/agent-views/pages/templates/TemplatesOverview.md` — surfaces and overlays
+- `design-system/agent-views/templates/TemplatesOverview.md` — surfaces and overlays

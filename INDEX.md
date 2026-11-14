@@ -9,7 +9,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 **New here, any role** → [`README.md`](README.md) → [`SETUP.md`](SETUP.md) → [`GLOSSARY.md`](GLOSSARY.md)
 
-**Designer building UI** → [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) → [`design-system/agent-views/components/index.md`](design-system/agent-views/components/index.md) → [`design-system/agent-views/pages/templates/TemplatesOverview.md`](design-system/agent-views/pages/templates/TemplatesOverview.md)
+**Designer building UI** → [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) → [`design-system/agent-views/components/index.md`](design-system/agent-views/components/index.md) → [`design-system/agent-views/templates/TemplatesOverview.md`](design-system/agent-views/templates/TemplatesOverview.md)
 
 **Agent, any task** → [`AGENTS.md`](AGENTS.md) → [`INDEX.md`](INDEX.md)
 

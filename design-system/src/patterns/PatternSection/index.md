@@ -8,7 +8,7 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Import:** `import { PatternSection } from '@/patterns';`
 
-**Governed by:** Filtering (`design-system/agent-views/pages/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
 
 **Source:** `design-system/src/patterns/PatternSection/PatternSection.jsx`
 

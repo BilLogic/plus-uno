@@ -44,5 +44,5 @@ grep -rnE 'isDisabled|disabled[=}]|trailing=|leading=' --include="*.jsx" <dir>
 ```
 
 A hit is evidence for judgement against
-`design-system/agent-views/pages/patterns/Disabled.md` (explain on press)
+`design-system/agent-views/patterns/Disabled.md` (explain on press)
 and `docs/engineering/coding.md` § Slot names.
