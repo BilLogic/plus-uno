@@ -83,8 +83,8 @@ Never a slide (which suggests the areas sit side by side) and never a cut. The S
             'You went one level deeper, and the way back is the way you came.',
             'Opening one record or item from a list, card or overview, or opening a focused task.',
             'A quick look that leaves the page in place is Open an overlay.',
-            'Gains a level going in, loses one coming back.',
-            'Session row in a tutor’s record; Log a session.',
+            'Gains a level going in, loses one coming back. A focused task has no Breadcrumb; it still counts as a Drill.',
+            'Session row in a tutor’s record; Log a session. Triggered by a row or button, the Breadcrumb, browser back.',
         ],
     ]}
 />
@@ -99,11 +99,11 @@ Never a slide (which suggests the areas sit side by side) and never a cut. The S
     ]}
 />
 
-The row becomes the page: its own bars fade as it grows, and the record's content fades in once the container shows where it is going. Because people drill many times a day, the grow runs on `spatial.default`, and Back reverses it one speed faster on `spatial.fast`, returning the list at the same scroll position with that row briefly lit.
+The row becomes the page: its own bars fade as it grows, and the record's content fades in once the container shows where it is going. Nothing inside travels; the container is the only mover. Because people drill many times a day, the grow runs on `spatial.default`, and Back reverses it one speed faster on `spatial.fast`, returning the list at the same scroll position with that row briefly lit.
 
 <Canvas of={FrameStories.MotionDrillAndClimb} sourceState="none" />
 
-PLUS is at most three levels deep (area, record, one record inside it), so the same container transform holds at deeper levels. On a desktop with a fixed Sidebar a page never slides in: a slide reads as a floating Panel opening.
+PLUS is at most three levels deep (area, record, one record inside it), so the same container transform holds at every level. A flow that needs a fourth level is a hierarchy to flatten, not a fourth grow. On a desktop with a fixed Sidebar a page never slides in: a slide reads as a floating Panel opening.
 
 <Canvas of={FrameStories.MotionDrillDeeper} sourceState="none" />
 
@@ -111,7 +111,7 @@ Climbing back one level shrinks the page into the row it came from. Jumping back
 
 <Canvas of={FrameStories.MotionClimbTwoLevels} sourceState="none" />
 
-**Focused task.** Opening a focused task (Log a session) replaces the frame itself: the page and Sidebar fade out together on `appearance.fast`, then Frame · focused fades in on `appearance.default`. Moving between steps is Step; leaving with unsaved work confirms in a Modal, then reverses one speed faster.
+**Focused task.** Opening a focused task (Log a session) replaces the frame itself: the page and Sidebar fade out together on `appearance.fast`, then Frame · focused fades in on `appearance.default`. A button, a row's menu item or a link all open the task the same way, because the frame changes, not the thing pressed. Moving between steps is Step; leaving with unsaved work confirms in a Modal, then reverses one speed faster. Finishing carries on forward to the new record and a Flag confirms.
 
 <Canvas of={FrameStories.MotionFocusedTask} sourceState="none" />
 
@@ -163,7 +163,7 @@ Because the views are peers in a row, the bodies move sideways as a group withou
             'An ordered set: form steps, paging, one week to the next, reflection questions.',
             'Going deeper is Drill; another area is Go to.',
             'Unchanged; position label changes ("2 of 4").',
-            'Reflection 1 of 4; Schedule week to week.',
+            'Reflection 1 of 4; Schedule week to week. Triggered by Next and Back, arrow keys, swipe on touch.',
         ],
     ]}
 />
@@ -176,7 +176,7 @@ Because the views are peers in a row, the bodies move sideways as a group withou
     ]}
 />
 
-The body moves on the same axis as the step list, and step states change in place on `appearance.fast`. Placement (top for four steps or fewer, side for five or more or when labels would truncate) is fixed when the task opens so a branch never changes the slide axis mid-task.
+The body moves on the same axis as the step list. Step states change in place on `appearance.fast`, the moment the body starts: the step just left becomes visited and the next becomes current, and nothing travels along the ProgressTracker. Placement (top for four steps or fewer, side for five or more) is set once, when the task opens, by the longest path the flow can take, so a branch never changes the slide axis mid-task. Fit can push top to side, never the reverse: four steps whose labels would truncate go down the side. The position label swaps on `appearance.fast`; the header, Sidebar and step list never move.
 
 <Canvas of={FrameStories.MotionStepAcross} sourceState="none" />
 
@@ -244,6 +244,8 @@ In Reduced mode the page does not travel: the content at the new position fades 
     ]}
 />
 
+The old content is gone before the new arrives, so one clean frame sits between them. A cross-fade shows both at half strength and reads as mud.
+
 <Canvas of={TransitionStories.SwapContent} sourceState="none" />
 
 </FoundationSubsection>
@@ -273,6 +275,8 @@ In Reduced mode the page does not travel: the content at the new position fades 
     ]}
 />
 
+In a grid, the others slide along their row and wrap.
+
 <Canvas of={TransitionStories.AddAnItem} sourceState="none" />
 
 <Canvas of={TransitionStories.RemoveAnItem} sourceState="none" />
@@ -300,7 +304,7 @@ In Reduced mode the page does not travel: the content at the new position fades 
     ]}
 />
 
-A dragged item follows the pointer by weight (`spatial.fast` for a Tag, `spatial.default` for a card) and settles on `spatial.fast` from the release velocity while neighbors close up on `spatial.default`. With the keyboard, Space picks up the grab handle, arrow keys move it (including across lists), Space drops it and Escape cancels.
+A dragged item follows the pointer by weight (`spatial.fast` for a Tag, `spatial.default` for a card) and settles on `spatial.fast` from the release velocity while neighbors close up on `spatial.default`. With the keyboard, Space picks up the grab handle, arrow keys move it (including across lists), Space drops it and Escape cancels, and a live region says where it is. Between two lists the dropped item takes the place it lands on and both lists close up. Under Reduced motion nothing travels: what moved fades in place on `appearance.fast`, in the same order.
 
 <Canvas of={TransitionStories.ReorderItems} sourceState="none" />
 
@@ -333,6 +337,8 @@ A dragged item follows the pointer by weight (`spatial.fast` for a Tag, `spatial
         ['Chevron', 'rotates with the height', 'Same as the container', '0'],
     ]}
 />
+
+Closing reverses the reveal on the same token, with the detail fading first.
 
 <Canvas of={AccordionStories.MotionOpenClose} sourceState="none" />
 
@@ -416,11 +422,15 @@ A Modal opens only from user action, moves focus to its first input as the motio
 
 <Canvas of={ModalStories.MotionReduced} sourceState="none" />
 
+The Popup's own motion is its live story: click Details to open it, press Escape to close it.
+
 <Canvas of={PopupStories.OpensAndCloses} sourceState="none" />
 
 <Canvas of={TransitionStories.FlagOpens} sourceState="none" />
 
 <Canvas of={TransitionStories.FlagCloses} sourceState="none" />
+
+Cancel plays the entrance backward, one speed faster, and nothing else changes. Confirm fades the Modal, recolors the row's status and brings a Flag in.
 
 <Canvas of={TransitionStories.ConfirmOrCancel} sourceState="none" />
 
@@ -448,6 +458,8 @@ A Modal opens only from user action, moves focus to its first input as the motio
         ['Panel content', 'opacity in', <C>appearance.fast</C>, 'When the page is about 90% done making room'],
     ]}
 />
+
+Below the docking width the Panel slides over with a Backdrop.
 
 <Canvas of={TransitionStories.DockAPanel} sourceState="none" />
 
@@ -482,6 +494,8 @@ Nothing moves place. One element answers, or asks to be looked at.
     ]}
 />
 
+A number never overshoots.
+
 <Canvas of={TransitionStories.UpdateAValue} sourceState="none" />
 
 </FoundationSubsection>
@@ -507,7 +521,7 @@ Nothing moves place. One element answers, or asks to be looked at.
     ]}
 />
 
-It plays once: repeating motion belongs to loading, never to attention.
+It plays once: repeating motion belongs to loading, never to attention. Color, icon and message always carry the meaning, so Reduced mode loses nothing.
 
 <Canvas of={TransitionStories.CallAttention} sourceState="none" />
 
@@ -524,11 +538,17 @@ It plays once: repeating motion belongs to loading, never to attention.
     ]}
 />
 
-One shake at most, however many fields are wrong, and errors make no sound. In Reduced mode there is no shake: color, icon, message and focus carry it.
+Prevent errors first: use pickers, dropdowns, radios and number inputs with limits wherever the value has a fixed set or range, and keep submit enabled until the form is sent so people act, then see exactly what to fix. One shake at most, however many fields are wrong, and errors make no sound. In Reduced mode there is no shake: color, icon, message, the focus move and a screen-reader announcement carry it.
+
+In a field, check when focus leaves and never flag the person while they type.
 
 <Canvas of={TransitionStories.ErrorInAField} sourceState="none" />
 
+A failure that is the system's gets a message that makes room, never a shake.
+
 <Canvas of={TransitionStories.ErrorInAModal} sourceState="none" />
+
+A page gets a summary at the top and focus on the first error, never a shake.
 
 <Canvas of={TransitionStories.ErrorOnAPage} sourceState="none" />
 

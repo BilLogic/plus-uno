@@ -38,7 +38,7 @@ import * as RadiusStories from './Radius.stories.jsx';
 
 <FoundationSection title="Overview">
 
-Nine rules decide a corner. Take the first one that matches.
+Nine rules decide a corner. Take the first one that matches. A radius comes only from a token.
 
 1. **Window edge:** 0. A Page in the Frame, and a Modal footer that runs to the Modal's sides.
 2. **Pill:** `--radius-full`. A pill keeps its shape wherever it sits.
@@ -174,7 +174,7 @@ The focus ring sits 2 px outside the element (`--focus-ring-width`), so its radi
 
 <FoundationSection title="Tokens">
 
-The `Radius` group names a step by size; `Radius / Control` names it by control height. Pattern and component radius tokens sit in the tables above, and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full ladder.
+The `Radius` group names a step by size; `Radius / Control` names it by control height. `--frame-sidebar-row-radius` (6) rounds a Sidebar row. Pattern and component radius tokens sit in the tables above, and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full ladder.
 
 <TokenTable
     rows={[
@@ -243,7 +243,7 @@ The `Radius` group names a step by size; `Radius / Control` names it by control 
 
 <DoDont>
 <Do caption="The token follows the rules when a value moves.">{<C>border-radius: var(--radius-control-lg);</C>}</Do>
-<Dont caption="A literal breaks the moment a token value changes.">{<C>border-radius: 10px;</C>}</Dont>
+<Dont caption="A literal is right today and wrong after the next change. The radius lint fails it.">{<C>border-radius: 10px;</C>}</Dont>
 </DoDont>
 
 </FoundationSubsection>

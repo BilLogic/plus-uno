@@ -40,7 +40,7 @@ Every page's outline starts with one `h1`, and a heading's tag is its place in t
 
 <FoundationSection title="Contrast">
 
-Text clears 4.5:1 and icons, borders and the focus ring clear 3:1 against what they sit on, in light and dark (7:1 and 4.5:1 under increased contrast). Each text and icon token pairs with a surface or fill; [Color](?path=/docs/foundations-visual-color--docs) shows every measured pair.
+Text clears 4.5:1 and icons, borders and the focus ring clear 3:1 against what they sit on, in light and dark (7:1 and 4.5:1 under increased contrast). Each text and icon token pairs with a surface or fill. Never put a neutral text token on a bold fill, or an inverse token on a surface; [Color](?path=/docs/foundations-visual-color--docs) shows every measured pair.
 
 <Canvas of={AccessibilityStories.ContrastPairings} sourceState="none" />
 
@@ -48,7 +48,7 @@ Text clears 4.5:1 and icons, borders and the focus ring clear 3:1 against what t
 
 <FoundationSection title="Focus">
 
-Focus is shown by the focus ring, never by a fill: the control's fill and opacity stay unchanged. [Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color, width and offset, and [Radius](?path=/docs/foundations-visual-radius--docs#foundation-focus-ring) owns its corner.
+Focus is shown by the focus ring, never by a fill: the control's fill and opacity stay unchanged. The ring is the same on every interactive element, including cards, table rows and list items. [Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color, width and offset, and [Radius](?path=/docs/foundations-visual-radius--docs#foundation-focus-ring) owns its corner.
 
 <FoundationSubsection title="Focus in overlays">
 
@@ -90,7 +90,7 @@ A disabled component keeps its label so people can tell what is unavailable. [Co
 
 [Forms](?path=/docs/patterns-forms--docs) and [Errors](?path=/docs/patterns-states-errors--docs) own form layout and validation.
 
-- Every field has a visible label tied to its control (`htmlFor` to `id`).
+- Every field has a visible label tied to its control: a field that renders its own label wires `htmlFor` to the control's `id` itself, and `Select` and `DatePicker` render none, so the form supplies it.
 - An error states what went wrong and how to fix it on the field through `errorMessage`.
 - A required field takes `required`, and the form places "Required fields are marked with an asterisk (*)" above its first field.
 - Related fields sit in a `Fieldset`, which renders a `fieldset` and its `legend`.
@@ -103,15 +103,25 @@ Every chart describes its type, axes, series and points to screen readers, and i
 
 </FoundationSection>
 
+<FoundationSection title="Automated checks">
+
+Every story runs axe in the Storybook test suite, and a story may not add a violation, so a component that breaks a rule here is caught before it ships.
+
+</FoundationSection>
+
 <FoundationSection title="Do and don't">
 
 <FoundationSubsection title="Show focus with a ring">
+
+The control's fill stays as it is.
 
 <Canvas of={AccessibilityStories.FocusRing} sourceState="none" />
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Never carry meaning in color alone">
+
+Pair a status color with an icon and a word.
 
 <Canvas of={AccessibilityStories.StatusNotColorAlone} sourceState="none" />
 
