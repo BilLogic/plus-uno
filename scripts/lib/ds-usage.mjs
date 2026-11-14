@@ -30,7 +30,22 @@ export const RULES = {
   'ds/fa-free-only': { level: 'fail' },
   'ds/no-retired-name': { level: 'warn' },
   'ds/page-starts-from-pattern': { level: 'warn' },
+  'ds/placement': { level: 'warn' },
 };
+
+const DEFAULT_PLACEMENTS = [
+  {
+    id: 'toolbar',
+    in: ['PatternSection.toolbar', 'PatternSection.Toolbar', 'SectionToolbar'],
+    components: ['Select', 'PopupSelect'],
+    unlessProp: { PopupSelect: 'trigger' },
+    use: ['FilterButton', 'FilterMenu'],
+    pattern: 'Filtering',
+    guide: 'filtering',
+    message: "in a Section's toolbar is a form or view-switch control, not a view-bar filter",
+    fix: 'use FilterButton (1–3 quick filters; pass trigger={<FilterButton … />} to PopupSelect) or FilterMenu (staged multi-category menu); run `ds guide filtering`',
+  },
+];
 
 /** The rule's section in the rules doc, as a link a terminal can open. */
 export const docLink = (rule) => `${RULES_DOC}#${rule.replace('/', '')}`;
@@ -92,6 +107,7 @@ export function contextFrom({
   promoted = new Set(),
   exported = new Set(),
   barrels = {},
+  placements = DEFAULT_PLACEMENTS,
 }) {
   const byName = new Map(components.components.map((c) => [c.name, c]));
   const tokenByName = new Map(
@@ -136,6 +152,7 @@ export function contextFrom({
     retired,
     exported,
     barrels: { '@/components': exported, ...barrels },
+    placements,
   };
 }
 
@@ -240,6 +257,7 @@ function resolveFrom(ctx, barrel, name) {
 
 function scriptEscapes(text, ctx, add) {
   const bound = new Map(); // local name -> component record
+  const importedNames = new Map(); // local name -> canonical imported name
   const namespaces = new Map(); // local name -> barrel
 
   const unknown = (index, name, barrel, otherwise) => {
@@ -258,6 +276,7 @@ function scriptEscapes(text, ctx, add) {
       for (const { imported, local } of imp.named) {
         const found = resolveFrom(ctx, barrel, imported);
         if (found && !found.wrongBarrel) {
+          importedNames.set(local, found !== true ? found.name : imported);
           if (found !== true) bound.set(local, found);
           continue;
         }
@@ -274,14 +293,19 @@ function scriptEscapes(text, ctx, add) {
         `import { ${shown} } from '${home ? homeOf(home) : '@/components'}'`,
       );
       for (const { imported, local } of imp.named) {
+        importedNames.set(local, imported);
         const record = ctx.components.get(imported);
         if (record) bound.set(local, record);
       }
-      if (imp.default && ctx.components.has(imp.default)) bound.set(imp.default, ctx.components.get(imp.default));
+      if (imp.default) {
+        importedNames.set(imp.default, imp.default);
+        if (ctx.components.has(imp.default)) bound.set(imp.default, ctx.components.get(imp.default));
+      }
     }
   }
 
-  for (const el of jsxElementsOf(text)) {
+  const elements = jsxElementsOf(text);
+  for (const el of elements) {
     let record = bound.get(el.name);
     const dot = el.name.indexOf('.');
     if (!record && dot > 0 && namespaces.has(el.name.slice(0, dot))) {
@@ -327,10 +351,62 @@ function scriptEscapes(text, ctx, add) {
     }
   }
 
+  placementEscapes(text, elements, importedNames, namespaces, ctx.placements ?? [], add);
+
   for (const obj of styleObjectsOf(text)) {
     for (const { key, value, index } of obj.properties) {
       const reason = rawInJsxStyle(key, value);
       if (reason) add('ds/no-raw-literal', index, `\`${key}: ${value}\` is a raw ${reason}`, rawFix(reason, key, literalOf(value).text, ctx));
+    }
+  }
+}
+
+function canonicalTagName(name, importedNames, namespaces) {
+  const dot = name.indexOf('.');
+  if (dot === -1) return importedNames.get(name) ?? null;
+  const head = name.slice(0, dot);
+  const rest = name.slice(dot + 1);
+  if (namespaces.has(head)) return rest;
+  const base = importedNames.get(head);
+  return base ? `${base}.${rest}` : null;
+}
+
+function placementEscapes(text, elements, importedNames, namespaces, placements, add) {
+  if (!placements.length) return;
+  for (const row of placements) {
+    const spans = [];
+    for (const target of row.in ?? []) {
+      const dot = target.lastIndexOf('.');
+      const isPropSlot = dot > 0 && /^[a-z]/.test(target.slice(dot + 1));
+      if (isPropSlot) {
+        const owner = target.slice(0, dot);
+        const propName = target.slice(dot + 1);
+        for (const el of elements) {
+          if (canonicalTagName(el.name, importedNames, namespaces) !== owner) continue;
+          const attr = el.attributes.find((a) => a.name === propName);
+          if (attr?.end !== undefined) spans.push([attr.index, attr.end]);
+        }
+      } else {
+        for (const el of elements) {
+          if (canonicalTagName(el.name, importedNames, namespaces) !== target) continue;
+          let end = el.end;
+          if (!el.selfClosing) {
+            const closeIdx = text.indexOf(`</${el.name}>`, el.end);
+            if (closeIdx !== -1) end = closeIdx;
+          }
+          spans.push([el.index + 1, end]);
+        }
+      }
+    }
+    if (!spans.length) continue;
+    const disallowed = new Set(row.components ?? []);
+    for (const el of elements) {
+      const comp = canonicalTagName(el.name, importedNames, namespaces);
+      if (!comp || !disallowed.has(comp)) continue;
+      if (!spans.some(([s, e]) => el.index >= s && el.index < e)) continue;
+      const exemptProp = row.unlessProp?.[comp];
+      if (exemptProp && (el.spread || el.attributes.some((a) => a.name === exemptProp))) continue;
+      add('ds/placement', el.index + 1, `\`<${comp}>\` ${row.message}`, row.fix);
     }
   }
 }

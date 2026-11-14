@@ -8,6 +8,8 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Import:** `import { PatternSection } from '@/patterns';`
 
+**Governed by:** Filtering (`design-system/agent-views/pages/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
+
 **Source:** `design-system/src/patterns/PatternSection/PatternSection.jsx`
 
 **Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, FillSubtle, CardNesting, Footer, Anatomy, Levels, ToolbarSearch, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, DetailWithPanel, DetailWithPanelNoSectionDetail, DetailSplitAt1440, DetailSplitHoldsWithPanelAt1440, DetailReplacesListBelow960, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, HeaderTypeTitle, HeaderTypeTitleAndActions, HeaderTypeViewBarOneView, HeaderTypeViewBarSeveralViews, HeaderTypeFormatSwitch, HeaderTypeViewBarAlone, HeaderTypeUnderPageTabs, HeaderTypeSubsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, RowsSelected, EmptyInTable, AnatomyQueue

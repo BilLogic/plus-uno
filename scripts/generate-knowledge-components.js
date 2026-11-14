@@ -110,6 +110,7 @@ Nothing here is authored, and nothing here explains a component.
 | \`_inventions.json\` | hand-kept, reviewed in PRs | The names agents reach for that do not exist here; rendered into the header of \`components/index.md\` |
 | \`_patterns.json\` | hand-kept, reviewed in PRs | The patterns a page, section, card, table or overlay starts from: each one's group and when to reach for it; rendered into \`components/index.md\` with its import and page from source |
 | \`_aliases.json\` | hand-kept, reviewed in PRs | The other words a component is asked by, which its name and docs do not say; \`ds_find\` ranks on them and \`ds_get\` prints them. Not rendered into \`components/index.md\`, which is the existence list, not a thesaurus |
+| \`_placements.json\` | hand-kept, reviewed in PRs | Component placements that \`ds/placement\` warns on: which components inside which slot or container belong to a different pattern, what to use instead, and the \`ds guide\` topic to read |
 
 The two JSON files are the machine copy of the facts above, for checkers and
 evals. Read the markdown; let scripts read the JSON. In \`components.json\`,

@@ -8,6 +8,8 @@ Also asked as: filter chip, filter control.
 
 **Import:** `import { FilterButton } from '@/components';`
 
+**Governed by:** Filtering (`design-system/agent-views/pages/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
+
 **Source:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.stories.jsx` — Overview, Metric, Appearances, Spacing, States, Selected, Disabled, Loading, HoveredState, PressedState, KeyboardFocus, Interactive

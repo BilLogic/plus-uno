@@ -6,6 +6,8 @@ Search field: find a record by typing. It is a TextField with a search icon befo
 
 **Import:** `import { SearchField } from '@/components';`
 
+**Governed by:** Filtering (`design-system/agent-views/pages/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
+
 **Source:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.stories.jsx` — Overview, Active, Spacing, Filled, ButtonInside, Disabled, Loading, Async, Collapsible, Scopes, CollapsibleScopes, Basic, Focused, FocusedKeyboard, Interactive

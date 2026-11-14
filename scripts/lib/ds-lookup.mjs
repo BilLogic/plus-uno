@@ -55,7 +55,7 @@ import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
 import { INSTALL_FOLDER } from './ds-add.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
-import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, renderComponent, sectionsOf } from './component-render.mjs';
+import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, governedByOf, renderComponent, sectionsOf } from './component-render.mjs';
 
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
 
@@ -101,8 +101,8 @@ const CONSTANT = /^[A-Z0-9_]+$/;
 const TOPIC_ALIASES = {
   __proto__: null,
   a11y: 'accessibility',
-  'layout formulas': 'layout',
-  formulas: 'layout',
+  'layout formulas': 'layout-formulas',
+  formulas: 'layout-formulas',
   page: 'layout',
   pages: 'layout',
   icons: 'iconography',
@@ -124,6 +124,42 @@ const TOPIC_ALIASES = {
   elevation: 'elevation',
   content: 'content',
   grid: 'grid',
+  filter: 'filtering',
+  filters: 'filtering',
+  filtering: 'filtering',
+  search: 'search',
+  empty: 'empty',
+  'empty state': 'empty',
+  error: 'errors',
+  errors: 'errors',
+  'error state': 'errors',
+  loading: 'loading',
+  notification: 'notifications',
+  notifications: 'notifications',
+  toast: 'notifications',
+  banner: 'notifications',
+  action: 'common-actions',
+  actions: 'common-actions',
+  'common-actions': 'common-actions',
+  commonactions: 'common-actions',
+  nav: 'navigation',
+  navigation: 'navigation',
+  disabled: 'disabled',
+  unavailable: 'disabled',
+  readonly: 'read-only',
+  'read-only': 'read-only',
+  'read only': 'read-only',
+  overflow: 'overflow',
+  truncation: 'overflow',
+  indicator: 'indicators',
+  indicators: 'indicators',
+  badge: 'indicators',
+  tag: 'indicators',
+  status: 'indicators',
+  templates: 'templates',
+  template: 'templates',
+  patterns: 'patterns',
+  pattern: 'patterns',
 };
 /** Topic words that are everyday English too ("copy to clipboard", "grid of cards"). */
 const GUIDE_WEAK = new Set('copy content grid icon icons page pages type writing voice shadow charts formulas'.split(' '));
@@ -143,6 +179,7 @@ const headed = (page, title) => {
 };
 const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
 const GUIDELINES = 'design-system/guidelines';
+const AGENT_PAGES = 'design-system/agent-views/pages';
 const FOUNDATION_PAGES = 'design-system/src/styles';
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
@@ -503,6 +540,8 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     };
     // The text is the generated doc's: one render (`component-render.mjs`) from the manifest record and the page.
     const homeName = a.aliasOf ?? a.name;
+    const governedBy = governedByOf(homeName);
+    if (governedBy) record.governedBy = governedBy;
     const componentFactsOf = componentFacts(facts.manifests.components, homeName, { [homeName]: facts.lookup(homeName).aliases });
     const text = componentFactsOf?.source ? renderComponent(componentFactsOf, docs) : null;
     if (text) record.doc = docPathOf(componentFactsOf);
@@ -512,8 +551,11 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       else if (s === 'figma') record.figma = figmaFor(a.aliasOf ?? a.name);
       else record[s] = text ? sectionsOf(text, SECTION_TITLES[s]) : null;
     }
-    if (text) record.text = section ? [`# ${a.name}`, a.import, sectionsOf(text, SECTION_TITLES[section]) ?? `## ${section}\n\nNone in the generated doc.`].join('\n\n') + '\n' : text;
-    else record.next = 'Next: ds_tokens for the roles you style; ds_check once the code is written.';
+    if (text) {
+      record.text = section
+        ? [`# ${a.name}`, a.import, ...(governedBy ? [`**Governed by:** ${governedBy}`] : []), sectionsOf(text, SECTION_TITLES[section]) ?? `## ${section}\n\nNone in the generated doc.`].join('\n\n') + '\n'
+        : text;
+    } else record.next = 'Next: ds_tokens for the roles you style; ds_check once the code is written.';
     return record;
   }
 
@@ -553,8 +595,22 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
    */
   const topics = () => {
     const map = {};
+    for (const dir of ['patterns', 'templates']) {
+      for (const f of mdIn(`${AGENT_PAGES}/${dir}`)) {
+        const rel = `${AGENT_PAGES}/${dir}/${f}`;
+        const stem = f.replace(/(?:Overview)?\.md$/, '');
+        const kebab = stem.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+        const lower = stem.toLowerCase();
+        map[kebab] = rel;
+        map[lower] = rel;
+      }
+    }
+    if (map.templates) map.layout = map.templates;
     for (const dir of ['foundations', 'composition']) {
-      for (const f of mdIn(`${GUIDELINES}/${dir}`)) map[f.replace(/\.md$/, '')] ??= `${GUIDELINES}/${dir}/${f}`;
+      for (const f of mdIn(`${GUIDELINES}/${dir}`)) {
+        const key = f === 'layout.md' ? 'layout-formulas' : f.replace(/\.md$/, '');
+        map[key] ??= `${GUIDELINES}/${dir}/${f}`;
+      }
     }
     if (fs.existsSync(path.join(root, GUIDELINES, 'foundations/content/overview.md'))) map.content = `${GUIDELINES}/foundations/content/overview.md`;
     for (const f of mdIn(`${GUIDELINES}/foundations/content`)) map[f.replace(/\.md$/, '')] = `${GUIDELINES}/foundations/content/${f}`;
@@ -570,7 +626,9 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   /** A topic file's text: a guideline as written, a foundation page as its page model's markdown. */
   const topicText = (rel) => {
     const source = fs.readFileSync(path.join(root, rel), 'utf8');
-    return rel.endsWith('.mdx') ? pageText(readDocsPage(source, { kind: 'foundation', root, file: rel })) : source.trim();
+    return rel.endsWith('.mdx')
+      ? pageText(readDocsPage(source, { kind: 'foundation', root, file: rel }))
+      : source.replace(/^<!--\s*DO NOT EDIT[\s\S]*?-->\n+/, '').trim();
   };
 
   function guide(arg) {
