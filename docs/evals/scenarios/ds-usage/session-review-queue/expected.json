@@ -21,8 +21,8 @@
       "template": "Panel + Form",
       "variant": "Panel · Details / Form · In a Panel",
       "pages": [
-        "design-system/agent-views/pages/templates/Panel.md",
-        "design-system/agent-views/pages/templates/Form.md"
+        "design-system/agent-views/templates/Panel.md",
+        "design-system/agent-views/templates/Form.md"
       ],
       "guides": ["panel", "form"],
       "expectation": "Details Panel wired through Frame's panel slot and usePanelControl, with PanelHeader, fields in PanelBody, and full-bleed Cancel (Default) and Save review (Primary) actions in PanelFooter."
@@ -44,7 +44,7 @@
       "id": "filtering",
       "pattern": "Filtering",
       "variant": "1 · Quick filters",
-      "page": "design-system/agent-views/pages/patterns/Filtering.md",
+      "page": "design-system/agent-views/patterns/Filtering.md",
       "guide": "filtering",
       "aliases": ["filter", "filters"],
       "expectation": "Quick filters at the end of the Section's view bar use FilterButton (or FilterMenu) per category (Affiliation, Status), applied as picked, rather than bare Select or PopupSelect controls."
@@ -53,7 +53,7 @@
       "id": "search",
       "pattern": "Search",
       "variant": "Active",
-      "page": "design-system/agent-views/pages/patterns/Search.md",
+      "page": "design-system/agent-views/patterns/Search.md",
       "guide": "search",
       "expectation": "Compact SearchField in the Section's view bar narrows rows in place as the coordinator types while the view bar stays put."
     },
@@ -61,7 +61,7 @@
       "id": "navigation",
       "pattern": "Navigation",
       "variant": "3 · Details Panel",
-      "page": "design-system/agent-views/pages/patterns/Navigation.md",
+      "page": "design-system/agent-views/patterns/Navigation.md",
       "guide": "navigation",
       "aliases": ["nav"],
       "expectation": "Selecting a table row opens the Details Panel beside the table via Frame's panel slot and usePanelControl while keeping the selected row highlighted."
@@ -70,7 +70,7 @@
       "id": "forms",
       "pattern": "Forms",
       "variant": "In a Panel · Details",
-      "page": "design-system/agent-views/pages/patterns/Forms.md",
+      "page": "design-system/agent-views/patterns/Forms.md",
       "guide": "forms",
       "expectation": "RadioGroup for review outcome and conditionally required TextArea for coordinator notes on follow-up or escalation, with inline validation message on the field and actions in PanelFooter."
     },
@@ -78,7 +78,7 @@
       "id": "common-actions",
       "pattern": "Common actions",
       "variant": "In a Panel / In a Modal / Table row actions",
-      "page": "design-system/agent-views/pages/patterns/CommonActions.md",
+      "page": "design-system/agent-views/patterns/CommonActions.md",
       "guide": "common-actions",
       "aliases": ["bulk", "row actions", "buttons"],
       "expectation": "Panel and Modal footers pair Cancel (Default) on the left with the primary action on the right; table row actions use distinct button controls rather than plain subtle text."
@@ -87,7 +87,7 @@
       "id": "notifications",
       "pattern": "Notifications",
       "variant": "Banner · Page + Flag with Undo",
-      "page": "design-system/agent-views/pages/patterns/Notifications.md",
+      "page": "design-system/agent-views/patterns/Notifications.md",
       "guide": "notifications",
       "aliases": ["toast", "banner", "alert"],
       "expectation": "Page-tier warning Banner sits under PageHeader when overdue sessions exist; committing a review surfaces an auto-dismissing Flag in a FlagGroup with an Undo action."
@@ -96,7 +96,7 @@
       "id": "empty",
       "pattern": "Empty",
       "variant": "No matches · In a table",
-      "page": "design-system/agent-views/pages/patterns/Empty.md",
+      "page": "design-system/agent-views/patterns/Empty.md",
       "guide": "empty",
       "expectation": "When combined search and filters match no sessions, EmptyState renders inside the table with a Clear filters action while the Section toolbar remains usable."
     },
@@ -104,7 +104,7 @@
       "id": "disabled",
       "pattern": "Disabled",
       "variant": "Explains on focus/hover or press",
-      "page": "design-system/agent-views/pages/patterns/Disabled.md",
+      "page": "design-system/agent-views/patterns/Disabled.md",
       "guide": "disabled",
       "aliases": ["unavailable", "tooltip on disabled"],
       "expectation": "For a Resolved session older than 7 days, the unavailable Reopen action provides a keyboard- and touch-reachable explanation."
@@ -113,7 +113,7 @@
       "id": "indicators",
       "pattern": "Indicators",
       "variant": "Status in a row",
-      "page": "design-system/agent-views/pages/patterns/Indicators.md",
+      "page": "design-system/agent-views/patterns/Indicators.md",
       "guide": "indicators",
       "expectation": "Each session row displays one StatusTag with semantic appearance matching its status (Flagged, In review, Resolved)."
     }

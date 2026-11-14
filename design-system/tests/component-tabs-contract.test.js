@@ -174,8 +174,10 @@ describe('the Harness tab', () => {
   const MODAL = 'design-system/src/components/messaging/Modal/index.md';
   const FIELDSET = 'design-system/src/components/forms-and-inputs/Fieldset.md';
   const PATTERN = 'design-system/src/patterns/PatternModal/index.md';
-  const PATTERN_PAGE = 'design-system/agent-views/pages/patterns/Filtering.md';
-  const modules = rawGlob([MODAL, FIELDSET, PATTERN, PATTERN_PAGE]);
+  const PATTERN_PAGE = 'design-system/agent-views/patterns/Filtering.md';
+  const TEMPLATE_PAGE = 'design-system/agent-views/templates/Form.md';
+  const FOUNDATION_PAGE = 'design-system/agent-views/foundations/Colors.md';
+  const modules = rawGlob([MODAL, FIELDSET, PATTERN, PATTERN_PAGE, TEMPLATE_PAGE, FOUNDATION_PAGE]);
 
   it('shows exactly the generated file for a nested component', () => {
     const entry = agentViewEntry(modules, {
@@ -209,7 +211,46 @@ describe('the Harness tab', () => {
     });
     expect(entry).toMatchObject({ path: PATTERN_PAGE, name: 'Filtering' });
     expect(entry.value).toBe(read(PATTERN_PAGE));
-    expect(repoPathOfGlobKey('../../agent-views/pages/patterns/Filtering.md')).toBe(PATTERN_PAGE);
+    expect(repoPathOfGlobKey('../../agent-views/patterns/Filtering.md')).toBe(PATTERN_PAGE);
+  });
+
+  it('shows the generated agent file for a docs-only template page and a foundation page', () => {
+    const templateEntry = agentViewEntry(modules, {
+      importPath: './design-system/src/patterns/Form/Form.stories.jsx',
+    });
+    expect(templateEntry).toMatchObject({ path: TEMPLATE_PAGE, name: 'Form' });
+    expect(templateEntry.value).toBe(read(TEMPLATE_PAGE));
+    expect(repoPathOfGlobKey('../../agent-views/templates/Form.md')).toBe(TEMPLATE_PAGE);
+
+    const foundationEntry = agentViewEntry(modules, {
+      importPath: './design-system/src/styles/Colors.stories.jsx',
+    });
+    expect(foundationEntry).toMatchObject({ path: FOUNDATION_PAGE, name: 'Colors' });
+    expect(foundationEntry.value).toBe(read(FOUNDATION_PAGE));
+    expect(repoPathOfGlobKey('../../agent-views/foundations/Colors.md')).toBe(FOUNDATION_PAGE);
+  });
+
+  it('resolves every template, pattern and foundation page to an existing generated file', () => {
+    const pages = [
+      ...['Frame', 'Page', 'PatternSection', 'PatternCard', 'PatternTable', 'PatternModal', 'Form', 'Panel', 'Popup'].map(
+        (n) => `design-system/src/patterns/${n}/${n}.mdx`,
+      ),
+      'design-system/src/storybook-docs/templates/TemplatesOverview.mdx',
+      'design-system/src/storybook-docs/patterns/PatternsOverview.mdx',
+      ...fs
+        .readdirSync(path.join(REPO_ROOT, 'design-system/src/storybook-docs/patterns'), { withFileTypes: true })
+        .filter((d) => d.isDirectory())
+        .map((d) => `design-system/src/storybook-docs/patterns/${d.name}/${d.name}.mdx`),
+      ...fs
+        .readdirSync(path.join(REPO_ROOT, 'design-system/src/styles'))
+        .filter((f) => f.endsWith('.mdx'))
+        .map((f) => `design-system/src/styles/${f}`),
+    ];
+    for (const page of pages) {
+      const docPath = generatedDocPathFor({ importPath: `./${page}` });
+      expect(docPath, page).toBeTruthy();
+      expect(fs.existsSync(path.join(REPO_ROOT, docPath)), `${page} -> ${docPath}`).toBe(true);
+    }
   });
 
   it('is absent for a pattern page with no generated file beside it', () => {
@@ -220,7 +261,7 @@ describe('the Harness tab', () => {
   });
 
   it('is absent when the page has no generated file', () => {
-    expect(agentViewEntry(modules, { importPath: './design-system/src/styles/Colors.stories.jsx' })).toBeNull();
+    expect(agentViewEntry(modules, { importPath: './design-system/src/styles/Unknown.stories.jsx' })).toBeNull();
     expect(agentViewEntry(modules, {})).toBeNull();
     expect(generatedDocPathFor(undefined)).toBeNull();
   });

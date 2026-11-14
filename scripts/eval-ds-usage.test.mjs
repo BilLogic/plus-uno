@@ -571,7 +571,7 @@ test('reach: deterministically scores opened and ds-guided template/pattern page
     call('Read', { file_path: '/c/design-system/src/patterns/Frame/index.md' }),
     call('mcp__plus-ds__ds_guide', { topic: 'filtering' }),
     call('Write', { file_path: '/c/prototypes/eval-session-review-queue/src/App.jsx', content: 'export default () => null;' }),
-    call('Read', { file_path: '/c/design-system/agent-views/pages/patterns/CommonActions.md' }),
+    call('Read', { file_path: '/c/design-system/agent-views/patterns/CommonActions.md' }),
     call('Bash', { command: 'npm run ds -- guide notifications' }),
   ].join('\n');
   const rs = readSet(stdout, '/c');
@@ -581,11 +581,11 @@ test('reach: deterministically scores opened and ds-guided template/pattern page
   assert.deepEqual(r.templates.reached, ['design-system/src/patterns/Frame/index.md']);
   assert.deepEqual(r.templates.before_first_write, ['design-system/src/patterns/Frame/index.md']);
   assert.deepEqual(r.patterns.reached, [
-    'design-system/agent-views/pages/patterns/Filtering.md',
-    'design-system/agent-views/pages/patterns/CommonActions.md',
-    'design-system/agent-views/pages/patterns/Notifications.md',
+    'design-system/agent-views/patterns/Filtering.md',
+    'design-system/agent-views/patterns/CommonActions.md',
+    'design-system/agent-views/patterns/Notifications.md',
   ]);
-  assert.deepEqual(r.patterns.before_first_write, ['design-system/agent-views/pages/patterns/Filtering.md']);
+  assert.deepEqual(r.patterns.before_first_write, ['design-system/agent-views/patterns/Filtering.md']);
 });
 
 test('a11y: captures screenshot.png at 1440x960 after fonts load', async () => {
@@ -656,7 +656,7 @@ test('rejudge: writes reach, screenshot and per-item fit as new rows marked reju
         arm: 'current',
         task: 'session-review-queue',
         run: 1,
-        read_set: { files: ['design-system/agent-views/pages/patterns/Filtering.md'], lookups: [] },
+        read_set: { files: ['design-system/agent-views/patterns/Filtering.md'], lookups: [] },
         output: srqDir,
       },
       {
@@ -667,7 +667,7 @@ test('rejudge: writes reach, screenshot and per-item fit as new rows marked reju
         arm: 'current',
         task: 'triage-repair',
         run: 1,
-        read_set: { files: ['design-system/agent-views/pages/patterns/Disabled.md'], lookups: [] },
+        read_set: { files: ['design-system/agent-views/patterns/Disabled.md'], lookups: [] },
         output: trDir,
       },
     ];
@@ -691,7 +691,7 @@ test('rejudge: writes reach, screenshot and per-item fit as new rows marked reju
     assert.equal(srq.scored_at, 'testsha');
     assert.equal(srq.screenshot, path.join(srqDir, 'screenshot.png'));
     assert.equal(srq.reach.hit, true);
-    assert.deepEqual(srq.reach.patterns.before_first_write, ['design-system/agent-views/pages/patterns/Filtering.md']);
+    assert.deepEqual(srq.reach.patterns.before_first_write, ['design-system/agent-views/patterns/Filtering.md']);
     assert.ok(srq.fit, 'session-review-queue gets per-item fit');
     for (const item of expectedItems(expected)) {
       assert.ok(FIT_VERDICTS.includes(srq.fit[item.id]?.verdict), `fit verdict for ${item.id}`);

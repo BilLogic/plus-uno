@@ -15,7 +15,7 @@ state, focus management, keyboard handling — is built on Base UI
 Two rules reach every group, each stated once:
 
 - **Disabled states** (explain on press):
-  `design-system/agent-views/pages/patterns/Disabled.md`.
+  `design-system/agent-views/patterns/Disabled.md`.
 - **Slot names:** `docs/engineering/coding.md` § Slot names.
 
 ## Start here — the group overviews

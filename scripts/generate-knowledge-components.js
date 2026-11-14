@@ -105,6 +105,9 @@ Nothing here is authored, and nothing here explains a component.
 | \`components/index.md\` | \`src/components/index.js\` exports | Does this component exist? |
 | \`forms/index.md\` | static redirect (\`src/forms/\` is gone) | Where did the form components go? |
 | \`tokens/tokens.md\` | \`src/tokens/*.scss\` | What is this token called? |
+| \`templates/<Name>.md\` | \`src/patterns/<Name>/<Name>.mdx\` and \`src/storybook-docs/templates/TemplatesOverview.mdx\` | Docs-only template agent copies |
+| \`patterns/<Name>.md\` | \`src/storybook-docs/patterns/**/*.mdx\` | Pattern agent copies |
+| \`foundations/<Name>.md\` | \`src/styles/*.mdx\` | Foundation agent copies |
 | \`components.json\` | the barrels (\`@/components\`, \`@/patterns\`), each component's and pattern's propTypes, defaults and JSDoc | For a program: which components and patterns exist (each record's \`kind\`), which props each takes, which values an enum prop accepts |
 | \`tokens.json\` | the same token files as \`tokens.md\` | For a program: each token's tier, group and first declared value |
 | \`_inventions.json\` | hand-kept, reviewed in PRs | The names agents reach for that do not exist here; rendered into the header of \`components/index.md\` |

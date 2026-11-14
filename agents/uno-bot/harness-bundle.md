@@ -19,7 +19,7 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,385 (−8,531 ide-only) | 10,385 | 20,000 (constitution) |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,385 (−8,525 ide-only) | 10,385 | 20,000 (constitution) |
 | 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,387 | 27,801 | 20,000 (constitution) |
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 49,284 | 22,048 (persona) |
 | 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 50,930 | — |
@@ -42,12 +42,12 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 162,636 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 162,630 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
 | `blueprint-upkeep` | [`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) | 4,291 |
-| `critique-a-design` | [`agents/uno-bot/skills/critique-a-design/SKILL.md`](../../agents/uno-bot/skills/critique-a-design/SKILL.md) | 3,736 |
+| `critique-a-design` | [`agents/uno-bot/skills/critique-a-design/SKILL.md`](../../agents/uno-bot/skills/critique-a-design/SKILL.md) | 3,730 |
 | `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 3,515 |
 | `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,574 |
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
@@ -1224,7 +1224,7 @@ A designer links a frame, a prototype, a spec or a coded component and asks what
 1. **Take the manifest.** Fidelity (low · mid · high · coded), tools used, PRD link. Ask once for what is missing. Design QA on a card at Ready for QA starts from the file whose title carries the card's number and its 📐 Specs pages instead. Done when fidelity and PRD are known, or asked for.
 2. **Read the artifact.** `source_read` the frame (the rendered screen, text layers, annotations, fills, comments) and the PRD; for what changed since a date, pass that date as `since`. Annotations are the designer's own spec: quote the ones a finding rests on, word for word, with the layer they sit on. `github_read` a coded artifact's source and the rule docs a lens applies, such as `design-system/src/styles/Accessibility.mdx`. The artifact is in hand only when the read returns its own content; a page that loads with none of it in it is unread. Done when you can quote what is in the artifact, or have said plainly what failed to load.
 3. **Apply the lenses one at a time**, at the manifest's fidelity:
-   - **DS:** components, tokens, layout, the constitution's hard rules. Fills come back as rendered hex; the token behind one is unread. A disabled action is checked against `design-system/agent-views/pages/patterns/Disabled.md` (explain on press).
+   - **DS:** components, tokens, layout, the constitution's hard rules. Fills come back as rendered hex; the token behind one is unread. A disabled action is checked against `design-system/agent-views/patterns/Disabled.md` (explain on press).
    - **Product:** the artifact against its PRD and the `search_blueprint` rows for the flow.
    - **Access:** contrast, target size, keyboard and focus, semantics, color carrying meaning alone, motion.
 

@@ -1,7 +1,7 @@
 /**
- * Generate the agent file for every template and pattern docs page.
+ * Generate the agent file for every template, pattern and foundation docs page.
  *
- *   design-system/agent-views/pages/<templates|patterns>/<Name>.md
+ *   design-system/agent-views/<templates|patterns|foundations>/<Name>.md
  *
  * Usage:
  *   node scripts/generate-docs-agent-files.mjs

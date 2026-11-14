@@ -35,7 +35,7 @@
     "design-system/agent-views/**",
     "design-system/guidelines/**",
     "design-system/figma/component-registry.json",
-    "design-system/src/**/*.{js,jsx,tsx,scss,css,mdx}",
+    "design-system/src/**/*.{js,jsx,tsx,scss,css,mdx,md}",
     "prototypes/**/*.{js,jsx,tsx,scss,css}",
     "docs/engineering/ds-usage-rules.md",
     "docs/conventions/design-system-glossary.md",

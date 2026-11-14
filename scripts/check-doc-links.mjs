@@ -140,6 +140,7 @@ const OLD_PATTERNS = [
   '/uno:',
   'docs/product-and-service/design-system',
   'design-system/docs/',
+  'design-system/agent-views/pages/',
 ];
 
 /** History keeps the words it was written in; a build output is not authored. */
@@ -150,6 +151,7 @@ const NOT_ACTIVE = [
   'docs/adr/',
   'todos/',
   'storybook-static/',
+  'packages/cli/dist/',
   'design-system/figma/knowledge-audit.json',
 ];
 
@@ -318,9 +320,9 @@ const inputs = byRoot((repoRoot) => {
   const activeFiles = documents('.', {
     root: repoRoot,
     ext: ['.md', '.jsx', '.json', '.mdc'],
-    ignore: new Set(['node_modules', '.git', 'storybook-static']),
+    ignore: new Set(['node_modules', '.git', 'storybook-static', 'dist']),
     skipDotDirs: false,
-  });
+  }).filter((rel) => !NOT_ACTIVE.some((skip) => rel.includes(skip)));
 
   const activeLines = activeFiles.flatMap((rel) =>
     readFileSync(path.join(repoRoot, rel), 'utf8')

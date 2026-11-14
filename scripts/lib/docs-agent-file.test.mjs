@@ -72,11 +72,19 @@ test('ruleTags reads the marker under its own heading only', () => {
 });
 
 test('a docs-only page gets a file, and the check passes straight after writing', () => {
-  const root = fixture({ [PAGE_PATH]: PAGE });
-  assert.equal(syncDocsAgentFiles(root, { check: true }).stale.length, 1);
+  const root = fixture({
+    [PAGE_PATH]: PAGE,
+    'design-system/src/styles/Colors.mdx': PAGE.replace('Patterns/Disabled', 'Foundations/Visual/Color').replace("tags={['!dev', 'manifest']}", "tags={['!dev', '!autodocs']}"),
+    'design-system/agent-views/tokens/tokens.md': 'keep\n',
+  });
+  assert.equal(syncDocsAgentFiles(root, { check: true }).stale.length, 2);
   syncDocsAgentFiles(root);
   const out = agentFilePath(PAGE_PATH, 'Patterns');
+  assert.equal(out, 'design-system/agent-views/patterns/Disabled.md');
   assert.ok(fs.existsSync(path.join(root, out)));
+  assert.ok(fs.existsSync(path.join(root, 'design-system/agent-views/foundations/Colors.md')));
+  assert.ok(fs.existsSync(path.join(root, 'design-system/agent-views/tokens/tokens.md')));
+  assert.match(fs.readFileSync(path.join(root, 'design-system/agent-views/foundations/Colors.md'), 'utf8'), /\*\*Kind:\*\* Foundation/);
   assert.deepEqual(syncDocsAgentFiles(root, { check: true }).stale, []);
 });
 
@@ -90,8 +98,8 @@ test('the check fails when a page changes under its file, and when a file loses 
   assert.deepEqual(syncDocsAgentFiles(root, { check: true }).stale, [agentFilePath(PAGE_PATH, 'Patterns')]);
 });
 
-test('a page outside Templates and Patterns gets no file', () => {
-  const root = fixture({ 'design-system/src/storybook-docs/x/Other.mdx': PAGE.replace('Patterns/Disabled', 'Foundations/Other') });
+test('a page outside Templates, Patterns and Foundations gets no file', () => {
+  const root = fixture({ 'design-system/src/storybook-docs/x/Other.mdx': PAGE.replace('Patterns/Disabled', 'Components/Other') });
   assert.equal(syncDocsAgentFiles(root, { check: true }).count, 0);
 });
 

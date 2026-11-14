@@ -8,7 +8,7 @@ summary: Which input or button to use, sorted by the shape of the answer, plus t
 
 Generated facts (props, defaults, coverage) are in
 `design-system/src/components/forms-and-inputs/index.md`. How the fields sit
-together on a surface is `design-system/agent-views/pages/patterns/Forms.md`; this
+together on a surface is `design-system/agent-views/patterns/Forms.md`; this
 file is about picking one.
 
 The group holds the buttons too.
@@ -138,7 +138,7 @@ group cannot be enforced natively, so check it yourself. `Select`
 announces it through a visually hidden "Required" description on the trigger.
 
 **Disabled states** (explain on press):
-`design-system/agent-views/pages/patterns/Disabled.md`.
+`design-system/agent-views/patterns/Disabled.md`.
 
 **Popup placement** for every field, menu and button popup:
 `design-system/guidelines/components/overlays-and-layering.md` § Where a popup
@@ -210,6 +210,6 @@ names.
 ## Related
 
 - `design-system/src/components/forms-and-inputs/index.md` — generated facts and coverage
-- `design-system/agent-views/pages/patterns/Forms.md` — how fields compose on a surface, when to validate, errors on submit, required, unsaved changes
-- `design-system/agent-views/pages/patterns/Disabled.md` — disabled and unavailable actions and fields
+- `design-system/agent-views/patterns/Forms.md` — how fields compose on a surface, when to validate, errors on submit, required, unsaved changes
+- `design-system/agent-views/patterns/Disabled.md` — disabled and unavailable actions and fields
 - `design-system/src/styles/Accessibility.mdx` — the WCAG bar

@@ -58,9 +58,16 @@ export const TOOLS = [
     name: 'ds_guide',
     op: 'guide',
     description:
-      'Step 4 of 5: a guideline (layout formulas, grid, content, accessibility, color…) or why a ds_check rule fired, with what to write instead. With no argument, the orientation: what the system is, the barrels, the tool order and the hard rules. Next: write the code, then ds_check.',
-    inputSchema: { type: 'object', properties: { topic: str('A guideline topic ("layout") or a rule id ("ds/no-raw-literal"); leave out for the orientation.') } },
-    call: (l, a) => l.guide(a.topic),
+      'Step 4 of 5: a guideline (layout formulas, grid, content, accessibility, color…) or why a ds_check rule fired, with what to write instead. Pattern and template guides return the brief chooser and section list by default; pass full: true for the whole page. With no argument, the orientation: what the system is, the barrels, the tool order and the hard rules. Next: write the code, then ds_check.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        topic: str('A guideline topic ("layout", "filter", "toolbar") or a rule id ("ds/no-raw-literal"); leave out for the orientation.'),
+        section: str('One section of the page ("Best practices", "Slots"), or "full" for the whole page.'),
+        full: { type: 'boolean', description: 'Return the full page instead of the brief chooser and section list.' },
+      },
+    },
+    call: (l, a) => l.guide(a.topic, { section: a.section, full: a.full }),
   },
   {
     name: 'ds_check',

@@ -134,25 +134,46 @@ const TOPIC_ALIASES = {
   filter: 'filtering',
   filters: 'filtering',
   filtering: 'filtering',
+  toolbar: 'section',
+  'view bar': 'section',
+  'view-bar': 'section',
+  viewbar: 'section',
+  validation: 'forms',
+  forms: 'forms',
   search: 'search',
   empty: 'empty',
   'empty state': 'empty',
+  'empty-state': 'empty',
   error: 'errors',
   errors: 'errors',
   'error state': 'errors',
+  'error-state': 'errors',
   loading: 'loading',
   notification: 'notifications',
   notifications: 'notifications',
   toast: 'notifications',
+  toasts: 'notifications',
   banner: 'notifications',
+  banners: 'notifications',
+  alert: 'notifications',
+  alerts: 'notifications',
   action: 'common-actions',
   actions: 'common-actions',
+  bulk: 'common-actions',
+  'bulk actions': 'common-actions',
+  'bulk-actions': 'common-actions',
+  'row actions': 'common-actions',
+  'row-actions': 'common-actions',
   'common-actions': 'common-actions',
   commonactions: 'common-actions',
   nav: 'navigation',
+  sidebar: 'navigation',
+  breadcrumb: 'navigation',
+  breadcrumbs: 'navigation',
   navigation: 'navigation',
   disabled: 'disabled',
   unavailable: 'disabled',
+  'tooltip on disabled': 'disabled',
   readonly: 'read-only',
   'read-only': 'read-only',
   'read only': 'read-only',
@@ -167,6 +188,13 @@ const TOPIC_ALIASES = {
   template: 'templates',
   patterns: 'patterns',
   pattern: 'patterns',
+  foundations: 'foundations',
+  foundation: 'foundations',
+  motion: 'motion',
+  transitions: 'transitions',
+  choreography: 'choreography',
+  sound: 'sound',
+  sounds: 'sound',
 };
 /** Topic words that are everyday English too ("copy to clipboard", "grid of cards"). */
 const GUIDE_WEAK = new Set('copy content grid icon icons page pages type writing voice shadow charts formulas'.split(' '));
@@ -186,8 +214,9 @@ const headed = (page, title) => {
 };
 const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
 const GUIDELINES = 'design-system/guidelines';
-const AGENT_PAGES = 'design-system/agent-views/pages';
-const FOUNDATION_PAGES = 'design-system/src/styles';
+const AGENT_VIEWS = 'design-system/agent-views';
+const PATTERNS_SRC = 'design-system/src/patterns';
+const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'PatternSection', 'PatternCard', 'PatternTable', 'PatternModal'];
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
   if (!text) return null;
@@ -596,20 +625,40 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   /** A folder's `.md` files other than its overview; none when the folder is empty or gone. */
   const mdIn = (dir) => (fs.existsSync(path.join(root, dir)) ? fs.readdirSync(path.join(root, dir)).filter((f) => f.endsWith('.md') && f !== 'overview.md') : []);
   /**
-   * Topic → the file that answers it. A guideline file answers its topic while
-   * it exists; a foundation topic with none is answered by its Storybook
-   * foundation page (`Colors.mdx` → color), read through the page model.
+   * Topic → the file that answers it: generated template, pattern and
+   * foundation agent views (`agent-views/<root>/<Name>.md` and component-backed
+   * templates under `src/patterns/<Name>/index.md`), plus any surviving
+   * `guidelines/` pages.
    */
   const topics = () => {
     const map = {};
-    for (const dir of ['patterns', 'templates']) {
-      for (const f of mdIn(`${AGENT_PAGES}/${dir}`)) {
-        const rel = `${AGENT_PAGES}/${dir}/${f}`;
+    for (const dir of ['patterns', 'templates', 'foundations']) {
+      for (const f of mdIn(`${AGENT_VIEWS}/${dir}`)) {
+        const rel = `${AGENT_VIEWS}/${dir}/${f}`;
         const stem = f.replace(/(?:Overview)?\.md$/, '');
         const kebab = stem.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
         const lower = stem.toLowerCase();
         map[kebab] = rel;
         map[lower] = rel;
+        if (TOPIC_ALIASES[lower]) map[TOPIC_ALIASES[lower]] = rel;
+        if (dir === 'foundations' && /^motion-/.test(kebab)) {
+          const sub = kebab.slice('motion-'.length);
+          if (sub === 'physics') map.motion = rel;
+          else map[sub] ??= rel;
+        }
+      }
+    }
+    for (const sub of TEMPLATE_COMPONENTS) {
+      const rel = `${PATTERNS_SRC}/${sub}/index.md`;
+      if (!fs.existsSync(path.join(root, rel))) continue;
+      const kebab = sub.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+      const short = sub.replace(/^Pattern/, '').replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+      if (short === 'page') {
+        map['page-template'] ??= rel;
+      } else {
+        map[kebab] ??= rel;
+        map[sub.toLowerCase()] ??= rel;
+        map[short] ??= rel;
       }
     }
     if (map.templates) map.layout = map.templates;
@@ -619,25 +668,59 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     }
     if (fs.existsSync(path.join(root, GUIDELINES, 'foundations/content/overview.md'))) map.content = `${GUIDELINES}/foundations/content/overview.md`;
     for (const f of mdIn(`${GUIDELINES}/foundations/content`)) map[f.replace(/\.md$/, '')] = `${GUIDELINES}/foundations/content/${f}`;
-    for (const f of fs.existsSync(path.join(root, FOUNDATION_PAGES)) ? fs.readdirSync(path.join(root, FOUNDATION_PAGES)) : []) {
-      const base = f.match(/^([A-Z][A-Za-z]*)\.mdx$/)?.[1]?.toLowerCase();
-      if (base && base !== 'foundationsoverview') map[TOPIC_ALIASES[base] ?? base] ??= `${FOUNDATION_PAGES}/${f}`;
-    }
     for (const [key, file] of [['components', 'components/overview.md'], ['figma', 'figma/overview.md']]) {
       if (fs.existsSync(path.join(root, GUIDELINES, file))) map[key] = `${GUIDELINES}/${file}`;
     }
     return map;
   };
-  /** A topic file's text: a guideline as written, a foundation page as its page model's markdown. */
+  /** A topic file's text, with generated HTML comments stripped. */
   const topicText = (rel) => {
     const source = fs.readFileSync(path.join(root, rel), 'utf8');
     return rel.endsWith('.mdx')
       ? pageText(readDocsPage(source, { kind: 'foundation', root, file: rel }))
-      : source.replace(/^<!--\s*DO NOT EDIT[\s\S]*?-->\n+/, '').trim();
+      : source
+          .replace(/^<!--\s*DO NOT EDIT[\s\S]*?-->\n+/, '')
+          .replace(/\n*<!--\s*authored coverage:[\s\S]*?-->\s*$/, '')
+          .trim();
+  };
+  const CHOOSER_HEADING = /^(?:Usage|Alternatives|Types|Header types|Slots|The nine templates|Which .*|Frame, Modal, Panel or Popup\?)$/;
+  const isBriefGuide = (rel) =>
+    rel.startsWith(`${AGENT_VIEWS}/patterns/`) ||
+    rel.startsWith(`${AGENT_VIEWS}/templates/`) ||
+    rel.startsWith(`${PATTERNS_SRC}/`);
+  const summarizeGuide = (rel, fullText) => {
+    const parts = fullText.split(/\n(?=## )/);
+    const header = parts[0].trim();
+    const blocks = parts.slice(1);
+    const sections = blocks.map((b) => b.match(/^## ([^\n]+)/)?.[1]?.trim()).filter(Boolean);
+    const includeFirst = rel.startsWith(`${AGENT_VIEWS}/`);
+    const chosen = blocks.filter((b, idx) => {
+      const title = b.match(/^## ([^\n]+)/)?.[1]?.trim() ?? '';
+      return (includeFirst && idx === 0) || CHOOSER_HEADING.test(title);
+    });
+    const text = [header, ...chosen.map((b) => b.trim()), `## Sections\n\n${sections.map((s) => `- ${s}`).join('\n')}`].join('\n\n');
+    return { text, sections };
   };
 
-  function guide(arg) {
-    const t = String(arg ?? '').trim().toLowerCase();
+  function guide(arg, opts = {}) {
+    let rawArg = String(arg ?? '').trim();
+    const optObj = typeof opts === 'string' ? (opts.toLowerCase() === 'full' ? { full: true } : { section: opts }) : (opts ?? {});
+    let wantFull = Boolean(optObj.full);
+    let wantSection = optObj.section ? String(optObj.section).trim() : null;
+    if (/(?:^|\s)--full$/i.test(rawArg) || /\s+full$/i.test(rawArg)) {
+      wantFull = true;
+      rawArg = rawArg.replace(/(?:^|\s)--full$/i, '').replace(/\s+full$/i, '').trim();
+    }
+    const secFlag = rawArg.match(/\s+--section(?:=|\s+)(.+)$/i);
+    if (secFlag) {
+      wantSection = secFlag[1].trim().replace(/^["']|["']$/g, '');
+      rawArg = rawArg.slice(0, secFlag.index).trim();
+    }
+    if (wantSection && wantSection.toLowerCase() === 'full') {
+      wantFull = true;
+      wantSection = null;
+    }
+    const t = rawArg.toLowerCase();
     if (!t) return { topic: null, path: null, text: ORIENTATION, next: 'Start with ds_find.' };
     const rule = Object.keys(RULES).find((id) => id === t || id === `ds/${t}`);
     if (rule) {
@@ -647,7 +730,27 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     const map = topics();
     const key = map[t] ? t : TOPIC_ALIASES[t] ?? Object.keys(map).find((k) => t.split(/[\s/-]+/).includes(k)) ?? Object.entries(TOPIC_ALIASES).find(([a]) => t.includes(a))?.[1];
     if (key && map[key]) {
-      return { topic: key, path: map[key], text: topicText(map[key]), next: 'Next: ds_find for the parts the guideline names.' };
+      const rel = map[key];
+      const fullText = topicText(rel);
+      const allParts = fullText.split(/\n(?=## )/);
+      const sections = allParts.slice(1).map((b) => b.match(/^## ([^\n]+)/)?.[1]?.trim()).filter(Boolean);
+      if (wantSection) {
+        const match = allParts.slice(1).find((b) => b.match(/^## ([^\n]+)/)?.[1]?.trim().toLowerCase() === wantSection.toLowerCase());
+        const text = match ? `${allParts[0].trim()}\n\n${match.trim()}` : fullText;
+        return { topic: key, path: rel, brief: false, sections, text, next: 'Next: ds_find for the parts the guideline names.' };
+      }
+      if (!wantFull && isBriefGuide(rel)) {
+        const { text } = summarizeGuide(rel, fullText);
+        return {
+          topic: key,
+          path: rel,
+          brief: true,
+          sections,
+          text,
+          next: `Full page: ds_guide("${key}", { full: true }) or ds guide ${key} --full. Next: ds_find for the parts the guideline names.`,
+        };
+      }
+      return { topic: key, path: rel, brief: false, sections, text: fullText, next: 'Next: ds_find for the parts the guideline names.' };
     }
     return {
       topic: t,
