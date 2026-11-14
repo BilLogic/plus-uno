@@ -26,3 +26,23 @@ test('a standalone multiline Meta supplies its title, docs name, id and tags', (
     tags: ['manifest', '!dev'], storiesFile: null, componentSource: null, componentName: null,
   });
 });
+
+test('attached Meta resolves aliased extensionless stories, custom names, tags and component source', (t) => {
+  const stories = 'design-system/src/styles/Color.stories.tsx';
+  const component = 'design-system/src/styles/Swatch.tsx';
+  const root = fixture(t, {
+    [FILE]: `import * as Palette from '@/styles/Color.stories';\n<Meta\n of={Palette}\n name="Guidelines"\n/>`,
+    [stories]: `import Swatch from './Swatch';\nconst example = { title: 'Not the page' };\nexport default {\n title: 'Foundations/Visual/Color', component: Swatch, tags: ['!dev', 'manifest']\n};`,
+    [component]: 'export default function Swatch() {}',
+  });
+  assert.deepEqual(readStorybookPage(root, FILE), {
+    file: FILE, title: 'Foundations/Visual/Color', categoryRoot: 'Foundations',
+    docsId: 'foundations-visual-color--guidelines', docsName: 'Guidelines',
+    tags: ['!dev', 'manifest'], storiesFile: stories, componentSource: component, componentName: null,
+  });
+  const story = readStorybookPage(root, stories);
+  assert.equal(story.title, 'Foundations/Visual/Color');
+  assert.deepEqual(story.tags, ['!dev', 'manifest']);
+  assert.equal(story.componentSource, component);
+  assert.deepEqual(scanStorybookPages(root).map((p) => p.file), [FILE, stories]);
+});
