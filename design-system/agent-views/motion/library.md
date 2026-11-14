@@ -177,6 +177,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | SectionMessage | component | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Select | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Select | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
+| SettingRow | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Sidebar | component | enter | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Sidebar | component | exit | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
 | Skeleton | component | change | Load content | `--ds-motion-linear` |  |

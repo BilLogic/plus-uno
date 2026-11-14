@@ -824,6 +824,27 @@
           }
         },
         {
+          "name": "Setting/row-pad-y",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--setting-row-pad-y)"
+          }
+        },
+        {
+          "name": "Setting/row-end-min-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--setting-row-end-min-height)"
+          }
+        },
+        {
+          "name": "Setting/row-select-min-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--setting-row-select-min-width)"
+          }
+        },
+        {
           "name": "Listbox/max-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {

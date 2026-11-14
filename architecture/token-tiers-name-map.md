@@ -222,6 +222,9 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Toggle | `--toggle-track-width-16` | Toggle size 16 |
 | Toggle | `--toggle-track-width-20` | Toggle size 20 |
 | Toggle | `--toggle-pad` | both sizes |
+| Setting row | `--setting-row-pad-y` |  |
+| Setting row | `--setting-row-end-min-height` |  |
+| Setting row | `--setting-row-select-min-width` |  |
 | Listbox | `--listbox-max-width` |  |
 | Listbox | `--listbox-min-height` |  |
 | Listbox | `--listbox-max-height` |  |

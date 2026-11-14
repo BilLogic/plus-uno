@@ -12850,6 +12850,150 @@
       ]
     },
     {
+      "name": "SettingRow",
+      "kind": "component",
+      "import": "import { SettingRow } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/SettingRow/SettingRow.jsx",
+      "summary": "SettingRow — puts a setting's name and one-line description at the start and its control (`Toggle`, compact `Select`, or `Button`) at the end, top-aligned to the label. Any `status` (`StatusTag`) sits beside the label so the end slot holds only the action. The row's `label` names `control` through `aria-labelledby`; controls that carry their own visible action text (such as a `Disconnect` `Button`) combine their own id with the row label id so both the action and the setting name are announced.",
+      "props": [
+        {
+          "name": "label",
+          "type": "node",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "The setting's name. Names `control` through `aria-labelledby`.",
+          "deprecated": null
+        },
+        {
+          "name": "description",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One line of context under the label, or the visible reason when disabled or read-only.",
+          "deprecated": null
+        },
+        {
+          "name": "control",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The setting's control at the end: a `Toggle` (with no own label), a compact `Select`, or a `Button`.",
+          "deprecated": null
+        },
+        {
+          "name": "status",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional `StatusTag` shown beside `label`, never inside the control slot.",
+          "deprecated": null
+        },
+        {
+          "name": "error",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline error message shown under `description` when saving or changing the setting fails.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Dims the setting label and forwards `isDisabled` to `control` while keeping `description` readable as the reason.",
+          "deprecated": null
+        },
+        {
+          "name": "isReadOnly",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Marks the setting read-only and forwards `isReadOnly` to value controls.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional id on the row container; also prefixes the generated label and description ids.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline style on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid`, for test queries.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "ToggleControl",
+        "SelectControl",
+        "ConnectionRow",
+        "Rest",
+        "Saving",
+        "Saved",
+        "ErrorState",
+        "DisabledWithReason",
+        "ReadOnly",
+        "Motion",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-border",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-disabled",
+        "--ds-text-subtle",
+        "--icon-sm",
+        "--inline-lg",
+        "--inline-md",
+        "--listbox-max-width",
+        "--setting-row-end-min-height",
+        "--setting-row-pad-y",
+        "--setting-row-select-min-width",
+        "--stack-sm",
+        "--type-weight-medium"
+      ]
+    },
+    {
       "name": "Sidebar",
       "kind": "component",
       "import": "import { Sidebar } from '@/components';",

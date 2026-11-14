@@ -343,6 +343,9 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Toggle', new: '--toggle-track-width-16', old: null, ref: '32px', note: 'Toggle size 16', use: 'Track width of a Toggle with size 16.' },
   { tier: 'components', group: 'Toggle', new: '--toggle-track-width-20', old: null, ref: '40px', note: 'Toggle size 20', use: 'Track width of a Toggle with size 20.' },
   { tier: 'components', group: 'Toggle', new: '--toggle-pad', old: null, ref: 'var(--space-0125)', note: 'both sizes', use: 'Gap between a Toggle\'s track and its knob, at both sizes.' },
+  { tier: 'components', group: 'Setting row', new: '--setting-row-pad-y', old: null, ref: 'var(--space-075)', use: 'Vertical padding of a SettingRow.' },
+  { tier: 'components', group: 'Setting row', new: '--setting-row-end-min-height', old: null, ref: 'var(--line-height-125)', use: 'Minimum height of a SettingRow end slot so compact controls align with the first line of the label.' },
+  { tier: 'components', group: 'Setting row', new: '--setting-row-select-min-width', old: null, ref: 'var(--size-1000)', use: 'Minimum width of a compact Select inside a SettingRow end slot.' },
 
   // ─── Components / Listbox ─────────────────────────────────────────────
   { tier: 'components', group: 'Listbox', new: '--listbox-max-width', old: '--layout-max-width-listbox', ref: '320px', use: 'Widest a Select or Cascader listbox may grow.' },

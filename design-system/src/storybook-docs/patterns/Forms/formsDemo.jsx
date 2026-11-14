@@ -4,6 +4,8 @@ import {
     Button,
     CheckboxGroup,
     Fieldset,
+    Flag,
+    FlagGroup,
     Heading,
     IconButton,
     Illustration,
@@ -11,10 +13,14 @@ import {
     ProgressTracker,
     RadioGroup,
     Select,
+    SettingRow,
+    StatusTag,
     TextField,
+    Toggle,
 } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame, PatternSection } from '@/patterns';
 import { STEPS_ACROSS_MAX, STEPS_RAIL, stepItems } from '@/storybook-docs/lib/focused-task.jsx';
+import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { FormFields, FILLED } from '../../../patterns/Form/formDemo.jsx';
 
@@ -386,3 +392,139 @@ export const QuestionStepInWindow = ({ address = 'app.plus.org/signup', height =
         <QuestionStep {...props} />
     </BrowserWindow>
 );
+
+/** Window height for the settings page example: docs geometry, in px. */
+export const SETTINGS_PAGE_HEIGHT = 560; // docs-literal
+
+const SETTINGS_BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Settings' }];
+
+const REMINDER_LEAD_OPTIONS = [
+    { value: '15m', label: '15 minutes before' },
+    { value: '1h', label: '1 hour before' },
+    { value: '24h', label: '24 hours before' },
+];
+
+/**
+ * Instant settings on a page: grouped SettingRows under section headings, with
+ * no card per row and no page Save button. Flipping a Toggle or choosing an
+ * option applies at once and confirms with a Flag; connection rows put their
+ * StatusTag beside the label and the action Button at the end.
+ */
+export const SettingsPage = () => {
+    const [reminders, setReminders] = useState(true);
+    const [leadTime, setLeadTime] = useState('1h');
+    const [digest, setDigest] = useState(false);
+    const [calendarConnected, setCalendarConnected] = useState(true);
+    const [savedTitle, setSavedTitle] = useState(null);
+
+    const handleToggle = (settingName, next, setter) => {
+        setter(next);
+        setSavedTitle(`${settingName} turned ${next ? 'on' : 'off'}`);
+    };
+
+    const handleLeadTimeChange = (next) => {
+        setLeadTime(next);
+        setSavedTitle('Reminder lead time saved');
+    };
+
+    const handleCalendarToggle = () => {
+        const next = !calendarConnected;
+        setCalendarConnected(next);
+        setSavedTitle(next ? 'Google Calendar connected' : 'Google Calendar disconnected');
+    };
+
+    return (
+        <div style={{ position: 'relative', blockSize: '100%' }}>
+            <InAppFrame height="100%" activeTabId="home" breadcrumbs={SETTINGS_BREADCRUMBS} panelStorageKey={null}>
+                <PatternSection level="page" title="Settings" layout="subsections">
+                    <PatternSection title="Notifications">
+                        <div>
+                            <SettingRow
+                                id="setting-session-reminders"
+                                label="Session reminders"
+                                description="Send an email before each scheduled tutoring session."
+                                control={(
+                                    <Toggle
+                                        isChecked={reminders}
+                                        onChange={(e) => handleToggle('Session reminders', e.target.checked, setReminders)}
+                                    />
+                                )}
+                            />
+                            <SettingRow
+                                id="setting-reminder-lead-time"
+                                label="Reminder lead time"
+                                description={
+                                    reminders
+                                        ? 'How far ahead we send your session reminder email.'
+                                        : 'Turn on session reminders above to choose a lead time.'
+                                }
+                                isDisabled={!reminders}
+                                control={(
+                                    <Select
+                                        spacing="compact"
+                                        isSearchable={false}
+                                        options={REMINDER_LEAD_OPTIONS}
+                                        value={leadTime}
+                                        onChange={handleLeadTimeChange}
+                                    />
+                                )}
+                            />
+                            <SettingRow
+                                id="setting-weekly-digest"
+                                label="Weekly digest"
+                                description="Receive a Monday summary of completed sessions."
+                                control={(
+                                    <Toggle
+                                        isChecked={digest}
+                                        onChange={(e) => handleToggle('Weekly digest', e.target.checked, setDigest)}
+                                    />
+                                )}
+                            />
+                        </div>
+                    </PatternSection>
+                    <PatternSection title="Connected accounts">
+                        <div>
+                            <SettingRow
+                                id="setting-google-calendar"
+                                label="Google Calendar"
+                                description="Sync upcoming tutoring sessions to your calendar."
+                                status={(
+                                    <StatusTag appearance={calendarConnected ? 'success' : 'default'}>
+                                        {calendarConnected ? 'Connected' : 'Not connected'}
+                                    </StatusTag>
+                                )}
+                                control={(
+                                    <Button
+                                        appearance="default"
+                                        spacing="compact"
+                                        onClick={handleCalendarToggle}
+                                    >
+                                        {calendarConnected ? 'Disconnect' : 'Connect'}
+                                    </Button>
+                                )}
+                            />
+                        </div>
+                    </PatternSection>
+                </PatternSection>
+            </InAppFrame>
+            {savedTitle && (
+                <FlagGroup containerPosition="absolute">
+                    <Flag
+                        appearance="success"
+                        title={savedTitle}
+                        show={Boolean(savedTitle)}
+                        onDismiss={() => setSavedTitle(null)}
+                    />
+                </FlagGroup>
+            )}
+        </div>
+    );
+};
+
+/** The settings page framed in its browser window for the Forms pattern page. */
+export const SettingsPageInWindow = ({ address = 'app.plus.org/settings', height = SETTINGS_PAGE_HEIGHT }) => (
+    <BrowserWindow address={address} height={height}>
+        <SettingsPage />
+    </BrowserWindow>
+);
+

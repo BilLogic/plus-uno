@@ -174,6 +174,9 @@ Tokens one component owns, named for it.
 --range-track-height-8  /* Track height of a Range with size 16. */
 --scroll-bar-max-height  /* Maximum height of a scrolling area that shows a scroll bar. */
 --scroll-bar-size  /* Thickness of a scroll bar. */
+--setting-row-end-min-height  /* Minimum height of a SettingRow end slot so compact controls align with the first line of the label. */
+--setting-row-pad-y  /* Vertical padding of a SettingRow. */
+--setting-row-select-min-width  /* Minimum width of a compact Select inside a SettingRow end slot. */
 --skeleton-circle-size  /* Size of a round Skeleton, such as an avatar placeholder. */
 --skeleton-height  /* Height of a block Skeleton. */
 --skeleton-status-width  /* Width of a Skeleton standing in for a status tag. */
