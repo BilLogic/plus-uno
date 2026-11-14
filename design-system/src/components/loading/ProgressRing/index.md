@@ -157,4 +157,8 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 From `design-system/src/components/loading/ProgressRing/ProgressRing.scss`. Override these through the token layer, never with a literal.
 
+## Figma
+
+- "ProgressRing" node 22240:478 in file zAecJNRdvJzAUOcjV32tRX
+
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

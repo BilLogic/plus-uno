@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-56 docs-page links + 59 style/variant entries across 56 components.
+56 docs-page links + 60 style/variant entries across 57 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -111,6 +111,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Popup | Popup | `20871:3153` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20871-3153) | verified |
 | Components | ProgressBar | _Progress Bar | `20095:7780` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7780) | verified |
 | Components | ProgressBar | Progress bar | `20117:5127` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5127) | verified |
+| Components | ProgressRing | ProgressRing | `22240:478` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=22240-478) | verified |
 | Components | Radio | Form Radio Button | `20328:77556` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20328-77556) | verified |
 | Components | Range | Form Range Input | `20003:1536` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20003-1536) | verified |
 | Components | Rating | Rating System (disclosure) | `20003:2230` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20003-2230) | verified |
