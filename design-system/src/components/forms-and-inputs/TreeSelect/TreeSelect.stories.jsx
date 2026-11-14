@@ -237,10 +237,11 @@ const motionTreeOptions = [{ value: 'school', label: 'Lincoln School', children:
 const treeMotionPlay = (reduced = false) => async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('combobox'));
-    const parent = await canvas.findByRole('treeitem', { name: 'Lincoln School' });
+    const popup = within(canvasElement.ownerDocument.body);
+    const parent = await popup.findByRole('treeitem', { name: 'Lincoln School' });
     parent.focus();
     await userEvent.keyboard('{ArrowRight}');
-    const child = await canvas.findByRole('treeitem', { name: 'Ana Ruiz' });
+    const child = await popup.findByRole('treeitem', { name: 'Ana Ruiz' });
     const reveal = child.parentElement;
     await expect(reveal.style.height).not.toBe('');
     if (reduced) await expect(reveal.style.height).toBe('auto');

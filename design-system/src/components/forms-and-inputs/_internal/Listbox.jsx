@@ -1,5 +1,3 @@
-import { useMotionReduced } from '@/lib/motionPreference';
-import { useOverlayPresence, useKeyboardOpen } from '@/lib/overlayMotion';
 import React, {
     useCallback,
     useEffect,
@@ -10,11 +8,10 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import Spinner from '@/components/loading/Spinner/Spinner';
 import OptionRow from './OptionRow';
-import { popupLayerOf, useAnchoredPopup } from './anchorPlacement';
+import AnchoredListboxSurface from './AnchoredListboxSurface';
 import Icon from '../../images-and-icons/Icon';
 import './Listbox.scss';
 
@@ -247,12 +244,6 @@ const Listbox = ({
     /* ---------- placement ---------- */
     const surfaceRef = useRef(null);
     const bodyRef = useRef(null);
-    // Placed against the field; a press outside the field and the list closes it.
-    const keyboardOpen = useKeyboardOpen(open);
-    const reduced = useMotionReduced();
-    const present = useOverlayPresence(open, surfaceRef);
-    const place = useAnchoredPopup({ open: present, anchorRef, popupRef: surfaceRef, align, onClose: open ? onClose : undefined });
-
     /* ---------- the row's own controls ---------- */
     // Drawn over one row, beside the listbox rather than inside it: an option's
     // children are presentational, so a button in one would be lost to a
@@ -399,34 +390,16 @@ const Listbox = ({
     }
 
     const standalone = !anchorRef;
-    const surfaceClasses = [
-        'plus-listbox',
-        embedded ? 'plus-listbox--embedded' : '',
-        anchorRef ? 'plus-listbox--floating' : '',
-        className,
-    ].filter(Boolean).join(' ');
-
     const surface = (
-        <div
-            ref={surfaceRef}
-            data-reduced={reduced ? 'true' : undefined}
-            className={surfaceClasses}
-            data-instant={keyboardOpen ? 'keyboard' : undefined}
-            data-ending-style={!open ? '' : undefined}
-            aria-hidden={!open ? true : undefined}
-            inert={!open ? true : undefined}
-            data-side={place?.placement ?? 'bottom'}
-            data-align={place?.side ?? 'start'}
-            data-placement={anchorRef ? place?.placement ?? 'bottom' : undefined}
-            style={anchorRef ? {
-                top: place?.top ?? 0,
-                left: place?.left ?? 0,
-                minWidth: place?.minWidth,
-                visibility: place ? undefined : 'hidden',
-                ...style,
-            } : style}
-            // Keep focus in the field while a row is pressed.
-            onMouseDown={anchorRef ? (event) => event.preventDefault() : undefined}
+        <AnchoredListboxSurface
+            open={open}
+            anchorRef={anchorRef}
+            align={align}
+            onClose={onClose}
+            surfaceRef={surfaceRef}
+            preserveFieldFocus
+            className={[embedded ? 'plus-listbox--embedded' : '', className].filter(Boolean).join(' ')}
+            style={style}
         >
             {header && <div className="plus-listbox-header">{header}</div>}
             <div
@@ -479,12 +452,12 @@ const Listbox = ({
                 )}
             </div>
             {footer && <div className="plus-listbox-footer">{footer}</div>}
-        </div>
+        </AnchoredListboxSurface>
     );
 
     return (
         <>
-            {present && (anchorRef ? createPortal(surface, popupLayerOf(anchorRef)) : surface)}
+            {surface}
             <div className="visually-hidden" role="status" aria-live="polite">{open ? announcement : ''}</div>
         </>
     );

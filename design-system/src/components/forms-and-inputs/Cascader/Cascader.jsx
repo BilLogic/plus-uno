@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import FieldBox from '../_internal/FieldBox';
 import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import OptionRow from '../_internal/OptionRow';
-import { useAnchoredPopup } from '../_internal/anchorPlacement';
+import AnchoredListboxSurface from '../_internal/AnchoredListboxSurface';
 import Icon from '../../images-and-icons/Icon';
 import '../_internal/Listbox.scss';
 import './Cascader.scss';
@@ -63,9 +63,7 @@ const Cascader = ({
     const [activeColumns, setActiveColumns] = useState([options]); // Array of option arrays for each column
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
-    const menuRef = useRef(null);
     const close = useCallback(() => setIsOpen(false), []);
-    const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef, onClose: close });
     /**
      * Where the keyboard cursor is: which column, and which row of it. The
      * options are real elements, so focus moves between them with a roving
@@ -396,64 +394,62 @@ const Cascader = ({
                 </FieldBox>
 
                 {/* The listbox surface; its body holds one column per level. */}
-                {isOpen && (
-                    <div
-                        ref={menuRef}
-                        className="plus-listbox plus-listbox--anchored plus-cascader-menu"
-                        id={menuId}
-                        data-placement={place?.placement}
-                        data-side={place?.side}
-                    >
-                        <div className="plus-listbox-body plus-cascader-columns">
-                            {activeColumns.map((columnOptions, columnIndex) => (
-                                <div
-                                    key={columnIndex}
-                                    className="plus-listbox-options plus-cascader-column"
-                                    role="listbox"
-                                    aria-label={columnIndex === 0
-                                        ? 'Options'
-                                        : `Options under ${selectedPath[columnIndex - 1]}`}
-                                >
-                                    {columnOptions.map((option, optionIndex) => {
-                                        const optionValue = optionValueOf(option);
-                                        const hasChildren = optionChildrenOf(option).length > 0;
-                                        // Part of the path so far, in this column.
-                                        const isSelected = columnIndex < selectedPath.length
-                                            && optionValue === selectedPath[columnIndex];
-                                        const key = `${columnIndex}:${optionIndex}`;
+                <AnchoredListboxSurface
+                    open={isOpen}
+                    anchorRef={wrapperRef}
+                    onClose={close}
+                    className="plus-cascader-menu"
+                    id={menuId}
+                >
+                    <div className="plus-listbox-body plus-cascader-columns">
+                        {activeColumns.map((columnOptions, columnIndex) => (
+                            <div
+                                key={columnIndex}
+                                className="plus-listbox-options plus-cascader-column"
+                                role="listbox"
+                                aria-label={columnIndex === 0
+                                    ? 'Options'
+                                    : `Options under ${selectedPath[columnIndex - 1]}`}
+                            >
+                                {columnOptions.map((option, optionIndex) => {
+                                    const optionValue = optionValueOf(option);
+                                    const hasChildren = optionChildrenOf(option).length > 0;
+                                    // Part of the path so far, in this column.
+                                    const isSelected = columnIndex < selectedPath.length
+                                        && optionValue === selectedPath[columnIndex];
+                                    const key = `${columnIndex}:${optionIndex}`;
 
-                                        return (
-                                            <OptionRow
-                                                key={key}
-                                                value={optionValue}
-                                                label={optionLabelOf(option)}
-                                                selected={isSelected}
-                                                disabled={isDisabled || optionIsDisabled(option)}
-                                                // The path is the value, so a row shows no check of its own.
-                                                check={false}
-                                                spacing={spacing}
-                                                elemAfter={hasChildren ? <OptionRow.Chevron /> : undefined}
-                                                /* One tab stop per open menu, on the cursor. */
-                                                tabbable={Boolean(activeCell
-                                                    && activeCell.column === columnIndex
-                                                    && activeCell.index === optionIndex)}
-                                                ref={(element) => {
-                                                    if (element) optionRefs.current.set(key, element);
-                                                    else optionRefs.current.delete(key);
-                                                }}
-                                                onFocus={() => setActiveCell({ column: columnIndex, index: optionIndex })}
-                                                // The menu's keys, handled before the row's own Enter and Space.
-                                                onKeyDown={handleMenuKeyDown}
-                                                onSelect={() => handleOptionClick(option, columnIndex)}
-                                                onMouseEnter={() => handleOptionHover(option, columnIndex)}
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            ))}
-                        </div>
+                                    return (
+                                        <OptionRow
+                                            key={key}
+                                            value={optionValue}
+                                            label={optionLabelOf(option)}
+                                            selected={isSelected}
+                                            disabled={isDisabled || optionIsDisabled(option)}
+                                            // The path is the value, so a row shows no check of its own.
+                                            check={false}
+                                            spacing={spacing}
+                                            elemAfter={hasChildren ? <OptionRow.Chevron /> : undefined}
+                                            /* One tab stop per open menu, on the cursor. */
+                                            tabbable={Boolean(activeCell
+                                                && activeCell.column === columnIndex
+                                                && activeCell.index === optionIndex)}
+                                            ref={(element) => {
+                                                if (element) optionRefs.current.set(key, element);
+                                                else optionRefs.current.delete(key);
+                                            }}
+                                            onFocus={() => setActiveCell({ column: columnIndex, index: optionIndex })}
+                                            // The menu's keys, handled before the row's own Enter and Space.
+                                            onKeyDown={handleMenuKeyDown}
+                                            onSelect={() => handleOptionClick(option, columnIndex)}
+                                            onMouseEnter={() => handleOptionHover(option, columnIndex)}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        ))}
                     </div>
-                )}
+                </AnchoredListboxSurface>
             </div>
             {name && selectedPath.map((v) => (
                 <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />

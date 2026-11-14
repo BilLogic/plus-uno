@@ -207,9 +207,9 @@ CascaderRightAligns.play = async ({ canvasElement }) => expectRightAligned(await
 export const CascaderColumnsPassTheCap = () => <AtTop width={120}><Cascader options={CASCADE} /></AtTop>;
 CascaderColumnsPassTheCap.play = async ({ canvasElement }) => {
     const { field } = await openPopup(canvasElement, 'cascader');
-    await userEvent.click(within(canvasElement).getByRole('option', { name: /Middle schools/ }));
-    await waitFor(() => expect(canvasElement.querySelectorAll('.plus-cascader-column').length, 'two columns open').toBe(2));
-    const popup = canvasElement.querySelector('.plus-cascader-menu').getBoundingClientRect();
+    await userEvent.click(within(canvasElement.ownerDocument.body).getByRole('option', { name: /Middle schools/ }));
+    await waitFor(() => expect(canvasElement.ownerDocument.querySelectorAll('.plus-cascader-column').length, 'two columns open').toBe(2));
+    const popup = canvasElement.ownerDocument.querySelector('.plus-cascader-menu').getBoundingClientRect();
     await expect(popup.width, 'at least the field').toBeGreaterThanOrEqual(field.width);
     await expect(popup.width, 'columns pass the cap').toBeGreaterThan(POPUP_MAX_WIDTH);
 };
@@ -219,7 +219,7 @@ CascaderColumnsPassTheCap.play = async ({ canvasElement }) => {
 /** A press inside the popup keeps it open; a press outside the field and popup closes it. */
 const expectOutsidePressCloses = async (canvasElement, kind, inside) => {
     await openPopup(canvasElement, kind);
-    await userEvent.click(inside(within(canvasElement)));
+    await userEvent.click(inside(within(canvasElement.ownerDocument.body)));
     await expect(document.querySelector(SURFACE[kind]), 'a press inside keeps it open').not.toBeNull();
     await userEvent.click(within(canvasElement).getByText('Outside the field'));
     await waitFor(() => expect(document.querySelector(SURFACE[kind]), 'a press outside closes it').toBeNull());
