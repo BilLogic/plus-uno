@@ -15,12 +15,13 @@ describe('Frame chrome', () => {
     it('draws the browser dots, title bar and rule by default', () => {
         const svg = draw({});
         expect(svg.querySelectorAll('circle')).toHaveLength(3);
+        expect(svg.querySelectorAll('rect').length).toBeGreaterThan(1);
     });
 
     it('draws only the plate when chrome is off', () => {
         const svg = draw({ chrome: false });
         expect(svg.querySelectorAll('circle')).toHaveLength(0);
-        expect(svg.querySelectorAll('line, path').length).toBe(0);
+        expect(svg.querySelectorAll('rect')).toHaveLength(1);
     });
 });
 
@@ -28,9 +29,11 @@ describe('Motion demo tiles', () => {
     const dir = __dirname;
     const src = (f) => readFileSync(join(dir, f), 'utf8');
 
-    it('principle tiles that draw into the top band use a plain Frame', () => {
+    it('tiles that draw into the top band sit on a plain Frame', () => {
         for (const f of ['motion-principles.jsx', 'principle-loops.jsx']) {
-            expect(src(f)).not.toMatch(/<Frame [^>]*h=\{88\} \/>/);
+            const frames = src(f).match(/<Frame [^>]*\/>/g) ?? [];
+            expect(frames.length).toBeGreaterThan(0);
+            for (const tag of frames) expect(tag).toContain('chrome={false}');
         }
     });
 });
