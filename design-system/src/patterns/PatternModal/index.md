@@ -57,7 +57,7 @@ A button, a link, an icon. Never on its own.
 
 **Checked:** Review
 
-One rule, so nobody guesses. A short form is 8-col; a table, an editor or steps is 10-col. Never pick a width to make content look a certain way. A confirm takes 6-col today; 4-col is Planned (see Widths).
+A short form is 8-col; a table, editor or steps is 10-col. Choose width by task. A confirm takes 6-col today; 4-col is Planned (see Widths).
 
 Do: A confirm at the narrow step: the title, one line and two buttons.
 Don't: The same confirm at a wide step: empty width around one line, picked to make it look a certain way.

@@ -40,7 +40,7 @@ import {
 
 ## The three cases
 
-Read-only is one of three ways to show a value without a way to change it. Pick by whether anyone can change it, and who.
+Choose how to show a value by who can change it and what prevents editing.
 
 <TypeGrid>
 <TypeCard of={ReadOnlyStories.KeyField} title="Read-only" stage={CARD_STAGE}>Someone can change it; this person cannot right now. Neutral fill, full contrast, the reason in the caption.</TypeCard>
@@ -137,7 +137,7 @@ It can be reached, read, selected and copied. `isReadOnly` sets `aria-readonly` 
 
 <RuleTag kind="review" />
 
-A person who cannot change a value must at least read all of it. A `Select` wraps to show its value; for a `TextArea`, set `rows` so all of it shows. <PlannedTag /> A TextArea that grows to fit its value is Planned.
+A `Select` wraps to show its full value; for a `TextArea`, set `rows` to show it all. Automatic TextArea growth is Planned <PlannedTag />.
 
 ### Show never-editable content as plain text.
 

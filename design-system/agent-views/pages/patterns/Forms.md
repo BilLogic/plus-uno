@@ -10,7 +10,7 @@ How a form takes and checks what someone types: its host, when it validates, wha
 
 ## The hosts
 
-A form lives in one of four hosts. The Form template draws each; this pattern says which to pick and how the form behaves inside it.
+Choose among four hosts. The Form template shows their layouts; this pattern guides host selection and form behavior.
 
 - **In a page.** Settings and anything saved as a group. Buttons left-aligned under the fields.
 - **In a Panel.** A short edit from a table, with the page in view. Cancel and Save full bleed at the bottom.

@@ -2,7 +2,7 @@
 
 # Templates
 
-A template is an arrangement of components with slots. Grab one, fill the slots, and the thinking from the patterns comes with it.
+Arrange components by filling a template's slots. Use patterns to guide the choices.
 
 **Kind:** Template
 
@@ -10,7 +10,7 @@ A template is an arrangement of components with slots. Grab one, fill the slots,
 
 ## The nine templates
 
-Broadest first. Each page opens with its types, then the anatomy and key states of each type, then the usage spine. The Templates and patterns section below says how the layers fit together.
+Templates run from broadest to smallest. Each page covers types, anatomy, key states and usage. See Templates and patterns below for how the layers fit together.
 
 - **Frame.** The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare.
 - **Page.** The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width.
@@ -24,11 +24,11 @@ Broadest first. Each page opens with its types, then the anatomy and key states 
 
 ## Templates and patterns
 
-A template is an arrangement of components with slots. A pattern is the thinking baked into it.
+Templates define slots; patterns guide decisions across templates.
 
 ### Three layers
 
-Grab a template, fill the slots, and open a pattern when you are lost or want to challenge a choice. Each layer answers one question and holds its guidance in one place.
+Fill a template's slots; consult a pattern when choosing or reconsidering an approach. Each layer owns one kind of guidance.
 
 - **Components** are single pieces with props, imported by name. The question is "Am I using this piece right?" Anatomy is the piece's parts.
 - **Templates** are arrangements of components with slots. They hold key scenarios and key states, and link to components for detail. The question is "Are the slots filled right?" Anatomy is the numbered slots.
@@ -41,8 +41,6 @@ Behavior splits out into a component, and a template that only redraws one compo
 The step up from a quick look to its own page is under Opening a record, below. A rule lives in one place. A template page that needs a pattern's rule links to it and keeps its own words for the slots.
 
 ### Frame, Screen, Flow
-
-The empty Frame is the template. A filled Frame is a Screen. A sequence of Screens that fulfills one user story is a Flow.
 
 - **Frame:** the template. Sidebar, Page and the AI panel slot, in its default, focused and bare types.
 - **Screen:** a Frame with its slots filled for one page. Screens are documented under Flows in Figma.

@@ -191,7 +191,24 @@ A Status tag never opens a menu. Where a status can be changed, the field around
 
 <RuleTag kind="review" />
 
-Build a checklist from `PatternCard` and `PatternSection`, with each step row composed from `Icon`, step text with one fact, and a 128 action column (`--checklist-action-width`, floor `--checklist-action-min-width` at 120). Put the title at the start of the header and the count ("2 of 5 done") with a `ProgressBar` at the end so the bar's start edge lands on the action column's start edge (128 wide on a persistent card, 96 wide when a 32 dismiss `IconButton` takes the end). Buttons fill the column so their edges line up down the list. Keep open steps in order on top; move each finished step below them and center a check icon with "Completed" (Body small, subtle) in the action column as plain text. Use three layouts: a dismissible card on Home (which shrinks to one line for a day when complete, then disappears), a persistent card in a page for required work (which keeps every ticked row on screen), and a compact card at the foot of the Sidebar showing the count, bar and next step that opens the full list.
+Build the checklist from `PatternCard` and `PatternSection`:
+
+1. Compose each row from an `Icon`, step text with one fact, and an action column. Use `--checklist-action-width` (128), with `--checklist-action-min-width` (120) as its floor. Buttons fill the column and align down the list.
+2. Put the title at the header's start and the count ("2 of 5 done") with a `ProgressBar` at the end. Align the bar's start edge with the action column: 128 wide on a persistent card, or 96 when a 32 dismiss `IconButton` occupies the end.
+3. Keep open steps in order above completed steps. Center a check icon and plain "Completed" text (Body small, subtle) in each completed row's action column.
+
+Choose the layout by where the checklist appears:
+
+<DocsTable>
+<thead>
+<tr><th>Layout</th><th>Use</th><th>Behavior</th></tr>
+</thead>
+<tbody>
+<tr><td>Dismissible card</td><td>Home</td><td>When complete, shrinks to one line for a day, then disappears.</td></tr>
+<tr><td>Persistent card</td><td>Required work on a page</td><td>Keeps every completed row visible.</td></tr>
+<tr><td>Compact card</td><td>Foot of the Sidebar</td><td>Shows the count, progress bar and next step, which opens the full list.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

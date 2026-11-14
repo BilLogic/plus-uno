@@ -121,7 +121,7 @@ Same group: `AiChat` · `Backdrop` · `Frame` · `PatternCard` · `PatternModal`
 
 ## Anatomy
 
-A record page, one level down, with everything the header can carry. Each marker sits in the gutter beside its part.
+A record page one level down shows every header slot, with markers in the gutter beside each part.
 
 1. **Breadcrumb** (optional). The record's parents on their own row, above the title.
 2. **Title.** The page's one h1, with its StatusTag after the text when the page is one record.

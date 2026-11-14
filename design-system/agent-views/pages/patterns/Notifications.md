@@ -31,7 +31,7 @@ One banner at a time, scrolling with its content. The Frame tier is system news 
 
 ## Usage
 
-Use Notifications when the product needs to tell someone something: an action finished, a condition holds, a decision is needed. Match the disruption to the urgency: a Flag passes, a SectionMessage stays in the page, a Banner holds for a condition, a Modal interrupts. Keep notifications to what is needed; when every message shouts, none does.
+Notify someone when an action finishes, a condition applies or a decision is needed. Match disruption to urgency using the carrier table below. Show only necessary notifications.
 
 | The message is about… | Carrier | Where | Leaves |
 | --- | --- | --- | --- |
