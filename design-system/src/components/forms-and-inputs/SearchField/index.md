@@ -16,7 +16,7 @@ Search field: find a record by typing. It is a TextField with a search icon befo
 
 ## Usage
 
-Use `SearchField` to find a record in a list by typing. Results show in the results area, never under the field (except in `focused` mode): the count in the table or results header, and the no-matches message in the table body.
+Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field (except in `focused` mode): the count sits in that header, and the no-matches message in its body.
 
 Pick the mode by where the answer lands:
 

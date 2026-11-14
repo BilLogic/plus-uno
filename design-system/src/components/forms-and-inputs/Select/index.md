@@ -18,7 +18,7 @@ Also asked as: combobox, picklist, option list, async select.
 
 ## Usage
 
-Use `Select` for a form field with six or more options, where typing to filter helps more than scanning, such as a tutor roster or a list of schools.
+Use `Select` for a form field with six or more options, where typing to filter helps more than scanning, such as a tutor roster or a school name.
 
 | The choice is | Reach for |
 | --- | --- |
