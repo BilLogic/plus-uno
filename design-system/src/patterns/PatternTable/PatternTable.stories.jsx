@@ -1,8 +1,10 @@
 import React from 'react';
-import { expect, waitFor, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { alpha, computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
+import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
 import { Checkbox, Button } from '@/components';
@@ -370,3 +372,221 @@ export const StickyColumn = {
         </div>
     ),
 };
+
+/* ------------------------------------------------------------------- motion */
+
+const withProductiveMotion = (Story) => (
+    <MotionPreferenceContext.Provider value={false}>
+        <Story />
+    </MotionPreferenceContext.Provider>
+);
+
+const INITIAL_ROSTER = [
+    { id: 'jordan', name: 'Jordan Blake', school: 'Lincoln Middle', sessions: 12 },
+    { id: 'casey', name: 'Casey Rivera', school: 'Roosevelt Middle', sessions: 6 },
+    { id: 'morgan', name: 'Morgan Lee', school: 'North High', sessions: 15 },
+];
+
+const ADDED_MEMBER = { id: 'maya', name: 'Maya Lin', school: 'Lincoln Middle', sessions: 9 };
+
+const AddRemoveTableDemo = ({ mode }) => {
+    const [rows, setRows] = React.useState(INITIAL_ROSTER);
+    const hasMaya = rows.some((row) => row.id === 'maya');
+    return (
+        <PatternSection
+            title="Sessions"
+            actions={mode === 'add' ? (
+                <Button
+                    text={hasMaya ? 'Reset roster' : 'Add session'}
+                    appearance="primary"
+                    spacing="compact"
+                    onClick={() => setRows(hasMaya
+                        ? INITIAL_ROSTER
+                        : [INITIAL_ROSTER[0], ADDED_MEMBER, ...INITIAL_ROSTER.slice(1)])}
+                />
+            ) : undefined}
+        >
+            <PatternTable>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>School</th>
+                        <th>Sessions</th>
+                        {mode === 'remove' && <th>Action</th>}
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows.map((row) => (
+                        <tr key={row.id}>
+                            <td>{row.name}</td>
+                            <td>{row.school}</td>
+                            <td>{row.sessions}</td>
+                            {mode === 'remove' && (
+                                <td>
+                                    <Button
+                                        text={`Remove ${row.name}`}
+                                        appearance="subtle"
+                                        spacing="compact"
+                                        onClick={() => setRows((current) => current.filter((item) => item.id !== row.id))}
+                                    />
+                                </td>
+                            )}
+                        </tr>
+                    ))}
+                </tbody>
+            </PatternTable>
+        </PatternSection>
+    );
+};
+
+const playAddRow = (reduced = false) => async ({ canvasElement }) => {
+    await settleAnimations(canvasElement);
+    const canvas = within(canvasElement);
+    const morganBefore = canvas.getByText('Morgan Lee').closest('tr').getBoundingClientRect().top;
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Add session' }));
+    const entering = canvasElement.querySelector('[data-row-key="maya"]');
+    await expect(entering, 'new row mounts keyed in tbody').not.toBeNull();
+    if (reduced) {
+        await expect(entering.querySelector('[data-table-seam]'), 'reduced motion skips spatial seam wrapper').toBeNull();
+    } else {
+        await expect(entering).toHaveAttribute('data-row-motion', 'enter');
+    }
+
+    await settleAnimations(canvasElement);
+    await waitFor(() => expect(entering.hasAttribute('data-row-motion')).toBe(false));
+    await expect(canvas.getByText('Maya Lin')).toBeVisible();
+    const morganAfter = canvas.getByText('Morgan Lee').closest('tr').getBoundingClientRect().top;
+    await expect(morganAfter, 'rows below moved down to make room').toBeGreaterThan(morganBefore);
+};
+
+export const MotionAddRow = {
+    name: 'Motion: Add an item',
+    decorators: [withProductiveMotion],
+    render: () => <AddRemoveTableDemo mode="add" />,
+    play: playAddRow(false),
+};
+
+export const MotionAddRowReduced = {
+    name: 'Motion: Add an item (reduced)',
+    decorators: [withReducedMotion],
+    render: () => <AddRemoveTableDemo mode="add" />,
+    play: playAddRow(true),
+};
+
+const playRemoveRow = (reduced = false) => async ({ canvasElement }) => {
+    await settleAnimations(canvasElement);
+    const canvas = within(canvasElement);
+    const caseyRow = canvas.getByText('Casey Rivera').closest('tr');
+    const morganRow = canvas.getByText('Morgan Lee').closest('tr');
+    const caseyTopBefore = caseyRow.getBoundingClientRect().top;
+    const morganTopBefore = morganRow.getBoundingClientRect().top;
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Remove Casey Rivera' }));
+
+    // Exit before reflow: the leaving row stays in place fading out before rows below move into its space.
+    const leaving = canvasElement.querySelector('[data-leaving-key="casey"]');
+    await expect(leaving, 'leaving row stays mounted during exit fade').not.toBeNull();
+    await expect(leaving).toHaveAttribute('data-row-motion', 'exit-fade');
+    if (!reduced) {
+        const morganDuringFade = morganRow.getBoundingClientRect().top;
+        await expect(morganDuringFade, 'rows below hold their space while leaving row fades out')
+            .toBeCloseTo(morganTopBefore, 0);
+    }
+
+    await waitFor(() => expect(canvasElement.querySelector('[data-leaving-key="casey"]')).toBeNull(), { timeout: 4000 });
+    await settleAnimations(canvasElement);
+    await expect(canvas.queryByText('Casey Rivera')).toBeNull();
+    await expect(morganRow.getBoundingClientRect().top, 'rows below closed up into removed row place')
+        .toBeCloseTo(caseyTopBefore, 1);
+};
+
+export const MotionRemoveRow = {
+    name: 'Motion: Remove an item (exit before reflow)',
+    decorators: [withProductiveMotion],
+    render: () => <AddRemoveTableDemo mode="remove" />,
+    play: playRemoveRow(false),
+};
+
+export const MotionRemoveRowReduced = {
+    name: 'Motion: Remove an item (reduced)',
+    decorators: [withReducedMotion],
+    render: () => <AddRemoveTableDemo mode="remove" />,
+    play: playRemoveRow(true),
+};
+
+const ReorderTableDemo = () => {
+    const [descending, setDescending] = React.useState(false);
+    const sorted = React.useMemo(() => {
+        const copy = [...INITIAL_ROSTER, ADDED_MEMBER];
+        copy.sort((a, b) => (descending ? b.sessions - a.sessions : a.name.localeCompare(b.name)));
+        return copy;
+    }, [descending]);
+
+    return (
+        <PatternSection
+            title="Students"
+            actions={(
+                <Button
+                    text={descending ? 'Sort by name' : 'Sort by sessions'}
+                    appearance="default"
+                    spacing="compact"
+                    onClick={() => setDescending((prev) => !prev)}
+                />
+            )}
+        >
+            <PatternTable>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>School</th>
+                        <th>Sessions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {sorted.map((row) => (
+                        <tr key={row.id}>
+                            <td>{row.name}</td>
+                            <td>{row.school}</td>
+                            <td>{row.sessions}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </PatternTable>
+        </PatternSection>
+    );
+};
+
+const playReorderRows = (reduced = false) => async ({ canvasElement }) => {
+    await settleAnimations(canvasElement);
+    const canvas = within(canvasElement);
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Sort by sessions' }));
+    const morganRow = canvasElement.querySelector('[data-row-key="morgan"]');
+    await expect(morganRow).not.toBeNull();
+    if (reduced) {
+        await expect(getComputedStyle(morganRow).transform, 'reduced reorder never translates').toBe('none');
+    } else {
+        await expect(morganRow).toHaveAttribute('data-row-motion', 'reorder');
+    }
+
+    await settleAnimations(canvasElement);
+    await waitFor(() => expect(morganRow.hasAttribute('data-row-motion')).toBe(false), { timeout: 4000 });
+    const names = Array.from(canvasElement.querySelectorAll('tbody tr td:first-child')).map((td) => td.textContent);
+    await expect(names).toEqual(['Morgan Lee', 'Jordan Blake', 'Maya Lin', 'Casey Rivera']);
+};
+
+export const MotionReorderRows = {
+    name: 'Motion: Reorder items',
+    decorators: [withProductiveMotion],
+    render: () => <ReorderTableDemo />,
+    play: playReorderRows(false),
+};
+
+export const MotionReorderRowsReduced = {
+    name: 'Motion: Reorder items (reduced)',
+    decorators: [withReducedMotion],
+    render: () => <ReorderTableDemo />,
+    play: playReorderRows(true),
+};
+

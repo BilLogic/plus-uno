@@ -1,10 +1,20 @@
 import React from 'react';
+import {
+  EXIT_FADE_MS,
+  STAGGER,
+  planExitBeforeReflow,
+  staggerDelays,
+  staggerGap as ruleGap,
+} from '@/lib/listMotion';
+import { CLEAN_FADE_GAP_MS, planSwapInPlace } from '@/lib/swapMotion';
 import { PAINT } from './paint.js';
 import { CardBox, Flag, Frame, PageHeader, Popup, Rect, Row, Section, SkeletonBar } from './primitives.jsx';
 import { Pointer, SequenceStrip } from './primitives-motion.jsx';
 import { ReflowScreen } from './compositions.jsx';
-import { measure, pair, springFor } from './motion.jsx';
+import { pair } from './motion.jsx';
 import { travel } from './trails.js';
+
+export { CLEAN_FADE_GAP_MS, STAGGER, ruleGap, staggerDelays };
 
 /**
  * The Choreography page's figures (Foundations/Expression/Motion/Choreography). Each is a
@@ -22,19 +32,7 @@ const Moved = ({ x = 0, y = 0, opacity = 1, children }) => (
   </g>
 );
 
-// ---------- The timing rules ----------
-
-/** Stagger: 20 ms apart, or 500 ms ÷ items if that is shorter, so a whole set is in within half a second. */
-export const STAGGER = { gap: 20, cap: 500 };
-/** The gap between rows for a list of `n` items. */
-export const ruleGap = (n) => Math.min(STAGGER.gap, STAGGER.cap / n);
-/** Each item's start, in ms after the first. */
-export const staggerDelays = (n, gap = ruleGap(n)) => Array.from({ length: n }, (_, i) => i * gap);
-
-/** Clean fades: the new content starts when the old is about 90% out, read from `appearance.fast`. */
-const FADE = measure(springFor('appearance.fast'));
-export const CLEAN_FADE_GAP_MS = Math.round(FADE.t90 * 1000);
-const FADE_MS = Math.round(FADE.settle * 1000);
+const FADE_MS = EXIT_FADE_MS;
 
 // ---------- Direction: unify ----------
 
@@ -225,12 +223,13 @@ const spaceScene = ({ id, title, caption, collide }) => ({
     </>
   ),
   play: async (ctx) => {
+    const exitPlan = planExitBeforeReflow();
     if (collide) {
       ctx.set({ clash: ctx.state.f > 0.05 ? 1 : 0 });
-      await Promise.all([ctx.spring('f', 0, 'appearance.fast'), ctx.spring('m', 1, 'spatial.default')]);
+      await Promise.all([ctx.spring('f', 0, exitPlan.fadeToken), ctx.spring('m', 1, 'spatial.default')]);
     } else {
       // What leaves fades out first; only then does anything move into its place.
-      await ctx.spring('f', 0, 'appearance.fast');
+      await ctx.spring('f', 0, exitPlan.fadeToken);
       ctx.set({ clash: ctx.state.f > 0.05 ? 1 : 0 });
       await ctx.spring('m', 1, 'spatial.default');
     }
@@ -273,14 +272,15 @@ const fadeScene = ({ id, title, caption, cross }) => ({
     </>
   ),
   play: async (ctx) => {
-    const fadeOut = ctx.spring('a', 0, 'appearance.fast');
+    const swapPlan = planSwapInPlace();
+    const fadeOut = ctx.spring('a', 0, swapPlan.outToken);
     if (cross) {
-      await Promise.all([fadeOut, ctx.spring('b', 1, 'appearance.fast')]);
+      await Promise.all([fadeOut, ctx.spring('b', 1, swapPlan.inToken)]);
     } else {
       // The new content begins when the old is about 90% out.
-      await ctx.after(CLEAN_FADE_GAP_MS);
-      ctx.set({ gap: CLEAN_FADE_GAP_MS });
-      await Promise.all([fadeOut, ctx.spring('b', 1, 'appearance.fast')]);
+      await ctx.after(swapPlan.inStartsAtMs);
+      ctx.set({ gap: swapPlan.inStartsAtMs });
+      await Promise.all([fadeOut, ctx.spring('b', 1, swapPlan.inToken)]);
     }
   },
 });

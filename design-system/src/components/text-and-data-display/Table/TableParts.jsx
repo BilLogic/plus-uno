@@ -151,6 +151,8 @@ export const TableRow = ({
     </tr>
 );
 
+TableRow.displayName = 'TableRow';
+
 TableRow.propTypes = {
     children: PropTypes.node,
     state: PropTypes.oneOf(['rest', 'highlighted', 'selected', 'disabled']),

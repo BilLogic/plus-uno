@@ -1,6 +1,8 @@
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
+import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { TextField } from '@/components';
 
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
@@ -276,3 +278,115 @@ export const KeyLeaving = {
         await expect(canvas.getByLabelText(/Student/), 'Back returns without losing anything typed').toHaveValue('Ana');
     },
 };
+
+/* ------------------------------------------------------------------- motion */
+
+const withProductiveMotion = (Story) => (
+    <MotionPreferenceContext.Provider value={false}>
+        <Story />
+    </MotionPreferenceContext.Provider>
+);
+
+const InlineValidationDemo = () => {
+    const [school, setSchool] = React.useState('');
+    const [notes, setNotes] = React.useState('');
+    const [touched, setTouched] = React.useState(false);
+    const error = touched && school.trim().length < 3 ? 'Enter the school name.' : undefined;
+
+    return (
+        <div style={{ maxInlineSize: 'var(--card-min-width-lg)', padding: 'var(--page-pad)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+                <div data-testid="school-field-wrap">
+                    <FormFieldSchool
+                        value={school}
+                        error={error}
+                        onChange={(next) => setSchool(next)}
+                        onBlur={() => setTouched(true)}
+                    />
+                </div>
+                <div data-testid="notes-field-wrap">
+                    <FormFieldNotes value={notes} onChange={setNotes} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const FormFieldSchool = ({ value, error, onChange, onBlur }) => (
+    <TextField
+        label="School"
+        isRequired
+        value={value}
+        isInvalid={Boolean(error)}
+        errorMessage={error}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+    />
+);
+
+const FormFieldNotes = ({ value, onChange }) => (
+    <TextField
+        label="Notes (optional)"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+    />
+);
+
+const playInlineValidation = (reduced = false) => async ({ canvasElement }) => {
+    await settleAnimations(canvasElement);
+    const canvas = within(canvasElement);
+    const school = canvas.getByLabelText(/School/);
+    const notesWrap = canvas.getByTestId('notes-field-wrap');
+    const notesTopInitial = notesWrap.getBoundingClientRect().top;
+
+    // Typing before leaving never flags the field.
+    await userEvent.type(school, 'Li');
+    await expect(school).not.toHaveAttribute('aria-invalid', 'true');
+    await expect(canvasElement.querySelector('[data-field-caption-slot]')).toBeNull();
+
+    // Leaving the incomplete field makes room on spatial.fast and fades the error in.
+    await userEvent.tab();
+    await expect(school).toHaveAttribute('aria-invalid', 'true');
+    const slot = canvasElement.querySelector('[data-field-caption-slot]');
+    await expect(slot, 'caption presence slot mounts').not.toBeNull();
+    await expect(slot).toHaveAttribute('data-reduced', reduced ? 'true' : 'false');
+
+    await settleAnimations(canvasElement);
+    await waitFor(() => expect(slot).toHaveAttribute('data-presence-phase', 'settled'));
+    await expect(canvas.getByText('Enter the school name.')).toBeVisible();
+    const notesTopWithError = notesWrap.getBoundingClientRect().top;
+    await expect(notesTopWithError, 'field below moved down for the error message').toBeGreaterThan(notesTopInitial);
+
+    // Once red, typing rechecks immediately: fixing the field fades the error out before closing the room.
+    await userEvent.click(school);
+    await userEvent.type(school, 'ncoln Middle');
+    await expect(school).not.toHaveAttribute('aria-invalid', 'true');
+
+    const exitingSlot = canvasElement.querySelector('[data-field-caption-slot]');
+    await expect(exitingSlot, 'slot stays mounted during exit fade').not.toBeNull();
+    await expect(exitingSlot.getAttribute('data-presence-phase')).toMatch(/^exit-/);
+    if (!reduced && exitingSlot.getAttribute('data-presence-phase') === 'exit-fade') {
+        await expect(notesWrap.getBoundingClientRect().top, 'field below waits for exit fade before closing up')
+            .toBeCloseTo(notesTopWithError, 1);
+    }
+
+    await waitFor(() => expect(canvasElement.querySelector('[data-field-caption-slot]')).toBeNull(), { timeout: 4000 });
+    await settleAnimations(canvasElement);
+    await expect(notesWrap.getBoundingClientRect().top, 'field below returned to its resting position')
+        .toBeCloseTo(notesTopInitial, 1);
+};
+
+export const MotionInlineValidation = {
+    name: 'Motion: Inline validation in a field',
+    decorators: [withProductiveMotion],
+    render: () => <InlineValidationDemo />,
+    play: playInlineValidation(false),
+};
+
+export const MotionInlineValidationReduced = {
+    name: 'Motion: Inline validation in a field (reduced)',
+    decorators: [withReducedMotion],
+    render: () => <InlineValidationDemo />,
+    play: playInlineValidation(true),
+};
+
