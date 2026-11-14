@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { animate } from 'motion';
+import { animate } from 'motion/react';
 import { CountTag, Icon, IconButton, Logo, Tooltip } from '@/components';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { ClippedTooltip } from '@/lib/ClippedTooltip';

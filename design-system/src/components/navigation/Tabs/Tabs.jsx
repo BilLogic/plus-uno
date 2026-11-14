@@ -13,7 +13,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
-import { animate } from 'motion';
+import { animate } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { useMotionReduced } from '@/lib/motionPreference';
 import './Tabs.scss';

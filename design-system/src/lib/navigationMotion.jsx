@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { animate } from 'motion';
+import { animate } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { useMotionReduced } from './motionPreference';
 
