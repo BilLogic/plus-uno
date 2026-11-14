@@ -2,7 +2,7 @@
 
 # PatternCard
 
-Card pattern for PLUS design system. Mirrors Figma `Pattern/Card`: an optional image, then the content (the `_Card header` over the body), then an optional footer, on Atlassian's raised pair: the raised surface and its shadow, whose 1px ring is the card's edge. - **Layout**: `stacked` (default) puts the image above the content. `image-start` and `image-end` put it beside the content, content two thirds and image one third, for wide cards; below the md breakpoint (768) a side card stacks. One layout per row of cards. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.
+PLUS card: an optional image, content and footer on the raised surface and shadow. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading medium on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.
 
 Also asked as: summary card, object card.
 
@@ -10,7 +10,7 @@ Also asked as: summary card, object card.
 
 **Source:** `design-system/src/patterns/PatternCard/PatternCard.jsx`
 
-**Stories:** `design-system/src/patterns/PatternCard/PatternCard.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, SizeSmall, SizeMedium, SizeLarge, ImageWide, ImageStandard, ImageSquare, LayoutStacked, LayoutImageStart, LayoutImageEnd, LayoutStacksBelowMd, BodyOnly, WithFooter, CustomHeader, Static, Clickable, Dragging, LoadingCard, Rows
+**Stories:** `design-system/src/patterns/PatternCard/PatternCard.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, SizeSmall, SizeMedium, SizeLarge, ImageWide, ImageStandard, ImageSquare, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, Static, Clickable, Dragging, LoadingCard, Rows, PlacementBoundary
 
 **Storybook page:** `design-system/src/patterns/PatternCard/PatternCard.mdx`
 
@@ -101,7 +101,7 @@ Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternModal` · `Pa
 
 ## Parts
 
-1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. Stacked, give the image you pass an aspect ratio of 16:9, 4:3 or 1:1; beside the content it fills the full height at one third of the width and crops to cover.
+1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. On top, give the image you pass an aspect ratio of 16:9, 4:3 or 1:1; beside the content it fills the full height at one third or one half of the width and crops to cover.
 2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. The title is 14/20 at every level, over a 14/20 description. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
 3. **Body.** A slot for text, a list or media.
 4. **Footer** (optional). A left-aligned slot for actions that commit a change.
@@ -154,8 +154,9 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 | `description` | node | — | Body/default 14 under the title |
 | `actions` | node | — | Actions at the end of the header row: buttons, a pager or an overflow |
 | `header` | node | — | Custom header that replaces title, description and actions (tabs, a toolbar) |
-| `image` | node | — | Image slot, full bleed: above the content, or at the start or end edge per `layout` |
-| `layout` | enum | `'stacked'` | Where the image sits. `stacked` puts it above the content. `image-start` and `image-end` put it beside the content at one third of the width, full height, bleeding to the card's top, bottom and that side's edge; for wide cards, and below the md breakpoint they stack. Pass one media element: it fills the cell and crops to cover. |
+| `image` | node | — | Image slot, full bleed: above the content, or at the start or end edge per `imagePlacement` |
+| `imagePlacement` | enum | `'top'` | Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. |
+| `imageSplit` | enum | `'1/3'` | Side image share. One half also steps the title up to Heading medium. Ignored for top placement. |
 | `footer` | node | — | Footer slot: commit actions, left-aligned, Card/stack-lg below the body |
 | `padding` | enum | `'md'` | Padding scale: Card/pad-sm · md · lg (16 · 20 · 24) |
 | `gap` | enum | `'md'` | Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12) |
@@ -169,7 +170,9 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 
 ## Variants
 
-**`layout`** — `stacked` · `image-start` · `image-end`
+**`imagePlacement`** — `top` · `start` · `end`
+
+**`imageSplit`** — `1/3` · `1/2`
 
 **`padding`** — `sm` · `md` · `lg`
 
@@ -179,7 +182,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-compact` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current`
+`--body-default` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-compact` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--heading-medium`
 
 From `design-system/src/patterns/PatternCard/PatternCard.scss`. Override these through the token layer, never with a literal.
 
