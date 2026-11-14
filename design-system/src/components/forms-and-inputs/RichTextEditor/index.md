@@ -14,9 +14,13 @@ RichTextEditor: a text field with a formatting toolbar, for where the formatting
 
 ## Usage
 
-Use a rich text editor where the formatting is part of the meaning: session notes with a list, feedback with emphasis, a description that needs a link. Where it is not, a text area is the smaller, sturdier control.
+Use `RichTextEditor` when formatting such as emphasis, lists or links is part of the content's meaning. `toolbarPreset` is `compact` or `full` (or pass `toolbarButtons` by name, which implies the full toolbar); `value` and `onChange` are HTML strings. Giving it a `name` also renders a hidden input, so the HTML posts with a plain form.
 
-`toolbarPreset` is `compact` or `full`; passing `toolbarButtons` selects the buttons by name and implies the full toolbar. `value` and `onChange` are HTML strings. Giving it a `name` also renders a hidden input, so the HTML posts with a plain form.
+## Alternatives
+
+- For plain multi-line text with no formatting toolbar, use `TextArea`.
+- For single-line text, use `TextField`.
+- For a threaded discussion entry with an author and timestamp, use `Comment`.
 
 ## Best practices
 
@@ -79,9 +83,10 @@ Don't: No label, only a placeholder, which disappears as soon as someone types.
 
 ## Related
 
-- For plain multi-line text, use Text area: smaller, labeled, and with none of the above.
-- For one line, use Text field.
-- For displaying formatted content the user cannot edit, render the HTML yourself after sanitizing it.
+- `TextArea`: use when plain multi-line text is enough.
+- `TextField`: use when collecting a single line of text.
+- To display formatted content the user cannot edit, render the HTML yourself after sanitizing it.
+- `Comment`: use when displaying a formatted note in a discussion thread.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

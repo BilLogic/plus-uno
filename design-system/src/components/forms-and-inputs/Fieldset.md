@@ -16,7 +16,13 @@ Also asked as: field group.
 
 ## Usage
 
-Use a fieldset wherever a set of fields shares one label and, often, one validation message: a group of radios, a group of checkboxes, related text fields asked together. For a single field with its own label, use the label and caption convention instead.
+Use `Fieldset` when a set of mixed controls shares one legend and one validation message, such as related text fields asked together.
+
+## Alternatives
+
+- For a group of radio buttons under one question, use `RadioGroup`.
+- For a group of checkboxes under one question, use `CheckboxGroup`.
+- For a single field with its own label and caption, use `TextField` or `Select`.
 
 ## Best practices
 
@@ -33,7 +39,7 @@ Pass `error` on the Fieldset, not on each field inside it, when the validation a
 
 ### Build on a fieldset rather than reimplementing it. {#build-on-a-fieldset-rather-than-reimplementing-it}
 
-Radio group already composes Fieldset with Radio children. Reach for Radio group directly for radios, and use Fieldset on its own only for a shape it does not already cover, like a checkbox group.
+`RadioGroup` and `CheckboxGroup` already compose `Fieldset` with `Radio` and `Checkbox` children. Reach for those directly for single-question choice sets, and use `Fieldset` on its own when grouping custom or mixed fields.
 
 Do: A fieldset with one legend for the set.
 Don't: Loose boxes in a plain container, with no legend.
@@ -67,8 +73,9 @@ Don't: An instruction.
 
 ## Related
 
-- For the ready-made radio composition, use Radio group.
-- For a single field's label and help text, see the label and caption convention.
+- `RadioGroup`: use when grouping radio buttons under a shared legend and error.
+- `CheckboxGroup`: use when grouping checkboxes under a shared legend and error.
+- [Form](?path=/docs/components-forms-and-inputs-form--docs): use when reviewing the label and caption rules for individual fields.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

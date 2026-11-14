@@ -14,10 +14,14 @@ Button group: a visually connected row of related actions. A plain container for
 
 ## Usage
 
-Use `ButtonGroup` for a short row of related actions that read as one unit —
-view toggles, a set of filters. For mutually exclusive options that pick one
-value, consider whether `RadioGroup` fits the data better than buttons
-styled to look selected.
+Use `ButtonGroup` for a short row of related actions or view toggles that read as one unit.
+
+## Alternatives
+
+- For a single standalone action, use `Button`.
+- For one primary action joined to a menu of variations, use `SplitButton`.
+- For mutually exclusive form answers, use `RadioGroup`.
+- For two to four large icon-over-label choices, use `VerticalButton`.
 
 ## Best practices
 
@@ -66,8 +70,9 @@ that should read as current, and manage which one that is yourself.
 
 ## Related
 
-- For a single action, use `Button` directly.
-- For two to four big choices with an icon over the label, such as a role at sign-in, use `VerticalButton`.
+- `Button`: use when an action stands alone or sits in a spaced row.
+- `SplitButton`: use when one primary action pairs with a chevron menu.
+- `VerticalButton`: use when offering two to four large icon-over-label choices.
 
 Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

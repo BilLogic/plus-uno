@@ -77,8 +77,6 @@ A calendar is the month grid that Date picker and Date time picker open, on its 
 
 <ComponentExample of={CalendarStories.Disabled} title="Disabled" description="Days before minDate or after maxDate are disabled and take no focus." />
 
-Hover and focus are described under Usage.
-
 </div>
 
 <div className="sb-ds-doc-section">
@@ -95,13 +93,7 @@ Hover and focus are described under Usage.
 
 <DocsInteractivePlayground
     of={CalendarStories.Interactive}
-    description={
-        <>
-            Use the table in the panel below to change props. The preview is rendered{' '}
-            <strong>inline</strong> so clicks and focus work while you scroll
-            the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -118,7 +110,16 @@ Hover and focus are described under Usage.
 
 ## Usage
 
-Use a calendar directly only when a date grid needs to be visible on the page without a field or a popup around it: a scheduling view, an embedded picker. For a single date field, use Date picker; for a date and time together, use Date time picker. Both already use this same grid.
+Use `Calendar` directly only when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a date or date range field that opens this grid in a popup, use `DatePicker`.
+- For a combined date and time answer, use `DateTimePicker`.
 
 </div>
 
@@ -175,7 +176,7 @@ Use a calendar directly only when a date grid needs to be visible on the page wi
 
 ### Name the month in full, with the year.
 
-The header says which month the grid shows, such as "October 2026". The calendar writes it this way itself; numbers alone make people count.
+The header states the full month name and year rather than numeric month codes so people do not have to count.
 
 ### Dim unavailable days, do not hide them.
 
@@ -263,8 +264,8 @@ Six weeks render every month, including the days of neighboring months that fill
 
 ## Related
 
-- For a single date field with this grid in a popup, use Date picker.
-- For a date and time together, use Date time picker.
+- `DatePicker`: use when a single date or date range field opens the calendar in a popup.
+- `DateTimePicker`: use when a date and a time are answered together.
 
 </div>
 

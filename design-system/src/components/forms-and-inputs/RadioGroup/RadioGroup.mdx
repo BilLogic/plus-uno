@@ -112,12 +112,7 @@ A radio group asks one question and offers a set of radio answers, one of which 
 
 <DocsInteractivePlayground
     of={RadioGroupStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -134,9 +129,18 @@ A radio group asks one question and offers a set of radio answers, one of which 
 
 ## Usage
 
-Use a radio group for one question with mutually exclusive answers, visible all at once: a handful of options someone picks by scanning, not searching. For a long list of options, use Select. For independent choices rather than one answer among several, use a group of Checkbox.
+Use `RadioGroup` for one question with mutually exclusive answers visible all at once: a handful of options someone picks by scanning, not searching. The group owns the `legend`, the `value` and a single group `error` on `Fieldset`.
 
-The group owns the legend, the value and the error, so each option stays a plain radio.
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a question where several answers may be chosen, use `CheckboxGroup`.
+- For a list of six or more options, use `Select`.
+- For asking the same radio question across multiple rows, use `ChoiceGrid`.
+- For a single radio placed in a custom layout such as a table, use `Radio`.
 
 </div>
 
@@ -309,10 +313,10 @@ When choosing one option should show an extra field, such as "Other, please spec
 
 ## Related
 
-- For a single radio outside a group, use Radio.
-- For a long list of options, use Select.
-- For independent choices instead of one answer among several, use CheckboxGroup or Checkbox.
-- For the legend-and-fields shell this builds on, see Fieldset.
+- `CheckboxGroup`: use when any number of options may be chosen.
+- `Radio`: use when placing individual radio controls in a custom layout.
+- `Select`: use when choosing from six or more options.
+- `Fieldset`: use when grouping mixed controls under a legend.
 
 </div>
 

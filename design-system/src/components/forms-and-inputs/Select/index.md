@@ -18,26 +18,17 @@ Also asked as: combobox, picklist, option list, async select.
 
 ## Usage
 
-Use `Select` for a list of six or more options, where typing to filter
-helps more than scanning — a tutor roster, a list of schools. Up to five
-options belong in view as a `RadioGroup` (one pick) or a Checkbox group
-(several). Pick the control by the shape of the answer.
+Use `Select` for a form field with six or more options, where typing to filter helps more than scanning, such as a tutor roster or a school name.
 
 | The choice is | Reach for |
 | --- | --- |
 | One pick, up to 5 options | `RadioGroup` |
-| Several picks, up to 5 options | A Checkbox group (`Fieldset` with `Checkbox`) |
+| Several picks, up to 5 options | `CheckboxGroup` |
 | 6 or more options | `Select`, searchable by default |
 | A list held on a server, too large to ship | `Select` with `loadOptions` |
 | Options in a hierarchy | `Cascader` or `TreeSelect` |
-| Narrowing a table from a bar | The tiers of the Filtering pattern |
+| Narrowing a table from a bar | `PopupSelect`, `FilterButton` or `FilterMenu` |
 | An action run from a button | `DropdownMenu` |
-
-### Turn typing off for a short set of choices.
-
-Typing is on because most lists are long enough to need it. A menu that
-holds a few choices, applied as you pick, has nothing to search: pass
-`isSearchable={false}` so the field stays a plain trigger and Space opens it.
 
 ## Motion
 
@@ -47,6 +38,15 @@ Select reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
 | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Clips back to the trigger and fades; stays mounted until the exit completes. |
+
+## Alternatives
+
+- For up to five mutually exclusive options, use `RadioGroup`.
+- For up to five multi-select options, use `CheckboxGroup`.
+- For hierarchical options, use `Cascader` or `TreeSelect`.
+- For free-form tags a person can create and manage in place, use `TagInput`.
+- For switching a view or setting one filter from a button, use `PopupSelect`.
+- For a menu of actions, use `DropdownMenu`.
 
 ## Best practices
 
@@ -73,22 +73,19 @@ Don't: The same words as plain help, in a default field.
 
 ### Pick the mode by the answer. {#pick-the-mode-by-the-answer}
 
-`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` (the most options a person can pick) apply to it only. `onOpenChange` reports the list opening and closing. Typing filters the list unless you pass `isSearchable={false}`, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
+`isMulti` shows picks as `Tag`s and checkboxes in the list; `selectAll` and `maxSelections` (the maximum number of picks) apply to it only. `onOpenChange` reports the list opening and closing. Typing filters the list unless you pass `isSearchable={false}`, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the created option, or refuses it with `null` (`TimePicker` uses it to parse `"1430"` as `"02:30 PM"`). `clearable` defaults to on with `isMulti` and off for a required single select.
 
 ### Mark a single pick with a check or a radio. {#mark-a-single-pick-with-a-check-or-a-radio}
 
-A single Select marks its pick with a check at the end of the row. Pass `marker="radio"` to draw a radio before the label instead, when the list reads as a set of alternatives to choose between, as in a view switch or a filter menu. Several picks always use checkboxes, so `marker` has no effect with `isMulti`. The marker changes color on selection; it does not move.
+A single `Select` marks its pick with a check at the end of the row. Pass `marker="radio"` to draw a radio before the label instead when the list reads as a set of alternatives, as in a view switch or filter menu. Several picks always use checkboxes, so `marker` has no effect with `isMulti`. The marker changes color on selection; it does not move.
 
 ### Show picks as text when Tags crowd the field. {#show-picks-as-text-when-tags-crowd-the-field}
 
-`displayMode="text"` (with `isMulti`) shows picks as comma-separated text instead of Tags. `isValid` with `successMessage` draws the success edge and message.
+`displayMode="text"` (with `isMulti`) shows picks as comma-separated text instead of `Tag`s. `isValid` with `successMessage` draws the success edge and message.
 
 ### Chain `dependsOn` for fields that filter each other. {#chain-dependson-for-fields-that-filter-each-other}
 
-Pass the parent's `{ value, label }` as `dependsOn` on the child. The child
-disables itself and explains why until the parent has a value, and clears
-itself the moment the parent's value changes — no manual wiring needed beyond
-passing the parent's current state down.
+Pass the parent's `{ value, label }` as `dependsOn` on the child. The child disables itself and explains why until the parent has a value, and clears itself the moment the parent's value changes.
 
 ```jsx
 <Select label="School" options={schools} value={school} onChange={setSchool} />
@@ -103,19 +100,13 @@ passing the parent's current state down.
 
 ### Use `commitOnClose` for a filter bar, not a form field. {#use-commitonclose-for-a-filter-bar-not-a-form-field}
 
-A form's multi-select should fire `onChange` on every pick, so other UI can
-react immediately. `commitOnClose` is for the opposite case — a filter panel
-where firing once, on close, avoids re-querying on every checkbox click.
+A form's multi-select should fire `onChange` on every pick. `commitOnClose` fires once on close to avoid re-querying on every checkbox click in a filter panel.
 
 ### Reach for `loadOptions` once a list is genuinely large or server-backed. {#reach-for-loadoptions-once-a-list-is-genuinely-large-or-server-backed}
 
-`recent` and `suggested` only change the order past 50 static options;
-`loadOptions` is for a list too large to ship as a static array at all.
+`recent` and `suggested` only change the order past 50 static options; `loadOptions` is for a list too large to ship as a static array.
 
-`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`.
-The first page loads as the list opens and again whenever the typed text
-changes; the next page loads as the list scrolls near its end, 50 at a time,
-and an older answer never overwrites a newer one. `isCreatable` works with it.
+`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`. The first page loads when the list opens and whenever the typed text changes; the next page loads as the list scrolls near its end (50 at a time), and an older answer never overwrites a newer one. `isCreatable` works with it.
 
 ```jsx
 <Select
@@ -125,16 +116,15 @@ and an older answer never overwrites a newer one. `isCreatable` works with it.
 />
 ```
 
-While a page is on its way the list shows one "Loading options" row; a Select
-never draws skeleton rows. If the request fails the list shows "Couldn't load
-options" with a Retry button, and Enter in the field retries too. A later page
-that fails keeps the rows already loaded and puts the same message in the
-footer. Options fade in one after another, 20 ms apart, the wait capped at
-500 ms; reduced motion shows them at once.
+While a page is loading, the list shows one "Loading options" row rather than skeleton rows. If the request fails it shows "Couldn't load options" with a Retry button, and Enter in the field retries too. A later page that fails keeps the rows already loaded and puts the same message in the footer. Options fade in one after another, 20 ms apart, capped at 500 ms; reduced motion shows them at once.
 
-### Read-only is not disabled. {#read-only-is-not-disabled}
+### Turn typing off for a short set of choices. {#turn-typing-off-for-a-short-set-of-choices}
 
-`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+Typing is on because most lists are long enough to need it. A menu that holds a few choices, applied as you pick, has nothing to search: pass `isSearchable={false}` so the field stays a plain trigger and Space opens it.
+
+### Use read-only for fixed values and disabled for unavailable ones. {#use-read-only-for-fixed-values-and-disabled-for-unavailable-ones}
+
+`isReadOnly` keeps the value focusable, selectable and at full contrast (`aria-readonly`); `isDisabled` removes the field from the tab order when it does not apply yet. Say why in the caption. Never swap one for the other, and never clip a read-only value; content nobody can edit is plain text, not a field. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: Read-only keeps the value readable, and the caption says why.
 Don't: Disabled fades a value people need to read.
@@ -155,9 +145,11 @@ Don't: Disabled fades a value people need to read.
 
 ## Related
 
-- For a handful of options visible all at once, use `RadioGroup`.
-- For hierarchical options, use `TreeSelect` or `Cascader`.
-- For free-form tags rather than a fixed option list, use `TagInput`.
+- `RadioGroup`: use when choosing one option from up to five visible options.
+- `CheckboxGroup`: use when choosing several options from up to five visible options.
+- `TreeSelect`: use when options form an expandable hierarchy.
+- `Cascader`: use when choosing a hierarchical path column by column.
+- `TagInput`: use when picking and creating color-coded tags in place.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

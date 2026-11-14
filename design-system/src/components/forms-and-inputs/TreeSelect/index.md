@@ -16,10 +16,7 @@ TreeSelect: a field that picks from options that nest, at any level of the tree.
 
 ## Usage
 
-Use `TreeSelect` when the options genuinely nest and someone may need to see
-or pick at more than one level — a curriculum with units and lessons, a
-category tree. For options that nest but are chosen one level at a time in
-sequence, use `Cascader` instead. For a flat list, use `Select`.
+Use `TreeSelect` when options nest in a hierarchy and someone needs to expand branches in place or pick nodes across multiple branches, such as curriculum units and lessons.
 
 ## Motion
 
@@ -30,6 +27,11 @@ TreeSelect reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
 | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Clips back to the trigger and fades; stays mounted until the exit completes. |
 | change | Expand and collapse | `--ds-motion-spatial-fast` | Columns and branches expand. |
+
+## Alternatives
+
+- For a single hierarchical path chosen one column per level in sequence, use `Cascader`.
+- For a flat list of options with no hierarchy, use `Select`.
 
 ## Best practices
 
@@ -93,8 +95,8 @@ subtree is complete.
 
 ## Related
 
-- For options chosen one level at a time in sequence, use `Cascader`.
-- For a flat list with no hierarchy, use `Select`.
+- `Cascader`: use when building a single path one level at a time across columns.
+- `Select`: use when choosing from a flat list of options.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `VerticalButton`
 

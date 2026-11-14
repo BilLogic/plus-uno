@@ -18,9 +18,7 @@ Also asked as: single choice, radio buttons, single select, multiple choice, rad
 
 ## Usage
 
-Use a radio group for one question with mutually exclusive answers, visible all at once: a handful of options someone picks by scanning, not searching. For a long list of options, use Select. For independent choices rather than one answer among several, use a group of Checkbox.
-
-The group owns the legend, the value and the error, so each option stays a plain radio.
+Use `RadioGroup` for one question with mutually exclusive answers visible all at once: a handful of options someone picks by scanning, not searching. The group owns the `legend`, the `value` and a single group `error` on `Fieldset`.
 
 ## Motion
 
@@ -29,6 +27,13 @@ RadioGroup reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |
+
+## Alternatives
+
+- For a question where several answers may be chosen, use `CheckboxGroup`.
+- For a list of six or more options, use `Select`.
+- For asking the same radio question across multiple rows, use `ChoiceGrid`.
+- For a single radio placed in a custom layout such as a table, use `Radio`.
 
 ## Best practices
 
@@ -93,10 +98,10 @@ When choosing one option should show an extra field, such as "Other, please spec
 
 ## Related
 
-- For a single radio outside a group, use Radio.
-- For a long list of options, use Select.
-- For independent choices instead of one answer among several, use CheckboxGroup or Checkbox.
-- For the legend-and-fields shell this builds on, see Fieldset.
+- `CheckboxGroup`: use when any number of options may be chosen.
+- `Radio`: use when placing individual radio controls in a custom layout.
+- `Select`: use when choosing from six or more options.
+- `Fieldset`: use when grouping mixed controls under a legend.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

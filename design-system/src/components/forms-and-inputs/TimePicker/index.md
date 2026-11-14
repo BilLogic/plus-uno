@@ -18,7 +18,7 @@ Also asked as: time input, clock, time field, time selector.
 
 ## Usage
 
-Use a time picker for a time of day alone: a reminder time, a recurring slot's start. For a date alone, use Date picker; for a date and a time together, use Date time picker.
+Use `TimePicker` to enter or choose a time of day, such as a reminder time or a recurring slot's start.
 
 ## Motion
 
@@ -29,6 +29,11 @@ TimePicker reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 | change | Step to the next or previous | `--ds-motion-spatial-default` | A month change slides the grid flat. |
+
+## Alternatives
+
+- For a date or date range with no time, use `DatePicker`.
+- For a combined date and time answer, use `DateTimePicker`.
 
 ## Best practices
 
@@ -42,25 +47,25 @@ TimePicker reads these motion tokens and no literal duration or curve.
 
 ### Show the format in the placeholder. {#show-the-format-in-the-placeholder}
 
-The placeholder shows hours and minutes with a colon, so an empty field says what it holds. The field also reads bare digits, 1430 or 930a, and shows the time it picked.
+The placeholder shows hours and minutes with a colon (`__ : __`), so an empty field says what it holds. The field also parses compact typed digits (`1430` or `930a`) into the chosen time.
 
 Do: The placeholder shows hours and minutes with a colon.
 Don't: The placeholder has no colon.
 
 ### Offer round steps. {#offer-round-steps}
 
-Steps of 15 or 30 minutes match how sessions are booked; pass them as `times`. Odd minutes nobody books only add choices.
+Half-hour or quarter-hour steps match how sessions are booked; pass custom intervals as `times`. Odd minutes nobody books only add noise.
 
 Do: A round start time.
 Don't: An odd minute.
 
 ### Pick the period with the time. {#pick-the-period-with-the-time}
 
-Every time in the list carries its period, so 9:30 AM and 9:30 PM are two rows, not one time and a separate switch. A typed time without AM or PM is read on the 24-hour clock: 9:30 is morning, 21:30 evening.
+Every option in the list carries `AM` or `PM` (`9:30 AM` and `9:30 PM` are separate rows). A typed time without `AM` or `PM` is read on the twenty-four-hour clock (`9:30` as morning, `21:30` as evening).
 
 ### Show a set time as read-only, not disabled. {#show-a-set-time-as-read-only-not-disabled}
 
-Read-only shows a time the person may read but not change. Disabled fades the field for a time that does not apply right now, and takes it out of the tab order.
+`isReadOnly` shows a time the person may read but not change; `isDisabled` fades a field that does not apply right now and removes it from the tab order. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: A set time, read-only and easy to read.
 Don't: The same time disabled, faded as if it did not apply.
@@ -73,8 +78,8 @@ Don't: The same time disabled, faded as if it did not apply.
 
 ## Related
 
-- For a date alone, use Date picker.
-- For a date and a time together, use Date time picker.
+- `DatePicker`: use when selecting a date or date range without a time.
+- `DateTimePicker`: use when selecting a date and a time together.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
 
@@ -108,7 +113,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Do | Don't |
 | --- | --- |
 | Name the time by its role: "Reminder time", "Session start". | A generic name: "Time". |
-| Say what is expected when invalid: "Enter a time such as 2:30". | "Invalid time". |
+| Say what is expected when invalid: "Enter a time such as 2:30 PM". | "Invalid time". |
 | Show the period with every time: "2:30 PM". | A bare "2:30" that could be either half of the day. |
 | Use sentence case in labels and messages. | Title case: "Reminder Time". |
 

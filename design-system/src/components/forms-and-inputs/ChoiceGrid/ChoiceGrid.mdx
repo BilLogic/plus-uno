@@ -112,12 +112,7 @@ A choice grid asks one question of several things at once, as a matrix of radios
 
 <DocsInteractivePlayground
     of={ChoiceGridStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -134,9 +129,19 @@ A choice grid asks one question of several things at once, as a matrix of radios
 
 ## Usage
 
-Use a choice grid when the same question is asked of several things at once: rate each of these six statements, tick which of these tools each tutor uses. It is a matrix with one question in the column headers and one subject per row.
+Use `ChoiceGrid` when the same question is asked of several items at once, as a matrix with the answer scale in the column headers and one subject per row.
 
-It is fully controlled. `values` is `{ rowId: columnId }` in `radio` mode and `{ rowId: { columnId: boolean } }` in `checkbox` mode, and the component holds no state of its own.
+It is fully controlled: `values` is `{ rowId: columnId }` in `radio` mode and `{ rowId: { columnId: boolean } }` in `checkbox` mode, and the component holds no state of its own.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a single question with mutually exclusive answers, use `RadioGroup`.
+- For a single question with multi-select answers, use `CheckboxGroup`.
+- For displaying rows and columns of read-only data, use `Table`.
 
 </div>
 
@@ -247,9 +252,9 @@ Mixed control sizes make a grid hard to scan. `size` is set per grid, so grids t
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><ChoiceGrid type="radio" size={14} rows={sessionRows} columns={sessionColumns} values={{ monday: 'morning' }} onChange={() => {}} /><ChoiceGrid type="radio" size={14} rows={scaleRows} columns={scaleColumns} values={{ punctuality: 'often' }} onChange={() => {}} /></div>}
-    doCaption="Size 14 across both grids."
+    doCaption="One size (`size={14}`) across both grids."
     dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><ChoiceGrid type="radio" size={14} rows={sessionRows} columns={sessionColumns} values={{ monday: 'morning' }} onChange={() => {}} /><ChoiceGrid type="radio" size={12} rows={scaleRows} columns={scaleColumns} values={{ punctuality: 'often' }} onChange={() => {}} /></div>}
-    dontCaption="A size 12 grid under a size 14 one."
+    dontCaption="A `size={12}` grid under a `size={14}` grid."
 />
 
 </div>
@@ -289,9 +294,9 @@ Mixed control sizes make a grid hard to scan. `size` is set per grid, so grids t
 
 ## Related
 
-- For one question with several answers, use Radio group.
-- For a rated answer with end labels, use Radio group with `leadingText` and `trailingText`.
-- For data being displayed rather than answered, use Table.
+- `RadioGroup`: use when asking a single radio question or a linear scale (`leadingText` and `trailingText`).
+- `CheckboxGroup`: use when asking a single multi-select question.
+- `Table`: use when displaying data rather than collecting answers.
 
 </div>
 

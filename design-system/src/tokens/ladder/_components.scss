@@ -72,6 +72,10 @@
     /* Option menu */
     --option-menu-width: 240px;
 
+    /* Checklist */
+    --checklist-action-width: calc(var(--space-400) * 2); /* 128px; 96px remains for the ProgressBar when a 32px dismiss IconButton takes the end */
+    --checklist-action-min-width: var(--size-750); /* 120px floor */
+
     /* Option row */
     --option-row-indent-step: var(--space-125);
     --option-row-control-gap: var(--space-0625);

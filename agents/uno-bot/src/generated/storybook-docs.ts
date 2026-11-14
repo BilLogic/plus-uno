@@ -20,7 +20,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/forms-and-inputs/Checkbox/",
     "Checkbox",
-    "components-forms-and-inputs-checkbox--docs"
+    "components-forms-and-inputs-checkbox-checkbox--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/ChoiceGrid/",
@@ -45,7 +45,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/forms-and-inputs/FileUpload/",
     "FileUpload",
-    "components-forms-and-inputs-file-upload--docs"
+    "components-forms-and-inputs-file-upload-file-upload--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/IconButton/",

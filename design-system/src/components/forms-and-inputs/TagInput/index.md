@@ -16,15 +16,7 @@ TagInput — a field of Tags with a text entry after them, modeled on Notion's m
 
 ## Usage
 
-Use `TagInput` when a field's value is a set of short labels the person picks
-from a list and may add to: the topics a session covered, or the languages a
-tutor teaches. It behaves like Notion's multi-select. The field holds the
-picked values as `Tag`s in a `TagGroup`, with a text entry after them, and
-focusing it opens the list of options under it.
-
-- For one value from a list, use `Select`.
-- For several values from a fixed list nobody adds to, use `Select` with `isMulti`.
-- For fewer than 5 options, use a Checkbox group (`Fieldset` + `Checkbox`).
+Use `TagInput` when a field's value is a set of short labels the person picks from a list and may create, rename, recolor or reorder in place, such as the topics a session covered. The field holds the picked values as `Tag`s in a `TagGroup`, with a text entry after them, and focusing it opens the option list under it.
 
 ## Motion
 
@@ -33,6 +25,12 @@ TagInput reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A chip is added or removed. |
+
+## Alternatives
+
+- For one value from a list, use `Select`.
+- For several values from a fixed list nobody adds to, use `Select` with `isMulti`.
+- For up to five multi-select options visible all at once, use `CheckboxGroup`.
 
 ## Best practices
 
@@ -126,34 +124,9 @@ A field with none of them works as before, with no "…" and no handle.
 - **Reorder** works on the whole list, so the handles hide while text is
   typed. `onReorder(fromIndex, toIndex)` gives places in `options`.
 
-### A tag's color is a Tag color. {#a-tag-s-color-is-a-tag-color}
+### Use a `Tag` color for each option. {#use-a-tag-color-for-each-option}
 
-A tag is a category, so it takes a Tag color. Any other name draws gray and
-warns in development.
-
-### The keys behave as in Notion. {#the-keys-behave-as-in-notion}
-
-| Key | In the field |
-| --- | --- |
-| Typing | Filters the list and highlights the first match. |
-| ↑ ↓ | Move the highlight; opens the list when it is closed. |
-| Enter | Adds the highlighted option, or creates the typed text when Create is highlighted. Text matching an option, ignoring case, picks that option. |
-| Backspace | In an empty entry, removes the last tag. |
-| Esc | Closes the list and clears only the typed text. The tags stay. |
-| Paste | Text with commas or line breaks becomes one tag per part, trimmed. |
-| Tab | With a handler for the menu or reordering, moves from the entry to the highlighted row's handle, then its "…". |
-
-On a row's handle and in its menu:
-
-| Key | Does |
-| --- | --- |
-| Space or Enter on the handle | Picks the row up. |
-| ↑ ↓ | Move the picked-up row. |
-| Space or Enter | Drops it there. |
-| Esc | Cancels, and the row goes back. |
-| Enter on the "…" | Opens the menu with focus in the name. |
-| Enter in the name | Renames the option. After ↑ ↓, picks the highlighted row instead. |
-| Esc in the menu | Closes it without renaming, and focus goes back to the "…". |
+A tag is a category, so it takes a `Tag` color. Any other name draws gray and warns in development.
 
 ## Accessibility
 
@@ -181,9 +154,9 @@ On a row's handle and in its menu:
 
 ## Related
 
-- For one value rather than a set, use `Tag`.
-- For the set without a field around it, use `TagGroup`.
-- For several values from a fixed list, use `Select` with `isMulti`.
+- `Tag`: use when rendering a single category or attribute label.
+- `TagGroup`: use when displaying a read-only set of tags outside a form field.
+- `Select`: use when choosing multiple values from a fixed list (`isMulti`).
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
@@ -206,6 +179,30 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Disabled | The whole field fades to `--ds-opacity-disabled`; every tag is disabled, with no × and no entry. |
 | Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
 | Read-only | The `--ds-background-neutral` fill at full contrast, no hover, in the tab order with `aria-readonly`, with no × and no list. |
+
+### Keyboard
+
+| Key | In the field |
+| --- | --- |
+| Typing | Filters the list and highlights the first match. |
+| ↑ ↓ | Move the highlight; opens the list when it is closed. |
+| Enter | Adds the highlighted option, or creates the typed text when Create is highlighted. Text matching an option, ignoring case, picks that option. |
+| Backspace | In an empty entry, removes the last tag. |
+| Esc | Closes the list and clears only the typed text. The tags stay. |
+| Paste | Text with commas or line breaks becomes one tag per part, trimmed. |
+| Tab | With a handler for the menu or reordering, moves from the entry to the highlighted row's handle, then its "…". |
+
+On a row's handle and in its menu:
+
+| Key | Does |
+| --- | --- |
+| Space or Enter on the handle | Picks the row up. |
+| ↑ ↓ | Move the picked-up row. |
+| Space or Enter | Drops it there. |
+| Esc | Cancels, and the row goes back. |
+| Enter on the "…" | Opens the menu with focus in the name. |
+| Enter in the name | Renames the option. After ↑ ↓, picks the highlighted row instead. |
+| Esc in the menu | Closes it without renaming, and focus goes back to the "…". |
 
 ### Tokens
 

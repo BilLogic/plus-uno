@@ -352,9 +352,11 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Listbox', new: '--listbox-min-height', old: '--layout-min-height-listbox', ref: '140px', use: 'Shortest a Select or Cascader listbox may be.' },
   { tier: 'components', group: 'Listbox', new: '--listbox-max-height', old: '--layout-max-height-listbox', ref: '300px', use: 'Tallest a Select or Cascader listbox may grow before it scrolls.' },
 
-  // ─── Components / Join row, Option menu ───────────────────────────────
+  // ─── Components / Join row, Option menu, Checklist ────────────────────
   { tier: 'components', group: 'Join row', new: '--join-row-width', old: '--layout-width-join-row', ref: '520px', use: 'Width of the Home page join row: the Join button with its session Select beside it.' },
   { tier: 'components', group: 'Option menu', new: '--option-menu-width', old: '--layout-width-option-menu', ref: '240px', use: 'Width of a fixed-width option menu.' },
+  { tier: 'components', group: 'Checklist', new: '--checklist-action-width', old: null, ref: 'calc(var(--space-400) * 2)', note: '128px; 96px remains for the ProgressBar when a 32px dismiss IconButton takes the end', use: 'Width of the trailing action column in a checklist card, and of its header progress slot.' },
+  { tier: 'components', group: 'Checklist', new: '--checklist-action-min-width', old: null, ref: 'var(--size-750)', note: '120px floor', use: 'Narrowest a checklist card\'s trailing action column may shrink.' },
 
   // ─── Components / sizes once written with primitives ─────────────────
   { tier: 'components', group: 'Button', new: '--button-vertical-size', old: null, ref: 'var(--space-400)', use: 'Height of a Button laid out vertically, with its icon above its label.' },

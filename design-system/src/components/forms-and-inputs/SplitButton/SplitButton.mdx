@@ -64,12 +64,7 @@ A primary action joined to a chevron that opens a menu of related actions.
 
 <DocsInteractivePlayground
     of={SplitButtonStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -86,9 +81,17 @@ A primary action joined to a chevron that opens a menu of related actions.
 
 ## Usage
 
-Use `SplitButton` when one action is clearly primary and a few related
-actions belong beside it in a menu — "Send" with "Send and close," "Save" as
-a draft. For actions with no clear primary, use `ButtonGroup` instead.
+Use `SplitButton` when one action is clearly primary and a few related variations belong in an attached menu, such as "Send" with "Send and close" or "Save as draft".
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a connected row of actions with no single primary, use `ButtonGroup`.
+- For a single trigger that opens a menu of actions without a separate primary button, use `DropdownMenu`.
+- For a single action with no menu, use `Button`.
 
 </div>
 
@@ -222,8 +225,9 @@ a `Popup` or `DropdownMenu` positioned under it.
 
 ## Related
 
-- For actions with no clear primary, use `ButtonGroup`.
-- For the menu the chevron opens, see `Popup` and `DropdownMenu`.
+- `ButtonGroup`: use when grouping peer actions with no single primary.
+- `DropdownMenu`: use when the chevron opens a menu of action items.
+- `Popup`: use when the chevron opens a custom overlay panel.
 
 </div>
 

@@ -83,12 +83,7 @@ branches in place rather than drilling down one level at a time.
 
 <DocsInteractivePlayground
     of={TreeSelectStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -105,10 +100,16 @@ branches in place rather than drilling down one level at a time.
 
 ## Usage
 
-Use `TreeSelect` when the options genuinely nest and someone may need to see
-or pick at more than one level — a curriculum with units and lessons, a
-category tree. For options that nest but are chosen one level at a time in
-sequence, use `Cascader` instead. For a flat list, use `Select`.
+Use `TreeSelect` when options nest in a hierarchy and someone needs to expand branches in place or pick nodes across multiple branches, such as curriculum units and lessons.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a single hierarchical path chosen one column per level in sequence, use `Cascader`.
+- For a flat list of options with no hierarchy, use `Select`.
 
 </div>
 
@@ -258,8 +259,8 @@ subtree is complete.
 
 ## Related
 
-- For options chosen one level at a time in sequence, use `Cascader`.
-- For a flat list with no hierarchy, use `Select`.
+- `Cascader`: use when building a single path one level at a time across columns.
+- `Select`: use when choosing from a flat list of options.
 
 </div>
 

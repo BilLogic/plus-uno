@@ -76,12 +76,7 @@ The label above a field names it, and the caption below it helps, warns or confi
 
 <DocsInteractivePlayground
     of={LabelAndCaptionStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -98,13 +93,7 @@ The label above a field names it, and the caption below it helps, warns or confi
 
 ## Usage
 
-These are the two lines that bracket a field: the label above it, and the caption
-below. Every field component in this group draws them for you — this page is the
-typography they all share, and the rules for what goes in them.
-
-A **label** names the field. It is always present, it is short, and it does not
-change. A **caption** is the line under the control that helps, warns or
-explains, and it carries a state: `default`, `success`, `danger`, `warning`.
+Every field component in this group draws two lines around its control: the **label** above that names the field (always present, short, and it does not change), and the **caption** below that helps, warns or explains (`default`, `success`, `danger`, `warning`). This page defines the typography and content rules they share.
 
 ### Appearance guidance
 
@@ -119,6 +108,15 @@ explains, and it carries a state: `default`, `success`, `danger`, `warning`.
 <tr><td>Warning</td><td>Something to check that does not block: "This number looks like a landline."</td></tr>
 </tbody>
 </DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a legend and error shared across a group of fields, use `Fieldset`, `RadioGroup` or `CheckboxGroup`.
+- For a message about the whole form rather than one field, use `SectionMessage` or `Banner`.
 
 </div>
 
@@ -298,10 +296,9 @@ when they need it, and it is low contrast by design. Put help in a caption.
 
 ## Related
 
-- For the fullest treatment of naming a field, including why the label cannot be
-  taken away, see `TextField`.
-- For a group of controls under one question, see `RadioGroup`.
-- For a message about the whole form rather than one field, use a `SectionMessage` or a `Banner`.
+- `TextField`: use when collecting single-line text with a built-in label and caption.
+- `Fieldset`: use when grouping multiple fields under a shared legend and error.
+- `SectionMessage`: use when showing a form-wide error or warning above the fields.
 
 </div>
 

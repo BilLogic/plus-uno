@@ -16,7 +16,7 @@ Link icon button: an icon that navigates. It renders an anchor with an accessibl
 
 ## Usage
 
-Use a link icon button when an icon alone opens another page or site and space is limited, such as the Help Center link in the top bar. For an icon that acts on the current page, use Icon button. For a link with a label, use Link button.
+Use `LinkIconButton` when an icon alone opens another page or site and space is limited, such as a Help Center link in a toolbar.
 
 ## Motion
 
@@ -25,6 +25,12 @@ LinkIconButton reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Hover and press change color, 90% by about 110 ms. |
+
+## Alternatives
+
+- For an icon that performs an action on the current page, use `IconButton`.
+- For a button-styled link with a visible text label, use `LinkButton`.
+- For an inline text link, use `Link`.
 
 ## Best practices
 
@@ -37,9 +43,7 @@ Don't: Link icon buttons touching.
 
 ### Say where the link goes. {#say-where-the-link-goes}
 
-The `label` is the accessible name and the tooltip. Name the destination:
-"Open Help Center", not "Link" or a bare "Help". The label is never drawn, so
-the difference shows only on hover, on focus and to a screen reader.
+The `label` is the accessible name and the tooltip. Name the destination ("Open Help Center"), not "Link" or a bare "Help".
 
 ```jsx
 // Incorrect: says nothing about the destination.
@@ -51,17 +55,13 @@ the difference shows only on hover, on focus and to a screen reader.
 
 ### Keep it square. {#keep-it-square}
 
-Link icon buttons stay 32 or 24 square, and round only in top navigation
-(`shape="circle"`). Link icon button has no prop to fill its container; never
-stretch one to fill a row.
+Link icon buttons stay square at `--item-height-md` (`default`) or `--item-height-sm` (`compact`), and round only in top navigation (`shape="circle"`). Never stretch one to fill a row.
 
-### A link goes somewhere; a button does something. {#a-link-goes-somewhere-a-button-does-something}
+### Use a link for navigation and a button for an action. {#use-a-link-for-navigation-and-a-button-for-an-action}
 
-If the icon acts on the current page, use Icon button. Navigation uses a link icon button so assistive technology announces a link and it can be opened in a new tab.
+If the icon acts on the current page, use `IconButton`. Navigation uses `LinkIconButton` so assistive technology announces a link and browser link shortcuts work.
 
-### Pick a glyph people know. {#pick-a-glyph-people-know}
-
-Use the glyph people already read as that destination.
+### Pick a glyph people recognize at a glance. {#pick-a-glyph-people-recognize-at-a-glance}
 
 Do: A question mark reads as help.
 Don't: A star does not read as the Help Center.
@@ -75,21 +75,21 @@ Don't: One link glyph for two destinations.
 
 ## Accessibility
 
-- `label` is required and says where the link goes. A missing label fails `check:icon-button-name`.
-- It has no disabled state. Disabled links leave the tab order and do not say why; use validation and error messages instead.
+- `label` is required and names the destination. A missing label fails `check:icon-button-name`.
+- Has no disabled state. A disabled link leaves the tab order and does not say why; omit unavailable links or use validation and error messages.
 - `target="_blank"` adds `rel="noopener noreferrer"`; say so in the label if it opens a new tab.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 
 ## Related
 
-- To act with an icon, use Icon button.
-- To navigate with a label, use Link button.
+- `IconButton`: use when the icon performs an action on the current page.
+- `LinkButton`: use when navigating with a visible text label.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
-1. **Container.** An anchor drawn as a square button: 32 at default spacing and 24 at compact. `shape="circle"` rounds it.
+1. **Container.** An anchor (`<a>`) drawn as a square button: 32 at default spacing and 24 at compact. `shape="circle"` rounds it.
 2. **Icon.** A Font Awesome Free glyph at 16.
 3. **Label.** Not drawn. It is the accessible name and the tooltip, and says where the link goes.
 

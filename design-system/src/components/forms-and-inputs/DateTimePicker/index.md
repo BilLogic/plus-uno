@@ -18,7 +18,7 @@ Also asked as: date and time, schedule.
 
 ## Usage
 
-Use a date time picker when a date and a time are one answer: a session's start, a deadline. For a date with no time, use Date picker alone; for a time with no date, use Time picker alone.
+Use `DateTimePicker` when a date and a time are one combined answer, such as a session's start or a deadline.
 
 ## Motion
 
@@ -29,6 +29,11 @@ DateTimePicker reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 | change | Step to the next or previous | `--ds-motion-spatial-default` | A month change slides the grid flat. |
+
+## Alternatives
+
+- For a date or date range with no time, use `DatePicker`.
+- For a time of day with no date, use `TimePicker`.
 
 ## Best practices
 
@@ -59,7 +64,7 @@ The label's text is read as the group's accessible name, and the date and time i
 
 ### Show the date and the time in one pattern. {#show-the-date-and-the-time-in-one-pattern}
 
-Date first, then time with AM or PM. The field already sets that order; write the moment the same way wherever else it appears, "10/21/2026, 3:30 PM" and not "2026-10-21 15:30", so people do not have to reread it.
+Date comes first, followed by time with `AM` or `PM` (`MM/DD/YYYY, h:mm AM`). Write the moment in the same order wherever else it appears, "10/21/2026, 3:30 PM" and not "2026-10-21 15:30", so people do not have to reread it.
 
 ### Always show AM or PM. {#always-show-am-or-pm}
 
@@ -90,8 +95,9 @@ Don't: A bare 'Invalid' does not say what to change.
 
 ## Related
 
-- For a date with no time, use Date picker.
-- For a time with no date, use Time picker.
+- `DatePicker`: use when selecting a date or date range without a time.
+- `TimePicker`: use when selecting a time of day without a date.
+- `Calendar`: use when embedding a standalone month grid on the page.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

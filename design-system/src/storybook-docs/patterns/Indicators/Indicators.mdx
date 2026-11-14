@@ -24,6 +24,9 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
             { title: 'Count tag', href: './?path=/docs/components-labels-count-tag--docs' },
             { title: 'Change tag', href: './?path=/docs/components-labels-change-tag--docs' },
             { title: 'Tag', href: './?path=/docs/components-labels-tag-tag--docs' },
+            { title: 'Progress bar', href: './?path=/docs/components-loading-progress-bar--docs' },
+            { title: 'Card', href: './?path=/docs/templates-card--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section--docs' },
             { title: 'Flag', href: './?path=/docs/components-messaging-flag--docs' },
             { title: 'Section message', href: './?path=/docs/components-messaging-section-message--docs' },
         ],
@@ -59,6 +62,14 @@ Three jobs, three components. A category with a color is a Tag, not an indicator
 <TypeCard of={IndicatorsStories.RollUpShowsWorst} title="A roll-up" stage={ROLL_UP_STAGE}>A group's status shows the worst state among its children: danger over warning over information.</TypeCard>
 </TypeGrid>
 
+A checklist tracks setup or compliance steps in three layouts: a dismissible card on Home, a persistent card in a page, and a compact summary at the foot of the Sidebar.
+
+<ComponentExample of={IndicatorsStories.ChecklistCardOnHome} title="Checklist: card on Home" description="Optional setup steps in a dismissible Card on Home: the title sits at the start, '2 of 5 done' and a 96-wide Progress bar sit beside the 32 dismiss Icon button so the bar's start edge lands on the 128 action column, open steps keep their order on top, and done steps move below with centered Completed text. Completing every step shrinks the card to one line for a day." />
+
+<ComponentExample of={IndicatorsStories.ChecklistCardInPage} title="Checklist: card in a page" description="Required training or compliance steps in a persistent Card inside a page Section: the Progress bar fills the full 128 action column, and completing every step keeps the card on screen with all five steps ticked." />
+
+<ComponentExample of={IndicatorsStories.ChecklistCompactInSidebar} title="Checklist: compact in the sidebar" description="At the foot of the Sidebar, a compact Card shows the count, the Progress bar and the next open step from any page; pressing it opens the full checklist." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -92,6 +103,7 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 <tr><td>How many</td><td>Count tag</td><td>Subtle neutral; bold for action now; nothing at 0; a cap past `max` with "+"</td><td>"12", "99+"</td></tr>
 <tr><td>How much it moved</td><td>Change tag</td><td>Signed value, arrow, tone from the good direction; neutral when there is no judgment</td><td>"+3 vs last week"</td></tr>
 <tr><td>A category, a subject, a person</td><td>Tag</td><td>Outline and text; a leading visual is optional</td><td>"Lincoln Middle"</td></tr>
+<tr><td>Setup or compliance steps left to finish</td><td>Checklist (`Card` + `Section` + `Progress bar`)</td><td>Header count and bar aligned to one 128 action column; open steps above done steps</td><td>"2 of 5 done"</td></tr>
 <tr><td>The shape of a trend <PlannedTag /></td><td>Sparkline (Planned)</td><td>A word-sized line beside the number</td><td>Attendance over eight weeks</td></tr>
 </tbody>
 </DocsTable>
@@ -175,6 +187,12 @@ A Status tag never opens a menu. Where a status can be changed, the field around
 
 "Needs review 3" reads as one label; two labels side by side read as unrelated.
 
+### Line up checklist actions in one column and mark done steps with text.
+
+<RuleTag kind="review" />
+
+Build a checklist from `PatternCard` and `PatternSection`, with each step row composed from `Icon`, step text with one fact, and a 128 action column (`--checklist-action-width`, floor `--checklist-action-min-width` at 120). Put the title at the start of the header and the count ("2 of 5 done") with a `ProgressBar` at the end so the bar's start edge lands on the action column's start edge (128 wide on a persistent card, 96 wide when a 32 dismiss `IconButton` takes the end). Buttons fill the column so their edges line up down the list. Keep open steps in order on top; move each finished step below them and center a check icon with "Completed" (Body small, subtle) in the action column as plain text. Use three layouts: a dismissible card on Home (which shrinks to one line for a day when complete, then disappears), a persistent card in a page for required work (which keeps every ticked row on screen), and a compact card at the foot of the Sidebar showing the count, bar and next step that opens the full list.
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -218,6 +236,7 @@ A Status tag never opens a menu. Where a status can be changed, the field around
 <tr><td>State</td><td><a target="_top" href="./?path=/docs/components-labels-status-tag--docs">Status tag</a></td><td>Six appearances; `trailingMetric` nests a count inside it.</td></tr>
 <tr><td>How many</td><td><a target="_top" href="./?path=/docs/components-labels-count-tag--docs">Count tag</a></td><td>`max` caps it, `isBold` asks for action, `label` names it for a screen reader.</td></tr>
 <tr><td>How much it moved</td><td><a target="_top" href="./?path=/docs/components-labels-change-tag--docs">Change tag</a></td><td>`goodDirection` sets the tone; `comparison` names what it is measured against.</td></tr>
+<tr><td>Checklist</td><td><a target="_top" href="./?path=/docs/templates-card--docs">Card</a>, <a target="_top" href="./?path=/docs/templates-section--docs">Section</a>, <a target="_top" href="./?path=/docs/components-loading-progress-bar--docs">Progress bar</a></td><td>Composed step rows (`Icon`, text, `Button` or "Completed" text) on `--checklist-action-width`; `Icon button` dismisses an optional card.</td></tr>
 <tr><td>Category</td><td><a target="_top" href="./?path=/docs/components-labels-tag-tag--docs">Tag</a></td><td>Not an indicator: a subject, a person or a category.</td></tr>
 </tbody>
 </DocsTable>
