@@ -3,7 +3,7 @@ import { RefTable, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.j
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import { FoundationSection, FoundationSubsection, FoundationRelated, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { VoiceTag } from '@/storybook-docs/rule-tag.jsx';
-import { Say, Sample, RuleHead } from '@/storybook-docs/content-blocks.jsx';
+import { Sample, RuleHead } from '@/storybook-docs/content-blocks.jsx';
 
 {/* Agent twin: design-system/guidelines/foundations/content/messages.md. Change the two together. */}
 
@@ -48,7 +48,7 @@ Pick by what the reader needs. Each type has a home component.
     head={['Type', 'When', 'Component']}
     rows={[
         ['Error', 'Something failed and the reader can act', <><DocsLink id="components-messaging-flag">Flag</DocsLink>, <DocsLink id="components-messaging-section-message">Section message</DocsLink>, <DocsLink id="components-messaging-inline-message">Inline message</DocsLink></>],
-        ['Warning', 'Before a step that’s hard to undo', <><DocsLink id="components-messaging-modal-dialog">Modal dialog</DocsLink>, <DocsLink id="components-messaging-section-message">Section message</DocsLink></>],
+        ['Warning', 'Before a step that’s hard to undo', <><DocsLink id="components-messaging-modal-dialog">Modal</DocsLink>, <DocsLink id="components-messaging-section-message">Section message</DocsLink></>],
         ['Success', 'A task finished', <DocsLink id="components-messaging-flag">Flag</DocsLink>],
         ['Info', 'Context that helps, then gets out of the way', <><DocsLink id="components-messaging-banner">Banner</DocsLink>, <DocsLink id="components-messaging-section-message">Section message</DocsLink></>],
         ['Empty state', 'Nothing to show yet', <DocsLink id="components-messaging-empty-state">Empty state</DocsLink>],
