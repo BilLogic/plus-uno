@@ -1,5 +1,5 @@
 import React from 'react';
-import { HAIRLINE, PAINT } from '../illustrations/paint.js';
+import { PAINT } from '../illustrations/paint.js';
 
 /**
  * Ten stroke glyphs on a 24 grid, each a different object, so a set reads as
@@ -61,28 +61,3 @@ export const Glyph = ({ name, x, y, size, stroke = PAINT.iconGlyph, weight = 2 }
         {GLYPHS[name]}
     </g>
 );
-
-/**
- * A glyph's construction, drawn under it: the 24 grid at every second line,
- * the two diagonals in the field border, and the keyline circle and square in
- * the accent, faint. Every line is a hairline.
- */
-export const IconConstruction = ({ x, y, size }) => {
-    const k = size / 24;
-    const grid = { stroke: PAINT.illustrationEdge, style: HAIRLINE };
-    const keyline = { fill: 'none', stroke: PAINT.accent, strokeOpacity: 0.55, style: HAIRLINE };
-    return (
-        <g data-shape="icon-construction">
-            {Array.from({ length: 13 }, (_, i) => (
-                <React.Fragment key={i}>
-                    <line x1={x + i * 2 * k} y1={y} x2={x + i * 2 * k} y2={y + size} {...grid} />
-                    <line x1={x} y1={y + i * 2 * k} x2={x + size} y2={y + i * 2 * k} {...grid} />
-                </React.Fragment>
-            ))}
-            <line x1={x} y1={y} x2={x + size} y2={y + size} {...grid} />
-            <line x1={x + size} y1={y} x2={x} y2={y + size} {...grid} />
-            <circle cx={x + size / 2} cy={y + size / 2} r={10 * k} {...keyline} />
-            <rect x={x + 3 * k} y={y + 3 * k} width={18 * k} height={18 * k} rx={2 * k} {...keyline} />
-        </g>
-    );
-};
