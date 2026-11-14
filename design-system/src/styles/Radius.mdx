@@ -38,8 +38,6 @@ import * as RadiusStories from './Radius.stories.jsx';
 
 <FoundationSection title="Overview">
 
-A corner's radius comes from where the element sits and what it is. Each part rounds by its own token.
-
 Nine rules decide a corner. Take the first one that matches.
 
 1. **Window edge:** 0. A Page in the Frame, and a Modal footer that runs to the Modal's sides.
@@ -52,30 +50,26 @@ Nine rules decide a corner. Take the first one that matches.
 8. **Templates:** Section, Modal and Card 16; Popup, compact Card, Table and boxes inside a page 12; the smallest nested visual 8.
 9. **Focus ring:** the element's radius + the ring's offset.
 
-A radius comes only from a token.
-
 </FoundationSection>
 
 <FoundationSection title="Scale">
 
-Eight steps. Each tile is drawn at its token; its value and role sit beneath it.
+Eight steps, each aliasing the Space step of the same name (`--radius-0625` is 0.625rem, 10); `--radius-full` is the only literal. Components bind the semantic tokens below, never a primitive.
 
 <Canvas of={RadiusStories.Scale} sourceState="none" />
-
-A primitive's name is its rem value × 100 (`--radius-0625` is 0.625rem, 10), and it aliases the Space step of the same name. `--radius-full` is the only literal. Components read the semantic tokens below, never a primitive.
 
 </FoundationSection>
 
 <FoundationSection title="Controls">
 
-A control rounds at a quarter of its height, so the corner reads the same at every size. The three heights each have a token in the `Radius / Control` group.
+A control rounds at a quarter of its height, so the corner reads the same at every size.
 
 <RefTable
-    head={['Control height (px)', 'Radius (px)', 'Token', 'For example']}
+    head={['Control height (px)', 'Radius (px)', 'Token', 'Examples']}
     rows={[
-        ['24', '6', <C>--radius-control-sm</C>, 'A Tooltip, a Sidebar row, a compact tab'],
-        ['32', '8', <C>--radius-control-md</C>, 'A compact field, a tab, an option row'],
-        ['40', '10', <C>--radius-control-lg</C>, 'A field at the default density'],
+        ['24', '6', <C>--radius-control-sm</C>, 'Tooltip, Sidebar row, compact tab'],
+        ['32', '8', <C>--radius-control-md</C>, 'Compact field, tab, option row'],
+        ['40', '10', <C>--radius-control-lg</C>, 'Default field'],
     ]}
 />
 
@@ -85,13 +79,13 @@ A Tile follows the same quarter: 20 rounds at 5 and 40 at 10. A square Avatar ro
 
 <FoundationSection title="Buttons">
 
-A button is built to sit inside a field, so it rounds at the field's radius minus the 4 it sits in from the field's edge. A 32 button in a 40 field takes 6; a 24 compact button in a 32 field takes 4.
+A button sits 4 inside a field, so it rounds at the field's radius minus 4: 6 at 32 (in a 40 field) and 4 at 24 (in a 32 compact field).
 
 <Canvas of={RadiusStories.ButtonsInFields} sourceState="none" />
 
-The same two values hold wherever the button sits, in a field or not: `--button-radius-default` and `--button-radius-compact`. A button inside a field takes the field's spacing, so a compact field holds a compact button. This covers Button, Icon button, Split button and every button built on them.
+`--button-radius-default` and `--button-radius-compact` apply whether the button sits in a field or not. This covers Button, Icon button, Split button and every button built on them.
 
-A button group joins its buttons: the group's outer corners round, and the seams between the buttons stay square.
+A button group rounds its outer corners and keeps the inner seams square.
 
 <Canvas of={RadiusStories.Joined} sourceState="none" />
 
@@ -110,17 +104,17 @@ Each template owns a token. A Page sits square in the Frame; a Section with a fi
         ['Section with a fill', '16', <C>--section-radius</C>],
         ['Modal', '16', <C>--modal-radius</C>],
         ['Card', '16', <C>--card-radius</C>],
-        ['Card, compact, and a Card inside a filled Section', '12', <C>--card-radius-compact</C>],
-        ['Popup, and the menus and Flags built on it', '12', <C>--popup-radius</C>],
+        ['Card, compact, or inside a filled Section', '12', <C>--card-radius-compact</C>],
+        ['Popup, menu, Flag', '12', <C>--popup-radius</C>],
         ['Table', '12', <C>--table-radius</C>],
     ]}
 />
 
-A box inside a page, such as a Comment, a Code block, a Section message or a File upload, rounds at 12 (`--radius-xl`). The smallest nested visual, such as a choice card or a spacious Status tag, rounds at 8 (`--radius-lg`).
+A box inside a page (Comment, Code block, Section message, File upload) rounds at 12 (`--radius-xl`). The smallest nested visual (a choice card, a spacious Status tag) rounds at 8 (`--radius-lg`).
 
 <FoundationSubsection title="Window edge">
 
-Where a box meets the window or its parent's side, it takes 0. The Page runs to the Frame's edge, and a Modal footer with a fill runs to the Modal's sides, so its seam is square and the Modal's own corner clips it.
+Where a box meets the window or its parent's side, it takes 0. The Page runs to the Frame's edge, and a filled Modal footer runs to the Modal's sides, so its seam is square and the Modal's corner clips it.
 
 <Canvas of={RadiusStories.Window} sourceState="none" />
 
@@ -130,15 +124,15 @@ Where a box meets the window or its parent's side, it takes 0. The Page runs to 
 
 <FoundationSection title="Nesting">
 
-A shape inset in a rounded box rounds at the box's radius minus the inset, so the gap between the two curves stays even. Rows inset 4 in a 12 Popup take 8.
+A shape inset in a rounded box rounds at the box's radius minus the inset, so the gap between the curves stays even. Rows inset 4 in a 12 Popup take 8.
 
 <Canvas of={RadiusStories.Nesting} sourceState="none" />
 
-If the corners still look uneven, change the padding, not the radius: the inner radius has to land on a step. A part flush with its parent's edge, such as a Table's head row or a Card's image, takes no radius of its own; the parent clips it.
+If the corners look uneven, change the padding, not the radius, so the inner radius lands on a step. A part flush with its parent's edge (a Table head row, a Card image) takes no radius of its own; the parent clips it.
 
 <FoundationSubsection title="Pills">
 
-A pill is exempt from nesting. It keeps `--radius-full` inside a Card, a field or a row.
+A pill is exempt from nesting and keeps `--radius-full` inside a Card, field or row.
 
 <Canvas of={RadiusStories.Pill} sourceState="none" />
 
@@ -148,56 +142,39 @@ A pill is exempt from nesting. It keeps `--radius-full` inside a Card, a field o
 
 <FoundationSection title="Small details">
 
-Small parts take the two smallest steps, and keep them wherever they sit.
+Small parts keep the two smallest steps wherever they sit. A tight grid, such as the days of a Calendar, rounds at 4 so a larger curve does not pinch the gap between neighbors.
 
 <RefTable
-    head={['Radius (px)', 'Token', 'For example']}
+    head={['Radius (px)', 'Token', 'Examples']}
     rows={[
-        ['2', <C>--radius-sm</C>, 'A logo in a Tile, a team avatar in a Tag'],
-        ['4', <C>--radius-md</C>, 'A Count tag, a Status tag, a Checkbox, a Link, a day in the Calendar, a Table loading bar'],
+        ['2', <C>--radius-sm</C>, 'Logo in a Tile, team avatar in a Tag'],
+        ['4', <C>--radius-md</C>, 'Count tag, Status tag, Checkbox, Link, Calendar day, Table loading bar'],
     ]}
 />
-
-A tight grid, such as the days of a Calendar, rounds at 4. A larger radius pinches the gap between neighbors.
 
 </FoundationSection>
 
 <FoundationSection title="Focus ring">
 
-The focus ring sits 2 px outside the element (`--focus-ring-width` for both its width and its offset), so its radius is the element's radius + 2. Interactive PLUS components draw the ring for you, and the browser rounds the outline to match.
+The focus ring sits 2 px outside the element (`--focus-ring-width`), so its radius is the element's radius + 2. [Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color and width. Radius is decoration: never let a corner alone signal state or meaning.
 
 <RefTable
     head={['Element', 'Radius (px)', 'Focus ring radius (px)']}
     rows={[
         ['Default button (32)', '6', '8'],
         ['Compact button (24)', '4', '6'],
-        ['24 high control', '6', '8'],
-        ['32 high control', '8', '10'],
-        ['40 high field', '10', '12'],
+        ['24 control', '6', '8'],
+        ['32 control', '8', '10'],
+        ['40 field', '10', '12'],
         ['Checkbox', '4', '6'],
     ]}
 />
-
-[Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color and width. Radius is decoration: never let a corner alone signal state or meaning.
 
 </FoundationSection>
 
 <FoundationSection title="Tokens">
 
-Four tiers. Primitives hold the values; semantic tokens name a role; pattern tokens belong to a template; component tokens belong to one component. Values are read from the page.
-
-<FoundationSubsection title="Primitives">
-
-<TokenTable
-    showFigma={false}
-    rows={['0125', '025', '0375', '050', '0625', '075', '100', 'full'].map((s) => ({ token: `--radius-${s}` }))}
-/>
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Semantic tokens">
-
-The `Radius` group names a step by size; the `Radius / Control` group names it by control height.
+The `Radius` group names a step by size; `Radius / Control` names it by control height. Pattern and component radius tokens sit in the tables above, and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full ladder.
 
 <TokenTable
     rows={[
@@ -212,37 +189,6 @@ The `Radius` group names a step by size; the `Radius / Control` group names it b
         { token: '--radius-control-lg', figma: 'Radius/Control/lg', use: '40 high controls.' },
     ]}
 />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Pattern tokens">
-
-<TokenTable
-    showFigma={false}
-    rows={[
-        { token: '--section-radius', use: 'A Section with a fill.' },
-        { token: '--modal-radius', use: 'A Modal.' },
-        { token: '--card-radius', use: 'A Card.' },
-        { token: '--card-radius-compact', use: 'A compact Card, and a Card inside a filled Section.' },
-        { token: '--popup-radius', use: 'A Popup, and the menus and Flags built on it.' },
-        { token: '--table-radius', use: 'A Table.' },
-        { token: '--frame-sidebar-row-radius', use: 'A Sidebar row.' },
-    ]}
-/>
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Component tokens">
-
-<TokenTable
-    showFigma={false}
-    rows={[
-        { token: '--button-radius-default', use: 'A button at the default density: the 40 field radius minus 4.' },
-        { token: '--button-radius-compact', use: 'A compact button: the 32 field radius minus 4.' },
-    ]}
-/>
-
-</FoundationSubsection>
 
 </FoundationSection>
 
@@ -297,7 +243,7 @@ The `Radius` group names a step by size; the `Radius / Control` group names it b
 
 <DoDont>
 <Do caption="The token follows the rules when a value moves.">{<C>border-radius: var(--radius-control-lg);</C>}</Do>
-<Dont caption="A literal is right today and wrong after the next change. The radius lint fails it.">{<C>border-radius: 10px;</C>}</Dont>
+<Dont caption="A literal breaks the moment a token value changes.">{<C>border-radius: 10px;</C>}</Dont>
 </DoDont>
 
 </FoundationSubsection>

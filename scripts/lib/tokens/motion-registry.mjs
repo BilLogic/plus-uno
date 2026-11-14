@@ -339,6 +339,13 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'SettingRow',
+    tier: 'component',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Row state and inline control transitions.' },
+    },
+  },
+  {
     name: 'Radio',
     tier: 'component',
     events: {

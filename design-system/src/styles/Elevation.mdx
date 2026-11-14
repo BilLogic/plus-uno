@@ -160,7 +160,7 @@ A label, so it has no shadow: the dark fill sets it apart.
 
 <FoundationSection title="Motion">
 
-Three rules for a shadow that moves. A shadow moves on the appearance springs, the `--ds-motion-appearance-*` tokens; the springs themselves are in [Motion](?path=/docs/foundations-expression-motion-physics--docs).
+A shadow moves on `--ds-motion-appearance-*`, documented in [Motion](?path=/docs/foundations-expression-motion-physics--docs).
 
 <FoundationSubsection title="A shadow changes with its fill">
 
@@ -192,7 +192,7 @@ It grows one to one with the scroll position, with no spring token of its own.
 
 - **A shadow is never the boundary.** The edge slot is: under increased contrast it becomes a 3:1 line. Turn it on below.
 - **Forced colors keep an edge.** Shadows disappear there, so a lifted surface carries a transparent border that the system paints.
-- **Text clears 4.5:1 on every level**, in light and dark. Check a new pairing on the overlay surface in dark, where it is lightest.
+- **Text clears 4.5:1 on every level**, in light and dark. Check a new pairing on the overlay surface in dark, where it is lightest. See [Color](?path=/docs/foundations-visual-color--docs).
 
 <Canvas of={ElevationStories.Contrast} sourceState="none" />
 
@@ -201,45 +201,45 @@ It grows one to one with the scroll position, with no spring token of its own.
 <FoundationSection title="Do and don't">
 
 <FoundationSubsection title="Lift with shadow, not a darker fill">
-A lifted surface gets its height from its shadow; a darker fill reads as a different surface.
 
 <Canvas of={ElevationStories.LiftWithShadow} sourceState="none" />
+
 </FoundationSubsection>
 
 <FoundationSubsection title="No border on a lifted surface">
-The shadow's edge slot is the border, so a drawn border doubles it.
 
 <Canvas of={ElevationStories.NoBorder} sourceState="none" />
+
 </FoundationSubsection>
 
 <FoundationSubsection title="Pair the surface with its shadow">
-A level's surface and shadow travel together.
 
 <Canvas of={ElevationStories.AlwaysPair} sourceState="none" />
+
 </FoundationSubsection>
 
 <FoundationSubsection title="Blocking only on the Backdrop">
-The blocking shadow belongs to the Modal over its Backdrop, and nothing else.
 
 <Canvas of={ElevationStories.BlockingOnBackdrop} sourceState="none" />
+
 </FoundationSubsection>
 
 <FoundationSubsection title="Sunken never floats">
-A sunken surface is a ground, so it sits behind the work and never lifts.
 
 <Canvas of={ElevationStories.SunkenNeverFloats} sourceState="none" />
+
 </FoundationSubsection>
 
 <FoundationSubsection title="Keep the Tooltip flat">
-A Tooltip is a label, so it has no shadow.
 
 <Canvas of={ElevationStories.TooltipFlat} sourceState="none" />
+
 </FoundationSubsection>
 
 <FoundationSubsection title="Raise one focal point">
-Raise the one object a person acts on; a page of raised cards has no focus.
 
 <Canvas of={ElevationStories.OneFocalPoint} sourceState="none" />
+
 </FoundationSubsection>
 
 </FoundationSection>

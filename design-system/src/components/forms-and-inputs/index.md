@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-38 components. Each row links to the generated facts; the three columns after it are the
+39 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -37,6 +37,7 @@ authored half, counted rather than assumed.
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [SearchField](SearchField/index.md) | 33 | ✅ | ✅ | ✅ |
 | [Select](Select/index.md) | 44 | ✅ | ✅ | ✅ |
+| [SettingRow](SettingRow/index.md) | 11 | ✅ | ✅ | ✅ |
 | [SplitButton](SplitButton/index.md) | 3 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput/index.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✅ | ✅ |
@@ -46,7 +47,7 @@ authored half, counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✅ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 37/38 (97%) · Correct/incorrect 35/38 (92%) · Accessibility 37/38 (97%)
+**Authored coverage:** When to use 38/39 (97%) · Correct/incorrect 36/39 (92%) · Accessibility 38/39 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

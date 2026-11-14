@@ -297,6 +297,7 @@ const preview = {
                 "Cascader",
                 "Tree select"
               ],
+              "Setting row",
               "Tag input",
               "Text area",
               "Text field",
