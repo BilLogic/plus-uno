@@ -74,17 +74,26 @@
 // Space motion. The Sidebar keeps its width and moves by its margin, so the Page beside it
 // narrows on the same clock and nothing inside the Sidebar reflows. Opening settles on
 // spatial.default, closing on spatial.fast to the edge. Floating, it slides over the Page.
-// Reduced motion (the person's setting or `data-reduced`) is an instant change.
+// What starts open on mount stays put; reduced motion (the person's setting or `data-reduced`) is instant.
 @keyframes plus-frame-sidebar-dock-in { from { margin-inline-start: calc(-1 * var(--frame-sidebar-width)); } }
 @keyframes plus-frame-sidebar-dock-out { to { margin-inline-start: calc(-1 * var(--frame-sidebar-width)); } }
 @keyframes plus-frame-sidebar-float-in { from { translate: -100% 0; } }
 @keyframes plus-frame-sidebar-float-out { to { translate: -100% 0; } }
 
-@mixin frame-space-motion($enter, $exit, $enter-speed: default, $exit-speed: fast) {
-    animation: #{$enter} var(--ds-motion-spatial-#{$enter-speed}-duration) var(--ds-motion-spatial-#{$enter-speed});
-    &[data-leaving], &[data-ending-style] {
+@mixin frame-space-motion(
+    $enter,
+    $exit,
+    $enter-duration: var(--ds-motion-spatial-default-duration),
+    $enter-easing: var(--ds-motion-spatial-default),
+    $exit-duration: var(--ds-motion-spatial-fast-duration),
+    $exit-easing: var(--ds-motion-spatial-fast)
+) {
+    &[data-entering='true'] {
+        animation: #{$enter} #{$enter-duration} #{$enter-easing};
+    }
+    &[data-leaving='true'], &[data-ending-style] {
         pointer-events: none;
-        animation: #{$exit} var(--ds-motion-spatial-#{$exit-speed}-duration) var(--ds-motion-spatial-#{$exit-speed}) forwards;
+        animation: #{$exit} #{$exit-duration} #{$exit-easing} forwards;
     }
     &[data-reduced='true'] { animation: none; }
 }
@@ -199,9 +208,10 @@
         @include plus-ring-reset;
     }
 
-    // The Panel's content keeps its own width while the Panel's edge moves, so it is revealed, never squeezed.
+    // The Panel's content keeps its full height and its target width while the Panel's edge moves,
+    // so it is revealed, never squeezed.
     > .plus-panel {
-        flex: 0 0 auto;
+        flex: 1 1 auto;
         width: calc(var(--frame-panel-width, var(--panel-width-default)) - var(--border-default));
         height: auto;
         min-height: 0;
@@ -210,19 +220,27 @@
 
 // Space motion. Docked, the Panel grows from its edge while the Page makes room on the same
 // clock (spatial.slow), and leaves on spatial.default; its content fades in once the Page is
-// about 90% done. Floating, it slides over the Page: spatial.default in, spatial.fast out; under
-// 1024, with its Backdrop-free overlay, spatial.slow in and spatial.default out. Reduced motion is instant.
+// about 90% done (60% of the spring's settle time). Floating, it slides over the Page:
+// spatial.default in, spatial.fast out; under 1024, spatial.slow in and spatial.default out.
+// Reduced motion is instant.
 @keyframes plus-frame-panel-dock-in { from { width: 0; } }
 @keyframes plus-frame-panel-dock-out { to { width: 0; } }
 @keyframes plus-frame-panel-float-in { from { translate: 100% 0; } }
 @keyframes plus-frame-panel-float-out { to { translate: 100% 0; } }
 
 .plus-frame__panel--docked {
-    @include frame-space-motion(plus-frame-panel-dock-in, plus-frame-panel-dock-out, slow, default);
+    @include frame-space-motion(
+        plus-frame-panel-dock-in,
+        plus-frame-panel-dock-out,
+        var(--ds-motion-spatial-slow-duration),
+        var(--ds-motion-spatial-slow),
+        var(--ds-motion-spatial-default-duration),
+        var(--ds-motion-spatial-default)
+    );
 
-    > .plus-panel {
+    &[data-entering='true'] > .plus-panel {
         animation: plus-overlay-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast)
-            calc(var(--ds-motion-spatial-slow-duration) * 0.9) backwards;
+            calc(var(--ds-motion-spatial-slow-duration) * 0.6) backwards;
     }
     &[data-ending-style] > .plus-panel,
     &[data-reduced='true'] > .plus-panel { animation: none; }
@@ -233,7 +251,14 @@
     @include frame-space-motion(plus-frame-panel-float-in, plus-frame-panel-float-out);
 }
 .plus-frame__panel--narrow {
-    @include frame-space-motion(plus-frame-panel-float-in, plus-frame-panel-float-out, slow, default);
+    @include frame-space-motion(
+        plus-frame-panel-float-in,
+        plus-frame-panel-float-out,
+        var(--ds-motion-spatial-slow-duration),
+        var(--ds-motion-spatial-slow),
+        var(--ds-motion-spatial-default-duration),
+        var(--ds-motion-spatial-default)
+    );
 }
 
 // Docked: in flow beside the Page, which it meets at the hairline; the same

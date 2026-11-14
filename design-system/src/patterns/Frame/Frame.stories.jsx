@@ -62,8 +62,8 @@ export default {
     beforeEach: () => { window.sessionStorage.removeItem(PANEL_STORAGE_KEY); },
     render: FrameWithSlots,
     decorators: [
-        // The geometry stories read settled layouts, so they run with motion held off; the Space motion
-        // stories below pin it on or off themselves, since CI's Chromium reports reduced motion.
+        // The geometry stories read settled layouts after clicks, so they hold motion off; the Space
+        // motion stories below pin it on or off explicitly.
         (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>,
         // A width story renders at its stated width whatever the preview is. The
         // Frame sizes itself from its own box, so a box of that width makes it dock
@@ -1831,17 +1831,21 @@ const expectOnlyTheRegionMoves = async (p, before) => {
 const collapsePlay = (reduced) => async ({ canvasElement }) => atViewport(1440, async () => {
     const p = parts(canvasElement);
     await waitFor(() => expect(sidebarBox(p), 'docked at 1440').not.toBeNull());
+    const box = sidebarBox(p);
+    await expect(getComputedStyle(box).animationName, 'already docked on mount: does not slide in').toBe('none');
     await settled(p.frame);
     const width = tokenLength(p.frame, '--frame-sidebar-width');
     const before = { top: rect(p.surface).top, bottom: rect(p.surface).bottom, right: rect(p.surface).right };
     await expect(rect(p.surface).left - rect(p.frame).left).toBeCloseTo(width, 0);
 
-    const box = sidebarBox(p);
-    if (reduced) await expect(getComputedStyle(box).animationName, 'reduced motion does not animate').toBe('none');
     await userEvent.click(p.canvas.getByRole('button', { name: 'Close sidebar' }));
     if (reduced) {
         await waitFor(() => expect(sidebarBox(p), 'it is gone at once').toBeNull());
         await expect(rect(p.surface).left - rect(p.frame).left, 'the Page runs to the edge').toBeCloseTo(0, 0);
+        await userEvent.click(p.canvas.getByRole('button', { name: 'Open sidebar' }));
+        const back = await waitFor(() => { const el = sidebarBox(p); expect(el).not.toBeNull(); return el; });
+        await expect(getComputedStyle(back).animationName).toBe('none');
+        await expect(rect(p.surface).left - rect(p.frame).left).toBeCloseTo(width, 0);
         return;
     }
     await expect(box, 'it stays for its exit').toHaveAttribute('data-leaving', 'true');
@@ -1895,6 +1899,8 @@ const peekPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, asyn
     const peek = await waitFor(() => { const el = p.frame.querySelector('.plus-frame__sidebar--raised'); expect(el).not.toBeNull(); return el; });
     if (reduced) {
         await expect(getComputedStyle(peek).animationName).toBe('none');
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.frame.querySelector('.plus-frame__sidebar--raised')).toBeNull());
         return;
     }
     await expect(getComputedStyle(peek).animationName, 'the peek slides in').not.toBe('none');
@@ -1902,6 +1908,15 @@ const peekPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, asyn
     await expect(rect(peek).left, 'part-way in from the left').toBeLessThan(rect(p.frame).left);
     await expect(rect(p.surface).left, 'the Page does not move for a peek').toBeCloseTo(left, 0);
     finish(running);
+    await settled(p.frame);
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(peek).toHaveAttribute('data-leaving', 'true'));
+    const leaving = pauseAt(peek);
+    await expect(leaving.length, 'the peek slides back out').toBeGreaterThan(0);
+    await expect(rect(p.surface).left, 'the Page stays put as the peek leaves').toBeCloseTo(left, 0);
+    finish(leaving);
+    await waitFor(() => expect(p.frame.querySelector('.plus-frame__sidebar--raised')).toBeNull());
 });
 export const SidebarPeekMotion = {
     name: 'Space motion: Sidebar peek',
@@ -1927,6 +1942,7 @@ const dockPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, asyn
     await userEvent.click(p.canvas.getByRole('button', { name: 'Open chat' }));
     const panel = await waitFor(() => { const el = p.panel(); expect(el, 'the Panel opens').not.toBeNull(); return el; });
     const full = tokenLength(p.frame, '--panel-width-default');
+    await expect(rect(panel.querySelector('.plus-panel')).height, 'the Panel content fills the full height').toBeCloseTo(rect(panel).height, 0);
     if (reduced) {
         await expect(getComputedStyle(panel).animationName, 'reduced motion does not animate').toBe('none');
         await expect(rect(panel).width).toBeCloseTo(full, 0);
@@ -1987,6 +2003,8 @@ const overlayPlay = (reduced) => async ({ canvasElement }) => atViewport(1100, a
     await panelIs(p, 'overlay');
     if (reduced) {
         await expect(getComputedStyle(panel).animationName).toBe('none');
+        await userEvent.click(within(panel).getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(p.panel()).toBeNull());
         return;
     }
     await expect(getComputedStyle(panel).animationName, 'the overlay slides in').not.toBe('none');
@@ -1994,6 +2012,15 @@ const overlayPlay = (reduced) => async ({ canvasElement }) => atViewport(1100, a
     await expect(rect(panel).left, 'part-way in from the edge').toBeGreaterThan(rect(p.frame).right - tokenLength(p.frame, '--panel-width-default'));
     await expect(rect(p.surface).width, 'an overlay does not move the Page').toBeCloseTo(pageWidth, 0);
     finish(running);
+    await settled(p.frame);
+
+    await userEvent.click(within(panel).getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(panel).toHaveAttribute('data-ending-style'));
+    const leaving = pauseAt(panel);
+    await expect(leaving.length, 'the overlay slides back out').toBeGreaterThan(0);
+    await expect(rect(p.surface).width, 'the Page stays put as the overlay leaves').toBeCloseTo(pageWidth, 0);
+    finish(leaving);
+    await waitFor(() => expect(p.panel()).toBeNull());
 });
 export const PanelOverlayMotion = {
     name: 'Space motion: Panel overlay',
@@ -2010,7 +2037,54 @@ export const PanelOverlayMotionReduced = {
     play: overlayPlay(true),
 };
 
-/** Crossing the 1024 breakpoint: the Sidebar leaves on its spring and the Page widens with it, with no jump. */
+const panelPeekPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, async () => {
+    const p = panelParts(canvasElement);
+    const edge = await waitFor(() => { const el = p.frame.querySelector('.plus-frame__panel-edge'); expect(el).not.toBeNull(); return el; });
+    await settled(p.frame);
+    const pageWidth = rect(p.surface).width;
+    await userEvent.hover(edge);
+    const panel = await waitFor(() => { const el = p.panel(); expect(el).not.toBeNull(); return el; });
+    await expect(p.splitter(), 'a peek does not show a splitter').toBeNull();
+    if (reduced) {
+        await expect(getComputedStyle(panel).animationName).toBe('none');
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.panel()).toBeNull());
+        return;
+    }
+    await expect(getComputedStyle(panel).animationName, 'the Panel peek slides in').not.toBe('none');
+    const running = pauseAt(panel);
+    await expect(rect(panel).left, 'part-way in from the right edge').toBeGreaterThan(rect(p.frame).right - tokenLength(p.frame, '--panel-width-default'));
+    await expect(rect(p.surface).width, 'a Panel peek does not move the Page').toBeCloseTo(pageWidth, 0);
+    finish(running);
+    await settled(p.frame);
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(panel).toHaveAttribute('data-ending-style'));
+    const leaving = pauseAt(panel);
+    await expect(leaving.length, 'the Panel peek slides back out').toBeGreaterThan(0);
+    await expect(p.splitter(), 'leaving peek still shows no splitter').toBeNull();
+    await expect(rect(p.surface).width, 'the Page stays put').toBeCloseTo(pageWidth, 0);
+    finish(leaving);
+    await waitFor(() => expect(p.panel()).toBeNull());
+});
+export const PanelPeekMotion = {
+    name: 'Space motion: Panel peek',
+    parameters: { frameWidth: 1440 },
+    args: { panelPeek: true },
+    render: WithPanel,
+    decorators: [motionOn],
+    play: panelPeekPlay(false),
+};
+export const PanelPeekMotionReduced = {
+    name: 'Space motion: Panel peek, reduced',
+    parameters: { frameWidth: 1440 },
+    args: { panelPeek: true },
+    render: WithPanel,
+    decorators: [motionOff],
+    play: panelPeekPlay(true),
+};
+
+/** Crossing the 1024 breakpoint: the Sidebar leaves and returns on its springs and the Page reflows with it, with no jump. */
 const breakpointPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, async () => {
     const p = panelParts(canvasElement);
     const stage = canvasElement.querySelector('[data-probe="stage"]');
@@ -2024,6 +2098,10 @@ const breakpointPlay = (reduced) => async ({ canvasElement }) => atViewport(1440
     if (reduced) {
         await waitFor(() => expect(sidebarBox(p)).toBeNull());
         await expect(edge()).toBeCloseTo(0, 0);
+        stage.style.inlineSize = '1200px';
+        const back = await waitFor(() => { const el = sidebarBox(p); expect(el).not.toBeNull(); return el; });
+        await expect(getComputedStyle(back).animationName).toBe('none');
+        await expect(edge()).toBeCloseTo(width, 0);
         return;
     }
     await waitFor(() => expect(box).toHaveAttribute('data-leaving', 'true'));
@@ -2035,6 +2113,15 @@ const breakpointPlay = (reduced) => async ({ canvasElement }) => atViewport(1440
     finish(running);
     await waitFor(() => expect(sidebarBox(p)).toBeNull());
     await expect(edge()).toBeCloseTo(0, 0);
+
+    stage.style.inlineSize = '1200px';
+    const back = await waitFor(() => { const el = sidebarBox(p); expect(el).not.toBeNull(); return el; });
+    const returning = pauseAt(back);
+    await expect(returning.length, 'widening docks the Sidebar on a spring').toBeGreaterThan(0);
+    await expect(edge(), 'the Page narrows smoothly as the Sidebar docks').toBeGreaterThan(0);
+    await expect(edge()).toBeLessThan(width);
+    finish(returning);
+    await waitFor(() => expect(edge()).toBeCloseTo(width, 0));
 });
 export const BreakpointReflowMotion = {
     name: 'Space motion: breakpoint reflow',
