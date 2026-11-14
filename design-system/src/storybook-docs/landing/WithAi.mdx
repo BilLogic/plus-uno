@@ -6,23 +6,36 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 <FoundationHero
     kind="Get started"
     title="With AI"
-    summary="How a coding agent reads this design system and stays on its components and tokens."
+    summary="How coding agents look up and verify the design system."
 />
 
 <FoundationContents />
 
-<FoundationSection title="What an agent reads">
+<FoundationSection title="Lookup tools">
 
-- The Storybook MCP endpoint, served while Storybook runs: `docs/connectors/storybook-mcp.md` says how to connect and what it returns.
-- The generated agent views under `design-system/agent-views/`: the indexes of components, forms and tokens.
-- One generated `index.md` beside each component, with its props, variants and tokens.
-- `AGENTS.md` at the repo root: the rules every agent follows here.
+The `ds` CLI and the `plus-ds` MCP server (`npm run ds:mcp`, or `/mcp/ds` when hosted) expose five tools over the design system (`docs/connectors/ds-mcp.md`):
+
+- `ds_find`: search components, patterns, tokens and icons by name, alias or task.
+- `ds_get`: read a component's import line, props, usage rules, accessibility and Figma mapping.
+- `ds_tokens`: list the token steps for a role with their tier, value and intent.
+- `ds_guide`: read a foundation or composition guideline by topic or rule ID.
+- `ds_check`: check JSX or SCSS code against design-system usage rules.
+
+While `npm run storybook` runs, `localhost:4200/mcp` also serves the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`).
+
+</FoundationSection>
+
+<FoundationSection title="Files an agent reads">
+
+- `AGENTS.md` at the repo root: the routing table, loading contract and hard rules.
+- `design-system/agent-views/`: generated indexes of components, tokens, motion and pages.
+- `design-system/src/components/<group>/<Name>/index.md`: the generated single-file reference for each component, also shown in its **Harness** tab.
 
 </FoundationSection>
 
 <FoundationSection title="Related">
 
-- <DocsLink id="get-started-develop">Develop</DocsLink>: the generators and checks that keep these files current.
-- <DocsLink id="ai-ui-about-ai-ui">AI UI</DocsLink>: designing AI features for PLUS.
+- <DocsLink id="get-started-develop">Develop</DocsLink>: the generators and checks that keep agent files current.
+- <DocsLink id="ai-ui-about-ai-ui">AI UI</DocsLink>: designing AI features in PLUS.
 
 </FoundationSection>
