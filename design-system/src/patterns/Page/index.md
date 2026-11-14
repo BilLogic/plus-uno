@@ -10,7 +10,7 @@ Also asked as: surface.
 
 **Source:** `design-system/src/patterns/Page/Page.jsx`
 
-**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepSmall, StepMedium, StepLarge, Bordered, WithTitle, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth
+**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepSmall, StepMedium, StepLarge, Bordered, WithTitle, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, AnatomyRecordScaledDown, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth
 
 **Storybook page:** `design-system/src/patterns/Page/Page.mdx`
 
