@@ -121,7 +121,7 @@ useEffect(() => {
 - `Spinner` is for an action in progress and for full-page transitions; a Tag saving a change uses its own spinner.
 - The loading guidance in the surfaces guideline points here.
 
-Same group: `GenerativeBorder` · `ProgressBar` · `Spinner`
+Same group: `GenerativeBorder` · `ProgressBar` · `ProgressRing` · `Spinner`
 
 ## Parts
 

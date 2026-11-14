@@ -88,7 +88,7 @@ Don't: A finished task left as a brand bar.
 - For the outcome when it finishes, use `Flag` or `SectionMessage`.
 - For position in a hierarchy rather than progress through a task, use `Breadcrumb`.
 
-Same group: `GenerativeBorder` · `Skeleton` · `Spinner`
+Same group: `GenerativeBorder` · `ProgressRing` · `Skeleton` · `Spinner`
 
 ## Parts
 

@@ -1,19 +1,20 @@
 ---
-summary: ProgressBar, Skeleton, Spinner or GenerativeBorder — showing work in flight
+summary: ProgressBar, ProgressRing, Skeleton, Spinner or GenerativeBorder — showing work in flight
 ---
 
 <!-- Tier: 2 | Load when: choosing a component from the loading group -->
 
 # Loading — which component to reach for
 
-Four components: `ProgressBar`, `Skeleton`, `Spinner` and `GenerativeBorder`.
+Five components: `ProgressBar`, `ProgressRing`, `Skeleton`, `Spinner` and `GenerativeBorder`.
 Generated facts are in `design-system/src/components/loading/index.md`.
 
 ## The choice
 
 | You want to show | Reach for |
 |---|---|
-| how far along a known quantity is | `ProgressBar` |
+| how far along a known quantity is, across a track | `ProgressBar` |
+| how far along a known quantity is, in an icon-sized slot | `ProgressRing` |
 | the shape of content that is still loading | `Skeleton` |
 | that something is happening, length unknown | `Spinner`, or `ProgressBar isIndeterminate` for a task with a bar's place on the page |
 | that the AI is generating into a region | `GenerativeBorder` with `isActive` |
@@ -21,6 +22,11 @@ Generated facts are in `design-system/src/components/loading/index.md`.
 `ProgressBar` takes `value` as a percent, 0 to 100, clamped so the drawn width
 and the announced `aria-valuenow` agree. Name it with `ariaLabel`: the default,
 "Progress", says nothing when a page has two bars.
+
+`ProgressRing` takes `value` (0 to 100, clamped) and a required `label` for the
+same determinate signal inside a compact slot (`size` 16, 20 by default, or 24;
+`appearance` `default` or `inverse`). A ring is never indeterminate; unknown
+time is `Spinner`'s job.
 
 `Spinner` is one animated ring. `size` is a pixel diameter, 16, 24 (default)
 or 48; `appearance="inherit"` takes the surrounding text color and `"invert"`

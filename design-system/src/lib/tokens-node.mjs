@@ -342,6 +342,7 @@ export const FAMILIES = [
   { family: 'option-menu', prefix: '--option-menu-', what: 'the option menu width' },
   { family: 'spinner', prefix: '--spinner-', what: 'Spinner sizes' },
   { family: 'progress-bar', prefix: '--progress-bar-', what: 'Progress bar height' },
+  { family: 'progress-ring', prefix: '--progress-ring-', what: 'Progress ring stroke width' },
   { family: 'progress-indicator', prefix: '--progress-indicator-', what: 'Progress indicator dot sizes' },
   { family: 'option-row', prefix: '--option-row-', what: 'the option row indent step, control gap and radio dot' },
   { family: 'count-tag', prefix: '--count-tag-', what: 'the Count tag dot' },

@@ -1,0 +1,292 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as ProgressRingStories from './ProgressRing.stories.jsx';
+import { ProgressRing, PROGRESS_RING_SIZES, Spinner } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+<Meta of={ProgressRingStories} />
+
+<Title />
+
+A small determinate ring for a known amount of progress where a horizontal bar
+will not fit.
+
+<DocsTabs of={ProgressRingStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/ProgressRing"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<ComponentExample of={ProgressRingStories.Default} title="Default" description="A brand-bold arc on a neutral track, starting at twelve o'clock and filling clockwise." />
+
+<ComponentExample of={ProgressRingStories.Inverse} title="Inverse" description="Reads on a bold or colored background." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Progress values
+
+<ComponentExample of={ProgressRingStories.Zero} title="Zero" description="At 0, only the neutral track shows, with no stray cap dot." />
+
+<ComponentExample of={ProgressRingStories.Partial} title="Partial" description="A known share done, drawn with a round cap." />
+
+<ComponentExample of={ProgressRingStories.Complete} title="Complete" description="At 100, the brand-bold arc closes the full circle." />
+
+<ComponentExample of={ProgressRingStories.OutOfRangeValuesAreClamped} title="Clamped bounds" description={<>Values below <code>0</code> or above <code>100</code> clamp on both the drawn arc and <code>aria-valuenow</code>.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size and layout
+
+<ComponentExample of={ProgressRingStories.Size16} title="16" description="Pairs with compact inline text or a 16 icon slot." />
+
+<ComponentExample of={ProgressRingStories.Size20} title="20" description="The default, sized for a row's leading 20 slot such as an uploading file row." />
+
+<ComponentExample of={ProgressRingStories.Size24} title="24" description="Pairs with a 24 icon slot." />
+
+<ComponentExample of={ProgressRingStories.WithInlineText} title="With inline text" description="The ring carries no text inside its center; put the status and percent beside it." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={ProgressRingStories.Rest} title="Rest" description="A determinate 20 ring at 64%." />
+
+<ComponentExample of={ProgressRingStories.Hovered} title="Hovered" description="No change: the ring has no hover layer." />
+
+<ComponentExample of={ProgressRingStories.Pressed} title="Pressed" description="No change." />
+
+<ComponentExample of={ProgressRingStories.Focused} title="Focused" description="Not a control, so Tab skips it." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="ProgressRing" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ProgressRingStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `ProgressRing` when a task has a known percent done and sits in an
+icon-sized slot, such as an uploading file row where a list of horizontal bars
+would crowd the view. A ring is never indeterminate.
+
+### Appearance guidance
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Default</td><td>Standard surfaces: a brand-bold fill on a neutral track.</td></tr>
+<tr><td>Inverse</td><td>On a bold or colored background.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a wait whose duration is unknown, use `Spinner`.
+- For progress where a horizontal track fits (such as a card header or a form step), use `ProgressBar`.
+- For content loading into a layout that already has a shape, use `Skeleton`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Track.** The full neutral circle behind the arc, drawn with a `--progress-ring-stroke` stroke.
+2. **Fill.** The clockwise brand-bold arc starting at twelve o'clock, rounded at its ends and hidden when `value` is `0`.
+3. **Accessible name.** The `label` prop set on the `progressbar` element via `aria-label`.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Zero</td><td><code>value</code> is <code>0</code>: only the neutral track draws, and <code>aria-valuenow</code> is <code>0</code>.</td></tr>
+<tr><td>Partial</td><td><code>value</code> between <code>0</code> and <code>100</code>: the brand-bold arc fills clockwise from twelve o'clock with round caps.</td></tr>
+<tr><td>Complete</td><td><code>value</code> is <code>100</code>: the brand-bold arc closes the ring, and <code>aria-valuenow</code> is <code>100</code>.</td></tr>
+<tr><td>Hovered</td><td>None. It is not a control.</td></tr>
+<tr><td>Pressed</td><td>None.</td></tr>
+<tr><td>Focused</td><td>None. It is not in the tab order.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Stroke width</td><td><code>--progress-ring-stroke</code> across all sizes.</td></tr>
+<tr><td>Size</td><td><code>--icon-md</code> for <code>16</code>, <code>--image-xs</code> for <code>20</code>, <code>--icon-lg</code> for <code>24</code>.</td></tr>
+<tr><td>Default</td><td>Track <code>--ds-background-neutral</code>, fill <code>--ds-background-brand-bold</code>.</td></tr>
+<tr><td>Inverse</td><td>Track <code>--ds-background-inverse-subtle</code>, fill <code>--ds-icon-inverse</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep `ProgressRing` determinate and reach for `Spinner` when the total is unknown.
+
+A ring with a track promises a known share of completion; spinning or freezing a
+half-filled ring when there is no total misleads the tutor about how long is
+left.
+
+<DoDontPair
+    doExample={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner size={16} /><span>Connecting to session</span></div>}
+    doCaption="Spinner when the wait has no measurable percent."
+    dontExample={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}><ProgressRing value={50} size={16} label="Connecting to session" /><span>Connecting to session</span></div>}
+    dontCaption="A fixed ProgressRing faking an unknown wait."
+/>
+
+### Pair `ProgressRing` with visible percent text when exact progress matters.
+
+At `PROGRESS_RING_SIZES` diameters (`16`, `20`, `24`), the center of the ring
+cannot hold text; put the percent beside it on the row's meta line.
+
+<DoDontPair
+    doExample={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}><ProgressRing value={64} label="Uploading recording, 64%" /><span>Uploading · 64%</span></div>}
+    doCaption="The percent sits beside the ring."
+    dontExample={<div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><ProgressRing value={64} size={24} label="Uploading recording, 64%" /></div>}
+    dontCaption="A bare ring with no surrounding context."
+/>
+
+### Match `size` from `PROGRESS_RING_SIZES` to the icon slot it replaces.
+
+Use `size={20}` in a row's leading slot so swapping between a status icon and
+an active upload never shifts the row, and `size={16}` beside compact text.
+
+<DoDontPair
+    doExample={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}><ProgressRing value={40} size={20} label="Uploading recording, 40%" /><span>session-recording.mp4</span></div>}
+    doCaption="A ring sized to match the row's leading icon slot."
+    dontExample={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}><ProgressRing value={40} size={16} label="Uploading recording, 40%" /><span>session-recording.mp4</span></div>}
+    dontCaption="An undersized ring that shifts when replaced by the row's icon."
+/>
+
+### Use `appearance="inverse"` on bold surfaces.
+
+The neutral track disappears against a bold ground; `inverse` switches the track
+and fill to inverse roles that stay legible.
+
+<DoDontPair
+    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><ProgressRing value={64} appearance="inverse" label="Uploading recording" /></div>}
+    doCaption="Inverse appearance on a bold surface."
+    dontExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><ProgressRing value={64} label="Uploading recording" /></div>}
+    dontCaption="Default appearance lost against a brand-bold fill."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name what is progressing in <code>label</code>: "Uploading session-recording.mp4".</td><td>Use a generic "Progress" label when several rows upload at once.</td></tr>
+<tr><td>Keep visible status text concise beside the ring: "Uploading · 64%".</td><td>Place numbers inside the ring itself.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Announced as a determinate progressbar.** Renders `role="progressbar"` with
+  `aria-label` set from the required `label` prop, `aria-valuemin="0"`,
+  `aria-valuemax="100"`, and `aria-valuenow` clamped to `0`–`100` together with
+  the drawn arc.
+- **Name each ring distinctly in a list.** When several file rows upload at the
+  same time, include the item's name in `label` so screen-reader users can tell
+  one progressbar from another.
+- **Decorative SVG.** The inner `<svg>` is marked `aria-hidden="true"` and
+  `focusable="false"` so assistive technology reads only the progressbar role
+  and its value.
+- **Reduced motion.** Under `prefers-reduced-motion: reduce`, changes to `value`
+  update the arc immediately without animating `stroke-dashoffset`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `ProgressBar`: use when there is horizontal space for a full-width track, such as a card header or a multi-step flow.
+- `Spinner`: use when a wait has no known duration or percent to report.
+- `Flag`: use when a background upload completes and needs a brief confirmation notice.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

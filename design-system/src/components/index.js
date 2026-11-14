@@ -69,6 +69,7 @@ export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBa
 
 export { default as GenerativeBorder, GENERATIVE_BORDER_RADII } from '@/components/loading/GenerativeBorder';
 export { default as ProgressBar, PROGRESS_BAR_APPEARANCES } from '@/components/loading/ProgressBar';
+export { default as ProgressRing, PROGRESS_RING_APPEARANCES, PROGRESS_RING_SIZES } from '@/components/loading/ProgressRing';
 export { default as Skeleton } from '@/components/loading/Skeleton';
 export { default as Spinner, SPINNER_APPEARANCES, SPINNER_SIZES } from '@/components/loading/Spinner';
 
