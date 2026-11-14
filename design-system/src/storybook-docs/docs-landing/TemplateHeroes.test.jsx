@@ -9,13 +9,13 @@ const TEMPLATE_IDS = [
     'templates-overview',
     'templates-frame',
     'templates-page',
-    'templates-section-section',
+    'templates-section',
     'templates-card',
     'templates-table',
     'templates-form',
-    'templates-modal-modal',
-    'templates-panel-panel',
-    'templates-popup-popup',
+    'templates-modal',
+    'templates-panel',
+    'templates-popup',
 ];
 
 const ACCENT = 'var(--ds-background-brand-bold)';

@@ -81,7 +81,7 @@ const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story 
 
 export default {
     decorators: [settledLayout],
-    title: 'Templates/Section/Section',
+    title: 'Templates/Section',
     component: PatternSection,
     tags: ['!dev', '!autodocs'],
     argTypes: {

@@ -124,16 +124,20 @@ const AccentRing = ({ x, y, w, h, corner }) => {
   return <rect x={x} y={y} width={Math.max(0, w)} height={Math.max(0, h)} fill="none" stroke={PAINT.accent} style={{ ...HAIRLINE, rx: radius, ry: radius }} />;
 };
 
-export const Frame = ({ x, y, w, h, accent = false }) => {
+export const Frame = ({ x, y, w, h, accent = false, chrome = true }) => {
   const onHeroGround = useContext(HeroGround);
   return (
     <g>
       <Rect x={x} y={y} w={w} h={h} fill={PAINT.frameSunken} stroke={accent ? PAINT.accent : onHeroGround ? PAINT.illustrationEdge : PAINT.frameDivider} corner="window" />
-      {[0, 1, 2].map((i) => (
-        <circle key={i} cx={x + 8 + i * 7} cy={y + 6} r={2} fill={PAINT.windowDot} />
-      ))}
-      <SkeletonBar x={x + 34} y={y + 4} w={w * 0.35} />
-      <Rule x1={x} x2={x + w} y1={y + 12} y2={y + 12} />
+      {chrome && (
+        <>
+          {[0, 1, 2].map((i) => (
+            <circle key={i} cx={x + 8 + i * 7} cy={y + 6} r={2} fill={PAINT.windowDot} />
+          ))}
+          <SkeletonBar x={x + 34} y={y + 4} w={w * 0.35} />
+          <Rule x1={x} x2={x + w} y1={y + 12} y2={y + 12} />
+        </>
+      )}
     </g>
   );
 };

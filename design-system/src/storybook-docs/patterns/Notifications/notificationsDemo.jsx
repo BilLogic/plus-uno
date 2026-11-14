@@ -16,6 +16,7 @@ import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
  *   FlagTopRight      one Flag at the top right, over the page
  *   FlagStack         several Flags, newest on top
  *   FlagWithActions   a Flag with up to two verbs
+ *   FlagUndo          the timed Undo Flag, then the plain "restored" Flag
  *   MustStay          a SectionMessage with dismiss off, by the action it informs
  *   TierPicture       one Banner at the Frame, Page or Section tier
  *   SeverityRow       the four statuses on SectionMessage
@@ -76,6 +77,14 @@ export const FlagWithActions = () => (
         >
             Lincoln Middle on Tuesday.
         </Flag>
+    </TopRight>
+);
+
+/** Undo: a timed Flag with Undo first, then the plain Flag that replaces it once Undo is pressed. */
+export const FlagUndo = () => (
+    <TopRight>
+        <Flag title="Session deleted" timer delay={60000} show actions={[{ text: 'Undo', onClick: noop }]} />
+        <Flag icon="circle-check" title="Session restored" autohide={false} show />
     </TopRight>
 );
 

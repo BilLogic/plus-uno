@@ -308,3 +308,14 @@ export function managerFailures(reads, expected) {
   }
   return failures;
 }
+
+/**
+ * A docs page opens at its top. `rows` is `{ page, scrollY }` for every docs
+ * page, read after load; any page below the top is a demo that scrolled itself
+ * into view when it mounted (see `keepDocsAtTop` in storybook-docs/lib).
+ */
+export function openAtTopFailures(rows) {
+  return rows
+    .filter((r) => typeof r.scrollY !== 'number' || r.scrollY > 0)
+    .map((r) => `${r.page}: opened ${typeof r.scrollY === 'number' ? `${Math.round(r.scrollY)}px down the page` : 'with no scroll reading'}; an open-by-default demo scrolled it on mount.`);
+}

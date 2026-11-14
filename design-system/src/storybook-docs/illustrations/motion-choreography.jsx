@@ -366,7 +366,7 @@ const causeScene = ({ id, title, caption, pushes }) => ({
   arrows: pushes ? [travel({ x: 16, y: 44, w: 128, h: 42 }, 0, -14)] : [[[150, 20], [128, 20]]],
   draw: ({ sel, flag, shift }) => (
     <>
-      <Frame x={8} y={6} w={144} h={88} />
+      <Frame x={8} y={6} w={144} h={88} chrome={false} />
       <Moved y={14 * shift}>
         {[0, 1, 2].map((i) => (
           <Row key={i} x={16} y={30 + i * 14} w={128} accent={i === 1 && sel > 0.5} />

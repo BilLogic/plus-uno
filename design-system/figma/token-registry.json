@@ -843,7 +843,7 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1159,
+    "scssTokenCount": 1161,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 759,

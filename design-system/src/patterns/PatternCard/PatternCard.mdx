@@ -31,7 +31,7 @@ import {
     links={{
         label: 'Uses',
         items: [
-            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section--docs' },
         ],
     }}
 />
@@ -66,6 +66,14 @@ The examples on this page follow the toolbar's Color mode switch.
 <ComponentExample of={PatternCardStories.ImageStandard} title="Image 4:3" description="The image slot at 4:3." />
 
 <ComponentExample of={PatternCardStories.ImageSquare} title="Image 1:1" description="The image slot at 1:1." />
+
+<ComponentExample of={PatternCardStories.LayoutStacked} title="Stacked" description={<><code>layout="stacked"</code>, the default: the image above the content. Use it for cards in a grid or any card narrower than the large size.</>} />
+
+<ComponentExample of={PatternCardStories.LayoutImageStart} title="Image start" description={<><code>layout="image-start"</code>: the image on the start side at one third of the width, full height, with the content beside it. Use it for a wide card that leads with a picture, one layout per row of cards.</>} />
+
+<ComponentExample of={PatternCardStories.LayoutImageEnd} title="Image end" description={<><code>layout="image-end"</code>: the mirror, for a card whose text should be read first.</>} />
+
+<ComponentExample of={PatternCardStories.LayoutStacksBelowMd} title="Below md" description="A side card stacks below the md breakpoint, so the image returns above the content." />
 
 </div>
 
@@ -179,12 +187,12 @@ In a row, place the most cards that keep each card at its minimum width. Each ro
 
 ## Parts
 
-1. **Image** (optional). A slot above everything else. It runs edge to edge, outside the pad, and the card radius clips its corners. Give the image you pass an aspect ratio of 16:9, 4:3 or 1:1.
+1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. Stacked, give the image you pass an aspect ratio of 16:9, 4:3 or 1:1; beside the content it fills the full height at one third of the width and crops to cover.
 2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
 3. **Body.** A slot for text, a list or media.
 4. **Footer** (optional). A left-aligned slot for actions that commit a change.
 
-The image sits above a padded frame, and the header, body and footer sit inside it.
+The image sits above (or, in a side layout, beside) a padded frame, and the header, body and footer sit inside it.
 
 ### States
 
@@ -302,10 +310,10 @@ A card that holds actions that commit a change gets a footer, and its actions st
 
 ## Related
 
-- <DocsLink id="templates-section-section">Section</DocsLink> for a region that holds cards under one heading.
+- <DocsLink id="templates-section">Section</DocsLink> for a region that holds cards under one heading.
 - <DocsLink id="templates-table">Table</DocsLink> for many objects of the same shape that people compare across columns.
 - <DocsLink id="templates-page">Page</DocsLink> for the content area's own fill, header and elevation.
-- <DocsLink id="templates-modal-modal">Modal</DocsLink> for something that must be decided before the page can continue.
+- <DocsLink id="templates-modal">Modal</DocsLink> for something that must be decided before the page can continue.
 
 </div>
 

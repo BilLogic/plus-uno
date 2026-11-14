@@ -47,6 +47,41 @@
     // offset, `--flag-offset`. Only transform and opacity move.
     @include overlay-motion(plus-flag-slide-in, plus-flag-exit, default, default, plus-flag-fade-in, plus-flag-fade);
 
+    // Timed (Undo): the corners step down from 12 to 4, and the bar is the top cap, clipped by them.
+    // Flag.jsx empties the bar over `delay`, linear; hover or focus pauses it and dims it.
+    // Reduced motion keeps the countdown: it is information, not movement.
+    &.plus-flag--timer {
+        position: relative;
+        border-radius: var(--flag-radius-timer);
+    }
+
+    .plus-flag-timer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--flag-timer-height);
+        overflow: hidden;
+        border-radius: var(--flag-radius-timer) var(--flag-radius-timer) 0 0;
+        transition: opacity var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+        .plus-progressbar {
+            height: 100%;
+            border-radius: 0;
+            background-color: transparent;
+        }
+
+        .plus-progressbar-fill {
+            border-radius: 0;
+            transition: none;
+            transform-origin: left;
+        }
+    }
+
+    &[data-paused='true'] .plus-flag-timer {
+        opacity: var(--ds-opacity-disabled);
+    }
+
     // --- ICON: 16, in a box one title line tall ---
     .plus-flag-icon {
         display: flex;
@@ -291,7 +326,7 @@
     }
 }
 
-// --- FLAG CONTAINER: bottom-left, 8 from the screen edge, 16 apart ---
+// --- FLAG CONTAINER: top-right by default, 8 from the screen edge, 16 apart ---
 .plus-flag-container {
     z-index: var(--layer-flag);
     display: flex;
