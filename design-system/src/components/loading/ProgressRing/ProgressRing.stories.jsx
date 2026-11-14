@@ -1,7 +1,6 @@
 import React from 'react';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { probe, px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { expect, within } from 'storybook/test';
 import ProgressRing, { PROGRESS_RING_APPEARANCES, PROGRESS_RING_SIZES } from './ProgressRing';
@@ -244,15 +243,38 @@ export const Focused = {
     },
 };
 
-/** Reduced motion: value changes step immediately with no stroke transition. */
+/**
+ * Reduced motion: value changes step immediately with no stroke transition.
+ * Reads `@media (prefers-reduced-motion: reduce)` from the loaded stylesheets
+ * rather than calling `emulateReducedMotion`, which flips Playwright's page-wide
+ * preference across concurrent story iframes.
+ */
 export const ReducedMotion = () => <Subject />;
-ReducedMotion.beforeEach = async () => async () => {
-    await emulateReducedMotion(null);
-};
 ReducedMotion.play = async ({ canvasElement }) => {
     const ring = within(canvasElement).getByRole('progressbar', { name: 'Uploading session recording' });
     const fill = ring.querySelector('.plus-progress-ring__fill');
-    if (!(await emulateReducedMotion('reduce'))) return;
-    await expect(getComputedStyle(fill).transitionProperty, 'no transition under reduced motion').toBe('none');
+
+    const reducedRules = [];
+    const walk = (rules, inReduced) => {
+        for (const rule of rules) {
+            const isReduced = inReduced
+                || (rule instanceof CSSMediaRule && /prefers-reduced-motion:\s*reduce/.test(rule.media.mediaText));
+            if (rule instanceof CSSStyleRule && isReduced && fill.matches(rule.selectorText)) {
+                reducedRules.push(rule);
+            }
+            if (rule.cssRules) walk(rule.cssRules, isReduced);
+        }
+    };
+    for (const sheet of document.styleSheets) {
+        let rules;
+        try {
+            rules = sheet.cssRules;
+        } catch {
+            continue;
+        }
+        walk(rules, false);
+    }
+
+    await expect(reducedRules.some((r) => r.style.transitionProperty === 'none' || r.style.transition === 'none'), 'disables transition under reduced motion').toBe(true);
     await expect(ring).toHaveAttribute('aria-valuenow', '64');
 };
