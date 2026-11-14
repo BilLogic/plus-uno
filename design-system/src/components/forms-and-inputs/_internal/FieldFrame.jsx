@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from '@base-ui/react/field';
 import { PresenceSlot } from '@/lib/listMotion';
@@ -125,10 +125,30 @@ export const FieldCaption = ({
     const counted = Boolean(countId && maxLength !== undefined);
     const hasContent = Boolean(message) || counted;
     const over = counted && count > maxLength;
-    const swapKey = `${tone}:${typeof message === 'string' || typeof message === 'number' ? message : Boolean(message)}`;
+    const mountedOnceRef = useRef(false);
+    const lastActiveToneRef = useRef(hasContent ? tone : 'help');
+    useEffect(() => {
+        mountedOnceRef.current = true;
+    }, []);
+
+    const animatesValidation = (hasContent && tone !== 'help') || (!hasContent && lastActiveToneRef.current !== 'help');
+    if (hasContent) {
+        lastActiveToneRef.current = tone;
+    }
+
+    if (!animatesValidation && !hasContent) {
+        return null;
+    }
+
+    const swapKey = animatesValidation
+        ? `${tone}:${typeof message === 'string' || typeof message === 'number' ? message : Boolean(message)}`
+        : 'static-help';
+
     return (
         <PresenceSlot
             show={hasContent}
+            animateOnMount={mountedOnceRef.current && tone !== 'help'}
+            onExited={() => { lastActiveToneRef.current = 'help'; }}
             data-field-caption-slot=""
             className="plus-field-caption-slot"
         >
