@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { Button, Link, Tabs } from '@/components';
+import { Banner, Button, Link, Tabs } from '@/components';
 import { Frame, PatternCard, PatternSection } from '@/patterns';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { SlideViews } from '@/lib/navigationMotion';
@@ -162,6 +162,63 @@ export const WithTitle = {
             {slotContent('Content slot')}
         </Page>
     ),
+};
+
+/** The Page owns the gaps when a page message appears below its header. */
+export const HeaderAndBanner = {
+    render: () => {
+        const [showBanner, setShowBanner] = useState(true);
+        return (
+            <Page
+                header={<DemoPageHeader title="Sessions" actions={<Button text="Toggle banner" onClick={() => setShowBanner((show) => !show)} />} />}
+                banner={showBanner && <Banner>Sessions move to the new calendar on Friday.</Banner>}
+            >
+                <PatternSection title="Upcoming sessions">{slotContent('Sessions')}</PatternSection>
+            </Page>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const header = canvas.getByRole('heading', { level: 1, name: 'Sessions' }).closest('header');
+        const content = canvas.getByRole('heading', { level: 2, name: 'Upcoming sessions' }).closest('.plus-pattern-section');
+        const gap = px(probe(canvasElement, 'marginTop', 'var(--page-stack-md)'));
+        const banner = canvas.getByRole('status');
+        await expect(banner.getBoundingClientRect().top - header.getBoundingClientRect().bottom).toBeCloseTo(gap, 0);
+        await expect(content.getBoundingClientRect().top - banner.getBoundingClientRect().bottom).toBeCloseTo(gap, 0);
+        await expect(canvas.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+        await userEvent.click(canvas.getByRole('button', { name: 'Toggle banner' }));
+        await expect(canvas.queryByRole('status')).toBeNull();
+        await expect(content.getBoundingClientRect().top - header.getBoundingClientRect().bottom).toBeCloseTo(gap, 0);
+        await userEvent.click(canvas.getByRole('button', { name: 'Toggle banner' }));
+        await expect(canvas.getByRole('status')).toBeVisible();
+    },
+};
+
+/** Optional slots leave no empty regions, and children-only Pages keep their layout. */
+export const OptionalSlots = {
+    render: () => (
+        <>
+            <Page data-testid="legacy" title="Legacy title"><p>Legacy content</p></Page>
+            <Page data-testid="header-only" title="Fallback title" header={<DemoPageHeader title="Header title" />} />
+            <Page data-testid="banner-only" banner={<Banner>Page message</Banner>}><p>Banner content</p></Page>
+            <Page data-testid="title-banner" title="Title with message" banner={<Banner>Another message</Banner>} />
+        </>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const legacy = canvas.getByTestId('legacy');
+        await expect([...legacy.children].map((el) => el.tagName)).toEqual(['H1', 'P']);
+        const headerOnly = canvas.getByTestId('header-only');
+        await expect(within(headerOnly).getAllByRole('heading', { level: 1 })).toHaveLength(1);
+        await expect(within(headerOnly).queryByText('Fallback title')).toBeNull();
+        await expect(headerOnly.children).toHaveLength(1);
+        const bannerOnly = canvas.getByTestId('banner-only');
+        await expect(bannerOnly.firstElementChild).toHaveClass('plus-pattern-page-banner');
+        const titleBanner = canvas.getByTestId('title-banner');
+        const gap = px(probe(canvasElement, 'marginTop', 'var(--page-stack-md)'));
+        await expect(titleBanner.lastElementChild.getBoundingClientRect().top - titleBanner.firstElementChild.getBoundingClientRect().bottom).toBeCloseTo(gap, 0);
+        await expect(titleBanner.children).toHaveLength(2);
+    },
 };
 
 /** In every color mode, each level draws its fill with its own shadow, and text in the body color. */
@@ -598,4 +655,3 @@ export const MotionScrollToSpotReduced = {
     render: () => <ScrollSpotDemo />,
     play: scrollSpotPlay(true),
 };
-

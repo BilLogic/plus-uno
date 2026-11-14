@@ -11,6 +11,16 @@
       "guide": "filtering",
       "message": "in a Section's toolbar is a form or view-switch control, not a view-bar filter",
       "fix": "use FilterButton (1–3 quick filters; pass trigger={<FilterButton … />} to PopupSelect) or FilterMenu (staged multi-category menu); run `ds guide filtering`"
+    },
+    {
+      "id": "page-banner",
+      "before": ["PageHeader"],
+      "components": ["Banner"],
+      "use": ["Page.banner"],
+      "pattern": "Notifications",
+      "guide": "notifications",
+      "message": "before the page header reverses the page message order",
+      "fix": "put PageHeader in Page's header slot and Banner in its banner slot; run `ds guide notifications`"
     }
   ]
 }

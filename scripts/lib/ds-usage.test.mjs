@@ -321,6 +321,27 @@ test('ds/placement: Select or PopupSelect without trigger in a Section toolbar w
   assert.deepEqual(warn('<PatternSection title="Form" toolbar={<PatternSection.Toolbar filters={<FilterButton text="Status" />} />}><Select label="Role" options={[]} /></PatternSection>'), []);
 });
 
+test('ds/placement: a Banner before a sibling PageHeader warns; the Page slots pass', () => {
+  const facts = loadFacts(REPO_ROOT);
+  const placementCtx = contextFrom({
+    components: facts.manifests.components,
+    tokens: facts.manifests.tokens,
+    exported: facts.importable,
+    barrels: facts.barrels,
+    placements: facts.placements,
+  });
+  const head = "import { Banner as Notice, PageHeader as Header } from '@/components';\nimport { Page } from '@/patterns';\n";
+  const findings = (code) => escapesIn({ path: 'p/src/Queue.jsx', text: head + code, page: false }, placementCtx);
+  const wrong = findings('<Page><Notice>Message</Notice><Header title="Queue" /></Page>');
+  assert.deepEqual(wrong.map((f) => [f.rule, f.level]), [['ds/placement', 'warn']]);
+  assert.match(wrong[0].fix, /banner/);
+  assert.match(wrong[0].fix, /ds guide notifications/);
+  assert.deepEqual(findings('<Page><Header title="Queue" /><Notice>Message</Notice></Page>'), []);
+  assert.deepEqual(findings('<Page header={<Header title="Queue" />} banner={<Notice>Message</Notice>} />'), []);
+  assert.deepEqual(findings('<Page><div><Notice>Other region</Notice></div><Header title="Queue" /></Page>'), []);
+  assert.deepEqual(findings('<><Page><Notice>Other page</Notice></Page><Page><Header title="Queue" /></Page></>'), []);
+});
+
 test('patterns: importing template and pattern motion helpers from @/patterns passes with 0 findings', () => {
   const facts = loadFacts(REPO_ROOT);
   const realCtx = contextFrom({
@@ -357,5 +378,4 @@ test('patterns: importing template and pattern motion helpers from @/patterns pa
   ].join('\n');
   assert.deepEqual(escapesIn({ path: 'prototypes/x/src/App.jsx', text: code }, realCtx), []);
 });
-
 

@@ -373,6 +373,7 @@ function canonicalTagName(name, importedNames, namespaces) {
 
 function placementEscapes(text, elements, importedNames, namespaces, placements, add) {
   if (!placements.length) return;
+  const parents = placements.some((row) => row.before) ? siblingParents(text, elements) : new Map();
   for (const row of placements) {
     const spans = [];
     for (const target of row.in ?? []) {
@@ -398,17 +399,45 @@ function placementEscapes(text, elements, importedNames, namespaces, placements,
         }
       }
     }
-    if (!spans.length) continue;
+    if (!spans.length && !row.before) continue;
     const disallowed = new Set(row.components ?? []);
     for (const el of elements) {
       const comp = canonicalTagName(el.name, importedNames, namespaces);
       if (!comp || !disallowed.has(comp)) continue;
-      if (!spans.some(([s, e]) => el.index >= s && el.index < e)) continue;
+      if (row.before) {
+        if (!parents.has(el) || !elements.some((next) => next.index > el.index
+          && parents.get(next) === parents.get(el)
+          && row.before.includes(canonicalTagName(next.name, importedNames, namespaces)))) continue;
+      } else if (!spans.some(([s, e]) => el.index >= s && el.index < e)) continue;
       const exemptProp = row.unlessProp?.[comp];
       if (exemptProp && (el.spread || el.attributes.some((a) => a.name === exemptProp))) continue;
       add('ds/placement', el.index + 1, `\`<${comp}>\` ${row.message}`, row.fix);
     }
   }
+}
+
+/** Direct JSX siblings, excluding JSX passed through an opening tag's props. */
+function siblingParents(text, elements) {
+  const parents = new Map();
+  const stack = [];
+  const tags = [
+    ...elements.map((el) => ({ index: el.index, el })),
+    ...[...text.matchAll(/<\/([\w.$:-]*)\s*>|<>/g)].map((m) => ({ index: m.index, name: m[1] })),
+  ].sort((a, b) => a.index - b.index);
+  let openingEnd = 0;
+  for (const tag of tags) {
+    if (tag.index < openingEnd) continue;
+    if (tag.el) {
+      if (stack.length) parents.set(tag.el, stack.at(-1));
+      openingEnd = tag.el.end;
+      if (!tag.el.selfClosing) stack.push(tag.el);
+    } else if (tag.name === undefined) {
+      stack.push({ name: '' }); // Fragment boundary.
+    } else if (stack.at(-1)?.name === tag.name) {
+      stack.pop();
+    }
+  }
+  return parents;
 }
 
 function rawInJsxStyle(key, value) {
