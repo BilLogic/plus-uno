@@ -2,6 +2,8 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
+    FoundationRelated,
+    DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
 import MotionLibrary from '@/storybook-docs/motion-library.jsx';
 
@@ -17,8 +19,19 @@ import MotionLibrary from '@/storybook-docs/motion-library.jsx';
 
 <FoundationSection title="Every row">
 
-Each row is a template's, pattern's or component's entry in the motion registry, and the same text sits in that page's Motion section. Rows are grouped by tier: templates first, then patterns, then components. A page absent from the table does not move: it is static, or its motion is the Update a value or state change on its own page. The Sound column names the sound an event plays, when it plays and its condition; an empty cell is silent (Foundations › Expression › Sound · When to play).
+Each row is a template's, pattern's or component's entry in the motion registry, and the same text sits in that page's Motion section. Rows are grouped by tier: templates first, then patterns, then components. A page absent from the table does not move. The Sound column names the sound an event plays, when it plays and its condition; an empty cell is silent (<DocsLink id="foundations-expression-sound-when-to-play">Sound · When to play</DocsLink>).
 
 <MotionLibrary />
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Transitions', description: 'The fourteen transitions each row draws from.', href: '?path=/docs/foundations-expression-motion-transitions--docs' },
+        { title: 'Physics', description: 'The spring tokens and their settle times.', href: '?path=/docs/foundations-expression-motion-physics--docs' },
+    ]}
+/>
 
 </FoundationSection>

@@ -1,12 +1,9 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
-import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
-    FoundationExample,
-    TokenSwatches,
 } from '@/storybook-docs/foundation-page.jsx';
 import * as AccessibilityStories from './Accessibility.stories.jsx';
 
@@ -31,45 +28,31 @@ import * as AccessibilityStories from './Accessibility.stories.jsx';
 
 WCAG 2.1 AA is the minimum bar for every PLUS screen. Tutors use PLUS on laptops during live sessions, often while sharing their screen with a student, so a screen stays legible at any zoom level and works under assistive technology.
 
-Most rules are built into the tokens and the patterns, so a screen built from them meets them by default. Each foundation page owns the rules for its subject: contrast in Color, heading levels in Typography, the focus ring in Border and Radius, reduced motion in Motion. Each component page adds the rules for its own name, role and keyboard behavior.
+Each foundation page owns the rules for its subject: contrast in [Color](?path=/docs/foundations-visual-color--docs), heading levels in [Typography](?path=/docs/foundations-visual-typography--docs#foundation-heading-levels), the focus ring in [Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) and [Radius](?path=/docs/foundations-visual-radius--docs#foundation-focus-ring), and reduced motion in [Motion](?path=/docs/foundations-expression-motion-physics--docs#foundation-reduced-motion). Each component page adds the rules for its own name, role and keyboard behavior.
 
 </FoundationSection>
 
 <FoundationSection title="Heading levels">
 
-Every page's outline starts with one `h1`, and a heading's tag is its place in the outline, never its size. A page whose name sits only in the topbar still has an `h1`, hidden visually but kept for assistive technology: moved off-screen, never `display: none`. Typography owns the rules: [Heading levels](?path=/docs/foundations-visual-typography--docs#foundation-heading-levels).
+Every page's outline starts with one `h1`, and a heading's tag is its place in the outline, never its size. A page whose name sits only in the topbar still has an `h1`, hidden visually with `VisuallyHidden` (never `display: none`). [Typography](?path=/docs/foundations-visual-typography--docs#foundation-heading-levels) and [Page](?path=/docs/templates-page--docs) own the outline rules.
 
 </FoundationSection>
 
 <FoundationSection title="Contrast">
 
-Text clears 4.5:1 and icons, borders and the focus ring clear 3:1 against what
-they sit on, in light and dark. Under increased contrast the bars are 7:1 and
-4.5:1. Each text and icon token is made for a surface or a fill, and using the
-pair keeps the contrast, so it is never checked one component at a time.
+Text clears 4.5:1 and icons, borders and the focus ring clear 3:1 against what they sit on, in light and dark (7:1 and 4.5:1 under increased contrast). Each text and icon token pairs with a surface or fill; [Color](?path=/docs/foundations-visual-color--docs) shows every measured pair.
 
 <Canvas of={AccessibilityStories.ContrastPairings} sourceState="none" />
-
-Never put a neutral text token on a bold fill, or an inverse token on a
-surface. **Color** shows every pair, measured, in both modes.
 
 </FoundationSection>
 
 <FoundationSection title="Focus">
 
-Focus is shown by the **focus ring**, never by a fill.
-
-- The ring is the same on every interactive element, including cards, table rows and list items, and it clears 3:1 against what it sits on.
-- The control's fill stays as it is, and its opacity stays at 100%.
-- Border owns the ring's color, width and offset, and Radius owns its corner: [Focus ring](?path=/docs/foundations-visual-border--docs).
-
-See Do and don't for the ring beside the fill-only mistake.
+Focus is shown by the focus ring, never by a fill: the control's fill and opacity stay unchanged. [Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color, width and offset, and [Radius](?path=/docs/foundations-visual-radius--docs#foundation-focus-ring) owns its corner.
 
 <FoundationSubsection title="Focus in overlays">
 
-Opening a `Modal` or a floating `Panel` moves focus inside it and keeps Tab
-there; closing it returns focus to the control that opened it. Both do this
-themselves, and a new overlay gets the same behavior by building on Base UI.
+Opening a `Modal` or a floating `Panel` moves focus inside it and keeps Tab there; closing it returns focus to the control that opened it. Both do this themselves, and a new overlay gets the same behavior by building on Base UI.
 
 </FoundationSubsection>
 
@@ -80,72 +63,59 @@ themselves, and a new overlay gets the same behavior by building on Base UI.
 Every interactive element can be reached and operated from the keyboard.
 
 - Tab order follows the visual reading order: left to right, top to bottom.
-- A widget follows its keyboard pattern: arrow keys move through a menu, and
-  Escape closes a `Modal`.
-- New interactive behavior (open and closed state, focus, keyboard) is built
-  on Base UI (`@base-ui/react`), which supplies these patterns.
+- Widgets follow standard keyboard patterns: arrow keys move through a menu or radio group, and Escape closes an overlay.
+- New interactive behavior is built on [Base UI](?path=/docs/tech-stack-base-ui--docs) (`@base-ui/react`), which supplies these patterns.
 
 </FoundationSection>
 
 <FoundationSection title="Screen readers">
 
-- Reach for the semantic element first (`button`, `nav`, `main`, `table`),
-  and for ARIA only when no element fits.
-- A control with no visible text is named with `aria-label` or
-  `aria-labelledby`.
-- Content that changes without a page load is announced through a live
-  region (`role="status"` with `aria-live="polite"`), as the `Table` bulk-action
-  count is.
+- Use semantic elements first (`button`, `nav`, `main`, `table`), and ARIA only when no element fits.
+- Name any control that has no visible text with `aria-label` or `aria-labelledby`.
+- Announce content that changes without a page load through a live region (`role="status"` with `aria-live="polite"`), as the `Table` bulk-action count does.
 
 </FoundationSection>
 
 <FoundationSection title="Disabled">
 
-A disabled component keeps its label so people can still tell what is unavailable. Color owns how disabled looks. Disabled elements are not focus targets, and none stands in with `aria-disabled` to stay focusable. The reason a field or option is disabled is visible text beside it, at full contrast, and never a tooltip on the disabled control. An action stays enabled and explains what is missing when it is pressed; a button disables only while it is sending.
+A disabled component keeps its label so people can tell what is unavailable. [Color](?path=/docs/foundations-visual-color--docs) owns how disabled looks, and [Disabled](?path=/docs/patterns-states-disabled--docs) owns when to use it.
+
+- Disabled elements are not focus targets, and none uses `aria-disabled` to stay focusable.
+- State the reason a field or option is disabled in visible text beside it at full contrast, never in a tooltip on the disabled control.
+- Keep submit actions enabled and explain what is missing when pressed; disable a button only while it is sending.
 
 </FoundationSection>
 
 <FoundationSection title="Forms">
 
-- Every field has a visible label tied to its control. A field that renders
-  its own label wires the label's `htmlFor` to the control's `id` itself;
-  `Select` and `DatePicker` render none, so the form supplies it.
-- An error says what went wrong and how to fix it, on the field, through its
-  `errorMessage`.
-- A required field takes `required`, which draws the asterisk, and the form
-  puts one line above its first field: "Required fields are marked with an
-  asterisk (*)."
-- Related fields are grouped in a `Fieldset`, which renders a `fieldset` and
-  its `legend`.
+[Forms](?path=/docs/patterns-forms--docs) and [Errors](?path=/docs/patterns-states-errors--docs) own form layout and validation.
+
+- Every field has a visible label tied to its control (`htmlFor` to `id`).
+- An error states what went wrong and how to fix it on the field through `errorMessage`.
+- A required field takes `required`, and the form places "Required fields are marked with an asterisk (*)" above its first field.
+- Related fields sit in a `Fieldset`, which renders a `fieldset` and its `legend`.
 
 </FoundationSection>
 
 <FoundationSection title="Charts">
 
-Every chart describes itself to screen readers: its type, its axes, each
-series and each point, and its data can be read with the keyboard. A chart is
-a labeled group inside its section, not a landmark of its own, so a dashboard
-of six charts does not add six entries to the landmark menu. Give every chart
-a title or a label, and never carry a series by color alone.
-
-</FoundationSection>
-
-<FoundationSection title="Automated checks">
-
-Every story runs axe in the Storybook test suite, and a story may not add a
-violation, so a component that breaks a rule here is caught before it ships.
+Every chart describes its type, axes, series and points to screen readers, and its data can be read from the keyboard. A chart is a labeled group inside its section, not a landmark of its own. Give every chart a title or label, and never carry a series by color alone; see [Chart color](?path=/docs/data-visualizations-color--docs).
 
 </FoundationSection>
 
 <FoundationSection title="Do and don't">
 
-**Show focus with a ring.** The control's fill stays as it is.
+<FoundationSubsection title="Show focus with a ring">
 
 <Canvas of={AccessibilityStories.FocusRing} sourceState="none" />
 
-**Never carry meaning in color alone.** Pair a status color with an icon and a word.
+</FoundationSubsection>
+
+<FoundationSubsection title="Never carry meaning in color alone">
 
 <Canvas of={AccessibilityStories.StatusNotColorAlone} sourceState="none" />
+
+</FoundationSubsection>
 
 </FoundationSection>
 

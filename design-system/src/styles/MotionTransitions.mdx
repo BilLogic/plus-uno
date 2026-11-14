@@ -28,15 +28,11 @@ import * as PopupStories from '../components/overlays-and-layering/Popup/Popup.s
 To tell the Between places transitions apart, look at the Breadcrumb:
 
 - It gets longer or shorter: **Drill into and climb back out**.
-- It stays the same length but your place in an ordered set changes: **Step to the next or previous**.
+- It stays the same length while your place in an ordered set changes: **Step to the next or previous**.
 - Tabs change: **Switch views**.
 - It is replaced by an unrelated one: **Go to another area**.
 
-In running text, Drill, Step and Go to stand for the full names. Tokens drop the `motion.` prefix (`spatial.fast`); their values are on Physics.
-
-Each transition gives what the move tells the person, when to use it and when not, a PLUS case, what triggers it, and how it moves: one timeline where spatial, appearance and linear rows play together. Per-component motion is in each component's Motion section.
-
-Every demo draws its paths from start to landing first, then plays, and has a speed control. Each Don't is the same scene with one rule broken.
+In running text, Drill, Step and Go to stand for the full names. Tokens drop the `motion.` prefix (`spatial.fast`); their values live on [Physics](?path=/docs/foundations-expression-motion-physics--docs). Per-component motion lives in each component's Motion section.
 
 </FoundationSection>
 
@@ -48,17 +44,18 @@ The person ends up somewhere else. Each transition in this group starts from a s
 
 <Canvas of={TransitionStories.TreeGoTo} sourceState="none" />
 
-**Tells the person:** this is a different area; nothing here relates to where you were.
-
-**When:** moving between Sidebar areas, such as Toolkit to Admin.
-
-**Not:** if the new view sits inside the current one, it is Drill.
-
-**Breadcrumb:** replaced.
-
-**PLUS case:** Sidebar from Sessions to Tutors.
-
-**Triggered by:** a Sidebar click, browser back.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'Breadcrumb', 'PLUS case']}
+    rows={[
+        [
+            'This is a different area; nothing here relates to where you were.',
+            'Moving between Sidebar areas (Sessions to Tutors).',
+            'If the new view sits inside the current one, it is Drill.',
+            'Replaced.',
+            'Sidebar click, browser back.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
@@ -69,7 +66,7 @@ The person ends up somewhere else. Each transition in this group starts from a s
     ]}
 />
 
-Never a slide, which would suggest the areas sit side by side, and never a cut. The Sidebar itself doesn't move. From the keyboard, a menu opens with no animation.
+Never a slide (which suggests the areas sit side by side) and never a cut. The Sidebar itself does not move.
 
 <Canvas of={FrameStories.MotionGoToArea} sourceState="none" />
 
@@ -79,19 +76,18 @@ Never a slide, which would suggest the areas sit side by side, and never a cut. 
 
 <Canvas of={TransitionStories.TreeDrill} sourceState="none" />
 
-**Tells the person:** you went one level deeper, and the way back is the way you came.
-
-**When:** opening one record or item from a list, card or overview, or opening a focused task from the work you're in.
-
-**Not:** a quick look that leaves the page in place is Open an overlay.
-
-**Breadcrumb:** gains a level going in, loses one coming back. A focused task has no Breadcrumb; it still counts as a Drill.
-
-**PLUS case:** a session row in a tutor's record; Log a session from a button.
-
-**Triggered by:** a row or button, the Breadcrumb, browser back.
-
-**Depth 1: the row grows into the record.**
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'Breadcrumb', 'PLUS case']}
+    rows={[
+        [
+            'You went one level deeper, and the way back is the way you came.',
+            'Opening one record or item from a list, card or overview, or opening a focused task.',
+            'A quick look that leaves the page in place is Open an overlay.',
+            'Gains a level going in, loses one coming back.',
+            'Session row in a tutor’s record; Log a session.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
@@ -103,19 +99,19 @@ Never a slide, which would suggest the areas sit side by side, and never a cut. 
     ]}
 />
 
-The row is the thing the person chose, so the row becomes the page: its own bars fade as it grows, and the record's content fades in only once the container has shown where it is going. Nothing inside travels; the container is the only mover. People drill many times a day, so the grow runs on `spatial.default`, one speed under its page size: a slower grow repeated all day reads as a delay. Back reverses it one speed faster, on `spatial.fast`, and the list returns at the same scroll position with that row briefly lit.
+The row becomes the page: its own bars fade as it grows, and the record's content fades in once the container shows where it is going. Because people drill many times a day, the grow runs on `spatial.default`, and Back reverses it one speed faster on `spatial.fast`, returning the list at the same scroll position with that row briefly lit.
 
 <Canvas of={FrameStories.MotionDrillAndClimb} sourceState="none" />
 
-**Deeper levels: the same rule, because PLUS is shallow.** The row or card the person clicked grows into its page: the session row in a tutor's record grows into the session page, and the Breadcrumb arrives one level longer. This container transform is for shallow hierarchies, and PLUS is at most three levels deep (area, record, one record inside it), so the rule holds at every level we have. A flow that needs a fourth level is a hierarchy to flatten, not a fourth grow. On a desktop with a fixed Sidebar a page never slides in: a slide reads as a floating Panel opening, not a deeper place.
+PLUS is at most three levels deep (area, record, one record inside it), so the same container transform holds at deeper levels. On a desktop with a fixed Sidebar a page never slides in: a slide reads as a floating Panel opening.
 
 <Canvas of={FrameStories.MotionDrillDeeper} sourceState="none" />
 
-Climbing back one level shrinks the page into the row it came from. Jumping back two or more levels, past a page that is no longer on screen, is a fade in place with the Breadcrumb already shorter: there is no row to shrink into.
+Climbing back one level shrinks the page into the row it came from. Jumping back two or more levels, past a page no longer on screen, fades in place with the Breadcrumb already shorter.
 
 <Canvas of={FrameStories.MotionClimbTwoLevels} sourceState="none" />
 
-**Focused task.** Opening a focused task (Log a session) changes the frame itself: the Sidebar leaves and Frame · focused takes the whole window. A change of frame is a clean fade in place, not a grow and not a slide: the page and the Sidebar fade out together on `appearance.fast`, then the task (header with × and the title, step list, form and bottom bar) fades in on `appearance.default`. The trigger doesn't matter: a button, a row's menu item or a link all open the task the same way, because the frame changes, not the thing pressed. Moving between steps is Step: with the steps down the left, the body slides up. Leaving through × or Cancel with unsaved work asks first in a Modal, then reverses one speed faster. Finishing carries on forward to the new record and a Flag confirms.
+**Focused task.** Opening a focused task (Log a session) replaces the frame itself: the page and Sidebar fade out together on `appearance.fast`, then Frame · focused fades in on `appearance.default`. Moving between steps is Step; leaving with unsaved work confirms in a Modal, then reverses one speed faster.
 
 <Canvas of={FrameStories.MotionFocusedTask} sourceState="none" />
 
@@ -127,17 +123,18 @@ Climbing back one level shrinks the page into the row it came from. Jumping back
 
 <Canvas of={TransitionStories.TreeSwitch} sourceState="none" />
 
-**Tells the person:** the same thing, seen another way.
-
-**When:** page tabs, such as a session's Overview, Notes and Reflection.
-
-**Not:** an ordered set is Step. Pill views, the format switch and the view dropdown are Swap content in place, because they filter the same content rather than switching between peers: a fill glides, and the content swaps.
-
-**Breadcrumb:** unchanged.
-
-**PLUS case:** a session's Overview, Notes and Reflection tabs.
-
-**Triggered by:** the tab bar, arrow keys within it.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'Breadcrumb', 'PLUS case']}
+    rows={[
+        [
+            'The same thing, seen another way.',
+            'Page tabs, such as a session’s Overview, Notes and Reflection.',
+            'An ordered set is Step; pill filters and format switches are Swap content in place.',
+            'Unchanged.',
+            'Tab bar click or arrow keys.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
@@ -148,7 +145,7 @@ Climbing back one level shrinks the page into the row it came from. Jumping back
     ]}
 />
 
-The views are peers in a row, so the bodies move sideways as a group and nothing fades: a fade on the slide would read as going deeper. In Reduced mode the slide becomes an `appearance.fast` fade.
+Because the views are peers in a row, the bodies move sideways as a group without fading; in Reduced mode the slide becomes an `appearance.fast` fade.
 
 <Canvas of={PageStories.MotionSwitchViews} sourceState="none" />
 
@@ -158,34 +155,28 @@ The views are peers in a row, so the bodies move sideways as a group and nothing
 
 <Canvas of={TransitionStories.TreeStep} sourceState="none" />
 
-**Tells the person:** the next one in line, and where you are in the set.
-
-**When:** an ordered set where the Breadcrumb keeps its length: form steps, paging, one week to the next, one student's reflection after another.
-
-**Not:** going deeper is Drill; another area is Go to.
-
-**Breadcrumb:** unchanged; the position label changes ("2 of 4").
-
-**PLUS case:** reflection questions 1 of 4; Schedule, this week to next week.
-
-**Triggered by:** Next and Back, arrow keys, swipe on touch.
-
-**The body moves on the same axis as the step list.** The move must match where the steps sit on screen.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'Breadcrumb', 'PLUS case']}
+    rows={[
+        [
+            'The next one in line, and where you are in the set.',
+            'An ordered set: form steps, paging, one week to the next, reflection questions.',
+            'Going deeper is Drill; another area is Go to.',
+            'Unchanged; position label changes ("2 of 4").',
+            'Reflection 1 of 4; Schedule week to week.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['Steps sit', 'Body', 'Token']}
     rows={[
-        ['Across the top (a horizontal ProgressTracker; in Frame · focused, four steps or fewer), paging, Schedule weeks, Carousel', 'Old and new slide together, sideways, no fade (as Switch views)', 'By size; step states change in place on appearance.fast'],
-        ['Down a side (a vertical ProgressTracker; in Frame · focused, five steps or more; reflection questions in a side list)', 'Old and new slide together, vertically, no fade: Next brings the new step up from below, Back brings it down from above', 'By size; step states change in place on appearance.fast'],
+        ['Across the top (horizontal ProgressTracker, ≤4 steps, paging, Schedule weeks, Carousel)', 'Old and new slide together sideways, no fade', 'By size; step states change in place on appearance.fast'],
+        ['Down a side (vertical ProgressTracker, ≥5 steps, reflection questions in a side list)', 'Old and new slide together vertically, no fade: Next brings the new step up from below', 'By size; step states change in place on appearance.fast'],
     ]}
 />
 
-Step states change in place, at the same moment the body starts: the step just left becomes visited and the next becomes current, both on `appearance.fast`, and the steps after it stay unvisited. Nothing travels along the ProgressTracker.
-
-**Where the steps sit** is a Frame · focused rule: four steps or fewer run across the top, five or more go down a left Section side. Two edges keep the motion honest:
-
-- **Placement is set once, when the task opens,** by the longest path the flow can take. A branch that adds a step never moves the ProgressTracker from the top to the side mid-task; that would break the axis the body slides on.
-- **Fit can push top to side, never the reverse.** Four steps whose labels would truncate across the top go down the side instead, where the wider side fits long labels. This too is decided at open. The position label ("2 of 4") swaps on `appearance.fast`. The header, Sidebar and step list never move.
+The body moves on the same axis as the step list, and step states change in place on `appearance.fast`. Placement (top for four steps or fewer, side for five or more or when labels would truncate) is fixed when the task opens so a branch never changes the slide axis mid-task.
 
 <Canvas of={FrameStories.MotionStepAcross} sourceState="none" />
 
@@ -199,17 +190,21 @@ Step states change in place, at the same moment the body starts: the step just l
 
 <FoundationSection title="Within a place">
 
-The person stays where they are. Something on the page changes.
+The person stays where they are; something on the page changes.
 
 <FoundationSubsection title="Scroll to a spot on the page">
 
-**Tells the person:** you're still on this page; here is the spot.
-
-**When:** the destination is on the current page: a heading outline link, a link to one comment.
-
-**Not:** another page is Go to or Drill.
-
-**PLUS case:** the heading outline's "Escalation" link scrolls there and marks the heading.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'PLUS case']}
+    rows={[
+        [
+            'You’re still on this page; here is the spot.',
+            'A heading outline link or a link to one comment on the current page.',
+            'Another page is Go to or Drill.',
+            'Heading outline "Escalation" link scrolls and marks the heading.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
@@ -219,7 +214,7 @@ The person stays where they are. Something on the page changes.
     ]}
 />
 
-In Reduced mode the page does not travel: the content at the new position fades in on `appearance.fast`, and the destination is still marked. Never a cut.
+In Reduced mode the page does not travel: the content at the new position fades in on `appearance.fast` and the destination is marked.
 
 <Canvas of={PageStories.MotionScrollToSpot} sourceState="none" />
 
@@ -227,13 +222,17 @@ In Reduced mode the page does not travel: the content at the new position fades 
 
 <FoundationSubsection title="Swap content in place">
 
-**Tells the person:** the frame is the same; what's inside it changed.
-
-**When:** the container stays and its content changes as a whole: a view pill or the view dropdown, a filter that replaces most of a list, a confirm replacing a form inside a Modal, Previous and Next inside a Panel.
-
-**Not:** if one item changes, it is Add or remove, or Update a value.
-
-**PLUS case:** Sessions, switching the filter from This week to Last month.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'PLUS case']}
+    rows={[
+        [
+            'The frame is the same; what’s inside it changed.',
+            'A view pill, a filter that replaces most of a list, a confirm replacing a form in a Modal, Previous/Next in a Panel.',
+            'If one item changes, it is Add or remove, or Update a value.',
+            'Sessions filter from This week to Last month.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
@@ -245,21 +244,23 @@ In Reduced mode the page does not travel: the content at the new position fades 
     ]}
 />
 
-The old content is gone before the new arrives, so one clean frame sits between them. A cross-fade shows both at half strength and reads as mud.
-
 <Canvas of={TransitionStories.SwapContent} sourceState="none" />
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Add or remove an item">
 
-**Tells the person:** one thing joined or left, and the others made room.
-
-**When:** one item joins or leaves a list or grid in the page.
-
-**Not:** above the page it is Open an overlay. If most of the list changes, it is Swap content in place.
-
-**PLUS case:** adding a session to the list; opening Maya's record adds her to the Sidebar's open items; a late call-off warning appears in a form.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'PLUS case']}
+    rows={[
+        [
+            'One thing joined or left, and the others made room.',
+            'One item joins or leaves a list or grid in the page (rows, SectionMessage, Banner).',
+            'Above the page is Open an overlay; replacing most of a list is Swap content.',
+            'Adding a session; opening a record adds it to Sidebar open items.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
@@ -272,44 +273,38 @@ The old content is gone before the new arrives, so one clean frame sits between 
     ]}
 />
 
-In a grid, the others slide along their row and wrap.
-
 <Canvas of={TransitionStories.AddAnItem} sourceState="none" />
 
 <Canvas of={TransitionStories.RemoveAnItem} sourceState="none" />
-
-**Used in:** Sidebar open items, SectionMessage, Banner (it pushes the page, so it lives on the page's layer), Table rows, Toolkit resource tiles.
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Reorder items">
 
-**Tells the person:** the same items, in a new order.
-
-**When:** sorting, or dragging an item to a new place in the same set.
-
-**Not:** if items join or leave, it is Add or remove.
-
-**PLUS case:** sorting Students by last session; dragging a session to another time slot.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'PLUS case']}
+    rows={[
+        [
+            'The same items, in a new order.',
+            'Sorting, or dragging an item to a new place in the same set.',
+            'If items join or leave, it is Add or remove.',
+            'Sorting Students by last session; dragging a session to another slot.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
     rows={[
-        ['Each item', 'moves to its new place: straight along the column in a list, x then y in a grid', <C>spatial.default</C>, 'Staggered: 20 ms apart, or 500 ms ÷ items if that is shorter'],
+        ['Each item', 'moves to its new place: straight along the column in a list, x then y in a grid', <C>spatial.default</C>, 'Staggered: 20 ms apart, or 500 ms ÷ items if shorter'],
     ]}
 />
 
-A dragged item follows the pointer by weight: a chip on `spatial.fast`, a card on `spatial.default`, never bouncing. On drop it settles on `spatial.fast`, started from the release velocity, while its neighbors close up on `spatial.default`. Under Reduced motion nothing travels: what moved fades in place on `appearance.fast`, in the same order.
-
-The first figure is a sort.
+A dragged item follows the pointer by weight (`spatial.fast` for a Tag, `spatial.default` for a card) and settles on `spatial.fast` from the release velocity while neighbors close up on `spatial.default`. With the keyboard, Space picks up the grab handle, arrow keys move it (including across lists), Space drops it and Escape cancels.
 
 <Canvas of={TransitionStories.ReorderItems} sourceState="none" />
 
-Drag a card to another place in the list, or use its grab handle: Space picks it up, the arrow keys move it, Space drops it and Escape puts it back. A live region says where it is.
-
 <Canvas of={TransitionStories.ReorderDragDemo} sourceState="none" />
-
-Between two lists the dropped item takes the place it lands on, and both lists close up. The arrow keys cross from one list to the other.
 
 <Canvas of={TransitionStories.DragBetweenListsDemo} sourceState="none" />
 
@@ -317,13 +312,17 @@ Between two lists the dropped item takes the place it lands on, and both lists c
 
 <FoundationSubsection title="Expand and collapse">
 
-**Tells the person:** more of the same thing, revealed from where it was hidden.
-
-**When:** something on the page grows to show more, or shrinks: a disclosure row, the Search icon opening into a field, the Filter button widening for its first count, the full-width toggle.
-
-**Not:** if new content arrives from elsewhere, it is Load content.
-
-**PLUS case:** "Escalate this session" reveals the reason field in a reflection.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'PLUS case']}
+    rows={[
+        [
+            'More of the same thing, revealed from where it was hidden.',
+            'A disclosure row, Search icon opening into a field, Filter button widening for its count.',
+            'If new content arrives from elsewhere, it is Load content.',
+            '"Escalate this session" reveals the reason field.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
@@ -335,8 +334,6 @@ Between two lists the dropped item takes the place it lands on, and both lists c
     ]}
 />
 
-A row expanding and a Select opening are the same reveal; size sets the speed. Closing reverses it on the same token, with the detail fading first.
-
 <Canvas of={AccordionStories.MotionOpenClose} sourceState="none" />
 
 <Canvas of={AccordionStories.MotionReduced} sourceState="none" />
@@ -345,15 +342,17 @@ A row expanding and a Select opening are the same reveal; size sets the speed. C
 
 <FoundationSubsection title="Load content">
 
-**Tells the person:** something is coming, and the page won't jump when it arrives.
-
-**When:** content is being fetched, then arrives. The wait and the arrival are one transition.
-
-**Not:** saving is not loading; nothing new arrives. That is Update a value or state.
-
-**PLUS case:** the Admin dashboard loading.
-
-Pick the signal by how long the wait is:
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'PLUS case']}
+    rows={[
+        [
+            'Something is coming, and the page won’t jump when it arrives.',
+            'Content is fetched, then arrives.',
+            'Saving is Update a value or state.',
+            'The Admin dashboard loading.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['Wait', 'Signal']}
@@ -374,7 +373,7 @@ Pick the signal by how long the wait is:
     ]}
 />
 
-Load order: the frame and navigation, then headings and text, then data, then the primary action, then charts, which may wait until scrolled to. Content may fade in over the Skeleton; this is one of the few true crossfades. A button that starts a load keeps its width: its label fades out, a Spinner fades in, and the same button confirms when done.
+A button that starts a load keeps its width: its label fades out, a Spinner fades in, and the same button confirms when done.
 
 <Canvas of={TransitionStories.LoadContent} sourceState="none" />
 
@@ -388,15 +387,17 @@ Something joins the page from above or beside it.
 
 <FoundationSubsection title="Open and close an overlay">
 
-**Tells the person:** this sits on top for now; the page underneath is untouched.
-
-**When:** a Modal, Popup, floating Panel, Flag or Tooltip appears.
-
-**Not:** if it takes space beside the page, it is Dock and undock. If it goes one level deeper and has its own Breadcrumb level, it is Drill.
-
-**PLUS case:** call-off. The confirm Modal opens; Cancel reverses its entrance, Confirm carries on.
-
-Each overlay moves by its layer; the full enter and exit for each is in the component's Motion section.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'PLUS case']}
+    rows={[
+        [
+            'This sits on top for now; the page underneath is untouched.',
+            'A Modal, Popup, floating Panel, Flag or Tooltip appears.',
+            'Taking space beside the page is Dock and undock; a deeper Breadcrumb level is Drill.',
+            'Call-off confirm Modal: Cancel reverses, Confirm carries on.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['Component', 'Enter', 'Exit']}
@@ -409,25 +410,17 @@ Each overlay moves by its layer; the full enter and exit for each is in the comp
     ]}
 />
 
-A Modal opens only from something the person did, never by itself. Focus moves to its first input as the motion starts and stays in the Modal until it closes. One Modal at a time: a confirm replaces its content in place (Swap content), never a second Modal. Scale is for floating layers only; nothing inside a page scales on entry.
-
-**Modal.**
+A Modal opens only from user action, moves focus to its first input as the motion starts, and never stacks a second Modal (a confirm swaps content in place). Scale is for floating layers only.
 
 <Canvas of={ModalStories.MotionOpenClose} sourceState="none" />
 
 <Canvas of={ModalStories.MotionReduced} sourceState="none" />
 
-**Popup.** The component's own motion is its live story: click Details to open it, press Escape to close it.
-
 <Canvas of={PopupStories.OpensAndCloses} sourceState="none" />
-
-**Flag.**
 
 <Canvas of={TransitionStories.FlagOpens} sourceState="none" />
 
 <Canvas of={TransitionStories.FlagCloses} sourceState="none" />
-
-**Cancel reverses, Confirm carries on.** Cancel plays the entrance backward, one speed faster, and nothing else changes. Confirm fades the Modal, recolors the row's status and brings a Flag in.
 
 <Canvas of={TransitionStories.ConfirmOrCancel} sourceState="none" />
 
@@ -435,13 +428,17 @@ A Modal opens only from something the person did, never by itself. Focus moves t
 
 <FoundationSubsection title="Dock and undock a panel">
 
-**Tells the person:** this sits beside your work, and your work made room for it.
-
-**When:** a panel takes space beside the page: the AI Panel.
-
-**Not:** if it floats above the page, it is Open an overlay.
-
-**PLUS case:** the AI Panel docks on the right of Sessions and the table narrows.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'PLUS case']}
+    rows={[
+        [
+            'This sits beside your work, and your work made room for it.',
+            'A panel takes space beside the page.',
+            'Floating above the page is Open an overlay.',
+            'The AI Panel docks on the right of Sessions and the table narrows.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
@@ -451,8 +448,6 @@ A Modal opens only from something the person did, never by itself. Focus moves t
         ['Panel content', 'opacity in', <C>appearance.fast</C>, 'When the page is about 90% done making room'],
     ]}
 />
-
-A panel on the page's layer pushes and resizes the page; one above it slides over the page with no Backdrop. Below the docking width the Panel slides over with a Backdrop. A quick look promoted to its record page grows from the floating Panel itself instead of closing first.
 
 <Canvas of={TransitionStories.DockAPanel} sourceState="none" />
 
@@ -466,13 +461,17 @@ Nothing moves place. One element answers, or asks to be looked at.
 
 <FoundationSubsection title="Update a value or state">
 
-**Tells the person:** this value changed.
-
-**When:** a status, Saving to Saved, a count.
-
-**Not:** if the element joins or leaves, it is Add or remove.
-
-**PLUS case:** a shift swap is accepted and the session goes from Called off to Covered.
+<RefTable
+    head={['Tells the person', 'When', 'Not', 'PLUS case']}
+    rows={[
+        [
+            'This value changed.',
+            'A status, Saving to Saved, or a count.',
+            'If the element joins or leaves, it is Add or remove.',
+            'Shift swap accepted: session goes from Called off to Covered.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
@@ -483,19 +482,22 @@ Nothing moves place. One element answers, or asks to be looked at.
     ]}
 />
 
-A number never overshoots.
-
 <Canvas of={TransitionStories.UpdateAValue} sourceState="none" />
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Call attention">
 
-**Tells the person:** look here.
-
-**When:** the row you just jumped to, a warning that appeared, a field that needs fixing.
-
-**PLUS case:** Scroll to "Escalation" marks the heading.
+<RefTable
+    head={['Tells the person', 'When', 'PLUS case']}
+    rows={[
+        [
+            'Look here.',
+            'The row you jumped to, a warning that appeared, a field that needs fixing.',
+            'Scroll to "Escalation" marks the heading.',
+        ],
+    ]}
+/>
 
 <RefTable
     head={['What', 'Property', 'Token', 'Starts']}
@@ -505,14 +507,12 @@ A number never overshoots.
     ]}
 />
 
-It plays once. Repeating motion belongs to loading, never to attention. Color, icon and message always carry the meaning, so Reduced mode loses nothing.
+It plays once: repeating motion belongs to loading, never to attention.
 
 <Canvas of={TransitionStories.CallAttention} sourceState="none" />
 
-**Errors.** The one place PLUS shakes:
-
 <RefTable
-    head={['Case', 'When it shows', 'What moves', 'Shake']}
+    head={['Error case', 'When it shows', 'What moves', 'Shake']}
     rows={[
         ['Leaving a field', 'When focus leaves it; once red, it rechecks while typing', 'The message makes room, then fades in; it clears the moment the field is fixed', 'No'],
         ['Typing', 'Never before the field is left; a code only when complete', 'Nothing', 'No'],
@@ -524,17 +524,11 @@ It plays once. Repeating motion belongs to loading, never to attention. Color, i
     ]}
 />
 
-Prevent errors first: pickers, dropdowns, radios and number inputs with limits wherever the value has a fixed set or range. Keep submit enabled until the form is sent; let people act, then show exactly what to fix, rather than disabling the action. One shake, however many fields are wrong. It is one pattern, a spring and not a token, used by Modal, a field with its own button and InlineEdit; its numbers are on Physics. Errors make no sound. In Reduced mode there is no shake: color, icon, message, the focus move and a screen-reader announcement carry it.
-
-**A field.** The Do checks when focus leaves; the Don't flags the person while they type.
+One shake at most, however many fields are wrong, and errors make no sound. In Reduced mode there is no shake: color, icon, message and focus carry it.
 
 <Canvas of={TransitionStories.ErrorInAField} sourceState="none" />
 
-**A Modal.** A failure that is the system's gets a message that makes room, never a shake.
-
 <Canvas of={TransitionStories.ErrorInAModal} sourceState="none" />
-
-**A page.** A page gets a summary at the top and focus on the first error, never a shake.
 
 <Canvas of={TransitionStories.ErrorOnAPage} sourceState="none" />
 
