@@ -79,7 +79,7 @@ Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set 
 
 <FoundationSection title="Font Awesome Free and color tokens">
 
-Use Font Awesome Free 7.2 only: `fa-solid`, `fa-regular` and `fa-brands` (such as `fa-brands fa-figma` and `fa-brands fa-github`). Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are unlicensed and render blank. Regular is the default weight; solid is used where Free has no regular glyph. Where one set of icons needs a glyph Free draws only in solid, that one glyph is solid and the rest stay regular. Always use current glyph names rather than legacy aliases (`calendar-days`, not `calendar-alt`).
+Use Font Awesome Free 7.2 only: `fa-solid`, `fa-regular` and `fa-brands` (such as `fa-brands fa-figma` and `fa-brands fa-github`). Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are unlicensed and render blank, so check a glyph name against the Free set first. Regular is the default weight; solid is used where Free has no regular glyph. Where one set of icons needs a glyph Free draws only in solid, that one glyph is solid and the rest stay regular. Always use current glyph names rather than legacy aliases (`calendar-days`, not `calendar-alt`).
 
 <Canvas of={IconsStories.Families} sourceState="none" />
 
@@ -95,7 +95,7 @@ Color icons with `--ds-icon-*` tokens (`--ds-icon-success`, `--ds-icon-danger`, 
     head={['Component', 'Job']}
     rows={[
         [<DocsLink id="components-images-and-icons-icon">Icon</DocsLink>, 'Backs up a text label at 12, 16 or 24.'],
-        [<DocsLink id="components-images-and-icons-tile">Tile</DocsLink>, 'Frames an icon, partner/tool logo or picture at 20 to 48.'],
+        [<DocsLink id="components-images-and-icons-tile">Tile</DocsLink>, 'Frames an icon, partner/tool logo or picture at 16 to 48.'],
         [<DocsLink id="components-images-and-icons-logo">Logo</DocsLink>, 'Marks PLUS itself.'],
         [<DocsLink id="components-images-and-icons-image">Image</DocsLink>, 'Places a photo or graphic in content.'],
     ]}

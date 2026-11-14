@@ -32,7 +32,7 @@ export const Sample = ({ font, weight, children = 'Tutors plan the week from her
 
 <FoundationSection title="Overview">
 
-PLUS uses Noto Serif (500) for headings 20 to 32, Noto Sans for headings 12 to 16, metrics and body text, and Noto Sans Mono for code. Pick a style by its role on the page, never by how big it looks.
+PLUS uses Noto Serif (500) for headings 20 to 32, Noto Sans for headings 12 to 16, metrics and body text, and Noto Sans Mono for code. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
 font: var(--heading-medium);
@@ -109,7 +109,7 @@ Markup without its own stylesheet can use the generated utility classes (`.headi
 
 <FoundationSection title="Heading levels">
 
-Headings step down one size per nesting level; containers use a fixed title size. Reserve `Heading/xxlarge` (32) and `Heading/xlarge` (28) for heroes, empty states and metric-heavy dashboards.
+Headings step down one size per nesting level; containers use a fixed title size. Reserve `Heading/xxlarge` (32) and `Heading/xlarge` (28) for heroes, empty states and metric-heavy dashboards, never a page title. Use a heading style rather than bold text or a size change, because heading styles carry the structure assistive technology reads.
 
 <Canvas of={TypographyStories.HeadingLevels} sourceState="none" />
 
@@ -133,6 +133,15 @@ Every page has one `h1` (visually hidden when the topbar or tab strip replaces a
 
 Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
 
+<DoDont>
+<Do caption="Body/default/medium on a button or tab label.">
+<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Save changes</span>
+</Do>
+<Dont caption="Regular or bold weight, or a heading style, on a button or tab label.">
+<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Save changes</span>
+</Dont>
+</DoDont>
+
 <Canvas of={TypographyStories.LabelStyle} sourceState="none" />
 
 </FoundationSection>
@@ -151,7 +160,7 @@ Names and titles truncate; primary content wraps. Never shrink font size to fit 
 
 - **Titles and names** truncate to one line with an ellipsis; expose the full text on hover or in the detail view.
 - **Descriptions** clamp at 3 lines unless configured to wrap.
-- **Session notes, messages and help answers** wrap in full. Table cells truncate by default and opt into wrap per column.
+- **Session notes and help answers** wrap in full. Table cells truncate by default and opt into wrap per column.
 
 <FoundationSubsection title="Truncate a long name to one line">
 

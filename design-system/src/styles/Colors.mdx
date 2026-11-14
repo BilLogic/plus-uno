@@ -68,9 +68,9 @@ Primitives hold raw ramps and stay hidden; bind only semantic tokens. Names read
 
 PLUS ships four modes: light and dark, each at standard and increased contrast. `auto` follows OS `prefers-color-scheme` and `prefers-contrast`.
 
-- **Dark mode** steps raised and overlay surfaces lighter as they rise, because shadows are subtle on dark grounds.
+- **Dark mode** is not light inverted: raised and overlay surfaces step lighter as they rise, because shadows are subtle on dark grounds. Design in dark mode by choosing the same token; never map your own values.
 - **Increased contrast** pushes text to 7:1 and borders, icons and the focus ring to 4.5:1. Tints, surfaces and the Backdrop stay unchanged.
-- **In code**, set `data-color-mode` (`light`, `dark`, `auto`) and `data-contrast-mode` (`no-preference`, `more`, `auto`) on `<html>`.
+- **In code**, set `data-color-mode` (`light`, `dark`, `auto`) and `data-contrast-mode` (`no-preference`, `more`, `auto`) on `<html>`. No attribute means light at standard contrast.
 - **In Figma**, set the frame mode to Light, Dark, Light IC or Dark IC.
 
 <Canvas of={ColorsStories.Modes} sourceState="none" />
@@ -138,7 +138,7 @@ The five SMART tutoring areas each have their own role (`social-emotional` orang
     ]}
 />
 
-Surface levels and shadows are owned by <DocsLink id="foundations-visual-elevation">Elevation</DocsLink>; stroke widths and the focus ring are owned by <DocsLink id="foundations-visual-border">Border</DocsLink>.
+A surface lifts by shadow, never by a different gray. Surface levels and shadows are owned by <DocsLink id="foundations-visual-elevation">Elevation</DocsLink>; stroke widths and the focus ring are owned by <DocsLink id="foundations-visual-border">Border</DocsLink>.
 
 </FoundationSection>
 
@@ -163,7 +163,7 @@ Hover and press step along the token's own ladder. Focus is always a ring, never
 </FoundationExample>
 
 - **Rows, menu items and sidebar items** take `color/background/neutral/subtle/hovered` and `/pressed`.
-- **Selected elements** take `color/background/selected` (`selected/hovered` and `/pressed` on interaction), paired with a second cue such as a check mark or border. Never use brand, link or focused tokens for selection.
+- **Selected elements** take `color/background/selected` (`selected/hovered` and `/pressed` on interaction), paired with a second cue such as a check mark or border. Never use brand, link or focused tokens for selection. Keep selected and focused distinct: selected persists to show a current choice, focus shows where the keyboard is, and a selected item stays recognizable while hovered or pressed.
 - **Fields** take `color/background/input/hovered` with `color/border/input` on hover; on focus they keep their fill and add the focus ring.
 - **Icons** have no hovered or pressed color tokens; show interaction with a subtle neutral background behind the icon.
 - **Avatars and images** whose fill cannot change use `color/interaction/hovered` and `color/interaction/pressed` overlays.
@@ -189,6 +189,7 @@ Every foreground token pairs with a ground that clears WCAG AA across all four m
 - **Bold fills** take `color/text/inverse` and `color/icon/inverse`, except bold warning which takes dark `color/text/warning/inverse`.
 - **Status tints** take the role's text token, or its `-bolder` step on `-subtler` and `-subtle` grounds.
 - **Surfaces** take `color/text/default`, `subtle` or `subtlest`.
+- Never carry meaning by color alone: a status has an icon or a word, and a chart has a legend or direct labels. Use 3:1 for UI essential to understanding.
 
 <Canvas of={ColorsStories.PartnerPairs} sourceState="none" />
 
