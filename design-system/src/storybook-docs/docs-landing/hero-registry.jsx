@@ -95,7 +95,7 @@ export const HEROES = {
   'foundations-visual-iconography': {
     Hero: IconographyHero,
     description:
-      'A set of different icons in one style; the bell drawn on its construction grid.',
+      'A set of different icons in one style, each on its own tile.',
   },
   'foundations-brand-illustrations': {
     Hero: IllustrationsHero,
