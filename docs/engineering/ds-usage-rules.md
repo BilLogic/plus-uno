@@ -95,5 +95,6 @@ Start the page from a template (`Frame` with the PLUS `Sidebar`; `import { Frame
 
 **warn.** A component placed inside a slot or container where a pattern specifies a different control (`design-system/agent-views/_placements.json`): for example, `<Select>` or `<PopupSelect>` (without a `FilterButton` `trigger`) inside a `PatternSection`'s `toolbar` (`PatternSection.Toolbar` / `SectionToolbar`), where the Filtering pattern uses `FilterButton` (for 1–3 quick filters) or `FilterMenu` (for staged multi-category filters).
 
-Use the component the pattern names and read the pattern guide the fix points to (`ds guide filtering`).
+Rows with `before` check direct JSX siblings: a `Banner` before a `PageHeader` belongs in Page's `banner` slot, below its `header` (Notifications).
 
+Use the component the pattern names and read the pattern guide the fix points to.

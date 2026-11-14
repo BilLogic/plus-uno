@@ -8003,6 +8003,24 @@
           "deprecated": null
         },
         {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One PageHeader with the page's h1, actions and tabs. Replaces title.",
+          "deprecated": null
+        },
+        {
+          "name": "banner",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One page Banner below the header. Governed by Notifications (ds guide notifications).",
+          "deprecated": null
+        },
+        {
           "name": "className",
           "type": "string",
           "required": false,
@@ -8042,6 +8060,8 @@
         "StepLarge",
         "Bordered",
         "WithTitle",
+        "HeaderAndBanner",
+        "OptionalSlots",
         "ColorModes",
         "MediumPad",
         "Interactive",

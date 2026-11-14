@@ -35,6 +35,8 @@ const Page = ({
     border = false,
     as: Component = 'div',
     title,
+    header,
+    banner,
     className = '',
     style,
     onClick,
@@ -43,6 +45,7 @@ const Page = ({
 }) => {
     const pageRef = useRef(null);
     const reduced = useMotionReduced();
+    const hasSlots = Boolean(header || banner);
 
     const classes = [
         'plus-pattern-page',
@@ -70,8 +73,9 @@ const Page = ({
 
     return (
         <Component ref={pageRef} id={id} className={classes} style={style} onClick={handleClick} {...props}>
-            {title && <h1 className="plus-pattern-page-title">{title}</h1>}
-            {children}
+            {header ? <div className="plus-pattern-page-header">{header}</div> : title && <h1 className="plus-pattern-page-title">{title}</h1>}
+            {banner && <div className="plus-pattern-page-banner">{banner}</div>}
+            {hasSlots && children != null && children !== false ? <div className="plus-pattern-page-content">{children}</div> : children}
         </Component>
     );
 };
@@ -90,6 +94,10 @@ Page.propTypes = {
     as: PropTypes.elementType,
     /** The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page. */
     title: PropTypes.node,
+    /** One PageHeader with the page's h1, actions and tabs. Replaces title. */
+    header: PropTypes.node,
+    /** One page Banner below the header. Governed by Notifications (ds guide notifications). */
+    banner: PropTypes.node,
     className: PropTypes.string,
     style: PropTypes.object,
     /** Content slot */
