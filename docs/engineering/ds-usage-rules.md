@@ -9,7 +9,7 @@ summary: The escape rules `check:ds-usage` holds consumer code to — one sectio
 
 An **escape** is one place where code in `prototypes/` or `src/` leaves the design system. `npm run check:ds-usage` finds them from the generated manifests (`design-system/agent-views/components.json`, `tokens.json`), so a rule here is only as current as `npm run generate:agent` left those files.
 
-The motion rule also checks component, pattern and template styles under `design-system/src/`.
+The motion rule also checks component, pattern and template styles under `design-system/src/`. Positive MDX code blocks and stories tagged `reference-screen` use the same checker.
 
 Each finding reads `file:line:col  rule-id  message`, then `->` with what to write instead, then a link to its section below. Fix the escape the line names; the suggestion is the nearest real name in the manifest, and where it lists several tokens that hold the same value, pick the one named for the role.
 
@@ -78,7 +78,7 @@ Use the replacement the fix names.
 
 ## ds/page-starts-from-pattern
 
-**warn.** A page-level module whose outer element is a hand-styled container: a `<div>`, `<main>` or `<section>` carrying a `className`, or a `style` with layout in it (display, grid, flex, gap, padding, margin, a width or a height), where a template belongs.
+**fail.** A page-level module whose outer element is a hand-styled container: a `<div>`, `<main>` or `<section>` carrying a `className`, or a `style` with layout in it (display, grid, flex, gap, padding, margin, a width or a height), where a template belongs.
 
 A module is page-level by its path, and nothing else is checked:
 
@@ -87,14 +87,14 @@ A module is page-level by its path, and nothing else is checked:
 - a module named for a page (`SessionsPage.jsx`);
 - the local module an app entry renders as its root (`<Reviews />` from `./Reviews`), one hop.
 
-The outer element is what the default-exported component returns last at its shallowest indent. A fragment and a `*Provider` are stepped through to the child written directly inside; a child behind a condition (`{open && <Fab />}`) is not outermost, and neither is a router or any other component. A bare `<div>` with no class or style carries no layout of its own and passes.
+The outer element is what the default-exported component returns last at its shallowest indent; a reference-screen story checks each inline `render`. A fragment and a `*Provider` are stepped through to the child written directly inside; a child behind a condition (`{open && <Fab />}`) is not outermost, and neither is a router or any other component. A bare `<div>` with no class or style carries no layout of its own and passes.
 
 Start the page from a template (`Frame` with the PLUS `Sidebar`; `import { Frame } from '@/patterns';`, or `Page`, `PatternCard` and the rest from `@/patterns`), and put the hand-made layout inside it if any is still needed.
 
 ## ds/placement
 
-**warn.** A component placed inside a slot or container where a pattern specifies a different control (`design-system/agent-views/_placements.json`): for example, `<Select>` or `<PopupSelect>` (without a `FilterButton` `trigger`) inside a `PatternSection`'s `toolbar` (`PatternSection.Toolbar` / `SectionToolbar`), where the Filtering pattern uses `FilterButton` (for 1–3 quick filters) or `FilterMenu` (for staged multi-category filters).
+**fail.** A component placed inside a slot or container where a pattern specifies a different control. Rows derive from slot acceptance metadata (`design-system/agent-views/_slots.json`): `<Select>` or `<PopupSelect>` (without a `FilterButton` `trigger`) inside a `PatternSection`'s `toolbar` (`PatternSection.Toolbar` / `SectionToolbar`), where the Filtering pattern uses `FilterButton` (for 1–3 quick filters) or `FilterMenu` (for staged multi-category filters).
 
-Rows with `before` check direct JSX siblings: a `Banner` before a `PageHeader` belongs in Page's `banner` slot, below its `header` (Notifications).
+Hand-kept rows with `before` (`_placements.json`) check direct JSX siblings: a `Banner` before a `PageHeader` belongs in Page's `banner` slot, below its `header` (Notifications). This row remains **warn**.
 
 Use the component the pattern names and read the pattern guide the fix points to.

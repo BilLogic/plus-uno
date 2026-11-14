@@ -41,6 +41,7 @@ import { DS_GLOSSARY, aliasInputs, searchAliases } from './ds-vocabulary.mjs';
 import { tokenMatchers } from './inventions.mjs';
 import { stripComments } from './js-comments.mjs';
 import { retiredRenames } from './tokens/plan.mjs';
+import { placementsFromSlots } from './ds-placements.mjs';
 
 /** Where consumer code lives: what the usage checks read and hold to the system. */
 export const CONSUMER_ROOTS = ['prototypes'];
@@ -188,7 +189,10 @@ export function loadFacts(root) {
   const tokenManifest = optional('tokens.json', { tokens: [] });
   const inventions = optional('_inventions.json', { components: [], props: [], tokens: [] });
   const patterns = optional('_patterns.json', { patterns: [] }).patterns;
-  const placements = optional('_placements.json', { placements: [] }).placements;
+  const placements = [
+    ...placementsFromSlots(optional('_slots.json', { slots: [] })),
+    ...optional('_placements.json', { placements: [] }).placements,
+  ];
   const glossaryFile = path.join(root, DS_GLOSSARY);
   const { rows: aliasRows, vocabulary } = searchAliases(
     fs.existsSync(glossaryFile) ? fs.readFileSync(glossaryFile, 'utf8') : '',
@@ -294,7 +298,7 @@ export function loadFacts(root) {
     barrels,
     /** Retired token name → its replacement. */
     retired,
-    /** Component placement rules (`_placements.json`) that `ds/placement` checks. */
+    /** Placement rows derived from slots, plus hand-kept ordering rules. */
     placements,
     /** What the glossary's design-system sections add to search: aliases, and the words and terms left out (`ds-vocabulary.mjs`). */
     vocabulary,

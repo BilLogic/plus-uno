@@ -133,6 +133,7 @@ function fixtureRoot(pages) {
   try {
     fs.mkdirSync(path.join(root, 'design-system/guidelines'), { recursive: true });
     fs.symlinkSync(path.join(REPO_ROOT, 'design-system/src'), path.join(root, 'design-system/src'));
+    fs.symlinkSync(path.join(REPO_ROOT, 'design-system/agent-views'), path.join(root, 'design-system/agent-views'));
     fs.symlinkSync(path.join(REPO_ROOT, 'src'), path.join(root, 'src'));
     for (const [name, text] of Object.entries(pages)) {
       fs.writeFileSync(path.join(root, 'design-system/guidelines', name), text);
@@ -153,6 +154,18 @@ function findingsIn(pages) {
     fs.rmSync(root, { recursive: true, force: true });
   }
 }
+
+test('positive examples reject primitive reads and name semantic replacements', () => {
+  const output = findingsIn({ 'example.md': '```jsx\n<div style={{ gap: "var(--space-0625)" }} />\n```\n' }).join('\n');
+  assert.match(output, /example.md:2.*--space-0625.*primitive/);
+  assert.match(output, /semantic/);
+});
+
+test('positive examples reject not-here tags with a fix', () => {
+  const output = findingsIn({ 'example.md': '```jsx\n<Card />\n<Button text="Open" />\n```\n' }).join('\n');
+  assert.match(output, /example.md:2.*Card.*(?:use|Use).*PatternCard/);
+
+});
 
 test('the checker reads the root it is given, not the repo it lives in', () => {
   // A page that exists only under the fixture root is reported there, with a
@@ -395,4 +408,66 @@ test('fences are lifted out but the prose keeps its line numbers', () => {
   assert.equal(fences[0].startLine, 3);
   assert.equal(tokenClaims(text).find((c) => c.name === '--elevation-light-1').line, 5);
   assert.ok(!prose.includes('--x'), 'fence content must not leak into prose');
+});
+
+
+test('positive examples reject declared deprecated props, while migration examples pass', () => {
+  const root = fixtureRoot({
+    'positive.md': '```jsx\n<Button text="Open" />\n```\n',
+    'migration.md': '```jsx\n// Deprecated: use children instead\n<Button text="Open" />\n```\n',
+  });
+  try {
+    const views = path.join(root, 'design-system/agent-views');
+    fs.unlinkSync(views);
+    fs.mkdirSync(views);
+    for (const name of ['components.json', 'tokens.json', '_inventions.json']) {
+      fs.copyFileSync(path.join(REPO_ROOT, 'design-system/agent-views', name), path.join(views, name));
+    }
+    const file = path.join(views, 'components.json');
+    const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
+    manifest.components.find((c) => c.name === 'Button').props.find((p) => p.name === 'text').deprecated = { replacement: 'children' };
+    fs.writeFileSync(file, JSON.stringify(manifest));
+    const findings = run({ repoRoot: root });
+    assert.ok(findings.some((f) => f.file.endsWith('positive.md') && /text.*deprecated.*children/.test(f.message)));
+    assert.ok(!findings.some((f) => f.file.endsWith('migration.md')));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('negative examples and local component names keep their existing meaning', () => {
+  const output = findingsIn({ 'examples.md': [
+    '# Examples',
+    '## Incorrect',
+    '```jsx',
+    '<Card style={{ gap: "var(--space-0625)" }} />',
+    '```',
+    '## Correct',
+    '```jsx',
+    '<LocalWidget />',
+    '<Button text="Still supported" />',
+    '```',
+  ].join('\n') });
+  assert.deepEqual(output, []);
+});
+
+test('MDX examples reject primitives except in Foundation token-tier documentation', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'mdx-identifiers-'));
+  try {
+    const ds = path.join(root, 'design-system');
+    fs.mkdirSync(path.join(ds, 'src/styles'), { recursive: true });
+    fs.mkdirSync(path.join(ds, 'src/storybook-docs'), { recursive: true });
+    fs.symlinkSync(path.join(REPO_ROOT, 'design-system/agent-views'), path.join(ds, 'agent-views'));
+    fs.writeFileSync(path.join(ds, 'src/styles/tokens.css'), ':root { --space-0625: 10px; }');
+    const example = '```jsx\n<div style={{ gap: "var(--space-0625)" }} />\n```\n';
+    fs.writeFileSync(path.join(ds, 'src/styles/TokensSpacingAndSize.mdx'), example);
+    fs.writeFileSync(path.join(ds, 'src/storybook-docs/Example.mdx'), example);
+    const findings = run({ repoRoot: root });
+    assert.equal(findings.length, 1);
+    assert.equal(findings[0].file, 'design-system/src/storybook-docs/Example.mdx');
+    assert.equal(findings[0].line, 2);
+    assert.match(findings[0].message, /primitive/);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });

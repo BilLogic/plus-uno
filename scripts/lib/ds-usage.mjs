@@ -12,6 +12,8 @@
  * `docs/engineering/ds-usage-rules.md`; a rule's id is its anchor there.
  */
 
+import slotMetadata from '../../design-system/agent-views/_slots.json' with { type: 'json' };
+import { placementsFromSlots } from './ds-placements.mjs';
 import { varReferencePattern } from '../../design-system/src/lib/tokens.mjs';
 import { EXTERNAL, isInterpolated } from '../undefined-tokens.mjs';
 import { blankComments, closeOf, importsOf, jsxElementsOf, literalOf, positionAt, styleObjectsOf } from './jsx-scan.mjs';
@@ -29,23 +31,9 @@ export const RULES = {
   'ds/no-primitive-read': { level: 'fail' },
   'ds/fa-free-only': { level: 'fail' },
   'ds/no-retired-name': { level: 'warn' },
-  'ds/page-starts-from-pattern': { level: 'warn' },
-  'ds/placement': { level: 'warn' },
+  'ds/page-starts-from-pattern': { level: 'fail' },
+  'ds/placement': { level: 'fail' },
 };
-
-const DEFAULT_PLACEMENTS = [
-  {
-    id: 'toolbar',
-    in: ['PatternSection.toolbar', 'PatternSection.Toolbar', 'SectionToolbar'],
-    components: ['Select', 'PopupSelect'],
-    unlessProp: { PopupSelect: 'trigger' },
-    use: ['FilterButton', 'FilterMenu'],
-    pattern: 'Filtering',
-    guide: 'filtering',
-    message: "in a Section's toolbar is a form or view-switch control, not a view-bar filter",
-    fix: 'use FilterButton (1–3 quick filters; pass trigger={<FilterButton … />} to PopupSelect) or FilterMenu (staged multi-category menu); run `ds guide filtering`',
-  },
-];
 
 /** The rule's section in the rules doc, as a link a terminal can open. */
 export const docLink = (rule) => `${RULES_DOC}#${rule.replace('/', '')}`;
@@ -107,7 +95,7 @@ export function contextFrom({
   promoted = new Set(),
   exported = new Set(),
   barrels = {},
-  placements = DEFAULT_PLACEMENTS,
+  placements = placementsFromSlots(slotMetadata),
 }) {
   const byName = new Map(components.components.map((c) => [c.name, c]));
   const tokenByName = new Map(
@@ -204,9 +192,9 @@ const didYouMean = (name, candidates, otherwise) => {
 export function escapesIn({ path, text: raw, page = isPageModule(path) }, ctx) {
   const text = blankComments(raw);
   const found = [];
-  const add = (rule, index, message, fix) => {
+  const add = (rule, index, message, fix, level = RULES[rule].level) => {
     const { line, col } = positionAt(text, index);
-    found.push({ rule, level: RULES[rule].level, file: path, line, col, message, fix });
+    found.push({ rule, level, file: path, line, col, message, fix });
   };
 
   // DS implementation styles own their dimensions and colors. Only motion is
@@ -226,7 +214,7 @@ export function escapesIn({ path, text: raw, page = isPageModule(path) }, ctx) {
     scriptEscapes(text, ctx, add);
     iconEscapes(text, ctx, add);
     tokenEscapes(text, ctx, add);
-    if (page) pageEscapes(text, add);
+    if (page) pageEscapes(text, add, /\.stories\.[jt]sx$/.test(path));
   } else if (STYLE.test(path)) {
     styleEscapes(text, ctx, add);
     tokenEscapes(text, ctx, add);
@@ -411,7 +399,7 @@ function placementEscapes(text, elements, importedNames, namespaces, placements,
       } else if (!spans.some(([s, e]) => el.index >= s && el.index < e)) continue;
       const exemptProp = row.unlessProp?.[comp];
       if (exemptProp && (el.spread || el.attributes.some((a) => a.name === exemptProp))) continue;
-      add('ds/placement', el.index + 1, `\`<${comp}>\` ${row.message}`, row.fix);
+      add('ds/placement', el.index + 1, `\`<${comp}>\` ${row.message}`, row.fix, row.level);
     }
   }
 }
@@ -610,8 +598,8 @@ const LAYOUT_KEYS = /\b(?:display|grid\w*|flex\w*|gap|rowGap|columnGap|(?:paddin
  * `export default X` naming a function or an arrow. An arrow with an expression body is its own range. Null when
  * the module exports no component this can read.
  */
-function defaultComponentOf(text) {
-  const direct = /\bexport\s+default\s+(?:function\s*[\w$]*\s*)?\(/.exec(text);
+function defaultComponentOf(text, story = false) {
+  const direct = (story ? /\brender\s*:\s*(?:function\s*[\w$]*\s*)?\(/ : /\bexport\s+default\s+(?:function\s*[\w$]*\s*)?\(/).exec(text);
   let at = direct ? direct.index + direct[0].length - 1 : -1;
   if (at === -1) {
     const named = /\bexport\s+default\s+([A-Z][\w$]*)\s*;?\s*$/m.exec(text);
@@ -635,7 +623,7 @@ function defaultComponentOf(text) {
   const start = at + /^\s*/.exec(text.slice(at))[0].length;
   if (text[start] !== '{') return arrow ? { start, end: text.length, expression: true } : null;
   // A top-level component closes at the first `}` that starts a line.
-  const close = text.indexOf('\n}', start);
+  const close = story ? closeOf(text, start) - 1 : text.indexOf('\n}', start);
   return { start: start + 1, end: close === -1 ? text.length : close, expression: false };
 }
 
@@ -650,8 +638,8 @@ function jsxAt(text, from) {
  * return at the shallowest indent, a fragment or a `*Provider` stepped
  * through to its first child. Null when there is none to read.
  */
-export function pageRootOf(text) {
-  const body = defaultComponentOf(text);
+export function pageRootOf(text, story = false) {
+  const body = defaultComponentOf(text, story);
   if (!body) return null;
   let at = -1;
   if (body.expression) at = jsxAt(text, body.start);
@@ -711,17 +699,24 @@ export function pagesOf(files) {
   return pages;
 }
 
-function pageEscapes(text, add) {
-  const root = pageRootOf(text);
-  if (!root || !SHELL_TAGS.has(root.name)) return;
-  const className = root.attributes.find((a) => a.name === 'className');
-  const style = root.attributes.find((a) => a.name === 'style');
-  const laidOut = style && (style.value.kind !== 'expression' || !/^\{/.test(style.value.text) || LAYOUT_KEYS.test(style.value.text));
-  if (!className && !laidOut) return;
-  add(
-    'ds/page-starts-from-pattern',
-    root.index,
-    `the page's outer element is a hand-styled \`<${root.name}>\`, not a template`,
-    "start the page from a template: `Frame` with the PLUS `Sidebar` (import { Frame } from '@/patterns'), or `Page` or `PatternCard` (@/patterns)",
-  );
+function pageEscapes(text, add, story = false) {
+  const roots = story
+    ? [...text.matchAll(/\brender\s*:\s*(?:function\s*[\w$]*\s*)?\(/g)].map((m) => {
+      const root = pageRootOf(text.slice(m.index), true);
+      return root && { ...root, index: root.index + m.index };
+    })
+    : [pageRootOf(text)];
+  for (const root of roots) {
+    if (!root || !SHELL_TAGS.has(root.name)) continue;
+    const className = root.attributes.find((a) => a.name === 'className');
+    const style = root.attributes.find((a) => a.name === 'style');
+    const laidOut = style && (style.value.kind !== 'expression' || !/^\{/.test(style.value.text) || LAYOUT_KEYS.test(style.value.text));
+    if (!className && !laidOut) continue;
+    add(
+      'ds/page-starts-from-pattern',
+      root.index,
+      `the page's outer element is a hand-styled \`<${root.name}>\`, not a template`,
+      "start the page from a template: `Frame` with the PLUS `Sidebar` (import { Frame } from '@/patterns'), or `Page` or `PatternCard` (@/patterns)",
+    );
+  }
 }
