@@ -10,9 +10,12 @@
  * `defaultValue` / `onValueChange`; `Accordion` makes the same choice.
  * `isDisabled` is per tab.
  */
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
+import { animate } from 'motion/react';
+import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
+import { useMotionReduced } from '@/lib/motionPreference';
 import './Tabs.scss';
 
 const alignmentClass = (alignment) =>
@@ -111,6 +114,79 @@ const Tabs = ({
      * modifier names its prop: a bare `plus-tabs--default` once meant either,
      * and a default-spacing pill picked up the underline strip's baseline.
      */
+    const rootRef = useRef(null);
+    const listRef = useRef(null);
+    const indicatorRef = useRef(null);
+    const mountedRef = useRef(false);
+    const lastTabRef = useRef(null);
+    const animRef = useRef(null);
+    const reduced = useMotionReduced();
+
+    useLayoutEffect(() => {
+        const rootEl = rootRef.current;
+        const listEl = listRef.current;
+        const indicatorEl = indicatorRef.current;
+        if (!rootEl || !listEl || !indicatorEl) return undefined;
+        const activeEl = listEl.querySelector('[role="tab"][aria-selected="true"]');
+        if (!activeEl) {
+            lastTabRef.current = null;
+            return undefined;
+        }
+        const readBox = (el) => ({
+            el,
+            x: listEl.offsetLeft + el.offsetLeft,
+            y: listEl.offsetTop + el.offsetTop,
+            width: el.offsetWidth,
+            height: el.offsetHeight,
+        });
+        if (!mountedRef.current) {
+            mountedRef.current = true;
+            lastTabRef.current = readBox(activeEl);
+            return undefined;
+        }
+        const prev = lastTabRef.current;
+        const next = readBox(activeEl);
+        if (!prev || prev.el === activeEl) {
+            if (!rootEl.dataset.gliding) lastTabRef.current = next;
+            return undefined;
+        }
+        if (reduced) {
+            animRef.current?.stop?.();
+            delete rootEl.dataset.gliding;
+            lastTabRef.current = next;
+            return undefined;
+        }
+        animRef.current?.stop?.();
+        rootEl.dataset.gliding = 'true';
+        const from = { ...prev };
+        const apply = (p) => {
+            const lerp = (a, b) => a + (b - a) * p;
+            const x = lerp(from.x, next.x);
+            const y = lerp(from.y, next.y);
+            const w = Math.max(0, lerp(from.width, next.width));
+            const h = Math.max(0, lerp(from.height, next.height));
+            indicatorEl.style.transform = `translate(${x}px, ${y}px)`;
+            indicatorEl.style.width = `${w}px`;
+            indicatorEl.style.height = appearance === 'pill' ? `${h}px` : '';
+            lastTabRef.current = { el: activeEl, x, y, width: w, height: h };
+        };
+        apply(0);
+        const anim = animate(0, 1, {
+            ...SPRINGS['spatial.fast'].productive,
+            onUpdate: apply,
+        });
+        animRef.current = anim;
+        Promise.resolve(anim.finished).then(() => {
+            if (animRef.current !== anim) return;
+            animRef.current = null;
+            delete rootEl.dataset.gliding;
+            lastTabRef.current = readBox(activeEl);
+        });
+        return undefined;
+    });
+
+    useLayoutEffect(() => () => { animRef.current?.stop?.(); }, []);
+
     const rootClasses = [
         'plus-tabs',
         `plus-tabs--appearance-${appearance}`,
@@ -123,6 +199,7 @@ const Tabs = ({
 
     return (
         <BaseTabs.Root
+            ref={rootRef}
             id={id}
             defaultValue={defaultActiveKey}
             value={activeKey}
@@ -130,9 +207,10 @@ const Tabs = ({
             className={rootClasses}
             {...props}
         >
+            <span ref={indicatorRef} className="plus-tabs-indicator" aria-hidden="true" />
             {/* `activateOnFocus`: arrow keys move selection immediately;
                 Base UI's own default waits for Enter/Space. */}
-            <BaseTabs.List className={listClasses} activateOnFocus>
+            <BaseTabs.List ref={listRef} className={listClasses} activateOnFocus>
                 {tabs}
             </BaseTabs.List>
             {rest}

@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useMotionReduced } from '@/lib/motionPreference';
+import { findScrollContainer, scrollToSpot } from '@/lib/navigationMotion';
 import './Page.scss';
 
 /**
@@ -35,9 +37,13 @@ const Page = ({
     title,
     className = '',
     style,
+    onClick,
     children,
     ...props
 }) => {
+    const pageRef = useRef(null);
+    const reduced = useMotionReduced();
+
     const classes = [
         'plus-pattern-page',
         `plus-pattern-page-level-${level}`,
@@ -47,8 +53,23 @@ const Page = ({
         className,
     ].filter(Boolean).join(' ');
 
+    const handleClick = (event) => {
+        onClick?.(event);
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const link = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null;
+        if (!link) return;
+        const raw = link.getAttribute('href').slice(1);
+        if (!raw) return;
+        const targetId = decodeURIComponent(raw);
+        const root = pageRef.current;
+        const target = root && targetId ? root.querySelector(`#${CSS.escape(targetId)}`) : null;
+        if (!target) return;
+        event.preventDefault();
+        scrollToSpot(findScrollContainer(root), target, { reduced });
+    };
+
     return (
-        <Component id={id} className={classes} style={style} {...props}>
+        <Component ref={pageRef} id={id} className={classes} style={style} onClick={handleClick} {...props}>
             {title && <h1 className="plus-pattern-page-title">{title}</h1>}
             {children}
         </Component>
