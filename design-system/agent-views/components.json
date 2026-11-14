@@ -3958,21 +3958,21 @@
         },
         {
           "name": "placement",
-          "type": "enum",
+          "type": "oneOf",
           "required": false,
           "default": "'bottom-start'",
           "values": [
-            "bottom-start",
-            "bottom",
-            "bottom-end",
-            "top-start",
             "top",
-            "top-end",
-            "right-start",
+            "bottom",
+            "left",
             "right",
+            "top-start",
+            "top-end",
+            "bottom-start",
+            "bottom-end",
+            "right-start",
             "right-end",
             "left-start",
-            "left",
             "left-end"
           ],
           "description": "Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side.",
@@ -9877,7 +9877,7 @@
         },
         {
           "name": "placement",
-          "type": "enum",
+          "type": "oneOf",
           "required": false,
           "default": "'top'",
           "values": [

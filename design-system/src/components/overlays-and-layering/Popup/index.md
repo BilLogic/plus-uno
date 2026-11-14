@@ -173,7 +173,7 @@ Same group: `Tooltip`
 | `children` | node (required) | — | The popup's body content. |
 | `title` | node | — | Popup title |
 | `label` | string | — | Names the popup for assistive tech when there is no `title`. Falls back to the trigger's own accessible text when neither is given. |
-| `placement` | enum | `'top'` | Popup placement |
+| `placement` | oneOf | `'top'` | Popup placement |
 | `triggerType` | string or arrayOf | `'click'` | Trigger behavior |
 | `defaultShow` | bool | `false` | — |
 | `show` | bool | — | — |

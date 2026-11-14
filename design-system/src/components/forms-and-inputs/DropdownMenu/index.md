@@ -153,7 +153,7 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 | `isOpen` | bool | — | Controlled open state. Pair it with `onOpenChange`; leave it out for an uncontrolled menu. |
 | `defaultOpen` | bool | `false` | Whether an uncontrolled menu starts open. |
 | `onOpenChange` | func | — | Called with the next open state (a boolean) when the menu opens or closes: trigger press, outside click, Escape or picking a row. |
-| `placement` | enum | `'bottom-start'` | Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side. |
+| `placement` | oneOf | `'bottom-start'` | Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side. |
 | `shouldFlip` | bool | `true` | Flips to the opposite side when there isn't room. |
 | `spacing` | enum | `'default'` | `default` draws 32px rows, `compact` draws 24px. |
 | `loading` | bool | `false` | Shows one "Loading options" row, with a spinner, in place of the menu's rows while its options load. Never skeleton rows. |
@@ -168,7 +168,7 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 
 ## Variants
 
-**`placement`** — `bottom-start` · `bottom` · `bottom-end` · `top-start` · `top` · `top-end` · `right-start` · `right` · `right-end` · `left-start` · `left` · `left-end`
+**`placement`** — `top` · `bottom` · `left` · `right` · `top-start` · `top-end` · `bottom-start` · `bottom-end` · `right-start` · `right-end` · `left-start` · `left-end`
 
 **`spacing`** — `default` · `compact`
 
