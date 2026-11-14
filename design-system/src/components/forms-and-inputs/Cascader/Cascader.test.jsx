@@ -57,6 +57,38 @@ describe('Cascader', () => {
         expect(screen.queryByRole('listbox')).toBeNull();
     });
 
+    it('preserves numeric 0 option values when selecting and displaying a path', async () => {
+        const user = userEvent.setup();
+        const zeroOptions = [
+            {
+                label: 'Tier 0',
+                value: 0,
+                children: [
+                    { label: 'Zero', value: 0 },
+                    { label: 'One', value: 1 },
+                ],
+            },
+        ];
+        const committed = [];
+        render(
+            <Harness
+                options={zeroOptions}
+                initial={[0, 1]}
+                onChange={(next) => committed.push(next)}
+            />
+        );
+        const trigger = screen.getByRole('combobox', { name: 'Region' });
+        expect(trigger).toHaveValue('Tier 0 / One');
+
+        await user.click(trigger);
+        const [first, second] = screen.getAllByRole('listbox');
+        expect(within(first).getByRole('option', { name: 'Tier 0' })).toHaveAttribute('aria-selected', 'true');
+        expect(within(second).getByRole('option', { name: 'One' })).toHaveAttribute('aria-selected', 'true');
+
+        await user.click(within(second).getByRole('option', { name: 'Zero' }));
+        expect(committed).toEqual([[0, 0]]);
+    });
+
     it('draws the error border and announces errorMessage when isInvalid', () => {
         render(<Harness isInvalid errorMessage="Pick a region" />);
         const trigger = screen.getByRole('combobox', { name: 'Region' });

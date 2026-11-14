@@ -15,11 +15,11 @@ import { useEffect, useRef, useState } from 'react';
  * @param {boolean} [options.open] the parent's state, to control it
  * @param {boolean} [options.defaultOpen]
  * @param {(open: boolean) => void} [options.onOpenChange]
- * @param {boolean} options.enabled false: `openList` does nothing
+ * @param {boolean} [options.enabled] false: `openList` does nothing
  * @param {() => void} [options.onOpen]
  * @param {() => void} [options.onClose]
  */
-export default function useOpenState({ open, defaultOpen = false, onOpenChange, enabled, onOpen, onClose }) {
+export default function useOpenState({ open, defaultOpen = false, onOpenChange, enabled = true, onOpen, onClose }) {
     const controlled = open !== undefined;
     const [internalOpen, setInternalOpen] = useState(Boolean(defaultOpen));
     const isOpen = controlled ? Boolean(open) : internalOpen;
@@ -43,6 +43,11 @@ export default function useOpenState({ open, defaultOpen = false, onOpenChange, 
         work.current.onClose?.();
     };
 
+    const setOpen = (next) => {
+        if (next) openList();
+        else closeList();
+    };
+
     // A controlled `open` that changes runs the same opening and closing work.
     const lastOpen = useRef(isOpen);
     useEffect(() => {
@@ -53,5 +58,5 @@ export default function useOpenState({ open, defaultOpen = false, onOpenChange, 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen]);
 
-    return { isOpen, openList, closeList };
+    return { isOpen, openList, closeList, setOpen };
 }

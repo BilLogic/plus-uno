@@ -5,6 +5,8 @@ import { Button } from '../Button/Button';
 import { IconButton } from '../IconButton/IconButton';
 import Checkbox from '../Checkbox/Checkbox';
 import Fieldset from '../Fieldset';
+import { normalizeOption } from '../_internal/optionShape';
+import useOpenState from '../_internal/useOpenState';
 import './FilterMenu.scss';
 
 /** Where the menu opens: under its trigger, lined up with the edge on the trigger's side of the bar. */
@@ -18,14 +20,6 @@ export const FILTER_MENU_WIDTHS = ['3-col', '4-col'];
 
 /** Up to this many categories sit side by side; more stack. */
 const MAX_SIDE_BY_SIDE = 3;
-
-/** An option's value and its label. */
-const optionInfo = (option) => {
-    if (typeof option === 'string' || typeof option === 'number') {
-        return { value: option, label: String(option), isDisabled: false };
-    }
-    return { value: option.value, label: option.label ?? String(option.value), isDisabled: Boolean(option.disabled) };
-};
 
 /** Every category present, each with a list of its own (empty when nothing is picked). */
 const normalize = (categories, value) => Object.fromEntries(
@@ -72,22 +66,15 @@ const FilterMenu = ({
     const [internalValue, setInternalValue] = useState(() => normalize(categories, defaultValue));
     const applied = value !== undefined ? normalize(categories, value) : internalValue;
 
-    const [internalOpen, setInternalOpen] = useState(defaultOpen);
-    const isOpen = open !== undefined ? Boolean(open) : internalOpen;
-
     // The values being ticked. Each open starts again from what is applied,
     // whoever opened it, so it is reset when `isOpen` turns true.
     const [draft, setDraft] = useState(applied);
-    const [wasOpen, setWasOpen] = useState(isOpen);
-    if (isOpen !== wasOpen) {
-        setWasOpen(isOpen);
-        if (isOpen) setDraft(applied);
-    }
-
-    const setOpen = (next) => {
-        if (open === undefined) setInternalOpen(next);
-        if (onOpenChange) onOpenChange(next);
-    };
+    const { isOpen, setOpen } = useOpenState({
+        open,
+        defaultOpen,
+        onOpenChange,
+        onOpen: () => setDraft(applied),
+    });
 
     const resolvedLayout = FILTER_MENU_LAYOUTS.includes(layout)
         ? layout
@@ -148,7 +135,7 @@ const FilterMenu = ({
                 {categories.map((category) => (
                     <Fieldset key={category.id} legend={category.label} className="plus-filter-menu__category">
                         {(category.options ?? []).map((option) => {
-                            const { value: optionValue, label: optionLabel, isDisabled } = optionInfo(option);
+                            const { value: optionValue, label: optionLabel, disabled: isDisabled } = normalizeOption(option);
                             return (
                                 <Checkbox
                                     key={optionValue}
