@@ -2,7 +2,7 @@
 
 # FileUpload
 
-FileUpload: a form field that opens the platform file picker. It chooses files; it does not upload them.
+FileUpload: a form field that opens the platform file or folder picker, accepts drops, and displays chosen FileItem rows below the drop zone.
 
 Also asked as: attach file, dropzone, drag and drop file.
 
@@ -10,7 +10,7 @@ Also asked as: attach file, dropzone, drag and drop file.
 
 **Source:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.stories.jsx` — Overview, Content, Styles, InteractionStates, ReadOnly, WithFiles, Interactive, Default, Required, Invalid, Valid, Disabled, KeyboardFocus, InvalidFocus
+**Stories:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.stories.jsx` — Overview, Content, Styles, InteractionStates, Default, AllowFolders, WithFiles, UploadingBatch, DragOver, ReadOnly, Required, Invalid, Valid, Disabled, KeyboardFocus, InvalidFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.mdx`
 
@@ -18,9 +18,9 @@ Also asked as: attach file, dropzone, drag and drop file.
 
 ## Usage
 
-Use a file upload where a form needs a document from the user: a report, an avatar, a signed form. It is a real `input type="file"` with the platform picker behind a styled button; it does not drag and drop and it does not upload.
+Use `FileUpload` where a form needs documents, recordings, or archives from the user. It wraps a native `input type="file"` inside a bordered drop zone, optionally adds a directory picker via `allowFolders`, and renders chosen `FileItem` rows through `children` without taking a `files` prop.
 
-`acceptedFormats` does two jobs from one array: it becomes the input's `accept` filter and, unless you pass your own `description`, the line of help text under the label. `onChange` is the file input's own change event, so the files are at `event.target.files`.
+`acceptedFormats` sets both the input's `accept` filter (including `.zip` when archives are allowed) and, unless you pass `description`, the help text inside the drop zone. While any `FileItem` child has `status="uploading"`, the label row automatically displays `"Uploading <current> of <total>"` at its end.
 
 ## Motion
 
@@ -31,6 +31,12 @@ FileUpload reads these motion tokens and no literal duration or curve.
 | change | Update a value or state | `--ds-motion-appearance-fast` | The drag-over highlight. |
 | progress | Load content | `--ds-motion-linear` | Progress fills with the work. |
 
+## Alternatives
+
+- For a standalone attachment row without a picker, use `FileItem`.
+- For text the user types rather than a file they hold, use `TextField` or `TextArea`.
+- For a message composer that mixes typed text with inline attachments, use `PromptInput`.
+
 ## Best practices
 
 ### State the accepted types and the size limit. {#state-the-accepted-types-and-the-size-limit}
@@ -40,41 +46,36 @@ Say what the field takes before anyone chooses a file. Finding out from an error
 Do: The types and the size limit are stated.
 Don't: No types and no limit.
 
-### Name the action, not the gesture. {#name-the-action-not-the-gesture}
+### Render chosen files as FileItem rows in children. {#render-chosen-files-as-fileitem-rows-in-children}
 
-"Choose a file" works for a click, a tap or a keyboard. "Click here" fails on a phone.
+Show every chosen file or folder below the drop zone as a `FileItem` so the user sees queued, uploading, completed, and failed items in place.
 
-Do: A verb and a noun: Choose a file.
-Don't: A gesture: Click here.
+Do: Chosen file appears below the drop zone as a FileItem row.
+Don't: Choosing a file leaves no visible confirmation of what will be submitted.
+
+### Enable `allowFolders` when users upload multi-file recordings. {#enable-allowfolders-when-users-upload-multi-file-recordings}
+
+Turn on `allowFolders` when a directory of files belongs together, and collapse each chosen or dropped folder into one `FileItem` with `kind="folder"`.
+
+Do: Folder picker enabled and folder shown as one row.
+Don't: Gesture-based button label and no folder support.
 
 ### Say why an upload failed and what to do. {#say-why-an-upload-failed-and-what-to-do}
 
-Name the cause and the fix in one sentence. A bare "Error" sends people back to the start.
+Name the cause and the fix in one sentence, either on the failed `FileItem` row or in `validationMessage` for field-wide rules.
 
 Do: The message names the cause and the fix.
 Don't: No cause and no fix.
 
 ### `accept` is a filter, not a check. {#accept-is-a-filter-not-a-check}
 
-The picker offers the listed types first and every platform lets the user override it. Validate the file after it arrives (type, size and count) and report it through `validation` and `validationMessage`.
-
-### Nothing shows the chosen file. That is yours to render. {#nothing-shows-the-chosen-file-that-is-yours-to-render}
-
-```jsx
-// Incorrect: the button text never changes and the component shows no file
-// name, so after picking a file the form looks exactly as it did before.
-<FileUpload label="Report" onChange={handleFile} />
-
-// Correct.
-<FileUpload label="Report" onChange={(e) => setFile(e.target.files[0])} />
-{file && <p>{file.name}</p>}
-```
+The picker offers the listed types first and every platform lets the user override it. Validate the file after it arrives (type, size, and count) and report field errors through `validation` and `validationMessage`, or per-file failures on `FileItem`.
 
 ### `label` should be a string here. {#label-should-be-a-string-here}
 
 ```jsx
-// Incorrect: the label is also written to the input's aria-label, and a node
-// stringifies. The field ends up named "[object Object]".
+// Incorrect: the label is also written to the input's aria-label when a string
+// is expected. Put qualifications in description instead.
 <FileUpload label={<span>Report <em>(PDF)</em></span>} />
 
 // Correct: put the qualification in the description, which is prose.
@@ -83,47 +84,48 @@ The picker offers the listed types first and every platform lets the user overri
 
 ## Accessibility
 
-- **The control is a real file input.** The label points at it with `htmlFor`, it takes the `accept` and `disabled` attributes, and it fires a genuine change event. All the platform behavior is intact.
-- **It is one control with two tab stops.** The input is hidden at zero size rather than removed, so it stays in the tab order: the keyboard reaches the invisible input first and the visible button second. Focusing either draws the container's focus ring, so the stop is at least visible, but it is two stops, and Enter on the first opens the picker just as the second does.
-- **The description and the message are both attached.** The format rules and the validation message each carry an id and the input points at both, in that order: "PDF, up to 10 MB" is heard before "that file was too large" rather than instead of it. An invalid field also carries `aria-invalid`.
-- **`isRequired` marks the label only.** The asterisk is decorative; the input carries no `required` attribute.
+- **Real file input and keyboard picker.** The `<label>` points at the native `<input type="file">` via `htmlFor`, preserving `accept`, `disabled`, and keyboard activation while outlining the drop zone with the focus ring.
+- **Polite batch announcements.** The `"Uploading 2 of 6"` batch status in the label row carries `role="status"` and `aria-live="polite"` so progress updates are announced without stealing focus.
+- **Attached description and validation.** The format help text and the validation message each carry an id and the input references both in reading order through `aria-describedby`, alongside `aria-invalid` when `validation="invalid"`.
+- **Propagated read-only and disabled states.** `isReadOnly` and `isDisabled` flow to `FileItem` children automatically so non-editable fields expose no stray removal buttons.
 
 ## Related
 
-- For text the user types rather than a file they hold, use Text field or Text area.
-- For the outcome of an upload, use Section message for something the user must act on and Flag for something they only need to know.
-- For progress while the file is going up, use Progress bar.
+- `FileItem`: use when rendering each chosen file or folder inside `FileUpload` or as a standalone attachment row.
+- `ProgressRing`: use when displaying determinate upload percentage inside each uploading `FileItem`.
+- `SectionMessage`: use when an upload outcome requires prominent page-level attention.
+- `Flag`: use when confirming a completed background action without blocking the page.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
-1. **Label.** Names the field. A required marker follows it.
-2. **Description.** Help text, by default the accepted formats.
-3. **Button.** A Button that opens the picker. Absent when read-only.
-4. **Files.** The chosen files, passed as children, below the frame.
-5. **Message.** The validation message, with an icon, under the field.
+1. **Label row.** Names the field, carries the required marker, and displays the batch upload status (`Uploading 2 of 6`) at its end while any `FileItem` child uploads.
+2. **Description.** Help text inside the drop zone, built from `acceptedFormats` when `description` is omitted.
+3. **Picker / drop line.** Either a primary `Button` (`buttonText`) or, with `allowFolders`, the `"Choose files or a folder, or drop them here"` line with inline file and folder triggers. Absent when `isReadOnly`.
+4. **Files (`children`).** `FileItem` rows rendered in one bordered list below the drop zone.
+5. **Message.** The field-level validation message, with an icon, under the list.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Focused | The container takes a `--ds-border-focused` edge and a 2px ring in the same color, drawn when either the input or the button has focus. On an invalid or valid field the ring stays and the status keeps the edge. |
-| Invalid | A `--ds-border-danger` edge and a `--ds-background-danger-subtler` ring; the message takes `--ds-text-danger`, and the input sets `aria-invalid`. |
-| Valid | A `--ds-border-success` edge and a `--ds-background-success-subtler` ring; the message takes `--ds-text-success`. |
-| Read-only | The container takes `--ds-background-neutral` and the button is not drawn. |
-| Disabled | The label and description take `--ds-text-subtle`; the input and button are disabled. |
-
-The button carries its own hovered and pressed steps; the container has none.
+| Rest | 1px `--ds-border` edge around the drop zone at `--card-radius-compact`. |
+| Drag-over | `--ds-background-brand-subtlest` fill and `--ds-border-brand` edge while dragged items hover over the drop zone. |
+| Focused | `--ds-border-focused` edge and a `--focus-ring-width` ring in the same color when the input or picker control holds focus. |
+| Invalid | `--ds-border-danger` edge and a `--ds-background-danger-subtler` ring; the message takes `--ds-text-danger`, and the input sets `aria-invalid`. |
+| Valid | `--ds-border-success` edge and a `--ds-background-success-subtler` ring; the message takes `--ds-text-success`. |
+| Read-only | `--ds-background-neutral` fill, picker controls omitted, and child `FileItem` rows hide their end actions. |
+| Disabled | `--ds-background-disabled` and `--ds-border-disabled` on the drop zone; picker controls and child `FileItem` rows are disabled. |
 
 ### Tokens
 
 | Part | Token |
 | --- | --- |
-| Label, description | `--ds-text`, body default; disabled `--ds-text-subtle`. |
+| Label and batch status | `--ds-text` in `--body-default`; batch status in `--body-small` and `--ds-text-subtle`; disabled `--ds-text-subtle`. |
+| Drop zone container | Padding `--pad-y-md` and `--pad-x-md`; radius `--card-radius-compact`; border `--ds-border`; drag-over `--ds-background-brand-subtlest` and `--ds-border-brand`. |
 | Required marker, error | `--ds-text-danger`, `--ds-icon-danger`. |
 | Success message | `--ds-text-success`, `--ds-icon-success`. |
-| Container | Padding `--pad-y-md` and `--pad-x-md`; radius `--radius-md`; gap `--stack-md`. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width`. |
 
 ## Content guidelines
@@ -146,17 +148,19 @@ The button carries its own hovered and pressed steps; the container has none.
 | `isRequired` | bool | `false` | Shows an asterisk on the label. |
 | `description` | string | — | Help text inside the field, such as size limits. When omitted, it is built from `acceptedFormats`. |
 | `acceptedFormats` | arrayOf | — | — |
-| `isDisabled` | bool | `false` | Disables the button and file input and dims the field. |
-| `isReadOnly` | bool | `false` | Shows the field and its files without a way to choose a file. |
+| `allowFolders` | bool | `false` | Shows the `"Choose files or a folder, or drop them here"` line and enables picking or dropping a folder. |
+| `isDisabled` | bool | `false` | Disables the picker controls and file input and dims the field and its FileItem rows. |
+| `isReadOnly` | bool | `false` | Shows the field and its files without a way to choose or remove files. |
 | `validation` | enum | `'none'` | `none` (default) shows no state, `invalid` draws the error state and `valid` the success state. Pair `invalid` or `valid` with `validationMessage`. |
 | `validationMessage` | string | — | Message shown under the field for the `invalid` or `valid` state. Not shown when `validation` is `none`. |
-| `buttonText` | string | `'Choose a file'` | The label of the choose-file button. Defaults to `Choose a file`. |
+| `buttonText` | string | `'Choose a file'` | The label of the choose-file button when `allowFolders` is false. Defaults to `Choose a file`. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `onChange` | func | — | — |
+| `onDrop` | func | — | Called with the drop event when files or folders are dropped onto the drop zone. |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
-| `children` | node | — | The uploaded-file list, shown below the button and outside the frame. |
+| `children` | node | — | The uploaded-file list (`FileItem` rows), shown below the drop zone and outside the frame. |
 
 ## Variants
 
@@ -166,7 +170,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--card-radius-compact` · `--ds-background-danger-subtler` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border-danger` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--border-default` · `--card-radius-compact` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--inline-md` · `--pad-x-md` · `--pad-y-md` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.scss`. Override these through the token layer, never with a literal.
 

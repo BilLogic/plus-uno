@@ -275,6 +275,10 @@ const preview = {
               "Dropdown menu",
               "Fieldset",
               "File upload",
+              [
+                "File upload",
+                "File item"
+              ],
               "Filter menu",
               "Form",
               "Popup select",

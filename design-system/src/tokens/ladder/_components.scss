@@ -28,6 +28,9 @@
     /* Choice tile */
     --choice-tile-width: var(--size-1400);
 
+    /* File item */
+    --file-item-height: calc(var(--space-300) + var(--space-050));
+
     /* Radio */
     --radio-control-size: 12px;
     --radio-control-size-10: 10px; /* RadioGroup size 10 */

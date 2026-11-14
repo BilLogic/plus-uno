@@ -657,6 +657,14 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'FileItem',
+    tier: 'component',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Row state and action hover transitions.' },
+      progress: { transition: 'Load content', appearance: 'linear', note: 'The uploading ProgressRing fills clockwise with the upload.' },
+    },
+  },
+  {
     name: 'Carousel',
     tier: 'component',
     events: {

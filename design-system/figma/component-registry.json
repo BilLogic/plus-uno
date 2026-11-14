@@ -497,7 +497,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/FileUpload",
         "source": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx",
-        "storybookId": "components-forms-and-inputs-file-upload--docs"
+        "storybookId": "components-forms-and-inputs-file-upload-file-upload--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
