@@ -15,17 +15,22 @@ ScrollBar — a wrapper that applies the Design System's tokenized custom scroll
 ## Usage
 
 Use `ScrollBar` when a region has to scroll inside a page that does not — a long
-list in a fixed panel, a wide table in a narrow column. It is a wrapper: it caps
-the height, turns on overflow, and applies the design system's thin scrollbar so
-the region does not draw the platform's default one.
+list in a fixed panel, a wide table in a narrow column. It caps the height,
+turns on overflow, and applies the design system's thin scrollbar so the region
+does not draw the platform's default one.
 
-`maxHeight` (default twice the `2000` size, 320 tall) caps a vertical region. `horizontal` switches the
-axis, and in that mode `maxHeight` is ignored — the width comes from the
-container.
+`maxHeight` (default twice `--size-1000`) caps a vertical region. `horizontal`
+switches the axis, and in that mode `maxHeight` is ignored — the width comes
+from the container.
+
+## Alternatives
+
+- For a long list that should page rather than scroll, use `Pagination`.
+- For content the user opens rather than scrolls past, use `Accordion`.
 
 ## Best practices
 
-### One scrollbar per region. {#one-scrollbar-per-region}
+### Use one scrollbar per region. {#use-one-scrollbar-per-region}
 
 Two bars side by side suggest two scrolling areas where there is one. Do not nest one region inside another on the same axis.
 
@@ -43,7 +48,7 @@ A region around content that already fits shows no bar and still adds a tab stop
 Do: A region around a list that overflows.
 Don't: A region around two short items.
 
-### It caps the height; it does not fill one. {#it-caps-the-height-it-does-not-fill-one}
+### Use `maxHeight` to cap height, not to fill a taller container. {#use-maxheight-to-cap-height-not-to-fill-a-taller-container}
 
 `maxHeight` is a cap. In a taller container, give the region the height you want it to take, such as `maxHeight="100%"`.
 
@@ -53,8 +58,7 @@ Don't: A smaller cap leaves the space below it empty.
 ### Name each region. {#name-each-region}
 
 ```jsx
-// Incorrect — two scroll regions on a page, both announced as the default
-// "Scrollable content".
+// Incorrect — two scroll regions on a page, both announced as the default "Scrollable content".
 <ScrollBar><SessionList /></ScrollBar>
 <ScrollBar><NoteList /></ScrollBar>
 
@@ -63,32 +67,30 @@ Don't: A smaller cap leaves the space below it empty.
 <ScrollBar aria-label="Notes"><NoteList /></ScrollBar>
 ```
 
-### One axis, not both. {#one-axis-not-both}
+### Scroll on one axis, not both. {#scroll-on-one-axis-not-both}
 
-`horizontal` chooses which axis is styled and which cap applies. A region that
-scrolls both ways is usually a sign the content should be laid out differently —
-a table that needs horizontal scroll inside a page that scrolls vertically is
-the case this handles, and that is one axis each.
+`horizontal` chooses which axis is styled and which cap applies. A table that
+needs horizontal scroll inside a page that scrolls vertically uses one axis on
+each container.
 
 ## Accessibility
 
-- **The region is focusable on purpose.** `tabIndex={0}` is what lets a keyboard
-  user scroll it with the arrow keys, and it is what satisfies the
-  scrollable-region-focusable rule. It is a tab stop, which is the cost of being
-  reachable.
-- **It has a name, and the default is generic.** `aria-label` defaults to
-  "Scrollable content". One per page is tolerable; two are indistinguishable.
-- **It is deliberately not a landmark.** No `role="region"` — a role would make
-  every scroll area a landmark, and several on one page would collide under the
-  unique-landmark rule. The label names the tab stop instead.
+- **The region is focusable on purpose.** `tabIndex={0}` lets a keyboard user
+  scroll it with the arrow keys and satisfies the scrollable-region-focusable
+  rule.
+- **Give multiple regions distinct names.** `aria-label` defaults to
+  "Scrollable content". When a page has more than one scroll region, name each
+  for what it holds.
+- **Not a landmark.** It omits `role="region"` so multiple scroll areas on a
+  page do not collide as landmarks; `aria-label` names the tab stop directly.
 - **Do not hide the last row.** A scroll region whose content ends exactly at the
-  cap looks finished. Leave the cut visible, or the user will not know to scroll.
+  cap looks finished. Leave the cut visible so the reader knows more content sits
+  below.
 
 ## Related
 
-- For a long list that should page rather than scroll, use `Pagination`.
-- For content the user opens rather than scrolls past, use `Accordion`.
-- For a wide data table, put the table in a horizontal `ScrollBar` rather than shrinking its columns — see `Table`.
+- `StaticTable`: use when wrapping a wide data table in a horizontal `ScrollBar` rather than shrinking its columns.
+- `Panel`: use when scrolling body content inside `PanelBody`.
 
 Same group: `Accordion` · `Carousel` · `PageHeader` · `Panel`
 

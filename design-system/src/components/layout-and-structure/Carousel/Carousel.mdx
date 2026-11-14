@@ -43,7 +43,7 @@ export const figmaMeta = {
 <Meta of={CarouselStories} />
 
 <Title />
-A centered stage of slides in a flat row: the active one full size, a smaller, faded neighbor peeking on each side. A <a href="?path=/docs/components-status-indicators-progress-indicator--docs">progress indicator</a> shows where you are: the current dot stretches into a bar that fills over the slide's time, on the same clock as the ring round the play button.
+A centered stage of slides in a flat row: the active one full size, a smaller, faded neighbor peeking on each side. A <a href="?path=/docs/components-status-indicators-progress-indicator--docs">Progress indicator</a> shows where you are: the current step stretches into a bar that fills over the slide's time, on the same clock as the ring round the play button.
 
 <DocsTabs of={CarouselStories}>
 
@@ -62,7 +62,7 @@ A centered stage of slides in a flat row: the active one full size, a smaller, f
 
 <ComponentExample of={CarouselStories.Overview} title="Autoplay" description="The default. The ring round the play button fills over each slide's time, then the next slide comes to the front." />
 
-<ComponentExample of={CarouselStories.Static} title="Autoplay off" description={<>With <code>autoplay={'{false}'}</code>, arrows sit either side of the dots and the slides wait to be chosen.</>} />
+<ComponentExample of={CarouselStories.Static} title="Autoplay off" description={<>With <code>autoplay={'{false}'}</code>, arrows sit either side of the progress indicator and the slides wait to be chosen.</>} />
 
 <ComponentExample of={CarouselStories.NoLoop} title="No loop" description={<>Without <code>loop</code>, the arrows stop at the first and last slide.</>} />
 
@@ -86,12 +86,7 @@ A centered stage of slides in a flat row: the active one full size, a smaller, f
 
 <DocsInteractivePlayground
     of={CarouselStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -113,11 +108,20 @@ new, a short tour, a handful of featured items. Every slide but one is hidden at
 any moment, so nothing a person must read or act on belongs in it.
 
 `slides` takes `{ media, title, description }`. `media` is the card; `title`
-and `description` fill the caption under the controls and name each dot.
-Autoplay is on, at `interval` 5000 ms a slide, and loops. `peek` shows the
-neighbors; turn it off to show the current slide alone. `onSlideChange` gets
-the new index. Give the region a name
-with `aria-label` or `aria-labelledby`.
+and `description` fill the caption under the controls and name each step in the
+progress indicator. Autoplay is on by default (`interval` `5000`), and loops.
+`peek` shows the neighbors; turn it off to show the current slide alone.
+`onSlideChange` gets the new index. Give the region a name with `aria-label` or
+`aria-labelledby`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For switching between alternative views of the same content, use `Tabs`.
+- For a short guided tour of a new feature, use `Spotlight`.
 
 </div>
 
@@ -128,8 +132,8 @@ with `aria-label` or `aria-labelledby`.
 1. **Stage.** Full width, with the edges fading out.
 2. **Slide.** A card, centered. A neighbor on each side sits in the same row, scaled down and faded; clicking one brings it to the front.
 3. **Play button.** A subtle circle `IconButton`, Pause while playing and Play while paused, inside a ring whose arc fills over the slide's time.
-4. **Progress indicator.** A selectable `ProgressIndicator`, one dot per slide. The current dot stretches into a 32px bar whose fill grows from the start edge over the slide's time. When it fills, the next slide comes up and its dot takes the bar. Choosing a dot moves to its slide and starts its clock over.
-5. **Arrows.** Circle `IconButton`s, only when the carousel does not autoplay, in place of the play button.
+4. **Progress indicator.** A selectable `ProgressIndicator`, one step per slide. The current step stretches into a bar (`--control-md`) whose fill grows from the start edge over the slide's time. Choosing a step moves to its slide and restarts the clock.
+5. **Arrows.** Circle `IconButton`s, shown when the carousel does not autoplay, in place of the play button.
 6. **Caption.** The active slide's title as a `Heading` and one line of body text, centered under the controls.
 
 ### States
@@ -142,7 +146,7 @@ with `aria-label` or `aria-labelledby`.
 <tr><td>Playing</td><td>The ring arc and the bar fill together in <code>--ds-background-brand-bold</code>.</td></tr>
 <tr><td>Paused</td><td>The play icon shows. The arc and the bar hold where they stopped.</td></tr>
 <tr><td>Held</td><td>The clock stops while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. It resumes where it held. Pressing Play starts it again even with focus inside.</td></tr>
-<tr><td>Hovered, pressed, focused</td><td>The play button and the arrows keep the states of <code>IconButton</code>. The dots keep the states of <code>ProgressIndicator</code>.</td></tr>
+<tr><td>Hovered, pressed, focused</td><td>The play button and the arrows keep the states of <code>IconButton</code>. The indicator steps keep the states of <code>ProgressIndicator</code>.</td></tr>
 <tr><td>Reduced motion or no autoplay</td><td>No ring; the bar shows full.</td></tr>
 <tr><td>Disabled arrow</td><td>Without <code>loop</code>, at the first or last slide.</td></tr>
 </tbody>
@@ -158,7 +162,7 @@ with `aria-label` or `aria-labelledby`.
 <tr><td>Card</td><td><code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>, corners <code>--card-radius</code>.</td></tr>
 <tr><td>Neighbors</td><td>Faded under <code>--ds-surface</code> at 45%, <code>--section-stack-lg</code> apart (<code>--inline-lg</code> on a narrow stage).</td></tr>
 <tr><td>Ring</td><td><code>--control-lg</code> across, <code>--border-selected</code> wide. Track <code>--ds-border</code>; progress <code>--ds-background-brand-bold</code>.</td></tr>
-<tr><td>Progress indicator</td><td>The default <code>ProgressIndicator</code>: dots <code>--progress-indicator-dot-size-8</code>, the bar <code>--control-md</code> long, each dot a <code>--control-sm</code> target.</td></tr>
+<tr><td>Progress indicator</td><td>The default <code>ProgressIndicator</code>: steps <code>--progress-indicator-dot-size-8</code>, the bar <code>--control-md</code> long, each step a <code>--control-sm</code> target.</td></tr>
 <tr><td>Motion</td><td>A move takes <code>--ds-motion-spatial-default</code>, fading on <code>--ds-motion-appearance-slow</code>. The caption lifts out over <code>--ds-motion-appearance-fast</code> and rises in over <code>--ds-motion-appearance-default</code>.</td></tr>
 <tr><td>Caption</td><td><code>Heading</code> size small; line in <code>--body-default</code> and <code>--ds-text-subtle</code>; at most <code>--content-max-width-reading</code> wide.</td></tr>
 <tr><td>Spacing</td><td><code>--section-stack-md</code> between the stage, the controls and the caption; <code>--inline-md</code> between controls.</td></tr>
@@ -173,24 +177,24 @@ with `aria-label` or `aria-labelledby`.
 
 ### Keep it to three to six slides.
 
-The dots are the map. Past six, nobody gets to the end.
+The progress indicator is the map. Past six, nobody gets to the end.
 
 <DoDontPair
     doExample={<Carousel aria-label="Features" slides={titled} autoplay={false} />}
     doCaption="Three slides, each worth seeing."
     dontExample={<Carousel aria-label="Features" slides={many} autoplay={false} />}
-    dontCaption="Ten slides and a row of dots to match."
+    dontCaption="Ten slides and a long progress indicator to match."
 />
 
 ### Give every slide a title.
 
-The title is the caption a sighted reader sees and the name a screen reader hears on each dot.
+The title is the caption a sighted reader sees and the name a screen reader hears on each step button.
 
 <DoDontPair
     doExample={<Carousel aria-label="Features" slides={titled} autoplay={false} />}
     doCaption="A title and one line for each slide."
     dontExample={<Carousel aria-label="Features" slides={untitled} autoplay={false} />}
-    dontCaption="No titles: the dots say only Slide 1 of 3."
+    dontCaption="No titles: the step buttons say only the slide number."
 />
 
 ### Keep the caption to one line.
@@ -212,12 +216,11 @@ Autoplay moves on whether or not a person finished. Turn it off with `autoplay={
 - **The pause control comes first.** Autoplay can always be stopped from the
   play button, which is the first control in the row. Its name says what a
   press will do: Pause, then Play.
-- **Each dot is a button.** The dots are a group named "Choose a slide"; each
-  is named "Slide 2 of 5" and the slide's title, and the current one carries
-  `aria-current="step"`. Each dot is its own tab stop, with a 24px target.
-- **Only the active slide is read.** Each slide is a group named "2 of 5";
-  the others are `aria-hidden` and inert, so focus never lands behind the
-  front card.
+- **Each indicator step is a button.** The `ProgressIndicator` is a group named
+  "Choose a slide"; each button is named with the slide number and title, and
+  the current one carries `aria-current="step"`.
+- **Only the active slide is read.** Each slide is a group; the others are
+  `aria-hidden` and inert, so focus never lands behind the front card.
 - **Keyboard focus holds the clock.** Tabbing into the carousel stops
   autoplay so nothing moves under a keyboard user; pressing Play starts it
   again. A mouse click on a control does not hold it.
@@ -235,10 +238,8 @@ Autoplay moves on whether or not a person finished. Turn it off with `autoplay={
 
 ## Related
 
-- To show a few items side by side, all at once, lay them out as cards in a
-  grid. Nothing is hidden and nothing moves.
-- For switching between alternative views of the same content, use `Tabs`.
-- For a short guided tour of a new feature, use `Spotlight`.
+- `ProgressIndicator`: use when displaying step indicators below the stage.
+- [Card](?path=/docs/templates-card--docs): use when laying out a few items side by side in a grid so nothing is hidden and nothing moves.
 
 </div>
 

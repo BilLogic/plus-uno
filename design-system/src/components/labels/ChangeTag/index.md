@@ -17,9 +17,7 @@ Also asked as: delta tag, trend indicator.
 ## Usage
 
 Use `ChangeTag` beside a number to say how it moved since the last period: in
-a card header, a table cell or a chart tooltip. For the number itself, use
-plain text; for a count on a tab or button, use `CountTag`; for the shape of
-a trend, use `Sparkline`.
+a card header, a table cell or a chart tooltip.
 
 ### Good direction
 
@@ -32,11 +30,16 @@ it, never from the arrow alone.
 | Down | Less is better: no-shows, absences, missed reflections. Down is success, up is danger. |
 | None | The change has no value judgment: hours tutored, students assigned. Neutral either way. |
 
+## Alternatives
+
+- For a count on its own, use `CountTag`.
+- For the condition something is in, use `StatusTag`.
+
 ## Best practices
 
 ### Set the tone from the metric, not the arrow. {#set-the-tone-from-the-metric-not-the-arrow}
 
-When less is better, up is bad: say so with `goodDirection="down"`.
+Pass the signed change as a number and set `goodDirection` once per metric. When less is better, up is bad: say so with `goodDirection="down"`.
 
 Do: More no-shows reads as danger.
 Don't: More no-shows reads as success.
@@ -56,7 +59,7 @@ It renders a `span` with no role and no click handler: `onClick`, `role` and
 ## Accessibility
 
 - **The change is spoken in words.** A screen reader hears "Up 3 vs last
-  week" or "Down 12% vs last month"; the visible chip and comparison are
+  week" or "Down 12% vs last month"; the visible pill and comparison are
   `aria-hidden`, so nothing is read twice.
 - **Color never carries it alone.** The arrow and the sign say the direction;
   the tone only reinforces it.
@@ -66,9 +69,8 @@ It renders a `span` with no role and no click handler: `onClick`, `role` and
 
 ## Related
 
-- For a count on its own, use `CountTag`.
-- For the condition something is in, use `StatusTag`.
-- For the shape of a trend beside a number, use `Sparkline`.
+- `Sparkline`: use when showing the shape of a trend beside a metric and its `ChangeTag`.
+- `CountTag`: use when showing an absolute count rather than a delta.
 
 Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
@@ -76,8 +78,8 @@ Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 
 1. **Arrow.** Up, down or flat, from the sign of `value`. `iconBefore` replaces it. It is decoration; the value and the spoken text say the direction.
 2. **Value.** Signed: "+3", "−12%", "+4.5 pts". An em dash when there is nothing to compare.
-3. **Chip.** A filled ground in the tone, with a 1 inside border, so the height stays exact.
-4. **Comparison.** Optional, such as "vs last week", in subtle text after the chip.
+3. **Pill.** A filled ground in the tone, with an inset border so the height stays exact.
+4. **Comparison.** Optional, such as "vs last week", in subtle text after the pill.
 
 ### States
 

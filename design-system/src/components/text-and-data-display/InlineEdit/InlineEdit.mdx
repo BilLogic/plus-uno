@@ -95,12 +95,7 @@ any edit view; `InlineEditableTextfield` is the one built on `TextField`.
 
 <DocsInteractivePlayground
     of={InlineEditStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -121,10 +116,14 @@ Use `InlineEdit` for a value that is read far more often than it is changed and
 that can be saved on its own: a title, a name or a short note on a record or a
 profile page.
 
-Use `TextField` inside a form, where a Save button submits every field together. An
-inline edit saves when it is confirmed and has no say in the form's submit, so
-placing one in a form leaves two ways to save. Use a subtle `TextField` where
-leaving the field should save with no buttons at all.
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a field in a form where a Save button submits every field together, use `TextField`.
+- For several lines edited in a form, use `TextArea`.
 
 </div>
 
@@ -147,7 +146,7 @@ leaving the field should save with no buttons at all.
 <tr><td>Rest</td><td>The read view: text on a transparent box with a transparent <code>--border-default</code> edge.</td></tr>
 <tr><td>Hovered</td><td>The read view takes <code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
 <tr><td>Pressed</td><td>Pressing the read view opens the edit view in the same box, with the caret in it.</td></tr>
-<tr><td>Focused</td><td>The read view draws a <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, <code>--focus-ring-width</code> off the box.</td></tr>
+<tr><td>Focused</td><td>The read view draws the focus ring; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Disabled</td><td>None. An inline edit has no disabled state.</td></tr>
 <tr><td>Editing</td><td>The field's fill and <code>--border-default</code> input edge appear; nothing else moves.</td></tr>
 <tr><td>Invalid</td><td>The field stays open with the danger edge and the message in its caption.</td></tr>
@@ -204,7 +203,7 @@ Both save; Escape cancels. The inline edit saves itself, so it needs no Save but
 
 ### Use compact in dense lists.
 
-Compact draws both views 32 high, to sit in a table cell or a dense row.
+`compact` draws both views at `--item-height-md`, to sit in a table cell or a dense row.
 
 <DoDontPair
     doExample={<div><div style={{ borderBottom: 'var(--border-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Ada Lovelace" compact /></div><div style={{ borderBottom: 'var(--border-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Grace Hopper" compact /></div><div style={{ borderBottom: 'var(--border-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Katherine Johnson" compact /></div></div>}
@@ -269,9 +268,8 @@ thought, and keep the buttons so there is a clear way out.
 
 ## Related
 
-- For a field in a form, use `TextField`.
-- For editing in place with no buttons, use `TextField` with `appearance="subtle"`.
-- For several lines edited in place, use `TextArea` with `appearance="subtle"`.
+- `TextField`: use when configuring the text input inside `InlineEditableTextfield` or editing in place with `appearance="subtle"`.
+- `TextArea`: use when passing a multi-line edit view to `InlineEdit`.
 
 </div>
 

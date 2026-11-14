@@ -16,33 +16,43 @@ Object: a fixed Font Awesome glyph that marks the kind of thing a row or referen
 
 ## Usage
 
-Use an `Object` icon beside the name of the thing it represents — a task in a
-list, a bug in a reference, a page in a breadcrumb. For a larger picture of a
-thing (a school, a tool, a lesson), use `Tile`. For a bitmap, use `Image`.
+Use an `Object` icon (`TaskIcon`, `BugIcon`, `IdeaIcon`, `PullRequestIcon`,
+`ProjectIcon` or `PageIcon`) beside the name of the record it represents — a
+task in a list, a bug in a reference, a page in a breadcrumb. Each kind is its
+own fixed Font Awesome Free glyph (`size` is `12` or `16`, and `label` defaults
+to the kind's name unless `label=""` marks it decorative) — there is no `icon`
+prop to swap it for another kind.
+
+## Alternatives
+
+- For a larger square picture of a school or tool or lesson, use `Tile`.
+- For a general-purpose Font Awesome Free glyph, use `Icon`.
+- For a bitmap photo or screenshot, use `Image`.
+- For a person or an agent, use `Avatar`.
 
 ## Best practices
 
-### Pick the component for the kind — there is no generic `Object`. {#pick-the-component-for-the-kind-there-is-no-generic-object}
+### Pick the component for the kind. {#pick-the-component-for-the-kind}
 
 `TaskIcon`, `BugIcon`, `IdeaIcon`, `PullRequestIcon`, `ProjectIcon` and
-`PageIcon` each draw a fixed glyph. Reach for the one that names the thing,
-rather than a generic component with a glyph prop.
+`PageIcon` each draw a fixed glyph. Reach for the component that names the
+record rather than passing a custom glyph name.
 
 Do: The Task glyph beside the task name.
 Don't: The Bug glyph on a task.
 
 ### Override `label` only when the default name does not fit. {#override-label-only-when-the-default-name-does-not-fit}
 
-Each kind defaults its accessible name to its kind ("Task", "Bug", …). Set
+Each kind defaults its accessible name to its kind ("Task", "Bug"). Set
 `label=""` when the kind is already stated in visible text beside it, so
 assistive technology does not hear it twice.
 
 Do: An empty label when the kind is written beside it.
 Don't: Both the default name and the visible kind, so it reads twice.
 
-### Keep the glyph at its kind. {#keep-the-glyph-at-its-kind}
+### Keep the glyph at its kind and put status in `StatusTag`. {#keep-the-glyph-at-its-kind-and-put-status-in-statustag}
 
-Each kind has one glyph. Do not change the glyph or the color to say a status; show the status in text or a Status tag.
+Each kind has one glyph and color. Do not swap the glyph to indicate workflow state; pair it with `StatusTag`.
 
 Do: The kind stays a Task; the status goes in a Status tag.
 Don't: A second glyph to hint at a status.
@@ -57,16 +67,15 @@ Don't: A second glyph to hint at a status.
 
 ## Related
 
-- For a larger, square picture of a thing, use `Tile`.
-- For a bitmap, use `Image`.
-- For a person or an agent, use `Avatar`.
+- `StatusTag`: use when pairing a record's kind with its workflow state.
+- `Breadcrumb`: use when showing a page or project icon in a hierarchy trail.
 
 Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Tile`
 
 ## Parts
 
 1. **Glyph.** A fixed Font Awesome Free glyph for the kind: task, bug, idea, pull request, project or page.
-2. **Size.** 12 or 16, in `--ds-icon-subtle`.
+2. **Size.** `12` or `16`, in `--ds-icon-subtle`.
 
 ### States
 

@@ -20,7 +20,9 @@ Also asked as: path, navigation trail.
 
 Use `Breadcrumb` when a page sits inside a hierarchy the user needs to see and
 climb — a student inside a cohort inside a program, a lesson inside a unit. It
-answers two questions at once: where am I, and what is one level up.
+answers two questions at once: where am I, and what is one level up. When the
+hierarchy is one level deep, a single "Back to X" `Link` says the same thing
+with less furniture.
 
 It takes a single `items` array, ordered root first. Each item is `{ text, href,
 onClick }`. The last item is the current page and is rendered as plain text; every
@@ -35,9 +37,15 @@ Breadcrumb reads these motion tokens and no literal duration or curve.
 | enter | Drill into and climb back out | `--ds-motion-spatial-fast` | Arrives with its page, one level longer; its row opens from its seam once, at Drill depth 1. |
 | exit | Drill into and climb back out | `--ds-motion-appearance-fast` | Leaves with its page. |
 
+## Alternatives
+
+- For progress through a sequence of steps, use `ProgressTracker`.
+- For moving between sibling views of the same subject, use `Tabs`.
+- For a persistent hierarchy the user browses rather than retraces, use `Sidebar`.
+
 ## Best practices
 
-### The last item is always the current page, whatever you pass it. {#the-last-item-is-always-the-current-page-whatever-you-pass-it}
+### End the trail on the current page. {#end-the-trail-on-the-current-page}
 
 ```jsx
 // Incorrect — the href is dropped. The last item is rendered active
@@ -55,7 +63,7 @@ Breadcrumb reads these motion tokens and no literal duration or curve.
 ]} />
 ```
 
-### An item with `onClick` still needs an `href`. {#an-item-with-onclick-still-needs-an-href}
+### Pass `href` alongside `onClick` on ancestor items. {#pass-href-alongside-onclick-on-ancestor-items}
 
 ```jsx
 // Incorrect — with no href the item is rendered active, which means it is an
@@ -74,7 +82,7 @@ Breadcrumb reads these motion tokens and no literal duration or curve.
 ]} />
 ```
 
-### `separator` takes a string, not a node. {#separator-takes-a-string-not-a-node}
+### Pass a string to `separator`, not a node. {#pass-a-string-to-separator-not-a-node}
 
 Despite the `node` prop type, the value is written into the breadcrumb's
 divider custom property, and a custom property holds text. A string is quoted
@@ -107,23 +115,19 @@ Don't: Names that mean nothing out of context.
 - **The landmark and the current page are handled.** It renders a `nav` around
   an `ol`, and the last item carries `aria-current="page"`.
 - **Every breadcrumb is named "breadcrumb" unless you say otherwise.** Pass
-  `label` to name the landmark. One breadcrumb per page is the shape that works;
-  two with the default name produce two landmarks with the same name.
+  `label` to name the landmark when more than one breadcrumb appears on a page.
 - **Keep `text` short and literal.** It is the whole accessible name of the
   link. "Autumn 2026" navigates; "here" does not.
 - **The separator is generated content.** It is a `::before` on each item after
-  the first, not text in the list. Browsers differ on whether they expose
-  generated content to assistive technology, so do not let the character carry
-  meaning — the `ol` structure is what states the nesting.
-- **`id` lands on the last item.** Not on the `nav`. If you need to point a
+  the first, not text in the list; the `ol` structure is what states the
+  nesting.
+- **`id` lands on the last item.** Not on the `nav`. If you need to point an
   `aria-describedby` or a test at the trail as a whole, use `className`.
 
 ## Related
 
-- For progress through a sequence of steps, use `ProgressTracker`. A breadcrumb is a position in a tree, not a position in a flow.
-- For moving between sibling views, use `Tabs`.
-- For a persistent hierarchy the user browses rather than retraces, use the Sidebar pattern.
-- When the hierarchy is one level deep, a single "Back to X" link says the same thing with less furniture.
+- `PageHeader`: use when placing `Breadcrumb` in the page header's `breadcrumbs` slot above the page title.
+- `Link`: use when rendering a single "Back to X" link for a one-level return.
 
 Same group: `Link` · `Pagination` · `Sidebar` · `Tabs`
 
@@ -141,7 +145,7 @@ Same group: `Link` · `Pagination` · `Sidebar` · `Tabs`
 | Rest | Ancestors in the link color with no underline; the current page in subtlest ink. |
 | Hovered | Underline on an ancestor link; the ink stays the link color. |
 | Pressed | No change of its own. |
-| Focused | The 2px ring, 2px off the link, for keyboard focus only. |
+| Focused | Shows the focus ring on the link for keyboard focus; see Border. |
 | Disabled | Not a state. A level the person cannot open is the current page or is left out, never a dimmed link. |
 
 ### Tokens

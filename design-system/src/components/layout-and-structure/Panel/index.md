@@ -22,9 +22,10 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 Use `Panel` for context or a focused task beside the page's main content — a
 detail view opened from a list, a filter set, a secondary thread — where
-leaving the page behind, as a `Modal` does, would lose that context. For
-something that must be decided before the page continues, use `Modal`
-instead.
+leaving the page behind, as a `Modal` does, would lose that context. Compose it
+from `PanelHeader`, `PanelSubheader`, `PanelBody` and `PanelFooter` inside
+`PanelContainer`, or pass `title`, `header` and `footer` to `Panel` for the
+standard layout.
 
 Fixed action components cover the common icons: `PanelBackAction`,
 `PanelCloseAction`, `PanelMoreAction`, `PanelUpAction`, `PanelDownAction`,
@@ -39,6 +40,11 @@ Panel reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Dock and undock a panel | `--ds-motion-spatial-slow` | Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Backdrop. |
 | exit | Dock and undock a panel | `--ds-motion-spatial-default` | Floating panels leave on spatial.fast. |
+
+## Alternatives
+
+- For something that must be decided before the page continues, use `Modal`.
+- For the page's persistent navigation rail, use `Sidebar`.
 
 ## Best practices
 
@@ -97,17 +103,15 @@ job only risks a different icon or label than the rest of the system uses.
 
 ## Related
 
-- For something that must be decided before the page continues, use `Modal`.
-- The Panel pattern, for the Panel as a Frame area with its docked, peek and overlay states; this page is the component inside it.
-- For the page's persistent navigation rail, see `Sidebar`.
-- Frame for where the Panel docks, peeks or opens as an overlay at each width.
+- Panel template: use when placing Panel as a Frame area with its docked, peek and overlay states.
+- Frame: use when configuring where the Panel docks, peeks or opens as an overlay at each width.
 
 Same group: `Accordion` · `Carousel` · `PageHeader` · `ScrollBar`
 
 ## Parts
 
-1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default` (400); inside the Frame's Panel area it fills the area instead.
-2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (close, more, …).
+1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default`; inside the Frame's Panel area it fills the area instead.
+2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (`PanelCloseAction`, `PanelMoreAction`).
 3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
 4. **Body** (`PanelBody`). The main content, which scrolls.
 5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.

@@ -24,7 +24,7 @@ state. `FlagGroup` positions a stack of them.
 
 `appearance` alone decides the kind of flag and its controls. A **default flag**
 (`normal`) is for passive news a person can clear: the overlay surface, an `icon`
-that carries the meaning (a status icon name or an element such as an Avatar), the
+that carries the meaning (a status icon name or an element such as an `Avatar`), the
 dismiss × and actions as links. A **bold flag** (`information`, `warning`, `error`,
 `success`) takes the appearance's bold fill, starts collapsed to its title, and
 opens its description and actions behind a chevron; its actions are buttons.
@@ -41,7 +41,7 @@ opens its description and actions behind a chevron; its actions are buttons.
 
 | Appearance | When to use |
 | --- | --- |
-| Normal | The default flag, for passive news a person can clear. Closes itself after 8 seconds. Example: "Notes copied". Set `icon` to a status icon or an Avatar. |
+| Normal | The default flag, for passive news a person can clear. Closes itself after `delay` (default `8000`). Example: "Notes copied". Set `icon` to a status icon or an `Avatar`. |
 | Information | Bold. Something worth knowing, on the dark neutral fill. Times out. |
 | Success | Bold. A finished action. Times out. |
 | Warning | Bold. Something to check before going on. Never closes itself; offers a next action. |
@@ -64,6 +64,12 @@ Flag reads these motion tokens and no literal duration or curve.
 | milestone | Open and close an overlay | `--ds-motion-spatial-fast` | Finishing a reflection: inside an Expressive container, slides in from the top-right corner with one overshoot; leaves by the exit rules. | `sound.done.step` on land: a reflection is complete |
 | prompt | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A Flag that asks for action now enters like any Flag. | `sound.prompt` on land: session link ready, a lead with an empty tutor, wrap-up, few students at 10 min; an app passes sound="prompt"; plays when the tab is hidden |
 | failed | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A danger Flag for a failed background job enters like any Flag and stays until closed. | `sound.error` on land: an error Flag, the default for that appearance: a background job the person started failed |
+
+## Alternatives
+
+- For something the user must read or act on in the page flow, use `SectionMessage`.
+- For a decision that blocks the task until answered, use `Modal`.
+- For help attached to a specific control, use `Tooltip` or `Popup`.
 
 ## Best practices
 
@@ -98,7 +104,7 @@ flag: it takes the view's `EmptyState`.
 Do: Error flag with Try again; it stays until the action resolves it.
 Don't: A failure with no next action.
 
-### Nothing important goes only in a flag. {#nothing-important-goes-only-in-a-flag}
+### Never put required information only in a flag. {#never-put-required-information-only-in-a-flag}
 
 The user can dismiss a flag before reading it, and that takes the only copy
 with it. A rejected form submit stays on the form, in a danger `SectionMessage`
@@ -126,8 +132,7 @@ The × is on default flags only, so a stack is all default flags or all bold.
 - **Announcement needs the region to already exist.** A flag mounted at the same
   moment as its container may not be announced at all. Render `FlagGroup`
   with the page and put flags into it.
-- **The dismiss button is the shared `CloseButton`** on a default flag's surface, with an `aria-hidden` ×. The × and its focus ring are at least
-  3:1 on that surface.
+- **The dismiss button is the shared `CloseButton`** on a default flag's surface, with an `aria-hidden` ×.
 - **The appearance icon is decorative.** It is `aria-hidden`, so the title beside it
   carries the meaning; the color and icon should never carry it alone.
 - **The chevron reports its state.** It sets `aria-expanded`, so a screen reader
@@ -135,21 +140,20 @@ The × is on default flags only, so a stack is all default flags or all bold.
 
 ## Related
 
-- For something the user must read or act on, use `SectionMessage`.
-- For a decision that blocks the task, use `Modal`.
-- For help attached to a specific control, use `Tooltip` or `Popup`.
+- `CloseButton`: use when rendering the dismiss control on a default flag.
+- `EmptyState`: use when a whole view fails to load rather than a background sync.
 
 Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
 
 ## Parts
 
 1. **Icon.** On a default flag the `icon` (the information icon unless set); on a bold flag the appearance glyph. Decorative.
-2. **Title.** What happened, in a few words, at 14 whatever level the page around it is at.
+2. **Title.** What happened, in a few words, in `--heading-xsmall` whatever level the page around it is at.
 3. **Timestamp.** Optional, subtle, after the title.
 4. **Description.** At most one line.
-5. **Actions.** At most two, under the description: links on a default flag, compact Buttons on a bold one; an action with an `href` navigates either way.
+5. **Actions.** At most two, under the description: links on a default flag, compact `Button`s on a bold one; an action with an `href` navigates either way.
 6. **Expand toggle.** Only on a bold flag that has a description or actions; it starts collapsed to its title.
-7. **Dismiss.** The shared CloseButton, named "Dismiss flag", on default flags only.
+7. **Dismiss.** The shared `CloseButton`, named "Dismiss flag", on default flags only.
 
 ### States
 
@@ -158,10 +162,10 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | Rest | The appearance icon color on the overlay surface; a bold flag fills the surface instead. |
 | Hovered | The flag does not react; Dismiss and the toggle take the subtle hovered step. |
 | Pressed | Dismiss and the toggle take the subtle pressed step. |
-| Focused | Dismiss, the toggle and each action show the 2px ring; the ring is inverse on a bold fill. |
+| Focused | Dismiss, the toggle and each action show the focus ring; the ring is inverse on a bold fill. |
 | Disabled | Not supported. |
 | Expanded | A bold flag shows its description and actions; collapsed, only the title. |
-| Autohide | Normal, information and success close after 8 seconds (keep any `delay` at 8000 or more); warning and error never close themselves. |
+| Autohide | Normal, information and success close after `delay` (default `8000`); warning and error never close themselves. |
 | Dismissed | The flag leaves the stack. |
 
 ### Tokens

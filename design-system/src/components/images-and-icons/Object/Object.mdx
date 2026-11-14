@@ -61,30 +61,7 @@ name in a list, a reference or a title.
 
 ## Content
 
-<ComponentExample of={ObjectStories.Decorative} title="Decorative" description={<>`label=""` marks the glyph decorative, for when the kind is already named beside it.</>} />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>size</code></td><td>number</td><td><code>12</code> or <code>16</code> (default), in pixels.</td></tr>
-        <tr><td><code>label</code></td><td>string</td><td>The accessible name, defaulted per kind (for example "Task"). An empty string marks it decorative.</td></tr>
-    </tbody>
-</DocsTable>
-
-Each kind is its own fixed Font Awesome glyph — there is no `icon` prop to
-swap it for another kind.
+<ComponentExample of={ObjectStories.Decorative} title="Decorative" description={<><code>label=""</code> marks the glyph decorative, for when the kind is already named beside it.</>} />
 
 </div>
 
@@ -92,7 +69,7 @@ swap it for another kind.
 
 ## State
 
-<ComponentExample of={ObjectStories.Rest} title="Rest" description={<>Rest. An object icon is a picture, not a control, so this is its one state.</>} />
+<ComponentExample of={ObjectStories.Rest} title="Rest" description="An object icon is a picture, not a control, so rest is its one state." />
 
 </div>
 
@@ -102,12 +79,7 @@ swap it for another kind.
 
 <DocsInteractivePlayground
     of={ObjectStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -124,9 +96,23 @@ swap it for another kind.
 
 ## Usage
 
-Use an `Object` icon beside the name of the thing it represents — a task in a
-list, a bug in a reference, a page in a breadcrumb. For a larger picture of a
-thing (a school, a tool, a lesson), use `Tile`. For a bitmap, use `Image`.
+Use an `Object` icon (`TaskIcon`, `BugIcon`, `IdeaIcon`, `PullRequestIcon`,
+`ProjectIcon` or `PageIcon`) beside the name of the record it represents — a
+task in a list, a bug in a reference, a page in a breadcrumb. Each kind is its
+own fixed Font Awesome Free glyph (`size` is `12` or `16`, and `label` defaults
+to the kind's name unless `label=""` marks it decorative) — there is no `icon`
+prop to swap it for another kind.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a larger square picture of a school or tool or lesson, use `Tile`.
+- For a general-purpose Font Awesome Free glyph, use `Icon`.
+- For a bitmap photo or screenshot, use `Image`.
+- For a person or an agent, use `Avatar`.
 
 </div>
 
@@ -135,7 +121,7 @@ thing (a school, a tool, a lesson), use `Tile`. For a bitmap, use `Image`.
 ## Parts
 
 1. **Glyph.** A fixed Font Awesome Free glyph for the kind: task, bug, idea, pull request, project or page.
-2. **Size.** 12 or 16, in `--ds-icon-subtle`.
+2. **Size.** `12` or `16`, in `--ds-icon-subtle`.
 
 ### States
 
@@ -167,11 +153,11 @@ thing (a school, a tool, a lesson), use `Tile`. For a bitmap, use `Image`.
 
 ## Best practices
 
-### Pick the component for the kind — there is no generic `Object`.
+### Pick the component for the kind.
 
 `TaskIcon`, `BugIcon`, `IdeaIcon`, `PullRequestIcon`, `ProjectIcon` and
-`PageIcon` each draw a fixed glyph. Reach for the one that names the thing,
-rather than a generic component with a glyph prop.
+`PageIcon` each draw a fixed glyph. Reach for the component that names the
+record rather than passing a custom glyph name.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon label="" /><span>Fix the broken sync</span></div>}
@@ -182,7 +168,7 @@ rather than a generic component with a glyph prop.
 
 ### Override `label` only when the default name does not fit.
 
-Each kind defaults its accessible name to its kind ("Task", "Bug", …). Set
+Each kind defaults its accessible name to its kind ("Task", "Bug"). Set
 `label=""` when the kind is already stated in visible text beside it, so
 assistive technology does not hear it twice.
 
@@ -193,9 +179,9 @@ assistive technology does not hear it twice.
     dontCaption="Both the default name and the visible kind, so it reads twice."
 />
 
-### Keep the glyph at its kind.
+### Keep the glyph at its kind and put status in `StatusTag`.
 
-Each kind has one glyph. Do not change the glyph or the color to say a status; show the status in text or a Status tag.
+Each kind has one glyph and color. Do not swap the glyph to indicate workflow state; pair it with `StatusTag`.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon /><span>Fix the sync</span><StatusTag appearance="success">Done</StatusTag></div>}
@@ -238,9 +224,8 @@ Each kind has one glyph. Do not change the glyph or the color to say a status; s
 
 ## Related
 
-- For a larger, square picture of a thing, use `Tile`.
-- For a bitmap, use `Image`.
-- For a person or an agent, use `Avatar`.
+- `StatusTag`: use when pairing a record's kind with its workflow state.
+- `Breadcrumb`: use when showing a page or project icon in a hierarchy trail.
 
 </div>
 

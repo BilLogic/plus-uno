@@ -17,7 +17,7 @@ Also asked as: rows and columns, grid.
 ## Usage
 
 Use `StaticTable` for a grid people only read: a record, a summary, a rate
-card. A table people sort, filter, select or page is a Dynamic table.
+card.
 
 ## Motion
 
@@ -28,6 +28,10 @@ Table reads these motion tokens and no literal duration or curve.
 | expand | Expand and collapse | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Tree rows reveal from their parent by spring height; collapse completes before removal. Reduced motion holds the final size and fades. |  |
 | change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Rows are added, removed and reordered; sort is Reorder, a filter is Swap content. Ticking rows cross-fades the head row into the bulk bar, same height, nothing slides. |  |
 | roster | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A student joins or leaves the session roster: the row is added or removed. | `sound.roster` on land: in a session; changes within 2 s play once |
+
+## Alternatives
+
+- For a table people sort or filter or page, use `Table`.
 
 ## Best practices
 
@@ -55,10 +59,9 @@ Don't: Every cell wrapped, so rows grow uneven.
 
 ## Related
 
-- For a table people sort, filter, select or page, use the Dynamic table.
-- For records that nest, use the Tree table.
-- For splitting a long result set across pages, use `Pagination`.
-- For a status or a count inside a cell, use `StatusTag` or `CountTag`.
+- `StatusTag`: use when showing a record's condition inside a cell.
+- `CountTag`: use when showing a numeric count inside a cell.
+- Table: use when choosing between Static, Dynamic and Tree tables.
 
 Same group: `Code` · `CodeBlock` · `Heading` · `InlineEdit` · `VisuallyHidden`
 

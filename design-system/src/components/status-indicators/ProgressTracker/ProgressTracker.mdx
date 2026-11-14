@@ -63,7 +63,7 @@ A step's status drives its marker and whether it is reachable: `visited` shows a
 
 <ComponentExample of={ProgressTrackerStories.Pressed} title="Pressed" description="The same step takes the subtle pressed step." />
 
-<ComponentExample of={ProgressTrackerStories.Focused} title="Focused" description="A step that can be opened shows the 2px ring inset in the step." />
+<ComponentExample of={ProgressTrackerStories.Focused} title="Focused" description="A step that can be opened shows the focus ring inset in the step." />
 
 <ComponentExample of={ProgressTrackerStories.Disabled} title="Disabled" description="The step takes the disabled ink and is neither a link nor a button." />
 
@@ -83,13 +83,7 @@ A step's status drives its marker and whether it is reachable: `visited` shows a
 
 <DocsInteractivePlayground
     of={ProgressTrackerStories.Interactive}
-    description={
-        <>
-            Click a step to make it current. Use the table below to change props.
-            The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Click a step to make it current, or change props in the table below."
 />
 
 </div>
@@ -108,8 +102,16 @@ A step's status drives its marker and whether it is reachable: `visited` shows a
 
 Use `ProgressTracker` when each step of a journey has its own name people
 need to see and, often, jump back to — a multi-page form, a setup flow, a
-reflection with named sections. When position alone is enough and the steps
-have no names to show, use `ProgressIndicator` instead.
+reflection with named sections.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a short sequence where position matters more than each step's name, use `ProgressIndicator`.
+- For a single bar showing percent complete, use `ProgressBar`.
 
 </div>
 
@@ -117,9 +119,9 @@ have no names to show, use `ProgressIndicator` instead.
 
 ## Parts
 
-1. **Marker.** A dot for unvisited, current and disabled steps; a success check for a visited step.
+1. **Marker.** A circle for unvisited, current and disabled steps; a success check for a visited step.
 2. **Label.** One line, truncating with an ellipsis.
-3. **Step.** A link, a button or plain text, with <code>aria-current="step"</code> on the current one.
+3. **Step.** A link, a button or plain text, with `aria-current="step"` on the current one.
 4. **Rule.** A hairline joining horizontal steps.
 
 ### States
@@ -132,7 +134,7 @@ have no names to show, use `ProgressIndicator` instead.
 <tr><td>Rest</td><td>Subtle text on no ground; the current step is on the selected ground in medium weight.</td></tr>
 <tr><td>Hovered</td><td>A link or button step takes the subtle neutral hovered ground.</td></tr>
 <tr><td>Pressed</td><td>A link or button step takes the subtle neutral pressed ground.</td></tr>
-<tr><td>Focused</td><td>A link or button step shows the 2px ring inset in the step.</td></tr>
+<tr><td>Focused</td><td>A link or button step shows the focus ring inset in the step; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Disabled</td><td>Disabled ink and icon; neither a link nor a button, and <code>aria-disabled</code>.</td></tr>
 </tbody>
 </DocsTable>
@@ -148,7 +150,7 @@ have no names to show, use `ProgressIndicator` instead.
 <tr><td>Current ground</td><td><code>--ds-background-selected</code></td></tr>
 <tr><td>Hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
 <tr><td>Visited check</td><td><code>--ds-icon-success</code></td></tr>
-<tr><td>Dot, rule</td><td><code>--ds-icon-subtle</code>, <code>--ds-border</code></td></tr>
+<tr><td>Marker, rule</td><td><code>--ds-icon-subtle</code>, <code>--ds-border</code></td></tr>
 <tr><td>Gap</td><td><code>--stack-lg</code>, <code>--stack-md</code>, <code>--stack-sm</code></td></tr>
 <tr><td>Ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
 </tbody>
@@ -160,7 +162,7 @@ have no names to show, use `ProgressIndicator` instead.
 
 ## Best practices
 
-### An item's status and its action are set separately.
+### Set an item's status and its action separately.
 
 `status` alone decides how a step looks. Give any non-`disabled` item an `href` or `onClick` to make it reachable; without either, it renders as plain text even if its status says it can be revisited.
 
@@ -231,9 +233,9 @@ Stack the steps in a narrow column such as a sidebar; keep the row when there is
     dontCaption="A row squeezed into a narrow column, so every label truncates."
 />
 
-### A `disabled` item takes neither a link nor a button, whatever is passed.
+### Mark unreachable steps `disabled`.
 
-This keeps a step someone cannot reach yet from being focusable or clickable, regardless of what `href` or `onClick` the caller supplies.
+A `disabled` item renders neither a link nor a button regardless of what `href` or `onClick` is passed, keeping a step someone cannot reach yet out of the tab order.
 
 </div>
 
@@ -273,9 +275,8 @@ This keeps a step someone cannot reach yet from being focusable or clickable, re
 
 ## Related
 
-- For a short sequence where position matters more than each step's name, use
-  `ProgressIndicator`.
-- For a single bar showing percent complete, use `ProgressBar`.
+- <a href="?path=/docs/patterns-forms--docs">Forms</a>: use when pairing `ProgressTracker` with a multi-step form layout.
+- `ProgressIndicator`: use when steps have no visible labels of their own.
 
 </div>
 

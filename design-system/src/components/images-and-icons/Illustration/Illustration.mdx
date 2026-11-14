@@ -52,27 +52,9 @@ in line work, every color from a token. Which character to use, and when, is on
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
-
-- **Frame.** A 1000 × 1000 square in Figma, scaled to `size` in code. It is the
-  layout box: what sits next to a character lines up with the frame.
-- **Body.** The textured shape, in the body token. The stipple texture is part
-  of the art, so the body reads as soft at every size.
-- **Face, arms and legs.** Line work in `--ds-icon-subtle`. Most characters
-  reach past the frame with their limbs.
-
-`character` picks one of the twelve. The galleries, and which character goes
-with which SMART area, are on
-<a href="?path=/docs/foundations-brand-illustrations--docs">Illustrations</a>.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Size
 
-`size` is the frame's width and height in pixels. 48, 96, 160 and 240 are the
-named sizes, and 96 is the default. Any other number also works.
+`size` sets the square layout box (`48`, `96`, `160` or `240`; `96` by default). The limbs reach past the frame and are never clipped; character galleries and safe-area clearances live on <a href="?path=/docs/foundations-brand-illustrations--docs">Illustrations</a>.
 
 <ComponentExample of={IllustrationStories.Size48} title="48" description="Beside a heading or in a compact card." />
 
@@ -81,14 +63,6 @@ named sizes, and 96 is the default. Any other number also works.
 <ComponentExample of={IllustrationStories.Size160} title="160" description="Page empty states." />
 
 <ComponentExample of={IllustrationStories.Size240} title="240" description="Onboarding and full-page moments." />
-
-- **Below 48 and above 240.** Below 48 the line work breaks into specks; above
-  240 the stipple starts to read as noise.
-- **The safe area is outside the frame.** The limbs are not clipped. Across
-  the twelve characters they reach up to about 33% of the size to the left,
-  60% to the right, 14% above and 50% below; dot reaches farthest. Leave that
-  much room on the sides a character has limbs on, or the limbs run into what
-  sits next to it.
 
 </div>
 
@@ -106,7 +80,7 @@ named sizes, and 96 is the default. Any other number also works.
 
 ## State
 
-<ComponentExample of={IllustrationStories.Rest} title="Rest" description={<>Rest. A character is a picture, not a control, so this is its one state.</>} />
+<ComponentExample of={IllustrationStories.Rest} title="Rest" description="A character is a picture, not a control, so rest is its one state." />
 
 </div>
 
@@ -116,12 +90,7 @@ named sizes, and 96 is the default. Any other number also works.
 
 <DocsInteractivePlayground
     of={IllustrationStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -138,6 +107,10 @@ named sizes, and 96 is the default. Any other number also works.
 
 ## Usage
 
+Use `Illustration` in empty states, onboarding and feature moments where a PLUS
+character sets the tone. In an empty state, the header and action do the work; the illustration is decorative (`decorative` defaults to `true`) and hidden from assistive technology. Pass `decorative={false}` with a `title` only when the character sits alone with no heading beside it. Which character pairs with which SMART area or math
+moment is on <a href="?path=/docs/foundations-brand-illustrations--docs">Illustrations</a>.
+
 ```jsx
 import { Illustration } from '@/components';
 
@@ -145,16 +118,15 @@ import { Illustration } from '@/components';
 <Illustration character="advocacy" size={96} title="Advocacy" />
 ```
 
-<DocsTable>
-<thead>
-<tr><th>Prop</th><th>Type</th><th>Default</th><th>What it does</th></tr>
-</thead>
-<tbody>
-<tr><td><code>character</code></td><td>One of twelve</td><td><code>mastering-content</code></td><td>The SMART characters <code>mastering-content</code>, <code>advocacy</code>, <code>technology</code>, <code>relationships</code> and <code>social-emotional</code>; the math characters <code>dot</code>, <code>approximately-equal</code>, <code>root</code>, <code>all</code>, <code>pi</code>, <code>equal</code> and <code>divider</code>.</td></tr>
-<tr><td><code>size</code></td><td>Number</td><td>96</td><td>The frame's width and height in pixels: 48, 96, 160 or 240.</td></tr>
-<tr><td><code>title</code></td><td>String</td><td>None</td><td>Makes the character an image with this name. Without it the character is decorative and hidden.</td></tr>
-</tbody>
-</DocsTable>
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a small square picture of a school or tool or lesson, use `Tile`.
+- For a person or an agent, use `Avatar`.
+- For a photo or raster screenshot, use `Image`.
 
 </div>
 
@@ -164,7 +136,7 @@ import { Illustration } from '@/components';
 
 1. **Frame.** The square layout box, `size` wide and high. The limbs reach past it and are never clipped.
 2. **Body.** The textured shape, filled from a body token and masked by the stipple.
-3. **Line work.** The face, arms and legs, in one icon token.
+3. **Line work.** The face, arms and legs, in `--ds-icon-subtle`.
 
 ### States
 
@@ -210,7 +182,7 @@ The body token for each character is on
     dontCaption="A title that repeats the heading, so it is read twice."
 />
 
-### Give a character room.
+### Give a character room for its limbs.
 
 <DoDontPair
     doExample={<div style={{ padding: 'var(--pad-x-md)' }}><Illustration character="dot" size={96} /></div>}
@@ -247,12 +219,10 @@ The body token for each character is on
 - **`title` makes it one image with a name.** The character becomes
   `role="img"` with that name, and its parts stay hidden, so it is announced
   once. Give it a title only when it carries meaning on its own.
-- **The line ratio is a property of the source art.** The line work measures
-  about 2.6:1 on the bodies in Light and about 2.7:1 in Dark. That is under 3:1,
-  and it is fine for decoration, which has no contrast requirement. Never put
-  information in a character that a person needs to read.
+- **Never put required information in the drawing alone.** The line work is
+  decorative art; state any meaning in visible text or `title`.
 - **Every mode.** Bodies and line work take their colors from tokens alone, so
-  a character follows Light, Dark and increased contrast with nothing to set.
+  a character follows Light, Dark and increased contrast automatically.
 
 </div>
 
@@ -260,9 +230,8 @@ The body token for each character is on
 
 ## Related
 
-- <a href="?path=/docs/foundations-brand-illustrations--docs">Illustrations</a> for which character to use, and when.
-- For a small square picture of a thing, use `Tile`.
-- For a person, use `Avatar`.
+- <a href="?path=/docs/foundations-brand-illustrations--docs">Illustrations</a>: use when choosing a character or checking its safe-area clearance and body token.
+- `EmptyState`: use when pairing a character with a heading, body and action in an empty view.
 
 </div>
 

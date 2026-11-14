@@ -102,7 +102,7 @@ One Font Awesome Free glyph, drawn from its name at an icon size and in an icon 
 
 ## Usage
 
-Pass the icon's name to the component that shows it. Where no component takes the name, draw it with Icon:
+Pass the icon's name to the component that shows it. Where no component takes the name, draw it with `Icon`:
 
 ```jsx
 import { Icon } from '@/components';
@@ -111,7 +111,18 @@ import { Icon } from '@/components';
 <Icon name="circle-check" size={16} color="success" label="Approved" />
 ```
 
-Navigation icons are always outlined: a selected row shows a fill, not a filled icon, and brand marks (`fa-brands`) are the only exception. Pass a plain name and set `iconStyle` only when a glyph must be solid outside navigation; never write `fa-solid` or `fa-regular` into the name. Use a glyph's current name: an alias is not in the regular list, so it draws solid. A `fa-brands` name carries its family: `fa-brands fa-figma`.
+Pass a plain Font Awesome Free name in its current spelling (an alias is not in the regular list, so it draws solid) and set `iconStyle` only when a glyph must be solid outside navigation; never write `fa-solid` or `fa-regular` into the name. A `fa-brands` name carries its family: `fa-brands fa-figma`. When to use an icon, outline vs solid rules, and size steps live on <a href="?path=/docs/foundations-visual-iconography--docs">Iconography</a>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For AI actions such as generate or summarize or rewrite, use `AiIcon`.
+- For an action shown as an icon alone, use `IconButton`.
+- For a framed mark or logo or thumbnail, use `Tile`.
+- For a typed record glyph such as a task or bug, use `Object`.
 
 </div>
 
@@ -119,7 +130,7 @@ Navigation icons are always outlined: a selected row shows a fill, not a filled 
 
 ## Parts
 
-1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it is 16 (`--icon-md`), or the size the component around it sets.
+1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it takes `--icon-md` or the size the component around it sets.
 
 ### States
 
@@ -158,7 +169,7 @@ Navigation icons are always outlined: a selected row shows a fill, not a filled 
 Without `label` the icon is hidden from assistive technology, so the words beside it carry the meaning.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}><Icon name="calendar-days" size={16} color="subtle" />Tuesday, 4 pm</div>}
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}><Icon name="calendar-days" size={16} color="subtle" />Tuesday, 4:00 PM ET</div>}
     doCaption="The icon beside the words it backs up."
     dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}><Icon name="calendar-days" size={16} color="subtle" /></div>}
     dontCaption="An icon alone with no label, so it has no name."
@@ -180,7 +191,7 @@ Without `label` the icon is hidden from assistive technology, so the words besid
 ## Accessibility
 
 - **Labeled or hidden.** With `label` the icon is `role="img"` named by it. Without, it is `aria-hidden`.
-- **An icon-only control is named by the control.** Icon button takes a required `label`, and the glyph inside stays hidden.
+- **An icon-only control is named by the control.** `IconButton` takes a required `label`, and the glyph inside stays hidden.
 
 </div>
 
@@ -188,10 +199,8 @@ Without `label` the icon is hidden from assistive technology, so the words besid
 
 ## Related
 
-- <a href="?path=/docs/foundations-visual-iconography--docs">Iconography</a> for when to use an icon and which one.
-- <a href="?path=/docs/ai-ui-components-icon--docs">AI icon</a> for AI actions.
-- <a href="?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a> for an action shown as an icon alone.
-- <a href="?path=/docs/components-images-and-icons-tile--docs">Tile</a> for a mark above 24.
+- <a href="?path=/docs/foundations-visual-iconography--docs">Iconography</a>: use when choosing which glyph, style or size step fits a surface.
+- `IconButton`: use when an icon is an interactive trigger with no visible text label.
 
 </div>
 

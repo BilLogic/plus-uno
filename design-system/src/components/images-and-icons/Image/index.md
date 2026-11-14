@@ -14,9 +14,14 @@ Image: a decorative or meaningful bitmap, with a dark-mode variant swapped in by
 
 ## Usage
 
-Use `Image` for a bitmap — a photo, a screenshot, an illustration exported as
-a raster. For a square picture of a school, a tool or a lesson, use `Tile`
-instead. For a typed glyph standing in for a kind of thing, use `Object`.
+Use `Image` for a bitmap — a photo, a screenshot or a raster graphic — especially when it has a dark-mode asset to swap via `srcDark`.
+
+## Alternatives
+
+- For a square picture of a school or tool or lesson, use `Tile`.
+- For a typed glyph standing in for a kind of record, use `Object`.
+- For a person or an agent's picture or initials, use `Avatar`.
+- For a vector PLUS character, use `Illustration`.
 
 ## Best practices
 
@@ -29,11 +34,11 @@ flash of the light image on a dark system.
 Do: One image with a dark variant, picked before paint.
 Don't: A light image alone on a dark surface.
 
-### `alt` defaults to empty, which marks the image decorative. {#alt-defaults-to-empty-which-marks-the-image-decorative}
+### Leave `alt` empty when nearby text already states the meaning. {#leave-alt-empty-when-nearby-text-already-states-the-meaning}
 
-Set `alt` to real text only when the image carries information nothing else
-on the page already states. A caption beside the image, or a heading above
-it, usually means `alt=""` is correct.
+`alt` defaults to empty (`""`), which marks the image decorative. Set `alt` to
+real text only when the image carries information nothing else on the page
+already states.
 
 Do: Empty alt where a caption already says it.
 Don't: Alt text that says nothing, or repeats the caption beside it.
@@ -48,8 +53,7 @@ Don't: Fixed in a narrow container: the picture overflows it.
 ## Accessibility
 
 - **Decorative by default.** `alt=""` hides the image from assistive
-  technology — appropriate when a caption or heading nearby already says
-  what it shows.
+  technology when a caption or heading nearby already says what it shows.
 - **Meaningful images need real alt text.** Describe what the image
   communicates, not what it depicts pixel for pixel.
 - **The dark swap has no accessibility impact.** It is a media query on the
@@ -57,16 +61,15 @@ Don't: Fixed in a narrow container: the picture overflows it.
 
 ## Related
 
-- For a square picture of a school, a tool or a lesson, use `Tile`.
-- For a typed glyph standing in for a kind of thing, use `Object`.
-- For a person or an agent's picture or initials, use `Avatar`.
+- `Tile`: use when framing a thumbnail or logo in a fixed square step.
+- `Illustration`: use when placing a vector PLUS character that adapts to color mode through tokens.
 
 Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Object` · `Tile`
 
 ## Parts
 
-1. **Picture.** An `img`, with a `picture` and a dark source when `srcDark` is set.
-2. **Size.** `fluid` fills its container's width and keeps the ratio; `fixed` keeps its natural size.
+1. **Picture.** An `img`, wrapped in `<picture>` with a dark `<source>` when `srcDark` is set.
+2. **Size.** `fluid` fills its container's width and keeps the aspect ratio; `fixed` keeps its natural size.
 
 ### States
 
@@ -74,7 +77,7 @@ Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Illustration` ·
 | --- | --- |
 | Rest | The only state. An image is not a control. |
 | Hovered, pressed, focused, disabled | None. Wrap it in a link or button for a click. |
-| Dark mode | The browser swaps in `srcDark` when the system is dark; no script. |
+| Dark mode | The browser swaps in `srcDark` when the system is dark, with no script. |
 
 ### Tokens
 

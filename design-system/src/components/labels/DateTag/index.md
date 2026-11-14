@@ -17,9 +17,8 @@ Also asked as: date pill.
 ## Usage
 
 Use `DateTag` for a due or event date beside the thing it belongs to: an
-assignment, a session, a report. For a status or a category, use `Tag`
-instead; `DateTag`'s outline, icon and three appearances are reserved for
-dates.
+assignment, a session, a report. `DateTag`'s outline, icon and three
+appearances are reserved for dates.
 
 ### Appearance guidance
 
@@ -27,18 +26,24 @@ The app derives `appearance` from the date and a due-soon window it defines.
 
 | Appearance | When to use |
 | --- | --- |
-| Neutral | The date is not close. Draws a calendar. Example: "Due Oct 14". |
+| Neutral | The date is not close. Draws a calendar. Example: "Due next week". |
 | Warning | The date is near, before it turns overdue. Draws a clock. Example: "Due tomorrow". |
-| Danger | The date has passed. Draws a triangle. Example: "2 days overdue". |
+| Danger | The date has passed. Draws a triangle. Example: "Overdue". |
+
+## Alternatives
+
+- For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
+- For a category or subject or person, use `Tag`.
+- For a numeric count, use `CountTag`.
 
 ## Best practices
 
 ### Reserve danger for overdue dates. {#reserve-danger-for-overdue-dates}
 
-Danger means the date has passed; a far-off date stays neutral.
+The app picks the appearance from the date and its due-soon window, never from taste. Danger means the date has passed; a far-off date stays neutral.
 
 Do: Danger when it is overdue.
-Don't: Danger on a date 30 days out.
+Don't: Danger on a date far in the future.
 
 ### Use warning for dates that are close. {#use-warning-for-dates-that-are-close}
 
@@ -73,8 +78,8 @@ the tooltip holding the full date.
 
 ## Related
 
-- For a status or a category, use `Tag`.
-- For a numeric count, use `CountTag`.
+- `DatePicker`: use when the person picks or edits a date in a form field.
+- `StatusTag`: use when showing the workflow state of a dated item.
 
 Same group: `AiMessage` · `ChangeTag` · `CountTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
@@ -82,7 +87,7 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `PromptStarters` · `Sma
 
 1. **Icon.** Fixed by the appearance: a calendar for neutral, a clock for warning and a triangle for danger. It is decoration; the date says the rest.
 2. **Date.** One short string, set by the app: "Due tomorrow", "Mar 4".
-3. **Outline.** A 1 inside border, so the height stays exact. A date tag has no fill.
+3. **Outline.** An inset border, so the height stays exact. A date tag has no fill.
 
 ### States
 

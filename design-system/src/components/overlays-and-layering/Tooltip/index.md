@@ -19,14 +19,9 @@ Also asked as: hover hint, hover text.
 ## Usage
 
 Use `Tooltip` for a short label on a control whose purpose is not obvious from
-what you can see — an icon-only `Button`, a truncated cell, an abbreviation. It
-wraps a single trigger element and shows on hover and focus by default, after
-250ms, hiding 400ms after you leave.
-
-It is the Tooltip of the Popup layers: body.small 12/16 in `--ds-text-inverse` on
-`--ds-background-neutral-bold`, so it flips with the color mode,
-padded 4 · 8, wrapping past 240, with no arrow. It opens 4 from its trigger
-and never comes nearer than 8 to the screen's edge.
+what you can see — an icon-only `IconButton`, a truncated cell, an abbreviation.
+It wraps a single trigger element and shows on hover and focus by default,
+after `250` ms, hiding `400` ms after you leave.
 
 ## Motion
 
@@ -37,14 +32,18 @@ Tooltip reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fade only, after 250 ms. A second Tooltip soon after shows at once. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades 100 ms after the pointer leaves. |
 
+## Alternatives
+
+- For anything the user must click or focus inside the overlay, use `Popup`.
+- For a transient confirmation after an action, use `Flag`.
+
 ## Best practices
 
-### Controlled mode ignores the trigger and the delays. {#controlled-mode-ignores-the-trigger-and-the-delays}
+### Let the component drive hover and focus rather than passing `show`. {#let-the-component-drive-hover-and-focus-rather-than-passing-show}
 
 ```jsx
-// Incorrect — once `show` is defined, the component takes a different branch
-// entirely. `trigger`, `delayShow` and `delayHide` are all dead, and the
-// tooltip is exactly as visible as the boolean says.
+// Incorrect — once `show` is defined, `trigger`, `delayShow` and `delayHide`
+// are ignored, and the tooltip is only as visible as `show` says.
 <Tooltip text="Saved" show={justSaved} trigger="hover" delayHide={2000}>
   <Button appearance="primary" text="Save" />
 </Tooltip>
@@ -66,7 +65,7 @@ Don't: Two sentences that wrap, with a closing period.
 
 ### Never put a tooltip on a disabled control. {#never-put-a-tooltip-on-a-disabled-control}
 
-A disabled control takes no hover and no focus, so a tooltip on it never opens, and touch has no hover at all. Say why in text where the cause is: the field's caption, the option's description line, or a warning Section message above when it blocks the main action. An action stays enabled and explains what is missing when it is pressed.
+A disabled control takes no hover and no focus, so a tooltip on it never opens, and touch has no hover at all. Explain why in text on the page; see Disabled.
 
 ```jsx
 // Incorrect: the disabled button cannot show the tooltip.
@@ -78,7 +77,7 @@ A disabled control takes no hover and no focus, so a tooltip on it never opens, 
 <Button appearance="primary" text="Save notes" onClick={explainWhatIsMissing} />
 ```
 
-### Put anything the user can click in a Popup. {#put-anything-the-user-can-click-in-a-popup}
+### Put anything the user can click in a `Popup`. {#put-anything-the-user-can-click-in-a-popup}
 
 Do: A popup holds content the user can reach.
 Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides.
@@ -90,17 +89,15 @@ Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip
   alone removes that — do not.
 - **It is wired as a description.** The overlay renders with `role="tooltip"`,
   and the positioning layer adds `aria-describedby` on the trigger pointing at
-  it. That is a description, which is why the trigger still needs its own name.
-- **Not on a disabled control.** A disabled control leaves the tab order and takes no hover, so it cannot open a tooltip. The reason it is disabled is visible text beside it.
-- **Touch has no hover.** There is no tap-to-show behavior, so on a touch
-  device the tooltip is simply absent. Never let it carry the only copy of
-  anything.
-- **No Escape.** There is no dismiss key and no way to move focus into the
-  tooltip, which is the other half of the reason it must stay non-interactive.
-- **The generated id is random.** With no `id`, the overlay gets one built from
-  `Math.random` and held in a ref: stable for the life of the instance, but
-  different on every mount and different between server and client. Pass `id`
-  when the value has to be predictable.
+  it. That is a description, which is why an `IconButton` still needs its own
+  `label`.
+- **Touch has no hover.** On a touch device the tooltip is absent, so never let
+  it carry the only copy of anything.
+- **No Escape or focus stop.** There is no way to move focus into the tooltip,
+  so its content must stay non-interactive.
+- **Pass `id` when a deterministic id is needed.** Without `id`, the overlay
+  generates an instance id from `Math.random` held in a ref — stable for the
+  life of the instance, but different between server and client.
 
 ### A tooltip describes; it does not name.
 
@@ -134,25 +131,24 @@ Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip
 
 ## Related
 
-- For content the user needs in order to complete the task, put it in the page — a tooltip is dismissed by moving the pointer.
-- For anything the user must click or focus, use `Popup`.
-- For the accessible name of an icon-only control, use `aria-label` on the control itself.
+- `IconButton`: use when pairing an icon-only button's required `label` with a tooltip on hover and focus.
+- Disabled: use when explaining unavailable actions in visible page text rather than a tooltip.
 
 Same group: `Popup`
 
 ## Parts
 
 1. **Trigger.** The control the tooltip describes.
-2. **Surface.** One line of text on the inverse fill, wrapping past the maximum width. No arrow.
+2. **Surface.** One line of text (`--body-small`) on the inverse fill (`--ds-background-neutral-bold`), wrapping past `--popover-max-width-tooltip`, with no arrow.
 
 ### States
 
 | State | What changes |
 | --- | --- |
 | Hidden | Only the trigger shows. |
-| Shown | After 250 ms of hover or focus; it hides 400 ms after both leave. |
+| Shown | After `delayShow` of hover or focus; hides after `delayHide` once both leave. |
 | Hovered, pressed | The tooltip does not react. |
-| Focused | The trigger shows the 2px ring; the tooltip is never a focus stop. |
+| Focused | The trigger shows the focus ring; the tooltip is never a focus stop. |
 | Disabled | An empty `trigger` list turns it off, for a trigger that only needs one when its text is truncated. |
 
 ### Tokens

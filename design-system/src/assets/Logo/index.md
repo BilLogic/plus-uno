@@ -12,6 +12,53 @@ The PLUS logo: the mark, or the lockup of mark and wordmark. Seven sizes, six ap
 
 **Storybook page:** `design-system/src/assets/Logo/Logo.mdx`
 
+## Usage
+
+Use `Logo` to mark PLUS in the sidebar header, sign-in, email headers and the loading screen. Brand rules, color options, clear space and construction live on Logos.
+
+## Alternatives
+
+- For partner or tool logos or school crests or lesson thumbnails, use `Tile`.
+- For a person or team or agent, use `Avatar`.
+- For an action or object glyph, use `Icon`.
+
+## Best practices
+
+### Pick a `LOGO_SIZES` step rather than scaling by hand. {#pick-a-logosizes-step-rather-than-scaling-by-hand}
+
+`size` takes a step from `LOGO_SIZES`; never stretch or resize the SVG with custom CSS.
+
+### Use `wordmark` from `LOCKUP_MIN_SIZE` up. {#use-wordmark-from-lockupminsize-up}
+
+Below `LOCKUP_MIN_SIZE` (`24`), `Logo` renders the mark alone even when `wordmark` is set.
+
+## Accessibility
+
+- **Labeled SVG.** `Logo` renders an SVG with `role="img"` and `aria-label="PLUS"`.
+- **Alt-text and link rules.** When the logo sits beside a visible PLUS title or inside a home link, follow the alt-text table on Logos.
+
+## Related
+
+- Logos: use when checking brand rules, color options, clear space or construction geometry.
+- `Sidebar`: use when rendering the application navigation rail that holds `Logo` in its header row.
+- `Tile`: use when framing a third-party tool or school logo.
+
+## Parts
+
+1. **Logomark.** The PLUS plus-sign tile at height `size` (`16` to `96`). At `SMALL_MAX_SIZE` (`24`) and below, it uses the small-size drawing.
+2. **Wordmark** (optional). Shown beside the logomark when `wordmark` is true and `size` is at least `LOCKUP_MIN_SIZE` (`24`).
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. The logo is brand artwork, not a control. |
+| Hovered, pressed, focused | None on `Logo` itself; when the logo links home, the wrapping link or button carries focus and interaction states. |
+
+### Tokens
+
+The logomark's glows and fills use fixed brand palette colors (`Logo.scss`); the wordmark uses `--ds-text` on light grounds and inverse neutral on dark grounds.
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -39,8 +86,6 @@ From `design-system/src/assets/Logo/Logo.scss`. Override these through the token
 
 - "Logo" node 21004:1217 in file zAecJNRdvJzAUOcjV32tRX
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet: when to use, correct/incorrect, and accessibility
-> are unwritten for this component. Nothing above tells you whether
-> reaching for `Logo` is the right call, only what it accepts.
+> Authored guidance is partial: missing correct/incorrect.

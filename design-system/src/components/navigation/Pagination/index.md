@@ -26,7 +26,7 @@ every click calls `onPageChange` with the target page. It holds no state.
 Reach for it to page through results too many for one screen: a table's rows,
 a search's matches, a long history.
 
-The window of numbers is computed for you. `max` (default 5) centers the
+The window of numbers is computed for you. `max` (default `5`) centers the
 window on the current page, and first and last pages are pinned with an ellipsis
 whenever the window does not reach them.
 
@@ -38,9 +38,14 @@ Pagination reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Step to the next or previous | `--ds-motion-spatial-default` | A page change is Step. |
 
+## Alternatives
+
+- For a step-by-step workflow rather than pages of results, use `ProgressTracker`.
+- For a bounded list that scrolls inside a fixed region, use `ScrollBar`.
+
 ## Best practices
 
-### It is controlled, so it needs both the page and the handler. {#it-is-controlled-so-it-needs-both-the-page-and-the-handler}
+### Pass both `currentPage` and `onPageChange`. {#pass-both-currentpage-and-onpagechange}
 
 ```jsx
 // Incorrect — nothing happens on click. The component never tracks a page of
@@ -51,7 +56,7 @@ Pagination reads these motion tokens and no literal duration or curve.
 <Pagination currentPage={page} totalPages={12} onPageChange={setPage} />
 ```
 
-### Text mode is the one that labels its arrows. {#text-mode-is-the-one-that-labels-its-arrows}
+### Use `navigator="text"` to show visible Previous and Next labels. {#use-navigator-text-to-show-visible-previous-and-next-labels}
 
 ```jsx
 // Incorrect — in the default `icon` navigator, previousLabel and nextLabel are used only
@@ -89,7 +94,7 @@ Don't: Every page in the row pushes the controls wide.
 
 ### Say how many pages there are. {#say-how-many-pages-there-are}
 
-When the total matters, such as a table of sessions, show it beside the pagination: “Page 3 of 12”. The row alone only shows a window.
+When the total matters, such as a table of sessions, show it beside the pagination. The row alone only shows a window.
 
 Do: The total beside the row.
 Don't: Only a window of numbers, with no total.
@@ -118,9 +123,8 @@ Don't: Only a window of numbers, with no total.
 
 ## Related
 
-- For a continuously loading feed, use infinite scroll rather than pages.
-- For a step-by-step flow, use `ProgressTracker` with your own step control.
-- For a long table, pair pagination with sorting and filtering; on its own it makes a specific row hard to find.
+- `DynamicTable`: use when pairing `Pagination` with sorting and filtering on a multi-page table.
+- [Table](?path=/docs/templates-table--docs): use when laying out a table footer with row counts and pagination.
 
 Same group: `Breadcrumb` · `Link` · `Sidebar` · `Tabs`
 
@@ -138,7 +142,7 @@ Same group: `Breadcrumb` · `Link` · `Sidebar` · `Tabs`
 | Rest | Subtle ink on the surface. |
 | Hovered | The subtle neutral hovered fill. |
 | Pressed | The subtle neutral pressed fill. |
-| Focused | The 2px ring drawn inside the segment. |
+| Focused | Shows the focus ring inside the segment; see Border. |
 | Current | The selected fill and ink, semibold; hover and press do not change it. |
 | Disabled | The disabled ground, ink and caret; the control keeps its tab stop with `aria-disabled`. |
 

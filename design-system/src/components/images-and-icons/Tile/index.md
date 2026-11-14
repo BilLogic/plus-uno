@@ -19,8 +19,11 @@ a list of integrations, a school's crest beside its name, a lesson's thumbnail,
 or an icon marking the kind of item in a row. Putting all of them in one frame
 keeps them the same size and shape wherever they appear.
 
-Use an icon on its own when it sits inline with text and needs no frame. Use
-`Avatar` for a person: people are round, and a tile is square.
+## Alternatives
+
+- For a person or an agent, use `Avatar`.
+- For an unframed glyph inline with text, use `Icon`.
+- For a value someone picked with a text label, use `Tag`.
 
 ## Best practices
 
@@ -32,7 +35,7 @@ logo keeps its own. Images cover the whole tile, so color does not apply.
 Do: Icons take appearance and color; logos keep their own.
 Don't: A bold appearance on a logo, which does nothing.
 
-### Colors are categories. {#colors-are-categories}
+### Use colors as categories, never statuses. {#use-colors-as-categories-never-statuses}
 
 `color` takes the Tag color set: plain names, never a status. Keep one color per kind of
 item across the app, or leave tiles gray.
@@ -61,14 +64,14 @@ Don't: A bold ground on the logo, which keeps its own.
 
 ## Related
 
-- For a person, use `Avatar`.
-- For a value someone picked, with a label, use `Tag`.
+- `Avatar`: use when representing a person, team or agent.
+- `Object`: use when placing a compact record-kind glyph inline with a title.
 
 Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object`
 
 ## Parts
 
-1. **Square.** The Media size of the step, 16 to 48, with a radius of a quarter of its size.
+1. **Square.** The Media size of the step, `16` to `48`, with a radius of a quarter of its size.
 2. **Content.** An icon, a logo or an image. An icon is inset to the Font Awesome size of the same step; an image covers the square.
 3. **Border.** Optional, drawn inside the square so the tile keeps its size.
 

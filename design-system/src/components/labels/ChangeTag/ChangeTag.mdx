@@ -44,7 +44,7 @@ tone follows which way is good, and the change is spoken in words.
 
 ## Size and layout
 
-<ComponentExample of={ChangeTagStories.Styles} title="Spacing" description="Every tone at default (20) and compact (16) spacing. The comparison sits after the chip, outside its fill." />
+<ComponentExample of={ChangeTagStories.Styles} title="Spacing" description="Every tone at default (20) and compact (16) spacing. The comparison sits after the pill, outside its fill." />
 
 </div>
 
@@ -52,7 +52,7 @@ tone follows which way is good, and the change is spoken in words.
 
 ## Behavior
 
-<ComponentExample of={ChangeTagStories.ValueChange} title="A new value" description="A new value fades in while the chip's color moves to its new tone. Reduced motion makes both instant." />
+<ComponentExample of={ChangeTagStories.ValueChange} title="A new value" description="A new value fades in while the pill's color moves to its new tone. Reduced motion makes both instant." />
 
 </div>
 
@@ -60,7 +60,7 @@ tone follows which way is good, and the change is spoken in words.
 
 ## State
 
-<ComponentExample of={ChangeTagStories.Rest} title="Rest" description="The only state: a filled chip with an arrow and a signed value." />
+<ComponentExample of={ChangeTagStories.Rest} title="Rest" description="The only state: a filled pill with an arrow and a signed value." />
 
 <ComponentExample of={ChangeTagStories.Hovered} title="Hovered" description="No change: a change tag is not a control." />
 
@@ -78,12 +78,7 @@ tone follows which way is good, and the change is spoken in words.
 
 <DocsInteractivePlayground
     of={ChangeTagStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -101,9 +96,7 @@ tone follows which way is good, and the change is spoken in words.
 ## Usage
 
 Use `ChangeTag` beside a number to say how it moved since the last period: in
-a card header, a table cell or a chart tooltip. For the number itself, use
-plain text; for a count on a tab or button, use `CountTag`; for the shape of
-a trend, use `Sparkline`.
+a card header, a table cell or a chart tooltip.
 
 ### Good direction
 
@@ -125,12 +118,21 @@ it, never from the arrow alone.
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For a count on its own, use `CountTag`.
+- For the condition something is in, use `StatusTag`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
 1. **Arrow.** Up, down or flat, from the sign of `value`. `iconBefore` replaces it. It is decoration; the value and the spoken text say the direction.
 2. **Value.** Signed: "+3", "−12%", "+4.5 pts". An em dash when there is nothing to compare.
-3. **Chip.** A filled ground in the tone, with a 1 inside border, so the height stays exact.
-4. **Comparison.** Optional, such as "vs last week", in subtle text after the chip.
+3. **Pill.** A filled ground in the tone, with an inset border so the height stays exact.
+4. **Comparison.** Optional, such as "vs last week", in subtle text after the pill.
 
 ### States
 
@@ -170,11 +172,9 @@ it, never from the arrow alone.
 
 ## Best practices
 
-Pass the signed change as a number and let the tag format it. Set `goodDirection` once per metric, not per value.
-
 ### Set the tone from the metric, not the arrow.
 
-When less is better, up is bad: say so with `goodDirection="down"`.
+Pass the signed change as a number and set `goodDirection` once per metric. When less is better, up is bad: say so with `goodDirection="down"`.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>No-shows</span><ChangeTag value={2} goodDirection="down" comparison="vs last week" /></div>}
@@ -223,7 +223,7 @@ It renders a `span` with no role and no click handler: `onClick`, `role` and
 ## Accessibility
 
 - **The change is spoken in words.** A screen reader hears "Up 3 vs last
-  week" or "Down 12% vs last month"; the visible chip and comparison are
+  week" or "Down 12% vs last month"; the visible pill and comparison are
   `aria-hidden`, so nothing is read twice.
 - **Color never carries it alone.** The arrow and the sign say the direction;
   the tone only reinforces it.
@@ -237,9 +237,8 @@ It renders a `span` with no role and no click handler: `onClick`, `role` and
 
 ## Related
 
-- For a count on its own, use `CountTag`.
-- For the condition something is in, use `StatusTag`.
-- For the shape of a trend beside a number, use `Sparkline`.
+- `Sparkline`: use when showing the shape of a trend beside a metric and its `ChangeTag`.
+- `CountTag`: use when showing an absolute count rather than a delta.
 
 </div>
 

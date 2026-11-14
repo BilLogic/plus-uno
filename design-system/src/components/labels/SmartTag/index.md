@@ -17,9 +17,8 @@ Also asked as: skill tag.
 ## Usage
 
 Use `SmartTag` wherever training content, a tutor's strengths or a feedback
-item is tagged by SMART area. For a category that is not a SMART subject, use
-`Tag` directly: `SmartTag` exists only to fix the color and icon per subject,
-not to add new behavior.
+item is tagged by SMART area. `SmartTag` fixes the color and icon per subject
+and delegates every other behavior to `Tag`.
 
 ### Subject guidance
 
@@ -33,6 +32,11 @@ not to add new behavior.
 
 Each subject's color and icon are fixed: there is no prop to mix a subject's
 meaning with a different color.
+
+## Alternatives
+
+- For a category outside the five SMART subjects, use `Tag`.
+- For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
 
 ## Best practices
 
@@ -66,15 +70,14 @@ spelling; the aliases exist for content written before it changed.
 ## Accessibility
 
 - **Inherits `Tag`'s accessibility.** Selection, removal and link behavior
-  are unchanged; see `Tag`'s own Accessibility section for the full
-  contract.
+  are unchanged; see `Tag`'s Accessibility section for the full contract.
 - **The subject icon is decorative.** It is `aria-hidden`; the subject's name
   is carried by the visible label, not the icon.
 
 ## Related
 
-- For a category outside the five SMART subjects, use `Tag` directly.
-- For a group of tags, including smart tags, use `TagGroup`.
+- `Tag`: use when configuring selection, removal, links or elevation on a `SmartTag`.
+- `TagGroup`: use when laying out a set of smart tags with shared spacing and overflow.
 
 Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
@@ -82,15 +85,15 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStar
 
 1. **Subject icon.** Fixed per subject: a heart, a book, a bullhorn, a handshake, a laptop. It is decoration.
 2. **Label.** The subject's own name unless the context needs other words.
-3. **Edge and ground.** The subject's hue on the border, with neutral text, exactly as Tag draws a color.
+3. **Edge and ground.** The subject's hue on the border, with neutral text, exactly as `Tag` draws a color.
 
 ### States
 
 | State | What changes |
 | --- | --- |
 | Rest | A span with no role. The five subjects are the hues orange, teal, lime, magenta and brown. |
-| Hovered, pressed | None until `isSelected` makes it selectable; then the subject's subtlest and subtlest pressed steps, as Tag. |
-| Focused | Only when selectable or removable: the 2px focus ring, 2px off the edge. |
+| Hovered, pressed | None until `isSelected` makes it selectable; then the subject's subtlest and subtlest pressed steps, as `Tag`. |
+| Focused | Only when selectable or removable: shows the focus ring; see Border. |
 | Disabled | `isDisabled`, or a disabled field, drops it to the disabled ground and words and removes the ×. |
 
 ### Tokens

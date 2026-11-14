@@ -99,7 +99,7 @@ dismissed, with an optional title, a leading icon and up to two actions.
 
 <ComponentExample of={SectionMessageStories.Pressed} title="Pressed" description="Dismiss takes the subtle pressed step." />
 
-<ComponentExample of={SectionMessageStories.Focused} title="Focused" description="Dismiss and each action show the 2px focus ring." />
+<ComponentExample of={SectionMessageStories.Focused} title="Focused" description="Dismiss and each action show the focus ring." />
 
 </div>
 
@@ -117,12 +117,7 @@ dismissed, with an optional title, a leading icon and up to two actions.
 
 <DocsInteractivePlayground
     of={SectionMessageStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -170,13 +165,24 @@ stripe: the fill and the icon carry the style.
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For validation on a single field, use `TextField` or the field's own error state.
+- For a transient confirmation that needs no reply, use `Flag`.
+- For something that must be acknowledged before continuing, use `Modal`.
+- For a status label on a row, use `StatusTag`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
 1. **Leading icon.** The appearance glyph on the first line, decorative.
-2. **Title.** An optional heading; set <code>headingLevel</code> to fit the outline.
+2. **Title.** An optional heading; set `headingLevel` to fit the outline.
 3. **Description.** What the person needs to act. A link in it keeps the text color and is underlined.
 4. **Actions.** Link buttons, separated by a divider.
-5. **Dismiss.** The shared CloseButton, centered on the first line.
+5. **Dismiss.** The shared `CloseButton`, centered on the first line.
 
 ### States
 
@@ -188,7 +194,7 @@ stripe: the fill and the icon carry the style.
 <tr><td>Rest</td><td>The fill and icon of the appearance, text in the default color.</td></tr>
 <tr><td>Hovered</td><td>The message does not react; Dismiss takes the subtle hovered step.</td></tr>
 <tr><td>Pressed</td><td>Dismiss takes the subtle pressed step.</td></tr>
-<tr><td>Focused</td><td>Dismiss and each action show the 2px ring.</td></tr>
+<tr><td>Focused</td><td>Dismiss and each action show the focus ring; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Dismissed</td><td>The message is removed and the page keeps no copy.</td></tr>
 </tbody>
@@ -250,7 +256,7 @@ default, so turn it off when the message must stay.
     dontCaption="A blocking error that can be dismissed."
 />
 
-### Replace the icon through icon, not the children.
+### Replace the icon through `icon`, not the children.
 
 A Font Awesome Free solid name or a node replaces the default; `false` removes
 it. An icon in the children adds a second one, in the text.
@@ -266,12 +272,10 @@ it. An icon in the children adds a second one, in the text.
 
 An error about one input belongs to that input's own error state, such as
 `TextField`'s `isInvalid` and `errorMessage`, not in a section message above it.
+A rejected submit is the exception: a danger section message at the top of the
+form says what was refused, and each field named still shows its own error.
 
-A rejected submit is the exception that proves the rule: a danger section
-message at the top of the form says what was refused, and each field named
-still shows its own error.
-
-### Dismissal is one-way.
+### Remount with a new `key` to show a dismissed message again.
 
 The component keeps its own dismissed state, and `show` is not a prop. To bring
 a message back when it genuinely changes, remount it with a new `key`.
@@ -301,15 +305,13 @@ a message back when it genuinely changes, remount it with a new `key`.
 
 - **It announces assertively.** The message renders `role="alert"`, which
   implies `aria-live="assertive"`, so a screen reader interrupts to read it.
-  That is right for something that just went wrong and wrong for ambient
-  information; for the latter, prefer plain text on the page.
 - **A message rendered on mount may not be announced at all.** Live regions
   announce changes. If the message is present in the first paint, treat it as
   ordinary content and make sure the surrounding page still reads correctly.
 - **`title` renders as a real heading**, at `headingLevel` (default `h2`). It
   joins the page's outline, so pick the level that fits where it sits.
-- **The dismiss button is labeled `Dismiss message`**, hard-coded. It is the
-  shared `CloseButton`: a fixed 24×24 target whose × is `aria-hidden`.
+- **The dismiss button is labeled `Dismiss message`**, rendered by the shared
+  `CloseButton` whose × is `aria-hidden`.
 - **Say the meaning in the words.** The leading icon is `aria-hidden` and there
   is no text prefix, so `appearance="danger"` on its own does not say "error"
   to a screen reader. The icon differs in shape per style, so danger and
@@ -323,10 +325,8 @@ a message back when it genuinely changes, remount it with a new `key`.
 
 ## Related
 
-- For validation on a single field, put the message on the field, as `TextField` does.
-- For a transient confirmation, use `Flag`.
-- For something that must be acknowledged before continuing, use `Modal`.
-- For a status label on a row, use `StatusTag`.
+- `CloseButton`: use when rendering the dismiss control on a dismissible message.
+- <a href="?path=/docs/patterns-forms--docs">Forms</a>: use when pairing a form-level danger `SectionMessage` with per-field validation errors.
 
 </div>
 

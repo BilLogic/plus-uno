@@ -19,12 +19,16 @@ Also asked as: counter, unread count, numeric badge.
 Use `CountTag` for a number on its own: unread messages on a nav item, results on a
 tab, errors in a section header, a notification on a bell.
 
-- **Is it a number?** Count tag.
-- **Is it the condition something is in, and can that condition change?** Status tag.
-- **Otherwise** (a subject, a person, a category): Tag.
+`spacing="compact"` (`16`) is for use inside a label: `StatusTag` nests it through its
+`trailingMetric` prop, and `Tag` nests it on a selectable tag.
 
-`spacing="compact"` (16) is for use inside a label: Status tag nests it through its
-`trailingMetric` prop, and Tag nests it on a selectable tag.
+## Alternatives
+
+- For the condition something is in, use `StatusTag`.
+- For a change over time such as "+3 vs last week", use `ChangeTag`.
+- For a due or event date, use `DateTag`.
+- For a category or subject or person, use `Tag`.
+- For progress toward a total, use `ProgressBar`.
 
 ## Best practices
 
@@ -37,18 +41,18 @@ Don't: Bold on every item in a list: when every count shouts, none of them does.
 
 ### Let the component decide zero and overflow. {#let-the-component-decide-zero-and-overflow}
 
-It renders nothing at 0 and caps past `max` with a `+`, so pass the raw number.
+It renders nothing at `value={0}` and caps past `max` with a `+`, so pass the raw number.
 
-Do: Pass the raw number: at 0 the badge leaves the empty tab bare.
+Do: Pass the raw number: at zero the tag leaves the empty tab bare.
 Don't: Force a zero onto an empty tab, unless the zero is the news.
 
 ### Show the bare number, and put the meaning in the label. {#show-the-bare-number-and-put-the-meaning-in-the-label}
 
-The badge shows 4, never "4 unread"; `label="4 unread messages"` tells a screen reader what it counts.
+The tag shows the number alone, never words alongside it; `label="4 unread messages"` tells a screen reader what it counts.
 
 ### Use inverse on filled buttons and dark surfaces. {#use-inverse-on-filled-buttons-and-dark-surfaces}
 
-Inverse is a solid white badge with dark text, so it passes contrast on any fill. On a light surface use subtle.
+Inverse is a solid light ground with dark text, so it passes contrast on any fill. On a light surface use subtle.
 
 Do: Inverse on a filled, dark ground.
 Don't: Inverse on a light surface, where it barely separates from the page.
@@ -63,27 +67,26 @@ A dot has no number, so `label` is its accessible name; without one it is announ
   exposed as an image with that name. Without one it is announced as nothing,
   and the component warns in development.
 - **A label turns a digit into information.** "Messages 4" is ambiguous; with
-  `label="4 unread"` a screen reader hears "Messages 4 unread", while the badge
+  `label="4 unread"` a screen reader hears "Messages 4 unread", while the tag
   still shows 4.
 - **The count is not a control.** It is a `span` that sits inside buttons, tabs
   and nav items; whatever is pressable is the thing around it.
-- **Contrast.** Subtle uses each appearance's (Text) color, and bold warning uses the
-  Warning Container pair because warning with white text fails AA. Inverse
-  is a solid white badge with dark text, so it clears AA on any fill, including
+- **Contrast.** Subtle uses each appearance's text color, and bold warning uses the
+  warning inverse pair so it clears AA. Inverse clears AA on any bold fill, including
   a primary button.
 
 ## Related
 
-- For the condition something is in, use `StatusTag`; its `trailingMetric` nests a Count tag inside it.
-- For a category, a subject or a person, use `Tag`.
+- `StatusTag`: use when nesting a `CountTag` inside a condition label through `trailingMetric`.
+- `Tag`: use when nesting a `CountTag` on a selectable filter tag through `trailingMetric`.
 
 Same group: `AiMessage` · `ChangeTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 
 1. **Number.** The count in the body-small size with tabular digits, hidden at 0 unless `showZero`, capped at `max` with a `+`.
-2. **Badge.** 20 tall on its own and 16 inside a label, 24 wide at minimum, with a 2 corner, so one digit is a small rectangle and more digits grow it from the trailing edge.
-3. **Dot.** Presence without a number: an 8 circle that needs a `label` for its name.
+2. **Pill.** `20` tall on its own and `16` inside a label, `24` wide at minimum, so one digit is a small rectangle and more digits grow it from the trailing edge.
+3. **Dot.** Presence without a number: an `8` circle that needs a `label` for its name.
 4. **Ring.** Optional, in the surface color, for a count pinned to the corner of an icon or an avatar.
 
 ### States
@@ -111,9 +114,9 @@ Same group: `AiMessage` · `ChangeTag` · `DateTag` · `PromptStarters` · `Smar
 
 | Do | Don't |
 | --- | --- |
-| Show the bare number: 4, 12, 99+. | Add words or units to the badge: "4 unread". |
+| Show the bare number: 4, 12, 99+. | Add words or units to the tag: "4 unread". |
 | Put the meaning in `label`, which a screen reader reads: "4 unread messages". | Write "04" or pad with zeros. |
-| Leave a zero out. An empty tab needs no badge. | Show "0" unless the zero is the news. |
+| Leave a zero out. An empty tab needs no count tag. | Show "0" unless the zero is the news. |
 | Give a dot a `label` that says what it marks: "New message". | Ship a dot with no name. |
 
 ## Props

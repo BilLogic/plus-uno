@@ -32,7 +32,7 @@ One row of the Navigation system: a 32 row padded 12 at the sides, with a 16 ico
 
 <ComponentExample of={SidebarTabStories.WithDescription} title="Description" description="A second line in Body/small; the row grows past 32 to hold it." />
 
-<ComponentExample of={SidebarTabStories.WithCount} title="Trailing slot" description={<><code>elemAfter</code> holds a count, a badge or a status at the end of the row.</>} />
+<ComponentExample of={SidebarTabStories.WithCount} title="Trailing slot" description={<><code>elemAfter</code> holds a count or a status at the end of the row.</>} />
 
 <ComponentExample of={SidebarTabStories.WithActions} title="Actions on hover" description={<><code>actionsOnHover</code> shows its controls on hover and focus, beside the row, so a press on one never opens the row.</>} />
 
@@ -56,7 +56,7 @@ One row of the Navigation system: a 32 row padded 12 at the sides, with a 16 ico
 
 <DocsInteractivePlayground
     of={SidebarTabStories.Interactive}
-    description={<>Change the label, icon and state in the table below.</>}
+    description="Change the label, icon and state in the table below."
 />
 
 </div>
@@ -79,13 +79,25 @@ The Sidebar builds every row from its config, so a page passes `groups` to the S
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For switching between views of a single subject inside a page, use `Tabs`.
+- For actions in an anchored menu, use `DropdownMenu`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
-1. **Icon.** A 16 Font Awesome Free glyph, hidden from assistive technology.
+1. **Icon.** A `16` Font Awesome Free glyph, hidden from assistive technology.
 2. **Label.** Body/default, truncated with an ellipsis.
 3. **Description** (optional). A second line in Body/small.
-4. **Trailing slot** (optional). A count, a badge or a status.
+4. **Trailing slot** (optional). A `CountTag` or a `StatusTag`.
 5. **Actions** (optional). Controls beside the row, shown on hover and focus.
+
+The tokens each part draws are read from `Sidebar.scss` and listed under Tokens
+touched in the Harness tab.
 
 ### States
 
@@ -96,11 +108,25 @@ The Sidebar builds every row from its config, so a page passes `groups` to the S
 <tbody>
 <tr><td>Rest</td><td>Subtle text and icon, no fill.</td></tr>
 <tr><td>Hovered</td><td>The neutral hovered fill; pressed takes its pressed step.</td></tr>
-<tr><td>Focused</td><td>A 2px focused ring, 2px inside the row, and no fill.</td></tr>
+<tr><td>Focused</td><td>Shows the focus ring inside the row with no fill; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Selected</td><td>The selected fill, selected text and icon, the medium weight and <code>aria-current="page"</code>.</td></tr>
 <tr><td>Disabled</td><td>The disabled text and icon colors, and no tab stop.</td></tr>
 </tbody>
 </DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Pass `groups` to `Sidebar` rather than hand-building the main rail.
+
+`Sidebar` manages group collapse, open tabs and keyboard navigation across rows; use `SidebarTab` directly only for custom rows outside the main groups.
+
+### Keep navigation icons outlined.
+
+Selection is shown by the selected fill and ink, never by swapping an outlined icon for a solid one.
 
 </div>
 
@@ -118,7 +144,8 @@ The Sidebar builds every row from its config, so a page passes `groups` to the S
 
 ## Related
 
-- <a href="?path=/docs/components-navigation-navigation-system-navigation-system--docs">Navigation system</a> for the Sidebar that holds the rows.
+- <a href="?path=/docs/components-navigation-navigation-system-navigation-system--docs">Navigation system</a>: use when configuring the `Sidebar` that holds the rows.
+- `CountTag`: use when placing a count in `elemAfter`.
 
 </div>
 

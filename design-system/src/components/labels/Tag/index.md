@@ -16,12 +16,24 @@ Also asked as: label, keyword.
 
 ## Usage
 
-- **Is it a number?** Count tag.
-- **Is it the condition something is in, and can that condition change?** Status tag.
-- **Otherwise** (a subject, a focus area, a person, a category): Tag.
+Use `Tag` for a subject, a focus area, a person, an agent, a team or a
+category. A tag is outlined and a status is filled, so a reader tells a
+category from a workflow state without reading the words.
 
-Who set the value no longer decides. A tag is outlined and a status is filled,
-so a reader tells a category from a meaning without reading the words.
+- **Is it a number?** `CountTag`.
+- **Is it a due or event date?** `DateTag`.
+- **Is it the condition something is in, and can that condition change?** `StatusTag`.
+- **Otherwise** (a subject, a focus area, a person, a category): `Tag`.
+
+`color` is one of the twelve tag hues (`standard`, `green`, `lime`, `blue`, `red`, `purple`, `magenta`, `grey`, `teal`, `orange`, `yellow`, `brown`). Pass `person` (or an `Avatar` in `elemBefore`) to round the leading corner around the avatar. `isSelected` makes the tag a toggle button (`aria-pressed`); `isLoading` puts a spinner in the leading slot while a toggle or remove is saving.
+
+## Alternatives
+
+- For one of the five SMART competency areas, use `SmartTag`.
+- For the condition something is in when that condition can change, use `StatusTag`.
+- For a number on its own, use `CountTag`.
+- For a due or event date, use `DateTag`.
+- For a labeled field where the person picks and removes tags, use `TagInput`.
 
 ## Best practices
 
@@ -34,7 +46,7 @@ Don't: Rainbow inside one category.
 
 ### Keep color for a category, never a status. {#keep-color-for-a-category-never-a-status}
 
-Pick a color per category and keep it stable, or leave every tag gray. A condition that can change is a Status tag.
+Pick a color per category and keep it stable, or leave every tag gray. A condition that can change is a `StatusTag`.
 
 Do: A stable color for a category.
 Don't: Green reads as "went well" beside anything red.
@@ -66,7 +78,7 @@ A plain tag is its outline and neutral words. Turn on `swatchBefore` for a tag t
 // Removable: a value the person can take out.
 <Tag isRemovable onAfterRemoveAction={drop}>Grade 4</Tag>
 
-// Selectable: a filter or an answer chip, with its result count.
+// Selectable: a filter or an answer choice, with its result count.
 <Tag isSelected={on} onClick={toggle} trailingMetric={12}>Science</Tag>
 
 // Link, and a link with a separate ×.
@@ -92,7 +104,6 @@ warning.
 ### Lift a tag onto an image with `isElevated`. {#lift-a-tag-onto-an-image-with-iselevated}
 
 ```jsx
-// A subject on a lesson thumbnail, 8 from the corner.
 <Tag color="blue" isElevated>Lincoln Middle</Tag>
 <Tag href="/lessons/42" color="magenta" isElevated>Open lesson</Tag>
 ```
@@ -129,7 +140,7 @@ and every tag inside follows:
 - **Selectable publishes `aria-pressed`**, so the state is not only visible.
   Selected also changes the border to the full hue, so it does not rest on a
   change of lightness alone. A selectable tag given `aria-expanded` is a button
-  that opens something, such as TagGroup's `+n`: it publishes the expanded
+  that opens something, such as `TagGroup`'s `+n`: it publishes the expanded
   state and no `aria-pressed`.
 - **A link with a × is two tab stops**, link then ×, and pressing the × never
   follows the link.
@@ -138,7 +149,7 @@ and every tag inside follows:
   but do nothing until the save lands.
 - **A × needs a name.** When the label is not text, pass `removeButtonLabel`, or the
   × is named only "Remove" and development warns.
-- **An elevated tag's focus ring has a surface gap.** The 2px between the tag
+- **An elevated tag's focus ring has a surface gap.** The gap between the tag
   (or a link's ×) and the ring is filled in the surface color, so the ring
   reads on a dark picture.
 - **Disabled tags take no focus, and say they are disabled.** They come from
@@ -156,28 +167,27 @@ and every tag inside follows:
 
 ## Related
 
-- For a set of tags, use `TagGroup`: it owns the gaps and the overflow.
-- For a number on its own, use `CountTag`.
-- For a labeled field where the person picks, creates and removes tags, use `TagInput`.
-- For a state, use `StatusTag`.
+- `TagGroup`: use when laying out a set of tags with shared spacing, alignment and overflow.
+- `SmartTag`: use when tagging one of the five SMART competency areas.
+- `Suggestion`: use when offering proposed tags for the person to accept.
 
 Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `TagGroup`
 
 ## Parts
 
-1. **Lead, optional.** Nothing by default. A 10 swatch (`swatchBefore`), an icon (`elemBefore`), or for a person, an agent or a team a 16 avatar.
+1. **Lead, optional.** Nothing by default. A `10` swatch (`swatchBefore`), an icon (`elemBefore`), or for a person, an agent or a team a `16` avatar.
 2. **Label.** Neutral text; the hue never colors the words.
-3. **Trailing metric.** Optional on a selectable tag: a compact Count tag, such as a filter's result count.
-4. **Remove button.** Optional, with the 2px focus ring on the button itself and a name that says what it removes.
+3. **Trailing metric.** Optional on a selectable tag: a compact `CountTag`, such as a filter's result count.
+4. **Remove button.** Optional, with its own focus ring and a name that says what it removes.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Rest | Outlined, clear ground, the hue on the border. 22 tall. |
+| Rest | Outlined, clear ground, the hue on the border. |
 | Hovered, pressed | A link or a selectable tag takes the accent's subtlest and subtlest pressed steps; a link's words underline. On a removable tag only the × reacts. |
 | Selected | The subtler ground with a full-hue border, held under hover and press. |
-| Focused | A 2px ring 2px off the edge, on the tag or on the ×. |
+| Focused | Shows the focus ring on the tag or on the ×; see Border. |
 | Disabled | Disabled ground and words, no ×, no link, no focus; a selected tag keeps a bold edge. |
 
 ### Tokens

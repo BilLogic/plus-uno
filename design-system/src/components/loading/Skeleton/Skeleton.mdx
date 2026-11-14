@@ -73,7 +73,7 @@ Status tag, Count tag and Tag, so nothing moves when the value arrives.
 
 <ComponentExample of={SkeletonStories.Paragraph} title="Lines" description={<><code>lines</code> repeats the text bar 8 apart with a shorter last line; <code>preset="paragraph"</code> is three lines.</>} />
 
-<ComponentExample of={SkeletonStories.TagGroupPreset} title="Tag group" description={<><code>preset="tag-group"</code> is three tag shapes at the TagGroup gap, for a tag list that loads on its own.</>} />
+<ComponentExample of={SkeletonStories.TagGroupPreset} title="Tag group" description={<><code>preset="tag-group"</code> is three tag shapes at the TagGroup gap, for a tag group that loads on its own.</>} />
 
 <ComponentExample of={SkeletonStories.LoadingTable} title="Loading table" description={<>The region carries <code>aria-busy</code> with a status beside it; <strong>Finish loading</strong> shows the students arriving.</>} />
 
@@ -119,12 +119,7 @@ Status tag, Count tag and Tag, so nothing moves when the value arrives.
 
 <DocsInteractivePlayground
     of={SkeletonStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -141,12 +136,21 @@ Status tag, Count tag and Tag, so nothing moves when the value arrives.
 
 ## Usage
 
-Use `Skeleton` while content loads, so the space it will fill is already on
-screen and the layout does not jump when it arrives.
+Use `Skeleton` for a loading state while content loads, so the space it will
+fill is already on screen and the layout does not jump when it arrives.
 
 - **One label loading on its own** (a status calculated after the row appears, a
-  tag list fetched separately): the matching preset.
+  tag group fetched separately): the matching preset.
 - **A thumbnail, avatar or header:** a rectangle or circle with its own size.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For an action in progress or a short wait with no layout shape yet, use `Spinner`.
+- For a wait whose percentage is known, use `ProgressBar` or `ProgressRing`.
 
 </div>
 
@@ -257,7 +261,7 @@ For a `CountTag` inside a `StatusTag` or `Tag`, use one `preset="status"` for th
 
 ### Leave flags, modals, menus and spinners out.
 
-They appear when they have something to say. A Tag saving a change keeps its
+They appear when they have something to say. A `Tag` saving a change keeps its
 own spinner (`isLoading`), so saving and loading look different.
 
 </div>
@@ -287,15 +291,11 @@ own spinner (`isLoading`), so saving and loading look different.
   with no role, never takes focus and ignores the pointer, so a screen reader
   does not read a list of empty items and a placeholder cannot be clicked.
 - **The loading region carries the busy state.** Set `aria-busy="true"` once on
-  the container that is loading, and remove it when the content arrives. The
-  component does not set it, because it cannot see the region.
-- **Pair the busy state with a live label.** `aria-busy` alone is not announced
-  by every screen reader. Render a visually hidden `role="status"` element
-  **beside** the busy region, not inside it: content inside a busy region may
-  be held back until it is no longer busy. Mount the status **empty** and set
-  its text after mount ("Loading students…"), because text a status already
-  holds when it mounts is not announced. Keep it mounted, and when the content
-  arrives, set its text again ("Students loaded").
+  the container that is loading, and remove it when the content arrives.
+- **Pair the busy state with a live label.** Render a visually hidden
+  `role="status"` element **beside** the busy region, not inside it. Mount the
+  status empty and set its text after mount ("Loading students…"), then update
+  it when content arrives ("Students loaded").
 
 ```jsx
 const [message, setMessage] = useState('');
@@ -311,8 +311,6 @@ useEffect(() => {
 ```
 - **Reduced motion.** Under `prefers-reduced-motion: reduce` the shimmer stops
   and the fill is flat.
-- **Contrast in any theme.** The fill is `--ds-skeleton` and the shimmer
-  `--ds-skeleton-subtle`, both theme tokens.
 
 </div>
 
@@ -320,10 +318,9 @@ useEffect(() => {
 
 ## Related
 
-- `StatusTag`, `CountTag` and `Tag` are the labels the presets are sized to.
-- `Spinner` is for an action in progress and for full-page transitions; a Tag
-  saving a change uses its own spinner.
-- The loading guidance in the surfaces guideline points here.
+- `StatusTag`: use when replacing a `preset="status"` placeholder once the status resolves.
+- `TagGroup`: use when replacing a `preset="tag-group"` placeholder once the tags load.
+- <a href="?path=/docs/patterns-states-loading--docs">Loading</a>: use when deciding between `Skeleton`, `Spinner` and `ProgressBar` across a view.
 
 </div>
 

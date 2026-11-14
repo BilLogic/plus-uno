@@ -14,21 +14,29 @@ Sidebar pattern: the app's side navigation, 240 wide, padded 12, on the sunken f
 
 ## Usage
 
-Use the Sidebar for the app's main areas. The PLUS `Sidebar` (`@/components`) fills it from the role's config, and the Frame decides whether it docks, collapses or floats; this page covers what is inside it.
+Use `Sidebar` for the app's main areas. `Sidebar` (`@/components`) fills the
+rail from the role's config, and the Frame decides whether it docks, collapses
+or floats; this page covers what is inside it.
 
-Content is data. The Sidebar draws the `groups` it is given and never changes the URL: the caller handles `onSelect` and decides which groups a role sees.
+Content is data. The Sidebar draws the `groups` it is given and never changes
+the URL: the caller handles `onSelect` and decides which groups a role sees.
+
+## Alternatives
+
+- For switching between views of a single subject inside a page, use `Tabs`.
+- For showing position inside a deep hierarchy above the page title, use `Breadcrumb`.
 
 ## Best practices
 
-### One selected tab. {#one-selected-tab}
+### Mark one selected item at a time. {#mark-one-selected-item-at-a-time}
 
 The Sidebar marks one current page. `activeId` takes one id, so exactly one row or tab carries the selected fill and `aria-current="page"`.
 
-### Every icon is outlined. {#every-icon-is-outlined}
+### Keep every row icon outlined. {#keep-every-row-icon-outlined}
 
 Rows draw regular-style icons in the one subtle icon color, and a selected row shows its fill with the selected icon color, never a solid icon. A brand mark such as Slack is the only exception: it keeps its brand glyph.
 
-### The ancestor marks the parent. {#the-ancestor-marks-the-parent}
+### Highlight the ancestor without a fill when a child tab is selected. {#highlight-the-ancestor-without-a-fill-when-a-child-tab-is-selected}
 
 A parent of the current page shows it without competing: when one of a row's tabs is selected, the tab takes the fill and the row goes to ink without it.
 
@@ -63,23 +71,22 @@ Don't: Everything in the label, and the time is cut off.
 
 ## Related
 
-- Frame docks, collapses and floats the Sidebar beside the Page.
-- Templates draw the Sidebar from the config you pass.
-- Sidebar tab for one row.
-- For a count on a row, the Sidebar uses `CountTag`.
+- Frame: use when docking, collapsing and floating the Sidebar beside the Page.
+- `SidebarTab`: use when configuring a single row inside a custom sidebar section.
+- `CountTag`: use when rendering a count on the trailing edge of a row.
 
 Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternTable`
 
 ## Parts
 
-1. **Logo row.** The PLUS logo, which goes Home, and the toggle at the end of the row.
+1. **Logo row.** The PLUS `Logo`, which goes Home, and the toggle at the end of the row.
 2. **Group.** Rows under an optional section title. A group without a title has no title row and never collapses.
-3. **Section title.** A full 32 row in the subtlest text. On hover and focus the collapse angle shows after it.
-4. **Row.** A 24 icon slot, the label, and a trailing slot for a count, a dot, the external icon or Close.
+3. **Section title.** A full `--item-height-md` row in the subtlest text. On hover and focus the collapse angle shows after it.
+4. **Row.** An icon slot, the label, and a trailing slot for a count, a dot, the external icon or Close.
 5. **Open tabs.** Records a person opened, such as a session or a student, under their row on a thread. Three show, then Show n more.
 6. **Account row.** The avatar, the name and the role, which open the account menu, and Help Center, under a divider.
 
-Every part sits on one grid: icon centers on x 32, labels start on x 48, trailing slots center on x 208, and section titles start on x 20.
+Every part sits on one grid: icon centers on x `32`, labels start on x `48`, trailing slots center on x `208`, and section titles start on x `20`.
 
 ### States
 
@@ -88,13 +95,11 @@ Every part sits on one grid: icon centers on x 32, labels start on x 48, trailin
 | Rest | The row in `--ds-text-subtle`, with no fill. |
 | Hovered | The neutral hovered fill and ink text. A row with tabs swaps its icon for the collapse angle and its trailing slot for Close all; a tab swaps its live dot for Close. |
 | Pressed | The neutral pressed fill. |
-| Focused | A ring inside the row's edge, in `--ds-border-focused`, and the same swaps as hover. |
+| Focused | Shows the focus ring inside the row's edge and the same swaps as hover; see Border. |
 | Disabled | Not used. A row the person cannot reach yet is locked instead. |
 | Selected | The selected fill, ink text and icon and the medium weight, with `aria-current="page"`. A selected tab takes the fill and its row goes to ink without it. |
 | Locked | While `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock and its rows take the subtlest text, with no hover and no press. |
 | Collapsed | A collapsed section hides its rows and turns its angle right. Collapsed sections are remembered per person under `storageKey`. |
-
-Docked, collapsed, peeking and overlay are the Frame's states, on the Frame page.
 
 ### Tokens
 
@@ -111,6 +116,8 @@ The Sidebar's width, 240, belongs to the Frame: see Frame.
 | Section title and locked rows | `--ds-text-subtlest`, `--ds-icon-subtlest`; titles at `--body-small`. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width`, inside the row. |
 | Account row divider | `--ds-border`. |
+
+Docked, collapsed, peeking and overlay are the Frame's states, on the Frame page.
 
 ## Content guidelines
 

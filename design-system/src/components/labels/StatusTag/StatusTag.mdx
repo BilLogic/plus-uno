@@ -14,10 +14,8 @@ import {
 <Meta of={StatusTagStories} />
 
 <Title />
-Is it a number? Count tag. Is it a due or event date? Date tag. Is it the
-condition something is in, and can that condition change? Status tag. Otherwise,
-Tag. A Status tag is the condition something is in, whether the system
-calculated it or a person set it.
+The condition something is in, when that condition can change — whether the
+system calculated it or a person set it.
 
 <DocsTabs of={StatusTagStories}>
 
@@ -34,7 +32,7 @@ calculated it or a person set it.
 
 ## Appearance
 
-<ComponentExample of={StatusTagStories.Styles} title="Appearances" description="Six appearances, each with a meaning, at default and spacious spacing: a tinted fill, its (Text) color and a 1px inside border one step darker." />
+<ComponentExample of={StatusTagStories.Styles} title="Appearances" description="Six appearances, each with a meaning, at default and spacious spacing: a tinted fill, its text color and an inset border one step darker." />
 
 <ComponentExample of={StatusTagStories.IconBefore} title="Icon before" description={<><code>iconBefore</code> adds one icon before the label, in the text color.</>} />
 
@@ -70,7 +68,7 @@ calculated it or a person set it.
 
 <ComponentExample of={StatusTagStories.Hovered} title="Hovered" description="No change: a status tag is not a control." />
 
-<ComponentExample of={StatusTagStories.Pressed} title="Pressed" description="No change. To edit a status, the field around it becomes a dropdown." />
+<ComponentExample of={StatusTagStories.Pressed} title="Pressed" description="No change. To edit a status, the field around it uses a Select." />
 
 <ComponentExample of={StatusTagStories.Focused} title="Focused" description="Not in the tab order, unless the text is truncated." />
 
@@ -84,12 +82,7 @@ calculated it or a person set it.
 
 <DocsInteractivePlayground
     of={StatusTagStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -110,13 +103,8 @@ Use `StatusTag` for the condition something is in when that condition can change
 completed, needs review, missed, in progress. It is the same component whether
 the system calculated the state or a person set it.
 
-- **Is it a number?** Count tag.
-- **Is it a due or event date?** Date tag.
-- **Is it the condition something is in, and can that condition change?** Status tag.
-- **Otherwise** (a subject, a person, a category): Tag.
-
-Use `spacing="default"` (20) in rows, lists, tables and sentences, and
-`spacing="spacious"` (32) beside a heading.
+Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
+`spacing="spacious"` (`32`) beside a heading.
 
 ### Appearance guidance
 
@@ -138,12 +126,23 @@ Use `spacing="default"` (20) in rows, lists, tables and sentences, and
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For a number on its own, use `CountTag`.
+- For a due or event date, use `DateTag`.
+- For a change over time such as "+3 vs last week", use `ChangeTag`.
+- For a category or subject or person, use `Tag` or `SmartTag`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
 1. **Icon before.** Optional: a Font Awesome Free icon by name.
-2. **Label.** The condition, in a word or two. Past <code>maxWidth</code> it ends in an ellipsis and the full text is a tooltip.
-3. **Trailing metric.** Optional: a compact Count tag nested inside, with its own appearance when it means something else.
-4. **Fill.** The appearance's tinted ground with its words and an edge one step darker.
+2. **Label.** The condition, in a word or two. Past `maxWidth` it ends in an ellipsis and the full text is a tooltip.
+3. **Trailing metric.** Optional: a compact `CountTag` nested inside, with its own appearance when it means something else.
+4. **Fill.** The appearance's tinted ground with its words and an inset edge one step darker.
 
 ### States
 
@@ -185,7 +184,7 @@ Use `spacing="default"` (20) in rows, lists, tables and sentences, and
 
 Color carries the verdict, so success never labels a problem. Each appearance
 means one thing (see the guidance above). There is no color prop; a category
-with a color is a Tag.
+with a color is a `Tag`.
 
 <DoDontPair
     doExample={<StatusTag appearance="success">Complete</StatusTag>}
@@ -234,9 +233,9 @@ success status with a danger count of failures.
 ### Edit in the field, not on the label.
 
 A Status tag never opens a menu. Where a status can be changed, the field around
-it becomes an inline Dropdown whose options are grouped To do · In progress ·
-Complete · Exception · Failed, each group with one appearance (neutral · info ·
-success · warning · danger).
+it uses a `Select` whose options are grouped To do · In progress · Complete ·
+Exception · Failed, each group with one appearance (neutral · info · success ·
+warning · danger).
 
 </div>
 
@@ -269,9 +268,9 @@ success · warning · danger).
   takes focus so a keyboard user can reach the tooltip holding the full text;
   pointer users get the same tooltip on hover. The full text is always in the
   DOM, so a screen reader hears all of it.
-- **Not color alone.** A state can add a `iconBefore` where color alone is
+- **Not color alone.** A state can add `iconBefore` where color alone is
   not enough. Icons are decorative and hidden from assistive technology.
-- **An edge on any surface.** The 1px inside border keeps a pale fill visible
+- **An edge on any surface.** The inset border keeps a pale fill visible
   on white and on gray; in forced-colors mode it becomes a real border.
 
 </div>
@@ -280,9 +279,8 @@ success · warning · danger).
 
 ## Related
 
-- For a number on its own, use `CountTag`; Status tag nests one through `trailingMetric`.
-- For a due or event date, use `DateTag`.
-- For a category, a subject or a person, use `Tag` (or `SmartTag` for a SMART subject).
+- `CountTag`: use when nesting a metric inside `StatusTag` through `trailingMetric`.
+- `Select`: use when letting a person change a record's status in a form or table cell.
 
 </div>
 
