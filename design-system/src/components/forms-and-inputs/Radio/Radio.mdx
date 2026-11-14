@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as RadioStories from './Radio.stories.jsx';
-import { Radio } from '@/components';
+import { Radio, Illustration } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -49,6 +49,14 @@ A radio lets a person choose one option from a set.
 <ComponentExample of={RadioStories.Content} title="Options" description="Concise labels in a logical order, stacked. Radios that share a name form a group." />
 
 <ComponentExample of={RadioStories.DescriptionAndCard} title="Description and card" description="A description under the label, and the card appearance for options that need more room." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tile appearance
+
+<ComponentExample of={RadioStories.Tile} title="Choice tiles" description="`appearance=&quot;tile&quot;` draws a 224px pictured tile; the chosen tile takes a 2px selected border and selected fill with no visible dot." />
 
 </div>
 
@@ -154,7 +162,8 @@ Make one option the default: the safest and lowest-risk one. If a person may dec
 <tr><td>Circle size, edge width</td><td><code>--radio-control-size</code> (12); <code>--stroke-2</code>.</td></tr>
 <tr><td>Row</td><td><code>--item-height-sm</code> (24); gap <code>--space-050</code>.</td></tr>
 <tr><td>Label</td><td><code>--ds-text</code>, body default.</td></tr>
-<tr><td>Card</td><td><code>--radius-025</code>, <code>--stroke-1</code> edge in <code>--ds-border</code>, <code>--ds-surface</code> fill.</td></tr>
+<tr><td>Card</td><td><code>--radius-control-md</code>, <code>--stroke-1</code> edge in <code>--ds-border</code>, <code>--ds-surface</code> fill.</td></tr>
+<tr><td>Choice tile</td><td><code>--choice-tile-width</code> (224px), <code>--radius-control-md</code>, <code>--ds-surface</code> fill; selected 2px <code>--ds-border-selected</code> and <code>--ds-background-selected</code>.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -163,6 +172,17 @@ Make one option the default: the safest and lowest-risk one. If a person may dec
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+### Reserve choice tiles for one big question with two to four pictured options.
+
+Use `appearance="tile"` when a step asks one focal question with two to four options and every option carries an `illustration`. Keep ordinary form lists and sets of five or more options in `plain` or `card`.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)' }}><Radio name="do-tile-r" label="One-on-one" value="a" description="One student." illustration={<Illustration character="relationships" size={48} />} appearance="tile" defaultChecked /><Radio name="do-tile-r" label="Small group" value="b" description="Two to four students." illustration={<Illustration character="social-emotional" size={48} />} appearance="tile" /></div>}
+    doCaption="Two pictured tiles for one focal question."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)' }}><Radio name="dont-tile-r" label="Daily" value="a" appearance="tile" /><Radio name="dont-tile-r" label="Weekly" value="b" appearance="tile" /><Radio name="dont-tile-r" label="Monthly" value="c" appearance="tile" /></div>}
+    dontCaption="Plain text options without illustrations drawn as tiles."
+/>
 
 ### Show one answer selected at a time.
 

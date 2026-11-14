@@ -177,3 +177,118 @@
 .plus-form-checkbox[data-readonly]:not([data-checked]):not([data-indeterminate]) {
     background-color: var(--ds-background-neutral);
 }
+
+// Choice tile (pick many): centered illustration, label, description in a 224px
+// surface, with the Checkbox anchored at the tile's top end and the focus ring
+// drawn outside the tile.
+.plus-form-checkbox-wrapper.plus-choice-tile {
+    width: var(--choice-tile-width);
+    padding: var(--card-pad-default) var(--pad-x-lg);
+    border: var(--border-default) solid var(--ds-border);
+    border-radius: var(--radius-control-md);
+    background-color: var(--ds-surface);
+    align-items: center;
+    text-align: center;
+    gap: var(--stack-sm);
+    position: relative;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+    .plus-choice-tile-illustration {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: var(--stack-sm);
+    }
+
+    .plus-form-checkbox-row {
+        justify-content: center;
+        min-height: 0;
+        gap: 0;
+    }
+
+    &:not(:has(.plus-choice-tile-illustration)) .plus-form-checkbox-row {
+        padding-inline: var(--pad-x-lg);
+    }
+
+    // Anchored at the tile's top end; shifts inward by 1px while the tile's
+    // border steps from 1px to 2px so the box never moves.
+    .plus-form-checkbox {
+        position: absolute;
+        inset-block-start: var(--stack-lg);
+        inset-inline-end: var(--stack-lg);
+
+        &:focus,
+        &:focus-visible,
+        &[data-focus-visible] {
+            @include plus-ring-reset;
+        }
+    }
+
+    .plus-form-checkbox-label {
+        font-weight: var(--type-weight-medium);
+    }
+
+    .plus-field-caption {
+        padding-left: 0;
+        justify-content: center;
+        text-align: center;
+
+        .plus-field-caption__message {
+            justify-content: center;
+        }
+    }
+
+    &:has(.plus-form-checkbox[data-checked]):not(.plus-field-stack--disabled),
+    &:has(.plus-form-checkbox[data-indeterminate]):not(.plus-field-stack--disabled) {
+        background-color: var(--ds-background-selected);
+        border-width: var(--border-selected);
+        border-color: var(--ds-border-selected);
+        padding: calc(var(--card-pad-default) - var(--border-selected) + var(--border-default)) calc(var(--pad-x-lg) - var(--border-selected) + var(--border-default));
+
+        .plus-form-checkbox {
+            inset-block-start: calc(var(--stack-lg) - var(--border-selected) + var(--border-default));
+            inset-inline-end: calc(var(--stack-lg) - var(--border-selected) + var(--border-default));
+        }
+    }
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-surface-hovered), border-color: var(--ds-border-brand)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover:not(.plus-field-stack--disabled):not(.plus-choice-readonly):not(:has(.plus-form-checkbox[data-checked])):not(:has(.plus-form-checkbox[data-indeterminate]))'
+    );
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-selected-hovered), border-color: var(--ds-border-selected)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:has(.plus-form-checkbox[data-checked]):hover:not(.plus-field-stack--disabled):not(.plus-choice-readonly), &:has(.plus-form-checkbox[data-indeterminate]):hover:not(.plus-field-stack--disabled):not(.plus-choice-readonly)'
+    );
+
+    &:has(.plus-form-checkbox:focus-visible),
+    &:has(.plus-form-checkbox[data-focus-visible]) {
+        @include plus-ring;
+    }
+
+    &.plus-form-checkbox-invalid:not(:has(.plus-form-checkbox[data-checked])):not(:has(.plus-form-checkbox[data-indeterminate])):not(.plus-field-stack--disabled) {
+        border-color: var(--ds-border-danger);
+    }
+
+    &.plus-choice-readonly {
+        cursor: default;
+
+        &:not(:has(.plus-form-checkbox[data-checked])):not(:has(.plus-form-checkbox[data-indeterminate])) {
+            background-color: var(--ds-background-neutral);
+        }
+    }
+
+    &.plus-field-stack--disabled {
+        cursor: not-allowed;
+        background-color: var(--ds-background-disabled);
+        border-color: var(--ds-border-disabled);
+    }
+}

@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as CheckboxStories from './Checkbox.stories.jsx';
-import { Checkbox } from '@/components';
+import { Checkbox, Illustration } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -50,7 +50,15 @@ A checkbox lets a person select one or more options from a list, or confirm a si
 
 <ComponentExample of={CheckboxStories.Description} title="Description" description="Text under the label that describes the choice. It is read after the name." />
 
-<ComponentExample of={CheckboxStories.Card} title="Card" description="The choice drawn as a bordered tile, for choices that need more room." />
+<ComponentExample of={CheckboxStories.Card} title="Card" description="The choice drawn as a bordered row, for choices that need more room." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tile appearance
+
+<ComponentExample of={CheckboxStories.Tile} title="Choice tiles" description="`appearance=&quot;tile&quot;` draws a 224px pictured tile with the Checkbox at its top end." />
 
 </div>
 
@@ -167,6 +175,7 @@ Individual checkboxes have two states, selected and unselected. When checkboxes 
 <tr><td>Row</td><td><code>--item-height-sm</code> (24); gap <code>--space-050</code>.</td></tr>
 <tr><td>Label</td><td><code>--ds-text</code>, body default.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+<tr><td>Choice tile</td><td><code>--choice-tile-width</code> (224px), <code>--radius-control-md</code>, <code>--ds-surface</code> fill; selected 2px <code>--ds-border-selected</code> and <code>--ds-background-selected</code>, with the Checkbox at the top end.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -175,6 +184,17 @@ Individual checkboxes have two states, selected and unselected. When checkboxes 
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+### Reserve choice tiles for one big question with two to four pictured options.
+
+Use `appearance="tile"` when a step asks one focal question with two to four options and every option carries an `illustration`. Keep ordinary form lists and sets of five or more options in `plain` or `card`.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)' }}><Checkbox label="Mastering content" description="Concept fluency." illustration={<Illustration character="mastering-content" size={48} />} appearance="tile" defaultChecked /><Checkbox label="Student advocacy" description="Self-advocacy skills." illustration={<Illustration character="advocacy" size={48} />} appearance="tile" /></div>}
+    doCaption="Two pictured tiles with top-end checkboxes for one focal question."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)' }}><Checkbox label="Monday" appearance="tile" /><Checkbox label="Tuesday" appearance="tile" /><Checkbox label="Wednesday" appearance="tile" /></div>}
+    dontCaption="Plain text options without illustrations drawn as tiles."
+/>
 
 ### Say what is being agreed to.
 
@@ -292,7 +312,7 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 
 - To turn a setting on or off at once, use Toggle.
 - For one answer from several options, use Radio, or Radio group for the whole set.
-- For a group of checkboxes, use a Checkbox group: Checkboxes inside a Fieldset with a legend.
+- For a group of checkboxes with a legend, value array and group error, use CheckboxGroup.
 - For a rows-by-columns matrix of choices, use Choice grid.
 - For choices in a popup, use Select.
 

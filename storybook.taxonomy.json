@@ -25,6 +25,7 @@
       "Vertical button",
       "Calendar",
       "Checkbox",
+      "Checkbox group",
       "Comment",
       "Date time picker",
       "Date picker",
@@ -247,6 +248,10 @@
         ],
         "Calendar",
         "Checkbox",
+        [
+          "Checkbox",
+          "Checkbox group"
+        ],
         "Comment",
         "Date time picker",
         [

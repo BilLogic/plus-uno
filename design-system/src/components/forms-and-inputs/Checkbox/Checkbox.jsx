@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
 import useFieldId from '../useFieldId';
-import { choiceClasses } from '../choiceItem';
+import { choiceClasses, activateChoiceTile } from '../choiceItem';
 import FieldFrame, { FieldLabel, FieldCaption, toneProps, fieldDescription } from '../_internal/FieldFrame';
 import './Checkbox.scss';
 
@@ -34,7 +34,9 @@ const Checkbox = ({
     isRequired = false,
     /** Secondary text under the label. It describes the box; it does not name it. */
     description,
-    /** `card` draws the choice as a bordered tile. */
+    /** Decorative picture shown above the label when `appearance` is `tile`. */
+    illustration,
+    /** `card` draws the choice as a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end. */
     appearance = 'plain',
     onChange,
     onFocus,
@@ -47,6 +49,7 @@ const Checkbox = ({
 }) => {
     const fieldId = useFieldId(id);
     const isControlled = isChecked !== undefined;
+    const isTile = appearance === 'tile';
     const tone = isInvalid ? 'invalid' : undefined;
     const { control } = toneProps(tone);
     const { 'aria-describedby': describedBy, ...inputRest } = props;
@@ -68,7 +71,18 @@ const Checkbox = ({
     ].filter(Boolean).join(' ');
 
     return (
-        <FieldFrame disabled={isDisabled} invalid={isInvalid} className={wrapperClasses} style={style}>
+        <FieldFrame
+            disabled={isDisabled}
+            invalid={isInvalid}
+            className={wrapperClasses}
+            style={style}
+            onClick={isTile ? activateChoiceTile : undefined}
+        >
+            {isTile && illustration && (
+                <div className="plus-choice-tile-illustration" aria-hidden="true">
+                    {illustration}
+                </div>
+            )}
             <div className="plus-form-checkbox-row">
                 <BaseCheckbox.Root
                     id={fieldId}
@@ -96,7 +110,7 @@ const Checkbox = ({
                     {label}
                 </FieldLabel>
             </div>
-            <FieldCaption messageId={messageId} message={description} tone={tone ?? 'help'} />
+            <FieldCaption messageId={messageId} message={description} tone="help" />
         </FieldFrame>
     );
 };
@@ -126,8 +140,10 @@ Checkbox.propTypes = {
     isRequired: PropTypes.bool,
     /** Secondary text under the label. It describes the box and does not name it. */
     description: PropTypes.node,
-    /** `plain` (default) draws the box and label inline; `card` draws the choice as a bordered tile. */
-    appearance: PropTypes.oneOf(['plain', 'card']),
+    /** Decorative picture shown above the label when `appearance` is `tile`. */
+    illustration: PropTypes.node,
+    /** `plain` (default) draws the box and label inline; `card` draws a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end. */
+    appearance: PropTypes.oneOf(['plain', 'card', 'tile']),
     /** Called with `{ target: { name, value, checked } }` when the box is toggled. */
     onChange: PropTypes.func,
     /** Called with the focus event when the checkbox gains focus. */

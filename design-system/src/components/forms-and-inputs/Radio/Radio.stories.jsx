@@ -5,6 +5,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
+import { Illustration } from '@/components';
 import Radio from './Radio';
 
 export default {
@@ -36,6 +37,11 @@ export default {
             control: 'text',
             description: 'Label text for the third option',
             table: { category: 'Content' },
+        },
+        appearance: {
+            control: 'select',
+            options: ['plain', 'card', 'tile'],
+            table: { category: 'Design' },
         },
         isInvalid: {
             control: 'boolean',
@@ -357,4 +363,44 @@ export const Required = {
         await expect(canvasElement.querySelector('.plus-form-radio-wrapper')).toHaveClass('plus-form-radio-required');
         await expect(canvasElement.querySelector('.plus-field-required')).toHaveAttribute('aria-hidden', 'true');
     },
+};
+
+export const Tile = () => {
+    const [value, setValue] = useState('one');
+    return (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)' }}>
+            <Radio
+                id="radio-tile-one"
+                name="radio-tile"
+                value="one"
+                label="One-on-one"
+                description="Work with one student."
+                illustration={<Illustration character="relationships" size={96} />}
+                appearance="tile"
+                isChecked={value === 'one'}
+                onChange={(e) => setValue(e.target.value)}
+            />
+            <Radio
+                id="radio-tile-group"
+                name="radio-tile"
+                value="group"
+                label="Small group"
+                description="Guide two to four students."
+                illustration={<Illustration character="social-emotional" size={96} />}
+                appearance="tile"
+                isChecked={value === 'group'}
+                onChange={(e) => setValue(e.target.value)}
+            />
+        </div>
+    );
+};
+Tile.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('radio', { name: 'One-on-one' });
+    const tile = first.closest('.plus-choice-tile');
+    await expect(px(getComputedStyle(tile).width)).toBe(224);
+    await expect(px(getComputedStyle(tile).borderTopWidth)).toBe(2);
+    await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    await expect(getComputedStyle(first).opacity).toBe('0');
+    await expect(tile.querySelector('.plus-choice-tile-illustration')).toHaveAttribute('aria-hidden', 'true');
 };

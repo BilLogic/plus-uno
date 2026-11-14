@@ -257,6 +257,10 @@ const preview = {
               ],
               "Calendar",
               "Checkbox",
+              [
+                "Checkbox",
+                "Checkbox group"
+              ],
               "Comment",
               "Date time picker",
               [

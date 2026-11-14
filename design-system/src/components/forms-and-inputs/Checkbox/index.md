@@ -10,7 +10,7 @@ Also asked as: multi-select, checklist, tick box.
 
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card
+**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card, Tile
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx`
 
@@ -32,6 +32,13 @@ Checkbox reads these motion tokens and no literal duration or curve.
 | goal | Update a value or state | `--ds-motion-appearance-fast` | A session goal set or checked off together: the mark and fill change color, like any change. | `sound.goal` on land: only the session goal check-in done together, shared with the student; other checkboxes stay silent |
 
 ## Best practices
+
+### Reserve choice tiles for one big question with two to four pictured options. {#reserve-choice-tiles-for-one-big-question-with-two-to-four-pictured-options}
+
+Use `appearance="tile"` when a step asks one focal question with two to four options and every option carries an `illustration`. Keep ordinary form lists and sets of five or more options in `plain` or `card`.
+
+Do: Two pictured tiles with top-end checkboxes for one focal question.
+Don't: Plain text options without illustrations drawn as tiles.
 
 ### Say what is being agreed to. {#say-what-is-being-agreed-to}
 
@@ -102,11 +109,11 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 
 - To turn a setting on or off at once, use Toggle.
 - For one answer from several options, use Radio, or Radio group for the whole set.
-- For a group of checkboxes, use a Checkbox group: Checkboxes inside a Fieldset with a legend.
+- For a group of checkboxes with a legend, value array and group error, use CheckboxGroup.
 - For a rows-by-columns matrix of choices, use Choice grid.
 - For choices in a popup, use Select.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -137,6 +144,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid
 | Row | `--item-height-sm` (24); gap `--space-050`. |
 | Label | `--ds-text`, body default. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+| Choice tile | `--choice-tile-width` (224px), `--radius-control-md`, `--ds-surface` fill; selected 2px `--ds-border-selected` and `--ds-background-selected`, with the Checkbox at the top end. |
 
 ## Content guidelines
 
@@ -164,7 +172,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid
 | `isReadOnly` | bool | `false` | Shown and announced, not changeable |
 | `isRequired` | bool | `false` | Show the required marker and require it natively |
 | `description` | node | — | Secondary text under the label. It describes the box and does not name it. |
-| `appearance` | enum | `'plain'` | `plain` (default) draws the box and label inline; `card` draws the choice as a bordered tile. |
+| `illustration` | node | — | Decorative picture shown above the label when `appearance` is `tile`. |
+| `appearance` | enum | `'plain'` | `plain` (default) draws the box and label inline; `card` draws a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end. |
 | `onChange` | func | — | Called with `{ target: { name, value, checked } }` when the box is toggled. |
 | `onFocus` | func | — | Called with the focus event when the checkbox gains focus. |
 | `onBlur` | func | — | Called with the blur event when the checkbox loses focus. |
@@ -175,13 +184,13 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid
 
 ## Variants
 
-**`appearance`** — `plain` · `card`
+**`appearance`** — `plain` · `card` · `tile`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--body-default` · `--checkbox-control-size` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-text` · `--item-height-sm` · `--pad-x-md` · `--plus-choice-indent` · `--radius-control-md` · `--radius-md` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-regular`
+`--body-default` · `--border-default` · `--border-selected` · `--card-pad-default` · `--checkbox-control-size` · `--choice-tile-width` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--item-height-sm` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radius-control-md` · `--radius-md` · `--space-025` · `--space-0375` · `--space-050` · `--stack-lg` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss`. Override these through the token layer, never with a literal.
 

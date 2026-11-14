@@ -2199,15 +2199,25 @@
           "deprecated": null
         },
         {
+          "name": "illustration",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Decorative picture shown above the label when `appearance` is `tile`.",
+          "deprecated": null
+        },
+        {
           "name": "appearance",
           "type": "enum",
           "required": false,
           "default": "'plain'",
           "values": [
             "plain",
-            "card"
+            "card",
+            "tile"
           ],
-          "description": "`plain` (default) draws the box and label inline; `card` draws the choice as a bordered tile.",
+          "description": "`plain` (default) draws the box and label inline; `card` draws a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end.",
           "deprecated": null
         },
         {
@@ -2294,17 +2304,24 @@
         "DisabledWithReason",
         "Required",
         "Description",
-        "Card"
+        "Card",
+        "Tile"
       ],
       "tokens": [
         "--body-default",
+        "--border-default",
+        "--border-selected",
+        "--card-pad-default",
         "--checkbox-control-size",
+        "--choice-tile-width",
         "--ds-background-disabled",
         "--ds-background-input",
         "--ds-background-input-hovered",
         "--ds-background-neutral",
+        "--ds-background-selected",
         "--ds-background-selected-bold",
         "--ds-background-selected-bold-hovered",
+        "--ds-background-selected-hovered",
         "--ds-border",
         "--ds-border-brand",
         "--ds-border-danger",
@@ -2318,8 +2335,10 @@
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
         "--ds-surface",
+        "--ds-surface-hovered",
         "--ds-text",
         "--item-height-sm",
+        "--pad-x-lg",
         "--pad-x-md",
         "--plus-choice-indent",
         "--radius-control-md",
@@ -2327,10 +2346,199 @@
         "--space-025",
         "--space-0375",
         "--space-050",
+        "--stack-lg",
         "--stack-sm",
         "--stroke-1",
         "--stroke-2",
+        "--type-weight-medium",
         "--type-weight-regular"
+      ]
+    },
+    {
+      "name": "CheckboxGroup",
+      "kind": "component",
+      "import": "import { CheckboxGroup } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.jsx",
+      "summary": "CheckboxGroup — one question and its checkbox answers, any number of which may be chosen. Mirrors `RadioGroup` on `Fieldset`: a `<fieldset>` named by `legend`, stacked or inline (wrapping 224px tiles when `appearance` is `tile`), with an array `value`, `onChange(nextArray)`, and one group `error` announced via `Fieldset`. `isDisabled` on the group overrides every `Checkbox`'s own.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Base for every id in the group. Generated when omitted.",
+          "deprecated": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The form key the choices submit under. Defaults to the group's id.",
+          "deprecated": null
+        },
+        {
+          "name": "legend",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The question. Names the group.",
+          "deprecated": null
+        },
+        {
+          "name": "orientation",
+          "type": "enum",
+          "required": false,
+          "default": "'stacked'",
+          "values": [
+            "stacked",
+            "inline"
+          ],
+          "description": "`stacked` (default) puts one option per line; `inline` lays them in a row.",
+          "deprecated": null
+        },
+        {
+          "name": "options",
+          "type": "arrayOf",
+          "required": true,
+          "default": "[]",
+          "values": null,
+          "description": "The choices. A string is its own value and label. An object can add a `description` under the label, a decorative `illustration` (for `tile`), `isDisabled`, an `id`, and `reveal`: content shown under the option while it is selected.",
+          "deprecated": null
+        },
+        {
+          "name": "value",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Controlled selected option values. Pair with `onChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Option values selected at the start when uncontrolled. Defaults to `[]`.",
+          "deprecated": null
+        },
+        {
+          "name": "onChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Receives the next array of selected option values when a box is toggled.",
+          "deprecated": null
+        },
+        {
+          "name": "appearance",
+          "type": "enum",
+          "required": false,
+          "default": "'plain'",
+          "values": [
+            "plain",
+            "card",
+            "tile"
+          ],
+          "description": "Passed to every Checkbox. `card` draws each as a bordered row; `tile` draws centered pictured tiles with a Checkbox at the top end.",
+          "deprecated": null
+        },
+        {
+          "name": "isRequired",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Marks the question as needing an answer on the legend.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Overrides every Checkbox's own `isDisabled`.",
+          "deprecated": null
+        },
+        {
+          "name": "isReadOnly",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Shown and focusable, not changeable.",
+          "deprecated": null
+        },
+        {
+          "name": "isInvalid",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Marks every unselected Checkbox as failing validation. Defaults to whether `error` is set.",
+          "deprecated": null
+        },
+        {
+          "name": "error",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One error for the group, announced when it appears.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the fieldset beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline styles for the fieldset.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Orientation",
+        "Descriptions",
+        "Reveal",
+        "Tiles",
+        "Unselected",
+        "Selected",
+        "Required",
+        "Invalid",
+        "ReadOnly",
+        "Disabled",
+        "TileRest",
+        "TileHovered",
+        "TileSelected",
+        "TileFocused",
+        "TileInvalid",
+        "TileReadOnly",
+        "TileDisabled",
+        "Interactive"
+      ],
+      "tokens": [
+        "--checkbox-control-size",
+        "--inline-lg",
+        "--stack-md"
       ]
     },
     {
@@ -10220,15 +10428,25 @@
           "deprecated": null
         },
         {
+          "name": "illustration",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Decorative picture shown above the label when `appearance` is `tile`.",
+          "deprecated": null
+        },
+        {
           "name": "appearance",
           "type": "enum",
           "required": false,
           "default": "'plain'",
           "values": [
             "plain",
-            "card"
+            "card",
+            "tile"
           ],
-          "description": "`plain` (default) is a radio beside its label; `card` draws the option as a bordered tile.",
+          "description": "`plain` (default) is a radio beside its label; `card` draws a bordered row; `tile` draws a centered pictured tile.",
           "deprecated": null
         },
         {
@@ -10320,16 +10538,23 @@
         "Focused",
         "Disabled",
         "DisabledWithReason",
-        "Required"
+        "Required",
+        "Tile"
       ],
       "tokens": [
         "--body-default",
+        "--border-default",
+        "--border-selected",
+        "--card-pad-default",
+        "--choice-tile-width",
         "--ds-background-disabled",
         "--ds-background-input",
         "--ds-background-input-hovered",
         "--ds-background-neutral",
+        "--ds-background-selected",
         "--ds-background-selected-bold",
         "--ds-background-selected-bold-hovered",
+        "--ds-background-selected-hovered",
         "--ds-border",
         "--ds-border-brand",
         "--ds-border-danger",
@@ -10343,8 +10568,10 @@
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
         "--ds-surface",
+        "--ds-surface-hovered",
         "--ds-text",
         "--item-height-sm",
+        "--pad-x-lg",
         "--pad-x-md",
         "--plus-choice-indent",
         "--radio-control-size",
@@ -10353,8 +10580,10 @@
         "--space-025",
         "--space-0375",
         "--space-050",
+        "--stack-sm",
         "--stroke-1",
         "--stroke-2",
+        "--type-weight-medium",
         "--type-weight-regular"
       ]
     },
@@ -10411,7 +10640,7 @@
           "required": true,
           "default": "[]",
           "values": null,
-          "description": "The answers. A string is its own value and label. An object can add a `description` under the label, `isDisabled`, an `id`, and `reveal`: content shown under the option while it is chosen.",
+          "description": "The answers. A string is its own value and label. An object can add a `description` under the label, a decorative `illustration` (for `tile`), `isDisabled`, an `id`, and `reveal`: content shown under the option while it is chosen.",
           "deprecated": null
         },
         {
@@ -10466,9 +10695,10 @@
           "default": "'plain'",
           "values": [
             "plain",
-            "card"
+            "card",
+            "tile"
           ],
-          "description": "Passed to every Radio. `card` draws each as a bordered tile.",
+          "description": "Passed to every Radio. `card` draws each as a bordered row; `tile` draws centered pictured tiles.",
           "deprecated": null
         },
         {
@@ -10560,6 +10790,14 @@
         "Validation",
         "TwoGroupsWithoutIds",
         "Interactive",
+        "Tiles",
+        "TileRest",
+        "TileHovered",
+        "TileSelected",
+        "TileFocused",
+        "TileInvalid",
+        "TileReadOnly",
+        "TileDisabled",
         "Unanswered",
         "Selected",
         "Hovered",
@@ -10572,6 +10810,7 @@
       "tokens": [
         "--body-default",
         "--ds-text",
+        "--inline-lg",
         "--radio-control-size",
         "--radio-control-size-10",
         "--radio-control-size-14",

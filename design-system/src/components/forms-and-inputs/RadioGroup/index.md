@@ -10,7 +10,7 @@ Also asked as: single choice, radio buttons, single select, multiple choice, rad
 
 **Source:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.stories.jsx` — Overview, Keyboard, Orientation, Size, LinearScale, Descriptions, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive, Unanswered, Selected, Hovered, Focused, Required, Invalid, ReadOnly, Disabled
+**Stories:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.stories.jsx` — Overview, Keyboard, Orientation, Size, LinearScale, Descriptions, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive, Tiles, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, Unanswered, Selected, Hovered, Focused, Required, Invalid, ReadOnly, Disabled
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.mdx`
 
@@ -73,6 +73,13 @@ Don't: The error state with no explanation.
 />
 ```
 
+### Reserve choice tiles for one big question with two to four pictured options. {#reserve-choice-tiles-for-one-big-question-with-two-to-four-pictured-options}
+
+Use `appearance="tile"` when a step asks one focal question with two to four options and every option carries an `illustration`. Keep ordinary form lists and sets of five or more options in `plain` or `card`.
+
+Do: Two pictured options for one focal question.
+Don't: An ordinary five-item list without illustrations drawn as tiles.
+
 ### Use `reveal` instead of a separate conditional field. {#use-reveal-instead-of-a-separate-conditional-field}
 
 When choosing one option should show an extra field, such as "Other, please specify", pass that field as the option's `reveal` rather than rendering it outside the group. It stays scoped to the option that triggers it and disappears when another option is chosen.
@@ -88,10 +95,10 @@ When choosing one option should show an extra field, such as "Other, please spec
 
 - For a single radio outside a group, use Radio.
 - For a long list of options, use Select.
-- For independent choices instead of one answer among several, use Checkbox.
+- For independent choices instead of one answer among several, use CheckboxGroup or Checkbox.
 - For the legend-and-fields shell this builds on, see Fieldset.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -117,7 +124,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Options gap | Stacked `--stack-md`; inline column gap `--space-0625`. |
+| Options gap | Stacked `--stack-md`; inline column gap `--space-0625`; tile gap `--inline-lg`. |
+| Choice tile width | `--choice-tile-width` (224px), inline and wrapping. |
 | Radio size | `--radio-control-size`, or `--radio-control-size-10` and `-14` through `size`. |
 | Scale ends | `--ds-text`, body default; gap `--space-0625`. |
 | Reveal indent | The radio width plus `--stack-md`. |
@@ -140,13 +148,13 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `name` | string | — | The form key the choices submit under. Defaults to the group's id. |
 | `legend` | node | — | The question. Names the group. |
 | `orientation` | enum | `'stacked'` | `stacked` (default) puts one option per line; `inline` lays them in a row, for short labels or a scale. |
-| `options` | arrayOf (required) | `[]` | The answers. A string is its own value and label. An object can add a `description` under the label, `isDisabled`, an `id`, and `reveal`: content shown under the option while it is chosen. |
+| `options` | arrayOf (required) | `[]` | The answers. A string is its own value and label. An object can add a `description` under the label, a decorative `illustration` (for `tile`), `isDisabled`, an `id`, and `reveal`: content shown under the option while it is chosen. |
 | `value` | optionValueType | — | The answer: one option value, or `null`/`undefined` while unanswered. |
 | `defaultValue` | optionValueType | — | The option value chosen at the start, when the group is uncontrolled. Leave it out for no answer. |
 | `onChange` | func | — | Receives the next answer's value. |
 | `leadingText` | node | — | Scale end before the options, e.g. "Not at all". Describes the group. |
 | `trailingText` | node | — | Scale end after the options, e.g. "Very". Describes the group. |
-| `appearance` | enum | `'plain'` | Passed to every Radio. `card` draws each as a bordered tile. |
+| `appearance` | enum | `'plain'` | Passed to every Radio. `card` draws each as a bordered row; `tile` draws centered pictured tiles. |
 | `size` | enum | — | Radio control (dot) width, in px; unset keeps today's rendering. |
 | `isRequired` | bool | `false` | The group needs an answer. Marked on the legend. |
 | `isDisabled` | bool | `false` | Overrides every Radio's own `isDisabled`. |
@@ -160,7 +168,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 **`orientation`** — `stacked` · `inline`
 
-**`appearance`** — `plain` · `card`
+**`appearance`** — `plain` · `card` · `tile`
 
 **`size`** — `10` · `12` · `14`
 
@@ -168,7 +176,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-text` · `--radio-control-size` · `--radio-control-size-10` · `--radio-control-size-14` · `--space-0625` · `--stack-md`
+`--body-default` · `--ds-text` · `--inline-lg` · `--radio-control-size` · `--radio-control-size-10` · `--radio-control-size-14` · `--space-0625` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.scss`. Override these through the token layer, never with a literal.
 

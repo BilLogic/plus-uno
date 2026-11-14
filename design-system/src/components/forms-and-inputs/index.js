@@ -4,6 +4,7 @@ export { default as Range } from './Range';
 export { default as TagInput } from './TagInput';
 export { default as TextField } from './TextField';
 export { default as Checkbox } from './Checkbox';
+export { default as CheckboxGroup } from './CheckboxGroup';
 export { default as Radio } from './Radio';
 export { default as Toggle } from './Toggle';
 export { default as DatePicker } from './DatePicker';

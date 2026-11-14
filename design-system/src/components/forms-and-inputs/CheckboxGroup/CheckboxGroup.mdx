@@ -1,0 +1,277 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import { CheckboxGroup, Illustration } from '@/components';
+import * as CheckboxGroupStories from './CheckboxGroup.stories.jsx';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+<Meta of={CheckboxGroupStories} />
+
+<Title />
+A checkbox group asks one question and offers a set of checkbox answers, any number of which a person may choose.
+
+<DocsTabs of={CheckboxGroupStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/CheckboxGroup"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Layout
+
+<ComponentExample of={CheckboxGroupStories.Overview} title="Stacked" description="A legend over a stacked set of checkboxes, reporting an array of selected values." />
+
+<ComponentExample of={CheckboxGroupStories.Orientation} title="Orientation" description="`stacked` (default) or `inline`." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<ComponentExample of={CheckboxGroupStories.Descriptions} title="Descriptions and card" description="Each option can carry a `description` under its label, plain or in `card` appearance." />
+
+<ComponentExample of={CheckboxGroupStories.Reveal} title="Reveal" description="An option's `reveal` content shows while that option is selected." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tile appearance
+
+<ComponentExample of={CheckboxGroupStories.Tiles} title="Choice tiles" description="`appearance=&quot;tile&quot;` lays out 224px pictured tiles inline and wrapping, with a Checkbox at each tile's top end." />
+
+<ComponentExample of={CheckboxGroupStories.TileRest} title="Tile rest" description="Surface fill, default border, centered illustration, label and description." />
+
+<ComponentExample of={CheckboxGroupStories.TileHovered} title="Tile hovered" description="Hovered surface fill and brand border." />
+
+<ComponentExample of={CheckboxGroupStories.TileSelected} title="Tile selected" description="Selected fill, 2px selected border, and the top-end Checkbox checked." />
+
+<ComponentExample of={CheckboxGroupStories.TileFocused} title="Tile focused" description="Keyboard focus draws the 2px focus ring outside the tile." />
+
+<ComponentExample of={CheckboxGroupStories.TileInvalid} title="Tile invalid" description="One group error under the tiles, with unselected tiles edged in danger." />
+
+<ComponentExample of={CheckboxGroupStories.TileReadOnly} title="Tile read-only" description="Full contrast, focusable, neutral fill on unselected tiles, and not changeable." />
+
+<ComponentExample of={CheckboxGroupStories.TileDisabled} title="Tile disabled" description="Disabled fill and border across every tile." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={CheckboxGroupStories.Unselected} title="Unselected" description="No option is selected at the start unless `defaultValue` names one." />
+
+<ComponentExample of={CheckboxGroupStories.Selected} title="Selected" description="Any number of options can hold the selected bold fill." />
+
+<ComponentExample of={CheckboxGroupStories.Required} title="Required" description="Marks the legend when at least one choice is needed." />
+
+<ComponentExample of={CheckboxGroupStories.Invalid} title="Invalid" description="`error` renders one message for the group and marks unselected boxes invalid." />
+
+<ComponentExample of={CheckboxGroupStories.ReadOnly} title="Read-only" description="Focusable, full contrast, and the answers do not change." />
+
+<ComponentExample of={CheckboxGroupStories.Disabled} title="Disabled" description="`isDisabled` on the group overrides every option's own." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="CheckboxGroup" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={CheckboxGroupStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `CheckboxGroup` for one question where a person may pick several answers — or none — from a short list visible all at once. It mirrors `RadioGroup` on `Fieldset`, owning the `legend`, the array `value`, and a single group `error` so each option stays a plain `Checkbox`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a single standalone confirmation or a select-all tree, use `Checkbox`.
+- For mutually exclusive answers where only one may be chosen, use `RadioGroup`.
+- For a long list of multi-select options, use `Select` with `isMulti`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Legend.** The question. It names the `<fieldset>` and carries the required marker.
+2. **Options.** Checkboxes in a stacked list, an inline row, bordered `card` rows, or 224px `tile` cards.
+3. **Tile checkbox and illustration.** When `appearance` is `tile`, each tile centers its decorative `illustration`, `label`, and `description`, and anchors its `Checkbox` at the top end so multi-select is clear before clicking.
+4. **Reveal.** Optional content under an option, shown while that option is selected.
+5. **Error.** One message under the group, tied to the `<fieldset>` with `aria-describedby`.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Plain/card as Checkbox; tile uses <code>--ds-surface</code> fill and 1px <code>--ds-border</code> edge.</td></tr>
+<tr><td>Hovered</td><td>Plain/card as Checkbox; unselected tile uses <code>--ds-surface-hovered</code> and <code>--ds-border-brand</code>; selected tile uses <code>--ds-background-selected-hovered</code>.</td></tr>
+<tr><td>Selected</td><td>Each selected Checkbox takes <code>--ds-background-selected-bold</code>; a selected tile also takes <code>--ds-background-selected</code> and a 2px <code>--ds-border-selected</code> edge.</td></tr>
+<tr><td>Focused</td><td>2px ring in <code>--ds-border-focused</code>: around the box in plain/card, and outside the tile in <code>tile</code> appearance.</td></tr>
+<tr><td>Invalid</td><td>Unselected options take <code>--ds-border-danger</code>, with one error message announced for the group.</td></tr>
+<tr><td>Read-only</td><td>Full contrast, focusable, no hover, <code>aria-readonly</code> on each Checkbox; unchecked controls and tiles take <code>--ds-background-neutral</code>.</td></tr>
+<tr><td>Disabled</td><td>Every option takes the disabled fill and edge and leaves the tab order.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Options gap</td><td>Stacked <code>--stack-md</code>; inline and tile gap <code>--inline-lg</code>.</td></tr>
+<tr><td>Choice tile width</td><td><code>--choice-tile-width</code> (224px), inline and wrapping.</td></tr>
+<tr><td>Tile surface and edge</td><td><code>--ds-surface</code> and <code>--ds-border</code>; selected <code>--ds-background-selected</code> and 2px <code>--ds-border-selected</code>; radius <code>--radius-control-md</code>.</td></tr>
+<tr><td>Reveal indent</td><td><code>--checkbox-control-size</code> plus <code>--stack-md</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Name the question with a legend.
+
+The `legend` tells people what the checkboxes answer and names the `<fieldset>` for assistive technology.
+
+<DoDontPair
+    doExample={<CheckboxGroup name="do-cbg-legend" legend="Which subjects can you tutor?" options={['Math', 'Reading', 'Science']} />}
+    doCaption="A visible legend names the question."
+    dontExample={<CheckboxGroup name="dont-cbg-legend" aria-label="Which subjects can you tutor?" options={['Math', 'Reading', 'Science']} />}
+    dontCaption="Checkboxes with no visible question."
+/>
+
+### Reserve choice tiles for one big question with two to four pictured options.
+
+Use `appearance="tile"` when a step asks one focal question with two to four options and every option carries an `illustration`. Keep ordinary form lists and sets of five or more options in `plain` or `card`.
+
+<DoDontPair
+    doExample={
+        <CheckboxGroup
+            name="do-cbg-tile"
+            legend="Which areas do you want to practice?"
+            appearance="tile"
+            options={[
+                { value: 'content', label: 'Mastering content', description: 'Concept fluency.', illustration: <Illustration character="mastering-content" size={48} /> },
+                { value: 'advocacy', label: 'Student advocacy', description: 'Self-advocacy skills.', illustration: <Illustration character="advocacy" size={48} /> },
+            ]}
+        />
+    }
+    doCaption="Two pictured options for one focal question."
+    dontExample={
+        <CheckboxGroup
+            name="dont-cbg-tile"
+            legend="Available days"
+            appearance="tile"
+            options={['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']}
+        />
+    }
+    dontCaption="An ordinary list without illustrations drawn as tiles."
+/>
+
+### Explain an error once under the group.
+
+Pass `error` on `CheckboxGroup` so one message explains what to fix, rather than repeating an error under every box.
+
+<DoDontPair
+    doExample={<CheckboxGroup name="do-cbg-error" legend="Which subjects can you tutor?" options={['Math', 'Reading']} isRequired error="Select at least one subject." />}
+    doCaption="One error explains what to select."
+    dontExample={<CheckboxGroup name="dont-cbg-error" legend="Which subjects can you tutor?" options={['Math', 'Reading']} isRequired isInvalid />}
+    dontCaption="Invalid borders with no explanation."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write the legend as the question: "Which subjects can you tutor?"</td><td>A noun label that hides whether multiple answers are allowed: "Subject".</td></tr>
+<tr><td>Keep option labels parallel, positive and in sentence case.</td><td>Mix positive and negative phrasing in the same group.</td></tr>
+<tr><td>Keep tile descriptions to one short caption line.</td><td>Repeat the label in the description or write a full paragraph.</td></tr>
+<tr><td>Say how to fix the error: "Select at least one subject."</td><td>"Required" or "Invalid".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Native `<fieldset>` grouping.** `Fieldset` wires the `legend` to name the group so screen readers announce the question when entering the checkboxes.
+- **Standard checkbox keyboard behavior.** `Tab` moves between checkboxes in the group and `Space` toggles the focused checkbox, in plain, card and tile appearances alike.
+- **Decorative illustrations.** In `tile` appearance, `illustration` is marked `aria-hidden="true"` so each tile is announced by its `label`, `description` (`aria-describedby`), and checked state.
+- **One error, announced once.** `error` renders a single `role="alert"` message linked to the `<fieldset>` via `aria-describedby`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `Checkbox`: use when there is a single confirmation or a parent-child select-all list.
+- `RadioGroup`: use when only one option may be chosen.
+- `Select`: use when the list is too long to show all at once, with `isMulti`.
+- `Fieldset`: use when grouping mixed form controls under a legend.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

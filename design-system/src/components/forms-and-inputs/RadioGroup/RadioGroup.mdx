@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import { RadioGroup } from '@/components';
+import { RadioGroup, Illustration } from '@/components';
 import * as RadioGroupStories from './RadioGroup.stories.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -43,6 +43,28 @@ A radio group asks one question and offers a set of radio answers, one of which 
 <ComponentExample of={RadioGroupStories.Descriptions} title="Descriptions" description="Each option can carry a `description` under its label." />
 
 <ComponentExample of={RadioGroupStories.Reveal} title="Reveal" description="An option's `reveal` content shows only while that option is chosen." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tile appearance
+
+<ComponentExample of={RadioGroupStories.Tiles} title="Choice tiles" description="`appearance=&quot;tile&quot;` lays out 224px pictured tiles inline and wrapping; the chosen tile takes a 2px selected border and selected fill with no visible dot." />
+
+<ComponentExample of={RadioGroupStories.TileRest} title="Tile rest" description="Surface fill, default border, centered illustration, label and description." />
+
+<ComponentExample of={RadioGroupStories.TileHovered} title="Tile hovered" description="Hovered surface fill and brand border." />
+
+<ComponentExample of={RadioGroupStories.TileSelected} title="Tile selected" description="Selected fill and 2px selected border, with no visible dot." />
+
+<ComponentExample of={RadioGroupStories.TileFocused} title="Tile focused" description="Keyboard focus draws the 2px focus ring outside the tile." />
+
+<ComponentExample of={RadioGroupStories.TileInvalid} title="Tile invalid" description="One group error under the tiles, with unselected tiles edged in danger." />
+
+<ComponentExample of={RadioGroupStories.TileReadOnly} title="Tile read-only" description="Full contrast, focusable, neutral fill on unselected tiles, and not changeable." />
+
+<ComponentExample of={RadioGroupStories.TileDisabled} title="Tile disabled" description="Disabled fill and border across every tile." />
 
 </div>
 
@@ -152,7 +174,8 @@ The group owns the legend, the value and the error, so each option stays a plain
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Options gap</td><td>Stacked <code>--stack-md</code>; inline column gap <code>--space-0625</code>.</td></tr>
+<tr><td>Options gap</td><td>Stacked <code>--stack-md</code>; inline column gap <code>--space-0625</code>; tile gap <code>--inline-lg</code>.</td></tr>
+<tr><td>Choice tile width</td><td><code>--choice-tile-width</code> (224px), inline and wrapping.</td></tr>
 <tr><td>Radio size</td><td><code>--radio-control-size</code>, or <code>--radio-control-size-10</code> and <code>-14</code> through <code>size</code>.</td></tr>
 <tr><td>Scale ends</td><td><code>--ds-text</code>, body default; gap <code>--space-0625</code>.</td></tr>
 <tr><td>Reveal indent</td><td>The radio width plus <code>--stack-md</code>.</td></tr>
@@ -218,6 +241,34 @@ why and removes it from the tab order.
 />
 ```
 
+### Reserve choice tiles for one big question with two to four pictured options.
+
+Use `appearance="tile"` when a step asks one focal question with two to four options and every option carries an `illustration`. Keep ordinary form lists and sets of five or more options in `plain` or `card`.
+
+<DoDontPair
+    doExample={
+        <RadioGroup
+            name="do-rg-tile"
+            legend="How would you like to tutor?"
+            appearance="tile"
+            options={[
+                { value: 'one', label: 'One-on-one', description: 'One student per session.', illustration: <Illustration character="relationships" size={48} /> },
+                { value: 'group', label: 'Small group', description: 'Two to four students.', illustration: <Illustration character="social-emotional" size={48} /> },
+            ]}
+        />
+    }
+    doCaption="Two pictured options for one focal question."
+    dontExample={
+        <RadioGroup
+            name="dont-rg-tile"
+            legend="Reminder frequency"
+            appearance="tile"
+            options={['Daily', 'Weekly', 'Every two weeks', 'Monthly', 'Never']}
+        />
+    }
+    dontCaption="An ordinary five-item list without illustrations drawn as tiles."
+/>
+
 ### Use `reveal` instead of a separate conditional field.
 
 When choosing one option should show an extra field, such as "Other, please specify", pass that field as the option's `reveal` rather than rendering it outside the group. It stays scoped to the option that triggers it and disappears when another option is chosen.
@@ -260,7 +311,7 @@ When choosing one option should show an extra field, such as "Other, please spec
 
 - For a single radio outside a group, use Radio.
 - For a long list of options, use Select.
-- For independent choices instead of one answer among several, use Checkbox.
+- For independent choices instead of one answer among several, use CheckboxGroup or Checkbox.
 - For the legend-and-fields shell this builds on, see Fieldset.
 
 </div>

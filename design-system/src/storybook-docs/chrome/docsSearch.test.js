@@ -6,7 +6,7 @@ const INDEX = {
     entries: {
         'components-forms-and-inputs-button-button--docs': { id: 'components-forms-and-inputs-button-button--docs', title: 'Forms and inputs/Button', name: 'Docs', type: 'docs' },
         'components-forms-and-inputs-button-button--overview': { id: 'components-forms-and-inputs-button-button--overview', title: 'Forms and inputs/Button', name: 'Overview', type: 'story' },
-        'components-forms-and-inputs-checkbox--overview': { id: 'components-forms-and-inputs-checkbox--overview', title: 'Forms and inputs/Checkbox', name: 'Overview', type: 'story' },
+        'components-forms-and-inputs-checkbox-checkbox--overview': { id: 'components-forms-and-inputs-checkbox-checkbox--overview', title: 'Forms and inputs/Checkbox', name: 'Overview', type: 'story' },
         'patterns-frame--docs': { id: 'patterns-frame--docs', title: 'Templates/Frame', name: 'Docs', type: 'docs' },
         'foundations-visual-color--docs': { id: 'foundations-visual-color--docs', title: 'Foundations/Visual/Color', name: 'Docs', type: 'docs' },
     },
@@ -38,7 +38,7 @@ describe('buildDocsEntries', () => {
     it('groups by title, preferring the docs page and falling back to a story', () => {
         const byTitle = Object.fromEntries(entries.map((e) => [e.title, e]));
         expect(byTitle['Forms and inputs/Button']).toMatchObject({ id: 'components-forms-and-inputs-button-button--docs', type: 'docs', name: 'Button' });
-        expect(byTitle['Forms and inputs/Checkbox']).toMatchObject({ id: 'components-forms-and-inputs-checkbox--overview', type: 'story' });
+        expect(byTitle['Forms and inputs/Checkbox']).toMatchObject({ id: 'components-forms-and-inputs-checkbox-checkbox--overview', type: 'story' });
     });
     it('tolerates a missing index', () => {
         expect(buildDocsEntries(null, ['Tooltip'])).toEqual([
@@ -56,7 +56,7 @@ describe('answerDocsQuery', () => {
         expect(ask('checkbox').sources[0].title).toBe('Checkbox');
     });
     it('links a story when a title has no docs page', () => {
-        expect(ask('checkbox').sources[0].href).toBe('/?path=/story/components-forms-and-inputs-checkbox--overview');
+        expect(ask('checkbox').sources[0].href).toBe('/?path=/story/components-forms-and-inputs-checkbox-checkbox--overview');
     });
     it('finds non-component pages by title words', () => {
         expect(ask('where is the color page').sources.map((s) => s.title)).toContain('Color');

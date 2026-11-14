@@ -1,0 +1,46 @@
+/**
+ * CheckboxGroup — a `Fieldset` holding a column or row of Checkboxes, or an
+ * inline wrapping row of 224px choice tiles when `appearance` is `tile`.
+ */
+
+.plus-checkbox-group-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-md);
+}
+
+.plus-checkbox-group-inline .plus-checkbox-group-options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: var(--inline-lg);
+}
+
+.plus-checkbox-group-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-md);
+}
+
+// Inline choices size to their content rather than filling the row; choice tiles keep their fixed 224px width.
+.plus-checkbox-group-inline .plus-checkbox-group-item > [class*='-wrapper']:not(.plus-choice-tile) {
+    width: auto;
+}
+
+.plus-checkbox-group-tile .plus-checkbox-group-options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--inline-lg);
+}
+
+.plus-checkbox-group-tile .plus-checkbox-group-item {
+    display: flex;
+
+    > .plus-choice-tile {
+        flex: 1 0 auto;
+    }
+}
+
+// Under the option's label, past its control and the label gap.
+.plus-checkbox-group-reveal {
+    padding-left: calc(var(--checkbox-control-size) + var(--stack-md));
+}
