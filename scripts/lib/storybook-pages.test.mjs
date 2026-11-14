@@ -46,3 +46,15 @@ test('attached Meta resolves aliased extensionless stories, custom names, tags a
   assert.equal(story.componentSource, component);
   assert.deepEqual(scanStorybookPages(root).map((p) => p.file), [FILE, stories]);
 });
+
+test('unattached pages, missing imports and Finder copies do not invent story metadata', (t) => {
+  const root = fixture(t, {
+    [FILE]: '<Meta of={Missing} />',
+    'design-system/src/styles/NoMeta.mdx': '# No page metadata',
+    'design-system/src/styles/Color 2.mdx': '<Meta title="Foundations/Copy" />',
+    'design-system/src/.hidden/Hidden.mdx': '<Meta title="Foundations/Hidden" />',
+  });
+  assert.equal(readStorybookPage(root, FILE).title, null);
+  assert.equal(readStorybookPage(root, FILE).storiesFile, null);
+  assert.deepEqual(scanStorybookPages(root).map((p) => p.file), [FILE, 'design-system/src/styles/NoMeta.mdx']);
+});

@@ -100,3 +100,29 @@ test('an overview thumbnail naming a hero the registry lacks fails', () => {
   assert.equal(found.length, 1, found.join('\n'));
   assert.match(found[0], /hero="patterns-ghost"/);
 });
+
+test('coverage follows fixture titles and taxonomy sources, including attached pages', async (t) => {
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const path = await import('node:path');
+  const { coveredPages } = await import('./check-docs-landing.mjs');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'landing-pages-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const files = {
+    'storybook.taxonomy.json': JSON.stringify({ rootSources: { Templates: ['design-system/src/templates/'], Patterns: ['design-system/src/patterns/'] } }),
+    'design-system/src/templates/New.mdx': 'import * as S from "./New.stories.js";\n<Meta of={S} name="Usage guide" />',
+    'design-system/src/templates/New.stories.js': 'export default { title: "Templates/New page" };',
+    'design-system/src/styles/New.mdx': '<Meta title="Foundations/New foundation" />',
+    'design-system/src/patterns/New.mdx': '<Meta title="Patterns/New pattern" />',
+    'design-system/src/Other.mdx': '<Meta title="Components/Other" />',
+  };
+  for (const [file, text] of Object.entries(files)) {
+    fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
+    fs.writeFileSync(path.join(root, file), text);
+  }
+  assert.deepEqual(coveredPages(root), [
+    { file: 'design-system/src/patterns/New.mdx', id: 'patterns-new-pattern' },
+    { file: 'design-system/src/styles/New.mdx', id: 'foundations-new-foundation' },
+    { file: 'design-system/src/templates/New.mdx', id: 'templates-new-page' },
+  ]);
+});

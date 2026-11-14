@@ -62,6 +62,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { readStorybookPage, resolveStorybookSource as resolveSpec } from './storybook-pages.mjs';
 
 // ── scanning ────────────────────────────────────────────────────────────────
 
@@ -701,45 +702,6 @@ export function pagesUnder(root, dir = DS_SRC) {
   return out.sort();
 }
 
-/** A module specifier from `fromFile` to a file on disk, repo-relative, or null. `@/` is the design-system source. */
-function resolveSpec(root, fromFile, spec) {
-  let base;
-  if (spec.startsWith('.')) base = path.resolve(root, path.dirname(fromFile), spec);
-  else if (spec.startsWith('@/')) base = path.join(root, DS_SRC, spec.slice(2));
-  else return null;
-  const tries = [base, ...['.jsx', '.js', '.tsx', '.ts'].map((x) => base + x), ...['index.jsx', 'index.js'].map((x) => path.join(base, x))];
-  const file = tries.find((f) => fs.existsSync(f) && fs.statSync(f).isFile());
-  return file ? toPosix(path.relative(root, file)) : null;
-}
-
-/** What a stories file's meta names as its `component`: `{source}` when the import resolves to one file, else `{name}`. */
-function storiesComponent(root, storiesFile) {
-  const text = fs.readFileSync(path.join(root, storiesFile), 'utf8');
-  const ident = text.match(/(?:^|[{,\s])component:\s*([A-Z]\w*)\s*(?:,|\}|$)/m)?.[1];
-  if (!ident) return null;
-  for (const m of text.matchAll(/import\s+([^;]+?)\s+from\s+['"]([^'"]+)['"]/g)) {
-    const [clause, spec] = [m[1], m[2]];
-    const def = clause.match(/^\s*([A-Za-z_$][\w$]*)/)?.[1];
-    const named = [...(clause.match(/\{([^}]*)\}/)?.[1] ?? '').split(',')].map((p) => p.trim().split(/\s+as\s+/)).find(([orig, local]) => (local ?? orig) === ident);
-    if (def !== ident && !named) continue;
-    let file = resolveSpec(root, storiesFile, spec);
-    let exported = def === ident ? 'default' : named[0];
-    // A folder index: follow its re-export of the name, a few hops at most; still an index, it is a barrel.
-    for (let hop = 0; hop < 4 && file && /\/index\.jsx?$/.test(file); hop++) {
-      const pattern =
-        exported === 'default'
-          ? String.raw`\{\s*default\b[^}]*\}`
-          : String.raw`\{[^}]*\b(?:default\s+as\s+${exported}|${exported})\b[^}]*\}`;
-      const reexport = fs.readFileSync(path.join(root, file), 'utf8').match(new RegExp(String.raw`export\s*${pattern}\s*from\s*['"]([^'"]+)['"]`));
-      if (reexport && exported !== 'default' && new RegExp(String.raw`\bdefault\s+as\s+${exported}\b`).test(reexport[0])) exported = 'default';
-      file = reexport ? resolveSpec(root, file, reexport[1]) : null;
-    }
-    if (file && /\/index\.jsx?$/.test(file)) file = null;
-    return file ? { source: file } : { name: named ? named[0] : ident };
-  }
-  return null;
-}
-
 /** The literal an `export const NAME =` in `text` binds, as text, or null. */
 function exportedLiteral(text, name) {
   const m = new RegExp(String.raw`^export\s+const\s+${name}\s*=\s*`, 'm').exec(text);
@@ -804,13 +766,9 @@ export function createPageFinder(root, registry = null) {
     const byName = new Map();
     const add = (map, key, page) => map.set(key, [...(map.get(key) ?? []), page]);
     for (const page of pagesUnder(root)) {
-      const text = fs.readFileSync(path.join(root, page), 'utf8');
-      const of = text.match(/<Meta\s[^>]*\bof=\{(\w+)\}/)?.[1];
-      const spec = of && text.match(new RegExp(`import\\s+\\*\\s+as\\s+${of}\\s+from\\s+['"]([^'"]+)['"]`))?.[1];
-      const stories = spec && resolveSpec(root, page, spec);
-      const component = stories && storiesComponent(root, stories);
-      if (component?.source) add(bySource, component.source, page);
-      else if (component?.name) add(byName, component.name, page);
+      const { componentSource, componentName } = readStorybookPage(root, page);
+      if (componentSource) add(bySource, componentSource, page);
+      else if (componentName) add(byName, componentName, page);
     }
     return { bySource, byName };
   };
