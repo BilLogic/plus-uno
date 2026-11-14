@@ -1,0 +1,68 @@
+/**
+ * The five-slot item-row anatomy (`__start`, `__body`, `__label`,
+ * `__description`, `__end`), defined once for `NotificationItem`, `FileItem`,
+ * and `SettingRow`:
+ *
+ *   - `item-row-start($size)`         non-shrinking centered square lead slot
+ *   - `item-row-body($gap)`           growing vertical text stack (`min-width: 0`)
+ *   - `item-row-label($weight)`       Body/default 14 primary line
+ *   - `item-row-description`          Body/small 12 secondary line in `--ds-text-subtle`
+ *   - `item-row-end($size, $justify)` non-shrinking trailing slot pushed to the end edge
+ *
+ * Each row keeps its own container, interactive states, and slot-specific
+ * additions beside the `@include`.
+ */
+
+@mixin item-row-start($size: null) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    @if $size != null {
+        width: $size;
+        height: $size;
+    }
+}
+
+@mixin item-row-body($gap: var(--stack-sm)) {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-width: 0;
+
+    @if $gap != null {
+        gap: $gap;
+    }
+}
+
+@mixin item-row-label($weight: null) {
+    font: var(--body-default);
+
+    @if $weight != null {
+        font-weight: $weight;
+    }
+}
+
+@mixin item-row-description {
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+@mixin item-row-end($size: null, $justify: null) {
+    display: inline-flex;
+    align-items: center;
+
+    @if $justify != null {
+        justify-content: $justify;
+    }
+
+    flex-shrink: 0;
+
+    @if $size != null {
+        width: $size;
+        height: $size;
+    }
+
+    margin-inline-start: auto;
+}

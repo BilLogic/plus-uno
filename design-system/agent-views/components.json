@@ -4505,7 +4505,6 @@
         "Interactive"
       ],
       "tokens": [
-        "--body-default",
         "--body-small",
         "--border-default",
         "--ds-background-disabled",
@@ -7833,8 +7832,6 @@
         "Interactive"
       ],
       "tokens": [
-        "--body-default",
-        "--body-small",
         "--control-sm",
         "--count-tag-dot-size",
         "--ds-background-brand-bold",
@@ -7847,7 +7844,6 @@
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-text",
-        "--ds-text-subtle",
         "--image-md",
         "--inline-lg",
         "--pad-x-md",
@@ -13195,7 +13191,6 @@
         "Interactive"
       ],
       "tokens": [
-        "--body-default",
         "--body-small",
         "--border-default",
         "--ds-border",
@@ -13204,7 +13199,6 @@
         "--ds-text",
         "--ds-text-danger",
         "--ds-text-disabled",
-        "--ds-text-subtle",
         "--icon-sm",
         "--inline-lg",
         "--inline-md",

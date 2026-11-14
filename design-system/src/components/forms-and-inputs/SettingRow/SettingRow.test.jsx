@@ -206,4 +206,17 @@ describe('SettingRow', () => {
         await user.click(readOnlyToggle);
         expect(onReadOnlyChange).not.toHaveBeenCalled();
     });
+
+    it('shares the item-row slot mixins from styles/_item-row.scss', async () => {
+        const fs = await import('node:fs');
+        const path = await import('node:path');
+        const scssPath = path.resolve(import.meta.dirname, 'SettingRow.scss');
+        const scss = fs.readFileSync(scssPath, 'utf8');
+        expect(scss).toMatch(/@use ['"][./]*styles\/item-row['"] as \*;/);
+        expect(scss).toMatch(/@include item-row-body\b/);
+        expect(scss).toMatch(/@include item-row-label\(/);
+        expect(scss).toMatch(/@include item-row-description\b/);
+        expect(scss).toMatch(/@include item-row-end\b/);
+    });
 });
+

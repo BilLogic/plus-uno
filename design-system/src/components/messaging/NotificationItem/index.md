@@ -117,7 +117,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--control-sm` · `--count-tag-dot-size` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-subtle` · `--image-md` · `--inline-lg` · `--pad-x-md` · `--pad-y-lg` · `--radius-control-md` · `--radius-full` · `--stack-sm` · `--type-weight-medium`
+`--control-sm` · `--count-tag-dot-size` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--image-md` · `--inline-lg` · `--pad-x-md` · `--pad-y-lg` · `--radius-control-md` · `--radius-full` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/NotificationItem/NotificationItem.scss`. Override these through the token layer, never with a literal.
 
