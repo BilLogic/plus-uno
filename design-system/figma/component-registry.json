@@ -1143,6 +1143,29 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19483"
       }
     },
+    "ProgressRing": {
+      "code": {
+        "import": "@/components/loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/loading/ProgressRing/ProgressRing.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/ProgressRing",
+        "source": "design-system/src/components/loading/ProgressRing/ProgressRing.jsx",
+        "storybookId": "components-loading-progress-ring--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "progress-ring",
+            "name": "ProgressRing",
+            "componentSetNodeId": "22240:478",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
+      }
+    },
     "Radio": {
       "code": {
         "import": "@/components/forms-and-inputs",

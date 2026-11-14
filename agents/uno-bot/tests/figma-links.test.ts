@@ -359,7 +359,8 @@ describe("only registry components", () => {
     // rows its docs pages carried went with it; Sidebar's moved to the Sidebar
     // pattern's page (-6 net). 56: MenuGroup left the public pages for
     // forms-and-inputs/_internal, and its registry row went with it (-1 net).
-    assert.equal(names.length, 56);
+    // 57: ProgressRing gained its Core component set and figmaMeta (+1).
+    assert.equal(names.length, 57);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
