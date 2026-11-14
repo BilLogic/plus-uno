@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={ParliamentChartStories} />
 
 <Title />
-Shows a count as rows of dots in a half circle, one dot per unit, grouped and
-colored by the part each unit belongs to.
+Shows a modest count of discrete units as rows of dots in a half-circle,
+grouped and colored by category.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/ParliamentChart"
@@ -31,14 +31,13 @@ colored by the part each unit belongs to.
 
 ## When to use
 
-Use `ParliamentChart` when the total is a modest count of real units and
-seeing each one matters: the students in a tutoring cohort by grade, the seats
-on a student council, the tutors at a school by certification level. A dot
-per person keeps the numbers human.
+Use `ParliamentChart` when a total is a modest count (a few dozen to a few
+hundred) of individual units where each dot represents one person or seat, such
+as cohort students by grade, council seats or school tutors by certification
+level.
 
-For a split where the units do not matter, use `PieChart` or
-`StackedBarChart`. For counts that must be compared precisely, use `BarChart`.
-For groups within groups, use `SunburstChart`.
+When individual units do not matter, use `PieChart` or `StackedBarChart`. For
+exact count comparisons, use `BarChart`. For nested groups, use `SunburstChart`.
 
 </div>
 
@@ -49,11 +48,11 @@ For groups within groups, use `SunburstChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Dots', <>One per unit. Each item in <C>data</C> contributes <C>value</C> dots, laid out together in the arc.</>],
-        ['Group labels', 'Each group is labeled on the chart with its name.'],
-        ['Legend', 'Names each group with its count beside it, in subtle text. Always shown.'],
-        ['Tooltip', 'Hovering a dot shows its group’s count.'],
-        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 400.</>],
+        ['Dots', <>One per unit; each item in <C>data</C> draws <C>value</C> contiguous dots in the arc.</>],
+        ['Group labels', 'Labels each group on the chart with its name.'],
+        ['Legend', 'Always shown; lists each group name and count in subtle text.'],
+        ['Tooltip', 'Shows the hovered dot’s group count.'],
+        ['Height', <>Pixel height from <C>height</C> (default 400).</>],
     ]}
 />
 
@@ -63,8 +62,9 @@ For groups within groups, use `SunburstChart`.
 
 ## Data shape
 
-`data` is an array of `{ name, value }`, one object per group. `value` is a
-whole count of units.
+`data` is an array of `{ name, value, color }` (`name` and whole-number `value`
+required; `color` optional). Sort `data` from most to least before passing it in
+so group and color order match size order.
 
 ```jsx
 <ParliamentChart
@@ -76,21 +76,16 @@ whole count of units.
 />
 ```
 
-An item may carry its own `color`; leave it out and the chart assigns one.
-Groups draw in the order given, so sort `data` from most to least before you
-pass it.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color is assigned by position.** Each group without a `color` takes the categorical order: slot 1 for the first item, slot 2 for the second. Sort first so the order of the colors matches the order of the sizes.
-- **Color is what tells groups apart in the arc.** Dots are the same shape and size, so adjacent groups differ only by hue. The group labels and the legend counts are the non-color encoding; keep both. Past six groups, adjacent hues get hard to tell apart, so group the smallest into "Other".
-- **Keep the total modest.** A few dozen to a few hundred dots; past that, dots shrink until they stop reading as units.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the groups. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Color by position.** Groups without `color` follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1. Past six groups, fold the smallest into "Other" so adjacent hues stay distinct.
+- **Keep labels and legend.** Because equal-sized dots differ only by hue in the arc, group labels and legend counts provide the non-color reading.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -98,11 +93,7 @@ pass it.
 
 ## States
 
-`ParliamentChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`ParliamentChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -119,12 +110,7 @@ pass it.
 
 <DocsInteractivePlayground
     of={ParliamentChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

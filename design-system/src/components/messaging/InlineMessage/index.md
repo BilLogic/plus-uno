@@ -90,7 +90,7 @@ accessible name and its tooltip. Write "Why this field is required", not
 - `Popup`: use when configuring the anchored overlay surface this component is built on.
 - `IconButton`: use when rendering the compact icon trigger button.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `SectionMessage` · `Spotlight`
+Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 

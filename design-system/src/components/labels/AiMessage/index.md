@@ -16,10 +16,8 @@ An assistant reply, marked as AI by the small AI icon at its start (named "AI" f
 
 ## Usage
 
-Use `AiMessage` for every reply an assistant writes: in the AI chat, in a panel,
-anywhere text comes from the model. Show `thinking` from the moment a message is
-sent until the first text arrives, `streaming` while text arrives, then
-`complete`.
+Use `AiMessage` for every AI reply, in chat, a panel or elsewhere. Choose its
+status from the table below.
 
 ### Status guidance
 
@@ -44,9 +42,8 @@ AiMessage reads these motion tokens and no literal duration or curve.
 
 ### Stream the answer, then settle. {#stream-the-answer-then-settle}
 
-The streaming state shows the answer arriving. Show the state, never a blank:
-the typing indicator holds the place until the first text, then text streams
-in, then the message settles to `complete`.
+Keep progress visible rather than leaving a blank; follow the status sequence
+in Usage.
 
 Do: The typing indicator, then the streaming state, shows the answer arriving.
 Don't: Partial text shown as finished hides that it is still being written.
@@ -62,10 +59,9 @@ Don't: An answer from records with nothing to open.
 
 ### Offer feedback on every finished answer. {#offer-feedback-on-every-finished-answer}
 
-Pass `onFeedback` wherever an answer is shown. The thumbs appear only once the
-reply is complete, so a streaming answer is never rated on partial text. A
-second press on the same thumb clears it; thumbs down opens an optional comment
-that can be skipped.
+Pass `onFeedback` for every answer; feedback appears only at `complete`, so
+partial replies cannot be rated. See AI feedback
+for rating changes and the optional, skippable comment.
 
 Do: Thumbs under a finished answer.
 Don't: A finished answer with no way to rate it.
@@ -75,13 +71,9 @@ Don't: A finished answer with no way to rate it.
 - **Marked as AI.** The AI icon at the start of every reply is an image named
   "AI", so a screen reader hears whose answer it is. Don't add a second icon
   beside the message.
-- **Sources are a named list.** The list is named by its "Sources" heading,
-  and the toggle past three says how many more and carries `aria-expanded`.
-- **Thumbs are toggle buttons.** They sit in a group named "Rate this answer" and
-  each reports `aria-pressed`, true on the chosen one. Thumbs down is not the popup's
-  trigger: the comment popup opens after the pick, takes focus, and returns it to the
-  thumb on close. A polite status names each rating ("Thanks. Marked
-  as a good answer."), so a change of mind is heard too. No animation.
+- **Sources and feedback.** See AI sources
+  for list naming and toggle semantics, and AI feedback
+  for rating names, pressed states, focus and announcements.
 - **Busy while arriving.** A streaming message is marked `aria-busy`, so a
   screen reader waits for the finished text. A typed-out reply carries its full
   text for assistive technology and hides the character-by-character copy.
@@ -104,7 +96,7 @@ Same group: `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 2. **Text.** The body style, keeping the reply's line breaks. With `parts`, text parts and other parts in order; `renderPart` draws a part that is not text.
 3. **Caret.** Streaming only: a thin bar after the last character, blinking.
 4. **Typing indicator.** Thinking only: three pulsing dots in place of the text.
-5. **Sources** (optional). Complete only: a "Sources" heading, one row per source with its title as a link and its type beside it, and a toggle past three.
+5. **Sources** (optional). Complete only: a counted "Sources" toggle, closed by default, with linked titles and types inside.
 6. **Feedback** (optional). Complete only, with `onFeedback`: thumbs up and down and a quiet thanks beside them.
 
 ### States

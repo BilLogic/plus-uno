@@ -13,14 +13,14 @@ import * as FoundationsStories from './Foundations.stories.jsx';
 <FoundationHero
     kind="Data visualizations"
     title="Chart foundations"
-    summary="Color has its own page. Every other foundation — spacing, radius, elevation, stroke, type, motion — takes the same component tokens as the rest of the design system."
+    summary="Spacing, radius, elevation, stroke, type and motion tokens for charts. For palette and ramp rules, see Chart color."
 />
 
 <FoundationContents />
 
 <FoundationSection title="Chart container and tooltip">
 
-The chart container is a Card: <C>--card-pad-compact</C> sets the padding Highcharts' `chart.spacing` draws with, and the chart itself adds none of its own. The tooltip is a floating layer — the Popup pattern's surface, overlay shadow, radius and padding, not Highcharts' own `shadow`/`borderRadius` options.
+A chart sits in a Card: <C>--card-pad-compact</C> sets Highcharts' `chart.spacing`, and the chart adds no outer padding of its own. The tooltip uses the Popup pattern's surface, shadow, radius, padding and layer tokens rather than Highcharts' built-in `shadow` or `borderRadius` options.
 
 <Canvas of={FoundationsStories.TooltipSurface} sourceState="none" />
 
@@ -40,7 +40,7 @@ The chart container is a Card: <C>--card-pad-compact</C> sets the padding Highch
 
 <FoundationSection title="Mark radius">
 
-Bars and columns round only the value end — the one end a bar can round without distorting the length comparison it exists to support. Pies, donuts and areas take no radius at all.
+Bars and columns round only the value end so the baseline stays flat and length comparisons stay accurate. Pies, donuts and areas take no radius.
 
 <Canvas of={FoundationsStories.BarRadius} sourceState="none" />
 
@@ -55,7 +55,7 @@ Bars and columns round only the value end — the one end a bar can round withou
 
 <FoundationSection title="Stroke">
 
-Gridlines, axes, series lines and chart-only separators (the gap between stacked bar segments, for instance) take one of two component-tier tokens — there is no shared stroke-primitive tier yet for them to alias, so they're declared directly in `chartTheme.css`.
+Gridlines, axes, series lines and chart separators (such as gaps between stacked bar segments) use two component-tier tokens declared in `chartTheme.css`:
 
 <RefTable
     head={['Role', 'Token']}
@@ -65,15 +65,21 @@ Gridlines, axes, series lines and chart-only separators (the gap between stacked
     ]}
 />
 
-A `0` (removing a border or line entirely) needs no token.
+Removing a border or line with `0` needs no token.
 
 </FoundationSection>
 
 <FoundationSection title="Type and motion">
 
-Tick labels, legends, tooltips and data labels take the current text tokens — never a `'12px'` literal, and never a token `var()` paired with a literal fallback value. A chart's title comes from its surrounding Section or Card header, not Highcharts' own `title` option.
-
-Series entrance and hover transitions take the motion tokens in `design-system/src/tokens/ladder/_motion.scss`. `prefers-reduced-motion` is handled once, globally — every duration collapses to `0ms` under it — so a chart needs no reduced-motion branch of its own.
+<RefTable
+    head={['Role', 'Rule']}
+    rows={[
+        ['Tick labels, legends, tooltips, data labels', <>Use current text tokens — never a <C>'12px'</C> literal or a <C>var()</C> with a literal fallback.</>],
+        ['Chart title', <>Name the chart in its surrounding Section or Card header, never Highcharts' <C>title</C> option.</>],
+        ['Series entrance and hover motion', <>Use motion tokens from <C>design-system/src/tokens/ladder/_motion.scss</C>.</>],
+        ['Reduced motion', <><C>prefers-reduced-motion</C> collapses every duration to <C>0ms</C> globally; charts need no custom reduced-motion branch.</>],
+    ]}
+/>
 
 </FoundationSection>
 

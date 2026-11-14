@@ -2,7 +2,7 @@
 
 # Patterns
 
-Code-free guidance for a situation, shown on templates used as they are or tweaked.
+Choose an approach with code-free guidance and examples on templates you can use or adapt.
 
 **Kind:** Pattern
 
@@ -10,7 +10,7 @@ Code-free guidance for a situation, shown on templates used as they are or tweak
 
 ## The patterns
 
-Seven pages and one group of six States pages. Each pattern is one page: its situations first, then the key cases drawn on templates, then the usage spine. Reach for one when you are unsure of a choice or challenging it; Templates and patterns says how the layers fit together.
+Seven patterns and six States pages cover situations, examples on templates and usage. Consult them when choosing or reconsidering an approach. Templates and patterns explains how the layers fit together.
 
 - **Navigation.** How a person moves between areas, views and records, with one control and one motion per move.
 - **Common actions.** Which button, in which look, in which place, with which word, and acting on many rows at once.

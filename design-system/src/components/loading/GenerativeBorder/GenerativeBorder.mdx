@@ -17,7 +17,7 @@ export const card = { padding: 'var(--card-pad-default)', border: 'var(--border-
 <Meta of={GenerativeBorderStories} />
 
 <Title />
-The border that shows the AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments running clockwise.
+A rounded, two-color border around content the AI is generating.
 
 <DocsTabs of={GenerativeBorderStories}>
 
@@ -104,9 +104,9 @@ Use `GenerativeBorder` only while the AI is generating into a piece of content, 
 
 ## Parts
 
-1. **Content.** What is being generated into, unchanged by the border.
-2. **Ring.** A 2px stroke over the edge while `isActive`, so layout never moves.
-3. **Segments.** Four flat segments, brand and discovery alternating, turning clockwise.
+1. **Content.** The content being generated, unchanged by the border.
+2. **Ring.** A stroke over the edge while `isActive`, so layout never moves. Its 2-unit width comes from `--border-selected`.
+3. **Segments.** Four hard-edged, flat segments alternating brand and discovery colors.
 
 ### States
 
@@ -116,8 +116,8 @@ Use `GenerativeBorder` only while the AI is generating into a piece of content, 
 </thead>
 <tbody>
 <tr><td>Rest</td><td>Idle: no ring. <code>aria-busy</code> is false.</td></tr>
-<tr><td>Generating</td><td>The ring is on and turns once every 6s. <code>aria-busy</code> is true.</td></tr>
-<tr><td>Reduced motion</td><td>The ring stays at its still frame.</td></tr>
+<tr><td>Generating</td><td>The ring alternates clockwise and counterclockwise turns on the <code>--ds-motion-loop</code> spring. Each turn takes <code>--ds-motion-loop-duration</code> (600 ms). <code>aria-busy</code> is true.</td></tr>
+<tr><td>Reduced motion</td><td>The ring holds still and keeps its colors, so the generating state remains visible.</td></tr>
 <tr><td>Hovered</td><td>None. It is not a control.</td></tr>
 <tr><td>Pressed</td><td>None.</td></tr>
 <tr><td>Focused</td><td>None. It is not in the tab order.</td></tr>
@@ -133,7 +133,7 @@ Use `GenerativeBorder` only while the AI is generating into a piece of content, 
 </thead>
 <tbody>
 <tr><td>Segments</td><td><code>--ds-border-brand</code> and <code>--ds-border-discovery</code>.</td></tr>
-<tr><td>Stroke</td><td><code>--stroke-2</code>, through <code>--generative-border-width</code>.</td></tr>
+<tr><td>Stroke</td><td><code>--border-selected</code>, through <code>--generative-border-width</code>.</td></tr>
 <tr><td>Corner</td><td><code>--generative-border-radius</code>, set to the radius token named by <code>radius</code>: <code>--radius-025</code>, <code>--radius-050</code>, <code>--radius-075</code>, <code>--radius-100</code>, <code>--radius-full</code>, or a control radius (<code>--radius-control-sm</code>, <code>--radius-control-md</code>, <code>--radius-control-lg</code>) to follow a field.</td></tr>
 <tr><td>Turn</td><td><code>--generative-border-angle</code>, from a rest of <code>--generative-border-rest</code>.</td></tr>
 </tbody>
@@ -149,7 +149,7 @@ Wrap the content and toggle `isActive` while the AI generates into it.
 
 ### Animate one thing at a time.
 
-The moving border marks where the AI is working; three at once means none of them is the focus.
+One moving border keeps attention on the content being generated.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><GenerativeBorder><div style={card}>Summary</div></GenerativeBorder><GenerativeBorder isActive><div style={card}>Goals</div></GenerativeBorder><GenerativeBorder><div style={card}>Next steps</div></GenerativeBorder></div>}
@@ -171,7 +171,7 @@ The border traces the content's corners; a pill around a rectangular card looks 
 
 ### Stop animating when the work ends.
 
-An idle border should read as finished, not as still thinking. Set `isActive` back to false.
+Set `isActive` to false when generation ends.
 
 <DoDontPair
     doExample={<GenerativeBorder><div style={card}>Here is a first draft of the session summary.</div></GenerativeBorder>}
@@ -211,7 +211,7 @@ An idle border should read as finished, not as still thinking. Set `isActive` ba
 ## Accessibility
 
 - **`aria-busy` says content is changing.** The wrapper sets it from `isActive`; the ring itself is decorative and hidden from assistive technology.
-- **Motion respects the user.** The segments turn slowly while active and hold still under reduced motion.
+- **Reduced motion.** The ring keeps its colors without moving; see States above.
 
 </div>
 

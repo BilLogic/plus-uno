@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
 
 import { Button, Fieldset, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader, SectionMessage, Select, Skeleton, TextField } from '@/components';
+import { PresenceSlot } from '@/lib/listMotion';
+import { SwapInPlace } from '@/lib/swapMotion';
 import { Backdrop, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
@@ -127,13 +129,27 @@ const Behind = () => (
 
 /** The fields' state, with the blur, submit and server rules each host shares. */
 const useFormState = ({ initial = EMPTY, sendingForever = false, server = false, marked = false, sending: sendingNow = false } = {}) => {
-    const [values, setValues] = useState(initial);
+    const [values, setValuesState] = useState(initial);
     // `marked` draws the state after a press or a blur, for a docs picture that cannot run a play.
     const [errors, setErrors] = useState(() => (marked ? marksFor(initial, marked) : {}));
     const [sending, setSending] = useState(sendingNow);
     const [serverError, setServerError] = useState(server);
     const refs = useRef({});
     const setRef = (name) => (el) => { refs.current[name] = el; };
+    const setValues = (nextValues) => {
+        setValuesState(nextValues);
+        // Once a field is marked invalid, recheck while typing so it clears the moment it is fixed.
+        setErrors((prev) => {
+            const activeKeys = Object.keys(prev).filter((key) => Boolean(prev[key]));
+            if (activeKeys.length === 0) return prev;
+            const nowMissing = missing(nextValues);
+            const next = { ...prev };
+            for (const key of activeKeys) {
+                next[key] = nowMissing[key];
+            }
+            return next;
+        });
+    };
     const onBlurField = (name) => setErrors((e) => ({ ...e, [name]: missing(values)[name] }));
     const submit = () => {
         const found = missing(values);
@@ -157,7 +173,9 @@ export const FormInPage = ({ initial, server, subjectWaits, sendingForever, mark
         <BrowserWindow address="app.plus.org/sessions/new" height={PAGE_HEIGHT}>
             <InAppFrame height="100%" activeTabId="sessions" breadcrumbs={PAGE_BREADCRUMBS} panelStorageKey={null}>
                 <PatternSection level="page" title="Log a session">
-                    {f.serverError && <FormMessage>{SERVER_MESSAGE}</FormMessage>}
+                    <PresenceSlot show={Boolean(f.serverError)}>
+                        <FormMessage>{SERVER_MESSAGE}</FormMessage>
+                    </PresenceSlot>
                     <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} subjectWaits={subjectWaits} setRef={f.setRef} />
                     <PageFooter sending={f.sending} onSave={f.submit} />
                 </PatternSection>
@@ -225,7 +243,9 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
                         onClose={close}
                         footer={<FullBleedFooter bleed={MODAL_PAD} sending={f.sending} onSave={f.submit} onCancel={close} />}
                     >
-                        {f.serverError && <FormMessage>{SERVER_MESSAGE}</FormMessage>}
+                        <PresenceSlot show={Boolean(f.serverError)}>
+                            <FormMessage>{SERVER_MESSAGE}</FormMessage>
+                        </PresenceSlot>
                         <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />
                     </PatternModal>
                 )}

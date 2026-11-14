@@ -16,8 +16,20 @@
 
 // The caption stays at full contrast: when a field is disabled, the caption is
 // the visible reason, so it must stay readable.
-.plus-field-stack--disabled > :not(.plus-field):not(.plus-field-caption) {
+.plus-field-stack--disabled > :not(.plus-field):not(.plus-field-caption):not(.plus-field-caption-slot) {
     opacity: var(--ds-opacity-disabled);
+}
+
+.plus-field-stack > .plus-field-caption-slot {
+    margin-block-start: calc(-1 * var(--stack-sm));
+}
+
+.plus-field-stack > .plus-field-caption-slot .plus-field-caption {
+    padding-block-start: var(--stack-sm);
+}
+
+.plus-field-caption__swap {
+    min-width: 0;
 }
 
 .plus-field-label-row {

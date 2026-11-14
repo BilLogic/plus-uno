@@ -1,39 +1,383 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import { Banner, Flag, FlagGroup, SectionMessage } from '@/components';
-import { PatternSection } from '@/patterns';
+import {
+    Avatar,
+    Banner,
+    Button,
+    CountTag,
+    EmptyState,
+    Flag,
+    FlagGroup,
+    Heading,
+    IconButton,
+    NotificationItem,
+    PanelBody,
+    PanelCloseAction,
+    PanelContainer,
+    PanelHeader,
+    SectionMessage,
+    StaticTable,
+    StatusTag,
+    Tabs,
+    Tile,
+} from '@/components';
+import { Frame, PatternSection, PatternSidebar } from '@/patterns';
 import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
+import { WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
- * The Notifications pattern's examples, drawn with the real Flag, Banner and
- * SectionMessage. Every picture renders the state its heading names through
- * props: a Flag is held with `show` and `autohide={false}` so it stays in the
- * docs picture, and no picture runs a play. The Inbox is the Panel template's
- * own demo (panelDemo.jsx), reused so the two pages show one thing.
+ * The Notifications pattern's examples, drawn with the real Flag, Banner,
+ * SectionMessage, NotificationItem and Panel.
  *
  *   FlagTopRight      one Flag at the top right, over the page
  *   FlagStack         several Flags, newest on top
  *   FlagWithActions   a Flag with up to two verbs
  *   FlagUndo          the timed Undo Flag, then the plain "restored" Flag
  *   MustStay          a SectionMessage with dismiss off, by the action it informs
+ *   InboxInSidebar    the 360px (--inbox-width) Inbox Panel beside the Sidebar
  *   TierPicture       one Banner at the Frame, Page or Section tier
  *   SeverityRow       the four statuses on SectionMessage
  *   FlagDo / FlagDont, BannerDo / BannerDont  the do and don't pairs
  */
 
 /** The width a picture lays out at, in px: docs geometry. */
-export const STAGE = 1024; // docs-literal
+export const STAGE = 1024; // docs-literal: stage width in px
+
+/** Inside BrowserWindow (2px border), 1080 leaves 1078 >= 1024 so the Frame docks the Sidebar. */
+export const INBOX_STAGE = 1080; // docs-literal: stage width in px
 
 /** The width the small pictures lay out at, so their words stay legible at card size. Docs geometry, in px. */
-export const PLACE_STAGE = 600; // docs-literal
+export const PLACE_STAGE = 600; // docs-literal: card stage width in px
 
 /** Docs geometry, in px: the window height of the picture whose Flag sits over the page; the others hug their content. */
-const WINDOW = 260; // docs-literal
+const WINDOW = 260; // docs-literal: window height in px
 
 const noop = () => {};
 const pad = { padding: 'var(--page-pad)', boxSizing: 'border-box' };
+
+const INBOX_SEED = [
+    {
+        id: 'ana',
+        day: 'Today',
+        kind: 'person',
+        name: 'Ana Ruiz',
+        title: "Ana Ruiz moved Thursday's session",
+        meta: 'Sessions · 2m',
+        unread: true,
+        href: '#session-thu',
+    },
+    {
+        id: 'notes-due',
+        day: 'Today',
+        kind: 'system',
+        icon: 'calendar-check',
+        color: 'blue',
+        title: 'Session notes are due Friday at 5:00 PM',
+        meta: 'Compliance · 1h',
+        unread: true,
+        href: '#notes-due',
+    },
+    {
+        id: 'ben',
+        day: 'Yesterday',
+        kind: 'person',
+        name: 'Ben Okafor',
+        color: 'purple',
+        title: 'Ben Okafor mentioned you in a session note',
+        meta: 'Notes · Yesterday',
+        unread: true,
+        href: '#note-ben',
+    },
+    {
+        id: 'chloe',
+        day: 'Yesterday',
+        kind: 'person',
+        name: 'Chloe Tran',
+        color: 'teal',
+        title: 'Chloe Tran confirmed Friday at 3:30 PM',
+        meta: 'Sessions · Yesterday',
+        unread: false,
+        href: '#session-fri',
+    },
+];
+
+const DAYS = ['Today', 'Yesterday'];
+
+const SESSIONS_BEHIND = [
+    ['Ana Ruiz', 'Thu 4:30 PM', { content: <StatusTag appearance="success">Confirmed</StatusTag> }],
+    ['Ben Okafor', 'Thu 5:00 PM', { content: <StatusTag appearance="warning">Needs a tutor</StatusTag> }],
+    ['Chloe Tran', 'Fri 3:30 PM', { content: <StatusTag appearance="success">Confirmed</StatusTag> }],
+];
+
+const actorFor = (item) => (
+    item.kind === 'system'
+        ? <Tile icon={item.icon} size={32} color={item.color} />
+        : <Avatar name={item.name} size={32} color={item.color} />
+);
+
+const buildSidebarGroups = (unreadCount) => [
+    {
+        id: 'home',
+        items: [
+            { id: 'home', text: 'Home', icon: 'house' },
+            {
+                id: 'inbox',
+                text: 'Inbox',
+                icon: 'bell',
+                ...(unreadCount > 0
+                    ? {
+                        count: unreadCount,
+                        countLabel: `${unreadCount} unread ${unreadCount === 1 ? 'notification' : 'notifications'}`,
+                    }
+                    : {}),
+            },
+            { id: 'slack', text: 'Slack', icon: 'fa-brands fa-slack', href: '#slack', external: true },
+        ],
+    },
+    {
+        id: 'toolkit',
+        title: 'Toolkit',
+        collapsible: true,
+        items: [
+            { id: 'sessions', text: 'Sessions', icon: 'video' },
+            { id: 'students', text: 'Students', icon: 'users' },
+            { id: 'notes', text: 'Session notes', icon: 'file-lines' },
+        ],
+    },
+];
+
+const groupByDay = (items) =>
+    DAYS
+        .map((day) => ({ day, items: items.filter((item) => item.day === day) }))
+        .filter((group) => group.items.length > 0);
+
+const InboxDayList = ({ items, onMarkRead }) => {
+    const groups = groupByDay(items);
+    if (groups.length === 0) {
+        return (
+            <EmptyState
+                spacing="compact"
+                icon="circle-check"
+                header="You are all caught up."
+                description="New updates from your sessions and supervisors will show up here."
+            />
+        );
+    }
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+            {groups.map((group) => (
+                <section key={group.day} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                    <div style={{ paddingInline: 'var(--pad-x-md)' }}>
+                        <Heading size="xxsmall">{group.day}</Heading>
+                    </div>
+                    <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                        {group.items.map((item) => (
+                            <li key={item.id}>
+                                <NotificationItem
+                                    actor={actorFor(item)}
+                                    title={item.title}
+                                    meta={item.meta}
+                                    unread={item.unread}
+                                    href={item.href}
+                                    onClick={(event) => {
+                                        event.preventDefault();
+                                        if (item.unread) onMarkRead(item.id);
+                                    }}
+                                    onMarkRead={() => onMarkRead(item.id)}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            ))}
+        </div>
+    );
+};
+
+/** The Inbox Panel itself: 360px (--inbox-width), Mark all as read, settings, close, Unread/All tabs and day groups. */
+export const NotificationsInboxPanel = ({
+    items,
+    onMarkRead,
+    onMarkAllRead,
+    onSettings = noop,
+    onClose = noop,
+}) => {
+    const [tab, setTab] = useState('unread');
+    const unreadItems = items.filter((item) => item.unread);
+    const unreadCount = unreadItems.length;
+
+    return (
+        <PanelContainer width="var(--inbox-width)" aria-label="Inbox">
+            <PanelHeader
+                title="Inbox"
+                actions={(
+                    <>
+                        {unreadCount > 0 ? (
+                            <Button
+                                text="Mark all as read"
+                                appearance="subtle"
+                                spacing="compact"
+                                onClick={onMarkAllRead}
+                            />
+                        ) : null}
+                        <IconButton
+                            icon="gear"
+                            label="Notification settings"
+                            tooltip="Notification settings"
+                            appearance="subtle"
+                            spacing="compact"
+                            onClick={onSettings}
+                        />
+                        <PanelCloseAction onClick={onClose} />
+                    </>
+                )}
+            />
+            <Tabs
+                activeKey={tab}
+                onSelect={setTab}
+                style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0, width: '100%' }}
+            >
+                <Tabs.Tab eventKey="unread">
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)' }}>
+                        <span>Unread</span>
+                        {unreadCount > 0 ? <CountTag value={unreadCount} spacing="compact" /> : null}
+                    </span>
+                </Tabs.Tab>
+                <Tabs.Tab eventKey="all">All</Tabs.Tab>
+
+                <Tabs.Panel eventKey="unread" style={{ flex: '1 1 auto', minHeight: 0, width: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <PanelBody style={{ padding: 'var(--pad-x-md)' }}>
+                        <InboxDayList items={unreadItems} onMarkRead={onMarkRead} />
+                    </PanelBody>
+                </Tabs.Panel>
+
+                <Tabs.Panel eventKey="all" style={{ flex: '1 1 auto', minHeight: 0, width: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <PanelBody style={{ padding: 'var(--pad-x-md)' }}>
+                        <InboxDayList items={items} onMarkRead={onMarkRead} />
+                    </PanelBody>
+                </Tabs.Panel>
+            </Tabs>
+        </PanelContainer>
+    );
+};
+
+/** The Inbox opening from the Sidebar at the start, 360px wide (--inbox-width), over the page with no Backdrop. */
+export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) => {
+    const [open, setOpen] = useState(defaultOpen);
+    const [items, setItems] = useState(() => (
+        initialAllRead ? INBOX_SEED.map((item) => ({ ...item, unread: false })) : INBOX_SEED
+    ));
+    const rootRef = useRef(null);
+    const inboxWrapRef = useRef(null);
+
+    const unreadCount = items.filter((item) => item.unread).length;
+
+    const markOneRead = (id) => {
+        setItems((prev) => prev.map((item) => (item.id === id ? { ...item, unread: false } : item)));
+    };
+
+    const markAllRead = () => {
+        setItems((prev) => prev.map((item) => (item.unread ? { ...item, unread: false } : item)));
+    };
+
+    const findInboxTrigger = () => {
+        const buttons = rootRef.current?.querySelectorAll('nav[aria-label="Main"] button') ?? [];
+        return Array.from(buttons).find((btn) => btn.textContent?.startsWith('Inbox')) ?? null;
+    };
+
+    const closeFromInside = () => {
+        const wasInside = inboxWrapRef.current?.contains(document.activeElement);
+        setOpen(false);
+        if (wasInside) {
+            findInboxTrigger()?.focus();
+        }
+    };
+
+    useEffect(() => {
+        if (!open) return undefined;
+
+        const onKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                event.stopPropagation();
+                closeFromInside();
+            }
+        };
+
+        const onPointerDown = (event) => {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+            if (inboxWrapRef.current?.contains(target)) return;
+            const clickedSidebarInbox = Boolean(
+                target.closest('nav[aria-label="Main"] button')?.textContent?.startsWith('Inbox')
+            );
+            if (clickedSidebarInbox) return;
+            setOpen(false);
+        };
+
+        document.addEventListener('keydown', onKeyDown);
+        document.addEventListener('pointerdown', onPointerDown);
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+            document.removeEventListener('pointerdown', onPointerDown);
+        };
+    }, [open]);
+
+    return (
+        <BrowserWindow address="app.plus.org/sessions" height={WINDOW_HEIGHT}>
+            <div ref={rootRef} style={{ position: 'relative', height: '100%' }}>
+                <Frame
+                    sidebar={(
+                        <PatternSidebar
+                            groups={buildSidebarGroups(unreadCount)}
+                            activeId={open ? 'inbox' : 'sessions'}
+                            onSelect={(id) => {
+                                if (id === 'inbox') setOpen((prev) => !prev);
+                            }}
+                            account={{ name: 'Maya Chen', role: 'tutor' }}
+                            storageKey={null}
+                            label="Main"
+                        />
+                    )}
+                >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+                        <DemoPageHeader title="Sessions" description="This week" />
+                        <PatternSection title="Upcoming sessions">
+                            <StaticTable
+                                headers={['Student', 'Time', 'Status']}
+                                rows={SESSIONS_BEHIND}
+                            />
+                        </PatternSection>
+                    </div>
+                </Frame>
+
+                {open ? (
+                    <div
+                        ref={inboxWrapRef}
+                        style={{
+                            position: 'absolute',
+                            insetBlock: 0,
+                            insetInlineStart: 'var(--frame-sidebar-width)',
+                            zIndex: 'var(--layer-dialog)',
+                            display: 'flex',
+                            boxShadow: 'var(--ds-shadow-overlay)',
+                            borderInlineEnd: 'var(--border-default) solid var(--ds-border)',
+                        }}
+                    >
+                        <NotificationsInboxPanel
+                            items={items}
+                            onMarkRead={markOneRead}
+                            onMarkAllRead={markAllRead}
+                            onClose={closeFromInside}
+                        />
+                    </div>
+                ) : null}
+            </div>
+        </BrowserWindow>
+    );
+};
 
 /** A Flag stack at the top right, held in the picture. */
 const TopRight = ({ children }) => (

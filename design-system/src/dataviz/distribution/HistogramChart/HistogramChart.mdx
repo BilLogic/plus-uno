@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={HistogramChartStories} />
 
 <Title />
-Groups raw numbers into equal ranges and draws how many fall in each, so the
-shape of a distribution shows: where values bunch, how wide they spread.
+Groups raw numbers into equal ranges and plots the count in each bin to show
+where values cluster and how far they spread.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/distribution/HistogramChart"
@@ -31,13 +31,11 @@ shape of a distribution shows: where values bunch, how wide they spread.
 
 ## When to use
 
-Use `HistogramChart` for the spread of one continuous measure: test scores
-across a class, session lengths across a week, minutes to first message across
-new students. It answers "what is typical, and how far do values stray".
+Use `HistogramChart` for the spread of one continuous measure, such as class
+test scores, weekly session lengths or minutes to first message.
 
-For counts of named categories, use `BarChart`; a histogram bins a continuous
-number, a bar chart does not. For the spread of several groups side by side,
-use `BoxPlotChart`. For a distribution across two dimensions, use
+For counts of named categories, use `BarChart`. To compare distributions across
+groups, use `BoxPlotChart`. For a distribution across two dimensions, use
 `HeatmapChart`.
 
 </div>
@@ -49,17 +47,17 @@ use `BoxPlotChart`. For a distribution across two dimensions, use
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Bins', <>One column per range; height is the count. Set the range with <C>binWidth</C>, or leave it out and the chart picks the bins. Adjacent bins are outlined in <C>--ds-border-inverse</C> so they stand apart.</>],
-        ['Bin axis', <>The value ranges the bins cover. It runs along the top of the chart and takes its title from <C>yAxisLabel</C>.</>],
-        ['Raw-data axis', <>Along the bottom, titled by <C>xAxisLabel</C>. It belongs to the hidden series of raw values the bins are computed from.</>],
-        ['Count axis', 'On the left, always titled "Count". A second axis on the right is titled "Probability" and carries no series.'],
+        ['Bins', <>One column per range; height encodes count. Set range width with <C>binWidth</C> or let the chart choose it. Outlined in <C>--ds-border-inverse</C> to separate adjacent bins.</>],
+        ['Bin axis', <>Top axis showing value ranges, titled by <C>yAxisLabel</C>.</>],
+        ['Raw-data axis', <>Bottom axis for the hidden raw-data series, titled by <C>xAxisLabel</C>.</>],
+        ['Count axis', 'Left axis titled "Count"; an unused right axis is titled "Probability".'],
         ['Tooltip', "A bin's range and count."],
     ]}
 />
 
-The axis wiring is not the usual one: `yAxisLabel` names the value ranges, not
-the counts. Set it to what the values are ("Score") and set `xAxisLabel` to
-match, as the stories do.
+Because `yAxisLabel` titles the top bin-range axis rather than the count axis,
+set both `yAxisLabel` and `xAxisLabel` to the measured unit (for example,
+`"Score"`).
 
 </div>
 
@@ -67,8 +65,9 @@ match, as the stories do.
 
 ## Data shape
 
-`data` is a flat array of numbers, one per record; the chart does the counting.
-`height` defaults to 400.
+`data` is a flat array of raw numbers; the chart bins and counts them. Pick a
+`binWidth` that matches how readers think about the unit (such as 5 points or
+10 minutes) so the shape is neither hidden nor noisy. `height` defaults to 400.
 
 ```jsx
 <HistogramChart
@@ -79,20 +78,16 @@ match, as the stories do.
 />
 ```
 
-Pick a `binWidth` that matches how readers think about the measure (5 points,
-10 minutes). Too wide hides the shape; too narrow turns it into noise.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **One color.** Bins take `--ds-chart-brand`; there is only ever one series, so there is no legend to read.
-- **Height carries the count.** Bins are positioned and sized by value, so the chart reads without hue. The count axis starts at zero.
-- **Uneven samples mislead.** A handful of records makes a ragged shape that looks meaningful. Say how many records are behind the chart.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Single series color.** Bins use `--ds-chart-brand` with no legend; height and position carry the count from a zero baseline without hue.
+- **State sample size.** Small samples produce jagged shapes that look meaningful; note how many records are behind the chart.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -100,11 +95,7 @@ Pick a `binWidth` that matches how readers think about the measure (5 points,
 
 ## States
 
-`HistogramChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`HistogramChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -121,12 +112,7 @@ Pick a `binWidth` that matches how readers think about the measure (5 points,
 
 <DocsInteractivePlayground
     of={HistogramChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

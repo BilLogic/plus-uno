@@ -1,8 +1,9 @@
 import { useMotionReduced } from '@/lib/motionPreference';
 import { useOverlayPresence } from '@/lib/overlayMotion';
-import React, { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { FlagStackContext, useFlagGroupCoordinator, useFlagQueue, useFlagStack } from '@/lib/flagStackMotion';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { animate, motion } from 'motion/react';
+import { LayoutGroup, animate, motion } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import ProgressBar from '@/components/loading/ProgressBar';
@@ -21,13 +22,12 @@ import './Flag.scss';
 export const FLAG_AUTO_CLOSE_MS = 8000;
 
 
+export { useFlagQueue };
+
 /** Where the flags that stay go when one leaves: `spatial.default`, read from the generated springs. */
 const CLOSE_UP = SPRINGS['spatial.default'].productive;
 /** Under reduced motion they fade into their new places on `appearance.fast` instead. */
 const CLOSE_UP_FADE = SPRINGS['appearance.fast'].productive;
-
-/** The group's reduced-motion setting, for the flags inside it. */
-const FlagGroupContext = createContext(undefined);
 
 /** The five appearances, as the Figma Flag set names them. */
 export const FLAG_APPEARANCES = ['normal', 'information', 'warning', 'error', 'success'];
@@ -92,6 +92,9 @@ export const Flag = ({
     timestamp, // '11 mins ago' etc
     sound,
     reducedMotion,
+    staggerDelayMs,
+    onExited,
+    style,
     ...props
 }) => {
     // An appearance outside the list falls back to the default, normal.
@@ -201,22 +204,37 @@ export const Flag = ({
      * `spatial.default` (a layout animation); under reduced motion they stay put in time and
      * fade into the new place on `appearance.fast`, never a cut.
      */
-    const group = useContext(FlagGroupContext);
+    const stack = useFlagStack();
     const osReduced = useMotionReduced();
-    const reduced = reducedMotion ?? group ?? osReduced;
+    const reduced = reducedMotion ?? stack?.reducedMotion ?? osReduced;
     const surface = useRef(null);
     const present = useOverlayPresence(show, surface);
+    const wasPresentRef = useRef(present);
     const lastTop = useRef(null);
+    const [arrivalSlot, setArrivalSlot] = useState({ delayMs: 0, playSound: true });
+
+    useEffect(() => {
+        if (wasPresentRef.current && !present) {
+            onExited?.();
+        }
+        wasPresentRef.current = present;
+    }, [present, onExited]);
 
     useLayoutEffect(() => {
         const el = surface.current;
         if (!el) return;
         if (!show) {
-            Object.assign(el.style, { position: 'absolute', top: `${el.offsetTop}px`, left: `${el.offsetLeft}px`, margin: '0' });
+            Object.assign(el.style, {
+                position: 'absolute',
+                top: `${el.offsetTop}px`,
+                left: `${el.offsetLeft}px`,
+                width: `${el.offsetWidth}px`,
+                margin: '0',
+            });
             lastTop.current = null;
             return;
         }
-        Object.assign(el.style, { position: '', top: '', left: '', margin: '' });
+        Object.assign(el.style, { position: '', top: '', left: '', width: '', margin: '' });
         if (reduced && lastTop.current !== null && lastTop.current !== el.offsetTop) {
             animate(el, { opacity: [0, 1] }, CLOSE_UP_FADE);
         }
@@ -226,19 +244,36 @@ export const Flag = ({
     /*
      * Its sound plays once as the flag lands, when it is shown, through the one
      * sound setting (off plays nothing): Error for an error appearance, Notify
-     * for the rest, or the token the app passes. When a flag should stay quiet,
-     * such as during a session, the app passes `sound={false}`. The effect reads
-     * both through refs, so only `show` re-runs it: a flag's arrival sounds,
-     * never another prop change.
+     * for the rest, or the token the app passes. Flags that arrive together play
+     * once (coalesced through FlagGroup's coordinator).
      */
     const landing = useRef({});
-    landing.current = { sound, appearance: flagAppearance, reduced };
+    landing.current = { sound, appearance: flagAppearance, reduced, stack, staggerDelayMs };
     useEffect(() => {
-        const { sound: token, appearance: currentAppearance, reduced: isReduced } = landing.current;
-        if (show && token !== false && token !== '') playOnLand(currentAppearance, token, isReduced);
+        const {
+            sound: token,
+            appearance: currentAppearance,
+            reduced: isReduced,
+            stack: groupStack,
+            staggerDelayMs: explicitDelay,
+        } = landing.current;
+        if (!show) return;
+        const slot = groupStack ? groupStack.claimArrivalSlot() : { delayMs: 0, playSound: true };
+        const resolvedDelay = explicitDelay ?? slot.delayMs;
+        if (resolvedDelay > 0) {
+            setArrivalSlot({ delayMs: resolvedDelay, playSound: slot.playSound });
+        }
+        if (token !== false && token !== '' && slot.playSound) {
+            playOnLand(currentAppearance, token, isReduced);
+        }
     }, [show]);
 
     if (!present) return null;
+
+    const effectiveDelay = show && !reduced ? (staggerDelayMs ?? arrivalSlot.delayMs) : 0;
+    const mergedStyle = effectiveDelay > 0
+        ? { animationDelay: `${effectiveDelay}ms`, ...style }
+        : style;
 
     return (
         <motion.div
@@ -250,6 +285,7 @@ export const Flag = ({
             data-leaving={!show ? exitKind.current : undefined}
             className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''}${timer ? ' plus-flag--timer' : ''} ${className}`}
             data-paused={paused ? 'true' : undefined}
+            style={mergedStyle}
             role={liveRole}
             aria-live={livePoliteness}
             aria-atomic="true"
@@ -378,32 +414,100 @@ Flag.propTypes = {
     /** The sound token it plays as it lands, through the app's sound setting, or `false` for none. Unset, an `error` flag plays `error` and every other appearance plays `notify`. Pass `false` when a flag should stay quiet, such as during a session. */
     sound: PropTypes.oneOfType([PropTypes.string, PropTypes.oneOf([false])]),
     /** Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting. */
-    reducedMotion: PropTypes.bool
+    reducedMotion: PropTypes.bool,
+    /** Optional entrance stagger delay in ms when arriving as part of a burst. */
+    staggerDelayMs: PropTypes.number,
+    /** Called once the leaving flag's exit animation finishes and it unmounts. */
+    onExited: PropTypes.func,
+    /** Inline styles applied to the flag surface. */
+    style: PropTypes.object,
 };
 
 /**
  * FlagGroup: where flags sit: top-right by default, fixed to the screen,
  * Popover/gap-screen 8 from its edges, stacking Popover/stack-flag 16 apart.
+ * Accepts either `<Flag>` children or a `flags` queue list (`useFlagQueue`) with `onDismiss`.
  */
 export const FlagGroup = ({
     position = 'top-end', // 'top-start', 'top-center', 'top-end', 'middle-start', etc.
     containerPosition = 'fixed',
     className = '',
     reducedMotion,
+    flags,
+    onDismiss,
     children,
     ...props
-}) => (
-    <FlagGroupContext.Provider value={reducedMotion}>
-        <div
-            data-position={position}
-            data-container-position={containerPosition}
-            className={`plus-flag-container ${className}`}
-            {...props}
-        >
-            {children}
-        </div>
-    </FlagGroupContext.Provider>
-);
+}) => {
+    const coordinator = useFlagGroupCoordinator(reducedMotion);
+    const prevFlagsRef = useRef(flags ?? []);
+    const [leavingFlags, setLeavingFlags] = useState([]);
+
+    if (Array.isArray(flags)) {
+        const prev = prevFlagsRef.current;
+        if (prev !== flags) {
+            const nextIds = new Set(flags.map((item) => item.id));
+            const newlyRemoved = prev
+                .map((item, index) => ({ item, index }))
+                .filter(({ item }) => item?.id && !nextIds.has(item.id));
+            prevFlagsRef.current = flags;
+            if (newlyRemoved.length > 0) {
+                setLeavingFlags((existing) => {
+                    const seen = new Set(existing.map((entry) => entry.item.id));
+                    const additions = newlyRemoved.filter(({ item }) => !seen.has(item.id));
+                    return additions.length > 0 ? [...existing, ...additions] : existing;
+                });
+            }
+        }
+    }
+
+    const renderQueueItems = () => {
+        if (!Array.isArray(flags)) return children;
+        const activeIds = new Set(flags.map((item) => item.id));
+        const merged = flags.map((item) => ({ item, show: true }));
+        const pending = leavingFlags
+            .filter(({ item }) => !activeIds.has(item.id))
+            .sort((a, b) => a.index - b.index);
+        for (const entry of pending) {
+            const insertAt = Math.min(entry.index, merged.length);
+            merged.splice(insertAt, 0, { item: entry.item, show: false });
+        }
+        return merged.map(({ item, show }) => {
+            const { id: flagId, children: description, description: altDescription, onDismiss: itemDismiss, ...rest } = item;
+            return (
+                <Flag
+                    key={flagId}
+                    id={flagId}
+                    show={show}
+                    onDismiss={() => {
+                        itemDismiss?.(flagId);
+                        onDismiss?.(flagId);
+                    }}
+                    onExited={() => {
+                        setLeavingFlags((current) => current.filter((entry) => entry.item.id !== flagId));
+                    }}
+                    {...rest}
+                >
+                    {description ?? altDescription}
+                </Flag>
+            );
+        });
+    };
+
+    return (
+        <FlagStackContext.Provider value={coordinator}>
+            <LayoutGroup id={coordinator.groupId}>
+                <div
+                    data-position={position}
+                    data-container-position={containerPosition}
+                    className={`plus-flag-container ${className}`}
+                    {...props}
+                >
+                    {renderQueueItems()}
+                </div>
+            </LayoutGroup>
+        </FlagStackContext.Provider>
+    );
+};
 
 FlagGroup.propTypes = {
     /** Where the stack sits: `top-end` (default), `top-start`, `top-center`, `middle-*` or `bottom-*`. */
@@ -412,6 +516,13 @@ FlagGroup.propTypes = {
     containerPosition: PropTypes.string,
     /** Hold reduced motion on or off for every flag inside. Unset, flags follow the person's setting. */
     reducedMotion: PropTypes.bool,
+    /** Optional visible flag items from `useFlagQueue`; dismissed items stay mounted for their exit before unmounting. */
+    flags: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        title: PropTypes.node.isRequired,
+    })),
+    /** Called with `flag.id` when an item in `flags` is dismissed or times out. */
+    onDismiss: PropTypes.func,
     className: PropTypes.string,
     children: PropTypes.node
 };

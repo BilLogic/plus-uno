@@ -123,7 +123,7 @@ a message back when it genuinely changes, remount it with a new `key`.
 - `CloseButton`: use when rendering the dismiss control on a dismissible message.
 - Forms: use when pairing a form-level danger `SectionMessage` with per-field validation errors.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `Spotlight`
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `Spotlight`
 
 ## Parts
 

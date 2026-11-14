@@ -145,6 +145,9 @@
     /* AI chat */
     --ai-chat-width: var(--width-2500);
 
+    /* Inbox */
+    --inbox-width: calc(var(--width-2000) + var(--space-250)); /* 360px */
+
     /* Table */
     --table-cell-max-width: var(--size-300);
 

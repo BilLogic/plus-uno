@@ -10,7 +10,7 @@ A value someone could change but this person cannot right now. It stays in the t
 
 ## The three cases
 
-Read-only is one of three ways to show a value without a way to change it. Pick by whether anyone can change it, and who.
+Choose how to show a value by who can change it and what prevents editing.
 
 - **Read-only.** Someone can change it; this person cannot right now. Neutral fill, full contrast, the reason in the caption.
 - **Plain text.** Nobody ever changes it here. It is a label and a value, not a field.
@@ -84,7 +84,7 @@ Don't: A faded value with no reason: out of the tab order and hard to read.
 
 **Checked:** Review
 
-A person who cannot change a value must at least read all of it. A `Select` wraps to show its value; for a `TextArea`, set `rows` so all of it shows.  A TextArea that grows to fit its value is Planned.
+A `Select` wraps to show its full value; for a `TextArea`, set `rows` to show it all. Automatic TextArea growth is Planned .
 
 ### Show never-editable content as plain text. {#show-never-editable-content-as-plain-text}
 

@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={ColumnRangeChartStories} />
 
 <Title />
-Shows a low-to-high span per category as a floating column. Where the column
-starts and ends is the data; its length is the spread.
+Shows a low-to-high span per category as a floating column whose ends mark the
+bounds and whose length shows the spread.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/ColumnRangeChart"
@@ -31,16 +31,16 @@ starts and ends is the data; its length is the spread.
 
 ## When to use
 
-Use `ColumnRangeChart` for a minimum and a maximum per category: a tutor's
-available hours each day, the shortest and longest session per subject, the
-lowest and highest score per class.
+Use `ColumnRangeChart` for a minimum and maximum per category, such as daily
+available hours, shortest and longest session per subject, or lowest and
+highest score per class.
 
-For one value per category, use `BarChart`. For two distinct moments, such as
-before and after, use `DumbbellChart`. For spans placed on a timeline rather
-than across categories, use `XRangeChart`. For the full spread of a
-distribution, with quartiles and outliers, use `BoxPlotChart`.
+For one value per category, use `BarChart`. For two distinct moments such as
+before and after, use `DumbbellChart`. For spans on a timeline, use
+`XRangeChart`. For a full distribution with quartiles and outliers, use
+`BoxPlotChart`.
 
-The chart is vertical by default. Set `horizontal` for long category labels.
+Vertical by default; set `horizontal` for long category labels.
 
 </div>
 
@@ -52,9 +52,9 @@ The chart is vertical by default. Set `horizontal` for long category labels.
     head={['Part', 'What it does']}
     rows={[
         ['Range column', <>One per item in <C>data</C>, from <C>low</C> to <C>high</C>, in categorical slot 1.</>],
-        ['End labels', 'Each column prints its low and high values at its two ends.'],
-        ['Category axis', <>Names each column, from <C>categories</C>.</>],
-        ['Value axis', <>Titled by <C>yAxisLabel</C>, which defaults to <C>Value</C>.</>],
+        ['End labels', 'Prints low and high values at the two ends of each column.'],
+        ['Category axis', <>Names each column from <C>categories</C>.</>],
+        ['Value axis', <>Titled by <C>yAxisLabel</C> (default <C>Value</C>).</>],
         ['Tooltip', 'Shows the hovered span.'],
     ]}
 />
@@ -65,9 +65,9 @@ The chart is vertical by default. Set `horizontal` for long category labels.
 
 ## Data shape
 
-`categories` is an array of strings. `data` is an array of `{ low, high }`,
-both required, one per category in the same order. `height` defaults to 400;
-`horizontal` defaults to `false`.
+`categories` is an array of strings. `data` is an array of `{ low, high }` (both
+required) in `categories` order. `height` defaults to 400; `horizontal` defaults
+to `false`.
 
 ```jsx
 <ColumnRangeChart
@@ -88,11 +88,10 @@ both required, one per category in the same order. `height` defaults to 400;
 
 ## Color and accessibility
 
-- **One color for every column.** The chart draws a single series in categorical slot 1 and takes no per-column color.
-- **Position carries the values, and the labels repeat them.** Both ends sit on a shared axis and print their numbers, so the chart reads without hue.
-- **The ends carry no unit.** The labels print bare numbers. Put the unit in `yAxisLabel`, as in "Hour" or "Session length (min)".
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. There is no legend, and the series is named only "Range", so the axis title and the surrounding header have to say what is measured. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Single series color.** Every column uses categorical slot 1 with no per-column color override.
+- **Position and end labels carry the values.** Both ends sit on a shared axis and print bare numbers, so the chart reads without hue. Include the unit in `yAxisLabel`, such as `"Hour"` or `"Session length (min)"`.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Because there is no legend and the series is named `"Range"`, state what is measured in `yAxisLabel` and the surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -100,11 +99,7 @@ both required, one per category in the same order. `height` defaults to 400;
 
 ## States
 
-`ColumnRangeChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`ColumnRangeChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -121,12 +116,7 @@ both required, one per category in the same order. `height` defaults to 400;
 
 <DocsInteractivePlayground
     of={ColumnRangeChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

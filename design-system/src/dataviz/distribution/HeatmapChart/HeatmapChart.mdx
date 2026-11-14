@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={HeatmapChartStories} />
 
 <Title />
-Lays values out as a grid of cells and shades each one by size, so patterns
-across two categories show at a glance. The strongest tone is the biggest value.
+Shades a grid of cells by value so patterns across two categories show at a
+glance, with the strongest tone on the largest value.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/distribution/HeatmapChart"
@@ -31,14 +31,12 @@ across two categories show at a glance. The strongest tone is the biggest value.
 
 ## When to use
 
-Use `HeatmapChart` to find patterns across two sets of categories: sessions by
-weekday and hour, students by SMART competency, tutor availability by day and
-time slot. It suits questions like "when are we busiest" or "which skills lag",
-where the shape matters more than any one number.
+Use `HeatmapChart` to surface patterns across two category axes, such as
+sessions by weekday and hour, students by SMART competency or tutor availability
+by day and slot.
 
 For exact values, use a table. For one measure over time, use `LineChart`. For
-individual points rather than a grid, use `ScatterChart`. For one dimension
-rather than two, use `HistogramChart`.
+individual points, use `ScatterChart`. For one dimension, use `HistogramChart`.
 
 </div>
 
@@ -49,18 +47,18 @@ rather than two, use `HistogramChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Cells', <>One per <C>[x, y, value]</C> point, shaded from the ramp. <C>pointPadding</C> (0 to 1) opens a gap between them.</>],
-        ['Cell labels', <>The raw value on each cell. On by default; <C>showDataLabels</C> turns them off.</>],
-        ['X axis', <>Names the columns from <C>xCategories</C>.</>],
-        ['Y axis', <>Names the rows from <C>yCategories</C>, first category at the top. It has no title.</>],
-        ['Color bar', <>The legend: a vertical scale on the right from the lowest value to the highest. <C>showLegend</C> hides it; <C>hideLegendNavigation</C> hides its scroll arrows.</>],
-        ['Tooltip', 'The column name, the row name and the value to two decimals.'],
+        ['Cells', <>One per <C>[x, y, value]</C> point, shaded from the ramp. <C>pointPadding</C> (0 to 1) opens a gap between cells.</>],
+        ['Cell labels', <>Raw value on each cell; on by default and toggled by <C>showDataLabels</C>.</>],
+        ['X axis', <>Names columns from <C>xCategories</C>.</>],
+        ['Y axis', <>Names rows from <C>yCategories</C> (first at top), with no axis title.</>],
+        ['Color bar', <>Vertical legend on the right from lowest to highest value. <C>showLegend</C> hides it; <C>hideLegendNavigation</C> hides its scroll arrows.</>],
+        ['Tooltip', 'Column name, row name and value to two decimals.'],
     ]}
 />
 
-`compactSpacing` trims the chart's inset to the tighter chart spacing step so
-the grid gets more room. `enableAnimation` and `animationDuration` control the
-entrance; the duration defaults to the standard motion duration.
+`compactSpacing` trims the chart inset to the tighter chart spacing step.
+`enableAnimation` and `animationDuration` (default standard motion duration)
+control the entrance transition.
 
 </div>
 
@@ -69,8 +67,7 @@ entrance; the duration defaults to the standard motion duration.
 ## Data shape
 
 `xCategories` and `yCategories` are arrays of strings. `data` is an array of
-`[x, y, value]`, where `x` and `y` are indexes into those arrays. `height`
-defaults to 400.
+`[x, y, value]` triples indexing into those arrays. `height` defaults to 400.
 
 ```jsx
 <HeatmapChart
@@ -92,14 +89,19 @@ defaults to 400.
 
 ## Color and accessibility
 
-- **A sequential ramp by default.** `hue` (default `blue`) picks one of the chart hues: blue, teal, green, lime, yellow, orange, red, magenta, purple, gray or brown. The ramp runs through four tokens, evenly spaced: `--ds-background-accent-{hue}-subtler` for the lowest value, then `--ds-chart-{hue}-bold`, `--ds-chart-{hue}-bolder` and `--ds-chart-{hue}-boldest` for the highest. Each step sits further from the surface than the last, so the biggest value is darker in light mode and lighter in dark.
-- **A diverging ramp on request.** `diverging={[low, high]}` takes two different hues and overrides `hue`. It builds seven steps: the low hue from `boldest` down to `bold`, the neutral midpoint `--ds-background-accent-gray-subtler`, then the high hue from `bold` up to `boldest`. Orange and blue stay apart under every common color-vision deficiency; never pair red with green.
-- **The ramp spans the data.** The lowest value takes the lightest step and the highest the strongest, not rounded ticks. Set `min` and `max` to fix the scale, so two heatmaps compare on the same ramp. For a diverging ramp, set them an equal distance either side of the baseline: the midpoint lands halfway between `min` and `max`, not at zero.
-- **Resolved per color mode.** The color bar blends between its stops, so it needs real colors, not token references. The chart reads each token's current value and reads them again whenever the color mode or contrast setting changes.
-- **Labels pick their ink.** Each cell label takes `--ds-text` or `--ds-text-inverse`, whichever contrasts more with that cell.
-- **Color is the only encoding.** Cells are all the same size, so the value lives in shade alone. Keep `showDataLabels` on wherever the grid is large enough; with labels off, readers who cannot tell the tones apart get only the tooltip.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+<RefTable
+    head={['Ramp', 'Prop', 'Tokens and rules']}
+    rows={[
+        ['Sequential (default)', <><C>hue</C> (default <C>blue</C>; supports blue, teal, green, lime, yellow, orange, red, magenta, purple, gray, brown)</>, <>Four even stops from lowest to highest: <C>{'--ds-background-accent-{hue}-subtler'}</C>, <C>{'--ds-chart-{hue}-bold'}</C>, <C>{'--ds-chart-{hue}-bolder'}</C>, <C>{'--ds-chart-{hue}-boldest'}</C> (darker in light mode, lighter in dark mode).</>],
+        ['Diverging', <><C>{'diverging={[low, high]}'}</C> (overrides <C>hue</C>)</>, <>Seven stops: low hue <C>boldest</C> down to <C>bold</C>, midpoint <C>--ds-background-accent-gray-subtler</C>, high hue <C>bold</C> up to <C>boldest</C>. Orange and blue stay distinct under color-vision deficiency; never pair red with green.</>],
+    ]}
+/>
+
+- **Scale bounds.** By default the ramp spans the data's lowest and highest values. Set `min` and `max` to compare heatmaps on a shared scale; for a diverging ramp, set them equidistant around the baseline because the midpoint lands halfway between `min` and `max`, not at zero.
+- **Live mode resolution.** The chart resolves token values for the color bar and updates automatically when color mode or contrast changes.
+- **Keep cell labels on.** Because equal-sized cells encode value by shade alone, leave `showDataLabels` on whenever cells fit text; each label picks `--ds-text` or `--ds-text-inverse` for contrast.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -107,11 +109,7 @@ defaults to 400.
 
 ## States
 
-`HeatmapChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`HeatmapChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -128,12 +126,7 @@ defaults to 400.
 
 <DocsInteractivePlayground
     of={HeatmapChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

@@ -23,7 +23,7 @@ Four kinds of wait. Each has its own shape in the 1 to 10 s band; the time bands
 
 ## Usage
 
-Use Loading whenever the product is fetching or saving and the person is waiting. Decide by two inputs: what is loading, and how long it has taken. The rule is the same whatever the page.
+Use Loading while someone waits for a fetch or save. Choose the indicator by what is loading and how long it has taken.
 
 | What is loading | Under 1 s | 1 to 10 s | Over 10 s |
 | --- | --- | --- | --- |

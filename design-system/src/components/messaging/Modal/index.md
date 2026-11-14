@@ -154,7 +154,7 @@ focused task, each with its own Backdrop.
 - `Backdrop`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
 - Templates: use when choosing between a Modal and a focused page; its Usage section weighs the two.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMessage` · `Spotlight`
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 

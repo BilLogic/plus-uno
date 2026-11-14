@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={BulletChartStories} />
 
 <Title />
-Shows a value against its target as a horizontal bar and a tick, over three
-shaded quality bands. One row per metric.
+Compares each metric's value against its target as a horizontal bar and tick
+over three shaded quality bands.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/BulletChart"
@@ -31,17 +31,17 @@ shaded quality bands. One row per metric.
 
 ## When to use
 
-Use `BulletChart` when each number has a goal: session completion rate against
-the weekly target, attendance against the program goal, a SMART competency
-score against its benchmark. Stack several metrics in one chart and the reader
-scans down for the bars that fall short of their ticks.
+Use `BulletChart` when each metric has a goal on a 0 to 100 scale, such as
+weekly session completion rate, program attendance or a SMART competency
+benchmark. Stacking metrics lets readers scan for bars that fall short of their
+ticks.
 
-For values with no target, use `BarChart`. For one headline value against a
-target, shown as a dial, use `GaugeChart`. For progress toward a target over
-time, use `LineChart`.
+For values without a target, use `BarChart`. For one headline value against a
+target on a dial, use `GaugeChart`. For progress toward a target over time, use
+`LineChart`.
 
-The scale is fixed at 0 to 100, so every metric must be a percentage or a score
-out of 100.
+Every metric must be a percentage or a score out of 100 because the scale is
+fixed at 0 to 100.
 
 </div>
 
@@ -52,12 +52,12 @@ out of 100.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Bar', <>One per item in <C>data</C>; its length is <C>y</C>. Always <C>--ds-chart-brand</C>.</>],
-        ['Target', <>A tick across the bar at <C>target</C>, in <C>--ds-chart-gray-boldest</C> so it reads on every band.</>],
-        ['Bands', <>Fixed: 0 to 60 in <C>--ds-background-danger</C>, 60 to 80 in <C>--ds-background-warning</C>, 80 to 100 in <C>--ds-background-success</C>. They are not configurable.</>],
-        ['Category axis', <>Names each row, from <C>categories</C>.</>],
-        ['Value axis', 'Runs from zero to a fixed maximum of 100.'],
-        ['Tooltip', <>Shows the value and its target, as <C>78 (target: 85)</C>.</>],
+        ['Bar', <>One per item in <C>data</C>; length is <C>y</C>, filled with <C>--ds-chart-brand</C>.</>],
+        ['Target', <>A tick across the bar at <C>target</C> in <C>--ds-chart-gray-boldest</C> so it reads on every band.</>],
+        ['Bands', <>Fixed, non-configurable ranges: 0–60 in <C>--ds-background-danger</C>, 60–80 in <C>--ds-background-warning</C>, 80–100 in <C>--ds-background-success</C>.</>],
+        ['Category axis', <>Names each row from <C>categories</C>.</>],
+        ['Value axis', 'Fixed from 0 to 100.'],
+        ['Tooltip', <>Shows the value and target as <C>78 (target: 85)</C>.</>],
     ]}
 />
 
@@ -67,9 +67,8 @@ out of 100.
 
 ## Data shape
 
-`categories` is an array of row labels. `data` is an array of `{ y, target }`,
-one per category in the same order. `height` defaults to 200; give each row
-roughly 60 to 80 px.
+`categories` is an array of row labels. `data` is an array of `{ y, target }` in
+the same order. `height` defaults to 200; allow roughly 60 to 80 px per row.
 
 ```jsx
 <BulletChart
@@ -89,12 +88,12 @@ roughly 60 to 80 px.
 
 ## Color and accessibility
 
-- **Color is fixed.** Every bar takes `--ds-chart-brand`, the target takes `--ds-chart-gray-boldest`, and the bands take the danger, warning and success backgrounds. Nothing is assigned per row.
-- **Position carries the value.** The bar's end and the tick's place on a shared axis say how far each metric is from its goal, without hue.
-- **The bands say "poor, fair, good" by color alone.** Red and green bands are the pair most often confused, and the chart prints no band labels. Say what the bands mean in the surrounding text, and do not rely on them to flag a row.
-- **The bands do not move.** They sit at 60 and 80 for every metric. When a metric's thresholds differ, the bands mislead; put that metric in its own chart or in `BarChart`.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Fixed colors.** Bars use `--ds-chart-brand`, targets use `--ds-chart-gray-boldest`, and bands use the danger, warning and success backgrounds; no color is assigned per row.
+- **Position carries the value.** Bar length and tick position on the shared axis show distance from the goal without hue.
+- **Unlabeled status bands.** The red and green bands carry no printed labels and are easily confused under color-vision deficiency. State what the bands mean in surrounding text and never rely on them alone to flag a row.
+- **Fixed band thresholds.** Thresholds stay at 60 and 80 for every row. If a metric uses different thresholds, put it in its own chart or in `BarChart`.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -102,11 +101,7 @@ roughly 60 to 80 px.
 
 ## States
 
-`BulletChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`BulletChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={250} />
@@ -123,12 +118,7 @@ roughly 60 to 80 px.
 
 <DocsInteractivePlayground
     of={BulletChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

@@ -130,7 +130,7 @@ Same group: `AiChat` · `Backdrop` · `Page` · `PatternCard` · `PatternModal` 
 
 ## Types
 
-Every page of the app sits in one of three, each shown in a browser window. A Frame with its slots filled for one page is a Screen, and Screens in order are a Flow; both live with the flows, not here.
+Choose one of three Frame types for every app page, shown here in browser windows. See Templates and patterns for how filled Frames become Screens and Flows, documented with the flows.
 
 - **Default.** Pages people move among: the Sidebar, the Page, and the AI panel as its own region on the right.
 - **Focused.** One task a person finishes or leaves: the whole window, Close beside the title, no Sidebar.

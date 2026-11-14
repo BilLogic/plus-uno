@@ -10,7 +10,7 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 **Source:** `design-system/src/patterns/PatternTable/PatternTable.jsx`
 
-**Stories:** `design-system/src/patterns/PatternTable/PatternTable.stories.jsx` — Overview, EmptyState, EmptyWithStickyColumn, Interactive, RowStates, Sticky, StickyHeaderNeedsMaxHeight, StickyHeader, StickyColumn
+**Stories:** `design-system/src/patterns/PatternTable/PatternTable.stories.jsx` — Overview, EmptyState, EmptyWithStickyColumn, Interactive, RowStates, Sticky, StickyHeaderNeedsMaxHeight, StickyHeader, StickyColumn, MotionAddRow, MotionAddRowReduced, MotionRemoveRow, MotionRemoveRowReduced, MotionReorderRows, MotionReorderRowsReduced
 
 **Storybook page:** `design-system/src/patterns/PatternTable/PatternTable.mdx`
 
@@ -22,7 +22,7 @@ A table sits in a Section and spans it. Its first and last cells sit flush with 
 
 ### Type guidance
 
-Pick the type from what people do with the rows. Ask the questions in order, and stop at the first yes.
+Choose by what people do with the rows. Read the questions in order and stop at the first yes.
 
 | Question | Type |
 | --- | --- |

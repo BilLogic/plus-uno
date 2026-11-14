@@ -1,0 +1,251 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import { Avatar, NotificationItem, Tile } from '@/components';
+import * as NotificationItemStories from './NotificationItem.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+<Meta of={NotificationItemStories} />
+
+<Title />
+A single-link row for an update that arrived over time, shared by the Inbox, a Home card and a full notifications page.
+
+<DocsTabs of={NotificationItemStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/NotificationItem"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Actors and list
+
+<ComponentExample of={NotificationItemStories.Overview} title="Notification list" description="Each row is one link with who and what in `title`, context and relative time in `meta`, and a `Mark as read` button that swaps in for the unread dot on hover." />
+
+<ComponentExample of={NotificationItemStories.Actors} title="Person and system actors" description="Pass an `Avatar` (`size={32}`) when a person triggered the update, or a `Tile` (`size={32}`) when the system sent it." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<ComponentExample of={NotificationItemStories.Unread} title="Unread" description="Selected fill (`--ds-background-selected`), medium title weight, an 8px brand dot, and the visually hidden word `Unread` announced with the link." />
+
+<ComponentExample of={NotificationItemStories.Read} title="Read" description="Clear ground (`--ds-background-neutral-subtle`) and regular title weight, with no unread dot or `Mark as read` button." />
+
+<ComponentExample of={NotificationItemStories.Hovered} title="Hovered" description="Steps to `--ds-background-selected-hovered` (or `--ds-background-neutral-subtle-hovered` when read) and reveals the compact `Mark as read` button over the trailing slot." />
+
+<ComponentExample of={NotificationItemStories.Focused} title="Focused" description="Draws the 2px `--ds-border-focused` ring around the row link and reveals `Mark as read` as the next Tab stop." />
+
+<ComponentExample of={NotificationItemStories.Pressed} title="Pressed" description="Steps to `--ds-background-selected-pressed` on unread rows and `--ds-background-neutral-subtle-pressed` on read rows." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="NotificationItem" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={NotificationItemStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `NotificationItem` for updates that arrived over time: in the Inbox <a target="_top" href="./?path=/docs/patterns-notifications--docs">Notifications</a> panel, in a recent-updates card on Home, or on a full notifications page. Every row says who, what, where and when in two compact lines and opens its destination as one link.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a passing confirmation of an action that just finished, use `Flag`.
+- For something to read or act on inside part of a page, use `SectionMessage`.
+- For a condition that holds across a whole surface, use `Banner`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Actor (`actor` at `start`).** A `32px` (`--image-md`) `Avatar` for a person or `Tile` for the system. Hidden from the link's accessible name because `title` already says who acted.
+2. **Title (`title` at `label`).** Who and what on `--body-default` in `--ds-text`, promoted to `--type-weight-medium` while `unread` is true.
+3. **Meta (`meta` at `description`).** Context and relative time separated by a middle dot (`"Sessions · 2m"`) on `--body-small` in `--ds-text-subtle`.
+4. **Unread indicator and action (`end`).** An `8px` (`--count-tag-dot-size`) dot in `--ds-background-brand-bold` paired with visually hidden `"Unread"`, replaced on hover and keyboard focus by a compact `"Mark as read"` `IconButton` when `onMarkRead` is provided.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Unread</td><td><code>--ds-background-selected</code> fill, <code>--type-weight-medium</code> title, <code>--ds-background-brand-bold</code> dot, and <code>Unread</code> announced in the link name.</td></tr>
+<tr><td>Read</td><td><code>--ds-background-neutral-subtle</code> fill, regular title weight, no dot and no <code>Mark as read</code> button.</td></tr>
+<tr><td>Hovered</td><td><code>--ds-background-selected-hovered</code> (unread) or <code>--ds-background-neutral-subtle-hovered</code> (read); on actionable unread rows the dot hides and <code>Mark as read</code> appears.</td></tr>
+<tr><td>Focused</td><td>2px <code>--ds-border-focused</code> ring on the row link, with <code>Mark as read</code> visible and reachable on the next Tab press.</td></tr>
+<tr><td>Pressed</td><td><code>--ds-background-selected-pressed</code> (unread) or <code>--ds-background-neutral-subtle-pressed</code> (read).</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Row padding, gap and radius</td><td><code>--pad-y-lg</code> × <code>--pad-x-md</code>, gap <code>--inline-lg</code>, radius <code>--radius-control-md</code>.</td></tr>
+<tr><td>Row state fills</td><td><code>--ds-background-selected</code> / <code>-hovered</code> / <code>-pressed</code> when unread; <code>--ds-background-neutral-subtle</code> / <code>-hovered</code> / <code>-pressed</code> when read.</td></tr>
+<tr><td>Actor and trailing slots</td><td><code>--image-md</code> (<code>32px</code>) start slot; <code>--control-sm</code> (<code>24px</code>) end slot with <code>--count-tag-dot-size</code> (<code>8px</code>) dot in <code>--ds-background-brand-bold</code>.</td></tr>
+<tr><td>Title and meta</td><td><code>--body-default</code> (<code>--type-weight-medium</code> when unread) in <code>--ds-text</code>; <code>--body-small</code> in <code>--ds-text-subtle</code>; stack gap <code>--stack-sm</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep the whole row a single link.
+
+Put the destination on `href` and never nest links inside `title` or `meta`. A single link gives one clear target for pointers and one stop per row for keyboard users.
+
+<DoDontPair
+    doExample={(
+        <NotificationItem
+            actor={<Avatar name="Ana Ruiz" size={32} />}
+            title="Ana Ruiz moved Thursday's session"
+            meta="Sessions · 2m"
+            unread
+            href="#do-one-link"
+            onClick={(event) => event.preventDefault()}
+            onMarkRead={() => {}}
+        />
+    )}
+    doCaption="One link opens the session; Mark as read sits beside it as a sibling button."
+    dontExample={(
+        <NotificationItem
+            actor={<Avatar name="Ana Ruiz" size={32} />}
+            title="moved a session"
+            meta="2m"
+            unread
+            href="#dont-vague"
+            onClick={(event) => event.preventDefault()}
+        />
+    )}
+    dontCaption="Missing actor name and context forces opening the notification to tell who and where."
+/>
+
+### Pair Avatar for people and Tile for the system.
+
+Circles represent people; rounded squares represent tools, reminders and system events.
+
+<DoDontPair
+    doExample={(
+        <NotificationItem
+            actor={<Tile icon="calendar-check" size={32} color="blue" />}
+            title="Session notes are due Friday at 5:00 PM"
+            meta="Compliance · 1h"
+            href="#do-system-tile"
+            onClick={(event) => event.preventDefault()}
+        />
+    )}
+    doCaption="System reminder uses a 32px Tile so people and automated events scan apart."
+    dontExample={(
+        <NotificationItem
+            actor={<Avatar name="PLUS System" size={32} />}
+            title="Session notes are due Friday at 5:00 PM"
+            meta="Compliance · 1h"
+            href="#dont-system-avatar"
+            onClick={(event) => event.preventDefault()}
+        />
+    )}
+    dontCaption="Person Avatar initials on an automated system reminder."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Say who and what in <code>title</code>: "Ana Ruiz moved Thursday's session".</td><td>"New update" or "Session notification".</td></tr>
+<tr><td>Pair where and when in <code>meta</code>: "Sessions · 2m", "Notes · Yesterday".</td><td>Full timestamps down to the second on every row.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **One link per row.** `NotificationItem` renders a single `<a>` element for the row and keeps the `"Mark as read"` `IconButton` as a sibling outside the link so interactive controls never nest.
+- **Unread state announced in words.** The unread dot is `aria-hidden="true"` and paired with visually hidden `"Unread"` inside the link, so assistive technology announces unread status without relying on color or shape.
+- **No duplicate actor announcement.** `actor` sits in an `aria-hidden="true"` start slot because `title` names who acted.
+- **Keyboard-reachable Mark as read.** Focusing the row link triggers `:focus-within`, revealing `"Mark as read"` as the next Tab stop.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-notifications--docs">Notifications</a>: use when choosing between a Flag, Banner, SectionMessage, Modal or the Inbox.
+- `Avatar`: use when a person triggered the notification (`actor`).
+- `Tile`: use when the system triggered the notification (`actor`).
+- `EmptyState`: use when all unread items in the Inbox have been cleared.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={NetworkGraphStories} />
 
 <Title />
-Shows which things are connected to which. Nodes settle into place by a force
-layout, so clusters and well-connected nodes stand out on their own.
+Plots unweighted connections between items using a force-directed layout so
+clusters and hubs emerge automatically.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/NetworkGraph"
@@ -31,16 +31,13 @@ layout, so clusters and well-connected nodes stand out on their own.
 
 ## When to use
 
-Use `NetworkGraph` to show connections with no fixed order or hierarchy: how
-topics in a subject connect, which students tutor each other, or which tutors
-share students.
+Use `NetworkGraph` for unweighted connections with no fixed order or hierarchy,
+such as linked math topics, peer tutoring pairs or tutors who share students.
+Filter to roughly 50 or fewer nodes so labels and links stay readable.
 
 For a strict hierarchy, use `OrganizationChart` or `TreegraphChart`. For a small
-set of items in a fixed order, use `ArcDiagram`. For connections that carry an
-amount, use `SankeyDiagram` or `DependencyWheel`.
-
-Past about 50 nodes the graph turns into a hairball; filter to the part of the
-network the question is about.
+ordered set, use `ArcDiagram`. For weighted connections or flows, use
+`SankeyDiagram` or `DependencyWheel`.
 
 </div>
 
@@ -51,11 +48,11 @@ network the question is about.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Nodes', <>One per distinct name in <C>data</C>, generated for you. Define them yourself in <C>nodes</C> to give one its own <C>color</C>.</>],
-        ['Links', <>One per <C>[from, to]</C> pair in <C>data</C>, drawn in <C>--ds-border-bold</C>. Links carry no weight.</>],
-        ['Node labels', 'Name each node. Links are not labeled.'],
-        ['Layout', 'A force simulation places the nodes and keeps adjusting them; position has no meaning beyond which nodes sit close together.'],
-        ['Height', <>The chart is <C>height</C> pixels tall, 500 by default.</>],
+        ['Nodes', <>One per distinct name in <C>data</C>, generated automatically; pass <C>nodes</C> to assign custom <C>color</C>s.</>],
+        ['Links', <>One unweighted line per <C>[from, to]</C> pair in <C>--ds-border-bold</C> (unlabeled).</>],
+        ['Node labels', 'Names each node.'],
+        ['Layout', 'Force simulation that settles nodes by proximity; exact coordinates have no fixed meaning.'],
+        ['Height', <>Pixel height from <C>height</C> (default 500).</>],
     ]}
 />
 
@@ -65,8 +62,8 @@ network the question is about.
 
 ## Data shape
 
-`data` is an array of `[from, to]` pairs of node names. `nodes` is optional: an
-array of `{ id, color }`, where `id` matches a name used in `data`.
+`data` is an array of `[from, to]` node-name pairs. Optional `nodes` is an array
+of `{ id, color }` matching names in `data`.
 
 ```jsx
 <NetworkGraph
@@ -87,12 +84,11 @@ array of `{ id, color }`, where `id` matches a name used in `data`.
 
 ## Color and accessibility
 
-- **One color by default.** Every node takes the series color, `--ds-chart-categorical-1`, unless `nodes` gives it its own `color`. Use a categorical token for that, and only to mark a group that matters to the question.
-- **Labels and links carry the reading.** Each node is named and each connection is a line, so the graph reads without hue. If you color node groups, say what each color means in the surrounding text; the chart has no legend.
-- **The layout moves.** The simulation keeps nodes in motion as it settles, and the arrangement can differ between renders. Do not refer to a node by where it sits.
-- **Dense graphs fail.** Overlapping labels and crossing links are the main hazard; fewer nodes is the fix.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Default and custom node colors.** Nodes default to `--ds-chart-categorical-1` unless overridden via `nodes` with another [categorical token](?path=/docs/data-visualizations-color--docs). Because there is no legend, explain any color grouping in surrounding text.
+- **Labels and links carry the structure.** Every node is named and joined by a visible line, so the graph reads without hue.
+- **Non-deterministic positions.** Because the force layout settles dynamically and can vary between renders, never refer to nodes by screen direction.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -100,11 +96,7 @@ array of `{ id, color }`, where `id` matches a name used in `data`.
 
 ## States
 
-`NetworkGraph` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`NetworkGraph` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={500} />
@@ -121,12 +113,7 @@ array of `{ id, color }`, where `id` matches a name used in `data`.
 
 <DocsInteractivePlayground
     of={NetworkGraphStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

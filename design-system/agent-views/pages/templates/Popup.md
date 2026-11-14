@@ -10,7 +10,7 @@ A floating layer that hangs off its trigger and closes on an outside click. Six 
 
 ## Types
 
-Each is a composition on the Popup component, which owns placement, the outside click and Escape.
+Each type composes the Popup component, which handles placement, outside clicks and Escape.
 
 - **Menu.** Actions from a More button, at auto width. Applies on pick.
 - **Profile menu.** From the account row: who is signed in, then links and Sign out. The 3-col width is Planned: today the menu hugs its rows.
