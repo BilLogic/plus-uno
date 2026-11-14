@@ -693,7 +693,7 @@ export async function a11y({ folder, screenshotPath, load = loadBrowserTools }) 
   let server;
   let browser;
   try {
-    const { chromium, vite } = await load();
+    const { chromium, vite, axePath } = await load();
     server = await vite.createServer({
       configFile: path.join(folder, 'vite.config.js'),
       root: folder,
@@ -711,7 +711,7 @@ export async function a11y({ folder, screenshotPath, load = loadBrowserTools }) 
     await page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 });
     await page.evaluate(() => document.fonts?.ready);
     if (screenshotPath) await page.screenshot?.({ path: screenshotPath });
-    await page.addScriptTag({ path: createRequire(import.meta.url).resolve('axe-core/axe.min.js') });
+    await page.addScriptTag({ path: axePath ?? createRequire(import.meta.url).resolve('axe-core/axe.min.js') });
     const results = await page.evaluate(() => globalThis.axe.run(document));
     return { a11y_violations: a11ySummary(results), a11y_error: null };
   } catch (error) {

@@ -594,6 +594,7 @@ test('a11y: captures screenshot.png at 1440x960 after fonts load', async () => {
     folder: '/fake',
     screenshotPath: '/fake/screenshot.png',
     load: async () => ({
+      axePath: '/fake/axe.min.js',
       vite: {
         createServer: async () => ({
           listen: async () => {},
