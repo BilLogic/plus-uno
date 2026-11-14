@@ -1223,6 +1223,13 @@
           }
         },
         {
+          "name": "Inbox/width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inbox-width)"
+          }
+        },
+        {
           "name": "Popup/pad",
           "resolvedType": "FLOAT",
           "codeSyntax": {

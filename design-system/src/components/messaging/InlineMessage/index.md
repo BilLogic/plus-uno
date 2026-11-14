@@ -89,7 +89,7 @@ accessible name and its tooltip. Write "Why this field is required", not
 - For the popup mechanics this component is built on, see `Popup`.
 - For a message that stays visible without being opened, use `SectionMessage` or `Banner`.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `SectionMessage` · `Spotlight`
+Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 

@@ -349,6 +349,7 @@ const preview = {
               "Flag",
               "Inline message",
               "Modal dialog",
+              "Notification item",
               "Section message",
               "Spotlight"
             ],
