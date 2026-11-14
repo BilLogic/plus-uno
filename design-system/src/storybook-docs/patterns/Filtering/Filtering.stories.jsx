@@ -1,10 +1,12 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { SECTION_DETAIL_FLOOR } from '@/patterns';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import { FilteredStudents, PageTabs, STAGE, ViewPicker } from './filteringDemo.jsx';
 
 /**
@@ -286,3 +288,52 @@ export const UnderPageTabs = {
         await fitsCanvas(canvasElement);
     },
 };
+
+/* ------------------------------------------------------------------- motion */
+
+const withProductiveMotion = (Story) => (
+    <MotionPreferenceContext.Provider value={false}>
+        <Story />
+    </MotionPreferenceContext.Provider>
+);
+
+const playSwapResults = (reduced = false) => async ({ canvasElement }) => {
+    await settleAnimations(canvasElement);
+    const p = parts(canvasElement);
+    await waitFor(() => expect(p.filterIcon()).not.toBeNull());
+
+    const swapStage = canvasElement.querySelector('[data-swap-stage]');
+    await expect(swapStage, 'filtering results sit inside SwapInPlace').not.toBeNull();
+    await expect(swapStage).toHaveAttribute('data-swap-phase', 'settled');
+    await expect(swapStage).toHaveAttribute('data-reduced', reduced ? 'true' : 'false');
+
+    // Apply a filter: old rows fade out on appearance.fast before new rows fade in after CLEAN_FADE_GAP_MS.
+    await userEvent.click(p.filterIcon());
+    await waitFor(() => expect(p.popup()).not.toBeNull());
+    await userEvent.click(within(p.popup()).getByRole('checkbox', { name: 'Grade 7' }));
+    await userEvent.click(within(p.popup()).getByRole('button', { name: 'Apply' }));
+
+    await expect(swapStage.getAttribute('data-swap-phase'), 'clean-fade swap enters out phase first').toBe('out');
+    const incoming = swapStage.querySelector('[data-swap-incoming]');
+    await expect(getComputedStyle(incoming).opacity, 'incoming results hold hidden during clean-fade gap').toBe('0');
+
+    await waitFor(() => expect(swapStage).toHaveAttribute('data-swap-phase', 'settled'), { timeout: 4000 });
+    await settleAnimations(canvasElement);
+    await expect(p.status()).toHaveTextContent('3 of 8 students');
+    await expect(getComputedStyle(incoming).opacity).toBe('1');
+};
+
+export const MotionSwapResults = {
+    name: 'Motion: Swap content in place',
+    decorators: [withProductiveMotion],
+    render: () => staged(<FilteredStudents tier="2b" categories={['grade', 'school']} />),
+    play: playSwapResults(false),
+};
+
+export const MotionSwapResultsReduced = {
+    name: 'Motion: Swap content in place (reduced)',
+    decorators: [withReducedMotion],
+    render: () => staged(<FilteredStudents tier="2b" categories={['grade', 'school']} />),
+    play: playSwapResults(true),
+};
+

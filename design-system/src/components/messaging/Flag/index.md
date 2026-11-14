@@ -10,7 +10,7 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, UndoTimer, FlagContent, UnknownAppearance, ActionKinds, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced, MotionOpenClose, MotionReduced, MotionExitCompletes
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, UndoTimer, FlagContent, UnknownAppearance, ActionKinds, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced, MotionOpenClose, MotionReduced, MotionExitCompletes, MotionQueueStack, MotionQueueStackReduced
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
@@ -206,6 +206,9 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | `timestamp` | node | — | Small text beside the title, such as "11 mins ago". |
 | `sound` | string or enum | — | The sound token it plays as it lands, through the app's sound setting, or `false` for none. Unset, an `error` flag plays `error` and every other appearance plays `notify`. Pass `false` when a flag should stay quiet, such as during a session. |
 | `reducedMotion` | bool | — | Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting. |
+| `staggerDelayMs` | number | — | Optional entrance stagger delay in ms when arriving as part of a burst. |
+| `onExited` | func | — | Called once the leaving flag's exit animation finishes and it unmounts. |
+| `style` | object | — | Inline styles applied to the flag surface. |
 
 ## Variants
 

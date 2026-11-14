@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from '@base-ui/react/field';
+import { PresenceSlot } from '@/lib/listMotion';
+import { SwapInPlace } from '@/lib/swapMotion';
 import Tooltip from '../../overlays-and-layering/Tooltip/Tooltip';
 import Icon from '../../images-and-icons/Icon';
 import './FieldFrame.scss';
@@ -120,30 +122,59 @@ export const FieldCaption = ({
     count,
     maxLength,
 }) => {
-    const counted = countId && maxLength !== undefined;
-    if (!message && !counted) return null;
+    const counted = Boolean(countId && maxLength !== undefined);
+    const hasContent = Boolean(message) || counted;
     const over = counted && count > maxLength;
+    const mountedOnceRef = useRef(false);
+    const lastActiveToneRef = useRef(hasContent ? tone : 'help');
+    useEffect(() => {
+        mountedOnceRef.current = true;
+    }, []);
+
+    const animatesValidation = (hasContent && tone !== 'help') || (!hasContent && lastActiveToneRef.current !== 'help');
+    if (hasContent) {
+        lastActiveToneRef.current = tone;
+    }
+
+    if (!animatesValidation && !hasContent) {
+        return null;
+    }
+
+    const swapKey = animatesValidation
+        ? `${tone}:${typeof message === 'string' || typeof message === 'number' ? message : Boolean(message)}`
+        : 'static-help';
+
     return (
-        <div className="plus-field-caption">
-            {message ? (
-                <div
-                    id={messageId}
-                    className={`plus-field-caption__message plus-field-caption__message--${tone}`}
-                    role={tone === 'invalid' ? 'alert' : undefined}
-                >
-                    {CAPTION_ICON[tone] && <Icon name={CAPTION_ICON[tone]} />}
-                    <span>{message}</span>
-                </div>
-            ) : <span />}
-            {counted && (
-                <div
-                    id={countId}
-                    className={`plus-field-caption__count${over ? ' plus-field-caption__count--over' : ''}`}
-                >
-                    {count} / {maxLength}
-                </div>
-            )}
-        </div>
+        <PresenceSlot
+            show={hasContent}
+            animateOnMount={mountedOnceRef.current && tone !== 'help'}
+            onExited={() => { lastActiveToneRef.current = 'help'; }}
+            data-field-caption-slot=""
+            className="plus-field-caption-slot"
+        >
+            <div className="plus-field-caption">
+                {message ? (
+                    <SwapInPlace swapKey={swapKey} className="plus-field-caption__swap">
+                        <div
+                            id={messageId}
+                            className={`plus-field-caption__message plus-field-caption__message--${tone}`}
+                            role={tone === 'invalid' ? 'alert' : undefined}
+                        >
+                            {CAPTION_ICON[tone] && <Icon name={CAPTION_ICON[tone]} />}
+                            <span>{message}</span>
+                        </div>
+                    </SwapInPlace>
+                ) : <span />}
+                {counted && (
+                    <div
+                        id={countId}
+                        className={`plus-field-caption__count${over ? ' plus-field-caption__count--over' : ''}`}
+                    >
+                        {count} / {maxLength}
+                    </div>
+                )}
+            </div>
+        </PresenceSlot>
     );
 };
 

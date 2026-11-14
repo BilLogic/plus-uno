@@ -78,7 +78,7 @@ export { default as Spinner, SPINNER_APPEARANCES, SPINNER_SIZES } from '@/compon
 
 export { default as Banner, BANNER_APPEARANCES, BANNER_ICONS } from '@/components/messaging/Banner';
 export { default as EmptyState, EMPTY_STATE_SPACINGS } from '@/components/messaging/EmptyState';
-export { default as Flag, FLAG_APPEARANCES, FLAG_AUTO_CLOSE_MS, FlagGroup } from '@/components/messaging/Flag';
+export { default as Flag, FLAG_APPEARANCES, FLAG_AUTO_CLOSE_MS, FlagGroup, useFlagQueue } from '@/components/messaging/Flag';
 export { default as InlineMessage, INLINE_MESSAGE_APPEARANCES } from '@/components/messaging/InlineMessage';
 export { default as Modal, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS, MODAL_WIDTHS } from '@/components/messaging/Modal';
 export { default as SectionMessage, SECTION_MESSAGE_APPEARANCES, SECTION_MESSAGE_ICONS } from '@/components/messaging/SectionMessage';

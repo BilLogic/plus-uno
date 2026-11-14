@@ -1,5 +1,6 @@
 import React, { Children, Fragment, isValidElement, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { TableBodyMotion } from '@/lib/listMotion';
 import './PatternTable.scss';
 
 /** Children with fragments opened, so a `thead` passed inside one is found. */
@@ -8,6 +9,13 @@ const flatten = (children) => Children.toArray(children).flatMap((child) => (
 ));
 
 const isElementOf = (type) => (child) => isValidElement(child) && child.type === type;
+
+/** Wrap `tbody` children in `TableBodyMotion` so keyed rows animate presence and reorder. */
+const withBodyMotion = (children) => flatten(children).map((child, index) => (
+    isElementOf('tbody')(child)
+        ? <TableBodyMotion key={child.key ?? `tbody-${index}`} tbodyElement={child} />
+        : child
+));
 
 /** The rows an empty table drops; the head row, a caption and column groups stay. */
 const isBody = (child) => isElementOf('tbody')(child) || isElementOf('tfoot')(child);
@@ -135,7 +143,7 @@ const PatternTable = ({
                                 </tr>
                             </tbody>
                         </>
-                    ) : children}
+                    ) : withBodyMotion(children)}
                 </table>
             </div>
             {footer && !showEmptyState && (

@@ -1,4 +1,5 @@
-import { expectOverlayExit, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { expectOverlayExit, settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { useFlagQueue } from '@/lib/flagStackMotion';
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
@@ -647,3 +648,84 @@ export const MotionExitCompletes = {
         await waitFor(() => expect(flag.isConnected).toBe(false));
     },
 };
+
+const QueueStackDemo = ({ reducedMotion }) => {
+    const queue = useFlagQueue([
+        { id: 'f-note', title: 'Note saved', children: 'Maya can read it now.', autohide: false, sound: false },
+        { id: 'f-sched', title: 'Schedule updated', children: 'Thursday moved to 4:30 PM.', autohide: false, sound: false },
+    ], { maxVisible: 3 });
+
+    return (
+        <div style={{ position: 'relative', minBlockSize: 340, padding: 'var(--page-pad)' }}>
+            <div style={{ display: 'flex', gap: 'var(--inline-md)', alignItems: 'center' }}>
+                <Button
+                    text="Queue two notices"
+                    appearance="primary"
+                    spacing="compact"
+                    onClick={() => queue.pushBurst([
+                        { id: 'f-session', title: 'Session logged', children: 'Supervisor notified.', autohide: false, sound: false },
+                        { id: 'f-roster', title: 'Roster synced', children: 'Lincoln Middle.', autohide: false, sound: false },
+                    ])}
+                />
+                <span data-testid="queued-count">{queue.queued.length} queued</span>
+            </div>
+            <FlagGroup
+                position="top-end"
+                containerPosition="absolute"
+                reducedMotion={reducedMotion}
+                flags={queue.visible}
+                onDismiss={queue.dismiss}
+                data-testid="flag-queue-group"
+            />
+        </div>
+    );
+};
+
+const playQueueStack = (reduced = false) => async ({ canvasElement }) => {
+    await settleAnimations(canvasElement);
+    const canvas = within(canvasElement);
+    const group = canvas.getByTestId('flag-queue-group');
+
+    // Initial two flags: newest ('Schedule updated') sits above 'Note saved'.
+    const initialTitles = () => Array.from(group.querySelectorAll(':scope > .plus-flag:not([data-leaving]) .plus-flag-title')).map((el) => el.textContent);
+    await expect(initialTitles()).toEqual(['Schedule updated', 'Note saved']);
+    await expect(canvas.getByTestId('queued-count')).toHaveTextContent('0 queued');
+
+    // Push a burst of two notices onto a cap-3 stack: 'Session logged' enters on top, 'Roster synced' waits in queue.
+    await userEvent.click(canvas.getByRole('button', { name: 'Queue two notices' }));
+    await expect(canvas.getByTestId('queued-count')).toHaveTextContent('1 queued');
+    await expect(initialTitles()).toEqual(['Session logged', 'Schedule updated', 'Note saved']);
+
+    await settleAnimations(canvasElement);
+
+    // Dismiss 'Schedule updated' in the middle: it stays mounted for its exit while 'Roster synced' promotes from the queue.
+    const schedFlag = canvas.getByText('Schedule updated').closest('.plus-flag');
+    await userEvent.click(within(schedFlag).getByRole('button', { name: 'Dismiss flag' }));
+    if (!reduced) {
+        await expect(schedFlag.isConnected, 'dismissed flag stays mounted during its exit').toBe(true);
+        await expect(schedFlag).toHaveAttribute('data-leaving', 'hand');
+    }
+    await expect(canvas.getByTestId('queued-count')).toHaveTextContent('0 queued');
+    await expect(initialTitles()).toEqual(['Roster synced', 'Session logged', 'Note saved']);
+
+    await waitFor(() => expect(schedFlag.isConnected).toBe(false), { timeout: 4000 });
+    await settleAnimations(canvasElement);
+    const settledFlags = Array.from(group.querySelectorAll('.plus-flag'));
+    await expect(settledFlags).toHaveLength(3);
+    for (const flagEl of settledFlags) {
+        await expect(getComputedStyle(flagEl).opacity).toBe('1');
+    }
+};
+
+export const MotionQueueStack = {
+    name: 'Motion: Notifications stacking and queue',
+    render: () => <QueueStackDemo reducedMotion={false} />,
+    play: playQueueStack(false),
+};
+
+export const MotionQueueStackReduced = {
+    name: 'Motion: Notifications stacking and queue (reduced)',
+    render: () => <QueueStackDemo reducedMotion />,
+    play: playQueueStack(true),
+};
+

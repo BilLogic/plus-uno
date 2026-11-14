@@ -10,7 +10,7 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 **Source:** `design-system/src/patterns/PatternTable/PatternTable.jsx`
 
-**Stories:** `design-system/src/patterns/PatternTable/PatternTable.stories.jsx` — Overview, EmptyState, EmptyWithStickyColumn, Interactive, RowStates, Sticky, StickyHeaderNeedsMaxHeight, StickyHeader, StickyColumn
+**Stories:** `design-system/src/patterns/PatternTable/PatternTable.stories.jsx` — Overview, EmptyState, EmptyWithStickyColumn, Interactive, RowStates, Sticky, StickyHeaderNeedsMaxHeight, StickyHeader, StickyColumn, MotionAddRow, MotionAddRowReduced, MotionRemoveRow, MotionRemoveRowReduced, MotionReorderRows, MotionReorderRowsReduced
 
 **Storybook page:** `design-system/src/patterns/PatternTable/PatternTable.mdx`
 
