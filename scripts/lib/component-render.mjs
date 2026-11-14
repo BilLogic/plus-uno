@@ -31,7 +31,7 @@
  */
 
 import path from 'node:path';
-import { contextLines, contextList } from './component-context.mjs';
+import { contextLabel, contextLines, contextList } from './component-context.mjs';
 
 import { AUTHORED_SECTIONS, coverageOf } from './authored-coverage.mjs';
 import { sectionText } from './docs-page.mjs';
@@ -134,8 +134,8 @@ const FILTERING_LINE =
 
 export function governedByOf(name, edges = {}) {
   const tracer = FILTERING_GOVERNED.has(name) ? FILTERING_LINE : null;
-  const derived = contextLines({ governedBy: (edges?.governedBy ?? []).filter((p) => !tracer || p.name !== 'Filtering') }).governedBy;
-  return contextList([tracer, derived].filter(Boolean));
+  const derived = (edges?.governedBy ?? []).filter((p) => !tracer || p.name !== 'Filtering').map(contextLabel);
+  return contextList([tracer, ...derived].filter(Boolean));
 }
 
 /** The text (see the header). */

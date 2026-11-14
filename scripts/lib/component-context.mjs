@@ -54,11 +54,12 @@ export function contextList(entries, limit = 360) {
   return text;
 }
 
+export const contextLabel = (p) => `${p.name} (\`ds guide ${p.name.toLowerCase().replace(/ /g, '-')}\`)`;
+
 export function contextLines(edges = {}, limit = 360) {
-  const label = (p) => `${p.name} (\`ds guide ${p.name.toLowerCase().replace(/ /g, '-')}\`)`;
   return {
-    usedIn: contextList((edges.usedIn ?? []).map(label), limit),
-    governedBy: contextList((edges.governedBy ?? []).map(label), limit),
+    usedIn: contextList((edges.usedIn ?? []).map(contextLabel), limit),
+    governedBy: contextList((edges.governedBy ?? []).map(contextLabel), limit),
   };
 }
 
