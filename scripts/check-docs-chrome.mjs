@@ -39,7 +39,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { chromeFailures, managerFailures, measureScript, tocFailures, tocMeasureScript } from './docs-chrome.mjs';
+import { chromeFailures, managerFailures, openAtTopFailures, measureScript, tocFailures, tocMeasureScript } from './docs-chrome.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -310,6 +310,31 @@ async function measureManager(context, baseUrl) {
   });
 }
 
+/**
+ * Every docs page, at 1280 wide in light: after load and a settle, the window is
+ * still at its top. An open-by-default demo that focuses itself on mount scrolls
+ * the page and drags the sticky "On this page" rail off with it.
+ */
+async function measureOpenAtTop(context, baseUrl, index) {
+  const ids = Object.values(index.entries ?? {}).filter((e) => e.type === 'docs').map((e) => e.id);
+  const rows = [];
+  let next = 0;
+  const worker = async () => {
+    const page = await context.newPage();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    while (next < ids.length) {
+      const id = ids[next++];
+      await page.goto(`${baseUrl}/iframe.html?viewMode=docs&id=${encodeURIComponent(id)}`, { waitUntil: 'load' });
+      await page.waitForTimeout(2500);
+      const scrollY = await page.evaluate(() => Math.max(window.scrollY, document.documentElement.scrollTop, document.scrollingElement?.scrollTop ?? 0));
+      rows.push({ page: id, scrollY });
+    }
+    await page.close();
+  };
+  await Promise.all([worker(), worker(), worker(), worker()]);
+  return { pages: ids.length, failures: openAtTopFailures(rows) };
+}
+
 let exitCode = 0;
 const browser = await chromium.launch();
 try {
@@ -351,7 +376,9 @@ try {
 
   const managerProblems = missing.includes(TOC_PAGE) ? [] : await measureManager(context, base);
 
-  const failures = [...chromeFailures(measurements), ...tocProblems, ...managerProblems];
+  const top = await measureOpenAtTop(context, base, index);
+
+  const failures = [...chromeFailures(measurements), ...tocProblems, ...managerProblems, ...top.failures];
   if (failures.length) {
     console.error(`[docs-chrome] ${failures.length} problem(s):`);
     for (const f of failures) console.error(`  -> ${f}`);
@@ -361,7 +388,7 @@ try {
     console.log(
       `[docs-chrome] ${measurements.length} page render(s) across ${WIDTHS.length} width(s): ` +
         `no horizontal bleed, ${total('canvases')} canvas(es) closed or attached, ` +
-        `${total('tables')} table(s) contained, ${total('prose')} prose element(s) in the ` +
+        `${top.pages} docs page(s) open at the top, ${total('tables')} table(s) contained, ${total('prose')} prose element(s) in the ` +
         `design system's own type.`,
     );
     if (total('prose') === 0) {
