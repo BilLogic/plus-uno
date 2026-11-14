@@ -7,8 +7,7 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={TreemapChartStories} />
 
 <Title />
-Splits a rectangle into labeled tiles, one per part, each sized by its share
-of the total.
+Splits a rectangle into labeled tiles sized by each part's share of the total.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/TreemapChart"
@@ -31,15 +30,12 @@ of the total.
 
 ## When to use
 
-Use `TreemapChart` when a total splits into more parts than a pie can hold and
-the big parts matter most: tutoring hours by subject across a district,
-library resources by type, sessions by school. Area makes the largest parts
-obvious at a glance, and the rectangle uses space well on a dashboard.
+Use `TreemapChart` for a flat split with more parts than a pie can hold where
+the largest shares matter most, such as tutoring hours by subject, library
+resources by type or sessions by school.
 
-`TreemapChart` takes one flat level of parts. For parts nested inside parts,
-use `SunburstChart`. For two to five parts, use `PieChart` or `DonutChart`.
-For values that must be compared or ranked precisely, use `BarChart`; area is
-harder to judge than length.
+For nested levels, use `SunburstChart`. For two to five parts, use `PieChart` or
+`DonutChart`. For exact ranking or comparison, use `BarChart`.
 
 </div>
 
@@ -50,11 +46,11 @@ harder to judge than length.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Tiles', <>One per item in <C>data</C>. Area is the item's <C>value</C>; tiles are laid out to stay close to square.</>],
-        ['Tile labels', 'Each tile is labeled with its name.'],
-        ['Color', <>With <C>colorByPoint</C> (the default), each tile is its own categorical color. Turn it off and color encodes the value on one hue's ramp, set by <C>hue</C>.</>],
-        ['Tooltip', 'Hovering a tile shows its name and value.'],
-        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 400.</>],
+        ['Tiles', <>One per item in <C>data</C>, sized by <C>value</C> and laid out close to square.</>],
+        ['Tile labels', 'Labels each tile with its name.'],
+        ['Color', <>Categorical per tile when <C>colorByPoint</C> is on (default), or a sequential ramp on <C>hue</C> when off.</>],
+        ['Tooltip', 'Shows the hovered tile’s name and value.'],
+        ['Height', <>Pixel height from <C>height</C> (default 400).</>],
     ]}
 />
 
@@ -64,8 +60,8 @@ harder to judge than length.
 
 ## Data shape
 
-`data` is an array of `{ name, value }`, one object per tile. Values are raw
-amounts; the chart sizes each tile against the total.
+`data` is an array of `{ name, value, color }` (`name` and raw `value`
+required; `color` optional when `colorByPoint` is on).
 
 ```jsx
 <TreemapChart
@@ -79,20 +75,23 @@ amounts; the chart sizes each tile against the total.
 />
 ```
 
-With `colorByPoint`, an item may carry its own `color`; leave it out and the
-chart assigns one.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Two ways to color.** With `colorByPoint`, each tile without a `color` takes the categorical order by position: slot 1 for the first item, slot 2 for the second. Sort `data` from most to least so the first slots land on the biggest tiles. With `colorByPoint={false}`, color repeats the value on a sequential ramp of `hue` (blue by default), the strongest tone on the biggest tile, and the ramp is resolved for the current color mode.
-- **Area and labels carry the value.** Color either separates tiles or restates their size, so the chart reads without hue. The weak spot is small tiles: thin slivers are hard to compare and leave little room for a label, so the exact value is only in the tooltip.
-- **Past six tiles, stop using categorical color.** Slots 7 and 8 exist for overflow only. With many tiles, prefer the sequential ramp, or group the smallest parts into "Other".
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the tiles. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+<RefTable
+    head={['Mode', 'Props', 'Rule']}
+    rows={[
+        ['Categorical (default)', <><C>colorByPoint</C> (or per-item <C>color</C>)</>, <>Assigns the <a href="?path=/docs/data-visualizations-color--docs">categorical order</a> from slot 1. Sort <C>data</C> most to least so the first slots land on the largest tiles. Past six tiles, switch to the sequential ramp or group the smallest into "Other" (slots 7 and 8 are overflow only).</>],
+        ['Sequential ramp', <><C>{'colorByPoint={false}'}</C>, <C>hue</C> (default <C>blue</C>)</>, 'Shades tiles along one hue’s ramp (resolved for the active color mode), with the strongest tone on the largest tile.'],
+    ]}
+/>
+
+- **Area and labels carry the value.** Small slivers are hard to compare and may not fit a label, so rely on the tooltip for exact figures.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -100,11 +99,7 @@ chart assigns one.
 
 ## States
 
-`TreemapChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`TreemapChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -121,12 +116,7 @@ chart assigns one.
 
 <DocsInteractivePlayground
     of={TreemapChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

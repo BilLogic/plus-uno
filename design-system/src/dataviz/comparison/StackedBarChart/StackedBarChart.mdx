@@ -7,8 +7,7 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={StackedBarChartStories} />
 
 <Title />
-Shows a total per category as a column, split into the parts that make it up.
-The column's height is the whole; each segment is one part.
+Shows a total per category as a column split into its constituent segments.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/StackedBarChart"
@@ -31,17 +30,15 @@ The column's height is the whole; each segment is one part.
 
 ## When to use
 
-Use `StackedBarChart` when both the total and its makeup matter: sessions per
-day split into 1-on-1 and group, tutoring hours per week split by activity.
-The bottom segment shares a baseline across columns, so it compares well; the
-segments above it do not, so put the part that matters most at the bottom.
+Use `StackedBarChart` when both the category total and its makeup matter, such
+as daily sessions split into 1-on-1 and group or weekly tutoring hours by
+activity. Place the most important part at the bottom so it shares the zero
+baseline; keep to a few segments since upper segments sit on moving baselines
+and there is no legend.
 
-For separate values with no total, use `BarChart`. For one total split into
-parts, with no categories to compare, use `PieChart` or `DonutChart`. For
-composition moving through time as a continuous shape, use `AreaChart`.
-
-Keep it to a few segments. Each one above the first is read against a moving
-baseline, and the chart has no legend to name them.
+For separate values without a total, use `BarChart`. For a single total split
+into parts, use `PieChart` or `DonutChart`. For continuous composition over
+time, use `AreaChart`.
 
 </div>
 
@@ -52,11 +49,11 @@ baseline, and the chart has no legend to name them.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Columns', <>One per entry in <C>data</C>, labeled by the matching entry in <C>dates</C>. Each is a fixed 48 px wide and rounded by <C>--chart-bar-radius</C>.</>],
-        ['Segments', <>One per item in a column's <C>segments</C>, stacked from the bottom in array order. Segment height comes from <C>height</C>; a thin gap in <C>--ds-border-inverse</C> separates neighbors.</>],
-        ['Segment labels', <>Each segment prints its <C>value</C> inside it. Segments with a height under 1 are left unlabeled.</>],
-        ['Value axis', <>Starts at zero. Its top is <C>yAxisMax</C>, or the tallest column rounded up to the next 10 when that is unset, with six evenly spaced ticks.</>],
-        ['Tooltip', <>Shows the hovered segment. Segments are named <C>Segment 1</C>, <C>Segment 2</C> and so on, in stacking order.</>],
+        ['Columns', <>One per entry in <C>data</C>, labeled from <C>dates</C>, 48 px wide and rounded by <C>--chart-bar-radius</C>.</>],
+        ['Segments', <>Stacked from the bottom in <C>segments</C> array order, sized by <C>height</C> and separated by <C>--ds-border-inverse</C>.</>],
+        ['Segment labels', <>Prints each segment's <C>value</C> inside it; segments with <C>height</C> under 1 are unlabeled.</>],
+        ['Value axis', <>Starts at zero up to <C>yAxisMax</C> (or the tallest column rounded up to the next 10), with six evenly spaced ticks.</>],
+        ['Tooltip', <>Shows the hovered segment, named <C>Segment 1</C>, <C>Segment 2</C> and so on in stacking order.</>],
     ]}
 />
 
@@ -66,11 +63,10 @@ baseline, and the chart has no legend to name them.
 
 ## Data shape
 
-`dates` is an array of category labels. `data` is an array of columns, one per
-date, each `{ segments }`. A segment is `{ value, height, color, textColor }`:
-`height` is a numeric string that sets the segment's size, `value` is the label
-printed on it, and `color` and `textColor` are optional. The segment at index 0
-in every column belongs to the same series, and so on up the stack.
+`dates` is an array of category labels. `data` is an array of `{ segments }`,
+one per date. Each segment is `{ value, height, color, textColor }`: `height`
+(numeric string) sets the size, `value` sets the printed label, and `color` and
+`textColor` are optional. Matching segment indexes across columns form a series.
 
 ```jsx
 <StackedBarChart
@@ -86,9 +82,9 @@ in every column belongs to the same series, and so on up the stack.
 />
 ```
 
-`height` and `value` are independent: the chart draws one and prints the other
-without checking that they agree. Keep them the same number unless the label is
-deliberately a different unit. `yLabels` is accepted but not used.
+Keep `height` and `value` equal unless the printed label intentionally uses a
+different unit; the chart does not verify that they match. `yLabels` is accepted
+but unused.
 
 </div>
 
@@ -96,12 +92,12 @@ deliberately a different unit. `yLabels` is accepted but not used.
 
 ## Color and accessibility
 
-- **Color follows stack position.** A segment without a `color` takes the categorical order by its index: the bottom segment slot 1, the next slot 2. Give the same segment the same color in every column, or leave `color` out and let the order do it.
-- **Label ink is picked for you.** Each segment label takes the text color that reads best on its fill in the current color mode. Set `textColor` only to override that.
-- **Height carries the value, the label confirms it.** Color is the only thing that tells segments apart, and there is no legend. Name the segments in the surrounding header or a caption, and keep the count low.
-- **Upper segments are hard to compare.** Only the bottom segment sits on a shared baseline. When the parts matter more than the total, use `BarChart` with one series per part instead.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. Series are announced as "Segment 1", "Segment 2", so the surrounding text has to say what each one is. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Color by stack position.** Segments without `color` take the [categorical order](?path=/docs/data-visualizations-color--docs) by index (bottom segment slot 1, next slot 2). Keep segment colors consistent across columns.
+- **Automatic label ink.** Segment labels automatically pick the contrasting text token for their fill in the active color mode unless overridden by `textColor`.
+- **No legend.** Because color alone distinguishes segments and series announce as `"Segment 1"`, `"Segment 2"`, name each segment in the surrounding header or caption.
+- **Upper segments are hard to compare.** When comparing parts matters more than the total, use a grouped `BarChart`.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -109,11 +105,7 @@ deliberately a different unit. `yLabels` is accepted but not used.
 
 ## States
 
-`StackedBarChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`StackedBarChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={300} />
@@ -130,12 +122,7 @@ deliberately a different unit. `yLabels` is accepted but not used.
 
 <DocsInteractivePlayground
     of={StackedBarChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

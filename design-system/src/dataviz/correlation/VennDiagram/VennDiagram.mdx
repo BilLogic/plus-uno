@@ -7,8 +7,7 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={VennDiagramStories} />
 
 <Title />
-Draws each group as a circle and their shared members as the overlap, so a
-reader sees how much two or three groups have in common.
+Draws two or three groups as overlapping circles to show shared membership.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/correlation/VennDiagram"
@@ -31,14 +30,14 @@ reader sees how much two or three groups have in common.
 
 ## When to use
 
-Use `VennDiagram` when the question is about membership in more than one
-group: students tutored in both Math and Reading, tutors certified in more than
-one SMART competency, students who joined both the fall and spring cohorts.
+Use `VennDiagram` for overlap across two or three groups, such as students
+tutored in both Math and Reading, tutors certified in multiple SMART
+competencies, or students in both fall and spring cohorts. Past three sets,
+overlaps cannot all be drawn to scale.
 
-Keep it to two or three sets; past that, the overlaps cannot all be drawn to
-scale. For the sizes of the groups rather than their overlap, use `PieChart`
-or `TreemapChart`. For membership across many groups, use `HeatmapChart`. For
-links between individual items, use `NetworkGraph`.
+For group sizes without overlap, use `PieChart` or `TreemapChart`. For
+membership across many groups, use `HeatmapChart`. For links between individual
+items, use `NetworkGraph`.
 
 </div>
 
@@ -49,10 +48,10 @@ links between individual items, use `NetworkGraph`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Circles', <>One per single-set entry. Area tracks its <C>value</C>.</>],
-        ['Overlaps', <>One per multi-set entry, sized by its <C>value</C>: the members those sets share.</>],
-        ['Names', <>An entry's <C>name</C> labels its region. It is optional, but give every entry one.</>],
-        ['Tooltip', 'The region and its value, with no header line.'],
+        ['Circles', <>One per single-set entry; area tracks <C>value</C>.</>],
+        ['Overlaps', <>One per multi-set entry, sized by <C>value</C> for shared members.</>],
+        ['Names', <>Optional <C>name</C> labeling each region; provide one on every entry.</>],
+        ['Tooltip', 'Region name and value, with no header line.'],
     ]}
 />
 
@@ -62,8 +61,9 @@ links between individual items, use `NetworkGraph`.
 
 ## Data shape
 
-`data` is an array of `{ sets, value, name }`. `sets` and `value` are required:
-list each set alone, then every overlap you want drawn. `height` defaults to 400.
+`data` is an array of `{ sets, value, name }` (`sets` and `value` required):
+list each single set, then each overlap. A single set's `value` is the full
+circle including overlaps, not the exclusive portion. `height` defaults to 400.
 
 ```jsx
 <VennDiagram
@@ -75,19 +75,16 @@ list each set alone, then every overlap you want drawn. `height` defaults to 400
 />
 ```
 
-A set's `value` is the whole circle, overlap included, not the "only" part.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color is assigned for you.** Each set's circle takes the next color in the categorical order, slot 1 first. Overlaps show where circles cross.
-- **Area carries the values, roughly.** Readers see that an overlap is small or large, not its exact size. Print the counts in the names or the surrounding copy when they matter.
-- **Name the regions.** Color alone does not say which circle is which; give every entry a `name` so the label and the tooltip carry it.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Automatic set colors.** Each single-set circle takes the next slot in the [categorical order](?path=/docs/data-visualizations-color--docs) starting at slot 1; overlaps blend where circles cross.
+- **Label every region.** Pass `name` on every entry so labels and tooltips identify each circle and intersection without hue. Because area is judged roughly, include exact counts in `name` or surrounding copy when they matter.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -95,11 +92,7 @@ A set's `value` is the whole circle, overlap included, not the "only" part.
 
 ## States
 
-`VennDiagram` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`VennDiagram` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -116,12 +109,7 @@ A set's `value` is the whole circle, overlap included, not the "only" part.
 
 <DocsInteractivePlayground
     of={VennDiagramStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

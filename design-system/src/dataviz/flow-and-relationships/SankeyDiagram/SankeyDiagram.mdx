@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={SankeyDiagramStories} />
 
 <Title />
-Shows how a quantity moves from one stage to the next. Each link is as wide as
-the amount that flows along it.
+Shows how a quantity splits and merges across stages, with link width
+proportional to the flow amount.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/SankeyDiagram"
@@ -31,17 +31,14 @@ the amount that flows along it.
 
 ## When to use
 
-Use `SankeyDiagram` when an amount splits, merges and moves between stages:
-students moving from referral source to first session to a subject, session
-hours flowing from tutors into subjects, or where students go after a module.
+Use `SankeyDiagram` when a quantity splits and merges across five to seven
+one-way stages, such as referral source → first session → subject or tutor hours
+flowing into subjects. Avoid backward loops (use `DependencyWheel` for two-way
+flows).
 
-For stages that only ever narrow, with nothing splitting off sideways, use
-`FunnelChart`. For connections that carry no amount, use `NetworkGraph` or
-`ArcDiagram`. For a plain comparison of totals, use `BarChart`.
-
-Keep the flow moving one way. A link that loops back to an earlier stage turns
-the diagram into a tangle; show that relationship with `DependencyWheel`
-instead. Five to seven stages is the readable range.
+For stages that only narrow without branching, use `FunnelChart`. For unweighted
+connections, use `NetworkGraph` or `ArcDiagram`. For comparing totals, use
+`BarChart`.
 
 </div>
 
@@ -52,11 +49,11 @@ instead. Five to seven stages is the readable range.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Nodes', <>One per distinct name in <C>data</C>, generated for you. A node is as tall as the total flowing through it.</>],
-        ['Links', <>One per <C>[from, to, weight]</C> row. Width is the <C>weight</C>; each link takes the color of the node it leaves.</>],
-        ['Node labels', 'Name each node beside it.'],
-        ['Tooltip', <>On a node: its name and total. On a link: <C>from → to</C> and the weight.</>],
-        ['Height', <>The chart is <C>height</C> pixels tall, 400 by default. Give a diagram with many nodes more room.</>],
+        ['Nodes', <>One per distinct name in <C>data</C>, sized vertically by total flow through it.</>],
+        ['Links', <>One per <C>[from, to, weight]</C> row, sized by <C>weight</C> and colored after its source node.</>],
+        ['Node labels', 'Printed beside each node.'],
+        ['Tooltip', <>Node name and total on nodes; <C>from → to</C> and weight on links.</>],
+        ['Height', <>Pixel height from <C>height</C> (default 400); increase for dense diagrams.</>],
     ]}
 />
 
@@ -66,9 +63,8 @@ instead. Five to seven stages is the readable range.
 
 ## Data shape
 
-`data` is an array of `[from, to, weight]` rows. `from` and `to` are node names;
-`weight` is the amount flowing between them. Nodes are created from the names,
-so spell a name the same way everywhere it appears.
+`data` is an array of `[from, to, weight]` rows. Because nodes are keyed by
+name, spell each node name identically across rows.
 
 ```jsx
 <SankeyDiagram
@@ -88,12 +84,11 @@ so spell a name the same way everywhere it appears.
 
 ## Color and accessibility
 
-- **Color tells nodes apart.** Nodes take the categorical colors in order, starting at `--ds-chart-categorical-1`, and each link takes its source node's color. There are eight categorical colors, so past eight nodes the colors repeat; keep the node count low or label every node.
-- **Width carries the amount.** Link width and node height are the reading; color only groups a link with where it came from. The tooltip gives the exact number.
-- **Labels carry identity.** Every node is named in place, so the diagram reads without hue.
-- **Thin links are hard to see and hard to hover.** Fold very small flows into an "Other" node rather than drawing slivers.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Per-node color.** Nodes cycle through the [categorical order](?path=/docs/data-visualizations-color--docs) from `--ds-chart-categorical-1` (repeating past eight), and links inherit their source node's color.
+- **Width and labels carry the reading.** Node heights, link widths and inline node labels let the chart read without hue; exact amounts are in the tooltip.
+- **Avoid thin slivers.** Fold minor flows into an `"Other"` node so links remain visible and hoverable.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -101,11 +96,7 @@ so spell a name the same way everywhere it appears.
 
 ## States
 
-`SankeyDiagram` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`SankeyDiagram` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -122,12 +113,7 @@ so spell a name the same way everywhere it appears.
 
 <DocsInteractivePlayground
     of={SankeyDiagramStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

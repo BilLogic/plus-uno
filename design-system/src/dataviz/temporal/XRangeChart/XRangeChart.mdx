@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={XRangeChartStories} />
 
 <Title />
-Shows spans of time as horizontal bars, one row per person or resource. Where a
-bar starts and ends is when something began and finished.
+Plots time spans as horizontal bars, one row per person or resource, from start
+to end timestamp.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/XRangeChart"
@@ -31,14 +31,13 @@ bar starts and ends is when something began and finished.
 
 ## When to use
 
-Use `XRangeChart` for who is busy when: tutors' sessions across a week,
-blocked-out availability, exam windows per class, or how long each unit of a
-lesson plan runs. Gaps between bars are free time; overlapping rows show
-clashes.
+Use `XRangeChart` for schedules and time spans across people or resources, such
+as weekly tutor sessions, blocked availability, class exam windows or lesson
+plan durations. Gaps show free time and overlaps show clashes.
 
-For milestones in order with no duration, use `TimelineChart`. For low-to-high
-ranges across categories with no time axis, use `ColumnRangeChart`. For how
-much capacity is used over time as a quantity, use `AreaChart`.
+For ordered milestones without duration, use `TimelineChart`. For low-to-high
+ranges without a time axis, use `ColumnRangeChart`. For capacity used over time
+as a quantity, use `AreaChart`.
 
 </div>
 
@@ -49,9 +48,9 @@ much capacity is used over time as a quantity, use `AreaChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Bars', <>One per item, from <C>start</C> to <C>end</C>, on the row its <C>y</C> picks.</>],
-        ['Bar labels', <>Each bar shows its <C>name</C>.</>],
-        ['Time axis', 'Along the bottom, as dates and times read from the timestamps.'],
+        ['Bars', <>One per item from <C>start</C> to <C>end</C> on row <C>y</C>.</>],
+        ['Bar labels', <>Prints each bar's <C>name</C>.</>],
+        ['Time axis', 'Bottom axis showing dates and times from the timestamps.'],
         ['Row axis', <>Names each row from <C>categories</C>, first row at the top.</>],
         ['Tooltip', 'Shows the hovered item and its span.'],
     ]}
@@ -63,10 +62,10 @@ much capacity is used over time as a quantity, use `AreaChart`.
 
 ## Data shape
 
-`categories` names the rows, top to bottom. `data` is an array of items, each
-`{ start, end, y, name, color }`: `start` and `end` are timestamps in
-milliseconds, `y` is the row's index in `categories`, and `name` and `color`
-are optional.
+`categories` names the rows top to bottom. `data` is an array of
+`{ start, end, y, name, color }`, where `start` and `end` are millisecond
+timestamps, `y` indexes into `categories`, and `name` and `color` are optional.
+`height` defaults to 400.
 
 ```jsx
 const day = 24 * 60 * 60 * 1000;
@@ -83,18 +82,16 @@ const monday = Date.UTC(2026, 8, 7);
 />
 ```
 
-`height` defaults to 400.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color follows the row.** Each bar takes the categorical color for its row index, so every bar on a row matches. Rows past the eighth reuse colors. Pass `color` on an item to override it, for example a status color for a cancelled session, and say the status in its `name` too.
-- **Position and labels carry the meaning.** The row names who, the bar's ends say when, and the label says what. Row color repeats what the row axis already says, so the chart reads without hue.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Per-row color.** Bars take the [categorical color](?path=/docs/data-visualizations-color--docs) for their row index `y` (repeating past eight) unless overridden by `color`. When using a status `color` (for example, a canceled session), include the status in `name` as well.
+- **Position and labels carry the reading.** Row labels, bar endpoints and bar `name`s convey who, when and what without hue.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -102,11 +99,7 @@ const monday = Date.UTC(2026, 8, 7);
 
 ## States
 
-`XRangeChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`XRangeChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -123,12 +116,7 @@ const monday = Date.UTC(2026, 8, 7);
 
 <DocsInteractivePlayground
     of={XRangeChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

@@ -7,8 +7,7 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={BubbleChartStories} />
 
 <Title />
-A scatter chart with a third measure as bubble size: position shows two values,
-area shows how much of the third.
+Plots records on two axes and sizes each bubble by a third measure.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/correlation/BubbleChart"
@@ -31,14 +30,14 @@ area shows how much of the third.
 
 ## When to use
 
-Use `BubbleChart` when three measures of the same records belong together:
-sessions per week against average rating, sized by student count per tutor;
-attendance against grade average, sized by class size. The third measure is
-read roughly, so use it for "bigger or smaller", not exact amounts.
+Use `BubbleChart` when three measures of the same records belong together, such
+as weekly sessions vs. average rating sized by student count, or attendance vs.
+grade average sized by class size. Because area is read roughly, use the third
+measure for relative size rather than exact comparison.
 
-For two measures with nothing to size by, use `ScatterChart`. For sizes alone
-with no axes, use `PackedBubbleChart`. When the size value needs exact
-comparison, give it its own `BarChart`.
+For two measures with nothing to size by, use `ScatterChart`. For sizes without
+axes, use `PackedBubbleChart`. When the third measure needs exact comparison,
+give it its own `BarChart`.
 
 </div>
 
@@ -49,11 +48,11 @@ comparison, give it its own `BarChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Bubbles', <>One per <C>[x, y, z]</C> point. Area scales with <C>z</C>, between 10 and 60 pixels across, filled at 70% opacity so overlaps show through.</>],
-        ['X axis', <>The first measure, with vertical grid lines. <C>xAxisLabel</C> titles it.</>],
-        ['Y axis', <>The second measure. <C>yAxisLabel</C> titles it.</>],
+        ['Bubbles', <>One per <C>[x, y, z]</C> point. Area scales with <C>z</C> (10 to 60 px across), filled at 70% opacity so overlaps show through.</>],
+        ['X axis', <>First measure, with vertical grid lines; titled by <C>xAxisLabel</C>.</>],
+        ['Y axis', <>Second measure; titled by <C>yAxisLabel</C>.</>],
         ['Legend', 'Names each series.'],
-        ['Tooltip', <>The series name, then each value under its axis label: <C>xAxisLabel</C>, <C>yAxisLabel</C> and <C>zAxisLabel</C>.</>],
+        ['Tooltip', <>Series name, then each value under <C>xAxisLabel</C>, <C>yAxisLabel</C> and <C>zAxisLabel</C>.</>],
         ['Zoom', 'Drag across the plot to zoom both axes.'],
     ]}
 />
@@ -64,9 +63,10 @@ comparison, give it its own `BarChart`.
 
 ## Data shape
 
-`data` is an array of series, each `{ name, data }`, where `data` holds
-`[x, y, z]` triples. The labels default to "X Axis", "Y Axis" and "Size", so
-always set all three. `height` defaults to 400.
+`data` is an array of series `{ name, data, color }`, where `data` holds
+`[x, y, z]` triples. Axis labels default to `"X Axis"`, `"Y Axis"` and
+`"Size"`, so always set `xAxisLabel`, `yAxisLabel` and `zAxisLabel`. `height`
+defaults to 400. Omit `color` to assign one automatically.
 
 ```jsx
 <BubbleChart
@@ -80,20 +80,18 @@ always set all three. `height` defaults to 400.
 />
 ```
 
-A series may carry its own `color`; leave it out and the chart assigns one.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color is assigned for you.** One series takes `--ds-chart-brand`. Two or more take the categorical order, slot 1 first, never skipping a slot. Keep to two or three series; bubbles crowd faster than dots.
-- **Position and size carry the values.** Color only tells series apart. Area is the weakest of the three encodings: readers can rank bubbles but cannot judge their ratio.
-- **No size legend.** The chart does not draw a key for bubble size, so say what size means in the header or description; the tooltip gives the exact value under `zAxisLabel`.
-- **Overlap.** The 70% fill keeps a bubble behind another visible, but many large bubbles still hide each other. Drag-to-zoom helps a reader pull a cluster apart.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Automatic series color.** One series uses `--ds-chart-brand`; two or more follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 without skipping. Keep to two or three series so bubbles do not crowd.
+- **Position and size carry the values.** Color only separates series. Because readers can rank bubble areas but cannot judge exact ratios, rely on the tooltip (`zAxisLabel`) for exact values.
+- **No size legend.** State what bubble size represents in the header or description.
+- **Overlap.** The 70% fill shows overlapping bubbles, and drag-to-zoom separates dense clusters, but many large bubbles still occlude each other.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -101,11 +99,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 
 ## States
 
-`BubbleChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`BubbleChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -122,12 +116,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 
 <DocsInteractivePlayground
     of={BubbleChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

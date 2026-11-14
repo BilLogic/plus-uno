@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={LollipopChartStories} />
 
 <Title />
-Compares one value across categories with a dot on a thin stem. It reads like
-a bar chart with less ink, which keeps a long ranking light.
+Compares one value across categories with a dot on a thin stem, keeping long
+rankings visually lighter than a bar chart.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/LollipopChart"
@@ -31,16 +31,15 @@ a bar chart with less ink, which keeps a long ranking light.
 
 ## When to use
 
-Use `LollipopChart` to rank many categories on one measure: scores by student,
-average rating by tutor, lesson views by lesson. Sort the data from most to
-least before passing it in; the chart keeps the order it is given.
+Use `LollipopChart` to rank many categories on one measure, such as scores by
+student, average rating by tutor or views by lesson. Sort data from most to
+least before passing it in; the chart preserves input order.
 
-For a few categories, or more than one series, use `BarChart`. For two values
-per category, such as before and after, use `DumbbellChart`. For a low-to-high
-span per category, use `ColumnRangeChart`.
+For a few categories or multiple series, use `BarChart`. For two values per
+category, use `DumbbellChart`. For a low-to-high span, use `ColumnRangeChart`.
 
-The chart is horizontal by default, which suits long names. Set `horizontal` to
-`false` for short labels laid out as columns.
+Horizontal by default to fit long names; set `horizontal={false}` for short
+labels in columns.
 
 </div>
 
@@ -51,10 +50,10 @@ The chart is horizontal by default, which suits long names. Set `horizontal` to
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Dot', <>One per value in <C>data</C>. Its position is the value.</>],
-        ['Stem', 'Joins each dot to the baseline, so the eye reads it as a length.'],
-        ['Category axis', <>Names each dot, from <C>categories</C>. Runs down the left when <C>horizontal</C> is on.</>],
-        ['Value axis', <>Titled by <C>yAxisLabel</C>, which defaults to <C>Value</C>.</>],
+        ['Dot', <>One per value in <C>data</C>; its position encodes the value.</>],
+        ['Stem', 'Joins each dot to the baseline so it reads as a length.'],
+        ['Category axis', <>Names each dot from <C>categories</C>; runs down the left when <C>horizontal</C> is on.</>],
+        ['Value axis', <>Titled by <C>yAxisLabel</C> (default <C>Value</C>).</>],
         ['Tooltip', 'Shows the hovered value.'],
     ]}
 />
@@ -65,9 +64,8 @@ The chart is horizontal by default, which suits long names. Set `horizontal` to
 
 ## Data shape
 
-`categories` is an array of strings. `data` is an array of numbers, one per
-category, in the same order. `height` defaults to 400; `horizontal` defaults to
-`true`.
+`categories` is an array of strings. `data` is an array of numbers in
+`categories` order. `height` defaults to 400; `horizontal` defaults to `true`.
 
 ```jsx
 <LollipopChart
@@ -83,10 +81,10 @@ category, in the same order. `height` defaults to 400; `horizontal` defaults to
 
 ## Color and accessibility
 
-- **One color for every dot.** The chart draws a single series in categorical slot 1 and takes no per-point color, so it cannot highlight one category. Call out the item that matters in the surrounding text.
-- **Position carries the value.** Dots read without hue; the stems make each one easy to trace back to its label.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. There is no legend, so the axis title from `yAxisLabel` is the only name for the measure. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Single series color.** Every dot uses categorical slot 1 with no per-point color override. Highlight notable items in surrounding text instead.
+- **Position carries the value.** Dots and stems trace each value to its label without hue.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Because there is no legend, `yAxisLabel` is the only name for the measure; name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -94,11 +92,7 @@ category, in the same order. `height` defaults to 400; `horizontal` defaults to
 
 ## States
 
-`LollipopChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`LollipopChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -115,12 +109,7 @@ category, in the same order. `height` defaults to 400; `horizontal` defaults to
 
 <DocsInteractivePlayground
     of={LollipopChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

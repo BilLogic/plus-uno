@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={AreaRangeChartStories} />
 
 <Title />
-Shows a range over time as a filled band between a low and a high value. The
-width of the band is the spread at each point.
+Plots a low-to-high range over time as a filled band whose width shows the
+spread at each point.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/AreaRangeChart"
@@ -31,18 +31,13 @@ width of the band is the spread at each point.
 
 ## When to use
 
-Use `AreaRangeChart` when the spread matters as much as the level: the lowest
-and highest session score each week, the expected score band across a term,
-the earliest and latest session start each day. A widening band says results
-are getting less consistent.
+Use `AreaRangeChart` when spread over time matters, such as weekly lowest and
+highest session scores, an expected score band across a term or daily earliest
+and latest session starts. Because the chart draws only the band and no
+midpoint line, state the average in surrounding text if needed.
 
 For a single value over time, use `LineChart`. For a fill down to zero, use
-`AreaChart`. For low-to-high ranges across categories rather than time, use
-`ColumnRangeChart`.
-
-The chart draws one band and nothing else. It does not draw the midpoint or a
-second series, so if the reader needs the average too, say it in the text
-beside the chart.
+`AreaChart`. For low-to-high ranges across categories, use `ColumnRangeChart`.
 
 </div>
 
@@ -53,10 +48,10 @@ beside the chart.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Band', 'One filled range from each low to its high, in the brand chart color at partial opacity, with no outline and no markers.'],
-        ['X axis', <>Plots each point at its numeric <C>x</C>. <C>xAxisLabel</C> titles it; it is empty by default.</>],
-        ['Value axis', <><C>yAxisLabel</C> titles it; it defaults to <C>"Value"</C>.</>],
-        ['Tooltip', 'Shared, with a crosshair: hovering a point shows its low and high.'],
+        ['Band', <>Single filled range from low to high in <C>--ds-chart-brand</C> at partial opacity, with no outline, markers or legend.</>],
+        ['X axis', <>Plots numeric <C>x</C> values; titled by <C>xAxisLabel</C> (empty by default).</>],
+        ['Value axis', <>Titled by <C>yAxisLabel</C> (default <C>"Value"</C>).</>],
+        ['Tooltip', 'Shared with a crosshair, showing the hovered point’s low and high.'],
     ]}
 />
 
@@ -66,9 +61,9 @@ beside the chart.
 
 ## Data shape
 
-`data` is an array of `[x, low, high]` triples, one per point, in x order.
-There is no `categories` prop, so the x axis shows numbers: index weeks or
-months from zero and name the unit in `xAxisLabel`.
+`data` is an array of `[x, low, high]` triples in `x` order. Because there is
+no `categories` prop, index periods numerically and name the unit in
+`xAxisLabel`. `height` defaults to 400.
 
 ```jsx
 <AreaRangeChart
@@ -80,19 +75,16 @@ months from zero and name the unit in `xAxisLabel`.
 />
 ```
 
-`height` defaults to 400. The legend is off, since there is only one series.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **One color, always.** The band takes `--ds-chart-brand`. There is no `color` prop and no second series to tell apart.
-- **Position carries the values.** The top and bottom edges are the high and low; the fill only shows the span between them. Without an outline, the edges are the fill's boundary alone, so read exact values from the tooltip.
-- **Name the range in words.** The chart has no legend, so the surrounding header or caption must say what the low and high are, such as "Lowest and highest score each week".
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Fixed brand color.** The band always uses `--ds-chart-brand` with no `color` prop or second series.
+- **Position carries the values.** Top and bottom edges mark the high and low without hue; rely on the tooltip for exact readings, and state what the bounds represent in the surrounding header or caption.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -100,11 +92,7 @@ months from zero and name the unit in `xAxisLabel`.
 
 ## States
 
-`AreaRangeChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`AreaRangeChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -121,12 +109,7 @@ months from zero and name the unit in `xAxisLabel`.
 
 <DocsInteractivePlayground
     of={AreaRangeChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

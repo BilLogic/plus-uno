@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={AreaChartStories} />
 
 <Title />
-Shows a quantity over time with the space below the line filled in, so volume
-reads at a glance. Stacked, it shows how parts build a total.
+Plots a quantity over time with the space beneath the line filled in to show
+volume, or stacked to show how parts build a total.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/AreaChart"
@@ -31,18 +31,15 @@ reads at a glance. Stacked, it shows how parts build a total.
 
 ## When to use
 
-Use `AreaChart` when the amount over time is the point: tutoring hours logged
-across a semester, sessions per week split by subject, enrolled students
-stacked by grade. Stack the series (`stacking="normal"`) to show parts adding
-up to a total, or as shares of 100% (`stacking="percent"`).
+Use `AreaChart` when volume over time matters, such as tutoring hours across a
+semester, weekly sessions by subject or enrolled students by grade. Set
+`stacking="normal"` to stack parts into a total, or `stacking="percent"` for
+shares of 100%; keep unstacked (`stacking={null}`) charts to two or three
+series so overlapping fills stay legible.
 
-For a trend where the area under the line means nothing, use `LineChart`.
-For precise comparison between periods, use `BarChart`. For composition with
-no meaningful zero baseline, use `StreamgraphChart`. For a band between a low
-and a high, use `AreaRangeChart`.
-
-Unstacked areas overlap and hide each other. Keep those to two or three series,
-or stack them.
+When the area under the line has no meaning, use `LineChart`. For exact period
+comparisons, use `BarChart`. For composition without a zero baseline, use
+`StreamgraphChart`. For a low-to-high band, use `AreaRangeChart`.
 
 </div>
 
@@ -53,11 +50,11 @@ or stack them.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Areas', <>One per series, filled from the line down to the baseline or to the series below it. <C>stacking</C> sets how they combine.</>],
+        ['Areas', <>One per series, filled to the baseline or the series below it according to <C>stacking</C>.</>],
         ['Markers', 'Hidden at rest; a small circle appears on the hovered point.'],
-        ['Time axis', <>Labels each period from the first series' <C>categories</C>. <C>xAxisLabel</C> titles it.</>],
-        ['Value axis', <><C>yAxisLabel</C> titles it.</>],
-        ['Legend', 'Names each series. Always shown.'],
+        ['Time axis', <>Labels each period from the first series' <C>categories</C>; titled by <C>xAxisLabel</C>.</>],
+        ['Value axis', <>Titled by <C>yAxisLabel</C>.</>],
+        ['Legend', 'Names each series; always shown.'],
         ['Tooltip', 'Shared: hovering a period lists every series’ value for it.'],
     ]}
 />
@@ -68,9 +65,10 @@ or stack them.
 
 ## Data shape
 
-`data` is an array of series, each `{ name, data }`, where `data` holds one
-number per period. Put the period labels on the first series as `categories`.
-`stacking` is `'normal'`, `'percent'` or `null` (the default, overlapping).
+`data` is an array of `{ name, data, categories, color }` series, with period
+labels passed on the first series' `categories`. `stacking` is `'normal'`,
+`'percent'` or `null` (default, overlapping). `height` defaults to 300. Omit
+`color` to assign one automatically.
 
 ```jsx
 <AreaChart
@@ -85,20 +83,17 @@ number per period. Put the period labels on the first series as `categories`.
 />
 ```
 
-A series may carry its own `color`; leave it out and the chart assigns one.
-`height` defaults to 300.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color is assigned for you.** One series takes `--ds-chart-brand`. Two or more take the categorical order, slot 1 first, never skipping a slot. Past six series, group the smallest into "Other".
-- **Height carries the value, but only the bottom layer reads off the axis.** In a stacked chart every upper layer floats on the ones below it, so its own size is hard to judge. Put the series that matters most at the bottom, and use the shared tooltip for exact values.
-- **Color is the only thing separating areas.** Every layer is a plain fill with no pattern, so keep the series count low enough that the legend can name each one.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Automatic series color.** One series uses `--ds-chart-brand`; two or more follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 without skipping. Past six series, group the smallest into "Other".
+- **Put the primary series at the bottom.** In stacked charts only the bottom layer sits on the zero baseline; upper layers float on moving baselines and rely on the shared tooltip for exact values.
+- **Plain fills.** Because layers have no pattern, keep the series count low enough for the legend to identify each one.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -106,11 +101,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 
 ## States
 
-`AreaChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`AreaChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={300} />
@@ -127,12 +118,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 
 <DocsInteractivePlayground
     of={AreaChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
