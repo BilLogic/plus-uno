@@ -51,9 +51,11 @@ export const Default = {
     render: () => <ProgressRing value={64} appearance="default" label="Uploading session recording" />,
     play: async ({ canvasElement }) => {
         const ring = within(canvasElement).getByRole('progressbar', { name: 'Uploading session recording' });
+        const svg = ring.querySelector('.plus-progress-ring__svg');
         const track = ring.querySelector('.plus-progress-ring__track');
         const fill = ring.querySelector('.plus-progress-ring__fill');
 
+        await expect(getComputedStyle(svg).transform).toBe(probe(canvasElement, 'transform', 'rotate(-90deg)'));
         await expect(getComputedStyle(track).stroke).toBe(probe(canvasElement, 'stroke', 'var(--ds-background-neutral)'));
         await expect(getComputedStyle(fill).stroke).toBe(probe(canvasElement, 'stroke', 'var(--ds-background-brand-bold)'));
         await expect(px(getComputedStyle(fill).strokeWidth)).toBe(tokenLength(canvasElement, '--progress-ring-stroke'));

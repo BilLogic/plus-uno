@@ -24,7 +24,7 @@ would crowd the view. A ring is never indeterminate.
 
 | Appearance | When to use |
 | --- | --- |
-| Default | Standard surfaces: a brand-bold fill on a neutral track, using `PROGRESS_RING_SIZES`. |
+| Default | Standard surfaces: a brand-bold fill on a neutral track. |
 | Inverse | On a bold or colored background. |
 
 ## Motion
