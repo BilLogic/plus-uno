@@ -188,6 +188,7 @@ export function loadFacts(root) {
   const tokenManifest = optional('tokens.json', { tokens: [] });
   const inventions = optional('_inventions.json', { components: [], props: [], tokens: [] });
   const patterns = optional('_patterns.json', { patterns: [] }).patterns;
+  const placements = optional('_placements.json', { placements: [] }).placements;
   const glossaryFile = path.join(root, DS_GLOSSARY);
   const { rows: aliasRows, vocabulary } = searchAliases(
     fs.existsSync(glossaryFile) ? fs.readFileSync(glossaryFile, 'utf8') : '',
@@ -293,6 +294,8 @@ export function loadFacts(root) {
     barrels,
     /** Retired token name → its replacement. */
     retired,
+    /** Component placement rules (`_placements.json`) that `ds/placement` checks. */
+    placements,
     /** What the glossary's design-system sections add to search: aliases, and the words and terms left out (`ds-vocabulary.mjs`). */
     vocabulary,
 

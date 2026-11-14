@@ -127,6 +127,12 @@ function usageTab(page, relatedFacts, motion) {
   return d;
 }
 
+const FILTERING_GOVERNED = new Set(['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'PatternSection']);
+const FILTERING_LINE =
+  'Filtering (`design-system/agent-views/pages/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.';
+
+export const governedByOf = (name) => (FILTERING_GOVERNED.has(name) ? FILTERING_LINE : null);
+
 /** The text (see the header). */
 export function renderComponent(facts, docs) {
   const page = docs?.page ?? null;
@@ -138,6 +144,8 @@ export function renderComponent(facts, docs) {
     d += `Import the exported name; read the source under the implementation name.\n\n`;
   }
   d += facts.import ? `**Import:** ${code(facts.import)}\n\n` : `**Import:** none; it is not exported from a barrel.\n\n`;
+  const governed = governedByOf(facts.name);
+  if (governed) d += `**Governed by:** ${governed}\n\n`;
   d += `**Source:** ${code(facts.source)}\n\n`;
   if (facts.stories) d += `**Stories:** ${code(sibling(facts.source, '.stories.jsx'))} — ${facts.stories.join(', ') || 'none exported'}\n\n`;
   if (docs?.path) d += `**Storybook page:** ${code(docs.path)}\n\n`;

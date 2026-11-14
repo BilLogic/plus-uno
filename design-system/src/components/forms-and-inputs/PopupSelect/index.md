@@ -6,6 +6,8 @@ Popup select: one list in a Popup, applied the moment a row is picked. - **One l
 
 **Import:** `import { PopupSelect } from '@/components';`
 
+**Governed by:** Filtering (`design-system/agent-views/pages/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
+
 **Source:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.stories.jsx` — Overview, Keyboard, Placement, Searchable, Spacing, Interactive

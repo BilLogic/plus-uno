@@ -8,6 +8,8 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Import:** `import { Select } from '@/components';`
 
+**Governed by:** Filtering (`design-system/agent-views/pages/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
+
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge, MotionOpenClose, MotionReduced, MotionKeyboardOpen

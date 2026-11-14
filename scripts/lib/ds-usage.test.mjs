@@ -283,3 +283,38 @@ test('pagesOf: the module an app entry renders as its root is a page too', () =>
   ];
   assert.ok(pagesOf(provided).has('p/src/shell/index.jsx'));
 });
+
+test('ds/placement: Select or PopupSelect without trigger in a Section toolbar warns', () => {
+  const placementCtx = contextFrom({
+    components: {
+      components: [
+        { name: 'Select', kind: 'component', import: "import { Select } from '@/components';", props: [{ name: 'options', values: null }, { name: 'label', values: null }] },
+        { name: 'PopupSelect', kind: 'component', import: "import { PopupSelect } from '@/components';", props: [{ name: 'options', values: null }, { name: 'label', values: null }, { name: 'trigger', values: null }] },
+        { name: 'FilterButton', kind: 'component', import: "import { FilterButton } from '@/components';", props: [{ name: 'text', values: null }] },
+        { name: 'FilterMenu', kind: 'component', import: "import { FilterMenu } from '@/components';", props: [{ name: 'categories', values: null }] },
+        { name: 'PatternSection', kind: 'pattern', import: "import { PatternSection } from '@/patterns';", props: [{ name: 'title', values: null }, { name: 'toolbar', values: null }] },
+      ],
+    },
+    tokens: { tokens: [] },
+    exported: new Set(['Select', 'PopupSelect', 'FilterButton', 'FilterMenu']),
+    barrels: { '@/patterns': new Set(['PatternSection', 'SectionToolbar']) },
+  });
+  const head = "import { Select, PopupSelect, FilterButton, FilterMenu } from '@/components';\nimport { PatternSection, SectionToolbar } from '@/patterns';\n";
+  const warn = (code) => escapesIn({ path: 'p/src/Queue.jsx', text: head + code, page: false }, placementCtx);
+
+  const f1 = warn('<PatternSection title="Queue" toolbar={<PatternSection.Toolbar filters={<Select options={[]} />} />} />');
+  assert.deepEqual(f1.map((f) => [f.rule, f.level]), [['ds/placement', 'warn']]);
+  assert.match(f1[0].message, /Select/);
+  assert.match(f1[0].fix, /FilterButton/);
+  assert.match(f1[0].fix, /ds guide filtering/);
+
+  const f2 = warn('<SectionToolbar filters={<PopupSelect label="Status" options={[]} />} />');
+  assert.deepEqual(f2.map((f) => [f.rule, f.level]), [['ds/placement', 'warn']]);
+  assert.match(f2[0].message, /PopupSelect/);
+
+  // Passing a FilterButton trigger to PopupSelect, or using FilterButton / FilterMenu directly, or Select in the body passes.
+  assert.deepEqual(warn('<PatternSection.Toolbar filters={<PopupSelect label="Status" options={[]} trigger={<FilterButton text="Status" />} />} />'), []);
+  assert.deepEqual(warn('<PatternSection.Toolbar filters={<FilterMenu categories={[]} />} />'), []);
+  assert.deepEqual(warn('<PatternSection title="Form" toolbar={<PatternSection.Toolbar filters={<FilterButton text="Status" />} />}><Select label="Role" options={[]} /></PatternSection>'), []);
+});
+

@@ -90,3 +90,10 @@ A module is page-level by its path, and nothing else is checked:
 The outer element is what the default-exported component returns last at its shallowest indent. A fragment and a `*Provider` are stepped through to the child written directly inside; a child behind a condition (`{open && <Fab />}`) is not outermost, and neither is a router or any other component. A bare `<div>` with no class or style carries no layout of its own and passes.
 
 Start the page from a template (`Frame` with the PLUS `Sidebar`; `import { Frame } from '@/patterns';`) or a pattern from `@/patterns` (`Page`, `PatternCard` and the rest), and put the hand-made layout inside it if any is still needed.
+
+## ds/placement
+
+**warn.** A component placed inside a slot or container where a pattern specifies a different control (`design-system/agent-views/_placements.json`): for example, `<Select>` or `<PopupSelect>` (without a `FilterButton` `trigger`) inside a `PatternSection`'s `toolbar` (`PatternSection.Toolbar` / `SectionToolbar`), where the Filtering pattern uses `FilterButton` (for 1–3 quick filters) or `FilterMenu` (for staged multi-category filters).
+
+Use the component the pattern names and read the pattern guide the fix points to (`ds guide filtering`).
+
