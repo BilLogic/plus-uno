@@ -297,6 +297,29 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19493"
       }
     },
+    "CheckboxGroup": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/CheckboxGroup",
+        "source": "design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.jsx",
+        "storybookId": "components-forms-and-inputs-checkbox-checkbox-group--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "checkbox-group",
+            "name": "CheckboxGroup",
+            "componentSetNodeId": "22266:381",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
+      }
+    },
     "ChoiceGrid": {
       "code": {
         "import": "@/components/forms-and-inputs",
@@ -1211,6 +1234,30 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
+      }
+    },
+    "RadioGroup": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.jsx",
+        "storybookId": "components-forms-and-inputs-radio-radio-group--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "radio-group",
+            "name": "RadioGroup",
+            "componentSetNodeId": "20009:71532",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13332-2508"
       }
     },
     "Range": {

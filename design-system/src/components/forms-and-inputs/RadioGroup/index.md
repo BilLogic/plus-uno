@@ -185,4 +185,8 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 From `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.scss`. Override these through the token layer, never with a literal.
 
+## Figma
+
+- "RadioGroup" node 20009:71532 in file zAecJNRdvJzAUOcjV32tRX
+
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
