@@ -32,7 +32,7 @@ describe('DoDontPair and DoDontCard', () => {
             expect(card.style.boxShadow).toBe('var(--ds-shadow-raised)');
             expect(card.style.borderRadius).toBe('var(--card-radius)');
             expect(card.style.padding).toBe('var(--card-pad-default)');
-            expect(card.style.gap).toBe('var(--section-stack-md)');
+            expect(card.style.rowGap).toBe('var(--section-stack-md)');
 
             // Well is the first child, caption block is the second child (no top header bar).
             expect(card.children).toHaveLength(2);
