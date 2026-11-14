@@ -698,6 +698,13 @@
           }
         },
         {
+          "name": "File/item-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--file-item-height)"
+          }
+        },
+        {
           "name": "Radio/control-size",
           "resolvedType": "FLOAT",
           "codeSyntax": {

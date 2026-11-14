@@ -4333,12 +4333,208 @@
       ]
     },
     {
+      "name": "FileItem",
+      "kind": "component",
+      "import": "import { FileItem } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/FileItem/FileItem.jsx",
+      "summary": "`FileItem` — one 56px row representing a file or a folder in a `FileUpload` list or as a standalone attachment on a note, comment or message. Anatomy (`start`, `label`, `description`, `end`) is structured for reuse: a 20px lead status/type indicator, middle-truncated name with a full-name tooltip, one status/meta line, and at most one removal control (preceded by Retry on `error`).",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "File or folder display name. Truncates in the middle so the extension stays visible, with the full name in a tooltip.",
+          "deprecated": null
+        },
+        {
+          "name": "meta",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Secondary metadata such as file size (`\"14.2 MB\"`), folder item count (`\"6 files\"`), or saved date (`\"Added Nov 12\"`).",
+          "deprecated": null
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "queued",
+            "uploading",
+            "done",
+            "error"
+          ],
+          "description": "Current upload lifecycle state of the item.",
+          "deprecated": null
+        },
+        {
+          "name": "progress",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Upload percent from 0 to 100 while `status` is `uploading`.",
+          "deprecated": null
+        },
+        {
+          "name": "error",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One-sentence cause and fix shown on `status=\"error\"`.",
+          "deprecated": null
+        },
+        {
+          "name": "kind",
+          "type": "enum",
+          "required": false,
+          "default": "'file'",
+          "values": [
+            "file",
+            "folder"
+          ],
+          "description": "`file` (default) or `folder` (uses the folder icon when done and shows file count in `meta`).",
+          "deprecated": null
+        },
+        {
+          "name": "fileType",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Explicit file category or extension (`pdf`, `video`, `audio`, `image`, `archive`, `word`, `spreadsheet`, `presentation`, `code`, `text`, `file`). Inferred from `name` when omitted.",
+          "deprecated": null
+        },
+        {
+          "name": "removal",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "cancel",
+            "remove",
+            "delete"
+          ],
+          "description": "`cancel` (in-flight upload X), `remove` (unsaved form X), or `delete` (saved attachment trash icon that confirms first).",
+          "deprecated": null
+        },
+        {
+          "name": "onRemove",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called when the user cancels, removes, or confirms deleting the item.",
+          "deprecated": null
+        },
+        {
+          "name": "onRetry",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called when the user presses Retry on an `error` item.",
+          "deprecated": null
+        },
+        {
+          "name": "href",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Destination URL that opens a completed (`status=\"done\"`) file.",
+          "deprecated": null
+        },
+        {
+          "name": "isReadOnly",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Hides all end actions while keeping full contrast, for read-only views and static attachments.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Hides end actions, disables opening links, and dims the row.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Element id on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the row container.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Queued",
+        "Uploading0",
+        "Uploading40",
+        "Uploading80",
+        "DoneRemove",
+        "DoneDelete",
+        "ErrorWithRetry",
+        "FolderUploading",
+        "FolderDone",
+        "ReadOnly",
+        "Disabled",
+        "LongName",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-disabled",
+        "--ds-border",
+        "--ds-border-disabled",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-surface",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-disabled",
+        "--ds-text-subtle",
+        "--file-item-height",
+        "--image-xs",
+        "--inline-lg",
+        "--inline-md",
+        "--inline-sm",
+        "--pad-x-lg",
+        "--radius-control-md",
+        "--stack-md"
+      ]
+    },
+    {
       "name": "FileUpload",
       "kind": "component",
       "import": "import { FileUpload } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx",
-      "summary": "FileUpload: a form field that opens the platform file picker. It chooses files; it does not upload them.",
+      "summary": "FileUpload: a form field that opens the platform file or folder picker, accepts drops, and displays chosen FileItem rows below the drop zone.",
       "props": [
         {
           "name": "id",
@@ -4395,12 +4591,21 @@
           "deprecated": null
         },
         {
+          "name": "allowFolders",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Shows the `\"Choose files or a folder, or drop them here\"` line and enables picking or dropping a folder.",
+          "deprecated": null
+        },
+        {
           "name": "isDisabled",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disables the button and file input and dims the field.",
+          "description": "Disables the picker controls and file input and dims the field and its FileItem rows.",
           "deprecated": null
         },
         {
@@ -4409,7 +4614,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows the field and its files without a way to choose a file.",
+          "description": "Shows the field and its files without a way to choose or remove files.",
           "deprecated": null
         },
         {
@@ -4440,7 +4645,7 @@
           "required": false,
           "default": "'Choose a file'",
           "values": null,
-          "description": "The label of the choose-file button. Defaults to `Choose a file`.",
+          "description": "The label of the choose-file button when `allowFolders` is false. Defaults to `Choose a file`.",
           "deprecated": null
         },
         {
@@ -4471,6 +4676,15 @@
           "deprecated": null
         },
         {
+          "name": "onDrop",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the drop event when files or folders are dropped onto the drop zone.",
+          "deprecated": null
+        },
+        {
           "name": "onFocus",
           "type": "func",
           "required": false,
@@ -4494,7 +4708,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The uploaded-file list, shown below the button and outside the frame.",
+          "description": "The uploaded-file list (`FileItem` rows), shown below the drop zone and outside the frame.",
           "deprecated": null
         }
       ],
@@ -4503,26 +4717,34 @@
         "Content",
         "Styles",
         "InteractionStates",
-        "ReadOnly",
-        "WithFiles",
-        "Interactive",
         "Default",
+        "AllowFolders",
+        "WithFiles",
+        "UploadingBatch",
+        "DragOver",
+        "ReadOnly",
         "Required",
         "Invalid",
         "Valid",
         "Disabled",
         "KeyboardFocus",
-        "InvalidFocus"
+        "InvalidFocus",
+        "Interactive"
       ],
       "tokens": [
         "--body-default",
         "--body-small",
         "--border-default",
         "--card-radius-compact",
+        "--ds-background-brand-subtlest",
         "--ds-background-danger-subtler",
+        "--ds-background-disabled",
         "--ds-background-neutral",
         "--ds-background-success-subtler",
+        "--ds-border",
+        "--ds-border-brand",
         "--ds-border-danger",
+        "--ds-border-disabled",
         "--ds-border-focused",
         "--ds-border-success",
         "--ds-icon-danger",
@@ -4530,11 +4752,14 @@
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-text",
+        "--ds-text-brand",
         "--ds-text-danger",
+        "--ds-text-disabled",
         "--ds-text-subtle",
         "--ds-text-success",
         "--focus-ring-width",
         "--icon-sm",
+        "--inline-md",
         "--pad-x-md",
         "--pad-y-md",
         "--stack-md",

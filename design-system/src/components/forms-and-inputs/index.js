@@ -17,6 +17,7 @@ export { default as TreeSelect } from './TreeSelect';
 export { default as ChoiceGrid } from './ChoiceGrid';
 export { default as RadioGroup } from './RadioGroup';
 export { default as Fieldset } from './Fieldset';
+export { default as FileItem, FILE_ITEM_KINDS, FILE_ITEM_REMOVALS, FILE_ITEM_STATUSES } from './FileItem';
 export { default as FileUpload } from './FileUpload';
 export { default as Rating } from './Rating';
 export { default as SearchField } from './SearchField';

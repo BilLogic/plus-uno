@@ -136,6 +136,7 @@ Tokens one component owns, named for it.
 --choice-grid-control-size-12  /* Size of the control in a ChoiceGrid with size 14 or 16. */
 --choice-tile-width  /* Width of a choice tile in a Radio, RadioGroup, Checkbox or CheckboxGroup with tile appearance. */
 --count-tag-dot-size  /* Size of the dot in a CountTag. */
+--file-item-height  /* Fixed height of a FileItem row across queued, uploading, done and error states. */
 --flag-min-height  /* Minimum height of a Flag. */
 --flag-offset  /* Distance between a Flag and the edge of the screen. */
 --flag-pad  /* Padding inside a Flag. */

@@ -16,6 +16,7 @@ export { default as DatePicker } from '@/components/forms-and-inputs/DatePicker'
 export { default as DateTimePicker } from '@/components/forms-and-inputs/DateTimePicker';
 export { default as DropdownMenu, ButtonItem, CustomItem, LinkItem, Section } from '@/components/forms-and-inputs/DropdownMenu';
 export { default as Fieldset } from '@/components/forms-and-inputs/Fieldset';
+export { default as FileItem, FILE_ITEM_KINDS, FILE_ITEM_REMOVALS, FILE_ITEM_STATUSES } from '@/components/forms-and-inputs/FileItem';
 export { default as FileUpload } from '@/components/forms-and-inputs/FileUpload';
 export { default as FilterButton, FILTER_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/FilterButton';
 export { default as FilterMenu, FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WIDTHS } from '@/components/forms-and-inputs/FilterMenu';
