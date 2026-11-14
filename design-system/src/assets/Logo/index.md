@@ -57,7 +57,7 @@ Below `LOCKUP_MIN_SIZE` (`24`), `Logo` renders the mark alone even when `wordmar
 
 ### Tokens
 
-The logomark's glows and fills use fixed brand palette colors (`Logo.scss`); the wordmark uses `--ds-text` on light grounds and inverse neutral on dark grounds.
+The logomark's glows and fills use fixed brand palette colors (`Logo.scss`); in the colored appearance the wordmark follows `--ds-text`, so it tracks the color mode.
 
 ## Props
 

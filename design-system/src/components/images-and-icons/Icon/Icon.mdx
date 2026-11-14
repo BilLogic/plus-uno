@@ -111,7 +111,7 @@ import { Icon } from '@/components';
 <Icon name="circle-check" size={16} color="success" label="Approved" />
 ```
 
-Pass a plain Font Awesome Free name in its current spelling (an alias is not in the regular list, so it draws solid) and set `iconStyle` only when a glyph must be solid outside navigation; never write `fa-solid` or `fa-regular` into the name. A `fa-brands` name carries its family: `fa-brands fa-figma`. When to use an icon, outline vs solid rules, and size steps live on <a href="?path=/docs/foundations-visual-iconography--docs">Iconography</a>.
+Navigation icons are always outlined: a selected row shows a fill, not a filled icon, and brand marks (`fa-brands`) are the only exception. Pass a plain Font Awesome Free name in its current spelling (an alias is not in the regular list, so it draws solid) and set `iconStyle` only when a glyph must be solid outside navigation; never write `fa-solid` or `fa-regular` into the name. A `fa-brands` name carries its family: `fa-brands fa-figma`. When to use an icon, outline vs solid rules, and size steps live on <a href="?path=/docs/foundations-visual-iconography--docs">Iconography</a>.
 
 </div>
 
@@ -169,7 +169,7 @@ Pass a plain Font Awesome Free name in its current spelling (an alias is not in 
 Without `label` the icon is hidden from assistive technology, so the words beside it carry the meaning.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}><Icon name="calendar-days" size={16} color="subtle" />Tuesday, 4:00 PM ET</div>}
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}><Icon name="calendar-days" size={16} color="subtle" />Tuesday, 4 pm</div>}
     doCaption="The icon beside the words it backs up."
     dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}><Icon name="calendar-days" size={16} color="subtle" /></div>}
     dontCaption="An icon alone with no label, so it has no name."

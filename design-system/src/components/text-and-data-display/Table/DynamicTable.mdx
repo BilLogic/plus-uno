@@ -159,7 +159,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 Use `DynamicTable` for a table of sessions or records where people act on the
 data: sort a column, filter or search the rows, select some for a bulk action,
-or page through a long result with pagination.
+or page through a long result with pagination. It holds its own sort and page until the page passes `sortKey` or `page`.
 
 </div>
 
@@ -292,7 +292,7 @@ With `totalRows`, `rows` is the current page only (`rowsPerPage`), and the foote
 ## Related
 
 - `Pagination`: use when splitting a long result set across numbered pages.
-- <a href="?path=/docs/templates-section--docs">Section</a>: use when placing search, filters and actions in the toolbar above the table.
+- <a href="?path=/docs/templates-section--docs">Section</a>: use when placing search, filters and actions in the toolbar above the table; selected rows never change it.
 
 </div>
 

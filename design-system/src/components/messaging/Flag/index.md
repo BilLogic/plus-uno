@@ -132,7 +132,7 @@ The × is on default flags only, so a stack is all default flags or all bold.
 - **Announcement needs the region to already exist.** A flag mounted at the same
   moment as its container may not be announced at all. Render `FlagGroup`
   with the page and put flags into it.
-- **The dismiss button is the shared `CloseButton`** on a default flag's surface, with an `aria-hidden` ×.
+- **The dismiss button is the shared `CloseButton`** on a default flag's surface, with an `aria-hidden` ×. The × and its focus ring are at least 3:1 on that surface.
 - **The appearance icon is decorative.** It is `aria-hidden`, so the title beside it
   carries the meaning; the color and icon should never carry it alone.
 - **The chevron reports its state.** It sets `aria-expanded`, so a screen reader
@@ -165,7 +165,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `Notificat
 | Focused | Dismiss, the toggle and each action show the focus ring; the ring is inverse on a bold fill. |
 | Disabled | Not supported. |
 | Expanded | A bold flag shows its description and actions; collapsed, only the title. |
-| Autohide | Normal, information and success close after `delay` (default `8000`); warning and error never close themselves. |
+| Autohide | Normal, information and success close after `delay` (default `8000`; keep any `delay` at 8000 or more); warning and error never close themselves. |
 | Dismissed | The flag leaves the stack. |
 
 ### Tokens

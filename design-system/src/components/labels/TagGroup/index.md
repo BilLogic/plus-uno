@@ -35,7 +35,7 @@ at the end of the row, after the tags and `+n`.
 
 `overflow="collapse"` keeps one line and puts the rest behind `+n`, measured by the container's width: give the group a width to fit into, because a group that can grow shows everything. Use `maxVisible` only to show fewer than fit (`maxVisible={0}` puts every tag behind `+n`), and `+n` reserves room for the widest label at its digit count (`+88` when up to `99` tags are hidden).
 
-`Suggestion` children stay on the row after `+n` and never collapse into the menu. Pass `Suggestion`s as direct children; a custom wrapper must copy the marker (`MySuggestion.isSuggestion = Suggestion.isSuggestion`) or it is counted as a tag. In the `+n` menu, a selectable tag toggles (`aria-pressed`) with the menu staying open, a link tag navigates, a saving tag is disabled and busy, and remove is only offered on the row, never from the menu.
+`Suggestion` children are offers, not values: they are not counted into `+n`, never appear in its menu and always sit after it. Their width comes off the row before tags are counted, so a group with suggestions shows fewer tags, not fewer suggestions. Pass `Suggestion`s as direct children; a custom wrapper must copy the marker (`MySuggestion.isSuggestion = Suggestion.isSuggestion`) or it is counted as a tag. In the `+n` menu, a selectable tag toggles (`aria-pressed`) with the menu staying open, a link tag navigates, a saving tag is a disabled, busy row, a read-only or removable tag is a static row, and remove is only offered on the row, never from the menu.
 
 Do: Collapse in a tight row.
 Don't: Wrap pushes the row taller.
@@ -60,9 +60,11 @@ Don't: A read-only group that looks editable.
 
 ## Accessibility
 
-- **Named list.** The group renders `role="list"` named by `label`, wrapping each child in a `listitem` so `Tag` stays usable outside a group.
+- **Named list.** The group renders `role="list"` named by `label`, wrapping each child in a `listitem` so `Tag` stays usable outside a group. `label` has no default, so a group without it is an unnamed list.
 - **Hidden tags leave the list.** Collapsed tags stay out of the tab order and list count until the `+n` menu opens.
-- **`+n` announces its count and menu state.** Enter or Space opens the menu, Tab reaches each interactive item inside, and Escape returns focus to `+n`. Selectable tags toggle in place (`aria-pressed`), links keep their `href`, and remove stays on the row.
+- **Suggestions stay reachable.** They are never behind `+n`, so a keyboard user reaches them on the row after `+n`.
+- **Disabled is announced per tag.** A selectable tag, a Suggestion and `+n` are native disabled buttons; every other tag is a plain span that carries visually hidden text and reads as "Science, disabled". Nothing in a disabled group takes focus.
+- **`+n` announces its count and menu state.** Its name starts with what it shows ("+3 more tags", "+1 more tag"). Enter or Space opens the menu, Tab reaches each interactive item inside, and Escape returns focus to `+n`. Selectable tags toggle in place (`aria-pressed`), links keep their `href`, and remove stays on the row.
 - **Suggestions stay on the row.** They are never folded into `+n`, so keyboard users reach them directly.
 - **Disabled is announced per item.** Interactive tags and `+n` become native disabled buttons; static tags append visually hidden ", disabled" text.
 

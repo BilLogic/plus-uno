@@ -23,7 +23,7 @@ import { Icon } from '@/components';
 <Icon name="circle-check" size={16} color="success" label="Approved" />
 ```
 
-Pass a plain Font Awesome Free name in its current spelling (an alias is not in the regular list, so it draws solid) and set `iconStyle` only when a glyph must be solid outside navigation; never write `fa-solid` or `fa-regular` into the name. A `fa-brands` name carries its family: `fa-brands fa-figma`. When to use an icon, outline vs solid rules, and size steps live on Iconography.
+Navigation icons are always outlined: a selected row shows a fill, not a filled icon, and brand marks (`fa-brands`) are the only exception. Pass a plain Font Awesome Free name in its current spelling (an alias is not in the regular list, so it draws solid) and set `iconStyle` only when a glyph must be solid outside navigation; never write `fa-solid` or `fa-regular` into the name. A `fa-brands` name carries its family: `fa-brands fa-figma`. When to use an icon, outline vs solid rules, and size steps live on Iconography.
 
 ## Alternatives
 

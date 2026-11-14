@@ -31,7 +31,7 @@ InlineEdit reads these motion tokens and no literal duration or curve.
 
 ## Alternatives
 
-- For a field in a form where a Save button submits every field together, use `TextField`.
+- For a field in a form where a Save button submits every field together, use `TextField`: an inline edit saves when confirmed and has no say in the form's submit, so placing one in a form leaves two ways to save.
 - For several lines edited in a form, use `TextArea`.
 
 ## Best practices

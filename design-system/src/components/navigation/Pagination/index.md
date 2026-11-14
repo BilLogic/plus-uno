@@ -42,6 +42,7 @@ Pagination reads these motion tokens and no literal duration or curve.
 
 - For a step-by-step workflow rather than pages of results, use `ProgressTracker`.
 - For a bounded list that scrolls inside a fixed region, use `ScrollBar`.
+- For a continuously loading feed, use infinite scroll rather than pages.
 
 ## Best practices
 

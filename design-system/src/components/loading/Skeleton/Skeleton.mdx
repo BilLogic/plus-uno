@@ -294,8 +294,10 @@ own spinner (`isLoading`), so saving and loading look different.
   the container that is loading, and remove it when the content arrives.
 - **Pair the busy state with a live label.** Render a visually hidden
   `role="status"` element **beside** the busy region, not inside it. Mount the
-  status empty and set its text after mount ("Loading students…"), then update
-  it when content arrives ("Students loaded").
+  status empty and set its text after mount ("Loading students…"), keep it
+  mounted, and update its text when content arrives ("Students loaded"). `aria-busy` alone is not announced by every screen reader.
+- **Contrast in any theme.** The fill is `--ds-skeleton` and the shimmer
+  `--ds-skeleton-subtle`, both theme tokens.
 
 ```jsx
 const [message, setMessage] = useState('');

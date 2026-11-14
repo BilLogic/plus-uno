@@ -200,7 +200,7 @@ A flag plays a sound as it lands: Error for an error flag, Notify for every othe
 <tr><td>Focused</td><td>Dismiss, the toggle and each action show the focus ring; the ring is inverse on a bold fill.</td></tr>
 <tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Expanded</td><td>A bold flag shows its description and actions; collapsed, only the title.</td></tr>
-<tr><td>Autohide</td><td>Normal, information and success close after <code>delay</code> (default <code>8000</code>); warning and error never close themselves.</td></tr>
+<tr><td>Autohide</td><td>Normal, information and success close after <code>delay</code> (default <code>8000</code>; keep any <code>delay</code> at 8000 or more); warning and error never close themselves.</td></tr>
 <tr><td>Dismissed</td><td>The flag leaves the stack.</td></tr>
 </tbody>
 </DocsTable>
@@ -324,7 +324,7 @@ The × is on default flags only, so a stack is all default flags or all bold.
 - **Announcement needs the region to already exist.** A flag mounted at the same
   moment as its container may not be announced at all. Render `FlagGroup`
   with the page and put flags into it.
-- **The dismiss button is the shared `CloseButton`** on a default flag's surface, with an `aria-hidden` ×.
+- **The dismiss button is the shared `CloseButton`** on a default flag's surface, with an `aria-hidden` ×. The × and its focus ring are at least 3:1 on that surface.
 - **The appearance icon is decorative.** It is `aria-hidden`, so the title beside it
   carries the meaning; the color and icon should never carry it alone.
 - **The chevron reports its state.** It sets `aria-expanded`, so a screen reader

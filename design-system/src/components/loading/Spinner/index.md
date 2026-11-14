@@ -103,7 +103,7 @@ Same group: `GenerativeBorder` · `ProgressBar` · `ProgressRing` · `Skeleton`
 
 | State | What changes |
 | --- | --- |
-| Rest | The ring turns once every 0.75s. Under reduced motion it slows, and the hidden label still names the wait. |
+| Rest | The ring turns once every 0.75s. Under reduced motion it holds still, and the hidden label still names the wait. |
 | Hovered | None. It is not a control. |
 | Pressed | None. |
 | Focused | None. It is not in the tab order. |

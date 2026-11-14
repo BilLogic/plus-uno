@@ -17,7 +17,7 @@ Also asked as: delta tag, trend indicator.
 ## Usage
 
 Use `ChangeTag` beside a number to say how it moved since the last period: in
-a card header, a table cell or a chart tooltip.
+a card header, a table cell or a chart tooltip. For the number itself, use plain text.
 
 ### Good direction
 

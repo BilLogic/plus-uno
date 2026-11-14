@@ -26,7 +26,7 @@ shape and the headers stay a readable index of what is there.
 It is uncontrolled by default: give it `defaultActiveKey` and it tracks the open
 item itself. Pass `activeKey` and `onSelect` together to control it. `alwaysOpen`
 lets more than one item stay open at once, and `flush` removes the outer border
-and rounded corners when the accordion sits inside a card or panel.
+and rounded corners when the accordion sits inside a card or panel. Use an accordion for several long, independent sections where only one matters at a time.
 
 ## Motion
 
@@ -63,7 +63,7 @@ Items share borders so the group reads as one control.
 Do: Items touch, borders shared.
 Don't: Items spaced apart like separate cards.
 
-### Author items with either `items` or `children`. {#author-items-with-either-items-or-children}
+### Author items with either `items` or `children`; `children` wins. {#author-items-with-either-items-or-children-children-wins}
 
 ```jsx
 // Incorrect — the items array is dropped when children exist.

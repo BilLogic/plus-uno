@@ -248,7 +248,7 @@ A label names a view. A count or status in it changes the name and breaks the pa
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice.
 
-A `pill` strip is a fixed set of views of one subject. A page has one tab system: the underline strip under the page header switches the page's sections, and a pill strip inside a card switches that card's views, without stacking two strips of the same kind. For a second-level choice inside a view, use the labeled trigger of `PopupSelect` ("Status: Upcoming") in the view's toolbar.
+A `pill` strip is a fixed set of views of one subject, decided when the page is designed, so it has no add-view control and people cannot create, rename, reorder or remove a tab. A strip that must grow with the data is a list or a `Select`, not tabs. A page has one tab system: the underline strip under the page header switches the page's sections, and a pill strip inside a card switches that card's views, without stacking two strips of the same kind. For a second-level choice inside a view, use the labeled trigger of `PopupSelect` ("Status: Upcoming") in the view's toolbar.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs><PopupSelect label="Status" defaultValue="upcoming" options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }]} /></div>}

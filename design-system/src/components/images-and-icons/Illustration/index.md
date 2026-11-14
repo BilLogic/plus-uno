@@ -17,7 +17,7 @@ Also asked as: mascot.
 ## Usage
 
 Use `Illustration` in empty states, onboarding and feature moments where a PLUS
-character sets the tone. In an empty state, the header and action do the work; the illustration is decorative (`decorative` defaults to `true`) and hidden from assistive technology. Pass `decorative={false}` with a `title` only when the character sits alone with no heading beside it. Which character pairs with which SMART area or math
+character sets the tone. In an empty state, the header and action do the work; the illustration is decorative and hidden from assistive technology. Pass a `title` only when the character sits alone with no heading beside it. Which character pairs with which SMART area or math
 moment is on Illustrations.
 
 ```jsx

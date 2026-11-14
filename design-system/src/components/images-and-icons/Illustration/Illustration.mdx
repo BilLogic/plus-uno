@@ -54,7 +54,7 @@ in line work, every color from a token. Which character to use, and when, is on
 
 ## Size
 
-`size` sets the square layout box (`48`, `96`, `160` or `240`; `96` by default). The limbs reach past the frame and are never clipped; character galleries and safe-area clearances live on <a href="?path=/docs/foundations-brand-illustrations--docs">Illustrations</a>.
+`size` sets the square layout box (`48`, `96`, `160` or `240`; `96` by default). Below 48 the line work breaks into specks; above 240 the stipple starts to read as noise. The limbs reach past the frame and are never clipped: across the twelve characters they reach up to about 33% of the size to the left, 60% to the right, 14% above and 50% below (`dot` reaches farthest), so leave that much room on the sides a character has limbs on. Character galleries live on <a href="?path=/docs/foundations-brand-illustrations--docs">Illustrations</a>.
 
 <ComponentExample of={IllustrationStories.Size48} title="48" description="Beside a heading or in a compact card." />
 
@@ -108,7 +108,7 @@ in line work, every color from a token. Which character to use, and when, is on
 ## Usage
 
 Use `Illustration` in empty states, onboarding and feature moments where a PLUS
-character sets the tone. In an empty state, the header and action do the work; the illustration is decorative (`decorative` defaults to `true`) and hidden from assistive technology. Pass `decorative={false}` with a `title` only when the character sits alone with no heading beside it. Which character pairs with which SMART area or math
+character sets the tone. In an empty state, the header and action do the work; the illustration is decorative and hidden from assistive technology. Pass a `title` only when the character sits alone with no heading beside it. Which character pairs with which SMART area or math
 moment is on <a href="?path=/docs/foundations-brand-illustrations--docs">Illustrations</a>.
 
 ```jsx

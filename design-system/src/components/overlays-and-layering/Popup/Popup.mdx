@@ -310,7 +310,7 @@ must be read is content that has to stay put while it is read.
   `aria-haspopup="dialog"` and an `aria-expanded` that tracks the open state —
   including while the caller drives `show` themselves. Both are applied only to
   a trigger that can hold them: a `button`, an `a`, a `Button`, anything you
-  have already given a `role`, and the button a string trigger becomes.
+  have already given a `role`, and the button a string trigger becomes. A plain `div` gets neither, because a state on something with no role is invalid ARIA.
 - **`aria-controls` is not set.** It needs the rendered panel's id, and an
   `aria-controls` pointing at an element that does not exist yet is worse than
   none.
@@ -328,7 +328,7 @@ must be read is content that has to stay put while it is read.
 
 ## Related
 
-- <a href="?path=/docs/templates-popup--docs">Popup template</a>: use when choosing between a general Popup, a Menu, a FilterMenu or aSpotlight.
+- <a href="?path=/docs/templates-popup--docs">Popup template</a>: use when choosing between a general Popup, a Menu, a FilterMenu or a Spotlight.
 - `DropdownMenu`: use when the anchored overlay is a menu of commands rather than prose.
 
 </div>

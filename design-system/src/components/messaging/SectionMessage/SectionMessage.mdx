@@ -304,7 +304,7 @@ a message back when it genuinely changes, remount it with a new `key`.
 ## Accessibility
 
 - **It announces assertively.** The message renders `role="alert"`, which
-  implies `aria-live="assertive"`, so a screen reader interrupts to read it.
+  implies `aria-live="assertive"`, so a screen reader interrupts to read it. That is right for something that just went wrong and wrong for ambient information; for the latter, prefer plain text on the page.
 - **A message rendered on mount may not be announced at all.** Live regions
   announce changes. If the message is present in the first paint, treat it as
   ordinary content and make sure the surrounding page still reads correctly.

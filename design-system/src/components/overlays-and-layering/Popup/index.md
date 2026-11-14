@@ -105,7 +105,7 @@ Don't: Says nothing about what opens, and reads as nothing in a list of links.
   `aria-haspopup="dialog"` and an `aria-expanded` that tracks the open state —
   including while the caller drives `show` themselves. Both are applied only to
   a trigger that can hold them: a `button`, an `a`, a `Button`, anything you
-  have already given a `role`, and the button a string trigger becomes.
+  have already given a `role`, and the button a string trigger becomes. A plain `div` gets neither, because a state on something with no role is invalid ARIA.
 - **`aria-controls` is not set.** It needs the rendered panel's id, and an
   `aria-controls` pointing at an element that does not exist yet is worse than
   none.
@@ -119,7 +119,7 @@ Don't: Says nothing about what opens, and reads as nothing in a list of links.
 
 ## Related
 
-- Popup template: use when choosing between a general Popup, a Menu, a FilterMenu or aSpotlight.
+- Popup template: use when choosing between a general Popup, a Menu, a FilterMenu or a Spotlight.
 - `DropdownMenu`: use when the anchored overlay is a menu of commands rather than prose.
 
 Same group: `Tooltip`
