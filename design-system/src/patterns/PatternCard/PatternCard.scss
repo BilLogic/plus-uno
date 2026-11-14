@@ -123,6 +123,51 @@ $-dragging: (
     min-width: 0;
 }
 
+/*
+ * Side layouts: the card becomes a two-column grid, content two thirds and image
+ * one third, and the image fills the full height, bleeding to the top, bottom and
+ * its side edge (the card radius clips it). Below md (768) the card stacks again.
+ * The 1fr / 2fr split is a ratio, not a length, so it takes no token.
+ */
+@media (min-width: 768px) {
+    .plus-pattern-card--image-start,
+    .plus-pattern-card--image-end {
+        display: grid;
+        grid-template-rows: 1fr;
+    }
+
+    .plus-pattern-card--image-start {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        // Place both explicitly: with no image the content still takes the two-thirds column.
+        > .plus-pattern-card-image { grid-column: 1; grid-row: 1; }
+        > .plus-pattern-card-inner { grid-column: 2; grid-row: 1; }
+    }
+
+    .plus-pattern-card--image-end {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+        // Source order is image first; put the image in the end column.
+        > .plus-pattern-card-image { grid-column: 2; grid-row: 1; }
+        > .plus-pattern-card-inner { grid-column: 1; grid-row: 1; }
+    }
+
+    .plus-pattern-card--image-start > .plus-pattern-card-image,
+    .plus-pattern-card--image-end > .plus-pattern-card-image {
+        // Fill the cell whatever ratio the image has: it crops to cover.
+        position: relative;
+        overflow: hidden;
+    }
+
+    .plus-pattern-card--image-start > .plus-pattern-card-image > *,
+    .plus-pattern-card--image-end > .plus-pattern-card-image > * {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        aspect-ratio: auto !important;
+    }
+}
+
 /* `_Card header`: the title block and the actions on one row */
 .plus-pattern-card-header {
     min-width: 0;
