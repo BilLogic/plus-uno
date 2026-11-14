@@ -831,6 +831,15 @@ export const EXCLUDED = [
     reason: 'it needs `npm ci`, Playwright Chromium and a Storybook server, so it runs in the storybook-gate job beside check:storybook.',
   },
   {
+    name: 'check:docs-hero-fit',
+    script: 'node scripts/check-docs-hero-fit.mjs',
+    pkg: 'root',
+    trigger: 'storybook-gate',
+    kind: 'spawn',
+    spawnReason: 'it starts a Storybook and drives a real Chromium; see check:storybook.',
+    reason: 'it needs `npm ci`, Playwright Chromium and a Storybook server, so it runs in the storybook-gate job beside check:docs-chrome.',
+  },
+  {
     name: 'test:design-system',
     script: 'npm --prefix design-system test',
     pkg: 'root',
@@ -906,6 +915,17 @@ export const WORKFLOW_STEPS = [
       "for by this point, and a failure here should not hide a story failure.",
     ],
     runs: ["check:docs-chrome"],
+  },
+  {
+    workflow: ".github/workflows/storybook-gate.yml",
+    region: "storybook-checks",
+    name: "npm run check:docs-hero-fit",
+    note: [
+      "Cover heroes against their cards: a hero's drawn box must not extend past",
+      "the card that holds it, at four widths. Starts its own Storybook, so it",
+      "sits beside check:docs-chrome.",
+    ],
+    runs: ["check:docs-hero-fit"],
   },
   {
     workflow: ".github/workflows/storybook-gate.yml",
