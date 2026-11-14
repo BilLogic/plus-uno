@@ -12,8 +12,9 @@ describe('TechStackTable', () => {
         }
     });
 
-    it('renders one row per package', () => {
+    it('renders one row per package inside a DocsTable wrapper', () => {
         const { container } = render(<TechStackTable />);
+        expect(container.querySelector('.sb-ds-doc-table-wrap')).toBeTruthy();
         expect(container.querySelectorAll('tbody tr')).toHaveLength(TECH_STACK.length);
     });
 });

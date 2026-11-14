@@ -326,101 +326,6 @@ a.sbdocs-a {
 
 
 /*
- * `.sb-plus-intro-mini-grid` was the other half of both of these selector lists.
- * #250 named it as 0 uses and #251 swept this file by hand and left it — which is the
- * whole argument for `check:docs-dead-selectors` existing. `Introduction.mdx` emits
- * `-mini-canvas`, `-mini-card`, `-mini-copy` and `-mini-title`, but never a `-mini-grid`
- * to hold them; the cards are laid out by `-sections-stack` below.
- */
-.sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
-  display: grid;
-  gap: var(--section-stack-md);
-  margin-top: var(--space-125);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-sections-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--section-stack-md);
-  margin-top: var(--space-125);
-}
-
-@media (min-width: 900px) {
-  .sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--inline-md);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--stack-md);
-}
-
-/* A color chip beside its token name. */
-.sbdocs .sb-plus-intro-page .sb-plus-intro-swatch {
-  display: inline-block;
-  inline-size: calc(var(--icon-sm) * 2);
-  block-size: var(--icon-sm);
-  border-radius: var(--radius-sm);
-  border: var(--border-default) solid var(--ds-border);
-}
-
-/* A boxed aside: a card, so its edge comes from elevation. */
-.sbdocs .sb-plus-intro-page .sb-plus-intro-box {
-  padding: var(--card-pad-default);
-  border-radius: var(--card-radius-compact);
-  background: var(--ds-surface-raised);
-  box-shadow: var(--ds-shadow-raised);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-card {
-  border-radius: var(--card-radius-compact);
-  background: var(--ds-surface-raised);
-  box-shadow: var(--ds-shadow-raised);
-  padding: var(--card-pad-default);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-title {
-  margin: 0;
-  font-weight: 600;
-  color: var(--ds-text);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-copy {
-  margin: var(--stack-sm) 0 var(--stack-lg);
-  font-size: var(--font-size-0875);
-  color: var(--ds-text-subtle);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .sbdocs.sbdocs-preview {
-  margin: 0 !important;
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story > div:first-child {
-  padding: 0 !important;
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .innerZoomElementWrapper > * {
-  border: none !important;
-}
-
-/*
  * Preview well: flatten inner Storybook Canvas chrome; outer card only.
  */
 .sbdocs .sb-ds-docs-preview-well .sbdocs.sbdocs-preview {
@@ -842,7 +747,6 @@ a.sbdocs-a {
 }
 
 /* Flush / custom wells: zero Storybook’s own padding (outer card supplies it). */
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story > div[scale="1"],
 .sbdocs .sb-ds-docs-preview-well .docs-story > div[scale="1"] {
   padding: 0 !important;
 }

@@ -6,38 +6,33 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 <FoundationHero
     kind="Get started"
     title="Develop"
-    summary="How to build PLUS UI from the components, tokens and patterns in this Storybook."
+    summary="How to build PLUS UI with components, tokens and templates."
 />
 
 <FoundationContents />
 
 <FoundationSection title="Start here">
 
-- Run Storybook locally: the steps are on <DocsLink id="get-started-about">About</DocsLink>.
-- Check that a component exists before you use it: `design-system/agent-views/components/index.md` is the generated list.
-- Import public components from the `@/components` barrel, never from a component's own folder.
-- Style with `--ds-*` tokens, never literal values: <DocsLink id="foundations-tokens-color">Tokens</DocsLink> lists every name.
-- Build new interactive behavior (open and closed state, focus, keyboard) on Base UI, styled on the tokens.
+- Run `npm install` and `npm run dev` to open Storybook at `localhost:4200`.
+- Check `design-system/agent-views/components/index.md` or run `npm run ds -- find <query>` before creating a component.
+- Import public components from `@/components` and patterns from `@/patterns`, never from a deep folder path.
+- Style with `--ds-*` and role tokens from <DocsLink id="foundations-tokens-color">Tokens</DocsLink>, never literal values.
+- Build new interactive behavior on <DocsLink id="tech-stack-base-ui">Base UI</DocsLink>, styled with tokens.
 
 </FoundationSection>
 
 <FoundationSection title="Pages">
 
-A new page starts from a template in <DocsLink id="templates-overview">Templates</DocsLink>, sits in a <DocsLink id="templates-frame">Frame</DocsLink> and is filled with <DocsLink id="templates-section">Sections</DocsLink>.
+Start a new page from a template in <DocsLink id="templates-overview">Templates</DocsLink>: place a <DocsLink id="templates-page">Page</DocsLink> inside a <DocsLink id="templates-frame">Frame</DocsLink> and fill it with <DocsLink id="templates-section">Sections</DocsLink>.
 
 </FoundationSection>
 
-<FoundationSection title="Generators">
+<FoundationSection title="Generators and checks">
 
-- `npm run regenerate` runs the generators in the order their inputs need, then the ratchets. Generated files are never edited by hand.
-- `node scripts/sync-storybook-sort.mjs` is run on its own after a taxonomy edit: it writes this sidebar's order from `storybook.taxonomy.json`.
-
-</FoundationSection>
-
-<FoundationSection title="Checks">
-
-- `npm run check:harness` says which generated file is stale.
-- `npm run check:storybook-categories` holds the sidebar sections, component groups and story titles to the taxonomy.
-- `DocumentedContract.stories.jsx` mounts every prop and variant the docs name, in a real browser. It runs with the Storybook tests and stays out of the sidebar.
+- `npm run regenerate` runs the generators in dependency order, then updates ratchets. Never hand-edit generated files.
+- `node scripts/sync-storybook-sort.mjs` regenerates the sidebar order from `storybook.taxonomy.json`.
+- `npm run check:harness` runs the repo's static checks and reports stale generated files.
+- `npm run check:storybook-categories` checks that sidebar sections, component folders and story titles match the taxonomy.
+- `DocumentedContract.stories.jsx` mounts every documented prop and variant in a real browser during Storybook test runs.
 
 </FoundationSection>

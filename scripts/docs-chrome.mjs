@@ -319,3 +319,43 @@ export function openAtTopFailures(rows) {
     .filter((r) => typeof r.scrollY !== 'number' || r.scrollY > 0)
     .map((r) => `${r.page}: opened ${typeof r.scrollY === 'number' ? `${Math.round(r.scrollY)}px down the page` : 'with no scroll reading'}; an open-by-default demo scrolled it on mount.`);
 }
+
+/**
+ * Whether a Playwright error came from a mid-measurement navigation tearing
+ * down the document's JS context (for example Vite's dev server reloading the
+ * page after optimizing a newly discovered dependency).
+ *
+ * @param {unknown} err
+ * @returns {boolean}
+ */
+export function isContextDestroyedError(err) {
+  const message = String(err?.message ?? err ?? '');
+  return (
+    message.includes('Execution context was destroyed') ||
+    message.includes('Cannot find context with specified id') ||
+    message.includes('interrupted by another navigation')
+  );
+}
+
+/**
+ * Runs a page measurement `measure`, retrying up to `retries` times when a
+ * navigation destroys the execution context mid-read. Calls `settle` before
+ * each retry so the reload finishes before re-measuring; non-reload errors and
+ * real measurement mismatches pass straight through.
+ *
+ * @template T
+ * @param {() => Promise<T>} measure
+ * @param {() => Promise<void>} settle
+ * @param {{ retries?: number }} [options]
+ * @returns {Promise<T>}
+ */
+export async function measureWithReloadRetry(measure, settle, { retries = 2 } = {}) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await measure();
+    } catch (err) {
+      if (attempt >= retries || !isContextDestroyedError(err)) throw err;
+      await settle();
+    }
+  }
+}
