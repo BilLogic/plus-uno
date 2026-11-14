@@ -33,34 +33,100 @@ const layersOf = (el) => parseShadow(getComputedStyle(el).boxShadow).length;
 
 /* ------------------------------------------------------------ overview */
 
-/** One screen, taken apart into its layers and put back together. */
+/** One screen, taken apart into its layers: an exploded view on the docs' flat turn. */
 export const Stack = {
     render: () => <ExplodedStack />,
     play: async ({ canvasElement }) => {
         const root = canvasElement.querySelector('[data-testid="exploded-stack"]');
-        // Seven plates, each drawn from the illustration kit, with no words inside the figure:
-        // the names and the --layer-* values live in the numbered legend beside it.
-        const plates = root.querySelectorAll('[data-plate]');
-        await expect(plates).toHaveLength(7);
-        for (const plate of plates) await expect(plate.querySelector('svg text'), `${plate.dataset.plate} draws no words`).toBeNull();
-        // Flat, front-on: no 3D transform anywhere in the figure.
+        // Seven plates, bottom first, each drawn from the illustration kit with no words:
+        // the names and the --layer-* values live in the labels beside it.
+        const plates = [...root.querySelectorAll('[data-plate]')];
+        await expect(plates.map((p) => p.dataset.plate)).toEqual(['frame', 'page', 'card', 'popup', 'backdrop', 'modal', 'tooltip']);
+        for (const plate of plates) await expect(plate.querySelector('svg text, text'), `${plate.dataset.plate} draws no words`).toBeNull();
+        // Flat turn, no perspective: every plate wears the same skew, and none is 3D.
         await expect(root.querySelector('[style*="preserve-3d"], [style*="rotateX"]')).toBeNull();
-        // The top plate is the Tooltip, and it is a label: its drawing carries no shadow filter.
-        await expect(plates[6].dataset.plate).toBe('tooltip');
-        await expect(plates[6].querySelector('[filter], filter')).toBeNull();
+        const turns = plates.map((p) => p.querySelector('[data-turn]').getAttribute('transform').replace(/translate\([^)]*\)\s*/, ''));
+        await expect(new Set(turns).size, 'one skew for every plate').toBe(1);
+        await expect(turns[0]).toBe('skewY(-12) scale(0.8 1)');
+        // Evenly spaced up the figure, once the rise has landed.
+        await waitFor(() => {
+            const origins = plates.map((p) => p.querySelector('[data-turn]').getAttribute('transform').match(/translate\(([-\d.]+) ([-\d.]+)\)/).slice(1).map(Number));
+            const steps = origins.slice(1).map(([x, y], i) => [x - origins[i][0], y - origins[i][1]]);
+            for (const [dx, dy] of steps) {
+                expect(dx).toBeCloseTo(steps[0][0], 3);
+                expect(dy).toBeCloseTo(steps[0][1], 3);
+            }
+            expect(steps[0][1]).toBeLessThan(0);
+        });
+        // Each plate above the Frame joins its subject to the plate below with dashed accent leaders.
+        for (const plate of plates.slice(1)) {
+            await expect(root.querySelectorAll(`[data-leader="${plate.dataset.plate}"]`).length, `${plate.dataset.plate} leaders`).toBeGreaterThan(0);
+        }
+        await expect(root.querySelectorAll('[data-leader="frame"]')).toHaveLength(0);
+        // A leader joins a point to the same spot on the plate below, so it runs exactly one step back down.
+        await waitFor(() => {
+            const [a0, a1] = [0, 1].map((i) => plates[i].querySelector('[data-turn]').getAttribute('transform').match(/translate\(([-\d.]+) ([-\d.]+)\)/).slice(1).map(Number));
+            for (const line of root.querySelectorAll('[data-leader]')) {
+                const n = (k) => Number(line.getAttribute(k));
+                expect(n('x1') - n('x2')).toBeCloseTo(a1[0] - a0[0], 3);
+                expect(n('y1') - n('y2')).toBeCloseTo(a1[1] - a0[1], 3);
+            }
+        });
+        // A layer with a shadow draws it with its real token; the Tooltip is a label and has none.
+        const shadowOf = (id) => root.querySelector(`[data-plate="${id}"] foreignObject div`)?.style.boxShadow ?? '';
+        await expect(shadowOf('card')).toBe('var(--ds-shadow-raised)');
+        await expect(shadowOf('popup')).toBe('var(--ds-shadow-overlay)');
+        await expect(shadowOf('modal')).toBe('var(--ds-shadow-blocking)');
+        await expect(plates[6].querySelector('[style*="box-shadow"]')).toBeNull();
+        // Labels read top first, in the DOM as on screen.
+        await expect([...root.querySelectorAll('[data-legend]')].map((li) => li.dataset.legend)).toEqual(['tooltip', 'modal', 'backdrop', 'popup', 'card', 'page', 'frame']);
+
         const legend = within(root.querySelector('[data-testid="stack-legend"]'));
         await waitFor(() => expect(legend.getByText(/--layer-modal \d+/)).toBeInTheDocument());
         await expect(legend.getByText('Backdrop')).toBeInTheDocument();
         await waitFor(() => expect(legend.getByText(/--layer-tooltip \d+/)).toBeInTheDocument());
         await expect(legend.getAllByRole('listitem')).toHaveLength(7);
-        // Each annotation names its shadow; the Tooltip has none.
-        await expect(legend.getByText('blocking shadow', { selector: '[data-legend="modal"] span' })).toBeInTheDocument();
+        // Each label names its shadow; the Tooltip has none.
+        await expect(legend.getByText('--ds-shadow-blocking', { selector: '[data-legend="modal"] span' })).toBeInTheDocument();
         await expect(legend.getByText('blanket fill', { selector: '[data-legend="backdrop"] span' })).toBeInTheDocument();
         await expect(legend.getByText('no shadow', { selector: '[data-legend="tooltip"] span' })).toBeInTheDocument();
         // Card is raised with no layer: --layer-card belongs to sticky headers and columns.
-        const cardRow = legend.getByText('Card').parentElement;
-        await expect(cardRow).toHaveTextContent(/no layer\s*raised shadow/);
+        await expect(root.querySelector('[data-legend="card"]')).toHaveTextContent(/no layer\s*--ds-shadow-raised/);
         await expect(legend.queryByText(/--layer-card/)).toBeNull();
+
+        // One pair is active at a time, the top one by default; a label and its plate turn accent together.
+        const active = () => root.querySelector('[data-active="true"][data-legend]')?.dataset.legend;
+        const activePlate = () => root.querySelector('[data-plate][data-active="true"]')?.dataset.plate;
+        await expect(active()).toBe('tooltip');
+        await expect(activePlate()).toBe('tooltip');
+        await userEvent.hover(root.querySelector('[data-legend="card"]'));
+        await waitFor(() => expect(active()).toBe('card'));
+        await expect(activePlate()).toBe('card');
+        await userEvent.hover(root.querySelector('[data-plate="popup"]'));
+        await waitFor(() => expect(activePlate()).toBe('popup'));
+        await expect(active()).toBe('popup');
+        // By keyboard: each label is a stop, and focus activates its pair.
+        root.querySelector('[data-legend="modal"] button').focus();
+        await waitFor(() => expect(active()).toBe('modal'));
+        await expect(activePlate()).toBe('modal');
+        await expect(root.querySelector('[data-legend="modal"] button')).toHaveAttribute('aria-current', 'true');
+    },
+};
+
+/** Narrow: the figure scales down and the labels move under the plates as a list. */
+export const StackNarrow = {
+    render: () => (
+        <div style={{ inlineSize: 360 }}>
+            <ExplodedStack />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const root = canvasElement.querySelector('[data-testid="exploded-stack"]');
+        await waitFor(() => expect(root).toHaveAttribute('data-layout', 'list'));
+        const figure = root.querySelector('svg').getBoundingClientRect();
+        const legend = root.querySelector('[data-testid="stack-legend"]').getBoundingClientRect();
+        await expect(legend.top).toBeGreaterThanOrEqual(figure.bottom - 1);
+        await expect(root.querySelectorAll('[data-tick]')).toHaveLength(0);
     },
 };
 

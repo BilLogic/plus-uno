@@ -19,6 +19,7 @@ import {
 } from '../illustrations/primitives.jsx';
 import { HeroDrawing, FRAME_UNITS, HERO_SIDEBAR_W, STAGE_UNITS } from './HeroDrawing.jsx';
 import { AppWindow } from './HeroWindow.jsx';
+import { TURN, turnTransform } from '../lib/iso-turn.js';
 
 /**
  * The Templates heroes: each template's anatomy blocked out, with the template
@@ -64,7 +65,6 @@ const WHOLE = {
  * a step higher. Units are the kit's, from the stage's corner.
  */
 const PLATE = { w: 160, h: 115 };
-const TURN = { skew: -12, scaleX: 0.8 };
 const CENTER_STEP = 75;
 /** The Page's content inset, and the rows' inset inside the Section. */
 const PAGE_PAD = 11;
@@ -88,7 +88,7 @@ export const PLATES = PARTS.map((part, i) => {
 const Plate = ({ i, children }) => {
     const { name, x, y } = PLATES[i];
     return (
-        <g data-plate={name} transform={`translate(${x} ${y}) skewY(${TURN.skew}) scale(${TURN.scaleX} 1)`}>
+        <g data-plate={name} transform={turnTransform(x, y)}>
             {children}
         </g>
     );
