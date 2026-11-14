@@ -3,7 +3,7 @@ import { animate } from 'motion';
 import { useReducedMotion } from 'motion/react';
 
 import { Button, IconButton } from '@/components';
-import { VerdictTag } from '@/storybook-docs/foundation-blocks.jsx';
+import { DoDontCaption } from '@/storybook-docs/ds-docs-layout.jsx';
 
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { measureSpring, springStep } from '@/tokens/spring.js';
@@ -369,20 +369,28 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
           )}
         </Illustration>
       </div>
-      <figcaption
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          gap: 'var(--stack-sm)',
-          font: 'var(--body-small)',
-          color: 'var(--ds-text-subtle)',
-          marginBlockEnd: 'var(--stack-md)',
-        }}
-      >
-        {scene.verdict && <VerdictTag tone={scene.verdict} />}
-        <span>{scene.caption}</span>
-      </figcaption>
+      {scene.verdict ? (
+        <DoDontCaption
+          tone={scene.verdict}
+          style={{ marginBlockStart: 'var(--stack-lg)', marginBlockEnd: 'var(--stack-md)' }}
+        >
+          {scene.caption}
+        </DoDontCaption>
+      ) : (
+        <figcaption
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: 'var(--stack-sm)',
+            font: 'var(--body-small)',
+            color: 'var(--ds-text-subtle)',
+            marginBlockEnd: 'var(--stack-md)',
+          }}
+        >
+          <span>{scene.caption}</span>
+        </figcaption>
+      )}
     </figure>
   );
 };
