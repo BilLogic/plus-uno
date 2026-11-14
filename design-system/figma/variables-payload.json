@@ -691,6 +691,13 @@
           }
         },
         {
+          "name": "Choice/tile-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--choice-tile-width)"
+          }
+        },
+        {
           "name": "Radio/control-size",
           "resolvedType": "FLOAT",
           "codeSyntax": {

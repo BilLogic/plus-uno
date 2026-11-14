@@ -159,3 +159,117 @@
 .plus-form-radio[data-readonly]:not([data-checked]) {
     background-color: var(--ds-background-neutral);
 }
+
+// Choice tile (pick one): centered illustration, label, description in a 224px
+// surface. Selection is carried by the 2px selected border and selected fill,
+// with no visible radio dot; focus draws a 2px ring outside the tile.
+.plus-form-radio-wrapper.plus-choice-tile {
+    width: var(--choice-tile-width);
+    padding: var(--card-pad-default) var(--pad-x-lg);
+    border: var(--border-default) solid var(--ds-border);
+    border-radius: var(--radius-control-md);
+    background-color: var(--ds-surface);
+    align-items: center;
+    text-align: center;
+    gap: var(--stack-sm);
+    position: relative;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+    .plus-choice-tile-illustration {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: var(--stack-sm);
+    }
+
+    .plus-form-radio-row {
+        justify-content: center;
+        min-height: 0;
+        gap: 0;
+    }
+
+    // Visually hidden, never display:none, so keyboard roving tabindex and
+    // screen-reader radio semantics remain intact with no visible dot.
+    .plus-form-radio {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        min-width: 0;
+        min-height: 0;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        border: 0;
+        opacity: 0;
+        pointer-events: none;
+
+        &:focus,
+        &:focus-visible,
+        &[data-focus-visible] {
+            @include plus-ring-reset;
+        }
+    }
+
+    .plus-form-radio-label {
+        font-weight: var(--type-weight-medium);
+    }
+
+    .plus-field-caption {
+        padding-left: 0;
+        justify-content: center;
+        text-align: center;
+
+        .plus-field-caption__message {
+            justify-content: center;
+        }
+    }
+
+    &:has(.plus-form-radio[data-checked]):not(.plus-field-stack--disabled) {
+        background-color: var(--ds-background-selected);
+        border-width: var(--border-selected);
+        border-color: var(--ds-border-selected);
+        padding: calc(var(--card-pad-default) - var(--border-selected) + var(--border-default)) calc(var(--pad-x-lg) - var(--border-selected) + var(--border-default));
+    }
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-surface-hovered), border-color: var(--ds-border-brand)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover:not(.plus-field-stack--disabled):not(.plus-choice-readonly):not(:has(.plus-form-radio[data-checked]))'
+    );
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-selected-hovered), border-color: var(--ds-border-selected)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:has(.plus-form-radio[data-checked]):hover:not(.plus-field-stack--disabled):not(.plus-choice-readonly)'
+    );
+
+    &:has(.plus-form-radio:focus-visible),
+    &:has(.plus-form-radio[data-focus-visible]) {
+        @include plus-ring;
+    }
+
+    &.plus-form-radio-invalid:not(:has(.plus-form-radio[data-checked])):not(.plus-field-stack--disabled) {
+        border-color: var(--ds-border-danger);
+    }
+
+    &.plus-choice-readonly {
+        cursor: default;
+
+        &:not(:has(.plus-form-radio[data-checked])) {
+            background-color: var(--ds-background-neutral);
+        }
+    }
+
+    &.plus-field-stack--disabled {
+        cursor: not-allowed;
+        background-color: var(--ds-background-disabled);
+        border-color: var(--ds-border-disabled);
+    }
+}

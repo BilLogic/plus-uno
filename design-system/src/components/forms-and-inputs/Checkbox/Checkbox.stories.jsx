@@ -6,9 +6,9 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Checkbox from './Checkbox';
-import { Fieldset } from '@/components';
+import { CheckboxGroup as CheckboxGroupComponent, Illustration } from '@/components';
 export default {
-    title: 'Components/Forms and inputs/Checkbox',
+    title: 'Components/Forms and inputs/Checkbox/Checkbox',
     component: Checkbox,
     tags: ['!dev', '!autodocs'],
     parameters: {
@@ -27,6 +27,11 @@ export default {
             control: 'text',
             description: 'Text that names the checkbox',
             table: { category: 'Content' },
+        },
+        appearance: {
+            control: 'select',
+            options: ['plain', 'card', 'tile'],
+            table: { category: 'Design' },
         },
         isChecked: { table: { disable: true, category: 'Development' } },
         isIndeterminate: {
@@ -155,7 +160,7 @@ SelectAll.play = async ({ canvasElement }) => {
     await expect(all.getAttribute('aria-checked')).toBe('true');
 };
 
-/** Checkbox group: Checkboxes inside a Fieldset with a legend, picking any number. */
+/** Checkbox group: CheckboxGroup renders a Fieldset with a legend, picking any number. */
 export const CheckboxGroup = () => {
     const [picked, setPicked] = useState([]);
     const options = [
@@ -163,23 +168,16 @@ export const CheckboxGroup = () => {
         { value: 'more-students', label: 'More students than expected' },
         { value: 'schedule-change', label: 'Schedule changed' },
     ];
-    const toggle = (value, checked) => {
-        setPicked((prev) => (checked ? [...prev, value] : prev.filter((v) => v !== value)));
-    };
     return (
         <div style={stack}>
-            <Fieldset legend="Reason for request" isRequired>
-                {options.map((option) => (
-                    <Checkbox
-                        key={option.value}
-                        name="checkbox-group-overview"
-                        value={option.value}
-                        label={option.label}
-                        isChecked={picked.includes(option.value)}
-                        onChange={(event) => toggle(option.value, event.target.checked)}
-                    />
-                ))}
-            </Fieldset>
+            <CheckboxGroupComponent
+                name="checkbox-group-overview"
+                legend="Reason for request"
+                options={options}
+                value={picked}
+                onChange={setPicked}
+                isRequired
+            />
             <p className="body-default" style={{ margin: 0 }} data-testid="checkbox-group-value">Picked: {picked.join(', ') || 'none'}</p>
         </div>
     );
@@ -412,4 +410,34 @@ export const Card = {
     play: async ({ canvasElement }) => {
         await expect(box(canvasElement, 'Text reminders')).toHaveAttribute('aria-checked', 'true');
     },
+};
+
+export const Tile = () => (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)' }}>
+        <Checkbox
+            id="cb-ex-tile-on"
+            name="cb-ex-tile"
+            label="Mastering content"
+            description="Build concept fluency."
+            illustration={<Illustration character="mastering-content" size={96} />}
+            appearance="tile"
+            defaultChecked
+        />
+        <Checkbox
+            id="cb-ex-tile-off"
+            name="cb-ex-tile"
+            label="Student advocacy"
+            description="Coach students to ask questions."
+            illustration={<Illustration character="advocacy" size={96} />}
+            appearance="tile"
+        />
+    </div>
+);
+Tile.play = async ({ canvasElement }) => {
+    const first = box(canvasElement, 'Mastering content');
+    const tile = first.closest('.plus-choice-tile');
+    await expect(px(getComputedStyle(tile).width)).toBe(224);
+    await expect(px(getComputedStyle(tile).borderTopWidth)).toBe(2);
+    await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    await expect(tile.querySelector('.plus-choice-tile-illustration')).toHaveAttribute('aria-hidden', 'true');
 };

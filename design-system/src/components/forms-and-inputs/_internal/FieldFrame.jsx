@@ -173,6 +173,7 @@ export const FieldFrame = ({
     invalid,
     dirty,
     touched,
+    onClick,
     className = '',
     style,
     children,
@@ -182,7 +183,7 @@ export const FieldFrame = ({
         invalid={invalid}
         dirty={dirty}
         touched={touched}
-        render={<div className={`plus-field-stack${disabled ? ' plus-field-stack--disabled' : ''} ${className}`.trim()} style={style} />}
+        render={<div className={`plus-field-stack${disabled ? ' plus-field-stack--disabled' : ''} ${className}`.trim()} style={style} onClick={onClick} />}
     >
         {children}
     </Field.Root>
@@ -196,6 +197,7 @@ FieldFrame.propTypes = {
     dirty: PropTypes.bool,
     /** Reported by the host, when it tracks it; drawn as `data-touched`. */
     touched: PropTypes.bool,
+    onClick: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object,
     children: PropTypes.node,

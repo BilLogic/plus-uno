@@ -280,7 +280,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx",
-        "storybookId": "components-forms-and-inputs-checkbox--docs"
+        "storybookId": "components-forms-and-inputs-checkbox-checkbox--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
