@@ -51,8 +51,10 @@ A form lives in one of four hosts. The <a target="_top" href="./?path=/docs/temp
 <TypeCard of={FormsStories.HostPage} title="In a page" stage={PAGE_WIDTH}>Settings and anything saved as a group. Buttons left-aligned under the fields.</TypeCard>
 <TypeCard of={FormsStories.HostPanel} title="In a Panel" stage={STAGE}>A short edit from a table, with the page in view. Cancel and Save full bleed at the bottom.</TypeCard>
 <TypeCard of={FormsStories.HostModal} title="In a Modal" stage={STAGE}>A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col.</TypeCard>
-<TypeCard of={FormsStories.HostSteps} title="In steps" stage={STAGE}>A long task on Frame · focused: steps down the left side when there are five or more.</TypeCard>
+<TypeCard of={FormsStories.HostSteps} title="In steps" stage={STAGE}>A stepped task on Frame · focused: dots above one question under five steps, or the left step list at five or more.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={FormsStories.OneQuestionPerStep} title="One question per step" description="In steps on Frame · focused for sign-up, training check-ins and site setup: ProgressIndicator dots centered above the question under five steps (the host's left step list at five or more), a heading and one line, pictured RadioGroup or CheckboxGroup tiles, and Back (Subtle) and Continue (Primary) centered below. Continue stays enabled and validates on press." />
 
 </div>
 
@@ -127,6 +129,7 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 <tr><td>is a short edit of a row, with the page still in view</td><td>In a Panel · Details</td><td>Cancel and Save full bleed at the bottom</td></tr>
 <tr><td>is rare and critical, with fewer than five fields</td><td>In a Modal, 8-col</td><td>Cancel (Default) and the action, full bleed</td></tr>
 <tr><td>is long, or has sections someone works through</td><td>In steps on Frame · focused</td><td>Cancel (Subtle) left; Back and Next full bleed right</td></tr>
+<tr><td>asks one big question per step (sign-up, check-in, site setup)</td><td>In steps on Frame · focused</td><td>Back (Subtle) and Continue (Primary) centered under the tiles</td></tr>
 <tr><td>asks for one value read far more than changed</td><td>Inline edit on the record</td><td>None; it saves on its own</td></tr>
 </tbody>
 </DocsTable>
@@ -216,6 +219,12 @@ The form's title is the page, Panel or Modal heading. Groups take a `Fieldset` l
 
 `autoComplete` on name, email, phone and address fields. Prefill what is already known, such as the student picked from a row.
 
+### Center dots above a single-question step under five steps.
+
+<RuleTag kind="automatic" />
+
+When the In steps host asks one focal question per step with two to four pictured `RadioGroup` or `CheckboxGroup` tiles, center `ProgressIndicator` dots above the heading while there are fewer than five steps, and center Back (Subtle) and Continue (Primary) under the tiles. At five steps or more, switch to the host's left step list. Continue stays enabled and validates on press.
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -261,7 +270,8 @@ The form's title is the page, Panel or Modal heading. Groups take a `Fieldset` l
 <tbody>
 <tr><td>Fields</td><td><a target="_top" href="./?path=/docs/templates-form--docs">Form</a> template</td><td>There is no Form component: a Fieldset groups the fields inside a host.</td></tr>
 <tr><td>Rejection at the top</td><td>`SectionMessage`</td><td>A danger message, scrolled into view.</td></tr>
-<tr><td>Choices</td><td>`RadioGroup`, `Select`, `DatePicker`</td><td>A control that cannot be wrong.</td></tr>
+<tr><td>Choices</td><td>`RadioGroup`, `CheckboxGroup`, `Select`, `DatePicker`</td><td>A control that cannot be wrong; pictured tiles for one big question per step.</td></tr>
+<tr><td>Step progress</td><td>`ProgressIndicator`, `ProgressTracker`</td><td>Dots centered above a single-question step under five steps; the left step list at five or more.</td></tr>
 <tr><td>Hosts</td><td><a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a>, <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a>, <a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a></td><td>A page (on the Page itself, no Section around it), a Panel, a Modal, or steps on Frame · focused.</td></tr>
 <tr><td>Confirm view</td><td>Modal</td><td>Swapped in place today. <PlannedTag /> A confirm view prop is Planned.</td></tr>
 </tbody>
