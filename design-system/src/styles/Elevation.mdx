@@ -202,11 +202,15 @@ It grows one to one with the scroll position, with no spring token of its own.
 
 <FoundationSubsection title="Lift with shadow, not a darker fill">
 
+A lifted surface gets its height from its shadow; a darker fill reads as a different surface.
+
 <Canvas of={ElevationStories.LiftWithShadow} sourceState="none" />
 
 </FoundationSubsection>
 
 <FoundationSubsection title="No border on a lifted surface">
+
+The shadow's edge slot is the border, so a drawn border doubles it.
 
 <Canvas of={ElevationStories.NoBorder} sourceState="none" />
 
@@ -214,11 +218,15 @@ It grows one to one with the scroll position, with no spring token of its own.
 
 <FoundationSubsection title="Pair the surface with its shadow">
 
+A level's surface and shadow travel together.
+
 <Canvas of={ElevationStories.AlwaysPair} sourceState="none" />
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Blocking only on the Backdrop">
+
+The blocking shadow belongs to the Modal over its Backdrop, and nothing else.
 
 <Canvas of={ElevationStories.BlockingOnBackdrop} sourceState="none" />
 
@@ -226,17 +234,23 @@ It grows one to one with the scroll position, with no spring token of its own.
 
 <FoundationSubsection title="Sunken never floats">
 
+A sunken surface is a ground, so it sits behind the work and never lifts.
+
 <Canvas of={ElevationStories.SunkenNeverFloats} sourceState="none" />
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Keep the Tooltip flat">
 
+A Tooltip is a label, so it has no shadow.
+
 <Canvas of={ElevationStories.TooltipFlat} sourceState="none" />
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Raise one focal point">
+
+Raise the one object a person acts on; a page of raised cards has no focus.
 
 <Canvas of={ElevationStories.OneFocalPoint} sourceState="none" />
 
