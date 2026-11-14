@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import PatternTable from '@/patterns/PatternTable';
 import Pagination from '@/components/navigation/Pagination';
+import Select from '@/components/forms-and-inputs/Select';
 import Spinner from '@/components/loading/Spinner';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
@@ -54,7 +55,7 @@ const deriveState = (state, isLoading, rowCount) => {
 
 /**
  * Dynamic table. A table people sort, page or act on, built on the
- * `PatternTable` shell: its `pagination` and `emptyState` slots,
+ * `PatternTable` shell: its `footer` and `emptyState` slots,
  * sortable `HeadCell`s in the head row and the shared `TableRow` and
  * `TableCell` parts in the body.
  *
@@ -94,12 +95,33 @@ const deriveState = (state, isLoading, rowCount) => {
  *   content, unless a head cell sets `width`; `isFixedSize` holds every column
  *   to its set width.
  */
+/** Whether the window is under the 768 desktop floor, where the footer drops its range. */
+const NARROW_QUERY = '(max-width: 767.98px)';
+const useNarrow = () => {
+    const [narrow, setNarrow] = useState(() => (
+        typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        && window.matchMedia(NARROW_QUERY).matches
+    ));
+    useEffect(() => {
+        if (typeof window.matchMedia !== 'function') return undefined;
+        const query = window.matchMedia(NARROW_QUERY);
+        const update = () => setNarrow(query.matches);
+        update();
+        query.addEventListener('change', update);
+        return () => query.removeEventListener('change', update);
+    }, []);
+    return narrow;
+};
+
 const DynamicTable = ({
     head,
     rows = [],
     caption,
     label,
     rowsPerPage,
+    rowsPerPageOptions,
+    onRowsPerPageChange,
+    noun,
     page: pageProp,
     defaultPage = 1,
     onSetPage,
@@ -205,14 +227,28 @@ const DynamicTable = ({
         loading: <><span aria-hidden="true"><Spinner size={24} /></span><span>Loading rows</span></>,
     }[bodyState];
 
+    const narrow = useNarrow();
+    const rangeText = `${total === 0 ? 0 : start + 1}–${Math.min(start + rowsPerPage, total)} of ${total}${noun ? ` ${noun}` : ''}`;
+    // One page shows the count alone: a pager that does nothing is not drawn.
+    const pageSizeSelect = rowsPerPageOptions && onRowsPerPageChange ? (
+        <Select
+            spacing="compact"
+            isSearchable={false}
+            aria-label="Rows per page"
+            value={rowsPerPage}
+            options={rowsPerPageOptions.map((size) => ({ value: size, label: `${size} / page` }))}
+            onChange={(next) => onRowsPerPageChange(Number(next))}
+        />
+    ) : null;
     const footer = rowsPerPage && !showsMessage ? (
-        <TableFooter range={`${total === 0 ? 0 : start + 1}–${Math.min(start + rowsPerPage, total)} of ${total}`}>
+        <TableFooter range={narrow ? null : rangeText}>
+            {pageSizeSelect}
             {pages > 1 && (
                 <Pagination
                     currentPage={currentPage}
                     totalPages={pages}
                     onPageChange={handlePage}
-                    spacing="compact"
+                    navigator={narrow ? 'text' : 'icon'}
                     // Two tables on a page need two pager landmarks with different names.
                     label={label ? `${label} pages` : undefined}
                 />
@@ -236,7 +272,7 @@ const DynamicTable = ({
             {...props}
         >
             <PatternTable
-                pagination={footer}
+                footer={footer}
                 empty={showsMessage}
                 stickyHeader={stickyHeader}
                 stickyColumn={isFrozen}
@@ -396,6 +432,12 @@ DynamicTable.propTypes = {
     label: PropTypes.string,
     /** Rows per page; leave it out and the table does not page. */
     rowsPerPage: PropTypes.number,
+    /** Page sizes offered in the footer's "25 / page" Select; with `onRowsPerPageChange`. */
+    rowsPerPageOptions: PropTypes.arrayOf(PropTypes.number),
+    /** Called with the chosen page size. */
+    onRowsPerPageChange: PropTypes.func,
+    /** The table's noun in the footer range, "1–25 of 140 sessions". */
+    noun: PropTypes.string,
     /** The current page, owned by the page (stateless). */
     page: PropTypes.number,
     /** The first page when the table holds its own page. */
