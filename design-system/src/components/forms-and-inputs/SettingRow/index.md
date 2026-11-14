@@ -6,6 +6,8 @@ SettingRow — puts a setting's name and one-line description at the start and i
 
 **Import:** `import { SettingRow } from '@/components';`
 
+**Governed by:** Forms (`ds guide forms`)
+
 **Source:** `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.stories.jsx` — Overview, ToggleControl, SelectControl, ConnectionRow, Rest, Saving, Saved, ErrorState, DisabledWithReason, ReadOnly, Motion, Interactive

@@ -128,7 +128,9 @@ test('the first find on a fresh lookup, index build included, takes under 300 ms
     const start = performance.now();
     const { results } = lookup.find('confirm before deleting');
     samples.push(performance.now() - start);
-    assert.equal(results[0].name, 'Modal');
+    // The governing pattern ranks first (spec #2550); the component it names follows.
+    assert.equal(results[0].name, 'Common actions');
+    assert.ok(results.some((r) => r.name === 'Modal'), 'Modal still in the answer');
   }
   const ms = Math.min(...samples);
   assert.ok(ms < 300, `the fastest of five first finds took ${ms.toFixed(0)} ms (${samples.map((t) => t.toFixed(0)).join(', ')})`);

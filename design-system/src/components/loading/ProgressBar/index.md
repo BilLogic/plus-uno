@@ -8,6 +8,8 @@ Also asked as: percent complete, determinate loading.
 
 **Import:** `import { ProgressBar } from '@/components';`
 
+**Governed by:** Indicators (`ds guide indicators`); Loading (`ds guide loading`)
+
 **Source:** `design-system/src/components/loading/ProgressBar/ProgressBar.jsx`
 
 **Stories:** `design-system/src/components/loading/ProgressBar/ProgressBar.stories.jsx` — Overview, Appearances, Default, Success, Inverse, WithACaption, Indeterminate, Interactive, Rest, Hovered, Pressed, Focused

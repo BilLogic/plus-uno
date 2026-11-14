@@ -8,6 +8,8 @@ Also asked as: multi-select, checklist, tick box.
 
 **Import:** `import { Checkbox } from '@/components';`
 
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card, Tile

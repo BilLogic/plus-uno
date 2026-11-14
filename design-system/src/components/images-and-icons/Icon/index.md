@@ -6,6 +6,10 @@ One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: reg
 
 **Import:** `import { Icon } from '@/components';`
 
+**Used in:** Frame (`ds guide frame`); Modal (`ds guide modal`); Section (`ds guide section`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Errors (`ds guide errors`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/images-and-icons/Icon/Icon.jsx`
 
 **Stories:** `design-system/src/components/images-and-icons/Icon/Icon.stories.jsx` — Names, Styles, Sizes, Colors, Inherited, Labeled, InAComponent, Interactive, Rest

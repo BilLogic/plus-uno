@@ -8,6 +8,10 @@ Also asked as: rows and columns, grid.
 
 **Import:** `import { Table } from '@/components';`
 
+**Used in:** Modal (`ds guide modal`); Section (`ds guide section`); Table (`ds guide table`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/text-and-data-display/Table/Table.jsx`
 
 **Storybook page:** `design-system/src/components/text-and-data-display/Table/StaticTable.mdx`

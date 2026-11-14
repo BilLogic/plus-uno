@@ -8,6 +8,10 @@ Also asked as: summary card, object card.
 
 **Import:** `import { PatternCard } from '@/patterns';`
 
+**Used in:** Form (`ds guide form`); Card (`ds guide card`); Section (`ds guide section`); Table (`ds guide table`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`)
+
 **Source:** `design-system/src/patterns/PatternCard/PatternCard.jsx`
 
 **Stories:** `design-system/src/patterns/PatternCard/PatternCard.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, SizeSmall, SizeMedium, SizeLarge, ImageWide, ImageStandard, ImageSquare, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, Static, Clickable, Dragging, LoadingCard, Rows, PlacementBoundary

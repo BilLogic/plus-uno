@@ -8,6 +8,8 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Import:** `import { Flag } from '@/components';`
 
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
 **Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, UndoTimer, FlagContent, UnknownAppearance, ActionKinds, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced, MotionOpenClose, MotionReduced, MotionExitCompletes, MotionQueueStack, MotionQueueStackReduced

@@ -8,6 +8,10 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 **Import:** `import { DropdownMenu } from '@/components';`
 
+**Used in:** Popup (`ds guide popup`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Loading (`ds guide loading`)
+
 **Source:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, DisabledRowWithReason, HoveredState, KeyboardFocus, OpenMenuEdge

@@ -8,6 +8,10 @@ Also asked as: dialog layout, confirm layout.
 
 **Import:** `import { PatternModal } from '@/patterns';`
 
+**Used in:** Form (`ds guide form`); Panel (`ds guide panel`); Card (`ds guide card`); Modal (`ds guide modal`); Popup (`ds guide popup`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/patterns/PatternModal/PatternModal.jsx`
 
 **Stories:** `design-system/src/patterns/PatternModal/PatternModal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthSmall, WidthMedium, WidthLarge, HugLong, HeightFill, TabsStill, Interactive, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, MotionOpenClose, MotionReduced

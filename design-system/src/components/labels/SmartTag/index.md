@@ -8,6 +8,8 @@ Also asked as: skill tag.
 
 **Import:** `import { SmartTag } from '@/components';`
 
+**Governed by:** Indicators (`ds guide indicators`)
+
 **Source:** `design-system/src/components/labels/SmartTag/SmartTag.jsx`
 
 **Stories:** `design-system/src/components/labels/SmartTag/SmartTag.stories.jsx` — Overview, CustomLabel, PassesThroughTagProps, UnknownSubjectFallsBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled

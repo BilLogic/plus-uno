@@ -6,6 +6,8 @@
 
 **Import:** `import { NotificationItem } from '@/components';`
 
+**Governed by:** Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/components/messaging/NotificationItem/NotificationItem.jsx`
 
 **Stories:** `design-system/src/components/messaging/NotificationItem/NotificationItem.stories.jsx` — Overview, Actors, Unread, Read, Hovered, Focused, Pressed, Motion, Interactive

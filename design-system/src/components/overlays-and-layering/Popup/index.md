@@ -8,6 +8,10 @@ Also asked as: popover, flyout, inline dialog.
 
 **Import:** `import { Popup } from '@/components';`
 
+**Used in:** Popup (`ds guide popup`)
+
+**Governed by:** Filtering (`ds guide filtering`); Loading (`ds guide loading`); Overflow (`ds guide overflow`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/overlays-and-layering/Popup/Popup.jsx`
 
 **Stories:** `design-system/src/components/overlays-and-layering/Popup/Popup.stories.jsx` — Layout, Content, InteractionStates, Overview, Interactive, Rest, Hovered, Pressed, Focused, Open, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, WidthAuto, WidthAutoCaps, WidthColumns, OpensWithAClip, KeyboardOpenIsInstant, OpensAndCloses, OpensOnTheMotionTokens, ReducedMotion, BodyOnly, TriggerClick, TriggerHover, TriggerFocus, TriggerHoverAndClick

@@ -6,6 +6,8 @@ InlineEdit — text that reads as text and becomes a field when it is pressed. T
 
 **Import:** `import { InlineEdit } from '@/components';`
 
+**Governed by:** Common actions (`ds guide common-actions`); Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+
 **Source:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.jsx`
 
 **Stories:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.stories.jsx` — Textfield, LeavingConfirms, KeepOpenOnBlur, Validation, FailedConfirm, WithoutButtons, StartsOpen, SameHeight, SpacingDefault, SpacingCompact, ButtonsDoNotMoveThePage, WithAnotherEditView, Placeholder, Interactive

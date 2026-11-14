@@ -92,7 +92,9 @@ Page.propTypes = {
     border: PropTypes.bool,
     /** Render element / component */
     as: PropTypes.elementType,
-    /** The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page. */
+    /** The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page.
+     * @ds-context Used in: Page.title (ds guide page)
+     */
     title: PropTypes.node,
     /** One PageHeader with the page's h1, actions and tabs. Replaces title. */
     header: PropTypes.node,
@@ -100,7 +102,9 @@ Page.propTypes = {
     banner: PropTypes.node,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** Content slot */
+    /** Content slot
+     * @ds-context Used in: Page.children (ds guide page)
+     */
     children: PropTypes.node,
 };
 

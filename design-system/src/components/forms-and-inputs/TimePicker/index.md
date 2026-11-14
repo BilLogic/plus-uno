@@ -8,6 +8,8 @@ Also asked as: time input, clock, time field, time selector.
 
 **Import:** `import { TimePicker } from '@/components';`
 
+**Governed by:** Read-only (`ds guide read-only`)
+
 **Source:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickTime, TwentyFourHourValueIsSplit, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, Interactive

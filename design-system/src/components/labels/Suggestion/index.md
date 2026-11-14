@@ -8,6 +8,8 @@ Also asked as: ai chip.
 
 **Import:** `import { Suggestion } from '@/components';`
 
+**Governed by:** Indicators (`ds guide indicators`)
+
 **Source:** `design-system/src/components/labels/Suggestion/Suggestion.jsx`
 
 **Stories:** `design-system/src/components/labels/Suggestion/Suggestion.stories.jsx` — Types, InATagRow, Callbacks, StateLayers, FocusRing, DisabledBesideTags, AcceptIntoTags, Interactive, Rest, Hovered, Pressed, Focused, Disabled

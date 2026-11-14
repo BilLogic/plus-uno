@@ -8,6 +8,8 @@ Also asked as: screen reader only, sr-only, assistive text, screen reader text.
 
 **Import:** `import { VisuallyHidden } from '@/components';`
 
+**Governed by:** Loading (`ds guide loading`)
+
 **Source:** `design-system/src/components/text-and-data-display/VisuallyHidden/VisuallyHidden.jsx`
 
 **Stories:** `design-system/src/components/text-and-data-display/VisuallyHidden/VisuallyHidden.stories.jsx` — Overview, NamesAControl, HiddenColumnHeaders, RoleAndId, Interactive

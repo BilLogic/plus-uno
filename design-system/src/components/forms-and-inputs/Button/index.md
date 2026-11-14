@@ -8,6 +8,10 @@ Also asked as: cta, submit.
 
 **Import:** `import { Button } from '@/components';`
 
+**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Panel (`ds guide panel`); Modal (`ds guide modal`); Section (`ds guide section`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Empty (`ds guide empty`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`); +1 more
+
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref

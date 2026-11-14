@@ -8,6 +8,10 @@ Also asked as: field group.
 
 **Import:** `import { Fieldset } from '@/components';`
 
+**Used in:** Form (`ds guide form`)
+
+**Governed by:** Forms (`ds guide forms`)
+
 **Source:** `design-system/src/components/forms-and-inputs/Fieldset.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/Fieldset.stories.jsx` — Default, CheckboxGroup, WithRequiredAndError, Required, Invalid, Disabled, Interactive

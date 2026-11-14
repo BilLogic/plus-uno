@@ -1,0 +1,170 @@
+[
+  {
+    "file": "design-system/src/patterns/Form/Form.mdx",
+    "title": "Templates/Form",
+    "categoryRoot": "Templates",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/patterns/Frame/Frame.mdx",
+    "title": "Templates/Frame",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/patterns/Frame/Frame.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/patterns/Page/Page.mdx",
+    "title": "Templates/Page",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/patterns/Page/Page.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/patterns/Panel/Panel.mdx",
+    "title": "Templates/Panel",
+    "categoryRoot": "Templates",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/patterns/PatternCard/PatternCard.mdx",
+    "title": "Templates/Card",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/patterns/PatternCard/PatternCard.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/patterns/PatternModal/PatternModal.mdx",
+    "title": "Templates/Modal",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/patterns/PatternModal/PatternModal.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/patterns/PatternSection/PatternSection.mdx",
+    "title": "Templates/Section",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/patterns/PatternSection/PatternSection.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/patterns/PatternTable/PatternTable.mdx",
+    "title": "Templates/Table",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/patterns/PatternTable/PatternTable.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/patterns/Popup/Popup.mdx",
+    "title": "Templates/Popup",
+    "categoryRoot": "Templates",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/CommonActions/CommonActions.mdx",
+    "title": "Patterns/Common actions",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Disabled/Disabled.mdx",
+    "title": "Patterns/States/Disabled",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Empty/Empty.mdx",
+    "title": "Patterns/States/Empty",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Errors/Errors.mdx",
+    "title": "Patterns/States/Errors",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx",
+    "title": "Patterns/Filtering",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Forms/Forms.mdx",
+    "title": "Patterns/Forms",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Indicators/Indicators.mdx",
+    "title": "Patterns/Indicators",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Loading/Loading.mdx",
+    "title": "Patterns/States/Loading",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Navigation/Navigation.mdx",
+    "title": "Patterns/Navigation",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Notifications/Notifications.mdx",
+    "title": "Patterns/Notifications",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Overflow/Overflow.mdx",
+    "title": "Patterns/States/Overflow",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/PatternsOverview.mdx",
+    "title": "Patterns/Overview",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/ReadOnly/ReadOnly.mdx",
+    "title": "Patterns/States/Read-only",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Search/Search.mdx",
+    "title": "Patterns/Search",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/templates/TemplatesOverview.mdx",
+    "title": "Templates/Overview",
+    "categoryRoot": "Templates",
+    "componentSource": null,
+    "componentName": null
+  }
+]

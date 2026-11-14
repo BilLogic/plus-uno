@@ -335,3 +335,44 @@ test('a get section is that part of the same text', () => {
   assert.ok(full.includes(a11y.slice(a11y.indexOf('## Accessibility'))));
   assert.doesNotMatch(full, /figma\.com|Next:/);
 });
+
+test('component lookups expose capped template and pattern back-edges in every answer', () => {
+  const full = lookup.get('SearchField').records[0];
+  assert.match(full.text, /\*\*Used in:\*\*.*Section/);
+  assert.match(full.text, /\*\*Governed by:\*\*.*Search/);
+  assert.match(lookup.get('SearchField', 'props').records[0].text, /\*\*Used in:\*\*.*Section/);
+  const line = render('find', lookup.find('SearchField')).split('\n')[0];
+  assert.match(line, /Used in:.*Section/);
+  assert.match(line, /Governed by:.*Search/);
+  assert.match(line, /Governed by:.*Filtering/);
+  assert.ok(line.length <= 160);
+  for (const line of full.text.split('\n').filter((l) => /^\*\*(Used in|Governed by):/.test(l))) assert.ok(line.length <= 400);
+});
+
+test('a brief or three component names returns a screen kit in one answer', () => {
+  for (const query of ['Build a student list screen with search and filters', 'Frame Sidebar Page PageHeader PatternSection PatternTable Panel']) {
+    const result = lookup.find(query);
+    assert.equal(result.kit.template.kind, 'template');
+    assert.ok(result.kit.patterns.length);
+    if (query.startsWith('Build')) assert.ok(result.kit.patterns.some((p) => p.name === 'Filtering'));
+    assert.ok(result.kit.components.length >= 3);
+    assert.ok(result.kit.tokenRoles.some((r) => r.role === 'stack' && r.steps.length));
+    const text = render('find', result);
+    for (const label of ['Template:', 'Patterns:', 'Components:', 'Token roles:']) assert.ok(text.includes(label), query);
+    assert.match(result.next, /template/i);
+  }
+  assert.equal(lookup.find('SearchField FilterButton').kit, undefined);
+});
+
+test('situation patterns lead their components and templates have their own result kind', () => {
+  for (const [query, name] of [['narrow a list', 'Filtering'], ['nothing to show', 'Empty'], ['confirm before deleting', 'Common actions']]) {
+    const first = lookup.find(query).results[0];
+    assert.equal(first.kind, 'pattern', query);
+    assert.equal(first.name, name, query);
+  }
+  assert.equal(lookup.find('Frame').results[0].kind, 'template');
+});
+
+test('a clean check names the template and pattern fit limit', () => {
+  assert.match(lookup.check({ code: 'export const value = 1;', path: 'prototypes/a.js' }).next, /[Tt]emplate.*pattern fit is not checked/);
+});

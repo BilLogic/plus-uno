@@ -8,6 +8,8 @@ Also asked as: date pill.
 
 **Import:** `import { DateTag } from '@/components';`
 
+**Governed by:** Indicators (`ds guide indicators`)
+
 **Source:** `design-system/src/components/labels/DateTag/DateTag.jsx`
 
 **Stories:** `design-system/src/components/labels/DateTag/DateTag.stories.jsx` — Overview, Styles, Truncation, NeverAButton, UnknownAppearanceFallsBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
