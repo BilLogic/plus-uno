@@ -21,6 +21,8 @@ Three jobs, three components. A category with a color is a Tag, not an indicator
 - **Change where up is bad.** Absences rose by 3: the value is up and the tone is danger, because the good direction is down.
 - **A roll-up.** A group's status shows the worst state among its children: danger over warning over information.
 
+A checklist tracks setup or compliance steps in three layouts: a dismissible card on Home, a persistent card in a page, and a compact summary at the foot of the Sidebar.
+
 ## Usage
 
 Use Indicators when something needs a small label that says how it is. Ask what the label says: a number is a Count tag; a condition that can change is a Status tag; how much a number moved is a Change tag; a subject, a person or a category is a Tag. Skip an indicator when no action follows from it; past five or six states, use text.
@@ -31,6 +33,7 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 | How many | Count tag | Subtle neutral; bold for action now; nothing at 0; a cap past `max` with "+" | "12", "99+" |
 | How much it moved | Change tag | Signed value, arrow, tone from the good direction; neutral when there is no judgment | "+3 vs last week" |
 | A category, a subject, a person | Tag | Outline and text; a leading visual is optional | "Lincoln Middle" |
+| Setup or compliance steps left to finish | Checklist (`Card` + `Section` + `Progress bar`) | Header count and bar aligned to one 128 action column; open steps above done steps | "2 of 5 done" |
 | The shape of a trend | Sparkline (Planned) | A word-sized line beside the number | Attendance over eight weeks |
 
 ## Alternatives
@@ -63,6 +66,7 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 | State | Status tag | Six appearances; `trailingMetric` nests a count inside it. |
 | How many | Count tag | `max` caps it, `isBold` asks for action, `label` names it for a screen reader. |
 | How much it moved | Change tag | `goodDirection` sets the tone; `comparison` names what it is measured against. |
+| Checklist | Card, Section, Progress bar | Composed step rows (`Icon`, text, `Button` or "Completed" text) on `--checklist-action-width`; `Icon button` dismisses an optional card. |
 | Category | Tag | Not an indicator: a subject, a person or a category. |
 
 ## Related
@@ -136,3 +140,9 @@ A Status tag never opens a menu. Where a status can be changed, the field around
 **Checked:** Review
 
 "Needs review 3" reads as one label; two labels side by side read as unrelated.
+
+### Line up checklist actions in one column and mark done steps with text. {#line-up-checklist-actions-in-one-column-and-mark-done-steps-with-text}
+
+**Checked:** Review
+
+Build a checklist from `PatternCard` and `PatternSection`, with each step row composed from `Icon`, step text with one fact, and a 128 action column (`--checklist-action-width`, floor `--checklist-action-min-width` at 120). Put the title at the start of the header and the count ("2 of 5 done") with a `ProgressBar` at the end so the bar's start edge lands on the action column's start edge (128 wide on a persistent card, 96 wide when a 32 dismiss `IconButton` takes the end). Buttons fill the column so their edges line up down the list. Keep open steps in order on top; move each finished step below them and center a check icon with "Completed" (Body small, subtle) in the action column as plain text. Use three layouts: a dismissible card on Home (which shrinks to one line for a day when complete, then disappears), a persistent card in a page for required work (which keeps every ticked row on screen), and a compact card at the foot of the Sidebar showing the count, bar and next step that opens the full list.

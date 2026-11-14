@@ -880,6 +880,20 @@
           }
         },
         {
+          "name": "Checklist/action-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--checklist-action-width)"
+          }
+        },
+        {
+          "name": "Checklist/action-min-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--checklist-action-min-width)"
+          }
+        },
+        {
           "name": "Button/vertical-size",
           "resolvedType": "FLOAT",
           "codeSyntax": {
