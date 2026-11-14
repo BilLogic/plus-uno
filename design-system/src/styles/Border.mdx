@@ -62,7 +62,7 @@ A card has no border: its edge comes from <DocsLink id="foundations-visual-eleva
 
 <FoundationSection title="Width tokens">
 
-Three widths cover every border. Pick by what the line says, never by how heavy you want it to look.
+Three widths cover every border. Pick by what the line says, never by how heavy you want it to look. Values are indicative; the tokens are the contract.
 
 <TokenTable
     rows={[
@@ -184,6 +184,8 @@ Take pattern borders from this table rather than adding one of your own.
 
 <FoundationSubsection title="Show focus with a ring, never a fill">
 
+The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no border.
+
 <DoDont>
 <Do caption="The field keeps its fill and gains the ring.">
 <span style={field({ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)' })}>Lincoln Middle Thursday</span>
@@ -197,6 +199,8 @@ Take pattern borders from this table rather than adding one of your own.
 
 <FoundationSubsection title="Show selection with the whole outline, never a side stripe">
 
+A selected row takes the 2 px selected border on every side, in `color/border/selected`.
+
 <DoDont>
 <Do caption="The 2 px outline wraps the whole row.">
 <div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Lincoln Middle</div>
@@ -209,6 +213,8 @@ Take pattern borders from this table rather than adding one of your own.
 </FoundationSubsection>
 
 <FoundationSubsection title="Use the selected width only for selection">
+
+`Border/default` is the width for everything that is not a state.
 
 <DoDont>
 <Do caption="Resting rows and cards keep Border/default.">

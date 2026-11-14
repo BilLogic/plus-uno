@@ -59,7 +59,7 @@ Elsewhere in the docs a token drops its `motion.` prefix (`spatial.fast`), and "
 **Productive** is the mode for everything. **Expressive** is switched on for one container at a time (`data-motion="expressive"`) for these moments only:
 
 - **Finish:** every completed reflection. The confirmation Flag lands with one overshoot on Expressive `spatial.fast`.
-- **Milestone:** onboarding complete, first session done, a student's goal reached, term start and term end. The one card in the hero entrance is Expressive. A goal shows once per person: the student sees it the moment it happens, the tutor the next time they open that student.
+- **Milestone:** onboarding complete, first session done, a student's goal reached, a badge claimed, term start and term end. The one card in the hero entrance is Expressive. A goal shows once per person: the student sees it the moment it happens, the tutor the next time they open that student.
 
 Inside an Expressive container, controls, fields, page transitions and data marks stay Productive. This is the only list of Expressive moments; other pages point here.
 
@@ -94,7 +94,7 @@ Two questions decide how something leaves.
    - **The person, with a click** (a close button, a deleted row): `appearance.fast` in place; surrounding rows close the gap on `spatial.fast`.
    - **The person, with a flick:** `spatial.exit` started from the hand's velocity.
 
-An exit is shorter than its entrance and lands without a bounce. A floating layer may shrink 2% as it fades (a Modal to 98%).
+An exit is shorter than its entrance and lands without a bounce. A floating layer may shrink 2% as it fades (a Modal to 98%). Every component names an enter and exit pair, and the exit is the entrance one speed faster, so there is no second token set.
 
 <Canvas of={PhysicsStories.Exits} sourceState="none" />
 
@@ -122,6 +122,7 @@ What a hand moves keeps the hand's speed.
 - **Opening, closing and selecting use the token as CSS.** There is no velocity to carry.
 - **Past a limit, it resists, then returns** with the hand's speed (√overshoot × 4 px, returning on `spatial.fast`).
 - **A throw is decided by where it would land,** and shows an armed state before release so the person can still take it back.
+- **Gestures stay contained:** a press is not a drag, and the page never scrolls under the hand.
 
 <FoundationSubsection title="A throw keeps the hand's speed">
 
@@ -155,7 +156,7 @@ Weight in PLUS is chosen by token, never by mass (every token is mass 1).
 
 <FoundationSubsection title="Size and carry">
 
-Bigger things travel on slower tokens (`fast`, `default`, `slow`). Something dragged follows the pointer on a spring: a tag or name stays right under the pointer on `spatial.fast`; a card trails slightly on `spatial.default` and settles a beat after the drop. Neither bounces: weight shows as lag, never wobble.
+Bigger things travel on slower tokens (`fast`, `default`, `slow`). Something dragged follows the pointer on a spring: a tag or name stays right under the pointer on `spatial.fast`; a card trails slightly on `spatial.default` and settles a beat after the drop. Neither bounces: weight shows as lag, never wobble. Keep the lag small; a carried thing that falls far behind the hand reads as slow, not heavy.
 
 <Canvas of={PhysicsStories.Carry} sourceState="none" />
 
@@ -206,7 +207,7 @@ Size and distance set the speed. How often it happens decides whether it travels
 
 <FoundationSection title="Reduced motion">
 
-When someone turns on reduce motion in their system settings, PLUS switches to Reduced mode.
+When someone turns on reduce motion in their system settings, PLUS switches to Reduced mode. It is a mapping, not a fourth set of springs.
 
 <RefTable
     head={['Family', 'In Reduced mode']}
@@ -236,7 +237,7 @@ One token, written for each target it ships to (`damping = 2 × ratio × √(sti
 
 <FoundationSection title="In code">
 
-CSS reads a semantic token as a `linear()` easing plus its settle time. Components bind `--ds-motion-*` semantics only, never a `--motion-spring-*` primitive.
+CSS reads a semantic token as a `linear()` easing plus its settle time. Components bind `--ds-motion-*` semantics only, never a `--motion-spring-*` primitive, and reduced motion is handled once, in the token layer.
 
 ```css
 transition: transform var(--ds-motion-spatial-default-duration) var(--ds-motion-spatial-default);
@@ -263,5 +264,12 @@ animate(panel, { x: 0 }, SPRINGS['spatial.default'].productive);
         { title: 'Illustration kit', description: 'The shapes these demos are drawn with, and the motion layer that moves them.', href: '?path=/docs/get-started-illustration-kit--docs' },
     ]}
 />
+
+</FoundationSection>
+
+<FoundationSection title="References">
+
+- ADR-041 records why motion moved to springs and how the tokens are named.
+- The token table is generated from `scripts/lib/tokens/plan.mjs` into `design-system/src/tokens/ladder/_springs.scss` and `springs.generated.js`.
 
 </FoundationSection>

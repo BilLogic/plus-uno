@@ -22,7 +22,7 @@ import * as ChoreographyStories from './MotionChoreography.stories.jsx';
 
 <FoundationSection title="How to read the figures">
 
-Before a move plays, the screen dims and the path each part takes is drawn from start (a dot) to landing (an arrowhead). Where the lesson is order, a strip under the screen shows when each part starts. Use a figure's speed control to watch at ½× or ¼×.
+Every transition is built from three blocks (something enters, something leaves, something changes) and a short list of atoms. The rules below decide direction, space, order and cause; where there is a wrong way, it is the same scene with one rule broken, played beside the right way. Before a move plays, the screen dims and the path each part takes is drawn from start (a dot) to landing (an arrowhead). Where the lesson is order, a strip under the screen shows when each part starts. Use a figure's speed control to watch at ½× or ¼×.
 
 </FoundationSection>
 
@@ -110,7 +110,7 @@ A shared container connects two views: the row becomes the record, or a quick lo
 
 <FoundationSubsection title="Sequence and stagger">
 
-When several items arrive, they stagger 20 ms apart (or 500 ms ÷ items if shorter), so the whole set lands within half a second and reads as one arrival.
+When several items arrive, they stagger 20 ms apart (or 500 ms ÷ items if shorter), so the whole set lands within half a second and reads as one arrival. The gap stays tight: the fifth row lands 80 ms after the first, while at 150 ms apart each row becomes its own event. The stagger and the clean-fade gap live in the composites, not as tokens.
 
 <Canvas of={ChoreographyStories.Stagger} sourceState="none" />
 
@@ -163,7 +163,7 @@ Input is answered at once. A system change is quieter, arrives where the system 
 
 <FoundationSubsection title="Breakpoints">
 
-A resize follows the hand: each layout change is a single jump the instant the edge crosses a breakpoint, with no animation afterward.
+A resize follows the hand: each layout change is a single jump the instant the edge crosses a breakpoint, with no animation afterward. A filter side hides at 960, quick filters fold into a menu at 768, and a rotating tablet does the same.
 
 <Canvas of={ChoreographyStories.Breakpoints} sourceState="none" />
 

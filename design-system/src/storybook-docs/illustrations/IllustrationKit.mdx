@@ -35,7 +35,7 @@ Motion follows the same split: a component's own motion is a live story, a princ
 <FoundationSection title="Drawing rules">
 
 - Paint with design-system tokens only: color, stroke and corner. Each part uses the token its real component uses from the role map in `paint.js`, so diagrams follow light and dark automatically.
-- Show an edge on every surface against the hero's sunken ground. Flat layers take one hairline in `illustrationEdge` (halved in `HeroDrawing` so it stays one device pixel); layers with a shadow (Page, Card, Popup, Flag) read by that shadow. `HeroEdges.test.jsx` checks that edges meet 1.5:1 against the ground in light and dark.
+- Show an edge on every surface against the hero's sunken ground. Flat layers take one hairline in `illustrationEdge` (halved in `HeroDrawing` so it stays one device pixel); layers with a shadow (Page, Card, Popup, Flag) read by that shadow. The real page edge is transparent outside increased contrast and the divider is about 1.1:1 on the ground, so neither is used. A page, screen or frame takes the `window` corner; a card, popup and modal take their own roles. `HeroEdges.test.jsx` holds edges to 1.5:1 against the ground in light and dark and fails any registered hero with a bare surface.
 - Draw text as soft `--ds-skeleton` bars. Never use black or dark bars.
 - Draw buttons only in shipped appearances: primary (the brand fill) on the subject, and default (the neutral fill) everywhere else.
 - Keep one scale per set, equal margins around every drawing, and at most one accent per drawing, placed on the subject.
@@ -44,7 +44,7 @@ Motion follows the same split: a component's own motion is a live story, a princ
 
 <FoundationSection title="Primitives">
 
-Each primitive takes a position (`x`, `y`), size (`w`, `h`) and `accent` flag. The top drawing is neutral and the bottom is accented (Button shows blocked-out above and real below). Screen combines a Frame, Sidebar and Page; Field also takes `invalid`; Flag takes `tone`; Tabs, Breadcrumb and Progress tracker take `count` and selection index. The gallery ends with the four motion primitives from `primitives-motion.jsx` and the six cover shapes from `shapes.jsx`.
+Each primitive takes a position (`x`, `y`), size (`w`, `h`) and `accent` flag. The top drawing is neutral and the bottom is accented (Button shows blocked-out above and real below). A card paints the raised surface and shadow, a Tooltip is flat with no shadow, and a Sticky header casts the overflow shadow over rows that scroll under it. Screen combines a Frame, Sidebar and Page, with the Sidebar docked, an overlay or none. Field also takes `invalid`, which paints its border with the error token. Flag takes `tone` (neutral, success, warning, danger or info). Tabs, Breadcrumb and Progress tracker take `count`; Tabs also takes `selected` and Progress tracker `current`. The gallery ends with the four motion primitives from `primitives-motion.jsx` and the six cover shapes from `shapes.jsx`.
 
 <IllustrationKitGallery />
 
@@ -75,6 +75,8 @@ Each primitive takes a position (`x`, `y`), size (`w`, `h`) and `accent` flag. T
 </FoundationSection>
 
 <FoundationSection title="Contributing">
+
+Every docs drawing, static or animated, comes from this one kit, and the motion layer lives beside the primitives in this folder.
 
 - Extend an existing primitive before adding a new one.
 - A new primitive takes `x`, `y`, `w`, `h` and `accent` (plus `label` when it supports real fidelity) and paints from `paint.js` only.
