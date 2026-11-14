@@ -144,7 +144,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 ## Parts
 
 1. **Icon.** On a default flag the `icon` (the information icon unless set); on a bold flag the appearance glyph. Decorative.
-2. **Title.** What happened, in a few words.
+2. **Title.** What happened, in a few words, at 14 whatever level the page around it is at.
 3. **Timestamp.** Optional, subtle, after the title.
 4. **Description.** At most one line.
 5. **Actions.** At most two, under the description: links on a default flag, compact Buttons on a bold one; an action with an `href` navigates either way.

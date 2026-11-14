@@ -32,6 +32,9 @@ export const markersLevelWithParts = async (canvasElement, parts) => {
             expect(rect(marker).bottom, `marker ${i + 1} (${label}) sits above its part`).toBeLessThanOrEqual(box.top);
             return;
         }
+        // In a gutter, over no content: clear of the picture's box on one side.
+        const picture = rect(marker.offsetParent);
+        expect(rect(marker).right <= picture.left + 1 || rect(marker).left >= picture.right - 1, `marker ${i + 1} (${label}) sits in a gutter, over no content`).toBe(true);
         const middle = rect(marker).top + rect(marker).height / 2;
         expect(middle, `marker ${i + 1} (${label}) sits level with its part`).toBeGreaterThanOrEqual(box.top - 1);
         expect(middle, `marker ${i + 1} (${label}) sits level with its part`).toBeLessThanOrEqual(box.bottom + 1);
