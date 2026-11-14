@@ -37,7 +37,7 @@ const toggle = ({ id, title, caption, waits }) => ({
   arrows: [[[TRACK.x + 8, 52], [TRACK.x + 8 + THUMB_TRAVEL, 52]]],
   draw: ({ c, t }) => (
     <>
-      <Frame x={8} y={6} w={144} h={88} />
+      <Frame x={8} y={6} w={144} h={88} chrome={false} />
       <Rect {...TRACK} fill={PAINT.shape} corner="full" />
       <Rect {...TRACK} fill={PAINT.accent} corner="full" opacity={c} />
       <circle cx={TRACK.x + 8 + t * THUMB_TRAVEL} cy={TRACK.y + 8} r={6} fill={PAINT.pageSurface} />
@@ -74,7 +74,7 @@ const save = ({ id, title, caption, shakes }) => ({
   arrows: [[[80, 50], [80, 58]]],
   draw: ({ o, y, x }) => (
     <>
-      <Frame x={8} y={6} w={144} h={88} />
+      <Frame x={8} y={6} w={144} h={88} chrome={false} />
       <SkeletonBar x={16} y={14} w={80} h={5} heading />
       <SkeletonBar x={16} y={26} w={100} />
       <g opacity={o} transform={`translate(${x} ${y * 4})`}>
@@ -117,7 +117,7 @@ const list = ({ id, title, caption, scatters }) => ({
   arrows: [[[140, 30], [140, 40]]],
   draw: ({ g }) => (
     <>
-      <Frame x={8} y={6} w={144} h={88} />
+      <Frame x={8} y={6} w={144} h={88} chrome={false} />
       {ROWS.map((r) => {
         const left = 1 - g;
         // One group moves together; the scatter sends each row its own way.
