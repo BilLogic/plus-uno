@@ -1,33 +1,13 @@
-import React, { useId, useRef, useState } from 'react';
+import { useMotionReduced } from '@/lib/motionPreference';
+import React, { useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
-import { overlayMountOf, useBoundedOverlay } from '@/lib/overlay';
+import { FLOATING_PLACEMENTS, useFloatingOverlay } from '@/lib/overlay';
 import Icon from '@/components/images-and-icons/Icon';
 import Spinner from '@/components/loading/Spinner/Spinner';
 import { ButtonItem, CustomItem, MenuGroup } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import './DropdownMenu.scss';
-
-/** Every placement this component accepts, matching Popup's side+align shape. */
-const PLACEMENTS = [
-    'bottom-start', 'bottom', 'bottom-end',
-    'top-start', 'top', 'top-end',
-    'right-start', 'right', 'right-end',
-    'left-start', 'left', 'left-end',
-];
-
-/** `bottom-start` → `{ side: 'bottom', align: 'start' }`. */
-function sideAlignOf(placement) {
-    const [side, align = 'center'] = placement.split('-');
-    return { side, align };
-}
-
-/** Host tags Base UI should NOT treat as a native button when merging its props in. */
-const NON_BUTTON_TAGS = new Set(['div', 'span', 'a', 'p']);
-
-function isButtonLike(element) {
-    return !(typeof element.type === 'string' && NON_BUTTON_TAGS.has(element.type));
-}
 
 /**
  * DropdownMenu: a trigger that opens a list of menu items in a
@@ -55,7 +35,7 @@ const DropdownMenu = ({
     id,
     className = '',
 }) => {
-    const { side, align } = sideAlignOf(placement);
+    const reduced = useMotionReduced();
     const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
     const isControlled = isOpen !== undefined;
     const open = isControlled ? isOpen : uncontrolledOpen;
@@ -65,26 +45,17 @@ const DropdownMenu = ({
         onOpenChange?.(next);
     };
 
-    const triggerNodeRef = useRef(null);
-    const containerRef = useRef(null);
-    const bounded = useBoundedOverlay({ container, fromNode: triggerNodeRef.current });
-    containerRef.current = container ?? overlayMountOf(triggerNodeRef.current);
-    const ownRef = trigger.props?.ref ?? trigger.ref;
-    const mergedTrigger = React.cloneElement(trigger, {
-        // Base UI's Trigger sets `aria-haspopup`/`aria-controls` itself but
-        // leaves `aria-expanded` to the caller, since it only knows this
-        // trigger's open state as a `data-popup-open` attribute.
-        'aria-expanded': open,
-        // A `Button` trigger (the default pattern: Button + chevron)
-        // shows selected while the menu is open; `isSelected` is a custom
-        // prop a plain DOM element (`button`, `a`, ...) would warn on, so it
-        // is only passed to a component trigger.
-        ...(typeof trigger.type !== 'string' ? { isSelected: open } : {}),
-        ref: (node) => {
-            triggerNodeRef.current = node;
-            if (typeof ownRef === 'function') ownRef(node);
-            else if (ownRef) ownRef.current = node;
+    const floating = useFloatingOverlay({
+        trigger,
+        triggerProps: {
+            'aria-expanded': open,
+            // Only component triggers accept Button's selected-state prop.
+            ...(typeof trigger.type !== 'string' ? { isSelected: open } : {}),
         },
+        placement,
+        container,
+        collisionAvoidance: { side: shouldFlip ? 'flip' : 'none' },
+        onOpenChange: handleOpenChange,
     });
 
     const labelId = useId();
@@ -105,21 +76,12 @@ const DropdownMenu = ({
     };
 
     return (
-        <BaseMenu.Root open={open} onOpenChange={handleOpenChange} loopFocus modal={false}>
-            <BaseMenu.Trigger
-                render={mergedTrigger}
-                nativeButton={isButtonLike(mergedTrigger)}
-            />
-            <BaseMenu.Portal container={bounded ? bounded.container : containerRef}>
-                <BaseMenu.Positioner
-                    side={side}
-                    align={align}
-                    sideOffset={4}
-                    collisionPadding={8}
-                    collisionBoundary={bounded?.collisionBoundary}
-                    collisionAvoidance={bounded?.collisionAvoidance ?? { side: shouldFlip ? 'flip' : 'none' }}
-                >
+        <BaseMenu.Root open={open} onOpenChange={floating.onOpenChange} loopFocus modal={false}>
+            <BaseMenu.Trigger {...floating.triggerProps} />
+            <BaseMenu.Portal container={floating.container}>
+                <BaseMenu.Positioner {...floating.positionerProps}>
                     <BaseMenu.Popup
+                        data-reduced={reduced ? 'true' : undefined}
                         id={id}
                         data-testid={testId}
                         className={clsx('plus-dropdown-menu', className)}
@@ -165,7 +127,7 @@ DropdownMenu.propTypes = {
     /** Called with the next open state (a boolean) when the menu opens or closes: trigger press, outside click, Escape or picking a row. */
     onOpenChange: PropTypes.func,
     /** Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side. */
-    placement: PropTypes.oneOf(PLACEMENTS),
+    placement: PropTypes.oneOf(FLOATING_PLACEMENTS),
     /** Flips to the opposite side when there isn't room. */
     shouldFlip: PropTypes.bool,
     /** `default` draws 32px rows, `compact` draws 24px. */

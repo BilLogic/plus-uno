@@ -1,4 +1,4 @@
-import { createContext, createElement, useContext, useMemo, useRef, useState, useLayoutEffect } from 'react';
+import { cloneElement, createContext, createElement, useCallback, useContext, useMemo, useRef, useState, useLayoutEffect } from 'react';
 
 /**
  * The shared overlay module (B4): the one place that owns the portal
@@ -121,6 +121,11 @@ export function overlayMountOf(fromNode) {
     return fromNode?.closest?.('.plus-pattern-backdrop') ?? getOverlayPortalRoot();
 }
 
+/** Compatibility for consumers that hold a trigger ref rather than its node. */
+export function popupMountOf(triggerRef) {
+    return overlayMountOf(triggerRef?.current);
+}
+
 const OverlayContainerContext = createContext(undefined);
 
 const BOUNDED_COLLISION_AVOIDANCE = {
@@ -225,4 +230,117 @@ export function isPressInRaisedOverlay(target, ownerNode) {
 export function isOverlayRaisedOver(ownerNode) {
     if (count === 0) return false;
     return !ownerNode?.closest?.('.plus-pattern-backdrop');
+}
+
+/** The offset in px when the token can't be read; matches `--popover-offset`. */
+export const POPOVER_OFFSET = 4;
+
+/** The screen gap in px when the token can't be read; matches `--popover-gap-screen`. */
+export const SCREEN_GAP = 8;
+
+/** A length token's value in px, read from the document, or `fallback`. */
+function readPx(name, fallback) {
+    if (typeof window === 'undefined') return fallback;
+    const raw = window.getComputedStyle(document.documentElement).getPropertyValue(name);
+    const px = parseFloat(raw);
+    return Number.isFinite(px) ? px : fallback;
+}
+
+/**
+ * The offset token's value in px, read from the document.
+ *
+ * @returns {number}
+ */
+export function readPopoverOffset() {
+    return readPx('--popover-offset', POPOVER_OFFSET);
+}
+
+/**
+ * The screen gap token's value in px, read from the document.
+ *
+ * @returns {number}
+ */
+export function readScreenGap() {
+    return readPx('--popover-gap-screen', SCREEN_GAP);
+}
+
+/** Placement vocabulary shared by the floating surfaces; only Popup accepts `auto`. */
+export const FLOATING_PLACEMENTS = [
+    'top', 'bottom', 'left', 'right',
+    'top-start', 'top-end', 'bottom-start', 'bottom-end',
+    'right-start', 'right-end', 'left-start', 'left-end',
+];
+
+export const POPUP_PLACEMENTS = ['auto', ...FLOATING_PLACEMENTS];
+
+export function sideAlignOf(placement) {
+    if (!placement || placement === 'auto') return { side: 'bottom', align: 'center' };
+    const [side, align = 'center'] = placement.split('-');
+    return { side, align };
+}
+
+const NON_BUTTON_TAGS = new Set(['div', 'span', 'a', 'p']);
+
+/** Custom component triggers are assumed to render buttons; known non-button host tags opt out. */
+export function isButtonLike(element) {
+    return !(typeof element.type === 'string' && NON_BUTTON_TAGS.has(element.type));
+}
+
+const DISMISS_REASONS = new Set(['outside-press', 'escape-key', 'focus-out']);
+
+/**
+ * Adapts a PLUS trigger to Base UI floating parts. Components keep their own
+ * open state, labels and trigger behavior; mounting, positioning and Modal
+ * dismissal protection belong here. An anchor serves triggerless Popups.
+ */
+export function useFloatingOverlay({
+    trigger,
+    triggerProps,
+    placement,
+    container,
+    anchor,
+    sideOffset = POPOVER_OFFSET,
+    collisionAvoidance,
+    dismissible = true,
+    onOpenChange,
+}) {
+    const triggerNodeRef = useRef(null);
+    const [triggerNode, setTriggerNode] = useState(null);
+    const fromNode = trigger ? triggerNode : (anchor?.current ?? anchor ?? null);
+    const bounded = useBoundedOverlay({ container, fromNode });
+    // Base UI reads ref containers after the trigger has committed, including
+    // initially-open surfaces whose first render has no trigger node yet.
+    const containerRef = useRef(null);
+    containerRef.current = container ?? overlayMountOf(fromNode);
+    const ownRef = trigger?.props?.ref;
+    const captureTrigger = useCallback((node) => {
+        triggerNodeRef.current = node;
+        setTriggerNode(node);
+        if (typeof ownRef === 'function') return ownRef(node);
+        if (ownRef) ownRef.current = node;
+    }, [ownRef]);
+    const mergedTrigger = trigger ? cloneElement(trigger, { ...triggerProps, ref: captureTrigger }) : undefined;
+
+    const handleOpenChange = (next, details) => {
+        const owner = triggerNodeRef.current ?? fromNode;
+        if (!next && !dismissible && DISMISS_REASONS.has(details?.reason)) return;
+        if (!next && details?.reason === 'outside-press'
+            && isPressInRaisedOverlay(details.event?.target, owner)) return;
+        if (!next && (details?.reason === 'escape-key' || details?.reason === 'focus-out')
+            && isOverlayRaisedOver(owner)) return;
+        onOpenChange?.(next, details);
+    };
+
+    return {
+        triggerProps: { render: mergedTrigger, nativeButton: trigger ? isButtonLike(trigger) : undefined },
+        container: bounded ? bounded.container : containerRef,
+        positionerProps: {
+            ...sideAlignOf(placement),
+            sideOffset,
+            collisionPadding: SCREEN_GAP,
+            collisionBoundary: bounded?.collisionBoundary,
+            collisionAvoidance: bounded?.collisionAvoidance ?? collisionAvoidance,
+        },
+        onOpenChange: handleOpenChange,
+    };
 }

@@ -1,8 +1,8 @@
 import { useMotionReduced } from '@/lib/motionPreference';
-import React, { useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
-import { overlayMountOf, useBoundedOverlay } from '@/lib/overlay';
+import { useFloatingOverlay } from '@/lib/overlay';
 import './Tooltip.scss';
 
 /**
@@ -34,37 +34,19 @@ const Tooltip = ({
     const baseTriggerElement = React.isValidElement(children) ? children : <span>{children}</span>;
     const disabled = Array.isArray(trigger) ? trigger.length === 0 : !trigger;
 
-    // Where the tooltip portals to: the page, or the modal the trigger sits
-    // in, through the shared overlay module.
-    const triggerNodeRef = useRef(null);
-    const containerRef = useRef(null);
-    const bounded = useBoundedOverlay({ fromNode: triggerNodeRef.current });
-    containerRef.current = overlayMountOf(triggerNodeRef.current);
-    const ownRef = baseTriggerElement.props?.ref ?? baseTriggerElement.ref;
-    const triggerElement = React.cloneElement(baseTriggerElement, {
-        ref: (node) => {
-            triggerNodeRef.current = node;
-            if (typeof ownRef === 'function') ownRef(node);
-            else if (ownRef) ownRef.current = node;
-        },
-    });
+    const floating = useFloatingOverlay({ trigger: baseTriggerElement, placement });
 
     return (
         <BaseTooltip.Root
             open={show}
+            onOpenChange={floating.onOpenChange}
             disabled={disabled}
             delay={delayShow}
             closeDelay={delayHide}
         >
-            <BaseTooltip.Trigger render={triggerElement} />
-            <BaseTooltip.Portal container={bounded ? bounded.container : containerRef}>
-                <BaseTooltip.Positioner
-                    side={placement}
-                    sideOffset={4}
-                    collisionPadding={8}
-                    collisionBoundary={bounded?.collisionBoundary}
-                    collisionAvoidance={bounded?.collisionAvoidance}
-                >
+            <BaseTooltip.Trigger render={floating.triggerProps.render} />
+            <BaseTooltip.Portal container={floating.container}>
+                <BaseTooltip.Positioner {...floating.positionerProps}>
                     <BaseTooltip.Popup
                         data-reduced={reduced ? 'true' : undefined}
                         id={id}
