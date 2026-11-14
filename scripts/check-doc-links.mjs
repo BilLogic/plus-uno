@@ -320,9 +320,9 @@ const inputs = byRoot((repoRoot) => {
   const activeFiles = documents('.', {
     root: repoRoot,
     ext: ['.md', '.jsx', '.json', '.mdc'],
-    ignore: new Set(['node_modules', '.git', 'storybook-static']),
+    ignore: new Set(['node_modules', '.git', 'storybook-static', 'dist']),
     skipDotDirs: false,
-  });
+  }).filter((rel) => !NOT_ACTIVE.some((skip) => rel.includes(skip)));
 
   const activeLines = activeFiles.flatMap((rel) =>
     readFileSync(path.join(repoRoot, rel), 'utf8')
@@ -331,9 +331,7 @@ const inputs = byRoot((repoRoot) => {
   );
 
   for (const pattern of OLD_PATTERNS) {
-    const hits = activeLines.filter(
-      (line) => line.includes(pattern) && !NOT_ACTIVE.some((skip) => line.includes(skip)),
-    );
+    const hits = activeLines.filter((line) => line.includes(pattern));
     if (hits.length) fail(`[stale] ${hits.length} references to old path pattern: ${pattern}`);
   }
 
