@@ -16,10 +16,7 @@ Vertical button: an icon stacked over a short label, one size (60 by 60). For ch
 
 ## Usage
 
-Use `VerticalButton` for a small set of large, equally weighted choices
-picked at a glance — a role at sign-up, a mode at the start of a flow. For a
-longer list or for actions that read better in a row, use `Button` or
-`ButtonGroup` instead; the fixed 60×60 size only suits a few options.
+Use `VerticalButton` for a small set of large, equally weighted actions picked at a glance, such as a role or mode at the start of a flow. Its fixed 64 by 64 size suits two to four options.
 
 ## Motion
 
@@ -28,6 +25,12 @@ VerticalButton reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Hover and press change color, 90% by about 110 ms. |
+
+## Alternatives
+
+- For actions in a standard horizontal row, use `Button` or `ButtonGroup`.
+- For an icon-only action with no visible label, use `IconButton`.
+- For a form question with pictured 224px choice tiles, use `RadioGroup` or `CheckboxGroup`.
 
 ## Best practices
 
@@ -71,8 +74,9 @@ reads better as a plain `Button`.
 
 ## Related
 
-- For a single action in a row, use `Button`.
-- For a connected row of related actions, use `ButtonGroup`.
+- `Button`: use when an action sits in a horizontal row.
+- `ButtonGroup`: use when related buttons connect into one row.
+- `RadioGroup`: use when asking a form question with pictured choice tiles.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 

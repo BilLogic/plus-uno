@@ -18,9 +18,9 @@ Also asked as: matrix question.
 
 ## Usage
 
-Use a choice grid when the same question is asked of several things at once: rate each of these six statements, tick which of these tools each tutor uses. It is a matrix with one question in the column headers and one subject per row.
+Use `ChoiceGrid` when the same question is asked of several items at once, as a matrix with the answer scale in the column headers and one subject per row.
 
-It is fully controlled. `values` is `{ rowId: columnId }` in `radio` mode and `{ rowId: { columnId: boolean } }` in `checkbox` mode, and the component holds no state of its own.
+It is fully controlled: `values` is `{ rowId: columnId }` in `radio` mode and `{ rowId: { columnId: boolean } }` in `checkbox` mode, and the component holds no state of its own.
 
 ## Motion
 
@@ -29,6 +29,12 @@ ChoiceGrid reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |
+
+## Alternatives
+
+- For a single question with mutually exclusive answers, use `RadioGroup`.
+- For a single question with multi-select answers, use `CheckboxGroup`.
+- For displaying rows and columns of read-only data, use `Table`.
 
 ## Best practices
 
@@ -77,8 +83,8 @@ Don't: Radios, where several tools apply to a row.
 
 Mixed control sizes make a grid hard to scan. `size` is set per grid, so grids that sit together in one form share it too.
 
-Do: Size 14 across both grids.
-Don't: A size 12 grid under a size 14 one.
+Do: One size (`size={14}`) across both grids.
+Don't: A `size={12}` grid under a `size={14}` grid.
 
 ## Accessibility
 
@@ -91,9 +97,9 @@ Don't: A size 12 grid under a size 14 one.
 
 ## Related
 
-- For one question with several answers, use Radio group.
-- For a rated answer with end labels, use Radio group with `leadingText` and `trailingText`.
-- For data being displayed rather than answered, use Table.
+- `RadioGroup`: use when asking a single radio question or a linear scale (`leadingText` and `trailingText`).
+- `CheckboxGroup`: use when asking a single multi-select question.
+- `Table`: use when displaying data rather than collecting answers.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

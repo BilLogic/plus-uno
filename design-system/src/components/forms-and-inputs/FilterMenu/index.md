@@ -18,17 +18,10 @@ Also asked as: filter dropdown.
 
 ## Usage
 
-Use `FilterMenu` when a section's content takes two or more filter
-categories applied together, and the view bar has room for one Filter icon
-rather than a button per category.
+Use `FilterMenu` when a section's content takes two or more filter categories staged and applied together from one Filter icon trigger.
 
 - **Two or three categories with short lists:** side by side.
-- **Four or more, or long lists:** stacked. Set `layout="stacked"` for a few
-  long ones.
-
-One category in a menu, applied as you pick, is a `PopupSelect`. One to
-three short categories with room in the bar are a `FilterButton` each. A bar
-holds one or the other, never quick filters and a filter menu together.
+- **Four or more, or long lists:** stacked (`layout="stacked"`).
 
 ## Motion
 
@@ -39,14 +32,24 @@ FilterMenu reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
 
+## Alternatives
+
+- For one category in a menu that applies as you pick, use `PopupSelect`.
+- For one to three quick filter triggers in a bar, use `FilterButton`.
+
 ## Best practices
 
-- **Show the count on the trigger.** It is the only place the applied
-  filters show; never add a row of chips under the bar.
-- **Apply once.** The content changes on Apply, not on each tick, so it
-  does not jump while someone is still choosing.
-- **Keep the categories short.** Long lists stack, so each keeps its full
-  width.
+### Show the applied count on the trigger. {#show-the-applied-count-on-the-trigger}
+
+The trigger's `trailingMetric` is the only place applied filters show; never add a row of filter tags under the bar, and never combine quick `FilterButton` triggers with a `FilterMenu` in the same bar.
+
+### Apply changes only when Apply is pressed. {#apply-changes-only-when-apply-is-pressed}
+
+The content behind the menu updates once on Apply, not on each checkbox tick, so the page does not jump while someone is still choosing.
+
+### Stack categories when lists are long. {#stack-categories-when-lists-are-long}
+
+Pass `layout="stacked"` when a few categories have long option lists so each category gets the full menu width.
 
 ## Accessibility
 
@@ -59,8 +62,8 @@ FilterMenu reads these motion tokens and no literal duration or curve.
 
 ## Related
 
-- For one category applied as you pick, use `PopupSelect`.
-- For quick filters in the bar, use `FilterButton`.
+- `PopupSelect`: use when one filter category applies immediately on pick.
+- `FilterButton`: use when placing one to three quick filter triggers directly in a bar.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

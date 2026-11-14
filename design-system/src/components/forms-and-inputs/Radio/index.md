@@ -16,7 +16,7 @@ Radio — single option within a named radio group. Supports controlled (`isChec
 
 ## Usage
 
-Use Radio when the options need custom presentation, such as options listed in a table. For a plain list of options, use RadioGroup, which owns the group label, the value and the error.
+Use `Radio` directly only when options need custom layout, such as radio cells inside a table.
 
 Make one option the default: the safest and lowest-risk one. If a person may decline all options, add a "None" option; if the list cannot be complete, add "Other".
 
@@ -27,6 +27,13 @@ Radio reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |
+
+## Alternatives
+
+- For a standard radio question with a shared legend and error, use `RadioGroup`.
+- For a question where several options may be chosen, use `CheckboxGroup` or `Checkbox`.
+- For a list of six or more options, use `Select`.
+- For a setting that turns on or off immediately, use `Toggle`.
 
 ## Best practices
 
@@ -71,26 +78,25 @@ Radios that share a `name` are one group; each option gets its own id. ARIA allo
 
 ### Avoid long lists and overlapping ranges. {#avoid-long-lists-and-overlapping-ranges}
 
-For a long list, use Select. Do not write numeric options that overlap ("0-20", "20-40") or skip a number.
+For six or more options, use `Select`. Do not write numeric options that overlap (`0–20`, `20–40`) or skip a number.
 
-### A description describes; the label names. {#a-description-describes-the-label-names}
+### Keep extra detail in `description`. {#keep-extra-detail-in-description}
 
 `description` renders under the label and is read after the name.
 
 ## Accessibility
 
-- **Each option has its own id.** The component derives one per instance, so labels never resolve to the first radio of the group.
-- **A radio with no `label` has no accessible name.** Pass `aria-label` where the design has no room for visible text.
-- **Include an error message for a required or invalid group**, for example "Select an option".
-- **Disable an option only for something the person can fix on the same screen.** Put the reason in the option's `description`, at full contrast, and never in a tooltip. A disabled option leaves the tab order. For a choice that must stay reachable, keep it enabled and use validation, so a screen reader user hears why it cannot be chosen.
-- **Keyboard focus is a 2px ring on `border.focused`, 2px off the radio.** Arrow keys move between the radios of a group.
+- **Unique ids.** Each instance derives its own id so labels never resolve to the first radio of the group; pass `aria-label` only when there is no visible label.
+- **Required or invalid group.** Include an error message, for example "Select an option".
+- **Disabled options.** Disable an option only for something the person can fix on the same screen, and put the reason in `description` at full contrast, never a tooltip; a disabled option leaves the tab order. For a choice that must stay reachable, keep it enabled and use validation, so a screen reader user hears why it cannot be chosen. See [Disabled](?path=/docs/patterns-states-disabled--docs).
+- **Keyboard.** Arrow keys move between radios that share a `name`. Focus is a 2px ring on `border.focused`, 2px off the radio.
 
 ## Related
 
-- For several answers from a list, use Checkbox.
-- For a longer list of options, use Select.
-- To turn something on or off, use Toggle.
-- For a whole group with its label, value and error, use RadioGroup.
+- `RadioGroup`: use when asking a complete radio question with a legend, value and error.
+- `CheckboxGroup`: use when any number of options may be chosen.
+- `Select`: use when choosing one option from a list of six or more.
+- `Toggle`: use when flipping a single setting on or off immediately.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

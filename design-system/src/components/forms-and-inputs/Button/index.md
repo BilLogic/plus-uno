@@ -18,17 +18,17 @@ Also asked as: cta, submit.
 
 ## Usage
 
-Use a button for an action on the current page: submit a form, mark attendance, close a dialog. For navigation to another page, use Link button.
+Use `Button` for an action on the current page: submit a form, mark attendance, close a dialog.
 
 ### Appearance guidance
 
 | Appearance | When to use |
 | --- | --- |
-| Default | Most actions that are not the main call to action of a page or area. Less prominent than primary. Example: "Reschedule session". |
+| Default | Most actions that are not the main call to action of a page or area. Example: "Reschedule session". |
 | Primary | The main call to action or a form submission. One per page or area. Example: "Book session". |
-| Subtle | Secondary actions next to a primary button, and places where it is already clear items are interactive, such as toolbars and button groups. Example: "Cancel" beside "Save notes". |
+| Subtle | Secondary actions beside a primary button, and toolbars or button groups where items already read as interactive. Example: "Cancel" beside "Save notes". |
 | Warning | Confirms an action that may cause a significant change or a loss of data, often in a confirmation modal. Example: "Remove from this week". |
-| Danger | The final confirmation of a destructive, irreversible action such as deleting. Example: "Delete session recording". |
+| Danger | The final confirmation of a destructive, irreversible action. Example: "Delete session recording". |
 | Discovery | The call to action for a new experience. Example: "Try the new schedule view". |
 | AI | The one primary AI action in a region. Draws the sparkle before its label. Example: "Generate summary". |
 
@@ -40,53 +40,57 @@ Button reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Hover and press change color, 90% by about 110 ms. |
 
+## Alternatives
+
+- For navigation to another page or site in the look of a button, use `LinkButton`.
+- For an action shown as an icon with no visible label, use `IconButton`.
+- For a primary action joined to a menu of related variations, use `SplitButton`.
+- For a menu of actions behind one trigger, use `DropdownMenu`.
+
 ## Best practices
 
-### One primary action per area. {#one-primary-action-per-area}
+### Use one primary action per area. {#use-one-primary-action-per-area}
 
 Do: One primary button, with the secondary action subtle beside it.
 Don't: Two primary buttons in one area compete for attention.
 
-### One primary AI action per region. {#one-primary-ai-action-per-region}
+### Use one primary AI action per region. {#use-one-primary-ai-action-per-region}
 
-The AI appearance marks the single main AI action in a region, such as "Generate summary" on a session's notes. Use it only for actions that call AI, never to emphasize an ordinary action, and leave its look as shipped: no custom color, icon or fill (the sparkle is always drawn and a label is required). Every other AI action in the region is a default or subtle button with an AI icon.
+The `ai` appearance marks the main AI action in a region, such as "Generate summary" on session notes. Use it only for actions that call AI, and leave its look as shipped (the sparkle is always drawn and a label is required). Every other AI action in the region is a `default` or `subtle` button with an AI icon.
 
 Do: One AI button for the region's main AI action, with the other actions subtle.
 Don't: A second AI button competes with the first, and Save notes is not an AI action.
 
 ### Pick the spacing for the surrounding space. {#pick-the-spacing-for-the-surrounding-space}
 
-Default spacing for most places; compact for tables and tight spaces, such as a row of student sessions.
+Use `default` spacing in most places, and `compact` for tables and inline toolbars.
 
 ### Keep an action enabled and explain on press. {#keep-an-action-enabled-and-explain-on-press}
 
-An action that is not ready stays enabled. When it is pressed, say what is missing: move focus to the first field that needs attention and show the reason as text there, or as a warning Section message above when it blocks the main action or several items. A button disables only while it is sending; `isLoading` does that and keeps the label. Never attach a tooltip to a disabled button.
+An action that is not ready stays enabled. When pressed, move focus to the first field that needs attention and show the reason there, or in a warning `SectionMessage` above when it blocks the main action. Disable a button only while it is sending (`isLoading`), or when the reason is self-evident, such as Back on the first step. A button for something a role can never do is left out. See [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: Enabled, with the reason shown as text when the button is pressed.
 Don't: A disabled submit button gives no direction and leaves the tab order.
 
-Self-evident cases need no reason: a Back button on the first step can be disabled. A button for something a role can never do is left out.
-
 ### Align the primary button with its group. {#align-the-primary-button-with-its-group}
 
-Right-align buttons in focused tasks and modal dialogs, with the primary on the right. Left-align on single-page forms and full-page tasks with a lot of content, with the primary on the left.
+Right-align buttons in focused tasks and modal dialogs, with the primary on the right. Left-align on single-page forms and full-page tasks, with the primary on the left.
 
 ## Accessibility
 
-- A button performs an action; a link navigates. Use the right element so screen readers announce the right role.
-- Leave an action enabled and explain on press; disable a button only while it is sending. A disabled button leaves the tab order and receives no events, and it takes no `aria-disabled` stand-in that keeps it focusable. Never attach a tooltip to one; the reason is visible text beside it.
-- A button with no visible label is an Icon button, which requires a `label`.
-- Loading blocks interaction and sets `aria-busy`; the label stays in the tree for assistive technology.
-- Selected is not color alone: `isSelected` sets `aria-pressed`.
-- The focus ring is 2px in `--ds-border-focused`. Never remove it.
+- **Action vs. navigation.** `Button` renders a `<button>`; use `LinkButton` for navigation so screen readers announce the right role.
+- **Disabled state.** A disabled button leaves the tab order, receives no events, and never takes a tooltip or an `aria-disabled` stand-in. See [Disabled](?path=/docs/patterns-states-disabled--docs).
+- **Icon-only buttons.** A button with no visible label is an `IconButton`, which requires a `label`.
+- **Focus.** The focus ring is 2px in `--ds-border-focused`. Never remove it.
+- **Loading and selected.** `isLoading` blocks interaction, sets `aria-busy`, and keeps the label in the accessibility tree. `isSelected` sets `aria-pressed`.
 
 ## Related
 
-- To act with an icon alone, use Icon button.
-- To navigate in the look of text, use Link button.
-- For a set of choices the user picks between, use `RadioGroup`.
-- For a menu of actions behind one trigger, use `DropdownMenu`.
-- To show that work is under way on the page rather than in the control, use `ProgressBar`.
+- `IconButton`: use when space allows only an icon with a tooltip label.
+- `LinkButton`: use when the control navigates to another page or URL.
+- `ButtonGroup`: use when related buttons sit together in a connected row.
+- `DropdownMenu`: use when a trigger opens a list of actions.
+- `ProgressBar`: use when showing progress on the page rather than inside the button.
 
 Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
@@ -96,9 +100,9 @@ Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `Checkbox
 2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
 3. **Label.** Body/default at the medium weight. It says what the action does.
 4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
-5. **Spinner** (loading only). The `Spinner` component at 16, the icon size, in both spacings. It replaces the label and the icons while the button is busy, in the label color.
+5. **Spinner** (loading only). A 16 `Spinner` in the label color that replaces the label and icons while the button is busy.
 
-Most buttons need no icon. Add one where the glyph has a clear, established meaning, such as `plus` for add.
+Most buttons need no icon. Add one only when the glyph has an established meaning, such as `plus` for add.
 
 ### States
 
@@ -109,7 +113,7 @@ Most buttons need no icon. Add one where the glyph has a clear, established mean
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
 | Selected | The selected role fill, label and icon. Applies to default and subtle, and sets `aria-pressed`. |
 | Disabled | The disabled fill, label and icon: a change of color, not of opacity. Subtle stays transparent. |
-| Loading | A 16 `Spinner` replaces the label and icons, in both spacings. The container keeps its fill, blocks interaction and sets `aria-busy`. |
+| Loading | A 16 `Spinner` replaces the label and icons. The container keeps its fill, blocks interaction and sets `aria-busy`. |
 
 ### Tokens
 

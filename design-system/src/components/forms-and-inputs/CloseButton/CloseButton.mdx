@@ -20,7 +20,7 @@ export const itemRow = { display: 'flex', justifyContent: 'space-between', align
 <Meta of={CloseButtonStories} />
 
 <Title />
-The one dismiss control for a surface that closes as a whole — a Modal, a Section message, a Flag.
+The dismiss control for a surface that closes as a whole, such as a Modal, a Section message, a Flag or a Panel.
 
 <DocsTabs of={CloseButtonStories}>
 
@@ -37,7 +37,7 @@ The one dismiss control for a surface that closes as a whole — a Modal, a Sect
 
 ## Layout
 
-<ComponentExample of={CloseButtonStories.Overview} title="Default" description="The one dismiss control for a surface that closes as a whole." />
+<ComponentExample of={CloseButtonStories.Overview} title="Default" description="The dismiss control for a surface that closes as a whole." />
 
 <ComponentExample of={CloseButtonStories.Spacing} title="Spacing" description="Default draws 32; compact draws 24." />
 
@@ -65,12 +65,7 @@ The one dismiss control for a surface that closes as a whole — a Modal, a Sect
 
 <DocsInteractivePlayground
     of={CloseButtonStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>
@@ -87,10 +82,16 @@ The one dismiss control for a surface that closes as a whole — a Modal, a Sect
 
 ## Usage
 
-Use `CloseButton` wherever a surface closes as a whole — the corner of a
-Modal, the end of a Section message or a Flag. For an action that
-removes one item from a set rather than closing a surface, use a plain
-`IconButton` with its own icon and label instead.
+Use `CloseButton` wherever a surface closes as a whole, such as the corner of a `Modal`, the end of a `SectionMessage`, a `Flag` or a `Panel`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For removing one item from a set or using a different glyph, use `IconButton`.
+- For a labeled Cancel action in a footer, use `Button`.
 
 </div>
 
@@ -176,11 +177,9 @@ A close button dismisses the surface it sits on. To remove one item from a set, 
     dontCaption="A close button on each item inside the message."
 />
 
-### There is no disabled state.
+### Keep the close button enabled.
 
-A close control stays available even while the surface it closes is in some
-other state (loading, in error). Don't pass a disabled prop through — it
-isn't one of `CloseButton`'s props.
+A close control stays available even while the surface it closes is loading or in error. `CloseButton` has no disabled prop.
 
 </div>
 
@@ -205,13 +204,9 @@ isn't one of `CloseButton`'s props.
 
 ## Accessibility
 
-- **A real, always-focusable button.** Reached with Tab, activated with
-  Enter or Space, same as any `IconButton`.
-- **The accessible name is the whole contract.** The × glyph is decorative;
-  `label` is what a screen reader announces, so it must say what closes.
-- **Inverse tone doesn't change behavior**, only contrast on a dark or
-  colored ground — pick it when the default subtle hover would be
-  invisible there.
+- **A real, always-focusable button.** Reached with Tab and activated with Enter or Space, same as any `IconButton`.
+- **The accessible name is the whole contract.** The `xmark` glyph is decorative; `label` is the accessible name and hover title, so it must say what closes.
+- **Inverse tone preserves contrast** on dark or bold-colored surfaces.
 
 </div>
 
@@ -219,10 +214,10 @@ isn't one of `CloseButton`'s props.
 
 ## Related
 
-- For a dismiss icon with a different meaning than "close," use `IconButton`
-  directly.
-- For the surfaces this control typically closes, see `Modal`,
-  `SectionMessage` and `Flag`.
+- `IconButton`: use when removing a single item or using a glyph other than `xmark`.
+- `Modal`: use when a dialog closes from its corner.
+- `SectionMessage`: use when an in-page notice can be dismissed.
+- `Flag`: use when a corner notification can be dismissed.
 
 </div>
 

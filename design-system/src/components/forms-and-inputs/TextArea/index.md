@@ -18,9 +18,7 @@ Also asked as: multi-line, multiline text, long text input, notes field, comment
 
 ## Usage
 
-Use a Text area for free text over several lines: session notes, feedback, a
-reason. Use a Text field for one short answer, and a Rich text editor only when
-the text needs formatting.
+Use `TextArea` for free-form plain text over several lines, such as session notes, feedback or a reason.
 
 ## Motion
 
@@ -29,6 +27,11 @@ TextArea reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Border color changes on focus and error. An error message makes room, then fades in; it fades, then the room closes, once the field is fixed. |
+
+## Alternatives
+
+- For a single-line answer, use `TextField`.
+- For multi-line text that requires formatting such as lists or links, use `RichTextEditor`.
 
 ## Best practices
 
@@ -60,7 +63,7 @@ Don't: Help in the placeholder disappears when the person starts typing.
 
 ### Match `rows` to the expected answer. {#match-rows-to-the-expected-answer}
 
-One row is a short note; six rows is a paragraph. The box starts at 80 whatever `rows` says.
+One or three rows fit a short note; six rows fit a longer paragraph. The box always starts at `--field-min-height-sm` (`80px`) regardless of `rows`.
 
 ### Set a count only for a real limit. {#set-a-count-only-for-a-real-limit}
 
@@ -74,9 +77,9 @@ Set `maxLength` when something downstream truncates; do not add a limit just to 
 
 `warningMessage` draws the warning edge and `successMessage` the success edge, each with its message. The value is accepted in both.
 
-### Read-only is not disabled. {#read-only-is-not-disabled}
+### Use read-only for fixed values and disabled for unavailable ones. {#use-read-only-for-fixed-values-and-disabled-for-unavailable-ones}
 
-`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, ignores the pointer and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: Read-only keeps the value readable, and the caption says why.
 Don't: Disabled fades a value people need to read.
@@ -94,9 +97,9 @@ Don't: Disabled fades a value people need to read.
 
 ## Related
 
-- For one line of text, see Text field.
-- For formatted text, see Rich text editor.
-- For the label and caption conventions, see Form.
+- `TextField`: use when collecting a single line of text.
+- `RichTextEditor`: use when the text needs formatting such as lists or links.
+- [Form](?path=/docs/components-forms-and-inputs-form--docs): use when reviewing label and caption rules across fields.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
@@ -137,9 +140,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Do | Don't |
 | --- | --- |
-| Name the field with a short noun: "Email address". | An instruction where the name belongs: "Enter your email address here". |
+| Name the field with a short noun phrase: "Session notes". | An instruction where the name belongs: "Write your session notes here". |
 | Use sentence case and no end punctuation on labels. | Title case, or a period after the label. |
-| Say what to do about an error: "Enter a 10-digit number." | "Invalid" or "Error". |
+| Say what to do about an error: "Add a note before you send." | "Invalid" or "Error". |
 | Keep helper text to one short line. | Paragraphs in the caption. Link to help instead. |
 
 ## Props

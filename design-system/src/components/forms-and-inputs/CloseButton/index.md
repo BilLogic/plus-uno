@@ -16,10 +16,7 @@ The one dismiss control for a surface that closes as a whole — Modal, Section 
 
 ## Usage
 
-Use `CloseButton` wherever a surface closes as a whole — the corner of a
-Modal, the end of a Section message or a Flag. For an action that
-removes one item from a set rather than closing a surface, use a plain
-`IconButton` with its own icon and label instead.
+Use `CloseButton` wherever a surface closes as a whole, such as the corner of a `Modal`, the end of a `SectionMessage`, a `Flag` or a `Panel`.
 
 ## Motion
 
@@ -28,6 +25,11 @@ CloseButton reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Hover and press change color, 90% by about 110 ms. |
+
+## Alternatives
+
+- For removing one item from a set or using a different glyph, use `IconButton`.
+- For a labeled Cancel action in a footer, use `Button`.
 
 ## Best practices
 
@@ -60,26 +62,22 @@ A close button dismisses the surface it sits on. To remove one item from a set, 
 Do: One close button for the whole message.
 Don't: A close button on each item inside the message.
 
-### There is no disabled state. {#there-is-no-disabled-state}
+### Keep the close button enabled. {#keep-the-close-button-enabled}
 
-A close control stays available even while the surface it closes is in some
-other state (loading, in error). Don't pass a disabled prop through — it
-isn't one of `CloseButton`'s props.
+A close control stays available even while the surface it closes is loading or in error. `CloseButton` has no disabled prop.
 
 ## Accessibility
 
-- **A real, always-focusable button.** Reached with Tab, activated with
-  Enter or Space, same as any `IconButton`.
-- **The accessible name is the whole contract.** The × glyph is decorative;
-  `label` is what a screen reader announces, so it must say what closes.
-- **Inverse tone doesn't change behavior**, only contrast on a dark or
-  colored ground — pick it when the default subtle hover would be
-  invisible there.
+- **A real, always-focusable button.** Reached with Tab and activated with Enter or Space, same as any `IconButton`.
+- **The accessible name is the whole contract.** The `xmark` glyph is decorative; `label` is the accessible name and hover title, so it must say what closes.
+- **Inverse tone preserves contrast** on dark or bold-colored surfaces.
 
 ## Related
 
-- For a dismiss icon with a different meaning than "close," use `IconButton` directly.
-- For the surfaces this control typically closes, see `Modal`, `SectionMessage` and `Flag`.
+- `IconButton`: use when removing a single item or using a glyph other than `xmark`.
+- `Modal`: use when a dialog closes from its corner.
+- `SectionMessage`: use when an in-page notice can be dismissed.
+- `Flag`: use when a corner notification can be dismissed.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 

@@ -16,21 +16,15 @@ Search field: find a record by typing. It is a TextField with a search icon befo
 
 ## Usage
 
-Use `SearchField` to find a record in a list by typing. To pick a value, use
-`Select`; to narrow by a category, use `FilterButton`.
-
-Results show in the results area, never under the field: the count in the table
-or results header, and the no-matches message in the table body.
+Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field (except in `focused` mode): the count sits in that header, and the no-matches message in its body.
 
 Pick the mode by where the answer lands:
 
-- `active` (default): the rows you hold filter as you type, through `onValueChange`.
-- `basic`: the search runs on Enter through `onSearch`, for a search too heavy to run on every keystroke.
-- `focused`: a panel under the field, for jumping straight to a record from anywhere. It lists `recent` searches on focus, matches grouped by type while typing, then a "See all" row. The panel is the one exception to the rule above: its rows sit under the field.
+- `active` (default): filters rows as you type through `onValueChange`.
+- `basic`: runs on Enter through `onSearch`, for searches too heavy to run on every keystroke.
+- `focused`: opens a panel under the field for jumping straight to a record from anywhere (`recent` searches on focus, matches grouped by type while typing, a "See all" row, and an optional `SearchFieldAction` child).
 
-The panel's last row is a slot: pass a `SearchFieldAction` child, such as "Create student", and it joins the keyboard order.
-
-`isCollapsible` starts the field as an icon button; `defaultOpen` starts it open. The field's own words are props, so a translation or a product term can replace them: `clearLabel` ("Clear search"), `panelLabel` ("Suggestions"), `recentLabel` ("Recent searches"), `noMatchesLabel` ("No matches for") and `seeAllLabel` ("See all results for").
+`isCollapsible` starts the field as an icon button (`defaultOpen` starts it open). Default strings can be overridden via `clearLabel` ("Clear search"), `panelLabel` ("Suggestions"), `recentLabel` ("Recent searches"), `noMatchesLabel` ("No matches for") and `seeAllLabel` ("See all results for").
 
 ## Motion
 
@@ -40,6 +34,12 @@ SearchField reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Update a value or state | `--ds-motion-spatial-fast` | A collapsed search grows from its icon into the field, end edge fixed, so it opens to the left; focus moves in. The focused mode's panel is a Popup and takes the Popup row's open and close. |
 | exit | Update a value or state | `--ds-motion-appearance-fast` | Left empty, the field narrows back into the icon and fades; Esc twice does the same. |
+
+## Alternatives
+
+- For picking a value from a known option list, use `Select`.
+- For narrowing a list by a category in a view bar, use `FilterButton`, `PopupSelect` or `FilterMenu`.
+- For general single-line text entry in a form, use `TextField`.
 
 ## Best practices
 
@@ -67,8 +67,9 @@ leave the field open.
 
 ## Related
 
-- To pick a value, use `Select`.
-- To narrow by a category, use `FilterButton`.
+- `Select`: use when picking a value from a list of options.
+- `FilterButton`: use when narrowing a list by a category in a filter bar.
+- `TextField`: use when collecting single-line text in a form.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
