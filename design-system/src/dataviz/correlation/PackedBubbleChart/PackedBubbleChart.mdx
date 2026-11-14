@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={PackedBubbleChartStories} />
 
 <Title />
-Packs items into clusters of circles, one cluster per group, with each circle
-sized by its value. It shows rough proportion at a glance, not exact amounts.
+Packs items into clustered circles sized by value to show rough proportions at
+a glance.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/correlation/PackedBubbleChart"
@@ -31,14 +31,13 @@ sized by its value. It shows rough proportion at a glance, not exact amounts.
 
 ## When to use
 
-Use `PackedBubbleChart` for an overview of how big things are within groups:
-enrollment per course grouped by subject, tutors per specialty, lessons per
-category in the content library. It suits a summary card where the reader
-wants the biggest items to stand out, not a precise ranking.
+Use `PackedBubbleChart` for a quick overview of relative sizes within groups,
+such as course enrollment by subject, tutors per specialty or library lessons by
+category.
 
 For exact comparison, use `BarChart`. For parts of one total, use
-`TreemapChart`. For bubbles placed on real axes, use `BubbleChart`. For the
-overlap between groups rather than their sizes, use `VennDiagram`.
+`TreemapChart`. For bubbles plotted on two axes, use `BubbleChart`. For overlap
+between groups, use `VennDiagram`.
 
 </div>
 
@@ -49,9 +48,9 @@ overlap between groups rather than their sizes, use `VennDiagram`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Bubbles', <>One per item. Size scales with <C>value</C> on a fixed 0 to 1,000 range.</>],
-        ['Clusters', <>One per series when <C>splitSeries</C> is on (the default). Turn it off to pack every bubble into one mass.</>],
-        ['Labels', <>The item's <C>name</C>, printed on bubbles whose value is over 50. Smaller bubbles go unlabeled.</>],
+        ['Bubbles', <>One per item; size scales with <C>value</C> on a fixed 0 to 1,000 range.</>],
+        ['Clusters', <>One per series when <C>splitSeries</C> is on (default); turn it off to pack all bubbles into one mass.</>],
+        ['Labels', <>Prints <C>name</C> on bubbles with <C>value</C> over 50; smaller bubbles are unlabeled.</>],
         ['Legend', 'Names each group.'],
         ['Tooltip', <>The item's <C>name</C> and <C>value</C>.</>],
     ]}
@@ -63,8 +62,10 @@ overlap between groups rather than their sizes, use `VennDiagram`.
 
 ## Data shape
 
-`data` is an array of groups, each `{ name, data }`, where `data` holds items
-as `{ name, value }`. `height` defaults to 500; `splitSeries` defaults to `true`.
+`data` is an array of `{ name, data }` groups, where `data` holds
+`{ name, value }` items. Keep values within the fixed 0 to 1,000 size range so
+bubbles above 1,000 do not all clamp to the maximum size. `height` defaults to
+500; `splitSeries` defaults to `true`.
 
 ```jsx
 <PackedBubbleChart
@@ -76,21 +77,18 @@ as `{ name, value }`. `height` defaults to 500; `splitSeries` defaults to `true`
 />
 ```
 
-The size range is fixed at 0 to 1,000, so values above 1,000 all draw at the
-largest size and values far below it draw small. Keep the data inside that range.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **One color per group.** Groups take the categorical order, slot 1 first. Every item in a group shares its color, so color names the group and size carries the value. Past six groups, fold the smallest into "Other".
-- **Area is a weak encoding.** Readers can pick out the biggest bubble but cannot judge one as twice another. Put exact numbers in a table or a `BarChart` beside it if they matter.
-- **Labels drop out.** Bubbles at 50 or under carry no label, so a reader sees them only by color and position; the tooltip is the only place their name appears.
-- **Label ink is fixed.** Bubble labels are drawn in black rather than a text token, so they do not adapt to dark mode or pick an ink by contrast. Check the chart in dark mode before shipping it there.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **One color per group.** Groups follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1. Past six groups, fold the smallest into "Other".
+- **Area is a rough encoding.** Readers can spot the largest bubble but cannot judge exact ratios; pair with a table or `BarChart` when exact numbers matter.
+- **Thresholded labels.** Bubbles at 50 or under carry no label, so their names appear only in the tooltip.
+- **Fixed black label ink.** Bubble labels draw in black rather than a text token and do not adapt to dark mode; verify legibility before shipping in dark mode.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Series colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -98,11 +96,7 @@ largest size and values far below it draw small. Keep the data inside that range
 
 ## States
 
-`PackedBubbleChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`PackedBubbleChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={500} />
@@ -119,12 +113,7 @@ largest size and values far below it draw small. Keep the data inside that range
 
 <DocsInteractivePlayground
     of={PackedBubbleChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

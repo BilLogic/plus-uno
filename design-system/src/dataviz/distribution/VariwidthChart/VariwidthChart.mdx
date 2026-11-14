@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={VariwidthChartStories} />
 
 <Title />
-A column chart where height is one value and width is a second, such as how
-many students a score covers. Wide columns carry more weight.
+Draws columns whose height encodes a value and whose width encodes each
+category's weight.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/distribution/VariwidthChart"
@@ -31,15 +31,13 @@ many students a score covers. Wide columns carry more weight.
 
 ## When to use
 
-Use `VariwidthChart` when a per-category value needs its weight beside it:
-average score per subject sized by enrollment, average rating per tutor sized
-by number of reviews. It keeps a high score from a small group from looking as
-important as one from a large group.
+Use `VariwidthChart` when a category value needs its weight alongside it, such
+as average score per subject sized by enrollment or average tutor rating sized
+by review count.
 
-For equal-width columns where only height matters, use `BarChart`. For parts
-of a total sized by area, use `TreemapChart`. For three measures on two real
-axes, use `BubbleChart`. For the spread within each category, use
-`BoxPlotChart`.
+For equal-width columns, use `BarChart`. For parts of a total sized by area,
+use `TreemapChart`. For three measures on two axes, use `BubbleChart`. For
+spread within each category, use `BoxPlotChart`.
 
 </div>
 
@@ -50,15 +48,13 @@ axes, use `BubbleChart`. For the spread within each category, use
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Columns', <>One per item. Height is <C>y</C>, width is <C>z</C>, and each takes its own color unless the item sets <C>color</C>.</>],
-        ['Value labels', <>The <C>y</C> value, rounded to a whole number, on every column.</>],
-        ['Category axis', <>Names each column from the item's <C>name</C>. <C>xAxisLabel</C> titles it; it defaults to "Category".</>],
-        ['Value axis', <><C>yAxisLabel</C> titles it; it defaults to "Value".</>],
-        ['Tooltip', <>Labeled "Value" and "Weight", for <C>y</C> and <C>z</C>. The words are fixed, so the axis labels and the header must say what each means.</>],
+        ['Columns', <>One per item; height is <C>y</C>, width is <C>z</C>, colored in categorical order unless the item sets <C>color</C>.</>],
+        ['Value labels', <>Prints <C>y</C> rounded to a whole number on every column.</>],
+        ['Category axis', <>Names each column from <C>name</C>; titled by <C>xAxisLabel</C> (default <C>"Category"</C>); no separate legend.</>],
+        ['Value axis', <>Titled by <C>yAxisLabel</C> (default <C>"Value"</C>).</>],
+        ['Tooltip', <>Fixed labels <C>"Value"</C> (<C>y</C>) and <C>"Weight"</C> (<C>z</C>); explain both in the axis labels and header.</>],
     ]}
 />
-
-There is no legend; the category axis names every column.
 
 </div>
 
@@ -66,8 +62,8 @@ There is no legend; the category axis names every column.
 
 ## Data shape
 
-`data` is an array of `{ name, y, z, color }`. `name`, `y` and `z` are
-required; `color` is optional. `height` defaults to 400.
+`data` is an array of `{ name, y, z, color }` (`name`, `y` and `z` required;
+`color` optional). `height` defaults to 400.
 
 ```jsx
 <VariwidthChart
@@ -88,11 +84,11 @@ required; `color` is optional. `height` defaults to 400.
 
 ## Color and accessibility
 
-- **Each column takes a color.** Columns run through the categorical order, slot 1 first. The axis already names each column, so these colors identify nothing; past six columns they move into the overflow slots, and past eight they repeat. To keep one hue, give every item the same `color`, such as `var(--ds-chart-brand)`.
-- **Height and width carry the values.** Neither depends on hue. Height reads well; width reads only roughly, and there is no width axis, so say what width means in the header or description.
-- **Area is not a total.** A wide, short column and a narrow, tall one can cover the same area. Readers will compare area anyway, so use this chart only when height times width means something.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Per-column color.** Columns cycle through the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 (overflowing past six and repeating past eight). Because the axis already names each column, pass `color: 'var(--ds-chart-brand)'` on every item if you prefer one hue.
+- **Height and width carry the values.** There is no width axis, so state what column width represents in the header or description.
+- **Ensure height × width is meaningful.** Readers naturally compare column areas, so use this chart only when the product of height and width makes sense.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -100,11 +96,7 @@ required; `color` is optional. `height` defaults to 400.
 
 ## States
 
-`VariwidthChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`VariwidthChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -121,12 +113,7 @@ required; `color` is optional. `height` defaults to 400.
 
 <DocsInteractivePlayground
     of={VariwidthChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

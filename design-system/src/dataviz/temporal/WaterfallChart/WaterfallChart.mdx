@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={WaterfallChartStories} />
 
 <Title />
-Shows how a starting value becomes an ending one through a sequence of gains
-and losses, each step floating where the last one left off.
+Shows how a starting value reaches an ending total through sequential gains and
+losses, with each step floating from where the previous one ended.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/WaterfallChart"
@@ -31,17 +31,13 @@ and losses, each step floating where the last one left off.
 
 ## When to use
 
-Use `WaterfallChart` to explain a change between two totals: enrolled students
-at the start of term, plus new sign-ups, minus withdrawals, to the current
-count; a tutoring budget, minus each cost, to what remains; a base score, plus
-bonuses, minus penalties, to the final score.
+Use `WaterfallChart` for roughly ten or fewer ordered steps that add up between
+two totals, such as term start enrollment → sign-ups → withdrawals → current
+enrollment, or budget → expenses → remaining balance.
 
-The steps must happen in order and add up. For totals without the steps between
-them, use `BarChart`. For a continuous running value, use `LineChart` or
-`AreaChart`. For a breakdown of one total with no sequence, use `TreemapChart`.
-
-Keep it to about ten steps. Past that the floating bars get thin and the
-running total hard to follow.
+For totals without intermediate steps, use `BarChart`. For a continuous running
+value, use `LineChart` or `AreaChart`. For an unordered breakdown of one total,
+use `TreemapChart`.
 
 </div>
 
@@ -52,13 +48,13 @@ running total hard to follow.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Step bars', 'One per change. Each starts where the previous one ended; a gain rises, a loss drops.'],
-        ['Total bars', <>A point with <C>isSum: true</C> draws the running total from zero; <C>isIntermediateSum: true</C> draws a subtotal since the last one.</>],
-        ['Connectors', 'Thin lines joining the end of each bar to the start of the next, drawn in the grid color as chrome.'],
-        ['Value labels', 'Every bar carries its value as a whole number.'],
+        ['Step bars', <>One per change, starting where the previous bar ended (gains in <C>--ds-chart-success</C>, losses in <C>--ds-chart-danger</C>, outlined in <C>--ds-border-inverse</C>).</>],
+        ['Total bars', <><C>isSum: true</C> draws the full total from zero; <C>isIntermediateSum: true</C> draws a subtotal since the last one.</>],
+        ['Connectors', 'Thin lines in the grid border token joining the end of each bar to the start of the next.'],
+        ['Value labels', 'Whole-number value on every bar (losses carry a minus sign; gains carry no plus sign).'],
         ['Category axis', <>Names each step from <C>categories</C>.</>],
-        ['Value axis', <><C>yAxisLabel</C> titles it; it defaults to <C>"Value"</C>.</>],
-        ['Tooltip', 'Shows the hovered bar’s value. There is no legend.'],
+        ['Value axis', <>Titled by <C>yAxisLabel</C> (default <C>"Value"</C>).</>],
+        ['Tooltip', 'Shows the hovered bar’s value; no legend.'],
     ]}
 />
 
@@ -68,10 +64,9 @@ running total hard to follow.
 
 ## Data shape
 
-`categories` names each step. `data` holds one entry per category, in the same
-order: a number for a change (negative for a loss), or an object
-`{ y, isSum, isIntermediateSum, color }`. A total needs no `y`; the chart
-computes it.
+`categories` names each step. `data` holds one entry per category in the same
+order: a number (negative for a loss) or `{ y, isSum, isIntermediateSum, color }`.
+Totals compute `y` automatically; `height` defaults to 400.
 
 ```jsx
 <WaterfallChart
@@ -88,19 +83,16 @@ computes it.
 />
 ```
 
-`height` defaults to 400.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Gains and losses are status colors.** A gain takes `--ds-chart-success` and a loss `--ds-chart-danger`. Bars are outlined in `--ds-border-inverse` and connectors take the grid border.
-- **Give the start and totals their own color.** They are amounts, not gains or losses. Pass `color` on those points, as the Overview story does with `--ds-chart-brand`; without it they take a status color they do not mean.
-- **Labels and direction carry the meaning, not only color.** Every bar shows its value and a loss drops below the previous bar's end. A loss's label carries a minus sign; a gain's carries no plus sign, so direction is the only cue besides color that a step is positive.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Override color on start and total bars.** Gains default to `--ds-chart-success` and losses to `--ds-chart-danger`. Pass `color: 'var(--ds-chart-brand)'` on starting and total bars so they do not take a status color.
+- **Direction and labels carry the reading.** Every bar prints its value and steps up or down from the previous bar's end, so the chart reads without hue.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -108,11 +100,7 @@ computes it.
 
 ## States
 
-`WaterfallChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`WaterfallChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -129,12 +117,7 @@ computes it.
 
 <DocsInteractivePlayground
     of={WaterfallChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

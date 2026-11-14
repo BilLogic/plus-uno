@@ -139,7 +139,7 @@ The × is on default flags only, so a stack is all default flags or all bold.
 - For a decision that blocks the task, use `Modal`.
 - For help attached to a specific control, use `Tooltip` or `Popup`.
 
-Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
+Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 

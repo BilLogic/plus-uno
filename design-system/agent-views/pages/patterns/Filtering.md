@@ -10,7 +10,7 @@ How a person narrows a collection, with filters at the end of the Section's view
 
 ## Tiers
 
-Pick by how many categories there are and how long their lists run. When a Section outgrows tier 1, all of its filters move into the menu.
+Choose a tier by the number of categories and the length of their lists. See Best practices for when to move filters into a menu.
 
 - **1 · Quick filters.** One to three categories, each a short list: a FilterButton per category, applied as you pick.
 - **2a · Menu, one category.** The Filter icon opens one list, applied as you pick. No footer.

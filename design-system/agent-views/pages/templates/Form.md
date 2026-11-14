@@ -54,7 +54,7 @@ A stepped form on its own page is Frame · focused with the form in the body. Ba
 
 ## Key states
 
-Each state shows how the form behaves in its host. Every field's own states live with the field.
+These examples show form states within each host. See each field's component page for its states.
 
 ## Sizes
 
@@ -136,7 +136,7 @@ Form reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-The rules for a form live in the pattern pages. This page keeps only how a form sits in each container.
+For form behavior, follow the pattern pages:
 
 - Where the buttons sit and in which look, full bleed and 48 high, and the footer that stays put: Common actions.
 - When to validate, the enabled submit, a blocked submit and a rejected one, bound inputs and leaving with edits: Forms.

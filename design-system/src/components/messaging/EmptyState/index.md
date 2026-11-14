@@ -97,7 +97,7 @@ Don't: An EmptyState under a Table with an empty body.
 - `Flag`, for a failure in the background that stays until closed.
 - `SectionMessage`, for a rejected form submit at the top of the form.
 
-Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
+Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 

@@ -122,7 +122,7 @@ a message back when it genuinely changes, remount it with a new `key`.
 - For something that must be acknowledged before continuing, use `Modal`.
 - For a status label on a row, use `StatusTag`.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `Spotlight`
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `Spotlight`
 
 ## Parts
 

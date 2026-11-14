@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={DumbbellChartStories} />
 
 <Title />
-Shows two values per category as two dots joined by a line. The line's length
-is the gap between them: a change, a spread or a shortfall.
+Compares two values per category as two dots joined by a line whose length
+shows the change, spread or shortfall between them.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/DumbbellChart"
@@ -31,18 +31,17 @@ is the gap between them: a change, a spread or a shortfall.
 
 ## When to use
 
-Use `DumbbellChart` when the gap between two values is the story: pre-test
-against post-test score per student, start against current level per skill,
-first-week against latest attendance per school. Sort by gap size and the
-biggest movers rise to the top.
+Use `DumbbellChart` when the gap between two values is the story: pre-test vs.
+post-test score per student, starting vs. current skill level, or first-week vs.
+latest attendance per school. Sort by gap size to surface the biggest movers.
 
-For one value per category, use `LollipopChart`. For a continuous span with no
-two distinct moments, use `ColumnRangeChart`. For the two values read as
-separate bars, use `BarChart` with two series. For more than two points per
-category, use `LineChart`.
+For one value per category, use `LollipopChart`. For a continuous span without
+two distinct moments, use `ColumnRangeChart`. For two values as side-by-side
+bars, use `BarChart` with two series. For more than two points per category, use
+`LineChart`.
 
-The chart is horizontal by default, which suits names. Set `horizontal` to
-`false` for short labels laid out as columns.
+Horizontal by default to fit names; set `horizontal={false}` for short labels
+in columns.
 
 </div>
 
@@ -55,10 +54,10 @@ The chart is horizontal by default, which suits names. Set `horizontal` to
     rows={[
         ['Low dot', <>Each item's <C>low</C>, in categorical slot 2.</>],
         ['High dot', <>Each item's <C>high</C>, in categorical slot 1.</>],
-        ['Connector', 'A 2 px line from low to high. Its length is the gap.'],
-        ['Category axis', <>Names each dumbbell, from <C>categories</C>; a missing label falls back to <C>Item 1</C>, <C>Item 2</C>.</>],
-        ['Value axis', <>Titled by <C>yAxisLabel</C>, which defaults to <C>Value</C>.</>],
-        ['Legend', <>One entry, top right, reading <C>lowLabel → highLabel</C>; the defaults are <C>Low</C> and <C>High</C>.</>],
+        ['Connector', 'A 2 px line from low to high; its length is the gap.'],
+        ['Category axis', <>Names each dumbbell from <C>categories</C>; missing labels fall back to <C>Item 1</C>, <C>Item 2</C>.</>],
+        ['Value axis', <>Titled by <C>yAxisLabel</C> (default <C>Value</C>).</>],
+        ['Legend', <>One entry top right reading <C>lowLabel → highLabel</C> (defaults <C>Low</C> and <C>High</C>).</>],
         ['Tooltip', 'Shared: shows both values for the hovered category.'],
     ]}
 />
@@ -69,9 +68,9 @@ The chart is horizontal by default, which suits names. Set `horizontal` to
 
 ## Data shape
 
-`categories` is an array of strings. `data` is an array of `{ low, high }`, both
-required, one per category in the same order. `lowLabel` and `highLabel` name the
-two ends. `height` defaults to 400; `horizontal` defaults to `true`.
+`categories` is an array of strings. `data` is an array of `{ low, high }` (both
+required) in `categories` order. `lowLabel` and `highLabel` name the two ends.
+`height` defaults to 400; `horizontal` defaults to `true`.
 
 ```jsx
 <DumbbellChart
@@ -94,12 +93,12 @@ two ends. `height` defaults to 400; `horizontal` defaults to `true`.
 
 ## Color and accessibility
 
-- **Color tells the two ends apart.** The high dot and the connector take categorical slot 1, the low dot slot 2. The colors are fixed and cannot mark a gain against a loss.
-- **The legend does not name the colors separately.** Its one entry reads "Pre-test → Post-test" in one swatch, so a reader matches dot to end by color alone. Say which end is which in the surrounding text, or rely on the tooltip.
+- **Fixed end colors.** The high dot and connector use categorical slot 1; the low dot uses slot 2. Colors cannot mark a gain vs. a loss.
+- **Single-swatch legend.** The legend prints `"Pre-test → Post-test"` with one swatch, so state which end is which in surrounding text or rely on the tooltip.
 - **Position carries the values.** Both dots sit on a shared axis, so the gap reads as a length without hue.
-- **Keep `low` and `high` consistent.** Put the same measure in the same field for every row, such as pre-test in `low`. When a row declines, only the order of the two colors shows it, so call declines out in the surrounding text.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Keep `low` and `high` consistent.** Put the same measure in the same field for every row (for example, pre-test in `low`). Because only dot color order indicates a decline, call declines out in surrounding text.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -107,11 +106,7 @@ two ends. `height` defaults to 400; `horizontal` defaults to `true`.
 
 ## States
 
-`DumbbellChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`DumbbellChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -128,12 +123,7 @@ two ends. `height` defaults to 400; `horizontal` defaults to `true`.
 
 <DocsInteractivePlayground
     of={DumbbellChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

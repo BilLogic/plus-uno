@@ -1,0 +1,134 @@
+@use '../../../styles/state' as *;
+
+/**
+ * NotificationItem — a single-link notification row with a 32px actor slot at
+ * the start, title over meta in the body, and an unread dot / Mark as read
+ * action in the trailing 24px slot.
+ */
+
+.plus-notification-item {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.plus-notification-item__link {
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--inline-lg);
+    width: 100%;
+    padding: var(--pad-y-lg) var(--pad-x-md);
+    border-radius: var(--radius-control-md);
+    background-color: var(--ds-background-neutral-subtle);
+    color: var(--ds-text);
+    text-decoration: none;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        ),
+        $hovered-selector: '.plus-notification-item:hover &, .plus-notification-item[data-hovered] &, &:hover, &[data-hovered]',
+        $pressed-selector: '.plus-notification-item[data-pressed] &, &:active, &[data-pressed]'
+    );
+}
+
+.plus-notification-item__link--unread {
+    background-color: var(--ds-background-selected);
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-selected-hovered)),
+            pressed: (background-color: var(--ds-background-selected-pressed)),
+        ),
+        $ring: false,
+        $hovered-selector: '.plus-notification-item:hover &, .plus-notification-item[data-hovered] &, &:hover, &[data-hovered]',
+        $pressed-selector: '.plus-notification-item[data-pressed] &, &:active, &[data-pressed]'
+    );
+}
+
+.plus-notification-item__start {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--image-md);
+    height: var(--image-md);
+}
+
+.plus-notification-item__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-sm);
+    flex: 1 1 0%;
+    min-width: 0;
+}
+
+.plus-notification-item__label {
+    font: var(--body-default);
+    color: var(--ds-text);
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.plus-notification-item--unread .plus-notification-item__label {
+    font-weight: var(--type-weight-medium);
+}
+
+.plus-notification-item__description {
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+    min-width: 0;
+}
+
+.plus-notification-item__end {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--control-sm);
+    height: var(--control-sm);
+    margin-inline-start: auto;
+}
+
+.plus-notification-item__dot {
+    width: var(--count-tag-dot-size);
+    height: var(--count-tag-dot-size);
+    border-radius: var(--radius-full);
+    background-color: var(--ds-background-brand-bold);
+    flex-shrink: 0;
+    transition: opacity var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+    @include plus-state(
+        $states: (
+            hovered: (opacity: 0),
+        ),
+        $ring: false,
+        $hovered-selector: '.plus-notification-item--actionable:hover &, .plus-notification-item--actionable[data-hovered] &, .plus-notification-item--actionable:focus-within &'
+    );
+}
+
+.plus-notification-item__actions {
+    position: absolute;
+    inset-block-start: var(--pad-y-lg);
+    inset-inline-end: var(--pad-x-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+    @include plus-state(
+        $states: (
+            hovered: (
+                opacity: 1,
+                pointer-events: auto,
+            ),
+        ),
+        $ring: false,
+        $hovered-selector: '.plus-notification-item--actionable:hover &, .plus-notification-item--actionable[data-hovered] &, .plus-notification-item--actionable:focus-within &'
+    );
+}

@@ -10,7 +10,7 @@ What a view shows when it has nothing to show. It says what belongs here, why it
 
 ## The types
 
-Every empty state is one of four. The type decides the words and whether there is an action. The Empty state page holds the props; these are the situations.
+Choose among four situations to set the wording and available action. See Empty state for props.
 
 - **First use.** Nothing has been added yet. Say what will appear and give the one action that adds it, if this person can.
 - **No matches.** A search or filter matched nothing. Name what is active and offer "Reset filters".

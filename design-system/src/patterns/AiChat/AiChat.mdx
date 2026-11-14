@@ -14,9 +14,9 @@ import {
 <Meta of={AiChatStories} />
 
 <Title>AI chat</Title>
-AI chat sits beside the work or over it, whichever the task needs. One floating action button at the bottom right of the Page opens it as a popup. From there it moves to the Frame's Panel or to full screen, and the app remembers the mode for the tab.
+AI chat opens from one floating button at the Page's bottom right and moves between popup, Frame Panel and full screen. The app remembers the mode for the tab.
 
-The examples on this page follow the **Color mode** switch in the toolbar.
+Use the toolbar's **Color mode** switch for these examples.
 
 <DocsTabs of={AiChatStories}>
 
@@ -47,7 +47,7 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 <ComponentExample of={AiChatStories.PanelMode} title="Panel" description="The same chat docked beside the Page, or over it on a Backdrop when there is no room." />
 
-Full screen covers the window, so it is not drawn inline here. Under 768 the popup is shown full screen. Replying starts only when a prompt is sent and ends when the reply arrives, so it is not drawn inline either; its typing indicator is the <a href="?path=/docs/ai-ui-components-ai-message-ai-message--docs">AI message</a>'s `thinking` status. How a reply carries the AI icon, its sources and its thumbs is under Best practices.
+Full screen covers the window and is not shown inline. Below 768, the popup is full screen. Replying runs from sending a prompt until the answer arrives; its indicator uses <a href="?path=/docs/ai-ui-components-ai-message-ai-message--docs">AI message</a>'s `thinking` status. See Best practices for answer identity, sources and feedback.
 
 </div>
 
@@ -79,7 +79,7 @@ Full screen covers the window, so it is not drawn inline here. Under 768 the pop
 
 ## Usage
 
-AI chat is the one way to ask AI about the page in front of you. Pick the mode for the size of the ask.
+Use AI chat to ask about the current page. Choose a mode for the task.
 
 <DocsTable>
 <thead>
@@ -92,18 +92,19 @@ AI chat is the one way to ask AI about the page in front of you. Pick the mode f
 </tbody>
 </DocsTable>
 
-AI chat applies the six AI rules from the AI overview.
-
-1. **One AI identity, unnamed.** The chat is called AI chat and carries the AI icon. It has no persona name or avatar.
-2. **Every answer is marked.** Each reply is an AI message, which leads with the AI icon.
-3. **Fallibility, once.** "AI can make mistakes. Check important info." sits under the prompt input, never on each message.
-4. **Sources when it draws on data.** A reply that used records lists them under the message: `respond` returns `{ text, sources }` instead of text.
-5. **People confirm actions.** The chat proposes changes; anything that changes data waits for the person's confirm.
-6. **Feedback on every answer.** Each reply offers thumbs up and thumbs down, and `onFeedback` receives the reply with its rating. The rating stays on the reply as chat moves between modes.
+Follow the six <a href="?path=/docs/ai-ui-ai-interaction-guidelines--docs">AI interaction guidelines</a> for identity, answer marking, fallibility, sources, confirmation and feedback.
+Call the chat "AI chat". Return `{ text, sources }` from `respond` for answers
+based on records; `linkTarget` controls where source links open. `onFeedback`
+receives the reply and its rating, which persists across modes.
 
 ### Storybook variant
 
-`variant="storybook"` is the chat in the Storybook docs. The docs' floating button opens it through its AI chat action, so the chat's own button is left out with `launcher={false}`: the popup floats above the bottom right corner instead. `respond` may return `{ text, sources }`, and the sources list under the answer, opening in `linkTarget`. The docs' answerer calls a server-side function that answers from the design-system index and holds the credentials, so none reaches the browser; when it errors or is rate limited, the chat searches the site's pages and the component index instead and says so.
+`variant="storybook"` uses the docs' floating button's AI chat action to open chat.
+Set `launcher={false}` to omit chat's own button; the popup floats above the bottom right corner.
+
+The docs answerer uses a server-side function grounded in the design-system index.
+Credentials stay on the server. On errors or rate limits, it searches site pages
+and the component index and names that fallback.
 
 </div>
 

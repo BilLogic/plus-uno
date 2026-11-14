@@ -15,14 +15,14 @@ import * as ColorStories from './Color.stories.jsx';
 <FoundationHero
     kind="Data visualizations"
     title="Data visualizations"
-    summary="Forty-one charts in six groups, one color system and the same spacing, type and motion tokens as the rest of PLUS. Pick the chart for the question, then let the palette do its one job per color."
+    summary="Forty-one charts in six groups, one color system, and shared spacing, type and motion tokens. Pick the chart for the question, then assign one job per color."
 />
 
 <FoundationContents />
 
 <FoundationSection title="Pick a chart by the question">
 
-Start from what the viewer needs to know. Each group in the sidebar answers one kind of question.
+Each sidebar group answers one kind of question.
 
 <RefTable
     head={['Question', 'Group', 'Start with']}
@@ -36,13 +36,11 @@ Start from what the viewer needs to know. Each group in the sidebar answers one 
     ]}
 />
 
-Every chart page shows the chart, then covers when to use it and which chart to use instead, its anatomy, the data it takes, how it colors and what it relies on besides color, and what to show while it has no data. It ends with a live playground and the sibling charts to consider.
-
 </FoundationSection>
 
 <FoundationSection title="Chart color">
 
-A chart color does one of four jobs, and each job has one token family. Name a color by its job, never by its hue.
+Each chart color does one of four jobs and maps to one token family. Name colors by job, never by hue. See [Chart color](?path=/docs/data-visualizations-color--docs) for the full palette and rules.
 
 <RefTable
     head={['Job', 'What it encodes', 'Tokens']}
@@ -54,9 +52,7 @@ A chart color does one of four jobs, and each job has one token family. Name a c
     ]}
 />
 
-A single-series chart takes <C>--ds-chart-brand</C>, and a de-emphasized comparison or reference line takes <C>--ds-chart-neutral</C>.
-
-Every family below is live: the swatches follow the toolbar's color mode and contrast.
+Single-series charts take <C>--ds-chart-brand</C>; de-emphasized comparison or reference lines take <C>--ds-chart-neutral</C>. Swatches below follow the toolbar's color mode and contrast.
 
 <FoundationSubsection title="Brand and neutral">
 <Canvas of={ColorStories.BrandAndNeutral} sourceState="none" />
@@ -83,34 +79,32 @@ Every family below is live: the swatches follow the toolbar's color mode and con
 <FoundationSection title="Color do and don't">
 
 <DoDont>
-    <Do caption="Stay within five or six series. Each keeps its slot in the categorical order, and the legend can name every one.">
+    <Do caption="Stay within five or six series so each keeps its categorical slot and legend label.">
         <Story of={OverviewStories.WithinTheLimit} />
     </Do>
-    <Dont caption="Past six series the sequence reaches its overflow slots and neighbors blur. Group the smallest categories into Other.">
+    <Dont caption="Past six series, slots 7 and 8 are overflow and neighbors blur. Group the smallest categories into Other.">
         <Story of={OverviewStories.PastTheLimit} />
     </Dont>
 </DoDont>
 
 <DoDont>
-    <Do caption="Use categorical colors to tell categories apart, and keep state colors for values that mean a state.">
+    <Do caption="Use categorical colors to separate categories, and reserve state colors for state values.">
         <Story of={OverviewStories.CategoriesOnly} />
     </Do>
-    <Dont caption="Mixing a categorical color with a state color reads wrong: one series now reads as success and the other as nothing.">
+    <Dont caption="Do not mix categorical and state colors: one series reads as success and the other as nothing.">
         <Story of={OverviewStories.CategoryAndStateMixed} />
     </Dont>
 </DoDont>
 
-More rules that hold for every chart:
-
-- **Never color alone.** Pair every series or state with a label, a shape, a pattern or a table the reader can check. Some chart pages name where the chart itself leans on color, so add the label there.
-- **No text on a chart color.** A label sits beside its mark. Where it must sit on a fill, such as a heatmap cell, it takes <C>--ds-text</C> or <C>--ds-text-inverse</C>, whichever reads.
-- **Sort categories from most to least.** An ordered set such as grades or stages takes one hue's ramp, with the strongest tone on the biggest value.
+- **Never rely on color alone.** Pair every series or state with a label, shape, pattern or table. Where a chart type leans on color, add a direct label.
+- **Keep text off chart fills.** Place labels beside marks. When a label must sit on a fill, such as a heatmap cell, use <C>--ds-text</C> or <C>--ds-text-inverse</C>, whichever contrasts.
+- **Sort categories from most to least.** Ordered sets such as grades or stages take one hue's sequential ramp, strongest tone on the largest value.
 
 </FoundationSection>
 
 <FoundationSection title="Spacing and type">
 
-A chart takes spacing and type from the same tokens as every other component. Charts are still being brought onto tokens, so a few older ones keep a literal size.
+Charts share spacing, type, radius and stroke tokens with the rest of the system; see [Foundations](?path=/docs/data-visualizations-foundations--docs). Older charts still being migrated may keep a literal size, but always take text sizes from tokens, never literal pixel values.
 
 <RefTable
     head={['Role', 'Token']}
@@ -123,7 +117,7 @@ A chart takes spacing and type from the same tokens as every other component. Ch
     ]}
 />
 
-A chart has no title of its own: name it in the header of the Section or Card around it. Take text sizes from tokens, not literal pixel values.
+Charts have no built-in title; name each chart in its surrounding Section or Card header.
 
 </FoundationSection>
 

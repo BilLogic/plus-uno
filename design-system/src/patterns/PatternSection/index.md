@@ -147,7 +147,7 @@ Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `Pat
 
 ## Types
 
-Common starting types of the one Section, not new components. Each is a header type, a body, and sometimes a side or a detail.
+Each Section type combines a header and body, with an optional side or detail. These are starting layouts of the same component.
 
 - **List.** The view bar alone, one table, paging. The default for an area page.
 - **Queue.** A list with a detail, for working through records one by one.

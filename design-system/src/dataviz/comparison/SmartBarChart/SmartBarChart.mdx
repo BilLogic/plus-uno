@@ -7,9 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={SmartBarChartStories} />
 
 <Title />
-Shows a percentage per category as a pill-shaped column filling a full-height
-track. It drops the value axis, so it suits compact cards where the shape
-matters more than the exact number.
+Shows a percentage per category as a pill-shaped column inside a full-height
+track, omitting the value axis for compact cards.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/SmartBarChart"
@@ -32,17 +31,16 @@ matters more than the exact number.
 
 ## When to use
 
-Use `SmartBarChart` for a small set of percentages read at a glance: share of
-students at each grade, session attendance by weekday, completion by unit. The
-track behind each column shows how far it is from 100%, so the chart reads as
-"how full" rather than "how much".
+Use `SmartBarChart` for a small set of percentages read at a glance, such as
+student share by grade, weekday attendance or unit completion. Each column's
+track marks 100%, so the chart reads as "how full" rather than "how much".
 
-For values that are not percentages, or that need an axis to read exactly, use
-`BarChart`. For a value against a target, use `BulletChart`. For parts of one
-total, use `StackedBarChart` or `DonutChart`.
+For non-percentage values or exact axis readings, use `BarChart`. For a value
+against a target, use `BulletChart`. For parts of one total, use
+`StackedBarChart` or `DonutChart`.
 
-Keep category labels short. The axis is sized for a letter or a day initial,
-which is what the stories use.
+Keep category labels to a single letter or day initial, which the axis is sized
+for.
 
 </div>
 
@@ -53,11 +51,11 @@ which is what the stories use.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Track', <>A full-height pill behind every column, in <C>--ds-background-neutral</C>. It marks 100% and takes no hover.</>],
-        ['Column', <>One per item in <C>data</C>, filled to its <C>height</C> on a fixed 0 to 100 scale, in the item's <C>color</C>. Fully rounded at both ends.</>],
-        ['Category labels', <>One per column, from each item's <C>letter</C>.</>],
-        ['Value axis', 'None. The scale is fixed at 0 to 100 and hidden, with no gridlines.'],
-        ['Tooltip', <>Shows the category and its value with a percent sign.</>],
+        ['Track', <>Full-height pill behind each column in <C>--ds-background-neutral</C>, marking 100% with no hover.</>],
+        ['Column', <>One per item in <C>data</C>, filled to <C>height</C> on a 0–100 scale in the item's <C>color</C>, rounded at both ends.</>],
+        ['Category labels', <>One per column from each item's <C>letter</C>.</>],
+        ['Value axis', 'None. Fixed 0–100 scale, hidden, with no gridlines.'],
+        ['Tooltip', 'Shows the category and value with a percent sign.'],
     ]}
 />
 
@@ -67,9 +65,9 @@ which is what the stories use.
 
 ## Data shape
 
-`data` is an array of `{ letter, height, color }`, all three required. `height`
-is a numeric string from 0 to 100; `letter` labels the column; `color` fills it.
-The chart's own `height` prop is its pixel height and defaults to 200.
+`data` is an array of `{ letter, height, color }` (all required): `height` is a
+numeric string from `0` to `100`, `letter` labels the column, and `color` fills
+it. The chart's `height` prop sets its pixel height (default 200).
 
 ```jsx
 import { BRAND } from '@/dataviz/palette';
@@ -92,11 +90,11 @@ import { BRAND } from '@/dataviz/palette';
 
 ## Color and accessibility
 
-- **You assign every color.** The chart has no default, so `color` is required on each item. For one measure across categories, give every column `--ds-chart-brand` (`BRAND`). For ordered groups such as grades, use one hue from `sequentialRamp`, the strongest step on the biggest value, as the Overview story does.
-- **Fill height carries the value.** Color adds nothing the height does not already say, so the chart reads without hue. Do not use color alone to flag a column as good or bad.
-- **No axis, no printed values.** The exact number is only in the tooltip. When readers need the number, put it in the surrounding text or use `BarChart`.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. Single letters make thin point labels, so say what each letter stands for nearby. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Caller-assigned color.** `color` is required on every item. Use `BRAND` (`--ds-chart-brand`) for one measure across categories, or one hue from `sequentialRamp` (strongest step on the largest value) for ordered groups such as grades.
+- **Fill height carries the value.** The chart reads without hue; never use color alone to flag a column as good or bad.
+- **Hover-only numbers.** With no axis or data labels, exact values appear only in the tooltip. State key numbers in surrounding text or use `BarChart`.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Explain single-letter category labels in nearby text, and name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -104,11 +102,7 @@ import { BRAND } from '@/dataviz/palette';
 
 ## States
 
-`SmartBarChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`SmartBarChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={200} />
@@ -125,12 +119,7 @@ import { BRAND } from '@/dataviz/palette';
 
 <DocsInteractivePlayground
     of={SmartBarChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

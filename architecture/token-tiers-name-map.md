@@ -279,6 +279,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Popup | `--popup-max-width` |  |
 | Popup | `--popup-clip-reach` |  |
 | AI chat | `--ai-chat-width` |  |
+| Inbox | `--inbox-width` | 360px |
 | Popup | `--popup-pad` |  |
 | Table | `--table-cell-max-width` |  |
 | Avatar | `--avatar-size-96` |  |

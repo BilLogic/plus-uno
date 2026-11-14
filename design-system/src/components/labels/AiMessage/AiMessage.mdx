@@ -15,9 +15,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 <Meta of={AiMessageStories} />
 
 <Title />
-An assistant reply in the three states it moves through: finished, streaming and
-the typing indicator. Every reply leads with the small AI icon, so no answer reads
-as a person's.
+An AI reply with thinking, streaming and complete states, identified by the AI icon.
 
 <DocsTabs of={AiMessageStories}>
 
@@ -46,7 +44,7 @@ as a person's.
 
 <ComponentExample of={AiMessageStories.WithParts} title="With parts" description="Text parts and a part the caller draws." />
 
-<ComponentExample of={AiMessageStories.WithSources} title="With sources" description="What a finished answer read, under it: the title as a link and the type beside it, with the rest folded behind a toggle past three." />
+<ComponentExample of={AiMessageStories.WithSources} title="With sources" description="Sources start collapsed under a finished answer. Expand the counted toggle to see linked titles and types." />
 
 <ComponentExample of={AiMessageStories.WithFeedback} title="With feedback" description="Thumbs up and down under a finished answer; one stays chosen at a time, and thumbs down asks for an optional comment." />
 
@@ -93,10 +91,8 @@ as a person's.
 
 ## Usage
 
-Use `AiMessage` for every reply an assistant writes: in the AI chat, in a panel,
-anywhere text comes from the model. Show `thinking` from the moment a message is
-sent until the first text arrives, `streaming` while text arrives, then
-`complete`.
+Use `AiMessage` for every AI reply, in chat, a panel or elsewhere. Choose its
+status from the table below.
 
 ### Status guidance
 
@@ -121,7 +117,7 @@ sent until the first text arrives, `streaming` while text arrives, then
 2. **Text.** The body style, keeping the reply's line breaks. With <code>parts</code>, text parts and other parts in order; <code>renderPart</code> draws a part that is not text.
 3. **Caret.** Streaming only: a thin bar after the last character, blinking.
 4. **Typing indicator.** Thinking only: three pulsing dots in place of the text.
-5. **Sources** (optional). Complete only: a "Sources" heading, one row per source with its title as a link and its type beside it, and a toggle past three.
+5. **Sources** (optional). Complete only: a counted "Sources" toggle, closed by default, with linked titles and types inside.
 6. **Feedback** (optional). Complete only, with <code>onFeedback</code>: thumbs up and down and a quiet thanks beside them.
 
 ### States
@@ -163,9 +159,8 @@ sent until the first text arrives, `streaming` while text arrives, then
 
 ### Stream the answer, then settle.
 
-The streaming state shows the answer arriving. Show the state, never a blank:
-the typing indicator holds the place until the first text, then text streams
-in, then the message settles to `complete`.
+Keep progress visible rather than leaving a blank; follow the status sequence
+in Usage.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}><AiMessage status="thinking" /><AiMessage status="streaming" text="Maya has the steps for adding fractions, but in word" /></div>}
@@ -189,10 +184,9 @@ shows no list.
 
 ### Offer feedback on every finished answer.
 
-Pass `onFeedback` wherever an answer is shown. The thumbs appear only once the
-reply is complete, so a streaming answer is never rated on partial text. A
-second press on the same thumb clears it; thumbs down opens an optional comment
-that can be skipped.
+Pass `onFeedback` for every answer; feedback appears only at `complete`, so
+partial replies cannot be rated. See <a href="?path=/docs/ai-ui-components-ai-message-ai-feedback--docs&tab=plus-usage">AI feedback</a>
+for rating changes and the optional, skippable comment.
 
 <DoDontPair
     doExample={<AiMessage text="Ava attended 12 of 14 sessions this term." onFeedback={() => {}} />}
@@ -227,13 +221,9 @@ that can be skipped.
 - **Marked as AI.** The AI icon at the start of every reply is an image named
   "AI", so a screen reader hears whose answer it is. Don't add a second icon
   beside the message.
-- **Sources are a named list.** The list is named by its "Sources" heading,
-  and the toggle past three says how many more and carries `aria-expanded`.
-- **Thumbs are toggle buttons.** They sit in a group named "Rate this answer" and
-  each reports `aria-pressed`, true on the chosen one. Thumbs down is not the popup's
-  trigger: the comment popup opens after the pick, takes focus, and returns it to the
-  thumb on close. A polite status names each rating ("Thanks. Marked
-  as a good answer."), so a change of mind is heard too. No animation.
+- **Sources and feedback.** See <a href="?path=/docs/ai-ui-components-ai-message-ai-sources--docs&tab=plus-usage">AI sources</a>
+  for list naming and toggle semantics, and <a href="?path=/docs/ai-ui-components-ai-message-ai-feedback--docs&tab=plus-usage">AI feedback</a>
+  for rating names, pressed states, focus and announcements.
 - **Busy while arriving.** A streaming message is marked `aria-busy`, so a
   screen reader waits for the finished text. A typed-out reply carries its full
   text for assistive technology and hides the character-by-character copy.

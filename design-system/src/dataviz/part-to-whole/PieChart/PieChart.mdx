@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={PieChartStories} />
 
 <Title />
-Shows how one total splits into a few parts, each part a slice of a circle
-labeled with its share.
+Splits one total into two to five slices of a circle, each labeled with its
+name and percentage share.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/PieChart"
@@ -31,16 +31,13 @@ labeled with its share.
 
 ## When to use
 
-Use `PieChart` when the question is "how is this total divided?" and the answer
-has two to five parts: sessions per subject this term, students by grade band,
-resource types in the library. It works best when one share dominates or when
-the split is close to a simple fraction like a half or a quarter.
+Use `PieChart` when one total divides into two to five parts — such as sessions
+per subject, students by grade band or library resource types — especially when
+one share dominates or matches a simple fraction.
 
-For parts that need a headline number in the middle, such as a completion
-rate, use `DonutChart`. For more than five parts, or when readers need to
-compare parts closely, use `BarChart`. For the same split across several
-groups, use `StackedBarChart` rather than a row of pies. For parts nested
-inside parts, use `SunburstChart`.
+For a headline number in the center, use `DonutChart`. For more than five parts
+or close comparisons, use `BarChart`. To compare the same split across groups,
+use `StackedBarChart`. For nested parts, use `SunburstChart`.
 
 </div>
 
@@ -51,11 +48,11 @@ inside parts, use `SunburstChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Slices', <>One per item in <C>data</C>. The angle is the item's share of the total. Clicking a slice selects it.</>],
-        ['Data labels', 'Each slice is labeled with its name and percentage, to one decimal place.'],
-        ['Legend', <>Names each slice. Shown by default; turn it off with <C>showLegend</C> when the data labels are enough.</>],
-        ['Tooltip', 'Hovering a slice shows its percentage of the total.'],
-        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 400.</>],
+        ['Slices', <>One per item in <C>data</C>, sized by share of the total; clicking a slice selects it.</>],
+        ['Data labels', 'Labels each slice with its name and percentage to one decimal place.'],
+        ['Legend', <>Names each slice; shown by default and toggled by <C>showLegend</C>.</>],
+        ['Tooltip', 'Shows the hovered slice’s percentage of the total.'],
+        ['Height', <>Pixel height from <C>height</C> (default 400).</>],
     ]}
 />
 
@@ -65,9 +62,9 @@ inside parts, use `SunburstChart`.
 
 ## Data shape
 
-`data` is an array of `{ name, y }`, one object per slice. `y` is the raw value;
-the chart works out each percentage from the total, so the values do not need
-to add up to 100.
+`data` is an array of `{ name, y, color }` (`name` and raw `y` required;
+`color` optional). The chart computes percentages from the sum of `y`. Sort
+`data` from most to least before passing it in.
 
 ```jsx
 <PieChart
@@ -80,22 +77,16 @@ to add up to 100.
 />
 ```
 
-An item may carry its own `color`; leave it out and the chart assigns one.
-Slices draw in the order given, so sort `data` from most to least before you
-pass it.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color is assigned by position.** Each slice without a `color` takes the categorical order, slot 1 for the first item, slot 2 for the second, and so on. Even a single slice gets slot 1, not the brand color.
-- **Keep it to five slices or fewer.** Slots 7 and 8 exist for overflow only, and thin slices become unreadable. Group the smallest into "Other".
-- **Angle carries the value, and angle is hard to compare.** The data labels give each slice its name and percentage, so the chart still reads without hue. Do not turn the labels into the only place a value appears for close shares; use `BarChart` when readers must rank parts that are near each other.
-- **No 3D.** Tilting the circle distorts the angles the reader is judging.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the slices. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Color by position.** Slices without `color` take the [categorical order](?path=/docs/data-visualizations-color--docs) starting at slot 1 (even for a single slice). Keep to five or fewer slices and group smaller parts into "Other" rather than reaching overflow slots 7 and 8.
+- **Labels compensate for angle.** Because angles are hard to compare closely, data labels print each slice's name and percentage so the chart reads without hue; switch to `BarChart` when ranking close shares. Never tilt the pie into 3D.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -103,11 +94,7 @@ pass it.
 
 ## States
 
-`PieChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`PieChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -124,12 +111,7 @@ pass it.
 
 <DocsInteractivePlayground
     of={PieChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

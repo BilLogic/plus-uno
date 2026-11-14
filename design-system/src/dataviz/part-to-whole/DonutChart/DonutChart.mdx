@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={DonutChartStories} />
 
 <Title />
-A thin ring split into parts of one total, with a headline value and label in
-the center. Most often it shows progress toward a goal.
+Splits one total into a thin ring with a headline value and label in the
+center, most often for progress toward a goal.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/DonutChart"
@@ -31,16 +31,14 @@ the center. Most often it shows progress toward a goal.
 
 ## When to use
 
-Use `DonutChart` for a single headline number that is a share of something:
-modules completed, sessions done against the term's target, SMART competencies
-a tutor has passed. The ring shows the share at a glance; the center states it
-exactly. It also fits a small split of two to five parts when a total or label
-belongs in the middle.
+Use `DonutChart` for a single headline share — such as modules completed,
+sessions against a term target or SMART competencies passed — or a small split
+of two to five parts when a total or label belongs in the center.
 
 For a split with labeled slices and a legend, use `PieChart`. For one value
-against a target that must be read precisely, use `BulletChart`. For a value
-on a dial with a min and max, use `GaugeChart`. For more than five parts, or
-comparing several donuts side by side, use `BarChart`.
+against a target read precisely, use `BulletChart`. For a value on a dial with a
+min and max, use `GaugeChart`. For more than five parts, or comparing multiple
+donuts, use `BarChart`.
 
 </div>
 
@@ -51,16 +49,13 @@ comparing several donuts side by side, use `BarChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Ring', <>One segment per item in <C>segments</C>, drawn as a thin ring. <C>size</C> sets its diameter in pixels; the default is 228.</>],
-        ['Center value', <>The headline, from <C>value</C>. <C>centerTextSize</C> picks its type size: <C>h1</C> (default), <C>h2</C>, <C>h3</C>, <C>h4</C>, <C>h5</C> or <C>body3</C>.</>],
-        ['Center label', <>A short line under the value, from <C>label</C>, in subtle body text.</>],
-        ['Tooltip', 'Hovering a segment shows its label and raw value.'],
-        ['Animation', <>Off by default. <C>animate</C> fills the ring on first render; <C>animationDelay</C> and <C>animationDuration</C> time it in milliseconds.</>],
+        ['Ring', <>One segment per item in <C>segments</C>, with no legend, data labels or hover highlight. <C>size</C> sets pixel diameter (default 228).</>],
+        ['Center value', <>Headline from <C>value</C>; <C>centerTextSize</C> selects <C>h1</C> (default), <C>h2</C>, <C>h3</C>, <C>h4</C>, <C>h5</C> or <C>body3</C>.</>],
+        ['Center label', <>Short line under the value from <C>label</C>, in subtle body text.</>],
+        ['Tooltip', 'Shows the hovered segment label and raw value.'],
+        ['Animation', <>Off by default. <C>animate</C> fills the ring on first render; <C>animationDelay</C> and <C>animationDuration</C> time it in ms.</>],
     ]}
 />
-
-The ring has no legend and no data labels, and segments do not highlight on
-hover.
 
 </div>
 
@@ -68,9 +63,8 @@ hover.
 
 ## Data shape
 
-`segments` is an array of `{ value, color, label }`. `value` and `color` are
-required; `label` names the segment in the tooltip. Segments draw in the order
-given.
+`segments` is an array of `{ value, color, label }` (`value` and `color`
+required; `label` names the segment in the tooltip), drawn in array order.
 
 ```jsx
 import { BRAND, CHROME } from '@/dataviz/palette';
@@ -91,12 +85,11 @@ import { BRAND, CHROME } from '@/dataviz/palette';
 
 ## Color and accessibility
 
-- **You pick every color.** `color` is required on each segment and the chart assigns none of its own. For progress, fill the done part with `BRAND` (`--ds-chart-brand`) and the remainder with `CHROME.track` (`--ds-background-neutral`). For a split, sort segments from most to least and give each the next `CATEGORICAL` slot in order, never skipping one.
-- **The center text carries the value.** Arc length shows the share, but the exact figure lives in `value`. Write the number there; do not leave the ring to speak alone.
-- **Without a legend, segment names are hover-only.** For a split of three or more parts, name the parts in the text around the chart or use `PieChart`, which labels each slice.
-- **Keep it to five segments or fewer.** Arcs on a thin ring are even harder to compare than pie slices.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the segments. Do not wrap it in `aria-hidden`; that would hide the keyboard proxies. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Caller-assigned colors.** `color` is required on every segment. For progress, pair `BRAND` (`--ds-chart-brand`) with `CHROME.track` (`--ds-background-neutral`); for a split of up to five parts, sort from most to least and assign `CATEGORICAL` slots in order without skipping ([Chart color](?path=/docs/data-visualizations-color--docs)).
+- **Always print the exact figure in `value`.** Never leave the arc to carry the number alone.
+- **Hover-only segment names.** With no legend or slice labels, name splits of three or more parts in surrounding copy or use `PieChart`.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Never wrap it in `aria-hidden` (which hides the keyboard proxies); name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -104,11 +97,7 @@ import { BRAND, CHROME } from '@/dataviz/palette';
 
 ## States
 
-`DonutChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the size of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`DonutChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's size, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={228} />
@@ -125,12 +114,7 @@ import { BRAND, CHROME } from '@/dataviz/palette';
 
 <DocsInteractivePlayground
     of={DonutChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

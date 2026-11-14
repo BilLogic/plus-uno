@@ -97,7 +97,7 @@ every visit.
 - For a message that explains one field or value inline, use `InlineMessage`.
 - For a message scoped to a page or section, use `Banner` or `SectionMessage`.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage`
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage`
 
 ## Parts
 

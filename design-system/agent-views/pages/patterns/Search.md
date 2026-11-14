@@ -10,7 +10,7 @@ How a person finds a record by typing, with a Search field in one of three modes
 
 ## Choosing a type
 
-Three modes, one field. Pick by how much data there is and how costly it is to search.
+Three modes share one field. Choose by the amount of data and the cost of searching it.
 
 - **Active.** Small or on-screen data. The rows narrow in place as the person types.
 - **Focused.** A person's own work, found from the page they are on. A panel under the field lists recent searches, then matches grouped by type, and widens with "See all results".
