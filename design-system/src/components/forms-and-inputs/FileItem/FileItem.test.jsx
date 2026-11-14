@@ -212,4 +212,18 @@ describe('FileItem', () => {
         expect(screen.queryAllByRole('button')).toHaveLength(0);
         expect(screen.queryByRole('link')).toBeNull();
     });
+
+    it('shares the item-row slot mixins from styles/_item-row.scss', async () => {
+        const fs = await import('node:fs');
+        const path = await import('node:path');
+        const scssPath = path.resolve(import.meta.dirname, 'FileItem.scss');
+        const scss = fs.readFileSync(scssPath, 'utf8');
+        expect(scss).toMatch(/@use ['"][./]*styles\/item-row['"] as \*;/);
+        expect(scss).toMatch(/@include item-row-start\(/);
+        expect(scss).toMatch(/@include item-row-body\b/);
+        expect(scss).toMatch(/@include item-row-label\b/);
+        expect(scss).toMatch(/@include item-row-description\b/);
+        expect(scss).toMatch(/@include item-row-end\b/);
+    });
 });
+

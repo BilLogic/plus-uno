@@ -124,7 +124,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--icon-sm` · `--inline-lg` · `--inline-md` · `--listbox-max-width` · `--setting-row-end-min-height` · `--setting-row-pad-y` · `--setting-row-select-min-width` · `--stack-sm` · `--type-weight-medium`
+`--body-small` · `--border-default` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--icon-sm` · `--inline-lg` · `--inline-md` · `--listbox-max-width` · `--setting-row-end-min-height` · `--setting-row-pad-y` · `--setting-row-select-min-width` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.scss`. Override these through the token layer, never with a literal.
 
