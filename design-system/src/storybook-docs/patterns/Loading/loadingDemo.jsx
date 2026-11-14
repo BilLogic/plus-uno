@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { Button, DropdownMenu, ButtonItem, Flag, FlagGroup, IconButton, ProgressBar, Skeleton, StatusTag } from '@/components';
+import { LoadRevealSlot, LoadThenReveal } from '@/lib/loadRevealMotion';
 import { PatternSection } from '@/patterns';
 import { StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
@@ -89,11 +90,15 @@ const WaitFlag = ({ title, children }) => (
 export const LoadingList = ({ band = 'shape', first = false, reduced }) => (
     <div style={stack}>
         <PatternSection title="Students" description="Lincoln Middle" tabs={<ViewBar views={['All students']} filters={null} primary={null} />}>
-            <section aria-label="Students" aria-busy={band === 'under' ? undefined : 'true'}>
-                {band === 'under'
-                    ? (first ? <div style={{ minBlockSize: BLANK }} /> : <StudentsTable count={4} />)
-                    : <SkeletonRows reduced={reduced} />}
-            </section>
+            <LoadThenReveal
+                as="section"
+                aria-label="Students"
+                loading={band !== 'under'}
+                reducedMotion={reduced}
+                skeleton={({ reduced: isReduced }) => <SkeletonRows reduced={isReduced} />}
+            >
+                {first ? <div style={{ minBlockSize: BLANK }} /> : <StudentsTable count={4} />}
+            </LoadThenReveal>
         </PatternSection>
         <LiveLabel>{band === 'under' ? '' : 'Loading students…'}</LiveLabel>
         {band === 'over' && <WaitFlag title="Still loading students">This group is large; you can keep working.</WaitFlag>}
@@ -232,3 +237,48 @@ export const LoadingTimeline = ({ kind = 'list', seconds = 2.5, reduced }) => {
         </div>
     );
 };
+
+/**
+ * Interactive Load content demo: holds layout with Skeletons, then cross-fades
+ * real content in load order (headings & summary -> data table -> primary action).
+ */
+export const LoadingRevealDemo = () => {
+    const [loading, setLoading] = useState(true);
+    const skeleton = ({ reduced }) => (
+        <div aria-hidden="true" style={stack}>
+            <Skeleton shape="text" width="40%" isShimmering={!reduced} />
+            <SkeletonRows rows={4} reduced={reduced} />
+            <Skeleton width={140} height="var(--height-250)" radius="element-radius-sm" isShimmering={!reduced} />
+        </div>
+    );
+    return (
+        <div style={{ padding: 'var(--page-pad)', ...stack }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button
+                    text={loading ? 'Finish loading' : 'Reload'}
+                    appearance="default"
+                    spacing="compact"
+                    onClick={() => setLoading((prev) => !prev)}
+                />
+            </div>
+            <PatternSection title="Students" description="Lincoln Middle">
+                <LoadThenReveal loading={loading} skeleton={skeleton}>
+                    <LoadRevealSlot>
+                        <p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                            4 active students scheduled this week
+                        </p>
+                    </LoadRevealSlot>
+                    <LoadRevealSlot>
+                        <StudentsTable count={4} />
+                    </LoadRevealSlot>
+                    <LoadRevealSlot>
+                        <div>
+                            <Button text="Export roster" appearance="primary" onClick={noop} />
+                        </div>
+                    </LoadRevealSlot>
+                </LoadThenReveal>
+            </PatternSection>
+        </div>
+    );
+};
+

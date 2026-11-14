@@ -8,9 +8,14 @@ import {
 } from '@/storybook-docs/foundation-page.jsx';
 import * as TransitionStories from './MotionTransitions.stories.jsx';
 import * as AccordionStories from '../components/layout-and-structure/Accordion/Accordion.stories.jsx';
+import * as FilteringStories from '../storybook-docs/patterns/Filtering/Filtering.stories.jsx';
+import * as FlagStories from '../components/messaging/Flag/Flag.stories.jsx';
+import * as FormStories from '../patterns/Form/Form.stories.jsx';
 import * as FrameStories from '../patterns/Frame/Frame.stories.jsx';
+import * as LoadingStories from '../storybook-docs/patterns/Loading/Loading.stories.jsx';
 import * as ModalStories from '../patterns/PatternModal/PatternModal.stories.jsx';
 import * as PageStories from '../patterns/Page/Page.stories.jsx';
+import * as PatternTableStories from '../patterns/PatternTable/PatternTable.stories.jsx';
 import * as PopupStories from '../components/overlays-and-layering/Popup/Popup.stories.jsx';
 
 <Meta of={TransitionStories} />
@@ -247,7 +252,7 @@ In Reduced mode the page does not travel: the content at the new position fades 
 
 The old content is gone before the new arrives, so one clean frame sits between them. A cross-fade shows both at half strength and reads as mud.
 
-<Canvas of={TransitionStories.SwapContent} sourceState="none" />
+<Canvas of={FilteringStories.MotionSwapResults} sourceState="none" />
 
 </FoundationSubsection>
 
@@ -274,9 +279,9 @@ The old content is gone before the new arrives, so one clean frame sits between 
 
 In a grid, the others slide along their row and wrap.
 
-<Canvas of={TransitionStories.AddAnItem} sourceState="none" />
+<Canvas of={PatternTableStories.MotionAddRow} sourceState="none" />
 
-<Canvas of={TransitionStories.RemoveAnItem} sourceState="none" />
+<Canvas of={PatternTableStories.MotionRemoveRow} sourceState="none" />
 
 **Used in:** Sidebar open items, SectionMessage, Banner (it pushes the page, so it lives on the page's layer), Table rows, Toolkit resource tiles.
 
@@ -303,7 +308,7 @@ A dragged item follows the pointer by weight: a chip on `spatial.fast`, a card o
 
 The first figure is a sort.
 
-<Canvas of={TransitionStories.ReorderItems} sourceState="none" />
+<Canvas of={PatternTableStories.MotionReorderRows} sourceState="none" />
 
 Drag a card to another place in the list, or use its grab handle: Space picks it up, the arrow keys move it, Space drops it and Escape puts it back. A live region says where it is.
 
@@ -376,7 +381,7 @@ Pick the signal by how long the wait is:
 
 Load order: the frame and navigation, then headings and text, then data, then the primary action, then charts, which may wait until scrolled to. Content may fade in over the Skeleton; this is one of the few true crossfades. A button that starts a load keeps its width: its label fades out, a Spinner fades in, and the same button confirms when done.
 
-<Canvas of={TransitionStories.LoadContent} sourceState="none" />
+<Canvas of={LoadingStories.MotionLoadReveal} sourceState="none" />
 
 </FoundationSubsection>
 
@@ -423,9 +428,9 @@ A Modal opens only from something the person did, never by itself. Focus moves t
 
 **Flag.**
 
-<Canvas of={TransitionStories.FlagOpens} sourceState="none" />
+<Canvas of={FlagStories.LandsWithNotify} sourceState="none" />
 
-<Canvas of={TransitionStories.FlagCloses} sourceState="none" />
+<Canvas of={FlagStories.MotionQueueStack} sourceState="none" />
 
 **Cancel reverses, Confirm carries on.** Cancel plays the entrance backward, one speed faster, and nothing else changes. Confirm fades the Modal, recolors the row's status and brings a Flag in.
 
@@ -528,7 +533,7 @@ Prevent errors first: pickers, dropdowns, radios and number inputs with limits w
 
 **A field.** The Do checks when focus leaves; the Don't flags the person while they type.
 
-<Canvas of={TransitionStories.ErrorInAField} sourceState="none" />
+<Canvas of={FormStories.MotionInlineValidation} sourceState="none" />
 
 **A Modal.** A failure that is the system's gets a message that makes room, never a shake.
 

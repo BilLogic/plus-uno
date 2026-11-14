@@ -5248,6 +5248,33 @@
           "values": null,
           "description": "Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting.",
           "deprecated": null
+        },
+        {
+          "name": "staggerDelayMs",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional entrance stagger delay in ms when arriving as part of a burst.",
+          "deprecated": null
+        },
+        {
+          "name": "onExited",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called once the leaving flag's exit animation finishes and it unmounts.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline styles applied to the flag surface.",
+          "deprecated": null
         }
       ],
       "stories": [
@@ -5274,7 +5301,9 @@
         "StackClosesUpReduced",
         "MotionOpenClose",
         "MotionReduced",
-        "MotionExitCompletes"
+        "MotionExitCompletes",
+        "MotionQueueStack",
+        "MotionQueueStackReduced"
       ],
       "tokens": [
         "--body-default",
@@ -9563,7 +9592,13 @@
         "Sticky",
         "StickyHeaderNeedsMaxHeight",
         "StickyHeader",
-        "StickyColumn"
+        "StickyColumn",
+        "MotionAddRow",
+        "MotionAddRowReduced",
+        "MotionRemoveRow",
+        "MotionRemoveRowReduced",
+        "MotionReorderRows",
+        "MotionReorderRowsReduced"
       ],
       "tokens": [
         "--body-default",

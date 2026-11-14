@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, DynamicTable, EmptyState, FilterButton, FilterMenu, IconButton, PopupSelect, Tabs } from '@/components';
+import { Button, DynamicTable, EmptyState, FilterButton, FilterMenu, IconButton, PopupSelect, Skeleton, Tabs } from '@/components';
+import { LoadThenReveal } from '@/lib/loadRevealMotion';
+import { SwapInPlace } from '@/lib/swapMotion';
 import { PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { useOwnWidth } from '@/patterns/Frame/useOwnWidth';
@@ -126,17 +128,21 @@ const OneListMenu = ({ category, value, onPick, open, mount }) => {
  * @param {string[]} [props.views]  the pill views at the bar's start
  * @param {(mount: Element | null) => React.ReactNode} [props.start]  the bar's start in place of the pills (a view picker), given the picture's mount
  */
-export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, views = ['All students', 'Needs follow-up'], start }) => {
+export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, views = ['All students', 'Needs follow-up'], start, loading = false }) => {
     const ref = useRef(null);
     const width = useOwnWidth(ref, STAGE);
     const [setMount, mount] = useLayerMount();
     const blank = Object.fromEntries(categories.map((id) => [id, []]));
     const [value, setValue] = useState({ ...blank, ...initial });
+    const [activeView, setActiveView] = useState(views[0]);
     const [showSide, setShowSide] = useState(false);
     const cats = categories.map((id) => CATEGORIES[id]);
     const pick = (id, next) => setValue((current) => ({ ...current, [id]: next }));
     const reset = () => setValue(blank);
-    const rows = narrow(value);
+    const baseRows = narrow(value);
+    const rows = activeView === 'Needs follow-up'
+        ? baseRows.filter((_, index) => index % 2 === 1)
+        : baseRows;
     const count = appliedCount(value);
 
     // A held-open picture shows the open layer, not the focus ring a real open moves into it.
@@ -180,7 +186,8 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
     if (mount === null && !openMenu) filters = null;
 
     const status = <span role="status" style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
-    const results = rows.length > 0 ? <StudentsTable rows={rows} /> : (
+    const swapKey = `${activeView}:${JSON.stringify(value)}`;
+    const rawResults = rows.length > 0 ? <StudentsTable rows={rows} /> : (
         <EmptyState
             spacing="compact"
             icon="user-group"
@@ -188,6 +195,25 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
             description={`Nothing matches ${flat(value).join(' and ')}. Reset the filters to see every student.`}
             primaryAction={<Button text="Reset filters" appearance="primary" onClick={reset} />}
         />
+    );
+    const resultsSkeleton = ({ reduced }) => (
+        <div aria-hidden="true" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+            {Array.from({ length: 4 }, (_, index) => (
+                <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 2fr 1fr', gap: 'var(--inline-lg)' }}>
+                    <Skeleton shape="text" width="70%" isShimmering={!reduced} />
+                    <Skeleton shape="text" width="60%" isShimmering={!reduced} />
+                    <Skeleton shape="text" width="65%" isShimmering={!reduced} />
+                    <Skeleton shape="text" width="55%" isShimmering={!reduced} />
+                </div>
+            ))}
+        </div>
+    );
+    const results = (
+        <LoadThenReveal loading={loading} skeleton={resultsSkeleton}>
+            <SwapInPlace swapKey={swapKey}>
+                {rawResults}
+            </SwapInPlace>
+        </LoadThenReveal>
     );
 
     let body = <>{status}{results}</>;
@@ -238,7 +264,7 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
                 <PatternSection
                     title="Students"
                     description="Lincoln Middle"
-                    tabs={<ViewBar views={views} start={start ? start(mount) : undefined} filters={filters} primary="Add students" narrow={width < FRAME_LAYOUT.fullWidthBelow} />}
+                    tabs={<ViewBar views={views} activeView={activeView} onViewChange={setActiveView} start={start ? start(mount) : undefined} filters={filters} primary="Add students" narrow={width < FRAME_LAYOUT.fullWidthBelow} />}
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>
                 </PatternSection>

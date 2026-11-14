@@ -48,10 +48,15 @@ export const StudentsTable = ({ count = 4, ...props }) => <DynamicTable head={ST
 export const row = { display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', minWidth: 0 };
 
 /** Pill views: a fixed set the product defines, one pill even with one view. */
-export const ViewPills = ({ views }) => {
-    const [active, setActive] = useState(views[0]);
+export const ViewPills = ({ views, activeView, onViewChange }) => {
+    const [uncontrolled, setUncontrolled] = useState(views[0]);
+    const active = activeView ?? uncontrolled;
+    const handleSelect = (next) => {
+        if (activeView === undefined) setUncontrolled(next);
+        onViewChange?.(next);
+    };
     return (
-        <TabsComponent appearance="pill" activeKey={active} onSelect={setActive} aria-label="Views">
+        <TabsComponent appearance="pill" activeKey={active} onSelect={handleSelect} aria-label="Views">
             {views.map((view) => <TabsComponent.Tab key={view} eventKey={view}>{view}</TabsComponent.Tab>)}
         </TabsComponent>
     );
@@ -88,9 +93,9 @@ export const BarEnd = ({ format = false, search = true, filters = null, more = t
 );
 
 /** The view bar: views at the start, everything that acts on the rows at the end. */
-export const ViewBar = ({ views = ['All students'], start, ...end }) => (
+export const ViewBar = ({ views = ['All students'], start, activeView, onViewChange, ...end }) => (
     <div className="plus-section-view-bar" style={{ ...row, inlineSize: '100%' }}>
-        {start ?? <ViewPills views={views} />}
+        {start ?? <ViewPills views={views} activeView={activeView} onViewChange={onViewChange} />}
         <BarEnd {...end} />
     </div>
 );

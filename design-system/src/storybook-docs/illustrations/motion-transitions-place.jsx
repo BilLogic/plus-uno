@@ -1,4 +1,7 @@
 import React from 'react';
+import { planEnterWithRoom, planExitBeforeReflow, staggerGap } from '@/lib/listMotion';
+import { planLoadReveal } from '@/lib/loadRevealMotion';
+import { planSwapInPlace } from '@/lib/swapMotion';
 import { HAIRLINE, PAINT } from './paint.js';
 import {
   Backdrop, ButtonShape, CardBox, Field, Flag, Modal, Panel, PageHeader, Rect, Rule, Row, Screen, SkeletonBar,
@@ -22,8 +25,8 @@ const HEADER_BUTTON = [128, 34];
 
 /** Milliseconds as beats, for the few pauses the rules count in time. */
 const ms = (n) => n / 1000 / BEAT;
-/** The stagger between items: 20 ms apart, or 500 ms divided by the items if that is shorter. */
-const stagger = (items) => ms(Math.min(20, 500 / items));
+/** The stagger between items: shared with listMotion. */
+const stagger = (items) => ms(staggerGap(items));
 
 const Base = ({ children, header = true }) => (
   <Screen {...FRAME} header={false}>
@@ -117,11 +120,13 @@ const swap = ({ id, title, caption, crossfade }) =>
     play: async (ctx) => {
       await ctx.hold(1);
       await ctx.tap(PILLS[1] + 12, 50);
+      const swapPlan = planSwapInPlace();
       const content = crossfade
         ? Promise.all([ctx.spring('o', 0, 'appearance.slow'), ctx.spring('n', 1, 'appearance.slow')])
         : (async () => {
-            await ctx.spring('o', 0, 'appearance.fast');
-            await ctx.spring('n', 1, 'appearance.fast');
+            const out = ctx.spring('o', 0, swapPlan.outToken);
+            await ctx.hold(ms(swapPlan.inStartsAtMs));
+            await Promise.all([out, ctx.spring('n', 1, swapPlan.inToken)]);
           })();
       await Promise.all([ctx.spring('f', 1, 'spatial.fast'), content]);
     },
@@ -157,15 +162,18 @@ const addRemove = ({ id, title, caption, removing }) =>
     play: async (ctx) => {
       await ctx.hold(1);
       if (removing) {
+        const exitPlan = planExitBeforeReflow();
         await ctx.tap(138, 69);
-        // The row fades as the gap closes.
-        await Promise.all([ctx.spring('c', 0, 'appearance.fast'), ctx.spring('h', 0, 'spatial.fast')]);
+        // Exit before reflow: the leaving row fades out first, then the rows below close up.
+        await ctx.spring('c', 0, exitPlan.fadeToken);
+        await ctx.spring('h', 0, exitPlan.collapseToken);
         return;
       }
+      const enterPlan = planEnterWithRoom();
       await ctx.tap(130, 34);
       // The rows below make room as the new row opens; its content waits for the room.
-      await ctx.spring('h', 1, 'spatial.fast');
-      await ctx.spring('c', 1, 'appearance.fast');
+      await ctx.spring('h', 1, enterPlan.spatialToken);
+      await ctx.spring('c', 1, enterPlan.appearanceToken);
     },
   });
 
@@ -328,20 +336,21 @@ const load = ({ id, title, caption, skeleton }) =>
     play: async (ctx) => {
       await ctx.hold(1);
       if (skeleton) {
+        const loadPlan = planLoadReveal(LOAD_KEYS.length);
         // The shimmer follows time one to one while the person waits.
         await ctx.linear('sh', 1, 2);
         await Promise.all([
-          ctx.spring('hd', 1, 'appearance.default'),
-          ctx.spring('sk', 0, 'appearance.fast'),
+          ctx.spring('hd', 1, loadPlan.contentInToken),
+          ctx.spring('sk', 0, loadPlan.skeletonOutToken),
         ]);
         await Promise.all(
           LOAD_KEYS.map(async (key, i) => {
-            await ctx.hold(i * stagger(LOAD_KEYS.length));
-            await ctx.spring(key, 1, 'appearance.default');
+            await ctx.hold(ms(loadPlan.slotDelaysMs[i]));
+            await ctx.spring(key, 1, loadPlan.contentInToken);
           }),
         );
-        await ctx.spring('pri', 1, 'appearance.default');
-        await ctx.spring('ch', 1, 'appearance.default');
+        await ctx.spring('pri', 1, loadPlan.contentInToken);
+        await ctx.spring('ch', 1, loadPlan.contentInToken);
         return;
       }
       // The same order with nothing holding the room: each part pops in and the rest jumps.
