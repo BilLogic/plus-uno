@@ -8,6 +8,10 @@ Object: a fixed Font Awesome glyph that marks the kind of thing a row or referen
 
 **Import:** `import { Object } from '@/components';`
 
+**Used in:** Panel (`ds guide panel`); Card (`ds guide card`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/components/images-and-icons/Object/Object.jsx`
 
 **Stories:** `design-system/src/components/images-and-icons/Object/Object.stories.jsx` — Kinds, Sizes, Decorative, Rest, Interactive

@@ -8,6 +8,8 @@ Also asked as: counter, unread count, numeric badge.
 
 **Import:** `import { CountTag } from '@/components';`
 
+**Governed by:** Filtering (`ds guide filtering`); Indicators (`ds guide indicators`)
+
 **Source:** `design-system/src/components/labels/CountTag/CountTag.jsx`
 
 **Stories:** `design-system/src/components/labels/CountTag/CountTag.stories.jsx` — Appearances, Spacings, Max, Zero, Ring, Styles, DotNeedsALabel, LabeledNumber, Interactive, Rest, Hovered, Pressed, Focused, Disabled

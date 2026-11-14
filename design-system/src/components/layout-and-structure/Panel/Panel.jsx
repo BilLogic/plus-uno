@@ -60,6 +60,9 @@ PanelContainer.propTypes = {
     /** Falls back to the nearest PanelProvider's width, then `--panel-width-default` (400). Inside the Frame's Panel area it fills the area instead. */
     width: PropTypes.string,
     className: PropTypes.string,
+    /**
+     * @ds-context Used in: Panel.children (ds guide panel)
+     */
     children: PropTypes.node,
 };
 

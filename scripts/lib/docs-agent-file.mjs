@@ -119,7 +119,7 @@ export function syncDocsAgentFiles(root, { check = false } = {}) {
     if (!fs.existsSync(subDir)) continue;
     for (const f of fs.readdirSync(subDir)) {
       const rel = `${OUT_DIR}/${sub}/${f}`;
-      if (wanted.has(rel)) continue;
+      if (wanted.has(rel) || rel === `${OUT_DIR}/templates/index.md`) continue;
       if (check) stale.push(rel);
       else fs.rmSync(path.join(root, rel));
     }

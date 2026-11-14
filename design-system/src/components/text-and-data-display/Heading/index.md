@@ -8,6 +8,10 @@ Also asked as: title, headline.
 
 **Import:** `import { Heading } from '@/components';`
 
+**Used in:** Page (`ds guide page`); Card (`ds guide card`); Section (`ds guide section`); Table (`ds guide table`)
+
+**Governed by:** Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`)
+
 **Source:** `design-system/src/components/text-and-data-display/Heading/Heading.jsx`
 
 **Stories:** `design-system/src/components/text-and-data-display/Heading/Heading.stories.jsx` — Overview, Sizes, OverridesTheTag, NestedContext, InverseColor, Interactive, Rest, Hovered, Pressed, NotAControl

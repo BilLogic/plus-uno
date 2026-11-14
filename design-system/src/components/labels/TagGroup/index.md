@@ -8,6 +8,8 @@ Also asked as: tag list.
 
 **Import:** `import { TagGroup } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/labels/TagGroup/TagGroup.jsx`
 
 **Stories:** `design-system/src/components/labels/TagGroup/TagGroup.stories.jsx` — Wrapping, Collapse, CollapseMenu, CollapseWithSuggestions, MenuKeepsActions, MaxVisible, OneMoreTag, CapNeverSqueezes, WrappedSuggestionsAreNotCounted, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, OverflowTag, DigitBoundary, StableOnParentRender, SqueezedFirstReplaced, AlignmentRight, Disabled, RemovableSet, CustomOverflowAction, Interactive, Rest, Hovered, Pressed, Focused, DisabledSet

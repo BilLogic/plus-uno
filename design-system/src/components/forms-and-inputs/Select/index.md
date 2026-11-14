@@ -8,7 +8,9 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Import:** `import { Select } from '@/components';`
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
+**Used in:** Form (`ds guide form`); Page (`ds guide page`); Panel (`ds guide panel`); Section (`ds guide section`)
+
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; +1 more
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 

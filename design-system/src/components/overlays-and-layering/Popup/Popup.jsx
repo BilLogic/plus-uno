@@ -144,13 +144,21 @@ const Popup = ({
 };
 
 Popup.propTypes = {
-    /** The element that triggers the popup. A plain string becomes a real `button`. */
+    /** The element that triggers the popup. A plain string becomes a real `button`.
+     * @ds-context Used in: Popup.trigger (ds guide popup)
+     * @ds-context Governed by: Filtering (ds guide filtering)
+     */
     trigger: PropTypes.node,
     /** A ref or element the popup points at when there is no `trigger`: a control that is not itself the popup's opener, such as a toggle whose press opens a follow-up. Drive it with `show`. */
     anchor: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
-    /** The popup's body content. */
+    /** The popup's body content.
+     * @ds-context Used in: Popup.children (ds guide popup)
+     * @ds-context Governed by: Filtering (ds guide filtering)
+     */
     children: PropTypes.node.isRequired,
-    /** Heading shown at the top of the popup. It also names the popup for assistive tech. */
+    /** Heading shown at the top of the popup. It also names the popup for assistive tech.
+     * @ds-context Used in: Popup.title (ds guide popup)
+     */
     title: PropTypes.node,
     /** Names the popup for assistive tech when there is no `title`. Falls back to the trigger's own accessible text when neither is given. */
     label: PropTypes.string,

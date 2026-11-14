@@ -8,6 +8,10 @@ Also asked as: hover hint, hover text.
 
 **Import:** `import { Tooltip } from '@/components';`
 
+**Used in:** Popup (`ds guide popup`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Errors (`ds guide errors`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.jsx`
 
 **Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview, Rest, Hovered, Pressed, Focused, Disabled, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, Wrapping, MotionOpenClose, MotionReduced

@@ -6,6 +6,8 @@ Image: a decorative or meaningful bitmap, with a dark-mode variant swapped in by
 
 **Import:** `import { Image } from '@/components';`
 
+**Used in:** Card (`ds guide card`)
+
 **Source:** `design-system/src/components/images-and-icons/Image/Image.jsx`
 
 **Stories:** `design-system/src/components/images-and-icons/Image/Image.stories.jsx` — Sizes, DarkVariant, Interactive, Rest

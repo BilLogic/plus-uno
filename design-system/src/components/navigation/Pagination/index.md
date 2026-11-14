@@ -8,6 +8,10 @@ Also asked as: paging, pager, next page, page numbers.
 
 **Import:** `import { Pagination } from '@/components';`
 
+**Used in:** Table (`ds guide table`)
+
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/navigation/Pagination/Pagination.jsx`
 
 **Stories:** `design-system/src/components/navigation/Pagination/Pagination.stories.jsx` — Content, Spacing, InteractionStates, Overview, Interactive, Accessibility, Rest, Hovered, Pressed, Focused, Current, Disabled, OuterHeight

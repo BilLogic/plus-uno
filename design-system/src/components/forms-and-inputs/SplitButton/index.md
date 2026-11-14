@@ -6,6 +6,8 @@ Split button: a primary action joined to a chevron that opens a menu of related 
 
 **Import:** `import { SplitButton } from '@/components';`
 
+**Governed by:** Common actions (`ds guide common-actions`)
+
 **Source:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.stories.jsx` — Overview, Appearances, Spacing, MenuState, States, HoveredState, PressedState, KeyboardFocus, Interactive

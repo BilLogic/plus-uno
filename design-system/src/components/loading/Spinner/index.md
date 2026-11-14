@@ -8,6 +8,8 @@ Also asked as: loading, busy indicator, wait indicator, loading indicator.
 
 **Import:** `import { Spinner } from '@/components';`
 
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Loading (`ds guide loading`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/loading/Spinner/Spinner.jsx`
 
 **Stories:** `design-system/src/components/loading/Spinner/Spinner.stories.jsx` — Overview, Sizes, Size16, Size24, Size48, Invert, Interactive, Rest, Hovered, Pressed, Focused, ReducedMotion

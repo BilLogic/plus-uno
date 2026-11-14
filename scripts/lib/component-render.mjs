@@ -31,6 +31,7 @@
  */
 
 import path from 'node:path';
+import { contextLines, contextList } from './component-context.mjs';
 
 import { AUTHORED_SECTIONS, coverageOf } from './authored-coverage.mjs';
 import { sectionText } from './docs-page.mjs';
@@ -131,10 +132,14 @@ const FILTERING_GOVERNED = new Set(['SearchField', 'FilterButton', 'FilterMenu',
 const FILTERING_LINE =
   'Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.';
 
-export const governedByOf = (name) => (FILTERING_GOVERNED.has(name) ? FILTERING_LINE : null);
+export function governedByOf(name, edges = {}) {
+  const tracer = FILTERING_GOVERNED.has(name) ? FILTERING_LINE : null;
+  const derived = contextLines({ governedBy: (edges?.governedBy ?? []).filter((p) => !tracer || p.name !== 'Filtering') }).governedBy;
+  return contextList([tracer, derived].filter(Boolean));
+}
 
 /** The text (see the header). */
-export function renderComponent(facts, docs) {
+export function renderComponent(facts, docs, edges) {
   const page = docs?.page ?? null;
   let d = `${GENERATED_HEADER}\n\n# ${facts.name}\n\n`;
   if (facts.summary) d += `${facts.summary}\n\n`;
@@ -144,7 +149,9 @@ export function renderComponent(facts, docs) {
     d += `Import the exported name; read the source under the implementation name.\n\n`;
   }
   d += facts.import ? `**Import:** ${code(facts.import)}\n\n` : `**Import:** none; it is not exported from a barrel.\n\n`;
-  const governed = governedByOf(facts.name);
+  const context = contextLines(edges);
+  if (context.usedIn) d += `**Used in:** ${context.usedIn}\n\n`;
+  const governed = governedByOf(facts.name, edges);
   if (governed) d += `**Governed by:** ${governed}\n\n`;
   d += `**Source:** ${code(facts.source)}\n\n`;
   if (facts.stories) d += `**Stories:** ${code(sibling(facts.source, '.stories.jsx'))} — ${facts.stories.join(', ') || 'none exported'}\n\n`;

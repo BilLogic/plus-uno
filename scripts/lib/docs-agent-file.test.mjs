@@ -183,3 +183,13 @@ test('a Best practices section that opens straight on its first rule prints that
   assert.equal(best.match(/### Give every disabled control a reason in visible text\./g).length, 1);
   assert.match(best, /^## Best practices\n\n### Give every disabled control/);
 });
+
+test('the template index owned by component generation survives docs-page regeneration', () => {
+  const root = fixture({
+    [PAGE_PATH]: PAGE,
+    'design-system/agent-views/templates/index.md': '# Templates\n',
+  });
+  syncDocsAgentFiles(root);
+  assert.equal(fs.readFileSync(path.join(root, 'design-system/agent-views/templates/index.md'), 'utf8'), '# Templates\n');
+  assert.deepEqual(syncDocsAgentFiles(root, { check: true }).stale, []);
+});

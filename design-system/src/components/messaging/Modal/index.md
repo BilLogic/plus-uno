@@ -8,6 +8,10 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window, 
 
 **Import:** `import { Modal } from '@/components';`
 
+**Used in:** Form (`ds guide form`); Panel (`ds guide panel`); Card (`ds guide card`); Modal (`ds guide modal`); Popup (`ds guide popup`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
 **Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused

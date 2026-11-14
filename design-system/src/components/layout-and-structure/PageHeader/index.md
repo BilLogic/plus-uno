@@ -8,6 +8,10 @@ Also asked as: heading with buttons, header actions, page heading.
 
 **Import:** `import { PageHeader } from '@/components';`
 
+**Used in:** Page (`ds guide page`)
+
+**Governed by:** Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.jsx`
 
 **Stories:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.stories.jsx` — Basic, WithBreadcrumbsActionsAndBottomBar, DisableTitleStyles, Interactive, Rest, Hovered, Pressed, Focused

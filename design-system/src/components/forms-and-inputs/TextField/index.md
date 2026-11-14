@@ -8,6 +8,10 @@ Also asked as: search box, single-line, text box.
 
 **Import:** `import { TextField } from '@/components';`
 
+**Used in:** Form (`ds guide form`)
+
+**Governed by:** Errors (`ds guide errors`); Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+
 **Source:** `design-system/src/components/forms-and-inputs/TextField/TextField.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/TextField/TextField.stories.jsx` — Overview, ElementBefore, TextAffix, HelperText, Filled, Success, SpacingDefault, SpacingCompact, Spacing, FocusRing, Interactive, Anatomy, ErrorAndCount, Warning, Autofill, Search, ButtonsInside, Subtle, CaptionColors, NumberSteppers, NumberEmptyIsNotZero, NumberClampOnBlur, NumberWheelLeavesTheValue, NumberReadOnly, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly

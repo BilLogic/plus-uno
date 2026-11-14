@@ -693,7 +693,9 @@ Frame.propTypes = {
     id: PropTypes.string,
     /** Current Sidebar area key: changing it fades the old page out on `appearance.fast`, then fades the new page in on `appearance.default`. */
     areaKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    /** The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle. */
+    /** The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle.
+     * @ds-context Used in: Frame.header (ds guide frame)
+     */
     header: PropTypes.node,
     /** A focused page: called when Back is pressed. With it the header row leads with a Back icon button. */
     onBack: PropTypes.func,
@@ -705,11 +707,15 @@ Frame.propTypes = {
     onClose: PropTypes.func,
     /** The accessible name of Close. */
     closeLabel: PropTypes.string,
-    /** Sidebar content. Without it there is no Sidebar and no toggle. */
+    /** Sidebar content. Without it there is no Sidebar and no toggle.
+     * @ds-context Used in: Frame.sidebar (ds guide frame)
+     */
     sidebar: PropTypes.node,
     /** Sets the Sidebar's default request: true opens it, false closes it. Under 1024 it never docks. Unset opens it where it fits. */
     sidebarDocked: PropTypes.bool,
-    /** Panel area content, usually a `PanelContainer` and its parts. Without it there is no Panel. */
+    /** Panel area content, usually a `PanelContainer` and its parts. Without it there is no Panel.
+     * @ds-context Used in: Frame.panel (ds guide frame)
+     */
     panel: PropTypes.node,
     /** The Panel's complementary landmark name, named for its content. */
     panelLabel: PropTypes.string,
@@ -736,7 +742,9 @@ Frame.propTypes = {
     surfaceDirect: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** Content slot */
+    /** Content slot
+     * @ds-context Used in: Frame.children (ds guide frame)
+     */
     children: PropTypes.node,
 };
 

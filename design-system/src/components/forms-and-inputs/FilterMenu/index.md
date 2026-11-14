@@ -8,7 +8,9 @@ Also asked as: filter dropdown.
 
 **Import:** `import { FilterMenu } from '@/components';`
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
+**Used in:** Popup (`ds guide popup`)
+
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Common actions (`ds guide common-actions`)
 
 **Source:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.jsx`
 

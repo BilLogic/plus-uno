@@ -8,6 +8,8 @@ Also asked as: mascot.
 
 **Import:** `import { Illustration } from '@/components';`
 
+**Governed by:** Empty (`ds guide empty`)
+
 **Source:** `design-system/src/components/images-and-icons/Illustration/Illustration.jsx`
 
 **Stories:** `design-system/src/components/images-and-icons/Illustration/Illustration.stories.jsx` — Gallery, SmartCharacters, MathCharacters, Sizes, Size48, Size96, Size160, Size240, DefaultSize, Rest, Decorative, Titled, MasteringContent, Advocacy, Technology, Relationships, SocialEmotional, Dot, ApproximatelyEqual, Root, All, Pi, Equal, Divider, Interactive

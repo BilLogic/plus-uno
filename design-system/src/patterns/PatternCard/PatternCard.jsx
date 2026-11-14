@@ -88,21 +88,36 @@ const PatternCard = ({
 
 PatternCard.propTypes = {
     id: PropTypes.string,
-    /** The card's title, in the card title type (`styles/_card-title.scss`), tagged one heading level below its section */
+    /** The card's title, in the card title type (`styles/_card-title.scss`), tagged one heading level below its section
+     * @ds-context Used in: Card.title (ds guide card)
+     */
     title: PropTypes.node,
-    /** Body/default 14 under the title */
+    /** Body/default 14 under the title
+     * @ds-context Used in: Card.description (ds guide card)
+     */
     description: PropTypes.node,
-    /** Actions at the end of the header row: buttons, a pager or an overflow */
+    /** Actions at the end of the header row: buttons, a pager or an overflow
+     * @ds-context Used in: Card.actions (ds guide card)
+     * @ds-context Governed by: Common actions (ds guide common-actions); Overflow (ds guide overflow)
+     */
     actions: PropTypes.node,
-    /** Custom header that replaces title, description and actions (tabs, a toolbar) */
+    /** Custom header that replaces title, description and actions (tabs, a toolbar)
+     * @ds-context Used in: Card.header (ds guide card)
+     * @ds-context Governed by: Common actions (ds guide common-actions)
+     */
     header: PropTypes.node,
-    /** Image slot, full bleed: above the content, or at the start or end edge per `imagePlacement` */
+    /** Image slot, full bleed: above the content, or at the start or end edge per `imagePlacement`
+     * @ds-context Used in: Card.image (ds guide card)
+     */
     image: PropTypes.node,
     /** Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. */
     imagePlacement: PropTypes.oneOf(['top', 'start', 'end']),
     /** Side image share. One half also steps the title up to Heading medium. Ignored for top placement. */
     imageSplit: PropTypes.oneOf(['1/3', '1/2']),
-    /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body */
+    /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body
+     * @ds-context Used in: Card.footer (ds guide card)
+     * @ds-context Governed by: Common actions (ds guide common-actions)
+     */
     footer: PropTypes.node,
     /** Padding scale: Card/pad-sm · md · lg (16 · 20 · 24) */
     padding: PropTypes.oneOf(['sm', 'md', 'lg']),
@@ -125,7 +140,9 @@ PatternCard.propTypes = {
     dragging: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** Body content slot */
+    /** Body content slot
+     * @ds-context Used in: Card.children (ds guide card)
+     */
     children: PropTypes.node,
 };
 

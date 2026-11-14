@@ -8,6 +8,8 @@ Also asked as: field error, helper error, inline error, form validation.
 
 **Import:** `import { InlineMessage } from '@/components';`
 
+**Governed by:** Forms (`ds guide forms`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/components/messaging/InlineMessage/InlineMessage.jsx`
 
 **Stories:** `design-system/src/components/messaging/InlineMessage/InlineMessage.stories.jsx` — Overview, Appearances, Info, Warning, Danger, Success, WithSecondaryText, Interactive, Rest, Hovered, Pressed, Focused

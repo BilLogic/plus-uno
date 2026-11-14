@@ -8,6 +8,10 @@ Also asked as: left nav, side nav.
 
 **Import:** `import { Sidebar } from '@/components';`
 
+**Used in:** Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`)
+
+**Governed by:** Disabled (`ds guide disabled`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/navigation/Sidebar/Sidebar.jsx`
 
 **Motion:** enter `spatial.default` · exit `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.

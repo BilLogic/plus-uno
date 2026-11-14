@@ -155,9 +155,15 @@ const PatternTable = ({
 
 PatternTable.propTypes = {
     id: PropTypes.string,
-    /** Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows */
+    /** Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows
+     * @ds-context Used in: Table.footer (ds guide table)
+     * @ds-context Governed by: Empty (ds guide empty)
+     */
     footer: PropTypes.node,
-    /** Empty-state slot: a message row under the head row, spanning every column, when `empty` is true */
+    /** Empty-state slot: a message row under the head row, spanning every column, when `empty` is true
+     * @ds-context Used in: Table.emptyState (ds guide table)
+     * @ds-context Governed by: Empty (ds guide empty)
+     */
     emptyState: PropTypes.node,
     /** Swap the body rows for the empty-state message row; the head row stays */
     empty: PropTypes.bool,
@@ -171,7 +177,9 @@ PatternTable.propTypes = {
     tableProps: PropTypes.object,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** Table content slot — pass thead/tbody elements */
+    /** Table content slot — pass thead/tbody elements
+     * @ds-context Used in: Table.children (ds guide table)
+     */
     children: PropTypes.node,
 };
 

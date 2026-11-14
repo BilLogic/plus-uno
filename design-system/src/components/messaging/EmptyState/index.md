@@ -8,6 +8,10 @@ Also asked as: no data, zero state, blank slate.
 
 **Import:** `import { EmptyState } from '@/components';`
 
+**Used in:** Section (`ds guide section`); Table (`ds guide table`)
+
+**Governed by:** Empty (`ds guide empty`); Errors (`ds guide errors`); Filtering (`ds guide filtering`); Notifications (`ds guide notifications`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/messaging/EmptyState/EmptyState.jsx`
 
 **Stories:** `design-system/src/components/messaging/EmptyState/EmptyState.stories.jsx` — Overview, WithIcon, Default, Compact, InATable, LoadFailure, NoAccess, LoadFailureInATable, Interactive, Rest, Hovered, Pressed, Focused
