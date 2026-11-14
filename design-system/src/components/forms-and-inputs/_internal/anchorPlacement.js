@@ -68,7 +68,8 @@ export function popupLayerOf(anchorRef) {
 
 const samePlace = (a, b) => Boolean(a && b)
     && a.placement === b.placement && a.side === b.side
-    && a.top === b.top && a.left === b.left && a.minWidth === b.minWidth && a.shift === b.shift;
+    && a.top === b.top && a.left === b.left && a.minWidth === b.minWidth && a.shift === b.shift
+    && a.maxWidth === b.maxWidth;
 
 /**
  * Places an open popup against its field, and keeps it there on scroll,
@@ -87,13 +88,16 @@ const samePlace = (a, b) => Boolean(a && b)
  * @param {{current: HTMLElement|null}} options.popupRef the popup surface
  * @param {'left'|'center'|'right'} [options.align]
  * @param {(reason: string, event?: PointerEvent) => void} [options.onClose] an outside press passes its event
+ * @param {{container: Element|null, collisionBoundary?: Element}|null} [options.bounded] an inline docs canvas; keeps the popup below its field
  * @returns {{placement: 'top'|'bottom', side: 'start'|'end', top: number, left: number, minWidth: number, shift: number}|null}
  *   `side` is `end` when the popup's right edge sits on the field's, `start` otherwise.
  *   `shift` is how far the popup's left edge sits from the field's, so a popup
  *   placed in place can honor the screen gap exactly.
  */
-export function useAnchoredPopup({ open, anchorRef, popupRef, align = 'left', onClose }) {
+export function useAnchoredPopup({ open, anchorRef, popupRef, align = 'left', onClose, bounded }) {
     const [place, setPlace] = useState(null);
+    const container = bounded?.container;
+    const boundary = bounded?.collisionBoundary;
 
     const reposition = useCallback(() => {
         const anchor = anchorRef?.current;
@@ -104,22 +108,32 @@ export function useAnchoredPopup({ open, anchorRef, popupRef, align = 'left', on
         // popup's edge sit a fraction inside the screen gap.
         const size = popup.getBoundingClientRect();
         const { width } = size;
+        const bounds = boundary?.getBoundingClientRect();
+        const origin = bounds ?? { left: 0, top: 0 };
         const placed = placePopup({
-            anchor: box,
+            anchor: { top: box.top - origin.top, bottom: box.bottom - origin.top, left: box.left - origin.left, right: box.right - origin.left, width: box.width },
             width,
             height: size.height,
-            viewport: { width: document.documentElement.clientWidth, height: window.innerHeight },
+            viewport: { width: bounds?.width ?? document.documentElement.clientWidth, height: bounds ? Infinity : window.innerHeight },
             align,
             offset: readPopoverOffset(),
             screenGap: readScreenGap(),
         });
+        // A bounded canvas uses absolute coordinates in its portal container,
+        // while normal app popups use fixed viewport coordinates.
+        const offsetParent = container ? (popup.offsetParent ?? container) : null;
+        const offset = offsetParent?.getBoundingClientRect() ?? { left: 0, top: 0 };
+        const left = placed.left + origin.left;
         const next = {
             ...placed,
-            side: width > box.width && placed.left < box.left ? 'end' : 'start',
-            shift: placed.left - box.left,
+            top: placed.top + origin.top - offset.top + (offsetParent?.scrollTop ?? 0) - (offsetParent?.clientTop ?? 0),
+            left: left - offset.left + (offsetParent?.scrollLeft ?? 0) - (offsetParent?.clientLeft ?? 0),
+            maxWidth: bounds ? Math.max(0, bounds.width - 2 * readScreenGap()) : undefined,
+            side: width > box.width && left < box.left ? 'end' : 'start',
+            shift: left - box.left,
         };
         setPlace((prev) => (samePlace(prev, next) ? prev : next));
-    }, [anchorRef, popupRef, align]);
+    }, [anchorRef, popupRef, align, container, boundary]);
 
     useLayoutEffect(() => {
         if (!open || !anchorRef) { setPlace(null); return undefined; }
@@ -129,12 +143,13 @@ export function useAnchoredPopup({ open, anchorRef, popupRef, align = 'left', on
         const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(reposition);
         if (popupRef.current) observer?.observe(popupRef.current);
         if (anchorRef.current) observer?.observe(anchorRef.current);
+        if (boundary) observer?.observe(boundary);
         return () => {
             window.removeEventListener('resize', reposition);
             window.removeEventListener('scroll', reposition, true);
             observer?.disconnect();
         };
-    }, [open, anchorRef, popupRef, reposition]);
+    }, [open, anchorRef, popupRef, reposition, boundary]);
 
     useEffect(() => {
         if (!open || !onClose || !anchorRef) return undefined;

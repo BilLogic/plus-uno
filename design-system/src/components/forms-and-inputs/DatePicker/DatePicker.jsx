@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import FieldBox from '../_internal/FieldBox';
 import Calendar from '../_internal/Calendar';
-import { popupLayerOf, useAnchoredPopup } from '../_internal/anchorPlacement';
+import AnchoredListboxSurface from '../_internal/AnchoredListboxSurface';
 import { formatDisplay, formatIso, outOfBounds, parseDate, parseTyped } from '../_internal/dates';
 import Icon from '../../images-and-icons/Icon';
 import '../_internal/Listbox.scss';
@@ -96,7 +95,6 @@ const DatePicker = ({
 
     const fieldRef = useRef(null);
     const inputRef = useRef(null);
-    const popupRef = useRef(null);
 
     const valueKey = Array.isArray(value) ? value.join('|') : value;
     useEffect(() => {
@@ -109,7 +107,6 @@ const DatePicker = ({
     }, [valueKey, range]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const close = useCallback(() => setOpen(false), []);
-    const place = useAnchoredPopup({ open, anchorRef: fieldRef, popupRef, align: calendarAlign, onClose: close });
 
     const interactive = !isDisabled && !isReadOnly;
 
@@ -248,36 +245,28 @@ const DatePicker = ({
                     onBlur={handleBlur}
                 />
             </FieldBox>
-            {open && createPortal(
-                <div
-                    ref={popupRef}
-                    id={popupId}
-                    role="dialog"
-                    aria-label={range ? 'Choose dates' : 'Choose a date'}
-                    className="plus-listbox plus-listbox--floating plus-date-popup"
-                    data-placement={place?.placement ?? 'bottom'}
-                    style={{
-                        top: place?.top ?? 0,
-                        left: place?.left ?? 0,
-                        minWidth: place?.minWidth,
-                        visibility: place ? undefined : 'hidden',
-                    }}
-                    // Keep focus in the field while a day is pressed.
-                    onMouseDown={(event) => event.preventDefault()}
-                >
-                    <Calendar
-                        viewDate={viewDate}
-                        onViewDateChange={setViewDate}
-                        selected={range ? undefined : picked}
-                        rangeStart={rangeStart}
-                        rangeEnd={rangeEnd}
-                        minDate={minDate}
-                        maxDate={maxDate}
-                        onPick={pick}
-                    />
-                </div>,
-                popupLayerOf(fieldRef),
-            )}
+            <AnchoredListboxSurface
+                open={open}
+                anchorRef={fieldRef}
+                align={calendarAlign}
+                onClose={close}
+                preserveFieldFocus
+                id={popupId}
+                role="dialog"
+                aria-label={range ? 'Choose dates' : 'Choose a date'}
+                className="plus-date-popup"
+            >
+                <Calendar
+                    viewDate={viewDate}
+                    onViewDateChange={setViewDate}
+                    selected={range ? undefined : picked}
+                    rangeStart={rangeStart}
+                    rangeEnd={rangeEnd}
+                    minDate={minDate}
+                    maxDate={maxDate}
+                    onPick={pick}
+                />
+                </AnchoredListboxSurface>
         </>
     );
 };
