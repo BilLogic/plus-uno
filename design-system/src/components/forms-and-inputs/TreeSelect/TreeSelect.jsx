@@ -529,7 +529,7 @@ const TreeSelect = ({
                             </AnimatePresence>
                         </div>
                     </div>
-                    </AnchoredListboxSurface>
+                </AnchoredListboxSurface>
             </div>
             {name && selectedValues.map((v) => (
                 <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />

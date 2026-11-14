@@ -266,7 +266,7 @@ const DatePicker = ({
                     maxDate={maxDate}
                     onPick={pick}
                 />
-                </AnchoredListboxSurface>
+            </AnchoredListboxSurface>
         </>
     );
 };

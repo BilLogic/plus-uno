@@ -449,7 +449,7 @@ const Cascader = ({
                             </div>
                         ))}
                     </div>
-                    </AnchoredListboxSurface>
+                </AnchoredListboxSurface>
             </div>
             {name && selectedPath.map((v) => (
                 <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />

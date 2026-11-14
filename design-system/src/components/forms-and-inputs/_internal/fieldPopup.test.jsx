@@ -24,7 +24,7 @@ afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe.each(fields)('%s field popup contract', (_name, field) => {
     it('portals above its Modal and latches a keyboard open', async () => {
-        render(<Modal show title="Edit" onClose={() => {}}>{field()}</Modal>);
+        render(<Bounded><Modal show title="Edit" onClose={() => {}}>{field()}</Modal></Bounded>);
         const trigger = await screen.findByRole('combobox', { name: 'Field' });
         fireEvent.keyDown(trigger, { key: 'ArrowDown' });
         const surface = document.querySelector('.plus-listbox');
@@ -62,6 +62,23 @@ describe.each(fields)('%s field popup contract', (_name, field) => {
         const surface = document.querySelector('.plus-listbox');
         expect(surface).toHaveAttribute('data-reduced', 'true');
         expect(surface).not.toHaveAttribute('data-instant');
+    });
+
+    it('cancels pending removal when reopened during an exit', async () => {
+        render(field());
+        const trigger = screen.getByRole('combobox', { name: 'Field' });
+        fireEvent.click(trigger);
+        const surface = document.querySelector('.plus-listbox');
+        let finish;
+        const finished = new Promise((resolve) => { finish = resolve; });
+        surface.getAnimations = () => [{ finished, effect: { getComputedTiming: () => ({ iterations: 1 }) } }];
+        fireEvent.pointerDown(document.body);
+        fireEvent.click(trigger);
+        await act(async () => finish());
+        expect(surface).toBeInTheDocument();
+        expect(surface).not.toHaveAttribute('data-ending-style');
+        expect(surface).not.toHaveAttribute('aria-hidden');
+        expect(surface).not.toHaveAttribute('inert');
     });
 
     it('stays below the field and shifts inside an OverlayContainer', () => {
