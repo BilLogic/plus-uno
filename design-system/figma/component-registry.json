@@ -1032,6 +1032,29 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
       }
     },
+    "NotificationItem": {
+      "code": {
+        "import": "@/components/messaging",
+        "export": "default",
+        "mdxPath": "design-system/src/components/messaging/NotificationItem/NotificationItem.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/NotificationItem",
+        "source": "design-system/src/components/messaging/NotificationItem/NotificationItem.jsx",
+        "storybookId": "components-messaging-notification-item--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "notification-item",
+            "name": "NotificationItem",
+            "componentSetNodeId": "22315:138",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
+      }
+    },
     "Object": {
       "code": {
         "import": "@/components/images-and-icons",
