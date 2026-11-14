@@ -72,7 +72,7 @@ export const FrameworkStrip = () => (
 
 const Page = ({ children }) => (
   <>
-    <Frame x={8} y={6} w={144} h={88} />
+    <Frame x={8} y={6} w={144} h={88} chrome={false} />
     <SkeletonBar x={16} y={14} w={70} h={5} heading />
     {children}
   </>
