@@ -23,3 +23,21 @@ export { default as AiChat, useAiChat, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, AI_CH
 export { default as Backdrop, BACKDROP_WIDTHS, BACKDROP_HEIGHTS, BACKDROP_SPANS } from './Backdrop';
 export { default as PatternModal } from './PatternModal';
 export { default as PatternTable } from './PatternTable';
+
+// Template and pattern motion helpers (Transitions & Choreography)
+export {
+    AreaStage,
+    DrillStack,
+    useDrillStack,
+    SlideViews,
+    StepStage,
+    FocusedFrameSwitch,
+    scrollToSpot,
+    callAttention,
+} from '../lib/navigationMotion';
+export { SwapInPlace } from '../lib/swapMotion';
+export { LoadThenReveal, LoadRevealSlot } from '../lib/loadRevealMotion';
+export { PresenceSlot } from '../lib/listMotion';
+export { useMotionReduced } from '../lib/motionPreference';
+export { SPRINGS } from '../tokens/ladder/springs.generated';
+

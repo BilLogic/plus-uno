@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
+import { REPO_ROOT } from './corpus.mjs';
+import { loadFacts } from './ds-facts.mjs';
 import { RULES, closest, contextFrom, escapesIn, isPageModule, pagesOf } from './ds-usage.mjs';
 
 const ctx = contextFrom({
@@ -318,4 +320,42 @@ test('ds/placement: Select or PopupSelect without trigger in a Section toolbar w
   assert.deepEqual(warn('<PatternSection.Toolbar filters={<FilterMenu categories={[]} />} />'), []);
   assert.deepEqual(warn('<PatternSection title="Form" toolbar={<PatternSection.Toolbar filters={<FilterButton text="Status" />} />}><Select label="Role" options={[]} /></PatternSection>'), []);
 });
+
+test('patterns: importing template and pattern motion helpers from @/patterns passes with 0 findings', () => {
+  const facts = loadFacts(REPO_ROOT);
+  const realCtx = contextFrom({
+    components: facts.manifests.components,
+    tokens: facts.manifests.tokens,
+    exported: facts.importable,
+    barrels: facts.barrels,
+  });
+  const code = [
+    "import { Frame, AreaStage, DrillStack, useDrillStack, SlideViews, StepStage, FocusedFrameSwitch, scrollToSpot, callAttention, SwapInPlace, LoadThenReveal, LoadRevealSlot, PresenceSlot, useMotionReduced, SPRINGS } from '@/patterns';",
+    'export default function App() {',
+    '  const reduced = useMotionReduced();',
+    '  const drill = useDrillStack();',
+    '  const spring = SPRINGS["spatial.default"].productive;',
+    '  return (',
+    '    <Frame>',
+    '      <AreaStage areaKey="main">',
+    '        <LoadThenReveal loading={false}>',
+    '          <LoadRevealSlot>',
+    '            <SwapInPlace swapKey={String(reduced)}>',
+    '              <PresenceSlot show>',
+    '                <StepStage step={0} labels={["One"]}>{spring.type}</StepStage>',
+    '              </PresenceSlot>',
+    '            </SwapInPlace>',
+    '          </LoadRevealSlot>',
+    '        </LoadThenReveal>',
+    '        <SlideViews activeKey="a" keys={["a"]}>{null}</SlideViews>',
+    '        <FocusedFrameSwitch focused={false} defaultFrame={null} focusedFrame={null} />',
+    '        <DrillStack controller={drill} renderView={() => null} />',
+    '      </AreaStage>',
+    '    </Frame>',
+    '  );',
+    '}',
+  ].join('\n');
+  assert.deepEqual(escapesIn({ path: 'prototypes/x/src/App.jsx', text: code }, realCtx), []);
+});
+
 
