@@ -130,3 +130,15 @@ Own the problem: "Couldn't add the student. Check the fields below and try again
 **Checked:** Automatic
 
 A tooltip is absent on touch and gone on blur. An error is text on the page, next to what failed.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Errors`.
+
+```jsx
+import { TextField } from '@/components';
+
+function ErrorExample() {
+    return <TextField label="Student name" isInvalid errorMessage="Enter the student name." />;
+}
+```

@@ -47,6 +47,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { REFERENCE_SCREENS } from './story-examples.mjs';
 
 import { componentContext, contextLines, contextList } from './component-context.mjs';
 
@@ -508,6 +509,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       out.push(row);
     };
 
+    const referenceRows = [];
     const exact = exactLane(c);
     const named = records.filter((r) => hasPhrase(c.ql, r.name.toLowerCase()));
     const kitQuery = named.length >= 3 || (c.raw.length >= 6 && /\b(build|create|design|screen|dashboard|page|with)\b/.test(c.ql));
@@ -530,6 +532,11 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     if (situation && patternPages.length) {
       push(pageRow(patternPages[0]));
     }
+    if (!exact.length && /\b(list|queue|review|detail)\b/.test(c.ql) && !speaksTokens(q) && !c.raw.some((w) => ICON_WORDS.has(w))) {
+      const kind = /\bdetail\b/.test(c.ql) ? 'detail' : 'list';
+      const reference = JSON.parse(readIf(path.join(root, REFERENCE_SCREENS)) ?? '[]').find((r) => r.reference === kind);
+      if (reference) referenceRows.push({ kind: 'reference', name: reference.name, file: reference.file, export: reference.export, url: reference.url });
+    }
     for (const row of exact) push(row);
     for (const row of notHereLane(c)) push(row);
     // The band is scored before the token lane: its best score decides how many token steps lead.
@@ -546,7 +553,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     // Lane 7: a pointer to the guideline a query word names, always kept as the last row.
     const topics = topicsOf(c);
     const guideRow = topics.length ? [{ kind: 'guide', name: topics[0], next: `ds_guide("${topics[0]}")` }] : [];
-    const results = [...out.slice(0, FIND_LIMIT - guideRow.length), ...guideRow];
+    const results = [...out.slice(0, FIND_LIMIT - guideRow.length - referenceRows.length), ...referenceRows, ...guideRow];
 
     let kit;
     if (kitQuery) {
@@ -860,6 +867,7 @@ function renderFind(r) {
       return `${pad(x.status, 10)}${x.name} → ${use}${x.why ? `  (${x.why})` : ''}`;
     }
     if (x.kind === 'token') return `${pad('token', 10)}${x.name}  ${shortSummary(x.intent) ?? ''}`.trimEnd();
+    if (x.kind === 'reference') return `${pad('reference', 10)}${x.name}  → ${x.file}#${x.export}\n          ${x.url}`;
     if (['template', 'pattern'].includes(x.kind) && x.doc) return `${pad(x.kind, 10)}${x.name}  → ${x.next}`;
     if (x.kind === 'guide') return `${pad('guide', 10)}${x.name}  → ${x.next}`;
     if (x.kind === 'icon') return `${pad('icon', 10)}${x.name}${x.status === 'pro' ? `  PRO: ${x.why}` : ''}`;

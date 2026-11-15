@@ -141,3 +141,24 @@ The person may not remember a filter set last week. "No students match these fil
 **Checked:** Review
 
 An illustration for a full view a person meets once, such as a new tutor's first day; an icon on anything that repeats, such as a card on a home page. Illustrations arrive with the character work .
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Empty`.
+
+```jsx
+import { Button, EmptyState } from '@/components';
+import { PatternTable } from '@/patterns';
+
+function EmptyExample() {
+    return (
+        <PatternTable empty emptyState={
+            <EmptyState spacing="compact" header="No matching sessions" description="Try another search or reset the filters."
+                secondaryAction={<Button text="Reset filters" />} />
+        }>
+            <thead><tr><th>Student</th><th>Status</th></tr></thead>
+            <tbody />
+        </PatternTable>
+    );
+}
+```
