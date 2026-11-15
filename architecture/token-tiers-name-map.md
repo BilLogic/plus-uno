@@ -231,7 +231,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Option menu | `--option-menu-width` |  |
 | Checklist | `--checklist-action-width` | 128px; 96px remains for the ProgressBar when a 32px dismiss IconButton takes the end |
 | Checklist | `--checklist-action-min-width` | 120px floor |
-| Button | `--button-size-vertical` |  |
 | Option row | `--option-row-indent-step` |  |
 | Option row | `--option-row-control-gap` |  |
 | Option row | `--option-row-dot-size` |  |

@@ -1397,11 +1397,9 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-sm",
         "--border-width-default",
         "--button-radius-compact",
         "--button-radius-default",
-        "--button-size-vertical",
         "--control-md",
         "--control-sm",
         "--ds-background-disabled",
@@ -1414,8 +1412,6 @@
         "--inline-sm",
         "--pad-x-md",
         "--pad-x-sm",
-        "--pad-x-xs",
-        "--pad-y-sm",
         "--radius-full",
         "--type-weight-medium"
       ]
@@ -2329,7 +2325,8 @@
         "Required",
         "Description",
         "Card",
-        "Tile"
+        "Tile",
+        "TileNarrowLargeIllustrations"
       ],
       "tokens": [
         "--body-default",
@@ -3504,7 +3501,13 @@
         "ReadOnly",
         "Disabled",
         "HoveredState",
-        "KeyboardFocus"
+        "KeyboardFocus",
+        "CalendarOpensFourPixelsBelow",
+        "CalendarFlipsAboveNearTheBottom",
+        "RangePicksASpan",
+        "BoundedDatesBehavior",
+        "TypedEntry",
+        "DaysAnnounceTheirDate"
       ],
       "tokens": [
         "--ds-icon-subtle"
@@ -6410,7 +6413,8 @@
         "Pi",
         "Equal",
         "Divider",
-        "Interactive"
+        "Interactive",
+        "WidthCappedStaysSquare"
       ],
       "tokens": [
         "--ds-background-accent-blue-subtle",
@@ -11242,7 +11246,8 @@
         "Disabled",
         "DisabledWithReason",
         "Required",
-        "Tile"
+        "Tile",
+        "TileNarrowLargeIllustrations"
       ],
       "tokens": [
         "--body-default",
@@ -17138,104 +17143,6 @@
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
         "--plus-popup-reach"
-      ]
-    },
-    {
-      "name": "VerticalButton",
-      "kind": "component",
-      "import": "import { VerticalButton } from '@/components';",
-      "group": "forms-and-inputs",
-      "source": "design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.jsx",
-      "summary": "Vertical button: an icon stacked over a short label, one size (60 by 60). For choosing between a few large options, such as a role.",
-      "props": [
-        {
-          "name": "icon",
-          "type": "string or node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "A Font Awesome Free glyph name (`user-gear`) or a node.",
-          "deprecated": null
-        },
-        {
-          "name": "label",
-          "type": "string",
-          "required": true,
-          "default": null,
-          "values": null,
-          "description": "One or two words, sentence case.",
-          "deprecated": null
-        },
-        {
-          "name": "appearance",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "default",
-            "subtle",
-            "primary"
-          ],
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "isSelected",
-          "type": "bool",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "isDisabled",
-          "type": "bool",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "isLoading",
-          "type": "bool",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "onClick",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "Appearances",
-        "States",
-        "Selected",
-        "Disabled",
-        "Loading",
-        "HoveredState",
-        "PressedState",
-        "KeyboardFocus",
-        "Interactive"
       ]
     },
     {

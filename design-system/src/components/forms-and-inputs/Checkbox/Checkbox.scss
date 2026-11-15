@@ -6,6 +6,7 @@
  * Lagoon fill, so the red edge never competes with the mark.
  */
 @use '../../../styles/state' as *;
+@use '../_internal/choice-tile';
 
 .plus-form-checkbox-wrapper {
     --plus-choice-indent: calc(var(--checkbox-control-size) + var(--space-050));
@@ -177,6 +178,7 @@
 // drawn outside the tile.
 .plus-form-checkbox-wrapper.plus-choice-tile {
     width: var(--choice-tile-width);
+    max-width: 100%;
     padding: var(--card-pad-default) var(--pad-x-lg);
     border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--radius-control-md);
@@ -190,10 +192,7 @@
     transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     .plus-choice-tile-illustration {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: var(--stack-sm);
+        @include choice-tile.illustration-slot;
     }
 
     .plus-form-checkbox-row {

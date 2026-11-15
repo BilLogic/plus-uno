@@ -206,4 +206,3 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | TreeSelect | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | TreeSelect | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | TreeSelect | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |
-| VerticalButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |

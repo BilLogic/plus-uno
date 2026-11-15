@@ -308,13 +308,6 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'VerticalButton',
-    tier: 'component',
-    events: {
-      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Hover and press change color, 90% by about 110 ms.' },
-    },
-  },
-  {
     name: 'SplitButton',
     tier: 'component',
     events: {

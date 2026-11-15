@@ -12,7 +12,7 @@ Also asked as: multi-select, checklist, tick box.
 
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card, Tile
+**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card, Tile, TileNarrowLargeIllustrations
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx`
 
@@ -118,7 +118,7 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 - `ChoiceGrid`: use when asking the same checkbox question across multiple rows.
 - `Select`: use when choosing from a long list of options (`isMulti`).
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 

@@ -14,7 +14,7 @@ Also asked as: calendar input, date field, date input, date selector.
 
 **Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus
+**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, CalendarOpensFourPixelsBelow, CalendarFlipsAboveNearTheBottom, RangePicksASpan, BoundedDatesBehavior, TypedEntry, DaysAnnounceTheirDate
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx`
 
@@ -103,7 +103,7 @@ Don't: Disabled fades a value people need to read.
 - `DateTimePicker`: use when selecting a date and a time together.
 - `Calendar`: use when rendering the month grid inline on the page.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 

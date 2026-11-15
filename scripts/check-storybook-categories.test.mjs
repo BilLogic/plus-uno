@@ -343,3 +343,23 @@ test('a component page titled as the folder of its sub-pages goes red; Name/Name
   });
   assert.ok(!messages(good).some((m) => m.includes('"Docs" entry')));
 });
+
+test('a same-name single-child wrapper folder goes red even when !dev sub-stories exist', () => {
+  const soloWrapper = fixture({
+    'design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx':
+      "import * as DatePickerStories from './DatePicker.stories.jsx';\n<Meta of={DatePickerStories} />\n",
+    'design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx':
+      "export default {\n    title: 'Components/Forms and inputs/Date time picker/Date picker/Date picker',\n    tags: ['!dev', '!autodocs'],\n};\n",
+    'design-system/src/components/forms-and-inputs/DatePickerBehavior.stories.jsx':
+      "export default {\n    title: 'Components/Forms and inputs/Date time picker/Date picker/Behavior',\n    tags: ['!dev', '!autodocs'],\n};\n",
+  });
+  assert.ok(messages(soloWrapper).some((m) => m.includes('DatePicker.stories.jsx') && m.includes('wrapper')));
+
+  const flat = fixture({
+    'design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx':
+      "import * as DatePickerStories from './DatePicker.stories.jsx';\n<Meta of={DatePickerStories} />\n",
+    'design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx':
+      "export default {\n    title: 'Components/Forms and inputs/Date time picker/Date picker',\n    tags: ['!dev', '!autodocs'],\n};\n",
+  });
+  assert.ok(!messages(flat).some((m) => m.includes('wrapper')));
+});

@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-39 components. Each row links to the generated facts; the three columns after it are the
+38 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
@@ -16,7 +16,7 @@ authored half, counted rather than assumed.
   - For a single standalone action, use `Button`.
   - For one primary action joined to a menu of variations, use `SplitButton`.
   - For mutually exclusive form answers, use `RadioGroup`.
-  - For two to four large icon-over-label choices, use `VerticalButton`.
+  - For large illustrated choices with a title and an illustration, use `ChoiceGrid` (or `RadioGroup` / `CheckboxGroup` in `tile` appearance).
 - **[Calendar](Calendar/index.md)** — Use `Calendar` directly only when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
   - For a date or date range field that opens this grid in a popup, use `DatePicker`.
   - For a combined date and time answer, use `DateTimePicker`.
@@ -155,28 +155,24 @@ authored half, counted rather than assumed.
 - **[TreeSelect](TreeSelect/index.md)** — Use `TreeSelect` when options nest in a hierarchy and someone needs to expand branches in place or pick nodes across multiple branches, such as curriculum units and lessons.
   - For a single hierarchical path chosen one column per level in sequence, use `Cascader`.
   - For a flat list of options with no hierarchy, use `Select`.
-- **[VerticalButton](VerticalButton/index.md)** — Use `VerticalButton` for a small set of large, equally weighted actions picked at a glance, such as a role or mode at the start of a flow. Its fixed 64 by 64 size suits two to four options.
-  - For actions in a standard horizontal row, use `Button` or `ButtonGroup`.
-  - For an icon-only action with no visible label, use `IconButton`.
-  - For a form question with pictured 224px choice tiles, use `RadioGroup` or `CheckboxGroup`.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Button](Button/index.md) | 21 | ✅ | ✅ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Calendar](Calendar/index.md) | 10 | ✅ | ✅ | ✅ |
-| [Cascader](Cascader/index.md) | 17 | ✅ | ✅ | ✅ |
-| [Checkbox](Checkbox/index.md) | 22 | ✅ | ✅ | ✅ |
-| [CheckboxGroup](CheckboxGroup/index.md) | 17 | ✅ | ✅ | ✅ |
+| [Cascader](Cascader/index.md) | 16 | ✅ | ✅ | ✅ |
+| [Checkbox](Checkbox/index.md) | 21 | ✅ | ✅ | ✅ |
+| [CheckboxGroup](CheckboxGroup/index.md) | 16 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid/index.md) | 12 | ✅ | ✅ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Comment](Comment/index.md) | 14 | ✅ | ✅ | ✅ |
 | [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
-| [DateTimePicker](DateTimePicker/index.md) | 31 | ✅ | ✅ | ✅ |
+| [DateTimePicker](DateTimePicker/index.md) | 30 | ✅ | ✅ | ✅ |
 | [DropdownMenu](DropdownMenu/index.md) | 17 | ✅ | ✅ | ✅ |
-| [Fieldset](Fieldset.md) | 9 | ✅ | ✅ | ✅ |
+| [Fieldset](Fieldset.md) | 8 | ✅ | ✅ | ✅ |
 | [FileItem](FileItem/index.md) | 15 | ✅ | ✅ | ✅ |
-| [FileUpload](FileUpload/index.md) | 20 | ✅ | ✅ | ✅ |
+| [FileUpload](FileUpload/index.md) | 19 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✅ | ✅ | ✅ |
 | [FilterMenu](FilterMenu/index.md) | 16 | ✅ | ✕ | ✅ |
 | [IconButton](IconButton/index.md) | 14 | ✅ | ✅ | ✅ |
@@ -185,24 +181,23 @@ authored half, counted rather than assumed.
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✅ | ✅ |
 | [PopupSelect](PopupSelect/index.md) | 18 | ✅ | ✕ | ✅ |
 | [PromptInput](PromptInput/index.md) | 16 | ✅ | ✅ | ✅ |
-| [Radio](Radio/index.md) | 22 | ✅ | ✅ | ✅ |
-| [RadioGroup](RadioGroup/index.md) | 20 | ✅ | ✅ | ✅ |
-| [Range](Range/index.md) | 15 | ✅ | ✅ | ✅ |
-| [Rating](Rating/index.md) | 14 | ✅ | ✅ | ✅ |
+| [Radio](Radio/index.md) | 21 | ✅ | ✅ | ✅ |
+| [RadioGroup](RadioGroup/index.md) | 19 | ✅ | ✅ | ✅ |
+| [Range](Range/index.md) | 14 | ✅ | ✅ | ✅ |
+| [Rating](Rating/index.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [SearchField](SearchField/index.md) | 33 | ✅ | ✅ | ✅ |
-| [Select](Select/index.md) | 45 | ✅ | ✅ | ✅ |
+| [Select](Select/index.md) | 44 | ✅ | ✅ | ✅ |
 | [SettingRow](SettingRow/index.md) | 11 | ✅ | ✅ | ✅ |
 | [SplitButton](SplitButton/index.md) | 3 | ✅ | ✅ | ✅ |
-| [TagInput](TagInput/index.md) | 28 | ✅ | ✅ | ✅ |
-| [TextArea](TextArea/index.md) | 28 | ✅ | ✅ | ✅ |
-| [TextField](TextField/index.md) | 36 | ✅ | ✅ | ✅ |
+| [TagInput](TagInput/index.md) | 27 | ✅ | ✅ | ✅ |
+| [TextArea](TextArea/index.md) | 27 | ✅ | ✅ | ✅ |
+| [TextField](TextField/index.md) | 35 | ✅ | ✅ | ✅ |
 | [TimePicker](TimePicker/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Toggle](Toggle/index.md) | 17 | ✅ | ✅ | ✅ |
-| [TreeSelect](TreeSelect/index.md) | 18 | ✅ | ✅ | ✅ |
-| [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✅ | ✅ |
+| [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 38/39 (97%) · Correct/incorrect 36/39 (92%) · Accessibility 38/39 (97%)
+**Authored coverage:** When to use 37/38 (97%) · Correct/incorrect 35/38 (92%) · Accessibility 37/38 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
