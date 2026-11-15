@@ -140,7 +140,7 @@ export const HEROES = {
   'foundations-tokens-typography': {
     Hero: TypographyHero,
     description:
-      'Serif and sans on one set of guides: cap height, x-height, and the baseline in the brand color.',
+      'Sans for the product, a serif brand slot for editorial, on one set of guides: cap height, x-height, and the baseline in the brand color.',
   },
   'foundations-tokens-spacing-and-size': {
     Hero: SpacingHero,
@@ -161,7 +161,7 @@ export const HEROES = {
   'foundations-visual-typography': {
     Hero: TypographyHero,
     description:
-      'Serif and sans on one set of guides: cap height, x-height, and the baseline in the brand color.',
+      'Sans for the product, a serif brand slot for editorial, on one set of guides: cap height, x-height, and the baseline in the brand color.',
   },
   'foundations-visual-color': {
     Hero: ColorHero,

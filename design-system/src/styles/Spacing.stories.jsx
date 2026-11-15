@@ -211,7 +211,7 @@ export const NeverHandSpace = () => (
 
 const Metric = ({ value, label, divider }) => (
     <div style={{ ...col('var(--card-stack-sm)'), paddingTop: divider ? 'var(--card-stack-lg)' : 0, borderTop: divider ? 'var(--border-width-default) solid var(--ds-border)' : 'none' }}>
-        <span style={{ font: 'var(--metric-md)', color: 'var(--ds-text)' }}>{value}</span>
+        <span style={{ font: 'var(--metric-md)', fontVariantNumeric: 'tabular-nums', color: 'var(--ds-text)' }}>{value}</span>
         <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{label}</span>
     </div>
 );

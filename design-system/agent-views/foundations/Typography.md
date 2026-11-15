@@ -125,17 +125,7 @@ Don't: An h3 straight after the h1 skips the h2.
 
 ### Headings
 
-Every heading level is Noto Sans at weight 600. Size, line height and tracking step down together.
-
-| Style | Size/line | Tracking |
-| --- | --- | --- |
-| Heading/xxlarge | 32/36 | −2% |
-| Heading/xlarge | 28/32 | −1% |
-| Heading/large (page title) | 24/28 | −1% |
-| Heading/medium (section) | 20/24 | None |
-| Heading/small | 16/20 | None |
-| Heading/xsmall | 14/20 | None |
-| Heading/xxsmall | 12/16 | None |
+Every heading level is Noto Sans at weight 600. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
 
 Semibold at 28 and 32 sits close to bold body text. Keep 600 and do not add a 700 weight.
 
