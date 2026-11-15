@@ -180,12 +180,6 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 
 ## Before you finish
 
-Re-read what you wrote, then fix each of these:
-
-1. Every component and pattern comes from these lists, imported from its barrel (`@/components` or `@/patterns`); a deep path becomes the barrel import.
-2. Every prop and value is in the component's generated doc (or `components.json`).
-3. Every color, size, radius and font is a token from `../tokens/tokens.md`, read at the ladder step for its role, in place of a raw value or a `--space-*`, `--radius-<n>` or `--palette-*` primitive.
-4. Every name in the tables above is replaced by its right-hand name.
-5. A page or card starts from its pattern: a full page sits in a template (`Frame` with the PLUS `Sidebar`), and a section, card, table or overlay is its pattern from the Patterns table, before any `div` with its own flex or grid.
+Re-read what you wrote for template and pattern fit: a full page sits in a template (`Frame` with the PLUS `Sidebar` and `Page`), each section, card, table or overlay uses its template from the Templates table above, and each situation (filtering, search, forms, common actions, notifications, empty, loading, errors) follows its governing pattern.
 
 Then run `npm run check:ds-usage -- <your files>` and fix what it reports; its rules are `docs/engineering/ds-usage-rules.md`.
