@@ -117,20 +117,20 @@ test('score: escapes by rule from this checkout\'s rules; the untouched template
     assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 0, byRule: {}, warnByRule: {}, layoutFormula: null });
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Buton } from '@/components';\nexport default () => <div style={{ padding: '12px' }} />;\n");
     const scored = score({ folder: dir, label: 'eval-x' });
-    assert.deepEqual(scored.byRule, { 'ds/no-unknown-component': 1, 'ds/no-raw-literal': 1 });
-    assert.deepEqual(scored.warnByRule, { 'ds/page-starts-from-pattern': 1 });
+    assert.deepEqual(scored.byRule, { 'ds/no-unknown-component': 1, 'ds/no-raw-literal': 1, 'ds/page-starts-from-pattern': 1 });
+    assert.deepEqual(scored.warnByRule, {});
     assert.equal(scored.layoutFormula, false);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('score: warnings are counted by rule beside the fail-level escapes', () => {
+test('score: a page that does not start from a template counts as a fail-level escape', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-warn-'));
   try {
     fs.cpSync(path.join(REPO_ROOT, SCENARIOS, '_template'), dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Button } from '@/components';\nexport default () => <div style={{ display: 'flex' }}><Button appearance=\"primary\" /></div>;\n");
-    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 1, byRule: {}, warnByRule: { 'ds/page-starts-from-pattern': 1 }, layoutFormula: false });
+    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 1, warnings: 0, byRule: { 'ds/page-starts-from-pattern': 1 }, warnByRule: {}, layoutFormula: false });
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

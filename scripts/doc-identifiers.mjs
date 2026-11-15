@@ -147,6 +147,19 @@ export function splitFences(text) {
   return { fences, prose };
 }
 
+/** Example blocks with their authored caption and source line numbers. */
+export function exampleFences(text) {
+  const { fences, prose } = splitFences(stripFrontmatter(text));
+  return fences.map((fence) => {
+    const before = prose.split('\n').slice(0, fence.startLine - 2).join('\n').trimEnd();
+    const caption = before.split('\n').at(-1) ?? '';
+    const comment = fence.code.match(/^\s*(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/)/)?.[0] ?? '';
+    return { ...fence, context: `${caption}\n${comment}`, negative: INCORRECT.test(`${caption}\n${comment}`) };
+  });
+}
+
+export const isTokenTierPage = (file) => /\/styles\/Tokens[^/]*\.mdx$/.test(file);
+
 /* ------------------------------------------------------- 1. token claims */
 
 /**

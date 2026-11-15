@@ -270,6 +270,8 @@ export const ChecklistCompactInSidebar = {
         await fitsCanvas(canvasElement);
 
         await userEvent.click(nextBtn);
+        // Move the pointer off the row so the a11y pass reads the resting colors, not the hover fill.
+        await userEvent.unhover(nextBtn);
         await expect(canvas.getByRole('heading', { name: 'Get ready for your first session' })).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
