@@ -37,7 +37,7 @@ describe('accent palette', () => {
 
 describe('chart palette', () => {
   const tokens = tokensOf(chartGroups(semantic));
-  const expected = [...corpus.keys()].filter((n) => n.startsWith('--ds-chart-') && !n.endsWith('-hovered'));
+  const expected = [...corpus.keys()].filter((n) => n.startsWith('--chart-') && !n.endsWith('-hovered'));
 
   it('shows exactly the chart tokens the token set defines, once each', () => {
     expect(expected.length).toBeGreaterThan(40);
@@ -61,7 +61,7 @@ describe('type scale', () => {
         const raw = corpus.get(s.token).raw;
         expect(raw).toContain(`var(${g.weightToken})`);
         expect(raw).toContain(`var(${g.familyToken})`);
-        expect(s.lineHeight).toBe(corpus.get(corpus.get(s.token).raw.match(/var\((--line-height-\d+)\)/)[1]).value);
+        expect(s.lineHeight).toBe(corpus.get(corpus.get(s.token).raw.match(/var\((--type-line-height-\d+)\)/)[1]).value);
         expect(s.size).toBe(corpus.get(s.sizeToken).value);
         expect(raw).toContain(`var(${s.sizeToken})`);
       }

@@ -24,7 +24,7 @@ export default {
 };
 
 const PAINTED = ['fill', 'stroke'];
-const TOKEN_OR_NONE = /^(?:var\(--ds-[\w-]+\)|none)$/;
+const TOKEN_OR_NONE = /^(?:var\(--(?:ds-|chart-)[\w-]+\)|none)$/;
 const everyPaintIsAToken = (root) =>
   [...root.querySelectorAll('svg *')].every((el) =>
     PAINTED.every((attr) => !el.hasAttribute(attr) || TOKEN_OR_NONE.test(el.getAttribute(attr))),
@@ -154,17 +154,17 @@ export const InterruptionRestsClosed = {
   },
 };
 
-/** What is carried lags by how much it holds: a chip stays closer than a card, and neither strays far. */
+/** What is carried lags by how much it holds: a tag stays closer than a card, and neither strays far. */
 export const CarryLagsByWeight = {
   render: () => <MotionDemo {...PHYSICS_DEMOS.carry} reduced={false} />,
   play: async ({ canvasElement }) => {
     await settled(canvasElement);
-    const chip = stateOf(canvasElement, 'carry-chip');
+    const tag = stateOf(canvasElement, 'carry-tag');
     const card = stateOf(canvasElement, 'carry-card');
-    await expect(chip.lag).toBeLessThan(card.lag);
+    await expect(tag.lag).toBeLessThan(card.lag);
     await expect(card.lag).toBeLessThan(12);
     // Both land in the slot, with the pointer's own spot.
-    await expect([chip.ix, chip.iy]).toEqual([chip.px, chip.py]);
+    await expect([tag.ix, tag.iy]).toEqual([tag.px, tag.py]);
     await expect([card.ix, card.iy]).toEqual([card.px, card.py]);
   },
 };

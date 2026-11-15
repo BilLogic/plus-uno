@@ -55,7 +55,7 @@ The `label` is the accessible name and the tooltip. Name the destination ("Open 
 
 ### Keep it square. {#keep-it-square}
 
-Link icon buttons stay square at `--item-height-md` (`default`) or `--item-height-sm` (`compact`), and round only in top navigation (`shape="circle"`). Never stretch one to fill a row.
+Link icon buttons stay square at `--control-md` (`default`) or `--control-sm` (`compact`), and round only in top navigation (`shape="circle"`). Never stretch one to fill a row.
 
 ### Use a link for navigation and a button for an action. {#use-a-link-for-navigation-and-a-button-for-an-action}
 
@@ -126,7 +126,7 @@ Hover, pressed and focus are the browser's own. A link icon button has no disabl
 | Fill: selected | `--ds-background-selected` with hovered and pressed steps. |
 | Icon | `--ds-icon-subtle` (default, subtle), `--ds-icon-inverse` (primary, discovery); the selected role. 16, `--icon-md`. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
-| Size | 32: `--item-height-md`. 24: `--item-height-sm`. Square. |
+| Size | 32: `--control-md`. 24: `--control-sm`. Square. |
 | Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. Circle 50%. |
 
 ## Content guidelines

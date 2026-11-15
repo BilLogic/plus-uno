@@ -26,7 +26,7 @@ Primitives hold raw ramps and stay hidden; bind only semantic tokens. Names read
 | Part | In `color/background/danger/bold/hovered` | Values | What it says |
 | --- | --- | --- | --- |
 | color | Namespace | `color` | Dropped in CSS. Surface and shadow tokens start with elevation. |
-| background | Property | `text` · `icon` · `border` · `background` · `link` · `surface` · `shadow` · `backdrop` · `skeleton` · `interaction` · `chart` | What the color paints. |
+| background | Property | `text` · `icon` · `border` · `background` · `link` · `surface` · `shadow` · `blanket` · `skeleton` · `interaction` · `chart` | What the color paints. |
 | danger | Role | `brand` · `neutral` · `selected` · `input` · `inverse` · `disabled` · `focused` · `danger` · `warning` · `success` · `information` · `discovery` · `accent-*` · `smart-*` | What it means. Omitted for default neutral. |
 | bold | Emphasis | `subtlest` · `subtler` · `subtle` · (default) · `bold` · `bolder` · `boldest` | Contrast against the surface. |
 | hovered | State | `hovered` · `pressed` · `visited` | Interactive backgrounds and links only. |
@@ -38,7 +38,7 @@ Primitives hold raw ramps and stay hidden; bind only semantic tokens. Names read
 PLUS ships four modes: light and dark, each at standard and increased contrast. `auto` follows OS `prefers-color-scheme` and `prefers-contrast`.
 
 - **Dark mode** is not light inverted: raised and overlay surfaces step lighter as they rise, because shadows are subtle on dark grounds. Design in dark mode by choosing the same token; never map your own values.
-- **Increased contrast** pushes text to 7:1 and borders, icons and the focus ring to 4.5:1. Tints, surfaces and the Backdrop stay unchanged.
+- **Increased contrast** pushes text to 7:1 and borders, icons and the focus ring to 4.5:1. Tints, surfaces and the Blanket stay unchanged.
 - **In code**, set `data-color-mode` (`light`, `dark`, `auto`) and `data-contrast-mode` (`no-preference`, `more`, `auto`) on `<html>`. No attribute means light at standard contrast.
 - **In Figma**, set the frame mode to Light, Dark, Light IC or Dark IC.
 
@@ -114,16 +114,16 @@ Every foreground token pairs with a ground that clears WCAG AA across all four m
 
 ## Data-viz color
 
-Charts use `--ds-chart-*` tokens (`chartPalette` from `@/components`). Never reach for an accent hue or a UI role token to draw a series. Color is the one foundation with chart rules of its own; charts take spacing, radius, elevation, stroke, type, layers and motion from the same component tokens as the rest of the system.
+Charts use `--chart-*` tokens (`chartPalette` from `@/components`). Never reach for an accent hue or a UI role token to draw a series. Color is the one foundation with chart rules of its own; charts take spacing, radius, elevation, stroke, type, layers and motion from the same component tokens as the rest of the system.
 
 | Job | What it encodes | Tokens |
 | --- | --- | --- |
-| One series | Single measure | `--ds-chart-brand`; reference line takes `--ds-chart-neutral` |
-| Categorical | Distinct series | `--ds-chart-categorical-1` to `-8`, in order |
+| One series | Single measure | `--chart-brand`; reference line takes `--chart-neutral` |
+| Categorical | Distinct series | `--chart-categorical-1` to `-8`, in order |
 | Sequential | Magnitude | One hue from `subtler` to `bold`, `bolder`, `boldest` (darkest = largest) |
 | Diverging | Direction from a baseline | Two hues around `--ds-background-accent-gray-subtler` (orange and blue by default; never red and green) |
-| Status | On track, at risk, off track | `--ds-chart-success`, `-warning`, `-danger`, `-information`, `-discovery` (plus `-bold` for the more extreme level) |
-| SMART subject | SMART area | `--ds-chart-smart-&lt;subject&gt;` |
+| Status | On track, at risk, off track | `--chart-success`, `-warning`, `-danger`, `-information`, `-discovery` (plus `-bold` for the more extreme level) |
+| SMART subject | SMART area | `--chart-smart-&lt;subject&gt;` |
 
 - Use five or six categories at most and group the rest into "Other".
 - Never mix categorical and status colors in one chart, and give every series or state a second cue (label, shape, pattern, icon or backing table).
@@ -146,7 +146,7 @@ Assign series in slot order without skipping.
 
 Three rules govern this sequence:
 
-- **Brand leads:** slot 1 is lagoon (`--ds-chart-brand`), so a one-series chart and the first series of a multi-series chart share their lead color.
+- **Brand leads:** slot 1 is lagoon (`--chart-brand`), so a one-series chart and the first series of a multi-series chart share their lead color.
 - **Neighbors alternate light and dark steps:** slot 2 (orange-800) sits between slot 1 (lagoon-600) and slot 3 (blue-500), alternating through slot 6 so adjacent series remain distinct in grayscale and under color-vision deficiency.
 - **Hues spread across the wheel:** lagoon, orange, blue, magenta, lime and purple never place two adjacent slots in the same hue family. Yellow (warning), red (danger) and teal (too close to brand) stay out; lime and purple-500 double as success and discovery, which is why categorical and status colors never mix.
 - **Overflow and dark mode:** slots 7 and 8 reprise orange and blue for overflow past six series. Dark mode steps one lighter except blue (3) and orange (7), which hold at 500 to preserve lightness alternation, and purple (6), which holds at 700 so it does not crowd its neighbors.
@@ -154,7 +154,7 @@ Three rules govern this sequence:
 ### Separators, ramps, SMART subjects and hover
 
 - **Separators:** keep a gap or `--ds-border-inverse` line where marks touch (stacked bars, histogram bins, waterfall steps). Lightness alternation identifies the series; the separator marks the boundary.
-- **Sequential and diverging ramps:** sequential runs `--ds-background-accent-<hue>-subtler` through `--ds-chart-<hue>-bold`, `-bolder` and `-boldest` (strongest tone = largest value). Diverging runs two hues around `--ds-background-accent-gray-subtler` (orange and blue by default; never red and green).
+- **Sequential and diverging ramps:** sequential runs `--ds-background-accent-<hue>-subtler` through `--chart-<hue>-bold`, `-bolder` and `-boldest` (strongest tone = largest value). Diverging runs two hues around `--ds-background-accent-gray-subtler` (orange and blue by default; never red and green).
 - **SMART subjects:** each subject uses the emphasis that keeps S-M-A-R-T neighbors apart: social-emotional orange (`bold`), mastering content teal (`boldest`), advocacy lime (`bold`), relationship magenta (`boldest`), technology tools brown (`bold`). Label directly or keep the legend beside the chart.
 - **Labels and hover:** place labels beside marks; when a label must sit on a fill (heatmap cell, stacked segment), use `--ds-text` or `--ds-text-inverse`. Hovered marks take their `-hovered` token, and unselected series fade with `--ds-opacity-disabled`.
 

@@ -42,8 +42,8 @@ Notify someone when an action finishes, a condition applies or a decision is nee
 | Guidance before a task that must not be missed | `SectionMessage`, dismiss off | By the action it informs | When it stops applying |
 | A condition that holds for everything in a Frame, page or Section | `Banner` at that tier | Top of the tier | When the condition ends |
 | A note beside one thing that most people never need | `InlineMessage` | Beside the field or value | On close |
-| Something that must be answered before going on | `Modal`, Acknowledge or Active | Centered over a Backdrop | On the button |
-| What arrived over time | The Inbox, a 360-wide (`--inbox-width`) Panel beside the Sidebar | Start of the page, over content, no Backdrop | Escape, outside click, or Close |
+| Something that must be answered before going on | `Modal`, Acknowledge or Active | Centered over a Blanket | On the button |
+| What arrived over time | The Inbox, a 360-wide (`--inbox-width`) Panel beside the Sidebar | Start of the page, over content, no Blanket | Escape, outside click, or Close |
 
 ## Alternatives
 
@@ -153,7 +153,7 @@ A bold fill competes with the page; it is for what must be seen. Routine news st
 
 **Checked:** Review
 
-A Flag is for now; the Inbox is for later. The Inbox opens from the Sidebar at `--inbox-width` over the start of the page with no Backdrop, carrying `Mark all as read`, settings and close in the header, `Unread` (with count) and `All` tabs, and `NotificationItem` rows grouped by day. Clearing every unread item shows `"You are all caught up."` in `EmptyState`; pressing `Escape` or clicking outside closes the panel.
+A Flag is for now; the Inbox is for later. The Inbox opens from the Sidebar at `--inbox-width` over the start of the page with no Blanket, carrying `Mark all as read`, settings and close in the header, `Unread` (with count) and `All` tabs, and `NotificationItem` rows grouped by day. Clearing every unread item shows `"You are all caught up."` in `EmptyState`; pressing `Escape` or clicking outside closes the panel.
 
 ## In code
 

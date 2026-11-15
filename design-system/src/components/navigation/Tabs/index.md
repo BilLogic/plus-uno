@@ -31,8 +31,8 @@ separately.
 It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
 `onSelect`). `alignment` covers left, center, right and `justified`, which
 stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
-`pill` (a filled, rounded selected tab); `spacing` is `default` (`--item-height-md`) or
-`compact` (`--item-height-sm`).
+`pill` (a filled, rounded selected tab); `spacing` is `default` (`--control-md`) or
+`compact` (`--control-sm`).
 
 ## Motion
 
@@ -157,10 +157,10 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 
 | Part | Token |
 | --- | --- |
-| Tab height | `--item-height-md` (default), `--item-height-sm` (compact) |
+| Tab height | `--control-md` (default), `--control-sm` (compact) |
 | Tab padding | `--pad-x-lg`, `--pad-x-md` |
 | Ink | `--ds-text-subtle`, selected `--ds-text-selected`, disabled `--ds-text-disabled` |
-| Baseline and bar | `--ds-border`, `--border-default`; `--ds-border-selected`, `--border-selected` |
+| Baseline and bar | `--ds-border`, `--border-width-default`; `--ds-border-selected`, `--border-width-selected` |
 | Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
 | Selected pill | `--ds-background-neutral`, `--ds-text`; `--ds-background-neutral-hovered`, `--ds-background-neutral-pressed` |
 | Gap | `--stack-md`, pill strip `--inline-lg` (12) |
@@ -225,7 +225,7 @@ Implemented as `Panel`.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--border-selected` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--inline-lg` · `--item-height-md` · `--item-height-sm` · `--pad-x-lg` · `--pad-x-md` · `--radius-control-md` · `--radius-control-sm` · `--radius-full` · `--section-stack-sm` · `--stack-md` · `--tab-radius` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--border-width-selected` · `--control-md` · `--control-sm` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--inline-lg` · `--pad-x-lg` · `--pad-x-md` · `--radius-control-md` · `--radius-control-sm` · `--radius-full` · `--section-stack-sm` · `--stack-md` · `--tab-radius` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/Tabs/Tabs.scss`. Override these through the token layer, never with a literal.
 

@@ -222,7 +222,7 @@ Shapes.play = async ({ canvasElement }) => {
         await expect(s.backgroundColor, 'fill is color.skeleton').toBe(tokenColor(canvasElement, '--ds-skeleton'));
         await expect(s.backgroundImage, 'the shimmer is a gradient').toContain('linear-gradient');
         await expect(s.backgroundImage, 'toward color.skeleton.subtle').toContain(
-            tokenColor(canvasElement, '--ds-skeleton-subtle'),
+            tokenColor(canvasElement, '--skeleton-subtle'),
         );
         await expect(s.animationName, 'shimmering by default').not.toBe('none');
         await expectInert(el, 'shape');
@@ -406,7 +406,7 @@ export const LoadingTable = () => {
         <div style={{ display: 'grid', gap: '12px', justifyItems: 'start' }}>
             <div role="status" className="visually-hidden" data-testid="live">{message}</div>
             <section aria-labelledby="skeleton-students" aria-busy={loaded ? undefined : 'true'}>
-                <h3 id="skeleton-students" className="heading-small">Students</h3>
+                <h3 id="skeleton-students" className="heading-sm">Students</h3>
                 <div style={{ display: 'grid', gap: '12px' }}>
                     {[['Rosa Chen', 140], ['Kai Brooks', 110], ['Amara Okafor', 160]].map(([name, width]) => (
                         <div key={name} style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
@@ -482,8 +482,8 @@ export const LoadingCard = () => {
             >
                 {loaded ? (
                     <>
-                        <p className="body-large" style={{ margin: 0 }}>Unit 3 review</p>
-                        <p className="body-small" style={{ margin: 0 }}>Four students worked through ratios and rates.</p>
+                        <p className="body-lg" style={{ margin: 0 }}>Unit 3 review</p>
+                        <p className="body-sm" style={{ margin: 0 }}>Four students worked through ratios and rates.</p>
                         <span style={{ display: 'flex', gap: '8px' }}>
                             <Tag text="Ratios" />
                             <Tag text="Rates" />

@@ -65,7 +65,7 @@ $btn-appearances: (
 
     // Every appearance draws a 1px edge, transparent unless the appearance
     // colors it, so the height is the same in all of them.
-    border: var(--border-default) solid transparent;
+    border: var(--border-width-default) solid transparent;
     text-align: center;
     white-space: nowrap;
     text-decoration: none;
@@ -82,25 +82,25 @@ $btn-appearances: (
     // radius, compact 24 high with a 4 radius. The height is set, not summed
     // from padding, so the 1px edge never makes a 26. Content centers in it.
     box-sizing: border-box;
-    height: var(--item-height-md);
+    height: var(--control-md);
     padding: 0 var(--pad-x-md);
     border-radius: var(--button-radius-default);
     gap: var(--inline-sm);
 
     &.plus-btn--compact {
-        height: var(--item-height-sm);
+        height: var(--control-sm);
         padding: 0 var(--pad-x-sm);
         border-radius: var(--button-radius-compact);
     }
 
     // An icon-only button is square.
     &.plus-btn--icon-only {
-        width: var(--item-height-md);
+        width: var(--control-md);
         padding: 0;
     }
 
     &.plus-btn--icon-only.plus-btn--compact {
-        width: var(--item-height-sm);
+        width: var(--control-sm);
     }
 
     // Icon button `shape="circle"`: a round icon button for top navigation.
@@ -217,14 +217,14 @@ $btn-appearances: (
     // --- VERTICAL LAYOUT ---
     // Vertical button: one size, 64 by 64, the icon stacked over the label.
     &.plus-btn--vertical {
-        width: var(--button-vertical-size);
-        height: var(--button-vertical-size);
+        width: var(--button-size-vertical);
+        height: var(--button-size-vertical);
         padding: var(--pad-y-sm) var(--pad-x-xs);
         flex-direction: column;
         gap: var(--inline-sm);
 
         .plus-btn-text {
-            font: var(--body-small);
+            font: var(--body-sm);
             font-weight: var(--type-weight-medium);
         }
     }

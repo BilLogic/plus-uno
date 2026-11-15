@@ -49,15 +49,15 @@ The full-height area at the left of the **Frame**, holding navigation. From 1024
 _Avoid_: "left nav", "side nav"
 
 **Panel**:
-The full-height area at the right of the **Frame**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Backdrop** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
+The full-height area at the right of the **Frame**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Blanket** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
 _Avoid_: "right sidebar", "side panel", "inspector", "Card" for the area
 
 **Docked / overlay**:
-The two states of the **Sidebar** and the **Panel**. Docked sits beside the **Page** and moves it; overlay opens over the **Page**, and an overlay **Panel** has a **Backdrop**.
+The two states of the **Sidebar** and the **Panel**. Docked sits beside the **Page** and moves it; overlay opens over the **Page**, and an overlay **Panel** has a **Blanket**.
 _Avoid_: "inline", "pinned", "floating" as a state
 
 **Peek**:
-A collapsed **Sidebar**, or a closed **Panel** whose `panelPeek` option is on, shown over the **Page** while a pointer rests on its toggle or edge. It has no **Backdrop**, does not move the **Page**, and closes on an outside click or Escape.
+A collapsed **Sidebar**, or a closed **Panel** whose `panelPeek` option is on, shown over the **Page** while a pointer rests on its toggle or edge. It has no **Blanket**, does not move the **Page**, and closes on an outside click or Escape.
 _Avoid_: "flyout" as our word, "hover menu"
 
 **Splitter**:
@@ -76,9 +76,9 @@ _Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section*
 The pattern for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
-**Backdrop**:
+**Blanket**:
 The pattern for the layer that dims what sits behind it: full screen for a **Modal**, which it also holds and sizes. A **Panel** floats with none.
-_Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
+_Avoid_: "backdrop", "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
 
 **Modal**:
 The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time. `Modal` is the component; `PatternModal` draws its shell inline.
@@ -111,7 +111,7 @@ A table whose rows nest under parent rows.
 _Avoid_: "table tree", "nested table"
 
 **Popup**:
-A floating layer anchored to its trigger, closed by clicking outside: a menu, a select list, a filter menu or content, with no **Backdrop**.
+A floating layer anchored to its trigger, closed by clicking outside: a menu, a select list, a filter menu or content, with no **Blanket**.
 _Avoid_: "popover", "inline dialog"
 
 **Menu**:
@@ -166,7 +166,7 @@ _Avoid_: "counter", "badge"
 
 **Tag**:
 A label a person can attach, filter by or remove: it names a category rather than a state. No color square unless `swatchBefore` opts in; `elemBefore` is its leading slot.
-_Avoid_: "chip"
+_Avoid_: "chip", `SelectChips`
 
 **Tag group**:
 A set of **Tag**s laid out together.
@@ -230,7 +230,7 @@ _Avoid_: "input wrapper", "form group"
 
 **Overlay module**:
 The shared layer code for everything that floats: the portal, the z-index scale and the stacking rules.
-_Avoid_: "overlay" for the **Backdrop**
+_Avoid_: "overlay" for the **Blanket**
 
 **State mixin**:
 The one shared source of hover, pressed, selected and focus styling, reading **Named state token**s.
@@ -250,7 +250,7 @@ _Avoid_: "mascot", "avatar" for a character
 
 **Progress indicator**:
 A row of dots that shows the current step of a sequence. With `progress`, the current dot stretches into a bar that fills over the step's time, as in a **Carousel**; without a clock (autoplay off, or reduced motion) the stretched dot shows full.
-_Avoid_: "dots", "slide marker"
+_Avoid_: "dots", "slide marker", `CarouselDots`
 
 ### Design system: tokens
 

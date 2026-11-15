@@ -34,7 +34,7 @@ padding: var(--card-pad-default);
 gap: var(--card-stack-md);
 ```
 
-Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Backdrop, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
+Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Blanket, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
 
 </FoundationSection>
 
@@ -97,7 +97,7 @@ Name the relationship first, then pick the token from the four-tier ladder on [T
         [<C>inline</C>, 'The horizontal gap between things side by side', <><C>--modal-inline-sm</C> 8</>],
         [<C>gutter</C>, 'The gap between grid columns, and between cards side by side on the grid', <><C>--grid-gutter</C> 16</>],
         [<C>radius</C>, <>Corner radius, set per component (<a href="?path=/docs/foundations-visual-radius--docs">Radius</a>)</>, <><C>--card-radius</C> 16</>],
-        [<><C>height</C> · <C>width</C> · <C>min</C> · <C>max</C></>, <>Size roles (<a href="?path=/docs/foundations-layout-grid--docs#foundation-size-roles">Grid</a>)</>, <><C>--item-height-md</C> 32</>],
+        [<><C>height</C> · <C>width</C> · <C>min</C> · <C>max</C></>, <>Size roles (<a href="?path=/docs/foundations-layout-grid--docs#foundation-size-roles">Grid</a>)</>, <><C>--control-md</C> 32</>],
     ]}
 />
 
@@ -258,14 +258,14 @@ Plain and full-span by default.
 
 </FoundationSubsection>
 
-<FoundationSubsection title="Backdrop and Modal">
+<FoundationSubsection title="Blanket and Modal">
 
-The Backdrop pads the screen. A modal pads 16 on every side at every width.
+The Blanket pads the screen. A modal pads 16 on every side at every width.
 
 <TokenTable
     rows={[
-        { token: '--blanket-pad-x', figma: 'Backdrop/pad-x' },
-        { token: '--blanket-pad-y', figma: 'Backdrop/pad-y' },
+        { token: '--blanket-pad-x', figma: 'Blanket/pad-x' },
+        { token: '--blanket-pad-y', figma: 'Blanket/pad-y' },
         { token: '--modal-pad', figma: 'Modal/pad' },
         { token: '--modal-stack-sm', figma: 'Modal/stack-sm' },
         { token: '--modal-stack-md', figma: 'Modal/stack-md', use: 'Between related fields' },
@@ -280,23 +280,23 @@ The Backdrop pads the screen. A modal pads 16 on every side at every width.
 
 <FoundationSubsection title="Popup, menu and tooltip">
 
-Menu, popup, flag and tooltip float without a Backdrop. The outer box of a menu pads 4, and a popup or flag pads 16.
+Menu, popup, flag and tooltip float without a Blanket. The outer box of a menu pads 4, and a popup or flag pads 16.
 
 <TokenTable
     rows={[
-        { token: '--popover-pad', figma: 'Popup and flag/pad' },
-        { token: '--popover-width-sm', figma: 'Popup and flag/width-sm' },
-        { token: '--popover-width-md', figma: 'Popup and flag/width-md' },
-        { token: '--popover-width-lg', figma: 'Popup and flag/width-lg' },
-        { token: '--popover-width-flag', figma: 'Popup and flag/width-flag' },
-        { token: '--popover-stack-flag', figma: 'Popup and flag/stack-flag' },
-        { token: '--popover-pad-menu', figma: 'Menu/pad-menu' },
-        { token: '--popover-min-width-menu', figma: 'Menu/min-width-menu' },
-        { token: '--popover-max-width-menu', figma: 'Menu/max-width-menu' },
-        { token: '--popover-max-height-menu', figma: 'Menu/max-height-menu' },
-        { token: '--popover-pad-y-tooltip', figma: 'Tooltip/pad-y-tooltip' },
-        { token: '--popover-max-width-tooltip', figma: 'Tooltip/max-width-tooltip' },
-        { token: '--popover-gap-screen', figma: 'Placement/gap-screen', use: 'The closest a floating layer comes to the screen edge' },
+        { token: '--popup-pad', figma: 'Popup and flag/pad' },
+        { token: '--popup-width-sm', figma: 'Popup and flag/width-sm' },
+        { token: '--popup-width-md', figma: 'Popup and flag/width-md' },
+        { token: '--popup-width-lg', figma: 'Popup and flag/width-lg' },
+        { token: '--flag-width', figma: 'Popup and flag/width-flag' },
+        { token: '--flag-stack', figma: 'Popup and flag/stack-flag' },
+        { token: '--dropdown-menu-pad', figma: 'Menu/pad-menu' },
+        { token: '--dropdown-menu-min-width', figma: 'Menu/min-width-menu' },
+        { token: '--dropdown-menu-max-width', figma: 'Menu/max-width-menu' },
+        { token: '--dropdown-menu-max-height', figma: 'Menu/max-height-menu' },
+        { token: '--tooltip-pad-y', figma: 'Tooltip/pad-y-tooltip' },
+        { token: '--tooltip-max-width', figma: 'Tooltip/max-width-tooltip' },
+        { token: '--popup-gap-screen', figma: 'Placement/gap-screen', use: 'The closest a floating layer comes to the screen edge' },
     ]}
 />
 
@@ -368,11 +368,11 @@ A gap tells the eye there is a boundary, but it cannot say what the boundary is.
 <Do caption="A 24 gap and a subsection heading say the same thing twice.">
 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <strong style={{ font: 'var(--heading-xsmall)' }}>Student</strong>
+        <strong style={{ font: 'var(--heading-xs)' }}>Student</strong>
         <span style={{ font: 'var(--body-default)' }}>School · Teacher</span>
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <strong style={{ font: 'var(--heading-xsmall)' }}>Schedule</strong>
+        <strong style={{ font: 'var(--heading-xs)' }}>Schedule</strong>
         <span style={{ font: 'var(--body-default)' }}>Session date · Time</span>
     </div>
 </div>
@@ -394,15 +394,15 @@ Keep a label near its own field and put the larger gap between groups.
 
 <DoDont>
 <Do caption="Label to field 8 (Stack/stack-md), group to group 24 (Modal/stack-lg), so each label attaches to its field.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', font: 'var(--body-small)' }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><span>School</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a school</span></div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><span>Teacher</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a teacher</span></div>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', font: 'var(--body-sm)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><span>School</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)' }}>Select a school</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><span>Teacher</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)' }}>Select a teacher</span></div>
 </div>
 </Do>
 <Dont caption="Label to field 24 and group to group 8: each label sits nearer the previous field than its own.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-sm)', font: 'var(--body-small)' }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>School</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a school</span></div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>Teacher</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a teacher</span></div>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-sm)', font: 'var(--body-sm)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>School</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)' }}>Select a school</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>Teacher</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)' }}>Select a teacher</span></div>
 </div>
 </Dont>
 </DoDont>

@@ -3,7 +3,7 @@ import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { PAINT } from './paint.js';
 import {
-  Backdrop, ButtonShape, CardBox, Flag, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule, Section, SkeletonBar,
+  Blanket, ButtonShape, CardBox, Flag, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule, Section, SkeletonBar,
 } from './primitives.jsx';
 import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
 import { BEAT, LOOP_PERIOD, measure, pair, projectedRest, ratioOf, resisted, springFor, springWithRatio, stepOf } from './motion.jsx';
@@ -308,7 +308,7 @@ const sizeDefault = {
     <>
       <Screen rows={3} />
       <g opacity={b}>
-        <Backdrop x={8} y={18} w={144} h={76} />
+        <Blanket x={8} y={18} w={144} h={76} />
       </g>
       <g opacity={o}>
         <Scaled cx={MODAL.x + MODAL.w / 2} cy={MODAL.y + MODAL.h / 2} s={s}>
@@ -721,8 +721,8 @@ const carryScene = ({ id, title, caption, token, card }) => ({
 });
 
 const carryChip = carryScene({
-  id: 'carry-chip',
-  title: 'A chip keeps close on fast',
+  id: 'carry-tag',
+  title: 'A tag keeps close on fast',
   caption: 'A tag or a name is light: it stays right under the pointer on spatial.fast.',
   token: 'spatial.fast',
 });

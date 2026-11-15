@@ -4,7 +4,7 @@ import { planLoadReveal } from '@/lib/loadRevealMotion';
 import { planSwapInPlace } from '@/lib/swapMotion';
 import { HAIRLINE, PAINT } from './paint.js';
 import {
-  Backdrop, ButtonShape, CardBox, Field, Flag, Modal, Panel, PageHeader, Rect, Rule, Row, Screen, SkeletonBar,
+  Blanket, ButtonShape, CardBox, Field, Flag, Modal, Panel, PageHeader, Rect, Rule, Row, Screen, SkeletonBar,
 } from './primitives.jsx';
 import { BEAT, pair } from './motion.jsx';
 import { Clip, Moved, VIEW, mix } from './motion-parts.jsx';
@@ -394,7 +394,7 @@ const modalScene = ({ id, title, caption, closing }) =>
       <>
         <UnderPage />
         <g opacity={d}>
-          <Backdrop {...FRAME} />
+          <Blanket {...FRAME} />
         </g>
         <Scaled s={s} opacity={m}>
           <Modal {...MODAL} accent />
@@ -473,7 +473,7 @@ const confirmScene = ({ id, title, caption, confirm }) =>
         <Rect x={124} y={80} w={14} h={6} fill={PAINT.countSurface} corner="count" />
         <Rect x={124} y={80} w={14} h={6} fill={PAINT.accent} corner="count" opacity={c} />
         <g opacity={d}>
-          <Backdrop {...FRAME} />
+          <Blanket {...FRAME} />
         </g>
         <Scaled s={s} opacity={m}>
           <Modal {...MODAL} accent />
@@ -568,7 +568,7 @@ const dockScene = ({ id, title, caption, closing }) =>
 const floatScene = scene({
   id: 'dock-floating',
   title: 'A floating Panel slides over and the page stays',
-  caption: 'Opens on spatial.default over the page, which does not move. No Backdrop at desktop width.',
+  caption: 'Opens on spatial.default over the page, which does not move. No Blanket at desktop width.',
   initial: { x: 1 },
   landing: { x: 0 },
   arrows: [[[152, 55], [110, 55]]],
@@ -731,7 +731,7 @@ const errModal = ({ id, title, caption, shakes }) =>
     draw: ({ sx = 0, h = 0, m = 0 }) => (
       <>
         <UnderPage />
-        <Backdrop {...FRAME} />
+        <Blanket {...FRAME} />
         <Moved x={sx}>
           <Modal {...MODAL_BASE} h={MODAL_BASE.h + 12 * h} />
           <Message x={MODAL_BASE.x + 10} y={MODAL_BASE.y + 41} w={46} opacity={m} />
@@ -813,7 +813,7 @@ export const WITHIN_DEMOS = {
 };
 
 export const ABOVE_DEMOS = {
-  modalOpen: { title: 'Modal opens', scenes: [modalScene({ id: 'modal-open', title: 'Scales up from 96% and fades in', caption: 'The Backdrop dims on the same clock. Scale is for floating layers only.' })] },
+  modalOpen: { title: 'Modal opens', scenes: [modalScene({ id: 'modal-open', title: 'Scales up from 96% and fades in', caption: 'The Blanket dims on the same clock. Scale is for floating layers only.' })] },
   modalClose: { title: 'Modal closes', scenes: [modalScene({ id: 'modal-close', title: 'Scales to 98% and fades', closing: true, caption: 'Leaves one speed faster than it arrived, on spatial.fast.' })] },
   flagOpen: { title: 'Flag appears', scenes: [flagScene({ id: 'flag-open', title: 'Slides in from the top right', caption: 'On spatial.default with an appearance.default fade.' })] },
   flagClose: { title: 'Flag leaves', scenes: [flagScene({ id: 'flag-close', title: 'Leaves the way it came', closing: true, caption: 'A timeout leaves on spatial.exit; it is still speeding up as it crosses the edge.' })] },

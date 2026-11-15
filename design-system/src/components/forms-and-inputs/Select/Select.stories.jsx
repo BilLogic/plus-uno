@@ -382,7 +382,7 @@ export const Interactive = {
 
         return (
             <div style={{ maxWidth: 'var(--width-2500)' }}>
-                <p style={{ margin: '0 0 var(--stack-md)', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                <p style={{ margin: '0 0 var(--stack-md)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                     Selected: {args.isMulti
                         ? (value.length > 0 ? value.join(', ') : 'None')
                         : (value || 'None')

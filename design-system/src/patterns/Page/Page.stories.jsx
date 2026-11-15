@@ -46,7 +46,7 @@ const pairLabel = (level) => {
     return `${fill} + ${shadow.slice('var('.length, -1)}`;
 };
 
-/** Every elevation level, lowest to highest, on the frame's sunken backdrop — docs section only */
+/** Every elevation level, lowest to highest, on the frame's sunken blanket — docs section only */
 function PageLevelsDemo() {
     return (
         <div style={{ ...col, padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
@@ -107,7 +107,7 @@ export const Overview = () => (
     </Page>
 );
 
-/** One level on the frame's sunken backdrop, labeled with its fill and shadow. */
+/** One level on the frame's sunken blanket, labeled with its fill and shadow. */
 const OneLevel = ({ level }) => (
     <div style={{ padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
         <Page level={level} padding="sm" radius="md">
@@ -116,7 +116,7 @@ const OneLevel = ({ level }) => (
     </div>
 );
 
-/** sunken: the frame's backdrop, with no shadow. */
+/** sunken: the frame's blanket, with no shadow. */
 export const Sunken = { render: () => <OneLevel level="sunken" /> };
 /** default: the page, edged by `--ds-border-surface`. */
 export const DefaultLevel = { name: 'Default', render: () => <OneLevel level="default" /> };
@@ -125,7 +125,7 @@ export const Raised = { render: () => <OneLevel level="raised" /> };
 /** overlay: anything over the UI, with the overlay shadow. */
 export const Overlay = { render: () => <OneLevel level="overlay" /> };
 
-/** One padding and radius step on a default Page, on the sunken backdrop. */
+/** One padding and radius step on a default Page, on the sunken blanket. */
 const OneStep = ({ step }) => (
     <div style={{ padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
         <Page padding={step} radius={step}>

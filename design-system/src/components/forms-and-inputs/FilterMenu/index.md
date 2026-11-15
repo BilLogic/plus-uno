@@ -100,10 +100,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Surface | Those of `Popup`: `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`. |
-| Pad, and the gap above the footer | 16: `--popover-pad`. |
+| Pad, and the gap above the footer | 16: `--popup-pad`. |
 | Gap between categories | `--inline-lg` across, `--stack-lg` down. |
-| Height of the categories | Scroll past 320: `--popover-max-height-menu`. |
-| Gap to the trigger | 4: `--popover-offset`. |
+| Height of the categories | Scroll past 320: `--dropdown-menu-max-height`. |
+| Gap to the trigger | 4: `--popup-offset`. |
 
 ## Content guidelines
 
@@ -147,7 +147,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--heading-xsmall` · `--inline-lg` · `--plus-filter-menu-bleed` · `--plus-filter-menu-columns` · `--popover-max-height-menu` · `--popover-pad` · `--stack-lg`
+`--border-width-default` · `--dropdown-menu-max-height` · `--heading-xs` · `--inline-lg` · `--plus-filter-menu-bleed` · `--plus-filter-menu-columns` · `--popup-pad` · `--stack-lg`
 
 From `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.scss`. Override these through the token layer, never with a literal.
 

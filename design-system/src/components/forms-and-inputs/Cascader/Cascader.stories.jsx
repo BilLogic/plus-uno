@@ -179,7 +179,7 @@ export const Interactive = (args) => {
                 placeholder={args.placeholder}
             />
             {value.length > 0 && (
-                <p style={{ marginTop: 'var(--stack-md)', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                <p style={{ marginTop: 'var(--stack-md)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                     Selected path: {value.join(' → ')}
                 </p>
             )}

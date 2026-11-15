@@ -123,7 +123,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 | Title | `Heading` at the `xlarge` size, as an `h2`. |
 | Rows | `--space-100` between breadcrumbs, title row and bottom bar. |
 | Title row | `--space-150` between the title and its actions; `--space-075` between actions. |
-| Breadcrumbs | `--body-small`. |
+| Breadcrumbs | `--body-sm`. |
 
 ## Content guidelines
 
@@ -147,7 +147,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 
 ## Tokens touched
 
-`--body-small` · `--space-075` · `--space-100` · `--space-150`
+`--body-sm` · `--space-075` · `--space-100` · `--space-150`
 
 From `design-system/src/components/layout-and-structure/PageHeader/PageHeader.scss`. Override these through the token layer, never with a literal.
 

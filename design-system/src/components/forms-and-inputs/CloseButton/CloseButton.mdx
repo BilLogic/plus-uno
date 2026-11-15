@@ -12,7 +12,7 @@ import {
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
-export const surface = { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--inline-md)', padding: 'var(--pad-y-md) var(--pad-x-md)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)', background: 'var(--ds-surface)' };
+export const surface = { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--inline-md)', padding: 'var(--pad-y-md) var(--pad-x-md)', border: 'var(--border-width-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)', background: 'var(--ds-surface)' };
 export const surfaceStacked = { ...surface, flexDirection: 'column', justifyContent: 'flex-start' };
 export const surfaceList = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', flex: 1 };
 export const itemRow = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--inline-md)' };
@@ -126,7 +126,7 @@ Use `CloseButton` wherever a surface closes as a whole, such as the corner of a 
 <tbody>
 <tr><td>Fill, default tone</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps.</td></tr>
 <tr><td>Glyph, inverse tone</td><td><code>--ds-icon-inverse</code>; text <code>--ds-text-inverse</code>.</td></tr>
-<tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square.</td></tr>
+<tr><td>Size</td><td>32: <code>--control-md</code>. 24: <code>--control-sm</code>. Square.</td></tr>
 </tbody>
 </DocsTable>
 

@@ -103,7 +103,7 @@ own spinner (`isLoading`), so saving and loading look different.
   status empty and set its text after mount ("Loading students…"), keep it
   mounted, and update its text when content arrives ("Students loaded"). `aria-busy` alone is not announced by every screen reader.
 - **Contrast in any theme.** The fill is `--ds-skeleton` and the shimmer
-  `--ds-skeleton-subtle`, both theme tokens.
+  `--skeleton-subtle`, both theme tokens.
 
 ```jsx
 const [message, setMessage] = useState('');
@@ -150,9 +150,9 @@ Same group: `GenerativeBorder` · `ProgressBar` · `ProgressRing` · `Spinner`
 | Part | Token |
 | --- | --- |
 | Fill | `--ds-skeleton`. |
-| Shimmer | A band of `--ds-skeleton-subtle`, 1.6s. |
+| Shimmer | A band of `--skeleton-subtle`, 1.6s. |
 | Radius | `--radius-md` by default; `--radius-full` for a circle and the person tag; `--radius-sm` for count; or the token named by `radius`. |
-| Label presets | Heights from the label height roles, so a placeholder is the size of its label. Count is `--control-sm` wide; status-spacious takes `--radius-0375` (6) for its corner. |
+| Label presets | Heights from the label height roles, so a placeholder is the size of its label. Count is `--control-sm` wide; status-spacious takes `--radius-control-sm` (6) for its corner. |
 | Sizes | Spacing primitives: `--space-400` (64) for the default height, `--space-200` (32) for the circle, `--space-100` (16) for the text bar. |
 | Gap | `--stack-md` between lines and tags. |
 | Forced colors | A `--stroke-1` outline keeps the shape. |
@@ -191,7 +191,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--control-sm` · `--ds-motion-linear` · `--ds-motion-loop-duration` · `--ds-skeleton` · `--ds-skeleton-subtle` · `--plus-skeleton-duration` · `--plus-skeleton-height` · `--plus-skeleton-radius` · `--plus-skeleton-width` · `--radius-control-md` · `--radius-full` · `--radius-md` · `--skeleton-circle-size` · `--skeleton-height` · `--skeleton-status-width` · `--skeleton-status-width-spacious` · `--skeleton-tag-width` · `--skeleton-tag-width-narrow` · `--skeleton-tag-width-person` · `--skeleton-tag-width-widest` · `--skeleton-text-height` · `--stack-md`
+`--border-width-default` · `--control-sm` · `--ds-motion-linear` · `--ds-motion-loop-duration` · `--ds-skeleton` · `--plus-skeleton-duration` · `--plus-skeleton-height` · `--plus-skeleton-radius` · `--plus-skeleton-width` · `--radius-control-md` · `--radius-full` · `--radius-md` · `--skeleton-circle-size` · `--skeleton-height` · `--skeleton-status-width` · `--skeleton-status-width-spacious` · `--skeleton-subtle` · `--skeleton-tag-width` · `--skeleton-tag-width-narrow` · `--skeleton-tag-width-person` · `--skeleton-tag-width-widest` · `--skeleton-text-height` · `--stack-md`
 
 From `design-system/src/components/loading/Skeleton/Skeleton.scss`. Override these through the token layer, never with a literal.
 

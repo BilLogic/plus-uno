@@ -281,7 +281,7 @@ test('an incomparable value is counted rather than called equal', () => {
 test('the name pattern selects which family is read', () => {
   // The dimension check passes any custom-property name and then filters by
   // VALUE, because lengths are spread across --space-*, --size-*,
-  // --font-size-* and --line-height-* with no shared prefix.
+  // --type-size-* and --type-line-height-* with no shared prefix.
   const use = 'gap: var(--stack-md, 16px);';
   assert.deepEqual(fallbackUsages([{ path: 'a.scss', text: use }]), []);
   assert.equal(fallbackUsages([{ path: 'a.scss', text: use }], { prefix: '--' }).length, 1);

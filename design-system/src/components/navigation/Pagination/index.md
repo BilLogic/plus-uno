@@ -155,10 +155,10 @@ Same group: `Breadcrumb` · `Link` · `Sidebar` · `Tabs`
 
 | Part | Token |
 | --- | --- |
-| Row height | `--item-height-md` (default), `--item-height-sm` (compact) |
+| Row height | `--control-md` (default), `--control-sm` (compact) |
 | Segment padding | `--pad-x-md`, `--pad-x-sm` |
 | Ink and ground | `--ds-text-subtle`, `--ds-surface` |
-| Pill edge | `--ds-border`, `--border-default`, `--radius-full` |
+| Pill edge | `--ds-border`, `--border-width-default`, `--radius-full` |
 | Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
 | Current page | `--ds-background-selected`, `--ds-text-selected`, `--type-weight-semibold` |
 | Disabled | `--ds-background-disabled`, `--ds-text-disabled`, `--ds-icon-disabled` |
@@ -225,7 +225,7 @@ Implemented as `PaginationNavigator`.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-disabled` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-surface` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--item-height-md` · `--item-height-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium` · `--type-weight-semibold`
+`--body-default` · `--border-width-default` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-surface` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium` · `--type-weight-semibold`
 
 From `design-system/src/components/navigation/Pagination/Pagination.scss`. Override these through the token layer, never with a literal.
 

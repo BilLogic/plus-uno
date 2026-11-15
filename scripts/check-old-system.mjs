@@ -76,7 +76,7 @@ export const FAMILIES = [
   {
     name: 'type',
     pattern: OLD_TYPE,
-    remedy: 'the old type tokens and classes are gone; use a text style (`font: var(--heading-*)`, `var(--body-*)`, `var(--metric-*)`, `var(--code)`), the `--font-size-NNNN` / `--line-height-NNNN` steps, `--type-family-*` and `--type-weight-*`, or `--icon-*` for a glyph',
+    remedy: 'the old type tokens and classes are gone; use a text style (`font: var(--heading-*)`, `var(--body-*)`, `var(--metric-*)`, `var(--code-default)`), the `--type-size-NNNN` / `--type-line-height-NNNN` steps, `--type-family-*` and `--type-weight-*`, or `--icon-*` for a glyph',
   },
 ];
 

@@ -294,7 +294,7 @@ test('guide answers a foundation topic with no guideline file from its Storybook
   assert.equal(color.path, 'design-system/agent-views/foundations/Colors.md');
   assert.match(color.text, /^# Color\n/);
   assert.match(color.text, /^## Data-viz color$/m);
-  assert.match(color.text, /--ds-chart-categorical-1/);
+  assert.match(color.text, /--chart-categorical-1/);
   assert.doesNotMatch(color.text, /<[A-Z][A-Za-z]*[\s/>]|import \{/);
   assert.equal(lookup.guide('colour').path, color.path);
   assert.equal(lookup.guide('colors').path, color.path);

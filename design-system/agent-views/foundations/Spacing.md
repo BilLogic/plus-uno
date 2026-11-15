@@ -17,7 +17,7 @@ padding: var(--card-pad-default);
 gap: var(--card-stack-md);
 ```
 
-Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Backdrop, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
+Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Blanket, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
 
 ## Principles
 
@@ -55,7 +55,7 @@ Name the relationship first, then pick the token from the four-tier ladder on [T
 | `inline` | The horizontal gap between things side by side | `--modal-inline-sm` 8 |
 | `gutter` | The gap between grid columns, and between cards side by side on the grid | `--grid-gutter` 16 |
 | `radius` | Corner radius, set per component (Radius) | `--card-radius` 16 |
-| `height` · `width` · `min` · `max` | Size roles (Grid) | `--item-height-md` 32 |
+| `height` · `width` · `min` · `max` | Size roles (Grid) | `--control-md` 32 |
 
 Margin, slot and viewport are never token words. What other systems call a page margin is the Page pad, `--page-pad`.
 
@@ -161,12 +161,12 @@ Plain and full-span by default.
 - `--table-pad-x-footer` (Table/pad-x-footer)
 - `--table-min-width-title` (Table/min-width-title)
 
-### Backdrop and Modal
+### Blanket and Modal
 
-The Backdrop pads the screen. A modal pads 16 on every side at every width.
+The Blanket pads the screen. A modal pads 16 on every side at every width.
 
-- `--blanket-pad-x` (Backdrop/pad-x)
-- `--blanket-pad-y` (Backdrop/pad-y)
+- `--blanket-pad-x` (Blanket/pad-x)
+- `--blanket-pad-y` (Blanket/pad-y)
 - `--modal-pad` (Modal/pad)
 - `--modal-stack-sm` (Modal/stack-sm)
 - `--modal-stack-md` (Modal/stack-md): Between related fields
@@ -177,21 +177,21 @@ The Backdrop pads the screen. A modal pads 16 on every side at every width.
 
 ### Popup, menu and tooltip
 
-Menu, popup, flag and tooltip float without a Backdrop. The outer box of a menu pads 4, and a popup or flag pads 16.
+Menu, popup, flag and tooltip float without a Blanket. The outer box of a menu pads 4, and a popup or flag pads 16.
 
-- `--popover-pad` (Popup and flag/pad)
-- `--popover-width-sm` (Popup and flag/width-sm)
-- `--popover-width-md` (Popup and flag/width-md)
-- `--popover-width-lg` (Popup and flag/width-lg)
-- `--popover-width-flag` (Popup and flag/width-flag)
-- `--popover-stack-flag` (Popup and flag/stack-flag)
-- `--popover-pad-menu` (Menu/pad-menu)
-- `--popover-min-width-menu` (Menu/min-width-menu)
-- `--popover-max-width-menu` (Menu/max-width-menu)
-- `--popover-max-height-menu` (Menu/max-height-menu)
-- `--popover-pad-y-tooltip` (Tooltip/pad-y-tooltip)
-- `--popover-max-width-tooltip` (Tooltip/max-width-tooltip)
-- `--popover-gap-screen` (Placement/gap-screen): The closest a floating layer comes to the screen edge
+- `--popup-pad` (Popup and flag/pad)
+- `--popup-width-sm` (Popup and flag/width-sm)
+- `--popup-width-md` (Popup and flag/width-md)
+- `--popup-width-lg` (Popup and flag/width-lg)
+- `--flag-width` (Popup and flag/width-flag)
+- `--flag-stack` (Popup and flag/stack-flag)
+- `--dropdown-menu-pad` (Menu/pad-menu)
+- `--dropdown-menu-min-width` (Menu/min-width-menu)
+- `--dropdown-menu-max-width` (Menu/max-width-menu)
+- `--dropdown-menu-max-height` (Menu/max-height-menu)
+- `--tooltip-pad-y` (Tooltip/pad-y-tooltip)
+- `--tooltip-max-width` (Tooltip/max-width-tooltip)
+- `--popup-gap-screen` (Placement/gap-screen): The closest a floating layer comes to the screen edge
 
 ## Usage
 

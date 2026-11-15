@@ -28,7 +28,7 @@ beyond that.
 
 The tooltip is a floating layer: the Popup pattern's surface
 (`--ds-surface-overlay`), overlay shadow (`--ds-shadow-overlay`), radius
-(`--popup-radius`) and padding (`--popover-pad`), plus the shared
+(`--popup-radius`) and padding (`--popup-pad`), plus the shared
 `--layer-popup` z-index. `useHTML` alone only moves the tooltip's TEXT into a
 foreignObject — the box Highcharts draws around it is always its own SVG
 `<path>`, and `background`/`border-radius`/`box-shadow` are no-ops there, so
@@ -47,7 +47,7 @@ Bars and columns round only the value end — the one end a bar is allowed to
 round without distorting the length comparison it exists to support; rounding
 both ends, or a radius bigger than a couple of pixels, reads as "this bar is
 shorter than it is." `--chart-bar-radius` (`chartTheme.css`, aliasing
-`--radius-0125`, ~2px) is the one component-tier token for it, applied via
+`--space-0125`, ~2px) is the one component-tier token for it, applied via
 Highcharts' `borderRadius: { radius, where: 'end' }` — `where: 'end'` is what
 keeps a stacked column from rounding every segment, only the stack's outer
 end. Pies, donuts and areas take no radius at all.
@@ -72,7 +72,7 @@ default Highcharts border or line entirely) needs no token — it draws nothing.
 ## Type
 
 Tick labels, legends, tooltips and data labels take the current text tokens
-(`--font-size-075`, `--type-family-body`, `--type-weight-semibold`, and so on) — never a
+(`--type-size-075`, `--type-family-body`, `--type-weight-semibold`, and so on) — never a
 `'12px'` literal, and never a token `var()` paired with a literal fallback
 value. A chart's title comes from the surrounding Section or Card header, not from Highcharts'
 own `title` option (every chart sets `title: { text: null }`).

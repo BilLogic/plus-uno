@@ -133,7 +133,7 @@ function renderTokensDoc() {
     tokensDoc += "```css\n" + ladderSemantics + "\n```\n\n";
 
     tokensDoc += `## Ladder Patterns\n`;
-    tokensDoc += `Space owned by a pattern: page, section, card, table, modal, popover. Inside a pattern, read its token before a semantics step.\n\n`;
+    tokensDoc += `Space owned by a pattern: page, section, card, table, modal, popup. Inside a pattern, read its token before a semantics step.\n\n`;
     tokensDoc += "```css\n" + ladderPatterns + "\n```\n\n";
 
     tokensDoc += `## Ladder Components\n`;
@@ -156,10 +156,10 @@ function renderTokensDoc() {
     tokensDoc += `The Size and Border scales (spacing / foundations): heights, widths, and the Icon, Image, Item, Row, Label and Field sizes.\n\n`;
     tokensDoc += "```css\n" + scaleFoundations + "\n```\n\n";
     tokensDoc += `## Frame and Layer Tokens\n`;
-    tokensDoc += `The patterns on the page frame, per breakpoint: page, section, card, table, overlay, modal, popover.\n\n`;
+    tokensDoc += `The patterns on the page frame, per breakpoint: page, section, card, table, overlay, modal, popup.\n\n`;
     tokensDoc += "```css\n" + frameLayerTokens + "\n```\n\n";
     tokensDoc += `## Type Scale\n`;
-    tokensDoc += `The text styles, generated from Figma: \`font: var(--heading-large)\`. A button or tab label is \`--body-default\` with \`font-weight: var(--type-weight-medium)\`; there is no button style.\n\n`;
+    tokensDoc += `The text styles, generated from Figma: \`font: var(--heading-lg)\`. A button or tab label is \`--body-default\` with \`font-weight: var(--type-weight-medium)\`; there is no button style.\n\n`;
     tokensDoc += "```css\n" + typeTokens + "\n```\n\n";
 
     tokensDoc += `## Color Tokens (\`--ds-\`)\n`;

@@ -19,7 +19,7 @@ describe('Sound heroes', () => {
         const c = draw(id);
         expect(c.querySelector('text')).toBeNull();
         expect(c.textContent).toBe('');
-        for (const v of paints(c)) expect(/^var\(--ds-[a-z-]+\)$/.test(v), v).toBe(true);
+        for (const v of paints(c)) expect(/^var\(--(?:ds-|chart-)[a-z-]+\)$/.test(v), v).toBe(true);
     });
 
     it.each(IDS)('%s puts the brand accent on its subject', (id) => {

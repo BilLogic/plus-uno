@@ -30,7 +30,7 @@ describe('sidebarGroups config override', () => {
                     items: [{ id: 'reviews', text: 'Reviews', icon: 'clipboard-check' }],
                 },
             ],
-            badges: { reviews: { count: 4, countLabel: '4 pending reviews' } },
+            countTags: { reviews: { count: 4, countLabel: '4 pending reviews' } },
         });
 
         expect(result.map((group) => group.id)).toEqual(['home', 'training', 'toolkit']);

@@ -197,7 +197,7 @@ const expectGrid = async (canvasElement) => {
         const slot = row.querySelector('.plus-pattern-sidebar__slot');
         const label = row.querySelector('.plus-pattern-sidebar__label');
         const end = row.querySelector('.plus-pattern-sidebar__end');
-        await expect(px(getComputedStyle(row).height), 'rows are 32').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+        await expect(px(getComputedStyle(row).height), 'rows are 32').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
         await expect(centerX(canvasElement, slot), `${label.textContent}: icon center`).toBeCloseTo(32, 0);
         await expect(leftX(canvasElement, label), `${label.textContent}: label`).toBeCloseTo(48, 0);
         if (end && visible(end)) await expect(centerX(canvasElement, end), `${label.textContent}: trailing center`).toBeCloseTo(208, 0);
@@ -251,7 +251,7 @@ export const Geometry = {
         await expect(centerX(canvasElement, avatar), 'avatar on the icon column').toBeCloseTo(32, 0);
         const edge = getComputedStyle(canvasElement.querySelector('.plus-frame__sidebar'));
         await expect(edge.boxShadow, 'the docked edge: one 1px line in --ds-border, outside the 240')
-            .toBe(computedShadow(canvasElement, 'var(--border-default) 0 0 0 var(--ds-border)'));
+            .toBe(computedShadow(canvasElement, 'var(--border-width-default) 0 0 0 var(--ds-border)'));
         await expect(px(edge.width), 'the Sidebar keeps 240').toBeCloseTo(tokenLength(canvasElement, '--frame-sidebar-width'), 0);
         // Close all and the collapse angle show on hover and focus: focus the row to reach them.
         rowNamed(canvasElement, 'Sessions').focus();
@@ -345,7 +345,7 @@ export const SectionsOpen = {
     play: async ({ canvasElement }) => {
         const title = within(canvasElement).getByRole('button', { name: 'Training' });
         const caret = title.querySelector('.plus-pattern-sidebar__caret');
-        await expect(px(getComputedStyle(title).height), 'title rows are 32').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+        await expect(px(getComputedStyle(title).height), 'title rows are 32').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
         await expect(getComputedStyle(caret).visibility, 'hidden at rest').toBe('hidden');
         const atHover = withForcedPseudo(title, ':hover', () => ({
             caret: getComputedStyle(caret).visibility,
@@ -638,7 +638,7 @@ const InFrame = ({ width, sidebarDocked }) => {
                 <Frame
                     sidebarDocked={sidebarDocked}
                     header={<Breadcrumb items={[{ text: 'Toolkit' }, { text: 'Sessions' }]} />}
-                    sidebar={<RoleSidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} badges={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' } }} lessonsLeft={2} />}
+                    sidebar={<RoleSidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} countTags={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' } }} lessonsLeft={2} />}
                     panelStorageKey={null}
                 >
                     <p style={{ margin: 0 }}>Upcoming and past sessions.</p>
@@ -660,7 +660,7 @@ export const SidebarOpen = {
         await expect(aside).toHaveClass('plus-frame__sidebar--docked');
         await expect(getComputedStyle(aside).backgroundColor, 'the sunken fill').toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(getComputedStyle(aside).boxShadow, 'docked: the 1px line, no shadow')
-            .toBe(computedShadow(canvasElement, 'var(--border-default) 0 0 0 var(--ds-border)'));
+            .toBe(computedShadow(canvasElement, 'var(--border-width-default) 0 0 0 var(--ds-border)'));
         await expect(canvasElement.querySelector('.plus-frame__topbar'), 'no top bar').toBeNull();
         await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(canvas.getByRole('button', { name: 'Open sidebar' })).toHaveFocus());

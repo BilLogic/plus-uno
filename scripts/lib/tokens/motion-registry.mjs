@@ -82,17 +82,17 @@ export const MOTION_REGISTRY = [
     name: 'PatternModal',
     tier: 'template',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% and fades in; the Backdrop dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts.' },
+      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% and fades in; the Blanket dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts.' },
       exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', appearance: 'appearance.fast', note: 'Leaves at 98%, fading; stays mounted until the exit completes.' },
       swap: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'One Modal at a time: a confirm replaces the content in place, never a second Modal.' },
       rejected: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes it once; never in reduced motion.' },
     },
   },
   {
-    name: 'Backdrop',
+    name: 'Blanket',
     tier: 'template',
     events: {
-      enter: { transition: 'Open and close an overlay', appearance: 'appearance.default', note: 'The Backdrop dims on the same fade as the layer it sits under.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.default', note: 'The Blanket dims on the same fade as the layer it sits under.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'It fades with the layer; a docked Panel never has one.' },
     },
   },
@@ -100,11 +100,11 @@ export const MOTION_REGISTRY = [
     name: 'Panel',
     tier: 'template',
     events: {
-      'docked-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.slow', appearance: 'appearance.fast', note: 'The AI Panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked Panel never has a Backdrop.' },
+      'docked-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.slow', appearance: 'appearance.fast', note: 'The AI Panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked Panel never has a Blanket.' },
       'docked-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Reverses and stays at the edge.' },
       'floating-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself.' },
       'floating-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'Reverses.' },
-      'narrow-enter': { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'At narrow widths it slides over with a Backdrop.' },
+      'narrow-enter': { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'At narrow widths it slides over with a Blanket.' },
       'narrow-exit': { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'The same way back.' },
     },
   },
@@ -474,7 +474,7 @@ export const MOTION_REGISTRY = [
     name: 'Modal',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% while it fades in; the Backdrop dims on the same fade.' },
+      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% while it fades in; the Blanket dims on the same fade.' },
       exit: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Scales to 98% while it fades.' },
       rejected: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes it once; never in reduced motion.' },
     },
@@ -483,7 +483,7 @@ export const MOTION_REGISTRY = [
     name: 'Panel',
     tier: 'component',
     events: {
-      enter: { transition: 'Dock and undock a panel', spatial: 'spatial.slow', note: 'Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Backdrop.' },
+      enter: { transition: 'Dock and undock a panel', spatial: 'spatial.slow', note: 'Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Blanket.' },
       exit: { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Floating panels leave on spatial.fast.' },
     },
   },

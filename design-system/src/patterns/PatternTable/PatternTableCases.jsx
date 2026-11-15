@@ -153,7 +153,7 @@ const TreeAsExpandableCase = () => (
             </tr>
             <tr>
                 <td colSpan={4} style={{ paddingInlineStart: 'calc(var(--table-indent) + var(--icon-sm))' }}>
-                    <div style={{ font: 'var(--heading-xxsmall)', ...subtle }}>Classes</div>
+                    <div style={{ font: 'var(--heading-xxs)', ...subtle }}>Classes</div>
                     <div>Grade 7 · Math: Ava Thompson, Sofia Ramirez. Grade 8 · Math: Marcus Lee, Jordan Patel.</div>
                 </td>
             </tr>
@@ -211,7 +211,7 @@ const PlainTableCase = () => <InSection>{studentTable}</InSection>;
 /** The table in its own padded frame, out of line with the Section header. */
 const FramedTableCase = () => (
     <InSection>
-        <div style={{ padding: 'var(--pad-x-md)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)' }}>
+        <div style={{ padding: 'var(--pad-x-md)', border: 'var(--border-width-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)' }}>
             {studentTable}
         </div>
     </InSection>

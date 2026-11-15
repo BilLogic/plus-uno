@@ -23,7 +23,7 @@ const DonutChartSVG = ({
             return {
                 fontFamily: 'var(--type-family-body)',
                 fontWeight: 'var(--type-weight-regular)',
-                fontSize: 'var(--font-size-075)',
+                fontSize: 'var(--type-size-075)',
                 lineHeight: '1.4',
                 color: 'var(--ds-text-subtle)',
                 letterSpacing: '0'
@@ -33,7 +33,7 @@ const DonutChartSVG = ({
         return {
             fontFamily: 'var(--type-family-heading)',
             fontWeight: 'var(--type-weight-semibold)',
-            fontSize: 'var(--font-size-200)',
+            fontSize: 'var(--type-size-200)',
             lineHeight: '1',
             color: 'var(--ds-text)'
         };
@@ -105,9 +105,9 @@ const DonutChartSVG = ({
                         transform: 'translate(-50%, -100%)',
                         backgroundColor: 'var(--ds-surface-overlay)',
                         color: 'var(--ds-text)',
-                        padding: 'var(--popover-pad-y-tooltip) var(--pad-x-sm)',
+                        padding: 'var(--tooltip-pad-y) var(--pad-x-sm)',
                         borderRadius: 'var(--radius-control-sm)',
-                        fontSize: 'var(--font-size-075)',
+                        fontSize: 'var(--type-size-075)',
                         fontFamily: 'var(--type-family-body)',
                         pointerEvents: 'none',
                         zIndex: 'var(--layer-tooltip)',
@@ -154,7 +154,7 @@ const DonutChartSVG = ({
                 {label && (
                     <span style={{
                         fontFamily: 'var(--type-family-body)',
-                        fontSize: 'var(--font-size-075)',
+                        fontSize: 'var(--type-size-075)',
                         color: 'var(--ds-text-subtle)',
                         marginTop: 'var(--pad-x-xs)'
                     }}>

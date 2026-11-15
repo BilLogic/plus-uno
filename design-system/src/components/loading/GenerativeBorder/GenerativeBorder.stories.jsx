@@ -49,7 +49,7 @@ const box = {
     flexDirection: 'column',
     gap: 'var(--inline-md)',
     padding: 'var(--card-pad-default)',
-    border: 'var(--border-default) solid var(--ds-border)',
+    border: 'var(--border-width-default) solid var(--ds-border)',
     borderRadius: 'var(--generative-border-radius, var(--card-radius))',
     background: 'var(--ds-surface-raised)',
     color: 'var(--ds-text)',
@@ -60,7 +60,7 @@ const wrap = { maxWidth: 'var(--section-min-width-main)' };
 
 const toggle = {
     padding: 'var(--pad-y-md) var(--pad-x-md)',
-    border: 'var(--border-default) solid var(--ds-border-input)',
+    border: 'var(--border-width-default) solid var(--ds-border-input)',
     borderRadius: 'var(--radius-md)',
     background: 'var(--ds-background-input)',
     color: 'var(--ds-text)',
@@ -70,7 +70,7 @@ const toggle = {
 
 const Draft = ({ text = 'Here is a first draft of the session summary.' }) => (
     <div style={box}>
-        <strong style={{ font: 'var(--heading-small)' }}>Session summary</strong>
+        <strong style={{ font: 'var(--heading-sm)' }}>Session summary</strong>
         <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{text}</span>
     </div>
 );
@@ -158,7 +158,7 @@ export const Radii = () => (
         {GENERATIVE_BORDER_RADII.map((radius) => (
             <GenerativeBorder key={radius} isActive radius={radius}>
                 <div style={{ ...box, minWidth: 'var(--card-min-width-sm)' }}>
-                    <span style={{ font: 'var(--body-small)' }}>{radius}</span>
+                    <span style={{ font: 'var(--body-sm)' }}>{radius}</span>
                 </div>
             </GenerativeBorder>
         ))}
@@ -188,7 +188,7 @@ export const Interactive = (args) => {
         </div>
     );
 };
-Interactive.args = { isActive: false, radius: 'radius-100' };
+Interactive.args = { isActive: false, radius: 'radius-xxl' };
 
 /** Starting and finishing generation flips the ring and `aria-busy` together. */
 Interactive.play = async ({ canvasElement }) => {

@@ -9,7 +9,7 @@
  * discovery's job: a dashed edge in `border.discovery`, the words in
  * `text.discovery` and the glyph in `icon.discovery`. Hover is
  * `background.discovery` and pressed `background.discovery.hovered`, the next
- * step, since the rest ground is clear: the color proposal's Suggestion chip
+ * step, since the rest ground is clear: the color proposal's Suggestion tag
  * row (§4.5, "pressed: background.discovery.hovered"). The Figma set still
  * binds Mastering Content, which now belongs to the SMART subjects alone.
  */
@@ -31,7 +31,7 @@
     /* No margin: TagGroup owns the gaps in a tag row. */
     margin: 0;
     padding: 0 var(--pad-x-xs);
-    border: var(--border-default) dashed var(--ds-border-discovery);
+    border: var(--border-width-default) dashed var(--ds-border-discovery);
     border-radius: var(--radius-md);
     background-color: transparent;
     appearance: none;
@@ -51,7 +51,7 @@
 }
 
 .plus-suggestion__label {
-    font: var(--body-small);
+    font: var(--body-sm);
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;

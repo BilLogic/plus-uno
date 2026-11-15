@@ -23,7 +23,7 @@
 }
 
 .plus-setting-row + .plus-setting-row {
-    border-top: var(--border-default) solid var(--ds-border);
+    border-top: var(--border-width-default) solid var(--ds-border);
 }
 
 .plus-setting-row__body {
@@ -63,7 +63,7 @@
     display: flex;
     align-items: center;
     gap: var(--stack-sm);
-    font: var(--body-small);
+    font: var(--body-sm);
     color: var(--ds-text-danger);
 
     i {

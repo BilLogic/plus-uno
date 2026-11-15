@@ -36,11 +36,11 @@ describe('GenerativeBorder', () => {
         expect(container.firstChild).toHaveAttribute('aria-busy', 'false');
     });
 
-    it('follows the named radius token and falls back to radius-100', () => {
-        const { container, rerender } = render(<GenerativeBorder radius="radius-050">x</GenerativeBorder>);
-        expect(container.firstChild.style.getPropertyValue('--generative-border-radius')).toBe('var(--radius-050)');
+    it('follows the named radius token and falls back to radius-xxl', () => {
+        const { container, rerender } = render(<GenerativeBorder radius="radius-lg">x</GenerativeBorder>);
+        expect(container.firstChild.style.getPropertyValue('--generative-border-radius')).toBe('var(--radius-lg)');
         rerender(<GenerativeBorder radius="huge">x</GenerativeBorder>);
-        expect(container.firstChild.style.getPropertyValue('--generative-border-radius')).toBe('var(--radius-100)');
+        expect(container.firstChild.style.getPropertyValue('--generative-border-radius')).toBe('var(--radius-xxl)');
         expect(GENERATIVE_BORDER_RADII).toContain('radius-full');
     });
 

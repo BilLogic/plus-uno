@@ -85,7 +85,7 @@ describe('InboxInSidebar (Patterns › Notifications)', () => {
         await user.click(inboxTrigger);
         expect(screen.getByRole('region', { name: 'Inbox' })).toBeInTheDocument();
 
-        // Closes on outside click (the page behind has no backdrop)
+        // Closes on outside click (the page behind has no blanket)
         await user.click(screen.getByRole('heading', { name: 'Sessions' }));
         expect(screen.queryByRole('region', { name: 'Inbox' })).toBeNull();
     });

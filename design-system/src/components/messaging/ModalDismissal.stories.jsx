@@ -11,12 +11,12 @@ import Modal from './Modal';
  * it is controlled: the caller owns `show` and the component only reports
  * that a dismissal happened, through `onClose`. Every dismissal path is
  * therefore a callback that has to fire, and each one is a separate wire:
- * the header's close button, Escape (via `keyboard`), the backdrop (via
- * `backdrop`), and the caller's own footer buttons.
+ * the header's close button, Escape (via `keyboard`), the blanket (via
+ * `blanket`), and the caller's own footer buttons.
  *
  * None of that was exercised. Every story in `Modal.stories.jsx` renders
  * `renderAs="inline"`, which returns the panel markup and never places it in
- * a `Backdrop` at all — so the overlay, the backdrop, the Escape handler and
+ * a `Blanket` at all — so the overlay, the blanket, the Escape handler and
  * the focus behavior had no coverage of any kind, and a render assertion
  * cannot reach them: an inline panel renders identically whether or not the
  * overlay it stands in for can be closed.
@@ -125,12 +125,12 @@ EveryRouteOut.play = async ({ canvasElement }) => {
 /**
  * The refusals, which are the same props read the other way.
  *
- * `keyboard={false}` and `backdrop="static"` are what a modal over an
+ * `keyboard={false}` and `blanket="static"` are what a modal over an
  * in-flight operation sets so that a stray Escape or a click beside the dialog
  * cannot abandon it. A component that ignored them would look identical until
  * someone lost work to it.
  */
-export const StaticBackdropRefusesToClose = () => {
+export const StaticBlanketRefusesToClose = () => {
     const [open, setOpen] = useState(true);
     const [closes, setCloses] = useState(0);
 
@@ -139,7 +139,7 @@ export const StaticBackdropRefusesToClose = () => {
             <Modal
                 id="mdis-uploading"
                 show={open}
-                backdrop="static"
+                blanket="static"
                 keyboard={false}
                 title="Uploading transcript"
                 body="Leaving now would discard it."
@@ -154,7 +154,7 @@ export const StaticBackdropRefusesToClose = () => {
     );
 };
 
-StaticBackdropRefusesToClose.play = async ({ canvasElement }) => {
+StaticBlanketRefusesToClose.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const doc = documentOf(canvasElement);
     const closes = canvas.getByTestId('close-count');
@@ -166,11 +166,11 @@ StaticBackdropRefusesToClose.play = async ({ canvasElement }) => {
     await expect(closes).toHaveTextContent('0');
     await expect(doc.getByText('Uploading transcript')).toBeInTheDocument();
 
-    // So is a click on the backdrop beside the dialog — dispatched on the
-    // backdrop itself, since a click landing on the dialog is not one.
-    const backdrop = canvasElement.ownerDocument.querySelector('.plus-pattern-backdrop');
-    await expect(backdrop).not.toBeNull();
-    backdrop.click();
+    // So is a click on the blanket beside the dialog — dispatched on the
+    // blanket itself, since a click landing on the dialog is not one.
+    const blanket = canvasElement.ownerDocument.querySelector('.plus-pattern-blanket');
+    await expect(blanket).not.toBeNull();
+    blanket.click();
     await expect(closes).toHaveTextContent('0');
     await expect(doc.getByText('Uploading transcript')).toBeInTheDocument();
 

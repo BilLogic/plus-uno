@@ -92,7 +92,7 @@ let temporaryIds = 0;
  * and move with the arrows. Without these handlers neither appears.
  *
  * Built on the shared parts: `_Field` is the box, `Listbox` the list and its
- * rows, and the chips are Tags in a TagGroup. Without focus the tags collapse
+ * rows, and the tags are Tags in a TagGroup. Without focus the tags collapse
  * into "+n"; with focus they wrap, up to three rows, then scroll.
  */
 const TagInput = ({

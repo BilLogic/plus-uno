@@ -6,11 +6,11 @@ import { Logo } from '@/components';
 // the wordmark starts a quarter-mark gap after it, so they take the size in px.
 const LOCKUP_SIZE = 64;
 
-const label = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const label = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 const tag = {
     alignSelf: 'flex-start',
-    font: 'var(--body-small)',
-            fontWeight: 600, // docs-literal: no weight token pairs with the body-small style
+    font: 'var(--body-sm)',
+            fontWeight: 600, // docs-literal: no weight token pairs with the body-sm style
     color: 'var(--ds-text-inverse)',
     background: 'var(--ds-background-neutral-bold)',
     borderRadius: 'var(--radius-full)',
@@ -38,10 +38,10 @@ const Bracket = ({ children, style }) => (
         style={{
             display: 'flex',
             justifyContent: 'center',
-            borderBottom: 'var(--border-default) solid var(--ds-border-bold)',
+            borderBottom: 'var(--border-width-default) solid var(--ds-border-bold)',
             paddingBottom: 'var(--stack-sm)',
-            font: 'var(--body-small)',
-            fontWeight: 600, // docs-literal: no weight token pairs with the body-small style
+            font: 'var(--body-sm)',
+            fontWeight: 600, // docs-literal: no weight token pairs with the body-sm style
             color: 'var(--ds-text)',
             ...style,
         }}
@@ -55,7 +55,7 @@ const Expression = ({ tagLetter, name, job, children }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <div style={ground}>{children}</div>
         <span style={tag} aria-hidden="true">{tagLetter}</span>
-        <h3 style={{ margin: 0, font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>{name}</h3>
+        <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>{name}</h3>
         <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{job}</p>
     </div>
 );
@@ -71,7 +71,7 @@ const frame = {
     minHeight: 'var(--card-min-width-sm)',
     overflow: 'hidden',
     borderRadius: 'var(--card-radius)',
-    border: 'var(--border-default) solid var(--ds-border)',
+    border: 'var(--border-width-default) solid var(--ds-border)',
     background: 'var(--ds-surface)',
 };
 
@@ -123,7 +123,7 @@ export const LogoExpressions = () => (
             <figcaption style={label}>The logomark, the wordmark and the lockup they make, each named once.</figcaption>
         </figure>
 
-        <h3 style={{ margin: 0, font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>In the product</h3>
+        <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>In the product</h3>
         <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Where each expression lives. The logomark marks the app; the lockup introduces PLUS.</p>
         <ul aria-label="In the product" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
             <Example title="Sidebar header ·" expression="Logomark">

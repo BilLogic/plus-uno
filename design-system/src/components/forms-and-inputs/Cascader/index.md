@@ -87,7 +87,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `CheckboxGr
 
 | State | What changes |
 | --- | --- |
-| Rest | The input fill with a `--border-default` input edge; the placeholder until a path is chosen. |
+| Rest | The input fill with a `--border-width-default` input edge; the placeholder until a path is chosen. |
 | Hovered | The edge turns `--ds-border-focused`. |
 | Pressed | No step of its own. The hovered edge holds while the pointer is down, and the press opens the columns. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
@@ -98,15 +98,15 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `CheckboxGr
 
 | Part | Token |
 | --- | --- |
-| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
-| Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
+| Box | `--ds-background-input` fill, `--border-width-default` edge in `--ds-border-input`. |
+| Height | 40: `--height-250`. Compact 32: `--control-md`. |
+| Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Side padding | `--pad-x-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
-| Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
+| Label and caption | `--body-sm`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
 | Menu | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
-| Column rule | `--border-default` in `--ds-border` between columns. |
-| Option | `--item-height-md` high; hovered `--ds-background-neutral-subtle-hovered`, chosen `--ds-background-selected` with `--ds-text-selected`. |
+| Column rule | `--border-width-default` in `--ds-border` between columns. |
+| Option | `--control-md` high; hovered `--ds-background-neutral-subtle-hovered`, chosen `--ds-background-selected` with `--ds-text-selected`. |
 
 ## Content guidelines
 
@@ -146,7 +146,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-border` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--plus-listbox-viewport-width`
+`--border-width-default` · `--ds-border` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--plus-listbox-viewport-width`
 
 From `design-system/src/components/forms-and-inputs/Cascader/Cascader.scss`. Override these through the token layer, never with a literal.
 

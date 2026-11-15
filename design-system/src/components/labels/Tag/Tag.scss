@@ -24,7 +24,7 @@
  * The text stays neutral (`color.text`) on every name: the steps it sits on
  * are the accent's lightest, made for neutral text. Gray is the accent gray,
  * which is the neutral ramp. A SMART area is not a hue: it reads the SMART
- * layer through `StaticBadgeSmart`, so the subject-to-hue pairing lives in the
+ * layer through `SmartTag`, so the subject-to-hue pairing lives in the
  * tokens alone. The map holds whole `var()` references so the generated docs
  * list them.
  */
@@ -154,7 +154,7 @@ $tag-colors: (
      */
     margin: 0;
     padding: 0 var(--pad-x-xs);
-    border: var(--border-default) solid var(--plus-tag-border-rest);
+    border: var(--border-width-default) solid var(--plus-tag-border-rest);
     border-radius: var(--radius-md);
     background-color: transparent;
     appearance: none;
@@ -279,7 +279,7 @@ $tag-colors: (
 }
 
 .plus-tag__label {
-    font: var(--body-small);
+    font: var(--body-sm);
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -301,7 +301,7 @@ $tag-colors: (
 
 /* A token swatch can carry any series color, which may sit near the ground. */
 .plus-tag__swatch--custom {
-    box-shadow: inset 0 0 0 var(--border-default) var(--ds-border);
+    box-shadow: inset 0 0 0 var(--border-width-default) var(--ds-border);
 }
 
 .plus-tag__elem-before {
@@ -441,7 +441,7 @@ $tag-colors: (
     box-sizing: border-box;
     width: var(--tag-dot-size);
     height: var(--tag-dot-size);
-    border: var(--border-default) solid transparent;
+    border: var(--border-width-default) solid transparent;
     /* Three quarters of the ring: a 270° arc. */
     border-top-color: var(--plus-tag-hue);
     border-right-color: var(--plus-tag-hue);

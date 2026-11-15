@@ -12,7 +12,7 @@ const corpus = tokenCorpus();
 
 test('the medium radius stays 4px: Storybook won the conflict with Figma', () => {
   const token = corpus.get('--radius-md');
-  assert.equal(token?.raw, 'var(--radius-025)');
+  assert.equal(token?.raw, 'var(--space-025)');
   assert.equal(token?.value, '4px');
 });
 

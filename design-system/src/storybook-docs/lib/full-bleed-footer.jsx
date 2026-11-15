@@ -22,7 +22,7 @@ import { BAR_TOKEN } from './focused-task.jsx';
 export const CELL = { borderRadius: 0, blockSize: '100%', borderWidth: 0 };
 
 /** The rule between two neighboring cells. */
-const DIVIDER = { borderInlineStartWidth: 'var(--border-default)', borderInlineStartStyle: 'solid', borderInlineStartColor: 'var(--ds-border)' };
+const DIVIDER = { borderInlineStartWidth: 'var(--border-width-default)', borderInlineStartStyle: 'solid', borderInlineStartColor: 'var(--ds-border)' };
 
 /**
  * @param {object} props
@@ -40,7 +40,7 @@ export const FooterCells = ({ columns = '1fr 1fr', bleed, radius = '--modal-radi
             flex: '1 1 auto',
             overflow: 'hidden',
             // An inset rule, so the cells keep the footer's whole height.
-            boxShadow: 'inset 0 var(--border-default) 0 var(--ds-border)',
+            boxShadow: 'inset 0 var(--border-width-default) 0 var(--ds-border)',
             ...(bleed && {
                 marginInline: `calc(-1 * var(${bleed}))`,
                 marginBlockEnd: `calc(-1 * var(${bleed}))`,

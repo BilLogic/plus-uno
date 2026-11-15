@@ -10,7 +10,7 @@
     /* Button */
     --button-radius-default: calc(var(--radius-control-lg) - var(--pad-x-xs)); /* nests in a 40-high field: its radius 10 minus the 4 slot inset = 6 */
     --button-radius-compact: calc(var(--radius-control-md) - var(--pad-x-xs)); /* nests in a 32-high field: its radius 8 minus the 4 slot inset = 4 */
-    --button-vertical-size: var(--space-400);
+    --button-size-vertical: var(--space-400);
 
     /* Calendar */
     --calendar-day-sm: 28px;
@@ -58,7 +58,7 @@
 
     /* Setting row */
     --setting-row-pad-y: var(--space-075);
-    --setting-row-end-min-height: var(--line-height-125);
+    --setting-row-end-min-height: var(--type-line-height-125);
     --setting-row-select-min-width: var(--size-1000);
 
     /* Listbox */
@@ -86,9 +86,9 @@
 
     /* Tag */
     --tag-dot-size: var(--space-0625);
-    --tag-pad-end-compact: var(--space-0125);
+    --tag-pad-x-end-compact: var(--space-0125);
     --tag-gap-compact: var(--space-0125);
-    --tag-pad-end: var(--space-0375);
+    --tag-pad-x-end: var(--space-0375);
     --tag-gap: var(--space-0375);
 
     /* Carousel */
@@ -123,7 +123,7 @@
     --flag-min-height: calc(var(--size-1000) + var(--size-750));
     --flag-pad: var(--space-125);
     --flag-offset: var(--space-125);
-    --flag-radius-timer: var(--radius-025);
+    --flag-radius-timer: var(--space-025);
     --flag-timer-height: var(--space-025);
 
     /* Spotlight */
@@ -140,7 +140,6 @@
     --popup-min-width: var(--width-1000);
     --popup-max-width: var(--width-2000);
     --popup-clip-reach: var(--space-300);
-    --popup-pad: var(--space-125);
 
     /* AI chat */
     --ai-chat-width: var(--width-2500);

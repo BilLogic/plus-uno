@@ -371,14 +371,14 @@ export const Interactive = {
 
 /* ------------------------------------------------------------------- states */
 
-const Chip = (props) => <Suggestion label="Relationships" onAccept={() => {}} {...props} />;
-const chip = (canvasElement) => within(canvasElement).getByRole('button', { name: 'Add Relationships, suggested' });
+const SuggestionExample = (props) => <Suggestion label="Relationships" onAccept={() => {}} {...props} />;
+const tag = (canvasElement) => within(canvasElement).getByRole('button', { name: 'Add Relationships, suggested' });
 
 /** Rest: a dashed discovery edge on a clear ground. */
 export const Rest = {
-    render: () => <Chip />,
+    render: () => <SuggestionExample />,
     play: async ({ canvasElement }) => {
-        const el = chip(canvasElement);
+        const el = tag(canvasElement);
         await expect(getComputedStyle(el).backgroundColor, 'clear ground').toBe(CLEAR);
         await expect(getComputedStyle(el).borderTopStyle).toBe('dashed');
         await expect(getComputedStyle(el).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-discovery'));
@@ -387,34 +387,34 @@ export const Rest = {
 
 /** Hovered: the discovery ground. */
 export const Hovered = {
-    render: () => <Chip />,
+    render: () => <SuggestionExample />,
     play: async ({ canvasElement }) => {
-        await expectGroundUnder(canvasElement, chip(canvasElement), ':hover', '--ds-background-discovery', 'suggestion');
+        await expectGroundUnder(canvasElement, tag(canvasElement), ':hover', '--ds-background-discovery', 'suggestion');
     },
 };
 
 /** Pressed: the next discovery step. */
 export const Pressed = {
-    render: () => <Chip />,
+    render: () => <SuggestionExample />,
     play: async ({ canvasElement }) => {
-        await expectGroundUnder(canvasElement, chip(canvasElement), ':active', '--ds-background-discovery-hovered', 'suggestion');
+        await expectGroundUnder(canvasElement, tag(canvasElement), ':active', '--ds-background-discovery-hovered', 'suggestion');
     },
 };
 
 /** Focused: the 2px ring 2px off the dashed edge; the ground stays clear. */
 export const Focused = {
-    render: () => <Chip />,
+    render: () => <SuggestionExample />,
     play: async ({ canvasElement }) => {
-        await expectFocusRing(canvasElement, chip(canvasElement), 'suggestion');
+        await expectFocusRing(canvasElement, tag(canvasElement), 'suggestion');
     },
 };
 
 /** Disabled: a native disabled button on the disabled ground, never accepted. */
 export const Disabled = {
     args: { onAccept: fn() },
-    render: ({ onAccept }) => <Chip isDisabled onAccept={onAccept} />,
+    render: ({ onAccept }) => <SuggestionExample isDisabled onAccept={onAccept} />,
     play: async ({ canvasElement, args }) => {
-        const el = chip(canvasElement);
+        const el = tag(canvasElement);
         await expect(el).toBeDisabled();
         await expectGroundUnder(canvasElement, el, ':hover', '--ds-background-disabled', 'disabled');
         await expect(getComputedStyle(el).color).toBe(tokenColor(canvasElement, '--ds-text-disabled'));

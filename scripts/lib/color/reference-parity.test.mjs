@@ -40,11 +40,12 @@ import { figmaSpec } from './figma.mjs';
 const REF = process.env.COLOR_REFERENCE_DIR ?? join(homedir(), 'Documents/Claude/Projects/PLUS/color-system');
 const skip = existsSync(join(REF, 'generator')) ? false : `reference folder not found at ${REF}`;
 const json = (rel) => JSON.parse(readFileSync(join(REF, rel), 'utf8'));
-const body = (text) => text.slice(text.indexOf('\n') + 1);
+const currentNames = (text) => text.replace(/--ds-(chart-|skeleton-)/g, '--$1');
+const body = (text) => currentNames(text.slice(text.indexOf('\n') + 1));
 const VALUE_KEYS = ['name', 'light_ref', 'light', 'dark_ref', 'dark', 'light_ic_ref', 'light_ic', 'dark_ic_ref', 'dark_ic'];
 const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) => [k, r[k]])));
 const withoutProse = (value) =>
-  JSON.parse(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v)));
+  JSON.parse(currentNames(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v))));
 /** Tokens PLUS added after the reference was cut. */
 const PLUS_ONLY_TOKEN = /^color[./]background[./]smart[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold/;
 const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-smart-[a-z-]+-subtle|ai-background-bold[a-z-]*): [^\n]*\n/gm;
@@ -75,7 +76,7 @@ const refShape = (palette) => ({
 const withoutElevation2 = (rows) => rows.filter((r) => !ELEVATION_2.test(r.name));
 const withoutElevation2Lines = (css) => css.split('\n').filter((l) => !ELEVATION_2.test(l)).join('\n');
 /** A stylesheet without the departed declarations. */
-const keptCss = (css) => css.split('\n').filter((l) => !/--ds-chart-(categorical|smart)-|--ds-chart-(neutral|gray-bold):/.test(l)).join('\n');
+const keptCss = (css) => css.split('\n').filter((l) => !/--chart-(categorical|smart)-|--chart-(neutral|gray-bold):/.test(l)).join('\n');
 /** Rewrites the reference's Lagoon values (hex, bare hex and rgb triplets) to ours, for the plan's retuned steps. */
 function lagoonSwap(key) {
   const ours = buildPlan(key).semantics.palette.lagoon;

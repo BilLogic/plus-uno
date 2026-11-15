@@ -42,7 +42,7 @@ import './Tag.scss';
  *
  * WHAT A TAG DOES FOLLOWS FROM ITS PROPS. `href` makes a link. `isSelected`, true
  * or false, makes a toggle: it publishes `aria-pressed` and fires `onClick`, which
- * is what an answer chip needs. `isRemovable` adds a Remove button. With none of
+ * is what an answer tag needs. `isRemovable` adds a Remove button. With none of
  * them a tag only names something.
  *
  * DISABLED. `isDisabled` disables one tag. A field disables all of its tags at
@@ -188,7 +188,7 @@ const TagAvatar = ({ type, avatar, label, isLoading }) => {
     );
 };
 
-/** A small outlined label that names a category, person, agent or team. It can also act as a link, a toggle or a removable chip, depending on its props. */
+/** A small outlined label that names a category, person, agent or team. It can also act as a link, a toggle or a removable tag, depending on its props. */
 export const Tag = ({
     text,
     children,

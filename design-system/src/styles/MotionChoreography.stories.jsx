@@ -27,7 +27,7 @@ export default {
 };
 
 const PAINTED = ['fill', 'stroke'];
-const TOKEN_OR_NONE = /^(?:var\(--ds-[\w-]+\)|none)$/;
+const TOKEN_OR_NONE = /^(?:var\(--(?:ds-|chart-)[\w-]+\)|none)$/;
 const everyPaintIsAToken = (root) =>
   [...root.querySelectorAll('svg *')].every((el) =>
     PAINTED.every((attr) => !el.hasAttribute(attr) || TOKEN_OR_NONE.test(el.getAttribute(attr))),

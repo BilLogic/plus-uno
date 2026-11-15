@@ -12,8 +12,8 @@ export default {
 };
 
 const col = (gap) => ({ display: 'flex', flexDirection: 'column', gap });
-const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
-const code = { font: 'var(--code)', color: 'var(--ds-text-subtle)' };
+const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const code = { font: 'var(--code-default)', color: 'var(--ds-text-subtle)' };
 
 const Glyph = ({ name, family = 'fa-solid', size = '--icon-md', color = '--ds-icon-subtle' }) => (
     <i
@@ -37,7 +37,7 @@ export const Sizes = () => (
                 <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 'var(--image-xl)', height: 'var(--image-xl)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface-sunken)' }}>
                     <Glyph name={name} size={token} color="--ds-icon" />
                 </span>
-                <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{value} · <span style={code}>{token}</span></span>
+                <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{value} · <span style={code}>{token}</span></span>
                 <span style={caption}>{use}</span>
             </div>
         ))}

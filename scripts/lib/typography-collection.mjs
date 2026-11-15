@@ -8,8 +8,8 @@
  * text styles that bind every property to one of these variables.
  *
  * A variable's code name is its folder's prefix plus its leaf:
- * `Font size/075` is `--font-size-075`, `Line height/125` is
- * `--line-height-125`, `Family/heading` is `--type-family-heading` and
+ * `Font size/075` is `--type-size-075`, `Line height/125` is
+ * `--type-line-height-125`, `Family/heading` is `--type-family-heading` and
  * `Weight/medium` is `--type-weight-medium` and `Letter spacing/tight` is
  * `--type-tracking-tight`. Each variable's WEB code syntax
  * in Figma names the same token.
@@ -24,8 +24,8 @@ export const TYPOGRAPHY_FILE = 'typography.json';
 
 /** Each folder: its Figma path prefix, its CSS prefix, and its kind of value. */
 export const TYPOGRAPHY_FOLDERS = [
-  { figma: 'Font size/', css: '--font-size-', kind: 'size' },
-  { figma: 'Line height/', css: '--line-height-', kind: 'size' },
+  { figma: 'Font size/', css: '--type-size-', kind: 'size' },
+  { figma: 'Line height/', css: '--type-line-height-', kind: 'size' },
   { figma: 'Family/', css: '--type-family-', kind: 'family' },
   { figma: 'Weight/', css: '--type-weight-', kind: 'weight' },
   { figma: 'Letter spacing/', css: '--type-tracking-', kind: 'tracking' },

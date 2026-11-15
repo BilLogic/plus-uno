@@ -109,8 +109,8 @@
         "MotionReduced"
       ],
       "tokens": [
-        "--body-large",
-        "--border-default",
+        "--body-lg",
+        "--border-width-default",
         "--card-pad-default",
         "--card-radius-compact",
         "--ds-background-neutral-subtle-hovered",
@@ -125,7 +125,7 @@
         "--ds-opacity-disabled",
         "--ds-surface",
         "--ds-text-subtle",
-        "--heading-small",
+        "--heading-sm",
         "--icon-md"
       ],
       "subComponents": [
@@ -356,7 +356,7 @@
       "tokens": [
         "--ai-chat-width",
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--content-max-width-reading",
         "--ds-shadow-overlay",
         "--ds-surface",
@@ -384,7 +384,7 @@
       "import": "import { AiIcon } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/AiIcon/AiIcon.jsx",
-      "summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each badged icon is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which starts at the icon color; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
+      "summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which starts at the icon color; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
       "props": [
         {
           "name": "name",
@@ -587,14 +587,14 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
-        "--code",
+        "--body-sm",
+        "--code-default",
         "--ds-background-neutral",
         "--ds-motion-loop",
         "--ds-motion-loop-duration",
         "--ds-text",
         "--ds-text-subtle",
-        "--heading-xsmall",
+        "--heading-xs",
         "--icon-md",
         "--inline-md",
         "--inline-sm",
@@ -755,7 +755,7 @@
         "--avatar-size",
         "--avatar-size-128",
         "--avatar-size-96",
-        "--border-default",
+        "--border-width-default",
         "--ds-background-accent-blue-subtler",
         "--ds-background-accent-gray-subtle",
         "--ds-background-accent-gray-subtler",
@@ -776,10 +776,6 @@
         "--ds-text-accent-purple",
         "--ds-text-accent-teal",
         "--ds-text-accent-yellow",
-        "--font-size-075",
-        "--font-size-0875",
-        "--font-size-100",
-        "--font-size-200",
         "--icon-lg",
         "--icon-md",
         "--icon-sm",
@@ -789,6 +785,10 @@
         "--image-xxs",
         "--radius-full",
         "--radius-xxl",
+        "--type-size-075",
+        "--type-size-0875",
+        "--type-size-100",
+        "--type-size-200",
         "--type-weight-semibold"
       ]
     },
@@ -888,109 +888,6 @@
       ]
     },
     {
-      "name": "Backdrop",
-      "kind": "pattern",
-      "import": "import { Backdrop } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Backdrop/Backdrop.jsx",
-      "summary": null,
-      "props": [
-        {
-          "name": "show",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Keep mounted and set false to finish the exit before removal.",
-          "deprecated": null
-        },
-        {
-          "name": "inline",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.",
-          "deprecated": null
-        },
-        {
-          "name": "screenWidth",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440.",
-          "deprecated": null
-        },
-        {
-          "name": "screenHeight",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the screen height (px); a layer inside caps at it less Backdrop/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do.",
-          "deprecated": null
-        },
-        {
-          "name": "onBackdropClick",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called for a click on the backdrop, not on the layer it holds.",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The layer it holds: a PatternModal, or a confirm over one.",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Inline",
-        "ConfirmOverPanel",
-        "Layers",
-        "Pads",
-        "ScreenGrid",
-        "Interactive",
-        "MotionOpenClose",
-        "MotionReduced"
-      ],
-      "tokens": [
-        "--blanket-pad-x",
-        "--blanket-pad-y",
-        "--ds-blanket",
-        "--layer-blanket",
-        "--layer-modal",
-        "--plus-overlay-origin",
-        "--plus-overlay-screen",
-        "--plus-overlay-screen-height",
-        "--transform-origin"
-      ]
-    },
-    {
       "name": "Banner",
       "kind": "component",
       "import": "import { Banner } from '@/components';",
@@ -1079,6 +976,109 @@
       ]
     },
     {
+      "name": "Blanket",
+      "kind": "pattern",
+      "import": "import { Blanket } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Blanket/Blanket.jsx",
+      "summary": null,
+      "props": [
+        {
+          "name": "show",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "Keep mounted and set false to finish the exit before removal.",
+          "deprecated": null
+        },
+        {
+          "name": "inline",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.",
+          "deprecated": null
+        },
+        {
+          "name": "screenWidth",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440.",
+          "deprecated": null
+        },
+        {
+          "name": "screenHeight",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline only: the screen height (px); a layer inside caps at it less Blanket/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do.",
+          "deprecated": null
+        },
+        {
+          "name": "onBlanketClick",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called for a click on the blanket, not on the layer it holds.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The layer it holds: a PatternModal, or a confirm over one.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Inline",
+        "ConfirmOverPanel",
+        "Layers",
+        "Pads",
+        "ScreenGrid",
+        "Interactive",
+        "MotionOpenClose",
+        "MotionReduced"
+      ],
+      "tokens": [
+        "--blanket-pad-x",
+        "--blanket-pad-y",
+        "--ds-blanket",
+        "--layer-blanket",
+        "--layer-modal",
+        "--plus-overlay-origin",
+        "--plus-overlay-screen",
+        "--plus-overlay-screen-height",
+        "--transform-origin"
+      ]
+    },
+    {
       "name": "Breadcrumb",
       "kind": "component",
       "import": "import { Breadcrumb } from '@/components';",
@@ -1153,9 +1153,9 @@
       ],
       "tokens": [
         "--body-default",
+        "--control-md",
         "--ds-link",
         "--ds-text-subtlest",
-        "--item-height-md",
         "--plus-breadcrumb-divider",
         "--stack-md"
       ]
@@ -1397,11 +1397,13 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--button-radius-compact",
         "--button-radius-default",
-        "--button-vertical-size",
+        "--button-size-vertical",
+        "--control-md",
+        "--control-sm",
         "--ds-background-disabled",
         "--ds-border-disabled",
         "--ds-icon-disabled",
@@ -1410,8 +1412,6 @@
         "--ds-text-disabled",
         "--icon-md",
         "--inline-sm",
-        "--item-height-md",
-        "--item-height-sm",
         "--pad-x-md",
         "--pad-x-sm",
         "--pad-x-xs",
@@ -1487,7 +1487,7 @@
         "Interactive"
       ],
       "tokens": [
-        "--border-default",
+        "--border-width-default",
         "--button-radius-default"
       ]
     },
@@ -1729,7 +1729,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-selected",
+        "--border-width-selected",
         "--card-radius",
         "--carousel-aspect",
         "--carousel-edge-fade",
@@ -1942,7 +1942,7 @@
         "FieldInvalid"
       ],
       "tokens": [
-        "--border-default",
+        "--border-width-default",
         "--ds-border",
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
@@ -2057,8 +2057,8 @@
         "Disabled"
       ],
       "tokens": [
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-background-danger",
         "--ds-background-danger-pressed",
         "--ds-background-neutral",
@@ -2309,11 +2309,12 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
-        "--border-selected",
+        "--border-width-default",
+        "--border-width-selected",
         "--card-pad-default",
         "--checkbox-control-size",
         "--choice-tile-width",
+        "--control-sm",
         "--ds-background-disabled",
         "--ds-background-input",
         "--ds-background-input-hovered",
@@ -2337,7 +2338,6 @@
         "--ds-surface",
         "--ds-surface-hovered",
         "--ds-text",
-        "--item-height-sm",
         "--pad-x-lg",
         "--pad-x-md",
         "--plus-choice-indent",
@@ -2683,8 +2683,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-large",
-        "--body-small",
+        "--body-lg",
+        "--body-sm",
         "--checkbox-control-size",
         "--choice-grid-control-size-10",
         "--choice-grid-control-size-12",
@@ -2778,7 +2778,7 @@
       "import": "import { Code } from '@/components';",
       "group": "text-and-data-display",
       "source": "design-system/src/components/text-and-data-display/Code/Code.jsx",
-      "summary": "An inline chip for a short piece of code inside a sentence. It is a `code` element in the code typeface at 0.875 of the text around it, on a neutral fill, so it follows a paragraph or a heading without a size of its own.",
+      "summary": "An inline snippet for a short piece of code inside a sentence. It is a `code` element in the code typeface at 0.875 of the text around it, on a neutral fill, so it follows a paragraph or a heading without a size of its own.",
       "props": [
         {
           "name": "children",
@@ -2810,7 +2810,7 @@
         "NotAControl"
       ],
       "tokens": [
-        "--code",
+        "--code-default",
         "--ds-background-neutral",
         "--ds-text-code-default",
         "--pad-x-xs",
@@ -2905,9 +2905,9 @@
         "WrapNotFocusable"
       ],
       "tokens": [
-        "--border-default",
+        "--border-width-default",
         "--card-radius-compact",
-        "--code",
+        "--code-default",
         "--ds-background-code-default",
         "--ds-background-code-gutter",
         "--ds-background-code-highlight",
@@ -2916,13 +2916,13 @@
         "--ds-text-code-default",
         "--ds-text-code-gutter",
         "--focus-ring-width",
-        "--font-size-0875",
-        "--line-height-125",
         "--pad-x-lg",
         "--pad-x-md",
         "--pad-y-lg",
         "--plus-code-block-digits",
-        "--plus-code-block-gutter"
+        "--plus-code-block-gutter",
+        "--type-line-height-125",
+        "--type-size-0875"
       ]
     },
     {
@@ -3078,8 +3078,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--card-radius-compact",
         "--ds-background-selected",
         "--ds-border",
@@ -3098,7 +3098,7 @@
       "import": "import { CountTag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/CountTag/CountTag.jsx",
-      "summary": "CountTag: a number on its own, as a near-square badge.",
+      "summary": "CountTag: a number on its own, as a near-square countTag.",
       "props": [
         {
           "name": "value",
@@ -3170,7 +3170,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "A solid white badge with dark text, for filled buttons and dark grounds. Always neutral.",
+          "description": "A solid white countTag with dark text, for filled buttons and dark grounds. Always neutral.",
           "deprecated": null
         },
         {
@@ -3236,7 +3236,7 @@
         "Disabled"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--control-sm",
         "--count-tag-dot-size",
         "--ds-background-danger",
@@ -3560,8 +3560,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-border",
         "--ds-border-danger-subtle",
         "--ds-border-focused",
@@ -3584,8 +3584,8 @@
         "--stack-sm",
         "--tag-gap",
         "--tag-gap-compact",
-        "--tag-pad-end",
-        "--tag-pad-end-compact"
+        "--tag-pad-x-end",
+        "--tag-pad-x-end-compact"
       ]
     },
     {
@@ -3893,7 +3893,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--ds-text",
         "--ds-text-danger",
         "--ds-text-subtle",
@@ -4102,15 +4102,15 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
+        "--border-width-default",
+        "--dropdown-menu-max-height",
+        "--dropdown-menu-max-width",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text-subtle",
         "--layer-popup",
         "--pad-x-md",
         "--pad-y-md",
-        "--popover-max-height-menu",
-        "--popover-max-width-menu",
         "--popup-radius",
         "--stack-md"
       ]
@@ -4219,10 +4219,8 @@
         "--ds-icon-subtle",
         "--ds-text",
         "--ds-text-subtle",
-        "--font-size-150",
-        "--font-size-200",
-        "--heading-medium",
-        "--heading-small",
+        "--heading-md",
+        "--heading-sm",
         "--inline-md",
         "--page-stack-lg",
         "--page-stack-md",
@@ -4231,7 +4229,9 @@
         "--section-min-width-main",
         "--section-stack-md",
         "--section-stack-sm",
-        "--stack-sm"
+        "--stack-sm",
+        "--type-size-150",
+        "--type-size-200"
       ]
     },
     {
@@ -4326,7 +4326,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--ds-text",
         "--ds-text-danger",
         "--stack-md"
@@ -4505,8 +4505,8 @@
         "Interactive"
       ],
       "tokens": [
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-background-disabled",
         "--ds-border",
         "--ds-border-disabled",
@@ -4732,8 +4732,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--card-radius-compact",
         "--ds-background-brand-subtlest",
         "--ds-background-danger-subtler",
@@ -5062,13 +5062,13 @@
         "Interactive"
       ],
       "tokens": [
-        "--border-default",
-        "--heading-xsmall",
+        "--border-width-default",
+        "--dropdown-menu-max-height",
+        "--heading-xs",
         "--inline-lg",
         "--plus-filter-menu-bleed",
         "--plus-filter-menu-columns",
-        "--popover-max-height-menu",
-        "--popover-pad",
+        "--popup-pad",
         "--stack-lg"
       ]
     },
@@ -5306,8 +5306,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-background-danger-bold",
         "--ds-background-neutral-bold",
         "--ds-background-neutral-subtle-hovered",
@@ -5339,18 +5339,18 @@
         "--flag-offset",
         "--flag-pad",
         "--flag-radius-timer",
+        "--flag-stack",
         "--flag-timer-height",
-        "--heading-xsmall",
+        "--flag-width",
+        "--heading-xs",
         "--icon-md",
         "--inline-lg",
         "--inline-md",
         "--inline-sm",
         "--label-height-md",
         "--layer-flag",
-        "--popover-gap-screen",
-        "--popover-pad",
-        "--popover-stack-flag",
-        "--popover-width-flag",
+        "--popup-gap-screen",
+        "--popup-pad",
         "--popup-radius",
         "--radius-md",
         "--stack-sm",
@@ -5363,7 +5363,7 @@
       "import": "import { Frame } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Frame/Frame.jsx",
-      "summary": "There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay` and no Backdrop. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay fill and shadow, with no Backdrop, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
+      "summary": "There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay fill and shadow, with no Blanket, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
       "props": [
         {
           "name": "id",
@@ -5515,7 +5515,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Hovering the Frame's right edge peeks a closed Panel over the Page, with no Backdrop. Off by default.",
+          "description": "Hovering the Frame's right edge peeks a closed Panel over the Page, with no Blanket. Off by default.",
           "deprecated": null
         },
         {
@@ -5662,7 +5662,7 @@
         "StatePanelWidest",
         "StateSidebarAndPanel",
         "StatePanelCollapsesSidebar",
-        "StatePanelOnBackdrop",
+        "StatePanelOnBlanket",
         "StateWithModal",
         "StateModalClosesFloating",
         "StateAt768",
@@ -5708,10 +5708,11 @@
         "MotionStepDownReduced"
       ],
       "tokens": [
-        "--border-default",
+        "--border-width-default",
         "--content-max-width",
         "--content-max-width-reading",
         "--content-min-width",
+        "--control-md",
         "--ds-border",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
@@ -5726,18 +5727,17 @@
         "--ds-surface-overlay",
         "--ds-surface-sunken",
         "--ds-text",
-        "--frame-layer-docked-edge",
-        "--frame-layer-edge",
-        "--frame-layer-panel-peek",
-        "--frame-layer-sidebar",
-        "--frame-layer-splitter",
         "--frame-panel-width",
         "--frame-sidebar-pad",
         "--frame-sidebar-width",
         "--grid-columns",
         "--grid-gutter",
         "--inline-md",
-        "--item-height-md",
+        "--layer-frame-docked-edge",
+        "--layer-frame-edge",
+        "--layer-frame-panel-peek",
+        "--layer-frame-sidebar",
+        "--layer-frame-splitter",
         "--pad-x-sm",
         "--pad-x-xs",
         "--page-pad",
@@ -5752,7 +5752,7 @@
       "import": "import { GenerativeBorder } from '@/components';",
       "group": "loading",
       "source": "design-system/src/components/loading/GenerativeBorder/GenerativeBorder.jsx",
-      "summary": "The border that shows the AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-100`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.",
+      "summary": "The border that shows the AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-xxl`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.",
       "props": [
         {
           "name": "isActive",
@@ -5767,12 +5767,12 @@
           "name": "radius",
           "type": "enum",
           "required": false,
-          "default": "'radius-100'",
+          "default": "'radius-xxl'",
           "values": [
-            "radius-025",
-            "radius-050",
-            "radius-075",
-            "radius-100",
+            "radius-md",
+            "radius-lg",
+            "radius-xl",
+            "radius-xxl",
             "radius-full",
             "radius-control-sm",
             "radius-control-md",
@@ -5821,7 +5821,7 @@
         "Focused"
       ],
       "tokens": [
-        "--border-selected",
+        "--border-width-selected",
         "--ds-border-brand",
         "--ds-border-discovery",
         "--ds-motion-loop",
@@ -5932,16 +5932,16 @@
         "--ds-text",
         "--ds-text-inverse",
         "--ds-text-warning-inverse",
-        "--heading-large",
-        "--heading-large-tracking",
-        "--heading-medium",
-        "--heading-small",
-        "--heading-xlarge",
-        "--heading-xlarge-tracking",
-        "--heading-xsmall",
-        "--heading-xxlarge",
-        "--heading-xxlarge-tracking",
-        "--heading-xxsmall"
+        "--heading-lg",
+        "--heading-lg-tracking",
+        "--heading-md",
+        "--heading-sm",
+        "--heading-xl",
+        "--heading-xl-tracking",
+        "--heading-xs",
+        "--heading-xxl",
+        "--heading-xxl-tracking",
+        "--heading-xxs"
       ]
     },
     {
@@ -6236,16 +6236,16 @@
         "Interactive"
       ],
       "tokens": [
-        "--border-default",
+        "--border-width-default",
+        "--control-md",
+        "--control-sm",
         "--ds-motion-appearance-default",
         "--ds-motion-appearance-default-duration",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-text-subtlest",
         "--icon-md",
-        "--inline-sm",
-        "--item-height-md",
-        "--item-height-sm"
+        "--inline-sm"
       ]
     },
     {
@@ -6626,7 +6626,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
+        "--border-width-default",
+        "--control-md",
         "--ds-background-neutral-subtle-hovered",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
@@ -6635,7 +6636,6 @@
         "--ds-text",
         "--ds-text-subtlest",
         "--height-250",
-        "--item-height-md",
         "--pad-x-md",
         "--radius-control-lg",
         "--radius-md",
@@ -6958,7 +6958,7 @@
       "tokens": [
         "--body-default",
         "--ds-text-subtle",
-        "--heading-small",
+        "--heading-sm",
         "--stack-sm"
       ]
     },
@@ -7434,7 +7434,7 @@
       "import": "import { Modal } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Modal/Modal.jsx",
-      "summary": "Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Backdrop`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the backdrop close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`): a second Modal stays closed and calls `onClose`. A follow-up about the dialog itself — \"discard these edits?\" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A Modal never opens on another Modal.",
+      "summary": "Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Blanket`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the blanket close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`): a second Modal stays closed and calls `onClose`. A follow-up about the dialog itself — \"discard these edits?\" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A Modal never opens on another Modal.",
       "props": [
         {
           "name": "id",
@@ -7557,14 +7557,14 @@
           "deprecated": null
         },
         {
-          "name": "backdrop",
+          "name": "blanket",
           "type": "enum",
           "required": false,
           "default": "true",
           "values": [
             "static"
           ],
-          "description": "`true` (default): a click on the backdrop closes. `static`: the backdrop shows but refuses to close on a click. `false`: no close on a click.",
+          "description": "`true` (default): a click on the blanket closes. `static`: the blanket shows but refuses to close on a click. `false`: no close on a click.",
           "deprecated": null
         },
         {
@@ -7612,7 +7612,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the backdrop (unless `backdrop` blocks it). The parent sets `show` to false.",
+          "description": "Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `blanket` blocks it). The parent sets `show` to false.",
           "deprecated": null
         },
         {
@@ -7683,7 +7683,7 @@
         "--ds-surface-overlay",
         "--ds-text",
         "--ds-text-subtle",
-        "--heading-medium",
+        "--heading-md",
         "--inline-sm",
         "--modal-inline-sm",
         "--modal-pad-x-default",
@@ -7922,7 +7922,7 @@
       "import": "import { Page } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Page/Page.jsx",
-      "summary": "Bare tokenized content box: pick an elevation level, padding scale, radius scale and border — children fill the content slot. The level sets the fill and its shadow together: sunken (the frame's backdrop), default (the page, edged by the surface border), raised (a card) and overlay (anything over the UI). A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.",
+      "summary": "Bare tokenized content box: pick an elevation level, padding scale, radius scale and border — children fill the content slot. The level sets the fill and its shadow together: sunken (the frame's blanket), default (the page, edged by the surface border), raised (a card) and overlay (anything over the UI). A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.",
       "props": [
         {
           "name": "id",
@@ -8089,8 +8089,8 @@
         "--ds-surface-raised",
         "--ds-surface-sunken",
         "--ds-text",
-        "--heading-large",
-        "--heading-large-tracking",
+        "--heading-lg",
+        "--heading-lg-tracking",
         "--page-border-width",
         "--page-pad",
         "--page-pad-x-compact",
@@ -8186,7 +8186,7 @@
         "Focused"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--space-075",
         "--space-100",
         "--space-150"
@@ -8323,7 +8323,9 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
+        "--border-width-default",
+        "--control-md",
+        "--control-sm",
         "--ds-background-disabled",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
@@ -8340,8 +8342,6 @@
         "--ds-text-subtle",
         "--focus-ring-width",
         "--icon-sm",
-        "--item-height-md",
-        "--item-height-sm",
         "--pad-x-md",
         "--pad-x-sm",
         "--radius-full",
@@ -8474,8 +8474,8 @@
         "Focused"
       ],
       "tokens": [
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-border",
         "--ds-surface-overlay",
         "--ds-text-subtle",
@@ -8730,7 +8730,7 @@
         "--ds-text",
         "--ds-text-subtle",
         "--ds-utility-elevation-surface-current",
-        "--heading-medium"
+        "--heading-md"
       ]
     },
     {
@@ -8739,7 +8739,7 @@
       "import": "import { PatternModal } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternModal/PatternModal.jsx",
-      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Backdrop`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (backdrop, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
+      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (blanket, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
       "props": [
         {
           "name": "show",
@@ -8747,7 +8747,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": "Keep mounted and set false to finish the exit before removal; also follows its Backdrop.",
+          "description": "Keep mounted and set false to finish the exit before removal; also follows its Blanket.",
           "deprecated": null
         },
         {
@@ -8940,12 +8940,12 @@
         "MotionReduced"
       ],
       "tokens": [
-        "--border-default",
+        "--border-width-default",
         "--ds-border",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
-        "--heading-medium",
+        "--heading-md",
         "--modal-body-min-height",
         "--modal-pad-x-default",
         "--modal-radius",
@@ -9345,19 +9345,19 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
+        "--control-md",
         "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
         "--grid-gutter",
-        "--heading-large",
-        "--heading-large-tracking",
-        "--heading-medium",
-        "--heading-small",
+        "--heading-lg",
+        "--heading-lg-tracking",
+        "--heading-md",
+        "--heading-sm",
         "--inline-lg",
         "--inline-md",
         "--inline-sm",
-        "--item-height-md",
         "--section-min-width-main",
         "--section-min-width-side",
         "--section-pad-x-default",
@@ -9642,8 +9642,9 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
+        "--control-md",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
         "--ds-background-selected",
@@ -9669,7 +9670,6 @@
         "--icon-md",
         "--icon-sm",
         "--inline-sm",
-        "--item-height-md",
         "--pad-x-lg",
         "--pad-x-md",
         "--pad-x-sm",
@@ -9807,7 +9807,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
+        "--border-width-default",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
         "--ds-background-selected",
@@ -9821,7 +9821,7 @@
         "--ds-text-subtle",
         "--ds-utility-elevation-surface-current",
         "--focus-ring-width",
-        "--heading-xxsmall",
+        "--heading-xxs",
         "--layer-card",
         "--pattern-table-overflow-reach",
         "--pattern-table-z-corner",
@@ -10042,16 +10042,15 @@
       "tokens": [
         "--anchor-width",
         "--body-default",
-        "--border-default",
+        "--border-width-default",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
-        "--heading-xsmall",
+        "--heading-xs",
         "--layer-popup",
-        "--popover-offset",
-        "--popover-pad",
         "--popup-max-width",
         "--popup-min-width",
+        "--popup-offset",
         "--popup-pad",
         "--popup-radius",
         "--stack-md"
@@ -10246,8 +10245,8 @@
         "Interactive"
       ],
       "tokens": [
-        "--popover-max-height-menu",
-        "--popover-pad-menu"
+        "--dropdown-menu-max-height",
+        "--dropdown-menu-pad"
       ]
     },
     {
@@ -10666,7 +10665,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
+        "--border-width-default",
+        "--control-md",
         "--ds-background-brand-bold",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
@@ -10685,7 +10685,6 @@
         "--focus-ring-width",
         "--icon-sm",
         "--inline-sm",
-        "--item-height-md",
         "--pad-x-md",
         "--radius-control-md",
         "--radius-full",
@@ -10870,16 +10869,16 @@
         "Interactive"
       ],
       "tokens": [
-        "--border-default",
+        "--border-width-default",
+        "--control-md",
         "--height-250",
-        "--item-height-md",
-        "--line-height-125",
         "--pad-x-md",
         "--pad-x-xs",
         "--pad-y-md",
         "--plus-prompt-input-max-height",
         "--stack-md",
-        "--stack-sm"
+        "--stack-sm",
+        "--type-line-height-125"
       ]
     },
     {
@@ -10888,7 +10887,7 @@
       "import": "import { PromptStarters } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/PromptStarters/PromptStarters.jsx",
-      "summary": "A few things a person could ask the AI, as a wrapping row of prompt `Suggestion` chips. - **starters** are `{ id, label, text }`: the short `label` on the chip and the longer `text` it stands for. - **onSelect(starter)** runs when a chip is pressed, with the whole starter and nothing else. A starter suggests; it never sends on its own, so the caller decides what happens — usually putting `text` in a `PromptInput` for a person to read and send. - **label** names the group for assistive technology.",
+      "summary": "A few things a person could ask the AI, as a wrapping row of prompt `Suggestion` tags. - **starters** are `{ id, label, text }`: the short `label` on the tag and the longer `text` it stands for. - **onSelect(starter)** runs when a tag is pressed, with the whole starter and nothing else. A starter suggests; it never sends on its own, so the caller decides what happens — usually putting `text` in a `PromptInput` for a person to read and send. - **label** names the group for assistive technology.",
       "props": [
         {
           "name": "starters",
@@ -10896,7 +10895,7 @@
           "required": true,
           "default": "[]",
           "values": null,
-          "description": "What to offer: `id` for the key, `label` on the chip, `text` for the prompt it stands for.",
+          "description": "What to offer: `id` for the key, `label` on the tag, `text` for the prompt it stands for.",
           "deprecated": null
         },
         {
@@ -11161,10 +11160,11 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
-        "--border-selected",
+        "--border-width-default",
+        "--border-width-selected",
         "--card-pad-default",
         "--choice-tile-width",
+        "--control-sm",
         "--ds-background-disabled",
         "--ds-background-input",
         "--ds-background-input-hovered",
@@ -11188,7 +11188,6 @@
         "--ds-surface",
         "--ds-surface-hovered",
         "--ds-text",
-        "--item-height-sm",
         "--pad-x-lg",
         "--pad-x-md",
         "--plus-choice-indent",
@@ -11593,6 +11592,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--control-md",
         "--ds-background-disabled",
         "--ds-background-neutral",
         "--ds-background-selected-bold",
@@ -11600,7 +11600,6 @@
         "--ds-icon-disabled",
         "--ds-shadow-raised",
         "--ds-text",
-        "--item-height-md",
         "--radius-full",
         "--range-dot-size-12",
         "--range-dot-size-16",
@@ -11760,6 +11759,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--control-md",
         "--ds-background-disabled",
         "--ds-background-neutral",
         "--ds-background-neutral-hovered",
@@ -11772,7 +11772,6 @@
         "--ds-text-danger",
         "--icon-lg",
         "--icon-md",
-        "--item-height-md",
         "--radius-full",
         "--space-0625",
         "--stack-md",
@@ -12015,7 +12014,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
+        "--border-width-default",
         "--ds-background-input",
         "--ds-background-neutral",
         "--ds-border",
@@ -12450,7 +12449,10 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
+        "--border-width-default",
+        "--control-md",
+        "--dropdown-menu-max-height",
+        "--dropdown-menu-pad",
         "--ds-background-input",
         "--ds-border-input",
         "--ds-motion-appearance-fast",
@@ -12460,11 +12462,8 @@
         "--ds-text-subtle",
         "--field-width-md",
         "--inline-sm",
-        "--item-height-md",
         "--pad-x-md",
         "--pad-y-md",
-        "--popover-max-height-menu",
-        "--popover-pad-menu",
         "--radius-control-md"
       ]
     },
@@ -12602,15 +12601,15 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
+        "--border-width-default",
         "--card-inline-sm",
         "--card-pad-compact",
         "--card-radius-compact",
+        "--control-md",
         "--ds-border",
         "--ds-text",
-        "--heading-small",
+        "--heading-sm",
         "--icon-lg",
-        "--item-height-md",
         "--stack-md",
         "--type-weight-medium"
       ]
@@ -12785,7 +12784,7 @@
             "tags",
             "text"
           ],
-          "description": "With `isMulti`: `tags` (Tag chips) or `text` (comma-separated).",
+          "description": "With `isMulti`: `tags` (Tag tags) or `text` (comma-separated).",
           "deprecated": null
         },
         {
@@ -13064,8 +13063,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-background-input",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-selected-bold",
@@ -13079,14 +13078,14 @@
         "--ds-text-subtle",
         "--ds-text-subtlest",
         "--focus-ring-width",
-        "--font-size-0875",
         "--icon-sm",
         "--pad-x-md",
         "--pad-y-md",
         "--radius-md",
         "--space-025",
         "--stack-md",
-        "--stack-sm"
+        "--stack-sm",
+        "--type-size-0875"
       ]
     },
     {
@@ -13212,8 +13211,8 @@
         "Interactive"
       ],
       "tokens": [
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-border",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
@@ -13288,7 +13287,7 @@
           "deprecated": null
         },
         {
-          "name": "badges",
+          "name": "countTags",
           "type": "objectOf",
           "required": false,
           "default": null,
@@ -13544,12 +13543,11 @@
         "Focused"
       ],
       "tokens": [
-        "--border-default",
+        "--border-width-default",
         "--control-sm",
         "--ds-motion-linear",
         "--ds-motion-loop-duration",
         "--ds-skeleton",
-        "--ds-skeleton-subtle",
         "--plus-skeleton-duration",
         "--plus-skeleton-height",
         "--plus-skeleton-radius",
@@ -13561,6 +13559,7 @@
         "--skeleton-height",
         "--skeleton-status-width",
         "--skeleton-status-width-spacious",
+        "--skeleton-subtle",
         "--skeleton-tag-width",
         "--skeleton-tag-width-narrow",
         "--skeleton-tag-width-person",
@@ -13754,7 +13753,7 @@
         "Interactive"
       ],
       "tokens": [
-        "--border-default",
+        "--border-width-default",
         "--ds-border-inverse"
       ]
     },
@@ -13899,7 +13898,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--ds-background-brand-bold",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
@@ -13907,7 +13906,7 @@
         "--ds-surface-overlay",
         "--ds-text",
         "--ds-text-inverse",
-        "--heading-small",
+        "--heading-sm",
         "--popup-radius",
         "--radius-lg",
         "--space-075",
@@ -14043,8 +14042,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-background-danger",
         "--ds-background-danger-pressed",
         "--ds-background-information",
@@ -14077,8 +14076,8 @@
         "--stack-sm",
         "--tag-gap",
         "--tag-gap-compact",
-        "--tag-pad-end",
-        "--tag-pad-end-compact"
+        "--tag-pad-x-end",
+        "--tag-pad-x-end-compact"
       ]
     },
     {
@@ -14087,7 +14086,7 @@
       "import": "import { Suggestion } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
-      "summary": "Suggestion: a chip for a value or question the system proposes, which a person accepts or leaves.",
+      "summary": "Suggestion: a tag for a value or question the system proposes, which a person accepts or leaves.",
       "props": [
         {
           "name": "label",
@@ -14190,8 +14189,8 @@
         "Disabled"
       ],
       "tokens": [
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-background-disabled",
         "--ds-background-discovery",
         "--ds-background-discovery-hovered",
@@ -14381,8 +14380,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
         "--ds-background-selected",
@@ -14397,7 +14396,7 @@
         "--ds-text-disabled",
         "--ds-text-subtle",
         "--focus-ring-width",
-        "--heading-xxsmall",
+        "--heading-xxs",
         "--icon-md",
         "--icon-sm",
         "--inline-md",
@@ -14536,8 +14535,10 @@
       ],
       "tokens": [
         "--body-default",
-        "--border-default",
-        "--border-selected",
+        "--border-width-default",
+        "--border-width-selected",
+        "--control-md",
+        "--control-sm",
         "--ds-background-neutral",
         "--ds-background-neutral-hovered",
         "--ds-background-neutral-pressed",
@@ -14553,8 +14554,6 @@
         "--ds-text-selected",
         "--ds-text-subtle",
         "--inline-lg",
-        "--item-height-md",
-        "--item-height-sm",
         "--pad-x-lg",
         "--pad-x-md",
         "--radius-control-md",
@@ -14635,7 +14634,7 @@
       "import": "import { Tag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/Tag/Tag.jsx",
-      "summary": "A small outlined label that names a category, person, agent or team. It can also act as a link, a toggle or a removable chip, depending on its props.",
+      "summary": "A small outlined label that names a category, person, agent or team. It can also act as a link, a toggle or a removable tag, depending on its props.",
       "props": [
         {
           "name": "text",
@@ -14880,7 +14879,7 @@
         "ElevatedDisabled",
         "ElevatedRemoveFocus",
         "ElevatedOnlyReadOnlyAndLink",
-        "AnswerChips",
+        "AnswerTags",
         "IsDisabled",
         "Interactive",
         "Rest",
@@ -14890,8 +14889,8 @@
         "Disabled"
       ],
       "tokens": [
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-background-accent-blue-subtler",
         "--ds-background-accent-blue-subtlest",
         "--ds-background-accent-blue-subtlest-pressed",
@@ -15146,7 +15145,7 @@
       "import": "import { TagInput } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TagInput/TagInput.jsx",
-      "summary": "TagInput — a field of Tags with a text entry after them, modeled on Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A \"Create *text*\" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag color it will get, and creating reports that color once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. People can tidy the options where they pick them, as in Notion. With `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a \"…\" that opens the option's menu: its name, Delete, and Tag's ten colors. With `onReorder`, each row has a handle to drag, or to pick up with Space and move with the arrows. Without these handlers neither appears. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into \"+n\"; with focus they wrap, up to three rows, then scroll.",
+      "summary": "TagInput — a field of Tags with a text entry after them, modeled on Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A \"Create *text*\" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag color it will get, and creating reports that color once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. People can tidy the options where they pick them, as in Notion. With `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a \"…\" that opens the option's menu: its name, Delete, and Tag's ten colors. With `onReorder`, each row has a handle to drag, or to pick up with Space and move with the arrows. Without these handlers neither appears. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the tags are Tags in a TagGroup. Without focus the tags collapse into \"+n\"; with focus they wrap, up to three rows, then scroll.",
       "props": [
         {
           "name": "id",
@@ -15431,8 +15430,8 @@
         "FieldDisabled"
       ],
       "tokens": [
-        "--body-small",
-        "--border-default",
+        "--body-sm",
+        "--border-width-default",
         "--ds-border",
         "--ds-icon-subtle",
         "--ds-text-subtle",
@@ -16226,7 +16225,7 @@
         "Rest"
       ],
       "tokens": [
-        "--border-default",
+        "--border-width-default",
         "--ds-background-accent-blue-bolder",
         "--ds-background-accent-blue-subtler",
         "--ds-background-accent-green-bolder",
@@ -16626,6 +16625,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--control-sm",
         "--ds-background-disabled",
         "--ds-background-neutral-bold",
         "--ds-background-neutral-bold-hovered",
@@ -16639,7 +16639,6 @@
         "--ds-motion-spatial-fast-duration",
         "--ds-opacity-disabled",
         "--ds-text",
-        "--item-height-sm",
         "--radius-full",
         "--stack-md",
         "--toggle-pad",
@@ -16762,15 +16761,15 @@
         "MotionReduced"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--ds-background-neutral-bold",
         "--ds-text-inverse",
         "--layer-tooltip",
         "--pad-x-sm",
         "--plus-overlay-origin",
-        "--popover-max-width-tooltip",
-        "--popover-pad-y-tooltip",
         "--radius-control-sm",
+        "--tooltip-max-width",
+        "--tooltip-pad-y",
         "--transform-origin"
       ]
     },

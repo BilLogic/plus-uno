@@ -61,11 +61,12 @@ body,
  * h1 and h2 the same 32px, and h3 and h4 the same 28px, so the outline had no
  * visible steps.
  *
- *   h1 page title     --heading-xxlarge   32 / 36 serif
- *   h2 section        --heading-large     24 / 28 serif
- *   h3 example, sub   --heading-medium    20 / 24 serif
- *   h4                --heading-small     16 / 20 sans semibold
- *   h5, h6            --heading-xsmall    14 / 20 sans semibold
+ *   h1 page title     --heading-xxl   32 / 36 serif
+ *   h2 section        --heading-xl     28 / 32 serif
+ *   h3 example, sub   --heading-lg     24 / 28 serif
+ *   h4                --heading-md     20 / 24 serif
+ *   h5                --heading-sm     16 / 20 sans semibold
+ *   h6                --heading-xs     14 / 20 sans semibold
  *
  * The space above a heading is the Page pattern's: `--page-stack-lg` before a
  * section, `--page-stack-md` before a sub-heading, `--section-stack-sm` between
@@ -81,8 +82,8 @@ body,
  */
 .sbdocs h1:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)),
 .sbdocs-title {
-    font: var(--heading-xxlarge) !important;
-    letter-spacing: var(--heading-xxlarge-tracking) !important;
+    font: var(--heading-xxl) !important;
+    letter-spacing: var(--heading-xxl-tracking) !important;
     color: var(--ds-text) !important;
 }
 
@@ -100,23 +101,29 @@ body,
 }
 
 .sbdocs h2:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
-    font: var(--heading-large) !important;
+    font: var(--heading-xl) !important;
+    letter-spacing: var(--heading-xl-tracking) !important;
     color: var(--ds-text) !important;
 }
 
 .sbdocs h3:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
-    font: var(--heading-medium) !important;
+    font: var(--heading-lg) !important;
+    letter-spacing: var(--heading-lg-tracking) !important;
     color: var(--ds-text) !important;
 }
 
 .sbdocs h4:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
-    font: var(--heading-small) !important;
+    font: var(--heading-md) !important;
     color: var(--ds-text) !important;
 }
 
-.sbdocs h5:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)),
+.sbdocs h5:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
+    font: var(--heading-sm) !important;
+    color: var(--ds-text) !important;
+}
+
 .sbdocs h6:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
-    font: var(--heading-xsmall) !important;
+    font: var(--heading-xs) !important;
     color: var(--ds-text) !important;
 }
 
@@ -158,8 +165,8 @@ body,
 .sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) {
     font-family: var(--type-family-body);
-    font-size: var(--font-size-100);
-    line-height: var(--line-height-150);
+    font-size: var(--type-size-100);
+    line-height: var(--type-line-height-150);
     font-weight: var(--type-weight-regular);
     color: var(--ds-text);
     max-width: 55ch;
@@ -432,7 +439,7 @@ a.sbdocs-a {
   overflow-x: auto;
   width: 100%;
   margin: var(--stack-md) 0 0;
-  border: var(--border-default) solid var(--ds-border);
+  border: var(--border-width-default) solid var(--ds-border);
   border-radius: var(--card-radius-compact);
   background: var(--ds-surface);
 }
@@ -441,14 +448,14 @@ a.sbdocs-a {
   width: 100%;
   margin: 0 !important;
   border-collapse: collapse;
-  font: var(--body-small);
+  font: var(--body-sm);
   color: var(--ds-text);
 }
 
 .sbdocs .sb-ds-doc-table th,
 .sbdocs .sb-ds-doc-table td {
   padding: var(--pad-y-lg) var(--pad-x-md);
-  border-bottom: var(--border-default) solid var(--ds-border);
+  border-bottom: var(--border-width-default) solid var(--ds-border);
   text-align: left;
   vertical-align: top;
 }
@@ -498,7 +505,7 @@ a.sbdocs-a {
 .sbdocs .sbdocs-toc h2,
 .toc-wrapper h2,
 .sbdocs-wrapper aside h2 {
-  font: var(--heading-xsmall) !important;
+  font: var(--heading-xs) !important;
   margin-top: 0 !important;
   margin-bottom: var(--section-stack-lg) !important;
   color: var(--ds-text-subtle) !important;
@@ -550,23 +557,11 @@ a.sbdocs-a {
     border-radius: 0 !important;
 }
 
-/*
- * Variant subheadings design within each story section.
- * Differentiates from normal headers by using a subtle body-copy typography token feel.
- *
- * Matched by SIZE CLASS as well as by tag. The tag is the outline position and the
- * text-style class is the appearance (see design-system/src/styles/Accessibility.mdx §
- * Heading levels), so a subheading that has to sit at level 3 in its page's
- * outline is written `<h3 className="heading-small">` and still has to look like the rest of
- * them. Keying this rule to the tag alone made the docs treatment fall off the
- * moment a story's outline was corrected. The tag selectors stay for headings
- * that carry no size class.
- */
+/* Story-section headings keep their product text styles and docs spacing. */
 .docs-story section > h5,
 .docs-story section > h6,
-.docs-story section > .heading-medium,
-.docs-story section > .heading-small {
-    font: var(--heading-xsmall) !important;
+.docs-story section > .heading-md,
+.docs-story section > .heading-sm {
     color: var(--ds-text-subtle) !important;
     margin-bottom: var(--stack-lg) !important;
     margin-top: 0 !important;
@@ -635,7 +630,7 @@ a.sbdocs-a {
     padding: var(--section-pad-y-spacious) var(--section-pad-x-spacious) !important;
     border-radius: var(--card-radius-compact) var(--card-radius-compact) 0 0;
     background: var(--ds-surface-raised) !important;
-    border: var(--border-default) solid var(--ds-border) !important;
+    border: var(--border-width-default) solid var(--ds-border) !important;
     border-bottom: none !important;
     box-shadow: none !important;
 }
@@ -646,7 +641,7 @@ a.sbdocs-a {
  * and the story JSX root. That wrapper has no explicit width, so flex-basis:auto resolves to content-size,
  * collapsing any percentage-width child (e.g. Carousel/Accordion). Setting width:100% here gives the
  * wrapper a definite size so its children's width:100% resolves correctly against the full column width.
- * Small shrink-wrapped components (Badge, Button, Spinner) remain centered via Storybook's inner
+ * Small shrink-wrapped components (CountTag, Button, Spinner) remain centered via Storybook's inner
  * column-flex align-items:center on the transform wrapper.
  */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .innerZoomElementWrapper > * {
@@ -680,7 +675,7 @@ a.sbdocs-a {
     padding: var(--pad-y-md) var(--pad-x-sm) !important;
     background: var(--ds-surface) !important;
     border: none !important;
-    border-top: var(--border-default) solid var(--ds-border) !important;
+    border-top: var(--border-width-default) solid var(--ds-border) !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     z-index: 1;
@@ -694,9 +689,9 @@ a.sbdocs-a {
 
 /* ActionBar strip under attached previews: match card sides + bottom radius when code collapsed */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) {
-    border-left: var(--border-default) solid var(--ds-border) !important;
-    border-right: var(--border-default) solid var(--ds-border) !important;
-    border-top: var(--border-default) solid var(--ds-border) !important;
+    border-left: var(--border-width-default) solid var(--ds-border) !important;
+    border-right: var(--border-width-default) solid var(--ds-border) !important;
+    border-top: var(--border-width-default) solid var(--ds-border) !important;
     background: var(--ds-surface-raised) !important;
 }
 
@@ -716,8 +711,8 @@ a.sbdocs-a {
     margin: 0 !important;
     margin-left: 0 !important;
     border-radius: var(--radius-md) !important;
-    border: var(--border-default) solid var(--ds-border) !important;
-    border-top: var(--border-default) solid var(--ds-border) !important;
+    border: var(--border-width-default) solid var(--ds-border) !important;
+    border-top: var(--border-width-default) solid var(--ds-border) !important;
     box-shadow: none !important;
 }
 
@@ -758,7 +753,7 @@ a.sbdocs-a {
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > div[scale="1"] {
   padding: var(--section-pad-y-spacious) var(--section-pad-x-spacious) !important;
   background: var(--ds-surface-raised) !important;
-  border: var(--border-default) solid var(--ds-border) !important;
+  border: var(--border-width-default) solid var(--ds-border) !important;
   border-bottom: none !important;
   border-radius: var(--card-radius-compact) var(--card-radius-compact) 0 0;
   box-sizing: border-box !important;
@@ -833,7 +828,7 @@ a.sbdocs-a {
   .sb-ds-docs-canvas-attached-root:not(:has(.docblock-code-toggle--expanded))
   .docs-story
   > div[scale="1"] {
-  border-bottom-width: var(--border-default) !important;
+  border-bottom-width: var(--border-width-default) !important;
   border-bottom-style: solid !important;
   border-bottom-color: var(--ds-border) !important;
   border-radius: var(--card-radius-compact);
@@ -912,11 +907,11 @@ a.sbdocs-a {
        the rail paints inside the strip's padding box, which is where this
        border already is. See the strip rule above for what the negative margin
        used to cost. */
-    border-bottom: var(--border-selected) solid transparent;
+    border-bottom: var(--border-width-selected) solid transparent;
     padding: var(--stack-lg) 0;
     color: var(--ds-text-subtle);
     font-family: var(--type-family-heading);
-    font-size: var(--font-size-100);
+    font-size: var(--type-size-100);
     font-weight: var(--type-weight-medium);
     line-height: 1.5;
     white-space: nowrap;
@@ -967,9 +962,9 @@ a.sbdocs-a {
     margin-top: var(--space-050);
     color: var(--ds-text-subtlest);
     font-family: var(--type-family-code);
-    font-size: var(--font-size-075);
+    font-size: var(--type-size-075);
     font-weight: var(--type-weight-regular);
-    line-height: var(--line-height-100);
+    line-height: var(--type-line-height-100);
 }
 
 
@@ -1013,7 +1008,7 @@ html[data-color-mode="dark"] .docs-story {
 
 .docblock-typeset {
   background: var(--ds-surface-container) !important;
-  border: var(--border-default) solid var(--ds-border) !important;
+  border: var(--border-width-default) solid var(--ds-border) !important;
   border-radius: var(--radius-lg) !important;
   box-shadow: none !important;
 }
@@ -1028,7 +1023,7 @@ html[data-color-mode="dark"] .docs-story {
 .sbdocs .sb-ds-docs-source pre {
     margin: 0 !important;
     border-radius: var(--card-radius-compact);
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
     box-shadow: none;
 }
 
@@ -1058,7 +1053,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .sbdocs .sb-ds-docs-all-props > summary {
-    font: var(--body-large);
+    font: var(--body-lg);
     font-weight: var(--type-weight-semibold);
     color: var(--ds-text);
     cursor: pointer;
@@ -1090,7 +1085,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .sbdocs p.sb-ds-canvas-description {
-  font: var(--body-large);
+  font: var(--body-lg);
   color: var(--ds-text-subtle);
   max-width: 55ch;
   margin: 0;
@@ -1160,7 +1155,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .sb-ds-resource-card__title {
-  font: var(--heading-xsmall);
+  font: var(--heading-xs);
   color: var(--ds-text);
 }
 

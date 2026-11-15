@@ -19,7 +19,7 @@ import { cloneElement, createContext, createElement, useCallback, useContext, us
  *   top of the scale in `design-system/src/tokens/ladder/_layers.scss`, so it layers
  *   above a modal wherever its `FlagGroup` is placed.
  * - **A Modal never opens on another Modal.** A confirm Modal may open over a
- *   Panel, a Popup or a focused task, a Modal brings its own Backdrop, a Panel has none; a Modal that
+ *   Panel, a Popup or a focused task, a Modal brings its own Blanket, a Panel has none; a Modal that
  *   needs a confirm holds it inside itself (a warning SectionMessage and the
  *   danger button). `useOverlaySlot(active, onRefused)` refuses a Modal while
  *   one is open: it does not open, development builds warn, and the caller's
@@ -33,7 +33,7 @@ import { cloneElement, createContext, createElement, useCallback, useContext, us
  *   the frame to it.
  *
  * - **A Modal never dismisses what raised it.** The Panel and the AI popup
- *   stay open under a Modal's Backdrop. The Panel is excluded in `Frame` by
+ *   stay open under a Modal's Blanket. The Panel is excluded in `Frame` by
  *   the open count; a popup is a Base UI popover that hears a press in the
  *   Modal as "outside", so it asks `isPressInRaisedOverlay` and keeps
  *   itself open when the press landed in a Modal it sits outside.
@@ -109,16 +109,16 @@ export function getOverlayPortalRoot() {
 }
 
 /**
- * Where a trigger's floating surface mounts: the Backdrop a Modal placed it in, or the shared portal root. The one rule
+ * Where a trigger's floating surface mounts: the Blanket a Modal placed it in, or the shared portal root. The one rule
  * `popupMountOf` (Popup) and `popupLayerOf` (the field-anchored popups) both
  * resolve through, so there is one spelling of it rather than two copies of
- * `.closest('.plus-pattern-backdrop') ?? document.body`.
+ * `.closest('.plus-pattern-blanket') ?? document.body`.
  *
  * @param {Element | null | undefined} fromNode a node inside the trigger
  * @returns {Element | null} `null` only without a `document` (SSR)
  */
 export function overlayMountOf(fromNode) {
-    return fromNode?.closest?.('.plus-pattern-backdrop') ?? getOverlayPortalRoot();
+    return fromNode?.closest?.('.plus-pattern-blanket') ?? getOverlayPortalRoot();
 }
 
 /** Compatibility for consumers that hold a trigger ref rather than its node. */
@@ -147,7 +147,7 @@ export function OverlayContainer({ container, boundary = container, children }) 
 
 /**
  * Bounded portal and positioner props when inside an `OverlayContainer`,
- * yielding to an explicit `container` prop or a Modal Backdrop ancestor.
+ * yielding to an explicit `container` prop or a Modal Blanket ancestor.
  * Returns `null` in normal app and story rendering so real placement and collision rules stay untouched.
  *
  * @param {{ container?: Element | object, fromNode?: Element | null }} [options]
@@ -156,7 +156,7 @@ export function OverlayContainer({ container, boundary = container, children }) 
 export function useBoundedOverlay({ container, fromNode } = {}) {
     const bounded = useContext(OverlayContainerContext);
     if (bounded === undefined || container !== undefined) return null;
-    if (fromNode?.closest?.('.plus-pattern-backdrop')) return null;
+    if (fromNode?.closest?.('.plus-pattern-blanket')) return null;
     return {
         container: bounded.container,
         collisionBoundary: bounded.boundary ?? undefined,
@@ -204,7 +204,7 @@ export function useOverlaySlot(active, onRefused) {
 /**
  * Whether a press landed inside a Modal that the surface owning
  * `ownerNode` sits outside of: the one case where an "outside press" is not a
- * dismissal. The AI popup and the Panel stay open under the Backdrop of a
+ * dismissal. The AI popup and the Panel stay open under the Blanket of a
  * Modal they raised, so a click in that Modal must not close them. A surface
  * that is itself inside the Modal (a popup opened in a dialog) still closes
  * on a press elsewhere in that dialog.
@@ -214,9 +214,9 @@ export function useOverlaySlot(active, onRefused) {
  * @returns {boolean}
  */
 export function isPressInRaisedOverlay(target, ownerNode) {
-    const backdrop = target?.closest?.('.plus-pattern-backdrop');
-    if (!backdrop) return false;
-    return !backdrop.contains(ownerNode ?? null);
+    const blanket = target?.closest?.('.plus-pattern-blanket');
+    if (!blanket) return false;
+    return !blanket.contains(ownerNode ?? null);
 }
 
 /**
@@ -229,13 +229,13 @@ export function isPressInRaisedOverlay(target, ownerNode) {
  */
 export function isOverlayRaisedOver(ownerNode) {
     if (count === 0) return false;
-    return !ownerNode?.closest?.('.plus-pattern-backdrop');
+    return !ownerNode?.closest?.('.plus-pattern-blanket');
 }
 
-/** The offset in px when the token can't be read; matches `--popover-offset`. */
-export const POPOVER_OFFSET = 4;
+/** The offset in px when the token can't be read; matches `--popup-offset`. */
+export const POPUP_OFFSET = 4;
 
-/** The screen gap in px when the token can't be read; matches `--popover-gap-screen`. */
+/** The screen gap in px when the token can't be read; matches `--popup-gap-screen`. */
 export const SCREEN_GAP = 8;
 
 /** A length token's value in px, read from the document, or `fallback`. */
@@ -251,8 +251,8 @@ function readPx(name, fallback) {
  *
  * @returns {number}
  */
-export function readPopoverOffset() {
-    return readPx('--popover-offset', POPOVER_OFFSET);
+export function readPopupOffset() {
+    return readPx('--popup-offset', POPUP_OFFSET);
 }
 
 /**
@@ -261,7 +261,7 @@ export function readPopoverOffset() {
  * @returns {number}
  */
 export function readScreenGap() {
-    return readPx('--popover-gap-screen', SCREEN_GAP);
+    return readPx('--popup-gap-screen', SCREEN_GAP);
 }
 
 /** Placement vocabulary shared by the floating surfaces; only Popup accepts `auto`. */
@@ -299,7 +299,7 @@ export function useFloatingOverlay({
     placement,
     container,
     anchor,
-    sideOffset = POPOVER_OFFSET,
+    sideOffset = POPUP_OFFSET,
     collisionAvoidance,
     dismissible = true,
     onOpenChange,

@@ -41,7 +41,7 @@ Panel reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Dock and undock a panel | `--ds-motion-spatial-slow` | Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Backdrop. |
+| enter | Dock and undock a panel | `--ds-motion-spatial-slow` | Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Blanket. |
 | exit | Dock and undock a panel | `--ds-motion-spatial-default` | Floating panels leave on spatial.fast. |
 
 ## Alternatives
@@ -133,12 +133,12 @@ Same group: `Accordion` · `Carousel` · `PageHeader` · `ScrollBar`
 
 | Part | Token |
 | --- | --- |
-| Ground and edge | `--ds-surface-overlay`; `--ds-border` at `--border-default` on the leading edge. |
-| Header | Padding `--space-100` and `--space-150`; `--space-075` between its parts; `--border-default` rule below. |
+| Ground and edge | `--ds-surface-overlay`; `--ds-border` at `--border-width-default` on the leading edge. |
+| Header | Padding `--space-100` and `--space-150`; `--space-075` between its parts; `--border-width-default` rule below. |
 | Action group | `--space-025` between actions. |
-| Subheader | Padding `--space-075` and `--space-150`; `--border-default` rule below. |
+| Subheader | Padding `--space-075` and `--space-150`; `--border-width-default` rule below. |
 | Body | Padding `--space-150`. |
-| Footer | Padding `--space-100` and `--space-150`, `--space-100` between its parts; rule above; disclaimer in `--body-small`, `--ds-text-subtle`. |
+| Footer | Padding `--space-100` and `--space-150`, `--space-100` between its parts; rule above; disclaimer in `--body-sm`, `--ds-text-subtle`. |
 
 ## Content guidelines
 
@@ -158,7 +158,7 @@ Same group: `Accordion` · `Carousel` · `PageHeader` · `ScrollBar`
 
 ## Tokens touched
 
-`--body-small` · `--border-default` · `--ds-border` · `--ds-surface-overlay` · `--ds-text-subtle` · `--space-025` · `--space-075` · `--space-100` · `--space-150`
+`--body-sm` · `--border-width-default` · `--ds-border` · `--ds-surface-overlay` · `--ds-text-subtle` · `--space-025` · `--space-075` · `--space-100` · `--space-150`
 
 From `design-system/src/components/layout-and-structure/Panel/Panel.scss`. Override these through the token layer, never with a literal.
 

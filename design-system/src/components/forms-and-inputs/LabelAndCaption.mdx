@@ -154,10 +154,10 @@ Every field component in this group draws two lines around its control: the **la
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Label</td><td><code>--body-small</code> in <code>--ds-text</code>.</td></tr>
+<tr><td>Label</td><td><code>--body-sm</code> in <code>--ds-text</code>.</td></tr>
 <tr><td>Required marker</td><td><code>--ds-text-danger</code>, <code>--stack-sm</code> after the label.</td></tr>
 <tr><td>Info button</td><td><code>--ds-icon-subtle</code>; focus ring <code>--focus-ring-width</code> in <code>--ds-border-focused</code>.</td></tr>
-<tr><td>Caption</td><td><code>--body-small</code>; help <code>--ds-text-subtle</code>, success <code>--ds-text-success</code>, danger <code>--ds-text-danger</code>, warning <code>--ds-text-warning</code>.</td></tr>
+<tr><td>Caption</td><td><code>--body-sm</code>; help <code>--ds-text-subtle</code>, success <code>--ds-text-success</code>, danger <code>--ds-text-danger</code>, warning <code>--ds-text-warning</code>.</td></tr>
 <tr><td>Caption icon</td><td><code>--icon-sm</code>, <code>--stack-sm</code> before the message.</td></tr>
 <tr><td>Character count</td><td><code>--ds-text-subtle</code>, over the limit <code>--ds-text-danger</code>.</td></tr>
 <tr><td>Gaps</td><td><code>--stack-sm</code> between label, field and caption; <code>--stack-md</code> between message and count.</td></tr>
@@ -208,9 +208,9 @@ A danger caption should say what to do. The state colors the line; the words do 
 The first line says what the form is for. A generic title makes people read the fields to find out.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><p style={{ margin: 0, font: 'var(--heading-small)' }}>Book a session</p><TextField label="Student name" defaultValue="Maya Johnson" /></div>}
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><p style={{ margin: 0, font: 'var(--heading-sm)' }}>Book a session</p><TextField label="Student name" defaultValue="Maya Johnson" /></div>}
     doCaption="The title names the task."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><p style={{ margin: 0, font: 'var(--heading-small)' }}>Form</p><TextField label="Student name" defaultValue="Maya Johnson" /></div>}
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><p style={{ margin: 0, font: 'var(--heading-sm)' }}>Form</p><TextField label="Student name" defaultValue="Maya Johnson" /></div>}
     dontCaption="A generic title."
 />
 

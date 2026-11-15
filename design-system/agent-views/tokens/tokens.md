@@ -53,7 +53,7 @@ Start here for space, size and radius (ADR-038). A component reads its component
 ```
 
 ## Ladder Patterns
-Space owned by a pattern: page, section, card, table, modal, popover. Inside a pattern, read its token before a semantics step.
+Space owned by a pattern: page, section, card, table, modal, popup. Inside a pattern, read its token before a semantics step.
 
 ```css
 --blanket-fill  /* Fill of the Blanket that dims the page behind a Modal. */
@@ -115,7 +115,7 @@ Tokens one component owns, named for it.
 --avatar-size-96  /* Size of an extra-large UserAvatar, such as in a profile header. */
 --button-radius-compact  /* Corner rounding of a Button with compact spacing. */
 --button-radius-default  /* Corner rounding of a Button with default spacing. */
---button-vertical-size  /* Height of a Button laid out vertically, with its icon above its label. */
+--button-size-vertical  /* Height of a Button laid out vertically, with its icon above its label. */
 --calendar-day-lg  /* Size of a day cell in a large Calendar. */
 --calendar-day-md  /* Size of a day cell in a default Calendar. */
 --calendar-day-sm  /* Size of a day cell in a compact Calendar. */
@@ -160,7 +160,6 @@ Tokens one component owns, named for it.
 --popup-clip-reach  /* How far past its edges a Popup's opening clip stays, so the overlay shadow is never cut. */
 --popup-max-width  /* Widest an auto-width Popup grows to fit its content, unless its trigger is wider. */
 --popup-min-width  /* Narrowest an auto-width Popup gets, unless its trigger is wider. */
---popup-pad  /* Padding inside a Popup. */
 --progress-bar-height  /* Height of a ProgressBar track. */
 --progress-indicator-dot-size-12  /* Dot size of a ProgressIndicator with size 12. */
 --progress-indicator-dot-size-8  /* Dot size of a ProgressIndicator with size 8. */
@@ -198,8 +197,8 @@ Tokens one component owns, named for it.
 --tag-dot-size  /* Size of the dot in a Tag. */
 --tag-gap  /* Horizontal gap between a Tag's parts with default spacing. */
 --tag-gap-compact  /* Horizontal gap between a Tag's parts with compact spacing. */
---tag-pad-end  /* Padding at the end of a Tag with default spacing. */
---tag-pad-end-compact  /* Padding at the end of a Tag with compact spacing. */
+--tag-pad-x-end  /* Padding at the end of a Tag with default spacing. */
+--tag-pad-x-end-compact  /* Padding at the end of a Tag with compact spacing. */
 --toggle-pad  /* Gap between a Toggle's track and its knob, at both sizes. */
 --toggle-track-height-16  /* Track height of a Toggle with size 16. */
 --toggle-track-height-20  /* Track height of a Toggle with size 20. */
@@ -215,7 +214,7 @@ Stacking order: `z-index: var(--layer-modal)`.
 --layer-card  /* Stacking order of a card raised above page content, such as a sticky table part. */
 --layer-dialog  /* Stacking order of a non-modal dialog over the page, below popups. */
 --layer-flag  /* Stacking order of a Flag, above any Modal. */
---layer-modal  /* Stacking order of a Modal, above its Backdrop. */
+--layer-modal  /* Stacking order of a Modal, above its Blanket. */
 --layer-navigation  /* Stacking order of the Frame's top bar and Sidebar. */
 --layer-popup  /* Stacking order of a Popup, DropdownMenu or listbox. */
 --layer-spotlight  /* Stacking order of a Spotlight, above Flags. */
@@ -277,9 +276,9 @@ The raw springs, named by stiffness (`-r<percent>` when the damping ratio is not
 The Size and Border scales (spacing / foundations): heights, widths, and the Icon, Image, Item, Row, Label and Field sizes.
 
 ```css
---border-default  /* Width of an ordinary border or divider line. */
---border-focused  /* Width of the border on a field that has focus. */
---border-selected  /* Width of the border that marks a selected item. */
+--border-width-default  /* Width of an ordinary border or divider line. */
+--border-width-focused  /* Width of the border on a field that has focus. */
+--border-width-selected  /* Width of the border that marks a selected item. */
 --field-min-height-lg  /* Shortest a multi-line field may be by default, such as a TextArea. */
 --field-min-height-sm  /* Shortest a multi-line field may be in its compact form. */
 --field-width-lg  /* Width of a field for a long value, such as an email address. */
@@ -305,8 +304,6 @@ The Size and Border scales (spacing / foundations): heights, widths, and the Ico
 --image-xl  /* Size of the largest image or avatar, such as an Illustration. */
 --image-xs  /* Size of an extra-small image or avatar, such as one in a dense row. */
 --image-xxs  /* Size of the smallest image or avatar, such as one inline with text. */
---item-height-md  /* Height of a default control or item: a Button, a field, a menu item. */
---item-height-sm  /* Height of a compact control or item: a compact Button, a menu item. */
 --label-height-md  /* Height of a default label row, such as a tag. */
 --label-height-sm  /* Height of a compact label row, such as a small tag. */
 --label-max-width  /* Widest a single-line label may grow before it truncates. */
@@ -324,7 +321,7 @@ The Size and Border scales (spacing / foundations): heights, widths, and the Ico
 ```
 
 ## Frame and Layer Tokens
-The patterns on the page frame, per breakpoint: page, section, card, table, overlay, modal, popover.
+The patterns on the page frame, per breakpoint: page, section, card, table, overlay, modal, popup.
 
 ```css
 --card-inline-lg  /* Horizontal gap between columns inside a PatternCard. */
@@ -339,6 +336,12 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --card-stack-lg  /* Vertical gap between a PatternCard's header, body and footer. */
 --card-stack-md  /* Vertical gap between blocks in a PatternCard. */
 --card-stack-sm  /* Vertical gap between tightly related lines in a PatternCard, such as a title and its meta. */
+--dropdown-menu-max-height  /* Tallest a DropdownMenu or listbox may grow before it scrolls. */
+--dropdown-menu-max-width  /* Widest a DropdownMenu or listbox may grow. */
+--dropdown-menu-min-width  /* Narrowest a DropdownMenu or listbox may shrink. */
+--dropdown-menu-pad  /* Padding inside a DropdownMenu or listbox. */
+--flag-stack  /* Vertical gap between stacked Flags. */
+--flag-width  /* Width of a Flag. */
 --focused-page-inline-md  /* Horizontal gap between the actions on a focused page. */
 --focused-page-inline-sm  /* Horizontal gap between small items in a focused page row. */
 --focused-page-pad-x  /* Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step. */
@@ -346,13 +349,13 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --focused-page-stack-lg  /* Vertical gap between a focused page's header, body and actions. */
 --focused-page-stack-md  /* Vertical gap between blocks on a focused page. */
 --focused-page-stack-sm  /* Vertical gap between a focused page's title and its description. */
---frame-layer-blanket
---frame-layer-docked-edge
---frame-layer-edge
---frame-layer-panel-peek
---frame-layer-sidebar
---frame-layer-splitter
---frame-layer-topbar-start
+--layer-frame-blanket
+--layer-frame-docked-edge
+--layer-frame-edge
+--layer-frame-panel-peek
+--layer-frame-sidebar
+--layer-frame-splitter
+--layer-frame-topbar-start
 --modal-inline-lg  /* Horizontal gap between columns in a Modal. */
 --modal-inline-md  /* Horizontal gap between the actions in a Modal footer. */
 --modal-inline-sm  /* Horizontal gap between small items in a Modal row. */
@@ -364,20 +367,12 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --page-stack-lg  /* Vertical gap between major regions of a Page. */
 --page-stack-md  /* Vertical gap between sections on a Page. */
 --page-stack-sm  /* Vertical gap between closely related blocks on a Page, such as a header and its subtitle. */
---popover-gap-screen  /* Space a floating layer keeps from the screen edge, such as a Flag or a listbox. */
---popover-max-height-menu  /* Tallest a DropdownMenu or listbox may grow before it scrolls. */
---popover-max-width-menu  /* Widest a DropdownMenu or listbox may grow. */
---popover-max-width-tooltip  /* Widest a Tooltip may grow before its text wraps. */
---popover-min-width-menu  /* Narrowest a DropdownMenu or listbox may shrink. */
---popover-offset  /* Gap between a Popup, menu or Tooltip and the element that opened it. */
---popover-pad  /* Padding inside a Popup. */
---popover-pad-menu  /* Padding inside a DropdownMenu or listbox. */
---popover-pad-y-tooltip  /* Vertical padding inside a Tooltip. */
---popover-stack-flag  /* Vertical gap between stacked Flags. */
---popover-width-flag  /* Width of a Flag. */
---popover-width-lg  /* Width of a large Popup. */
---popover-width-md  /* Width of a default Popup. */
---popover-width-sm  /* Width of a small Popup. */
+--popup-gap-screen  /* Space a floating layer keeps from the screen edge, such as a Flag or a listbox. */
+--popup-offset  /* Gap between a Popup, menu or Tooltip and the element that opened it. */
+--popup-pad  /* Padding inside a Popup. */
+--popup-width-lg  /* Width of a large Popup. */
+--popup-width-md  /* Width of a default Popup. */
+--popup-width-sm  /* Width of a small Popup. */
 --section-min-width-main  /* Narrowest the main column of a two-column PatternSection may shrink. */
 --section-min-width-side  /* Narrowest the side column of a two-column PatternSection may shrink. */
 --section-stack-lg  /* Vertical gap between groups of blocks inside a PatternSection. */
@@ -389,48 +384,50 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --table-pad-x-footer  /* Horizontal padding of a PatternTable footer, such as its Pagination row. */
 --table-pad-y-cell  /* Vertical padding inside a PatternTable cell. */
 --table-stack  /* Vertical gap between a PatternTable and its toolbar or footer. */
+--tooltip-max-width  /* Widest a Tooltip may grow before its text wraps. */
+--tooltip-pad-y  /* Vertical padding inside a Tooltip. */
 ```
 
 ## Type Scale
-The text styles, generated from Figma: `font: var(--heading-large)`. A button or tab label is `--body-default` with `font-weight: var(--type-weight-medium)`; there is no button style.
+The text styles, generated from Figma: `font: var(--heading-lg)`. A button or tab label is `--body-default` with `font-weight: var(--type-weight-medium)`; there is no button style.
 
 ```css
 --body-default
---body-large
---body-small
---code
---font-size-075
---font-size-0875
---font-size-100
---font-size-125
---font-size-150
---font-size-175
---font-size-200
---heading-large
---heading-large-tracking
---heading-medium
---heading-small
---heading-xlarge
---heading-xlarge-tracking
---heading-xsmall
---heading-xxlarge
---heading-xxlarge-tracking
---heading-xxsmall
---line-height-100
---line-height-125
---line-height-150
---line-height-175
---line-height-200
---line-height-225
---metric-large
---metric-medium
---metric-small
+--body-lg
+--body-sm
+--code-default
+--heading-lg
+--heading-lg-tracking
+--heading-md
+--heading-sm
+--heading-xl
+--heading-xl-tracking
+--heading-xs
+--heading-xxl
+--heading-xxl-tracking
+--heading-xxs
+--metric-lg
+--metric-md
+--metric-sm
 --type-family-body
 --type-family-brand-body
 --type-family-brand-heading
 --type-family-code
 --type-family-heading
 --type-family-heading-serif
+--type-line-height-100
+--type-line-height-125
+--type-line-height-150
+--type-line-height-175
+--type-line-height-200
+--type-line-height-225
+--type-size-075
+--type-size-0875
+--type-size-100
+--type-size-125
+--type-size-150
+--type-size-175
+--type-size-200
 --type-tracking-none
 --type-tracking-tight
 --type-tracking-tighter
@@ -443,6 +440,122 @@ The text styles, generated from Figma: `font: var(--heading-large)`. A button or
 The color set, generated from a plan into `design-system/src/tokens/color/` with a value per mode (light, dark, and each with increased contrast). Name a token `color.property.role.emphasis.state` without `color.`: `var(--ds-background-brand-bold)`, `var(--ds-text-subtle)`, `var(--ds-border-focused)`. Never write one with a fallback (`check:ds-fallbacks`).
 
 ```css
+--chart-blue-bold  /* For data visualization only */
+--chart-blue-bold-hovered
+--chart-blue-bolder  /* For data visualization only */
+--chart-blue-bolder-hovered
+--chart-blue-boldest  /* For data visualization only */
+--chart-blue-boldest-hovered
+--chart-brand  /* Our primary color for data visualization. Use when only one color is required */
+--chart-brand-hovered
+--chart-brown-bold  /* For data visualization only */
+--chart-brown-bold-hovered
+--chart-brown-bolder  /* For data visualization only */
+--chart-brown-bolder-hovered
+--chart-brown-boldest  /* For data visualization only */
+--chart-brown-boldest-hovered
+--chart-categorical-1  /* For data visualization only. Follow numbered sequence */
+--chart-categorical-1-hovered
+--chart-categorical-2  /* For data visualization only. Follow numbered sequence */
+--chart-categorical-2-hovered
+--chart-categorical-3  /* For data visualization only. Follow numbered sequence */
+--chart-categorical-3-hovered
+--chart-categorical-4  /* For data visualization only. Follow numbered sequence */
+--chart-categorical-4-hovered
+--chart-categorical-5  /* For data visualization only. Follow numbered sequence */
+--chart-categorical-5-hovered
+--chart-categorical-6  /* For data visualization only. Follow numbered sequence */
+--chart-categorical-6-hovered
+--chart-categorical-7  /* For data visualization only. Follow numbered sequence */
+--chart-categorical-7-hovered
+--chart-categorical-8  /* For data visualization only. Follow numbered sequence */
+--chart-categorical-8-hovered
+--chart-danger  /* For data visualization communicating negative information, such as 'off track' */
+--chart-danger-bold  /* A stronger emphasis option of --chart-danger */
+--chart-danger-bold-hovered
+--chart-danger-hovered
+--chart-discovery  /* For data visualization communicating 'new' statuses */
+--chart-discovery-bold  /* A stronger emphasis option of --chart-discovery */
+--chart-discovery-bold-hovered
+--chart-discovery-hovered
+--chart-gray-bold  /* For data visualization only */
+--chart-gray-bold-hovered
+--chart-gray-bolder  /* For data visualization only */
+--chart-gray-bolder-hovered
+--chart-gray-boldest  /* For data visualization only */
+--chart-gray-boldest-hovered
+--chart-green-bold  /* For data visualization only */
+--chart-green-bold-hovered
+--chart-green-bolder  /* For data visualization only */
+--chart-green-bolder-hovered
+--chart-green-boldest  /* For data visualization only */
+--chart-green-boldest-hovered
+--chart-information  /* For data visualization communicating low priority or in-progress statuses */
+--chart-information-bold  /* A stronger emphasis option of --chart-information */
+--chart-information-bold-hovered
+--chart-information-hovered
+--chart-lime-bold  /* For data visualization only */
+--chart-lime-bold-hovered
+--chart-lime-bolder  /* For data visualization only */
+--chart-lime-bolder-hovered
+--chart-lime-boldest  /* For data visualization only */
+--chart-lime-boldest-hovered
+--chart-magenta-bold  /* For data visualization only */
+--chart-magenta-bold-hovered
+--chart-magenta-bolder  /* For data visualization only */
+--chart-magenta-bolder-hovered
+--chart-magenta-boldest  /* For data visualization only */
+--chart-magenta-boldest-hovered
+--chart-neutral  /* A secondary color for data visualization or to communicate 'to-do' statuses */
+--chart-neutral-hovered
+--chart-orange-bold  /* For data visualization only */
+--chart-orange-bold-hovered
+--chart-orange-bolder  /* For data visualization only */
+--chart-orange-bolder-hovered
+--chart-orange-boldest  /* For data visualization only */
+--chart-orange-boldest-hovered
+--chart-purple-bold  /* For data visualization only */
+--chart-purple-bold-hovered
+--chart-purple-bolder  /* For data visualization only */
+--chart-purple-bolder-hovered
+--chart-purple-boldest  /* For data visualization only */
+--chart-purple-boldest-hovered
+--chart-red-bold  /* For data visualization only */
+--chart-red-bold-hovered
+--chart-red-bolder  /* For data visualization only */
+--chart-red-bolder-hovered
+--chart-red-boldest  /* For data visualization only */
+--chart-red-boldest-hovered
+--chart-smart-advocacy  /* Chart series for the advocacy subject. Aliases --chart-lime-bold. */
+--chart-smart-advocacy-hovered
+--chart-smart-mastering-content  /* Chart series for the mastering-content subject. Aliases --chart-teal-boldest. */
+--chart-smart-mastering-content-hovered
+--chart-smart-relationship  /* Chart series for the relationship subject. Aliases --chart-magenta-boldest. */
+--chart-smart-relationship-hovered
+--chart-smart-social-emotional  /* Chart series for the social-emotional subject. Aliases --chart-orange-bold. */
+--chart-smart-social-emotional-hovered
+--chart-smart-technology-tools  /* Chart series for the technology-tools subject. Aliases --chart-brown-bold. */
+--chart-smart-technology-tools-hovered
+--chart-success  /* For data visualization communicating positive information, such as 'on track' */
+--chart-success-bold  /* A stronger emphasis option of --chart-success */
+--chart-success-bold-hovered
+--chart-success-hovered
+--chart-teal-bold  /* For data visualization only */
+--chart-teal-bold-hovered
+--chart-teal-bolder  /* For data visualization only */
+--chart-teal-bolder-hovered
+--chart-teal-boldest  /* For data visualization only */
+--chart-teal-boldest-hovered
+--chart-warning  /* For data visualization communicating caution, such as 'at risk' statuses */
+--chart-warning-bold  /* A stronger emphasis option of --chart-warning */
+--chart-warning-bold-hovered
+--chart-warning-hovered
+--chart-yellow-bold  /* For data visualization only */
+--chart-yellow-bold-hovered
+--chart-yellow-bolder  /* For data visualization only */
+--chart-yellow-bolder-hovered
+--chart-yellow-boldest  /* For data visualization only */
+--chart-yellow-boldest-hovered
 --ds-ai-background-bold  /* Ground of the one primary AI action in a region (Button, AI appearance). Pair its label with --ds-text-inverse. */
 --ds-ai-background-bold-hovered  /* Hovered ground of an AI action. */
 --ds-ai-background-bold-pressed  /* Pressed ground of an AI action. */
@@ -753,122 +866,6 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-border-surface  /* A container's 1px edge. Invisible except in light increased contrast, where the sunken frame turns white. */
 --ds-border-warning  /* Borders communicating caution */
 --ds-border-warning-subtle  /* Decorative warning borders that do not need to meet 3:1 contrast requirements */
---ds-chart-blue-bold  /* For data visualization only */
---ds-chart-blue-bold-hovered
---ds-chart-blue-bolder  /* For data visualization only */
---ds-chart-blue-bolder-hovered
---ds-chart-blue-boldest  /* For data visualization only */
---ds-chart-blue-boldest-hovered
---ds-chart-brand  /* Our primary color for data visualization. Use when only one color is required */
---ds-chart-brand-hovered
---ds-chart-brown-bold  /* For data visualization only */
---ds-chart-brown-bold-hovered
---ds-chart-brown-bolder  /* For data visualization only */
---ds-chart-brown-bolder-hovered
---ds-chart-brown-boldest  /* For data visualization only */
---ds-chart-brown-boldest-hovered
---ds-chart-categorical-1  /* For data visualization only. Follow numbered sequence */
---ds-chart-categorical-1-hovered
---ds-chart-categorical-2  /* For data visualization only. Follow numbered sequence */
---ds-chart-categorical-2-hovered
---ds-chart-categorical-3  /* For data visualization only. Follow numbered sequence */
---ds-chart-categorical-3-hovered
---ds-chart-categorical-4  /* For data visualization only. Follow numbered sequence */
---ds-chart-categorical-4-hovered
---ds-chart-categorical-5  /* For data visualization only. Follow numbered sequence */
---ds-chart-categorical-5-hovered
---ds-chart-categorical-6  /* For data visualization only. Follow numbered sequence */
---ds-chart-categorical-6-hovered
---ds-chart-categorical-7  /* For data visualization only. Follow numbered sequence */
---ds-chart-categorical-7-hovered
---ds-chart-categorical-8  /* For data visualization only. Follow numbered sequence */
---ds-chart-categorical-8-hovered
---ds-chart-danger  /* For data visualization communicating negative information, such as 'off track' */
---ds-chart-danger-bold  /* A stronger emphasis option of --ds-chart-danger */
---ds-chart-danger-bold-hovered
---ds-chart-danger-hovered
---ds-chart-discovery  /* For data visualization communicating 'new' statuses */
---ds-chart-discovery-bold  /* A stronger emphasis option of --ds-chart-discovery */
---ds-chart-discovery-bold-hovered
---ds-chart-discovery-hovered
---ds-chart-gray-bold  /* For data visualization only */
---ds-chart-gray-bold-hovered
---ds-chart-gray-bolder  /* For data visualization only */
---ds-chart-gray-bolder-hovered
---ds-chart-gray-boldest  /* For data visualization only */
---ds-chart-gray-boldest-hovered
---ds-chart-green-bold  /* For data visualization only */
---ds-chart-green-bold-hovered
---ds-chart-green-bolder  /* For data visualization only */
---ds-chart-green-bolder-hovered
---ds-chart-green-boldest  /* For data visualization only */
---ds-chart-green-boldest-hovered
---ds-chart-information  /* For data visualization communicating low priority or in-progress statuses */
---ds-chart-information-bold  /* A stronger emphasis option of --ds-chart-information */
---ds-chart-information-bold-hovered
---ds-chart-information-hovered
---ds-chart-lime-bold  /* For data visualization only */
---ds-chart-lime-bold-hovered
---ds-chart-lime-bolder  /* For data visualization only */
---ds-chart-lime-bolder-hovered
---ds-chart-lime-boldest  /* For data visualization only */
---ds-chart-lime-boldest-hovered
---ds-chart-magenta-bold  /* For data visualization only */
---ds-chart-magenta-bold-hovered
---ds-chart-magenta-bolder  /* For data visualization only */
---ds-chart-magenta-bolder-hovered
---ds-chart-magenta-boldest  /* For data visualization only */
---ds-chart-magenta-boldest-hovered
---ds-chart-neutral  /* A secondary color for data visualization or to communicate 'to-do' statuses */
---ds-chart-neutral-hovered
---ds-chart-orange-bold  /* For data visualization only */
---ds-chart-orange-bold-hovered
---ds-chart-orange-bolder  /* For data visualization only */
---ds-chart-orange-bolder-hovered
---ds-chart-orange-boldest  /* For data visualization only */
---ds-chart-orange-boldest-hovered
---ds-chart-purple-bold  /* For data visualization only */
---ds-chart-purple-bold-hovered
---ds-chart-purple-bolder  /* For data visualization only */
---ds-chart-purple-bolder-hovered
---ds-chart-purple-boldest  /* For data visualization only */
---ds-chart-purple-boldest-hovered
---ds-chart-red-bold  /* For data visualization only */
---ds-chart-red-bold-hovered
---ds-chart-red-bolder  /* For data visualization only */
---ds-chart-red-bolder-hovered
---ds-chart-red-boldest  /* For data visualization only */
---ds-chart-red-boldest-hovered
---ds-chart-smart-advocacy  /* Chart series for the advocacy subject. Aliases --ds-chart-lime-bold. */
---ds-chart-smart-advocacy-hovered
---ds-chart-smart-mastering-content  /* Chart series for the mastering-content subject. Aliases --ds-chart-teal-boldest. */
---ds-chart-smart-mastering-content-hovered
---ds-chart-smart-relationship  /* Chart series for the relationship subject. Aliases --ds-chart-magenta-boldest. */
---ds-chart-smart-relationship-hovered
---ds-chart-smart-social-emotional  /* Chart series for the social-emotional subject. Aliases --ds-chart-orange-bold. */
---ds-chart-smart-social-emotional-hovered
---ds-chart-smart-technology-tools  /* Chart series for the technology-tools subject. Aliases --ds-chart-brown-bold. */
---ds-chart-smart-technology-tools-hovered
---ds-chart-success  /* For data visualization communicating positive information, such as 'on track' */
---ds-chart-success-bold  /* A stronger emphasis option of --ds-chart-success */
---ds-chart-success-bold-hovered
---ds-chart-success-hovered
---ds-chart-teal-bold  /* For data visualization only */
---ds-chart-teal-bold-hovered
---ds-chart-teal-bolder  /* For data visualization only */
---ds-chart-teal-bolder-hovered
---ds-chart-teal-boldest  /* For data visualization only */
---ds-chart-teal-boldest-hovered
---ds-chart-warning  /* For data visualization communicating caution, such as 'at risk' statuses */
---ds-chart-warning-bold  /* A stronger emphasis option of --ds-chart-warning */
---ds-chart-warning-bold-hovered
---ds-chart-warning-hovered
---ds-chart-yellow-bold  /* For data visualization only */
---ds-chart-yellow-bold-hovered
---ds-chart-yellow-bolder  /* For data visualization only */
---ds-chart-yellow-bolder-hovered
---ds-chart-yellow-boldest  /* For data visualization only */
---ds-chart-yellow-boldest-hovered
 --ds-icon  /* Icon-only buttons, or icons paired with --ds-text */
 --ds-icon-accent-blue  /* Blue icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
 --ds-icon-accent-brown  /* Brown icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
@@ -908,7 +905,6 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-link-visited  /* Visited links */
 --ds-link-visited-pressed  /* Visited links in a pressed state */
 --ds-skeleton  /* Skeleton loading states */
---ds-skeleton-subtle  /* The pulse or shimmer effect in skeleton loading states */
 --ds-surface  /* The primary background for the UI */
 --ds-surface-container  /* A neutral container surface background */
 --ds-surface-container-hovered
@@ -979,6 +975,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-text-warning-bolder  /* Text on top of warning semantic labels to ensure accessibility and desired visual appearance */
 --ds-text-warning-inverse  /* Text when on bold warning backgrounds */
 --ds-utility-elevation-surface-current  /* The surface the element sits on; containers reassign it, sticky cells and overflow fades read it. */
+--skeleton-subtle  /* The pulse or shimmer effect in skeleton loading states */
 ```
 
 ## Elevation and Opacity Tokens (`--ds-`)
@@ -987,7 +984,7 @@ Pick the level by what the surface does (Foundations/Visual/Elevation § Choose 
 ```css
 --ds-opacity-disabled  /* Images and whole elements in a disabled state. */
 --ds-opacity-loading  /* Content under a loading spinner. */
---ds-shadow-blocking  /* Box shadow of the Modal on its Backdrop, the one surface that blocks the page. Pair with --ds-surface-overlay. */
+--ds-shadow-blocking  /* Box shadow of the Modal on its Blanket, the one surface that blocks the page. Pair with --ds-surface-overlay. */
 --ds-shadow-overflow  /* Shadow where content scrolls under a part that stays put, such as a table's sticky header or column. A border marks the cut first. */
 --ds-shadow-overflow-perimeter  /* Fallback for overflow when a box shadow is not feasible; pair with .spread. */
 --ds-shadow-overflow-spread  /* Fallback for overflow when a box shadow is not feasible; pair with .perimeter. */
@@ -1207,13 +1204,6 @@ The ramps the `--ds-` tokens alias. Never name one in a component; a plan swap c
 The primitives (spacing / primitives), named by rem × 100; point semantic tokens at these, not components.
 
 ```css
---radius-0125
---radius-025
---radius-0375
---radius-050
---radius-0625
---radius-075
---radius-100
 --radius-full
 --size-075
 --size-100

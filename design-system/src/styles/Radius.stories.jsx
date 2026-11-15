@@ -53,7 +53,7 @@ const expectLegendValue = async (root, part, token, canvasElement) => {
 
 /* --------------------------------------------------------------- scale */
 
-const STEPS = ['--radius-0125', '--radius-025', '--radius-0375', '--radius-050', '--radius-0625', '--radius-075', '--radius-100', '--radius-full'];
+const STEPS = ['--radius-sm', '--radius-md', '--radius-control-sm', '--radius-lg', '--radius-control-lg', '--radius-xl', '--radius-xxl', '--radius-full'];
 
 /** The eight steps, each drawn at its token and labeled by role outside the tile. */
 export const Scale = {
@@ -105,7 +105,7 @@ export const Nesting = {
         const outer = rxOf(root.querySelector('[data-part="outer"]'));
         const inner = rxOf(root.querySelector('[data-part="inner"]'));
         await expect(outer).toBeCloseTo(radiusOf(canvasElement, '--popup-radius'), 1);
-        await expect(inner).toBeCloseTo(outer - radiusOf(canvasElement, '--popover-pad-menu'), 1);
+        await expect(inner).toBeCloseTo(outer - radiusOf(canvasElement, '--dropdown-menu-pad'), 1);
         await expectLegendValue(root, 'outer', '--popup-radius', canvasElement);
         await expectLegendValue(root, 'inner', '--radius-control-md', canvasElement);
     },

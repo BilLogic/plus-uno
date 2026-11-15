@@ -111,7 +111,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Rest | The input fill with a `--border-default` input edge; the placeholder until a node is picked. |
+| Rest | The input fill with a `--border-width-default` input edge; the placeholder until a node is picked. |
 | Hovered | The edge turns `--ds-border-focused`. |
 | Pressed | No step of its own. The hovered edge holds while the pointer is down, and the press opens the tree. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
@@ -122,13 +122,13 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
-| Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
+| Box | `--ds-background-input` fill, `--border-width-default` edge in `--ds-border-input`. |
+| Height | 40: `--height-250`. Compact 32: `--control-md`. |
+| Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
-| Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
+| Label and caption | `--body-sm`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
 | Tree panel | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
-| Row | `--item-height-md` high; hovered `--ds-background-neutral-subtle-hovered`, picked `--ds-background-selected` with `--ds-text-selected`; the expand toggle `--ds-icon-subtle`. |
+| Row | `--control-md` high; hovered `--ds-background-neutral-subtle-hovered`, picked `--ds-background-selected` with `--ds-text-selected`; the expand toggle `--ds-icon-subtle`. |
 
 ## Content guidelines
 

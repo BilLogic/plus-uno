@@ -69,7 +69,7 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
                 header={(
                     <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--space-100)', minInlineSize: 0 }}>
                         <IconButton appearance="subtle" icon="xmark" label="Close" onClick={() => {}} />
-                        <h1 style={{ margin: 0, font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{title}</h1>
+                        <h1 style={{ margin: 0, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{title}</h1>
                     </div>
                 )}
                 width="reading"
@@ -97,7 +97,7 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
                     boxSizing: 'border-box',
                     paddingInline: 'var(--page-pad)',
                     background: 'var(--ds-surface)',
-                    borderBlockStart: 'var(--border-default) solid var(--ds-border)',
+                    borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
                 }}
             >
                 {/* The bar's actions sit on the Page's reading column, the same edges as Close, the title and the body. */}

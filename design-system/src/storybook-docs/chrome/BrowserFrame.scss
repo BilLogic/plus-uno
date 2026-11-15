@@ -9,14 +9,14 @@
     background: var(--ds-surface);
     outline: var(--stroke-1) solid var(--ds-border);
     outline-offset: calc(-1 * var(--stroke-1));
-    border-radius: var(--radius-075);
+    border-radius: var(--radius-xl);
     overflow: hidden;
 }
 
 // Type, icon and selection rules sit on the chrome alone, so the framed page inherits nothing.
 .plus-browser-frame__chrome {
     color: var(--ds-text);
-    font: var(--body-small);
+    font: var(--body-sm);
     user-select: none;
 
     i {
@@ -67,7 +67,7 @@
     height: var(--size-200);
     padding-inline: var(--space-075);
     background: var(--ds-surface);
-    border-radius: var(--radius-050) var(--radius-050) 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .plus-browser-frame__tab-title {
@@ -81,7 +81,7 @@
     flex: none;
     width: var(--icon-sm);
     height: var(--icon-sm);
-    border-radius: var(--radius-025);
+    border-radius: var(--radius-md);
     background: var(--ds-background-brand-bold);
 }
 
@@ -127,7 +127,7 @@
     justify-content: center;
     gap: var(--space-050);
     height: var(--size-200);
-    border-radius: var(--radius-050);
+    border-radius: var(--radius-lg);
     background: var(--ds-background-neutral);
     font: var(--body-default);
 }
@@ -140,6 +140,6 @@
 // Edge: Chrome's layout with rounder tabs and a pill address bar.
 .plus-browser-frame--edge {
     .plus-browser-frame__tab {
-        border-radius: var(--radius-075) var(--radius-075) 0 0;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
 }

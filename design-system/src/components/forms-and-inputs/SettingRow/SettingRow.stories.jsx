@@ -19,7 +19,7 @@ const containerStyle = {
 
 const groupHeadingStyle = {
     margin: '0 0 var(--stack-sm)',
-    font: 'var(--heading-small)',
+    font: 'var(--heading-sm)',
     color: 'var(--ds-text)',
 };
 

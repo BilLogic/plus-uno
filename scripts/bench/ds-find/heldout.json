@@ -388,7 +388,7 @@
   "q": "selected border color",
   "want": [
    "--ds-border-selected",
-   "--border-selected"
+   "--border-width-selected"
   ],
   "kind": "real-token",
   "source": "ledger"

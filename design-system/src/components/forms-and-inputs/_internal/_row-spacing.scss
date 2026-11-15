@@ -8,6 +8,6 @@
         @error 'Unknown row spacing: #{$spacing}';
     }
     $step: map.get($steps, $spacing);
-    min-height: var(--item-height-#{$step});
+    min-height: var(--control-#{$step});
     padding-block: var(--pad-y-#{$step});
 }

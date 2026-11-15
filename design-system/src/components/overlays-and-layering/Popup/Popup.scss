@@ -17,8 +17,8 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    // The popup sits offset 4 (`--popover-offset`) from its trigger.
-    gap: var(--popover-offset);
+    // The popup sits offset 4 (`--popup-offset`) from its trigger.
+    gap: var(--popup-offset);
     padding: var(--popup-pad);
 
     .plus-popup {
@@ -28,7 +28,7 @@
 
 // ===== MAIN CONTAINER =====
 // The Popups pattern's Popup (Figma Pattern/Popup): one surface, no overlay
-// backdrop and no arrow. Pad 16 (`--popover-pad`), radius 12 (`--popup-radius`).
+// blanket and no arrow. Pad 16 (`--popup-pad`), radius 12 (`--popup-radius`).
 // The title and body stack Element/stack-md 8 apart on the popup's own fill.
 //
 // WIDTH. `auto` hugs one list: at least the trigger (Base UI's
@@ -48,7 +48,7 @@
     width: max-content;
     min-width: max(var(--popup-min-width), var(--anchor-width, 0px));
     max-width: max(var(--popup-max-width), var(--anchor-width, 0px));
-    padding: var(--popover-pad);
+    padding: var(--popup-pad);
     box-sizing: border-box;
     z-index: var(--layer-popup);
 
@@ -56,13 +56,13 @@
     // increased contrast), so the popup paints no border of its own; the
     // transparent one keeps an edge in forced colors, where shadows are dropped.
     background-color: var(--ds-surface-overlay);
-    border: var(--border-default) solid transparent;
+    border: var(--border-width-default) solid transparent;
     border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
 
     &.plus-popup--3-col,
     &.plus-popup--4-col {
-        @include screen-grid-width(var(--popover-pad));
+        @include screen-grid-width(var(--popup-pad));
         min-width: 0;
         max-width: none;
     }
@@ -87,7 +87,7 @@
     // ===== TITLE: heading.xsmall 14/20, on the popup's surface =====
     .plus-popup-title {
         color: var(--ds-text);
-        font: var(--heading-xsmall);
+        font: var(--heading-xs);
     }
 
     // ===== BODY: body 14/20 =====

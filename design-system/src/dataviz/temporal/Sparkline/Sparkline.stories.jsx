@@ -53,8 +53,8 @@ A sparkline is a word-sized line chart: the shape of a trend, beside the number 
 const sessions = ['Sep 1–5', 'Sep 8–12', 'Sep 15–19', 'Sep 22–26', 'Sep 29–Oct 3', 'Oct 6–10', 'Oct 13–17'];
 
 const row = { display: 'flex', alignItems: 'center', gap: 'var(--stack-lg)' };
-const value = { fontFamily: 'var(--type-family-heading-serif)', fontSize: 'var(--font-size-150)', fontWeight: 'var(--type-weight-medium)', color: 'var(--ds-text)' };
-const caption = { color: 'var(--ds-text-subtle)', fontSize: 'var(--font-size-075)' };
+const value = { fontFamily: 'var(--type-family-heading-serif)', fontSize: 'var(--type-size-150)', fontWeight: 'var(--type-weight-medium)', color: 'var(--ds-text)' };
+const caption = { color: 'var(--ds-text-subtle)', fontSize: 'var(--type-size-075)' };
 
 /**
  * Overview: a sparkline beside its number, and one per status
@@ -121,9 +121,9 @@ export const ColorModes = {
         await expect(brand.querySelector('.highcharts-xaxis-labels'), 'no axis labels').toBeNull();
         await inEveryColorMode(async (mode) => {
             await expect(getComputedStyle(brand.querySelector('.highcharts-graph')).stroke, `${mode}: brand line`)
-                .toBe(tokenColor(canvasElement, '--ds-chart-brand'));
+                .toBe(tokenColor(canvasElement, '--chart-brand'));
             await expect(getComputedStyle(danger.querySelector('.highcharts-graph')).stroke, `${mode}: danger line`)
-                .toBe(tokenColor(canvasElement, '--ds-chart-danger'));
+                .toBe(tokenColor(canvasElement, '--chart-danger'));
         });
     },
 };

@@ -1,7 +1,7 @@
 /* The type token set, generated from Figma's `typography` collection: the font
-   primitives (`--font-size-075` … and `--line-height-100` …), the
+   primitives (`--type-size-075` … and `--type-line-height-100` …), the
    `--type-family-*` and `--type-weight-*` variables, and the text styles
-   (`--heading-*`, `--body-*`, `--metric-*`, `--code`). Pulled in here so every
+   (`--heading-*`, `--body-*`, `--metric-*`, `--code-default`). Pulled in here so every
    entry point that loads this file gets it. */
 @use "type";
 
@@ -33,7 +33,7 @@
    it. `main.scss` sets the body family, weight and line height; this sets the
    size: Body/default's 14. */
 body {
-    font-size: var(--font-size-0875);
+    font-size: var(--type-size-0875);
     /* next rule prevents "rubberband" nudging of topbar in OSX/Chrome browser */
     overscroll-behavior: none;
 }
@@ -42,7 +42,7 @@ body {
    small icon size. */
 body :is(.fa-solid, .fa-regular, .fas, .far) {
     font-size: var(--icon-sm);
-    line-height: var(--line-height-150);
+    line-height: var(--type-line-height-150);
 }
 
 /* Bare heading elements take the heading text style that matches their level
@@ -60,30 +60,30 @@ h6 {
 }
 
 h1 {
-    font: var(--heading-xxlarge);
-    letter-spacing: var(--heading-xxlarge-tracking);
+    font: var(--heading-xxl);
+    letter-spacing: var(--heading-xxl-tracking);
 }
 
 h2 {
-    font: var(--heading-xlarge);
-    letter-spacing: var(--heading-xlarge-tracking);
+    font: var(--heading-xl);
+    letter-spacing: var(--heading-xl-tracking);
 }
 
 h3 {
-    font: var(--heading-large);
-    letter-spacing: var(--heading-large-tracking);
+    font: var(--heading-lg);
+    letter-spacing: var(--heading-lg-tracking);
 }
 
 h4 {
-    font: var(--heading-medium);
+    font: var(--heading-md);
 }
 
 h5 {
-    font: var(--heading-small);
+    font: var(--heading-sm);
 }
 
 h6 {
-    font: var(--heading-xsmall);
+    font: var(--heading-xs);
 }
 
 :is(h1, h2, h3, h4, h5, h6) :is(.fa-solid, .fa-regular, .fas, .far) {

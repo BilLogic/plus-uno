@@ -359,7 +359,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--item-height-sm)"
+        "WEB": "var(--control-sm)"
       },
       "description": "compact: inside table rows and inline toolbars only"
     },
@@ -381,7 +381,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--item-height-md)"
+        "WEB": "var(--control-md)"
       },
       "description": "the default: button, tab, menu row, field, select"
     },
@@ -1108,7 +1108,7 @@
       "valuesByMode": {
         "19378:0": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:215"
+          "id": "VariableID:19364:200"
         }
       },
       "resolvedValuesByMode": {
@@ -1130,7 +1130,7 @@
       "valuesByMode": {
         "19378:0": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:216"
+          "id": "VariableID:19364:201"
         }
       },
       "resolvedValuesByMode": {
@@ -1152,7 +1152,7 @@
       "valuesByMode": {
         "19378:0": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:218"
+          "id": "VariableID:19364:203"
         }
       },
       "resolvedValuesByMode": {
@@ -1174,7 +1174,7 @@
       "valuesByMode": {
         "19378:0": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:217"
+          "id": "VariableID:19364:202"
         }
       },
       "resolvedValuesByMode": {
@@ -1196,7 +1196,7 @@
       "valuesByMode": {
         "19378:0": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:218"
+          "id": "VariableID:19364:203"
         }
       },
       "resolvedValuesByMode": {
@@ -1250,7 +1250,7 @@
         "STROKE_FLOAT"
       ],
       "codeSyntax": {
-        "WEB": "var(--border-default)"
+        "WEB": "var(--border-width-default)"
       }
     },
     {
@@ -1271,7 +1271,7 @@
         "STROKE_FLOAT"
       ],
       "codeSyntax": {
-        "WEB": "var(--border-selected)"
+        "WEB": "var(--border-width-selected)"
       }
     },
     {
@@ -1292,7 +1292,7 @@
         "STROKE_FLOAT"
       ],
       "codeSyntax": {
-        "WEB": "var(--border-focused)"
+        "WEB": "var(--border-width-focused)"
       },
       "description": "focus ring, drawn 2 outside"
     },

@@ -25,7 +25,7 @@ export const webAppSourceSnippets = {
         '  Message with title and body text.',
         '</SectionMessage>'
     ]),
-    badge: snippet([
+    countTag: snippet([
         '<StatusTag appearance="info">Primary</StatusTag>'
     ]),
     breadcrumb: snippet([

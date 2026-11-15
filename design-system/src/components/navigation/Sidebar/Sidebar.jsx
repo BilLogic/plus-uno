@@ -27,7 +27,7 @@ const Sidebar = ({
     account,
     modulesLeft = 0,
     lessonsLeft = 0,
-    badges,
+    countTags,
     onHomeClick,
     onTabClick,
     onOpenTabSelect,
@@ -66,7 +66,7 @@ const Sidebar = ({
         <PatternSidebar
             className={['plus-sidebar', className].filter(Boolean).join(' ')}
             style={style}
-            groups={sidebarGroups(user, { slackUrl, badges, groups })}
+            groups={sidebarGroups(user, { slackUrl, countTags, groups })}
             activeId={activeId}
             onSelect={handleSelect}
             tabs={tabs}
@@ -128,7 +128,7 @@ Sidebar.propTypes = {
     /** A tutor's assigned lessons left; counted on the Lessons row */
     lessonsLeft: PropTypes.number,
     /** The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` */
-    badges: PropTypes.objectOf(PropTypes.shape({
+    countTags: PropTypes.objectOf(PropTypes.shape({
         count: PropTypes.number,
         countLabel: PropTypes.string,
         dot: PropTypes.bool,

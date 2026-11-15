@@ -31,7 +31,7 @@ import { FullBleedFooter } from '../Form/formDemo.jsx';
  * The Panel template's examples: the real Frame with its Panel area, filled the
  * way each type fills it. A Frame under 1408 wide cannot dock a Sidebar and a
  * 400 Panel beside 720 of content, so at the docs stage the Panel floats on the
- * overlay fill and shadow with no Backdrop, which is what Details and the
+ * overlay fill and shadow with no Blanket, which is what Details and the
  * Inbox always do. The Frame is the only host a Panel has today, so the
  * Inbox's own placement (out of the Sidebar, on the left) is Planned and the
  * Inbox is drawn in the same right-hand slot.
@@ -151,8 +151,8 @@ export const InboxPanel = ({ onClose = () => {}, items = INBOX }) => (
                         <Avatar name={n.name} size={32} />
                         <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>{`${n.name} ${n.what} in ${n.where}`}</span>
-                            <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{n.excerpt}</span>
-                            <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{n.time}</span>
+                            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.excerpt}</span>
+                            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.time}</span>
                         </div>
                         {n.unread ? (
                             <>

@@ -15,7 +15,7 @@
      * Chart-only component tokens, aliasing the same stroke-width primitive
      * `--focus-ring-width` reads (`_frame_layers.scss`'s `--card-radius`
      * aliases the equivalent radius primitive). Bar/column marks round only
-     * the value end at `--chart-bar-radius` (`--radius-0125`, ~2px) —
+     * the value end at `--chart-bar-radius` (`--radius-sm`, ~2px) —
      * rounding both ends or a larger radius distorts length reading, the one
      * thing a bar chart asks its reader to compare. Declared at `:root`, not
      * `.highcharts-container` (unlike the `--highcharts-*` overrides below):
@@ -25,7 +25,7 @@
      * if it's declared on an ancestor of that element, never a descendant
      * like `.highcharts-container`.
      */
-    --chart-bar-radius: var(--radius-0125);
+    --chart-bar-radius: var(--radius-sm);
     --chart-line-width: var(--stroke-2);
     --chart-grid-width: var(--stroke-1);
 }
@@ -41,17 +41,17 @@
     --highcharts-neutral-color-10: var(--ds-border);
     --highcharts-neutral-color-5: var(--ds-background-neutral-subtle-hovered);
     --highcharts-neutral-color-3: var(--ds-background-neutral-subtle-hovered);
-    --highcharts-highlight-color: var(--ds-chart-brand);
-    --highcharts-highlight-color-100: var(--ds-chart-brand);
-    --highcharts-highlight-color-80: var(--ds-chart-brand);
-    --highcharts-highlight-color-60: var(--ds-chart-brand-hovered);
+    --highcharts-highlight-color: var(--chart-brand);
+    --highcharts-highlight-color-100: var(--chart-brand);
+    --highcharts-highlight-color-80: var(--chart-brand);
+    --highcharts-highlight-color-60: var(--chart-brand-hovered);
     --highcharts-highlight-color-40: var(--ds-border-selected);
     --highcharts-highlight-color-20: var(--ds-background-selected-hovered);
     --highcharts-highlight-color-10: var(--ds-background-selected);
     --highcharts-highlight-color-5: var(--ds-background-selected);
     --highcharts-highlight-color-3: var(--ds-background-selected);
-    --highcharts-positive-color: var(--ds-chart-success);
-    --highcharts-negative-color: var(--ds-chart-danger);
+    --highcharts-positive-color: var(--chart-success);
+    --highcharts-negative-color: var(--chart-danger);
 }
 
 /*
@@ -75,5 +75,5 @@
     background: var(--ds-surface-overlay);
     border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
-    padding: var(--popover-pad);
+    padding: var(--popup-pad);
 }

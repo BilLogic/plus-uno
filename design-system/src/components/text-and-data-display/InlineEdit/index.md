@@ -55,7 +55,7 @@ Don't: A separate Save step beside an inline edit.
 
 ### Use compact in dense lists. {#use-compact-in-dense-lists}
 
-`compact` draws both views at `--item-height-md`, to sit in a table cell or a dense row.
+`compact` draws both views at `--control-md`, to sit in a table cell or a dense row.
 
 Do: Compact rows in a dense list.
 Don't: The default height spreads a dense list out.
@@ -107,12 +107,12 @@ Same group: `Code` · `CodeBlock` · `Heading` · `Table` · `VisuallyHidden`
 
 | State | What changes |
 | --- | --- |
-| Rest | The read view: text on a transparent box with a transparent `--border-default` edge. |
+| Rest | The read view: text on a transparent box with a transparent `--border-width-default` edge. |
 | Hovered | The read view takes `--ds-background-neutral-subtle-hovered`. |
 | Pressed | Pressing the read view opens the edit view in the same box, with the caret in it. |
 | Focused | The read view draws the focus ring; see Border. |
 | Disabled | None. An inline edit has no disabled state. |
-| Editing | The field's fill and `--border-default` input edge appear; nothing else moves. |
+| Editing | The field's fill and `--border-width-default` input edge appear; nothing else moves. |
 | Invalid | The field stays open with the danger edge and the message in its caption. |
 | Placeholder | An empty read view shows the placeholder in `--ds-text-subtlest`. |
 
@@ -120,8 +120,8 @@ Same group: `Code` · `CodeBlock` · `Heading` · `Table` · `VisuallyHidden`
 
 | Part | Token |
 | --- | --- |
-| Read view height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Read view box | `--radius-0625`, a `--border-default` transparent edge, `--pad-x-md` either side. |
+| Read view height | 40: `--height-250`. Compact 32: `--control-md`. |
+| Read view box | `--radius-control-lg`, a `--border-width-default` transparent edge, `--pad-x-md` either side. |
 | Read view text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Read view hovered | `--ds-background-neutral-subtle-hovered`. |
 | Actions | `--ds-surface-overlay` with `--ds-shadow-overlay`, `--radius-md`, `--stack-sm` padding and gap. |
@@ -162,7 +162,7 @@ The edit view takes the field's own tokens: see Text field.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--height-250` · `--item-height-md` · `--pad-x-md` · `--radius-control-lg` · `--radius-md` · `--stack-sm`
+`--body-default` · `--border-width-default` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--height-250` · `--pad-x-md` · `--radius-control-lg` · `--radius-md` · `--stack-sm`
 
 From `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss`. Override these through the token layer, never with a literal.
 

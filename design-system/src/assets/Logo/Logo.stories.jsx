@@ -26,7 +26,7 @@ export default {
 };
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-lg)', alignItems: 'flex-end' };
-const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 
 /** A ground for a theme: the dark theme the logo's stronger glows are drawn for. */
 const Ground = ({ mode, children }) => (

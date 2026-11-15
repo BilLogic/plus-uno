@@ -100,11 +100,11 @@
 }
 
 .plus-tag-input__menu .plus-listbox-options > [role='option'] + [role='group'] {
-    border-top: var(--border-default) solid var(--ds-border);
+    border-top: var(--border-width-default) solid var(--ds-border);
 }
 
 .plus-tag-input__hint {
     padding: var(--space-025) var(--pad-x-md);
     color: var(--ds-text-subtle);
-    font: var(--body-small);
+    font: var(--body-sm);
 }

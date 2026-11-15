@@ -31,7 +31,7 @@ const swatchStyle = {
     height: 'var(--icon-lg)',
     flexShrink: 0,
     borderRadius: 'var(--radius-md)',
-    boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)',
+    boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
 };
 
 /** A swatch for a color, a shadow sample, a bar for a length, or nothing. */
@@ -73,7 +73,7 @@ const Row = ({ row, onCopy }) => (
                     </span>
                 )}
                 <Button appearance="subtle" spacing="compact" aria-label={`${row.name} (copy)`} onClick={() => onCopy(row.name)}>
-                    <span data-token-name={row.name} style={{ font: 'var(--code)' }}>{row.name}</span>
+                    <span data-token-name={row.name} style={{ font: 'var(--code-default)' }}>{row.name}</span>
                 </Button>
             </span>
         </td>

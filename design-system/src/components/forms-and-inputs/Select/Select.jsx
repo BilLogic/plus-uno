@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import FieldBox from '../_internal/FieldBox';
 import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import Listbox from '../_internal/Listbox';
-import SelectChips from '../_internal/SelectChips';
+import SelectTags from '../_internal/SelectTags';
 import { SEARCH_FIRST_ABOVE, selectList } from '../_internal/selectList';
 import useOpenState from '../_internal/useOpenState';
 import useOptionSource from '../_internal/useOptionSource';
@@ -351,8 +351,8 @@ const Select = ({
         );
     }
 
-    const chips = multi && hasValue ? (
-        <SelectChips
+    const tags = multi && hasValue ? (
+        <SelectTags
             displayMode={displayMode}
             values={current}
             textFor={textFor}
@@ -450,7 +450,7 @@ const Select = ({
                     elemAfter={trailing}
                     onClick={handleFieldClick}
                 >
-                    {chips}
+                    {tags}
                     {control}
                 </FieldBox>
                 <Listbox
@@ -539,7 +539,7 @@ Select.propTypes = {
     onOpenChange: PropTypes.func,
     /** The text the search input starts with, so the list opens already filtered. Used by a searchable field. */
     defaultSearchTerm: PropTypes.string,
-    /** With `isMulti`: `tags` (Tag chips) or `text` (comma-separated). */
+    /** With `isMulti`: `tags` (Tag tags) or `text` (comma-separated). */
     displayMode: PropTypes.oneOf(['tags', 'text']),
     /** `text` display mode only: wrap onto more lines. */
     lineWrap: PropTypes.bool,

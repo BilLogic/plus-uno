@@ -7,7 +7,7 @@ import { IconButton, Button, Select } from '@/components';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
-    title: 'Components/Messaging/Modal dialog',
+    title: 'Components/Messaging/Modal',
     component: Modal,
     tags: ['!dev', '!autodocs'],
     argTypes: {
@@ -472,7 +472,7 @@ export const ModalOverModalRefused = {
             await userEvent.click(body.getByRole('button', { name: 'Open second' }));
             await expect(hiddenDialog('Second'), 'a Modal over a Modal is refused').toBeNull();
             await expect(dialogNamed(canvasElement, 'First'), 'the first Modal stays open').not.toBeNull();
-            await expect(canvasElement.ownerDocument.querySelectorAll('.plus-pattern-backdrop').length, 'one Backdrop').toBe(1);
+            await expect(canvasElement.ownerDocument.querySelectorAll('.plus-pattern-blanket').length, 'one Blanket').toBe(1);
         } finally {
             console.warn = warn;
         }
@@ -491,7 +491,7 @@ const paintedShadow = (doc, token) => {
     return value;
 };
 
-/** The Modal is the one surface on a backdrop, so it draws the blocking shadow in every width. */
+/** The Modal is the one surface on a blanket, so it draws the blocking shadow in every width. */
 export const BlockingShadow = {
     render: () => (
         <div style={col}>

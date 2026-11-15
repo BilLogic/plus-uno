@@ -33,7 +33,7 @@ Elsewhere in the docs a token drops its `motion.` prefix (`spatial.fast`), and "
 **Productive** is the mode for everything. **Expressive** is switched on for one container at a time (`data-motion="expressive"`) for these moments only:
 
 - **Finish:** every completed reflection. The confirmation Flag lands with one overshoot on Expressive `spatial.fast`.
-- **Milestone:** onboarding complete, first session done, a student's goal reached, a badge claimed, term start and term end. The one card in the hero entrance is Expressive. A goal shows once per person: the student sees it the moment it happens, the tutor the next time they open that student.
+- **Milestone:** onboarding complete, first session done, a student's goal reached, a recognition earned, term start and term end. The one card in the hero entrance is Expressive. A goal shows once per person: the student sees it the moment it happens, the tutor the next time they open that student.
 
 Inside an Expressive container, controls, fields, page transitions and data marks stay Productive. This is the only list of Expressive moments; other pages point here.
 

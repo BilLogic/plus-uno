@@ -2,7 +2,7 @@
 
 # PromptStarters
 
-A few things a person could ask the AI, as a wrapping row of prompt `Suggestion` chips. - **starters** are `{ id, label, text }`: the short `label` on the chip and the longer `text` it stands for. - **onSelect(starter)** runs when a chip is pressed, with the whole starter and nothing else. A starter suggests; it never sends on its own, so the caller decides what happens — usually putting `text` in a `PromptInput` for a person to read and send. - **label** names the group for assistive technology.
+A few things a person could ask the AI, as a wrapping row of prompt `Suggestion` tags. - **starters** are `{ id, label, text }`: the short `label` on the tag and the longer `text` it stands for. - **onSelect(starter)** runs when a tag is pressed, with the whole starter and nothing else. A starter suggests; it never sends on its own, so the caller decides what happens — usually putting `text` in a `PromptInput` for a person to read and send. - **label** names the group for assistive technology.
 
 **Import:** `import { PromptStarters } from '@/components';`
 
@@ -64,7 +64,7 @@ no conditional wrapper is needed.
 
 - **A named group.** The row is `role="group"` with `label` as its accessible
   name, required so assistive technology announces the set together.
-- **Each chip is `Suggestion`'s own control.** Keyboard reach, focus and the
+- **Each tag is `Suggestion`'s own control.** Keyboard reach, focus and the
   accept action all follow `Suggestion`'s accessibility contract.
 
 ## Related
@@ -77,35 +77,35 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `SmartTag` 
 ## Parts
 
 1. **Group.** A wrapping row with `role="group"`, named by the required `label`.
-2. **Starter.** A prompt `Suggestion` per entry in `starters`: the sparkle wand, the short `label` on the chip, and the longer `text` it stands for.
+2. **Starter.** A prompt `Suggestion` per entry in `starters`: the sparkle wand, the short `label` on the tag, and the longer `text` it stands for.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Rest | A row of prompt chips. The group itself has no ground and no state. |
-| Hovered, pressed, focused | Each chip reacts as a `Suggestion` does. |
+| Rest | A row of prompt tags. The group itself has no ground and no state. |
+| Hovered, pressed, focused | Each tag reacts as a `Suggestion` does. |
 | Empty | An empty `starters` array renders nothing. |
 
 ### Tokens
 
 | Part | Token |
 | --- | --- |
-| Gap | `--stack-md` between chips and between rows, the same gap as a tag row. |
+| Gap | `--stack-md` between tags and between rows, the same gap as a tag row. |
 | Starter | A `Suggestion`, so its edge, words, grounds and focus ring are Suggestion's tokens. |
 
 ## Content guidelines
 
 | Do | Don't |
 | --- | --- |
-| Write a label of a few words that reads as a request: "Summarize this session". | Put a whole paragraph on the chip. |
+| Write a label of a few words that reads as a request: "Summarize this session". | Put a whole paragraph on the tag. |
 | Name the group for what it offers: "Suggested prompts". | Leave the group unnamed. |
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `starters` | arrayOf (required) | `[]` | What to offer: `id` for the key, `label` on the chip, `text` for the prompt it stands for. |
+| `starters` | arrayOf (required) | `[]` | What to offer: `id` for the key, `label` on the tag, `text` for the prompt it stands for. |
 | `onSelect` | func | — | Called with the starter that was pressed. It never sends anything itself. |
 | `label` | string (required) | — | The group's accessible name, such as "Suggested prompts". |
 | `className` | string | `''` | — |

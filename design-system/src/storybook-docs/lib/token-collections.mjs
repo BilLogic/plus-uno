@@ -8,7 +8,7 @@
  * Library page and the naming audit all read `placeToken`.
  *
  * Templates are page-level tokens (page, focused page, section, frame and
- * frame layers); Components are card, modal, popover, table and every
+ * frame layers); Components are card, modal, popup, table and every
  * per-component token; Global is everything shared. Frame tokens live on
  * Spacing and size, layer tokens on Elevation and layers.
  *
@@ -40,17 +40,17 @@ export function placeToken(name, file = '') {
   if (/^--palette-/.test(name)) return place('color', 'primitive');
   if (/^--ds-(shadow|opacity)-/.test(name)) return place('elevation', 'semantic', 'global');
   if (/^--ds-motion-/.test(name)) return place('motion', 'semantic', 'global');
-  if (/^--ds-(chart|skeleton)-/.test(name)) return place('color', 'semantic', 'components');
+  if (/^--chart-/.test(name) || name === '--skeleton-subtle') return place('color', 'semantic', 'components');
   if (/^--ds-/.test(name)) return place('color', 'semantic', 'global');
 
-  if (/^--(font-size|line-height)-\d/.test(name) || /^--type-(family|weight|tracking)-/.test(name)) {
+  if (/^--type-(size|line-height)-\d/.test(name) || /^--type-(family|weight|tracking)-/.test(name)) {
     return place('typography', 'primitive');
   }
   if (/^--(heading|body|metric|code)(-|$)/.test(name)) return place('typography', 'semantic', 'global');
 
   if (/^--motion-spring-/.test(name)) return place('motion', 'primitive');
 
-  if (/^--frame-layer-/.test(name)) return place('elevation', 'semantic', 'templates');
+  if (/^--layer-frame-/.test(name)) return place('elevation', 'semantic', 'templates');
   if (/^--layer-/.test(name)) return place('elevation', 'semantic', 'global');
 
   if (/^--(space|size|width|height|stroke)-\d/.test(name) || name === '--space-0' || /^--radius-(\d|full$)/.test(name)) {
@@ -60,7 +60,7 @@ export function placeToken(name, file = '') {
   if (/^--(pad|stack|inline|radius|control|focus-ring|grid|screen|content|border|breakpoint|col)-/.test(name)) {
     return place('spacing', 'semantic', 'global');
   }
-  // Card, modal, popover, table, blanket, panel and every per-component size
+  // Card, modal, popup, table, blanket, panel and every per-component size
   // (field, row, label, icon, image, button, tag ...) are Components.
   if (/^--[a-z0-9-]+$/.test(name) && /(^|\/)(ladder\/_components|ladder\/_patterns|_frame_layers|_scales)\.scss$/.test(file)) {
     return place('spacing', 'semantic', 'components');
@@ -135,19 +135,9 @@ const AUDIT_RULES = [
     propose: (n) => n.replace(/(xxlarge|xlarge|large|medium|small|xsmall|xxsmall)/, (s) => SHORT[s]),
   },
   {
-    problem: 'Primitive and semantic radius share the `--radius-` prefix, so the tier cannot be read from the name; `full` is not a rem × 100 step',
-    match: (n) => /^--radius-(\d+|full)$/.test(n),
-    propose: (n) => n.replace('--radius-', '--radius-scale-'),
-  },
-  {
-    problem: 'Stroke step is a bare pixel count; the other primitives are rem × 100',
-    match: (n) => /^--stroke-[12]$/.test(n),
-    propose: (n) => ({ '--stroke-1': '--stroke-00625', '--stroke-2': '--stroke-0125' })[n],
-  },
-  {
     problem: 'Typography primitives use three prefixes (`font-size`, `line-height`, `type`)',
     match: (n) => /^--(font-size|line-height)-\d/.test(n),
-    propose: (n) => n.replace(/^--font-size-/, '--type-size-').replace(/^--line-height-/, '--type-leading-'),
+    propose: (n) => n.replace(/^--font-size-/, '--type-size-').replace(/^--line-height-/, '--type-line-height-'),
   },
   {
     problem: 'Text style with no variant segment; `body` and `heading` carry one',
@@ -173,11 +163,6 @@ const AUDIT_RULES = [
     problem: 'Component color token carries the global `--ds-` prefix',
     match: (n) => /^--ds-(chart|skeleton)-/.test(n),
     propose: (n) => n.replace('--ds-', '--'),
-  },
-  {
-    problem: 'Flag, menu and tooltip tokens sit in the `popover` family; each has (or should have) its own family',
-    match: (n) => /^--popover-.*-(flag|menu|tooltip)$/.test(n),
-    propose: (n) => n.replace(/^--popover-(.*)-(flag|menu|tooltip)$/, '--$2-$1'),
   },
   {
     problem: 'Side is spelled `end`; every other pad token uses `-x` / `-y`',

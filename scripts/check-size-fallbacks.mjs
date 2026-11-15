@@ -20,7 +20,7 @@
  *
  * WHICH TOKENS COUNT. Any token, from the same token sources, whose value
  * RESOLVES to a length. Not a name prefix: dimensions are spread across
- * `--space-*`, `--size-*`, `--font-size-*` and `--line-height-*`, and a
+ * `--space-*`, `--size-*`, `--type-size-*` and `--type-line-height-*`, and a
  * prefix list is a thing to forget to update. Selecting by value means a new
  * family is covered the day it is minted.
  *

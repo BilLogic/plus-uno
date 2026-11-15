@@ -16,7 +16,7 @@ Tokens form a ladder. A screen binds the semantic token whose job matches, never
 | --- | --- | --- |
 | Primitive | Raw palette hues, rem scales and spring curves | Semantic tokens only; hidden from features |
 | Semantic · Global | Roles that apply anywhere: text, surface, border, space, radius, shadow, motion | Any feature or component |
-| Semantic · Templates | Frame, Page, Section, Card, Table, Backdrop, Modal and Popup tokens | The template and the layout inside it |
+| Semantic · Templates | Frame, Page, Section, Card, Table, Blanket, Modal and Popup tokens | The template and the layout inside it |
 | Semantic · Components | Tokens owned by one component (Button radius, chart colors, Skeleton) | That component only |
 
 ## Find a token

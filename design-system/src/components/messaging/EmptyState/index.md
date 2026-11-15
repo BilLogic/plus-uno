@@ -42,8 +42,8 @@ of the form summarizes it. A failure in the background is a `Flag`.
 
 | Spacing | When to use |
 | --- | --- |
-| Default | A whole view or panel, with the header at `--heading-medium`. |
-| Compact | A table body or a card, with the header at `--heading-small` and a smaller picture. |
+| Default | A whole view or panel, with the header at `--heading-md`. |
+| Compact | A table body or a card, with the header at `--heading-sm` and a smaller picture. |
 
 ## Alternatives
 
@@ -129,7 +129,7 @@ Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `NotificationIte
 
 | Part | Token |
 | --- | --- |
-| Header | `--heading-medium` (default), `--heading-small` (compact), `--ds-text` |
+| Header | `--heading-md` (default), `--heading-sm` (compact), `--ds-text` |
 | Description | `--body-default`, `--ds-text-subtle` |
 | Icon | `--ds-icon-subtle` |
 | Spacing | `--stack-sm`, `--inline-md`, `--section-stack-sm`, `--section-stack-md`, `--page-stack-sm`, `--page-stack-md`, `--page-stack-lg` |
@@ -167,7 +167,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--font-size-150` · `--font-size-200` · `--heading-medium` · `--heading-small` · `--inline-md` · `--page-stack-lg` · `--page-stack-md` · `--page-stack-sm` · `--screen-pad-x` · `--section-min-width-main` · `--section-stack-md` · `--section-stack-sm` · `--stack-sm`
+`--body-default` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--heading-sm` · `--inline-md` · `--page-stack-lg` · `--page-stack-md` · `--page-stack-sm` · `--screen-pad-x` · `--section-min-width-main` · `--section-stack-md` · `--section-stack-sm` · `--stack-sm` · `--type-size-150` · `--type-size-200`
 
 From `design-system/src/components/messaging/EmptyState/EmptyState.scss`. Override these through the token layer, never with a literal.
 

@@ -20,7 +20,7 @@
 }
 
 // How far a 24 box sits inside a 32 row, top and bottom.
-$inset-24: calc((var(--item-height-md) - var(--icon-lg)) / 2);
+$inset-24: calc((var(--control-md) - var(--icon-lg)) / 2);
 
 .plus-pattern-sidebar {
     display: flex;
@@ -43,14 +43,14 @@ $inset-24: calc((var(--item-height-md) - var(--icon-lg)) / 2);
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    height: var(--item-height-md);
+    height: var(--control-md);
     padding-inline-start: calc(2 * var(--pad-x-xs));
 }
 
 .plus-pattern-sidebar__brand {
     display: inline-flex;
     align-items: center;
-    height: var(--item-height-md);
+    height: var(--control-md);
     border-radius: var(--frame-sidebar-row-radius);
     color: var(--ds-text);
     text-decoration: none;
@@ -139,7 +139,7 @@ $inset-24: calc((var(--item-height-md) - var(--icon-lg)) / 2);
     align-items: center;
     gap: var(--inline-sm);
     width: 100%;
-    height: var(--item-height-md);
+    height: var(--control-md);
     box-sizing: border-box;
     padding: 0 var(--pad-x-md) 0 calc(2 * var(--pad-x-xs));
     border: 0;
@@ -211,7 +211,7 @@ button.plus-pattern-sidebar__title {
     align-items: center;
     gap: var(--inline-sm);
     width: 100%;
-    height: var(--item-height-md);
+    height: var(--control-md);
     min-width: 0;
     box-sizing: border-box;
     padding: 0 var(--pad-x-xs);
@@ -399,8 +399,8 @@ button.plus-pattern-sidebar__title {
         position: absolute;
         top: calc(-1 * (#{$inset-24} + var(--frame-sidebar-row-gap)));
         bottom: calc(-1 * (#{$inset-24} + var(--frame-sidebar-row-gap)));
-        inset-inline-start: calc(var(--icon-lg) / 2 - var(--border-default) / 2);
-        width: var(--border-default);
+        inset-inline-start: calc(var(--icon-lg) / 2 - var(--border-width-default) / 2);
+        width: var(--border-width-default);
         background-color: var(--ds-border);
         pointer-events: none;
     }
@@ -416,11 +416,11 @@ button.plus-pattern-sidebar__title {
         position: absolute;
         top: calc(-1 * (#{$inset-24} + var(--frame-sidebar-row-gap)));
         height: calc(50% + #{$inset-24} + var(--frame-sidebar-row-gap));
-        inset-inline-start: calc(var(--icon-lg) / 2 - var(--border-default) / 2);
+        inset-inline-start: calc(var(--icon-lg) / 2 - var(--border-width-default) / 2);
         width: var(--icon-sm);
         box-sizing: border-box;
-        border-inline-start: var(--border-default) solid var(--ds-border);
-        border-bottom: var(--border-default) solid var(--ds-border);
+        border-inline-start: var(--border-width-default) solid var(--ds-border);
+        border-bottom: var(--border-width-default) solid var(--ds-border);
         border-end-start-radius: var(--frame-sidebar-row-radius);
         pointer-events: none;
     }
@@ -462,7 +462,7 @@ button.plus-pattern-sidebar__title {
     gap: var(--frame-sidebar-row-gap);
     margin: var(--stack-md) calc(-1 * var(--frame-sidebar-pad)) calc(-1 * var(--frame-sidebar-pad));
     padding: var(--stack-md) var(--pad-x-lg) var(--frame-sidebar-pad) var(--frame-sidebar-pad);
-    border-top: var(--border-default) solid var(--ds-border);
+    border-top: var(--border-width-default) solid var(--ds-border);
 }
 
 .plus-sidebar-account__hit {
@@ -478,7 +478,7 @@ button.plus-pattern-sidebar__title {
     gap: var(--inline-sm);
     min-width: 0;
     max-width: 100%;
-    height: var(--item-height-md);
+    height: var(--control-md);
     padding: 0 var(--pad-x-sm) 0 var(--pad-x-xs);
     border: 0;
     border-radius: var(--frame-sidebar-row-radius);
@@ -521,7 +521,7 @@ button.plus-pattern-sidebar__title {
 
 .plus-sidebar-account__role {
     flex-shrink: 0;
-    font: var(--body-small);
+    font: var(--body-sm);
     color: var(--ds-text-subtlest);
 }
 

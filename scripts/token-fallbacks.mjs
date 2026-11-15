@@ -49,8 +49,8 @@
  * preference:
  *
  *   which tokens      color matches `--ds-*` by name. Dimensions have no
- *                     single prefix (`--space-*`, `--size-*`, `--font-size-*`,
- *                     `--line-height-*` and more), so that family is
+ *                     single prefix (`--space-*`, `--size-*`, `--type-size-*`,
+ *                     `--type-line-height-*` and more), so that family is
  *                     defined by VALUE: a token counts if its resolved value is
  *                     a length. Nothing has to be added here when a new
  *                     dimension family is minted.

@@ -172,7 +172,7 @@ describe('the corpus — where tokens live, answered once and read through the o
     expect(corpus.get('--ds-border-focused').raw).toMatch(/^var\(--palette-/);
     expect(corpus.get('--ds-border-focused').value).toMatch(/^#[0-9a-f]{6}$/);
     expect(corpus.get('--ds-border-focused').file).toBe('color/_semantic.scss');
-    expect([...corpus.keys()].every((name) => name.startsWith('--ds-'))).toBe(true);
+    expect([...corpus.keys()].every((name) => COLOR_PREFIXES.some((prefix) => name.startsWith(prefix)))).toBe(true);
     expect(tokenCorpus({ prefix: '--palette-' }).values().next().value.primitive).toBe(true);
   });
 
@@ -268,8 +268,8 @@ describe('the corpus — where tokens live, answered once and read through the o
 
 describe('the family map — one statement of which family a name is in', () => {
   it('reads the longest prefix, not the first that matches', () => {
-    expect(familyOf('--font-size-0875')).toBe('font-size');
-    expect(familyOf('--line-height-125')).toBe('line-height');
+    expect(familyOf('--type-size-0875')).toBe('type-size');
+    expect(familyOf('--type-line-height-125')).toBe('type-line-height');
     expect(familyOf('--type-weight-medium')).toBe('type');
     expect(familyOf('--ds-text')).toBe('ds');
     expect(familyOf('--row-height-sm')).toBe('row');

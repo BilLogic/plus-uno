@@ -18,8 +18,8 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
-const name = { font: 'var(--code)', color: 'var(--ds-text-subtle)', wordBreak: 'break-word' };
-const label = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const name = { font: 'var(--code-default)', color: 'var(--ds-text-subtle)', wordBreak: 'break-word' };
+const label = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 
 const grid = () => ({
     display: 'grid',
@@ -36,7 +36,7 @@ const Swatch = ({ token, kind = 'background', on }) => {
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--ds-surface)',
-        boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)',
+        boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
     };
     let sample = null;
     if (kind === 'background' || kind === 'surface') {
@@ -46,11 +46,11 @@ const Swatch = ({ token, kind = 'background', on }) => {
             : box.boxShadow;
         if (on) sample = <span style={{ font: 'var(--body-default)', color: `var(${on})` }}>Aa</span>;
     } else if (kind === 'text') {
-        sample = <span style={{ font: 'var(--heading-small)', color: `var(${token})` }}>Aa</span>;
+        sample = <span style={{ font: 'var(--heading-sm)', color: `var(${token})` }}>Aa</span>;
     } else if (kind === 'icon') {
         sample = <i className={iconClass('calendar-days')} aria-hidden="true" style={{ fontSize: 'var(--icon-lg)', color: `var(${token})` }} />;
     } else if (kind === 'border') {
-        box.boxShadow = `inset 0 0 0 var(--border-selected) var(${token})`;
+        box.boxShadow = `inset 0 0 0 var(--border-width-selected) var(${token})`;
     }
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minWidth: 0 }}>
@@ -71,7 +71,7 @@ const Swatches = ({ tokens, kind, on }) => (
 const action = {
     display: 'inline-flex',
     alignItems: 'center',
-    height: 'var(--item-height-md)',
+    height: 'var(--control-md)',
     padding: '0 var(--pad-x-md)',
     borderRadius: 'var(--radius-control-md)',
     font: 'var(--body-default)',
@@ -92,11 +92,11 @@ export const Overview = () => (
                 boxShadow: 'var(--ds-shadow-raised)',
             }}
         >
-            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Session with Maya</span>
+            <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Session with Maya</span>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Tuesday, June 3 · 11:00 am</span>
             <span style={{ display: 'inline-flex', gap: 'var(--inline-md)', flexWrap: 'wrap' }}>
-                <span style={{ font: 'var(--body-small)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-success)', color: 'var(--ds-text-success)' }}>Confirmed</span>
-                <span style={{ font: 'var(--body-small)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-warning)', color: 'var(--ds-text-warning)' }}>Reflection due</span>
+                <span style={{ font: 'var(--body-sm)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-success)', color: 'var(--ds-text-success)' }}>Confirmed</span>
+                <span style={{ font: 'var(--body-sm)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-warning)', color: 'var(--ds-text-warning)' }}>Reflection due</span>
             </span>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-link)', textDecoration: 'underline' }}>View the lesson plan</span>
             <span style={{ display: 'inline-flex', gap: 'var(--inline-md)' }}>
@@ -165,13 +165,13 @@ const SMART = [
     ['technology-tools', 'Technology tools'],
 ];
 
-/** The five SMART subjects: chip fill, illustration body, bold fill, text and edge. */
+/** The five SMART subjects: tag fill, illustration body, bold fill, text and edge. */
 export const SmartSubjects = () => (
     <ModeCompare>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
             {SMART.map(([key, title]) => (
                 <div key={key} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--inline-md)', alignItems: 'center' }}>
-                    <span style={{ font: 'var(--body-default)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: `var(--ds-background-smart-${key})`, color: `var(--ds-text-smart-${key})`, boxShadow: `inset 0 0 0 var(--border-default) var(--ds-border-smart-${key})`, justifySelf: 'start' }}>
+                    <span style={{ font: 'var(--body-default)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: `var(--ds-background-smart-${key})`, color: `var(--ds-text-smart-${key})`, boxShadow: `inset 0 0 0 var(--border-width-default) var(--ds-border-smart-${key})`, justifySelf: 'start' }}>
                         {title}
                     </span>
                     <div aria-hidden="true" style={{ height: 'var(--row-height-sm)', borderRadius: 'var(--radius-full)', background: `var(--ds-background-smart-${key}-subtle)` }} />
@@ -179,7 +179,7 @@ export const SmartSubjects = () => (
                 </div>
             ))}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--inline-md)' }}>
-                <span style={label}>chip: background, text, border</span>
+                <span style={label}>tag: background, text, border</span>
                 <span style={label}>illustration body: subtle</span>
                 <span style={label}>bold fill</span>
             </div>
@@ -217,7 +217,7 @@ const MeasuredPair = ({ fg, bg, bar }) => {
     }, []);
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minWidth: 0 }}>
-            <div style={{ height: 'var(--row-height-lg)', display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: `var(${bg})`, color: isLine ? 'var(--ds-text)' : `var(${fg})`, boxShadow: isLine ? `inset 0 0 0 var(--border-selected) var(${fg})` : 'none', font: 'var(--body-default)' }}>
+            <div style={{ height: 'var(--row-height-lg)', display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: `var(${bg})`, color: isLine ? 'var(--ds-text)' : `var(${fg})`, boxShadow: isLine ? `inset 0 0 0 var(--border-width-selected) var(${fg})` : 'none', font: 'var(--body-default)' }}>
                 <span ref={ref} aria-hidden="true" style={{ display: 'inline-flex', width: 'var(--icon-md)', height: 'var(--icon-md)', borderRadius: 'var(--radius-full)', background: `var(${fg})` }} />
                 <span>{ratio ? `${ratio.toFixed(2)}:1` : ' '}</span>
             </div>
@@ -251,14 +251,14 @@ export const AccentOnComponents = () => (
         <Do caption={<>Body text in <C>--ds-text</C> and <C>--ds-text-subtle</C>. The brand color marks the button and the link only.</>}>
             <div style={sample}>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>Your next session starts in 10 minutes.</span>
-                <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Maya joined the waiting room.</span>
+                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Maya joined the waiting room.</span>
                 <span><Button text="Join session" appearance="primary" /></span>
             </div>
         </Do>
         <Dont caption="Running text in the brand color. Nothing reads as the action any more, and links look like plain text.">
             <div style={sample}>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-brand)' }}>Your next session starts in 10 minutes.</span>
-                <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-brand)' }}>Maya joined the waiting room.</span>
+                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-brand)' }}>Maya joined the waiting room.</span>
                 <span><Button text="Join session" appearance="primary" /></span>
             </div>
         </Dont>
@@ -293,7 +293,7 @@ TextTokenForWords.parameters = { a11y: { config: { rules: [{ id: 'color-contrast
 export const FocusIsARing = () => (
     <DoDont>
         <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the field. The fill stays as it was.</>}>
-            <div style={{ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)', borderRadius: 'var(--radius-control-md)' }}>
+            <div style={{ outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-width-focused)', borderRadius: 'var(--radius-control-md)' }}>
                 <TextField id="color-focus-do" label="Student name" isLabelHidden placeholder="Search students" />
             </div>
         </Do>
@@ -456,7 +456,7 @@ export const Modes = () => {
                 {SWATCHES.map(({ label, tokens, style }) => (
                     <figure key={label} style={{ margin: 0, display: 'grid', gap: 'var(--stack-md)' }}>
                         <div style={{ ...swatchBase, ...style }}>{label}</div>
-                        <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                        <figcaption style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                             {tokens.map((name) => (
                                 <div key={name} style={{ overflowWrap: 'anywhere' }}>
                                     <code>{name}</code>: <span data-token={name}>{values[name]}</span>

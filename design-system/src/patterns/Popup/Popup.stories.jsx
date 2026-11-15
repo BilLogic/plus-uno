@@ -137,13 +137,13 @@ export const AnatomyFilterMenu = {
         await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
         const layer = canvasElement.querySelector('.plus-filter-menu');
-        await expect(getComputedStyle(layer).paddingTop, 'pad 16').toBe(`${tokenLength(canvasElement, '--popover-pad')}px`);
+        await expect(getComputedStyle(layer).paddingTop, 'pad 16').toBe(`${tokenLength(canvasElement, '--popup-pad')}px`);
         await expect(getComputedStyle(layer).borderTopLeftRadius, 'radius 12').toBe(`${tokenLength(canvasElement, '--popup-radius')}px`);
         const trigger = rect(canvasElement.querySelector('.plus-filter-menu__trigger'));
         const gap = rect(layer).top - trigger.bottom;
         const stage = canvasElement.querySelector('[data-popup-stage]');
         const scale = rect(stage).width / stage.offsetWidth;
-        await expect(Math.round(gap / scale), 'the layer hangs 4 below its trigger').toBe(tokenLength(canvasElement, '--popover-offset'));
+        await expect(Math.round(gap / scale), 'the layer hangs 4 below its trigger').toBe(tokenLength(canvasElement, '--popup-offset'));
         await expect(Math.round((rect(layer).right - trigger.right) / scale), 'aligned to the trigger’s end edge').toBe(0);
     },
 };
@@ -224,7 +224,7 @@ export const Placement = {
         const select = await found(startStage, '.plus-popup-select');
         const menu = await found(endStage, '.plus-dropdown-menu');
         const scale = rect(startStage).width / startStage.offsetWidth;
-        const offset = tokenLength(canvasElement, '--popover-offset');
+        const offset = tokenLength(canvasElement, '--popup-offset');
 
         const startTrigger = rect(startStage.querySelector('.plus-popup-select__trigger'));
         await expect(Math.round(rect(select).left - startTrigger.left), 'a start trigger gets a start-aligned layer').toBe(0);
@@ -259,7 +259,7 @@ export const KeyLongLabel = {
     ),
     play: async ({ canvasElement }) => {
         const layer = await holdsInStage(canvasElement, '.plus-dropdown-menu');
-        await expect(layer.offsetWidth, 'a menu stops at 320').toBeLessThanOrEqual(tokenLength(canvasElement, '--popover-max-width-menu'));
+        await expect(layer.offsetWidth, 'a menu stops at 320').toBeLessThanOrEqual(tokenLength(canvasElement, '--dropdown-menu-max-width'));
         const label = within(layer).getByText(LONG_LABEL);
         await expect(label.scrollWidth, 'the label ends in an ellipsis').toBeGreaterThan(label.clientWidth);
     },

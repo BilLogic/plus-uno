@@ -47,7 +47,7 @@
 
 @keyframes plus-search-field-grow {
     from {
-        width: var(--item-height-md);
+        width: var(--control-md);
         overflow: hidden;
     }
 
@@ -67,7 +67,7 @@
     inset-block: 0;
     inset-inline-end: 0;
     box-sizing: border-box;
-    border: var(--border-default) solid var(--ds-border-input);
+    border: var(--border-width-default) solid var(--ds-border-input);
     border-radius: var(--radius-control-md);
     background-color: var(--ds-background-input);
     pointer-events: none;
@@ -82,7 +82,7 @@
     }
 
     to {
-        width: var(--item-height-md);
+        width: var(--control-md);
         opacity: 0;
     }
 }
@@ -97,13 +97,13 @@
 // The focused mode's results panel: a Popup at the field's width, rows on the
 // shared option row. The Popup draws the surface and its own open and close.
 .plus-search-field__popup.plus-popup {
-    padding: var(--popover-pad-menu);
+    padding: var(--dropdown-menu-pad);
 }
 
 .plus-search-field__panel {
     display: flex;
     flex-direction: column;
-    max-height: var(--popover-max-height-menu);
+    max-height: var(--dropdown-menu-max-height);
     overflow-y: auto;
     overscroll-behavior: contain;
 }

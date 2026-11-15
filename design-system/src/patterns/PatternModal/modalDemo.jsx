@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { Button, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
-import { Backdrop, PatternModal, PatternSection } from '@/patterns';
+import { Blanket, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { stepItems } from '@/storybook-docs/lib/focused-task.jsx';
@@ -14,7 +14,7 @@ import { FormFields, FILLED } from '../Form/formDemo.jsx';
  * (Planned).
  */
 
-/** The stand-in screen the docs draw the Backdrop at (docs geometry, px). */
+/** The stand-in screen the docs draw the Blanket at (docs geometry, px). */
 export const SCREEN = { width: 1024, height: 480 }; // docs-literal
 
 /** The Modal's own pad, which a full-bleed footer cancels. */
@@ -22,11 +22,11 @@ const MODAL_PAD = '--modal-pad-x-default';
 
 const text = (copy) => <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{copy}</p>;
 
-/** A Modal at a width step, centered in its Backdrop at the stand-in screen. */
+/** A Modal at a width step, centered in its Blanket at the stand-in screen. */
 export const ModalStage = ({ children, width = 'sm', height = SCREEN.height, screenWidth = SCREEN.width, ...modal }) => (
-    <Backdrop inline screenWidth={screenWidth} screenHeight={height}>
+    <Blanket inline screenWidth={screenWidth} screenHeight={height}>
         <PatternModal width={width} onClose={() => {}} {...modal}>{children}</PatternModal>
-    </Backdrop>
+    </Blanket>
 );
 
 /** Full-bleed cells: Cancel (Default) left, the action (Primary or Danger) right, half each. */
@@ -185,7 +185,7 @@ const PageBehind = () => (
 
 /**
  * A confirm Modal over a Panel, drawn open: the Panel open, the confirm over it,
- * and the confirm's own Backdrop covering the Panel. Cancel or Escape closes the
+ * and the confirm's own Blanket covering the Panel. Cancel or Escape closes the
  * confirm and hands focus back to the Panel's trigger.
  */
 export const ConfirmOverPanel = () => {
@@ -211,7 +211,7 @@ export const ConfirmOverPanel = () => {
                     </PanelContainer>
                 </div>
                 {open && (
-                    <Backdrop inline screenWidth={SCREEN.width} screenHeight={420} style={{ position: 'absolute', inset: 0, inlineSize: '100%' }}>
+                    <Blanket inline screenWidth={SCREEN.width} screenHeight={420} style={{ position: 'absolute', inset: 0, inlineSize: '100%' }}>
                         <PatternModal
                             width="sm"
                             title="Delete student?"
@@ -225,7 +225,7 @@ export const ConfirmOverPanel = () => {
                         >
                             {text('This removes Ana and her sessions. This cannot be undone.')}
                         </PatternModal>
-                    </Backdrop>
+                    </Blanket>
                 )}
             </div>
         </BrowserWindow>

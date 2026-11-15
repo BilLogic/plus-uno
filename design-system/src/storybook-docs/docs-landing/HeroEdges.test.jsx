@@ -63,7 +63,7 @@ describe('the hero edge role', () => {
 /**
  * The fills that need an edge on the ground: a layer or a page. Gray fills
  * (`countSurface`, `shape`) also mark things inside a layer, so the generic check
- * cannot tell them apart; the Indicators hero's chips on the ground are held by
+ * cannot tell them apart; the Indicators hero's tags on the ground are held by
  * name below. The sunken fills (`frameSunken`, `sectionSubtleSurface`) are the ground
  * itself, so they have no edge to show, and the Logo mark's tile is a gray that
  * already clears the ground. A new surface role goes in this list.
@@ -120,12 +120,12 @@ describe('every hero surface shows its edge', () => {
     });
 });
 
-describe('the Indicators hero chips on the ground show their edge', () => {
-    it('every neutral count chip carries the edge', () => {
+describe('the Indicators hero tags on the ground show their edge', () => {
+    it('every neutral count tag carries the edge', () => {
         const { container } = render(React.createElement(HEROES['patterns-indicators'].Hero));
-        const chips = [...container.querySelectorAll('rect,circle')].filter((el) => fillOf(el) === PAINT.countSurface);
-        expect(chips.length).toBeGreaterThan(0);
-        for (const chip of chips) expect(chip.getAttribute('stroke')).toBe(PAINT.illustrationEdge);
+        const tags = [...container.querySelectorAll('rect,circle')].filter((el) => fillOf(el) === PAINT.countSurface);
+        expect(tags.length).toBeGreaterThan(0);
+        for (const tag of tags) expect(tag.getAttribute('stroke')).toBe(PAINT.illustrationEdge);
     });
 });
 

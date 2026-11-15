@@ -45,14 +45,14 @@ Each chart color does one of four jobs and maps to one token family. Name colors
 <RefTable
     head={['Job', 'What it encodes', 'Tokens']}
     rows={[
-        ['Identity', 'Which series', <><C>--ds-chart-categorical-1</C> through <C>-6</C> in order, or <C>--ds-chart-smart-*</C> for the five SMART subjects</>],
-        ['Magnitude', 'How much', <>One hue's sequential ramp: <C>--ds-background-accent-&lt;hue&gt;-subtler</C>, then <C>--ds-chart-&lt;hue&gt;-bold</C>, <C>-bolder</C> and <C>-boldest</C></>],
+        ['Identity', 'Which series', <><C>--chart-categorical-1</C> through <C>-6</C> in order, or <C>--chart-smart-*</C> for the five SMART subjects</>],
+        ['Magnitude', 'How much', <>One hue's sequential ramp: <C>--ds-background-accent-&lt;hue&gt;-subtler</C>, then <C>--chart-&lt;hue&gt;-bold</C>, <C>-bolder</C> and <C>-boldest</C></>],
         ['Polarity', 'Which side of a baseline', <>Two hues' ramps meeting at <C>--ds-background-accent-gray-subtler</C>, orange and blue by default. Never pair red with green.</>],
-        ['State', 'On track, at risk, off track', <><C>--ds-chart-success</C>, <C>-warning</C>, <C>-danger</C>, <C>-information</C>, <C>-discovery</C>, each with a <C>-bold</C> step, plus a neutral for to-do</>],
+        ['State', 'On track, at risk, off track', <><C>--chart-success</C>, <C>-warning</C>, <C>-danger</C>, <C>-information</C>, <C>-discovery</C>, each with a <C>-bold</C> step, plus a neutral for to-do</>],
     ]}
 />
 
-Single-series charts take <C>--ds-chart-brand</C>; de-emphasized comparison or reference lines take <C>--ds-chart-neutral</C>. Swatches below follow the toolbar's color mode and contrast.
+Single-series charts take <C>--chart-brand</C>; de-emphasized comparison or reference lines take <C>--chart-neutral</C>. Swatches below follow the toolbar's color mode and contrast.
 
 <FoundationSubsection title="Brand and neutral">
 <Canvas of={ColorStories.BrandAndNeutral} sourceState="none" />

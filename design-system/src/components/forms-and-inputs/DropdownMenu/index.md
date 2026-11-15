@@ -127,7 +127,7 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 | Focused trigger | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
 | Disabled row | Text takes `--ds-text-disabled`; the row cannot be picked. Its description keeps `--ds-text-subtle`, so the reason stays readable. |
 | Loading | One "Loading options" row with a 16 spinner replaces the rows, in `--ds-text-subtle`. |
-| Load failed | A "Couldn't load options" row with an alert icon, then a Retry row. |
+| Load failed | A "Couldn't load options" row with a Section message icon, then a Retry row. |
 
 ### Tokens
 
@@ -135,7 +135,7 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 | --- | --- |
 | Row text | `--ds-text`, body default; disabled `--ds-text-disabled`. |
 | Row icon | `--ds-icon-subtle`. |
-| Row padding, radius | `--space-0625` and `--space-150`; `--radius-050`. |
+| Row padding, radius | `--space-0625` and `--space-150`; `--radius-lg`. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
 
 ## Content guidelines
@@ -180,7 +180,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text-subtle` · `--layer-popup` · `--pad-x-md` · `--pad-y-md` · `--popover-max-height-menu` · `--popover-max-width-menu` · `--popup-radius` · `--stack-md`
+`--body-default` · `--border-width-default` · `--dropdown-menu-max-height` · `--dropdown-menu-max-width` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text-subtle` · `--layer-popup` · `--pad-x-md` · `--pad-y-md` · `--popup-radius` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss`. Override these through the token layer, never with a literal.
 

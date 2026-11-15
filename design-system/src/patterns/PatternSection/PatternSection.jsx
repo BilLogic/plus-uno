@@ -85,9 +85,9 @@ const inferType = ({ header, toolbar, tabs }) => {
 
 /** Title line height per rank, so the skeleton bar is as tall as the title it stands in for. */
 const TITLE_LINE = {
-    page: 'var(--line-height-175)',
-    section: 'var(--line-height-150)',
-    subsection: 'var(--line-height-125)',
+    page: 'var(--type-line-height-175)',
+    section: 'var(--type-line-height-150)',
+    subsection: 'var(--type-line-height-125)',
 };
 
 /**
@@ -100,7 +100,7 @@ const HeaderSkeleton = ({ rank, hasBottomRow, tabsOnly }) => (
         {!tabsOnly && (
             <>
                 <Skeleton width="50%" height={TITLE_LINE[rank]} radius="element-radius-sm" />
-                <Skeleton width="100%" height="var(--line-height-125)" radius="element-radius-sm" />
+                <Skeleton width="100%" height="var(--type-line-height-125)" radius="element-radius-sm" />
             </>
         )}
         {(hasBottomRow || tabsOnly) && (

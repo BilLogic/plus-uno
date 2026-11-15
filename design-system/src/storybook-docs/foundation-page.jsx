@@ -18,9 +18,9 @@ const linkStyle = { font: 'var(--body-default)', color: 'var(--ds-link)', textDe
  */
 export const FoundationHero = ({ title, summary, kind = 'Foundation' }) => (
     <header className="sb-docs-header">
-        <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>{kind}</span>
-        <h1 style={{ margin: 0, font: 'var(--heading-xlarge)', color: 'var(--ds-text)' }}>{title}</h1>
-        <div style={{ margin: 0, font: 'var(--body-large)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{summary}</div>
+        <span style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' }}>{kind}</span>
+        <h1 style={{ margin: 0, font: 'var(--heading-xl)', color: 'var(--ds-text)' }}>{title}</h1>
+        <div style={{ margin: 0, font: 'var(--body-lg)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{summary}</div>
     </header>
 );
 
@@ -40,7 +40,7 @@ export const FoundationContents = () => {
     }, []);
     return (
         <nav aria-label="Contents">
-            <h2 style={{ margin: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>
+            <h2 style={{ margin: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
                 Contents
             </h2>
             <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-md) var(--section-stack-md)' }}>
@@ -63,7 +63,7 @@ export const FoundationSection = ({ title, id = slug(title), children }) => (
         className="sb-docs-section"
         {...{ [SECTION_ATTR]: title }}
     >
-        <h2 style={{ margin: 0, font: 'var(--heading-large)', color: 'var(--ds-text)' }}>{title}</h2>
+        <h2 style={{ margin: 0, font: 'var(--heading-lg)', color: 'var(--ds-text)' }}>{title}</h2>
         {children}
     </section>
 );
@@ -71,7 +71,7 @@ export const FoundationSection = ({ title, id = slug(title), children }) => (
 /** A sub-heading inside a section. */
 export const FoundationSubsection = ({ title, children }) => (
     <div className="sb-docs-subsection">
-        <h3 style={{ margin: 0, font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>{title}</h3>
+        <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>{title}</h3>
         {children}
     </div>
 );
@@ -106,7 +106,7 @@ export const FoundationRelated = ({ items }) => (
                         textDecoration: 'none',
                     }}
                 >
-                    <span style={{ font: 'var(--heading-xsmall)' }}>{item.title}</span>
+                    <span style={{ font: 'var(--heading-xs)' }}>{item.title}</span>
                     <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{item.description}</span>
                 </a>
             </li>
@@ -128,7 +128,7 @@ export const FoundationExample = ({ caption, children }) => (
         >
             {children}
         </div>
-        {caption && <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
+        {caption && <figcaption style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
     </figure>
 );
 
@@ -162,17 +162,17 @@ export const TokenSwatches = ({ items, min = 'var(--card-min-width-sm)' }) => (
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        minHeight: 'var(--item-height-md)',
+                        minHeight: 'var(--control-md)',
                         borderRadius: 'var(--radius-lg)',
                         background: `var(${item.token})`,
                         color: item.text ? `var(${item.text})` : 'var(--ds-text)',
                         font: 'var(--body-default)',
-                        boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)',
+                        boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
                     }}
                 >
                     {item.sample ?? 'Aa'}
                 </span>
-                <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)', wordBreak: 'break-word' }}>
+                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)', wordBreak: 'break-word' }}>
                     {item.label ?? item.token}
                 </span>
             </li>

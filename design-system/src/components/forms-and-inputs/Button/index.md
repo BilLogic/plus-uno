@@ -78,7 +78,7 @@ Don't: A disabled submit button gives no direction and leaves the tab order.
 
 ### Align the primary button with its group. {#align-the-primary-button-with-its-group}
 
-Right-align buttons in focused tasks and modal dialogs, with the primary on the right. Left-align on single-page forms and full-page tasks, with the primary on the left.
+Right-align buttons in focused tasks and Modals, with the primary on the right. Left-align on single-page forms and full-page tasks, with the primary on the left.
 
 ## Accessibility
 
@@ -129,7 +129,7 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 | Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps; `--ds-background-disabled`. |
 | Label and icon | `--ds-text-subtle` and `--ds-icon-subtle` (default, subtle); `--ds-text-inverse` and `--ds-icon-inverse` (primary, danger, discovery, ai); `--ds-text-warning-inverse` (warning); the selected and disabled roles. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
-| Height | 32: `--item-height-md`. 24: `--item-height-sm`. |
+| Height | 32: `--control-md`. 24: `--control-sm`. |
 | Padding | 12: `--pad-x-md`. Compact 8: `--pad-x-sm`. |
 | Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. |
 | Icon-to-label gap | 4: `--inline-sm`. |
@@ -180,7 +180,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--button-radius-compact` · `--button-radius-default` · `--button-vertical-size` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--item-height-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-sm` · `--radius-full` · `--type-weight-medium`
+`--body-default` · `--body-sm` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--button-size-vertical` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-sm` · `--radius-full` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 

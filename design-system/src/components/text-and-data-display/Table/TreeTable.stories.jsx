@@ -92,7 +92,7 @@ export const Overview = {
         const chevron = school.querySelector('.plus-tree-table-toggle i');
         await expect(px(getComputedStyle(chevron).fontSize), 'the chevron is 12').toBe(tokenLength(canvasElement, '--icon-sm'));
         const hit = school.querySelector('.plus-tree-table-toggle').getBoundingClientRect();
-        await expect(hit.width, 'in a 24 hit area').toBe(tokenLength(canvasElement, '--item-height-sm'));
+        await expect(hit.width, 'in a 24 hit area').toBe(tokenLength(canvasElement, '--control-sm'));
         await expect(canvas.getByText('Nothing in here yet')).toBeVisible();
     }
 };

@@ -45,7 +45,7 @@ Use the toolbar's **Color mode** switch for these examples.
 
 <ComponentExample of={AiChatStories.Popup} title="Popup" description="The default mode: the popup opens anchored to the button, over the Page." />
 
-<ComponentExample of={AiChatStories.PanelMode} title="Panel" description="The same chat docked beside the Page, or over it on a Backdrop when there is no room." />
+<ComponentExample of={AiChatStories.PanelMode} title="Panel" description="The same chat docked beside the Page, or over it on a Blanket when there is no room." />
 
 Full screen covers the window and is not shown inline. Below 768, the popup is full screen. Replying runs from sending a prompt until the answer arrives; its indicator uses <a href="?path=/docs/ai-ui-components-ai-message-ai-message--docs">AI message</a>'s `thinking` status. See Best practices for answer identity, sources and feedback.
 
@@ -87,7 +87,7 @@ Use AI chat to ask about the current page. Choose a mode for the task.
 </thead>
 <tbody>
 <tr><td>Popup</td><td>The default. A quick ask that keeps the page in view.</td></tr>
-<tr><td>Panel</td><td>Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Backdrop when there is no room.</td></tr>
+<tr><td>Panel</td><td>Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Blanket when there is no room.</td></tr>
 <tr><td>Full screen</td><td>Long answers that need room. It covers the window.</td></tr>
 </tbody>
 </DocsTable>
@@ -130,7 +130,7 @@ The same surface fills every mode; the mode only changes which header controls s
 <tbody>
 <tr><td>Closed</td><td>Only the button shows.</td></tr>
 <tr><td>Popup</td><td>The popup opens anchored to the button, over the Page. The button stays.</td></tr>
-<tr><td>Panel</td><td>Chat docks in the Frame's Panel, or opens over the Page on a Backdrop. The button hides.</td></tr>
+<tr><td>Panel</td><td>Chat docks in the Frame's Panel, or opens over the Page on a Blanket. The button hides.</td></tr>
 <tr><td>Full screen</td><td>Chat covers the window, in a column capped at the reading width. The button hides.</td></tr>
 <tr><td>Replying</td><td>A typing indicator stands in for the reply, and the prompt input's send button becomes Stop.</td></tr>
 </tbody>
@@ -151,7 +151,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 <tr><td>Full screen</td><td><code>--ds-surface</code>, on <code>--layer-dialog</code>; the conversation is capped at <code>--content-max-width-reading</code>.</td></tr>
 <tr><td>Conversation</td><td><code>--stack-md</code> between messages, <code>--body-default</code> in <code>--ds-text</code>.</td></tr>
 <tr><td>The person's message</td><td><code>--ds-surface-sunken</code>, <code>--pad-y-sm</code> by <code>--pad-x-md</code>, <code>--radius-md</code>.</td></tr>
-<tr><td>Empty state and fallibility line</td><td><code>--ds-text-subtle</code>; the line at <code>--body-small</code>.</td></tr>
+<tr><td>Empty state and fallibility line</td><td><code>--ds-text-subtle</code>; the line at <code>--body-sm</code>.</td></tr>
 <tr><td>Footer</td><td><code>--stack-sm</code> between the starters, the input and the line.</td></tr>
 </tbody>
 </DocsTable>
@@ -186,9 +186,9 @@ Full screen gives long answers room. A docked Panel squeezes them.
 ### Say fallibility once.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><AiMessage text="Ava attended 12 of 14 sessions." /><AiMessage text="Her next session is Thursday at 4:00 PM." /><PromptInput label="Message to AI chat (do example)" placeholder="Ask anything" /><p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)', textAlign: 'center' }}>AI can make mistakes. Check important info.</p></div>}
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><AiMessage text="Ava attended 12 of 14 sessions." /><AiMessage text="Her next session is Thursday at 4:00 PM." /><PromptInput label="Message to AI chat (do example)" placeholder="Ask anything" /><p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)', textAlign: 'center' }}>AI can make mistakes. Check important info.</p></div>}
     doCaption="One line, under the prompt input."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><AiMessage text="Ava attended 12 of 14 sessions." /><p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>AI can make mistakes. Check important info.</p><AiMessage text="Her next session is Thursday at 4:00 PM." /><p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>AI can make mistakes. Check important info.</p><PromptInput label="Message to AI chat (don't example)" placeholder="Ask anything" /></div>}
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><AiMessage text="Ava attended 12 of 14 sessions." /><p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>AI can make mistakes. Check important info.</p><AiMessage text="Her next session is Thursday at 4:00 PM." /><p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>AI can make mistakes. Check important info.</p><PromptInput label="Message to AI chat (don't example)" placeholder="Ask anything" /></div>}
     dontCaption="The line repeated under every reply turns into noise."
 />
 
@@ -239,7 +239,7 @@ Full screen gives long answers room. A docked Panel squeezes them.
 ## Related
 
 - <a href="?path=/docs/templates-frame--docs">Frame</a> places the Panel the chat docks in.
-- <a href="?path=/docs/templates-modal--docs#backdrop">Backdrop</a> sits under the Panel when it opens over the Page.
+- <a href="?path=/docs/templates-modal--docs#blanket">Blanket</a> sits under the Panel when it opens over the Page.
 - For one reply on its own, use `AiMessage`.
 - For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
 

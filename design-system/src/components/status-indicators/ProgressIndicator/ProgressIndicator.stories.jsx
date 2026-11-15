@@ -75,7 +75,7 @@ export const Appearances = () => (
         <ProgressIndicator values={VALUES} selectedIndex={1} appearance="default" />
         <ProgressIndicator values={VALUES} selectedIndex={1} appearance="primary" />
         <ProgressIndicator values={VALUES} selectedIndex={1} appearance="help" />
-        <div style={{ background: 'var(--ds-background-inverse-subtle)', padding: 'var(--space-100)', borderRadius: 'var(--radius-050)' }}>
+        <div style={{ background: 'var(--ds-background-inverse-subtle)', padding: 'var(--space-100)', borderRadius: 'var(--radius-lg)' }}>
             <ProgressIndicator values={VALUES} selectedIndex={1} appearance="inverted" />
         </div>
     </div>

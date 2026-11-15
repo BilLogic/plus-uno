@@ -21,7 +21,7 @@ export const soundLabelOf = (name) => {
 const minus = (n) => String(n).replace('-', '−');
 
 const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-sm)' };
-const note = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const note = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 
 /**
  * Plays one generated token. It stays pressable with sound off and says why

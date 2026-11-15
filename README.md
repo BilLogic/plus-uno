@@ -64,7 +64,7 @@ The same five tools answer from a shell, from an MCP client in the checkout, and
 npm run ds -- find "modal dialog"         # what exists for a task, name or alias
 npm run ds -- get Button --section props  # import line and props
 npm run ds -- tokens stack                # the token steps for a role, with intent
-npm run ds -- check --code '<Button appearance="primary">Save</Button>' --path f.jsx
+npm run ds -- check --code-default '<Button appearance="primary">Save</Button>' --path f.jsx
 ```
 
 **Local MCP.** `plus-ds` is registered in [`.mcp.json`](.mcp.json), so Claude Code and Cursor start it from the checkout (`npm run ds:mcp`). Its tools are `ds_find`, `ds_get`, `ds_tokens`, `ds_guide` and `ds_check`.

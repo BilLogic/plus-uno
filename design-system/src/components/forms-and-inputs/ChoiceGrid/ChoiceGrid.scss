@@ -10,7 +10,7 @@
     // `size`: option-label font and the control width that goes with it.
     // Unset keeps the default rendering (the control's own size, body-default text).
     &[data-size="12"] {
-        --_choice-grid-label-font: var(--body-small);
+        --_choice-grid-label-font: var(--body-sm);
         --_choice-grid-control-size: var(--choice-grid-control-size-10);
     }
 
@@ -20,7 +20,7 @@
     }
 
     &[data-size="16"] {
-        --_choice-grid-label-font: var(--body-large);
+        --_choice-grid-label-font: var(--body-lg);
         --_choice-grid-control-size: var(--choice-grid-control-size-12);
     }
 }

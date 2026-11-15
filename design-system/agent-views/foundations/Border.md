@@ -13,9 +13,9 @@ A border is a width token paired with a color token.
 Borders mark a boundary, separate neighbors and show state. The width token sets how heavy the line is and the color token says what it means, so always choose them as a pair.
 
 ```css
-border-width: var(--border-default);
-border-width: var(--border-selected);
-border-width: var(--border-focused);
+border-width: var(--border-width-default);
+border-width: var(--border-width-selected);
+border-width: var(--border-width-focused);
 ```
 
 Figma holds `Border/default`, `Border/selected` and `Border/focused` in `spacing / semantics`, paired with `color/border/*` in `color / semantics`.
@@ -24,9 +24,9 @@ Figma holds `Border/default`, `Border/selected` and `Border/focused` in `spacing
 
 Three widths cover every border. Pick by what the line says, never by how heavy you want it to look. Values are indicative; the tokens are the contract.
 
-- `--border-default` (Border/default): Every standard border and divider: field edges, table lines, section rules.
-- `--border-selected` (Border/selected): The chosen option in a group: an active tab, a selected tile or row.
-- `--border-focused` (Border/focused): The focus ring that shows keyboard users where they are.
+- `--border-width-default` (Border/default): Every standard border and divider: field edges, table lines, section rules.
+- `--border-width-selected` (Border/selected): The chosen option in a group: an active tab, a selected tile or row.
+- `--border-width-focused` (Border/focused): The focus ring that shows keyboard users where they are.
 
 ## Pair width with color
 
@@ -47,7 +47,7 @@ The focus ring shows keyboard users where they are. It is a ring, never a fill: 
 
 | Fact | Rule |
 | --- | --- |
-| Width | 2 px, `--border-focused` |
+| Width | 2 px, `--border-width-focused` |
 | Distance | 2 px away from the control (`--focus-ring-width`) |
 | Color | `color/border/focused` (`--ds-border-focused`); `color/border/focused/inverse` on a dark surface |
 | Radius | The control’s radius plus 2 px. Radius owns the pairs. |

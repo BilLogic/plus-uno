@@ -27,13 +27,13 @@ Skipped: Cover, Retired, Archive, Specs draft (not docs), Patterns pages + Form/
 | 5 | ↳ Vertical button | I21279:1279;20311:70920;20311:70847;19455:10952;21279:1328 | Vertical button (Docs) | Label 35px past, shows "all session" | Hug specimen, or give label wrap/truncation | VERIFIED |
 | 6 | Popup select | I21928:1395;20311:70920;20311:70847;19455:10952;21929:3983 | Bar (Docs) | Popup select 90px + Filter button 13px past Bar; menu cut at left/bottom | Grow Bar, align menu inside | VERIFIED |
 | 7 | Templates · Overview | I21129:67184;21774:38146;20311:70793;19455:10952;21129:67231 | Frame (Pattern/Templates, 680px past) | Browser mock cropped at bottom, sidebar cut | Likely intentional crop; confirm, else hug | VERIFIED crop, intent unknown |
-| 8 | Inline edit | I21259:526;20313:5902;21259:574 | Inline edit (Docs) | Actions 72px below, overhang, not clipped | none | FALSE POSITIVE (intentional popover) |
+| 8 | Inline edit | I21259:526;20313:5902;21259:574 | Inline edit (Docs) | Actions 72px below, overhang, not clipped | none | FALSE POSITIVE (intentional popup) |
 
 Worst 5 (real, visible): 21207:3198-chain Page header (I21207:2902;…;21212:1771), I21151:4430;20311:70902 Calendar, I19847:45183;19394:48937 Modal body, I21232:528;20313:5902;21233:2516 Heading, I21279:1279;…;21279:1328 Vertical button.
 
 ## Scan-only findings by page
 ### Foundations
-- Elevation 17156:121: I20328:76839;20313:20109;21959:17380 "Blocking · Backdrop" 80px past Plate · Layer stack (clip) — likely demo overhang; body section 4px past Stage x2 (I21949:880;20313:5902;21960:1643 / ;21960:1721). Fix: clip off or grow Stage.
+- Elevation 17156:121: I20328:76839;20313:20109;21959:17380 "Blocking · Blanket" 80px past Plate · Layer stack (clip) — likely demo overhang; body section 4px past Stage x2 (I21949:880;20313:5902;21960:1643 / ;21960:1721). Fix: clip off or grow Stage.
 - Grid 6:189: "Glow 1-5" 6-11px past Tile (Updated) — decorative, ignore.
 - Border 20246:48414: focus ring 2px past Text field (Docs) — intentional.
 - Logos 20246:48416 / Illustrations 19785:489: vector art past Logo Container / Character (artwork); Docs "Body" 3px past Specimen · relationships (I20328:108639…), Vector 10px past Specimen · dot (I20328:108669…). Fix: grow specimen.
@@ -41,7 +41,7 @@ Worst 5 (real, visible): 21207:3198-chain Page header (I21207:2902;…;21212:177
 ### Templates
 - Overview 21757:21091: Content 96px past Content area (I19438:3134;19394:1644;21977:3712); 19847:126404 Anatomy · Focused page 32px past Docs / Templates / Anatomy 19858:130896; Pattern/Frame sidebar/Page 200px past (x2, I21577:50678…, I21577:51090…); 21577:51993 Browser frame 33px past X-Large (1440px) 19394:48089; Pattern/Templates 680px past Frame (x6); browser toolbar text (Address, Sidebar, Back, Forward) 85-135px past, toolbar Address field/Trailing 189-202px past (I21764:53414…). Fix: Browser frame toolbar auto-layout fill/hug, or clip off for preview crops.
 - Section 21757:21084: _Item 4px past _Tab Item (+29), controls 21551:48753 2px past Tabs row (+5). ↳ Table 21757:21086: _Item 4px (+3).
-- Modal 21757:21088: Fields 298px (see #3). ↳ Backdrop 21757:21087: Pattern/Blanket 19444:7996, 19444:8089 32px past Cell · height=hug / fill (+3).
+- Modal 21757:21088: Fields 298px (see #3). ↳ Blanket 21757:21087: Pattern/Blanket 19444:7996, 19444:8089 32px past Cell · height=hug / fill (+3).
 - Popup 21757:21090: Icon 2px; 19393:47608 _Pattern/Menu row 4px past Scrolling menu (+2).
 - Frame, Page, ↳ Heading outline, ↳ Card: clean.
 ### AI UI
@@ -69,7 +69,7 @@ Worst 5 (real, visible): 21207:3198-chain Page header (I21207:2902;…;21212:177
 - Static table 17156:122: Anatomy pin 6px (+1). Dynamic table 19685:27042: _Table head cell 97px/88px past (I20095:14438…, I20095:14449…), _Table cell 2px. Tree table 19685:27043: Name truncation w=308 chars=31 (+17), labels 2px.
 - Image 19592:514: Specimen 4px past body. Avatar 19592:512: Glyph 3px past Icon (+13). Breadcrumbs: 2px label. Progress bar: _Progress Striped 4px (+423, decorative).
 - Status tag 20454:85 / Smart tag 20455:8547: Text truncation chars=40 / 48 (Docs), look deliberate.
-- Clean: Button + 8 button siblings (except Vertical button), Checkbox, Comment, Date time picker, Date/Time picker, Fieldset, File upload, Filter menu, Form, Radio x3, Range, Rating, Rich text editor, Cascader, Text area, Text field, Toggle, Avatar group, Icon, Illustration, Logo, Object, Tile, Change/Count/Date/Tag/Tag group, Skeleton, Spinner, Banner, Empty state, Inline message, Modal dialog, Link, Tooltip, Popup, Progress indicator/tracker, Code, Code block, Visually hidden, About AI UI/AI motion etc.
+- Clean: Button + 8 button siblings (except Vertical button), Checkbox, Comment, Date time picker, Date/Time picker, Fieldset, File upload, Filter menu, Form, Radio x3, Range, Rating, Rich text editor, Cascader, Text area, Text field, Toggle, Avatar group, Icon, Illustration, Logo, Object, Tile, Change/Count/Date/Tag/Tag group, Skeleton, Spinner, Banner, Empty state, Inline message, Modal, Link, Tooltip, Popup, Progress indicator/tracker, Code, Code block, Visually hidden, About AI UI/AI motion etc.
 
 ## Notes
 - Instance-internal bboxes are noisy: component-level overflows (Close button, Send, Glyph) repeat on many pages; fix once in the component.
@@ -103,13 +103,13 @@ Method: per page, scripted walk of every non-Deprecated node (instances not ente
 | Section 21757:21084 | 19448:11004 | Docs | bottom 120 (40 extra) | hug | high |
 | Overview 21757:21091 | 19438:3133 | Labeled instance | Pattern/Templates overlaps Pin 1 (10x10) and Redline 1 (231x8); abs layout 5 kids | intentional anatomy overlay? confirm; else Pin/Redline absolute-in-autolayout | medium |
 | Overview | 21378:52591 / :52592 | Row · 0 / Row · 1 | FIXED/FIXED, 1,124px slack (matrix rows) | HUG vertical | medium |
-| Backdrop 21757:21087 | 19438:3016 | Labeled instance | abs 5 kids, Marker overlap 10x10 | same as above | medium |
+| Blanket 21757:21087 | 19438:3016 | Labeled instance | abs 5 kids, Marker overlap 10x10 | same as above | medium |
 | Popup | 19438:3089 | Labeled instance | abs 10 kids, Marker overlap | same | medium |
 | Modal 21757:21088 | 21726:18543, 21726:18620 + 7 more | Screen | layoutMode NONE with 2 kids (9 frames) | auto-layout or intentional absolute screen mock; confirm | medium |
 | Frame 21757:21081 | 21979:2917.. | Column label / Row label | FIXED/FIXED with 1,314/434px slack | HUG | low |
 | Frame | 19422:2971 | Docs / Frame | FIXED/HUG pad 24,32,24,32 (not 80) | confirm page-column width intent | low |
 | all template pages | 21757:37372, 37358-37449 | Components zone / Components | gap 80 / pad 40 unbound; gap 40 unbound | bind to spacing vars | high |
-| Page, Section, Card, Table, Modal, Backdrop, Popup | Docs / X / Anatomy, Anatomy / Labeled | FRAME not instance (2–8 per page) | detached anatomy blocks, no mainComponent | replace with Docs parts Anatomy instance | medium |
+| Page, Section, Card, Table, Modal, Blanket, Popup | Docs / X / Anatomy, Anatomy / Labeled | FRAME not instance (2–8 per page) | detached anatomy blocks, no mainComponent | replace with Docs parts Anatomy instance | medium |
 | Section | 21379:52579, 19394:48764 | _Section header / Variant matrix | frame, not instance | Docs parts section header instance | medium |
 | Playground 21757:21092 | 21729:21126, 21729:22247 | Screen | NONE layout, 2 kids | confirm | medium |
 
@@ -143,14 +143,14 @@ Status tag 20454:101 Updated (bottom 120); Tag 20454:1340 Updated (120), 20454:1
 Button group 19956:140193, Close button 20310:26965 (pad 64); Radio group 20009:73126, Choice grid 20009:70624, Range 20003:1560, Rating 20003:2843, Tooltip 20643:315, Scrollbar 20095:7544, Section message 20095:8366 (pad 40); Time picker 21461:2147 (pad 0); AI icon 20303:71149, Generative border 20303:80995, Prompt input 20324:90001, AI message 20343:2004, AI sources 20398:2749, AI feedback 20398:3041 (Playground / ..., pad 24). Padding 24/32/40/64, none is 80.
 
 ### Hand-built / detached docs blocks — medium
-- Color 3:36: 130 FRAMEs named "Chip" (e.g. 20252:1471, :1475, :1479, :1483), token chips built by hand, FIXED/FIXED with 67x16 slack. Fix: Docs parts token chip instance.
+- Color 3:36: 130 FRAMEs named "Chip" (e.g. 20252:1471, :1475, :1479, :1483), token tags built by hand, FIXED/FIXED with 67x16 slack. Fix: Docs parts token tag instance.
 - Page header 20455:2827: 20622:89 "Page header frame", 20955:1786 "Docs / Page header" (FIXED/HUG pad 32), 21207:2824 "Token redlines" — non-instances.
 - Tooltip 20277:35 "Docs / Page header" FRAME, Banner 20455:3267: 20645:199 "Banner", 20737:142 "Docs / Banner" (these may be the component docs themselves, not docs parts: low).
 - Logos 20246:48416: 20282:73605 "Banner · PLUS brand" (NONE layout, 7 kids).
 - All Foundations and Components pages: "Part / Anatomy" and "Part / Do and don’t" are plain FRAMEs (not instances) on ~100 pages (e.g. 20330:46706, 20328:88686, 20328:88760). If Docs parts defines these as components, they are detached; if they are template skeleton frames this is fine. Needs Bill's answer. Low.
 
 ### Overlaps (6)
-Docs parts (2 above); Templates Overview/Backdrop/Popup labeled instances (3, overlay pins: likely intentional); Checkbox, Dropdown menu Updated (Components x Parts, real, VERIFIED Dropdown); Image 19593:557 Figure / Variant matrix x Docs / Section header 320x24; Tile 19593:673 Variant matrix x Docs / Section header 320x20 (section header sits over matrix; real, not screenshotted).
+Docs parts (2 above); Templates Overview/Blanket/Popup labeled instances (3, overlay pins: likely intentional); Checkbox, Dropdown menu Updated (Components x Parts, real, VERIFIED Dropdown); Image 19593:557 Figure / Variant matrix x Docs / Section header 320x24; Tile 19593:673 Variant matrix x Docs / Section header 320x20 (section header sits over matrix; real, not screenshotted).
 
 ### Per-page counts: unbound gap/padding and FIXED slack (examples)
 Raw counts, one example each. Pattern: "Row labels" / "Column labels" / "Matrix body" / "Components" / "Token grid" / "Docs / X" frames use raw gap 8/16/24/40/80 and pad 24/32/40/80.
@@ -192,7 +192,7 @@ Clean (no flags in any category): Panel 20630:44, AI button 21740:1279.
 - Run 2 Sections: 35 pages hug content + 80, 200 between sections. Spot-checked Table, Card, Section, Elevation, Popup select.
 - Run 3/3b auto-layout: every absolute-positioned frame is a deliberate canvas; nothing converted.
 - Run 4/4b spacing: exact-value Space/* bindings on about 140 pages; non-matching values left as is.
-- Run 5 hand-built blocks: nothing swapped; no Docs part matches the Color Chip (swatch tile vs token chip) or the markers; all left.
+- Run 5 hand-built blocks: nothing swapped; no Docs part matches the Color Chip (swatch tile vs token tag) or the markers; all left.
 - No node counts dropped on any page.
 
 # Unverified

@@ -15,7 +15,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 <Meta of={PromptStartersStories} />
 
 <Title />
-A wrapping row of `Suggestion` chips offering first prompts. Selecting a starter never sends it automatically.
+A wrapping row of `Suggestion` tags offering first prompts. Selecting a starter never sends it automatically.
 
 <DocsTabs of={PromptStartersStories}>
 
@@ -32,7 +32,7 @@ A wrapping row of `Suggestion` chips offering first prompts. Selecting a starter
 
 ## Appearance
 
-<ComponentExample of={PromptStartersStories.Default} title="Starters" description="A wrapping row of prompt chips, each a short label standing for a longer prompt." />
+<ComponentExample of={PromptStartersStories.Default} title="Starters" description="A wrapping row of prompt tags, each a short label standing for a longer prompt." />
 
 </div>
 
@@ -40,7 +40,7 @@ A wrapping row of `Suggestion` chips offering first prompts. Selecting a starter
 
 ## Behavior
 
-<ComponentExample of={PromptStartersStories.SelectHandsBackTheStarter} title="Select" description={<>Pressing a chip calls <code>onSelect</code> with the whole starter (<code>id</code>, <code>label</code> and <code>text</code>) and nothing else.</>} />
+<ComponentExample of={PromptStartersStories.SelectHandsBackTheStarter} title="Select" description={<>Pressing a tag calls <code>onSelect</code> with the whole starter (<code>id</code>, <code>label</code> and <code>text</code>) and nothing else.</>} />
 
 <ComponentExample of={PromptStartersStories.FillsThePromptInput} title="Fills the prompt input" description={<>The common pattern: <code>onSelect</code> puts the starter's <code>text</code> into a <code>PromptInput</code> for a person to read and send.</>} />
 
@@ -94,7 +94,7 @@ blank prompt field. For a single follow-up during a conversation, use `Suggestio
 ## Parts
 
 1. **Group.** A wrapping row with <code>role="group"</code>, named by the required <code>label</code>.
-2. **Starter.** A prompt <code>Suggestion</code> per entry in <code>starters</code>: the sparkle wand, the short <code>label</code> on the chip, and the longer <code>text</code> it stands for.
+2. **Starter.** A prompt <code>Suggestion</code> per entry in <code>starters</code>: the sparkle wand, the short <code>label</code> on the tag, and the longer <code>text</code> it stands for.
 
 ### States
 
@@ -103,8 +103,8 @@ blank prompt field. For a single follow-up during a conversation, use `Suggestio
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>A row of prompt chips. The group itself has no ground and no state.</td></tr>
-<tr><td>Hovered, pressed, focused</td><td>Each chip reacts as a <code>Suggestion</code> does.</td></tr>
+<tr><td>Rest</td><td>A row of prompt tags. The group itself has no ground and no state.</td></tr>
+<tr><td>Hovered, pressed, focused</td><td>Each tag reacts as a <code>Suggestion</code> does.</td></tr>
 <tr><td>Empty</td><td>An empty <code>starters</code> array renders nothing.</td></tr>
 </tbody>
 </DocsTable>
@@ -116,7 +116,7 @@ blank prompt field. For a single follow-up during a conversation, use `Suggestio
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Gap</td><td><code>--stack-md</code> between chips and between rows, the same gap as a tag row.</td></tr>
+<tr><td>Gap</td><td><code>--stack-md</code> between tags and between rows, the same gap as a tag row.</td></tr>
 <tr><td>Starter</td><td>A <code>Suggestion</code>, so its edge, words, grounds and focus ring are Suggestion's tokens.</td></tr>
 </tbody>
 </DocsTable>
@@ -181,7 +181,7 @@ no conditional wrapper is needed.
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Write a label of a few words that reads as a request: "Summarize this session".</td><td>Put a whole paragraph on the chip.</td></tr>
+<tr><td>Write a label of a few words that reads as a request: "Summarize this session".</td><td>Put a whole paragraph on the tag.</td></tr>
 <tr><td>Name the group for what it offers: "Suggested prompts".</td><td>Leave the group unnamed.</td></tr>
 </tbody>
 </DocsTable>
@@ -194,7 +194,7 @@ no conditional wrapper is needed.
 
 - **A named group.** The row is `role="group"` with `label` as its accessible
   name, required so assistive technology announces the set together.
-- **Each chip is `Suggestion`'s own control.** Keyboard reach, focus and the
+- **Each tag is `Suggestion`'s own control.** Keyboard reach, focus and the
   accept action all follow `Suggestion`'s accessibility contract.
 
 </div>

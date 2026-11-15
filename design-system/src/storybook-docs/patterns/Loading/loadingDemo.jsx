@@ -264,7 +264,7 @@ export const LoadingRevealDemo = () => {
             <PatternSection title="Students" description="Lincoln Middle">
                 <LoadThenReveal loading={loading} skeleton={skeleton}>
                     <LoadRevealSlot>
-                        <p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                        <p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                             4 active students scheduled this week
                         </p>
                     </LoadRevealSlot>

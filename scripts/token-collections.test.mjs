@@ -57,12 +57,12 @@ test('frame tokens sit on Spacing and size and layer tokens on Elevation and lay
   assert.equal(placeToken('--page-pad', 'ladder/_patterns.scss').scope, 'templates');
   assert.equal(placeToken('--frame-sidebar-width', 'ladder/_patterns.scss').collection, 'spacing');
   assert.equal(placeToken('--layer-modal', 'ladder/_layers.scss').collection, 'elevation');
-  assert.equal(placeToken('--frame-layer-sidebar', '_frame_layers.scss').collection, 'elevation');
-  assert.equal(placeToken('--frame-layer-sidebar', '_frame_layers.scss').scope, 'templates');
+  assert.equal(placeToken('--layer-frame-sidebar', '_frame_layers.scss').collection, 'elevation');
+  assert.equal(placeToken('--layer-frame-sidebar', '_frame_layers.scss').scope, 'templates');
   assert.equal(placeToken('--card-pad-default', 'ladder/_patterns.scss').scope, 'components');
 });
 
-test('scope follows the family: page-level tokens are Templates, card, modal, popover and table are Components', () => {
+test('scope follows the family: page-level tokens are Templates, card, modal, popup and table are Components', () => {
   const scopeOf = (family) => {
     const scopes = new Set();
     for (const [name, entry] of corpus) {
@@ -73,11 +73,30 @@ test('scope follows the family: page-level tokens are Templates, card, modal, po
     return [...scopes];
   };
   for (const f of ['page', 'focused-page', 'section']) assert.deepEqual(scopeOf(f), ['templates'], f);
-  for (const f of ['card', 'modal', 'popover', 'table']) assert.deepEqual(scopeOf(f), ['components'], f);
+  for (const f of ['card', 'modal', 'popup', 'table']) assert.deepEqual(scopeOf(f), ['components'], f);
 });
 
 test('the audit names no token twice and gives each a proposed name', () => {
   const rows = tokenNamingAudit(corpus);
   assert.equal(new Set(rows.map((r) => r.token)).size, rows.length);
-  for (const r of rows) assert.ok(r.token && r.collection && r.problem && r.proposed, JSON.stringify(r));
+  for (const r of rows) {
+    assert.ok(r.token && r.collection && r.problem && r.proposed, JSON.stringify(r));
+    assert.notEqual(r.token, r.proposed, JSON.stringify(r));
+  }
+});
+
+
+test('Skeleton colors stay in Color and all Skeleton dimensions stay in Spacing and size', () => {
+  const skeleton = [...corpus].filter(([name]) => name.startsWith('--skeleton-'));
+  assert.equal(skeleton.length, 10);
+  for (const [name, entry] of skeleton) {
+    assert.deepEqual(placeToken(name, entry.file), {
+      collection: name === '--skeleton-subtle' ? 'color' : 'spacing',
+      tier: 'semantic', scope: 'components',
+    }, name);
+  }
+});
+
+test('typography size spelling has zero naming outliers', () => {
+  assert.deepEqual(tokenNamingAudit(corpus).filter((row) => row.problem.startsWith('Size step spelled out')), []);
 });

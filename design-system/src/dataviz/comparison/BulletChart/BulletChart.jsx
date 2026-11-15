@@ -58,7 +58,7 @@ const BulletChart = ({
                 targetOptions: {
                     width: '140%',
                     // The target is a reference mark: the strongest gray, which reads on every band.
-                    color: 'var(--ds-chart-gray-boldest)'
+                    color: 'var(--chart-gray-boldest)'
                 }
             }
         },

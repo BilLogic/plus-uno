@@ -53,10 +53,10 @@ describe('Patterns heroes', () => {
 });
 
 describe('Patterns Overview: a bento of real moments', () => {
-    it('draws four cells, Filtering big and ringed, a Flag wide, a Spinner and a bell with a count badge small', () => {
+    it('draws four cells, Filtering big and ringed, a Flag wide, a Spinner and a bell with a count countTag small', () => {
         const { container } = render(React.createElement(HEROES['patterns-overview'].Hero));
         const cells = [...container.querySelectorAll('[data-cell]')];
-        expect(cells.map((c) => c.dataset.cell)).toEqual(['filtering', 'flag', 'spinner', 'badge']);
+        expect(cells.map((c) => c.dataset.cell)).toEqual(['filtering', 'flag', 'spinner', 'countTag']);
         const ringed = cells.filter((c) => c.querySelector(':scope > g > rect[stroke="' + ACCENT + '"]'));
         expect(ringed.map((c) => c.dataset.cell)).toEqual(['filtering']);
         const size = (c) => +c.dataset.w * +c.dataset.h;

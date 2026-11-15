@@ -85,8 +85,8 @@
     z-index: 1;
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
-    outline: var(--border-default) solid var(--ds-border);
-    outline-offset: calc(-1 * var(--border-default));
+    outline: var(--border-width-default) solid var(--ds-border);
+    outline-offset: calc(-1 * var(--border-width-default));
     cursor: grabbing;
 }
 
@@ -99,7 +99,7 @@
         position: absolute;
         right: 0;
         left: 0;
-        height: var(--border-selected);
+        height: var(--border-width-selected);
         background-color: var(--ds-border-selected);
         pointer-events: none;
     }
@@ -116,7 +116,7 @@
 .plus-option-row--group {
     min-height: 0;
     color: var(--ds-text-subtle);
-    font: var(--heading-xxsmall);
+    font: var(--heading-xxs);
     cursor: default;
 
     @include plus-state(
@@ -174,7 +174,7 @@
 
 .plus-option-row-description {
     color: var(--ds-text-subtle);
-    font: var(--body-small);
+    font: var(--body-sm);
 }
 
 .plus-option-row-selected-mark {
@@ -210,7 +210,7 @@
     width: var(--icon-md);
     height: var(--icon-md);
     box-sizing: border-box;
-    border: var(--border-default) solid var(--ds-border-input);
+    border: var(--border-width-default) solid var(--ds-border-input);
     background-color: var(--ds-background-input);
     transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 

@@ -63,8 +63,8 @@ export const SettingsInPage = {
         const rows = canvasElement.querySelectorAll('.plus-setting-row');
         await expect(rows.length).toBeGreaterThanOrEqual(4);
         await expect(tokenLength(rows[0], '--setting-row-pad-y')).toBe(12);
-        await expect(parseFloat(getComputedStyle(rows[1]).borderTopWidth), 'adjacent rows divide with --border-default').toBe(
-            tokenLength(rows[1], '--border-default')
+        await expect(parseFloat(getComputedStyle(rows[1]).borderTopWidth), 'adjacent rows divide with --border-width-default').toBe(
+            tokenLength(rows[1], '--border-width-default')
         );
 
         const reminders = canvas.getByRole('switch', { name: 'Session reminders' });

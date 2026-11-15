@@ -16,9 +16,9 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
     BesideAiPanel,
     CoversAiPanel,
-    FloatsNoBackdrop,
+    FloatsNoBlanket,
     OneFloatingPanel,
-    PanelOnBackdrop,
+    PanelOnBlanket,
     ReadingNoFooter,
     ReadingWithFooter,
     TwoFloatingPanels,
@@ -30,7 +30,7 @@ import {
     page="templates-panel"
     eyebrow="Template"
     title="Panel"
-    purpose="A full-height layer on the right with no Backdrop: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame."
+    purpose="A full-height layer on the right with no Blanket: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame."
     links={{
         label: 'Uses',
         items: [
@@ -54,7 +54,7 @@ Import the Panel component from `@/components`. This template documents its layo
 
 ## Types
 
-Both open on the right with no Backdrop: docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths). Floating at every width is Planned.
+Both open on the right with no Blanket: docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths). Floating at every width is Planned.
 
 <TypeGrid>
 <TypeCard of={PanelStories.TypeDetails} title="Details" stage={1100}>A quick look at a row, floating over the right of the Page. The picked row stays highlighted.</TypeCard>
@@ -96,7 +96,7 @@ The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with th
 
 ## Width behavior
 
-Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay fill and shadow, capped at 320 under 1024 and full width under 768. It never has a Backdrop.
+Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay fill and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
 
 <DocsInteractivePlayground of={PanelStories.ResponsiveWidth} description="The width control sets the Frame's own width." />
 
@@ -110,7 +110,7 @@ Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge l
 
 <ComponentExample of={PanelStories.KeyRecordGone} title="Record gone" description={<>When the row no longer exists the body shows its empty state with a way back: <DocsLink id="patterns-states-empty">Empty</DocsLink>.</>} />
 
-<ComponentExample of={PanelStories.KeyUnder1024} title="Under 1024" description="Too narrow to dock beside the table: the Panel floats on the overlay fill and shadow, capped as Width behavior says, still with no Backdrop." />
+<ComponentExample of={PanelStories.KeyUnder1024} title="Under 1024" description="Too narrow to dock beside the table: the Panel floats on the overlay fill and shadow, capped as Width behavior says, still with no Blanket." />
 
 ### Beside the AI panel <PlannedTag />
 
@@ -194,7 +194,7 @@ The Panel components are the parts: header with its fixed actions, body, footer,
 
 ## Usage
 
-Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Backdrop, so the page behind stays usable. Details floats over the right of the Page; the Inbox floats out of the Sidebar on the left. One floating Panel is open at a time; opening another replaces it.
+Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details floats over the right of the Page; the Inbox floats out of the Sidebar on the left. One floating Panel is open at a time; opening another replaces it.
 
 The AI panel is not a floating Panel. It is a region of the Frame, docked where there is room, so it persists across pages.
 
@@ -215,17 +215,17 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 
 ## Best practices
 
-### Float a Panel with no Backdrop.
+### Float a Panel with no Blanket.
 
 <RuleTag kind="automatic" />
 
-The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Narrow, it is capped and then full width, still with no Backdrop. A confirm Modal over a Panel brings its own Backdrop.
+The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Narrow, it is capped and then full width, still with no Blanket. A confirm Modal over a Panel brings its own Blanket.
 
 <DoDontPair
-    doExample={<FloatsNoBackdrop />}
+    doExample={<FloatsNoBlanket />}
     doCaption="The Panel floats on its shadow and the page beside it stays undimmed."
-    dontExample={<PanelOnBackdrop />}
-    dontCaption="The same Panel with a Backdrop dimming the whole page."
+    dontExample={<PanelOnBlanket />}
+    dontCaption="The same Panel with a Blanket dimming the whole page."
 />
 
 ### Open one floating Panel at a time.

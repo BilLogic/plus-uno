@@ -33,10 +33,10 @@ export const TypeScaleBlocks = () => (
     <>
         {typeGroups(typeScss).map((g) => (
             <section key={g.title} style={{ marginBlock: 'var(--stack-lg)' }}>
-                <h4 style={{ font: 'var(--heading-xsmall)', margin: 0 }}>
+                <h4 style={{ font: 'var(--heading-xs)', margin: 0 }}>
                     {g.title} · {g.family} {g.weight}
                 </h4>
-                <p style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)', margin: 0 }}>
+                <p style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)', margin: 0 }}>
                     {g.styles.map((s) => `${s.token} ${s.size}/${s.lineHeight}`).join(' · ')}
                 </p>
                 <Typeset

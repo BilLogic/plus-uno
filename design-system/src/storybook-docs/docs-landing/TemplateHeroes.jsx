@@ -1,7 +1,7 @@
 import React from 'react';
 import { HAIRLINE, PAINT } from '../illustrations/paint.js';
 import {
-    Backdrop,
+    Blanket,
     Breadcrumb,
     PageSheet,
     ButtonShape,
@@ -49,7 +49,7 @@ const Rows = ({ x, w, y, n, pitch = 14 }) => (
     </>
 );
 
-/** The whole frame the hero sits in, in stage units: the backdrop covers all of it. */
+/** The whole frame the hero sits in, in stage units: the blanket covers all of it. */
 const WHOLE = {
     x: -(FRAME_UNITS.w - STAGE_UNITS.w) / 2,
     y: -(FRAME_UNITS.h - STAGE_UNITS.h) / 2,
@@ -277,8 +277,8 @@ export const ModalHero = () => (
         {/* The page behind: rows across the whole frame. */}
         <PageSheet {...WHOLE} />
         <Rows x={WHOLE.x} w={WHOLE.w} y={WHOLE.y + 6} n={14} pitch={14} />
-        {/* The Backdrop covers the whole frame; the Modal sits centered on it, ringed. */}
-        <Backdrop {...WHOLE} />
+        {/* The Blanket covers the whole frame; the Modal sits centered on it, ringed. */}
+        <Blanket {...WHOLE} />
         <Modal x={80} y={26} w={140} h={100} accent divider={false} closeButton />
     </HeroDrawing>
 );

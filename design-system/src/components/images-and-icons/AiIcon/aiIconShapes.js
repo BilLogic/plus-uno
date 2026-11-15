@@ -3,7 +3,7 @@
  * the export's paths on a `size` x `size` grid, so the artwork sits as it does
  * in the set.
  *
- * A badged icon is a Font Awesome Free glyph fitted into the bottom-left of the
+ * A icon with a sparkle mark is a Font Awesome Free glyph fitted into the bottom-left of the
  * grid, with a four-point sparkle in the top-right corner. The gap around the
  * sparkle is cut into the glyph's own outline, so every shape is plain geometry:
  * no mask, clip or id. Plan's calendar needs `fillRule: 'evenodd'` for its holes.
@@ -147,7 +147,7 @@ export const AI_ICON_SHAPES = {
     }
 };
 
-/** The sizes each icon exists at: badged icons start at 16, generate and stop-generating also have 12. */
+/** The sizes each icon exists at: icons with sparkle marks start at 16, generate and stop-generating also have 12. */
 export const AI_ICON_SIZES = Object.fromEntries(
     Object.entries(AI_ICON_SHAPES).map(([name, bySize]) => [name, Object.keys(bySize).map(Number)]),
 );

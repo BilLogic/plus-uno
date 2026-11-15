@@ -48,7 +48,7 @@ Toolkit
 | 2 | No cross-linking between categories | Opening a student from a session sub-tab redirects to Students, does not spawn a sub-tab under Sessions. StudentInsightsModal is **exempt** — it is a contextual overlay, not sidebar navigation |
 | 3 | Max depth = 2 | Category > specific item only; breadcrumbs handle inner-page nesting |
 | 4 | Real URLs | `/sessions/:id`, `/students/:id`, `/reflections/:id` — supports bookmarking, sharing, browser back/forward |
-| 5 | Overflow with `...` | Per-category, 3 visible sub-tabs before overflow; click `...` reveals full list in a popover |
+| 5 | Overflow with `...` | Per-category, 3 visible sub-tabs before overflow; click `...` reveals full list in a popup |
 | 6 | Accordion headers are dual-purpose | Text/label area navigates to list; chevron icon toggles collapse |
 | 7 | Multiple categories can be open simultaneously | `alwaysOpen={true}` — collapsing one category should not hide another's sub-tabs |
 | 8 | Dismiss navigates to parent list | Dismissing the active sub-tab navigates to the parent category list (e.g., `/sessions`) |
@@ -138,7 +138,7 @@ Extend the `Sidebar` component to support:
 1. **Accordion categories** — Toolkit section renders as collapsible groups instead of flat items
 2. **Dynamic sub-items** — each category can have spawned children stored in sessionStorage
 3. **Dismiss affordance** — sub-items have an `x` close button
-4. **Overflow** — more than 3 sub-items per category shows a `...` popover
+4. **Overflow** — more than 3 sub-items per category shows a `...` popup
 
 ```
 Sidebar.jsx (extended)
@@ -159,7 +159,7 @@ Sidebar.jsx (extended)
 New components needed:
 - **`SidebarAccordionItem`** — wraps a category header (icon + text + chevron) with collapsible children. Header click navigates; chevron toggles. Uses React Bootstrap `Collapse` for animation.
 - **`SidebarSubTab`** — variant of `SidebarTab` with indented styling, dismiss `x` button, and slightly smaller text. Fixed width matching parent (184px), with left indent (~16px).
-- **`SidebarOverflow`** — `...` indicator that opens a `Popover` or dropdown listing all hidden sub-tabs with dismiss capability.
+- **`SidebarOverflow`** — `...` indicator that opens a `Popup` or dropdown listing all hidden sub-tabs with dismiss capability.
 
 #### sessionStorage Schema
 
@@ -232,7 +232,7 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 - Refactor `Sidebar.jsx` to accept `categories` as an optional prop (falls back to hardcoded for backward compatibility)
 - Create `SidebarAccordionItem` component — collapsible category with split-target header (text navigates, chevron toggles)
 - Create `SidebarSubTab` component — indented, dismissible variant of `SidebarTab`
-- Create `SidebarOverflow` component — `...` indicator with popover showing hidden sub-tabs
+- Create `SidebarOverflow` component — `...` indicator with popup showing hidden sub-tabs
 - Update Sidebar to render Toolkit category items using `SidebarAccordionItem` instead of flat `SidebarTab`
 - Update active state model: category-level "contains active" state vs sub-tab "selected" state
 - Add Storybook stories for all new components and the extended Sidebar
@@ -250,7 +250,7 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 - Static sub-tabs can be rendered (hardcoded for testing)
 - Overflow indicator appears when > 3 sub-tabs
 - Dismiss button removes a sub-tab
-- Keyboard accessible (Enter/Space to toggle, Tab to navigate, Escape to close popover)
+- Keyboard accessible (Enter/Space to toggle, Tab to navigate, Escape to close popup)
 
 **Estimated effort:** Medium
 
@@ -320,11 +320,11 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 #### Phase 5: Polish and Edge Cases
 
 **Tasks:**
-- Overflow popover: full list with dismiss capability, sorted by creation time
+- Overflow popup: full list with dismiss capability, sorted by creation time
 - 404/invalid ID handling: show an error state and do not spawn a sub-tab for nonexistent IDs
 - Responsive behavior: define behavior when sidebar is collapsed (< 1024px) — sub-tabs accessible via breadcrumbs
 - Animation: sub-tab spawn/dismiss uses React Bootstrap `Collapse` with 200ms transition
-- Keyboard accessibility: ARIA roles for accordion, sub-tabs, dismiss buttons, overflow popover
+- Keyboard accessibility: ARIA roles for accordion, sub-tabs, dismiss buttons, overflow popup
 - Update TopBar breadcrumbs to use route manifest auto-generation
 - Remove per-page `setBreadcrumbs` `useEffect` calls from content components
 
@@ -333,7 +333,7 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 - Content components that currently call `setBreadcrumbs` manually
 
 **Success criteria:**
-- Overflow popover works with dismiss from within
+- Overflow popup works with dismiss from within
 - Invalid IDs show graceful error, no broken sub-tab
 - Keyboard-only navigation works end-to-end
 - No manual `setBreadcrumbs` calls remain
@@ -379,7 +379,7 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 ### Integration Test Scenarios
 
 1. Navigate to `/sessions/abc-123` directly → verify sub-tab spawns, sidebar highlights Sessions category, breadcrumbs show `Toolkit > Sessions > [label]`
-2. Open 4 session sub-tabs → verify 3 visible + `...` overflow → click `...` → verify popover shows 4th → dismiss from popover → verify removed
+2. Open 4 session sub-tabs → verify 3 visible + `...` overflow → click `...` → verify popup shows 4th → dismiss from popup → verify removed
 3. Open `/sessions/abc-123`, navigate to `/students`, press browser Back → verify `/sessions/abc-123` re-activates with correct sidebar state
 4. Open 3 sub-tabs across categories, refresh browser → verify all 3 rehydrate from sessionStorage
 5. Dismiss the active sub-tab → verify navigation goes to parent list, not blank page
@@ -395,7 +395,7 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 - [ ] Sub-tabs display the item label and a dismiss `x` button
 - [ ] Dismissing the active sub-tab navigates to the parent category list
 - [ ] Dismissing a non-active sub-tab does not change the current view
-- [ ] More than 3 sub-tabs per category shows `...` overflow with full list popover
+- [ ] More than 3 sub-tabs per category shows `...` overflow with full list popup
 - [ ] Sub-tabs persist across page refresh (sessionStorage)
 - [ ] Sub-tabs clear when browser session ends (new tab = fresh state)
 - [ ] Direct URL navigation to `/sessions/:id` auto-spawns the sub-tab
@@ -419,7 +419,7 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 ## Dependencies & Prerequisites
 
 - **No backend changes required** — all state is client-side (sessionStorage + React state)
-- **No new npm packages** — React Bootstrap Collapse, Popover already available
+- **No new npm packages** — React Bootstrap Collapse, Popup already available
 - **Existing pages** (InSessionContent, ReflectionAssistantChat) are wrapped, not rewritten
 - **Design tokens** from `packages/plus-ds/src/tokens/` used for all new component styling
 
@@ -461,7 +461,7 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 
 - Notion PRD: [Toolkit Information Architecture Revision](https://www.notion.so/plus-tutors/Toolkit-Information-Architecture-Revision-2eab7cca4982804fad5dd1768b7d3087) (ID 2198)
 - React Router DOM 7 nested routes: framework docs
-- React Bootstrap Collapse/Popover: framework docs
+- React Bootstrap Collapse/Popup: framework docs
 
 ## Outcome (2026-07-08 plans sweep)
 

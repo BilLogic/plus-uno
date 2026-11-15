@@ -221,8 +221,8 @@ export const screenLayout = ({ x, y, w, h, sidebar = 'docked' }) => {
 
 /**
  * A whole screen: Frame, Sidebar and Page. `sidebar` is 'docked' (beside the
- * Page), 'overlay' (over a Backdrop, floating) or 'none'. Children draw on the
- * Page, under the Backdrop.
+ * Page), 'overlay' (over a Blanket, floating) or 'none'. Children draw on the
+ * Page, under the Blanket.
  */
 export const Screen = ({ x, y, w, h, accent = false, accentSidebar = false, sidebar = 'docked', header = true, children }) => {
   const { sidebarW, content } = screenLayout({ x, y, w, h, sidebar });
@@ -235,7 +235,7 @@ export const Screen = ({ x, y, w, h, accent = false, accentSidebar = false, side
       </Page>
       {sidebar === 'overlay' && (
         <>
-          <Backdrop x={x} y={y + 12} w={w} h={h - 12} />
+          <Blanket x={x} y={y + 12} w={w} h={h - 12} />
           <Sidebar x={x} y={y + 12} w={sidebarW} h={h - 12} overlay accent={accentSidebar} />
         </>
       )}
@@ -397,7 +397,7 @@ export const Panel = ({ x, y, w, h, accent = false, floating = false }) => (
   </g>
 );
 
-export const Backdrop = ({ x, y, w, h }) => <Rect x={x} y={y} w={w} h={h} fill={PAINT.backdrop} />;
+export const Blanket = ({ x, y, w, h }) => <Rect x={x} y={y} w={w} h={h} fill={PAINT.blanket} />;
 
 export const Modal = ({ x, y, w, h, accent = false, divider = true, closeButton = false }) => {
   // Footer buttons shrink with a narrow modal so they stay inside it.

@@ -21,7 +21,7 @@ Use AI chat to ask about the current page. Choose a mode for the task.
 | Mode | When to use |
 | --- | --- |
 | Popup | The default. A quick ask that keeps the page in view. |
-| Panel | Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Backdrop when there is no room. |
+| Panel | Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Blanket when there is no room. |
 | Full screen | Long answers that need room. It covers the window. |
 
 Follow the six AI interaction guidelines for identity, answer marking, fallibility, sources, confirmation and feedback.
@@ -79,11 +79,11 @@ Don't: An answer from records with nothing to check it against.
 ## Related
 
 - Frame places the Panel the chat docks in.
-- Backdrop sits under the Panel when it opens over the Page.
+- Blanket sits under the Panel when it opens over the Page.
 - For one reply on its own, use `AiMessage`.
 - For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
 
-Same group: `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 
@@ -102,7 +102,7 @@ The same surface fills every mode; the mode only changes which header controls s
 | --- | --- |
 | Closed | Only the button shows. |
 | Popup | The popup opens anchored to the button, over the Page. The button stays. |
-| Panel | Chat docks in the Frame's Panel, or opens over the Page on a Backdrop. The button hides. |
+| Panel | Chat docks in the Frame's Panel, or opens over the Page on a Blanket. The button hides. |
 | Full screen | Chat covers the window, in a column capped at the reading width. The button hides. |
 | Replying | A typing indicator stands in for the reply, and the prompt input's send button becomes Stop. |
 
@@ -118,7 +118,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 | Full screen | `--ds-surface`, on `--layer-dialog`; the conversation is capped at `--content-max-width-reading`. |
 | Conversation | `--stack-md` between messages, `--body-default` in `--ds-text`. |
 | The person's message | `--ds-surface-sunken`, `--pad-y-sm` by `--pad-x-md`, `--radius-md`. |
-| Empty state and fallibility line | `--ds-text-subtle`; the line at `--body-small`. |
+| Empty state and fallibility line | `--ds-text-subtle`; the line at `--body-sm`. |
 | Footer | `--stack-sm` between the starters, the input and the line. |
 
 ## Content guidelines
@@ -161,7 +161,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ai-chat-width` · `--body-default` · `--body-small` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popup-radius` · `--radius-md` · `--stack-lg` · `--stack-md` · `--stack-sm`
+`--ai-chat-width` · `--body-default` · `--body-sm` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popup-radius` · `--radius-md` · `--stack-lg` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/patterns/AiChat/AiChat.scss`. Override these through the token layer, never with a literal.
 

@@ -41,7 +41,7 @@ export const useTokenValues = (names) => {
 /** `16px` reads as `16`; anything else is shown as the page resolves it. */
 const plain = (value) => (/^-?\d+(\.\d+)?px$/.test(value) ? value.replace(/px$/, '') : value);
 
-const codeStyle = { font: 'var(--code)', color: 'var(--ds-text)', wordBreak: 'break-word' };
+const codeStyle = { font: 'var(--code-default)', color: 'var(--ds-text)', wordBreak: 'break-word' };
 
 /** Inline code for JSX prose: `<C>--card-pad-default</C>`. */
 export const C = ({ children }) => <code style={codeStyle}>{children}</code>;
@@ -84,7 +84,7 @@ export const TokenTable = ({ rows, swatch = false, valueHeader = 'Value', showFi
                                             flexShrink: 0,
                                             borderRadius: 'var(--radius-md)',
                                             background: `var(${r.token})`,
-                                            boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)',
+                                            boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
                                         }}
                                     />
                                 )}
@@ -115,7 +115,7 @@ export const RefTable = ({ head, rows }) => (
     </DocsTable>
 );
 
-/** The Do or Don’t tag a verdict carries; kept for callers that render the badge inline. */
+/** The Do or Don’t tag a verdict carries; kept for callers that render the countTag inline. */
 export const VerdictTag = ({ tone }) => {
     const isDo = tone === 'do';
     return (
@@ -173,10 +173,10 @@ export const ModeCompare = ({ children, initial = 'both', stacked = false }) => 
                         aria-pressed={mode === m.id}
                         onClick={() => setMode(m.id)}
                         style={{
-                            height: 'var(--item-height-md)',
+                            height: 'var(--control-md)',
                             padding: '0 var(--pad-x-md)',
                             borderRadius: 'var(--radius-control-md)',
-                            border: 'var(--border-default) solid var(--ds-border)',
+                            border: 'var(--border-width-default) solid var(--ds-border)',
                             background: mode === m.id ? 'var(--ds-background-selected)' : 'var(--ds-background-neutral-subtle)',
                             color: mode === m.id ? 'var(--ds-text-selected)' : 'var(--ds-text-subtle)',
                             font: 'var(--body-default)',
@@ -211,7 +211,7 @@ export const ModeCompare = ({ children, initial = 'both', stacked = false }) => 
                             font: 'var(--body-default)',
                         }}
                     >
-                        <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>
+                        <span style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' }}>
                             {p === 'light' ? 'Light' : 'Dark'}
                         </span>
                         {typeof children === 'function' ? children(p) : children}
@@ -243,14 +243,14 @@ export const Callout = ({ title, children }) => (
 
 /**
  * The focus ring as the app draws it: an outline in `--ds-border-focused`,
- * `--border-focused` wide, offset by `--focus-ring-width`. Every ring demo on
+ * `--border-width-focused` wide, offset by `--focus-ring-width`. Every ring demo on
  * the Foundations pages goes through this block, so they draw one ring.
  */
 export const RingDemo = ({ children, style }) => (
     <span
         style={{
             display: 'inline-flex',
-            outline: 'var(--border-focused) solid var(--ds-border-focused)',
+            outline: 'var(--border-width-focused) solid var(--ds-border-focused)',
             outlineOffset: 'var(--focus-ring-width)',
             ...style,
         }}

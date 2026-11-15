@@ -187,7 +187,7 @@ export const Placement = {
         const triggerBox = trigger.getBoundingClientRect();
         const menuBox = menu.getBoundingClientRect();
         await expect(menuBox.right, 'end edge meets the trigger').toBeCloseTo(triggerBox.right, 0);
-        await expect(menuBox.top - triggerBox.bottom, 'offset 4').toBeCloseTo(tokenLength(canvasElement, '--popover-offset'), 0);
+        await expect(menuBox.top - triggerBox.bottom, 'offset 4').toBeCloseTo(tokenLength(canvasElement, '--popup-offset'), 0);
 
         const reset = within(menu).getByRole('button', { name: 'Reset' }).getBoundingClientRect();
         const apply = within(menu).getByRole('button', { name: 'Apply' }).getBoundingClientRect();

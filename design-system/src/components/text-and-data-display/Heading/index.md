@@ -91,7 +91,7 @@ Same group: `Code` · `CodeBlock` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 | Part | Token |
 | --- | --- |
-| Text style | `--heading-xxlarge` to `--heading-xxsmall`, with tracking for xxlarge, xlarge and large |
+| Text style | `--heading-xxl` to `--heading-xxs`, with tracking for xxlarge, xlarge and large |
 | Default ink | `--ds-text` |
 | Inverse ink | `--ds-text-inverse` |
 | Warning inverse ink | `--ds-text-warning-inverse` |
@@ -128,7 +128,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-text` · `--ds-text-inverse` · `--ds-text-warning-inverse` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--heading-xlarge` · `--heading-xlarge-tracking` · `--heading-xsmall` · `--heading-xxlarge` · `--heading-xxlarge-tracking` · `--heading-xxsmall`
+`--ds-text` · `--ds-text-inverse` · `--ds-text-warning-inverse` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-sm` · `--heading-xl` · `--heading-xl-tracking` · `--heading-xs` · `--heading-xxl` · `--heading-xxl-tracking` · `--heading-xxs`
 
 From `design-system/src/components/text-and-data-display/Heading/Heading.scss`. Override these through the token layer, never with a literal.
 

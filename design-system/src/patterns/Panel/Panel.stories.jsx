@@ -15,7 +15,7 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
  * Panel: the template page's examples, run in the Storybook tests. They compose
  * the real Frame, Panel parts, Table and EmptyState. Each type asserts the
  * ruling that defines it: a floating Panel sits on the overlay fill and shadow,
- * draws no Backdrop, and leaves the page reachable.
+ * draws no Blanket, and leaves the page reachable.
  *
  * Run: npx vitest run --project=storybook design-system/src/patterns/Panel/Panel.stories.jsx
  */
@@ -45,7 +45,7 @@ const frameParts = (canvasElement) => {
     };
 };
 
-/** A floating Panel: the overlay fill and shadow over the page, full height at the right edge, and no Backdrop layer anywhere. */
+/** A floating Panel: the overlay fill and shadow over the page, full height at the right edge, and no Blanket layer anywhere. */
 const expectFloating = async (canvasElement) => {
     const { frame, panel, surface } = frameParts(canvasElement);
     await waitFor(() => expect(panel(), 'the Panel is open').not.toBeNull());
@@ -55,7 +55,7 @@ const expectFloating = async (canvasElement) => {
     await expect(getComputedStyle(el).boxShadow, 'the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(el).top, 'full height, from the top').toBeCloseTo(rect(frame).top, 0);
     await expect(rect(el).right, 'at the right edge').toBeCloseTo(rect(frame).right, 0);
-    await expect(canvasElement.querySelector('.plus-frame__backdrop, .plus-pattern-backdrop'), 'a Panel never has a Backdrop').toBeNull();
+    await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-pattern-blanket'), 'a Panel never has a Blanket').toBeNull();
     // The page under it is not covered by a layer of its own: only the Panel stands over it.
     const hit = document.elementFromPoint(rect(surface).left + 40, rect(surface).top + 40);
     await expect(frame.contains(hit) && !hit.closest('.plus-frame__panel'), 'a point on the page lands on the page').toBe(true);
@@ -155,9 +155,9 @@ const panelMode = (canvasElement, mode) => waitFor(() => expect(
     `the Panel is ${mode}`,
 ).toContain(`plus-frame__panel--${mode}`));
 
-const expectNoBackdrop = (canvasElement) => expect(
-    canvasElement.querySelector('.plus-frame__backdrop, .plus-pattern-backdrop'),
-    'no Backdrop at any width',
+const expectNoBlanket = (canvasElement) => expect(
+    canvasElement.querySelector('.plus-frame__blanket, .plus-pattern-blanket'),
+    'no Blanket at any width',
 ).toBeNull();
 
 /** Docked: an edge line, the Page's own fill and no shadow. */
@@ -168,7 +168,7 @@ const expectDocked = async (canvasElement) => {
     await expect(parseFloat(getComputedStyle(panel()).borderInlineStartWidth), 'docked: an edge line').toBeGreaterThan(0);
     await expect(getComputedStyle(panel()).position, 'beside the Page, not over it').not.toBe('absolute');
     await expect(frame.querySelector('tbody tr:nth-child(2)').className, 'Ben Okafor\'s row is the picked one').toMatch(/highlighted/);
-    await expectNoBackdrop(canvasElement);
+    await expectNoBlanket(canvasElement);
 };
 
 /** Floating: over the Page on the overlay fill and shadow. */
@@ -177,10 +177,10 @@ const expectOverlay = async (canvasElement) => {
     await panelMode(canvasElement, 'overlay');
     await expect(getComputedStyle(panel()).boxShadow, 'floating: the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(getComputedStyle(panel()).backgroundColor, 'floating: the overlay fill').toBe(tokenColor(frame, '--ds-surface-overlay'));
-    await expectNoBackdrop(canvasElement);
+    await expectNoBlanket(canvasElement);
 };
 
-/** Width behavior: Details is open; from 1168 up the Panel docks at an edge line, under it it floats on the overlay pair; never a Backdrop. */
+/** Width behavior: Details is open; from 1168 up the Panel docks at an edge line, under it it floats on the overlay pair; never a Blanket. */
 export const ResponsiveWidth = {
     name: 'Width behavior',
     args: { width: 1440 },
@@ -201,7 +201,7 @@ export const ResponsiveWidth = {
         // Read the token once: a probe inside waitFor mutates the DOM, which re-runs waitFor forever.
         const narrowest = tokenLength(frame, '--panel-min-width');
         await waitFor(() => expect(frameParts(canvasElement).panel().offsetWidth, 'under 1024 the Panel is capped at its narrowest').toBeCloseTo(narrowest, 0));
-        await expectNoBackdrop(canvasElement);
+        await expectNoBlanket(canvasElement);
     },
 };
 
@@ -216,7 +216,7 @@ export const WidthDocked = {
     },
 };
 
-/** At 1000 the Panel floats on the overlay fill and shadow, with no Backdrop. */
+/** At 1000 the Panel floats on the overlay fill and shadow, with no Blanket. */
 export const WidthFloating = {
     name: 'Width: 1000',
     args: { width: 1000 },
@@ -259,7 +259,7 @@ export const KeyRecordGone = {
     },
 };
 
-/** Under 1024: too narrow to float beside the table, so the Panel is capped at its narrowest, still with no Backdrop. */
+/** Under 1024: too narrow to float beside the table, so the Panel is capped at its narrowest, still with no Blanket. */
 export const KeyUnder1024 = {
     name: 'Key state: Under 1024',
     render: () => sized(<PanelFrame label="Session details" panel={<DetailsPanel />} />, FRAME_LAYOUT.dockMin - 124),
@@ -268,7 +268,7 @@ export const KeyUnder1024 = {
         await waitFor(() => expect(panel()).not.toBeNull());
         const narrowest = tokenLength(frame, '--panel-min-width');
         await waitFor(() => expect(panel().offsetWidth, 'capped at its narrowest').toBeCloseTo(narrowest, 0));
-        await expect(canvasElement.querySelector('.plus-frame__backdrop, .plus-pattern-backdrop'), 'no Backdrop').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-pattern-blanket'), 'no Blanket').toBeNull();
         await fitsCanvas(canvasElement);
     },
 };

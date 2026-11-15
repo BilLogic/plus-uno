@@ -143,7 +143,7 @@ export function readTokens(source, { prefix = '--' } = {}) {
 /**
  * Follow `--a: var(--b)` until a literal value or a dead end.
  *
- * This is not a nicety. `--radius-050` IS `var(--space-050)` in the token
+ * This is not a nicety. `--radius-lg` IS `var(--radius-lg)` in the token
  * file, and a resolver that stopped at the first `var()` would report it as an
  * unreadable token instead of as the alias it is.
  *

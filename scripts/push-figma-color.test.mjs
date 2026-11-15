@@ -148,7 +148,7 @@ test('the push never deletes: an extra variable and an unrelated collection surv
   assert.equal(probe.ok, false);
 });
 
-test('scopes are never ALL_SCOPES and every foundations color carries var(--ds-â€¦) code syntax', async () => {
+test('scopes are never ALL_SCOPES and every foundations color carries its CSS code syntax', async () => {
   const { figma } = fakeFigma();
   await pushAll(figma);
   const probe = await run(figma, probeScript(SPEC));
@@ -156,7 +156,7 @@ test('scopes are never ALL_SCOPES and every foundations color carries var(--ds-â
   // The shadow layer variables have none: CSS reads a shadow as one composite --ds-shadow-* value.
   const colors = SPEC.collections[1].variables.filter((v) => !v.name.startsWith('elevation/shadow/'));
   assert.equal(probe.collections['color / foundations'].withWebSyntax, colors.length);
-  assert.ok(colors.every((v) => /^var\(--ds-[a-z0-9-]+\)$/.test(v.codeSyntax.WEB)));
+  assert.ok(colors.every((v) => /^var\(--(?:ds-|chart-|skeleton-)[a-z0-9-]+\)$/.test(v.codeSyntax.WEB)));
 });
 
 test('the probe names a variable missing from the file', async () => {

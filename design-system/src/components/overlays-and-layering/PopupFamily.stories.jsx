@@ -7,7 +7,7 @@ import { Flag, FlagGroup, Button, Popup, Tooltip } from '@/components';
  * The Popups pattern: Popup, Flag and Tooltip. Menu's own behavior and size
  * cover lives on `DropdownMenu`'s own stories
  * (`Components/Forms and inputs/Dropdown menu`), since it draws from the
- * Menu family's own tokens rather than this page's older Popover numbers.
+ * Menu family's own tokens rather than this page's older Popup numbers.
  *
  * Floating layers behave the same everywhere, and these stories hold them to
  * the Popups pattern page: popups auto 160 to 320 or a column step, padded 16,
@@ -39,7 +39,7 @@ const documentOf = (canvasElement) => canvasElement.ownerDocument;
 
 /**
  * Open once the story has mounted. Popper measures the trigger through its
- * ref, which is only attached after the first render; a popover asked to show
+ * ref, which is only attached after the first render; a popup asked to show
  * on that first render has nothing to measure yet, so these stories open it
  * a beat later, the way a click would.
  */
@@ -127,7 +127,7 @@ export const PopupLayers = () => {
             >
                 Notes stay with the session.
             </Popup>
-            <div className="plus-pattern-backdrop" style={{ position: 'relative', display: 'block', zIndex: 'var(--layer-modal)' }}>
+            <div className="plus-pattern-blanket" style={{ position: 'relative', display: 'block', zIndex: 'var(--layer-modal)' }}>
                 <Popup
                     id="pf-popup-modal"
                     triggerType="manual"
@@ -153,9 +153,9 @@ PopupLayers.play = async ({ canvasElement }) => {
     const z = (token) => probe(canvasElement, 'zIndex', `var(${token})`, { position: 'relative' });
     // On the popup layer (400) from the page, not above toasts.
     await expect(getComputedStyle(page).zIndex, 'popup layer').toBe(z('--layer-popup'));
-    // Opened from a modal it mounts in the modal's backdrop and so rides its layer (510).
-    await expect(inModal.closest('.plus-pattern-backdrop'), 'mounted in the modal').not.toBeNull();
-    await expect(getComputedStyle(inModal.closest('.plus-pattern-backdrop')).zIndex, 'modal layer').toBe(z('--layer-modal'));
+    // Opened from a modal it mounts in the modal's blanket and so rides its layer (510).
+    await expect(inModal.closest('.plus-pattern-blanket'), 'mounted in the modal').not.toBeNull();
+    await expect(getComputedStyle(inModal.closest('.plus-pattern-blanket')).zIndex, 'modal layer').toBe(z('--layer-modal'));
     await expect(getComputedStyle(inModal).zIndex, 'popup layer inside the modal').toBe(z('--layer-popup'));
 };
 

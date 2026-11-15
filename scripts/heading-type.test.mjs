@@ -9,6 +9,7 @@
  * off the type set fails here instead of in a screenshot.
  */
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import test from 'node:test';
@@ -49,7 +50,7 @@ function font(selector) {
   return got;
 }
 
-const LEVEL_SIZES = { h1: 'xxlarge', h2: 'xlarge', h3: 'large', h4: 'medium', h5: 'small', h6: 'xsmall' };
+const LEVEL_SIZES = { h1: 'xxl', h2: 'xl', h3: 'lg', h4: 'md', h5: 'sm', h6: 'xs' };
 
 for (const [level, size] of Object.entries(LEVEL_SIZES)) {
   test(`${level} takes the ${size} heading style`, () => {
@@ -66,5 +67,39 @@ for (const level of ['h1', 'h2', 'h3', 'h4']) {
 for (const level of ['h5', 'h6']) {
   test(`${level} is Noto Sans at 600`, () => {
     assert.match(font(level), /^600 \S+ \/ \S+ "Noto Sans"/);
+  });
+}
+
+
+const docsCss = fs.readFileSync(path.join(ROOT, '.storybook/storybook-overrides.css'), 'utf8');
+const docsRoot = require('postcss').parse(docsCss);
+for (const [level, size] of Object.entries(LEVEL_SIZES)) {
+  test(`docs ${level} shares the product heading style`, () => {
+    const selector = `.sbdocs ${level}:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *))`;
+    const rule = docsRoot.nodes.find((node) => node.type === 'rule' && node.selectors.includes(selector));
+    assert.ok(rule, selector);
+    const fontDecl = rule.nodes.find((node) => node.prop === 'font');
+    assert.equal(resolve(fontDecl.value), font(level));
+    const tracking = rule.nodes.find((node) => node.prop === 'letter-spacing');
+    if (tokens.has(`--heading-${size}-tracking`)) {
+      assert.equal(tracking?.value, `var(--heading-${size}-tracking)`);
+    }
+  });
+}
+
+test('docs preserve explicit heading size classes', () => {
+  docsRoot.walkRules((rule) => {
+    if (!/\.heading-(xxl|xl|lg|md|sm|xs|xxs)\b/.test(rule.selector)) return;
+    for (const decl of rule.nodes.filter((node) => node.type === 'decl')) {
+      assert.ok(!['font', 'font-size', 'line-height', 'letter-spacing'].includes(decl.prop), rule.selector);
+    }
+  });
+});
+
+
+for (const size of ['heading-xs', 'heading-xxs', 'body-lg', 'body-sm', 'metric-lg', 'metric-md', 'metric-sm']) {
+  test(`generated .${size} uses the matching text style`, () => {
+    assert.ok(tokens.has(`--${size}`));
+    assert.equal(font(`.${size}`), resolve(`var(--${size})`));
   });
 }

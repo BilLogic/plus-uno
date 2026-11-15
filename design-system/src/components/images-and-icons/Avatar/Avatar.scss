@@ -9,11 +9,11 @@
 
 $avatar-sizes: (
     16: (var(--image-xxs), var(--icon-sm), var(--icon-sm)),
-    24: (var(--image-sm), var(--font-size-075), var(--icon-md)),
-    32: (var(--image-md), var(--font-size-0875), var(--icon-md)),
-    40: (var(--image-lg), var(--font-size-100), var(--icon-lg)),
-    96: (var(--avatar-size-96), var(--font-size-200), var(--icon-lg)),
-    128: (var(--avatar-size-128), var(--font-size-200), var(--icon-lg)),
+    24: (var(--image-sm), var(--type-size-075), var(--icon-md)),
+    32: (var(--image-md), var(--type-size-0875), var(--icon-md)),
+    40: (var(--image-lg), var(--type-size-100), var(--icon-lg)),
+    96: (var(--avatar-size-96), var(--type-size-200), var(--icon-lg)),
+    128: (var(--avatar-size-128), var(--type-size-200), var(--icon-lg)),
 );
 
 // The initials and icon grounds, per Tag color: ground, ink.
@@ -43,7 +43,7 @@ $avatar-colors: (
     background-color: var(--ds-background-accent-blue-subtler);
     color: var(--ds-text-accent-blue);
     font-family: inherit;
-    font-size: var(--avatar-font, var(--font-size-0875));
+    font-size: var(--avatar-font, var(--type-size-0875));
     font-weight: var(--type-weight-semibold);
     line-height: 1;
     border-radius: var(--radius-full);
@@ -103,12 +103,12 @@ $avatar-colors: (
     inset-block-end: 0;
     inline-size: calc(var(--avatar-size, var(--image-md)) / 4);
     block-size: calc(var(--avatar-size, var(--image-md)) / 4);
-    min-inline-size: calc(var(--border-default) * 6);
-    min-block-size: calc(var(--border-default) * 6);
+    min-inline-size: calc(var(--border-width-default) * 6);
+    min-block-size: calc(var(--border-width-default) * 6);
     box-sizing: border-box;
     border-radius: var(--radius-full);
     // The ring cuts the dot out of the picture beneath it.
-    box-shadow: 0 0 0 calc(var(--border-default) * 2) var(--ds-surface);
+    box-shadow: 0 0 0 calc(var(--border-width-default) * 2) var(--ds-surface);
 }
 
 // A circle's edge curves in, so its dot sits on the curve, not the corner.
@@ -150,5 +150,5 @@ button.plus-avatar--overflow {
 
 // A ring separates neighbors, in the surface color the group sits on.
 .plus-avatar-group .plus-avatar {
-    box-shadow: 0 0 0 calc(var(--border-default) * 2) var(--ds-surface);
+    box-shadow: 0 0 0 calc(var(--border-width-default) * 2) var(--ds-surface);
 }

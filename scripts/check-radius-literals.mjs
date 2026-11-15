@@ -5,14 +5,14 @@
  *
  * WHY. Radius is a ladder: the semantic steps, the Radius / Control group,
  * and one token per pattern or component. A `4px`, a `50%` or a primitive
- * step (`--radius-0625`) written in a component is a corner nothing else
+ * step (`--space-0625`) written in a component is a corner nothing else
  * knows about: the ladder can move in Figma and the generated tokens with it,
  * and that corner stays where it was.
  *
  * WHAT COUNTS. In a `border-radius` (or a corner longhand such as
  * `border-start-end-radius`), a custom property named `--*-radius*`, or a JSX
  * `borderRadius`, any of: a length (`px`, `rem`, `em`), a `%`, a primitive
- * radius read (`--radius-0125` and the other numbered steps), or a literal
+ * radius read (`--space-0125` and the other numbered steps), or a literal
  * fallback inside `var()` (`var(--radius-full, 9999px)` draws 9999px the one
  * time the token is missing). Circles take `--radius-full`.
  *
@@ -228,7 +228,7 @@ export function roleRadii(files, exceptions = RADIUS_EXCEPTIONS) {
   return findings;
 }
 
-const PRIMITIVE = /--radius-\d+\b/;
+const PRIMITIVE = /--(?:space|size|stroke|radius)-\d+\b/;
 const LENGTH = /(^|[^\w.-])\d*\.?\d+\s*(px|rem|em|%)/;
 
 /** Blank comments to spaces, keeping line numbers. */

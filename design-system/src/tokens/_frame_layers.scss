@@ -53,19 +53,19 @@
     --modal-inline-md: var(--space-100);
     --modal-inline-lg: var(--space-150);
     /* Popover */
-    --popover-pad: var(--space-100);
-    --popover-width-sm: var(--width-2000);
-    --popover-width-md: var(--width-2500);
-    --popover-width-lg: var(--width-3000);
-    --popover-width-flag: var(--width-2500);
-    --popover-stack-flag: var(--space-100);
-    --popover-pad-menu: var(--space-025);
-    --popover-min-width-menu: var(--width-1000);
-    --popover-max-width-menu: var(--width-2000);
-    --popover-max-height-menu: var(--height-2000);
-    --popover-pad-y-tooltip: var(--space-025);
-    --popover-max-width-tooltip: var(--width-1500);
-    --popover-gap-screen: var(--space-050);
+    --popup-pad: var(--space-100);
+    --popup-width-sm: var(--width-2000);
+    --popup-width-md: var(--width-2500);
+    --popup-width-lg: var(--width-3000);
+    --flag-width: var(--width-2500);
+    --flag-stack: var(--space-100);
+    --dropdown-menu-pad: var(--space-025);
+    --dropdown-menu-min-width: var(--width-1000);
+    --dropdown-menu-max-width: var(--width-2000);
+    --dropdown-menu-max-height: var(--height-2000);
+    --tooltip-pad-y: var(--space-025);
+    --tooltip-max-width: var(--width-1500);
+    --popup-gap-screen: var(--space-050);
     /* Focused page */
     --focused-page-pad-x: var(--space-050);
     --focused-page-pad-y: var(--space-050);
@@ -76,12 +76,12 @@
     --focused-page-inline-md: var(--space-075);
 
     /* Code only; not Figma variables (CODE_ONLY_FRAME_LAYERS) */
-    --popover-offset: var(--space-025); /* gap from a popover to its trigger */
-    --frame-layer-edge: calc(var(--layer-navigation) - 1); /* the hover strips that peek a closed Sidebar or Panel */
-    --frame-layer-sidebar: var(--layer-navigation); /* the raised Sidebar */
-    --frame-layer-topbar-start: calc(var(--layer-navigation) + 1); /* the Topbar start, above a raised Sidebar */
-    --frame-layer-blanket: calc(var(--layer-navigation) + 2); /* the overlay Panel's Backdrop */
-    --frame-layer-panel-peek: calc(var(--layer-navigation) + 3); /* a peeking or overlay Panel, above its Backdrop */
-    --frame-layer-splitter: 1; /* local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip */
-    --frame-layer-docked-edge: 1; /* local to the Frame's row, not a step on the navigation scale: lifts a docked Sidebar so its 1px edge lies over the Page's first pixel */
+    --popup-offset: var(--space-025); /* gap from a Popup to its trigger */
+    --layer-frame-edge: calc(var(--layer-navigation) - 1); /* the hover strips that peek a closed Sidebar or Panel */
+    --layer-frame-sidebar: var(--layer-navigation); /* the raised Sidebar */
+    --layer-frame-topbar-start: calc(var(--layer-navigation) + 1); /* the Topbar start, above a raised Sidebar */
+    --layer-frame-blanket: calc(var(--layer-navigation) + 2); /* the overlay Panel's Blanket */
+    --layer-frame-panel-peek: calc(var(--layer-navigation) + 3); /* a peeking or overlay Panel, above its Blanket */
+    --layer-frame-splitter: 1; /* local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip */
+    --layer-frame-docked-edge: 1; /* local to the Frame's row, not a step on the navigation scale: lifts a docked Sidebar so its 1px edge lies over the Page's first pixel */
 }

@@ -13,7 +13,7 @@ import {
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const DemoSlide = ({ children }) => (
-    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-background-accent-blue-subtlest)', color: 'var(--ds-text-subtle)', font: 'var(--heading-xsmall)' }}>
+    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-background-accent-blue-subtlest)', color: 'var(--ds-text-subtle)', font: 'var(--heading-xs)' }}>
         {children}
     </div>
 );
@@ -161,7 +161,7 @@ progress indicator. Autoplay is on by default (`interval` `5000`), and loops.
 <tbody>
 <tr><td>Card</td><td><code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>, corners <code>--card-radius</code>.</td></tr>
 <tr><td>Neighbors</td><td>Faded under <code>--ds-surface</code> at 45%, <code>--section-stack-lg</code> apart (<code>--inline-lg</code> on a narrow stage).</td></tr>
-<tr><td>Ring</td><td><code>--control-lg</code> across, <code>--border-selected</code> wide. Track <code>--ds-border</code>; progress <code>--ds-background-brand-bold</code>.</td></tr>
+<tr><td>Ring</td><td><code>--control-lg</code> across, <code>--border-width-selected</code> wide. Track <code>--ds-border</code>; progress <code>--ds-background-brand-bold</code>.</td></tr>
 <tr><td>Progress indicator</td><td>The default <code>ProgressIndicator</code>: steps <code>--progress-indicator-dot-size-8</code>, the bar <code>--control-md</code> long, each step a <code>--control-sm</code> target.</td></tr>
 <tr><td>Motion</td><td>A move takes <code>--ds-motion-spatial-default</code>, fading on <code>--ds-motion-appearance-slow</code>. The caption lifts out over <code>--ds-motion-appearance-fast</code> and rises in over <code>--ds-motion-appearance-default</code>.</td></tr>
 <tr><td>Caption</td><td><code>Heading</code> size small; line in <code>--body-default</code> and <code>--ds-text-subtle</code>; at most <code>--content-max-width-reading</code> wide.</td></tr>

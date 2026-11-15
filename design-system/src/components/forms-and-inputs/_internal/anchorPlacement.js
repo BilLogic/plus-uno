@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { POPOVER_OFFSET, SCREEN_GAP, readPopoverOffset, readScreenGap } from '@/lib/popoverPlacement';
+import { POPUP_OFFSET, SCREEN_GAP, readPopupOffset, readScreenGap } from '@/lib/popupPlacement';
 import { overlayMountOf } from '@/lib/overlay';
 
 /**
@@ -7,14 +7,14 @@ import { overlayMountOf } from '@/lib/overlay';
  * every field popup shares with `_Listbox`, and the one the Popups pattern
  * (menu, popup, tooltip, flag) follows.
  *
- * - **Offset:** `--popover-offset` (4px) between the field's edge and the
+ * - **Offset:** `--popup-offset` (4px) between the field's edge and the
  *   popup.
  * - **Alignment:** the popup's left edge meets the field's, and it is at least
  *   as wide. `center` and `right` are for callers that ask (DatePicker's
  *   `calendarAlign`). A popup that would run off the right of the viewport
  *   right-aligns with the field instead.
  * - **Flip:** with no room below, it opens above, the same offset away.
- * - **Screen gap:** whatever the alignment, it stays `--popover-gap-screen`
+ * - **Screen gap:** whatever the alignment, it stays `--popup-gap-screen`
  *   (8px) inside the left, right and top edges of the screen. A list taller
  *   than the room below and above caps at its own max height and scrolls.
  */
@@ -30,7 +30,7 @@ import { overlayMountOf } from '@/lib/overlay';
  * @param {number} [options.screenGap] the least distance to the screen's edges
  * @returns {{placement: 'top'|'bottom', top: number, left: number, minWidth: number}}
  */
-export function placePopup({ anchor, width, height, viewport, align = 'left', offset = POPOVER_OFFSET, screenGap = SCREEN_GAP }) {
+export function placePopup({ anchor, width, height, viewport, align = 'left', offset = POPUP_OFFSET, screenGap = SCREEN_GAP }) {
     const below = viewport.height - anchor.bottom - offset;
     const above = anchor.top - offset;
     const flip = below < height && above > below;
@@ -116,7 +116,7 @@ export function useAnchoredPopup({ open, anchorRef, popupRef, align = 'left', on
             height: size.height,
             viewport: { width: bounds?.width ?? document.documentElement.clientWidth, height: bounds ? Infinity : window.innerHeight },
             align,
-            offset: readPopoverOffset(),
+            offset: readPopupOffset(),
             screenGap: readScreenGap(),
         });
         // A bounded canvas uses absolute coordinates in its portal container,

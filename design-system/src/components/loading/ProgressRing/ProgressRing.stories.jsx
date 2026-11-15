@@ -160,7 +160,7 @@ export const Size24 = () => <ProgressRing value={64} size={24} label="Uploading 
 export const WithInlineText = () => (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
         <ProgressRing value={64} label="Uploading session recording, 64%" />
-        <span className="body-small">Uploading · 64%</span>
+        <span className="body-sm">Uploading · 64%</span>
     </div>
 );
 

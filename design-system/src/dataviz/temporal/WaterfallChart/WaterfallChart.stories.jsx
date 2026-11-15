@@ -20,8 +20,8 @@ A waterfall chart shows how a value changes through **sequential additions and s
 
 ### How to Read
 - **First bar** = starting value
-- **Success bars** (\`--ds-chart-success\`) = positive additions
-- **Danger bars** (\`--ds-chart-danger\`) = deductions/losses
+- **Success bars** (\`--chart-success\`) = positive additions
+- **Danger bars** (\`--chart-danger\`) = deductions/losses
 - **Final bar** = ending total (sum)
 - Each bar floats from previous endpoint
 

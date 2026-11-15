@@ -50,9 +50,9 @@ Aligned to the edge of the trigger on the side where it sits. A trigger at the s
 | Token | Value | Used for |
 | --- | --- | --- |
 | `--popup-min-width`, `--popup-max-width` | 160, 320 | The auto range. |
-| `--popover-offset`, `--popover-gap-screen` | 4, 8 | Below the trigger; from the screen edge. |
-| `--popover-pad`, `--popup-radius` | 16, 12 | The layer's pad and its corner radius (12, `--popup-radius`). |
-| `--popover-max-height-menu` | 320 | A menu's rows scroll past this height. |
+| `--popup-offset`, `--popup-gap-screen` | 4, 8 | Below the trigger; from the screen edge. |
+| `--popup-pad`, `--popup-radius` | 16, 12 | The layer's pad and its corner radius (12, `--popup-radius`). |
+| `--dropdown-menu-max-height` | 320 | A menu's rows scroll past this height. |
 | `--ds-surface-overlay`, `--ds-shadow-overlay` | pair | The layer's fill and its one edge, the shadow's ring. |
 | `--layer-popup` | 400 | The layer's place in the stack. |
 
@@ -77,7 +77,7 @@ Popup is the component: placement, offset, outside click and Escape. Each type i
 
 ## Usage
 
-Use a Popup for content anchored to a trigger that leaves on an outside click or Escape: a menu of actions, a list to pick from, the filter menu behind the Filter icon, the profile menu, a short aside. It brings no Backdrop and the page stays usable.
+Use a Popup for content anchored to a trigger that leaves on an outside click or Escape: a menu of actions, a list to pick from, the filter menu behind the Filter icon, the profile menu, a short aside. It brings no Blanket and the page stays usable.
 
 | Type | Use when | Width | Applies |
 | --- | --- | --- | --- |
@@ -163,19 +163,19 @@ Don't: A Popup wider than 4-col: anything this wide is a Panel or a Modal.
 
 An outside click closes a Popup and loses what was typed.
 
-Do: Fields to finish go in a Modal, over its Backdrop.
+Do: Fields to finish go in a Modal, over its Blanket.
 Don't: A form in a Popup: an outside click loses what was typed.
 
 ### Open one Popup at a time, each off its own trigger. {#open-one-popup-at-a-time-each-off-its-own-trigger}
 
 **Checked:** Automatic
 
-A confirm Modal may open over a Popup and brings its own Backdrop. A Popup opened from a Modal sits above it; a Tooltip sits above everything.
+A confirm Modal may open over a Popup and brings its own Blanket. A Popup opened from a Modal sits above it; a Tooltip sits above everything.
 
 Do: One flat menu; a choice with two forms is two rows.
 Don't: A menu opening a second Popup beside it: two layers off one trigger.
 
-### Leave the Backdrop to the Modal. {#leave-the-backdrop-to-the-modal}
+### Leave the Blanket to the Modal. {#leave-the-blanket-to-the-modal}
 
 **Checked:** Automatic
 

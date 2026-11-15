@@ -14,7 +14,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'A fixed grid people read. Headers and rows accept either plain values or per-cell objects ({ content, align, emphasis, overflow, secondary, elemBefore, state, loading, colSpan, className }), so a cell can hold any node — a Badge, formatted currency. Rows rest or are highlighted; nothing in a Static table hovers, sorts, selects, pages or expands — see the Dynamic table for that.'
+                    'A fixed grid people read. Headers and rows accept either plain values or per-cell objects ({ content, align, emphasis, overflow, secondary, elemBefore, state, loading, colSpan, className }), so a cell can hold any node — a CountTag, formatted currency. Rows rest or are highlighted; nothing in a Static table hovers, sorts, selects, pages or expands — see the Dynamic table for that.'
             }
         }
     },

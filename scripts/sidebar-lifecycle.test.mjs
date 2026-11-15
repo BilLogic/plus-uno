@@ -12,7 +12,7 @@ import {
   COLLAPSED_ROOTS,
   lifecycleOf,
   lifecycleOfEntry,
-  badgeRules,
+  countTagRules,
 } from '../.storybook/sidebar-lifecycle.js';
 import { BACKGROUND_OPTIONS } from '../.storybook/backgrounds.js';
 import { MANAGER_MODES, MANAGER_TOKENS, resolveManagerThemes } from './lib/manager-theme.mjs';
@@ -55,11 +55,11 @@ test('roots foundations, components, data-visualizations and specs start collaps
 test('each badge is painted from tokens the manager theme resolves in every mode', () => {
   const themes = resolveManagerThemes();
   for (const mode of Object.keys(MANAGER_MODES)) {
-    const rules = badgeRules(themes[mode].vars);
+    const rules = countTagRules(themes[mode].vars);
     for (const tag of LIFECYCLE_TAGS) assert.match(rules, new RegExp(`data-lifecycle='${tag}'`));
     assert.doesNotMatch(rules, /undefined/, mode);
   }
-  assert.ok(MANAGER_TOKENS.vars['--plus-manager-badge-text']);
+  assert.ok(MANAGER_TOKENS.vars['--plus-manager-count-tag-text']);
 });
 
 test('preview backgrounds are surface tokens, defined in the semantic sheet, never literals', () => {

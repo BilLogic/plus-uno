@@ -135,20 +135,20 @@ const FIXED = {
   '--focused-page-stack-lg': '24px',
   '--focused-page-inline-sm': '8px',
   '--focused-page-inline-md': '12px',
-  '--popover-pad': '16px',
-  '--popover-width-sm': '320px',
-  '--popover-width-md': '400px',
-  '--popover-width-lg': '480px',
-  '--popover-width-flag': '400px',
-  '--popover-stack-flag': '16px',
-  '--popover-pad-menu': '4px',
-  '--popover-min-width-menu': '160px',
-  '--popover-max-width-menu': '320px',
-  '--popover-max-height-menu': '320px',
-  '--popover-pad-y-tooltip': '4px',
-  '--popover-max-width-tooltip': '240px',
-  '--popover-gap-screen': '8px',
-  '--popover-offset': '4px',
+  '--popup-pad': '16px',
+  '--popup-width-sm': '320px',
+  '--popup-width-md': '400px',
+  '--popup-width-lg': '480px',
+  '--flag-width': '400px',
+  '--flag-stack': '16px',
+  '--dropdown-menu-pad': '4px',
+  '--dropdown-menu-min-width': '160px',
+  '--dropdown-menu-max-width': '320px',
+  '--dropdown-menu-max-height': '320px',
+  '--tooltip-pad-y': '4px',
+  '--tooltip-max-width': '240px',
+  '--popup-gap-screen': '8px',
+  '--popup-offset': '4px',
 };
 
 test('every Layout token resolves to its value at Medium, Large and X-Large', () => {
@@ -303,8 +303,8 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
     '--screen-pad-x': 'var(--space-150)',
     '--section-min-width-main': 'var(--width-3000)',
     '--modal-radius': 'var(--radius-xxl)',
-    '--popover-max-height-menu': 'var(--height-2000)',
-    '--popover-offset': 'var(--space-025)',
+    '--dropdown-menu-max-height': 'var(--height-2000)',
+    '--popup-offset': 'var(--space-025)',
   };
   for (const [name, raw] of Object.entries(ALIASES)) assert.equal(corpus.get(name)?.raw, raw, name);
   for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad']) {
@@ -323,12 +323,12 @@ test('the code-only frame tokens resolve, unchanged', () => {
 });
 
 // `--modal-pad-x-default` (ADR-038, tokens/ladder, outside this file's corpus) is
-// non-responsive, same 16px the old `--modal-pad` held at every mode. `--popover-pad` is 16 too.
+// non-responsive, same 16px the old `--modal-pad` held at every mode. `--popup-pad` is 16 too.
 const MODAL_PAD_PX = 16;
 
 /*
  * The screen grid (`styles/_screen-grid.scss`) is the one rule every
- * floating layer takes its column steps from: Modal, the Backdrop patterns and
+ * floating layer takes its column steps from: Modal, the Blanket patterns and
  * Popup. At the three mode widths it has to land on Figma's Modal/width-modal-*.
  */
 const SCREEN_GRID_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/styles/_screen-grid.scss'), 'utf8');
@@ -386,7 +386,7 @@ test('Modal takes its 6 · 8 · 10 column widths from the shared screen grid', (
 
 test('Popup\'s 3-col and 4-col take the same screen grid, and POPUP_WIDTH_PX is that rule at 768 · 1024 · 1280', () => {
   assert.match(POPUP_SCSS, /@use '[./]*styles\/screen-grid' as \*;/);
-  assert.match(POPUP_SCSS, /@include screen-grid-width\(var\(--popover-pad\)\);/);
+  assert.match(POPUP_SCSS, /@include screen-grid-width\(var\(--popup-pad\)\);/);
   assert.match(POPUP_SCSS, /&\.plus-popup--3-col \{\s*--plus-overlay-span: 3;/);
   assert.match(POPUP_SCSS, /&\.plus-popup--4-col \{\s*--plus-overlay-span: 4;/);
   const px = exportedValue(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Popup/Popup.jsx', 'POPUP_WIDTH_PX');
@@ -405,8 +405,8 @@ test('the Frame stacks its layers by name: no arithmetic on --layer-navigation a
   assert.doesNotMatch(scss, /z-index:\s*-?\d/);
 });
 
-test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start < Backdrop < Panel peek', () => {
-  const order = ['edge', 'sidebar', 'topbar-start', 'blanket', 'panel-peek'].map((n) => `--frame-layer-${n}`);
+test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start < Blanket < Panel peek', () => {
+  const order = ['edge', 'sidebar', 'topbar-start', 'blanket', 'panel-peek'].map((n) => `--layer-frame-${n}`);
   const values = order.map((n) => {
     const token = corpus.get(n);
     assert.ok(token, `${n} is not declared`);
@@ -420,7 +420,7 @@ test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start 
   });
   assert.deepEqual(resolved, [...resolved].sort((a, b) => a - b));
   assert.equal(new Set(resolved).size, resolved.length);
-  assert.ok(corpus.get('--frame-layer-splitter'), 'the splitter layer is named');
+  assert.ok(corpus.get('--layer-frame-splitter'), 'the splitter layer is named');
 });
 
 test('one hairline token across the Frame: the semantic border width, never the primitive', () => {

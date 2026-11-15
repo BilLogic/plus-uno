@@ -156,7 +156,7 @@ export const HeaderCustom = {
             title="This week"
             header={(
                 <>
-                    <p style={{ margin: 0, font: 'var(--heading-medium)' }}>Week of October 20</p>
+                    <p style={{ margin: 0, font: 'var(--heading-md)' }}>Week of October 20</p>
                     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>12 sessions · 3 tutors out</p>
                 </>
             )}
@@ -690,7 +690,7 @@ export const DetailSplitHoldsWithPanelAt1440 = {
         await waitFor(() => expect(p.sidebar(), 'the Sidebar collapsed to keep 960').toBeNull());
         await waitFor(() => expect(rect(p.root).width).toBeGreaterThanOrEqual(SECTION_DETAIL_FLOOR));
         await expectSplit(p, 1440 - 400 - 48);
-        await expect(canvasElement.querySelector('.plus-frame__backdrop'), 'the Panel stays docked').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame__blanket'), 'the Panel stays docked').toBeNull();
     }),
 };
 
@@ -758,7 +758,7 @@ const Facts = ({ pairs, columns = 2 }) => (
     <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: 'var(--stack-lg) var(--grid-gutter)' }}>
         {pairs.map(([label, value]) => (
             <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <dt style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{label}</dt>
+                <dt style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{label}</dt>
                 <dd style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{value}</dd>
             </div>
         ))}

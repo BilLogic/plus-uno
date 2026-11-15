@@ -98,15 +98,15 @@ const show = (px) => (px === undefined || Number.isNaN(px) ? '' : px >= 999 ? 'f
 /* ---------------------------------------------------------------- layout */
 
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' };
-const small = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
-const codeText = { font: 'var(--code)', color: 'var(--ds-text-subtle)' };
+const small = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const codeText = { font: 'var(--code-default)', color: 'var(--ds-text-subtle)' };
 const well = {
     position: 'relative',
     padding: 'var(--card-pad-spacious)',
     borderRadius: 'var(--card-radius)',
     background: 'var(--ds-surface-sunken)',
 };
-const badge = {
+const countTag = {
     display: 'grid',
     placeItems: 'center',
     width: 'var(--image-xs)',
@@ -114,11 +114,11 @@ const badge = {
     borderRadius: 'var(--radius-full)',
     background: 'var(--ds-background-brand-bold)',
     color: 'var(--ds-text-inverse)',
-    font: 'var(--heading-xsmall)',
+    font: 'var(--heading-xs)',
 };
 
 /**
- * A drawing in a well with numbered badges pinned to its parts, and a legend
+ * A drawing in a well with numbered countTags pinned to its parts, and a legend
  * beside it naming each part, its token and the value the token resolves to.
  * `parts`: `{ id, title, token?, value?, at: [x, y] }`, `at` in drawing units.
  */
@@ -137,7 +137,7 @@ const Legended = ({ testid, title, stage, parts, children }) => {
                             key={p.id}
                             aria-hidden="true"
                             style={{
-                                ...badge,
+                                ...countTag,
                                 position: 'absolute',
                                 insetInlineStart: `calc(${(p.at[0] / stage.w) * 100}% - var(--image-xs) / 2)`,
                                 insetBlockStart: `calc(${(p.at[1] / stage.h) * 100}% - var(--image-xs) / 2)`,
@@ -151,7 +151,7 @@ const Legended = ({ testid, title, stage, parts, children }) => {
             <ol data-testid="radius-legend" aria-label="Parts and their radius" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                 {parts.map((p, i) => (
                     <li key={p.id} data-legend={p.id} style={{ display: 'grid', gridTemplateColumns: 'var(--image-xs) 1fr', columnGap: 'var(--inline-md)', alignItems: 'center' }}>
-                        <span aria-hidden="true" style={badge}>{i + 1}</span>
+                        <span aria-hidden="true" style={countTag}>{i + 1}</span>
                         <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
                             <strong>{p.title}</strong>
                             <span data-value>{p.value ?? show(values[p.token])}</span>
@@ -165,18 +165,18 @@ const Legended = ({ testid, title, stage, parts, children }) => {
 };
 
 /** A menu row inset in a Popup: the Popup's radius minus its inset. */
-const ROW_CORNER = 'calc(var(--popup-radius) - var(--popover-pad-menu))';
+const ROW_CORNER = 'calc(var(--popup-radius) - var(--dropdown-menu-pad))';
 
 /* ----------------------------------------------------------------- scale */
 
 const STEPS = [
-    { token: '--radius-0125', role: 'Small details' },
-    { token: '--radius-025', role: 'Tight grids, tags, compact buttons' },
-    { token: '--radius-0375', role: '24 high controls, default buttons' },
-    { token: '--radius-050', role: '32 high controls, the smallest nested visual' },
-    { token: '--radius-0625', role: '40 high fields' },
-    { token: '--radius-075', role: 'Popup, compact Card, Table' },
-    { token: '--radius-100', role: 'Section, Modal, Card' },
+    { token: '--radius-sm', role: 'Small details' },
+    { token: '--radius-md', role: 'Tight grids, tags, compact buttons' },
+    { token: '--radius-control-sm', role: '24 high controls, default buttons' },
+    { token: '--radius-lg', role: '32 high controls, the smallest nested visual' },
+    { token: '--radius-control-lg', role: '40 high fields' },
+    { token: '--radius-xl', role: 'Popup, compact Card, Table' },
+    { token: '--radius-xxl', role: 'Section, Modal, Card' },
     { token: '--radius-full', role: 'Pills' },
 ];
 
@@ -192,7 +192,7 @@ export const ScaleStrip = () => {
                         <TokenRect x={0} y={0} w={64} h={64} token={s.token} fill={PAINT.shape} data-corner="" />
                     </Illustration>
                     <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <strong data-value style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{show(values[s.token])}</strong>
+                        <strong data-value style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{show(values[s.token])}</strong>
                         <span style={small}>{s.role}</span>
                     </figcaption>
                 </figure>
@@ -238,7 +238,7 @@ const Values = ({ items }) => {
         <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-sm) var(--inline-lg)' }}>
             {probes}
             {items.map((i) => (
-                <li key={i.id} data-legend={i.id} style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-small)', color: 'var(--ds-text)' }}>
+                <li key={i.id} data-legend={i.id} style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-sm)', color: 'var(--ds-text)' }}>
                     <span style={{ color: 'var(--ds-text-subtle)' }}>{i.title}</span>
                     <strong data-value>{i.value ?? show(values[i.token])}</strong>
                     {i.token && <code style={codeText}>{i.token}</code>}
@@ -296,13 +296,13 @@ export const ButtonInField = () => (
                 <TokenRect x={4} y={8} w={120} h={40} token="--radius-control-lg" fill={PAINT.fieldSurface} stroke={PAINT.fieldBorder} data-part="field" />
                 <SkeletonBar x={16} y={26} w={44} />
                 <TokenRect x={88} y={12} w={32} h={32} token="--button-radius-default" fill={PAINT.shape} data-part="button" />
-                <TokenRect x={98} y={22} w={12} h={12} token="--radius-0125" fill={PAINT.sidebarIcon} />
+                <TokenRect x={98} y={22} w={12} h={12} token="--radius-sm" fill={PAINT.sidebarIcon} />
             </g>
             <g data-density="compact">
                 <TokenRect x={140} y={12} w={80} h={32} token="--radius-control-md" fill={PAINT.fieldSurface} stroke={PAINT.fieldBorder} data-part="field" />
                 <SkeletonBar x={150} y={26} w={28} />
                 <TokenRect x={192} y={16} w={24} h={24} token="--button-radius-compact" fill={PAINT.shape} data-part="button" />
-                <TokenRect x={198} y={22} w={12} h={12} token="--radius-0125" fill={PAINT.sidebarIcon} />
+                <TokenRect x={198} y={22} w={12} h={12} token="--radius-sm" fill={PAINT.sidebarIcon} />
             </g>
         </Illustration>
     </CloseUp>
@@ -339,7 +339,7 @@ export const WindowEdge = () => {
             <Illustration width={300} height={128} title="A Page running to the window's edge, and a Modal whose footer runs to its sides">
                 <defs>
                     <clipPath id={`${clip}-window`}>
-                        <TokenRect x={4} y={4} w={140} h={120} token="--radius-0375" scale="kit" />
+                        <TokenRect x={4} y={4} w={140} h={120} token="--radius-control-sm" scale="kit" />
                     </clipPath>
                 </defs>
                 <Frame x={4} y={4} w={140} h={120} />
@@ -411,9 +411,9 @@ export const OverrideDont = () => <ButtonRow odd title="One button rounded to a 
 /** A Card and a tag on the scale, or nudged off it to 14 and 5. */
 const OnScale = ({ off, title }) => (
     <Illustration width={160} height={80} title={title}>
-        <TokenRect x={8} y={8} w={144} h={64} token={off ? 'calc(var(--radius-100) - var(--radius-0125))' : '--card-radius'} fill={PAINT.cardSurface} stroke={PAINT.frameDivider} />
+        <TokenRect x={8} y={8} w={144} h={64} token={off ? 'calc(var(--radius-xxl) - var(--radius-sm))' : '--card-radius'} fill={PAINT.cardSurface} stroke={PAINT.frameDivider} />
         <SkeletonBar x={20} y={22} w={64} heading />
-        <TokenRect x={20} y={40} w={40} h={16} token={off ? 'calc(var(--radius-025) + var(--radius-0125) / 2)' : '--radius-md'} fill={PAINT.countSurface} />
+        <TokenRect x={20} y={40} w={40} h={16} token={off ? 'calc(var(--radius-md) + var(--radius-sm) / 2)' : '--radius-md'} fill={PAINT.countSurface} />
         <SkeletonBar x={28} y={46} w={24} />
     </Illustration>
 );
@@ -436,7 +436,7 @@ export const TightDont = () => <TightGrid big title="Six tiles 2 apart, rounded 
 /** A Modal header with its title and close control. */
 const Header = ({ children }) => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--inline-md)', padding: 'var(--card-pad-default)', borderRadius: 'var(--modal-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)' }}>
-        <span style={{ font: 'var(--heading-small)', color: 'var(--ds-text)' }}>Session details</span>
+        <span style={{ font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Session details</span>
         {children}
     </div>
 );
@@ -449,7 +449,7 @@ export const CloseDo = () => (
 
 export const CloseDont = () => (
     <Header>
-        <span aria-hidden="true" style={{ display: 'grid', placeItems: 'center', width: 'var(--item-height-md)', height: 'var(--item-height-md)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)', color: 'var(--ds-icon-subtle)' }}>
+        <span aria-hidden="true" style={{ display: 'grid', placeItems: 'center', width: 'var(--control-md)', height: 'var(--control-md)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)', color: 'var(--ds-icon-subtle)' }}>
             <i className="fa-solid fa-xmark" />
         </span>
     </Header>

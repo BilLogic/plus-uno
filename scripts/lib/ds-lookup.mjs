@@ -439,7 +439,9 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       if (/-(hovered|pressed)$/.test(n)) score -= t.state;
       if (score > 0) steps.push({ kind: 'token', name: tok.name, status: 'exists', tier: tok.tier, intent: tok.intent ?? null, score });
     }
-    steps.sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : 1));
+    // For tied hue matches, shared roles lead component colors; a prefix rename preserves discovery.
+    const componentColor = (name) => /^--(chart|skeleton)-/.test(name);
+    steps.sort((a, b) => b.score - a.score || Number(componentColor(a.name)) - Number(componentColor(b.name)) || (a.name < b.name ? -1 : 1));
     if (ql.length > 2) for (const { row, bl } of notHere) if (row.kind === 'token' && bl.includes(bareQuery)) steps.push(notHereRow(row));
     return steps.slice(0, top > t.yield ? PER_KIND.token - 1 : PER_KIND.token);
   }

@@ -52,7 +52,7 @@ const EXCLUDED = /\.(stories|test)\.[jt]sx?$/;
 export const MIN_FILES = 200;
 
 export const REMEDY =
-  '  -> Give the text a style (`font: var(--body-default)`, `var(--heading-small)`, …)\n' +
+  '  -> Give the text a style (`font: var(--body-default)`, `var(--heading-sm)`, …)\n' +
   '     or an icon a size (`font-size: var(--icon-md)`), with no literal fallback.';
 
 const KEYWORDS = /\b(xx-small|x-small|small|medium|large|x-large|xx-large|xxx-large|smaller|larger)\b/;

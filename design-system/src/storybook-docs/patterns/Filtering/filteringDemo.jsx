@@ -185,7 +185,7 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
     // A menu a press opens mounts where `container` points at that moment: until the picture's element is in state, those filters wait, so no menu lands on the page. A held-open menu waits on its own (`held`).
     if (mount === null && !openMenu) filters = null;
 
-    const status = <span role="status" style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
+    const status = <span role="status" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
     const swapKey = `${activeView}:${JSON.stringify(value)}`;
     const rawResults = rows.length > 0 ? <StudentsTable rows={rows} /> : (
         <EmptyState

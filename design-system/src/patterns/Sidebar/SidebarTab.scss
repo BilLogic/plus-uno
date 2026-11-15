@@ -14,7 +14,7 @@
     gap: var(--inline-md);
     width: 100%;
     min-width: 0;
-    height: var(--item-height-md);
+    height: var(--control-md);
     box-sizing: border-box;
     padding: 0 var(--pad-x-md);
     border-radius: var(--radius-control-md);
@@ -84,7 +84,7 @@
 }
 
 .plus-sidebar-tab__description {
-    font: var(--body-small);
+    font: var(--body-sm);
     color: var(--ds-text-subtle);
 }
 
@@ -92,7 +92,7 @@
 // as the Figma row does with its min height 32 and pad-y 2.
 .plus-sidebar-tab--with-description {
     height: auto;
-    min-height: var(--item-height-md);
+    min-height: var(--control-md);
     padding-top: var(--pad-y-sm);
     padding-bottom: var(--pad-y-sm);
 }
@@ -175,7 +175,7 @@
     // Hover or focus anywhere in the item reveals the actions. Room for them,
     // so the label truncates before it reaches them.
     @include plus-state(
-        (hovered: (padding-right: calc(var(--pad-x-sm) + var(--item-height-sm)))),
+        (hovered: (padding-right: calc(var(--pad-x-sm) + var(--control-sm)))),
         $ring: false,
         $hovered-selector: '&:hover > .plus-sidebar-tab, &:focus-within > .plus-sidebar-tab'
     );

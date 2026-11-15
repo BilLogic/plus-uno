@@ -83,3 +83,10 @@ test('a component family parent redirects to its Name/Name page, whose story is 
     assert.ok(sources.includes(`title: '${title}',`), `no story is titled ${title}`);
   }
 });
+
+
+test('historical Modal Backdrop bookmarks land on the Blanket section', () => {
+  assert.deepEqual(rules.find((r) => r.from === 'templates-modal-backdrop'), {
+    from: 'templates-modal-backdrop', to: 'templates-modal', anchor: '#blanket',
+  });
+});

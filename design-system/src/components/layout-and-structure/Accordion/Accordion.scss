@@ -19,7 +19,7 @@
     // --- ACCORDION ITEM ---
     .plus-accordion-item {
         background-color: var(--ds-surface);
-        border: var(--border-default) solid var(--ds-border);
+        border: var(--border-width-default) solid var(--ds-border);
 
         &:first-of-type {
             border-top-left-radius: var(--card-radius-compact);
@@ -60,7 +60,7 @@
         padding: var(--card-pad-default) var(--card-pad-default);
         background-color: var(--ds-surface);
         color: var(--ds-text-subtle);
-        font: var(--heading-small);
+        font: var(--heading-sm);
         border: none;
         text-align: left;
         transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
@@ -111,8 +111,8 @@
         padding: var(--card-pad-default) var(--card-pad-default);
         background-color: var(--ds-surface);
         color: var(--ds-text-subtle);
-        font: var(--body-large);
-        border-top: var(--border-default) solid var(--ds-border);
+        font: var(--body-lg);
+        border-top: var(--border-width-default) solid var(--ds-border);
         text-align: left;
     }
 
@@ -123,7 +123,7 @@
             border: none;
             border-radius: 0 !important;
             background: transparent;
-            border-bottom: var(--border-default) solid var(--ds-border);
+            border-bottom: var(--border-width-default) solid var(--ds-border);
 
             .plus-accordion-trigger,
             .plus-accordion-body {

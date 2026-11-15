@@ -158,7 +158,7 @@ Same group: `Link` · `Pagination` · `Sidebar` · `Tabs`
 | --- | --- |
 | Ancestor link | `--ds-link` |
 | Separator and current page | `--ds-text-subtlest` |
-| Row | `--item-height-md`, `--body-default` |
+| Row | `--control-md`, `--body-default` |
 | Gap and separator space | `--stack-md` |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width` |
 
@@ -184,7 +184,7 @@ Same group: `Link` · `Pagination` · `Sidebar` · `Tabs`
 
 ## Tokens touched
 
-`--body-default` · `--ds-link` · `--ds-text-subtlest` · `--item-height-md` · `--plus-breadcrumb-divider` · `--stack-md`
+`--body-default` · `--control-md` · `--ds-link` · `--ds-text-subtlest` · `--plus-breadcrumb-divider` · `--stack-md`
 
 From `design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss`. Override these through the token layer, never with a literal.
 

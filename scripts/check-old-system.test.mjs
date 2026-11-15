@@ -64,7 +64,7 @@ test('the old size and spacing names fail, the retired ladder names too; the cur
   const found = findings(src('design-system/src/components/A/A.scss', css));
   assert.equal(found.length, 1);
   assert.match(found[0].message, /3 x size/);
-  const current = '.a { gap: var(--card-stack-md); padding: var(--space-100); width: var(--size-300); border-radius: var(--radius-075); height: var(--icon-md); }';
+  const current = '.a { gap: var(--card-stack-md); padding: var(--space-100); width: var(--size-300); border-radius: var(--space-075); height: var(--icon-md); }';
   assert.deepEqual(findings(src('design-system/src/components/A/A.scss', current)), []);
 });
 
@@ -82,9 +82,9 @@ test('the old type tokens and classes fail; the current text styles and steps pa
   assert.match(found.find((f) => f.file.endsWith('.scss')).message, /3 x type/);
   assert.match(found.find((f) => f.file.endsWith('.jsx')).message, /2 x type/);
   const current = [
-    '.a { font: var(--body-default); font-size: var(--font-size-0875); font-weight: var(--type-weight-medium); }',
+    '.a { font: var(--body-default); font-size: var(--type-size-0875); font-weight: var(--type-weight-medium); }',
     '.b { font-size: var(--icon-lg); }',
-    '<p className="body-default">a</p><h2 className="heading-large">b</h2><h4>c</h4>',
+    '<p className="body-default">a</p><h2 className="heading-lg">b</h2><h4>c</h4>',
   ].join('\n');
   assert.deepEqual(findings(src('design-system/src/components/A/A.jsx', current)), []);
 });

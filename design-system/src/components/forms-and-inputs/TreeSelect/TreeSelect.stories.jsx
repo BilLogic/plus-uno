@@ -186,7 +186,7 @@ export const Interactive = (args) => {
                 placeholder={args.placeholder}
             />
             {selectionSummary && (
-                <p style={{ marginTop: 'var(--stack-md)', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                <p style={{ marginTop: 'var(--stack-md)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                     Selected: {selectionSummary}
                 </p>
             )}

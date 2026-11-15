@@ -49,7 +49,7 @@ precisely, use `BulletChart`. For a completion share with a centered label, use
     head={['Part', 'What it does']}
     rows={[
         ['Track', <>Half-circle arc behind the fill in <C>--ds-background-neutral</C>, spanning <C>min</C> to <C>max</C> (default 0 to 100).</>],
-        ['Fill', <>Grows from the left end to <C>value</C> in <C>color</C> (default <C>--ds-chart-brand</C>).</>],
+        ['Fill', <>Grows from the left end to <C>value</C> in <C>color</C> (default <C>--chart-brand</C>).</>],
         ['Scale labels', <>Labels only <C>min</C> and <C>max</C> at the two ends, with no intermediate ticks.</>],
         ['Value and label', <>Prints <C>value</C> in bold beneath the arc with <C>label</C> under it in subtle text.</>],
         ['Height', <>Pixel height from <C>height</C> (default 300).</>],
@@ -75,7 +75,7 @@ precisely, use `BulletChart`. For a completion share with a centered label, use
 
 ## Color and accessibility
 
-- **Brand by default, status when meaningful.** The fill uses `--ds-chart-brand` unless `color` is set (it does not change dynamically with `value`). When encoding status with `STATUS.success`, `STATUS.warning` or `STATUS.danger`, state the status in `label` or surrounding copy.
+- **Brand by default, status when meaningful.** The fill uses `--chart-brand` unless `color` is set (it does not change dynamically with `value`). When encoding status with `STATUS.success`, `STATUS.warning` or `STATUS.danger`, state the status in `label` or surrounding copy.
 - **Arc length and printed value.** Because `value` is always printed under the arc, the gauge reads without hue.
 - **Keep the scale honest.** Setting `min` above zero exaggerates small values; use a non-zero `min` only when the scale genuinely starts there.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, a per-point label, and keyboard navigation to the value. Name the chart in its surrounding Section or Card header.

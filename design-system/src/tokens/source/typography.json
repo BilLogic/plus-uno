@@ -14,7 +14,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--font-size-075)"
+        "WEB": "var(--type-size-075)"
       },
       "valuesByMode": {
         "19364:0": 12
@@ -33,7 +33,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--font-size-0875)"
+        "WEB": "var(--type-size-0875)"
       },
       "valuesByMode": {
         "19364:0": 14
@@ -52,7 +52,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--font-size-100)"
+        "WEB": "var(--type-size-100)"
       },
       "valuesByMode": {
         "19364:0": 16
@@ -71,7 +71,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--font-size-125)"
+        "WEB": "var(--type-size-125)"
       },
       "valuesByMode": {
         "19364:0": 20
@@ -90,7 +90,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--font-size-150)"
+        "WEB": "var(--type-size-150)"
       },
       "valuesByMode": {
         "19364:0": 24
@@ -109,7 +109,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--font-size-175)"
+        "WEB": "var(--type-size-175)"
       },
       "valuesByMode": {
         "19364:0": 28
@@ -128,7 +128,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--font-size-200)"
+        "WEB": "var(--type-size-200)"
       },
       "valuesByMode": {
         "19364:0": 32
@@ -147,7 +147,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--line-height-100)"
+        "WEB": "var(--type-line-height-100)"
       },
       "valuesByMode": {
         "19364:0": 16
@@ -166,7 +166,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--line-height-125)"
+        "WEB": "var(--type-line-height-125)"
       },
       "valuesByMode": {
         "19364:0": 20
@@ -185,7 +185,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--line-height-150)"
+        "WEB": "var(--type-line-height-150)"
       },
       "valuesByMode": {
         "19364:0": 24
@@ -204,7 +204,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--line-height-175)"
+        "WEB": "var(--type-line-height-175)"
       },
       "valuesByMode": {
         "19364:0": 28
@@ -223,7 +223,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--line-height-200)"
+        "WEB": "var(--type-line-height-200)"
       },
       "valuesByMode": {
         "19364:0": 32
@@ -242,7 +242,7 @@
       ],
       "hiddenFromPublishing": true,
       "codeSyntax": {
-        "WEB": "var(--line-height-225)"
+        "WEB": "var(--type-line-height-225)"
       },
       "valuesByMode": {
         "19364:0": 36
@@ -484,7 +484,7 @@
     {
       "id": "S:0ed9850bc32acd70372f2267ea06dec4fdb425ce,",
       "name": "Heading/xxlarge",
-      "description": "CSS: var(--heading-xxlarge)",
+      "description": "CSS: var(--heading-xxl)",
       "boundVariables": {
         "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:105",
@@ -499,7 +499,7 @@
     {
       "id": "S:73116d2afedb2caa9861643023b0234cbb831071,",
       "name": "Heading/xlarge",
-      "description": "CSS: var(--heading-xlarge)",
+      "description": "CSS: var(--heading-xl)",
       "boundVariables": {
         "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:104",
@@ -514,7 +514,7 @@
     {
       "id": "S:2a7efad1464e56c45c3682969b1e20d75c2283d2,",
       "name": "Heading/large",
-      "description": "CSS: var(--heading-large)",
+      "description": "CSS: var(--heading-lg)",
       "boundVariables": {
         "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:103",
@@ -529,7 +529,7 @@
     {
       "id": "S:c5fc7d7d8e564872c98ae451b2191e74b41ab447,",
       "name": "Heading/medium",
-      "description": "CSS: var(--heading-medium)",
+      "description": "CSS: var(--heading-md)",
       "boundVariables": {
         "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:102",
@@ -540,7 +540,7 @@
     {
       "id": "S:c93ddcb756348f9b6263ad61b599d268e70b75ea,",
       "name": "Heading/small",
-      "description": "CSS: var(--heading-small)",
+      "description": "CSS: var(--heading-sm)",
       "boundVariables": {
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:101",
@@ -551,7 +551,7 @@
     {
       "id": "S:730be28629d6bf631f2d46f665bea8f70018b531,",
       "name": "Heading/xsmall",
-      "description": "CSS: var(--heading-xsmall)",
+      "description": "CSS: var(--heading-xs)",
       "boundVariables": {
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:100",
@@ -562,7 +562,7 @@
     {
       "id": "S:7e7932287e837cdb1dfb125c004af6fbc7287c56,",
       "name": "Heading/xxsmall",
-      "description": "CSS: var(--heading-xxsmall)",
+      "description": "CSS: var(--heading-xxs)",
       "boundVariables": {
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:99",
@@ -573,7 +573,7 @@
     {
       "id": "S:ba6312f40fa41923124bf3a88b3eda3e5b25969d,",
       "name": "Body/large",
-      "description": "CSS: var(--body-large)",
+      "description": "CSS: var(--body-lg)",
       "boundVariables": {
         "fontFamily": "VariableID:19364:113",
         "fontSize": "VariableID:19364:101",
@@ -595,7 +595,7 @@
     {
       "id": "S:22fc1dd33b8ea4831b40c53e2eacea69733fcff3,",
       "name": "Body/small",
-      "description": "CSS: var(--body-small)",
+      "description": "CSS: var(--body-sm)",
       "boundVariables": {
         "fontFamily": "VariableID:19364:113",
         "fontSize": "VariableID:19364:99",
@@ -606,7 +606,7 @@
     {
       "id": "S:a34307720a50ba4fed1bc0ba242e869a2e39894f,",
       "name": "Metric/large",
-      "description": "CSS: var(--metric-large)",
+      "description": "CSS: var(--metric-lg)",
       "boundVariables": {
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:104",
@@ -617,7 +617,7 @@
     {
       "id": "S:52a40030528fcf2203affe70f95938707ba87b78,",
       "name": "Metric/medium",
-      "description": "CSS: var(--metric-medium)",
+      "description": "CSS: var(--metric-md)",
       "boundVariables": {
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:103",
@@ -628,7 +628,7 @@
     {
       "id": "S:71bd013c1444fe78265faf4d237107bd2f051003,",
       "name": "Metric/small",
-      "description": "CSS: var(--metric-small)",
+      "description": "CSS: var(--metric-sm)",
       "boundVariables": {
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:101",

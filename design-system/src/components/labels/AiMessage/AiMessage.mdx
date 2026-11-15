@@ -56,7 +56,7 @@ An AI reply with thinking, streaming and complete states, identified by the AI i
 
 <ComponentExample of={AiMessageStories.Streaming} title="Streaming" description="Text still arriving: a caret follows the last character." />
 
-<ComponentExample of={AiMessageStories.TypingIndicator} title="Thinking" description="Three pulsing dots before any text exists." />
+<ComponentExample of={AiMessageStories.TypingIndicator} title="Thinking" description="A pulsing progress indicator before any text exists." />
 
 </div>
 
@@ -116,7 +116,7 @@ status from the table below.
 1. **AI icon.** The small AI icon at 16, named "AI", centered on the first line, so no answer reads as a person's.
 2. **Text.** The body style, keeping the reply's line breaks. With <code>parts</code>, text parts and other parts in order; <code>renderPart</code> draws a part that is not text.
 3. **Caret.** Streaming only: a thin bar after the last character, blinking.
-4. **Typing indicator.** Thinking only: three pulsing dots in place of the text.
+4. **Progress indicator.** Thinking only: three pulsing marks in place of the text.
 5. **Sources** (optional). Complete only: a counted "Sources" toggle, closed by default, with linked titles and types inside.
 6. **Feedback** (optional). Complete only, with <code>onFeedback</code>: thumbs up and down and a quiet thanks beside them.
 
@@ -130,7 +130,7 @@ status from the table below.
 <tr><td>Complete</td><td>The text, then the sources and the thumbs when they are passed. With <code>typeOut</code>, the text types out character by character (<code>TypingText</code> takes <code>speed</code>, in milliseconds per character, and <code>onComplete</code>). <code>linkTarget</code> sets where links open, such as <code>_top</code> from inside a frame, and <code>resolveHref</code> rewrites a link's address.</td></tr>
 <tr><td>Streaming</td><td>A caret follows the last character, and the message carries <code>aria-busy</code>. No sources and no thumbs yet.</td></tr>
 <tr><td>Thinking</td><td>The typing indicator, a status named "AI is writing", in place of the text.</td></tr>
-<tr><td>Reduced motion</td><td>The caret and dots stop animating, and typed-out text shows at once.</td></tr>
+<tr><td>Reduced motion</td><td>The caret and progress indicator stop animating, and typed-out text shows at once.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -144,10 +144,10 @@ status from the table below.
 <tr><td>Text</td><td><code>--body-default</code> in <code>--ds-text</code>.</td></tr>
 <tr><td>Icon to text</td><td><code>--inline-md</code>; the icon centers on the first line against <code>--icon-md</code>.</td></tr>
 <tr><td>Between parts</td><td><code>--stack-md</code>.</td></tr>
-<tr><td>Typing dots</td><td><code>--ds-text-subtle</code>, <code>--radius-full</code>, <code>--stack-sm</code> apart.</td></tr>
-<tr><td>Caret and dots motion</td><td><code>--ds-motion-loop</code>, with the dots offset by a quarter and a half cycle.</td></tr>
-<tr><td>Sources</td><td>Heading <code>--heading-xxsmall</code> in <code>--ds-text-subtle</code>; type <code>--body-small</code> in <code>--ds-text-subtle</code>; rows <code>--stack-sm</code> apart.</td></tr>
-<tr><td>Feedback</td><td>Thanks <code>--body-small</code> in <code>--ds-text-subtle</code>; buttons <code>--inline-sm</code> apart.</td></tr>
+<tr><td>Progress indicator</td><td><code>--ds-text-subtle</code>, <code>--radius-full</code>, <code>--stack-sm</code> apart.</td></tr>
+<tr><td>Caret and progress indicator motion</td><td><code>--ds-motion-loop</code>, with its three marks offset by a quarter and a half cycle.</td></tr>
+<tr><td>Sources</td><td>Heading <code>--heading-xxs</code> in <code>--ds-text-subtle</code>; type <code>--body-sm</code> in <code>--ds-text-subtle</code>; rows <code>--stack-sm</code> apart.</td></tr>
+<tr><td>Feedback</td><td>Thanks <code>--body-sm</code> in <code>--ds-text-subtle</code>; buttons <code>--inline-sm</code> apart.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -228,8 +228,8 @@ for rating changes and the optional, skippable comment.
   screen reader waits for the finished text. A typed-out reply carries its full
   text for assistive technology and hides the character-by-character copy.
 - **Announced indicator.** The typing indicator is a status named "AI is writing";
-  its dots are hidden from assistive technology.
-- **Reduced motion.** The caret and dots stop animating, and typed-out text
+  its visual marks are hidden from assistive technology.
+- **Reduced motion.** The caret and progress indicator stop animating, and typed-out text
   shows at once.
 
 </div>

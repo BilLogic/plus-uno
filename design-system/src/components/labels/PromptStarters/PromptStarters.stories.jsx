@@ -4,7 +4,7 @@ import PromptStarters from './PromptStarters';
 import { PromptInput } from '@/components';
 /**
  * `PromptStarters` — a few things a person could ask the AI, as a wrapping
- * row of `Suggestion` chips.
+ * row of `Suggestion` tags.
  *
  * THE TEST SEAM IS THIS FILE. `play:` functions assert the group role and
  * name, that a press hands back the whole starter, and that pressing one never
@@ -25,7 +25,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'A wrapping row of prompt Suggestion chips. A press hands the whole starter to '
+                    'A wrapping row of prompt Suggestion tags. A press hands the whole starter to '
                     + '`onSelect`; it never sends anything by itself.',
             },
         },
@@ -63,7 +63,7 @@ export const SelectHandsBackTheStarter = {
             <PromptStarters {...args} />
         </div>
     ),
-    /** Pressing a chip calls `onSelect` with the whole starter object. */
+    /** Pressing a tag calls `onSelect` with the whole starter object. */
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Plan next steps, suggested' }));

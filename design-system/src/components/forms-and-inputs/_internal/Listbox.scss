@@ -2,29 +2,29 @@
 /*
  * Listbox — the internal option list (Figma _Listbox), a Popups Menu.
  * `elevation.surface.overlay` and its shadow (as every floating layer
- * without a backdrop; the shadow's ring is the edge) and
- * Popover/radius-menu-md, with its options inset Popover/pad-menu 4.
+ * without a blanket; the shadow's ring is the edge) and
+ * Popup/radius-menu-md, with its options inset Popup/pad-menu 4.
  */
 @use '../../../styles/state' as *;
 
 .plus-listbox {
     /*
-     * Popover/max-height-menu 320: nine rows and the cut tenth that says the
+     * Popup/max-height-menu 320: nine rows and the cut tenth that says the
      * list scrolls. There is no floor: a short list is as tall as its rows, so
      * two options leave no empty band under them. A floating list is on the
      * popup layer; one opened from a field inside a modal mounts in the
      * modal's overlay and takes its layer, so the dialog never covers it.
      */
-    --plus-listbox-max-height: var(--popover-max-height-menu);
+    --plus-listbox-max-height: var(--dropdown-menu-max-height);
     --plus-listbox-z-index: var(--layer-popup);
     /*
      * The popup placement rule: content grows a list past its field up to
-     * Popover/max-width-menu 320. `min-width` (the field's width) wins over
+     * Popup/max-width-menu 320. `min-width` (the field's width) wins over
      * this, so a field wider than the cap keeps its own width. It never comes
-     * nearer than Popover/gap-screen 8 to either side of the screen.
+     * nearer than Popup/gap-screen 8 to either side of the screen.
      */
-    --plus-listbox-max-width: var(--popover-max-width-menu);
-    --plus-listbox-viewport-width: calc(100vw - 2 * var(--popover-gap-screen));
+    --plus-listbox-max-width: var(--dropdown-menu-max-width);
+    --plus-listbox-viewport-width: calc(100vw - 2 * var(--popup-gap-screen));
 
     display: flex;
     flex-direction: column;
@@ -35,7 +35,7 @@
     background-color: var(--ds-surface-overlay);
     // The shadow's ring is the edge; the transparent border keeps one in
     // forced colors, where shadows are dropped.
-    border: var(--border-default) solid transparent;
+    border: var(--border-width-default) solid transparent;
     border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
 }
@@ -54,7 +54,7 @@
    (`data-placement`, `data-side`). At least the field's width. */
 .plus-listbox--anchored {
     position: absolute;
-    top: calc(100% + var(--popover-offset));
+    top: calc(100% + var(--popup-offset));
     left: 0;
     z-index: var(--plus-listbox-z-index);
     width: max-content;
@@ -63,7 +63,7 @@
 
     &[data-placement='top'] {
         top: auto;
-        bottom: calc(100% + var(--popover-offset));
+        bottom: calc(100% + var(--popup-offset));
     }
 
     &[data-side='end'] {
@@ -93,11 +93,11 @@
 }
 
 .plus-listbox-header {
-    border-bottom: var(--border-default) solid var(--ds-border);
+    border-bottom: var(--border-width-default) solid var(--ds-border);
 }
 
 .plus-listbox-footer {
-    border-top: var(--border-default) solid var(--ds-border);
+    border-top: var(--border-width-default) solid var(--ds-border);
 }
 
 .plus-listbox-body {
@@ -132,7 +132,7 @@
 .plus-listbox-options {
     display: flex;
     flex-direction: column;
-    padding: var(--popover-pad-menu);
+    padding: var(--dropdown-menu-pad);
 
     &:focus {
         @include plus-ring-reset;
@@ -158,7 +158,7 @@
 
     &--count,
     &--limit {
-        font: var(--body-small);
+        font: var(--body-sm);
     }
 }
 

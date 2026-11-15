@@ -48,7 +48,7 @@ const SCOPES = [
 
 /** The results header: the count, always, in words. */
 const ResultsHeader = ({ children }) => (
-    <span role="status" style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{children}</span>
+    <span role="status" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{children}</span>
 );
 
 /** Loading mirrors empty: the same body slot, three Skeleton bars where the rows will be. */
@@ -257,7 +257,7 @@ export const BasicPage = ({ text = 'Ava' }) => (
     <PageFrame
         field={(
             <div style={{ ...row, inlineSize: '100%' }}>
-                <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)', whiteSpace: 'nowrap' }}>Press Enter to search</span>
+                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)', whiteSpace: 'nowrap' }}>Press Enter to search</span>
                 <div style={{ inlineSize: 'var(--field-width-md)' }}>
                     <SearchField mode="basic" spacing="compact" placeholder={SCOPE} defaultValue={text} onSearch={() => {}} />
                 </div>

@@ -2,7 +2,7 @@
  * Chart colors at runtime: what a token computes to in the current color
  * mode, and a hook that says when the mode changed.
  *
- * Most charts never need this: Highcharts paints `var(--ds-chart-*)` and the
+ * Most charts never need this: Highcharts paints `var(--chart-*)` and the
  * browser resolves it in every mode. A color axis interpolates between stops,
  * and a label on a fill picks its ink by contrast, so those two need the real
  * colors, read here, and read again when the mode changes.

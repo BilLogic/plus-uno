@@ -193,7 +193,7 @@ export const WithSlots = () => (
             label="Message to AI chat"
             placeholder="Ask anything"
             startSlot={<i className={iconClass('paperclip')} aria-hidden="true" title="Attach a file" />}
-            attachments={<span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>session-notes.pdf</span>}
+            attachments={<span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>session-notes.pdf</span>}
             actions={<i className={iconClass('microphone')} aria-hidden="true" title="Dictate" />}
             onSubmit={fn()}
         />

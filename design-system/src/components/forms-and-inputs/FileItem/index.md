@@ -94,9 +94,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Row height and padding | `--file-item-height`, horizontal padding `--pad-x-lg`, gap `--inline-lg`. |
-| Row surface and border | `--ds-surface`, `--ds-border`, radius `--radius-control-md`; list dividers use `--border-default` in `--ds-border`. |
+| Row surface and border | `--ds-surface`, `--ds-border`, radius `--radius-control-md`; list dividers use `--border-width-default` in `--ds-border`. |
 | Lead slot | `--image-xs`; icons use `--ds-icon-subtlest`, `--ds-icon-subtle`, and `--ds-icon-danger`. |
-| Name and meta | `--body-default` in `--ds-text`; meta in `--body-small` and `--ds-text-subtle` (or `--ds-text-danger` on error). |
+| Name and meta | `--body-default` in `--ds-text`; meta in `--body-sm` and `--ds-text-subtle` (or `--ds-text-danger` on error). |
 
 ## Content guidelines
 
@@ -138,7 +138,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--border-default` · `--ds-background-disabled` · `--ds-border` · `--ds-border-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-surface` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--file-item-height` · `--image-xs` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--radius-control-md` · `--stack-md`
+`--body-sm` · `--border-width-default` · `--ds-background-disabled` · `--ds-border` · `--ds-border-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-surface` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--file-item-height` · `--image-xs` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--radius-control-md` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/FileItem/FileItem.scss`. Override these through the token layer, never with a literal.
 

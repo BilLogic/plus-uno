@@ -374,7 +374,7 @@
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:222"
+          "id": "VariableID:19364:207"
         }
       },
       "resolvedValuesByMode": {
@@ -395,7 +395,7 @@
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:220"
+          "id": "VariableID:19364:205"
         }
       },
       "resolvedValuesByMode": {
@@ -479,7 +479,7 @@
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:218"
+          "id": "VariableID:19364:203"
         }
       },
       "resolvedValuesByMode": {
@@ -689,7 +689,7 @@
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:220"
+          "id": "VariableID:19364:205"
         }
       },
       "resolvedValuesByMode": {
@@ -705,7 +705,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-pad)"
+        "WEB": "var(--popup-pad)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -726,7 +726,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-width-sm)"
+        "WEB": "var(--popup-width-sm)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -747,7 +747,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-width-md)"
+        "WEB": "var(--popup-width-md)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -768,7 +768,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-width-lg)"
+        "WEB": "var(--popup-width-lg)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -789,7 +789,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-width-flag)"
+        "WEB": "var(--flag-width)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -810,7 +810,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-stack-flag)"
+        "WEB": "var(--flag-stack)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -831,12 +831,12 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-radius)"
+        "WEB": "var(--popup-radius)"
       },
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:220"
+          "id": "VariableID:19364:205"
         }
       },
       "resolvedValuesByMode": {
@@ -852,7 +852,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-pad-menu)"
+        "WEB": "var(--dropdown-menu-pad)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -873,7 +873,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-min-width-menu)"
+        "WEB": "var(--dropdown-menu-min-width)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -894,7 +894,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-max-width-menu)"
+        "WEB": "var(--dropdown-menu-max-width)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -915,7 +915,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-max-height-menu)"
+        "WEB": "var(--dropdown-menu-max-height)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -936,12 +936,12 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-radius-menu-sm)"
+        "WEB": "var(--popup-radius-menu-sm)"
       },
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:219"
+          "id": "VariableID:19364:204"
         }
       },
       "resolvedValuesByMode": {
@@ -957,12 +957,12 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-radius-menu-md)"
+        "WEB": "var(--popup-radius-menu-md)"
       },
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:220"
+          "id": "VariableID:19364:205"
         }
       },
       "resolvedValuesByMode": {
@@ -978,7 +978,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-pad-y-tooltip)"
+        "WEB": "var(--tooltip-pad-y)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -999,7 +999,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-max-width-tooltip)"
+        "WEB": "var(--tooltip-max-width)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -1020,12 +1020,12 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-radius-tooltip)"
+        "WEB": "var(--tooltip-radius)"
       },
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:217"
+          "id": "VariableID:19364:202"
         }
       },
       "resolvedValuesByMode": {
@@ -1041,7 +1041,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--popover-gap-screen)"
+        "WEB": "var(--popup-gap-screen)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -1193,7 +1193,7 @@
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19675:182"
+          "id": "VariableID:19675:181"
         }
       },
       "resolvedValuesByMode": {
@@ -1214,7 +1214,7 @@
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:219"
+          "id": "VariableID:19364:204"
         }
       },
       "resolvedValuesByMode": {

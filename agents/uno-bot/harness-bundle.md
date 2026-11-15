@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 162,630 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 162,679 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -52,8 +52,8 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,574 |
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
-| `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 21,324 |
+| `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 26,000 |
+| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 21,361 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
@@ -1651,7 +1651,7 @@ Dependency from one cell to another
 | `created_at` | — |
 | `updated_at` | — |
 | `kind` | leads_to = temporal (this cell makes the other happen; drawn as an arrow); enables = functional (the other must already be in place). enables renders in the panel only. |
-| `name` | RETIRED (#550), and kept only so stage 1 is reversible. Documented as the word ON the arrow, it was never used as one: all 8 rows that carried it carried a sentence about why the edge exists, and 20260909040000 copied every one of them into note. Nothing writes it any more — not set_cell_dependency's argument, not the editor, not the agent tool. The dependency row still RENDERS it as a badge, because that row is held byte-identical to the template's and the change to stop belongs upstream; stage 2 drops the column and that badge together, and is a separate decision. |
+| `name` | RETIRED (#550), and kept only so stage 1 is reversible. Documented as the word ON the arrow, it was never used as one: all 8 rows that carried it carried a sentence about why the edge exists, and 20260909040000 copied every one of them into note. Nothing writes it any more — not set_cell_dependency's argument, not the editor, not the agent tool. The dependency row still RENDERS it as a countTag, because that row is held byte-identical to the template's and the change to stop belongs upstream; stage 2 drops the column and that countTag together, and is a separate decision. |
 | `note` | Anything worth knowing about this dependency, in the author's own words — rendered as the line under the dependency row, revealed on hover. General purpose, not "why this edge exists": the same kind of aside paths.note and scenarios.note carry, and since #550 the ONE prose field an edge has. Null means nothing was recorded, which is not the same as nothing worth recording. |
 
 ### `cell_touchpoints`
@@ -1666,7 +1666,7 @@ One touchpoint used at one cell: its own summary and role at this moment. Named 
 | `touchpoint_id` | — |
 | `position` | — |
 | `summary` | — |
-| `role` | What this touchpoint is to this moment: core (the step happens through it) or peripheral (present, but not what the step turns on), or null for the unmarked majority. Null is a state of its own and not a quiet "peripheral": it means nobody has judged this placement, so the panel renders nothing for it rather than a badge saying so. On the placement and not the catalog because the same artifact is central at one step and incidental at another. |
+| `role` | What this touchpoint is to this moment: core (the step happens through it) or peripheral (present, but not what the step turns on), or null for the unmarked majority. Null is a state of its own and not a quiet "peripheral": it means nobody has judged this placement, so the panel renders nothing for it rather than a countTag saying so. On the placement and not the catalog because the same artifact is central at one step and incidental at another. |
 | `origin` | — |
 | `created_at` | — |
 | `updated_at` | — |
@@ -1920,7 +1920,7 @@ Deployment-level cast list: one pool of actors a lane picks from, unique by name
 | `id` | — |
 | `name` | The identity: unique across the deployment, so the same actor recurs across services by name rather than as one row per service. |
 | `kind` | What sort of party this is. staff/recipient/partner/provider are ACTORS — they can be a lane's stakeholder. team is an accountable group — it can be a lane's owner_team and never its stakeholder. |
-| `summary` | What this party IS, in one line — a definition, not an aside. The lane panel and the owner badge read it; a lane never copies it, because one stakeholder owns many lanes and 37 copies is 37 chances to disagree. |
+| `summary` | What this party IS, in one line — a definition, not an aside. The lane panel and the owner countTag read it; a lane never copies it, because one stakeholder owns many lanes and 37 copies is 37 chances to disagree. |
 | `aliases` | — |
 | `created_at` | — |
 | `updated_at` | — |
@@ -2039,15 +2039,15 @@ The full-height area at the left of the **Frame**, holding navigation. From 1024
 _Avoid_: "left nav", "side nav"
 
 **Panel**:
-The full-height area at the right of the **Frame**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Backdrop** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
+The full-height area at the right of the **Frame**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Blanket** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
 _Avoid_: "right sidebar", "side panel", "inspector", "Card" for the area
 
 **Docked / overlay**:
-The two states of the **Sidebar** and the **Panel**. Docked sits beside the **Page** and moves it; overlay opens over the **Page**, and an overlay **Panel** has a **Backdrop**.
+The two states of the **Sidebar** and the **Panel**. Docked sits beside the **Page** and moves it; overlay opens over the **Page**, and an overlay **Panel** has a **Blanket**.
 _Avoid_: "inline", "pinned", "floating" as a state
 
 **Peek**:
-A collapsed **Sidebar**, or a closed **Panel** whose `panelPeek` option is on, shown over the **Page** while a pointer rests on its toggle or edge. It has no **Backdrop**, does not move the **Page**, and closes on an outside click or Escape.
+A collapsed **Sidebar**, or a closed **Panel** whose `panelPeek` option is on, shown over the **Page** while a pointer rests on its toggle or edge. It has no **Blanket**, does not move the **Page**, and closes on an outside click or Escape.
 _Avoid_: "flyout" as our word, "hover menu"
 
 **Splitter**:
@@ -2066,9 +2066,9 @@ _Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section*
 The pattern for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
-**Backdrop**:
+**Blanket**:
 The pattern for the layer that dims what sits behind it: full screen for a **Modal**, which it also holds and sizes. A **Panel** floats with none.
-_Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
+_Avoid_: "backdrop", "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
 
 **Modal**:
 The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time. `Modal` is the component; `PatternModal` draws its shell inline.
@@ -2101,7 +2101,7 @@ A table whose rows nest under parent rows.
 _Avoid_: "table tree", "nested table"
 
 **Popup**:
-A floating layer anchored to its trigger, closed by clicking outside: a menu, a select list, a filter menu or content, with no **Backdrop**.
+A floating layer anchored to its trigger, closed by clicking outside: a menu, a select list, a filter menu or content, with no **Blanket**.
 _Avoid_: "popover", "inline dialog"
 
 **Menu**:
@@ -2156,7 +2156,7 @@ _Avoid_: "counter", "badge"
 
 **Tag**:
 A label a person can attach, filter by or remove: it names a category rather than a state. No color square unless `swatchBefore` opts in; `elemBefore` is its leading slot.
-_Avoid_: "chip"
+_Avoid_: "chip", `SelectChips`
 
 **Tag group**:
 A set of **Tag**s laid out together.
@@ -2220,7 +2220,7 @@ _Avoid_: "input wrapper", "form group"
 
 **Overlay module**:
 The shared layer code for everything that floats: the portal, the z-index scale and the stacking rules.
-_Avoid_: "overlay" for the **Backdrop**
+_Avoid_: "overlay" for the **Blanket**
 
 **State mixin**:
 The one shared source of hover, pressed, selected and focus styling, reading **Named state token**s.
@@ -2240,7 +2240,7 @@ _Avoid_: "mascot", "avatar" for a character
 
 **Progress indicator**:
 A row of dots that shows the current step of a sequence. With `progress`, the current dot stretches into a bar that fills over the step's time, as in a **Carousel**; without a clock (autoplay off, or reduced motion) the stretched dot shows full.
-_Avoid_: "dots", "slide marker"
+_Avoid_: "dots", "slide marker", `CarouselDots`
 
 ### Design system: tokens
 

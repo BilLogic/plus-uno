@@ -264,7 +264,7 @@ export const NotificationsInboxPanel = ({
     );
 };
 
-/** The Inbox opening from the Sidebar at the start, 360px wide (--inbox-width), over the page with no Backdrop. */
+/** The Inbox opening from the Sidebar at the start, 360px wide (--inbox-width), over the page with no Blanket. */
 export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) => {
     const [open, setOpen] = useState(defaultOpen);
     const [items, setItems] = useState(() => (
@@ -363,7 +363,7 @@ export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) =
                             zIndex: 'var(--layer-dialog)',
                             display: 'flex',
                             boxShadow: 'var(--ds-shadow-overlay)',
-                            borderInlineEnd: 'var(--border-default) solid var(--ds-border)',
+                            borderInlineEnd: 'var(--border-width-default) solid var(--ds-border)',
                         }}
                     >
                         <NotificationsInboxPanel

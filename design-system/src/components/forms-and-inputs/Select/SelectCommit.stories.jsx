@@ -254,7 +254,7 @@ MultiAccumulatesAndRemoves.play = async ({ canvasElement }) => {
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(page().queryByRole('option', { name: 'South High' })).toBeNull());
 
-    // The chip is a Tag in a TagGroup.
+    // The tag is a Tag in a TagGroup.
     await expect(canvasElement.querySelector('.plus-tag-group .plus-tag')).not.toBeNull();
     await userEvent.click(canvas.getByRole('button', { name: 'Remove South High' }));
     await expect(chosen.textContent).toBe('');
@@ -610,13 +610,13 @@ export const ControlledOpenAsksTheParent = {
  * Select firing a window `resize` of its own: the shared placement watches
  * the field's size.
  */
-export const ListFollowsWrappingChips = () => (
+export const ListFollowsWrappingTags = () => (
     <div style={{ ...stack, maxWidth: '220px' }}>
         <Select id="sopen-wrap" label="Schools" isMulti options={schools} />
     </div>
 );
 
-ListFollowsWrappingChips.play = async ({ canvasElement }) => {
+ListFollowsWrappingTags.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const field = canvas.getByRole('combobox', { name: 'Schools' });
     let resizes = 0;

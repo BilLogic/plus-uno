@@ -22,7 +22,7 @@
 
 .plus-file-upload-batch-status {
     margin-left: auto;
-    font: var(--body-small);
+    font: var(--body-sm);
     color: var(--ds-text-subtle);
     white-space: nowrap;
 }
@@ -38,7 +38,7 @@
         border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast),
         box-shadow var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
 
     &.plus-file-upload-invalid {
         border-color: var(--ds-border-danger);
@@ -167,7 +167,7 @@
     display: flex;
     align-items: center;
     gap: var(--stack-sm);
-    font: var(--body-small);
+    font: var(--body-sm);
 
     i {
         font-size: var(--icon-sm);

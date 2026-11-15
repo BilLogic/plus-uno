@@ -30,12 +30,12 @@
 }
 
 .principle-card__framework {
-    font: var(--body-small);
+    font: var(--body-sm);
     color: var(--ds-text-brand);
 }
 
 .principle-card__name {
-    font: var(--heading-xsmall);
+    font: var(--heading-xs);
     color: var(--ds-text);
 }
 
@@ -205,7 +205,7 @@
     background: var(--ds-surface-sunken);
 }
 .principle-reel figcaption {
-    font: var(--body-small);
+    font: var(--body-sm);
     color: var(--ds-text-subtle);
 }
 

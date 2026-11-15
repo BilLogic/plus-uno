@@ -22,8 +22,8 @@
     flex: none;
     align-items: center;
     justify-content: center;
-    width: var(--item-height-sm);
-    height: var(--item-height-sm);
+    width: var(--control-sm);
+    height: var(--control-sm);
     font-size: var(--icon-sm);
     color: var(--ds-text-subtle);
 }
@@ -53,7 +53,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--inline-md);
-    padding-inline-start: calc(var(--plus-tree-table-level) * var(--table-indent) + var(--item-height-sm));
+    padding-inline-start: calc(var(--plus-tree-table-level) * var(--table-indent) + var(--control-sm));
 }
 
 .plus-pattern-table-table.plus-tree-table-table .plus-tree-table-message-row .plus-table-message {

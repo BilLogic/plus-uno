@@ -48,10 +48,10 @@ export const MANAGER_TOKENS = {
     '--plus-manager-selected-bg': '--ds-background-brand-bold',
     '--plus-manager-selected-fg': '--ds-text-inverse',
     // The lifecycle badge, drawn like a Tag: a hue on the border, neutral text.
-    '--plus-manager-badge-text': '--ds-text',
-    '--plus-manager-badge-new-border': '--ds-border-accent-green-subtle',
-    '--plus-manager-badge-beta-border': '--ds-border-accent-orange-subtle',
-    '--plus-manager-badge-deprecated-border': '--ds-border-accent-gray-subtle',
+    '--plus-manager-count-tag-text': '--ds-text',
+    '--plus-manager-count-tag-new-border': '--ds-border-accent-green-subtle',
+    '--plus-manager-count-tag-beta-border': '--ds-border-accent-orange-subtle',
+    '--plus-manager-count-tag-deprecated-border': '--ds-border-accent-gray-subtle',
   },
 };
 

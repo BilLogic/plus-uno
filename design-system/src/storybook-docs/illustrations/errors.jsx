@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Backdrop, ButtonShape, Field, Modal, Popup, Rect, Section, SkeletonBar } from './primitives.jsx';
+import { Blanket, ButtonShape, Field, Modal, Popup, Rect, Section, SkeletonBar } from './primitives.jsx';
 
 /**
  * The Errors pattern's do and don't drawings. Each lesson is about where a
@@ -63,7 +63,7 @@ export const FailureInSlot = ({ title = 'A Section whose body shows its error an
 export const FailureInModal = ({ title = 'A Section with an empty body while a Modal opens over the whole page to report the failure' }) => (
   <Canvas title={title}>
     <PageBehind />
-    <Backdrop x={0} y={0} w={W} h={H} />
+    <Blanket x={0} y={0} w={W} h={H} />
     <Modal x={44} y={26} w={80} h={52} accent />
   </Canvas>
 );

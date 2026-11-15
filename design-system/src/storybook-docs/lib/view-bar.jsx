@@ -115,7 +115,7 @@ export const FilterSide = ({ checked, onToggle, onReset, filters = FILTERS }) =>
             const on = values.filter((v) => checked.includes(v)).length;
             return (
                 <fieldset key={category} style={{ margin: 0, padding: 0, border: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                    <legend style={{ ...row, padding: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xxsmall)', color: 'var(--ds-text)' }}>
+                    <legend style={{ ...row, padding: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xxs)', color: 'var(--ds-text)' }}>
                         {category}
                         <CountTag value={on} label={`${on} applied`} spacing="compact" />
                     </legend>

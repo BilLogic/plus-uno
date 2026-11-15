@@ -16,7 +16,7 @@ export const DemoLabel = ({ children }) => (
         style={{
             display: 'block',
             marginBottom: 'var(--stack-md)',
-            font: 'var(--heading-xxsmall)',
+            font: 'var(--heading-xxs)',
             textTransform: 'uppercase',
             color: 'var(--ds-text-subtle)',
         }}
@@ -33,11 +33,11 @@ export const slotContent = (label) => (
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: 'calc(var(--control-lg) * 2)',
-            border: 'var(--border-default) dashed var(--ds-border-bold)',
+            border: 'var(--border-width-default) dashed var(--ds-border-bold)',
             borderRadius: 'var(--radius-md)',
             color: 'var(--ds-text-subtle)',
         }}
-        className="body-large"
+        className="body-lg"
     >
         {label}
     </div>
@@ -85,7 +85,7 @@ export const FocusedFrame = ({ title, actions, actionsLabel = 'Page actions', he
                         overflow: 'hidden',
                         whiteSpace: 'nowrap',
                         textOverflow: 'ellipsis',
-                        font: 'var(--heading-xsmall)',
+                        font: 'var(--heading-xs)',
                         color: 'var(--ds-text)',
                     }}
                 >

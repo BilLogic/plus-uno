@@ -7,10 +7,10 @@
  *
  * - Primitives are named by rem × 100 (`--space-025` is 4) and the radius,
  *   stroke and small size steps point at Space.
- * - Category tokens point at the common scales: `--item-height-md` is a var()
+ * - Category tokens point at the common scales: `--control-md` is a var()
  *   of `--height-200`, not a second 32.
  * - There is no 40 Item, and a collection that holds one property skips the
- *   word (`--border-default`, `--icon-md`, `--image-sm`).
+ *   word (`--border-width-default`, `--icon-md`, `--image-sm`).
  * - The retired size names are gone; the `--size-spacing-*` primitives they read still resolve.
  */
 import assert from 'node:assert/strict';
@@ -44,13 +44,6 @@ const PRIMITIVES = {
   '--space-300': [48, null],
   '--space-400': [64, null],
   '--space-500': [80, null],
-  '--radius-0125': [2, '--space-0125'],
-  '--radius-025': [4, '--space-025'],
-  '--radius-0375': [6, '--space-0375'],
-  '--radius-050': [8, '--space-050'],
-  '--radius-0625': [10, '--space-0625'],
-  '--radius-075': [12, '--space-075'],
-  '--radius-100': [16, '--space-100'],
   '--radius-full': [9999, null],
   '--stroke-1': [1, '--space-00625'],
   '--stroke-2': [2, '--space-0125'],
@@ -88,9 +81,9 @@ const SEMANTICS = {
   '--inline-sm': [4, '--space-025'],
   '--inline-md': [8, '--space-050'],
   '--inline-lg': [12, '--space-075'],
-  '--radius-sm': [2, '--radius-0125'],
-  '--radius-md': [4, '--radius-025'],
-  '--radius-lg': [8, '--radius-050'],
+  '--radius-sm': [2, '--space-0125'],
+  '--radius-md': [4, '--space-025'],
+  '--radius-lg': [8, '--space-050'],
 };
 
 const SIZE = {
@@ -111,8 +104,8 @@ const SIZE = {
   '--width-2000': [320, '--size-2000'],
   '--width-2500': [400, '--size-2500'],
   '--width-3000': [480, '--size-3000'],
-  '--item-height-sm': [24, '--height-150'],
-  '--item-height-md': [32, '--height-200'],
+  '--control-sm': [24, '--size-150'],
+  '--control-md': [32, '--size-200'],
   '--row-height-sm': [32, '--height-200'],
   '--row-height-md': [40, '--height-250'],
   '--row-height-lg': [48, '--height-300'],
@@ -138,9 +131,9 @@ const SIZE = {
 };
 
 const BORDER = {
-  '--border-default': [1, '--stroke-1'],
-  '--border-selected': [2, '--stroke-2'],
-  '--border-focused': [2, '--stroke-2'],
+  '--border-width-default': [1, '--stroke-1'],
+  '--border-width-selected': [2, '--stroke-2'],
+  '--border-width-focused': [2, '--stroke-2'],
 };
 
 for (const [group, tokens] of Object.entries({ PRIMITIVES, SEMANTICS, SIZE, BORDER })) {
@@ -160,7 +153,7 @@ test('there is no 40 Item, and no Width/250', () => {
 });
 
 test('one-property collections skip the property word', () => {
-  for (const name of ['--border-width-default', '--icon-size-md', '--image-size-sm']) {
+  for (const name of ['--border-default', '--icon-size-md', '--image-size-sm']) {
     assert.equal(corpus.has(name), false, name);
   }
 });

@@ -131,7 +131,7 @@ A fieldset has no hover, pressed or focus state of its own. The fields inside ca
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-text` · `--ds-text-danger` · `--stack-md`
+`--body-default` · `--body-sm` · `--ds-text` · `--ds-text-danger` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/Fieldset.scss`. Override these through the token layer, never with a literal.
 

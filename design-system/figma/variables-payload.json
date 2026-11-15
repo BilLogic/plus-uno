@@ -894,10 +894,10 @@
           }
         },
         {
-          "name": "Button/vertical-size",
+          "name": "Button/size-vertical",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--button-vertical-size)"
+            "WEB": "var(--button-size-vertical)"
           }
         },
         {
@@ -936,10 +936,10 @@
           }
         },
         {
-          "name": "Tag/pad-end-compact",
+          "name": "Tag/pad-x-end-compact",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--tag-pad-end-compact)"
+            "WEB": "var(--tag-pad-x-end-compact)"
           }
         },
         {
@@ -950,10 +950,10 @@
           }
         },
         {
-          "name": "Tag/pad-end",
+          "name": "Tag/pad-x-end",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--tag-pad-end)"
+            "WEB": "var(--tag-pad-x-end)"
           }
         },
         {
@@ -1227,13 +1227,6 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--inbox-width)"
-          }
-        },
-        {
-          "name": "Popup/pad",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--popup-pad)"
           }
         },
         {

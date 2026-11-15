@@ -130,7 +130,7 @@
     {
       "id": "FD4",
       "name": "a design-system decision: an intake, even with no card",
-      "judgeNote": "The thread settles that the goal chip uses the Badge component's pill variant everywhere — a shared component, so a design-system intake. The file has no card, so no other route exists.",
+      "judgeNote": "The thread settles that the goal tag uses the CountTag component's pill variant everywhere — a shared component, so a design-system intake. The file has no card, so no other route exists.",
       "input": {
         "file": { "title": "Design System (S23)", "url": "https://www.figma.com/design/LibFile1" },
         "threads": [
@@ -140,7 +140,7 @@
             "page": "Badges",
             "resolved": true,
             "comments": [
-              { "by": "bea", "at": "2026-09-29T17:00:00Z", "text": "Agreed: goal chips use Badge's pill variant everywhere, not the custom chip." }
+              { "by": "bea", "at": "2026-09-29T17:00:00Z", "text": "Agreed: goal tags use CountTag's pill variant everywhere, not the custom tag." }
             ]
           }
         ],
@@ -149,11 +149,11 @@
       },
       "recording": {
         "source": "authored",
-        "reply": "{\"decisions\":[{\"thread_id\":\"c4\",\"route\":\"design-system\",\"decision\":\"Goal chips use the Badge pill variant everywhere.\",\"title\":\"Goal chips use the Badge pill variant\",\"body\":\"The team agreed in Figma that goal chips use Badge's pill variant everywhere, replacing the custom chip.\",\"confidence\":0.8}]}"
+        "reply": "{\"decisions\":[{\"thread_id\":\"c4\",\"route\":\"design-system\",\"decision\":\"Goal tags use the CountTag pill variant everywhere.\",\"title\":\"Goal tags use the CountTag pill variant\",\"body\":\"The team agreed in Figma that goal tags use CountTag's pill variant everywhere, replacing the custom tag.\",\"confidence\":0.8}]}"
       },
       "expect": {
         "decisions": [
-          { "threadId": "c4", "route": "design-system", "intake": { "title": "Goal chips use the Badge pill variant", "body": "The team agreed in Figma that goal chips use Badge's pill variant everywhere, replacing the custom chip." } }
+          { "threadId": "c4", "route": "design-system", "intake": { "title": "Goal tags use the CountTag pill variant", "body": "The team agreed in Figma that goal tags use CountTag's pill variant everywhere, replacing the custom tag." } }
         ]
       }
     },

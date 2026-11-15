@@ -124,7 +124,7 @@ export const EditRecord = ({ held = false }) => {
     return (
         // A held-open menu waits for the picture's element, so it mounts inside it and not on the page.
         <div ref={setMount} style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: 'var(--page-pad)', minBlockSize: held ? 'calc(var(--card-min-width-md) * 0.6)' : undefined }}>
-            <span style={{ font: 'var(--heading-small)', color: 'var(--ds-text)' }}>Ana Ruiz</span>
+            <span style={{ font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Ana Ruiz</span>
             <DropdownMenu
                 trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" />}
                 placement="bottom-end"

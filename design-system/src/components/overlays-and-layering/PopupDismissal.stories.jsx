@@ -3,25 +3,25 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button, Modal, Popup } from '@/components';
 /**
- * Getting a `Popover` shut again.
+ * Getting a `Popup` shut again.
  *
  * WHY THIS FILE EXISTS (#321). react-bootstrap's `Overlay` defaults `rootClose`
- * to false, and `Popover` passed no value for it. A click-triggered popover —
+ * to false, and `Popup` passed no value for it. A click-triggered popup —
  * the default trigger — therefore stayed open until the trigger itself was
  * clicked a second time: not on a click elsewhere, and not on Escape.
  *
  * A caller could not fix it from outside either. Extra props are spread onto
  * the overlay's CONTENT, not onto `OverlayTrigger`, so `rootClose` passed to
- * this component landed on the popover panel and did nothing there. The
+ * this component landed on the popup panel and did nothing there. The
  * behavior was unreachable from the public API in both directions.
  *
  * This is #209's defect class in a second component: something that opens,
  * looks right in a screenshot, and cannot be closed by the route everyone
- * expects. A render assertion cannot see it — an open popover renders
+ * expects. A render assertion cannot see it — an open popup renders
  * identically whether or not a click away will dismiss it — so the cover has to
  * be an interaction.
  *
- * The popover portals out of the story canvas, so these queries run against the
+ * The popup portals out of the story canvas, so these queries run against the
  * document. The exit transition keeps the node for a frame, so disappearance is
  * waited for rather than asserted.
  */
@@ -31,7 +31,7 @@ const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--space-150)
 /** The overlay is a portal; `within(canvasElement)` cannot see it. */
 const documentOf = (canvasElement) => within(canvasElement.ownerDocument.body);
 
-async function expectPopoverGone(canvasElement, text) {
+async function expectPopupGone(canvasElement, text) {
     await waitFor(() => expect(documentOf(canvasElement).queryByText(text)).toBeNull());
 }
 
@@ -42,7 +42,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'Interaction cover for #321: a click-triggered popover has to close on a '
+                    'Interaction cover for #321: a click-triggered popup has to close on a '
                     + 'click away and on Escape, and a manual one has to ignore both.',
             },
         },
@@ -50,7 +50,7 @@ export default {
 };
 
 /**
- * The two routes out that a click popover advertises by being a click popover.
+ * The two routes out that a click popup advertises by being a click popup.
  *
  * Both assertions fail before the fix, for the same reason: `rootClose` was off,
  * and it is what binds the outside click AND the Escape key.
@@ -74,21 +74,21 @@ ClickAwayAndEscape.play = async ({ canvasElement }) => {
     await waitFor(() => expect(doc.getByText('Ran 45 minutes over.')).toBeTruthy());
 
     await userEvent.click(canvas.getByTestId('pd-elsewhere'));
-    await expectPopoverGone(canvasElement, 'Ran 45 minutes over.');
+    await expectPopupGone(canvasElement, 'Ran 45 minutes over.');
 
     // Route two: Escape.
     await userEvent.click(trigger);
     await waitFor(() => expect(doc.getByText('Ran 45 minutes over.')).toBeTruthy());
 
     await userEvent.keyboard('{Escape}');
-    await expectPopoverGone(canvasElement, 'Ran 45 minutes over.');
+    await expectPopupGone(canvasElement, 'Ran 45 minutes over.');
 };
 
 /**
  * And the case the default must NOT reach into.
  *
  * With `triggerType="manual"` the caller owns `show`. A root close it did not
- * ask for would dismiss a popover the caller still believes is open, which is
+ * ask for would dismiss a popup the caller still believes is open, which is
  * the state desync #207 found in `Dropdown` pointing the other way.
  */
 export const ManualIgnoresRootClose = () => (
@@ -126,7 +126,7 @@ ManualIgnoresRootClose.play = async ({ canvasElement }) => {
  *
  *   · nothing announced that a panel existed, or that it had opened. No
  *     `aria-haspopup`, no `aria-expanded`. react-bootstrap adds
- *     `aria-describedby` while the popover is shown, which points AT the
+ *     `aria-describedby` while the popup is shown, which points AT the
  *     content once it is open and says nothing before that.
  *   · a STRING trigger became `<span className="d-inline-block" tabIndex="0">`
  *     — a tab stop with no role and no accessible name. Reachable by keyboard,
@@ -167,7 +167,7 @@ TriggerSemantics.play = async ({ canvasElement }) => {
     await waitFor(() => expect(trigger.getAttribute('aria-expanded')).toBe('true'));
 
     await userEvent.keyboard('{Escape}');
-    await expectPopoverGone(canvasElement, 'Sessions are scored on the rubric agreed at intake.');
+    await expectPopupGone(canvasElement, 'Sessions are scored on the rubric agreed at intake.');
     await waitFor(() => expect(trigger.getAttribute('aria-expanded')).toBe('false'));
 };
 
@@ -176,7 +176,7 @@ TriggerSemantics.play = async ({ canvasElement }) => {
  *
  * The AI chat popup raises a confirm (clear chat). The Modal portals to the
  * document, outside the popup, so Base UI hears a press in it as an outside
- * press. The popup stays open under the Modal's Backdrop instead.
+ * press. The popup stays open under the Modal's Blanket instead.
  */
 const RaisedModal = () => {
     const [open, setOpen] = React.useState(false);

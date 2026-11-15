@@ -22,7 +22,7 @@ const block = (opener) => {
 };
 const MODES = { light: block(':root,'), dark: block('[data-color-mode="dark"] {') };
 
-const named = (value) => value.match(/^var\((--ds-[\w-]+)\)$/)[1];
+const named = (value) => value.match(/^var\((--[\w-]+)\)$/)[1];
 const resolved = (mode, token) => {
     const values = new Map([...palette, ...MODES[mode]]);
     return parseColor(resolveToken(token, values));

@@ -30,10 +30,10 @@ export const TooltipSurface = () => (
                 background: 'var(--ds-surface-overlay)',
                 borderRadius: 'var(--popup-radius)',
                 boxShadow: 'var(--ds-shadow-overlay)',
-                padding: 'var(--popover-pad)',
+                padding: 'var(--popup-pad)',
                 color: 'var(--ds-text)',
                 fontFamily: 'var(--type-family-body)',
-                fontSize: 'var(--font-size-0875)',
+                fontSize: 'var(--type-size-0875)',
             }}
         >
             Thursday: <b>24 sessions</b>

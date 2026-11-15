@@ -27,16 +27,16 @@
     --inline-lg: var(--space-075);
 
     /* Radius */
-    --radius-sm: var(--radius-0125);
-    --radius-md: var(--radius-025);
-    --radius-lg: var(--radius-050);
-    --radius-xl: var(--radius-075);
-    --radius-xxl: var(--radius-100);
+    --radius-sm: var(--space-0125);
+    --radius-md: var(--space-025);
+    --radius-lg: var(--space-050);
+    --radius-xl: var(--space-075);
+    --radius-xxl: var(--space-100);
 
     /* Radius / Control */
-    --radius-control-sm: var(--radius-0375); /* pairs with --control-sm; height 24, 24÷4 = 6 */
-    --radius-control-md: var(--radius-050); /* pairs with --control-md; height 32, 32÷4 = 8 */
-    --radius-control-lg: var(--radius-0625); /* pairs with --control-lg; height 40, 40÷4 = 10 */
+    --radius-control-sm: var(--space-0375); /* pairs with --control-sm; height 24, 24÷4 = 6 */
+    --radius-control-md: var(--space-050); /* pairs with --control-md; height 32, 32÷4 = 8 */
+    --radius-control-lg: var(--space-0625); /* pairs with --control-lg; height 40, 40÷4 = 10 */
 
     /* Focus */
     --focus-ring-width: var(--stroke-2); /* matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive */

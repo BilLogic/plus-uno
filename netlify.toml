@@ -74,7 +74,7 @@
   force = true
 
 # Storybook docs ids renamed or folded on 2026-11-13 (Patterns flattened to
-# Patterns/<Name>; Heading outline, Backdrop and Templates and patterns folded
+# Patterns/<Name>; Heading outline, Blanket and Templates and patterns folded
 # into Page, Modal and Templates overview). Storybook addresses a page by the
 # `path` query, so each rule matches the old id and lands on the new one; a
 # folded page lands on its section. Before the `/storybook/*` rule: first match wins.
@@ -179,7 +179,7 @@
 [[redirects]]
   from = "/storybook/"
   query = { path = "/docs/templates-modal-backdrop--docs" }
-  to = "/storybook/?path=/docs/templates-modal--docs#backdrop"
+  to = "/storybook/?path=/docs/templates-modal--docs#blanket"
   status = 301
   force = true
 

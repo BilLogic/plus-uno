@@ -104,7 +104,7 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `PromptStarters` · `Sma
 
 | Part | Token |
 | --- | --- |
-| Height | `--label-height-md` (20), or `--item-height-md` (32) when spacious. |
+| Height | `--label-height-md` (20), or `--control-md` (32) when spacious. |
 | Padding and gap | `--pad-x-xs` on the leading edge, 2 on the trailing edge and between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` with 6 behind. |
 | Corner | `--radius-md`; spacious `--radius-lg`. |
 | Neutral | `--ds-border` edge, `--ds-text-subtle` words. |
@@ -140,7 +140,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-warning` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--radius-control-md` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-end` · `--tag-pad-end-compact`
+`--body-default` · `--body-sm` · `--border-width-default` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-warning` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--radius-control-md` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-x-end` · `--tag-pad-x-end-compact`
 
 From `design-system/src/components/labels/DateTag/DateTag.scss`. Override these through the token layer, never with a literal.
 

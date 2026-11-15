@@ -20,7 +20,7 @@ export const PAGE_EDGE = '0 0 0 var(--page-border-width) var(--ds-border-surface
  * Page pattern for PLUS design system.
  * Bare tokenized content box: pick an elevation level, padding scale, radius
  * scale and border — children fill the content slot. The level sets the fill
- * and its shadow together: sunken (the frame's backdrop), default (the page,
+ * and its shadow together: sunken (the frame's blanket), default (the page,
  * edged by the surface border), raised (a card) and overlay (anything over
  * the UI).
  *

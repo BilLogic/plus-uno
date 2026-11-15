@@ -71,7 +71,7 @@ required; `label` names the segment in the tooltip), drawn in array order.
     value="18/24"
     label="Sessions this term"
     segments={[
-        { value: 18, color: 'var(--ds-chart-brand)', label: 'Completed' },
+        { value: 18, color: 'var(--chart-brand)', label: 'Completed' },
         { value: 6, color: 'var(--ds-background-neutral)', label: 'Remaining' },
     ]}
 />
@@ -83,7 +83,7 @@ required; `label` names the segment in the tooltip), drawn in array order.
 
 ## Color and accessibility
 
-- **Caller-assigned colors.** `color` is required on every segment. For progress, pair `BRAND` (`--ds-chart-brand`) with `CHROME.track` (`--ds-background-neutral`); for a split of up to five parts, sort from most to least and assign `CATEGORICAL` slots in order without skipping ([Chart color](?path=/docs/data-visualizations-color--docs)).
+- **Caller-assigned colors.** `color` is required on every segment. For progress, pair `BRAND` (`--chart-brand`) with `CHROME.track` (`--ds-background-neutral`); for a split of up to five parts, sort from most to least and assign `CATEGORICAL` slots in order without skipping ([Chart color](?path=/docs/data-visualizations-color--docs)).
 - **Always print the exact figure in `value`.** Never leave the arc to carry the number alone.
 - **Hover-only segment names.** With no legend or slice labels, name splits of three or more parts in surrounding copy or use `PieChart`.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Never wrap it in `aria-hidden` (which hides the keyboard proxies); name the chart in its surrounding Section or Card header.

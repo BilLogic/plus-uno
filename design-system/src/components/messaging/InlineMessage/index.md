@@ -115,7 +115,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `NotificationItem` 
 | Part | Token |
 | --- | --- |
 | Trigger icon | `--ds-icon-information`, `--ds-icon-warning`, `--ds-icon-danger`, `--ds-icon-success`, set on the icon in the jsx rather than the scss |
-| Title | `--heading-small` |
+| Title | `--heading-sm` |
 | Secondary text | `--body-default`, `--ds-text-subtle` |
 | Spacing | `--stack-sm` |
 
@@ -153,7 +153,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-text-subtle` · `--heading-small` · `--stack-sm`
+`--body-default` · `--ds-text-subtle` · `--heading-sm` · `--stack-sm`
 
 From `design-system/src/components/messaging/InlineMessage/InlineMessage.scss`. Override these through the token layer, never with a literal.
 

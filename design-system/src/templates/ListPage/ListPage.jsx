@@ -18,17 +18,17 @@ const ListPage = ({ title = 'Members', rows = ROWS, sidebar, onAdd }) => (
             <PatternTable>
                 <thead>
                     <tr>
-                        <th className="body-small">Name</th>
-                        <th className="body-small">Role</th>
-                        <th className="body-small">Status</th>
+                        <th className="body-sm">Name</th>
+                        <th className="body-sm">Role</th>
+                        <th className="body-sm">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     {rows.map((row) => (
                         <tr key={row.name}>
-                            <td className="body-large">{row.name}</td>
-                            <td className="body-large">{row.role}</td>
-                            <td className="body-large">{row.status}</td>
+                            <td className="body-lg">{row.name}</td>
+                            <td className="body-lg">{row.role}</td>
+                            <td className="body-lg">{row.status}</td>
                         </tr>
                     ))}
                 </tbody>

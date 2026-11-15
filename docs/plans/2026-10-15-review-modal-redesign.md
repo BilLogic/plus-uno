@@ -3899,12 +3899,12 @@ bullets of mrkdwn links.
 
 ### 12. DS precedence intake (`ds_precedence_intake`): Needs help → anatomy
 
-The header carries the finding ("Badge: the library needs the fix"). The
+The header carries the finding ("CountTag: the library needs the fix"). The
 disagreements are a list with props in `code` style. Code and Figma are
 buttons. The paragraph about what Needs changes does moves into that option's
 description.
 
-**Before: ds_precedence_intake** · 5 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*The%20draft*%22%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Badge*%20%C2%B7%20library%20side%20needs%20the%20fix%20%C2%B7%20%3Chttps%3A%2F%2Fgithub.com%2FBilLogic%2Fplus-uno%2Fblob%2Fmain%2Fdesign-system%2Fsrc%2Fcomponents%2FBadge%2FBadge.jsx%7Ccode%3E%20%C2%B7%20%3Chttps%3A%2F%2Fwww.figma.com%2Fdesign%2FW0qz%3Fnode-id%3D3-4%7CFigma%3E%5Cn%E2%80%A2%20code%20has%20%60size%3D%5C%22xs%5C%22%60%2C%20the%20library%20doesn't%5Cn%E2%80%A2%20the%20library%20has%20a%20%60pill%60%20variant%20code%20doesn't%5CnApproving%20adds%20it%20to%20the%20DS%20precedence%20intake%20for%20the%20week%20of%20Oct%2012%2C%20filing%20the%20intake%20if%20this%20is%20the%20week's%20first.%20Needs%20changes%20puts%20your%20note%20on%20the%20intake%20instead%2C%20for%20a%20library%20that%20is%20right%20or%20a%20difference%20that%20is%20deliberate.%22%7D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20I%20revise%20the%20draft%20from%20it.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%5D%7D)
+**Before: ds_precedence_intake** · 5 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*The%20draft*%22%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*CountTag*%20%C2%B7%20library%20side%20needs%20the%20fix%20%C2%B7%20%3Chttps%3A%2F%2Fgithub.com%2FBilLogic%2Fplus-uno%2Fblob%2Fmain%2Fdesign-system%2Fsrc%2Fcomponents%2FBadge%2FBadge.jsx%7Ccode%3E%20%C2%B7%20%3Chttps%3A%2F%2Fwww.figma.com%2Fdesign%2FW0qz%3Fnode-id%3D3-4%7CFigma%3E%5Cn%E2%80%A2%20code%20has%20%60size%3D%5C%22xs%5C%22%60%2C%20the%20library%20doesn't%5Cn%E2%80%A2%20the%20library%20has%20a%20%60pill%60%20variant%20code%20doesn't%5CnApproving%20adds%20it%20to%20the%20DS%20precedence%20intake%20for%20the%20week%20of%20Oct%2012%2C%20filing%20the%20intake%20if%20this%20is%20the%20week's%20first.%20Needs%20changes%20puts%20your%20note%20on%20the%20intake%20instead%2C%20for%20a%20library%20that%20is%20right%20or%20a%20difference%20that%20is%20deliberate.%22%7D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20I%20revise%20the%20draft%20from%20it.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -3937,7 +3937,7 @@ description.
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*Badge* · library side needs the fix · <https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/Badge/Badge.jsx|code> · <https://www.figma.com/design/W0qz?node-id=3-4|Figma>\n• code has `size=\"xs\"`, the library doesn't\n• the library has a `pill` variant code doesn't\nApproving adds it to the DS precedence intake for the week of Oct 12, filing the intake if this is the week's first. Needs changes puts your note on the intake instead, for a library that is right or a difference that is deliberate."
+        "text": "*CountTag* · library side needs the fix · <https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/CountTag/CountTag.jsx|code> · <https://www.figma.com/design/W0qz?node-id=3-4|Figma>\n• code has `size=\"xs\"`, the library doesn't\n• the library has a `pill` variant code doesn't\nApproving adds it to the DS precedence intake for the week of Oct 12, filing the intake if this is the week's first. Needs changes puts your note on the intake instead, for a library that is right or a difference that is deliberate."
       }
     },
     {
@@ -4029,7 +4029,7 @@ description.
       "type": "header",
       "text": {
         "type": "plain_text",
-        "text": "Badge: the library needs the fix"
+        "text": "CountTag: the library needs the fix"
       }
     },
     {
@@ -4130,7 +4130,7 @@ description.
             "type": "plain_text",
             "text": "Code"
           },
-          "url": "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/Badge/Badge.jsx"
+          "url": "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/CountTag/CountTag.jsx"
         },
         {
           "type": "button",

@@ -44,13 +44,13 @@
     width: 100%;
 }
 
-// The control is 32 (`--item-height-md`); the track draws inside it,
+// The control is 32 (`--control-md`); the track draws inside it,
 // centered, so the thumb has room and the hit area is the row.
 .plus-form-range-control {
     display: flex;
     align-items: center;
     width: 100%;
-    height: var(--item-height-md);
+    height: var(--control-md);
     cursor: pointer;
     touch-action: none;
 
@@ -126,8 +126,8 @@
     // instead: a bigger hit and focus target than the visible dot, the same
     // row the native `<input type="range">` used to be before Base UI.
     input[type="range"] {
-        width: var(--item-height-md) !important;
-        height: var(--item-height-md) !important;
+        width: var(--control-md) !important;
+        height: var(--control-md) !important;
         top: 50%;
         left: 50%;
         margin: 0;

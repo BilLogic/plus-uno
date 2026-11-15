@@ -127,7 +127,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Fill and edge | Those of Button, default and subtle. |
 | Metric | `--ds-text-subtlest`; gap to the label 4: `--inline-sm`. |
-| Height | 32: `--item-height-md`. 24: `--item-height-sm`. |
+| Height | 32: `--control-md`. 24: `--control-sm`. |
 
 ## Content guidelines
 

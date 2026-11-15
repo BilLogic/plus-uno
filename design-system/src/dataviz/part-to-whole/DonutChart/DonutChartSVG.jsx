@@ -52,7 +52,7 @@ const DonutChartSVG = ({
             return {
                 fontFamily: 'var(--type-family-body)',
                 fontWeight: 'var(--type-weight-regular)',
-                fontSize: 'var(--font-size-075)',
+                fontSize: 'var(--type-size-075)',
                 lineHeight: '1.4',
                 color: 'var(--ds-text-subtle)',
                 letterSpacing: '0'
@@ -62,7 +62,7 @@ const DonutChartSVG = ({
         return {
             fontFamily: 'var(--type-family-heading)',
             fontWeight: 'var(--type-weight-semibold)',
-            fontSize: 'var(--font-size-200)',
+            fontSize: 'var(--type-size-200)',
             lineHeight: '1',
             color: 'var(--ds-text)'
         };
@@ -105,7 +105,7 @@ const DonutChartSVG = ({
                 {percentage > 0 && (
                     <path
                         d={completedPath}
-                        fill="var(--ds-chart-yellow-bold)"
+                        fill="var(--chart-yellow-bold)"
                     />
                 )}
             </svg>
@@ -134,7 +134,7 @@ const DonutChartSVG = ({
                 {label && (
                     <span style={{
                         fontFamily: 'var(--type-family-body)',
-                        fontSize: 'var(--font-size-075)',
+                        fontSize: 'var(--type-size-075)',
                         color: 'var(--ds-text-subtle)',
                         marginTop: 'var(--pad-x-xs)'
                     }}>

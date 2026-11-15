@@ -18,7 +18,7 @@
  *     this passes happily. It checks agreement, not judgment.
  *  2. COMPONENTS THAT USE A LEVEL DIRECTLY. The layers moved to the new color
  *     tokens name `--ds-shadow-overlay` with `--ds-surface-overlay` themselves;
- *     a modal takes that overlay pair too, since the backdrop under it is what
+ *     a modal takes that overlay pair too, since the blanket under it is what
  *     sets it apart from a menu. The surfaces listed below are pinned one by
  *     one; auditing every `box-shadow` against the table is a different check
  *     with a much larger corpus.
@@ -44,7 +44,7 @@ const ELEVATION_DEMOS = 'design-system/src/storybook-docs/elevation-demos.jsx';
 
 test('every floating layer takes the overlay pair, and only the Modal blocks', () => {
   // Elevation 2.0: a layer that floats with the page usable is on the overlay
-  // pair; the Modal on its Backdrop is the one surface on the blocking shadow,
+  // pair; the Modal on its Blanket is the one surface on the blocking shadow,
   // over the same overlay surface.
   const mapping = fs.readFileSync(MAPPING, 'utf8');
   const rowOf = (name) => mapping.split('\n').find((line) => new RegExp(`^\\|\\s*${name}\\s*\\(`).test(line.trim()));

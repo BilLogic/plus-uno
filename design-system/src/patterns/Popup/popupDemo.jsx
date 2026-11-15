@@ -53,7 +53,7 @@ export const PopupStage = ({ height, side = 'start', align = 'start', children }
                 justifyContent: side === 'end' ? 'flex-end' : 'flex-start',
                 '--plus-overlay-screen': `${READ_SCREEN}px`,
                 background: 'var(--ds-surface)',
-                border: 'var(--border-default) solid var(--ds-border)',
+                border: 'var(--border-width-default) solid var(--ds-border)',
                 borderRadius: 'var(--radius-md)',
             }}
         >

@@ -111,8 +111,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Field | Those of the text field. |
 | Gap between scope and field | `--inline-sm`. |
 | Width open | `--field-width-md`. |
-| Collapsed width and height | `--item-height-md`. |
-| Panel maximum height | `--popover-max-height-menu`. |
+| Collapsed width and height | `--control-md`. |
+| Panel maximum height | `--dropdown-menu-max-height`. |
 
 ## Content guidelines
 
@@ -169,7 +169,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text-subtle` · `--field-width-md` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--pad-y-md` · `--popover-max-height-menu` · `--popover-pad-menu` · `--radius-control-md`
+`--body-default` · `--border-width-default` · `--control-md` · `--dropdown-menu-max-height` · `--dropdown-menu-pad` · `--ds-background-input` · `--ds-border-input` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text-subtle` · `--field-width-md` · `--inline-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-control-md`
 
 From `design-system/src/components/forms-and-inputs/SearchField/SearchField.scss`. Override these through the token layer, never with a literal.
 

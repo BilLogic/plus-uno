@@ -143,7 +143,7 @@ Same group: `Popup`
 ## Parts
 
 1. **Trigger.** The control the tooltip describes.
-2. **Surface.** One line of text (`--body-small`) on the inverse fill (`--ds-background-neutral-bold`), wrapping past `--popover-max-width-tooltip`, with no arrow.
+2. **Surface.** One line of text (`--body-sm`) on the inverse fill (`--ds-background-neutral-bold`), wrapping past `--tooltip-max-width`, with no arrow.
 
 ### States
 
@@ -160,10 +160,10 @@ Same group: `Popup`
 | Part | Token |
 | --- | --- |
 | Fill, text | `--ds-background-neutral-bold`, `--ds-text-inverse` |
-| Padding | `--popover-pad-y-tooltip`, `--pad-x-sm` |
+| Padding | `--tooltip-pad-y`, `--pad-x-sm` |
 | Radius | `--radius-control-sm` |
-| Maximum width | `--popover-max-width-tooltip` |
-| Type | `--body-small` |
+| Maximum width | `--tooltip-max-width` |
+| Type | `--body-sm` |
 
 ## Content guidelines
 
@@ -196,7 +196,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-tooltip` · `--pad-x-sm` · `--plus-overlay-origin` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--radius-control-sm` · `--transform-origin`
+`--body-sm` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-tooltip` · `--pad-x-sm` · `--plus-overlay-origin` · `--radius-control-sm` · `--tooltip-max-width` · `--tooltip-pad-y` · `--transform-origin`
 
 From `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss`. Override these through the token layer, never with a literal.
 

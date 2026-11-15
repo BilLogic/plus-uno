@@ -22,7 +22,7 @@
 }
 
 .plus-table-framed {
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--table-radius);
     overflow: hidden;
 }
@@ -47,7 +47,7 @@
     td {
         padding: 0 var(--table-pad-x-cell);
         border: none;
-        border-bottom: var(--border-default) solid var(--ds-border);
+        border-bottom: var(--border-width-default) solid var(--ds-border);
         vertical-align: middle;
         background-color: transparent;
     }
@@ -56,7 +56,7 @@
     // a stronger rule.
     thead th {
         height: var(--plus-table-row-height);
-        font: var(--heading-xxsmall);
+        font: var(--heading-xxs);
         color: var(--ds-text-subtle);
         text-align: left;
         border-bottom-color: var(--ds-border-bold);
@@ -108,7 +108,7 @@
 }
 
 .plus-table-cell-secondary {
-    font: var(--body-small);
+    font: var(--body-sm);
     color: var(--ds-text-subtle);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -245,7 +245,7 @@
 .plus-table-vertical-lines {
     th:not(:last-child),
     td:not(:last-child) {
-        border-inline-end: var(--border-default) solid var(--ds-border);
+        border-inline-end: var(--border-width-default) solid var(--ds-border);
     }
 }
 
@@ -310,7 +310,7 @@
 }
 
 .plus-table-footer-range {
-    font: var(--body-small);
+    font: var(--body-sm);
     color: var(--ds-text-subtle);
 }
 

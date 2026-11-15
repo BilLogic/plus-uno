@@ -121,7 +121,7 @@ Use `NotificationItem` for updates that arrived over time: in the Inbox <a targe
 
 1. **Actor (`actor` at `start`).** A `32px` (`--image-md`) `Avatar` for a person or `Tile` for the system. Hidden from the link's accessible name because `title` already says who acted.
 2. **Title (`title` at `label`).** Who and what on `--body-default` in `--ds-text`, promoted to `--type-weight-medium` while `unread` is true.
-3. **Meta (`meta` at `description`).** Context and relative time separated by a middle dot (`"Sessions · 2m"`) on `--body-small` in `--ds-text-subtle`.
+3. **Meta (`meta` at `description`).** Context and relative time separated by a middle dot (`"Sessions · 2m"`) on `--body-sm` in `--ds-text-subtle`.
 4. **Unread indicator and action (`end`).** An `8px` (`--count-tag-dot-size`) dot in `--ds-background-brand-bold` paired with visually hidden `"Unread"`, replaced on hover and keyboard focus by a compact `"Mark as read"` `IconButton` when `onMarkRead` is provided.
 
 ### States
@@ -149,7 +149,7 @@ Use `NotificationItem` for updates that arrived over time: in the Inbox <a targe
 <tr><td>Row padding, gap and radius</td><td><code>--pad-y-lg</code> × <code>--pad-x-md</code>, gap <code>--inline-lg</code>, radius <code>--radius-control-md</code>.</td></tr>
 <tr><td>Row state fills</td><td><code>--ds-background-selected</code> / <code>-hovered</code> / <code>-pressed</code> when unread; <code>--ds-background-neutral-subtle</code> / <code>-hovered</code> / <code>-pressed</code> when read.</td></tr>
 <tr><td>Actor and trailing slots</td><td><code>--image-md</code> (<code>32px</code>) start slot; <code>--control-sm</code> (<code>24px</code>) end slot with <code>--count-tag-dot-size</code> (<code>8px</code>) dot in <code>--ds-background-brand-bold</code>.</td></tr>
-<tr><td>Title and meta</td><td><code>--body-default</code> (<code>--type-weight-medium</code> when unread) in <code>--ds-text</code>; <code>--body-small</code> in <code>--ds-text-subtle</code>; stack gap <code>--stack-sm</code>.</td></tr>
+<tr><td>Title and meta</td><td><code>--body-default</code> (<code>--type-weight-medium</code> when unread) in <code>--ds-text</code>; <code>--body-sm</code> in <code>--ds-text-subtle</code>; stack gap <code>--stack-sm</code>.</td></tr>
 </tbody>
 </DocsTable>
 

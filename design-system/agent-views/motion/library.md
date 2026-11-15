@@ -6,8 +6,8 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 
 | Name | Tier | Event | Transition | Tokens | Sound |
 | --- | --- | --- | --- | --- | --- |
-| Backdrop | template | enter | Open and close an overlay | `--ds-motion-appearance-default` |  |
-| Backdrop | template | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| Blanket | template | enter | Open and close an overlay | `--ds-motion-appearance-default` |  |
+| Blanket | template | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Form | template | focus | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Form | template | error | Call attention | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Frame | template | sidebar-open | Dock and undock a panel | `--ds-motion-spatial-default` |  |

@@ -1,8 +1,8 @@
 @use '../../../styles/overlay-motion' as *;
 /*
  * Flag Component Styles: the Popups pattern's Flag (Figma Pattern/Flag).
- * One surface, Popover/width-flag 400, pad Popover/pad 16, radius
- * Popover/radius 12, on the overlay pair (elevation.surface.overlay with
+ * One surface, Popup/width-flag 400, pad Popup/pad 16, radius
+ * Popup/radius 12, on the overlay pair (elevation.surface.overlay with
  * elevation.shadow.overlay, whose 1px ring is its edge, so no border). Icon,
  * content and close button sit in
  * a row Element/inline-lg 12 apart; the title and its message stack
@@ -27,7 +27,7 @@
 }
 
 @keyframes plus-flag-exit {
-    to { transform: translate(calc(100% + var(--popover-gap-screen)), calc(-100% - var(--popover-gap-screen))); }
+    to { transform: translate(calc(100% + var(--popup-gap-screen)), calc(-100% - var(--popup-gap-screen))); }
 }
 
 .plus-flag {
@@ -35,9 +35,9 @@
     align-items: flex-start;
     gap: var(--inline-lg);
     box-sizing: border-box;
-    width: var(--popover-width-flag);
-    max-width: calc(100vw - 2 * var(--popover-gap-screen));
-    padding: var(--popover-pad);
+    width: var(--flag-width);
+    max-width: calc(100vw - 2 * var(--popup-gap-screen));
+    padding: var(--popup-pad);
     background-color: var(--ds-surface-overlay);
     border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
@@ -118,13 +118,13 @@
     .plus-flag-title {
         flex: 0 1 auto;
         min-width: 0;
-        font: var(--heading-xsmall);
+        font: var(--heading-xs);
         color: var(--ds-text);
     }
 
     .plus-flag-timestamp {
         flex-shrink: 0;
-        font: var(--body-small);
+        font: var(--body-sm);
         color: var(--ds-text-subtle);
     }
 
@@ -331,8 +331,8 @@
     z-index: var(--layer-flag);
     display: flex;
     flex-direction: column;
-    gap: var(--popover-stack-flag);
-    padding: var(--popover-gap-screen);
+    gap: var(--flag-stack);
+    padding: var(--popup-gap-screen);
 
     &[data-container-position='fixed'] {
         position: fixed;
@@ -402,7 +402,7 @@
     position: relative;
     box-sizing: border-box;
     min-height: var(--flag-min-height);
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
     background-color: var(--ds-surface);
     border-radius: var(--radius-md);
     padding: var(--flag-pad);

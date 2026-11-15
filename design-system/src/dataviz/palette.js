@@ -1,5 +1,5 @@
 /**
- * The data-viz palette: which `--ds-chart-*` token does which job.
+ * The data-viz palette: which `--chart-*` token does which job.
  *
  * Every chart color does one of four jobs, and each job has one source here:
  *
@@ -17,7 +17,7 @@
  * tokens in the same order. Reading a token's value in the current color mode
  * is `colorMode.js`: this module only names tokens.
  */
-const v = (name) => `var(--ds-${name})`;
+const v = (name) => `var(--${name.startsWith('chart-') ? '' : 'ds-'}${name})`;
 
 /** Atlassian's limit: past six series, group the smallest into "Other". */
 export const CATEGORICAL_LIMIT = 6;
@@ -94,7 +94,7 @@ const EMPHASES = ['bold', 'bolder', 'boldest'];
  */
 export const sequentialRamp = (hue = 'blue') => {
     if (!HUES.includes(hue)) throw new Error(`sequentialRamp: no chart ramp for "${hue}"`);
-    return [`--ds-background-accent-${hue}-subtler`, ...EMPHASES.map((e) => `--ds-chart-${hue}-${e}`)];
+    return [`--ds-background-accent-${hue}-subtler`, ...EMPHASES.map((e) => `--chart-${hue}-${e}`)];
 };
 
 /** The neutral midpoint of every diverging ramp. */

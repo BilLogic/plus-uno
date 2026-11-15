@@ -165,18 +165,18 @@
 }
 
 .sbdocs .sb-docs-landing__eyebrow {
-    font: var(--heading-xxsmall);
+    font: var(--heading-xxs);
     color: var(--ds-text-subtle);
 }
 
 .sbdocs .sb-docs-landing__title {
-    font: var(--heading-xxlarge);
-    letter-spacing: var(--heading-xxlarge-tracking);
+    font: var(--heading-xxl);
+    letter-spacing: var(--heading-xxl-tracking);
     color: var(--ds-text);
 }
 
 .sbdocs .sb-docs-landing__purpose {
-    font: var(--body-large);
+    font: var(--body-lg);
     color: var(--ds-text-subtle);
 }
 
@@ -190,7 +190,7 @@
 }
 
 .sbdocs .sb-docs-landing__links-label {
-    font: var(--heading-xxsmall);
+    font: var(--heading-xxs);
     color: var(--ds-text-subtle);
 }
 
@@ -316,7 +316,7 @@
 }
 
 .sbdocs .sb-docs-thumb__title {
-    font: var(--heading-xsmall);
+    font: var(--heading-xs);
     color: var(--ds-link);
     text-decoration: underline;
 }

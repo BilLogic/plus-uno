@@ -9,7 +9,7 @@ import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/sto
 import { iconClass } from '../../../lib/icon';
 
 /**
- * `CountTag` — a number on its own, as a near-square badge.
+ * `CountTag` — a number on its own, as a near-square countTag.
  *
  * THE TEST SEAM IS THIS FILE: story `play:` functions run by `check:storybook`
  * in a real browser. Every assertion is something a person could observe —
@@ -87,7 +87,7 @@ Appearances.play = async ({ canvasElement }) => {
     await expect(bold.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-danger-bold'));
     await expect(bold.color).toBe(tokenColor(canvasElement, '--ds-text-inverse'));
 
-    // Inverse is a solid surface badge with subtle text, on a button and on a
+    // Inverse is a solid surface countTag with subtle text, on a button and on a
     // bold neutral fill alike.
     for (const text of ['14', '15']) {
         const inverse = getComputedStyle(pillOf(canvas, text));
@@ -99,17 +99,17 @@ Appearances.play = async ({ canvasElement }) => {
         await expect(contrast(inverse.color, inverse.backgroundColor), 'AA on any fill').toBeGreaterThanOrEqual(4.5);
     }
 
-    // The figures are tabular and sit in the middle of the badge, in a button too.
+    // The figures are tabular and sit in the middle of the countTag, in a button too.
     for (const text of ['12', '14']) {
         const value = canvas.getByText(text);
-        const badge = pillOf(canvas, text).getBoundingClientRect();
+        const countTag = pillOf(canvas, text).getBoundingClientRect();
         await expect(getComputedStyle(value).fontVariantNumeric, `${text}: tabular figures`).toBe('tabular-nums');
         const v = value.getBoundingClientRect();
-        await expect(Math.abs((v.left + v.right) / 2 - (badge.left + badge.right) / 2), `${text}: centered across`).toBeLessThanOrEqual(0.5);
+        await expect(Math.abs((v.left + v.right) / 2 - (countTag.left + countTag.right) / 2), `${text}: centered across`).toBeLessThanOrEqual(0.5);
     }
     const inButton = pillOf(canvas, '14').getBoundingClientRect();
     const button = canvas.getByRole('button', { name: /Review/ }).getBoundingClientRect();
-    await expect(Math.abs((inButton.top + inButton.bottom) / 2 - (button.top + button.bottom) / 2), 'the badge is centered in the button').toBeLessThanOrEqual(0.5);
+    await expect(Math.abs((inButton.top + inButton.bottom) / 2 - (button.top + button.bottom) / 2), 'the countTag is centered in the button').toBeLessThanOrEqual(0.5);
 
     const dot = canvas.getByRole('img', { name: 'New activity' });
     const d = getComputedStyle(dot);
@@ -179,7 +179,7 @@ Zero.play = async ({ canvasElement }) => {
     await expect(within(canvas.getByTestId('shown')).getByText('0')).toBeInTheDocument();
 };
 
-/** The ring, for a count pinned to an icon or avatar: 2px of surface outside the badge. */
+/** The ring, for a count pinned to an icon or avatar: 2px of surface outside the countTag. */
 export const Ring = () => (
     <div style={row}>
         <span style={{ position: 'relative', display: 'inline-flex' }}>
