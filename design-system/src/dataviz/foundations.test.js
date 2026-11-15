@@ -65,6 +65,12 @@ describe('data-viz foundations', () => {
         }
     });
 
+    it('no chart sets an animation millisecond literal; timing comes from the motion model', () => {
+        const offenders = files.flatMap(({ path, text }) =>
+            [...text.matchAll(/\bduration\s*:\s*\d+/g)].map((m) => `${path}: ${m[0]}`));
+        expect(offenders).toEqual([]);
+    });
+
     it('every Highcharts chart component renders through PlusChart rather than HighchartsReact directly', () => {
         const offenders = files.filter(({ path, text }) =>
             path.endsWith('.jsx') &&

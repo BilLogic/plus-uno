@@ -81,9 +81,9 @@ own `title` option (every chart sets `title: { text: null }`).
 
 Charts follow the same spring physics and choreography as the rest of the design system:
 
-- **Entrance:** charts grow to their value on the default spatial spring (`spatial.default`), or the expressive spring inside an expressive container.
+- **Entrance:** charts grow to their value on the default spatial spring (`spatial.default`). Charts inside a `ChartMotionArea expressive` take the expressive spring instead; the page's `data-motion="expressive"` attribute does not reach Highcharts, which animates in JavaScript.
 - **State changes:** hover and inactive series transitions fade on `appearance.fast`.
-- **Reduced motion:** reduced motion makes every entrance a fade (`appearance.fast`), even inside an expressive container.
+- **Reduced motion:** reduced motion makes every entrance a fade (`appearance.fast`), even inside a `ChartMotionArea expressive`.
 - **One orchestrated moment per area:** charts in one area arrive 20 ms apart within half a second (500 ms cap); a standalone chart enters with no delay.
 - **No replay:** a chart animates on its first render only; nothing replays on redraw, resize or data update, and micro-charts such as a sparkline opt out of entrance motion altogether.
 

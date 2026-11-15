@@ -256,6 +256,8 @@ const widthStory = (size) => () => (
     </div>
 );
 
+export const Width4Col = widthStory('4-col');
+Width4Col.storyName = 'Width 4-col';
 export const Width6Col = widthStory('6-col');
 Width6Col.storyName = 'Width 6-col';
 export const Width8Col = widthStory('8-col');

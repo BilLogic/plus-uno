@@ -35,10 +35,11 @@
 }
 
 /**
- * The width steps: `&-width-sm` · `-md` · `-lg` set the span to 6 · 8 · 10.
+ * The width steps: `&-width-xs` · `-sm` · `-md` · `-lg` set the span to 4 · 6 · 8 · 10.
  * The numbers match BLANKET_SPANS in patterns/Blanket/Blanket.jsx.
  */
 @mixin screen-grid-width-steps {
+    &-width-xs { --plus-overlay-span: 4; }
     &-width-sm { --plus-overlay-span: 6; }
     &-width-md { --plus-overlay-span: 8; }
     &-width-lg { --plus-overlay-span: 10; }

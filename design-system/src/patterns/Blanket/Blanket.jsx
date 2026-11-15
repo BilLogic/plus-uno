@@ -5,13 +5,13 @@ import PropTypes from 'prop-types';
 import './Blanket.scss';
 
 /** The width steps a layer in the Blanket takes: columns of the screen grid. */
-export const BLANKET_WIDTHS = ['sm', 'md', 'lg'];
+export const BLANKET_WIDTHS = ['xs', 'sm', 'md', 'lg'];
 
 /** `hug` grows with the content to the screen less 128; `fill` sits at that cap. */
 export const BLANKET_HEIGHTS = ['hug', 'fill'];
 
 /** Screen-grid columns per width step, matched by `screen-grid-width-steps` in `styles/_screen-grid.scss`. */
-export const BLANKET_SPANS = Object.freeze({ sm: 6, md: 8, lg: 10 });
+export const BLANKET_SPANS = Object.freeze({ xs: 4, sm: 6, md: 8, lg: 10 });
 
 /**
  * Blanket pattern for PLUS design system.

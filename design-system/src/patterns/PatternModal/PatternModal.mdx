@@ -92,9 +92,9 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 16 on ev
 
 ## Widths
 
-A width is a step of the screen grid plus 16 on each side: 6, 8 and 10 columns, here at 1024. It grows with the window and never shrinks; the Sidebar never changes it. The 4-col step is Planned: today the smallest step is 6-col.
+A width is a step of the screen grid plus 16 on each side: 4, 6, 8 and 10 columns, here at 1024. It grows with the window and never shrinks; the Sidebar never changes it.
 
-<ComponentExample of={PatternModalStories.WidthStrip} title="6 · 8 · 10-col" description="Each Modal measured against the screen grid at 1024." />
+<ComponentExample of={PatternModalStories.WidthStrip} title="4 · 6 · 8 · 10-col" description="Each Modal measured against the screen grid at 1024." />
 
 </div>
 
@@ -111,7 +111,7 @@ Drag the screen's width. The Modal grows with it and never shrinks.
 <tr><th>Width</th><th>768</th><th>1024</th><th>1440</th><th>Made of</th></tr>
 </thead>
 <tbody>
-<tr><td>4-col <PlannedTag /></td><td>261</td><td>347</td><td>432</td><td>4 screen-grid columns + 2 × 16</td></tr>
+<tr><td>4-col</td><td>261</td><td>347</td><td>432</td><td>4 screen-grid columns + 2 × 16</td></tr>
 <tr><td>6-col</td><td>384</td><td>512</td><td>640</td><td>6 columns + 2 × 16</td></tr>
 <tr><td>8-col</td><td>507</td><td>677</td><td>848</td><td>8 columns + 2 × 16</td></tr>
 <tr><td>10-col</td><td>629</td><td>843</td><td>1056</td><td>10 columns + 2 × 16</td></tr>
@@ -340,8 +340,7 @@ Modal is the component: Blanket, focus trap, Escape and focus return. The templa
 </thead>
 <tbody>
 <tr><td><code>title</code> · <code>onClose</code></td><td>The h1 and the Close icon button.</td></tr>
-<tr><td><code>width</code></td><td><code>6-col</code> · <code>8-col</code> · <code>10-col</code>.</td></tr>
-<tr><td><code>width="4-col"</code> <PlannedTag /></td><td>Planned. The confirm width, 4 columns plus the pad. Today the smallest step is 6-col.</td></tr>
+<tr><td><code>width</code></td><td><code>4-col</code> · <code>6-col</code> · <code>8-col</code> · <code>10-col</code>.</td></tr>
 <tr><td><code>body</code></td><td>Text, a list, fields or a table. It scrolls past the cap.</td></tr>
 <tr><td><code>footer</code> or <code>primaryButton</code> · <code>secondaryButton</code></td><td>The footer's buttons. Leave them out for Passive.</td></tr>
 <tr><td>Full-bleed footer <PlannedTag /></td><td>Planned. Cells that fill the footer edge to edge at <code>--space-300</code> with the inner corners squared. Today the page composes it from Button.</td></tr>
@@ -406,7 +405,7 @@ A button, a link, an icon. Never on its own.
 
 <RuleTag kind="review" />
 
-A short form is 8-col; a table, editor or steps is 10-col. Choose width by task. A confirm takes 6-col today; 4-col is Planned (see Widths).
+A confirm takes 4-col or 6-col; a short form is 8-col; a table, editor or steps is 10-col. Choose width by task.
 
 <DoDontPair
     doExample={<ConfirmNarrow />}
