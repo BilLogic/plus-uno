@@ -11,8 +11,8 @@ import Blanket from '@/patterns/Blanket';
 /** Safe CSS length / custom-property patterns for Modal width. */
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
 
-/** The `width` steps, from the screen grid: 6 · 8 · 10 columns plus the modal pad. */
-export const MODAL_WIDTHS = ['6-col', '8-col', '10-col'];
+/** The `width` steps, from the screen grid: 4 · 6 · 8 · 10 columns plus the modal pad. */
+export const MODAL_WIDTHS = ['4-col', '6-col', '8-col', '10-col'];
 
 /** The screens `MODAL_WIDTH_PX` is read at: 768 and 1024, and 1280, where the grid reaches its cap and the width stops growing. */
 export const MODAL_WIDTH_SCREENS = [768, 1024, 1280];
@@ -23,6 +23,7 @@ export const MODAL_WIDTH_SCREENS = [768, 1024, 1280];
  * equal to the `--modal-width-*` tokens.
  */
 export const MODAL_WIDTH_PX = {
+    '4-col': [261, 347, 432],
     '6-col': [384, 512, 640],
     '8-col': [507, 677, 848],
     '10-col': [629, 843, 1056],
@@ -353,7 +354,7 @@ Modal.propTypes = {
     /** Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `blanket` blocks it). The parent sets `show` to false. */
     onClose: PropTypes.func,
     /**
-     * `6-col` · `8-col` · `10-col`: 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with
+     * `4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with
      * the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept
      * for the callers that still pass one.
      */

@@ -13,7 +13,7 @@ import {
     SpotlightTarget,
     Tooltip,
 } from '@/components';
-import { DocsOverlayBoundary } from './docs-overlay-boundary';
+import { DocsOverlayBoundary, MIN_FIT_ZOOM, fitZoom } from './docs-overlay-boundary';
 
 describe('DocsOverlayBoundary', () => {
     it('keeps Spotlight, Popup, Tooltip, DropdownMenu, FilterMenu and PopupSelect inside their docs canvas', () => {
@@ -77,5 +77,23 @@ describe('DocsOverlayBoundary', () => {
         for (const boundary of boundaries) {
             expect(boundary.querySelector('[data-side]')).toHaveAttribute('data-side', 'bottom');
         }
+    });
+});
+
+describe('fitZoom', () => {
+    it('leaves an example that fits at 1', () => {
+        expect(fitZoom(600, 800)).toBe(1);
+        expect(fitZoom(800, 800)).toBe(1);
+    });
+    it('zooms a wider example to the preview width', () => {
+        expect(fitZoom(1600, 800)).toBe(0.5);
+        expect(fitZoom(1000, 800)).toBeCloseTo(0.8);
+    });
+    it('never zooms below the legibility floor', () => {
+        expect(fitZoom(4000, 800)).toBe(MIN_FIT_ZOOM);
+    });
+    it('ignores unmeasured boxes', () => {
+        expect(fitZoom(0, 800)).toBe(1);
+        expect(fitZoom(1200, 0)).toBe(1);
     });
 });

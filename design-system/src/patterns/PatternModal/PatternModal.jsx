@@ -12,7 +12,7 @@ import './PatternModal.scss';
  * Modal pattern for PLUS design system.
  * Modal shell rendered inline (no portal, focus trap or Escape): header with
  * title and close button, body slot, footer slot. Width is a step of the
- * screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and
+ * screen grid (xs · sm · md · lg: 4 · 6 · 8 · 10 columns plus the modal pad), and
  * height hugs the content up to the screen less 128 or fills to it, the body
  * scrolling past it. Place it in `Blanket`.
  * Baked-in tokens: the overlay pair (`--ds-surface-overlay` with
@@ -248,8 +248,8 @@ PatternModal.propTypes = {
      */
     footer: PropTypes.node,
     /**
-     * `sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the modal pad
-     * (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440).
+     * `xs` · `sm` · `md` · `lg`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad
+     * (261 · 384 · 507 · 629 at 768, 347 · 512 · 677 · 843 at 1024, 432 · 640 · 848 · 1056 at 1440).
      * Grows with the screen, never shrinks, ignores the sidebar.
      */
     width: PropTypes.oneOf(BLANKET_WIDTHS),

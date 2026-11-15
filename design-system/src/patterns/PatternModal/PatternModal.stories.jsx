@@ -16,8 +16,8 @@ import * as Demo from './modalDemo.jsx';
 /** The stand-in screen the docs draw the overlay at: the Large mode, and a short template. */
 const SCREEN = { width: 1024, height: 520 };
 
-/** Figma's Modal/width-modal-* at 1024: 6 · 8 · 10 screen columns plus 2 × 16. */
-const WIDTHS_AT_1024 = { sm: 512, md: 677, lg: 843 };
+/** Figma's Modal/width-modal-* at 1024: 4 · 6 · 8 · 10 screen columns plus 2 × 16. */
+const WIDTHS_AT_1024 = { xs: 347, sm: 512, md: 677, lg: 843 };
 
 const bodyCopy = (
     <p style={{ margin: 0, font: 'var(--body-default)' }}>
@@ -401,6 +401,7 @@ const atWidth = (width) => (
     </InBlanket>
 );
 
+export const WidthXSmall = { name: 'Extra small', render: () => atWidth('xs') };
 export const WidthSmall = { name: 'Small', render: () => atWidth('sm') };
 export const WidthMedium = { name: 'Medium', render: () => atWidth('md') };
 export const WidthLarge = { name: 'Large', render: () => atWidth('lg') };
@@ -573,12 +574,12 @@ export const AnatomyActive = {
     },
 };
 
-/** The width steps against the screen grid: 6 · 8 · 10 columns plus 16 a side at 1024. 4-col is Planned. */
+/** The width steps against the screen grid: 4 · 6 · 8 · 10 columns plus 16 a side at 1024. */
 export const WidthStrip = {
     render: () => (
         <FitStage width={STAGE}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', inlineSize: STAGE }}>
-            {[['sm', '6-col'], ['md', '8-col'], ['lg', '10-col']].map(([width, label]) => (
+            {[['xs', '4-col'], ['sm', '6-col'], ['md', '8-col'], ['lg', '10-col']].map(([width, label]) => (
                 <Demo.ModalStage key={width} width={width} height={240} title={label} footer={<Demo.TwoCells action="Save" />}>
                     <p style={{ margin: 0, font: 'var(--body-default)' }}>{`${label} on the 1024 screen grid.`}</p>
                 </Demo.ModalStage>
@@ -590,11 +591,12 @@ export const WidthStrip = {
         await settleAnimations(canvasElement);
         fitsCanvas(canvasElement);
         const modals = within(canvasElement).getAllByRole('dialog');
-        for (const [i, width] of ['sm', 'md', 'lg'].entries()) {
+        for (const [i, width] of ['xs', 'sm', 'md', 'lg'].entries()) {
             await expect(modals[i].offsetWidth, `${width} matches the grid at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
         }
         await expect(modals[0].offsetWidth, 'widths step up').toBeLessThan(modals[1].offsetWidth);
         await expect(modals[1].offsetWidth, 'widths step up').toBeLessThan(modals[2].offsetWidth);
+        await expect(modals[2].offsetWidth, 'widths step up').toBeLessThan(modals[3].offsetWidth);
     },
 };
 

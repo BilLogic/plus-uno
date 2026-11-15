@@ -57,6 +57,8 @@ a confirmation, a short form, or a detail view the user closes and returns from.
 
 The width examples are drawn at the 1024 screen.
 
+<ComponentExample of={ModalStories.Width4Col} title="Width 4-col" description="Four columns of the screen grid plus the modal pad, for a short confirmation." />
+
 <ComponentExample of={ModalStories.Width6Col} title="Width 6-col" description="Six columns of the screen grid plus the modal pad, for a confirmation." />
 
 <ComponentExample of={ModalStories.Width8Col} title="Width 8-col" description="Eight columns, for a short form." />
@@ -150,6 +152,7 @@ many columns of the screen grid plus the modal pad.
 <tr><th>Width</th><th>When to use</th><th><code>MODAL_WIDTH_PX</code> at {MODAL_WIDTH_SCREENS.join(' · ')}</th></tr>
 </thead>
 <tbody>
+<tr><td>4-col</td><td>A compact confirmation.</td><td>{MODAL_WIDTH_PX['4-col'].join(' · ')}</td></tr>
 <tr><td>6-col</td><td>A confirmation or a short question.</td><td>{MODAL_WIDTH_PX['6-col'].join(' · ')}</td></tr>
 <tr><td>8-col</td><td>A short form.</td><td>{MODAL_WIDTH_PX['8-col'].join(' · ')}</td></tr>
 <tr><td>10-col</td><td>A table or an editor.</td><td>{MODAL_WIDTH_PX['10-col'].join(' · ')}</td></tr>

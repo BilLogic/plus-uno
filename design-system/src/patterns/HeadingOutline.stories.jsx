@@ -105,7 +105,8 @@ ModalTitle.play = async ({ canvasElement }) => {
     const inside = within(dialog);
     await expectStyle(inside.getByRole('heading', { level: 1, name: 'Edit session' }), 'modal title', HEADING_MEDIUM);
     await expectStyle(inside.getByText('Changes apply to every session in the series.'), 'modal description', BODY_DEFAULT);
-    await expectStyle(inside.getByRole('heading', { level: 2, name: 'When' }), 'section in a modal', HEADING_MEDIUM);
+    await expectStyle(inside.getByRole('heading', { level: 2, name: 'When' }), 'section in a modal', HEADING_SMALL);
+    await expectStyle(inside.getByText('Thursdays at 4:00 PM.'), 'section body in a modal', BODY_DEFAULT);
 };
 
 /** A popup's title is 14. */

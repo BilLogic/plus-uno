@@ -622,7 +622,10 @@ const preview = {
           context.name !== 'Overview' &&
           context.title.startsWith('Components/');
         return (
-          <DocsOverlayBoundary disablePointerEvents={staticComponentExample}>
+          <DocsOverlayBoundary
+            disablePointerEvents={staticComponentExample}
+            fit={context.parameters?.docs?.fit !== false}
+          >
             <Story />
           </DocsOverlayBoundary>
         );
