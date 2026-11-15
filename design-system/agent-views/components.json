@@ -6341,7 +6341,8 @@
         "Pi",
         "Equal",
         "Divider",
-        "Interactive"
+        "Interactive",
+        "WidthCappedStaysSquare"
       ],
       "tokens": [
         "--ds-background-accent-blue-subtle",

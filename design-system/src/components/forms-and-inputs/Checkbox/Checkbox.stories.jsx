@@ -442,8 +442,9 @@ Tile.play = async ({ canvasElement }) => {
     await expect(tile.querySelector('.plus-choice-tile-illustration')).toHaveAttribute('aria-hidden', 'true');
 };
 
+const SQUARE_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Crect width='10' height='10'/%3E%3C/svg%3E";
 export const TileNarrowLargeIllustrations = () => (
-    <div style={{ width: 320, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+    <div style={{ width: 320, /* 320px: the narrow-phone container width the ticket names */ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <Checkbox id="cb-narrow-character" name="cb-narrow-a" label="Character" illustration={<Illustration character="advocacy" size={240} />} appearance="tile" />
         <Checkbox
             id="cb-narrow-svg"
@@ -456,14 +457,18 @@ export const TileNarrowLargeIllustrations = () => (
             id="cb-narrow-img"
             name="cb-narrow-c"
             label="Image"
-            illustration={<img alt="" width="300" height="300" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Crect width='10' height='10'/%3E%3C/svg%3E" />}
+            illustration={<img alt="" width="300" height="300" src={SQUARE_IMAGE} />}
             appearance="tile"
         />
+        {/* 160px: the smallest container a tile is asked to fit */}
+        <div style={{ width: 160 }}>
+            <Checkbox id="cb-narrow-small" name="cb-narrow-small" label="Smallest" illustration={<Illustration character="advocacy" size={240} />} appearance="tile" />
+        </div>
     </div>
 );
 TileNarrowLargeIllustrations.play = async ({ canvasElement }) => {
     const tiles = canvasElement.querySelectorAll('.plus-choice-tile');
-    await expect(tiles.length).toBe(3);
+    await expect(tiles.length).toBe(4);
     for (const tile of tiles) {
         const card = tile.getBoundingClientRect();
         const slotChild = tile.querySelector('.plus-choice-tile-illustration > *');

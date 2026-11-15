@@ -83,6 +83,8 @@ export const Illustration = ({
         .filter(Boolean)
         .join(' ');
 
+    // Height follows width through aspect-ratio rather than a fixed blockSize, so a
+    // caller that caps the width (a choice tile's slot) keeps the frame square.
     return (
         <span
             className={classes}

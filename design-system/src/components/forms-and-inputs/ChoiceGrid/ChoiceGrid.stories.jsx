@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -424,6 +425,8 @@ Overview.play = async ({ canvasElement }) => {
     await expect(radiusOf(canvasElement, '.plus-choice-grid-table'), 'Choice grid radius is 12').toBe('12px');
     const corner = canvasElement.querySelector('.plus-choice-grid-row-header');
     const column = canvasElement.querySelector('.plus-choice-grid-column-header');
-    await expect(getComputedStyle(corner).backgroundColor, 'Corner cell matches a column header').toBe(getComputedStyle(column).backgroundColor);
-    await expect(getComputedStyle(corner).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-container'));
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(corner).backgroundColor, `${mode}: corner cell matches a column header`).toBe(getComputedStyle(column).backgroundColor);
+        await expect(getComputedStyle(corner).backgroundColor, `${mode}: corner cell takes the container fill`).toBe(token('--ds-surface-container'));
+    });
 };
