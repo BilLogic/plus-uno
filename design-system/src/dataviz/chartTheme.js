@@ -147,8 +147,8 @@ const chartTheme = {
     title: {
         style: {
             color: CHROME.text,
-            fontFamily: 'var(--type-family-heading-serif)',
-            fontWeight: 'var(--type-weight-medium)',
+            fontFamily: 'var(--type-family-heading)',
+            fontWeight: 'var(--type-weight-semibold)',
             fontSize: 'var(--type-size-150)'
         }
     },

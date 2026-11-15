@@ -10,7 +10,7 @@ Heading, Body, Metric and Code are the text styles for all work.
 
 ## Overview
 
-PLUS uses Noto Serif (500) for headings 20 to 32, Noto Sans for headings 12 to 16, metrics and body text, and Noto Sans Mono for code. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
+PLUS is all sans. Every heading, metric and body style is Noto Sans, and Noto Sans Mono is for code. Headings are semibold (600). Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
 font: var(--heading-md);
@@ -46,19 +46,18 @@ Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`
 
 | Token | Value | Used for |
 | --- | --- | --- |
-| `--type-family-heading-serif` | Noto Serif | Headings 20 to 32 |
-| `--type-family-heading` | Noto Sans | Headings 12 to 16 and metrics |
+| `--type-family-heading` | Noto Sans | Headings and metrics |
 | `--type-family-body` | Noto Sans | Body text |
 | `--type-family-code` | Noto Sans Mono | Code |
-| `--type-family-brand-heading` · `--type-family-brand-body` | Noto Serif · Noto Sans | Brand headings and body |
+| `--type-family-brand-heading` · `--type-family-brand-body` | Noto Serif · Noto Sans | Marketing and docs heroes only, never the product |
 | `--type-weight-regular` | 400 | Body text |
-| `--type-weight-medium` | 500 | Labels, icon-paired text, and Noto Serif headings 20 and up |
-| `--type-weight-semibold` | 600 | Noto Sans headings 16 and under, metrics, bold body |
+| `--type-weight-medium` | 500 | Labels and icon-paired text |
+| `--type-weight-semibold` | 600 | Headings, metrics, bold body |
 | `--heading-xxl-tracking` · `-xlarge-tracking` · `-large-tracking` | −2% · −1% · −1% | Companion letter-spacing for headings 32, 28 and 24 (20 and below use 0) |
 
 ### Text-style classes
 
-Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and tracking together. Component stylesheets use `font: var(--…)` directly.
+Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and tracking together. The metric classes also set tabular figures. Component stylesheets use `font: var(--…)` directly, and add `font-variant-numeric: tabular-nums` to a metric.
 
 ```jsx
 <p className="body-default">Helper text</p>
@@ -122,12 +121,37 @@ Headings step down one level at a time.
 Do: h1, then h2, then h3.
 Don't: An h3 straight after the h1 skips the h2.
 
-### Numbers take Metric
+## Headings, numbers and mono
 
-Use Metric to emphasize a number; a serif heading style makes the figure read as a title.
+### Headings
+
+Every heading level is Noto Sans at weight 600. Size, line height and tracking step down together.
+
+| Style | Size/line | Tracking |
+| --- | --- | --- |
+| Heading/xxlarge | 32/36 | −2% |
+| Heading/xlarge | 28/32 | −1% |
+| Heading/large (page title) | 24/28 | −1% |
+| Heading/medium (section) | 20/24 | None |
+| Heading/small | 16/20 | None |
+| Heading/xsmall | 14/20 | None |
+| Heading/xxsmall | 12/16 | None |
+
+Semibold at 28 and 32 sits close to bold body text. Keep 600 and do not add a 700 weight.
+
+### Numbers
+
+Metric styles are Noto Sans 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
 
 Do: Metric/large for the figure.
 Don't: Heading/medium for a number.
+
+### Mono
+
+Noto Sans Mono is for code, token names, property values and machine IDs such as a session ID or a URL. Never use it for metrics, times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.
+
+Do: Metric/large for the count, mono for the session ID.
+Don't: Mono for the count.
 
 ## Accessibility
 

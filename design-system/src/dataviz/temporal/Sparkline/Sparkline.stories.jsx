@@ -53,7 +53,7 @@ A sparkline is a word-sized line chart: the shape of a trend, beside the number 
 const sessions = ['Sep 1–5', 'Sep 8–12', 'Sep 15–19', 'Sep 22–26', 'Sep 29–Oct 3', 'Oct 6–10', 'Oct 13–17'];
 
 const row = { display: 'flex', alignItems: 'center', gap: 'var(--stack-lg)' };
-const value = { fontFamily: 'var(--type-family-heading-serif)', fontSize: 'var(--type-size-150)', fontWeight: 'var(--type-weight-medium)', color: 'var(--ds-text)' };
+const value = { fontFamily: 'var(--type-family-heading)', fontSize: 'var(--type-size-150)', fontWeight: 'var(--type-weight-semibold)', color: 'var(--ds-text)' };
 const caption = { color: 'var(--ds-text-subtle)', fontSize: 'var(--type-size-075)' };
 
 /**

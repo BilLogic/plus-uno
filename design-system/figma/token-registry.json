@@ -62,9 +62,6 @@
       "Family/body": [
         "var(--type-family-body)"
       ],
-      "Family/heading-serif": [
-        "var(--type-family-heading-serif)"
-      ],
       "Family/code": [
         "var(--type-family-code)"
       ],
@@ -121,7 +118,6 @@
       "Family/brand-heading": "var(--type-family-brand-heading)",
       "Family/code": "var(--type-family-code)",
       "Family/heading": "var(--type-family-heading)",
-      "Family/heading-serif": "var(--type-family-heading-serif)",
       "Font size/075": "var(--type-size-075)",
       "Font size/0875": "var(--type-size-0875)",
       "Font size/100": "var(--type-size-100)",
@@ -846,11 +842,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1161,
+    "scssTokenCount": 1160,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 759,
-      "resolved": 717,
+      "total": 758,
+      "resolved": 716,
       "percent": 94,
       "unresolved": [
         {

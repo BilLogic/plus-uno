@@ -36,10 +36,10 @@ const rem = (px) => `${px / 16}rem`;
 
 /** Name, family, size px, line height px, weight: the Atlassian scale in the lab. */
 const STYLES = [
-  ['Heading/xxlarge', 'heading-serif', 32, 36, 500],
-  ['Heading/xlarge', 'heading-serif', 28, 32, 500],
-  ['Heading/large', 'heading-serif', 24, 28, 500],
-  ['Heading/medium', 'heading-serif', 20, 24, 500],
+  ['Heading/xxlarge', 'heading', 32, 36, 600],
+  ['Heading/xlarge', 'heading', 28, 32, 600],
+  ['Heading/large', 'heading', 24, 28, 600],
+  ['Heading/medium', 'heading', 20, 24, 600],
   ['Heading/small', 'heading', 16, 20, 600],
   ['Heading/xsmall', 'heading', 14, 20, 600],
   ['Heading/xxsmall', 'heading', 12, 16, 600],
@@ -52,7 +52,7 @@ const STYLES = [
 ];
 const STACKS = {
   heading: '"Noto Sans", "Noto Sans Fallback", sans-serif',
-  'heading-serif': '"Noto Serif", "Noto Serif Fallback", serif',
+  brand: '"Noto Serif", "Noto Serif Fallback", serif',
   body: '"Noto Sans", "Noto Sans Fallback", sans-serif',
   code: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 };
@@ -70,9 +70,9 @@ test('the font primitives are named by rem × 100 and resolve to their rem value
 test('the family and weight variables resolve to Noto Sans, Noto Serif, Noto Sans Mono and 400 · 500 · 600', () => {
   assert.equal(corpus.get('--type-family-heading')?.value, STACKS.heading);
   assert.equal(corpus.get('--type-family-body')?.value, STACKS.body);
-  assert.equal(corpus.get('--type-family-heading-serif')?.value, STACKS['heading-serif']);
+  assert.equal(corpus.get('--type-family-heading-serif'), undefined, 'the serif heading family is retired');
   assert.equal(corpus.get('--type-family-code')?.value, STACKS.code);
-  assert.equal(corpus.get('--type-family-brand-heading')?.value, STACKS['heading-serif']);
+  assert.equal(corpus.get('--type-family-brand-heading')?.value, STACKS.brand);
   assert.equal(corpus.get('--type-family-brand-body')?.value, STACKS.body);
   assert.equal(corpus.get('--type-weight-regular')?.value, '400');
   assert.equal(corpus.get('--type-weight-medium')?.value, '500');
@@ -135,7 +135,7 @@ test('a family is set in one place: the family token, never in a style', () => {
   );
   for (const [face, tokens] of [
     ['Noto Sans', ['--type-family-heading', '--type-family-body', '--type-family-brand-body']],
-    ['Noto Serif', ['--type-family-heading-serif', '--type-family-brand-heading']],
+    ['Noto Serif', ['--type-family-brand-heading']],
     ['Noto Sans Mono', ['--type-family-code']],
   ]) {
     const setters = declarations.filter((d) => d.value.startsWith(`"${face}",`)).map((d) => d.name);
@@ -144,4 +144,13 @@ test('a family is set in one place: the family token, never in a style', () => {
   for (const [style, family] of STYLES) {
     assert.match(corpus.get(cssName(style)).raw, new RegExp(`var\\(--type-family-${family}\\)$`), style);
   }
+});
+
+test('metric classes and .num set tabular figures; running text does not', () => {
+  const css = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/tokens/_type.scss'), 'utf8');
+  for (const size of ['lg', 'md', 'sm']) {
+    assert.match(css, new RegExp(`\\.metric-${size} \{[^}]*font-variant-numeric: tabular-nums`), `.metric-${size}`);
+  }
+  assert.match(css, /\.num \{ font-variant-numeric: tabular-nums; \}/);
+  assert.doesNotMatch(css, /\.body-\w+ \{[^}]*tabular-nums/);
 });

@@ -365,7 +365,6 @@ function typeToken(v) {
  */
 const FAMILY_FALLBACKS = {
     'Family/heading': ['"Noto Sans Fallback"', 'sans-serif'],
-    'Family/heading-serif': ['"Noto Serif Fallback"', 'serif'],
     'Family/body': ['"Noto Sans Fallback"', 'sans-serif'],
     'Family/code': ['ui-monospace', '"SF Mono"', 'Menlo', 'Consolas', 'monospace'],
     'Family/brand-heading': ['"Noto Serif Fallback"', 'serif'],
@@ -495,9 +494,10 @@ function textStyleClasses(styles) {
         .map(({ token }) => {
             const name = token.slice(2);
             const spacing = tracked.has(token) ? ` letter-spacing: var(${token}-tracking);` : '';
-            return `.${name} { font: var(${token});${spacing} }\n`;
+            const figures = name.startsWith('metric-') ? ' font-variant-numeric: tabular-nums;' : '';
+            return `.${name} { font: var(${token});${spacing}${figures} }\n`;
         })
-        .join('');
+        .join('') + '/* Numbers that line up vertically: table columns, times, counts in lists. Running text keeps proportional figures. */\n.num { font-variant-numeric: tabular-nums; }\n';
 }
 
 // Generate all files

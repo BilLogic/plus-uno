@@ -32,7 +32,7 @@ export const Sample = ({ font, weight, children = 'Tutors plan the week from her
 
 <FoundationSection title="Overview">
 
-PLUS uses Noto Serif (500) for headings 20 to 32, Noto Sans for headings 12 to 16, metrics and body text, and Noto Sans Mono for code. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
+PLUS is all sans. Every heading, metric and body style is Noto Sans, and Noto Sans Mono is for code. Headings are semibold (600). Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
 font: var(--heading-md);
@@ -80,14 +80,13 @@ Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`
 <RefTable
     head={['Token', 'Value', 'Used for']}
     rows={[
-        [<C>--type-family-heading-serif</C>, 'Noto Serif', 'Headings 20 to 32'],
-        [<C>--type-family-heading</C>, 'Noto Sans', 'Headings 12 to 16 and metrics'],
+        [<C>--type-family-heading</C>, 'Noto Sans', 'Headings and metrics'],
         [<C>--type-family-body</C>, 'Noto Sans', 'Body text'],
         [<C>--type-family-code</C>, 'Noto Sans Mono', 'Code'],
-        [<><C>--type-family-brand-heading</C> · <C>--type-family-brand-body</C></>, 'Noto Serif · Noto Sans', 'Brand headings and body'],
+        [<><C>--type-family-brand-heading</C> · <C>--type-family-brand-body</C></>, 'Noto Serif · Noto Sans', 'Marketing and docs heroes only, never the product'],
         [<C>--type-weight-regular</C>, '400', 'Body text'],
-        [<C>--type-weight-medium</C>, '500', 'Labels, icon-paired text, and Noto Serif headings 20 and up'],
-        [<C>--type-weight-semibold</C>, '600', 'Noto Sans headings 16 and under, metrics, bold body'],
+        [<C>--type-weight-medium</C>, '500', 'Labels and icon-paired text'],
+        [<C>--type-weight-semibold</C>, '600', 'Headings, metrics, bold body'],
         [<><C>--heading-xxl-tracking</C> · <C>-xlarge-tracking</C> · <C>-large-tracking</C></>, '−2% · −1% · −1%', 'Companion letter-spacing for headings 32, 28 and 24 (20 and below use 0)'],
     ]}
 />
@@ -96,7 +95,7 @@ Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`
 
 <FoundationSubsection title="Text-style classes">
 
-Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and tracking together. Component stylesheets use `font: var(--…)` directly.
+Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and tracking together. The metric classes also set tabular figures. Component stylesheets use `font: var(--…)` directly, and add `font-variant-numeric: tabular-nums` to a metric.
 
 ```jsx
 <p className="body-default">Helper text</p>
@@ -224,9 +223,34 @@ Headings step down one level at a time.
 
 </FoundationSubsection>
 
-<FoundationSubsection title="Numbers take Metric">
+</FoundationSection>
 
-Use Metric to emphasize a number; a serif heading style makes the figure read as a title.
+<FoundationSection title="Headings, numbers and mono">
+
+<FoundationSubsection title="Headings">
+
+Every heading level is Noto Sans at weight 600. Size, line height and tracking step down together.
+
+<RefTable
+    head={['Style', 'Size/line', 'Tracking']}
+    rows={[
+        ['Heading/xxlarge', '32/36', '−2%'],
+        ['Heading/xlarge', '28/32', '−1%'],
+        ['Heading/large (page title)', '24/28', '−1%'],
+        ['Heading/medium (section)', '20/24', 'None'],
+        ['Heading/small', '16/20', 'None'],
+        ['Heading/xsmall', '14/20', 'None'],
+        ['Heading/xxsmall', '12/16', 'None'],
+    ]}
+/>
+
+Semibold at 28 and 32 sits close to bold body text. Keep 600 and do not add a 700 weight.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Numbers">
+
+Metric styles are Noto Sans 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
 
 <DoDont>
 <Do caption="Metric/large for the figure.">
@@ -234,6 +258,21 @@ Use Metric to emphasize a number; a serif heading style makes the figure read as
 </Do>
 <Dont caption="Heading/medium for a number.">
 <Sample font="--heading-md">1,284</Sample><div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Mono">
+
+Noto Sans Mono is for code, token names, property values and machine IDs such as a session ID or a URL. Never use it for metrics, times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.
+
+<DoDont>
+<Do caption="Metric/large for the count, mono for the session ID.">
+<Sample font="--metric-lg">1,284</Sample><div style={{ font: 'var(--code-default)', color: 'var(--ds-text-subtle)' }}>ses_8f2a91c4</div>
+</Do>
+<Dont caption="Mono for the count.">
+<span style={{ font: 'var(--metric-lg)', fontFamily: 'var(--type-family-code)', color: 'var(--ds-text)' }}>1,284</span><div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
 </Dont>
 </DoDont>
 

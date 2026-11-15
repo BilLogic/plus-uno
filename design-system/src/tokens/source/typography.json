@@ -347,25 +347,6 @@
       }
     },
     {
-      "id": "VariableID:20219:28",
-      "name": "Family/heading-serif",
-      "variableCollectionId": "VariableCollectionId:19364:98",
-      "resolvedType": "STRING",
-      "scopes": [
-        "FONT_FAMILY"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--type-family-heading-serif)"
-      },
-      "valuesByMode": {
-        "19364:0": "Noto Serif"
-      },
-      "resolvedValuesByMode": {
-        "19364:0": "Noto Serif"
-      },
-      "hiddenFromPublishing": false
-    },
-    {
       "id": "VariableID:20219:29",
       "name": "Family/code",
       "variableCollectionId": "VariableCollectionId:19364:98",
@@ -486,10 +467,10 @@
       "name": "Heading/xxlarge",
       "description": "CSS: var(--heading-xxl)",
       "boundVariables": {
-        "fontFamily": "VariableID:20219:28",
+        "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:105",
         "lineHeight": "VariableID:19364:111",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:116"
       },
       "letterSpacing": {
         "unit": "PERCENT",
@@ -501,10 +482,10 @@
       "name": "Heading/xlarge",
       "description": "CSS: var(--heading-xl)",
       "boundVariables": {
-        "fontFamily": "VariableID:20219:28",
+        "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:104",
         "lineHeight": "VariableID:19364:110",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:116"
       },
       "letterSpacing": {
         "unit": "PERCENT",
@@ -516,10 +497,10 @@
       "name": "Heading/large",
       "description": "CSS: var(--heading-lg)",
       "boundVariables": {
-        "fontFamily": "VariableID:20219:28",
+        "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:103",
         "lineHeight": "VariableID:19364:109",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:116"
       },
       "letterSpacing": {
         "unit": "PERCENT",
@@ -531,10 +512,10 @@
       "name": "Heading/medium",
       "description": "CSS: var(--heading-md)",
       "boundVariables": {
-        "fontFamily": "VariableID:20219:28",
+        "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:102",
         "lineHeight": "VariableID:19364:108",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:116"
       }
     },
     {

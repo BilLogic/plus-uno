@@ -40,7 +40,6 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | Metric/small | `var(--metric-sm)` |
 | Family/heading | `var(--type-family-heading)` |
 | Family/body | `var(--type-family-body)` |
-| Family/heading-serif | `var(--type-family-heading-serif)` |
 | Family/code | `var(--type-family-code)` |
 | Family/brand-heading | `var(--type-family-brand-heading)` |
 | Family/brand-body | `var(--type-family-brand-body)` |
