@@ -83,12 +83,13 @@ const buildTheme = (key) =>
     inputBorderRadius: 8,
   });
 
-// The selected row's brand pair is written as a rule, not custom properties: the
+// The selected row's colors are written as a rule, not custom properties: the
 // manager has no stylesheet that could define them (see manager-head.html for the rest).
 const paintSelected = (key) => {
   const { vars = {} } = THEMES[key] ?? {};
   const bg = vars['--plus-manager-selected-bg'];
   const fg = vars['--plus-manager-selected-fg'];
+  const border = vars['--plus-manager-selected-border'];
   let style = document.getElementById('plus-manager-selected');
   if (!style) {
     style = document.createElement('style');
@@ -97,7 +98,7 @@ const paintSelected = (key) => {
   }
   document.documentElement.dataset.plusManagerMode = key;
   style.textContent =
-    `.sidebar-container [data-selected='true'] { background-color: ${bg} !important; color: ${fg} !important; }\n` +
+    `.sidebar-container [data-selected='true'] { background-color: ${bg} !important; color: ${fg} !important; box-shadow: inset 0 0 0 1px ${border}; }\n` +
     `.sidebar-container [data-selected='true'] svg { color: ${fg} !important; opacity: 0.95; }\n` +
     countTagRules(vars);
 };

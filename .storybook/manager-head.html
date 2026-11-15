@@ -4,7 +4,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400..700&family=Noto+Sans+Mono:wght@400..500&display=swap" rel="stylesheet">
 
 <style>
-  /* Active story/docs row: its colors are the brand token pair, written per mode by manager.js. */
+  /* Active story/docs row: the selected tokens (fill, text, 1px outline), written per mode by manager.js. */
   .sidebar-container [data-selected='true'] {
     /* docs-literal: the manager has no token stylesheet; 6 and 4 are --radius-md and --radius-sm. */
     border-radius: 0.375rem;
@@ -58,27 +58,14 @@
   }
 
   /*
-   * Storybook pads a leaf row for its TypeIcon (14) as well as its depth. The icon is
-   * out of layout above, so a leaf under a folder sat 14 right of where its depth puts
-   * it, deeper than the folder rows beside it. Pull its content back by the icon's
-   * width. A leaf straight under a top-level section keeps the gap: it already reads
-   * as a child of the section label. Those sections are listed by id, so a new
-   * top-level section with its own pages joins the list.
+   * Storybook indents each depth by 18px and pads a leaf row for its TypeIcon, which is
+   * out of layout above. A folder row's label sits after its chevron. Pull every leaf's
+   * content back 6px so a leaf's label starts exactly where a folder's label at the same
+   * depth starts: one label column per depth, chevrons hanging in the gutter.
    */
-  .sidebar-container .sidebar-item[data-nodetype='document']:not(
-      :is(
-        [data-parent-id='get-started'],
-        [data-parent-id='foundations'],
-        [data-parent-id='components'],
-        [data-parent-id='patterns'],
-        [data-parent-id='templates'],
-        [data-parent-id='ai-ui'],
-        [data-parent-id='data-visualizations'],
-        [data-parent-id='tech-stack']
-      )
-    )
+  .sidebar-container .sidebar-item:is([data-nodetype='document'], [data-nodetype='story'])
     > a
     > div:first-child {
-    margin-left: -14px;
+    margin-left: -6px;
   }
 </style>
