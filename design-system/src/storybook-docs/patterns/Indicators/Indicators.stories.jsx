@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
@@ -270,9 +270,11 @@ export const ChecklistCompactInSidebar = {
         await fitsCanvas(canvasElement);
 
         await userEvent.click(nextBtn);
-        // Move the pointer off the row so the a11y pass reads the resting colors, not the hover fill.
+        // Move the pointer off the row and wait for the Sidebar selection glide from
+        // Sessions to Home to finish so axe does not sample the mid-flight pill behind Toolkit.
         await userEvent.unhover(nextBtn);
         await expect(canvas.getByRole('heading', { name: 'Get ready for your first session' })).toBeInTheDocument();
+        await waitFor(() => expect(canvasElement.querySelector('[data-gliding]')).toBeNull());
         await fitsCanvas(canvasElement);
     },
 };
