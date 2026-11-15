@@ -151,32 +151,42 @@ a PRD existing is not the same as a PRD being complete. Name the gaps in the
 reply, and either ask instead of proceeding or carry them visibly alongside
 what you propose. Filling a gap with invented behavior is a defect, not a draft.
 
-**DS gap → protocol, never silent invention.** When the design needs a
-component the system doesn't have: (1) name the gap explicitly, (2) propose the
-nearest existing composition as the interim, (3) file a uno-maintain intake for
-the missing component. Zero hand-rolled lookalikes — a gap is a finding, not a
-license to invent. Filing is an external-estate write, so it needs the usual
-approval: if no approver is present, record the intake in the artifact manifest
-as pending and say so — never drop the gap silently, and never write unasked.
+**Reuse ladder — take the lowest rung that does the job.** Each rung is allowed:
+
+1. **Use.** A template slot or a component as it is, through its props.
+2. **Arrange.** Existing components placed in a slot — JSX in the screen.
+3. **Local component.** A named component in the build's own `components/`
+   folder (`prototypes/<slug>/src/components/`), when an arrangement is used
+   twice in the build or carries its own state or behavior. Built from existing
+   components and tokens, with new interactive behavior on Base UI (hard rule 5).
+4. **Core candidate.** A local component that another area would use unchanged.
+   Keep it local so the build proceeds, record the gap in the artifact manifest,
+   and file a `uno-maintain` intake for the missing core component (with the
+   usual approval for external-estate writes, or recorded as pending in the
+   manifest when running headless).
+
+Match the rung to each component's usage note: reach for a local composition
+when forcing a core component would go against its usage rule (such as a bare
+`Select` where Filtering calls for `FilterButton`, a `Table` used for layout,
+or a `Modal` where a `Panel` belongs).
 
 ## 5. Exit — validation, manifest, hand off
 
 Before any artifact leaves the skill:
 
-1. **Validation.** Coded artifacts run the validation loop their deliverable
-   reference defines (objective: every available machine check passes AND the
-   brief card is honored; capped attempts); its gate of record is
-   `check:ds-usage` on the prototype. Headless codegen faces run the
-   check set as a deterministic post-step whose results land in the draft PR
-   under "Machine checks" — the PR review is their fix loop, and a ❌ there
-   blocks review sign-off, not PR creation. Spec deliverables carry their
-   validation inside the spec (§3).
+1. **Validation.** Coded artifacts use the post-edit hook during edits, one
+   fit re-read, and one exit `ds check` (`check:ds-usage`) on the prototype
+   while honoring the brief card (`references/deliverables/coded-build.md`).
+   Headless codegen faces run the check set as a deterministic post-step whose
+   results land in the draft PR under "Machine checks" — the PR review is their
+   fix loop, and a ❌ there blocks review sign-off, not PR creation. Spec
+   deliverables carry their validation inside the spec (§3).
 2. **DS-lens validation pass** — a conformance check at the artifact's own
    fidelity (no token nits on a flow sketch; full rigor on a hi-fi build).
    Major findings loop back to the route decision (§2).
 3. **Artifact manifest** — one line: fidelity · tools used · PRD link, plus
-   any unresolved check failures. A coded build adds the `check:ds-usage`
-   result (clean, or escapes by rule) and its retrieval proof. Review's
+   any unresolved check failures. A coded build adds the `ds check`
+   (`check:ds-usage`) result (clean, or escapes by rule). Review's
    mandatory input; **every path exit produces it**.
 4. Hand to **uno-review** for the stage-lens review. Passing review and being
    ready to share are separate gates — iteration by choice re-enters at §2.
