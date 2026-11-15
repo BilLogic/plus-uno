@@ -57,18 +57,18 @@ export const colorTokens = [
 ];
 
 <DocsLanding
-    page="templates-frame-frame"
+    page="templates-frame"
     eyebrow="Template"
     title="Frame"
     purpose="The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare."
     links={{
         label: 'Uses',
         items: [
-            { title: 'Page', href: './?path=/docs/templates-page-page--docs' },
-            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
-            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
-            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
-            { title: 'Navigation system', href: './?path=/docs/components-navigation-navigation-system--docs' },
+            { title: 'Page', href: './?path=/docs/templates-page--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal--docs' },
+            { title: 'Navigation system', href: './?path=/docs/components-navigation-navigation-system-navigation-system--docs' },
         ],
     }}
 />
@@ -78,7 +78,7 @@ export const colorTokens = [
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-2971"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21757-21081"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Frame"
 />
 
@@ -88,9 +88,9 @@ export const colorTokens = [
 
 ## Types
 
-Every page of the app sits in one of three, each shown in a browser window. A Frame with its slots filled for one page is a Screen, and Screens in order are a Flow; both live with the flows, not here.
+Choose one of three Frame types for every app page, shown here in browser windows. See <DocsLink id="templates-overview">Templates and patterns</DocsLink> for how filled Frames become Screens and Flows, documented with the flows.
 
-<TypeGrid>
+<TypeGrid wide>
 <TypeCard of={FrameStories.TypeDefault} title="Default" stage={1440}>Pages people move among: the Sidebar, the Page, and the AI panel as its own region on the right.</TypeCard>
 <TypeCard of={FrameStories.TypeFocused} title="Focused" stage={1440}>One task a person finishes or leaves: the whole window, Close beside the title, no Sidebar.</TypeCard>
 <TypeCard of={FrameStories.TypeBare} title="Bare" stage={1440}>Sign-in, errors and welcome: one centered column, with no Sidebar and no header row.</TypeCard>
@@ -395,11 +395,11 @@ Elevation and fills follow <DocsLink id="foundations-visual-elevation">Elevation
 
 ## Related
 
-- <DocsLink id="templates-page-page">Page</DocsLink>: use when you need the bare fill-and-elevation the content box is built on.
-- <DocsLink id="components-navigation-navigation-system">Sidebar</DocsLink>: use when choosing what the Frame places beside the Page.
-- <DocsLink id="templates-section-section">Section</DocsLink>: use when the content needs a region under its own heading.
-- <DocsLink id="templates-modal-modal">Modal</DocsLink>: use when the task is short and the page should stay in view behind it.
-- <DocsLink id="templates-panel-panel">Panel</DocsLink>: use when the work should float beside the page, not replace it.
+- <DocsLink id="templates-page">Page</DocsLink>: use when you need the bare fill-and-elevation the content box is built on.
+- <DocsLink id="components-navigation-navigation-system-navigation-system">Sidebar</DocsLink>: use when choosing what the Frame places beside the Page.
+- <DocsLink id="templates-section">Section</DocsLink>: use when the content needs a region under its own heading.
+- <DocsLink id="templates-modal">Modal</DocsLink>: use when the task is short and the page should stay in view behind it.
+- <DocsLink id="templates-panel">Panel</DocsLink>: use when the work should float beside the page, not replace it.
 - <DocsLink id="foundations-layout-grid">Grid</DocsLink>: use when you need the column math the Frame is sized by.
 
 </div>

@@ -2,17 +2,38 @@
 
 # Loading
 
-4 components. Each row links to the generated facts; the three columns after it are the
+5 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
+
+## Which component to reach for
+
+- **[GenerativeBorder](GenerativeBorder/index.md)** — Use `GenerativeBorder` only while the AI is generating into a piece of content, one ring per piece. It is never decoration, and two must not nest. For other waits, use `Spinner` or `Skeleton`.
+- **[ProgressBar](ProgressBar/index.md)** — Use `ProgressBar` for progress through a task: an upload, a course, a multi-step form. When the task's length is unknown, set `isIndeterminate`.
+  - For an indeterminate wait with no track at all, use `Spinner`.
+  - For a compact determinate ring beside a title or a file row, use `ProgressRing`.
+  - For the outcome when a task finishes, use `Flag` or `SectionMessage`.
+  - For position in a hierarchy rather than progress through a task, use `Breadcrumb`.
+- **[ProgressRing](ProgressRing/index.md)** — Use `ProgressRing` when a task has a known percent done and sits in an icon-sized slot, such as an uploading file row where a list of horizontal bars would crowd the view. A ring is never indeterminate.
+  - For a wait whose duration is unknown, use `Spinner`.
+  - For progress where a horizontal track fits (such as a card header or a form step), use `ProgressBar`.
+  - For content loading into a layout that already has a shape, use `Skeleton`.
+- **[Skeleton](Skeleton/index.md)** — Use `Skeleton` for a loading state while content loads, so the space it will fill is already on screen and the layout does not jump when it arrives.
+  - For an action in progress or a short wait with no layout shape yet, use `Spinner`.
+  - For a wait whose percentage is known, use `ProgressBar` or `ProgressRing`.
+- **[Spinner](Spinner/index.md)** — Use `Spinner` when the wait is short, indeterminate, and the user has nothing to do but wait: a submit in flight, a panel fetching on open. For a wait under about 300 ms, show nothing so the indicator does not flicker.
+  - For a wait whose percentage is known, use `ProgressBar` or `ProgressRing`.
+  - For content loading into a layout that already has a shape, use `Skeleton`.
+  - For a result once the wait ends, use `SectionMessage` or `Flag`.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [GenerativeBorder](GenerativeBorder/index.md) | 5 | ✅ | ✅ | ✅ |
 | [ProgressBar](ProgressBar/index.md) | 6 | ✅ | ✅ | ✅ |
+| [ProgressRing](ProgressRing/index.md) | 6 | ✅ | ✅ | ✅ |
 | [Skeleton](Skeleton/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Spinner](Spinner/index.md) | 4 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 4/4 (100%) · Correct/incorrect 4/4 (100%) · Accessibility 4/4 (100%)
+**Authored coverage:** When to use 5/5 (100%) · Correct/incorrect 5/5 (100%) · Accessibility 5/5 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

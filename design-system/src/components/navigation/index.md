@@ -5,12 +5,33 @@
 5 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
+## Which component to reach for
+
+- **[Breadcrumb](Breadcrumb/index.md)** — Use `Breadcrumb` when a page sits inside a hierarchy the user needs to see and climb — a student inside a cohort inside a program, a lesson inside a unit. It answers two questions at once: where am I, and what is one level up. When the hierarchy is one level deep, a single "Back to X" `Link` says the same thing with less furniture.
+  - For progress through a sequence of steps, use `ProgressTracker`.
+  - For moving between sibling views of the same subject, use `Tabs`.
+  - For a persistent hierarchy the user browses rather than retraces, use `Sidebar`.
+- **[Link](Link/index.md)** — Use `Link` for navigation inside a sentence or a block of text — "see the session report," "read more." `Link`'s appearances are for inline text, not for a control that stands on its own.
+  - For a standalone navigation action styled like a button, use `LinkButton`.
+  - For an action that triggers in-page behavior rather than navigating to a URL, use `Button`.
+  - For a trail of links showing where a page sits in a hierarchy, use `Breadcrumb`.
+- **[Pagination](Pagination/index.md)** — Use `Pagination` when a list is split into numbered pages and the user needs to move between them or jump to a known one — admin tables of sessions, students, tutors. It is fully controlled: `currentPage` and `totalPages` are required, and every click calls `onPageChange` with the target page. It holds no state.
+  - For a step-by-step workflow rather than pages of results, use `ProgressTracker`.
+  - For a bounded list that scrolls inside a fixed region, use `ScrollBar`.
+  - For a continuously loading feed, use infinite scroll rather than pages.
+- **[Sidebar](Sidebar/index.md)** — The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for the role (`sidebarConfig.js`), the signed-in person's account row, and the open tabs. Home is selected when nothing else is. Pass `groups` to add or override a prototype's own area(s) by `id` while keeping the role's navigation. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under its row. A tab is selected while its row is the current page (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Signing out clears the tabs. Nothing here changes the URL.
+- **[Tabs](Tabs/index.md)** — Use `Tabs` for the tab bar that switches between sibling views on the same page — a student's Overview / Sessions / Progress, or the sections of an admin page. Compose it from `Tabs.Tab` children, and declare a `Tabs.Panel` alongside each one when the tab's content should be owned by the component rather than rendered separately.
+  - For navigating to a different page in a hierarchy, use `Breadcrumb` or `Sidebar`.
+  - For more options than fit on one strip without wrapping, use `Select`.
+  - For a second-level choice inside a view, use `PopupSelect`.
+  - For filtering a list rather than switching between views, use `FilterMenu` or `RadioGroup`.
+
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Breadcrumb](Breadcrumb/index.md) | 6 | ✅ | ✅ | ✅ |
 | [Link](Link/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Pagination](Pagination/index.md) | 11 | ✅ | ✅ | ✅ |
-| [Sidebar](Sidebar/index.md) | 17 | ✕ | ✕ | ✕ |
+| [Sidebar](Sidebar/index.md) | 18 | ✕ | ✕ | ✕ |
 | [Tabs](Tabs/index.md) | 9 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 4/5 (80%) · Correct/incorrect 4/5 (80%) · Accessibility 4/5 (80%)

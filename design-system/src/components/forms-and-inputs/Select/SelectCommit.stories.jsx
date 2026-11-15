@@ -1,3 +1,4 @@
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useState } from 'react';
 import { Button } from '@/components';
 import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/test';
@@ -587,6 +588,7 @@ export const ControlledOpenAsksTheParent = {
         </div>
     ),
     play: async ({ canvasElement, args }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const field = canvas.getByRole('combobox', { name: 'School' });
         await page().findByRole('option', { name: 'North High' });

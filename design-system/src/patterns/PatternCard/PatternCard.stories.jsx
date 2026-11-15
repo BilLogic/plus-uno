@@ -1,11 +1,12 @@
 import React from 'react';
-import { expect, within } from 'storybook/test';
+import { expect, within, waitFor } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import PatternCard from '@/patterns/PatternCard';
+import { PatternCard } from '@/patterns';
 import { Skeleton, Button, IconButton } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
+import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 const bodyCopy = (
     <p className="body-large" style={{ margin: 0 }}>
@@ -63,23 +64,26 @@ function PatternCardRowsDemo() {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-300)' }}>
             {[['Medium', 720], ['Large', 736], ['X-Large', 1152]].map(([mode, width]) => (
-                <div key={mode} style={{ overflowX: 'auto' }}>
+                <div key={mode}>
                     <DemoCaption>{`${mode} · content ${width}`}</DemoCaption>
-                    <div
-                        data-row={mode}
-                        style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-md), 1fr))',
-                            gap: 'var(--grid-gutter)',
-                            width,
-                        }}
-                    >
-                        {people.map(([name, detail], i) => (
-                            <PatternCard key={`${name}-${i}`} title={name} description={detail}>
-                                {sessionBody}
-                            </PatternCard>
-                        ))}
-                    </div>
+                    {/* Each row is a picture of one content width: scaled to fit, never reflowed. */}
+                    <FitStage width={width} reflow={false}>
+                        <div
+                            data-row={mode}
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-md), 1fr))',
+                                gap: 'var(--grid-gutter)',
+                                width,
+                            }}
+                        >
+                            {people.map(([name, detail], i) => (
+                                <PatternCard key={`${name}-${i}`} title={name} description={detail}>
+                                    {sessionBody}
+                                </PatternCard>
+                            ))}
+                        </div>
+                    </FitStage>
                 </div>
             ))}
         </div>
@@ -127,6 +131,16 @@ export default {
             options: ['sm', 'md', 'lg'],
             table: { category: 'Design' },
         },
+        imagePlacement: {
+            control: 'select',
+            options: ['top', 'start', 'end'],
+            table: { category: 'Design' },
+        },
+        imageSplit: {
+            control: 'select',
+            options: ['1/3', '1/2'],
+            table: { category: 'Design' },
+        },
         minWidth: {
             control: 'text',
             table: { category: 'Design' },
@@ -160,6 +174,8 @@ export const Interactive = {
         padding: 'md',
         gap: 'md',
         minWidth: '',
+        imagePlacement: 'top',
+        imageSplit: '1/3',
     },
     render: (args) => (
         <PatternCard
@@ -169,6 +185,9 @@ export const Interactive = {
             header={args.header || undefined}
             footer={args.footer || undefined}
             padding={args.padding}
+            image={imagePlaceholder('16:9')}
+            imagePlacement={args.imagePlacement}
+            imageSplit={args.imageSplit}
             gap={args.gap}
             minWidth={args.minWidth || undefined}
         >
@@ -178,7 +197,7 @@ export const Interactive = {
 };
 
 /**
- * A card rests on Atlassian's raised pair: the raised surface and its shadow,
+ * A PLUS card rests on the raised pair: the raised surface and its shadow,
  * whose ring is the edge, with no border. A clickable card lifts while hovered
  * (the raised surface's hovered step under the overlay shadow) and settles
  * back while pressed; a dragged card is on the overlay pair. Held in all four
@@ -278,6 +297,74 @@ export const ImageWide = { name: 'Image 16:9', render: () => imageCard('16:9') }
 export const ImageStandard = { name: 'Image 4:3', render: () => imageCard('4:3') };
 export const ImageSquare = { name: 'Image 1:1', render: () => imageCard('1:1') };
 
+/** Each image placement retains the card's elevation states. */
+const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => ({
+    render: () => (
+        <PatternCard imagePlacement={imagePlacement} imageSplit={imageSplit}
+            image={<img alt="Session illustration" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='90'%3E%3C/svg%3E"
+                style={{ display: 'block', width: '100%', aspectRatio: '16 / 9', background: 'var(--ds-skeleton)' }} />}
+            title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" footer={viewSession}
+            role="article" aria-label="Session summary" dragging={state === 'dragging'}
+            onClick={state === 'hovered' || state === 'pressed' ? () => {} : undefined}
+            data-hovered={state === 'hovered' || undefined} data-pressed={state === 'pressed' || undefined}
+            style={{ width: 'var(--card-min-width-lg)', maxWidth: '100%' }}>
+            {sessionBody}
+        </PatternCard>
+    ),
+    play: async ({ canvasElement }) => {
+        const card = within(canvasElement).getByRole('article', { name: 'Session summary' });
+        const image = within(card).getByRole('img', { name: 'Session illustration' });
+        const heading = within(card).getByRole('heading', { name: 'Ana Ruiz' });
+        const root = card.getBoundingClientRect();
+        const media = image.getBoundingClientRect();
+        const title = heading.getBoundingClientRect();
+        if (imagePlacement === 'top') {
+            await expect(media.width).toBeCloseTo(root.width, 0);
+            await expect(title.top).toBeGreaterThanOrEqual(media.bottom);
+            await expect(media.width / media.height).toBeCloseTo(16 / 9, 2);
+        } else {
+            await expect(media.width).toBeCloseTo(root.width / (imageSplit === '1/2' ? 2 : 3), 0);
+            await expect(media.height).toBeCloseTo(root.height, 0);
+            await expect(media.top).toBe(root.top);
+            await expect(getComputedStyle(image).objectFit).toBe('cover');
+            if (imagePlacement === 'start') {
+                await expect(media.left).toBe(root.left);
+                await expect(title.left).toBeGreaterThanOrEqual(media.right);
+            } else {
+                await expect(media.right).toBe(root.right);
+                await expect(title.right).toBeLessThanOrEqual(media.left);
+            }
+        }
+        const typeProbe = document.createElement('span');
+        typeProbe.style.font = `var(${imagePlacement !== 'top' && imageSplit === '1/2' ? '--heading-medium' : '--heading-xsmall'})`;
+        card.appendChild(typeProbe);
+        await expect(getComputedStyle(heading).fontSize).toBe(getComputedStyle(typeProbe).fontSize);
+        typeProbe.remove();
+        const surface = state === 'dragging' ? '--ds-surface-overlay' : state === 'hovered' ? '--ds-surface-raised-hovered' : state === 'pressed' ? '--ds-surface-raised-pressed' : '--ds-surface-raised';
+        const shadow = state === 'dragging' || state === 'hovered' ? '--ds-shadow-overlay' : '--ds-shadow-raised';
+        card.style.transition = 'none';
+        await expect(getComputedStyle(card).backgroundColor).toBe(tokenColor(canvasElement, surface));
+        await expect(getComputedStyle(card).boxShadow).toBe(computedShadow(canvasElement, `var(${shadow})`));
+        await expect(getComputedStyle(card).overflow).toBe('hidden');
+    },
+});
+
+export const ImageTop = placementStory('top', 'rest');
+export const ImageTopHovered = placementStory('top', 'hovered');
+export const ImageTopPressed = placementStory('top', 'pressed');
+export const ImageTopDragging = placementStory('top', 'dragging');
+export const ImageStart = placementStory('start', 'rest');
+export const ImageStartHovered = placementStory('start', 'hovered');
+export const ImageStartPressed = placementStory('start', 'pressed');
+export const ImageStartDragging = placementStory('start', 'dragging');
+export const ImageEnd = placementStory('end', 'rest');
+export const ImageEndHovered = placementStory('end', 'hovered');
+export const ImageEndPressed = placementStory('end', 'pressed');
+export const ImageEndDragging = placementStory('end', 'dragging');
+export const ImageStartHalf = placementStory('start', 'rest', '1/2');
+export const ImageEndHalf = placementStory('end', 'rest', '1/2');
+export const ImageTopIgnoresSplit = placementStory('top', 'rest', '1/2');
+
 const slotNote = (text) => <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{text}</span>;
 
 /** No header: the body carries its own title, as a metric tile does. */
@@ -346,5 +433,40 @@ export const Rows = {
         await expect(count('Medium'), 'Medium holds 2 md cards').toBe(2);
         await expect(count('Large'), 'Large holds 2 md cards').toBe(2);
         await expect(count('X-Large'), 'X-Large holds 3 md cards').toBe(3);
+    },
+};
+
+/** Cards reflow at the large minimum width independently of the page width. */
+export const PlacementBoundary = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+            {['start', 'end'].flatMap((placement) => ['1/3', '1/2'].map((split) => (
+                <PatternCard key={`${placement}-${split}`} imagePlacement={placement} imageSplit={split}
+                    image={imagePlaceholder('1:1')} title="Ana Ruiz" role="article"
+                    aria-label={`${placement} ${split}`} style={{ width: 479 }}>
+                    {sessionBody}
+                </PatternCard>
+            )))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        for (const placement of ['start', 'end']) {
+            for (const split of ['1/3', '1/2']) {
+                const card = within(canvasElement).getByRole('article', { name: `${placement} ${split}` });
+                const image = card.firstElementChild;
+                const heading = within(card).getByRole('heading', { name: 'Ana Ruiz' });
+                for (const width of [479, 480, 600, 479]) {
+                    card.style.width = `${width}px`;
+                    await waitFor(() => {
+                        const media = image.getBoundingClientRect();
+                        expect(media.width).toBeCloseTo(width < 480 ? width : width / (split === '1/2' ? 2 : 3), 0);
+                        if (width < 480) {
+                            expect(heading.getBoundingClientRect().top).toBeGreaterThanOrEqual(media.bottom);
+                            expect(media.height).toBeCloseTo(width, 0);
+                        }
+                    });
+                }
+            }
+        }
     },
 };

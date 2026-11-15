@@ -12,6 +12,8 @@
  * `docs/engineering/ds-usage-rules.md`; a rule's id is its anchor there.
  */
 
+import slotMetadata from '../../design-system/agent-views/_slots.json' with { type: 'json' };
+import { placementsFromSlots } from './ds-placements.mjs';
 import { varReferencePattern } from '../../design-system/src/lib/tokens.mjs';
 import { EXTERNAL, isInterpolated } from '../undefined-tokens.mjs';
 import { blankComments, closeOf, importsOf, jsxElementsOf, literalOf, positionAt, styleObjectsOf } from './jsx-scan.mjs';
@@ -24,11 +26,14 @@ export const RULES = {
   'ds/no-deep-import': { level: 'fail' },
   'ds/no-unknown-prop': { level: 'fail' },
   'ds/no-raw-literal': { level: 'fail' },
+  'ds/no-raw-motion': { level: 'fail' },
   'ds/no-unknown-token': { level: 'fail' },
   'ds/no-primitive-read': { level: 'fail' },
   'ds/fa-free-only': { level: 'fail' },
   'ds/no-retired-name': { level: 'warn' },
-  'ds/page-starts-from-pattern': { level: 'warn' },
+  'ds/page-starts-from-pattern': { level: 'fail' },
+  'ds/placement': { level: 'fail' },
+  'ds/no-raw-control': { level: 'fail' },
 };
 
 /** The rule's section in the rules doc, as a link a terminal can open. */
@@ -36,6 +41,7 @@ export const docLink = (rule) => `${RULES_DOC}#${rule.replace('/', '')}`;
 
 const SCRIPT = /\.(jsx|js|mjs|cjs|tsx|ts)$/;
 const STYLE = /\.(scss|css)$/;
+export const isDsStyle = (path) => /^design-system\/src\/(?:components|patterns|templates)\/.+\.(?:scss|css)$/.test(path);
 const MARKUP = /\.html$/;
 
 /**
@@ -90,6 +96,7 @@ export function contextFrom({
   promoted = new Set(),
   exported = new Set(),
   barrels = {},
+  placements = placementsFromSlots(slotMetadata),
 }) {
   const byName = new Map(components.components.map((c) => [c.name, c]));
   const tokenByName = new Map(
@@ -134,6 +141,7 @@ export function contextFrom({
     retired,
     exported,
     barrels: { '@/components': exported, ...barrels },
+    placements,
   };
 }
 
@@ -183,18 +191,47 @@ const didYouMean = (name, candidates, otherwise) => {
  * @returns {{rule: string, level: 'fail'|'warn', file: string, line: number, col: number, message: string, fix: string}[]}
  */
 export function escapesIn({ path, text: raw, page = isPageModule(path) }, ctx) {
+  if (path.endsWith('.mdx')) {
+    const found = [];
+    // Check each fenced example independently; padding keeps source locations.
+    const fences = [...raw.matchAll(/^([ \t]*)(`{3,}|~{3,})(jsx?|tsx?|javascript|typescript|html|css|scss)[^\n]*\n([\s\S]*?)^\1\2[ \t]*$/gm)];
+    let outside = raw;
+    for (const fence of fences) outside = outside.slice(0, fence.index) + fence[0].replace(/[^\n]/g, ' ') + outside.slice(fence.index + fence[0].length);
+    const imports = [...outside.matchAll(/import\s+\{[^}]*\}\s+from\s+['"]@\/(?:components|patterns)['"];?/g)];
+    for (const fence of fences) {
+      const offset = fence.index + fence[0].indexOf('\n') + 1;
+      let prefix = raw.slice(0, offset).replace(/[^\n]/g, ' ');
+      for (const i of imports.filter((i) => i.index + i[0].length <= offset)) prefix = prefix.slice(0, i.index) + i[0] + prefix.slice(i.index + i[0].length);
+      const ext = { javascript: 'js', typescript: 'ts' }[fence[3]] ?? fence[3];
+      found.push(...escapesIn({ path: path.replace(/\.mdx$/, `.${ext}`), text: prefix + fence[4], page: false }, ctx).map((f) => ({ ...f, file: path })));
+    }
+    return found;
+  }
   const text = blankComments(raw);
   const found = [];
-  const add = (rule, index, message, fix) => {
+  const add = (rule, index, message, fix, level = RULES[rule].level) => {
     const { line, col } = positionAt(text, index);
-    found.push({ rule, level: RULES[rule].level, file: path, line, col, message, fix });
+    found.push({ rule, level, file: path, line, col, message, fix });
   };
 
-  if (SCRIPT.test(path)) {
+  // DS implementation styles own their dimensions and colors. Only motion is
+  // checked here; the other usage rules apply to consumers of the system.
+  if (isDsStyle(path)) {
+    for (const m of blankAtRules(text).matchAll(DECLARATION)) {
+      const [, lead, property, value] = m;
+      // Stagger delays have their own documented cadence (Listbox: 20 ms,
+      // capped at 500 ms); this rule guards duration and easing only.
+      if (!/^(?:transition|animation)(?:-(?:duration|timing-function))?$/.test(property)) continue;
+      if (!/(?<![\w-])(?:\d*\.)?\d+(?:ms|s)\b|\bease(?:-in-out|-in|-out)?\b|\bcubic-bezier\s*\(/.test(value)) continue;
+      add('ds/no-raw-motion', m.index + lead.length,
+        `\`${property}: ${value.trim()}\` hardcodes motion`,
+        'use the matching --ds-motion-* easing and duration; loops use --ds-motion-loop and progress uses --ds-motion-linear');
+    }
+  } else if (SCRIPT.test(path)) {
     scriptEscapes(text, ctx, add);
     iconEscapes(text, ctx, add);
     tokenEscapes(text, ctx, add);
-    if (page) pageEscapes(text, add);
+    if (page) pageEscapes(text, add, /\.stories\.[jt]sx$/.test(path));
   } else if (STYLE.test(path)) {
     styleEscapes(text, ctx, add);
     tokenEscapes(text, ctx, add);
@@ -225,6 +262,7 @@ function resolveFrom(ctx, barrel, name) {
 
 function scriptEscapes(text, ctx, add) {
   const bound = new Map(); // local name -> component record
+  const importedNames = new Map(); // local name -> canonical imported name
   const namespaces = new Map(); // local name -> barrel
 
   const unknown = (index, name, barrel, otherwise) => {
@@ -236,13 +274,15 @@ function scriptEscapes(text, ctx, add) {
     }
   };
 
-  for (const imp of importsOf(text)) {
+  const imports = importsOf(text);
+  for (const imp of imports) {
     if (BARREL.test(imp.source)) {
       const barrel = barrelOf(imp.source);
       if (imp.namespace) namespaces.set(imp.namespace, barrel);
       for (const { imported, local } of imp.named) {
         const found = resolveFrom(ctx, barrel, imported);
         if (found && !found.wrongBarrel) {
+          importedNames.set(local, found !== true ? found.name : imported);
           if (found !== true) bound.set(local, found);
           continue;
         }
@@ -259,14 +299,19 @@ function scriptEscapes(text, ctx, add) {
         `import { ${shown} } from '${home ? homeOf(home) : '@/components'}'`,
       );
       for (const { imported, local } of imp.named) {
+        importedNames.set(local, imported);
         const record = ctx.components.get(imported);
         if (record) bound.set(local, record);
       }
-      if (imp.default && ctx.components.has(imp.default)) bound.set(imp.default, ctx.components.get(imp.default));
+      if (imp.default) {
+        importedNames.set(imp.default, imp.default);
+        if (ctx.components.has(imp.default)) bound.set(imp.default, ctx.components.get(imp.default));
+      }
     }
   }
 
-  for (const el of jsxElementsOf(text)) {
+  const elements = jsxElementsOf(text);
+  for (const el of elements) {
     let record = bound.get(el.name);
     const dot = el.name.indexOf('.');
     if (!record && dot > 0 && namespaces.has(el.name.slice(0, dot))) {
@@ -312,12 +357,122 @@ function scriptEscapes(text, ctx, add) {
     }
   }
 
+  placementEscapes(text, elements, importedNames, namespaces, ctx.placements ?? [], add);
+  rawControlEscapes(imports, elements, add);
+
   for (const obj of styleObjectsOf(text)) {
     for (const { key, value, index } of obj.properties) {
       const reason = rawInJsxStyle(key, value);
       if (reason) add('ds/no-raw-literal', index, `\`${key}: ${value}\` is a raw ${reason}`, rawFix(reason, key, literalOf(value).text, ctx));
     }
   }
+}
+
+const RAW_CONTROL_FIX = {
+  button: 'use `Button`, `IconButton` or `CloseButton` from `@/components` (or a Base UI part for new interactive behavior)',
+  input: 'use `TextField`, `SearchField`, `Checkbox`, `Radio`, `Toggle` or `Range` from `@/components`',
+  select: 'use `Select`, `PopupSelect`, `FilterButton` or `FilterMenu` from `@/components`',
+  textarea: 'use `TextArea` from `@/components`',
+};
+
+function rawControlEscapes(imports, elements, add) {
+  if (imports.some((imp) => /^@base-ui\/react(?:\/|$)/.test(imp.source))) return;
+  const renderSpans = elements.flatMap((el) =>
+    el.attributes.filter((a) => a.name === 'render' && a.end !== undefined).map((a) => [a.index, a.end]),
+  );
+  const inRenderProp = (idx) => renderSpans.some(([s, e]) => idx >= s && idx < e);
+  for (const el of elements) {
+    if (inRenderProp(el.index)) continue;
+    if (Object.hasOwn(RAW_CONTROL_FIX, el.name)) {
+      add('ds/no-raw-control', el.index + 1, `raw \`<${el.name}>\` where a design-system control belongs`, RAW_CONTROL_FIX[el.name]);
+    } else if (el.name === 'div' && el.attributes.some((a) => a.name === 'onClick')) {
+      add(
+        'ds/no-raw-control',
+        el.index + 1,
+        'click handler on a raw `<div>` is not an accessible control',
+        'use `Button`, `IconButton`, `PatternCard` (with `onClick`), or a Base UI part (`@base-ui/react`)',
+      );
+    }
+  }
+}
+
+function canonicalTagName(name, importedNames, namespaces) {
+  const dot = name.indexOf('.');
+  if (dot === -1) return importedNames.get(name) ?? null;
+  const head = name.slice(0, dot);
+  const rest = name.slice(dot + 1);
+  if (namespaces.has(head)) return rest;
+  const base = importedNames.get(head);
+  return base ? `${base}.${rest}` : null;
+}
+
+function placementEscapes(text, elements, importedNames, namespaces, placements, add) {
+  if (!placements.length) return;
+  const parents = placements.some((row) => row.before) ? siblingParents(text, elements) : new Map();
+  for (const row of placements) {
+    const spans = [];
+    for (const target of row.in ?? []) {
+      const dot = target.lastIndexOf('.');
+      const isPropSlot = dot > 0 && /^[a-z]/.test(target.slice(dot + 1));
+      if (isPropSlot) {
+        const owner = target.slice(0, dot);
+        const propName = target.slice(dot + 1);
+        for (const el of elements) {
+          if (canonicalTagName(el.name, importedNames, namespaces) !== owner) continue;
+          const attr = el.attributes.find((a) => a.name === propName);
+          if (attr?.end !== undefined) spans.push([attr.index, attr.end]);
+        }
+      } else {
+        for (const el of elements) {
+          if (canonicalTagName(el.name, importedNames, namespaces) !== target) continue;
+          let end = el.end;
+          if (!el.selfClosing) {
+            const closeIdx = text.indexOf(`</${el.name}>`, el.end);
+            if (closeIdx !== -1) end = closeIdx;
+          }
+          spans.push([el.index + 1, end]);
+        }
+      }
+    }
+    if (!spans.length && !row.before) continue;
+    const disallowed = new Set(row.components ?? []);
+    for (const el of elements) {
+      const comp = canonicalTagName(el.name, importedNames, namespaces);
+      if (!comp || !disallowed.has(comp)) continue;
+      if (row.before) {
+        if (!parents.has(el) || !elements.some((next) => next.index > el.index
+          && parents.get(next) === parents.get(el)
+          && row.before.includes(canonicalTagName(next.name, importedNames, namespaces)))) continue;
+      } else if (!spans.some(([s, e]) => el.index >= s && el.index < e)) continue;
+      const exemptProp = row.unlessProp?.[comp];
+      if (exemptProp && (el.spread || el.attributes.some((a) => a.name === exemptProp))) continue;
+      add('ds/placement', el.index + 1, `\`<${comp}>\` ${row.message}`, row.fix, row.level);
+    }
+  }
+}
+
+/** Direct JSX siblings, excluding JSX passed through an opening tag's props. */
+function siblingParents(text, elements) {
+  const parents = new Map();
+  const stack = [];
+  const tags = [
+    ...elements.map((el) => ({ index: el.index, el })),
+    ...[...text.matchAll(/<\/([\w.$:-]*)\s*>|<>/g)].map((m) => ({ index: m.index, name: m[1] })),
+  ].sort((a, b) => a.index - b.index);
+  let openingEnd = 0;
+  for (const tag of tags) {
+    if (tag.index < openingEnd) continue;
+    if (tag.el) {
+      if (stack.length) parents.set(tag.el, stack.at(-1));
+      openingEnd = tag.el.end;
+      if (!tag.el.selfClosing) stack.push(tag.el);
+    } else if (tag.name === undefined) {
+      stack.push({ name: '' }); // Fragment boundary.
+    } else if (stack.at(-1)?.name === tag.name) {
+      stack.pop();
+    }
+  }
+  return parents;
 }
 
 function rawInJsxStyle(key, value) {
@@ -490,8 +645,8 @@ const LAYOUT_KEYS = /\b(?:display|grid\w*|flex\w*|gap|rowGap|columnGap|(?:paddin
  * `export default X` naming a function or an arrow. An arrow with an expression body is its own range. Null when
  * the module exports no component this can read.
  */
-function defaultComponentOf(text) {
-  const direct = /\bexport\s+default\s+(?:function\s*[\w$]*\s*)?\(/.exec(text);
+function defaultComponentOf(text, story = false) {
+  const direct = (story ? /\brender\s*:\s*(?:function\s*[\w$]*\s*)?\(/ : /\bexport\s+default\s+(?:function\s*[\w$]*\s*)?\(/).exec(text);
   let at = direct ? direct.index + direct[0].length - 1 : -1;
   if (at === -1) {
     const named = /\bexport\s+default\s+([A-Z][\w$]*)\s*;?\s*$/m.exec(text);
@@ -515,7 +670,7 @@ function defaultComponentOf(text) {
   const start = at + /^\s*/.exec(text.slice(at))[0].length;
   if (text[start] !== '{') return arrow ? { start, end: text.length, expression: true } : null;
   // A top-level component closes at the first `}` that starts a line.
-  const close = text.indexOf('\n}', start);
+  const close = story ? closeOf(text, start) - 1 : text.indexOf('\n}', start);
   return { start: start + 1, end: close === -1 ? text.length : close, expression: false };
 }
 
@@ -530,8 +685,8 @@ function jsxAt(text, from) {
  * return at the shallowest indent, a fragment or a `*Provider` stepped
  * through to its first child. Null when there is none to read.
  */
-export function pageRootOf(text) {
-  const body = defaultComponentOf(text);
+export function pageRootOf(text, story = false) {
+  const body = defaultComponentOf(text, story);
   if (!body) return null;
   let at = -1;
   if (body.expression) at = jsxAt(text, body.start);
@@ -591,17 +746,24 @@ export function pagesOf(files) {
   return pages;
 }
 
-function pageEscapes(text, add) {
-  const root = pageRootOf(text);
-  if (!root || !SHELL_TAGS.has(root.name)) return;
-  const className = root.attributes.find((a) => a.name === 'className');
-  const style = root.attributes.find((a) => a.name === 'style');
-  const laidOut = style && (style.value.kind !== 'expression' || !/^\{/.test(style.value.text) || LAYOUT_KEYS.test(style.value.text));
-  if (!className && !laidOut) return;
-  add(
-    'ds/page-starts-from-pattern',
-    root.index,
-    `the page's outer element is a hand-styled \`<${root.name}>\`, not a template or a pattern`,
-    "start the page from a template, `Frame` with the PLUS `Sidebar` (import { Frame } from '@/patterns'), or from a pattern such as `Page` or `PatternCard` (@/patterns)",
-  );
+function pageEscapes(text, add, story = false) {
+  const roots = story
+    ? [...text.matchAll(/\brender\s*:\s*(?:function\s*[\w$]*\s*)?\(/g)].map((m) => {
+      const root = pageRootOf(text.slice(m.index), true);
+      return root && { ...root, index: root.index + m.index };
+    })
+    : [pageRootOf(text)];
+  for (const root of roots) {
+    if (!root || !SHELL_TAGS.has(root.name)) continue;
+    const className = root.attributes.find((a) => a.name === 'className');
+    const style = root.attributes.find((a) => a.name === 'style');
+    const laidOut = style && (style.value.kind !== 'expression' || !/^\{/.test(style.value.text) || LAYOUT_KEYS.test(style.value.text));
+    if (!className && !laidOut) continue;
+    add(
+      'ds/page-starts-from-pattern',
+      root.index,
+      `the page's outer element is a hand-styled \`<${root.name}>\`, not a template`,
+      "start the page from a template: `Frame` with the PLUS `Sidebar` (import { Frame } from '@/patterns'), or `Page` or `PatternCard` (@/patterns)",
+    );
+  }
 }

@@ -23,14 +23,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { pagesUnder } from './docs-page.mjs';
-import { storybookId } from './storybook-id.mjs';
+import { readStorybookPage } from './storybook-pages.mjs';
 
 /** The roots whose pages are all MDX, so every link into them can be resolved from source. */
 export const CHECKED_ROOTS = ['templates-', 'patterns-'];
 
-const META_TITLE = /<Meta\b[^>]*?\btitle=["']([^"']+)["']/;
-const META_OF = /<Meta\b[^>]*?\bof=\{(\w+)\}/;
-const STORIES_TITLE = /\btitle:\s*['"]([^'"]+)['"]/;
 const LINK = /path=\/docs\/([a-z0-9][a-z0-9-]*--docs)(?:#([a-z0-9][a-z0-9-]*))?/g;
 
 /** Storybook's heading id: github-slugger's, without its duplicate counter. */
@@ -44,31 +41,16 @@ export function headingSlug(heading) {
     .replace(/ /g, '-');
 }
 
-/** The stories file a `<Meta of={X}>` names, through its `import * as X from '…'`. */
-function storiesTitle(root, file, source, name) {
-  const spec = source.match(new RegExp(`import\\s+\\*\\s+as\\s+${name}\\s+from\\s+['"]([^'"]+)['"]`))?.[1];
-  if (!spec) return null;
-  const target = spec.startsWith('@/')
-    ? path.join(root, 'design-system/src', spec.slice(2))
-    : path.join(root, path.dirname(file), spec);
-  if (!fs.existsSync(target)) return null;
-  const stories = fs.readFileSync(target, 'utf8');
-  // The meta's title: the first `title:` after the default export, or the file's first when the meta is a named const.
-  const meta = stories.indexOf('export default');
-  return (meta === -1 ? null : stories.slice(meta).match(STORIES_TITLE)?.[1]) ?? stories.match(STORIES_TITLE)?.[1] ?? null;
-}
-
 /** Every MDX page's docs id, with the slugs of its `##` to `####` headings. */
 export function docsIndex(root) {
   const index = {};
   for (const file of pagesUnder(root)) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
-    const of = source.match(META_OF)?.[1];
-    const title = source.match(META_TITLE)?.[1] ?? (of ? storiesTitle(root, file, source, of) : null);
-    if (!title) continue;
+    const { docsId } = readStorybookPage(root, file);
+    if (!docsId) continue;
     const slugs = new Set();
     for (const m of source.matchAll(/^#{1,4}\s+(.+?)\s*$/gm)) slugs.add(headingSlug(m[1]));
-    index[`${storybookId(title)}--docs`] = slugs;
+    index[docsId] = slugs;
   }
   return index;
 }

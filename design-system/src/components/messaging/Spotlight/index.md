@@ -14,17 +14,13 @@ Also asked as: onboarding, feature tour, coach mark, new feature highlight, walk
 
 **Storybook page:** `design-system/src/components/messaging/Spotlight/Spotlight.mdx`
 
-**Motion:** enter `spatial.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
-Use `Spotlight` to call out one feature the first time someone can use it:
+Use `Spotlight` to point out one feature the first time someone can use it:
 a new button, a changed control, a place to start. It is a single step or a
 short, explicit sequence with a `stepCount`, not an ongoing help system.
-
-For a message that stays on the page until resolved, use `SectionMessage` or
-`Banner` instead. For a short note tied to one field or value, use
-`InlineMessage`.
 
 ## Motion
 
@@ -34,6 +30,12 @@ Spotlight reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Open and close an overlay | `--ds-motion-spatial-default` | Each coachmark step is Step. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
+
+## Alternatives
+
+- For a message that stays in the page until resolved, use `SectionMessage`.
+- For a short label on hover or focus over a control, use `Tooltip`.
+- For an interactive anchored overlay with arbitrary content, use `Popup`.
 
 ## Best practices
 
@@ -48,8 +50,8 @@ Don't: A greeting and a paragraph.
 
 One step alone has nothing to count.
 
-Do: 1 of 3 in a three-step tour.
-Don't: 1 of 1 on a single tip.
+Do: Step count in a multi-step tour.
+Don't: Step count on a single tip.
 
 ### Make the secondary action a link. {#make-the-secondary-action-a-link}
 
@@ -59,7 +61,7 @@ The primary action leads; the second one stays quiet. A `SpotlightAction` with
 Do: Secondary action as a link.
 Don't: Two competing buttons.
 
-### Wrap the target and the callout in one SpotlightProvider. {#wrap-the-target-and-the-callout-in-one-spotlightprovider}
+### Wrap the target and the spotlight in one `SpotlightProvider`. {#wrap-the-target-and-the-spotlight-in-one-spotlightprovider}
 
 `SpotlightTarget` and `Spotlight` share an anchor through context, so both
 need to sit inside the same provider. Pass `target` directly only when the
@@ -84,7 +86,7 @@ every visit.
 
 ## Accessibility
 
-- **A dialog, not a tooltip.** The callout is a Popup with a title and a
+- **A dialog, not a tooltip.** The spotlight is a `Popup` with a title and a
   description, read together when it opens.
 - **The dismiss control is the first focusable element.** Tab reaches it
   before the body or the actions, so closing never requires finding the
@@ -94,14 +96,14 @@ every visit.
 
 ## Related
 
-- For a message that explains one field or value inline, use `InlineMessage`.
-- For a message scoped to a page or section, use `Banner` or `SectionMessage`.
+- `Popup`: use when anchoring an overlay dialog or panel to a trigger element.
+- `CloseButton`: use when rendering the inverse dismiss control in the spotlight header.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage`
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage`
 
 ## Parts
 
-1. **Target.** `SpotlightTarget` wraps the element the callout points at and
+1. **Target.** `SpotlightTarget` wraps the element the spotlight points at and
    shares its anchor with the `Spotlight` through a `SpotlightProvider`.
 2. **Headline.** The dialog title, read first.
 3. **Dismiss.** The shared `CloseButton` in its `inverse` tone, in the header, the dialog's first focusable element. `dismissible={false}` leaves it out.
@@ -117,7 +119,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 | Rest | Popup on the brand bold fill with inverse text. |
 | Hovered | Dismiss takes the inverse hovered layer. |
 | Pressed | Dismiss takes the inverse pressed layer. |
-| Focused | Dismiss and actions show the inverse 2px ring. |
+| Focused | Dismiss and actions show the inverse focus ring; see Border. |
 | Disabled | Not supported. |
 | Dismissed | The popup closes and `onDismiss` fires. |
 
@@ -167,7 +169,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-small` · `--radius-lg` · `--radius-xl` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width`
+`--body-default` · `--body-small` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-small` · `--popup-radius` · `--radius-lg` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width`
 
 From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override these through the token layer, never with a literal.
 

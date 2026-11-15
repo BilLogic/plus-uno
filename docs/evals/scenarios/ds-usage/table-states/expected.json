@@ -1,0 +1,88 @@
+{
+  "task": "table-states",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/table-states/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "roster-page",
+      "screen": "Student roster table view",
+      "template": "Page + PatternSection + PatternTable",
+      "variant": "Page · Default / PatternSection · Default / PatternTable · Dynamic table",
+      "page": "design-system/src/patterns/PatternTable/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Page/index.md",
+        "design-system/src/patterns/PatternSection/index.md",
+        "design-system/src/patterns/PatternTable/index.md"
+      ],
+      "guides": ["page", "section", "table", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["Page", "PatternSection", "PatternTable"]
+      },
+      "expectation": "Student roster built on Page, PatternSection, and PatternTable with sortable Name and Last session columns."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "loading",
+      "pattern": "Loading",
+      "variant": "Skeleton rows in table",
+      "page": "design-system/agent-views/patterns/Loading.md",
+      "section": "The carriers",
+      "guide": "loading",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["Skeleton"]
+      },
+      "expectation": "Loading state renders Skeleton placeholders matching the table structure."
+    },
+    {
+      "id": "empty",
+      "pattern": "Empty",
+      "variant": "Nothing here yet + Load failed",
+      "page": "design-system/agent-views/patterns/Empty.md",
+      "section": "The types",
+      "guide": "empty",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["EmptyState"]
+      },
+      "expectation": "Empty state (with invite action) and error state (with retry action) use EmptyState or Banner inside the table section."
+    },
+    {
+      "id": "indicators",
+      "pattern": "Indicators",
+      "variant": "Avatar with name in row",
+      "page": "design-system/agent-views/patterns/Indicators.md",
+      "section": "The three tags",
+      "guide": "indicators",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["Avatar"]
+      },
+      "expectation": "Each loaded student row renders the student's Avatar alongside their name, grade, school, last session, and attendance rate."
+    }
+  ],
+  "required_placements": [],
+  "against_placements": [
+    {
+      "id": "bare-select-in-toolbar",
+      "placement": "Bare Select or PopupSelect in Section toolbar",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-bare-select-in-toolbar",
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Counts against: placing a bare Select or PopupSelect in PatternSection's toolbar."
+    }
+  ]
+}

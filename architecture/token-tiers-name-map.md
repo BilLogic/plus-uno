@@ -141,6 +141,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Table | `--table-radius` |  |
 | Table | `--table-stack` (declared elsewhere) |  |
 | Table | `--table-pad-x-footer` (declared elsewhere) |  |
+| Table | `--table-footer-height` |  |
 | Table | `--table-min-width-title` (declared elsewhere) |  |
 | Blanket | `--blanket-pad-x` |  |
 | Blanket | `--blanket-pad-y` |  |
@@ -202,6 +203,8 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Progress indicator | `--progress-indicator-dot-size-8` | ProgressIndicator size 8 |
 | Progress indicator | `--progress-indicator-dot-size-12` | ProgressIndicator size 12 |
 | Checkbox | `--checkbox-control-size` |  |
+| Choice tile | `--choice-tile-width` |  |
+| File item | `--file-item-height` |  |
 | Radio | `--radio-control-size` |  |
 | Radio | `--radio-control-size-10` | RadioGroup size 10 |
 | Radio | `--radio-control-size-14` | RadioGroup size 14 |
@@ -219,11 +222,16 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Toggle | `--toggle-track-width-16` | Toggle size 16 |
 | Toggle | `--toggle-track-width-20` | Toggle size 20 |
 | Toggle | `--toggle-pad` | both sizes |
+| Setting row | `--setting-row-pad-y` |  |
+| Setting row | `--setting-row-end-min-height` |  |
+| Setting row | `--setting-row-select-min-width` |  |
 | Listbox | `--listbox-max-width` |  |
 | Listbox | `--listbox-min-height` |  |
 | Listbox | `--listbox-max-height` |  |
 | Join row | `--join-row-width` |  |
 | Option menu | `--option-menu-width` |  |
+| Checklist | `--checklist-action-width` | 128px; 96px remains for the ProgressBar when a 32px dismiss IconButton takes the end |
+| Checklist | `--checklist-action-min-width` | 120px floor |
 | Button | `--button-vertical-size` |  |
 | Option row | `--option-row-indent-step` |  |
 | Option row | `--option-row-control-gap` |  |
@@ -259,6 +267,8 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Flag | `--flag-min-height` |  |
 | Flag | `--flag-pad` |  |
 | Flag | `--flag-offset` |  |
+| Flag | `--flag-radius-timer` |  |
+| Flag | `--flag-timer-height` |  |
 | Spotlight | `--spotlight-width` |  |
 | Spotlight | `--spotlight-media-height` |  |
 | Menu group | `--menu-group-min-width` |  |
@@ -269,6 +279,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Popup | `--popup-max-width` |  |
 | Popup | `--popup-clip-reach` |  |
 | AI chat | `--ai-chat-width` |  |
+| Inbox | `--inbox-width` | 360px |
 | Popup | `--popup-pad` |  |
 | Table | `--table-cell-max-width` |  |
 | Avatar | `--avatar-size-96` |  |
@@ -277,6 +288,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Spinner | `--spinner-size-md` |  |
 | Spinner | `--spinner-size-lg` |  |
 | Progress bar | `--progress-bar-height` |  |
+| Progress ring | `--progress-ring-stroke` |  |
 
 ## Layers
 

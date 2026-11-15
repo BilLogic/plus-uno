@@ -55,6 +55,47 @@ function fixture(files) {
 
 const PAGE_PATH = 'design-system/src/storybook-docs/patterns/Disabled.mdx';
 
+test('a tagged story supplies executable code and only its used imports to the pattern copy', () => {
+  const story = 'design-system/src/storybook-docs/patterns/Code.stories.jsx';
+  const root = fixture({
+    [PAGE_PATH]: PAGE,
+    [story]: `import { Button, SearchField } from '@/components';
+export default { title: 'Patterns/Code' };
+export const Disabled = {
+  tags: ['pattern:Disabled'],
+  render: function DisabledExample() {
+    return <Button text="Save" disabled />;
+  },
+  play: () => { throw new Error('not snippet code'); },
+};`,
+  });
+  syncDocsAgentFiles(root);
+  const read = () => fs.readFileSync(path.join(root, agentFilePath(PAGE_PATH, 'Patterns')), 'utf8');
+  assert.match(read(), /## In code\n\n.*Code\.stories\.jsx#Disabled/);
+  assert.match(read(), /import \{ Button \} from '@\/components';/);
+  assert.match(read(), /function DisabledExample\(\)/);
+  assert.doesNotMatch(read(), /SearchField|not snippet code/);
+  assert.equal(fs.readFileSync(path.join(root, PAGE_PATH), 'utf8'), PAGE);
+  fs.writeFileSync(path.join(root, story), fs.readFileSync(path.join(root, story), 'utf8').replace('text="Save"', 'text="Send"'));
+  assert.deepEqual(syncDocsAgentFiles(root, { check: true }).stale, [agentFilePath(PAGE_PATH, 'Patterns')]);
+  syncDocsAgentFiles(root);
+  assert.match(read(), /text="Send"/);
+});
+
+test('all thirteen pattern examples reach their generated copies and both reference stories have live story IDs', () => {
+  const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+  for (const name of ['CommonActions', 'Disabled', 'Empty', 'Errors', 'Filtering', 'Forms', 'Indicators', 'Loading', 'Navigation', 'Notifications', 'Overflow', 'ReadOnly', 'Search']) {
+    const text = fs.readFileSync(path.join(root, `design-system/agent-views/patterns/${name}.md`), 'utf8');
+    assert.match(text, new RegExp(`## In code\\n\\nFrom .*CodeExamples\\.stories\\.jsx#${name}`));
+    assert.match(text, /import .* from '@\/(?:components|patterns)'/);
+  }
+  const rows = JSON.parse(fs.readFileSync(path.join(root, 'design-system/agent-views/reference-screens.json'), 'utf8'));
+  assert.deepEqual(rows.map((r) => [r.reference, r.url.split('--').at(-1)]), [
+    ['list', 'list-with-filters'], ['detail', 'detail-with-panel'],
+  ]);
+  assert.deepEqual(syncDocsAgentFiles(root, { check: true }).stale, []);
+});
+
 test('each rule renders as its slug id with its tag; an untagged rule reads as Review', () => {
   const text = renderDocsAgentFile(PAGE, { file: PAGE_PATH, kind: 'Pattern' });
   assert.match(text, /### Give every disabled control a reason in visible text\. \{#give-every-disabled-control-a-reason-in-visible-text\}\n\n\*\*Checked:\*\* Automatic/);
@@ -72,11 +113,19 @@ test('ruleTags reads the marker under its own heading only', () => {
 });
 
 test('a docs-only page gets a file, and the check passes straight after writing', () => {
-  const root = fixture({ [PAGE_PATH]: PAGE });
-  assert.equal(syncDocsAgentFiles(root, { check: true }).stale.length, 1);
+  const root = fixture({
+    [PAGE_PATH]: PAGE,
+    'design-system/src/styles/Colors.mdx': PAGE.replace('Patterns/Disabled', 'Foundations/Visual/Color').replace("tags={['!dev', 'manifest']}", "tags={['!dev', '!autodocs']}"),
+    'design-system/agent-views/tokens/tokens.md': 'keep\n',
+  });
+  assert.equal(syncDocsAgentFiles(root, { check: true }).stale.length, 2);
   syncDocsAgentFiles(root);
   const out = agentFilePath(PAGE_PATH, 'Patterns');
+  assert.equal(out, 'design-system/agent-views/patterns/Disabled.md');
   assert.ok(fs.existsSync(path.join(root, out)));
+  assert.ok(fs.existsSync(path.join(root, 'design-system/agent-views/foundations/Colors.md')));
+  assert.ok(fs.existsSync(path.join(root, 'design-system/agent-views/tokens/tokens.md')));
+  assert.match(fs.readFileSync(path.join(root, 'design-system/agent-views/foundations/Colors.md'), 'utf8'), /\*\*Kind:\*\* Foundation/);
   assert.deepEqual(syncDocsAgentFiles(root, { check: true }).stale, []);
 });
 
@@ -90,8 +139,8 @@ test('the check fails when a page changes under its file, and when a file loses 
   assert.deepEqual(syncDocsAgentFiles(root, { check: true }).stale, [agentFilePath(PAGE_PATH, 'Patterns')]);
 });
 
-test('a page outside Templates and Patterns gets no file', () => {
-  const root = fixture({ 'design-system/src/storybook-docs/x/Other.mdx': PAGE.replace('Patterns/Disabled', 'Foundations/Other') });
+test('a page outside Templates, Patterns and Foundations gets no file', () => {
+  const root = fixture({ 'design-system/src/storybook-docs/x/Other.mdx': PAGE.replace('Patterns/Disabled', 'Components/Other') });
   assert.equal(syncDocsAgentFiles(root, { check: true }).count, 0);
 });
 
@@ -125,12 +174,12 @@ test('a MotionSection naming a row the registry lacks fails the render', () => {
   assert.throws(() => renderDocsAgentFile(source, { file: 'x.mdx', kind: 'Template', registry: [] }), /Ghost/);
 });
 
-// ── Foundations · Motion through get-documentation ──
+// ── Foundations › Expression › Motion through get-documentation ──
 
-const MOTION_MDX = (name) => `import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title="Foundations/Motion/${name}" tags={['!dev', 'manifest']} />\n\n# ${name}\n`;
-const MOTION_STORIES = (name, tags) => `export default {\n    title: 'Foundations/Motion/${name}',\n    tags: [${tags}],\n};\n`;
+const MOTION_MDX = (name) => `import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title="Foundations/Expression/Motion/${name}" tags={['!dev', 'manifest']} />\n\n# ${name}\n`;
+const MOTION_STORIES = (name, tags) => `export default {\n    title: 'Foundations/Expression/Motion/${name}',\n    tags: [${tags}],\n};\n`;
 
-test('a Foundations · Motion page without the manifest tag is named, whether its Meta or its stories file carries the title', () => {
+test('a Foundations › Expression › Motion page without the manifest tag is named, whether its Meta or its stories file carries the title', () => {
   const root = fixture({
     'design-system/src/styles/MotionLibrary.mdx': MOTION_MDX('Library').replace(", 'manifest'", ''),
     'design-system/src/styles/MotionPhysics.mdx': `import * as S from './MotionPhysics.stories.jsx';\n\n<Meta of={S} />\n`,
@@ -144,17 +193,17 @@ test('a Foundations · Motion page without the manifest tag is named, whether it
   ]);
 });
 
-test('on the real repo every Foundations · Motion page is served, and a component with a motion row carries its Motion section', () => {
+test('on the real repo every Foundations › Expression › Motion page is served, and a component with a motion row carries its Motion section', () => {
   const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
   assert.deepEqual(pagesMissingManifestTag(root), []);
   const served = fs.readdirSync(path.join(root, 'design-system/src/styles')).filter((f) => /^Motion[A-Z].*\.mdx$/.test(f));
-  assert.ok(served.length >= 6, `expected the six Foundations · Motion pages, found ${served.length}`);
+  assert.ok(served.length >= 6, `expected the six Foundations › Expression › Motion pages, found ${served.length}`);
   const popup = fs.readFileSync(path.join(root, 'design-system/src/components/overlays-and-layering/Popup/index.md'), 'utf8');
   assert.match(popup, /^## Motion$/m);
   assert.match(popup, /--ds-motion-spatial-fast/);
 });
 
-test('a Foundations · Sound page without the manifest tag is named', () => {
+test('a Foundations › Expression › Sound page without the manifest tag is named', () => {
   const root = fixture({
     'design-system/src/styles/SoundOverview.mdx': MOTION_MDX('Overview').replace('Motion', 'Sound').replace(", 'manifest'", ''),
     'design-system/src/styles/SoundSettings.mdx': MOTION_MDX('Settings').replace('Motion', 'Sound'),
@@ -162,7 +211,7 @@ test('a Foundations · Sound page without the manifest tag is named', () => {
   assert.deepEqual(pagesMissingManifestTag(root), ['design-system/src/styles/SoundOverview.mdx']);
 });
 
-test('on the real repo every Foundations · Sound page is served, and a component with a sound cell carries it in its Motion section', () => {
+test('on the real repo every Foundations › Expression › Sound page is served, and a component with a sound cell carries it in its Motion section', () => {
   const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
   assert.deepEqual(pagesMissingManifestTag(root), []);
   const flag = fs.readdirSync(path.join(root, 'design-system/src/components'), { recursive: true }).find((f) => String(f).endsWith('Flag/index.md'));
@@ -174,4 +223,14 @@ test('a Best practices section that opens straight on its first rule prints that
   const best = text.slice(text.indexOf('## Best practices'));
   assert.equal(best.match(/### Give every disabled control a reason in visible text\./g).length, 1);
   assert.match(best, /^## Best practices\n\n### Give every disabled control/);
+});
+
+test('the template index owned by component generation survives docs-page regeneration', () => {
+  const root = fixture({
+    [PAGE_PATH]: PAGE,
+    'design-system/agent-views/templates/index.md': '# Templates\n',
+  });
+  syncDocsAgentFiles(root);
+  assert.equal(fs.readFileSync(path.join(root, 'design-system/agent-views/templates/index.md'), 'utf8'), '# Templates\n');
+  assert.deepEqual(syncDocsAgentFiles(root, { check: true }).stale, []);
 });

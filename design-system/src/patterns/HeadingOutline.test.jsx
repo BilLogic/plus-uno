@@ -18,7 +18,7 @@ import Page from './Page';
  * its own page: its title is an h1 and names it. Group labels are not headings.
  *
  * The sizes each level draws are asserted in the browser, in the
- * `Templates/Page/Page/Heading outline` stories; this file holds the tags.
+ * `Templates/Heading outline` stories; this file holds the tags.
  */
 const outline = () => screen.queryAllByRole('heading').map((h) => [h.tagName.toLowerCase(), h.textContent]);
 

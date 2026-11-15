@@ -60,37 +60,37 @@ export default {
 
 const sampleOptions = [
     {
-        text: 'Zhejiang',
-        value: 'zhejiang',
+        text: 'North District',
+        value: 'north',
         children: [
             {
-                text: 'Hangzhou',
-                value: 'hangzhou',
+                text: 'Lincoln Middle',
+                value: 'lincoln',
                 children: [
-                    { text: 'WestLake', value: 'westlake' },
-                    { text: 'Xihu', value: 'xihu' },
+                    { text: 'Grade 6', value: 'grade-6' },
+                    { text: 'Grade 7', value: 'grade-7' },
                 ],
             },
             {
-                text: 'Ningbo',
-                value: 'ningbo',
+                text: 'Roosevelt Elementary',
+                value: 'roosevelt',
                 children: [
-                    { text: 'Jiangbei', value: 'jiangbei' },
-                    { text: 'Haishu', value: 'haishu' },
+                    { text: 'Grade 4', value: 'grade-4' },
+                    { text: 'Grade 5', value: 'grade-5' },
                 ],
             },
         ],
     },
     {
-        text: 'Jiangsu',
-        value: 'jiangsu',
+        text: 'South District',
+        value: 'south',
         children: [
             {
-                text: 'Nanjing',
-                value: 'nanjing',
+                text: 'Jefferson Middle',
+                value: 'jefferson',
                 children: [
-                    { text: 'Xuanwu', value: 'xuanwu' },
-                    { text: 'Qinhuai', value: 'qinhuai' },
+                    { text: 'Grade 7', value: 'grade-7' },
+                    { text: 'Grade 8', value: 'grade-8' },
                 ],
             },
         ],
@@ -104,7 +104,7 @@ export const Overview = () => {
         <div style={{ maxWidth: 'var(--width-2500)' }}>
             <Cascader
                 id="cascader-overview"
-                aria-label="Region"
+                aria-label="Location"
                 value={value}
                 options={sampleOptions}
                 onChange={setValue}
@@ -124,41 +124,41 @@ export const EmptyPath = () => {
     const [value, setValue] = useState([]);
     return (
         <div style={{ maxWidth: 'var(--width-2500)' }}>
-            <Cascader id="cascader-empty" label="Region" value={value} options={sampleOptions} onChange={setValue} />
+            <Cascader id="cascader-empty" label="Location" value={value} options={sampleOptions} onChange={setValue} />
         </div>
     );
 };
 
 /** A chosen path shows in the field; opening reveals the columns up to its level. */
 export const PreselectedPath = () => {
-    const [value, setValue] = useState(['zhejiang', 'hangzhou', 'westlake']);
+    const [value, setValue] = useState(['north', 'lincoln', 'grade-6']);
     return (
         <div style={{ maxWidth: 'var(--width-2500)' }}>
-            <Cascader id="cascader-preselected" label="Region" value={value} options={sampleOptions} onChange={setValue} />
+            <Cascader id="cascader-preselected" label="Location" value={value} options={sampleOptions} onChange={setValue} />
         </div>
     );
 };
 
 export const SpacingDefault = () => (
     <div style={{ maxWidth: 'var(--width-2500)' }}>
-        <Cascader id="cascader-default" label="Region" value={[]} options={sampleOptions} onChange={() => {}} />
+        <Cascader id="cascader-default" label="Location" value={[]} options={sampleOptions} onChange={() => {}} />
     </div>
 );
 
 export const SpacingCompact = () => (
     <div style={{ maxWidth: 'var(--width-2500)' }}>
-        <Cascader id="cascader-compact" label="Region" spacing="compact" value={[]} options={sampleOptions} onChange={() => {}} />
+        <Cascader id="cascader-compact" label="Location" spacing="compact" value={[]} options={sampleOptions} onChange={() => {}} />
     </div>
 );
 
 export const Interactive = (args) => {
     const [value, setValue] = useState(args.contentPreset === 'preselected'
-        ? ['zhejiang', 'hangzhou', 'westlake']
+        ? ['north', 'lincoln', 'grade-6']
         : []);
 
     useEffect(() => {
         setValue(args.contentPreset === 'preselected'
-            ? ['zhejiang', 'hangzhou', 'westlake']
+            ? ['north', 'lincoln', 'grade-6']
             : []);
     }, [args.contentPreset]);
 
@@ -175,7 +175,7 @@ export const Interactive = (args) => {
                 spacing={args.spacing}
                 isDisabled={args.isDisabled}
                 isInvalid={args.isInvalid}
-                errorMessage={args.isInvalid ? 'Pick a region.' : undefined}
+                errorMessage={args.isInvalid ? 'Pick a location.' : undefined}
                 placeholder={args.placeholder}
             />
             {value.length > 0 && (
@@ -189,7 +189,7 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     contentPreset: 'empty',
-    label: 'Region',
+    label: 'Location',
     spacing: 'default',
     isDisabled: false,
     isInvalid: false,
@@ -197,30 +197,30 @@ Interactive.args = {
 };
 
 /** One story per state, for the Examples tab. */
-const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Region' });
+const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Location' });
 const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
 
 export const Rest = {
-    render: () => <div style={wrap}><Cascader id="cascader-ex-rest" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
+    render: () => <div style={wrap}><Cascader id="cascader-ex-rest" label="Location" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
     play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
 };
 
 export const Hovered = {
-    render: () => <div style={wrap}><Cascader id="cascader-ex-hover" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
+    render: () => <div style={wrap}><Cascader id="cascader-ex-hover" label="Location" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
     play: async ({ canvasElement }) => expectHovered(canvasElement, controlOf(canvasElement)),
 };
 
 export const Focused = {
-    render: () => <div style={wrap}><Cascader id="cascader-ex-focus" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
+    render: () => <div style={wrap}><Cascader id="cascader-ex-focus" label="Location" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
     play: async ({ canvasElement }) => expectFocused(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldDisabled = {
-    render: () => <div style={wrap}><Cascader id="cascader-ex-disabled" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" isDisabled /></div>,
+    render: () => <div style={wrap}><Cascader id="cascader-ex-disabled" label="Location" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" isDisabled /></div>,
     play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldInvalid = {
-    render: () => <div style={wrap}><Cascader id="cascader-ex-invalid" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" isInvalid errorMessage="Pick a region." /></div>,
+    render: () => <div style={wrap}><Cascader id="cascader-ex-invalid" label="Location" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" isInvalid errorMessage="Pick a location." /></div>,
     play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
 };

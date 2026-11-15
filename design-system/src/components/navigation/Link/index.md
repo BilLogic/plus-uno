@@ -6,19 +6,22 @@ Link: an inline navigation anchor.
 
 **Import:** `import { Link } from '@/components';`
 
+**Used in:** Modal (`ds guide modal`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/components/navigation/Link/Link.jsx`
 
 **Stories:** `design-system/src/components/navigation/Link/Link.stories.jsx` — Appearances, OpenInNewWindow, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/navigation/Link/Link.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
 Use `Link` for navigation inside a sentence or a block of text — "see the
-session report," "read more." For a standalone action styled like a button,
-use `Button` or `LinkButton` instead; `Link`'s appearances are for text, not
+session report," "read more." `Link`'s appearances are for inline text, not
 for a control that stands on its own.
 
 ## Motion
@@ -28,6 +31,12 @@ Link reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Color only, on the fast fade. |
+
+## Alternatives
+
+- For a standalone navigation action styled like a button, use `LinkButton`.
+- For an action that triggers in-page behavior rather than navigating to a URL, use `Button`.
+- For a trail of links showing where a page sits in a hierarchy, use `Breadcrumb`.
 
 ## Best practices
 
@@ -68,8 +77,8 @@ Don't: A standalone action dressed as a link. Use a button.
 
 ## Related
 
-- For a standalone action styled like a button, use `LinkButton`.
-- For a trail of links showing where a page sits, use `Breadcrumb`.
+- `LinkButton`: use when rendering a standalone navigation control with button sizing and padding.
+- `Breadcrumb`: use when rendering a hierarchy trail of ancestor links above a page title.
 
 Same group: `Breadcrumb` · `Pagination` · `Sidebar` · `Tabs`
 
@@ -86,7 +95,7 @@ Same group: `Breadcrumb` · `Pagination` · `Sidebar` · `Tabs`
 | Rest | Default in the link ink, underlined; visited in the visited ink. |
 | Hovered | Subtle is underlined; default keeps its ink. |
 | Pressed | The pressed link ink on default and subtle. |
-| Focused | The 2px ring, 2px off the link; the inverse ring on a dark fill. |
+| Focused | Shows the focus ring on the link; the inverse ring on a dark fill. See Border. |
 | Disabled | Not a state. A link with nowhere to go is plain text, not a dimmed link. |
 
 ### Tokens

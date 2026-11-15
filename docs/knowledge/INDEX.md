@@ -32,7 +32,9 @@ carries no `disposition:`. Two exclusions, both structural:
 - **`docs/knowledge/archive/`** is out of scope. It holds a superseded doc only
   while a live doc, ADR or code comment cites it as its decision trail; once
   nothing does, the doc is deleted. Archiving *is* a disposition; the archive's
-  own contents do not need one.
+  own contents do not need one. The same test clears `docs/plans/` and `todos/`:
+  a plan, todo or archived doc whose work has landed or been abandoned is
+  deleted once nothing live cites it.
 - **This file and `changelog.md`** govern the folder rather than sitting in it.
   They are named in the script, not exempted by a magic frontmatter value, so
   the exemption cannot spread.

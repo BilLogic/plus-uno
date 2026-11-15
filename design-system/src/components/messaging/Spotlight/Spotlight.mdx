@@ -54,9 +54,9 @@ export const gotIt = <SpotlightAction appearance="primary">Got it</SpotlightActi
 <Meta of={SpotlightStories} />
 
 <Title />
-A one-step onboarding callout anchored to a target element, for walking
+A one-step onboarding dialog anchored to a target element, for walking
 someone through a feature the first time they see it. `SpotlightProvider` and
-`SpotlightTarget` share an anchor so the callout always points at the right
+`SpotlightTarget` share an anchor so the dialog always points at the right
 place without wiring a ref by hand.
 
 <DocsTabs of={SpotlightStories}>
@@ -65,8 +65,6 @@ place without wiring a ref by hand.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-66"
-    sets={figmaMeta.sets}
-    figmaFileKey={figmaMeta.fileKey}
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Spotlight"
 />
 
@@ -98,7 +96,7 @@ place without wiring a ref by hand.
 
 <ComponentExample of={SpotlightStories.Pressed} title="Pressed" description="Dismiss takes the inverse pressed layer." />
 
-<ComponentExample of={SpotlightStories.Focused} title="Focused" description="Dismiss shows the inverse 2px ring." />
+<ComponentExample of={SpotlightStories.Focused} title="Focused" description="Dismiss shows the inverse focus ring." />
 
 </div>
 
@@ -116,12 +114,7 @@ place without wiring a ref by hand.
 
 <DocsInteractivePlayground
     of={SpotlightStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The callout opens over the page, anchored to the{' '}
-            <strong>Create</strong> button. The Demo rows set the action labels; they are not props.
-        </>
-    }
+    description="Change props in the table below. The spotlight opens anchored to the Create button."
 />
 
 </div>
@@ -138,13 +131,19 @@ place without wiring a ref by hand.
 
 ## Usage
 
-Use `Spotlight` to call out one feature the first time someone can use it:
+Use `Spotlight` to point out one feature the first time someone can use it:
 a new button, a changed control, a place to start. It is a single step or a
 short, explicit sequence with a `stepCount`, not an ongoing help system.
 
-For a message that stays on the page until resolved, use `SectionMessage` or
-`Banner` instead. For a short note tied to one field or value, use
-`InlineMessage`.
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a message that stays in the page until resolved, use `SectionMessage`.
+- For a short label on hover or focus over a control, use `Tooltip`.
+- For an interactive anchored overlay with arbitrary content, use `Popup`.
 
 </div>
 
@@ -152,14 +151,14 @@ For a message that stays on the page until resolved, use `SectionMessage` or
 
 ## Parts
 
-1. **Target.** `SpotlightTarget` wraps the element the callout points at and
+1. **Target.** `SpotlightTarget` wraps the element the spotlight points at and
    shares its anchor with the `Spotlight` through a `SpotlightProvider`.
 2. **Headline.** The dialog title, read first.
 3. **Dismiss.** The shared `CloseButton` in its `inverse` tone, in the header, the dialog's first focusable element. `dismissible={false}` leaves it out.
 4. **Media.** An optional image above the body.
 5. **Body.** The `children` text.
 6. **Step count.** A short label like "1 of 3".
-7. **Actions.** A secondary and a primary <code>SpotlightAction</code>, the secondary first. Each takes `onClick`, or `href` to render a link.
+7. **Actions.** A secondary and a primary `SpotlightAction`, the secondary first. Each takes `onClick`, or `href` to render a link.
 
 ### States
 
@@ -171,7 +170,7 @@ For a message that stays on the page until resolved, use `SectionMessage` or
 <tr><td>Rest</td><td>Popup on the brand bold fill with inverse text.</td></tr>
 <tr><td>Hovered</td><td>Dismiss takes the inverse hovered layer.</td></tr>
 <tr><td>Pressed</td><td>Dismiss takes the inverse pressed layer.</td></tr>
-<tr><td>Focused</td><td>Dismiss and actions show the inverse 2px ring.</td></tr>
+<tr><td>Focused</td><td>Dismiss and actions show the inverse focus ring; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Dismissed</td><td>The popup closes and <code>onDismiss</code> fires.</td></tr>
 </tbody>
@@ -218,9 +217,9 @@ One step alone has nothing to count.
 
 <DoDontPair
     doExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={skip} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
-    doCaption="1 of 3 in a three-step tour."
+    doCaption="Step count in a multi-step tour."
     dontExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 1" secondaryAction={skip} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
-    dontCaption="1 of 1 on a single tip."
+    dontCaption="Step count on a single tip."
 />
 
 ### Make the secondary action a link.
@@ -235,7 +234,7 @@ The primary action leads; the second one stays quiet. A `SpotlightAction` with
     dontCaption="Two competing buttons."
 />
 
-### Wrap the target and the callout in one SpotlightProvider.
+### Wrap the target and the spotlight in one `SpotlightProvider`.
 
 `SpotlightTarget` and `Spotlight` share an anchor through context, so both
 need to sit inside the same provider. Pass `target` directly only when the
@@ -281,7 +280,7 @@ every visit.
 
 ## Accessibility
 
-- **A dialog, not a tooltip.** The callout is a Popup with a title and a
+- **A dialog, not a tooltip.** The spotlight is a `Popup` with a title and a
   description, read together when it opens.
 - **The dismiss control is the first focusable element.** Tab reaches it
   before the body or the actions, so closing never requires finding the
@@ -295,8 +294,8 @@ every visit.
 
 ## Related
 
-- For a message that explains one field or value inline, use `InlineMessage`.
-- For a message scoped to a page or section, use `Banner` or `SectionMessage`.
+- `Popup`: use when anchoring an overlay dialog or panel to a trigger element.
+- `CloseButton`: use when rendering the inverse dismiss control in the spotlight header.
 
 </div>
 

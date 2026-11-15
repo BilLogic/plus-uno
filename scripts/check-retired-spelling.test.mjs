@@ -195,3 +195,33 @@ test('an error that is NOT a missing file still stops the sweep', () => {
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+// ── Foundations IA (#2429): the retired story ids and titles ──
+test('a retired Foundations id or title is caught, the new ids pass', () => {
+  const retired = [
+    'open the foundations-basics-overview story',
+    'story foundations-motion-principles',
+    'story foundations-sound-overview',
+    'Foundations · Motion is the page',
+    'Foundations · Sound first',
+    'Foundations/Basics/Tokens',
+    'see Foundations/Motion/Library',
+    'Get started › Content design',
+    'Get started/Content design',
+    'the principle "Show what changed"',
+    'the principle "Move like real things"',
+    'the principle "Quiet by default"',
+  ];
+  const found = findingsIn(retired.join('\n'), 'AGENTS.md');
+  assert.equal(found.length, retired.length, JSON.stringify(found, null, 1));
+  assert.deepEqual(found.map((f) => f.line), retired.map((_, i) => i + 1));
+  const current = [
+    'foundations-expression-motion-principles',
+    'foundations-expression-sound-overview',
+    'foundations-tokens-library',
+    'foundations-expression-motion-library',
+    'Foundations › Expression › Motion',
+    'Always responsive, Build understanding, Lead with empathy, Cut the noise',
+  ];
+  assert.deepEqual(findingsIn(current.join('\n'), 'AGENTS.md'), []);
+});

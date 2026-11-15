@@ -7,7 +7,7 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={OrganizationChartStories} />
 
 <Title />
-Draws who reports to whom as a top-down tree of named boxes, one level per row.
+Draws reporting lines as a top-down tree of named boxes, one level per row.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/OrganizationChart"
@@ -30,16 +30,14 @@ Draws who reports to whom as a top-down tree of named boxes, one level per row.
 
 ## When to use
 
-Use `OrganizationChart` for reporting lines between people or roles: the
-program team, which lead tutors supervise which tutors, or who a support
-request escalates to.
+Use `OrganizationChart` for reporting lines between people or roles, such as a
+program team, lead-to-tutor supervision or support escalation paths. Each box
+displays a name only; when titles, contact details or avatars are needed, build
+the layout from UI components instead.
 
-For a hierarchy that is not people, like subject to topic to lesson, use
-`TreegraphChart`. For a hierarchy sized by a value, use `TreemapChart` or
-`SunburstChart`. For relationships that are not a tree, use `NetworkGraph`.
-
-Each box shows a name only. When the reader needs titles, contact details or
-photos, build the structure from components instead.
+For non-people hierarchies such as subject → topic → lesson, use
+`TreegraphChart`. For hierarchies sized by value, use `TreemapChart` or
+`SunburstChart`. For non-tree relationships, use `NetworkGraph`.
 
 </div>
 
@@ -50,11 +48,11 @@ photos, build the structure from components instead.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Nodes', <>One box per distinct name in <C>data</C>, generated for you. The name is both the box's label and its identity.</>],
-        ['Levels', 'The top row, the row below it and the third row each take their own fill. Rows below the third get no fill of their own from this chart.'],
-        ['Links', <>The reporting lines, drawn in <C>--ds-border-bold</C>.</>],
-        ['Tooltip', 'Hover a box or a line for its details. It draws outside the chart, so it is not clipped at the edge.'],
-        ['Height', <>The chart is <C>height</C> pixels tall, 500 by default.</>],
+        ['Nodes', <>One box per unique name in <C>data</C>, serving as both label and ID.</>],
+        ['Levels', <>Row 1 uses <C>--ds-chart-categorical-1</C> (with <C>--ds-text-inverse</C>), row 2 <C>--ds-chart-categorical-2</C>, row 3 <C>--ds-chart-categorical-3</C>, and deeper rows take no fill; all boxes are outlined in <C>--ds-chart-categorical-1</C>.</>],
+        ['Links', <>Reporting lines in <C>--ds-border-bold</C>.</>],
+        ['Tooltip', 'Shows hovered box or link details, rendered outside the chart so edges do not clip it.'],
+        ['Height', <>Pixel height from <C>height</C> (default 500).</>],
     ]}
 />
 
@@ -64,9 +62,9 @@ photos, build the structure from components instead.
 
 ## Data shape
 
-`data` is an array of `[from, to]` pairs: the manager first, then the person who
-reports to them. Boxes are created from the names, so every name must be unique.
-Two people with the same name merge into one box.
+`data` is an array of `[from, to]` pairs (`[manager, report]`). Because nodes
+are keyed by name, every person's name must be unique or identical names merge
+into one box.
 
 ```jsx
 <OrganizationChart
@@ -86,11 +84,10 @@ Two people with the same name merge into one box.
 
 ## Color and accessibility
 
-- **Color marks depth, not identity.** The top row is `--ds-chart-categorical-1` with `--ds-text-inverse` labels, the second row `--ds-chart-categorical-2`, the third `--ds-chart-categorical-3`. Every box is outlined in `--ds-chart-categorical-1`. There is no per-person color.
-- **Position carries the structure.** Rows and lines show the hierarchy, so the chart reads without hue; the level colors repeat what position already says.
-- **Wide trees overflow.** Many people on one row shrink the boxes until labels truncate. Split a large organization into one chart per team, or raise `height` for deep trees.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Depth-based color.** Colors mark row depth rather than individuals, and row position plus connector lines carry the hierarchy without hue.
+- **Avoid wide or deep crowding.** Many boxes on one row shrink and truncate labels; split large organizations by team or increase `height` for deep trees.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -98,11 +95,7 @@ Two people with the same name merge into one box.
 
 ## States
 
-`OrganizationChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`OrganizationChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={500} />
@@ -119,12 +112,7 @@ Two people with the same name merge into one box.
 
 <DocsInteractivePlayground
     of={OrganizationChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

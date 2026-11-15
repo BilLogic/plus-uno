@@ -4,11 +4,12 @@ import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './PatternCard.scss';
 
 /**
- * Card pattern for PLUS design system. Mirrors Figma `Pattern/Card`:
- * an optional image, then the content (the `_Card header` over the body), then
- * an optional footer, on Atlassian's raised pair: the raised surface and its
- * shadow, whose 1px ring is the card's edge.
+ * PLUS card: an optional image, content and footer on the raised surface and shadow.
  *
+ * - **Image placement**: `top` (default), `start` or `end`. Side images apply
+ *   at the large card minimum width and fill the height. `imageSplit` chooses
+ *   one third (default) or one half; half uses Heading medium on a side card.
+ *   Below the large minimum width, the image returns to the top with its own ratio.
  * - **Header** (`_Card header`): `title` (the card title type, shared with Card
  *   in `styles/_card-title.scss`, one heading level below its section) over an
  *   optional `description` (Body/default 14), with
@@ -32,6 +33,8 @@ const PatternCard = ({
     header,
     image,
     footer,
+    imagePlacement = 'top',
+    imageSplit = '1/3',
     padding = 'md',
     gap = 'md',
     minWidth,
@@ -43,6 +46,8 @@ const PatternCard = ({
 }) => {
     const classes = [
         'plus-pattern-card',
+        image ? `plus-pattern-card--image-${imagePlacement}` : '',
+        image && imageSplit === '1/2' ? 'plus-pattern-card--image-half' : '',
         `plus-pattern-card-pad-${padding}`,
         `plus-pattern-card-gap-${gap}`,
         props.onClick ? 'plus-pattern-card--clickable' : '',
@@ -83,17 +88,36 @@ const PatternCard = ({
 
 PatternCard.propTypes = {
     id: PropTypes.string,
-    /** The card's title, in the card title type (`styles/_card-title.scss`), tagged one heading level below its section */
+    /** The card's title, in the card title type (`styles/_card-title.scss`), tagged one heading level below its section
+     * @ds-context Used in: Card.title (ds guide card)
+     */
     title: PropTypes.node,
-    /** Body/default 14 under the title */
+    /** Body/default 14 under the title
+     * @ds-context Used in: Card.description (ds guide card)
+     */
     description: PropTypes.node,
-    /** Actions at the end of the header row: buttons, a pager or an overflow */
+    /** Actions at the end of the header row: buttons, a pager or an overflow
+     * @ds-context Used in: Card.actions (ds guide card)
+     * @ds-context Governed by: Common actions (ds guide common-actions); Overflow (ds guide overflow)
+     */
     actions: PropTypes.node,
-    /** Custom header that replaces title, description and actions (tabs, a toolbar) */
+    /** Custom header that replaces title, description and actions (tabs, a toolbar)
+     * @ds-context Used in: Card.header (ds guide card)
+     * @ds-context Governed by: Common actions (ds guide common-actions)
+     */
     header: PropTypes.node,
-    /** Image slot above the content, full bleed */
+    /** Image slot, full bleed: above the content, or at the start or end edge per `imagePlacement`
+     * @ds-context Used in: Card.image (ds guide card)
+     */
     image: PropTypes.node,
-    /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body */
+    /** Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. */
+    imagePlacement: PropTypes.oneOf(['top', 'start', 'end']),
+    /** Side image share. One half also steps the title up to Heading medium. Ignored for top placement. */
+    imageSplit: PropTypes.oneOf(['1/3', '1/2']),
+    /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body
+     * @ds-context Used in: Card.footer (ds guide card)
+     * @ds-context Governed by: Common actions (ds guide common-actions)
+     */
     footer: PropTypes.node,
     /** Padding scale: Card/pad-sm · md · lg (16 · 20 · 24) */
     padding: PropTypes.oneOf(['sm', 'md', 'lg']),
@@ -116,7 +140,9 @@ PatternCard.propTypes = {
     dragging: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** Body content slot */
+    /** Body content slot
+     * @ds-context Used in: Card.children (ds guide card)
+     */
     children: PropTypes.node,
 };
 

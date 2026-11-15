@@ -1,7 +1,12 @@
-import React from 'react';
-import { expect, waitFor, within } from 'storybook/test';
-import { Button } from '@/components';
-import { Frame, PatternSection } from '@/patterns';
+import React, { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { Banner, Button, Link, Tabs } from '@/components';
+import { Frame, PatternCard, PatternSection } from '@/patterns';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
+import { SlideViews } from '@/lib/navigationMotion';
+import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
+import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import {
     CardsSection,
@@ -10,7 +15,6 @@ import {
     TYPE_STAGE,
     ANATOMY_PARTS,
     PageActions,
-    PageAnatomy,
     PageBanner,
     PageStage,
     PageTabs,
@@ -21,6 +25,8 @@ import Page, { PAGE_EDGE, PAGE_LEVELS } from '@/patterns/Page';
 import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { DemoLabel, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
+import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 
 const col = { display: 'flex', flexDirection: 'column', gap: '24px' };
 
@@ -57,8 +63,8 @@ function PageLevelsDemo() {
 }
 
 export default {
-    title: 'Templates/Page/Page',
-    id: 'templates-page-page',
+    title: 'Templates/Page',
+    id: 'templates-page',
     component: Page,
     tags: ['!dev', '!autodocs'],
     argTypes: {
@@ -156,6 +162,63 @@ export const WithTitle = {
             {slotContent('Content slot')}
         </Page>
     ),
+};
+
+/** The Page owns the gaps when a page message appears below its header. */
+export const HeaderAndBanner = {
+    render: () => {
+        const [showBanner, setShowBanner] = useState(true);
+        return (
+            <Page
+                header={<DemoPageHeader title="Sessions" actions={<Button text="Toggle banner" onClick={() => setShowBanner((show) => !show)} />} />}
+                banner={showBanner && <Banner>Sessions move to the new calendar on Friday.</Banner>}
+            >
+                <PatternSection title="Upcoming sessions">{slotContent('Sessions')}</PatternSection>
+            </Page>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const header = canvas.getByRole('heading', { level: 1, name: 'Sessions' }).closest('header');
+        const content = canvas.getByRole('heading', { level: 2, name: 'Upcoming sessions' }).closest('.plus-pattern-section');
+        const gap = px(probe(canvasElement, 'marginTop', 'var(--page-stack-md)'));
+        const banner = canvas.getByRole('status');
+        await expect(banner.getBoundingClientRect().top - header.getBoundingClientRect().bottom).toBeCloseTo(gap, 0);
+        await expect(content.getBoundingClientRect().top - banner.getBoundingClientRect().bottom).toBeCloseTo(gap, 0);
+        await expect(canvas.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+        await userEvent.click(canvas.getByRole('button', { name: 'Toggle banner' }));
+        await expect(canvas.queryByRole('status')).toBeNull();
+        await expect(content.getBoundingClientRect().top - header.getBoundingClientRect().bottom).toBeCloseTo(gap, 0);
+        await userEvent.click(canvas.getByRole('button', { name: 'Toggle banner' }));
+        await expect(canvas.getByRole('status')).toBeVisible();
+    },
+};
+
+/** Optional slots leave no empty regions, and children-only Pages keep their layout. */
+export const OptionalSlots = {
+    render: () => (
+        <>
+            <Page data-testid="legacy" title="Legacy title"><p>Legacy content</p></Page>
+            <Page data-testid="header-only" title="Fallback title" header={<DemoPageHeader title="Header title" />} />
+            <Page data-testid="banner-only" banner={<Banner>Page message</Banner>}><p>Banner content</p></Page>
+            <Page data-testid="title-banner" title="Title with message" banner={<Banner>Another message</Banner>} />
+        </>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const legacy = canvas.getByTestId('legacy');
+        await expect([...legacy.children].map((el) => el.tagName)).toEqual(['H1', 'P']);
+        const headerOnly = canvas.getByTestId('header-only');
+        await expect(within(headerOnly).getAllByRole('heading', { level: 1 })).toHaveLength(1);
+        await expect(within(headerOnly).queryByText('Fallback title')).toBeNull();
+        await expect(headerOnly.children).toHaveLength(1);
+        const bannerOnly = canvas.getByTestId('banner-only');
+        await expect(bannerOnly.firstElementChild).toHaveClass('plus-pattern-page-banner');
+        const titleBanner = canvas.getByTestId('title-banner');
+        const gap = px(probe(canvasElement, 'marginTop', 'var(--page-stack-md)'));
+        await expect(titleBanner.lastElementChild.getBoundingClientRect().top - titleBanner.firstElementChild.getBoundingClientRect().bottom).toBeCloseTo(gap, 0);
+        await expect(titleBanner.children).toHaveLength(2);
+    },
 };
 
 /** In every color mode, each level draws its fill with its own shadow, and text in the body color. */
@@ -264,36 +327,27 @@ const RecordPage = ({ banner = false }) => (
 export const AnatomyRecord = {
     name: 'Anatomy',
     render: () => (
-        <PageAnatomy width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
+        <LiveAnatomy width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
             <RecordPage banner />
-        </PageAnatomy>
+        </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
-        const figure = canvasElement.querySelector('[data-anatomy-figure]');
-        const origin = figure.getBoundingClientRect();
-        const rect = (el) => el.getBoundingClientRect();
-        await waitFor(() => expect(figure.querySelectorAll('[data-anatomy-marker]'), 'a marker for every part').toHaveLength(ANATOMY_PARTS.length));
-        const markers = [...figure.querySelectorAll('[data-anatomy-marker]')].map(rect);
-        markers.forEach((a, i) => markers.slice(i + 1).forEach((b, j) => {
-            const touch = a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
-            expect(touch, `markers ${i + 1} and ${i + j + 2} share no space`).toBe(false);
-        }));
-        const outlines = [...figure.querySelectorAll('[data-anatomy-outline]')].map(rect);
-        for (const [i, part] of ANATOMY_PARTS.entries()) {
-            const marker = rect(figure.querySelector(`[data-anatomy-marker="${i + 1}"]`));
-            const leader = rect(figure.querySelector(`[data-leader="${i + 1}"]`));
-            const target = outlines[i];
-            const centerY = marker.top + marker.height / 2;
-            await expect(centerY, `${part.label}: marker level with its part`).toBeGreaterThanOrEqual(target.top);
-            await expect(centerY, `${part.label}: marker level with its part`).toBeLessThanOrEqual(target.bottom);
-            await expect(marker.right <= origin.left + 1 || marker.left >= origin.right - 1, `${part.label}: marker in a gutter, over no content`).toBe(true);
-            outlines.forEach((other, j) => {
-                if (j === i) return;
-                const crosses = leader.left < other.right && leader.right > other.left && leader.top < other.bottom && leader.bottom > other.top;
-                expect(crosses, `the leader of ${part.label} crosses ${ANATOMY_PARTS[j].label}`).toBe(false);
-            });
-        }
+        await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
+        leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
     },
+};
+
+/** The same figure at the docs column's width, where the story scales down and the title and description rows sit closer than a marker is tall. */
+export const AnatomyRecordScaledDown = {
+    name: 'Anatomy, scaled down',
+    render: () => (
+        <div style={{ width: 880 }}>
+            <LiveAnatomy width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
+                <RecordPage banner />
+            </LiveAnatomy>
+        </div>
+    ),
+    play: AnatomyRecord.play,
 };
 
 /** Area page, one collection: the title alone; the collection's Primary ends its view bar. */
@@ -415,4 +469,189 @@ export const ResponsiveWidth = {
         await waitFor(() => expect(box(), 'under the cap the content takes the width').toBeLessThan(FRAME_LAYOUT.contentCap));
         await expect(within(canvasElement).getAllByRole('heading', { level: 1 }), 'one h1 at every width').toHaveLength(1);
     },
+};
+
+/* ------------------------------------------------------- navigation motion */
+
+const motionOn = (Story) => <MotionPreferenceContext.Provider value={false}><Story /></MotionPreferenceContext.Provider>;
+const motionOff = (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>;
+
+const RECORD_TABS = ['overview', 'sessions', 'notes'];
+
+const SwitchViewsDemo = () => {
+    const [tab, setTab] = useState('overview');
+    const views = {
+        overview: (
+            <PatternSection title="Current goals">
+                <PatternCard title="Multi-step equations" description="Target 80% accuracy by Friday." />
+            </PatternSection>
+        ),
+        sessions: (
+            <PatternSection title="Sessions" type="tabs-only" tabs={<ViewSelect />}>
+                <CardsSection title="This month" />
+            </PatternSection>
+        ),
+        notes: (
+            <PatternSection title="Tutor notes">
+                <PatternCard title="Oct 14 reflection" description="Worked through distributive property together." />
+            </PatternSection>
+        ),
+    };
+    return (
+        <ScreenStage width={FRAME_LAYOUT.dockMin} fluid>
+            <BrowserWindow address="app.plus.org/students/maya-rodriguez" height={WINDOW_HEIGHT}>
+                <Frame>
+                    <Page padding="none">
+                        <DemoPageHeader
+                            breadcrumb={[{ text: 'Students', href: '#students' }, { text: 'Maya Rodriguez' }]}
+                            title="Maya Rodriguez"
+                            description="Grade 8 · Math"
+                            actions={<PageActions />}
+                            tabs={(
+                                <Tabs activeKey={tab} onSelect={setTab} aria-label="Student views">
+                                    <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
+                                    <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
+                                    <Tabs.Tab eventKey="notes">Notes</Tabs.Tab>
+                                </Tabs>
+                            )}
+                        />
+                        <SlideViews activeKey={tab} keys={RECORD_TABS} size="page">
+                            {views[tab]}
+                        </SlideViews>
+                    </Page>
+                </Frame>
+            </BrowserWindow>
+        </ScreenStage>
+    );
+};
+
+const switchViewsPlay = (reduced) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const breadcrumb = canvas.getByRole('navigation', { name: 'Breadcrumb' });
+    await expect(canvas.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true');
+    await expect(canvas.getByRole('heading', { name: 'Current goals' })).toBeInTheDocument();
+
+    const sessionsTab = canvas.getByRole('tab', { name: 'Sessions' });
+    await userEvent.click(sessionsTab);
+    const stage = canvasElement.querySelector('[data-slide-views]');
+    const tabsRoot = canvasElement.querySelector('.plus-tabs');
+
+    if (reduced) {
+        await expect(stage, 'reduced motion never slides').not.toHaveAttribute('data-view-phase', 'sliding');
+        await expect(tabsRoot, 'indicator does not glide under reduced motion').not.toHaveAttribute('data-gliding', 'true');
+    } else {
+        await expect(tabsRoot, 'tab indicator glides on spatial.fast').toHaveAttribute('data-gliding', 'true');
+        await expect(stage, 'both peer bodies slide together').toHaveAttribute('data-view-phase', 'sliding');
+        const current = stage.querySelector('[data-view-role="current"]');
+        const previous = stage.querySelector('[data-view-role="previous"]');
+        await expect(previous, 'previous body stays mounted while sliding').not.toBeNull();
+        await expect(getComputedStyle(current).opacity, 'peer views never fade while sliding').toBe('1');
+        await expect(getComputedStyle(previous).opacity, 'outgoing peer view never fades while sliding').toBe('1');
+    }
+
+    await waitFor(() => expect(stage).toHaveAttribute('data-view-phase', 'settled'));
+    await expect(sessionsTab).toHaveAttribute('aria-selected', 'true');
+    await expect(canvas.getByRole('heading', { name: 'This month' })).toBeInTheDocument();
+    await expect(within(breadcrumb).getAllByRole('link').map((a) => a.textContent), 'breadcrumb stays unchanged').toEqual(['Students']);
+
+    sessionsTab.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await waitFor(() => expect(canvas.getByRole('tab', { name: 'Notes' })).toHaveAttribute('aria-selected', 'true'));
+    await waitFor(() => expect(stage).toHaveAttribute('data-view-phase', 'settled'));
+    await expect(canvas.getByRole('heading', { name: 'Tutor notes' })).toBeInTheDocument();
+};
+
+export const MotionSwitchViews = {
+    name: 'Navigation motion: Switch views',
+    decorators: [motionOn],
+    render: () => <SwitchViewsDemo />,
+    play: switchViewsPlay(false),
+};
+
+export const MotionSwitchViewsReduced = {
+    name: 'Navigation motion: Switch views, reduced',
+    decorators: [motionOff],
+    render: () => <SwitchViewsDemo />,
+    play: switchViewsPlay(true),
+};
+
+const ScrollSpotDemo = () => (
+    <ScreenStage width={FRAME_LAYOUT.dockMin} fluid>
+        <BrowserWindow address="app.plus.org/sessions/oct-14" height={WINDOW_HEIGHT}>
+            <Frame>
+                <Page padding="none">
+                    <DemoPageHeader
+                        breadcrumb={[{ text: 'Sessions', href: '#sessions' }, { text: 'Oct 14 · Maya Rodriguez' }]}
+                        title="Oct 14 · Maya Rodriguez"
+                        description="Grade 8 · Math · 60 minutes"
+                    />
+                    <nav aria-label="On this page" style={{ display: 'flex', gap: 'var(--inline-lg)', paddingBlock: 'var(--stack-sm)' }}>
+                        <Link href="#spot-overview">Overview</Link>
+                        <Link href="#spot-practice">Practice</Link>
+                        <Link href="#spot-escalation">Escalation</Link>
+                    </nav>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
+                        <PatternSection id="spot-overview" title="Overview">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', minBlockSize: 'var(--height-500)' }}>
+                                <PatternCard title="Goal check-in" description="Started with two warm-up problems on linear expressions." />
+                                <PatternCard title="Attendance" description="Arrived on time and stayed for the full hour." />
+                            </div>
+                        </PatternSection>
+                        <PatternSection id="spot-practice" title="Practice">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', minBlockSize: 'var(--height-500)' }}>
+                                <PatternCard title="Guided set" description="Completed four of five word problems independently." />
+                                <PatternCard title="Exit check" description="Paused on negative coefficients." />
+                            </div>
+                        </PatternSection>
+                        <PatternSection id="spot-escalation" title="Escalation">
+                            <PatternCard title="Supervisor follow-up" description="Share curriculum packet for negative rational numbers before Tuesday." />
+                        </PatternSection>
+                        <PatternSection id="spot-next" title="Next steps">
+                            <div style={{ minBlockSize: 'var(--height-500)' }}>
+                                <PatternCard title="Thursday plan" description="Revisit two-step inequalities with number lines." />
+                            </div>
+                        </PatternSection>
+                    </div>
+                </Page>
+            </Frame>
+        </BrowserWindow>
+    </ScreenStage>
+);
+
+const scrollSpotPlay = (reduced) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const surface = canvasElement.querySelector('.plus-frame__surface');
+    const target = canvasElement.querySelector('#spot-escalation');
+    await expect(surface.scrollTop).toBe(0);
+    await expect(target).not.toHaveAttribute('data-call-attention');
+
+    await userEvent.click(canvas.getByRole('link', { name: 'Escalation' }));
+
+    if (reduced) {
+        await expect(surface, 'reduced motion does not travel through intermediate scroll positions').not.toHaveAttribute('data-scroll-phase', 'scrolling');
+        await expect(surface.scrollTop, 'lands immediately at the spot').toBeGreaterThan(100);
+        await expect(target, 'reduced motion marks the destination too').toHaveAttribute('data-call-attention');
+    } else {
+        await expect(surface, 'scrolls smoothly on spatial.slow').toHaveAttribute('data-scroll-phase', 'scrolling');
+        await waitFor(() => expect(surface).not.toHaveAttribute('data-scroll-phase'), { timeout: 4000 });
+        await expect(surface.scrollTop, 'arrived at the spot').toBeGreaterThan(100);
+        await expect(target, 'Call attention marks the destination on arrival').toHaveAttribute('data-call-attention');
+    }
+
+    await expect(canvasElement.ownerDocument.activeElement, 'focus moves to the destination').toBe(target);
+    await waitFor(() => expect(target, 'Call attention plays once and ends unmarked').not.toHaveAttribute('data-call-attention'), { timeout: 4000 });
+};
+
+export const MotionScrollToSpot = {
+    name: 'Navigation motion: Scroll to a spot',
+    decorators: [motionOn],
+    render: () => <ScrollSpotDemo />,
+    play: scrollSpotPlay(false),
+};
+
+export const MotionScrollToSpotReduced = {
+    name: 'Navigation motion: Scroll to a spot, reduced',
+    decorators: [motionOff],
+    render: () => <ScrollSpotDemo />,
+    play: scrollSpotPlay(true),
 };

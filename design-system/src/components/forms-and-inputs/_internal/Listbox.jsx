@@ -8,11 +8,11 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import Spinner from '@/components/loading/Spinner/Spinner';
 import OptionRow from './OptionRow';
-import { popupLayerOf, useAnchoredPopup } from './anchorPlacement';
+import AnchoredListboxSurface from './AnchoredListboxSurface';
+import { normalizeOption } from './optionShape';
 import Icon from '../../images-and-icons/Icon';
 import './Listbox.scss';
 
@@ -22,34 +22,6 @@ export const VIRTUALIZE_ABOVE = 100;
 const OVERSCAN = 6;
 /** A row's height before one has been measured. */
 const FALLBACK_ROW_HEIGHT = 36;
-
-/**
- * One shape for every option, whether the caller passed a string or an object.
- *
- * @param {string|object} option
- * @param {number} index Its place in the caller's array, which keeps its id stable while filtering.
- * @returns {{ value: *, label: *, text: string, description?: *, disabled: boolean, group?: string, elemBefore?: *, elemAfter?: *, index: number, source: * }}
- */
-const normalize = (option, index) => {
-    if (typeof option === 'string' || typeof option === 'number') {
-        return { value: option, label: option, text: String(option), disabled: false, index, source: option };
-    }
-    const label = option.label ?? option.text ?? String(option.value);
-    return {
-        value: option.value ?? label,
-        label,
-        text: typeof label === 'string' ? label : String(option.value ?? ''),
-        description: option.description,
-        disabled: Boolean(option.disabled),
-        group: option.group,
-        elemBefore: option.elemBefore,
-        elemAfter: option.elemAfter,
-        dragging: Boolean(option.dragging),
-        dropIndicator: option.dropIndicator,
-        index,
-        source: option,
-    };
-};
 
 /** Text fields keep their own Space, Home and End. */
 const isTextEntry = (target) => target instanceof HTMLElement
@@ -128,7 +100,7 @@ const Listbox = ({
     );
 
     /* ---------- the rows: filtered options, then the Create row ---------- */
-    const all = useMemo(() => options.map(normalize), [options]);
+    const all = useMemo(() => options.map(normalizeOption), [options]);
     const query = filter.trim().toLowerCase();
     const shown = useMemo(
         () => (query ? all.filter((option) => option.text.toLowerCase().includes(query)) : all),
@@ -245,9 +217,6 @@ const Listbox = ({
     /* ---------- placement ---------- */
     const surfaceRef = useRef(null);
     const bodyRef = useRef(null);
-    // Placed against the field; a press outside the field and the list closes it.
-    const place = useAnchoredPopup({ open, anchorRef, popupRef: surfaceRef, align, onClose });
-
     /* ---------- the row's own controls ---------- */
     // Drawn over one row, beside the listbox rather than inside it: an option's
     // children are presentational, so a button in one would be lost to a
@@ -394,27 +363,16 @@ const Listbox = ({
     }
 
     const standalone = !anchorRef;
-    const surfaceClasses = [
-        'plus-listbox',
-        embedded ? 'plus-listbox--embedded' : '',
-        anchorRef ? 'plus-listbox--floating' : '',
-        className,
-    ].filter(Boolean).join(' ');
-
     const surface = (
-        <div
-            ref={surfaceRef}
-            className={surfaceClasses}
-            data-placement={anchorRef ? place?.placement ?? 'bottom' : undefined}
-            style={anchorRef ? {
-                top: place?.top ?? 0,
-                left: place?.left ?? 0,
-                minWidth: place?.minWidth,
-                visibility: place ? undefined : 'hidden',
-                ...style,
-            } : style}
-            // Keep focus in the field while a row is pressed.
-            onMouseDown={anchorRef ? (event) => event.preventDefault() : undefined}
+        <AnchoredListboxSurface
+            open={open}
+            anchorRef={anchorRef}
+            align={align}
+            onClose={onClose}
+            surfaceRef={surfaceRef}
+            preserveFieldFocus
+            className={[embedded ? 'plus-listbox--embedded' : '', className].filter(Boolean).join(' ')}
+            style={style}
         >
             {header && <div className="plus-listbox-header">{header}</div>}
             <div
@@ -467,12 +425,12 @@ const Listbox = ({
                 )}
             </div>
             {footer && <div className="plus-listbox-footer">{footer}</div>}
-        </div>
+        </AnchoredListboxSurface>
     );
 
     return (
         <>
-            {open && (anchorRef ? createPortal(surface, popupLayerOf(anchorRef)) : surface)}
+            {surface}
             <div className="visually-hidden" role="status" aria-live="polite">{open ? announcement : ''}</div>
         </>
     );

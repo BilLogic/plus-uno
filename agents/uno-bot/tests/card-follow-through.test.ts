@@ -487,6 +487,30 @@ describe("F3: a to-do to make a card", () => {
     assert.ok(later.posts.every((p) => p.channel === SANDBOX && p.threadTs === ROOT));
   });
 
+  it("found in a channel that relays to #plus-design, is asked at #plus-design's top, linking back to its thread", async () => {
+    const FEEDBACK = "G0FEEDBACK";
+    const store = createInMemoryCommitmentStore();
+    const provider = fakeProvider({
+      generateReplies: [JSON.stringify({ todos: [{ message_ts: TODO, assignee: MAYA, what: "the facelift last stage", confidence: 0.9 }] })],
+    });
+    await recordThreadCardTodos({ ...todoThread, channel: FEEDBACK, channelKind: "private" }, ts(29, 0), {
+      detector: modelCardTodoDetector(provider),
+      store,
+      config: { ...CONFIG, relayToDesign: [FEEDBACK] },
+      now: () => EOD,
+      runDate: utcDay(EOD),
+    });
+    const m = morning(store, roadmap({ titles: ["Facelift kickoff"] }), at(32, 13));
+    await m.run();
+    assert.deepEqual(m.posts.map((p) => [p.channel, p.threadTs]), [[DESIGN, null]]);
+    const [c] = m.posts[0]!.cards;
+    assert.equal(c!.subtitle!.text, "<@U0MAYA> · from a thread");
+    assert.ok(c!.actions[1]!.url!.includes(`/archives/${FEEDBACK}/p${TODO.replace(".", "")}`), "Open source goes to the feedback thread");
+    assert.deepEqual(m.marked, [], "#plus-design's top is not the team's thread");
+    const op = m.staged[0]!.operations![0]!;
+    assert.match(String(op.input.summary), /a Slack thread \(/);
+  });
+
   it("a running note's to-do with nobody named mentions the note's takers, in #plus-design", async () => {
     const store = createInMemoryCommitmentStore();
     await recordNoteCardTodos(

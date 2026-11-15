@@ -9,7 +9,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 **New here, any role** → [`README.md`](README.md) → [`SETUP.md`](SETUP.md) → [`GLOSSARY.md`](GLOSSARY.md)
 
-**Designer building UI** → [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) → [`design-system/agent-views/components/index.md`](design-system/agent-views/components/index.md) → [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md)
+**Designer building UI** → [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) → [`design-system/agent-views/components/index.md`](design-system/agent-views/components/index.md) → [`design-system/agent-views/templates/TemplatesOverview.md`](design-system/agent-views/templates/TemplatesOverview.md)
 
 **Agent, any task** → [`AGENTS.md`](AGENTS.md) → [`INDEX.md`](INDEX.md)
 
@@ -87,20 +87,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input or button to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
-| [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status tag, Date tag, Count tag, Change tag, Tag, Smart tag, TagGroup and Suggestion — and how to choose between them |
-| [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | The remaining container components sorted by what is being contained |
-| [`design-system/guidelines/components/loading.md`](design-system/guidelines/components/loading.md) | ProgressBar, Skeleton, Spinner or GenerativeBorder — showing work in flight |
-| [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | SectionMessage, Flag or Modal — choosing by how long the message lives and whether it blocks |
-| [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Five navigation components sorted by what the user is moving between |
-| [`design-system/guidelines/components/overlays-and-layering.md`](design-system/guidelines/components/overlays-and-layering.md) | Tooltip or Popup — hover description versus click-triggered content, and where every popup opens |
-| [`design-system/guidelines/components/overview.md`](design-system/guidelines/components/overview.md) | What each component is for, when to reach for it, and how it composes |
-| [`design-system/guidelines/composition/form-behavior.md`](design-system/guidelines/composition/form-behavior.md) | How a PLUS form behaves — when it validates, how errors surface on submit, required fields, disabled vs read-only, unsaved changes, dependent fields, and subtle vs standard fields |
-| [`design-system/guidelines/composition/forms.md`](design-system/guidelines/composition/forms.md) | How PLUS form elements compose inside surfaces |
-| [`design-system/guidelines/composition/hierarchy.md`](design-system/guidelines/composition/hierarchy.md) | Every PLUS surface sits at one of four context levels |
-| [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md) | If you are building a full page (like a dashboard, student list, or toolkit), you MUST build it on a template — the Frame with the PLUS Sidebar and a breadcrumb |
-| [`design-system/guidelines/composition/overview.md`](design-system/guidelines/composition/overview.md) | How components combine |
-| [`design-system/guidelines/composition/surfaces.md`](design-system/guidelines/composition/surfaces.md) | Cards, tables, modals, and the empty and loading states they fall into |
 | [`design-system/guidelines/documentation-ia.md`](design-system/guidelines/documentation-ia.md) | The documentation IA contract — the shared tree Storybook titles, repo folders and Figma all speak, plus the MDX page shell. |
 | [`design-system/guidelines/figma/component-alignment.md`](design-system/guidelines/figma/component-alignment.md) | How to keep Figma component instances and PLUS code imports (@/components/) consistent when implementing designs in Cursor or writing prototypes back to Figma |
 | [`design-system/guidelines/figma/mcp-guide.md`](design-system/guidelines/figma/mcp-guide.md) | The registry load gate is design-system/guidelines/figma/registry-load-gate.md — MANDATORY, registries first, not restated here |
@@ -109,15 +95,13 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/figma/parity-2026-07.md`](design-system/guidelines/figma/parity-2026-07.md) | Full-inventory sweep across both Figma files and the Storybook docs after the IA overhaul and BS4 library publish |
 | [`design-system/guidelines/figma/registry-load-gate.md`](design-system/guidelines/figma/registry-load-gate.md) | Agents MUST read both files below before |
 | [`design-system/guidelines/figma/token-mapping.md`](design-system/guidelines/figma/token-mapping.md) | For quick machine lookups, agents may read token-registry.json (read-only); use this doc for the authoritative tables, extended cases, and notes |
-| [`design-system/guidelines/foundations/content/date-and-time.md`](design-system/guidelines/foundations/content/date-and-time.md) | How dates, times, durations, and time zones are written in the product |
-| [`design-system/guidelines/foundations/content/inclusive-language.md`](design-system/guidelines/foundations/content/inclusive-language.md) | Words to prefer and words to retire, so copy reads as written for everyone |
-| [`design-system/guidelines/foundations/content/language-and-grammar.md`](design-system/guidelines/foundations/content/language-and-grammar.md) | Active voice, contractions, sentence case, and the punctuation conventions product copy follows |
-| [`design-system/guidelines/foundations/content/message-design.md`](design-system/guidelines/foundations/content/message-design.md) | Error, warning, success, and empty-state copy — what each says and how long it runs |
-| [`design-system/guidelines/foundations/content/overview.md`](design-system/guidelines/foundations/content/overview.md) | Product copy rules |
-| [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | Warm, direct, encouraging |
+| [`design-system/guidelines/foundations/content/language.md`](design-system/guidelines/foundations/content/language.md) | Words, people, sentences and mechanics for product copy |
+| [`design-system/guidelines/foundations/content/messages.md`](design-system/guidelines/foundations/content/messages.md) | Message anatomy, type to component, and how to write each type |
+| [`design-system/guidelines/foundations/content/overview.md`](design-system/guidelines/foundations/content/overview.md) | Product copy rules, one file per Brand › Content page |
+| [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | The four voice words, when to dial them, and tone by reader |
 | [`design-system/guidelines/foundations/data-visualization.md`](design-system/guidelines/foundations/data-visualization.md) | A chart's foundations other than color come from the same component tokens as the rest of the design system |
 | [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fifteen foundations, in the order they are documented |
-| [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | says where design knowledge lives |
+| [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | The staged build — Template, Blocks, Pieces, Polish, Motion — and where each stage's answer comes from |
 
 ## Engineering
 
@@ -126,6 +110,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/engineering/coding.md`](docs/engineering/coding.md) | How to write code in this repo — barrel imports, tokens over literals, styling conventions, and what not to reach for. |
 | [`docs/engineering/ds-usage-rules.md`](docs/engineering/ds-usage-rules.md) | The escape rules `check:ds-usage` holds consumer code to — one section per rule ID, each saying what fails and what to write instead. |
 | [`docs/engineering/foundation-docs.md`](docs/engineering/foundation-docs.md) | Code-side notes behind the Foundations docs pages — the checks, helpers and generated files a designer page does not carry. |
+| [`docs/engineering/local-components.md`](docs/engineering/local-components.md) | The reuse ladder (use, arrange, local component, core candidate) and when a prototype builds a local piece on PLUS components and Base UI. |
 | [`docs/engineering/measurement-window.md`](docs/engineering/measurement-window.md) | How to run uno-bot's measurement window each week and close it — the five numbers, where each comes from, where it is recorded, and what stays private. |
 | [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, owner and a link to its home. |
 | [`docs/engineering/setup.md`](docs/engineering/setup.md) | Aliases, package structure, prototype conventions, token workflow, local preview. |
@@ -177,25 +162,31 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/028-a-tier-is-model-plus-thinking-level-moving-together.md`](docs/adr/028-a-tier-is-model-plus-thinking-level-moving-together.md) | On the Gemini lane a tier is one named configuration of model PLUS thinking level — chill low, default medium, grind high — reversing the 2026-08-07 call to pin one dial; attribution comes from changing one tier at a time (2026-09-04) |
 | [`docs/adr/029-in-place-block-replacement-behind-the-gate.md`](docs/adr/029-in-place-block-replacement-behind-the-gate.md) | uno-bot may rewrite a named Notion block in place — keyed by a block id plus the last-edited stamp seen at read, behind the ✅ gate — relaxing the append-only rule that made every correction a contradicting section at the bottom of the page (2026-09-15) |
 | [`docs/adr/030-the-usage-record-lives-in-d1-not-analytics-engine.md`](docs/adr/030-the-usage-record-lives-in-d1-not-analytics-engine.md) | uno-bot's per-turn usage record is a D1 (SQLite) database, uno-bot-usage, rather than Workers Analytics Engine — rows are updated after the turn, every metric is re-runnable SQL, and nothing may be sampled or expire mid-window; with what the database is for and what it never stores (2026-09-29) |
-| [`docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md`](docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md) | A scheduled run has no requester whose visibility bounds it, so each finding's own evidence does — a private channel's finding stays in it, a group DM's goes back to it and leaves only as a reworded note on a separate share card someone there ✅s, and mixed evidence is private (2026-09-29); a file in one of the six PLUS Figma teams counts like a public design channel (amended 2026-09-30, #891); a finding with no thread goes to its team's channel, by the card's pillar else the Figma file's team, before #plus-design (amended 2026-10-14); it names only a design owner active on Team Members, never a Figma file's creator (amended 2026-10-19, #1361) |
+| [`docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md`](docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md) | A scheduled run has no requester whose visibility bounds it, so each finding's own evidence does — a private channel's finding stays in it, a group DM's goes back to it and leaves only as a reworded note on a separate share card someone there ✅s, and mixed evidence is private (2026-09-29); a file in one of the six PLUS Figma teams counts like a public design channel (amended 2026-09-30, #891); a finding with no thread goes to its team's channel, by the card's pillar else the Figma file's team, before #plus-design (amended 2026-10-14); it names only a design owner active on Team Members, never a Figma file's creator (amended 2026-10-19, #1361); a relayed channel (#plus-design-feedback) posts to #plus-design (2026-11-13). |
 | [`docs/adr/032-a-cron-may-read-with-a-persons-own-token-only-for-them.md`](docs/adr/032-a-cron-may-read-with-a-persons-own-token-only-for-them.md) | A scheduled job with no requester may read with a person's own Slack token only after that person opted in, only after the live token's granted scopes check out, and only to tell that person — in their DM with uno-bot, never anyone else — keeping a permalink, a due time and a state and nothing of the message (2026-09-30) |
 | [`docs/adr/033-bot-skills-live-with-the-worker.md`](docs/adr/033-bot-skills-live-with-the-worker.md) | uno-bot's instructions are its own bot skills, kept with the Worker and named for what the bot does, each ending in answer, file or hand off; the six uno skills become IDE-only, and the bot never builds code or draws in Figma (2026-10-14) |
 | [`docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md`](docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md) | uno-bot writes approved blueprint revisions itself, through the authoring RPCs under its own rpc_writer identity, all or none, on a ✅ from a confirmer the card names; it may delete through the delete RPCs, and every row it causes in authoring_changes reads author uno-bot; writers/blueprint becomes the IDE writer plus the Worker's gated writer (2026-10-15) |
 | [`docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md`](docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md) | PLUS colors follow Atlassian's token grammar under --ds- (semantic) and --palette- (primitive), generated in the repo from plan files that hold primitive values only; a plan swaps without touching the semantic layer, and a parity check enforces it (2026-10-25) |
-| [`docs/adr/036-base-ui-for-ai-components.md`](docs/adr/036-base-ui-for-ai-components.md) | PLUS AI components use Base UI (@base-ui/react, pinned) as their headless behavior layer, styled with SCSS on --ds-* tokens; Assistant UI is gone, and the rest of product UI stays on React-Bootstrap (2026-11-03) |
+| [`docs/adr/036-base-ui-for-ai-components.md`](docs/adr/036-base-ui-for-ai-components.md) | PLUS AI components use Base UI (@base-ui/react, pinned) as their headless behavior layer, styled with SCSS on --ds-* tokens; Assistant UI is gone, later widened by ADR-037 and corrected by ADR-042 to remove Bootstrap (2026-11-03) |
 | [`docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md`](docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md) | Base UI (@base-ui/react, pinned per ADR-036) is the headless behavior layer for every interactive PLUS component, not just AI surfaces; supersedes ADR-009, widens ADR-036 (2026-11-03) |
 | [`docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md`](docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md) | Space, size, radius, border width, typography and motion become generated from plans this repo owns, the way ADR-035 generates color — Figma downstream, PLUS ×16 numbering kept, one token ladder with the old vocabulary deleted |
 | [`docs/adr/039-one-checker-defines-an-escape.md`](docs/adr/039-one-checker-defines-an-escape.md) | One deterministic checker, check:ds-usage, defines an escape from the design system; the hook, CI, the prototype exit, ds-lens and the usage eval all call it, and AI review advises while the checker blocks |
-| [`docs/adr/040-agent-view-is-the-fourth-component-tab.md`](docs/adr/040-agent-view-is-the-fourth-component-tab.md) | Component docs pages gain a 4th tab, Agent view, that shows the component's generated file byte for byte through one raw glob in the tabs module; amends ADR-025, whose tabs were a human affordance only (2026-11-08) |
+| [`docs/adr/040-agent-view-is-the-fourth-component-tab.md`](docs/adr/040-agent-view-is-the-fourth-component-tab.md) | Component docs pages gain a 4th tab, Agent view (now labeled Harness), that shows the component's generated file byte for byte through one raw glob in the tabs module; amends ADR-025, whose tabs were a human affordance only (2026-11-08) |
 | [`docs/adr/041-motion-is-springs-on-four-tiers.md`](docs/adr/041-motion-is-springs-on-four-tiers.md) | Motion is springs only, on four tiers (primitives, semantics, patterns and components); Expressive is a container switch, Reduced is a fade, Figma holds no motion tokens; supersedes the motion half of ADR-038 |
 | [`docs/adr/042-plus-ships-no-bootstrap.md`](docs/adr/042-plus-ships-no-bootstrap.md) | PLUS ships no Bootstrap — the bootstrap and react-bootstrap packages, the Bootstrap CSS layer, the generated Bootstrap color bridge and their checks are gone; a small element baseline in main.scss keeps what components relied on; completes ADR-037 and retires ADR-009 (2026-11-11) |
 | [`docs/adr/043-sound-is-synthesized-on-the-motion-registry.md`](docs/adr/043-sound-is-synthesized-on-the-motion-registry.md) | Sound is synthesized in the browser from a repo plan, behind one switch, and plays only where motion lands an Expressive moment, named by a sound cell on the motion registry; the always-silent list never plays |
+| [`docs/adr/044-a-panel-floats-without-a-backdrop.md`](docs/adr/044-a-panel-floats-without-a-backdrop.md) | A floating Panel keeps the page usable; Modal owns the Backdrop and modal focus behavior; Drawer is retired. |
+| [`docs/adr/045-radius-follows-role-not-size.md`](docs/adr/045-radius-follows-role-not-size.md) | Radius tokens follow a corner’s role and nesting; controls follow their height, and templates own a radius token. |
+| [`docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md`](docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md) | Pragmatic drag and drop owns pointer drag; Base UI supplies the grab handle and Motion supplies spring travel. |
+| [`docs/adr/047-the-design-system-ships-outside-the-repo.md`](docs/adr/047-the-design-system-ships-outside-the-repo.md) | The design system ships outside the repo as one package, @plus-uno/cli, a copy-in registry plus the ds lookup and MCP over one baked snapshot. |
+| [`docs/adr/048-agents-build-in-stages-and-a-ds-fact-has-one-home.md`](docs/adr/048-agents-build-in-stages-and-a-ds-fact-has-one-home.md) | Agents build a screen in five stages (Template, Blocks, Pieces, Polish, Motion) and each design-system fact has one authored home; guidelines/composition/ is retired. |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
 
 | Doc | Summary |
 |-----|---------|
+| [`docs/conventions/design-system-glossary.md`](docs/conventions/design-system-glossary.md) | Design-system vocabulary — load for component, pattern, token, motion and sound terms |
 | [`docs/conventions/writing.md`](docs/conventions/writing.md) | How agents and humans write long-form prose and findings pages here. |
 
 ## Rubrics and golden scenarios
@@ -218,6 +209,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-147 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+138 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

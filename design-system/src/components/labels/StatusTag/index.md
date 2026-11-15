@@ -8,6 +8,10 @@ Also asked as: lozenge, pill, state label.
 
 **Import:** `import { StatusTag } from '@/components';`
 
+**Used in:** Panel (`ds guide panel`)
+
+**Governed by:** Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/labels/StatusTag/StatusTag.jsx`
 
 **Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — Styles, WithCount, TrailingMetricAppearance, IconBefore, Truncation, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
@@ -20,13 +24,8 @@ Use `StatusTag` for the condition something is in when that condition can change
 completed, needs review, missed, in progress. It is the same component whether
 the system calculated the state or a person set it.
 
-- **Is it a number?** Count tag.
-- **Is it a due or event date?** Date tag.
-- **Is it the condition something is in, and can that condition change?** Status tag.
-- **Otherwise** (a subject, a person, a category): Tag.
-
-Use `spacing="default"` (20) in rows, lists, tables and sentences, and
-`spacing="spacious"` (32) beside a heading.
+Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
+`spacing="spacious"` (`32`) beside a heading.
 
 ### Appearance guidance
 
@@ -39,13 +38,20 @@ Use `spacing="default"` (20) in rows, lists, tables and sentences, and
 | Info | In progress. Example: "In progress". |
 | Discovery | New. |
 
+## Alternatives
+
+- For a number on its own, use `CountTag`.
+- For a due or event date, use `DateTag`.
+- For a change over time such as "+3 vs last week", use `ChangeTag`.
+- For a category or subject or person, use `Tag` or `SmartTag`.
+
 ## Best practices
 
 ### Match the appearance to the meaning. {#match-the-appearance-to-the-meaning}
 
 Color carries the verdict, so success never labels a problem. Each appearance
 means one thing (see the guidance above). There is no color prop; a category
-with a color is a Tag.
+with a color is a `Tag`.
 
 Do: Success for a finished thing.
 Don't: Danger on a finished thing.
@@ -78,9 +84,9 @@ success status with a danger count of failures.
 ### Edit in the field, not on the label. {#edit-in-the-field-not-on-the-label}
 
 A Status tag never opens a menu. Where a status can be changed, the field around
-it becomes an inline Dropdown whose options are grouped To do · In progress ·
-Complete · Exception · Failed, each group with one appearance (neutral · info ·
-success · warning · danger).
+it uses a `Select` whose options are grouped To do · In progress · Complete ·
+Exception · Failed, each group with one appearance (neutral · info · success ·
+warning · danger).
 
 ## Accessibility
 
@@ -91,16 +97,15 @@ success · warning · danger).
   takes focus so a keyboard user can reach the tooltip holding the full text;
   pointer users get the same tooltip on hover. The full text is always in the
   DOM, so a screen reader hears all of it.
-- **Not color alone.** A state can add a `iconBefore` where color alone is
+- **Not color alone.** A state can add `iconBefore` where color alone is
   not enough. Icons are decorative and hidden from assistive technology.
-- **An edge on any surface.** The 1px inside border keeps a pale fill visible
+- **An edge on any surface.** The inset border keeps a pale fill visible
   on white and on gray; in forced-colors mode it becomes a real border.
 
 ## Related
 
-- For a number on its own, use `CountTag`; Status tag nests one through `trailingMetric`.
-- For a due or event date, use `DateTag`.
-- For a category, a subject or a person, use `Tag` (or `SmartTag` for a SMART subject).
+- `CountTag`: use when nesting a metric inside `StatusTag` through `trailingMetric`.
+- `Select`: use when letting a person change a record's status in a form or table cell.
 
 Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `Suggestion` · `Tag` · `TagGroup`
 
@@ -108,8 +113,8 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStar
 
 1. **Icon before.** Optional: a Font Awesome Free icon by name.
 2. **Label.** The condition, in a word or two. Past `maxWidth` it ends in an ellipsis and the full text is a tooltip.
-3. **Trailing metric.** Optional: a compact Count tag nested inside, with its own appearance when it means something else.
-4. **Fill.** The appearance's tinted ground with its words and an edge one step darker.
+3. **Trailing metric.** Optional: a compact `CountTag` nested inside, with its own appearance when it means something else.
+4. **Fill.** The appearance's tinted ground with its words and an inset edge one step darker.
 
 ### States
 
@@ -166,7 +171,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-information` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-pressed` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-smart-mastering-content` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--radius-lg` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-end` · `--tag-pad-end-compact`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-information` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-pressed` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-smart-mastering-content` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--radius-control-md` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-end` · `--tag-pad-end-compact`
 
 From `design-system/src/components/labels/StatusTag/StatusTag.scss`. Override these through the token layer, never with a literal.
 

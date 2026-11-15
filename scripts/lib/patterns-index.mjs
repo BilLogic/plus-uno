@@ -56,8 +56,8 @@ export function checkPatterns(rows, { lookup, exists, required }) {
 /** The section, with doc links relative to the folder the index is written in. */
 export function renderPatterns(rows, { from, lookup }) {
   const link = (doc) => path.relative(from, doc).split(path.sep).join('/');
-  let out = `## Patterns: start a page, section, card, table or overlay here\n\n`;
-  out += `A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leaves you slots to fill. `;
+  let out = `## Templates: start a page, section, card, table or overlay here\n\n`;
+  out += `A template is a shell that owns the frame (fill, pad, radius, elevation) and leaves you slots to fill. `;
   out += `Build a page or a container from these before writing a \`div\` with its own flex or grid. `;
   out += `Each one's props are on its page (linked) and in its source.\n\n`;
   out += `| Group | Name | Import | Reach for it when |\n|---|---|---|---|\n`;
@@ -73,13 +73,13 @@ export function readPatterns(repoRoot) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, PATTERNS_FILE), 'utf8')).patterns;
 }
 
-/** The router names every pattern too; this is the line it does so in. */
-export const OVERVIEW_FILE = 'design-system/guidelines/overview.md';
+/** The component index that renders the Templates table. */
+export const OVERVIEW_FILE = 'design-system/agent-views/components/index.md';
 
 /** Every pattern the facts hold: the `@/patterns` barrel's. */
 const patternNames = (facts) => facts.manifests.components.components.filter((c) => c.kind === 'pattern').map((c) => c.name);
 
-/** The committed list, read against the real facts and the router. */
+/** The committed list, read against the real facts and the rendered index. */
 export function checkCommitted(repoRoot) {
   const rows = readPatterns(repoRoot);
   const facts = loadFacts(repoRoot);

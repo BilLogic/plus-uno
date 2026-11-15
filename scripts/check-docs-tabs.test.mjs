@@ -287,7 +287,7 @@ test('an unknown tab name is caught; Code takes only a template\'s Slots', () =>
   assert.ok(checkFile(COMPONENT, props, true).some((f) => /section "Overview" is in the "code" tab but belongs in "examples"/.test(f)));
 });
 
-test('an authored Agent view is caught — it shows the generated file, so no MDX carries agent text', () => {
+test('an authored Harness is caught — it shows the generated file, so no MDX carries agent text', () => {
   const broken = page().replace('<DocsTab tab="examples">', '<DocsTab tab="examples">\n\n</DocsTab>\n\n<DocsTab tab="agent">');
   const found = checkFile(COMPONENT, broken, true);
   assert.ok(found.some((f) => /Found: agent/.test(f)), found.join('\n'));

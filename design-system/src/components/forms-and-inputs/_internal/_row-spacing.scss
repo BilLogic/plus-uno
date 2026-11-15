@@ -1,0 +1,13 @@
+@use 'sass:map';
+
+// Shared by option and menu rows. Horizontal insets belong to each surface;
+// min-height lets a description grow past the single-line sizing floor.
+@mixin size($spacing: 'default') {
+    $steps: ('default': 'md', 'compact': 'sm');
+    @if not map.has-key($steps, $spacing) {
+        @error 'Unknown row spacing: #{$spacing}';
+    }
+    $step: map.get($steps, $spacing);
+    min-height: var(--item-height-#{$step});
+    padding-block: var(--pad-y-#{$step});
+}

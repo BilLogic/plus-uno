@@ -63,7 +63,7 @@
         font: var(--heading-small);
         border: none;
         text-align: left;
-        transition: background-color 0.2s ease, color 0.2s ease;
+        transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
         // Layout: text on left, icon on right (space-between)
         display: flex;
         align-items: center;
@@ -80,7 +80,7 @@
             font-size: var(--icon-md);
             color: var(--ds-text-subtle);
             transform: rotate(0deg);
-            transition: transform 0.2s ease;
+            transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
             margin-left: auto; // Push to right
             flex-shrink: 0;
         }

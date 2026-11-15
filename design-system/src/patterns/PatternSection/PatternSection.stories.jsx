@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
     Button,
@@ -25,6 +26,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { FilterSide, STUDENTS, StudentsTable, ViewBar, row } from '@/storybook-docs/lib/view-bar.jsx';
 import { iconClass } from '../../lib/icon';
+import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 const col = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)' };
 
@@ -74,8 +76,12 @@ const StatCard = ({ title, body }) => (
     </PatternCard>
 );
 
+/** These stories read settled layouts, so the Frame's space motion is held off; its own motion stories live in Frame.stories. */
+const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>;
+
 export default {
-    title: 'Templates/Section/Section',
+    decorators: [settledLayout],
+    title: 'Templates/Section',
     component: PatternSection,
     tags: ['!dev', '!autodocs'],
     argTypes: {
@@ -780,7 +786,7 @@ export const TypeQueue = {
         const [index, setIndex] = useState(0);
         const [name, grade] = STUDENTS[index];
         return (
-            <div style={{ inlineSize: STAGE }}>
+            <ScreenStage width={STAGE}>
                 <PatternSection
                     title="Reflections to review"
                     tabs={<ViewBar views={['To review']} primary={null} />}
@@ -795,7 +801,7 @@ export const TypeQueue = {
                 >
                     <StudentsTable count={4} />
                 </PatternSection>
-            </div>
+            </ScreenStage>
         );
     },
 };
@@ -1072,7 +1078,7 @@ const FilterSideSection = () => {
 /** Filter side at the start, when filtering is the main job. */
 export const FilterSideAtStart = {
     name: 'Filter side at the start',
-    render: () => <div style={{ inlineSize: STAGE }}><FilterSideSection /></div>,
+    render: () => <ScreenStage width={STAGE}><FilterSideSection /></ScreenStage>,
 };
 
 /** The Section's width, as a control: drag through 960 and 768. */

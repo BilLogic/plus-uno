@@ -234,6 +234,8 @@ export function sweepHarness(opts: {
   pageSize?: number;
   /** `SLACK_SEARCH_PRIVATE_ALLOWLIST`: the private channels the sweep may read. */
   privateAllowlist?: string[];
+  /** `SWEEP_RELAY_TO_DESIGN`: channels whose findings go to #plus-design. */
+  relayToDesign?: string[];
   /** The group DMs uno-bot is in, as the bot's own conversation list names
    *  them; null when that list cannot be read. Unset, none. */
   groupDms?: string[] | null;
@@ -609,6 +611,7 @@ export function sweepHarness(opts: {
       roadmapDb: ROADMAP_DB,
       teamSurfaceDbs: [ROADMAP_DB],
       ...(opts.privateAllowlist ? { privateAllowlist: opts.privateAllowlist } : {}),
+      ...(opts.relayToDesign ? { relayToDesign: opts.relayToDesign } : {}),
     },
     meter: { subrequests: () => 0, d1Queries: () => 0, headroom: () => ({ ...headroom }) },
     now: () => clock.now,

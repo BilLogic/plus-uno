@@ -6,6 +6,33 @@ import chartTheme, { CHART_ANIMATION_DURATION_MS, CHART_BAR_RADIUS } from '@/dat
 import { seriesColor } from '@/dataviz/palette';
 
 /**
+ * The two Highcharts axes for a bar or column chart. Categories always sit on `xAxis` and values on
+ * `yAxis`, whichever way the bars point; `horizontal` only decides which switches and limits apply.
+ */
+export const buildBarAxes = ({
+    horizontal, categories, yAxisLabel, yAxisMax, xAxisMax, yAxisTickPositions, hideXAxisLabels, hideYAxisLabels
+}) => {
+    const valueMax = horizontal ? xAxisMax : yAxisMax;
+    const hideCategoryLabels = horizontal ? hideYAxisLabels : hideXAxisLabels;
+    const hideValueLabels = horizontal ? hideXAxisLabels : hideYAxisLabels;
+    return {
+        xAxis: {
+            ...chartTheme.xAxis,
+            categories,
+            labels: { ...chartTheme.xAxis.labels, enabled: !hideCategoryLabels }
+        },
+        yAxis: {
+            ...chartTheme.yAxis,
+            ...(horizontal && { min: 0 }),
+            title: { ...chartTheme.yAxis.title, text: horizontal ? undefined : yAxisLabel },
+            ...(valueMax !== undefined && { max: valueMax }),
+            ...(yAxisTickPositions && { tickPositions: yAxisTickPositions }),
+            labels: { ...chartTheme.yAxis.labels, enabled: !hideValueLabels }
+        }
+    };
+};
+
+/**
  * BarChart Component
  * Basic Column or Bar chart for categorical comparison.
  * Supports compact/spark mode (showLegend, yAxisMax, xAxisMax, hideXAxisLabels).
@@ -34,35 +61,11 @@ const BarChart = ({
         color: s.color || seriesColor(i, all.length)
     })), [series]);
 
-    // Column: xAxis = categories, yAxis = values. Bar (horizontal): xAxis = values, yAxis = categories.
-    const xAxisConfig = useMemo(() => horizontal
-        ? {
-            ...chartTheme.xAxis,
-            min: 0,
-            ...(xAxisMax !== undefined && { max: xAxisMax }),
-            categories: undefined,
-            labels: { ...chartTheme.xAxis.labels, enabled: !hideXAxisLabels }
-        }
-        : {
-            ...chartTheme.xAxis,
-            categories: categories,
-            labels: { ...chartTheme.xAxis.labels, enabled: !hideXAxisLabels }
-        }, [horizontal, xAxisMax, hideXAxisLabels, categories]);
-
-    const yAxisConfig = useMemo(() => horizontal
-        ? {
-            ...chartTheme.yAxis,
-            categories: categories,
-            reversed: false,
-            labels: { ...chartTheme.yAxis.labels, enabled: !hideYAxisLabels }
-        }
-        : {
-            ...chartTheme.yAxis,
-            title: { ...chartTheme.yAxis.title, text: yAxisLabel },
-            ...(yAxisMax !== undefined && { max: yAxisMax }),
-            ...(yAxisTickPositions && { tickPositions: yAxisTickPositions }),
-            labels: { ...chartTheme.yAxis.labels, enabled: !hideYAxisLabels }
-        }, [horizontal, categories, hideYAxisLabels, yAxisLabel, yAxisMax, yAxisTickPositions]);
+    // Highcharts keeps categories on `xAxis` for both types; `bar` only turns the chart on its side.
+    // The label switches name the axis as drawn: `hideXAxisLabels` is the one along the bottom.
+    const { xAxis: xAxisConfig, yAxis: yAxisConfig } = useMemo(() => buildBarAxes({
+        horizontal, categories, yAxisLabel, yAxisMax, xAxisMax, yAxisTickPositions, hideXAxisLabels, hideYAxisLabels
+    }), [horizontal, categories, yAxisLabel, yAxisMax, xAxisMax, yAxisTickPositions, hideXAxisLabels, hideYAxisLabels]);
 
     const options = useMemo(() => ({
         ...chartTheme,

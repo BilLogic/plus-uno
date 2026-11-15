@@ -8,13 +8,17 @@ Also asked as: callout, inline alert, warning box.
 
 **Import:** `import { SectionMessage } from '@/components';`
 
+**Used in:** Form (`ds guide form`)
+
+**Governed by:** Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/messaging/SectionMessage/SectionMessage.jsx`
 
 **Stories:** `design-system/src/components/messaging/SectionMessage/SectionMessage.stories.jsx` — Primary, Secondary, Success, Danger, Warning, Info, Content, Overview, Interactive, DismissPlacement, LeadingIcon, GroundAndText, Actions, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/SectionMessage/SectionMessage.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -49,6 +53,13 @@ SectionMessage reads these motion tokens and no literal duration or curve.
 | enter | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Makes room, then fades in. |
 | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Fades, then the room closes. |
 
+## Alternatives
+
+- For validation on a single field, use `TextField` or the field's own error state.
+- For a transient confirmation that needs no reply, use `Flag`.
+- For something that must be acknowledged before continuing, use `Modal`.
+- For a status label on a row, use `StatusTag`.
+
 ## Best practices
 
 ### Match the appearance to the meaning. {#match-the-appearance-to-the-meaning}
@@ -73,7 +84,7 @@ default, so turn it off when the message must stay.
 Do: A blocking error cannot be dismissed.
 Don't: A blocking error that can be dismissed.
 
-### Replace the icon through icon, not the children. {#replace-the-icon-through-icon-not-the-children}
+### Replace the icon through `icon`, not the children. {#replace-the-icon-through-icon-not-the-children}
 
 A Font Awesome Free solid name or a node replaces the default; `false` removes
 it. An icon in the children adds a second one, in the text.
@@ -85,12 +96,10 @@ Don't: An icon in the children, beside the default one.
 
 An error about one input belongs to that input's own error state, such as
 `TextField`'s `isInvalid` and `errorMessage`, not in a section message above it.
+A rejected submit is the exception: a danger section message at the top of the
+form says what was refused, and each field named still shows its own error.
 
-A rejected submit is the exception that proves the rule: a danger section
-message at the top of the form says what was refused, and each field named
-still shows its own error.
-
-### Dismissal is one-way. {#dismissal-is-one-way}
+### Remount with a new `key` to show a dismissed message again. {#remount-with-a-new-key-to-show-a-dismissed-message-again}
 
 The component keeps its own dismissed state, and `show` is not a prop. To bring
 a message back when it genuinely changes, remount it with a new `key`.
@@ -98,16 +107,14 @@ a message back when it genuinely changes, remount it with a new `key`.
 ## Accessibility
 
 - **It announces assertively.** The message renders `role="alert"`, which
-  implies `aria-live="assertive"`, so a screen reader interrupts to read it.
-  That is right for something that just went wrong and wrong for ambient
-  information; for the latter, prefer plain text on the page.
+  implies `aria-live="assertive"`, so a screen reader interrupts to read it. That is right for something that just went wrong and wrong for ambient information; for the latter, prefer plain text on the page.
 - **A message rendered on mount may not be announced at all.** Live regions
   announce changes. If the message is present in the first paint, treat it as
   ordinary content and make sure the surrounding page still reads correctly.
 - **`title` renders as a real heading**, at `headingLevel` (default `h2`). It
   joins the page's outline, so pick the level that fits where it sits.
-- **The dismiss button is labeled `Dismiss message`**, hard-coded. It is the
-  shared `CloseButton`: a fixed 24×24 target whose × is `aria-hidden`.
+- **The dismiss button is labeled `Dismiss message`**, rendered by the shared
+  `CloseButton` whose × is `aria-hidden`.
 - **Say the meaning in the words.** The leading icon is `aria-hidden` and there
   is no text prefix, so `appearance="danger"` on its own does not say "error"
   to a screen reader. The icon differs in shape per style, so danger and
@@ -117,12 +124,10 @@ a message back when it genuinely changes, remount it with a new `key`.
 
 ## Related
 
-- For validation on a single field, put the message on the field, as `TextField` does.
-- For a transient confirmation, use `Flag`.
-- For something that must be acknowledged before continuing, use `Modal`.
-- For a status label on a row, use `StatusTag`.
+- `CloseButton`: use when rendering the dismiss control on a dismissible message.
+- Forms: use when pairing a form-level danger `SectionMessage` with per-field validation errors.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `Spotlight`
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `Spotlight`
 
 ## Parts
 
@@ -130,7 +135,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 2. **Title.** An optional heading; set `headingLevel` to fit the outline.
 3. **Description.** What the person needs to act. A link in it keeps the text color and is underlined.
 4. **Actions.** Link buttons, separated by a divider.
-5. **Dismiss.** The shared CloseButton, centered on the first line.
+5. **Dismiss.** The shared `CloseButton`, centered on the first line.
 
 ### States
 
@@ -139,7 +144,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 | Rest | The fill and icon of the appearance, text in the default color. |
 | Hovered | The message does not react; Dismiss takes the subtle hovered step. |
 | Pressed | Dismiss takes the subtle pressed step. |
-| Focused | Dismiss and each action show the 2px ring. |
+| Focused | Dismiss and each action show the focus ring; see Border. |
 | Disabled | Not supported. |
 | Dismissed | The message is removed and the page keeps no copy. |
 
@@ -187,7 +192,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--card-inline-sm` · `--card-pad-compact` · `--ds-border` · `--ds-text` · `--heading-small` · `--icon-lg` · `--item-height-md` · `--radius-xl` · `--stack-md` · `--type-weight-medium`
+`--body-default` · `--border-default` · `--card-inline-sm` · `--card-pad-compact` · `--card-radius-compact` · `--ds-border` · `--ds-text` · `--heading-small` · `--icon-lg` · `--item-height-md` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/SectionMessage/SectionMessage.scss`. Override these through the token layer, never with a literal.
 

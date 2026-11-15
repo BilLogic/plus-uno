@@ -136,6 +136,10 @@ export interface Env {
   /** The channels the end-of-day sweep reads, comma-separated ids
    *  (`scheduled/runs.ts` `sweepChannelsFrom`). Unset → nothing is swept. */
   SWEEP_CHANNELS?: string;
+  /** Swept channels whose findings and to-dos post in #plus-design rather
+   *  than back into their own thread, comma-separated ids
+   *  (`destination/index.ts` `relaysToDesign`). Unset → none relay. */
+  SWEEP_RELAY_TO_DESIGN?: string;
   // #plus-design-feedback — shareout_post posts feedback bundles here (distinct
   // from the reviews channel above). Optional — unset → shareout_post falls back
   // to the origin thread.

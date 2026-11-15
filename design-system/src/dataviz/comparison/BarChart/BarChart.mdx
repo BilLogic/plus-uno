@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={BarChartStories} />
 
 <Title />
-Compares one value across categories by the length of a bar. Vertical it is
-a column chart, horizontal a ranked list; both read the same way.
+Compares a value across categories by bar length, vertically as columns or
+horizontally as a ranked list.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/BarChart"
@@ -20,7 +20,7 @@ a column chart, horizontal a ranked list; both read the same way.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Vertical columns, a horizontal bar and a grouped chart, each on the same category axis.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Vertical columns, a horizontal bar and a grouped chart on the same category axis.</>}>
     <Canvas of={BarChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -31,13 +31,13 @@ a column chart, horizontal a ranked list; both read the same way.
 
 ## When to use
 
-Use `BarChart` to compare values across categories: enrollment per subject,
-average score per class, sessions per day of the week. It also ranks — sort the
-bars from most to least and the order does the reading for you.
+Use `BarChart` to compare or rank values across categories, such as enrollment
+per subject, average score per class or sessions per weekday. Sort bars from
+most to least when ranking.
 
-For the same value moving through time, use `LineChart`. For parts of one
-total, use `StackedBarChart`, `PieChart` or `DonutChart`. For a value against
-a target, use `BulletChart`.
+For change over time, use `LineChart`. For parts of one total, use
+`StackedBarChart`, `PieChart` or `DonutChart`. For a value against a target, use
+`BulletChart`.
 
 Prefer **vertical** columns for short labels and fewer than seven categories.
 Prefer **horizontal** bars (`horizontal`) for long labels, many categories or a
@@ -52,10 +52,10 @@ ranking.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Bars', <>One per category per series. Length is the value; only the value end is rounded, by <C>--chart-bar-radius</C>.</>],
-        ['Category axis', <>Names each group. Hide its labels with <C>hideXAxisLabels</C> or <C>hideYAxisLabels</C> for a compact chart.</>],
+        ['Bars', <>One per category per series. Length encodes the value; only the value end is rounded by <C>--chart-bar-radius</C>.</>],
+        ['Category axis', <>Names each group. Hide labels with <C>hideXAxisLabels</C> or <C>hideYAxisLabels</C> for compact charts.</>],
         ['Value axis', <>Always starts at zero. <C>yAxisLabel</C> titles it; <C>yAxisMax</C> and <C>yAxisTickPositions</C> fix its range.</>],
-        ['Legend', <>Names each series. Shown by default; turn it off with <C>showLegend</C> for a single series.</>],
+        ['Legend', <>Names each series. Shown by default; hide with <C>showLegend</C> for a single series.</>],
         ['Tooltip', 'Shared: hovering a group lists every series’ value for that category.'],
     ]}
 />
@@ -67,7 +67,8 @@ ranking.
 ## Data shape
 
 `categories` is an array of strings. `series` is an array of `{ name, data }`,
-where `data` holds one number per category, in the same order as `categories`.
+with one number per category in `categories` order. Omit `color` on a series to
+assign one automatically.
 
 ```jsx
 <BarChart
@@ -80,19 +81,17 @@ where `data` holds one number per category, in the same order as `categories`.
 />
 ```
 
-A series may carry its own `color`; leave it out and the chart assigns one.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color is assigned for you.** One series takes `--ds-chart-brand`. Two or more take the categorical order, slot 1 first, never skipping a slot. Past six series, group the smallest categories into "Other".
-- **Bar length carries the value.** Color only tells series apart, so the chart reads without hue. Keep the series count low enough that the legend can name each one.
-- **Keep the baseline at zero.** A truncated axis makes a small difference look large.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Automatic series color.** One series uses `--ds-chart-brand`; two or more follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 without skipping. Past six series, group the smallest categories into "Other".
+- **Length carries the value.** Color only separates series, so the chart reads without hue. Keep the series count low enough for the legend to name each one.
+- **Start the baseline at zero.** A truncated axis exaggerates small differences.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -100,11 +99,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 
 ## States
 
-`BarChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`BarChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={300} />
@@ -121,12 +116,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 
 <DocsInteractivePlayground
     of={BarChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

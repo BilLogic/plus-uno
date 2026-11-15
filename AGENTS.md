@@ -65,10 +65,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 **uno-bot's Tier 2 is `read_reference`.** A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name — `draft-a-prd` — on the turns whose pointer fires; the text lasts the turn and a later turn re-reads it in one call. Everything else in the bundle is always in context.
 
 <!-- ide-only -->
-**Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names.
-
-**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the char budgets — this file, the persona, each bot skill, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` names the file and the distance for each: this file's overrun warns, and a stale bundle, any other overrun or a shortfall fails the build. Its `assemble()` returns a manifest of what it computed, and the root checks read that in-process through `scripts/lib/bundled-set.mjs`. A doc cites a budget by its `BUDGETS` key and leaves the number to the bundler; `check:harness-budgets` holds every doc under a section root to that.
-
+**Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names. Bundle assembly, `ide-only` stripping and `BUDGETS` keys live in `agents/uno-bot/scripts/bundle-harness.mjs` (`docs/engineering/setup.md` § The harness gate).
 <!-- /ide-only -->
 
 ## Hard rules
@@ -82,40 +79,39 @@ The name in parentheses is how the rest of the harness cites each rule, so renum
 2. **Read the source for every name you use** (`read-source-first`, `no-hallucinated-props`). Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
 3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
 4. **Notion writes follow `docs/connectors/notion/`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
-5. **PLUS components first; interactive behavior built on Base UI** (`PLUS-components-first`): reach for a PLUS component before any other framework, and build any new interactive behavior — open/closed state, focus, keyboard — on `@base-ui/react`, headless, styled on `--ds-*` tokens (ADR-037, widening ADR-036). Non-interactive markup is PLUS components and `--ds-*` tokens; PLUS ships no Bootstrap (ADR-042). The Storybook docs chrome is styled on the same tokens as the app, with no other framework.
+5. **PLUS components first; interactive behavior built on Base UI** (`PLUS-components-first`): reach for a PLUS component before any other framework, and build any new interactive behavior — open/closed state, focus, keyboard — on `@base-ui/react`, headless, styled on `--ds-*` tokens (ADR-037, widening ADR-036). Drag uses Pragmatic drag and drop ([ADR-046](docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md)). Non-interactive markup is PLUS components and `--ds-*` tokens; PLUS ships no Bootstrap (ADR-042). The Storybook docs chrome is styled on the same tokens as the app, with no other framework.
 
 <!-- ide-only -->
 ### Code authoring — IDE only
 
 Each rule is one line here and its body lives in the document it names; the leading word is the trigger.
 
-6. **Tokens** (`tokens-over-literals`) style everything — color, spacing, typography, radius, elevation: `design-system/src/styles/Tokens.mdx` § Non-negotiable rules.
-7. **Layout** (`layout-formulas-first`) starts from the structural formulas: `design-system/guidelines/composition/layout.md`, loaded before a new page, dashboard or layout.
+6. **Tokens** (`tokens-over-literals`) style everything — color, spacing, typography, radius, elevation: `design-system/guidelines/foundations/overview.md` § Token rules.
+7. **Templates** (`templates-first`): a screen starts from a template and each choice on it from its pattern, built in stages: `design-system/guidelines/overview.md`.
 8. **Figma input** (`Figma-registries-are-law`) means registries first, then the implement-design workflow: `design-system/guidelines/figma/registry-load-gate.md`, then `design-system/guidelines/figma/mcp-guide.md`.
 9. **Packages** (`never-install-without-approval`) are the user's call: ask before installing one.
 10. **Imports** (`no-deep-imports`) of public components come from the `@/components` barrel: `docs/engineering/coding.md` § Imports.
 11. **Generated files** (`no-hand-edited-generated-files`) are regenerated from their source, and `npm run check:harness` says which one is stale: `docs/engineering/setup.md` § The harness gate.
 12. **Storybook** (`Storybook-validation`) validates a component behavior change — the story and its tests, not just the build: `docs/connectors/storybook-mcp.md`.
 13. **Large or risky edits** get the plan and the touched files confirmed first.
-14. **Intake** runs one step per message when the hook points at the briefing file: `skills/uno-prototype/references/intake.md` § One step per turn.
+14. **Intake** runs one step per message when the hook points at the brief card: `skills/uno-prototype/references/intake.md` § One step per turn.
 15. **Figma write-back** goes through the DS gate: `design-system/guidelines/figma/component-alignment.md` § Write-back gate.
 <!-- /ide-only -->
 
 ## Knowledge
 
-Finished work leaves behind a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, an **archive** entry in `docs/knowledge/archive/` while a live doc, ADR or code comment cites it as its decision trail, or — most often — **nothing**: git keeps the trail, and a finding worth less than the context it costs is worth deleting. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. The same test clears `docs/plans/`, `todos/` and the archive itself: a plan, todo or archived doc whose work has landed or been abandoned is deleted once nothing live cites it.
+Finished work leaves a **rule** in the doc that owns the subject, an **ADR** under `docs/adr/`, an **archive** entry in `docs/knowledge/archive/` while something live cites it, or **nothing** (`docs/knowledge/INDEX.md`, enforced by `npm run check:knowledge-disposition` via `skills/uno-maintain`).
 
 <!-- ide-only -->
 ## Progressive loading
 
 | Trigger | Load |
 |---------|------|
-| DS implementation task, any kind | `design-system/guidelines/overview.md` (MANDATORY entry — route from here) |
-| Building UI, using components or tokens, or a component's facts (usage, rules, props, variants) | `design-system/agent-views/components/index.md` (existence) + `tokens/tokens.md` (names), then the component's generated file, `design-system/src/components/<group>/<Name>/index.md` (`<Name>.md` when filed flat): one read answers it, the same text `ds_get` returns and Storybook's Agent view shows. A disabled state follows `design-system/guidelines/composition/form-behavior.md` § Unavailable actions and fields; a slot prop, `docs/engineering/coding.md` § Slot names |
-| Animating anything | Foundations · Motion (`design-system/src/styles/MotionPhysics.mdx`, then the page for the transition), then the component's own Motion section, in its generated file under `src/components/` |
-| Adding or changing a sound | Foundations · Sound (`design-system/src/styles/SoundOverview.mdx`, then `SoundWhenToPlay.mdx`), then the row's Motion section for its `sound` cell; the code half is `docs/engineering/sound.md` |
-| Verifying a component's API, or writing a story's code | `docs/connectors/storybook-mcp.md` |
-| Building new pages, dashboards, layouts | `design-system/guidelines/composition/layout.md` (MANDATORY) |
+| Building or changing any screen | `design-system/guidelines/overview.md` (the staged build), which names the page for each stage; for DS terminology, `docs/conventions/design-system-glossary.md` |
+| Building UI, using components or tokens, or a component's facts (usage, rules, props, variants) | `design-system/agent-views/components/index.md` (existence) + `tokens/tokens.md` (names), then the component's generated file, `design-system/src/components/<group>/<Name>/index.md` (`<Name>.md` when filed flat): one read answers it, the same text `ds_get` returns and Storybook's Harness tab shows. A disabled state follows `design-system/agent-views/patterns/Disabled.md`; a slot prop, `docs/engineering/coding.md` § Slot names |
+| Animating anything | Foundations › Expression › Motion (`design-system/src/styles/MotionPhysics.mdx`, then the page for the transition), then `design-system/agent-views/motion/library.md` for the component's event-to-token row and the component's own Motion section, in its generated file under `src/components/` |
+| Adding or changing a sound | Foundations › Expression › Sound (`design-system/src/styles/SoundOverview.mdx`, then `SoundWhenToPlay.mdx`), then the row's Motion section for its `sound` cell; the code half is `docs/engineering/sound.md` |
+| Verifying a component's API, or writing a story's code | `docs/connectors/ds-mcp.md` (`plus-ds` / `npm run ds`) + `docs/connectors/storybook-mcp.md` |
 | Laying out on the grid, or matching a Figma frame's breakpoint modes | `design-system/src/styles/Grid.mdx` (`npm run ds -- guide grid`) |
 | Titling a story, renaming a docs folder, or authoring an MDX page | `design-system/guidelines/documentation-ia.md` |
 | Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
@@ -128,44 +124,11 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 | Writing or editing a bot skill | `skills/README.md` § Bot skills, then `npm run check:bot-skills` |
 | Editing anything an agent reads — this file, a skill, a convention, an agent doc | load the `writing-for-agents` skill first. It is the standard harness prose is reviewed against, and it lives upstream so there is no second copy here to drift. |
 | Product / in-app UI copy (labels, errors, empty states) | `design-system/guidelines/foundations/content/` — what a tutor reads inside the app |
-| Building a page, a dialog, a filter bar, or an empty, loading or error state | the template page (`design-system/agent-views/pages/templates/`, or its component file under `src/patterns/<Name>/index.md`), then its pattern (`design-system/agent-views/pages/patterns/`); the same pages answer `get-documentation` |
-| Component architecture questions | `design-system/guidelines/components/overview.md` |
+| Component architecture questions | `docs/engineering/local-components.md` |
 | Product context, users, or domain terms | `docs/product-and-service/*.md` (foundation) + uno-blueprint (live truth) |
 | New teammate orientation | `docs/product-and-service/onboarding.md` |
 
-<!-- Every `ide-only` region in this file is stripped from the uno-bot system
-     prompt when the harness is bundled (agents/uno-bot/scripts/bundle-harness.mjs,
-     stripIdeOnly), because the Worker has no filesystem, npm, or localhost, and
-     its prompt is fixed at build time. They stay here as the single source for
-     the IDE agent. The comment sits INSIDE the fence on purpose: a note about
-     removed sections is itself meaningless to the reader they were removed for. -->
-<!-- /ide-only -->
-
-<!-- ide-only -->
-
 ## Agent skills
 
-Config the `mattpocock-skills` plugin's skills read — `/tdd`, `/code-review`,
-`/triage`, `/implement` and the rest. Each sub-section summarizes its file in a
-line; open the file itself only when a skill asks for it, since loading three
-config docs up front spends context no task has asked for. IDE-only: these
-skills run against a filesystem and the `gh` CLI, and the Worker has neither, so
-this region is stripped from its prompt.
-
-### Issue tracker
-
-GitHub Issues on `BilLogic/plus-uno`, inferred from `git remote`.
-See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-The five canonical roles, label strings unchanged (`needs-triage`, `needs-info`,
-`ready-for-agent`, `ready-for-human`, `wontfix`) — all created in GitHub.
-See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context. `GLOSSARY.md` at the root is the glossary (`npm run check:glossary`
-keeps it glossary-only); `docs/adr/` holds the decisions, indexed by
-`docs/adr/overview.md`. See `docs/agents/domain.md`.
+Config for engineering skills (`/tdd`, `/code-review`, `/triage`, `/implement`): `docs/agents/issue-tracker.md` (GitHub Issues on `BilLogic/plus-uno`), `docs/agents/triage-labels.md` (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`), and `docs/agents/domain.md` (`GLOSSARY.md` + `docs/adr/overview.md`).
 <!-- /ide-only -->

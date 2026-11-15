@@ -178,9 +178,10 @@
     gap: var(--stack-sm);
 }
 
-.plus-pattern-table-pagination {
+.plus-pattern-table-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: var(--space-0625);
+    min-height: var(--table-footer-height);
 }

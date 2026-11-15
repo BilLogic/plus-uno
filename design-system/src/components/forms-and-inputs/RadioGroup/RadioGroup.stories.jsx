@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { Illustration } from '@/components';
 import RadioGroup from './RadioGroup';
 
 export default {
@@ -33,7 +34,7 @@ export default {
         },
         appearance: {
             control: 'select',
-            options: ['plain', 'card'],
+            options: ['plain', 'card', 'tile'],
             table: { category: 'Design' },
         },
         size: {
@@ -313,12 +314,15 @@ TwoGroupsWithoutIds.play = async ({ canvasElement }) => {
 
 export const Interactive = (args) => {
     const [value, setValue] = useState(null);
+    const activeOptions = args.leadingText || args.trailingText
+        ? fivePoint
+        : (args.appearance === 'tile' ? tileChoices : described);
     return (
-        <div style={{ maxWidth: '560px' }}>
+        <div style={{ maxWidth: 'var(--content-max-width)' }}>
             <RadioGroup
                 {...args}
                 name="rg-interactive"
-                options={args.leadingText || args.trailingText ? fivePoint : described}
+                options={activeOptions}
                 value={value}
                 onChange={setValue}
             />
@@ -335,6 +339,190 @@ Interactive.args = {
     isRequired: false,
     isDisabled: false,
     isReadOnly: false,
+};
+
+const tileChoices = [
+    {
+        value: 'one-on-one',
+        label: 'One-on-one',
+        description: 'Work with one student on a focused goal.',
+        illustration: <Illustration character="relationships" size={96} />,
+    },
+    {
+        value: 'small-group',
+        label: 'Small group',
+        description: 'Guide two to four students together.',
+        illustration: <Illustration character="social-emotional" size={96} />,
+    },
+    {
+        value: 'drop-in',
+        label: 'Drop-in help',
+        description: 'Answer quick homework questions.',
+        illustration: <Illustration character="mastering-content" size={96} />,
+    },
+];
+
+/** Pictured 224px tiles laid out inline and wrapping; selection uses the 2px border and fill with no visible dot. */
+export const Tiles = () => {
+    const [value, setValue] = useState('one-on-one');
+    return (
+        <RadioGroup
+            name="rg-tiles"
+            legend="How would you like to tutor?"
+            appearance="tile"
+            orientation="inline"
+            options={tileChoices}
+            value={value}
+            onChange={setValue}
+        />
+    );
+};
+Tiles.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('radiogroup', { name: 'How would you like to tutor?' });
+    const tiles = [...group.querySelectorAll('.plus-choice-tile')];
+    await expect(tiles).toHaveLength(3);
+    await expect(px(getComputedStyle(tiles[0]).width)).toBe(224);
+
+    // Pick one: selected border (2px) and selected fill, no visible dot.
+    const firstRadio = within(tiles[0]).getByRole('radio', { name: 'One-on-one' });
+    await expect(getComputedStyle(firstRadio).opacity).toBe('0');
+    await expect(px(getComputedStyle(tiles[0]).borderTopWidth)).toBe(2);
+    await expect(getComputedStyle(tiles[0]).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+    await expect(getComputedStyle(tiles[0]).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+
+    // Decorative illustration; accessible description preserved.
+    await expect(tiles[0].querySelector('.plus-choice-tile-illustration')).toHaveAttribute('aria-hidden', 'true');
+    await expect(firstRadio).toHaveAccessibleDescription('Work with one student on a focused goal.');
+
+    // Arrow keys move focus and selection across tiles.
+    firstRadio.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    const secondRadio = within(tiles[1]).getByRole('radio', { name: 'Small group' });
+    await expect(document.activeElement).toBe(secondRadio);
+    await expect(secondRadio).toHaveAttribute('aria-checked', 'true');
+    secondRadio.blur();
+};
+
+export const TileRest = {
+    render: () => <RadioGroup name="rg-tile-rest" legend="Tutoring format" appearance="tile" options={tileChoices.slice(0, 2)} />,
+    play: async ({ canvasElement }) => {
+        const tile = canvasElement.querySelector('.plus-choice-tile');
+        await expect(px(getComputedStyle(tile).width)).toBe(224);
+        await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface'));
+        await expect(getComputedStyle(tile).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border'));
+    },
+};
+
+export const TileHovered = {
+    render: () => <RadioGroup name="rg-tile-hover" legend="Tutoring format" appearance="tile" options={tileChoices.slice(0, 2)} />,
+    play: async ({ canvasElement }) => {
+        const tile = canvasElement.querySelector('.plus-choice-tile');
+        tile.style.transition = 'none';
+        const hovered = withForcedPseudo(tile, ':hover', () => ({
+            backgroundColor: getComputedStyle(tile).backgroundColor,
+            borderTopColor: getComputedStyle(tile).borderTopColor,
+        }));
+        await expect(hovered.backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-hovered'));
+        await expect(hovered.borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-brand'));
+    },
+};
+
+export const TileSelected = {
+    render: () => (
+        <RadioGroup
+            name="rg-tile-selected"
+            legend="Tutoring format"
+            appearance="tile"
+            options={tileChoices.slice(0, 2)}
+            defaultValue="one-on-one"
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const tile = canvasElement.querySelector('.plus-choice-tile');
+        await expect(px(getComputedStyle(tile).borderTopWidth)).toBe(2);
+        await expect(getComputedStyle(tile).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    },
+};
+
+export const TileFocused = {
+    render: () => (
+        <RadioGroup
+            name="rg-tile-focus"
+            legend="Tutoring format"
+            appearance="tile"
+            options={tileChoices.slice(0, 2)}
+            defaultValue="one-on-one"
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const radio = within(canvasElement).getByRole('radio', { name: 'One-on-one' });
+        const tile = radio.closest('.plus-choice-tile');
+        tile.style.transition = 'none';
+        radio.focus({ focusVisible: true });
+        await waitFor(() => expect(getComputedStyle(tile).outlineStyle).toBe('solid'));
+        await expect(px(getComputedStyle(tile).outlineWidth)).toBe(2);
+        await expect(px(getComputedStyle(tile).outlineOffset)).toBe(2);
+        await expect(getComputedStyle(tile).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        radio.blur();
+    },
+};
+
+export const TileInvalid = {
+    render: () => (
+        <RadioGroup
+            name="rg-tile-invalid"
+            legend="Tutoring format"
+            appearance="tile"
+            options={tileChoices.slice(0, 2)}
+            isRequired
+            error="Choose a tutoring format."
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('alert').textContent).toBe('Choose a tutoring format.');
+        const tile = canvasElement.querySelector('.plus-choice-tile');
+        await expect(getComputedStyle(tile).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
+    },
+};
+
+export const TileReadOnly = {
+    render: () => (
+        <RadioGroup
+            name="rg-tile-readonly"
+            legend="Tutoring format"
+            appearance="tile"
+            options={tileChoices.slice(0, 2)}
+            defaultValue="one-on-one"
+            isReadOnly
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const tiles = canvasElement.querySelectorAll('.plus-choice-tile');
+        await expect(getComputedStyle(tiles[1]).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await userEvent.click(tiles[1]);
+        await expect(within(tiles[0]).getByRole('radio', { name: 'One-on-one' })).toHaveAttribute('aria-checked', 'true');
+    },
+};
+
+export const TileDisabled = {
+    render: () => (
+        <RadioGroup
+            name="rg-tile-disabled"
+            legend="Tutoring format"
+            appearance="tile"
+            options={tileChoices.slice(0, 2)}
+            defaultValue="one-on-one"
+            isDisabled
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const tile = canvasElement.querySelector('.plus-choice-tile');
+        await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+        await expect(getComputedStyle(tile).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-disabled'));
+    },
 };
 
 /** One story per state, for the Examples tab. */

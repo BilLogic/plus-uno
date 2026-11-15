@@ -106,6 +106,11 @@ test("the parse refuses what the read cannot stand behind", () => {
   assert.equal(parseDetectorReply("I think the date changed.", threadOf(trueDrift!), trueDrift!.sources).length, 0);
 });
 
+test("what the thread says is kept as plain words: a quoted mention or entity is never re-escaped", () => {
+  const [kept] = parse({ thread_says: "Hi <@U03FYQJRQHX>, A &amp; B make sense &lt;3" });
+  assert.equal(kept?.threadSays, "Hi @someone, A & B make sense <3");
+});
+
 test("the stamp kept is the read's, never the model's", () => {
   const [kept] = parse({ last_edited_time: "2030-01-01T00:00:00.000Z" });
   assert.equal(kept?.lastEditedTime, "2026-09-01T10:00:00.000Z");

@@ -22,6 +22,7 @@ and the due-soon window — never a caller's choice.
 <DocsTab tab="examples">
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-2387"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/DateTag"
 />
 
@@ -73,12 +74,7 @@ and the due-soon window — never a caller's choice.
 
 <DocsInteractivePlayground
     of={DateTagStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -96,9 +92,8 @@ and the due-soon window — never a caller's choice.
 ## Usage
 
 Use `DateTag` for a due or event date beside the thing it belongs to: an
-assignment, a session, a report. For a status or a category, use `Tag`
-instead; `DateTag`'s outline, icon and three appearances are reserved for
-dates.
+assignment, a session, a report. Write `children` as people say the date, such as "Due tomorrow" or "2 days overdue", never a raw timestamp. `DateTag`'s outline, icon and three
+appearances are reserved for dates.
 
 ### Appearance guidance
 
@@ -109,11 +104,21 @@ The app derives `appearance` from the date and a due-soon window it defines.
 <tr><th>Appearance</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td>Neutral</td><td>The date is not close. Draws a calendar. Example: "Due Oct 14".</td></tr>
+<tr><td>Neutral</td><td>The date is not close. Draws a calendar. Example: "Due next week".</td></tr>
 <tr><td>Warning</td><td>The date is near, before it turns overdue. Draws a clock. Example: "Due tomorrow".</td></tr>
-<tr><td>Danger</td><td>The date has passed. Draws a triangle. Example: "2 days overdue".</td></tr>
+<tr><td>Danger</td><td>The date has passed. Draws a triangle. Example: "Overdue".</td></tr>
 </tbody>
 </DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
+- For a category or subject or person, use `Tag`.
+- For a numeric count, use `CountTag`.
 
 </div>
 
@@ -123,7 +128,7 @@ The app derives `appearance` from the date and a due-soon window it defines.
 
 1. **Icon.** Fixed by the appearance: a calendar for neutral, a clock for warning and a triangle for danger. It is decoration; the date says the rest.
 2. **Date.** One short string, set by the app: "Due tomorrow", "Mar 4".
-3. **Outline.** A 1 inside border, so the height stays exact. A date tag has no fill.
+3. **Outline.** An inset border, so the height stays exact. A date tag has no fill.
 
 ### States
 
@@ -161,17 +166,15 @@ The app derives `appearance` from the date and a due-soon window it defines.
 
 ## Best practices
 
-The app picks the appearance from the date and its due-soon window, never from taste. Write `children` as people say the date: "Due tomorrow", "2 days overdue", not a raw timestamp.
-
 ### Reserve danger for overdue dates.
 
-Danger means the date has passed; a far-off date stays neutral.
+The app picks the appearance from the date and its due-soon window, never from taste. Danger means the date has passed; a far-off date stays neutral.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Overdue</span><DateTag appearance="danger">2 days overdue</DateTag></div>}
     doCaption="Danger when it is overdue."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Due in 30 days</span><DateTag appearance="danger">Due in 30 days</DateTag></div>}
-    dontCaption="Danger on a date 30 days out."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Due later</span><DateTag appearance="danger">Due next month</DateTag></div>}
+    dontCaption="Danger on a date far in the future."
 />
 
 ### Use warning for dates that are close.
@@ -240,8 +243,8 @@ the tooltip holding the full date.
 
 ## Related
 
-- For a status or a category, use `Tag`.
-- For a numeric count, use `CountTag`.
+- `DatePicker`: use when the person picks or edits a date in a form field.
+- `StatusTag`: use when showing the workflow state of a dated item.
 
 </div>
 

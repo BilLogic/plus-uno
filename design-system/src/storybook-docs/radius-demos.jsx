@@ -184,7 +184,7 @@ const STEPS = [
 export const ScaleStrip = () => {
     const [values, probes] = useRadii(STEPS.map((s) => s.token));
     return (
-        <div data-testid="radius-scale" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(calc(var(--image-xl) * 2), 1fr))', gap: 'var(--grid-gutter)' }}>
+        <div data-testid="radius-scale" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, calc(var(--image-xl) * 2)), 1fr))', gap: 'var(--grid-gutter)' }}>
             {probes}
             {STEPS.map((s) => (
                 <figure key={s.token} data-step={s.token} style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>

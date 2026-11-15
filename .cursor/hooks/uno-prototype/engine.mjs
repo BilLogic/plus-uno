@@ -1,455 +1,303 @@
-import { GLOBAL_COMMANDS } from './constants.mjs';
-import {
-  hasPrototypeIntent,
-  hasNewPrdIntent,
-  isBypassRequest,
-  isExplicitInvocation,
-  isMachineTurn,
-} from './intents.mjs';
-import { getState, STATES } from './states.mjs';
-import {
-  buildAgentIntakeInstruction,
-  clearIntakeQuestion,
-  pruneStaleIntakeQuestion,
-  readActiveIntake,
-  writeIntakeQuestion,
-} from './intake-question.mjs';
-import {
-  clearBriefing,
-  clearPrdCache,
-  clearSession,
-  isPrdGateEnabled,
-  loadPrdCache,
-  loadSession,
-  resolveRepoRoot,
-  savePrdCache,
-  saveSession,
-} from './storage.mjs';
-import { isNoPrdAnswer, looksLikePrdContent, parseChoice } from './validators.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+export const STEPS_FILE = path.join(__dirname, 'intake-steps.json');
+export const BRIEFINGS_DIR = path.join(__dirname, '..', 'briefings');
+
+export const INTAKE_SPEC = JSON.parse(fs.readFileSync(STEPS_FILE, 'utf8'));
+export const STEPS = INTAKE_SPEC.steps;
+export const STEP_IDS = STEPS.map((s) => s.id);
+export const DIMENSIONS = INTAKE_SPEC.dimensions;
+export const DELIVERABLES = INTAKE_SPEC.deliverables;
+
+const COMMANDS = {
+  back: /^(back|previous|go back)$/i,
+  restart: /^(restart|start over|upload (a )?new prd|use (a )?different prd)$/i,
+  bypass: /^(#?skip-prd-gate|skip prd( upload)?|quit|terminate (this )?(prototyping )?(process|workflow|session)|cancel (this )?(workflow|process)|abort (workflow|process)|stop (this )?(process|workflow))$/i,
+};
+
+const MACHINE_TURN =
+  /^\s*<(?:task-notification|system-reminder|local-command-stdout|command-message)\b|^\s*\[Request interrupted\b/;
 
 /**
- * @typedef {object} HookInput
- * @property {string} [prompt]
- * @property {string} [conversation_id] required — without it the gate passes through
- * @property {Array<{ type?: string; file_path?: string }>} [attachments]
- * @property {string[]} [workspace_roots]
- * @property {boolean} [explicit_start_only] start only on an explicit invocation,
- *   never on a plain-words build request — set by the Claude Code adapter, where
- *   "spin up a prototype script" is engineering talk as often as a design ask
+ * Strip quoted text and non-invocation code spans so mentions of `/uno-prototype`
+ * inside a report or quote do not start the intake.
+ * @param {string} prompt
  */
+function stripQuoted(prompt) {
+  return prompt
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`([^`\r\n]+)`/g, (_m, inner) =>
+      /^\s*\/?uno[-:]prototype\s*$/i.test(inner) ? ` ${inner} ` : ' ',
+    )
+    .replace(/^\s*>.*$/gm, ' ')
+    .replace(/"[^"\r\n]{8,}"/g, ' ')
+    .replace(/\u201c[^\u201d\r\n]{8,}\u201d/g, ' ');
+}
 
 /**
- * @param {boolean} continueSubmit
- * @param {string} [userMessage]
- * @param {string} [agentMessage]
- * @returns {{ continue: boolean; user_message?: string; agent_message?: string }}
+ * Explicit `/uno-prototype` start only (no keyword heuristics).
+ * @param {string} prompt
  */
-function result(continueSubmit, userMessage, agentMessage) {
-  if (continueSubmit) {
-    /** @type {{ continue: true; agent_message?: string }} */
-    const out = { continue: true };
-    if (agentMessage) out.agent_message = agentMessage;
-    return out;
+export function isExplicitStart(prompt) {
+  if (!prompt || MACHINE_TURN.test(prompt)) return false;
+  if (/<command-name>\s*\/?uno[-:]prototype\s*<\/command-name>/i.test(prompt)) return true;
+  const text = stripQuoted(prompt);
+  if (/(?:^|[\s(])\/uno[-:]prototype\b/i.test(text)) return true;
+  if (/(?:^|[\s(])@?skills\/uno-prototype\b/i.test(text)) return true;
+  return /^\s*(?:please\s+)?(?:use|run|invoke|start)\s+uno[-:]prototype\b/i.test(text);
+}
+
+/**
+ * @param {string} sessionId
+ * @param {string} [dir]
+ */
+export function cardPath(sessionId, dir = BRIEFINGS_DIR) {
+  const safe = String(sessionId).replace(/[^a-zA-Z0-9_-]/g, '_');
+  return path.join(dir, `${safe}.json`);
+}
+
+/**
+ * @param {Record<string, unknown>} card
+ * @param {string} stepId
+ */
+function isFilled(card, stepId) {
+  const val = card?.[stepId];
+  return typeof val === 'string' ? val.trim().length > 0 : Boolean(val);
+}
+
+/**
+ * Create an empty brief card with one field per step in `intake-steps.json`.
+ * @param {string} sessionId
+ */
+export function createEmptyCard(sessionId) {
+  /** @type {Record<string, unknown>} */
+  const card = { sessionId };
+  for (const step of STEPS) card[step.id] = '';
+  card._seen = 0;
+  return card;
+}
+
+/**
+ * @param {string} sessionId
+ * @param {string} [dir]
+ * @returns {Record<string, unknown> | null}
+ */
+export function readCard(sessionId, dir = BRIEFINGS_DIR) {
+  const file = cardPath(sessionId, dir);
+  if (!fs.existsSync(file)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch {
+    return null;
   }
-  return { continue: false, user_message: userMessage };
 }
 
 /**
- * Send an instruction that points the agent at the briefing — only while the
- * briefing on disk binds this conversation. The file is one fixed path, so
- * another session can overwrite it between this write and the agent's read;
- * then the agent gets no pointer at someone else's interview.
- * @param {string} conversationId
- * @param {string} message
+ * @param {string} sessionId
+ * @param {Record<string, unknown>} card
+ * @param {string} [dir]
  */
-function intakeResult(conversationId, message) {
-  if (!readActiveIntake(conversationId)) return result(true);
-  return result(true, undefined, message);
+export function writeCard(sessionId, card, dir = BRIEFINGS_DIR) {
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(cardPath(sessionId, dir), JSON.stringify(card, null, 2) + '\x0a');
 }
 
 /**
- * @param {string} conversationId
+ * @param {string} sessionId
+ * @param {string} [dir]
  */
-function releaseSession(conversationId) {
-  clearIntakeQuestion(conversationId);
-  clearSession(conversationId);
+export function removeCard(sessionId, dir = BRIEFINGS_DIR) {
+  const file = cardPath(sessionId, dir);
+  if (fs.existsSync(file)) fs.unlinkSync(file);
 }
 
 /**
- * @param {Record<string, unknown>} [cachedPrd]
- * @returns {{ stateId: string; history: string[]; context: Record<string, unknown>; status: 'active' }}
+ * Current step = first empty field in the brief card.
+ * @param {Record<string, unknown>} card
  */
-function createSession(cachedPrd = null) {
-  if (cachedPrd?.prd) {
-    // PRD already captured this conversation — the PRD gate is satisfied, so
-    // re-enter the reflection at its first question (Step 2 re-runs on a fresh
-    // prototype request; a failed review legitimately changes the strategy).
+export function currentStepOf(card) {
+  return STEPS.find((step) => !isFilled(card, step.id)) || null;
+}
+
+/**
+ * @param {Record<string, unknown>} card
+ */
+export function filledStepsOf(card) {
+  return STEPS.filter((step) => isFilled(card, step.id));
+}
+
+/**
+ * Clear the last filled field on the brief card ("back").
+ * @param {Record<string, unknown>} card
+ */
+export function stepBack(card) {
+  const filled = filledStepsOf(card);
+  if (filled.length === 0) return { moved: false, cleared: null };
+  const last = filled[filled.length - 1];
+  card[last.id] = '';
+  card._seen = filled.length - 1;
+  return { moved: true, cleared: last.id };
+}
+
+/**
+ * @param {string} [repoRoot]
+ */
+function isPrdGateEnabled(repoRoot) {
+  if (!repoRoot) return true;
+  const settingsFile = path.join(repoRoot, '.cursor', 'settings.json');
+  if (!fs.existsSync(settingsFile)) return true;
+  try {
+    const settings = JSON.parse(fs.readFileSync(settingsFile, 'utf8'));
+    return settings?.uno?.prdGate !== false;
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Format the prompt injection for the active step.
+ * @param {typeof STEPS[number]} step
+ * @param {string} file
+ * @param {{ multiFieldCount?: number; outOfOrder?: boolean; alreadyFirst?: boolean }} [flags]
+ */
+function formatStepMessage(step, file, flags = {}) {
+  const parts = [];
+  if (flags.multiFieldCount && flags.multiFieldCount > 1) {
+    parts.push(
+      `WARNING: More than one field was filled in a turn (${flags.multiFieldCount} fields filled at once). Intake is strictly one step per turn — clear the extra field(s) in ${file} and ask only the current step.`,
+    );
+  } else if (flags.outOfOrder) {
+    parts.push(
+      `WARNING: A later field in ${file} was filled while ${step.id} is still empty. Fill fields strictly in step order, one per turn.`,
+    );
+  }
+  if (flags.alreadyFirst) {
+    parts.push('Already at the first step. Say "restart" to start over.');
+  }
+  parts.push(
+    `uno-prototype intake active: current step = ${step.id} (${step.stepNumber} of ${INTAKE_SPEC.totalSteps}, ${step.progressLabel}), card at ${file}.`,
+  );
+  if (step.id === 'prd_check') {
+    parts.push(`Flow map: "${INTAKE_SPEC.flowMap}".`);
+  }
+  parts.push(`Question: ${step.question}`);
+  if (step.options?.length) {
+    parts.push(`Options / vocabulary: ${step.options.join(' · ')}.`);
+  }
+  parts.push(step.guidance);
+  parts.push(
+    `Ask ONLY this one step in this message (never batch questions). When the designer replies, write their answer into "${step.id}" in ${file} (one field per turn) before asking the next empty step.`,
+  );
+  return parts.join(' ');
+}
+
+/**
+ * @param {Record<string, unknown>} card
+ */
+function formatHandoffMessage(card) {
+  return [
+    'uno-prototype intake complete — brief card confirmed:',
+    `- Goal & audience: ${card.reflect_learn}`,
+    `- Designer's words: ${card.reflect_artifact_open}`,
+    `- Fidelity dials: ${card.reflect_fidelity}`,
+    `- Deliverable: ${card.reflect_artifact}`,
+    `- Won't include: ${card.reflect_exclude}`,
+    'Load the ONE deliverable reference selected by the confirmed deliverable (see skills/uno-prototype/SKILL.md § Deliverables & routing), restate this brief at the top of the plan, and proceed to Step 3 (Plan) → Step 4 (Generate).',
+  ].join('\x0a');
+}
+
+/**
+ * Evaluate a user prompt against the session's brief card.
+ * @param {{ prompt?: string; conversation_id?: string; session_id?: string; workspace_roots?: string[]; cwd?: string; briefingsDir?: string }} input
+ * @returns {{ continue: true; agent_message?: string }}
+ */
+export function handleSubmit(input) {
+  const prompt = String(input.prompt || '').trim();
+  const sessionId = input.session_id || input.conversation_id;
+  const repoRoot = input.cwd || input.workspace_roots?.[0];
+  const dir = input.briefingsDir || BRIEFINGS_DIR;
+
+  if (!prompt || !sessionId || MACHINE_TURN.test(prompt)) return { continue: true };
+  if (!isPrdGateEnabled(repoRoot)) return { continue: true };
+
+  const file = cardPath(sessionId, dir);
+  let card = readCard(sessionId, dir);
+
+  if (COMMANDS.bypass.test(prompt)) {
+    removeCard(sessionId, dir);
+    return { continue: true };
+  }
+
+  if (!card) {
+    if (!isExplicitStart(prompt)) return { continue: true };
+    card = createEmptyCard(sessionId);
+    writeCard(sessionId, card, dir);
+    return { continue: true, agent_message: formatStepMessage(STEPS[0], file) };
+  }
+
+  if (COMMANDS.restart.test(prompt)) {
+    card = createEmptyCard(sessionId);
+    writeCard(sessionId, card, dir);
+    return { continue: true, agent_message: formatStepMessage(STEPS[0], file) };
+  }
+
+  if (COMMANDS.back.test(prompt)) {
+    const { moved } = stepBack(card);
+    writeCard(sessionId, card, dir);
+    const step = currentStepOf(card) || STEPS[0];
     return {
-      stateId: 'reflect_learn',
-      history: ['reflect_learn'],
-      context: {
-        prd: cachedPrd.prd,
-        prdResumed: true,
-      },
-      status: 'active',
+      continue: true,
+      agent_message: formatStepMessage(step, file, { alreadyFirst: !moved }),
     };
   }
 
+  // Check if the agent recorded "No" for prd_check.
+  if (typeof card.prd_check === 'string' && /^no\b/i.test(card.prd_check.trim())) {
+    removeCard(sessionId, dir);
+    return {
+      continue: true,
+      agent_message:
+        'No PRD yet — stopping the uno-prototype workflow. Create a PRD first with skills/uno-synthesize (or message @uno-bot in Slack), then run /uno-prototype again.',
+    };
+  }
+
+  const filled = filledStepsOf(card);
+  const prevSeen = typeof card._seen === 'number' ? card._seen : 0;
+  const delta = filled.length - prevSeen;
+  const step = currentStepOf(card);
+  const firstEmptyIdx = step ? STEPS.indexOf(step) : STEPS.length;
+  const outOfOrder = STEPS.slice(firstEmptyIdx + 1).some((s) => isFilled(card, s.id));
+
+  card._seen = filled.length;
+
+  // All fields filled: if more than one field was filled in the final turn,
+  // flag the violation; otherwise release the card and hand off to the build.
+  if (!step) {
+    if (delta > 1) {
+      writeCard(sessionId, card, dir);
+      return {
+        continue: true,
+        agent_message: formatStepMessage(STEPS[STEPS.length - 1], file, { multiFieldCount: delta }),
+      };
+    }
+    if (isExplicitStart(prompt)) {
+      card = createEmptyCard(sessionId);
+      writeCard(sessionId, card, dir);
+      return { continue: true, agent_message: formatStepMessage(STEPS[0], file) };
+    }
+    removeCard(sessionId, dir);
+    return { continue: true, agent_message: formatHandoffMessage(card) };
+  }
+
+  writeCard(sessionId, card, dir);
   return {
-    stateId: 'prd_check',
-    history: ['prd_check'],
-    context: {},
-    status: 'active',
+    continue: true,
+    agent_message: formatStepMessage(step, file, {
+      multiFieldCount: delta > 1 ? delta : 0,
+      outOfOrder,
+    }),
   };
 }
-
-/**
- * @param {import('./storage.mjs').SessionState} session
- * @param {string} nextStateId
- * @param {Record<string, unknown>} [patch]
- */
-function transitionSession(session, nextStateId, patch = {}) {
-  session.stateId = nextStateId;
-  session.history.push(nextStateId);
-  session.context = { ...session.context, ...patch };
-  session.status = 'active';
-}
-
-/**
- * @param {Record<string, unknown>} context
- * @param {string} prdText
- * @param {string} conversationId
- */
-function storePrdContext(context, prdText, conversationId) {
-  context.prd = prdText;
-  savePrdCache(conversationId, { prd: prdText });
-}
-
-/**
- * @param {import('./storage.mjs').SessionState} session
- */
-function goBack(session) {
-  if (session.history.length <= 1) return false;
-  session.history.pop();
-  session.stateId = session.history[session.history.length - 1];
-  return true;
-}
-
-/**
- * Handoff emitted the moment the brief card is confirmed. The hook releases
- * the session and the agent takes over Step 3 (Plan) → Step 4 (Generate) —
- * never jumping straight to a build. The confirmed reflection answers ride
- * along as the contract: the build's validation loop checks the artifact
- * against them, and prompt-specs embed them as the external tool's self-check.
- * @param {Record<string, unknown>} [context]
- * @returns {string}
- */
-function buildHandoffMessage(context = {}) {
-  const reflection = /** @type {Record<string, string> | undefined} */ (context.reflection);
-  const contractLines = reflection
-    ? [
-        'The confirmed prototype brief (the contract for everything that follows):',
-        reflection.reflect_learn ? `- Goal: ${reflection.reflect_learn}` : '',
-        reflection.reflect_artifact ? `- Artifact: ${reflection.reflect_artifact}` : '',
-        reflection.reflect_fidelity ? `- Fidelity: ${reflection.reflect_fidelity}` : '',
-        reflection.reflect_exclude ? `- Won't include: ${reflection.reflect_exclude}` : '',
-      ].filter(Boolean)
-    : [];
-
-  return [
-    'Step 2 (Prototype Reflection) is complete — the brief is confirmed and the uno-prototype hook will no longer intercept.',
-    ...contractLines,
-    'NOW load the ONE deliverable doc the confirmed artifact selects — the map is in skills/uno-prototype/SKILL.md § Deliverables & routing (e.g. a user flow → references/deliverables/flow-map.md; a hi-fi build → references/deliverables/coded-build.md). Step 3 (Plan) and Step 4 (Generate) live in that doc: restate this brief at the top of the plan, confirm the plan and touched files before any large edit, then produce the deliverable.',
-    'The validation loop\'s objective is this brief: the artifact serves the goal, matches the fidelity dials, and contains nothing from the won\'t-include list — never expand scope just because the PRD lists more.',
-  ].join(' ');
-}
-
-/**
- * This conversation's session, but only while the active briefing on disk is
- * its own. A session whose briefing another session has since replaced (or
- * that has none) is not mid-intake, so no turn is read as its answer.
- * @param {string} conversationId
- */
-function loadBoundSession(conversationId) {
-  const session = loadSession(conversationId);
-  if (session?.status !== 'active') return session;
-  return readActiveIntake(conversationId) ? session : null;
-}
-
-/**
- * @param {HookInput} input
- * @returns {{ continue: boolean; user_message?: string }}
- */
-export function handleSubmit(input) {
-  const prompt = (input.prompt || '').trim();
-  const conversationId = input.conversation_id;
-  const attachments = input.attachments || [];
-  const repoRoot = resolveRepoRoot(input.workspace_roots);
-
-  // No session id, no gate: a shared fallback id would let every session
-  // start and answer the same intake.
-  if (!prompt || !conversationId) return result(true);
-  if (isMachineTurn(prompt)) return result(true);
-
-  if (!isPrdGateEnabled(repoRoot)) return result(true);
-
-  pruneStaleIntakeQuestion();
-
-  if (isBypassRequest(prompt)) {
-    clearSession(conversationId);
-    clearBriefing(conversationId);
-    clearIntakeQuestion(conversationId);
-    return result(true);
-  }
-
-  const cachedPrd = loadPrdCache(conversationId);
-  const session = loadBoundSession(conversationId);
-
-  // An override that pre-empts even an active session (mid-reflection, "actually
-  // let's use a different PRD" should restart rather than be read as a reflection
-  // answer) — but only within an already-active uno-prototype conversation.
-  // "Replace the PRD" presupposes there's a PRD or in-progress gate to replace;
-  // gating on existing context keeps this from firing on unrelated meta-discussion
-  // like "update the prd gate logic", which has no prototype context at all and
-  // was reaching this check unconditionally before any context was known.
-  if ((cachedPrd || session) && hasNewPrdIntent(prompt)) {
-    clearPrdCache(conversationId);
-    clearBriefing(conversationId);
-    clearSession(conversationId);
-    const fresh = createSession();
-    saveSession(conversationId, fresh);
-    return presentState(conversationId, fresh);
-  }
-
-  if (session?.status === 'active') {
-    return handleActiveSession(conversationId, session, prompt, attachments);
-  }
-
-  const startRequested = input.explicit_start_only
-    ? isExplicitInvocation(prompt)
-    : hasPrototypeIntent(prompt);
-
-  // Re-entry: a fresh prototype request when a PRD is already cached skips the
-  // PRD gate and hands off to the agent to re-run the reflection workflow.
-  if (startRequested && cachedPrd) {
-    const resumed = createSession(cachedPrd);
-    saveSession(conversationId, resumed);
-    return presentState(conversationId, resumed);
-  }
-
-  if (!startRequested) return result(true);
-
-  const newSession = createSession();
-  saveSession(conversationId, newSession);
-  return presentState(conversationId, newSession);
-}
-
-/**
- * Advance the gate with an answer that arrived as a TOOL RESULT rather than a
- * user prompt.
- *
- * The FSM was written for Cursor, where every gate answer is a `beforeSubmitPrompt`
- * submission. In Claude Code the agent is instructed to ask via AskQuestion, and
- * those answers come back as tool results that never fire `UserPromptSubmit` —
- * so the gate could not advance at all, and the user's *next* unrelated message
- * got consumed as the answer instead. This is the entry point the PostToolUse
- * adapter uses to close that gap.
- * @param {{ conversation_id?: string; answer?: string; workspace_roots?: string[] }} input
- * @returns {{ continue: boolean; agent_message?: string }}
- */
-export function handleGateAnswer(input) {
-  const answer = (input.answer || '').trim();
-  const conversationId = input.conversation_id;
-  const repoRoot = resolveRepoRoot(input.workspace_roots);
-
-  if (!answer || !conversationId) return result(true);
-  if (!isPrdGateEnabled(repoRoot)) return result(true);
-
-  pruneStaleIntakeQuestion();
-
-  const session = loadBoundSession(conversationId);
-  if (session?.status !== 'active') return result(true);
-
-  return handleActiveSession(conversationId, session, answer, []);
-}
-
-/**
- * @param {string} conversationId
- * @param {import('./storage.mjs').SessionState} session
- * @param {string} prompt
- * @param {Array<{ type?: string; file_path?: string }>} attachments
- */
-function handleActiveSession(conversationId, session, prompt, attachments) {
-  // Dedup: on runtimes where an ask-the-user answer ALSO surfaces as a prompt
-  // event (Claude Code / Codex — the typed rather than tapped path), the same
-  // answer can reach the FSM twice: once via UserPromptSubmit, once via
-  // PostToolUse. Reflection steps validate any non-empty text, so the second
-  // arrival would silently advance a second step and store the answer under the
-  // wrong id. Same text, same step, within a few seconds → already consumed.
-  // Matched on text + recency only: by the time the duplicate arrives the step
-  // has already advanced, so comparing against the CURRENT step never matches.
-  // A user cannot deliberately answer twice inside the window — they have not
-  // seen the next question yet.
-  const now = Date.now();
-  if (
-    session.lastAnswer === prompt &&
-    session.lastAnswerAt &&
-    now - Date.parse(session.lastAnswerAt) < 5_000
-  ) {
-    return result(true);
-  }
-  session.lastAnswer = prompt;
-  session.lastAnswerAt = new Date(now).toISOString();
-
-  if (GLOBAL_COMMANDS.restart.test(prompt)) {
-    const cached = loadPrdCache(conversationId);
-    const restarted = createSession(cached);
-    saveSession(conversationId, restarted);
-    return presentState(conversationId, restarted);
-  }
-
-  if (GLOBAL_COMMANDS.back.test(prompt)) {
-    if (!goBack(session)) {
-      return result(
-        true,
-        undefined,
-        'Already at the first step. Say "restart" to begin again.',
-      );
-    }
-    saveSession(conversationId, session);
-    return presentState(conversationId, session);
-  }
-
-  const state = getState(session.stateId);
-  if (!state) {
-    clearSession(conversationId);
-    return result(true);
-  }
-
-  if (state.terminal) {
-    releaseSession(conversationId);
-    return result(true);
-  }
-
-  // Every non-terminal state is a strict gate: an invalid or empty reply
-  // re-prompts the same step rather than falling through. Terminal states
-  // return above, so there is no non-strict path to handle here.
-  const effectiveType = state.type;
-  const options = state.options;
-
-  let answer = prompt;
-  if (effectiveType === 'choice' && options) {
-    const choice = parseChoice(prompt, options);
-    if (!choice) {
-      // Fast path: the designer answered "Do you have a PRD?" by pasting the PRD
-      // itself. That input satisfies BOTH gate steps, so consume it as the
-      // answer and the document in one move rather than rejecting it as an
-      // invalid choice — otherwise the gate re-asks forever (the paste can never
-      // parse as Yes/No). Covers the common case where the PRD arrives before
-      // the question is formally answered.
-      if (state.id === 'prd_check' && looksLikePrdContent(prompt)) {
-        storePrdContext(session.context, prompt, conversationId);
-        transitionSession(session, 'prd_paste');
-        transitionSession(session, 'reflect_learn');
-        saveSession(conversationId, session);
-        return presentState(conversationId, session);
-      }
-      // Mirror of the fast path on the "No" branch: natural phrasings like
-      // "nope" or "not yet" are unmistakably a no, but `parseChoice` only
-      // accepts the literal option label, so they used to be rejected and
-      // re-asked forever. `isNoPrdAnswer` was written for exactly this and was
-      // never wired in — route it to the guided uno-synthesize exit.
-      if (state.id === 'prd_check' && isNoPrdAnswer(prompt)) {
-        answer = 'No';
-      } else {
-        writeIntakeQuestion(conversationId, session, state);
-        saveSession(conversationId, session);
-        return intakeResult(
-          conversationId,
-          `Invalid choice for the current uno-prototype intake step. ${buildAgentIntakeInstruction(state)}`,
-        );
-      }
-    } else {
-      answer = choice;
-    }
-  }
-
-  if (state.validate && !state.validate(answer, session.context, attachments)) {
-    writeIntakeQuestion(conversationId, session, state);
-    saveSession(conversationId, session);
-    return intakeResult(
-      conversationId,
-      `Input validation failed for the current uno-prototype intake step. ${buildAgentIntakeInstruction(state)}`,
-    );
-  }
-
-  if (state.id === 'prd_paste') {
-    storePrdContext(session.context, answer, conversationId);
-  }
-
-  if (!state.transition) {
-    return presentState(conversationId, session);
-  }
-
-  const transitionResult = state.transition(answer, session.context);
-  let nextStateId;
-  let patch = {};
-
-  if (typeof transitionResult === 'string') {
-    nextStateId = transitionResult;
-  } else {
-    nextStateId = transitionResult.next;
-    patch = transitionResult.patch || {};
-  }
-
-  transitionSession(session, nextStateId, patch);
-
-  const nextState = getState(nextStateId);
-  if (!nextState) {
-    clearSession(conversationId);
-    return result(true);
-  }
-
-  if (nextStateId === 'awaiting_prd_synthesize') {
-    releaseSession(conversationId);
-    return result(true, undefined, nextState.question);
-  }
-
-  if (nextStateId === 'build_handoff') {
-    releaseSession(conversationId);
-    return result(true, undefined, buildHandoffMessage(session.context));
-  }
-
-  saveSession(conversationId, session);
-  return presentState(conversationId, session);
-}
-
-/**
- * @param {string} conversationId
- * @param {import('./storage.mjs').SessionState} session
- */
-function presentState(conversationId, session) {
-  const state = getState(session.stateId);
-  if (!state) {
-    clearSession(conversationId);
-    clearIntakeQuestion(conversationId);
-    return result(true);
-  }
-
-  saveSession(conversationId, session);
-
-  if (state.id === 'build_handoff') {
-    releaseSession(conversationId);
-    return result(true, undefined, buildHandoffMessage(session.context));
-  }
-
-  if (state.terminal) {
-    releaseSession(conversationId);
-    return result(true);
-  }
-
-  writeIntakeQuestion(conversationId, session, state);
-  return intakeResult(conversationId, buildAgentIntakeInstruction(state));
-}
-
-export { STATES };

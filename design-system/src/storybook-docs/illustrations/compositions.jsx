@@ -126,8 +126,12 @@ const REFLOW = {
  * side from 960 of its own width), not a restated copy.
  */
 /** The drawing inside the canvas, without its wrapper, so a motion scene can animate between widths. */
-export const ReflowScreen = ({ width = 1280, neutral = false }) => {
-  const { sidebar } = REFLOW[width];
+export const ReflowScreen = ({ width = 1280, layout = width, neutral = false, resizing = false }) => {
+  // `layout` is the breakpoint whose arrangement is drawn; `width` the window's
+  // own width, so a window resized between breakpoints keeps its last layout.
+  // While a window is being resized nobody has opened the Sidebar, so below
+  // 1280 it stays collapsed rather than opening as an overlay.
+  const sidebar = resizing && REFLOW[layout].sidebar === 'overlay' ? 'none' : REFLOW[layout].sidebar;
   const box = { x: 8, y: 6, w: width / 8, h: 100 };
   const { content } = screenLayout({ ...box, sidebar });
   const body = pageBody({ ...content, header: true });

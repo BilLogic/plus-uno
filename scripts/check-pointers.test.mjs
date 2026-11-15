@@ -2,10 +2,11 @@
 // breaks it, not by the committed router passing.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { sweep, pointersIn, triggersIn } from './check-pointers.mjs';
+import { frontmatter } from './lib/corpus.mjs';
+import { REPO_ROOT, sweep, pointersIn, triggersIn } from './check-pointers.mjs';
 
 /** A throwaway repo: a router plus whatever files the test says exist. */
 function repo(router, files = {}) {
@@ -207,7 +208,7 @@ import * as SectionStories from './Section.stories.jsx';
 
 ### Drop the Filter icon while a filter side shows.
 `;
-const SECTION_STORIES = "export default { title: 'Templates/Section/Section' };\n";
+const SECTION_STORIES = "export default { title: 'Templates/Section' };\n";
 const pattern = (href) => `import { Meta } from '@storybook/addon-docs/blocks';
 
 <Meta title="Patterns/Filtering" />
@@ -221,7 +222,7 @@ const crossRepo = (href) => repo('# Router\n', {
 });
 
 test('a cross-link to a rule another page owns resolves, by page id and rule slug', () => {
-  const r = crossRepo('templates-section-section--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary');
+  const r = crossRepo('templates-section--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary');
   try {
     const { failures, crossLinks } = sweep(r.root);
     assert.deepEqual(failures, []);
@@ -235,18 +236,18 @@ test('a cross-link to a page titled by its Meta resolves too', () => {
 });
 
 test('a cross-link to a template or pattern page that does not exist fails and names it', () => {
-  const r = crossRepo('templates-section--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary');
+  const r = crossRepo('templates-sections--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary');
   try {
     const { failures } = sweep(r.root);
     assert.equal(failures.length, 1);
     assert.match(failures[0], /Filtering\.mdx/);
-    assert.match(failures[0], /templates-section--docs/);
+    assert.match(failures[0], /templates-sections--docs/);
     assert.match(failures[0], /no page/);
   } finally { r.done(); }
 });
 
 test('a cross-link to a rule that was renamed fails and names the anchor', () => {
-  const r = crossRepo('templates-section-section--docs#order-the-right-side');
+  const r = crossRepo('templates-section--docs#order-the-right-side');
   try {
     const { failures } = sweep(r.root);
     assert.equal(failures.length, 1);
@@ -259,3 +260,56 @@ test('a link outside the Templates and Patterns roots is left to check:storybook
   const r = crossRepo('components-forms-and-inputs-filter-menu--docs');
   try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
 });
+
+test('#2513: router, engineering docs, and skills point at @plus-uno/cli, ds-mcp, and check:ds-usage without stale rules', () => {
+  const read = (rel) => readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+
+  const agents = read('AGENTS.md');
+  assert.match(agents, /Verifying a component's API, or writing a story's code[^\n]*`docs\/connectors\/ds-mcp\.md`[^\n]*`docs\/connectors\/storybook-mcp\.md`/);
+  assert.ok(
+    frontmatter(agents).body.length < 18_000,
+    `expected dieted AGENTS.md body < 18,000 chars, got ${frontmatter(agents).body.length}`,
+  );
+
+  const setup = read('docs/engineering/setup.md');
+  assert.match(setup, /npm run ds/);
+  assert.match(setup, /@plus-uno\/cli/);
+  assert.match(setup, /generate:docs-agent-files/);
+
+  const coding = read('docs/engineering/coding.md');
+  assert.match(coding, /check:ds-usage/);
+  assert.match(coding, /docs\/engineering\/ds-usage-rules\.md/);
+  assert.doesNotMatch(coding, /forms-and-inputs\/index\.js/);
+
+  const synthesize = read('skills/uno-synthesize/SKILL.md');
+  assert.match(synthesize, /docs\/connectors\/overview\.md/);
+  assert.doesNotMatch(synthesize, /Only Notion and Figma have MCP/);
+
+  const discovery = read('skills/uno-research/references/component-discovery.md');
+  assert.match(discovery, /ds_find/);
+  assert.match(discovery, /ds_get/);
+  assert.match(discovery, /docs\/connectors\/ds-mcp\.md/);
+
+  for (const rel of [
+    'skills/uno-maintain/references/production-checklist.md',
+    'skills/uno-maintain/references/staleness-sweep.md',
+    'skills/uno-maintain/references/ds-fix.md',
+  ]) {
+    assert.doesNotMatch(read(rel), /forms-and-inputs\/index\.js/, rel);
+  }
+  assert.match(read('skills/uno-maintain/references/production-checklist.md'), /check:ds-usage/);
+
+  const sbReview = read('skills/uno-review/references/storybook.md');
+  assert.match(sbReview, /design-system\/guidelines\/documentation-ia\.md/);
+  assert.match(sbReview, /docs\/connectors\/storybook-mcp\.md/);
+  assert.doesNotMatch(sbReview, /\bvariant\b|\bdismissable\b|Components\/Buttons\/Button/);
+
+  const sbDocs = read('skills/uno-review/references/storybook-component-docs.md');
+  assert.match(sbDocs, /design-system\/agent-views\/components\/index\.md/);
+  assert.match(sbDocs, /storybook\.taxonomy\.json/);
+  assert.match(sbDocs, /Harness/);
+  assert.match(sbDocs, /Templates/);
+  assert.match(sbDocs, /Patterns/);
+  assert.doesNotMatch(sbDocs, /\|\s*Forms and inputs\s*\|/);
+});
+

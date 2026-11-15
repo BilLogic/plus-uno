@@ -5,6 +5,15 @@
 2 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
+## Which component to reach for
+
+- **[ProgressIndicator](ProgressIndicator/index.md)** — Use `ProgressIndicator` for a short sequence where position matters more than the name of each step — a carousel, an onboarding flight, a slide deck.
+  - For steps with their own visible labels, use `ProgressTracker`.
+  - For a single bar showing percent complete, use `ProgressBar`.
+- **[ProgressTracker](ProgressTracker/index.md)** — Use `ProgressTracker` when each step of a journey has its own name people need to see and, often, jump back to — a multi-page form, a setup flow, a reflection with named sections.
+  - For a short sequence where position matters more than each step's name, use `ProgressIndicator`.
+  - For a single bar showing percent complete, use `ProgressBar`.
+
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [ProgressIndicator](ProgressIndicator/index.md) | 9 | ✅ | ✅ | ✅ |

@@ -32,8 +32,8 @@ const Rect = ({ x, y, w, h, fill, stroke, corner, opacity }) => {
     <rect
       x={x}
       y={y}
-      width={w}
-      height={h}
+      width={Math.max(0, w)}
+      height={Math.max(0, h)}
       fill={fill ?? 'none'}
       stroke={stroke}
       opacity={opacity}
@@ -62,8 +62,8 @@ export const SkeletonBar = ({ x, y, w, h = 4, accent = false, heading = false, t
   <rect
     x={x}
     y={y}
-    width={w}
-    height={h}
+    width={Math.max(0, w)}
+    height={Math.max(0, h)}
     rx={h / 2}
     ry={h / 2}
     fill={tone ?? (accent ? PAINT.accent : heading ? PAINT.placeholderHeading : PAINT.placeholderText)}
@@ -114,19 +114,30 @@ export const PageSheet = ({ x, y, w, h, accent = false, corner = 'window' }) => 
   <Layer x={x} y={y} w={w} h={h} fill={PAINT.pageSurface} shadow={PAINT.cardShadow} corner={corner} accent={accent} />
 );
 
-/** The accent marking a layer as the subject: a brand outline over its edge. */
-const AccentRing = ({ x, y, w, h, corner }) => <Rect x={x} y={y} w={w} h={h} stroke={PAINT.accent} corner={corner} />;
+/**
+ * The subject's ring around a layer (a Popup, a Modal, a Tooltip): a hairline in the accent. A
+ * layer is large, so the kit-unit accent stroke reads as a heavy border at its size; the hairline
+ * renders 1px wherever a drawing sets `--stroke-hairline` to half a stroke (heroes, motion demos).
+ */
+const AccentRing = ({ x, y, w, h, corner }) => {
+  const radius = clampedCorner(CORNER[corner], w, h);
+  return <rect x={x} y={y} width={Math.max(0, w)} height={Math.max(0, h)} fill="none" stroke={PAINT.accent} style={{ ...HAIRLINE, rx: radius, ry: radius }} />;
+};
 
-export const Frame = ({ x, y, w, h, accent = false }) => {
+export const Frame = ({ x, y, w, h, accent = false, chrome = true }) => {
   const onHeroGround = useContext(HeroGround);
   return (
     <g>
       <Rect x={x} y={y} w={w} h={h} fill={PAINT.frameSunken} stroke={accent ? PAINT.accent : onHeroGround ? PAINT.illustrationEdge : PAINT.frameDivider} corner="window" />
-      {[0, 1, 2].map((i) => (
-        <circle key={i} cx={x + 8 + i * 7} cy={y + 6} r={2} fill={PAINT.windowDot} />
-      ))}
-      <SkeletonBar x={x + 34} y={y + 4} w={w * 0.35} />
-      <Rule x1={x} x2={x + w} y1={y + 12} y2={y + 12} />
+      {chrome && (
+        <>
+          {[0, 1, 2].map((i) => (
+            <circle key={i} cx={x + 8 + i * 7} cy={y + 6} r={2} fill={PAINT.windowDot} />
+          ))}
+          <SkeletonBar x={x + 34} y={y + 4} w={w * 0.35} />
+          <Rule x1={x} x2={x + w} y1={y + 12} y2={y + 12} />
+        </>
+      )}
     </g>
   );
 };
@@ -151,7 +162,8 @@ export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => {
         </>
       )}
       <Rect x={x + 6} y={y + 4} w={12} h={12} fill={accent ? PAINT.accent : icon} corner="sidebarRow" />
-      {/* The logo row ends with the sidebar toggle, on the trailing column. */}
+      {/* The logo row: the mark, then the wordmark, then the sidebar toggle on the trailing column. */}
+      {w >= 56 && <SkeletonBar x={x + 22} y={y + 8} w={w * 0.3} h={4} heading />}
       {w >= 56 && <Rect x={x + w - 16} y={y + 6} w={8} h={8} fill={icon} corner="icon" />}
       {Array.from({ length: rowCount }, (_, i) => {
         const ry = y + 24 + i * SIDEBAR_ROW_PITCH;
@@ -545,4 +557,4 @@ export const AnatomyMarker = ({ x, y, tx, ty, accent = false }) => (
   </g>
 );
 
-export { Rect, Rule };
+export { Layer, Rect, Rule };

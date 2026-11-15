@@ -85,6 +85,7 @@ export const OpensAndSelectsFromTheKeyboard = () => {
 
 OpensAndSelectsFromTheKeyboard.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const popup = within(canvasElement.ownerDocument.body);
     const trigger = canvas.getByRole('combobox', { name: 'Site' });
     const readout = () => canvas.getByTestId('mkn-single-value').textContent;
 
@@ -94,7 +95,7 @@ OpensAndSelectsFromTheKeyboard.play = async ({ canvasElement }) => {
     trigger.focus();
     await userEvent.keyboard('{ArrowDown}');
 
-    const tree = await waitFor(() => canvas.getByRole('tree'));
+    const tree = await waitFor(() => popup.getByRole('tree'));
     await expect(trigger.getAttribute('aria-controls')).toBe(tree.getAttribute('id'));
 
     // Focus is IN the tree, on its first row.
@@ -114,7 +115,7 @@ OpensAndSelectsFromTheKeyboard.play = async ({ canvasElement }) => {
 
     await expect(readout()).toBe('roosevelt-k8');
     // Choosing closes the panel and hands focus back to the trigger.
-    await waitFor(() => expect(canvas.queryByRole('tree')).toBeNull());
+    await waitFor(() => expect(popup.queryByRole('tree')).toBeNull());
     await expect(document.activeElement).toBe(trigger);
 };
 
@@ -136,12 +137,13 @@ export const CollapsesAndEscapes = () => {
 
 CollapsesAndEscapes.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const popup = within(canvasElement.ownerDocument.body);
     const trigger = canvas.getByRole('combobox', { name: 'Site' });
 
     trigger.focus();
     await userEvent.keyboard('{Enter}');
 
-    const tree = await waitFor(() => canvas.getByRole('tree'));
+    const tree = await waitFor(() => popup.getByRole('tree'));
 
     // Opening reveals the selection's branch and starts on the selected node.
     await waitFor(() => expect(tree.contains(document.activeElement)).toBe(true));
@@ -161,7 +163,7 @@ CollapsesAndEscapes.play = async ({ canvasElement }) => {
     await expect(document.activeElement.textContent).toContain('High schools');
 
     await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(canvas.queryByRole('tree')).toBeNull());
+    await waitFor(() => expect(popup.queryByRole('tree')).toBeNull());
     await expect(document.activeElement).toBe(trigger);
 };
 
@@ -181,12 +183,13 @@ export const MultipleTogglesWithoutClosing = () => {
 
 MultipleTogglesWithoutClosing.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const popup = within(canvasElement.ownerDocument.body);
     const trigger = canvas.getByRole('combobox', { name: 'Sites' });
     const readout = () => canvas.getByTestId('mkn-multi-value').textContent;
 
     trigger.focus();
     await userEvent.keyboard('{ArrowDown}');
-    const tree = await waitFor(() => canvas.getByRole('tree'));
+    const tree = await waitFor(() => popup.getByRole('tree'));
     await expect(tree.getAttribute('aria-multiselectable')).toBe('true');
 
     await waitFor(() => expect(tree.contains(document.activeElement)).toBe(true));
@@ -194,7 +197,7 @@ MultipleTogglesWithoutClosing.play = async ({ canvasElement }) => {
     // Space on a parent takes its subtree with it, and leaves the panel open.
     await userEvent.keyboard(' ');
     await expect(readout()).toBe('middle-schools,lincoln-middle,roosevelt-k8');
-    await expect(canvas.getByRole('tree')).toBeTruthy();
+    await expect(popup.getByRole('tree')).toBeTruthy();
 
     // And off again.
     await userEvent.keyboard(' ');
@@ -245,6 +248,7 @@ export const CascaderWalksItsColumns = () => {
 
 CascaderWalksItsColumns.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const popup = within(canvasElement.ownerDocument.body);
     const trigger = canvas.getByRole('combobox', { name: 'Region' });
     const readout = () => canvas.getByTestId('mkn-cascader-value').textContent;
 
@@ -256,7 +260,7 @@ CascaderWalksItsColumns.play = async ({ canvasElement }) => {
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(trigger.getAttribute('aria-expanded')).toBe('true'));
 
-    const firstColumn = await waitFor(() => canvas.getByRole('listbox', { name: 'Options' }));
+    const firstColumn = await waitFor(() => popup.getByRole('listbox', { name: 'Options' }));
     await waitFor(() => expect(firstColumn.contains(document.activeElement)).toBe(true));
     await expect(document.activeElement.textContent).toContain('Scotland');
 
@@ -266,7 +270,7 @@ CascaderWalksItsColumns.play = async ({ canvasElement }) => {
 
     // Right opens the child column and steps into it.
     await userEvent.keyboard('{ArrowRight}');
-    const second = await waitFor(() => canvas.getByRole('listbox', { name: /Options under/ }));
+    const second = await waitFor(() => popup.getByRole('listbox', { name: /Options under/ }));
     await waitFor(() => expect(second.contains(document.activeElement)).toBe(true));
     await expect(document.activeElement.textContent).toContain('Cardiff');
 
@@ -277,7 +281,7 @@ CascaderWalksItsColumns.play = async ({ canvasElement }) => {
     // Enter on a leaf commits the whole path and closes.
     await userEvent.keyboard('{Enter}');
     await expect(readout()).toBe('wales / cardiff');
-    await waitFor(() => expect(canvas.queryByRole('listbox')).toBeNull());
+    await waitFor(() => expect(popup.queryByRole('listbox')).toBeNull());
     await expect(document.activeElement).toBe(trigger);
 };
 
@@ -296,11 +300,12 @@ export const CascaderGoesBackAndCloses = () => {
 
 CascaderGoesBackAndCloses.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const popup = within(canvasElement.ownerDocument.body);
     const trigger = canvas.getByRole('combobox', { name: 'Region' });
 
     trigger.focus();
     await userEvent.keyboard('{Enter}');
-    await waitFor(() => canvas.getByRole('listbox', { name: 'Options' }));
+    await waitFor(() => popup.getByRole('listbox', { name: 'Options' }));
 
     // Into the second column…
     await userEvent.keyboard('{ArrowRight}');
@@ -311,6 +316,6 @@ CascaderGoesBackAndCloses.play = async ({ canvasElement }) => {
     await expect(document.activeElement.textContent).toContain('Scotland');
 
     await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(canvas.queryByRole('listbox')).toBeNull());
+    await waitFor(() => expect(popup.queryByRole('listbox')).toBeNull());
     await expect(document.activeElement).toBe(trigger);
 };

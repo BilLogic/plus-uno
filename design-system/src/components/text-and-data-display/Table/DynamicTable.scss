@@ -66,8 +66,8 @@
     text-align: left;
 }
 
-// The footer spans the pagination slot: range at the start, pager at the end.
-.plus-dynamic-table .plus-pattern-table-pagination > .plus-table-footer {
+// The footer spans the footer slot: range at the start, pager at the end.
+.plus-dynamic-table .plus-pattern-table-footer > .plus-table-footer {
     flex: 1;
 }
 

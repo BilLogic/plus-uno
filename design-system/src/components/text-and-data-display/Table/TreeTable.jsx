@@ -1,3 +1,4 @@
+import { AnimatePresence, HeightRow } from '@/lib/heightMotion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import PatternTable from '@/patterns/PatternTable';
@@ -216,6 +217,7 @@ const TreeTable = ({
                     </tr>
                 </thead>
                 <tbody ref={bodyRef}>
+                    <AnimatePresence initial={false}>
                     {rows.map((row) => {
                         if (row.type === 'message') {
                             return (
@@ -240,10 +242,9 @@ const TreeTable = ({
                         const isLoading = loading.has(item.id);
                         const toggleState = !row.isParent ? 'leaf' : (isLoading ? 'loading' : (row.expanded ? 'expanded' : 'collapsed'));
                         return (
-                            <TableRow
-                                key={item.id}
+                            <HeightRow key={item.id}><TableRow
                                 data-tree-id={item.id}
-                                className={classes('plus-tree-table-row', shouldExpandOnClick && row.isParent && 'plus-tree-table-row--expands')}
+                                className={classes('plus-tree-table-row', level > 0 && 'plus-tree-table-row--motion', shouldExpandOnClick && row.isParent && 'plus-tree-table-row--expands')}
                                 aria-level={level + 1}
                                 aria-posinset={row.posinset}
                                 aria-setsize={row.setsize}
@@ -298,9 +299,10 @@ const TreeTable = ({
                                         </TableCell>
                                     );
                                 })}
-                            </TableRow>
+                            </TableRow></HeightRow>
                         );
                     })}
+                    </AnimatePresence>
                 </tbody>
             </PatternTable>
         </div>

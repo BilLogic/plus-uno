@@ -68,7 +68,7 @@ describe('every drawn height is its token, halved', () => {
 
 describe('no corner exceeds half its drawn height, except a full one', () => {
   const all = [
-    ...Object.entries(primitives).filter(([n, C]) => typeof C === 'function' && !['Rect', 'Rule', 'pageBody', 'screenLayout'].includes(n)).map(([n, C]) => [n, <C x={4} y={4} w={100} h={60} />]),
+    ...Object.entries(primitives).filter(([n, C]) => typeof C === 'function' && !['Layer', 'Rect', 'Rule', 'pageBody', 'screenLayout'].includes(n)).map(([n, C]) => [n, <C x={4} y={4} w={100} h={60} />]),
     ['ResponsiveReflow', <compositions.ResponsiveReflow width={1280} />],
     ['ThreeLayers', <compositions.ThreeLayers />],
   ];
@@ -87,8 +87,8 @@ describe('no corner exceeds half its drawn height, except a full one', () => {
 describe('every drawn paint resolves to a role', () => {
   const drawn = [
     ...Object.entries(primitives)
-      // Rect and Rule are the helpers every primitive draws with, and the two layout helpers draw nothing.
-      .filter(([name, C]) => typeof C === 'function' && !['Rect', 'Rule', 'pageBody', 'screenLayout'].includes(name))
+      // Layer, Rect and Rule are the helpers every primitive draws with, and the two layout helpers draw nothing.
+      .filter(([name, C]) => typeof C === 'function' && !['Layer', 'Rect', 'Rule', 'pageBody', 'screenLayout'].includes(name))
       .flatMap(([name, C]) => [false, true].map((accent) => [`${name} accent=${accent}`, <C x={4} y={4} w={100} h={60} accent={accent} />])),
     ...Object.entries(compositions)
       .filter(([, C]) => typeof C === 'function')

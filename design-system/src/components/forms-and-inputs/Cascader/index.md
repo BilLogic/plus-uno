@@ -12,14 +12,11 @@ Cascader: a field that picks one path through nested options, one level at a tim
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
-Use `Cascader` when a choice is naturally made one level at a time, in
-sequence — a region, then a city, then a neighborhood. For a hierarchy where
-someone might pick or see several nodes at once rather than one path, use
-`TreeSelect` instead. For a flat list, use `Select`.
+Use `Cascader` when a single path through a hierarchy is chosen one level at a time in sequence, such as district, then school, then grade.
 
 ## Motion
 
@@ -30,6 +27,11 @@ Cascader reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 | change | Expand and collapse | `--ds-motion-spatial-fast` | Columns and branches expand. |
+
+## Alternatives
+
+- For a hierarchy where someone may pick or view several nodes across branches at once, use `TreeSelect`.
+- For a flat list of options with no hierarchy, use `Select`.
 
 ## Best practices
 
@@ -69,10 +71,10 @@ Don't: A failed pick still draws the normal border, so nothing marks the error.
 
 ## Related
 
-- For a hierarchy where several nodes can be picked or seen at once, use `TreeSelect`.
-- For a flat list with no hierarchy, use `Select`.
+- `TreeSelect`: use when expanding branches in place or selecting multiple nodes across a tree.
+- `Select`: use when choosing from a flat list of options.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -110,9 +112,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid
 
 | Do | Don't |
 | --- | --- |
-| Name each level by what it is: "Region", "City". | Names that only make sense at one level. |
+| Name each level by what it is: "District", "School". | Names that only make sense at one level. |
 | Keep each level's options short and parallel. | Mixed kinds of option in one column. |
-| Say what to do in an error: "Pick a region". | "Required" or "Invalid". |
+| Say what to do in an error: "Pick a location". | "Required" or "Invalid". |
 | Label the field with the whole path's subject: "Location". | A label for just the first level. |
 
 ## Props
@@ -144,7 +146,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-border` · `--plus-listbox-viewport-width`
+`--border-default` · `--ds-border` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--plus-listbox-viewport-width`
 
 From `design-system/src/components/forms-and-inputs/Cascader/Cascader.scss`. Override these through the token layer, never with a literal.
 

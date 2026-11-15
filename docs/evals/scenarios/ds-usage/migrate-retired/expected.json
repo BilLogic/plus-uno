@@ -1,0 +1,71 @@
+{
+  "task": "migrate-retired",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/migrate-retired/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "calloff-page",
+      "screen": "Call-off confirmation view",
+      "template": "Page + PatternCard",
+      "variant": "Page · Default / PatternCard · Default",
+      "page": "design-system/src/patterns/PatternCard/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Page/index.md",
+        "design-system/src/patterns/PatternCard/index.md"
+      ],
+      "guides": ["page", "card", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["Page", "PatternCard"]
+      },
+      "expectation": "Call-off confirmation migrated onto current Page / PatternCard templates and --ds-* tokens."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "notifications",
+      "pattern": "Notifications",
+      "variant": "Banner warning + Flag confirmation",
+      "page": "design-system/agent-views/patterns/Notifications.md",
+      "section": "The carriers",
+      "guide": "notifications",
+      "aliases": ["toast", "banner", "alert"],
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["Banner", "Flag"]
+      },
+      "expectation": "Retired Alert is replaced by Banner (warning) and retired Toast is replaced by Flag / FlagGroup."
+    },
+    {
+      "id": "indicators",
+      "pattern": "Indicators",
+      "variant": "StatusTag for Late status",
+      "page": "design-system/agent-views/patterns/Indicators.md",
+      "section": "The three tags",
+      "guide": "indicators",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["StatusTag"]
+      },
+      "expectation": "Retired Badge marking the call-off Late is replaced by StatusTag (or Tag) with warning/danger appearance."
+    },
+    {
+      "id": "common-actions",
+      "pattern": "Common actions",
+      "variant": "Current Button props",
+      "page": "design-system/agent-views/patterns/CommonActions.md",
+      "section": "Appearances",
+      "guide": "common-actions",
+      "scoring": "judge",
+      "expectation": "Buttons replace retired size=\"small\", fill, and variant props with spacing=\"compact\", shouldFitContainer, and appearance."
+    }
+  ],
+  "required_placements": [],
+  "against_placements": []
+}

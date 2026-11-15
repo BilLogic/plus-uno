@@ -2,8 +2,9 @@ import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
-import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { CARD_STAGE, LongValue, OwnedForm, PlainText, ReadOnlyChoices, ReadOnlyField, ReadOnlyPickers, STAGE } from './readOnlyDemo.jsx';
+import { FitStage, ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
+import { CARD_STAGE, LongValue, OwnedForm, PlainText, ReadOnlyChoices, ReadOnlyField, ReadOnlyPickers } from './readOnlyDemo.jsx';
 
 /**
  * Read-only: the pattern page's examples, run in the Storybook tests. Each is
@@ -75,7 +76,7 @@ export const KeyChoices = {
 /** A whole form someone else owns: every field read-only, one caption on the group, no Save. */
 export const KeyOwnedForm = {
     name: 'Key case: A form someone else owns',
-    render: () => staged(<OwnedForm />, STAGE),
+    render: () => <ScreenStage width={PAGE_WIDTH}><OwnedForm /></ScreenStage>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByLabelText('Student')).toHaveAttribute('readonly');

@@ -8,6 +8,10 @@ Also asked as: title, headline.
 
 **Import:** `import { Heading } from '@/components';`
 
+**Used in:** Page (`ds guide page`); Card (`ds guide card`); Section (`ds guide section`); Table (`ds guide table`)
+
+**Governed by:** Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`)
+
 **Source:** `design-system/src/components/text-and-data-display/Heading/Heading.jsx`
 
 **Stories:** `design-system/src/components/text-and-data-display/Heading/Heading.stories.jsx` — Overview, Sizes, OverridesTheTag, NestedContext, InverseColor, Interactive, Rest, Hovered, Pressed, NotAControl
@@ -20,6 +24,14 @@ Use `Heading` for every heading in the product: a page title, a section
 header, a card title. Never style plain text to look like a heading: a
 sighted-only "heading" breaks navigation by heading for anyone using
 assistive technology.
+
+Nest content in a `HeadingContextProvider`, or rely on the one a template like
+`Section` already provides, and `Heading` picks `h1` to `h6` from how deep it
+sits. Pass `size` for the look; reach for `as` only to break that link on purpose.
+
+## Alternatives
+
+- For a page's top title row with breadcrumbs and actions, use `PageHeader`.
 
 ## Best practices
 
@@ -44,7 +56,7 @@ Don't: The default ink on a dark ground, which barely reads.
 
 - **The tag is the real heading level**, not a visual effect: a screen
   reader's "jump to heading" list is built from the actual tag, which is why
-  nesting through `HeadingContextProvider` matters more than it looks.
+  nesting through `HeadingContextProvider` matters.
 - **`as` can break the outline if misused.** Overriding the tag to something
   that isn't `h1`–`h6` (like `div` or `span`) removes it from the heading
   outline entirely: correct for a styled label, wrong for an actual section
@@ -55,14 +67,14 @@ Don't: The default ink on a dark ground, which barely reads.
 
 ## Related
 
-- For the component that supplies the ambient heading level, see `HeadingContextProvider` in this same module.
-- For a page's own title row, see `PageHeader`, which renders its title in a `Heading` by default.
+- `PageHeader`: use when rendering a page's top title row, which uses `Heading` by default.
+- Typography: use when checking the heading scale and document outline rules.
 
 Same group: `Code` · `CodeBlock` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 ## Parts
 
-1. **Text.** Set in the text style of `size`, from xxlarge to xxsmall.
+1. **Text.** Set in the text style of `size`, from `xxlarge` to `xxsmall`.
 2. **Tag.** Follows the ambient heading level, or `as` when given.
 3. **Color.** Default ink, inverse ink on a dark ground, or the warning inverse ink.
 

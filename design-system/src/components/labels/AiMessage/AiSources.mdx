@@ -11,13 +11,14 @@ import {
 <Meta of={AiSourcesStories} />
 
 <Title />
-What an AI answer read: a compact list under the message, one row per source with its title as a link and its type beside it.
+Sources an AI answer read, collapsed under the message. Each row links the title and shows its type.
 
 <DocsTabs of={AiSourcesStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21740-1282"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/AiMessage/AiSources.jsx"
 />
 
@@ -27,7 +28,7 @@ What an AI answer read: a compact list under the message, one row per source wit
 
 ## Appearance
 
-<ComponentExample of={AiSourcesStories.Overview} title="Sources" description="Up to three sources show, each a link with its type beside it." />
+<ComponentExample of={AiSourcesStories.Overview} title="Sources" description="Closed at first: the toggle carries the count and opens the list, each source a link with its type beside it." />
 
 </div>
 
@@ -35,7 +36,7 @@ What an AI answer read: a compact list under the message, one row per source wit
 
 ## Behavior
 
-<ComponentExample of={AiSourcesStories.MoreThanThree} title="More than three" description={<>Past three, the rest fold behind "Show N more sources", which reports whether it is open.</>} />
+<ComponentExample of={AiSourcesStories.Repeated} title="Repeated sources" description="The same address twice shows once, and the count says so." />
 
 </div>
 
@@ -59,7 +60,12 @@ What an AI answer read: a compact list under the message, one row per source wit
 
 ## Usage
 
-Place `AiSources` under the AI message it belongs to, and pass one `{ title, href, type }` per source the answer read. With no sources it renders nothing. Inside a frame, pass `target` (such as `_top`) so the links leave it; without it, outside links open in a new window.
+Place `AiSources` under its AI message with one `{ title, href, type }` per source.
+Duplicate addresses appear once; no sources renders nothing. The toggle shows
+the count and starts closed.
+
+Inside a frame, pass `target`, such as `_top`, to open links outside it.
+Without `target`, external links open in a new window.
 
 </div>
 
@@ -67,8 +73,8 @@ Place `AiSources` under the AI message it belongs to, and pass one `{ title, hre
 
 ## Accessibility
 
-- The list is named by its "Sources" heading.
-- The toggle is a button that reports `aria-expanded`.
+- The list has the accessible name "Sources".
+- The counted toggle is a button that reports `aria-expanded`.
 
 </div>
 
@@ -76,7 +82,7 @@ Place `AiSources` under the AI message it belongs to, and pass one `{ title, hre
 
 ## Related
 
-- <a href="?path=/docs/ai-ui-components-ai-message--docs">AI message</a> for the reply the sources sit under.
+- <a href="?path=/docs/ai-ui-components-ai-message-ai-message--docs">AI message</a> for the reply the sources sit under.
 - <a href="?path=/docs/ai-ui-components-ai-message-ai-feedback--docs">AI feedback</a> for rating the answer.
 
 </div>

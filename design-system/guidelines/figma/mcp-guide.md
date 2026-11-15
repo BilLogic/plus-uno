@@ -82,7 +82,7 @@ For iterating a prototype between the repo and Figma (build here → designer tw
 
 1. **Primary:** `design-system/figma/component-registry.json` — import path, props, Figma set node IDs (generated from each component's MDX `figmaMeta`; read-only — edit MDX to change a mapping)
 2. **Secondary:** `search_design_system` MCP — confirm library instance names
-3. **Tertiary:** `design-system/guidelines/components/components-index.json` — unmapped components only
+3. **Tertiary:** `design-system/guidelines/components-index.json` — unmapped components only
 
 If a node is not in the registry, flag as a gap. Do not invent imports or props.
 

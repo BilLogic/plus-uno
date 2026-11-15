@@ -38,9 +38,8 @@ export const figmaMeta = {
 <Meta of={CountTagStories} />
 
 <Title />
-Is it a number? Count tag. Is it the condition something is in, and can that
-condition change? Status tag. Otherwise, Tag. A Count tag is a number on its
-own: unread items, results, errors.
+A number on its own: unread items on a nav row, results on a tab, errors in a
+section header, or a presence dot on a bell.
 
 <DocsTabs of={CountTagStories}>
 
@@ -49,8 +48,6 @@ own: unread items, results, errors.
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20454-869"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/CountTag"
-    sets={figmaMeta.sets}
-    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -69,9 +66,9 @@ own: unread items, results, errors.
 
 ## Size and layout
 
-<ComponentExample of={CountTagStories.Spacings} title="Spacing" description="Default draws 20 high on its own; compact draws 16, for use inside a label. More digits grow the badge from the trailing edge." />
+<ComponentExample of={CountTagStories.Spacings} title="Spacing" description="Default draws 20 high on its own; compact draws 16, for use inside a label. More digits grow the tag from the trailing edge." />
 
-<ComponentExample of={CountTagStories.Ring} title="Ring" description={<><code>hasRing</code> adds a 2px ring in the page color, for a count pinned to an icon or an avatar.</>} />
+<ComponentExample of={CountTagStories.Ring} title="Ring" description={<><code>hasRing</code> adds a ring in the surface color, for a count pinned to an icon or an avatar.</>} />
 
 </div>
 
@@ -93,7 +90,7 @@ own: unread items, results, errors.
 
 ## State
 
-<ComponentExample of={CountTagStories.Rest} title="Rest" description="The only state: a number in a near-square badge." />
+<ComponentExample of={CountTagStories.Rest} title="Rest" description="The only state: a number in a near-square pill." />
 
 <ComponentExample of={CountTagStories.Hovered} title="Hovered" description="No change: a count is not a control." />
 
@@ -111,12 +108,7 @@ own: unread items, results, errors.
 
 <DocsInteractivePlayground
     of={CountTagStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -137,12 +129,20 @@ own: unread items, results, errors.
 Use `CountTag` for a number on its own: unread messages on a nav item, results on a
 tab, errors in a section header, a notification on a bell.
 
-- **Is it a number?** Count tag.
-- **Is it the condition something is in, and can that condition change?** Status tag.
-- **Otherwise** (a subject, a person, a category): Tag.
+`spacing="compact"` (`16`) is for use inside a label: `StatusTag` nests it through its
+`trailingMetric` prop, and `Tag` nests it on a selectable tag.
 
-`spacing="compact"` (16) is for use inside a label: Status tag nests it through its
-`trailingMetric` prop, and Tag nests it on a selectable tag.
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For the condition something is in, use `StatusTag`.
+- For a change over time such as "+3 vs last week", use `ChangeTag`.
+- For a due or event date, use `DateTag`.
+- For a category or subject or person, use `Tag`.
+- For progress toward a total, use `ProgressBar`.
 
 </div>
 
@@ -150,9 +150,9 @@ tab, errors in a section header, a notification on a bell.
 
 ## Parts
 
-1. **Number.** The count in the body-small size with tabular digits, hidden at 0 unless <code>showZero</code>, capped at <code>max</code> with a <code>+</code>.
-2. **Badge.** 20 tall on its own and 16 inside a label, 24 wide at minimum, with a 2 corner, so one digit is a small rectangle and more digits grow it from the trailing edge.
-3. **Dot.** Presence without a number: an 8 circle that needs a <code>label</code> for its name.
+1. **Number.** The count in the body-small size with tabular digits, hidden at 0 unless `showZero`, capped at `max` with a `+`.
+2. **Pill.** `20` tall on its own and `16` inside a label, `24` wide at minimum, so one digit is a small rectangle and more digits grow it from the trailing edge.
+3. **Dot.** Presence without a number: an `8` circle that needs a `label` for its name.
 4. **Ring.** Optional, in the surface color, for a count pinned to the corner of an icon or an avatar.
 
 ### States
@@ -192,8 +192,6 @@ tab, errors in a section header, a notification on a bell.
 
 ## Best practices
 
-Use a count for a number on its own, beside the thing it counts or inside a Status tag or Tag. For a condition, use Status tag; for a category, use Tag; for progress toward a total, use Progress bar.
-
 ### Keep most counts quiet.
 
 Subtle neutral is the default. Bold asks for action now, so use at most one bold count per area.
@@ -207,22 +205,22 @@ Subtle neutral is the default. Bold asks for action now, so use at most one bold
 
 ### Let the component decide zero and overflow.
 
-It renders nothing at 0 and caps past `max` with a `+`, so pass the raw number.
+It renders nothing at `value={0}` and caps past `max` with a `+`, so pass the raw number.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}><span>Messages</span><CountTag value={0} /></div>}
-    doCaption="Pass the raw number: at 0 the badge leaves the empty tab bare."
+    doCaption="Pass the raw number: at zero the tag leaves the empty tab bare."
     dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}><span>Messages</span><CountTag value={0} showZero /></div>}
     dontCaption="Force a zero onto an empty tab, unless the zero is the news."
 />
 
 ### Show the bare number, and put the meaning in the label.
 
-The badge shows 4, never "4 unread"; `label="4 unread messages"` tells a screen reader what it counts.
+The tag shows the number alone, never words alongside it; `label="4 unread messages"` tells a screen reader what it counts.
 
 ### Use inverse on filled buttons and dark surfaces.
 
-Inverse is a solid white badge with dark text, so it passes contrast on any fill. On a light surface use subtle.
+Inverse is a solid light ground with dark text, so it passes contrast on any fill. On a light surface use subtle.
 
 <DoDontPair
     doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><CountTag value={4} isInverse /></div>}
@@ -246,9 +244,9 @@ A dot has no number, so `label` is its accessible name; without one it is announ
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Show the bare number: 4, 12, 99+.</td><td>Add words or units to the badge: "4 unread".</td></tr>
+<tr><td>Show the bare number: 4, 12, 99+.</td><td>Add words or units to the tag: "4 unread".</td></tr>
 <tr><td>Put the meaning in <code>label</code>, which a screen reader reads: "4 unread messages".</td><td>Write "04" or pad with zeros.</td></tr>
-<tr><td>Leave a zero out. An empty tab needs no badge.</td><td>Show "0" unless the zero is the news.</td></tr>
+<tr><td>Leave a zero out. An empty tab needs no count tag.</td><td>Show "0" unless the zero is the news.</td></tr>
 <tr><td>Give a dot a <code>label</code> that says what it marks: "New message".</td><td>Ship a dot with no name.</td></tr>
 </tbody>
 </DocsTable>
@@ -263,13 +261,12 @@ A dot has no number, so `label` is its accessible name; without one it is announ
   exposed as an image with that name. Without one it is announced as nothing,
   and the component warns in development.
 - **A label turns a digit into information.** "Messages 4" is ambiguous; with
-  `label="4 unread"` a screen reader hears "Messages 4 unread", while the badge
+  `label="4 unread"` a screen reader hears "Messages 4 unread", while the tag
   still shows 4.
 - **The count is not a control.** It is a `span` that sits inside buttons, tabs
   and nav items; whatever is pressable is the thing around it.
-- **Contrast.** Subtle uses each appearance's (Text) color, and bold warning uses the
-  Warning Container pair because warning with white text fails AA. Inverse
-  is a solid white badge with dark text, so it clears AA on any fill, including
+- **Contrast.** Subtle uses each appearance's text color, and bold warning uses the
+  warning inverse pair so it clears AA. Inverse clears AA on any bold fill, including
   a primary button.
 
 </div>
@@ -278,8 +275,8 @@ A dot has no number, so `label` is its accessible name; without one it is announ
 
 ## Related
 
-- For the condition something is in, use `StatusTag`; its `trailingMetric` nests a Count tag inside it.
-- For a category, a subject or a person, use `Tag`.
+- `StatusTag`: use when nesting a `CountTag` inside a condition label through `trailingMetric`.
+- `Tag`: use when nesting a `CountTag` on a selectable filter tag through `trailingMetric`.
 
 </div>
 

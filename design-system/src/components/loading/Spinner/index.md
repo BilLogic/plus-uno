@@ -8,19 +8,21 @@ Also asked as: loading, busy indicator, wait indicator, loading indicator.
 
 **Import:** `import { Spinner } from '@/components';`
 
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Loading (`ds guide loading`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/loading/Spinner/Spinner.jsx`
 
 **Stories:** `design-system/src/components/loading/Spinner/Spinner.stories.jsx` — Overview, Sizes, Size16, Size24, Size48, Invert, Interactive, Rest, Hovered, Pressed, Focused, ReducedMotion
 
 **Storybook page:** `design-system/src/components/loading/Spinner/Spinner.mdx`
 
-**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
 Use `Spinner` when the wait is short, indeterminate, and the user has nothing
-to do but wait: a submit in flight, a panel fetching on open. It says
-"working", and that is all it says.
+to do but wait: a submit in flight, a panel fetching on open. For a wait under
+about 300 ms, show nothing so the indicator does not flicker.
 
 ### Appearance guidance
 
@@ -37,14 +39,20 @@ Spinner reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Load content | `--ds-motion-linear` | Turns while work runs and stops the moment it stops. A static label in reduced motion. |
 
+## Alternatives
+
+- For a wait whose percentage is known, use `ProgressBar` or `ProgressRing`.
+- For content loading into a layout that already has a shape, use `Skeleton`.
+- For a result once the wait ends, use `SectionMessage` or `Flag`.
+
 ## Best practices
 
 ### Size the spinner to its container. {#size-the-spinner-to-its-container}
 
-A small control takes the 16 spinner; a large one dwarfs the label it replaces.
+A small control takes the `size={16}` spinner; `size={48}` dwarfs the label it replaces.
 
-Do: 16 spinner in a small control.
-Don't: 48 spinner in a small control.
+Do: Small spinner in a compact row.
+Don't: Large spinner in a compact row.
 
 ### Use invert on dark surfaces. {#use-invert-on-dark-surfaces}
 
@@ -54,7 +62,7 @@ stays visible. There is no color prop: a spinner is not a status color.
 Do: Invert on a dark surface.
 Don't: Inherit on a dark surface.
 
-### One spinner per wait. {#one-spinner-per-wait}
+### Show one spinner per wait. {#show-one-spinner-per-wait}
 
 Several spinners on one view compete for attention; show one for the whole load.
 
@@ -74,23 +82,19 @@ Don't: A loose spinner beside a button that can still be pressed.
 - **A status region is only announced when it changes.** A spinner rendered
   into a region that was already on the page is announced; one that arrives
   with a whole new screen usually is not. If the wait matters, put the live
-  region where it will still be there afterwards and swap its contents.
-- **Say what is loading, if it is not obvious.** "Loading" beside a form is
-  fine. "Loading" as the only thing on a page is not; override `label` with
-  something more specific.
+  region where it will still be there afterward and swap its contents.
+- **Say what is loading when it is not obvious.** "Loading" beside a form is
+  fine; "Loading" as the only thing on a page needs a specific `label`.
 - **Reduced motion is handled.** The rotation slows under
   `prefers-reduced-motion: reduce` rather than stopping outright, so the ring
   still reads as working.
 
 ## Related
 
-- For a wait whose length is known, use `ProgressBar`. A determinate bar answers "how much longer", which a spinner never can.
-- For content loading into a layout that already has a shape, use `Skeleton`: it holds the shape and does not flash. A spinner is for when there is no shape yet.
-- For a result once the wait ends, use `SectionMessage` or `Flag`.
-- For a button that is busy, set its `isLoading`; the `Button` renders this Spinner at 16, the button icon size, in both spacings.
-- For a wait under about 300ms, show nothing. The spinner appears and vanishes as a flicker, which reads as a glitch rather than as work.
+- `Button`: use when a button is busy by setting its `isLoading` prop rather than placing a loose `Spinner` beside it.
+- Loading: use when choosing wait thresholds and loading states across a view.
 
-Same group: `GenerativeBorder` · `ProgressBar` · `Skeleton`
+Same group: `GenerativeBorder` · `ProgressBar` · `ProgressRing` · `Skeleton`
 
 ## Parts
 
@@ -140,7 +144,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-icon-inverse` · `--plus-spinner-size` · `--radius-full` · `--spinner-size-lg` · `--spinner-size-md` · `--spinner-size-sm`
+`--ds-icon-inverse` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--plus-spinner-size` · `--radius-full` · `--spinner-size-lg` · `--spinner-size-md` · `--spinner-size-sm`
 
 From `design-system/src/components/loading/Spinner/Spinner.scss`. Override these through the token layer, never with a literal.
 

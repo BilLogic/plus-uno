@@ -497,6 +497,13 @@
           }
         },
         {
+          "name": "Table/footer-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-footer-height)"
+          }
+        },
+        {
           "name": "Blanket/pad-x",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -684,6 +691,20 @@
           }
         },
         {
+          "name": "Choice/tile-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--choice-tile-width)"
+          }
+        },
+        {
+          "name": "File/item-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--file-item-height)"
+          }
+        },
+        {
           "name": "Radio/control-size",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -803,6 +824,27 @@
           }
         },
         {
+          "name": "Setting/row-pad-y",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--setting-row-pad-y)"
+          }
+        },
+        {
+          "name": "Setting/row-end-min-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--setting-row-end-min-height)"
+          }
+        },
+        {
+          "name": "Setting/row-select-min-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--setting-row-select-min-width)"
+          }
+        },
+        {
           "name": "Listbox/max-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -835,6 +877,20 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--option-menu-width)"
+          }
+        },
+        {
+          "name": "Checklist/action-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--checklist-action-width)"
+          }
+        },
+        {
+          "name": "Checklist/action-min-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--checklist-action-min-width)"
           }
         },
         {
@@ -1083,6 +1139,20 @@
           }
         },
         {
+          "name": "Flag/radius-timer",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--flag-radius-timer)"
+          }
+        },
+        {
+          "name": "Flag/timer-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--flag-timer-height)"
+          }
+        },
+        {
           "name": "Spotlight/width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -1153,6 +1223,13 @@
           }
         },
         {
+          "name": "Inbox/width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inbox-width)"
+          }
+        },
+        {
           "name": "Popup/pad",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -1206,6 +1283,13 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--progress-bar-height)"
+          }
+        },
+        {
+          "name": "Progress/ring-stroke",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--progress-ring-stroke)"
           }
         }
       ]

@@ -72,12 +72,7 @@ and unmounts it once it clears.
 
 <DocsInteractivePlayground
     of={BannerStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -98,10 +93,6 @@ Use `Banner` for a condition that applies to the whole page, for as long as it
 holds: scheduled maintenance, an outage, an account-wide notice. It has no
 timeout and no dismiss, so only mount it while the condition is true.
 
-For something that belongs to one part of the page and stays until resolved
-or dismissed, use `SectionMessage`. For a confirmation that something already
-happened and needs no reply, use `Flag`.
-
 ### Appearance guidance
 
 <DocsTable>
@@ -109,7 +100,7 @@ happened and needs no reply, use `Flag`.
 <tr><th>Appearance</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td>Warning</td><td>The default, cautionary form. Example: "Scheduled maintenance begins at 9:00 PM EST."</td></tr>
+<tr><td>Warning</td><td>The default, cautionary form. Example: "Scheduled maintenance begins tonight."</td></tr>
 <tr><td>Danger</td><td>Something that needs immediate attention, such as an outage.</td></tr>
 <tr><td>Announcement</td><td>A general notice with nothing wrong. No icon and no severity.</td></tr>
 </tbody>
@@ -119,9 +110,19 @@ happened and needs no reply, use `Flag`.
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For a message scoped to one region of the page that stays until resolved or dismissed, use `SectionMessage`.
+- For a timed confirmation that something already happened, use `Flag`.
+- For a short note tied to one control or field, use `Popup` or `Tooltip`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
-1. **Icon.** Leading glyph for <code>warning</code> and <code>danger</code>; <code>announcement</code> has none.
+1. **Icon.** Leading glyph for `warning` and `danger`; `announcement` has none.
 2. **Message.** Short text that fits on one line. A link inside inherits the banner's text color and is underlined, so it stays visible on every fill.
 
 ### States
@@ -134,7 +135,7 @@ happened and needs no reply, use `Flag`.
 <tr><td>Rest</td><td>Fill and text per appearance.</td></tr>
 <tr><td>Hovered</td><td>Not a control, so nothing changes.</td></tr>
 <tr><td>Pressed</td><td>Nothing changes; there is no pressed layer.</td></tr>
-<tr><td>Focused</td><td>Tab skips the banner; a link inside shows the 2px focus ring.</td></tr>
+<tr><td>Focused</td><td>Tab skips the banner; a link inside shows the focus ring.</td></tr>
 <tr><td>Disabled</td><td>Not supported. Unmount the banner once the condition clears.</td></tr>
 <tr><td>Truncated</td><td>Not supported. Keep the message short enough to fit.</td></tr>
 </tbody>
@@ -226,7 +227,7 @@ A banner is read at a glance; long copy belongs on the page.
   a notice with no severity.
 - **No focus trap.** A banner never captures focus or keyboard navigation; it
   sits in the page's reading order like any other content.
-- **A banner link takes focus like any link.** It shows the 2px focus ring and
+- **A banner link takes focus like any link.** It shows the focus ring and
   its text names the destination.
 
 </div>
@@ -235,9 +236,8 @@ A banner is read at a glance; long copy belongs on the page.
 
 ## Related
 
-- For a message scoped to one region of the page, use `SectionMessage`.
-- For a timed confirmation that something already happened, use `Flag`.
-- For a short note tied to one object on the page, use `InlineMessage`.
+- `Link`: use when embedding an inline action or destination inside the banner message.
+- <a href="?path=/docs/templates-frame--docs">Frame</a>: use when placing a site-wide banner above the application layout.
 
 </div>
 

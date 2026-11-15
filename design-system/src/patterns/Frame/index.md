@@ -8,13 +8,17 @@ Also asked as: page template, page shell, page layout, full page, new page, surf
 
 **Import:** `import { Frame } from '@/patterns';`
 
+**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`); Card (`ds guide card`); Table (`ds guide table`)
+
+**Governed by:** Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/patterns/Frame/Frame.jsx`
 
-**Stories:** `design-system/src/patterns/Frame/Frame.stories.jsx` — Overview, ColorModes, Reading, DocsOverview, DocsReading, DocsContentGrid, PairWithSidebar, PairWithoutSidebar, PairTitleInHeader, Interactive, Floating, Medium768, Large1024, CtrlBracketToggle, CtrlBracketAt768, SidebarMeetsPage, XLarge1440, Wide1600, ReadingAt1440, ContentGrid, ModalClosesFloatingSidebar, ModalFromFloatingSidebar, ModalLeavesDockedSidebar, ModalClosesOverlaySidebarAt768, PanelDockedAt1440, PanelAutoCollapsesSidebarAt1200, PanelOverlayAt1100, SidebarByHandWinsAt1300, ModalLeavesPanelOpen, ModalOverOverlayPanelAt1100, OverlayPanelIsModalAt1100, DockedPanelIsNotModalAt1440, PanelFieldKeepsEscapeAt1100, DockedPanelLeavesEscapeAt1200, DockedPanelTakesLostFocusAt1200, HeaderTriggerTogglesOverlayAt1100, OverlaySplitterKeepsSidebarAt1100, OneOverlayAt768, FullWidthUnder768, SplitterKeyboardAt1440, SplitterDragAt1440, PanelRememberedForTheTab, PanelPeek, NoPanelPeekByDefault, SectionDetailKeepsSplitAt1440, SectionDetailSplitterKeepsSplitAt1440, StateSidebarDocked, StateSidebarClosed, StateSidebarPeek, StateSidebarFloating, StatePanelDocked, StatePanelPeek, StatePanelOverlay, StatePanelFullWidth, StatePanelNarrowest, StatePanelWidest, StateSidebarAndPanel, StatePanelCollapsesSidebar, StatePanelOnBackdrop, StateWithModal, StateModalClosesFloating, StateAt768, StateAt1024, StateAt1440, TypeDefault, TypeFocused, TypeBare, AnatomyDefault, AnatomyFocused, FocusedStepsDown, FocusedStepsAcross, ResponsiveWidth, KeyPanelCollapsesSidebar, KeyUnder1024
+**Stories:** `design-system/src/patterns/Frame/Frame.stories.jsx` — Overview, ColorModes, Reading, DocsOverview, DocsReading, DocsContentGrid, PairWithSidebar, PairWithoutSidebar, PairTitleInHeader, Interactive, Floating, Medium768, Large1024, CtrlBracketToggle, CtrlBracketAt768, SidebarMeetsPage, XLarge1440, Wide1600, ReadingAt1440, ContentGrid, ModalClosesFloatingSidebar, ModalFromFloatingSidebar, ModalLeavesDockedSidebar, ModalClosesOverlaySidebarAt768, PanelDockedAt1440, PanelAutoCollapsesSidebarAt1200, PanelOverlayAt1100, SidebarByHandWinsAt1300, ModalLeavesPanelOpen, ModalOverOverlayPanelAt1100, OverlayPanelIsModalAt1100, DockedPanelIsNotModalAt1440, PanelFieldKeepsEscapeAt1100, DockedPanelLeavesEscapeAt1200, DockedPanelTakesLostFocusAt1200, HeaderTriggerTogglesOverlayAt1100, OverlaySplitterKeepsSidebarAt1100, OneOverlayAt768, FullWidthUnder768, SplitterKeyboardAt1440, SplitterDragAt1440, PanelRememberedForTheTab, PanelPeek, NoPanelPeekByDefault, SectionDetailKeepsSplitAt1440, SectionDetailSplitterKeepsSplitAt1440, StateSidebarDocked, StateSidebarClosed, StateSidebarPeek, StateSidebarFloating, StatePanelDocked, StatePanelPeek, StatePanelOverlay, StatePanelFullWidth, StatePanelNarrowest, StatePanelWidest, StateSidebarAndPanel, StatePanelCollapsesSidebar, StatePanelOnBackdrop, StateWithModal, StateModalClosesFloating, StateAt768, StateAt1024, StateAt1440, TypeDefault, TypeFocused, TypeBare, AnatomyDefault, AnatomyFocused, FocusedStepsDown, FocusedStepsAcross, ResponsiveWidth, KeyPanelCollapsesSidebar, KeyUnder1024, SidebarCollapseMotion, SidebarCollapseMotionReduced, SidebarPeekMotion, SidebarPeekMotionReduced, PanelDockMotion, PanelDockMotionReduced, PanelOverlayMotion, PanelOverlayMotionReduced, PanelPeekMotion, PanelPeekMotionReduced, BreakpointReflowMotion, BreakpointReflowMotionReduced, MotionGoToArea, MotionGoToAreaReduced, MotionDrillAndClimb, MotionDrillAndClimbReduced, MotionDrillDeeper, MotionDrillDeeperReduced, MotionClimbTwoLevels, MotionClimbTwoLevelsReduced, MotionRecordOverlay, MotionRecordOverlayReduced, MotionFocusedTask, MotionFocusedTaskReduced, MotionStepAcross, MotionStepAcrossReduced, MotionStepDown, MotionStepDownReduced
 
 **Storybook page:** `design-system/src/patterns/Frame/Frame.mdx`
 
-**Motion:** sidebar-open `spatial.default` · sidebar-close `spatial.fast` · panel-dock `spatial.slow` + `appearance.fast` · panel-undock `spatial.default` · focused-open `appearance.default` · focused-close `appearance.fast` · step `spatial.default` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** sidebar-open `spatial.default` · sidebar-close `spatial.fast` · panel-dock `spatial.slow` + `appearance.fast` · panel-undock `spatial.default` · focused-open `appearance.default` · focused-close `appearance.fast` · step `spatial.default` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -130,7 +134,7 @@ Same group: `AiChat` · `Backdrop` · `Page` · `PatternCard` · `PatternModal` 
 
 ## Types
 
-Every page of the app sits in one of three, each shown in a browser window. A Frame with its slots filled for one page is a Screen, and Screens in order are a Flow; both live with the flows, not here.
+Choose one of three Frame types for every app page, shown here in browser windows. See Templates and patterns for how filled Frames become Screens and Flows, documented with the flows.
 
 - **Default.** Pages people move among: the Sidebar, the Page, and the AI panel as its own region on the right.
 - **Focused.** One task a person finishes or leaves: the whole window, Close beside the title, no Sidebar.
@@ -193,6 +197,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
+| `areaKey` | string or number | — | Current Sidebar area key: changing it fades the old page out on `appearance.fast`, then fades the new page in on `appearance.default`. |
 | `header` | node | — | The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle. |
 | `onBack` | func | — | A focused page: called when Back is pressed. With it the header row leads with a Back icon button. |
 | `backHref` | string | — | A focused page: where Back goes, as a link. |
@@ -226,7 +231,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--content-max-width` · `--content-max-width-reading` · `--content-min-width` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--frame-layer-docked-edge` · `--frame-layer-edge` · `--frame-layer-panel-peek` · `--frame-layer-sidebar` · `--frame-layer-splitter` · `--frame-panel-width` · `--frame-sidebar-pad` · `--frame-sidebar-width` · `--grid-columns` · `--grid-gutter` · `--inline-md` · `--item-height-md` · `--pad-x-sm` · `--pad-x-xs` · `--page-pad` · `--page-stack-md` · `--page-stack-sm` · `--panel-width-default`
+`--border-default` · `--content-max-width` · `--content-max-width-reading` · `--content-min-width` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-motion-spatial-slow` · `--ds-motion-spatial-slow-duration` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--frame-layer-docked-edge` · `--frame-layer-edge` · `--frame-layer-panel-peek` · `--frame-layer-sidebar` · `--frame-layer-splitter` · `--frame-panel-width` · `--frame-sidebar-pad` · `--frame-sidebar-width` · `--grid-columns` · `--grid-gutter` · `--inline-md` · `--item-height-md` · `--pad-x-sm` · `--pad-x-xs` · `--page-pad` · `--page-stack-md` · `--page-stack-sm` · `--panel-width-default`
 
 From `design-system/src/patterns/Frame/Frame.scss`. Override these through the token layer, never with a literal.
 

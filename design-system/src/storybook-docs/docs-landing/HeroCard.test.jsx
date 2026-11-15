@@ -12,7 +12,7 @@ describe('HeroCard', () => {
   });
 
   it('draws no text', () => {
-    render(<HeroCard page="templates-page-page" />);
+    render(<HeroCard page="templates-page" />);
     const card = screen.getByRole('img');
     expect(document.createTreeWalker(card, NodeFilter.SHOW_TEXT).nextNode()).toBeNull();
   });

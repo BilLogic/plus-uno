@@ -8,33 +8,35 @@ Also asked as: popover, flyout, inline dialog.
 
 **Import:** `import { Popup } from '@/components';`
 
+**Used in:** Popup (`ds guide popup`)
+
+**Governed by:** Filtering (`ds guide filtering`); Loading (`ds guide loading`); Overflow (`ds guide overflow`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/overlays-and-layering/Popup/Popup.jsx`
 
 **Stories:** `design-system/src/components/overlays-and-layering/Popup/Popup.stories.jsx` — Layout, Content, InteractionStates, Overview, Interactive, Rest, Hovered, Pressed, Focused, Open, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, WidthAuto, WidthAutoCaps, WidthColumns, OpensWithAClip, KeyboardOpenIsInstant, OpensAndCloses, OpensOnTheMotionTokens, ReducedMotion, BodyOnly, TriggerClick, TriggerHover, TriggerFocus, TriggerHoverAndClick
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Popup/Popup.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.exit` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.exit` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
 Use `Popup` for a small panel of secondary content anchored to a control: a
 definition, a preview or a short list. Its body is text or a short list, never a
-form. For a form, use a `Modal`. It holds more than a `Tooltip` and
-less than a `Modal`, and unlike a modal it does not take the page.
+form. It holds more than a `Tooltip` and less than a `Modal`, and unlike a modal
+it does not take the page.
 
 `trigger` is the element it hangs off, `children` the body, `title` the optional
 title. `triggerType` is `click` (the default), `hover`, `focus`, an array of
-those, or `manual` for a popup you drive with `show`. `defaultShow` opens it on first render. With no `trigger`, `anchor` is the ref or element it points at, driven by `show`. `container` is the element it portals into.
+those, or `manual` for a popup you drive with `show`. `defaultShow` opens it on
+first render. With no `trigger`, `anchor` is the ref or element it points at,
+driven by `show`. `container` is the element it portals into.
 
-It is the Popup template's layer: one surface padded 16, with the title in
-heading.xsmall over the body, and no arrow. `width` is `auto` (the default),
-which hugs its content between 160 and 320 and is never narrower than the
-trigger, or a column step, `3-col` or `4-col`, for a menu of several
-categories. It opens 4 from its trigger and never comes nearer than 8 to the
-screen's edge.
-
-Its width never animates, and opened from the keyboard it appears at once.
+`width` is `auto` (the default), which hugs its content between `--popup-min-width`
+and `--popup-max-width` and is never narrower than the trigger, or a column step,
+`3-col` or `4-col`, for a menu of several categories. Its width never animates,
+and opened from the keyboard it appears at once.
 
 ## Motion
 
@@ -45,9 +47,15 @@ Popup reads these motion tokens and no literal duration or curve.
 | enter | Open | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. From the keyboard it opens with no animation. |
 | exit | Close | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | The clip folds back to the same corner while it fades. Under reduced motion it is the fade alone. |
 
+## Alternatives
+
+- For one line of non-interactive help on a control, use `Tooltip`.
+- For a form or a decision that must be made before continuing, use `Modal`.
+- For detail that belongs inline with the content rather than over it, use `Accordion`.
+
 ## Best practices
 
-### Dismissal is on by default, except when you own the state. {#dismissal-is-on-by-default-except-when-you-own-the-state}
+### Let default dismissal work unless you drive `show` manually. {#let-default-dismissal-work-unless-you-drive-show-manually}
 
 ```jsx
 // A click away and Escape both close it — `rootClose` defaults to true for
@@ -60,7 +68,7 @@ Popup reads these motion tokens and no literal duration or curve.
        onToggle={setOpen}>…</Popup>
 ```
 
-### A string trigger is a button. {#a-string-trigger-is-a-button}
+### Pass a control or a string as `trigger`, never a `div`. {#pass-a-control-or-a-string-as-trigger-never-a-div}
 
 ```jsx
 // Fine — a string trigger renders a real <button className="plus-popup-trigger">,
@@ -79,7 +87,7 @@ Popup reads these motion tokens and no literal duration or curve.
 Do: A string trigger becomes a real button, named by its own text.
 Don't: A div is not a control: it has no role and no keyboard behavior.
 
-### Hover alone leaves out the keyboard. {#hover-alone-leaves-out-the-keyboard}
+### Pair hover triggers with focus or click. {#pair-hover-triggers-with-focus-or-click}
 
 `triggerType="hover"` has no keyboard equivalent. Use `['hover', 'focus']` at
 least, and `click` when the content is more than a sentence — hover content that
@@ -101,26 +109,22 @@ Don't: Says nothing about what opens, and reads as nothing in a list of links.
   `aria-haspopup="dialog"` and an `aria-expanded` that tracks the open state —
   including while the caller drives `show` themselves. Both are applied only to
   a trigger that can hold them: a `button`, an `a`, a `Button`, anything you
-  have already given a `role`, and the button a string trigger becomes. A plain
-  `div` gets neither, because a state on something with no role is invalid ARIA.
-- **`aria-controls` is not set.** It needs the rendered panel's id,
-  `id` is optional here, and an `aria-controls` pointing at an element that does
-  not exist yet is worse than none.
+  have already given a `role`, and the button a string trigger becomes. A plain `div` gets neither, because a state on something with no role is invalid ARIA.
+- **`aria-controls` is not set.** It needs the rendered panel's id, and an
+  `aria-controls` pointing at an element that does not exist yet is worse than
+  none.
 - **Opening it by a click or a key moves focus into it.** Focus lands on the
-  first focusable element inside, or on the popup itself when there is none, so
-  a keyboard or screen reader user starts where the content is. A popup opened
-  by hover leaves focus where it was. Closing it with Escape or a click away
-  returns focus to the trigger.
+  first focusable element inside, or on the popup itself when there is none.
+  Closing it with Escape or a click away returns focus to the trigger.
 - **Escape and a click away both close it.** Both come from the same
   `rootClose` binding, which is on for every trigger but `manual`.
 - **Do not put required content in one.** Anything the user must read to finish
-  the task belongs on the page. A popup is an aside.
+  the task belongs on the page.
 
 ## Related
 
-- For one line of help on a control, use `Tooltip`.
-- For a decision that must be made before continuing, use `Modal`.
-- For detail that belongs with the content rather than over it, use `Accordion`.
+- Popup template: use when choosing between a general Popup, a Menu, a FilterMenu or a Spotlight.
+- `DropdownMenu`: use when the anchored overlay is a menu of commands rather than prose.
 
 Same group: `Tooltip`
 
@@ -128,17 +132,17 @@ Same group: `Tooltip`
 
 1. **Trigger.** The control the popup hangs off. A string becomes a real button.
 2. **Surface.** One fill, padded, with no arrow and no border of its own.
-3. **Title.** Optional, heading.xsmall. It also names the popup.
-4. **Body.** Text or a short list, body 14/20.
+3. **Title.** Optional, `--heading-xsmall`. It also names the popup.
+4. **Body.** Text or a short list, `--body-default`.
 
 ### States
 
 | State | What changes |
 | --- | --- |
 | Closed | Only the trigger shows. |
-| Open | The surface sits 4 from the trigger and never nearer than 8 to the screen edge. |
+| Open | The surface sits offset from the trigger and stays inside the screen edge. |
 | Hovered, pressed | The popup does not react; the trigger keeps its own states. |
-| Focused | The trigger shows the 2px ring. Opened by a click or a key, the popup takes focus: its first focusable element, or the popup itself. |
+| Focused | The trigger shows the focus ring. Opened by a click or a key, the popup takes focus: its first focusable element, or the popup itself. |
 | Disabled | A popup has no disabled state. |
 | Dismissed | A click away or Escape closes it, except with the manual trigger type. |
 
@@ -173,7 +177,7 @@ Same group: `Tooltip`
 | `children` | node (required) | — | The popup's body content. |
 | `title` | node | — | Popup title |
 | `label` | string | — | Names the popup for assistive tech when there is no `title`. Falls back to the trigger's own accessible text when neither is given. |
-| `placement` | enum | `'top'` | Popup placement |
+| `placement` | oneOf | `'top'` | Popup placement |
 | `triggerType` | string or arrayOf | `'click'` | Trigger behavior |
 | `defaultShow` | bool | `false` | — |
 | `show` | bool | — | — |
@@ -195,7 +199,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--anchor-width` · `--body-default` · `--border-default` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-exit` · `--ds-motion-spatial-exit-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--plus-popup-clip-bottom` · `--plus-popup-clip-left` · `--plus-popup-clip-right` · `--plus-popup-clip-top` · `--plus-popup-reach` · `--popover-offset` · `--popover-pad` · `--popup-clip-reach` · `--popup-max-width` · `--popup-min-width` · `--popup-pad` · `--popup-radius` · `--stack-md`
+`--anchor-width` · `--body-default` · `--border-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--popover-offset` · `--popover-pad` · `--popup-max-width` · `--popup-min-width` · `--popup-pad` · `--popup-radius` · `--stack-md`
 
 From `design-system/src/components/overlays-and-layering/Popup/Popup.scss`. Override these through the token layer, never with a literal.
 

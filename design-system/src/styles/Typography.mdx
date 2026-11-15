@@ -5,7 +5,7 @@ import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
-    FoundationExample,
+    DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
 import { TypeScaleBlocks } from '@/storybook-docs/token-blocks.jsx';
 import * as TypographyStories from './Typography.stories.jsx';
@@ -32,7 +32,7 @@ export const Sample = ({ font, weight, children = 'Tutors plan the week from her
 
 <FoundationSection title="Overview">
 
-Noto Serif (weight 500) for headings 32 to 20, Noto Sans for headings 16 to 12, metrics and body text, and a monospace face for code: seven Heading sizes, three Body sizes in regular, medium and bold, and three Metric sizes, each a text style bound to the typography variables. Pick a style by where the text sits on the page, not by how big it should look.
+PLUS uses Noto Serif (500) for headings 20 to 32, Noto Sans for headings 12 to 16, metrics and body text, and Noto Sans Mono for code. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
 font: var(--heading-medium);
@@ -40,44 +40,30 @@ font: var(--body-default);
 font: var(--metric-large);
 ```
 
-Figma holds the text styles Heading/*, Body/*, Metric/* and Code/default, bound to the typography collection (font size, line height, family, weight).
-
-</FoundationSection>
-
-<FoundationSection title="About typography">
-
-Typography is the system of fonts and text styles. It carries communication, reinforces the product's voice and guides how people feel using it. Follow three principles, together with the color and spacing tokens.
-
-<FoundationSubsection title="Optimize for readability">
-Help every reader understand easily, regardless of ability. Use Body/large for long reading, such as a lesson or a help article.
-</FoundationSubsection>
-
-<FoundationSubsection title="Create visual harmony">
-Keep type consistent and cohesive, and use hierarchy and space to simplify complex information.
-</FoundationSubsection>
-
-<FoundationSubsection title="Contextualize for different users">
-Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
-</FoundationSubsection>
+Figma holds `Heading/*`, `Body/*`, `Metric/*` and `Code/default`, bound to the typography variables (<DocsLink id="foundations-tokens-typography">Tokens: Typography</DocsLink>).
 
 </FoundationSection>
 
 <FoundationSection title="Type scale">
 
-Heading/*, Body/* and Metric/* are the text styles for all new work. Every property of each style is bound to a variable in the typography collection. The tokens are the contract: a later change edits a variable, never a component. Sizes are in rem, where 1rem is 16px, so people can scale text in their browser.
+Every text style binds to a typography variable and is sized in `rem` (1 rem = 16 px) so text scales with browser settings. Never type a raw size or detach a style.
 
 <TypeScaleBlocks />
 
-<FoundationSubsection title="Weights in use">
+<FoundationSubsection title="Body, metric and weights">
 
-Body comes in three weights. Regular is for paragraphs, medium is for labels and text beside an icon, and bold (600, semibold) is for emphasis, used sparingly.
+- **Body/large (16/24):** long-form reading such as lessons, help articles and quotes (quotes use the body family; never add a decorative face).
+- **Body/default (14/20):** default interface text and control labels (sets the 24, 32 and 40 control heights). Do not use heading styles inside components; use body with a heavier weight instead.
+- **Body/small (12/16):** secondary meta text, tags, statuses, counts and tooltips.
+- **Metric (large, medium, small):** featured numbers such as session counts or scores.
+- **Paragraph spacing:** space blocks with Section and stack tokens (<DocsLink id="foundations-layout-spacing">Spacing</DocsLink>), never a paragraph-spacing style.
 
 <RefTable
     head={['Style', 'Size/line', 'Weight', 'Role', 'Sample']}
     rows={[
         ['Body/default/regular', '14/20', '400', 'Paragraphs and descriptions', <Sample font="--body-default" weight="--type-weight-regular" />],
-        ['Body/default/medium', '14/20', '500', 'Labels, and text beside an icon', <Sample font="--body-default" weight="--type-weight-medium" />],
-        ['Body/default/bold', '14/20', '600', 'Emphasis, used sparingly', <Sample font="--body-default" weight="--type-weight-semibold" />],
+        ['Body/default/medium', '14/20', '500', 'Control labels and text beside an icon', <Sample font="--body-default" weight="--type-weight-medium" />],
+        ['Body/default/bold', '14/20', '600', 'Inline emphasis, used sparingly', <Sample font="--body-default" weight="--type-weight-semibold" />],
     ]}
 />
 
@@ -87,31 +73,30 @@ Body comes in three weights. Regular is for paragraphs, medium is for labels and
 
 <FoundationSection title="In code">
 
-Component text takes a text style, `font: var(--heading-small)` or `font: var(--body-default)`, and an icon glyph takes an icon size such as `--icon-md`. Never type a font size, family or weight.
+Set component text with `font: var(--heading-small)` or `font: var(--body-default)`, and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (<DocsLink id="foundations-visual-iconography">Iconography</DocsLink>). Never hardcode a font size, family or weight.
 
 <FoundationSubsection title="Family, weight and tracking tokens">
 
 <RefTable
     head={['Token', 'Value', 'Used for']}
     rows={[
-        [<C>--type-family-heading-serif</C>, 'Noto Serif', 'Headings 32 to 20'],
-        [<C>--type-family-heading</C>, 'Noto Sans', 'Headings 16 to 12 and metrics'],
+        [<C>--type-family-heading-serif</C>, 'Noto Serif', 'Headings 20 to 32'],
+        [<C>--type-family-heading</C>, 'Noto Sans', 'Headings 12 to 16 and metrics'],
         [<C>--type-family-body</C>, 'Noto Sans', 'Body text'],
         [<C>--type-family-code</C>, 'Noto Sans Mono', 'Code'],
         [<><C>--type-family-brand-heading</C> · <C>--type-family-brand-body</C></>, 'Noto Serif · Noto Sans', 'Brand headings and body'],
         [<C>--type-weight-regular</C>, '400', 'Body text'],
-        [<C>--type-weight-medium</C>, '500', 'Labels, emphasis, and Noto Serif headings 20 and up'],
+        [<C>--type-weight-medium</C>, '500', 'Labels, icon-paired text, and Noto Serif headings 20 and up'],
         [<C>--type-weight-semibold</C>, '600', 'Noto Sans headings 16 and under, metrics, bold body'],
+        [<><C>--heading-xxlarge-tracking</C> · <C>-xlarge-tracking</C> · <C>-large-tracking</C></>, '−2% · −1% · −1%', 'Companion letter-spacing for headings 32, 28 and 24 (20 and below use 0)'],
     ]}
 />
-
-A `font` shorthand cannot carry letter spacing, so each tracked heading has a companion token set beside it: `--heading-xxlarge-tracking`, `--heading-xlarge-tracking` and `--heading-large-tracking`.
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Text-style classes">
 
-Markup with no stylesheet of its own takes the text style as a class, one per style, generated beside the type tokens: `.heading-xxlarge` to `.heading-xxsmall`, `.body-large`, `.body-default`, `.body-small`, and `.metric-large` to `.metric-small`. Each sets the `font` shorthand, and the tracked headings their letter spacing too. A component's own stylesheet sets `font: var(--…)` instead.
+Markup without its own stylesheet can use the generated utility classes (`.heading-xxlarge` to `.heading-xxsmall`, `.body-large`, `.body-default`, `.body-small`, `.metric-large` to `.metric-small`), which set `font` and tracking together. Component stylesheets use `font: var(--…)` directly.
 
 ```jsx
 <p className="body-default">Helper text</p>
@@ -124,7 +109,7 @@ Markup with no stylesheet of its own takes the text style as a class, one per st
 
 <FoundationSection title="Heading levels">
 
-Headings step down one size per nesting level, and containers use a fixed title size.
+Headings step down one size per nesting level; containers use a fixed title size. Reserve `Heading/xxlarge` (32) and `Heading/xlarge` (28) for heroes, empty states and metric-heavy dashboards, never a page title. Use a heading style rather than bold text or a size change, because heading styles carry the structure assistive technology reads.
 
 <Canvas of={TypographyStories.HeadingLevels} sourceState="none" />
 
@@ -134,31 +119,19 @@ Headings step down one size per nesting level, and containers use a fixed title 
         ['Page title', 'Heading/large · 24 · the page\'s one h1'],
         ['Section title', 'Heading/medium · 20 · h2'],
         ['Subsection title', 'Heading/small · 16 · h3'],
-        ['Modal title', 'Heading/medium · 20 · the dialog\'s h1, named by aria-labelledby'],
+        ['Modal title', 'Heading/medium · 20 · the modal\'s h1, named by aria-labelledby'],
         ['Card, popup and flag title', 'Heading/xsmall · 14 · one level below its section'],
-        ['Group label (menu group, table head)', 'Heading/xxsmall · 12 · a group or a head cell, never a heading'],
+        ['Group label (menu group, table head)', 'Heading/xxsmall · 12 · a group or head cell, never a heading tag'],
     ]}
 />
 
-A page has one `h1`, and a page whose title is hidden by a tabs-only header keeps it, visually hidden. A card title is tagged one level below its section. Accessibility links here for the heading rules; this table and the Do and don't below are their home.
-
-</FoundationSection>
-
-<FoundationSection title="Using headings">
-
-Headings introduce a new section of content. They are sized to contrast with the content and to make the structure easy to see.
-
-- Use a heading style, not bold text or a change of size. Heading styles carry the structure that assistive technology reads.
-- Heading/xxlarge and xlarge are for hero and marketing content. Heading/large is a page title, such as a form title. Heading/medium suits components with room, such as modals. Heading/small and xsmall title small components where space is limited, such as a card or a flag.
-- Heading/xxsmall is used sparingly, matched with Body/small, for fine print and group labels.
+Every page has one `h1` (visually hidden when the topbar or tab strip replaces a visible page header). Card titles take the heading tag one level below their section.
 
 </FoundationSection>
 
 <FoundationSection title="Labels">
 
-A label uses Body/default/medium (Noto Sans 500). There is no separate button style: use the medium style for button, tab and menu labels and apply it directly, with no variables bound inline. In code it is `font: var(--body-default)` with `font-weight: var(--type-weight-medium)`.
-
-A Sidebar tab is a navigation row, not a tab in a Tab group: its label is Body/default at regular weight, and medium once the tab is selected.
+Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
 
 <DoDont>
 <Do caption="Body/default/medium on a button or tab label.">
@@ -173,59 +146,21 @@ A Sidebar tab is a navigation row, not a tab in a Tab group: its label is Body/d
 
 </FoundationSection>
 
-<FoundationSection title="Using body and metric">
-
-- Body/large is the size for long-form content, where a comfortable read matters.
-- Body/default is the size in components or wherever space is limited, for detailed or descriptive content.
-- Body/small is for secondary content such as fine print or semantic messages. Use it sparingly.
-- Weights: every body size comes in three styles, regular, medium and bold. Use Regular for paragraphs, Medium as the default inside components and beside icons (button, tab and menu labels), and Bold for emphasis in body text, sparingly. PLUS bold is 600 (semibold), through the bold weight token.
-- In code it stays one size token plus a weight token: `font: var(--body-default); font-weight: var(--type-weight-medium)`.
-- Use medium beside an icon, because icon stroke width is designed to align with medium weight text. Do not use heading styles inside components; use body with a heavier weight instead.
-- Use Metric when a number is the point, such as a session count or a score. Metric sizes are large, medium and small.
-- PLUS has no paragraph-spacing style. Space paragraphs and blocks with the Section and stack tokens (see Spacing).
-
-</FoundationSection>
-
 <FoundationSection title="Code">
 
-Code is code-only. Code/default (12/16) sets code samples, token names and property values in Figma docs. Code is Noto Sans Mono. In code, `var(--code)` sets 0.875em of the parent size in the code font, so a code span follows the text around it.
+`Code/default` (12/16, Noto Sans Mono) sets code samples, token names and property values. In CSS, `var(--code)` sets `0.875em` of the parent size so inline code scales with surrounding text.
 
 <Canvas of={TypographyStories.CodeStyle} sourceState="none" />
 
 </FoundationSection>
 
-<FoundationSection title="Usage">
-
-Pick the style by the text's place on the page.
-
-<FoundationSubsection title="Keep xxlarge and xlarge for heroes">
-
-Heading/xxlarge 32 and Heading/xlarge 28 are for heroes, empty states and metric-heavy dashboards only, never for a page title.
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Body/default runs the interface">
-
-Every control label is 14/20, which is what sets the 24, 32 and 40 item heights. Body/large is for reading text such as lessons and help articles; Body/small for meta text, Tag, Status, Count and tooltips.
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Change the token, not the text">
-
-Every style binds the typography variables, so a later change to a size, line height, family or weight edits a variable and no component needs touching. Never type a size, and never detach a style.
-
-</FoundationSubsection>
-
-</FoundationSection>
-
 <FoundationSection title="Truncate and wrap">
 
-Text that may be longer than its box either stops or wraps, and the component decides which. Names and titles stop; text that is the content wraps.
+Names and titles truncate; primary content wraps. Never shrink font size to fit a long string.
 
-- A title or a name truncates to one line with an ellipsis. Give people the full text on hover or in the detail view.
-- A description stops at 3 lines unless the component is set to wrap.
-- Set wrap only when the whole text is the content, such as a session note or a help answer. In a table cell, truncate is the default and wrap is chosen per column.
-- Never shrink the type to make a long name fit.
+- **Titles and names** truncate to one line with an ellipsis; expose the full text on hover or in the detail view.
+- **Descriptions** clamp at 3 lines unless configured to wrap.
+- **Session notes and help answers** wrap in full. Table cells truncate by default and opt into wrap per column.
 
 <FoundationSubsection title="Truncate a long name to one line">
 
@@ -247,21 +182,6 @@ A student name in a roster row.
 </DoDont>
 
 </FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="Tracking and quotes">
-
-<RefTable
-    head={['Style', 'Tracking', 'Where']}
-    rows={[
-        ['Heading/xxlarge · 32', '−2%', 'Hero and empty-state headings.'],
-        ['Heading/xlarge · 28 and Heading/large · 24', '−1%', 'Page titles and large metrics.'],
-        ['Heading/medium · 20 and below', '0', 'Everything else, including Body and Metric.'],
-    ]}
-/>
-
-A quote takes the body family, such as "I finally understand fractions," in Body/large. Do not add a decorative face for it.
 
 </FoundationSection>
 
@@ -323,9 +243,9 @@ Use Metric to emphasize a number; a serif heading style makes the figure read as
 
 <FoundationSection title="Accessibility">
 
-- Heading levels help people using screen readers and other assistive technology navigate a page. Keep one h1 per page and descend one level at a time; the tag sets the structure and the text style sets the look.
-- Text color comes from the `color/text/*` tokens, whose pairs clear 4.5:1 on their grounds in all four modes (see Color).
-- Sizes are in rem, so text follows the reader's browser setting. A code span is 0.875em of the text around it, so it follows the reader's text size too.
+- Keep one `h1` per page and step down one heading level at a time (`h1` → `h2` → `h3`); the HTML tag sets the outline while the token sets the visual size.
+- Pair text styles with `color/text/*` tokens to meet WCAG AA 4.5:1 contrast (<DocsLink id="foundations-visual-color">Color</DocsLink>).
+- All type tokens use `rem` or `em` so text scales with browser zoom and font-size preferences.
 
 </FoundationSection>
 

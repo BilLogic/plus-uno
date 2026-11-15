@@ -20,7 +20,12 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/forms-and-inputs/Checkbox/",
     "Checkbox",
-    "components-forms-and-inputs-checkbox--docs"
+    "components-forms-and-inputs-checkbox-checkbox--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/CheckboxGroup/",
+    "CheckboxGroup",
+    "components-forms-and-inputs-checkbox-checkbox-group--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/ChoiceGrid/",
@@ -35,17 +40,22 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/forms-and-inputs/DatePicker/",
     "DatePicker",
-    "components-forms-and-inputs-date-time-picker-date-picker--docs"
+    "components-forms-and-inputs-date-time-picker-date-picker-date-picker--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/DateTimePicker/",
     "DateTimePicker",
-    "components-forms-and-inputs-date-time-picker--docs"
+    "components-forms-and-inputs-date-time-picker-date-time-picker--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/FileItem/",
+    "FileItem",
+    "components-forms-and-inputs-file-upload-file-item--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/FileUpload/",
     "FileUpload",
-    "components-forms-and-inputs-file-upload--docs"
+    "components-forms-and-inputs-file-upload-file-upload--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/IconButton/",
@@ -70,7 +80,12 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/forms-and-inputs/Radio/",
     "Radio",
-    "components-forms-and-inputs-radio--docs"
+    "components-forms-and-inputs-radio-radio--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/RadioGroup/",
+    "RadioGroup",
+    "components-forms-and-inputs-radio-radio-group--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/Range/",
@@ -86,6 +101,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/forms-and-inputs/RichTextEditor/",
     "RichTextEditor",
     "components-forms-and-inputs-rich-text-editor--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/SettingRow/",
+    "SettingRow",
+    "components-forms-and-inputs-setting-row--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/TagInput/",
@@ -155,7 +175,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/labels/Tag/",
     "Tag",
-    "components-labels-tag--docs"
+    "components-labels-tag-tag--docs"
   ],
   [
     "design-system/src/components/labels/TagGroup/",
@@ -193,6 +213,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-loading-progress-bar--docs"
   ],
   [
+    "design-system/src/components/loading/ProgressRing/",
+    "ProgressRing",
+    "components-loading-progress-ring--docs"
+  ],
+  [
     "design-system/src/components/loading/Skeleton/",
     "Skeleton",
     "components-loading-skeleton--docs"
@@ -213,6 +238,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-messaging-modal-dialog--docs"
   ],
   [
+    "design-system/src/components/messaging/NotificationItem/",
+    "NotificationItem",
+    "components-messaging-notification-item--docs"
+  ],
+  [
     "design-system/src/components/messaging/SectionMessage/",
     "SectionMessage",
     "components-messaging-section-message--docs"
@@ -231,11 +261,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/navigation/Link/",
     "Link",
     "components-navigation-link--docs"
-  ],
-  [
-    "design-system/src/components/navigation/MenuGroup/",
-    "MenuGroup",
-    "components-navigation-menu--docs"
   ],
   [
     "design-system/src/components/navigation/Pagination/",
@@ -285,6 +310,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/patterns/Sidebar/",
     "Sidebar",
-    "components-navigation-navigation-system--docs"
+    "components-navigation-navigation-system-navigation-system--docs"
   ]
 ];

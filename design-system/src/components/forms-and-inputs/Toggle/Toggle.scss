@@ -45,7 +45,7 @@
     border: 0;
     border-radius: var(--radius-full);
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
     position: relative;
     display: inline-block;
     box-sizing: border-box;
@@ -90,7 +90,7 @@
     height: var(--_toggle-thumb);
     border-radius: var(--radius-full);
     background-color: var(--ds-icon-inverse);
-    transition: transform 0.2s ease;
+    transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
     display: block;
     pointer-events: none;
 

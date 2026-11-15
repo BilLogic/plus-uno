@@ -1,72 +1,46 @@
 ---
-summary: Warm, direct, encouraging
+summary: The four voice words, when to dial them, and tone by reader
 ---
 
 <!-- Tier: 2 -->
 
-<!-- Descriptive foundation (product tone rationale). The house voice is the model default; long-form craft lives in docs/docs/conventions/writing.md — on conflict, that file wins. -->
+<!-- Human twin: Brand › Content › Voice and tone (Storybook). The two change together. -->
 
-# Content and Voice
+# Voice and tone
 
-> **Status: in use, descriptive.** Promoted out of DRAFT on 2026-08-22. The
-> banner had said "needs design leadership iteration before finalizing" since
-> April while a preferences note in the knowledge folder pointed here for "full
-> rules" on capitalization — so one doc told readers to rely on this file and
-> this file told them not to. Whichever was wrong, both could not be right.
-> (That note was dissolved in #172; § Capitalization below is now the only
-> statement of the rule.)
->
-> What it is: the *descriptive* rationale for product tone and UI copy. The
-> long-form craft rules are in `docs/conventions/writing.md`,
-> which wins on conflict (see the comment above). Nothing here is a house rule
-> in its own right; it is the reasoning and the worked examples behind them.
+PLUS sounds like a supportive teammate, not a policy manual. Tutors are college
+students between classes and sessions. Write the way they talk.
 
 ## Voice
 
-Warm, direct, encouraging. Tutors are college students juggling coursework and sessions — not enterprise employees reading corporate comms. Write like a supportive teammate, not a policy manual.
+Four words, each serving one thing the product promises.
 
-## Tone Shifts by Context
+| Word | Serves | In practice |
+|------|--------|-------------|
+| Helpful | Productivity | Lead with the next step. Name the action, then the reason. |
+| Honest | Learning | Say what happened and what is still unknown. Name skills, leave out labels. |
+| Warm | Uplift | Acknowledge the person's effort. Promise only what we will do. |
+| Clear | Simplicity | Everyday words, short sentences, one idea each. |
 
-| Context | Tone | Example |
-|---------|------|---------|
-| Training / onboarding | Instructional, clear | "Complete these three steps before your first session." |
-| In-session (live) | Supportive, concise | "Nice — student answered correctly. Move on when ready." |
-| Admin / scheduling | Professional, neutral | "Your October payout has been processed." |
+## Dial
 
-## Action-Oriented Labels
+The voice stays; the volume moves with the moment.
 
-Use verbs that describe what happens next. Avoid nominal or bureaucratic phrasing.
+- Dial warm up after a finished task. Dial it down when something failed.
+- Dial honest up when work is at risk or hard to undo.
+- Dial helpful up in onboarding and empty states.
+- Dial clear up in every error, and in anything with a deadline.
 
-- "Start Session" not "Session Initiation"
-- "Call Off" not "Request Absence"
-- "Submit Reflection" not "Reflection Submission"
-- "View Report" not "Report Access"
+## Tone by reader
 
-## Error Messages
+| Reader | Tone | Example |
+|--------|------|---------|
+| New tutor, onboarding | Instructional, encouraging | Finish these three steps before your first session. |
+| Tutor, live session | Supportive, brief | Nice — Leo answered correctly. Move on when you're ready. |
+| Tutor, admin and scheduling | Professional, neutral | Your October payout has been processed. |
+| Lead tutor | Direct, specific | Two reflections are due before Friday's check-in. |
+| Student | Plain, encouraging, no jargon | You finished two-step equations. |
+| School or family | Respectful, plain, no team terms | Sessions start at 10:30 AM ET on Monday. |
 
-Say what happened, what the user can do, and never assign blame.
-
-- Good: "We couldn't save your notes. Check your connection and try again."
-- Bad: "Error 500: Internal server error."
-- Bad: "You entered an invalid date."
-
-## Terminology
-
-Use PLUS vocabulary consistently. See `GLOSSARY.md` for the canonical list. When in doubt, use the term students and tutors already use in conversation.
-
-## Capitalization
-
-- UI labels and buttons: sentence case ("Start session", "View schedule").
-- Page titles and navigation items: title case ("Monthly Report", "Session History").
-
-## Numbers
-
-- Spell out one through nine in running text.
-- Use digits for 10 and above, measurements, and data displays.
-- Always use digits in tables, stats, and dashboards.
-
-## Abbreviations
-
-- Spell out on first use, then abbreviate: "Individualized Education Program (IEP)".
-- Universally known abbreviations need no expansion: ID, URL, AI, PDF.
-- Avoid internal jargon abbreviations in student-facing or parent-facing copy.
+Word choices follow [language.md](language.md); message structure follows
+[messages.md](messages.md).

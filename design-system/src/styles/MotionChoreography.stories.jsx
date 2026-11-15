@@ -20,8 +20,8 @@ import {
 
 export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
-  // The page itself is Foundations/Motion/Choreography (MotionChoreography.mdx).
-  title: 'Foundations/Motion/Choreography',
+  // The page itself is Foundations/Expression/Motion/Choreography (MotionChoreography.mdx).
+  title: 'Foundations/Expression/Motion/Choreography',
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };

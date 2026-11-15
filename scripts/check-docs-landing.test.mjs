@@ -60,13 +60,13 @@ test('a hero with no description fails', () => {
   assert.ok(found.some((m) => /no description/.test(m)), found.join('\n'));
 });
 
-test('the real tree passes, and covers Color, the 12 other Foundations pages, the 6 Motion pages, the 5 Sound pages, all 14 Patterns pages and all 10 Templates pages', () => {
+test('the real tree passes, and covers Color, the 20 other Foundations pages, the 6 Motion pages, the 5 Sound pages, all 14 Patterns pages and all 10 Templates pages', () => {
   const ids = PAGES.map((p) => p.id);
   assert.equal(ids.filter((id) => id.startsWith('patterns-')).length, 14);
   assert.equal(ids.filter((id) => id.startsWith('templates-')).length, 10);
-  assert.equal(ids.filter((id) => id.startsWith('foundations-')).length, 24);
-  assert.equal(ids.filter((id) => id.startsWith('foundations-motion-')).length, 6);
-  assert.equal(ids.filter((id) => id.startsWith('foundations-sound-')).length, 5);
+  assert.equal(ids.filter((id) => id.startsWith('foundations-')).length, 32);
+  assert.equal(ids.filter((id) => id.startsWith('foundations-expression-motion-')).length, 6);
+  assert.equal(ids.filter((id) => id.startsWith('foundations-expression-sound-')).length, 5);
   assert.ok(ids.includes('foundations-visual-color'));
   assert.ok(REGISTRY.endsWith('hero-registry.jsx'));
   assert.deepEqual(run(), []);
@@ -92,4 +92,37 @@ test('an overview card naming a hero the registry lacks fails', () => {
   const found = checkPage({ file: 'Overview.mdx', source, id: 'templates-overview', heroes: ['templates-overview'] });
   assert.equal(found.length, 1, found.join('\n'));
   assert.match(found[0], /hero="templates-ghost"/);
+});
+
+test('an overview thumbnail naming a hero the registry lacks fails', () => {
+  const source = `${landing('patterns-overview')}\n<ThumbTile hero="patterns-ghost" title="Ghost" span="wide" />\n<ThumbTile hero="patterns-overview" title="Real" />\n`;
+  const found = checkPage({ file: 'Overview.mdx', source, id: 'patterns-overview', heroes: ['patterns-overview'] });
+  assert.equal(found.length, 1, found.join('\n'));
+  assert.match(found[0], /hero="patterns-ghost"/);
+});
+
+test('coverage follows fixture titles and taxonomy sources, including attached pages', async (t) => {
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const path = await import('node:path');
+  const { coveredPages } = await import('./check-docs-landing.mjs');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'landing-pages-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const files = {
+    'storybook.taxonomy.json': JSON.stringify({ rootSources: { Templates: ['design-system/src/templates/'], Patterns: ['design-system/src/patterns/'] } }),
+    'design-system/src/templates/New.mdx': 'import * as S from "./New.stories.js";\n<Meta of={S} name="Usage guide" />',
+    'design-system/src/templates/New.stories.js': 'export default { title: "Templates/New page" };',
+    'design-system/src/styles/New.mdx': '<Meta title="Foundations/New foundation" />',
+    'design-system/src/patterns/New.mdx': '<Meta title="Patterns/New pattern" />',
+    'design-system/src/Other.mdx': '<Meta title="Components/Other" />',
+  };
+  for (const [file, text] of Object.entries(files)) {
+    fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
+    fs.writeFileSync(path.join(root, file), text);
+  }
+  assert.deepEqual(coveredPages(root), [
+    { file: 'design-system/src/patterns/New.mdx', id: 'patterns-new-pattern' },
+    { file: 'design-system/src/styles/New.mdx', id: 'foundations-new-foundation' },
+    { file: 'design-system/src/templates/New.mdx', id: 'templates-new-page' },
+  ]);
 });

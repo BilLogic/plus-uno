@@ -10,11 +10,11 @@ Also asked as: collapsible, expand collapse, disclosure, expandable sections, fa
 
 **Source:** `design-system/src/components/layout-and-structure/Accordion/Accordion.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx` — Styles, Behavior, InteractionStates, Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Expanded, Disabled
+**Stories:** `design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx` — Styles, Behavior, InteractionStates, Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Expanded, Disabled, MotionOpenClose, MotionReduced
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Accordion/Accordion.mdx`
 
-**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -25,7 +25,8 @@ shape and the headers stay a readable index of what is there.
 
 It is uncontrolled by default: give it `defaultActiveKey` and it tracks the open
 item itself. Pass `activeKey` and `onSelect` together to control it. `alwaysOpen`
-lets more than one item stay open at once.
+lets more than one item stay open at once, and `flush` removes the outer border
+and rounded corners when the accordion sits inside a card or panel. Use an accordion for several long, independent sections where only one matters at a time.
 
 ## Motion
 
@@ -34,6 +35,10 @@ Accordion reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Expand and collapse | `--ds-motion-spatial-fast` | Height and chevron move together, opening down from the header and collapsing back into it. A section uses spatial.default; closing is one speed faster. |
+
+## Alternatives
+
+- For switching between alternative views of the same content, use `Tabs`.
 
 ## Best practices
 
@@ -53,46 +58,38 @@ Don't: A title that runs on and wraps.
 
 ### Stack the items in one accordion. {#stack-the-items-in-one-accordion}
 
-Items share borders so the group reads as one control. This is not the `flush` prop, which is covered below.
+Items share borders so the group reads as one control.
 
 Do: Items touch, borders shared.
 Don't: Items spaced apart like separate cards.
 
-### There are two ways to author items, and `children` wins. {#there-are-two-ways-to-author-items-and-children-wins}
+### Author items with either `items` or `children`; `children` wins. {#author-items-with-either-items-or-children-children-wins}
 
 ```jsx
-// Incorrect — the items array is dropped without warning. The component
-// returns children whenever children exist, and never looks at items.
+// Incorrect — the items array is dropped when children exist.
 <Accordion items={sections}>
     <Accordion.Item eventKey="0" header="One">…</Accordion.Item>
 </Accordion>
 
-// Correct — pick one. The array for uniform, data-driven sections:
+// Correct — pick one:
 <Accordion items={sections} />
-
-// or children when a body needs its own markup:
-<Accordion>
-    <Accordion.Item eventKey="0" header="One">…</Accordion.Item>
-</Accordion>
 ```
 
-### `alwaysOpen` needs an array key, even for one item. {#alwaysopen-needs-an-array-key-even-for-one-item}
+### Pass an array key when `alwaysOpen` is set. {#pass-an-array-key-when-alwaysopen-is-set}
 
 ```jsx
-// Incorrect — the open item snaps shut on the first click elsewhere. With
-// alwaysOpen set and a non-array key, opening any item replaces the whole
-// selection with just that item.
+// Incorrect — with alwaysOpen and a string key, opening another item replaces the selection.
 <Accordion alwaysOpen defaultActiveKey="0" items={sections} />
 
 // Correct.
 <Accordion alwaysOpen defaultActiveKey={['0']} items={sections} />
 ```
 
-### `flush` is for accordions inside another bordered surface. {#flush-is-for-accordions-inside-another-bordered-surface}
+### Use `flush` inside another bordered surface. {#use-flush-inside-another-bordered-surface}
 
-It removes the outer border and the corner radius so the item rows sit flat
-against their container. Inside a Card pattern that is what you want; on the bare page
-it leaves the accordion with no edge to hold it.
+`flush` removes the outer border and corner radius so the item rows sit flat
+against a bordered container such as a card. On the bare page, keep the default
+border.
 
 ## Accessibility
 
@@ -100,25 +97,22 @@ it leaves the accordion with no edge to hold it.
   `aria-controls`, wrapped in a heading. Tab reaches every header; Enter and
   Space toggle; the heading list shows the whole index.
 - **The body is associated with its header.** The panel's `role="region"` is
-  labelled by the header that opened it, so a screen reader can jump straight
+  labeled by the header that opened it, so a screen reader can jump straight
   to it, not just land there in document order.
 - **Write `header` as a heading.** It becomes the text of a heading, so it is
-  read both in place and in the heading list. A short noun phrase, not a
-  sentence.
-- **`disabled` is a real disabled button.** It leaves the tab order and a press,
-  by mouse or keyboard, never opens it. Say why in text inside or beside the
-  item, never in a tooltip on the header. It is still not a way to withhold
-  content: the body stays in the DOM, so leave the item out if what is inside
-  it is not for this reader.
+  read both in place and in the heading list.
+- **`disabled` is a real disabled button.** It leaves the tab order and a press
+  never opens it. Say why in text inside or beside the item, never in a tooltip
+  on the header. The body stays in the DOM, so omit the item if its content is
+  not for this reader.
 - **Focus stays on the header after a toggle.** Opening an item does not move
-  focus into the body and does not scroll it into view. That is the right
-  behavior — the user keeps their place — but it means a tall body opened low
-  in the viewport is off-screen until they scroll.
+  focus into the body and does not scroll it into view, so the user keeps their
+  place.
 
 ## Related
 
-- For switching between alternative views of the same content, use `Tabs`. Tabs say "one of these"; an accordion says "these, some of which are open".
-- When every section has to be readable at once, use none of them and lay the sections out. Comparing two collapsed items means opening, reading, closing, opening.
+- `Tabs`: use when switching between mutually exclusive views of the same area.
+- [Section](?path=/docs/templates-section--docs): use when every section should stay visible at once so people can compare them without opening and closing rows.
 
 Same group: `Carousel` · `PageHeader` · `Panel` · `ScrollBar`
 
@@ -136,9 +130,9 @@ Same group: `Carousel` · `PageHeader` · `Panel` · `ScrollBar`
 | Rest | Surface ground, subtle text, chevron down. |
 | Hovered | `--ds-background-neutral-subtle-hovered`. |
 | Pressed | `--ds-background-neutral-subtle-pressed`. |
-| Focused | A 2px ring 2px off the edge; no fill change. |
+| Focused | Shows the focus ring with no fill change; see Border. |
 | Expanded | `--ds-background-selected`, and `--ds-background-selected-hovered` under the pointer. The chevron turns up. |
-| Disabled | The item is dimmed to `--ds-opacity-disabled`. The trigger is announced as disabled, stays in the tab order, and a press never opens it. |
+| Disabled | The item is dimmed to `--ds-opacity-disabled`. The trigger is announced as disabled, leaves the tab order, and a press never opens it. |
 
 ### Tokens
 
@@ -190,7 +184,7 @@ Implemented as `AccordionItem`.
 
 ## Tokens touched
 
-`--body-large` · `--border-default` · `--card-pad-default` · `--card-radius-compact` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text-subtle` · `--heading-small` · `--icon-md`
+`--body-large` · `--border-default` · `--card-pad-default` · `--card-radius-compact` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text-subtle` · `--heading-small` · `--icon-md`
 
 From `design-system/src/components/layout-and-structure/Accordion/Accordion.scss`. Override these through the token layer, never with a literal.
 

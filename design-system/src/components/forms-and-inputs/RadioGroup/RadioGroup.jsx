@@ -72,7 +72,7 @@ const RadioGroup = ({
     };
 
     const renderOption = (option, index) => {
-        const { value: optionValue, label, description, isDisabled: optionDisabled, id: optionId, reveal } = normalize(option);
+        const { value: optionValue, label, description, illustration, isDisabled: optionDisabled, id: optionId, reveal } = normalize(option);
         const checked = answer === optionValue;
         return (
             <div key={optionId || `${optionValue}`} className="plus-radio-group-item">
@@ -82,6 +82,7 @@ const RadioGroup = ({
                     value={optionValue}
                     label={label}
                     description={description}
+                    illustration={illustration}
                     appearance={appearance}
                     isDisabled={isDisabled || optionDisabled}
                     isReadOnly={isReadOnly}
@@ -114,6 +115,7 @@ const RadioGroup = ({
         'plus-radio-group',
         `plus-radio-group-${orientation}`,
         appearance === 'card' ? 'plus-radio-group-card' : '',
+        appearance === 'tile' ? 'plus-radio-group-tile' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -176,8 +178,9 @@ RadioGroup.propTypes = {
     orientation: PropTypes.oneOf(['stacked', 'inline']),
     /**
      * The answers. A string is its own value and label. An object can add a
-     * `description` under the label, `isDisabled`, an `id`, and `reveal`:
-     * content shown under the option while it is chosen.
+     * `description` under the label, a decorative `illustration` (for `tile`),
+     * `isDisabled`, an `id`, and `reveal`: content shown under the option while
+     * it is chosen.
      */
     options: PropTypes.arrayOf(PropTypes.oneOfType([
         optionValueType,
@@ -185,6 +188,7 @@ RadioGroup.propTypes = {
             value: optionValueType.isRequired,
             label: PropTypes.node.isRequired,
             description: PropTypes.node,
+            illustration: PropTypes.node,
             isDisabled: PropTypes.bool,
             id: PropTypes.string,
             reveal: PropTypes.node,
@@ -200,8 +204,8 @@ RadioGroup.propTypes = {
     leadingText: PropTypes.node,
     /** Scale end after the options, e.g. "Very". Describes the group. */
     trailingText: PropTypes.node,
-    /** Passed to every Radio. `card` draws each as a bordered tile. */
-    appearance: PropTypes.oneOf(['plain', 'card']),
+    /** Passed to every Radio. `card` draws each as a bordered row; `tile` draws centered pictured tiles. */
+    appearance: PropTypes.oneOf(['plain', 'card', 'tile']),
     /** Radio control (dot) width, in px; unset keeps today's rendering. */
     size: PropTypes.oneOf([10, 12, 14]),
     /** The group needs an answer. Marked on the legend. */

@@ -23,6 +23,7 @@ leading icon, and every other `Tag` prop passes straight through.
 <DocsTab tab="examples">
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-8547"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/SmartTag"
 />
 
@@ -56,7 +57,7 @@ leading icon, and every other `Tag` prop passes straight through.
 
 <ComponentExample of={SmartTagStories.Pressed} title="Pressed" description="Nothing on the plain tag; once selectable, the subtlest pressed step." />
 
-<ComponentExample of={SmartTagStories.Focused} title="Focused" description="The plain tag is skipped; a selectable one takes the 2px focus ring." />
+<ComponentExample of={SmartTagStories.Focused} title="Focused" description="The plain tag is skipped; a selectable one takes the focus ring." />
 
 <ComponentExample of={SmartTagStories.Disabled} title="Disabled" description="The disabled ground and words, as any Tag." />
 
@@ -68,12 +69,7 @@ leading icon, and every other `Tag` prop passes straight through.
 
 <DocsInteractivePlayground
     of={SmartTagStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -91,9 +87,8 @@ leading icon, and every other `Tag` prop passes straight through.
 ## Usage
 
 Use `SmartTag` wherever training content, a tutor's strengths or a feedback
-item is tagged by SMART area. For a category that is not a SMART subject, use
-`Tag` directly: `SmartTag` exists only to fix the color and icon per subject,
-not to add new behavior.
+item is tagged by SMART area. `SmartTag` fixes the color and icon per subject
+and delegates every other behavior to `Tag`.
 
 ### Subject guidance
 
@@ -121,11 +116,20 @@ meaning with a different color.
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For a category outside the five SMART subjects, use `Tag`.
+- For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
 1. **Subject icon.** Fixed per subject: a heart, a book, a bullhorn, a handshake, a laptop. It is decoration.
 2. **Label.** The subject's own name unless the context needs other words.
-3. **Edge and ground.** The subject's hue on the border, with neutral text, exactly as Tag draws a color.
+3. **Edge and ground.** The subject's hue on the border, with neutral text, exactly as `Tag` draws a color.
 
 ### States
 
@@ -135,8 +139,8 @@ meaning with a different color.
 </thead>
 <tbody>
 <tr><td>Rest</td><td>A span with no role. The five subjects are the hues orange, teal, lime, magenta and brown.</td></tr>
-<tr><td>Hovered, pressed</td><td>None until <code>isSelected</code> makes it selectable; then the subject's subtlest and subtlest pressed steps, as Tag.</td></tr>
-<tr><td>Focused</td><td>Only when selectable or removable: the 2px focus ring, 2px off the edge.</td></tr>
+<tr><td>Hovered, pressed</td><td>None until <code>isSelected</code> makes it selectable; then the subject's subtlest and subtlest pressed steps, as <code>Tag</code>.</td></tr>
+<tr><td>Focused</td><td>Only when selectable or removable: shows the focus ring; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Disabled</td><td><code>isDisabled</code>, or a disabled field, drops it to the disabled ground and words and removes the ×.</td></tr>
 </tbody>
 </DocsTable>
@@ -226,8 +230,7 @@ spelling; the aliases exist for content written before it changed.
 ## Accessibility
 
 - **Inherits `Tag`'s accessibility.** Selection, removal and link behavior
-  are unchanged; see `Tag`'s own Accessibility section for the full
-  contract.
+  are unchanged; see `Tag`'s Accessibility section for the full contract.
 - **The subject icon is decorative.** It is `aria-hidden`; the subject's name
   is carried by the visible label, not the icon.
 
@@ -237,8 +240,8 @@ spelling; the aliases exist for content written before it changed.
 
 ## Related
 
-- For a category outside the five SMART subjects, use `Tag` directly.
-- For a group of tags, including smart tags, use `TagGroup`.
+- `Tag`: use when configuring selection, removal, links or elevation on a `SmartTag`.
+- `TagGroup`: use when laying out a set of smart tags with shared spacing and overflow.
 
 </div>
 

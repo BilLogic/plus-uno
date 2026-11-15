@@ -17,7 +17,7 @@ const { TYPE_STAGE } = Demo;
  * edge and offset come from the tokens.
  */
 export default {
-    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Templates/Popup/Popup (Popup.mdx).
+    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Templates/Popup (Popup.mdx).
     title: 'Templates/Popup/Examples',
     tags: ['!dev', '!autodocs'],
 };

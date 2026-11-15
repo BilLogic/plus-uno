@@ -104,7 +104,9 @@
         "Pressed",
         "Focused",
         "Expanded",
-        "Disabled"
+        "Disabled",
+        "MotionOpenClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--body-large",
@@ -116,6 +118,10 @@
         "--ds-background-selected",
         "--ds-background-selected-hovered",
         "--ds-border",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
         "--ds-opacity-disabled",
         "--ds-surface",
         "--ds-text-subtle",
@@ -887,8 +893,17 @@
       "import": "import { Backdrop } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Backdrop/Backdrop.jsx",
-      "summary": "The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token.",
+      "summary": null,
       "props": [
+        {
+          "name": "show",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "Keep mounted and set false to finish the exit before removal.",
+          "deprecated": null
+        },
         {
           "name": "inline",
           "type": "bool",
@@ -959,7 +974,9 @@
         "Layers",
         "Pads",
         "ScreenGrid",
-        "Interactive"
+        "Interactive",
+        "MotionOpenClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--blanket-pad-x",
@@ -967,8 +984,10 @@
         "--ds-blanket",
         "--layer-blanket",
         "--layer-modal",
+        "--plus-overlay-origin",
         "--plus-overlay-screen",
-        "--plus-overlay-screen-height"
+        "--plus-overlay-screen-height",
+        "--transform-origin"
       ]
     },
     {
@@ -1386,6 +1405,8 @@
         "--ds-background-disabled",
         "--ds-border-disabled",
         "--ds-icon-disabled",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--ds-text-disabled",
         "--icon-md",
         "--inline-sm",
@@ -1709,6 +1730,7 @@
       "tokens": [
         "--body-default",
         "--border-selected",
+        "--card-radius",
         "--carousel-aspect",
         "--carousel-edge-fade",
         "--carousel-neighbor-dim",
@@ -1744,7 +1766,6 @@
         "--inline-lg",
         "--inline-md",
         "--page-stack-md",
-        "--radius-xxl",
         "--section-stack-lg",
         "--section-stack-md",
         "--stack-md",
@@ -1923,6 +1944,8 @@
       "tokens": [
         "--border-default",
         "--ds-border",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
         "--plus-listbox-viewport-width"
       ]
     },
@@ -2176,15 +2199,25 @@
           "deprecated": null
         },
         {
+          "name": "illustration",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Decorative picture shown above the label when `appearance` is `tile`.",
+          "deprecated": null
+        },
+        {
           "name": "appearance",
           "type": "enum",
           "required": false,
           "default": "'plain'",
           "values": [
             "plain",
-            "card"
+            "card",
+            "tile"
           ],
-          "description": "`plain` (default) draws the box and label inline; `card` draws the choice as a bordered tile.",
+          "description": "`plain` (default) draws the box and label inline; `card` draws a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end.",
           "deprecated": null
         },
         {
@@ -2271,17 +2304,24 @@
         "DisabledWithReason",
         "Required",
         "Description",
-        "Card"
+        "Card",
+        "Tile"
       ],
       "tokens": [
         "--body-default",
+        "--border-default",
+        "--border-selected",
+        "--card-pad-default",
         "--checkbox-control-size",
+        "--choice-tile-width",
         "--ds-background-disabled",
         "--ds-background-input",
         "--ds-background-input-hovered",
         "--ds-background-neutral",
+        "--ds-background-selected",
         "--ds-background-selected-bold",
         "--ds-background-selected-bold-hovered",
+        "--ds-background-selected-hovered",
         "--ds-border",
         "--ds-border-brand",
         "--ds-border-danger",
@@ -2290,20 +2330,215 @@
         "--ds-border-selected",
         "--ds-icon-disabled",
         "--ds-icon-inverse",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
         "--ds-surface",
+        "--ds-surface-hovered",
         "--ds-text",
         "--item-height-sm",
+        "--pad-x-lg",
         "--pad-x-md",
         "--plus-choice-indent",
-        "--radius-lg",
+        "--radius-control-md",
         "--radius-md",
         "--space-025",
         "--space-0375",
         "--space-050",
+        "--stack-lg",
         "--stack-sm",
         "--stroke-1",
         "--stroke-2",
+        "--type-weight-medium",
         "--type-weight-regular"
+      ]
+    },
+    {
+      "name": "CheckboxGroup",
+      "kind": "component",
+      "import": "import { CheckboxGroup } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.jsx",
+      "summary": "CheckboxGroup — one question and its checkbox answers, any number of which may be chosen. Mirrors `RadioGroup` on `Fieldset`: a `<fieldset>` named by `legend`, stacked or inline (wrapping 224px tiles when `appearance` is `tile`), with an array `value`, `onChange(nextArray)`, and one group `error` announced via `Fieldset`. `isDisabled` on the group overrides every `Checkbox`'s own.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Base for every id in the group. Generated when omitted.",
+          "deprecated": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The form key the choices submit under. Defaults to the group's id.",
+          "deprecated": null
+        },
+        {
+          "name": "legend",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The question. Names the group.",
+          "deprecated": null
+        },
+        {
+          "name": "orientation",
+          "type": "enum",
+          "required": false,
+          "default": "'stacked'",
+          "values": [
+            "stacked",
+            "inline"
+          ],
+          "description": "`stacked` (default) puts one option per line; `inline` lays them in a row.",
+          "deprecated": null
+        },
+        {
+          "name": "options",
+          "type": "arrayOf",
+          "required": true,
+          "default": "[]",
+          "values": null,
+          "description": "The choices. A string is its own value and label. An object can add a `description` under the label, a decorative `illustration` (for `tile`), `isDisabled`, an `id`, and `reveal`: content shown under the option while it is selected.",
+          "deprecated": null
+        },
+        {
+          "name": "value",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Controlled selected option values. Pair with `onChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Option values selected at the start when uncontrolled. Defaults to `[]`.",
+          "deprecated": null
+        },
+        {
+          "name": "onChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Receives the next array of selected option values when a box is toggled.",
+          "deprecated": null
+        },
+        {
+          "name": "appearance",
+          "type": "enum",
+          "required": false,
+          "default": "'plain'",
+          "values": [
+            "plain",
+            "card",
+            "tile"
+          ],
+          "description": "Passed to every Checkbox. `card` draws each as a bordered row; `tile` draws centered pictured tiles with a Checkbox at the top end.",
+          "deprecated": null
+        },
+        {
+          "name": "isRequired",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Marks the question as needing an answer on the legend.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Overrides every Checkbox's own `isDisabled`.",
+          "deprecated": null
+        },
+        {
+          "name": "isReadOnly",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Shown and focusable, not changeable.",
+          "deprecated": null
+        },
+        {
+          "name": "isInvalid",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Marks every unselected Checkbox as failing validation. Defaults to whether `error` is set.",
+          "deprecated": null
+        },
+        {
+          "name": "error",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One error for the group, announced when it appears.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the fieldset beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline styles for the fieldset.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Orientation",
+        "Descriptions",
+        "Reveal",
+        "Tiles",
+        "Unselected",
+        "Selected",
+        "Required",
+        "Invalid",
+        "ReadOnly",
+        "Disabled",
+        "TileRest",
+        "TileHovered",
+        "TileSelected",
+        "TileFocused",
+        "TileInvalid",
+        "TileReadOnly",
+        "TileDisabled",
+        "Interactive"
+      ],
+      "tokens": [
+        "--checkbox-control-size",
+        "--inline-lg",
+        "--stack-md"
       ]
     },
     {
@@ -2458,7 +2693,7 @@
         "--ds-text-subtle",
         "--pad-x-md",
         "--pad-y-md",
-        "--radius-xl"
+        "--table-radius"
       ]
     },
     {
@@ -2671,6 +2906,7 @@
       ],
       "tokens": [
         "--border-default",
+        "--card-radius-compact",
         "--code",
         "--ds-background-code-default",
         "--ds-background-code-gutter",
@@ -2686,8 +2922,7 @@
         "--pad-x-md",
         "--pad-y-lg",
         "--plus-code-block-digits",
-        "--plus-code-block-gutter",
-        "--radius-xl"
+        "--plus-code-block-gutter"
       ]
     },
     {
@@ -2845,10 +3080,10 @@
         "--body-default",
         "--body-small",
         "--border-default",
+        "--card-radius-compact",
         "--ds-background-selected",
         "--ds-border",
         "--ds-text-subtle",
-        "--radius-xl",
         "--space-025",
         "--space-050",
         "--space-075",
@@ -3344,7 +3579,7 @@
         "--plus-date-tag-height",
         "--plus-date-tag-icon-box",
         "--plus-date-tag-max",
-        "--radius-lg",
+        "--radius-control-md",
         "--radius-md",
         "--stack-sm",
         "--tag-gap",
@@ -3723,21 +3958,21 @@
         },
         {
           "name": "placement",
-          "type": "enum",
+          "type": "oneOf",
           "required": false,
           "default": "'bottom-start'",
           "values": [
-            "bottom-start",
-            "bottom",
-            "bottom-end",
-            "top-start",
             "top",
-            "top-end",
-            "right-start",
+            "bottom",
+            "left",
             "right",
+            "top-start",
+            "top-end",
+            "bottom-start",
+            "bottom-end",
+            "right-start",
             "right-end",
             "left-start",
-            "left",
             "left-end"
           ],
           "description": "Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side.",
@@ -4098,12 +4333,207 @@
       ]
     },
     {
+      "name": "FileItem",
+      "kind": "component",
+      "import": "import { FileItem } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/FileItem/FileItem.jsx",
+      "summary": "`FileItem` — one 56px row representing a file or a folder in a `FileUpload` list or as a standalone attachment on a note, comment or message. Anatomy (`start`, `label`, `description`, `end`) is structured for reuse: a 20px lead status/type indicator, middle-truncated name with a full-name tooltip, one status/meta line, and at most one removal control (preceded by Retry on `error`).",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "File or folder display name. Truncates in the middle so the extension stays visible, with the full name in a tooltip.",
+          "deprecated": null
+        },
+        {
+          "name": "meta",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Secondary metadata such as file size (`\"14.2 MB\"`), folder item count (`\"6 files\"`), or saved date (`\"Added Nov 12\"`).",
+          "deprecated": null
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "queued",
+            "uploading",
+            "done",
+            "error"
+          ],
+          "description": "Current upload lifecycle state of the item.",
+          "deprecated": null
+        },
+        {
+          "name": "progress",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Upload percent from 0 to 100 while `status` is `uploading`.",
+          "deprecated": null
+        },
+        {
+          "name": "error",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One-sentence cause and fix shown on `status=\"error\"`.",
+          "deprecated": null
+        },
+        {
+          "name": "kind",
+          "type": "enum",
+          "required": false,
+          "default": "'file'",
+          "values": [
+            "file",
+            "folder"
+          ],
+          "description": "`file` (default) or `folder` (uses the folder icon when done and shows file count in `meta`).",
+          "deprecated": null
+        },
+        {
+          "name": "fileType",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Explicit file category or extension (`pdf`, `video`, `audio`, `image`, `archive`, `word`, `spreadsheet`, `presentation`, `code`, `text`, `file`). Inferred from `name` when omitted.",
+          "deprecated": null
+        },
+        {
+          "name": "removal",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "cancel",
+            "remove",
+            "delete"
+          ],
+          "description": "`cancel` (in-flight upload X), `remove` (unsaved form X), or `delete` (saved attachment trash icon that confirms first).",
+          "deprecated": null
+        },
+        {
+          "name": "onRemove",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called when the user cancels, removes, or confirms deleting the item.",
+          "deprecated": null
+        },
+        {
+          "name": "onRetry",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called when the user presses Retry on an `error` item.",
+          "deprecated": null
+        },
+        {
+          "name": "href",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Destination URL that opens a completed (`status=\"done\"`) file.",
+          "deprecated": null
+        },
+        {
+          "name": "isReadOnly",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Hides all end actions while keeping full contrast, for read-only views and static attachments.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Hides end actions, disables opening links, and dims the row.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Element id on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the row container.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Queued",
+        "Uploading0",
+        "Uploading40",
+        "Uploading80",
+        "DoneRemove",
+        "DoneDelete",
+        "ErrorWithRetry",
+        "FolderUploading",
+        "FolderDone",
+        "ReadOnly",
+        "Disabled",
+        "LongName",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-small",
+        "--border-default",
+        "--ds-background-disabled",
+        "--ds-border",
+        "--ds-border-disabled",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-surface",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-disabled",
+        "--ds-text-subtle",
+        "--file-item-height",
+        "--image-xs",
+        "--inline-lg",
+        "--inline-md",
+        "--inline-sm",
+        "--pad-x-lg",
+        "--radius-control-md",
+        "--stack-md"
+      ]
+    },
+    {
       "name": "FileUpload",
       "kind": "component",
       "import": "import { FileUpload } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx",
-      "summary": "FileUpload: a form field that opens the platform file picker. It chooses files; it does not upload them.",
+      "summary": "FileUpload: a form field that opens the platform file or folder picker, accepts drops, and displays chosen FileItem rows below the drop zone.",
       "props": [
         {
           "name": "id",
@@ -4160,12 +4590,21 @@
           "deprecated": null
         },
         {
+          "name": "allowFolders",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Shows the `\"Choose files or a folder, or drop them here\"` line and enables picking or dropping a folder.",
+          "deprecated": null
+        },
+        {
           "name": "isDisabled",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disables the button and file input and dims the field.",
+          "description": "Disables the picker controls and file input and dims the field and its FileItem rows.",
           "deprecated": null
         },
         {
@@ -4174,7 +4613,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows the field and its files without a way to choose a file.",
+          "description": "Shows the field and its files without a way to choose or remove files.",
           "deprecated": null
         },
         {
@@ -4205,7 +4644,7 @@
           "required": false,
           "default": "'Choose a file'",
           "values": null,
-          "description": "The label of the choose-file button. Defaults to `Choose a file`.",
+          "description": "The label of the choose-file button when `allowFolders` is false. Defaults to `Choose a file`.",
           "deprecated": null
         },
         {
@@ -4236,6 +4675,15 @@
           "deprecated": null
         },
         {
+          "name": "onDrop",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the drop event when files or folders are dropped onto the drop zone.",
+          "deprecated": null
+        },
+        {
           "name": "onFocus",
           "type": "func",
           "required": false,
@@ -4259,7 +4707,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The uploaded-file list, shown below the button and outside the frame.",
+          "description": "The uploaded-file list (`FileItem` rows), shown below the drop zone and outside the frame.",
           "deprecated": null
         }
       ],
@@ -4268,38 +4716,51 @@
         "Content",
         "Styles",
         "InteractionStates",
-        "ReadOnly",
-        "WithFiles",
-        "Interactive",
         "Default",
+        "AllowFolders",
+        "WithFiles",
+        "UploadingBatch",
+        "DragOver",
+        "ReadOnly",
         "Required",
         "Invalid",
         "Valid",
         "Disabled",
         "KeyboardFocus",
-        "InvalidFocus"
+        "InvalidFocus",
+        "Interactive"
       ],
       "tokens": [
         "--body-default",
         "--body-small",
         "--border-default",
+        "--card-radius-compact",
+        "--ds-background-brand-subtlest",
         "--ds-background-danger-subtler",
+        "--ds-background-disabled",
         "--ds-background-neutral",
         "--ds-background-success-subtler",
+        "--ds-border",
+        "--ds-border-brand",
         "--ds-border-danger",
+        "--ds-border-disabled",
         "--ds-border-focused",
         "--ds-border-success",
         "--ds-icon-danger",
         "--ds-icon-success",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--ds-text",
+        "--ds-text-brand",
         "--ds-text-danger",
+        "--ds-text-disabled",
         "--ds-text-subtle",
         "--ds-text-success",
         "--focus-ring-width",
         "--icon-sm",
+        "--inline-md",
         "--pad-x-md",
         "--pad-y-md",
-        "--radius-xl",
         "--stack-md",
         "--stack-sm"
       ]
@@ -4725,6 +5186,15 @@
           "deprecated": null
         },
         {
+          "name": "timer",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Draws a 4 px countdown bar as the flag's top cap, emptying over `delay`, and steps the corners from 12 to 4. For a timed action such as Undo: the first action undoes, `onDismiss` commits. The bar and the wait pause while the flag is hovered or focused.",
+          "deprecated": null
+        },
+        {
           "name": "className",
           "type": "string",
           "required": false,
@@ -4777,6 +5247,33 @@
           "values": null,
           "description": "Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting.",
           "deprecated": null
+        },
+        {
+          "name": "staggerDelayMs",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional entrance stagger delay in ms when arriving as part of a burst.",
+          "deprecated": null
+        },
+        {
+          "name": "onExited",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called once the leaving flag's exit animation finishes and it unmounts.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline styles applied to the flag surface.",
+          "deprecated": null
         }
       ],
       "stories": [
@@ -4790,6 +5287,7 @@
         "Bold",
         "Interactive",
         "Dismiss",
+        "UndoTimer",
         "FlagContent",
         "UnknownAppearance",
         "ActionKinds",
@@ -4799,7 +5297,12 @@
         "Focused",
         "LandsWithNotify",
         "StackClosesUp",
-        "StackClosesUpReduced"
+        "StackClosesUpReduced",
+        "MotionOpenClose",
+        "MotionReduced",
+        "MotionExitCompletes",
+        "MotionQueueStack",
+        "MotionQueueStackReduced"
       ],
       "tokens": [
         "--body-default",
@@ -4822,14 +5325,9 @@
         "--ds-icon-warning-inverse",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
-        "--ds-motion-appearance-default",
-        "--ds-motion-appearance-default-duration",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
-        "--ds-motion-spatial-default",
-        "--ds-motion-spatial-default-duration",
-        "--ds-motion-spatial-exit",
-        "--ds-motion-spatial-exit-duration",
+        "--ds-opacity-disabled",
         "--ds-shadow-overlay",
         "--ds-surface",
         "--ds-surface-overlay",
@@ -4840,6 +5338,8 @@
         "--flag-min-height",
         "--flag-offset",
         "--flag-pad",
+        "--flag-radius-timer",
+        "--flag-timer-height",
         "--heading-xsmall",
         "--icon-md",
         "--inline-lg",
@@ -4872,6 +5372,15 @@
           "default": null,
           "values": null,
           "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "areaKey",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Current Sidebar area key: changing it fades the old page out on `appearance.fast`, then fades the new page in on `appearance.default`.",
           "deprecated": null
         },
         {
@@ -5168,7 +5677,35 @@
         "FocusedStepsAcross",
         "ResponsiveWidth",
         "KeyPanelCollapsesSidebar",
-        "KeyUnder1024"
+        "KeyUnder1024",
+        "SidebarCollapseMotion",
+        "SidebarCollapseMotionReduced",
+        "SidebarPeekMotion",
+        "SidebarPeekMotionReduced",
+        "PanelDockMotion",
+        "PanelDockMotionReduced",
+        "PanelOverlayMotion",
+        "PanelOverlayMotionReduced",
+        "PanelPeekMotion",
+        "PanelPeekMotionReduced",
+        "BreakpointReflowMotion",
+        "BreakpointReflowMotionReduced",
+        "MotionGoToArea",
+        "MotionGoToAreaReduced",
+        "MotionDrillAndClimb",
+        "MotionDrillAndClimbReduced",
+        "MotionDrillDeeper",
+        "MotionDrillDeeperReduced",
+        "MotionClimbTwoLevels",
+        "MotionClimbTwoLevelsReduced",
+        "MotionRecordOverlay",
+        "MotionRecordOverlayReduced",
+        "MotionFocusedTask",
+        "MotionFocusedTaskReduced",
+        "MotionStepAcross",
+        "MotionStepAcrossReduced",
+        "MotionStepDown",
+        "MotionStepDownReduced"
       ],
       "tokens": [
         "--border-default",
@@ -5176,6 +5713,14 @@
         "--content-max-width-reading",
         "--content-min-width",
         "--ds-border",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-default",
+        "--ds-motion-spatial-default-duration",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
+        "--ds-motion-spatial-slow",
+        "--ds-motion-spatial-slow-duration",
         "--ds-shadow-overlay",
         "--ds-surface",
         "--ds-surface-overlay",
@@ -5279,6 +5824,8 @@
         "--border-selected",
         "--ds-border-brand",
         "--ds-border-discovery",
+        "--ds-motion-loop",
+        "--ds-motion-loop-duration",
         "--generative-border-angle",
         "--generative-border-radius",
         "--generative-border-rest",
@@ -6081,6 +6628,8 @@
         "--body-default",
         "--border-default",
         "--ds-background-neutral-subtle-hovered",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
@@ -7146,6 +7695,166 @@
       ]
     },
     {
+      "name": "NotificationItem",
+      "kind": "component",
+      "import": "import { NotificationItem } from '@/components';",
+      "group": "messaging",
+      "source": "design-system/src/components/messaging/NotificationItem/NotificationItem.jsx",
+      "summary": "`NotificationItem` — one row for an update that arrived over time, shared by the Inbox, a Home card and a full notifications page. The whole row is a single link (`href`). When `unread` is true, the row shows the selected fill and an unread dot paired with the visually hidden word \"Unread\" so assistive technology announces it. When `onMarkRead` is also passed, a compact \"Mark as read\" `IconButton` sits as a sibling of the link over the trailing slot and appears on hover and keyboard focus. Anatomy (`__start`, `__body` [`__label`, `__description`], `__end`) matches `FileItem` and `SettingRow` so all three can lift onto a shared row base.",
+      "props": [
+        {
+          "name": "actor",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Leading actor visual: an `Avatar` for a person or a `Tile` for the system. Hidden from the link's accessible name because `title` names who acted.",
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Who did what, such as `\"Ana Ruiz moved Thursday's session\"`.",
+          "deprecated": null
+        },
+        {
+          "name": "meta",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Context and relative time on one line, such as `\"Sessions · 2m\"`.",
+          "deprecated": null
+        },
+        {
+          "name": "unread",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Marks the row unread with the selected fill, an unread dot and an announced `\"Unread\"` state.",
+          "deprecated": null
+        },
+        {
+          "name": "href",
+          "type": "string",
+          "required": false,
+          "default": "'#'",
+          "values": null,
+          "description": "Destination URL for the notification row.",
+          "deprecated": null
+        },
+        {
+          "name": "onMarkRead",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called when the user activates the `\"Mark as read\"` button on an unread item.",
+          "deprecated": null
+        },
+        {
+          "name": "onClick",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Click handler forwarded to the row link.",
+          "deprecated": null
+        },
+        {
+          "name": "onPointerEnter",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Pointer-enter handler on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "onPointerLeave",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Pointer-leave handler on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional `id` on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Extra class names on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline style on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid` on the row container.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Actors",
+        "Unread",
+        "Read",
+        "Hovered",
+        "Focused",
+        "Pressed",
+        "Motion",
+        "Interactive"
+      ],
+      "tokens": [
+        "--control-sm",
+        "--count-tag-dot-size",
+        "--ds-background-brand-bold",
+        "--ds-background-neutral-subtle",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-background-selected-hovered",
+        "--ds-background-selected-pressed",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-text",
+        "--image-md",
+        "--inline-lg",
+        "--pad-x-md",
+        "--pad-y-lg",
+        "--radius-control-md",
+        "--radius-full",
+        "--stack-sm",
+        "--type-weight-medium"
+      ]
+    },
+    {
       "name": "Object",
       "kind": "component",
       "import": "import { Object } from '@/components';",
@@ -7294,6 +8003,24 @@
           "deprecated": null
         },
         {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One PageHeader with the page's h1, actions and tabs. Replaces title.",
+          "deprecated": null
+        },
+        {
+          "name": "banner",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One page Banner below the header. Governed by Notifications (ds guide notifications).",
+          "deprecated": null
+        },
+        {
           "name": "className",
           "type": "string",
           "required": false,
@@ -7333,18 +8060,25 @@
         "StepLarge",
         "Bordered",
         "WithTitle",
+        "HeaderAndBanner",
+        "OptionalSlots",
         "ColorModes",
         "MediumPad",
         "Interactive",
         "TypeDefault",
         "TypeFullWidth",
         "AnatomyRecord",
+        "AnatomyRecordScaledDown",
         "ScenarioArea",
         "ScenarioSeveralSections",
         "ScenarioRecordTabs",
         "ScenarioTwoLevels",
         "KeyBanner",
-        "ResponsiveWidth"
+        "ResponsiveWidth",
+        "MotionSwitchViews",
+        "MotionSwitchViewsReduced",
+        "MotionScrollToSpot",
+        "MotionScrollToSpotReduced"
       ],
       "tokens": [
         "--ds-border-bold",
@@ -7584,7 +8318,8 @@
         "Pressed",
         "Focused",
         "Current",
-        "Disabled"
+        "Disabled",
+        "OuterHeight"
       ],
       "tokens": [
         "--body-default",
@@ -7756,7 +8491,7 @@
       "import": "import { PatternCard } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternCard/PatternCard.jsx",
-      "summary": "Card pattern for PLUS design system. Mirrors Figma `Pattern/Card`: an optional image, then the content (the `_Card header` over the body), then an optional footer, on Atlassian's raised pair: the raised surface and its shadow, whose 1px ring is the card's edge. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
+      "summary": "PLUS card: an optional image, content and footer on the raised surface and shadow. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading medium on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
       "props": [
         {
           "name": "id",
@@ -7809,7 +8544,32 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Image slot above the content, full bleed",
+          "description": "Image slot, full bleed: above the content, or at the start or end edge per `imagePlacement`",
+          "deprecated": null
+        },
+        {
+          "name": "imagePlacement",
+          "type": "enum",
+          "required": false,
+          "default": "'top'",
+          "values": [
+            "top",
+            "start",
+            "end"
+          ],
+          "description": "Image position. Side placements apply from the large card minimum width; narrower cards put the image on top.",
+          "deprecated": null
+        },
+        {
+          "name": "imageSplit",
+          "type": "enum",
+          "required": false,
+          "default": "'1/3'",
+          "values": [
+            "1/3",
+            "1/2"
+          ],
+          "description": "Side image share. One half also steps the title up to Heading medium. Ignored for top placement.",
           "deprecated": null
         },
         {
@@ -7923,6 +8683,21 @@
         "ImageWide",
         "ImageStandard",
         "ImageSquare",
+        "ImageTop",
+        "ImageTopHovered",
+        "ImageTopPressed",
+        "ImageTopDragging",
+        "ImageStart",
+        "ImageStartHovered",
+        "ImageStartPressed",
+        "ImageStartDragging",
+        "ImageEnd",
+        "ImageEndHovered",
+        "ImageEndPressed",
+        "ImageEndDragging",
+        "ImageStartHalf",
+        "ImageEndHalf",
+        "ImageTopIgnoresSplit",
         "BodyOnly",
         "WithFooter",
         "CustomHeader",
@@ -7930,7 +8705,8 @@
         "Clickable",
         "Dragging",
         "LoadingCard",
-        "Rows"
+        "Rows",
+        "PlacementBoundary"
       ],
       "tokens": [
         "--body-default",
@@ -7943,6 +8719,8 @@
         "--card-stack-lg",
         "--card-stack-md",
         "--card-stack-sm",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--ds-shadow-overlay",
         "--ds-shadow-raised",
         "--ds-surface-overlay",
@@ -7951,7 +8729,8 @@
         "--ds-surface-raised-pressed",
         "--ds-text",
         "--ds-text-subtle",
-        "--ds-utility-elevation-surface-current"
+        "--ds-utility-elevation-surface-current",
+        "--heading-medium"
       ]
     },
     {
@@ -7962,6 +8741,15 @@
       "source": "design-system/src/patterns/PatternModal/PatternModal.jsx",
       "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Backdrop`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (backdrop, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
       "props": [
+        {
+          "name": "show",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "Keep mounted and set false to finish the exit before removal; also follows its Backdrop.",
+          "deprecated": null
+        },
         {
           "name": "id",
           "type": "string",
@@ -8147,7 +8935,9 @@
         "KeyLoading",
         "KeyConfirmInside",
         "StackConfirmOverPanel",
-        "StackModalOnModalRefused"
+        "StackModalOnModalRefused",
+        "MotionOpenClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--border-default",
@@ -8161,8 +8951,10 @@
         "--modal-radius",
         "--modal-stack-md",
         "--modal-stack-sm",
+        "--plus-overlay-origin",
         "--stack-lg",
-        "--stack-md"
+        "--stack-md",
+        "--transform-origin"
       ]
     },
     {
@@ -8824,6 +9616,7 @@
         "Overview",
         "Geometry",
         "Tutor",
+        "PrototypeAreas",
         "OnboardingInProgress",
         "OnboardingDone",
         "SectionsOpen",
@@ -8861,6 +9654,8 @@
         "--ds-icon-selected",
         "--ds-icon-subtle",
         "--ds-icon-subtlest",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
         "--ds-text",
         "--ds-text-selected",
         "--ds-text-subtle",
@@ -8891,7 +9686,7 @@
       "import": "import { PatternTable } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternTable/PatternTable.jsx",
-      "summary": "Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a pagination slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the header stays and the empty state takes the body as one message row spanning every column, so the columns still say what will appear. The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected=\"true\"` (in a `role=\"grid\"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the \"Table\" slot component in the Figma design system file.",
+      "summary": "Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a footer slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the header stays and the empty state takes the body as one message row spanning every column, so the columns still say what will appear. The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected=\"true\"` (in a `role=\"grid\"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the \"Table\" slot component in the Figma design system file.",
       "props": [
         {
           "name": "id",
@@ -8903,12 +9698,12 @@
           "deprecated": null
         },
         {
-          "name": "pagination",
+          "name": "footer",
           "type": "node",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Pagination slot under the rows; hidden while the empty state shows",
+          "description": "Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows",
           "deprecated": null
         },
         {
@@ -9002,7 +9797,13 @@
         "Sticky",
         "StickyHeaderNeedsMaxHeight",
         "StickyHeader",
-        "StickyColumn"
+        "StickyColumn",
+        "MotionAddRow",
+        "MotionAddRowReduced",
+        "MotionRemoveRow",
+        "MotionRemoveRowReduced",
+        "MotionReorderRows",
+        "MotionReorderRowsReduced"
       ],
       "tokens": [
         "--body-default",
@@ -9031,6 +9832,7 @@
         "--space-0625",
         "--stack-md",
         "--stack-sm",
+        "--table-footer-height",
         "--table-overflow-reach",
         "--table-pad-x-cell",
         "--table-pad-y-cell",
@@ -9092,7 +9894,7 @@
         },
         {
           "name": "placement",
-          "type": "enum",
+          "type": "oneOf",
           "required": false,
           "default": "'top'",
           "values": [
@@ -9241,25 +10043,13 @@
         "--anchor-width",
         "--body-default",
         "--border-default",
-        "--ds-motion-appearance-fast",
-        "--ds-motion-appearance-fast-duration",
-        "--ds-motion-spatial-exit",
-        "--ds-motion-spatial-exit-duration",
-        "--ds-motion-spatial-fast",
-        "--ds-motion-spatial-fast-duration",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
         "--heading-xsmall",
         "--layer-popup",
-        "--plus-popup-clip-bottom",
-        "--plus-popup-clip-left",
-        "--plus-popup-clip-right",
-        "--plus-popup-clip-top",
-        "--plus-popup-reach",
         "--popover-offset",
         "--popover-pad",
-        "--popup-clip-reach",
         "--popup-max-width",
         "--popup-min-width",
         "--popup-pad",
@@ -9547,6 +10337,10 @@
         "--ds-background-inverse-subtle-pressed",
         "--ds-background-neutral",
         "--ds-background-success-bold",
+        "--ds-motion-linear",
+        "--ds-motion-loop",
+        "--ds-motion-loop-duration",
+        "--ds-motion-spatial-fast-duration",
         "--plus-progressbar-fill-color",
         "--progress-bar-height",
         "--radius-full"
@@ -9702,6 +10496,110 @@
       ]
     },
     {
+      "name": "ProgressRing",
+      "kind": "component",
+      "import": "import { ProgressRing } from '@/components';",
+      "group": "loading",
+      "source": "design-system/src/components/loading/ProgressRing/ProgressRing.jsx",
+      "summary": "`ProgressRing` — a determinate ring for a known amount of progress in a small slot. `value` is a percent (0 to 100); the drawn arc and the announced `aria-valuenow` clamp together to 0 to 100. A ring is never indeterminate; unknown time is `Spinner`'s job.",
+      "props": [
+        {
+          "name": "value",
+          "type": "number",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Percent complete, from 0 to 100",
+          "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "required": false,
+          "default": "20",
+          "values": [
+            "16",
+            "20",
+            "24"
+          ],
+          "description": "Diameter in pixels: 16, 20 or 24",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Accessible name describing what the ring measures",
+          "deprecated": null
+        },
+        {
+          "name": "appearance",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "inverse"
+          ],
+          "description": "default draws a brand fill on a neutral track; inverse reads on a bold background",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names on the root element.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Element id on the root progressbar.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Default",
+        "Inverse",
+        "Zero",
+        "Partial",
+        "Complete",
+        "Values",
+        "Sizes",
+        "Size16",
+        "Size20",
+        "Size24",
+        "WithInlineText",
+        "OutOfRangeValuesAreClamped",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "ReducedMotion"
+      ],
+      "tokens": [
+        "--ds-background-brand-bold",
+        "--ds-background-inverse-subtle",
+        "--ds-background-neutral",
+        "--ds-icon-inverse",
+        "--ds-motion-linear",
+        "--ds-motion-spatial-fast-duration",
+        "--icon-lg",
+        "--icon-md",
+        "--image-xs",
+        "--progress-ring-stroke"
+      ]
+    },
+    {
       "name": "ProgressTracker",
       "kind": "component",
       "import": "import { ProgressTracker } from '@/components';",
@@ -9779,6 +10677,8 @@
         "--ds-icon-disabled",
         "--ds-icon-subtle",
         "--ds-icon-success",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--ds-text-disabled",
         "--ds-text-selected",
         "--ds-text-subtle",
@@ -10146,15 +11046,25 @@
           "deprecated": null
         },
         {
+          "name": "illustration",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Decorative picture shown above the label when `appearance` is `tile`.",
+          "deprecated": null
+        },
+        {
           "name": "appearance",
           "type": "enum",
           "required": false,
           "default": "'plain'",
           "values": [
             "plain",
-            "card"
+            "card",
+            "tile"
           ],
-          "description": "`plain` (default) is a radio beside its label; `card` draws the option as a bordered tile.",
+          "description": "`plain` (default) is a radio beside its label; `card` draws a bordered row; `tile` draws a centered pictured tile.",
           "deprecated": null
         },
         {
@@ -10246,16 +11156,23 @@
         "Focused",
         "Disabled",
         "DisabledWithReason",
-        "Required"
+        "Required",
+        "Tile"
       ],
       "tokens": [
         "--body-default",
+        "--border-default",
+        "--border-selected",
+        "--card-pad-default",
+        "--choice-tile-width",
         "--ds-background-disabled",
         "--ds-background-input",
         "--ds-background-input-hovered",
         "--ds-background-neutral",
+        "--ds-background-selected",
         "--ds-background-selected-bold",
         "--ds-background-selected-bold-hovered",
+        "--ds-background-selected-hovered",
         "--ds-border",
         "--ds-border-brand",
         "--ds-border-danger",
@@ -10264,19 +11181,27 @@
         "--ds-border-selected",
         "--ds-icon-disabled",
         "--ds-icon-inverse",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
         "--ds-surface",
+        "--ds-surface-hovered",
         "--ds-text",
         "--item-height-sm",
+        "--pad-x-lg",
         "--pad-x-md",
         "--plus-choice-indent",
         "--radio-control-size",
+        "--radius-control-md",
         "--radius-full",
-        "--radius-lg",
         "--space-025",
         "--space-0375",
         "--space-050",
+        "--stack-sm",
         "--stroke-1",
         "--stroke-2",
+        "--type-weight-medium",
         "--type-weight-regular"
       ]
     },
@@ -10333,7 +11258,7 @@
           "required": true,
           "default": "[]",
           "values": null,
-          "description": "The answers. A string is its own value and label. An object can add a `description` under the label, `isDisabled`, an `id`, and `reveal`: content shown under the option while it is chosen.",
+          "description": "The answers. A string is its own value and label. An object can add a `description` under the label, a decorative `illustration` (for `tile`), `isDisabled`, an `id`, and `reveal`: content shown under the option while it is chosen.",
           "deprecated": null
         },
         {
@@ -10388,9 +11313,10 @@
           "default": "'plain'",
           "values": [
             "plain",
-            "card"
+            "card",
+            "tile"
           ],
-          "description": "Passed to every Radio. `card` draws each as a bordered tile.",
+          "description": "Passed to every Radio. `card` draws each as a bordered row; `tile` draws centered pictured tiles.",
           "deprecated": null
         },
         {
@@ -10482,6 +11408,14 @@
         "Validation",
         "TwoGroupsWithoutIds",
         "Interactive",
+        "Tiles",
+        "TileRest",
+        "TileHovered",
+        "TileSelected",
+        "TileFocused",
+        "TileInvalid",
+        "TileReadOnly",
+        "TileDisabled",
         "Unanswered",
         "Selected",
         "Hovered",
@@ -10494,6 +11428,7 @@
       "tokens": [
         "--body-default",
         "--ds-text",
+        "--inline-lg",
         "--radio-control-size",
         "--radio-control-size-10",
         "--radio-control-size-14",
@@ -10831,6 +11766,8 @@
         "--ds-icon-disabled",
         "--ds-icon-selected",
         "--ds-icon-subtle",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
         "--ds-text",
         "--ds-text-danger",
         "--icon-lg",
@@ -11668,12 +12605,12 @@
         "--border-default",
         "--card-inline-sm",
         "--card-pad-compact",
+        "--card-radius-compact",
         "--ds-border",
         "--ds-text",
         "--heading-small",
         "--icon-lg",
         "--item-height-md",
-        "--radius-xl",
         "--stack-md",
         "--type-weight-medium"
       ]
@@ -12118,8 +13055,12 @@
         "FieldDisabled",
         "FieldInvalid",
         "FieldReadOnly",
+        "FieldReadOnlyShowsLabel",
         "FieldReadOnlyLongValue",
-        "OpenListEdge"
+        "OpenListEdge",
+        "MotionOpenClose",
+        "MotionReduced",
+        "MotionKeyboardOpen"
       ],
       "tokens": [
         "--body-default",
@@ -12149,12 +13090,154 @@
       ]
     },
     {
+      "name": "SettingRow",
+      "kind": "component",
+      "import": "import { SettingRow } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/SettingRow/SettingRow.jsx",
+      "summary": "SettingRow — puts a setting's name and one-line description at the start and its control (`Toggle`, compact `Select`, or `Button`) at the end, top-aligned to the label. Any `status` (`StatusTag`) sits beside the label so the end slot holds only the action. The row's `label` names `control` through `aria-labelledby`; controls that carry their own visible action text (such as a `Disconnect` `Button`) combine their own id with the row label id so both the action and the setting name are announced.",
+      "props": [
+        {
+          "name": "label",
+          "type": "node",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "The setting's name. Names `control` through `aria-labelledby`.",
+          "deprecated": null
+        },
+        {
+          "name": "description",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One line of context under the label, or the visible reason when disabled or read-only.",
+          "deprecated": null
+        },
+        {
+          "name": "control",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The setting's control at the end: a `Toggle` (with no own label), a compact `Select`, or a `Button`.",
+          "deprecated": null
+        },
+        {
+          "name": "status",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional `StatusTag` shown beside `label`, never inside the control slot.",
+          "deprecated": null
+        },
+        {
+          "name": "error",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline error message shown under `description` when saving or changing the setting fails.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Dims the setting label and forwards `isDisabled` to `control` while keeping `description` readable as the reason.",
+          "deprecated": null
+        },
+        {
+          "name": "isReadOnly",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Marks the setting read-only and forwards `isReadOnly` to value controls.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional id on the row container; also prefixes the generated label and description ids.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline style on the row container.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid`, for test queries.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "ToggleControl",
+        "SelectControl",
+        "ConnectionRow",
+        "Rest",
+        "Saving",
+        "Saved",
+        "ErrorState",
+        "DisabledWithReason",
+        "ReadOnly",
+        "Motion",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-small",
+        "--border-default",
+        "--ds-border",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-disabled",
+        "--icon-sm",
+        "--inline-lg",
+        "--inline-md",
+        "--listbox-max-width",
+        "--setting-row-end-min-height",
+        "--setting-row-pad-y",
+        "--setting-row-select-min-width",
+        "--stack-sm",
+        "--type-weight-medium"
+      ]
+    },
+    {
       "name": "Sidebar",
       "kind": "component",
       "import": "import { Sidebar } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Sidebar/Sidebar.jsx",
-      "summary": "The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for the role (`sidebarConfig.js`), the signed-in person's account row, and the open tabs. Home is selected when nothing else is. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under its row. A tab is selected while its row is the current page (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Signing out clears the tabs. Nothing here changes the URL.",
+      "summary": "The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for the role (`sidebarConfig.js`), the signed-in person's account row, and the open tabs. Home is selected when nothing else is. Pass `groups` to add or override a prototype's own area(s) by `id` while keeping the role's navigation. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under its row. A tab is selected while its row is the current page (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Signing out clears the tabs. Nothing here changes the URL.",
       "props": [
         {
           "name": "user",
@@ -12166,6 +13249,15 @@
             "supervisor"
           ],
           "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "groups",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Extra or overridden groups merged by `id` into the role's config (`sidebarConfig.js`): e.g. `[{ id: 'toolkit', items: [{ id: 'reviews', text: 'Reviews', icon: 'clipboard-check' }] }]`",
           "deprecated": null
         },
         {
@@ -12454,14 +13546,16 @@
       "tokens": [
         "--border-default",
         "--control-sm",
+        "--ds-motion-linear",
+        "--ds-motion-loop-duration",
         "--ds-skeleton",
         "--ds-skeleton-subtle",
         "--plus-skeleton-duration",
         "--plus-skeleton-height",
         "--plus-skeleton-radius",
         "--plus-skeleton-width",
+        "--radius-control-md",
         "--radius-full",
-        "--radius-lg",
         "--radius-md",
         "--skeleton-circle-size",
         "--skeleton-height",
@@ -12603,6 +13697,8 @@
       ],
       "tokens": [
         "--ds-icon-inverse",
+        "--ds-motion-loop",
+        "--ds-motion-loop-duration",
         "--plus-spinner-size",
         "--radius-full",
         "--spinner-size-lg",
@@ -12812,8 +13908,8 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-small",
+        "--popup-radius",
         "--radius-lg",
-        "--radius-xl",
         "--space-075",
         "--space-100",
         "--space-150",
@@ -12976,7 +14072,7 @@
         "--plus-status-height",
         "--plus-status-icon-box",
         "--plus-status-max",
-        "--radius-lg",
+        "--radius-control-md",
         "--radius-md",
         "--stack-sm",
         "--tag-gap",
@@ -13313,6 +14409,7 @@
         "--row-height-sm",
         "--space-0625",
         "--table-cell-max-width",
+        "--table-footer-height",
         "--table-pad-x-cell",
         "--table-pad-y-cell",
         "--table-radius",
@@ -13864,6 +14961,8 @@
         "--ds-icon-accent-yellow",
         "--ds-icon-disabled",
         "--ds-icon-subtle",
+        "--ds-motion-loop",
+        "--ds-motion-loop-duration",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
@@ -15507,6 +16606,7 @@
         }
       ],
       "stories": [
+        "Motion",
         "Overview",
         "Sizes",
         "States",
@@ -15533,6 +16633,10 @@
         "--ds-background-selected-bold-hovered",
         "--ds-icon-disabled",
         "--ds-icon-inverse",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
         "--ds-opacity-disabled",
         "--ds-text",
         "--item-height-sm",
@@ -15653,7 +16757,9 @@
         "PlacementBottom",
         "PlacementLeft",
         "PlacementRight",
-        "Wrapping"
+        "Wrapping",
+        "MotionOpenClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--body-small",
@@ -15661,9 +16767,11 @@
         "--ds-text-inverse",
         "--layer-tooltip",
         "--pad-x-sm",
+        "--plus-overlay-origin",
         "--popover-max-width-tooltip",
         "--popover-pad-y-tooltip",
-        "--radius-control-sm"
+        "--radius-control-sm",
+        "--transform-origin"
       ]
     },
     {
@@ -15842,7 +16950,15 @@
         "Hovered",
         "Focused",
         "FieldDisabled",
-        "FieldInvalid"
+        "FieldInvalid",
+        "MotionOpenClose",
+        "MotionReduced",
+        "MotionKeyboardOpen"
+      ],
+      "tokens": [
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
+        "--plus-popup-reach"
       ]
     },
     {

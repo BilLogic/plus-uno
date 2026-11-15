@@ -15,6 +15,20 @@ import { ORIENTATION, PATHS_REFUSAL, PathsRefused, createLookup, render } from '
 
 const lookup = createLookup(REPO_ROOT);
 
+test('brief-shaped list, queue, review and detail queries return reference stories', () => {
+  for (const query of ['review queue with filters', 'a list of students', 'review sessions', 'session detail with a panel']) {
+    const result = lookup.find(query);
+    const reference = result.results.find((r) => r.kind === 'reference');
+    assert.ok(reference, query);
+    assert.equal(reference.name, query.includes('detail') ? 'Detail with panel' : 'List with filters');
+    assert.match(reference.file, /ReferenceScreens\.stories\.jsx$/);
+    assert.match(reference.url, /\/storybook\/\?path=\/story\/templates-page-reference-screens--/);
+    assert.match(render('find', result), /reference.*ReferenceScreens\.stories\.jsx#/);
+    assert.match(render('find', result), /https:\/\/plus-uno.netlify.app\/storybook/);
+  }
+  assert.equal(lookup.find('Button').results.some((r) => r.kind === 'reference'), false);
+});
+
 test('check refuses paths when built with readPaths off, and still checks code', () => {
   const closed = createLookup(REPO_ROOT, { readPaths: false });
   assert.throws(() => closed.check({ paths: ['package.json'] }), (err) => err instanceof PathsRefused && err.message === PATHS_REFUSAL);
@@ -167,15 +181,117 @@ test('tokens returns steps with intent and leaves primitives out', () => {
 
 test('guide returns the orientation, a guideline and a rule section', () => {
   assert.equal(lookup.guide().text, ORIENTATION);
-  assert.equal(lookup.guide('layout formulas').path, 'design-system/guidelines/composition/layout.md');
-  assert.equal(lookup.guide('a11y').path, 'design-system/src/styles/Accessibility.mdx');
+  assert.match(ORIENTATION, /Template, then blocks, then pieces/);
+  assert.equal(lookup.guide('layout').path, 'design-system/agent-views/templates/TemplatesOverview.md');
+  assert.equal(lookup.guide('layout formulas').path, 'design-system/agent-views/templates/TemplatesOverview.md');
+  assert.equal(lookup.guide('a11y').path, 'design-system/agent-views/foundations/Accessibility.md');
   assert.match(lookup.guide('no-raw-literal').text, /^## ds\/no-raw-literal/);
   assert.ok(lookup.guide('nope').topics.includes('layout'));
 });
 
+test('guide answers pattern, template and foundation topics and situation aliases, with brief form by default and full page on request', () => {
+  for (const alias of ['filtering', 'filter', 'filters']) {
+    const g = lookup.guide(alias);
+    assert.equal(g.path, 'design-system/agent-views/patterns/Filtering.md', alias);
+    assert.equal(g.brief, true, `${alias} is brief by default`);
+    assert.match(g.text, /^# Filtering\n/, alias);
+    assert.match(g.text, /^## Tiers$/m, alias);
+    assert.match(g.text, /^## Usage$/m, alias);
+    assert.match(g.text, /^## Sections$/m, alias);
+    assert.doesNotMatch(g.text, /^## Best practices$/m, `${alias} brief omits full Best practices body`);
+    assert.ok(Array.isArray(g.sections) && g.sections.includes('Best practices'), alias);
+  }
+  const fullFiltering = lookup.guide('filtering', { full: true });
+  assert.equal(fullFiltering.brief, false);
+  assert.match(fullFiltering.text, /^## Best practices$/m);
+  assert.equal(lookup.guide('filtering --full').text, fullFiltering.text);
+
+  for (const alias of ['layout', 'page', 'pages', 'templates', 'template']) {
+    const g = lookup.guide(alias);
+    assert.equal(g.path, 'design-system/agent-views/templates/TemplatesOverview.md', alias);
+    assert.equal(g.brief, true, `${alias} is brief by default`);
+    assert.match(g.text, /^## Which template for which job$/m, alias);
+    assert.match(g.text, /^## Sections$/m, alias);
+  }
+
+  for (const alias of ['toolbar', 'view bar', 'view-bar', 'section']) {
+    const g = lookup.guide(alias);
+    assert.equal(g.path, 'design-system/src/patterns/PatternSection/index.md', alias);
+    assert.equal(g.brief, true, `${alias} is brief by default`);
+    assert.match(g.text, /^# PatternSection\n/, alias);
+    assert.match(g.text, /^## Sections$/m, alias);
+  }
+
+  const cases = [
+    ['search', 'design-system/agent-views/patterns/Search.md'],
+    ['empty', 'design-system/agent-views/patterns/Empty.md'],
+    ['empty state', 'design-system/agent-views/patterns/Empty.md'],
+    ['error', 'design-system/agent-views/patterns/Errors.md'],
+    ['errors', 'design-system/agent-views/patterns/Errors.md'],
+    ['error state', 'design-system/agent-views/patterns/Errors.md'],
+    ['loading', 'design-system/agent-views/patterns/Loading.md'],
+    ['notification', 'design-system/agent-views/patterns/Notifications.md'],
+    ['notifications', 'design-system/agent-views/patterns/Notifications.md'],
+    ['toast', 'design-system/agent-views/patterns/Notifications.md'],
+    ['banner', 'design-system/agent-views/patterns/Notifications.md'],
+    ['action', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['actions', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['bulk', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['row actions', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['common-actions', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['commonactions', 'design-system/agent-views/patterns/CommonActions.md'],
+    ['nav', 'design-system/agent-views/patterns/Navigation.md'],
+    ['sidebar', 'design-system/agent-views/patterns/Navigation.md'],
+    ['navigation', 'design-system/agent-views/patterns/Navigation.md'],
+    ['validation', 'design-system/agent-views/patterns/Forms.md'],
+    ['forms', 'design-system/agent-views/patterns/Forms.md'],
+    ['form-behavior', 'design-system/agent-views/patterns/Forms.md'],
+    ['disabled', 'design-system/agent-views/patterns/Disabled.md'],
+    ['unavailable', 'design-system/agent-views/patterns/Disabled.md'],
+    ['readonly', 'design-system/agent-views/patterns/ReadOnly.md'],
+    ['read-only', 'design-system/agent-views/patterns/ReadOnly.md'],
+    ['read only', 'design-system/agent-views/patterns/ReadOnly.md'],
+    ['overflow', 'design-system/agent-views/patterns/Overflow.md'],
+    ['truncation', 'design-system/agent-views/patterns/Overflow.md'],
+    ['indicator', 'design-system/agent-views/patterns/Indicators.md'],
+    ['indicators', 'design-system/agent-views/patterns/Indicators.md'],
+    ['badge', 'design-system/agent-views/patterns/Indicators.md'],
+    ['tag', 'design-system/agent-views/patterns/Indicators.md'],
+    ['status', 'design-system/agent-views/patterns/Indicators.md'],
+    ['patterns', 'design-system/agent-views/patterns/PatternsOverview.md'],
+    ['pattern', 'design-system/agent-views/patterns/PatternsOverview.md'],
+    ['frame', 'design-system/src/patterns/Frame/index.md'],
+    ['card', 'design-system/src/patterns/PatternCard/index.md'],
+    ['table', 'design-system/src/patterns/PatternTable/index.md'],
+    ['modal', 'design-system/src/patterns/PatternModal/index.md'],
+    ['form', 'design-system/agent-views/templates/Form.md'],
+    ['panel', 'design-system/agent-views/templates/Panel.md'],
+    ['popup', 'design-system/agent-views/templates/Popup.md'],
+    ['foundations', 'design-system/agent-views/foundations/FoundationsOverview.md'],
+    ['motion', 'design-system/agent-views/foundations/MotionPhysics.md'],
+    ['transitions', 'design-system/agent-views/foundations/MotionTransitions.md'],
+    ['choreography', 'design-system/agent-views/foundations/MotionChoreography.md'],
+    ['sound', 'design-system/agent-views/foundations/SoundOverview.md'],
+  ];
+  for (const [topic, expectedPath] of cases) {
+    assert.equal(lookup.guide(topic).path, expectedPath, topic);
+  }
+});
+
+test('get includes Governed by: Filtering on SearchField, FilterButton, FilterMenu, PopupSelect, Select and PatternSection', () => {
+  const names = ['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'PatternSection'];
+  const full = lookup.get(names);
+  for (const r of full.records) {
+    assert.match(r.text, /\*\*Governed by:\*\* Filtering \(`design-system\/agent-views\/patterns\/Filtering\.md`/, r.name);
+    assert.match(r.text, /Quick filters \(1–3 categories, short lists\) use `FilterButton`, not `Select`\./, r.name);
+  }
+  const propsOnly = render('get', lookup.get(['SearchField'], 'props'));
+  assert.match(propsOnly, /\*\*Governed by:\*\* Filtering/);
+});
+
 test('guide answers a foundation topic with no guideline file from its Storybook foundation page, as text', () => {
   const color = lookup.guide('color');
-  assert.equal(color.path, 'design-system/src/styles/Colors.mdx');
+  assert.equal(color.path, 'design-system/agent-views/foundations/Colors.md');
   assert.match(color.text, /^# Color\n/);
   assert.match(color.text, /^## Data-viz color$/m);
   assert.match(color.text, /--ds-chart-categorical-1/);
@@ -195,9 +311,9 @@ test('guide survives a guideline folder that is empty or missing', () => {
       if (e !== 'guidelines') fs.symlinkSync(path.join(REPO_ROOT, 'design-system', e), path.join(tmp, 'design-system', e));
     }
     const bare = createLookup(tmp);
-    assert.equal(bare.guide('color').path, 'design-system/src/styles/Colors.mdx');
+    assert.equal(bare.guide('color').path, 'design-system/agent-views/foundations/Colors.md');
     assert.ok(bare.guide('nope').topics.includes('typography'));
-    assert.equal(bare.guide('layout formulas').text, null);
+    assert.equal(bare.guide('data-visualization').text, null);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -232,4 +348,45 @@ test('a get section is that part of the same text', () => {
   assert.match(a11y, /^# Modal\n\nimport \{ Modal \} from '@\/components';\n\n## Accessibility\n/);
   assert.ok(full.includes(a11y.slice(a11y.indexOf('## Accessibility'))));
   assert.doesNotMatch(full, /figma\.com|Next:/);
+});
+
+test('component lookups expose capped template and pattern back-edges in every answer', () => {
+  const full = lookup.get('SearchField').records[0];
+  assert.match(full.text, /\*\*Used in:\*\*.*Section/);
+  assert.match(full.text, /\*\*Governed by:\*\*.*Search/);
+  assert.match(lookup.get('SearchField', 'props').records[0].text, /\*\*Used in:\*\*.*Section/);
+  const line = render('find', lookup.find('SearchField')).split('\n')[0];
+  assert.match(line, /Used in:.*Section/);
+  assert.match(line, /Governed by:.*Search/);
+  assert.match(line, /Governed by:.*Filtering/);
+  assert.ok(line.length <= 160);
+  for (const line of full.text.split('\n').filter((l) => /^\*\*(Used in|Governed by):/.test(l))) assert.ok(line.length <= 400);
+});
+
+test('a brief or three component names returns a screen kit in one answer', () => {
+  for (const query of ['Build a student list screen with search and filters', 'Frame Sidebar Page PageHeader PatternSection PatternTable Panel']) {
+    const result = lookup.find(query);
+    assert.equal(result.kit.template.kind, 'template');
+    assert.ok(result.kit.patterns.length);
+    if (query.startsWith('Build')) assert.ok(result.kit.patterns.some((p) => p.name === 'Filtering'));
+    assert.ok(result.kit.components.length >= 3);
+    assert.ok(result.kit.tokenRoles.some((r) => r.role === 'stack' && r.steps.length));
+    const text = render('find', result);
+    for (const label of ['Template:', 'Patterns:', 'Components:', 'Token roles:']) assert.ok(text.includes(label), query);
+    assert.match(result.next, /template/i);
+  }
+  assert.equal(lookup.find('SearchField FilterButton').kit, undefined);
+});
+
+test('situation patterns lead their components and templates have their own result kind', () => {
+  for (const [query, name] of [['narrow a list', 'Filtering'], ['nothing to show', 'Empty'], ['confirm before deleting', 'Common actions']]) {
+    const first = lookup.find(query).results[0];
+    assert.equal(first.kind, 'pattern', query);
+    assert.equal(first.name, name, query);
+  }
+  assert.equal(lookup.find('Frame').results[0].kind, 'template');
+});
+
+test('a clean check names the template and pattern fit limit', () => {
+  assert.match(lookup.check({ code: 'export const value = 1;', path: 'prototypes/a.js' }).next, /[Tt]emplate.*pattern fit is not checked/);
 });

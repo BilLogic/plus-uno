@@ -331,17 +331,32 @@ const PatternSection = ({
 
 PatternSection.propTypes = {
     id: PropTypes.string,
-    /** Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section */
+    /** Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section
+     * @ds-context Used in: Section.title (ds guide section)
+     */
     title: PropTypes.node,
-    /** Optional description under the title, Body/default */
+    /** Optional description under the title, Body/default
+     * @ds-context Used in: Section.description (ds guide section)
+     */
     description: PropTypes.node,
-    /** Actions slot, aligned to the end of the title row */
+    /** Actions slot, aligned to the end of the title row
+     * @ds-context Used in: Section.actions (ds guide section)
+     * @ds-context Governed by: Common actions (ds guide common-actions)
+     */
     actions: PropTypes.node,
-    /** Tabs row under the title row (header type `tabs`, or `tabs-only`) */
+    /** Tabs row under the title row (header type `tabs`, or `tabs-only`)
+     * @ds-context Used in: Section.tabs (ds guide section)
+     */
     tabs: PropTypes.node,
-    /** Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar` */
+    /** Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`
+     * @ds-context Used in: Section.toolbar (ds guide section)
+     * @ds-context Governed by: Common actions (ds guide common-actions); Filtering (ds guide filtering); Search (ds guide search)
+     */
     toolbar: PropTypes.node,
-    /** Free-form header in place of title and description (header type `custom`) */
+    /** Free-form header in place of title and description (header type `custom`)
+     * @ds-context Used in: Section.header (ds guide section)
+     * @ds-context Governed by: Forms (ds guide forms)
+     */
     header: PropTypes.node,
     /** Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row */
     type: PropTypes.oneOf(SECTION_HEADER_TYPES),
@@ -353,17 +368,29 @@ PatternSection.propTypes = {
     loading: PropTypes.bool,
     /** Body layout: the content alone, content beside `side`, or stacked subsections */
     layout: PropTypes.oneOf(SECTION_LAYOUTS),
-    /** Side column of `layout="split"` */
+    /** Side column of `layout="split"`
+     * @ds-context Used in: Section.side (ds guide section)
+     */
     side: PropTypes.node,
-    /** Footer, for "View all" or paging only; aligned to the end */
+    /** Footer, for "View all" or paging only; aligned to the end
+     * @ds-context Used in: Section.footer (ds guide section)
+     */
     footer: PropTypes.node,
-    /** The optional detail region on the right: one record of the content. Pass `null` for the region with nothing open; leave it off for a plain Section */
+    /** The optional detail region on the right: one record of the content. Pass `null` for the region with nothing open; leave it off for a plain Section
+     * @ds-context Used in: Section.detail (ds guide section)
+     */
     detail: PropTypes.node,
-    /** The detail's title; also the region's accessible name */
+    /** The detail's title; also the region's accessible name
+     * @ds-context Used in: Section.detailTitle (ds guide section)
+     */
     detailTitle: PropTypes.node,
-    /** Optional description under the detail title */
+    /** Optional description under the detail title
+     * @ds-context Used in: Section.detailDescription (ds guide section)
+     */
     detailDescription: PropTypes.node,
-    /** Detail footer, such as "Open full review" */
+    /** Detail footer, such as "Open full review"
+     * @ds-context Used in: Section.detailFooter (ds guide section)
+     */
     detailFooter: PropTypes.node,
     /** Whether a record is open. Defaults to whether `detail` is given */
     hasSelection: PropTypes.bool,
@@ -393,7 +420,10 @@ PatternSection.propTypes = {
     named: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** Content slot; with `layout="split"`, the main column */
+    /** Content slot; with `layout="split"`, the main column
+     * @ds-context Used in: Section.children (ds guide section)
+     * @ds-context Governed by: Forms (ds guide forms)
+     */
     children: PropTypes.node,
 };
 

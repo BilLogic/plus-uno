@@ -42,7 +42,7 @@
     font: var(--body-default);
     text-align: start;
     cursor: pointer;
-    transition: background-color 0.15s ease-in-out;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     @include plus-state(
         $states: (

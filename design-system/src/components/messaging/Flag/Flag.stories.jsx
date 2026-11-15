@@ -1,3 +1,5 @@
+import { expectOverlayExit, settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { useFlagQueue } from '@/lib/flagStackMotion';
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
@@ -36,7 +38,7 @@ export default {
         },
         position: {
             control: 'select',
-            options: ['top-start', 'top-end', 'bottom-start', 'bottom-end'],
+            options: ['top-start', 'top-center', 'top-end', 'bottom-start', 'bottom-end'],
             table: { category: 'Layout' }
         },
         title: {
@@ -292,6 +294,49 @@ Dismiss.play = async ({ canvasElement }) => {
     await userEvent.click(button);
     await expect(canvas.getByTestId('dismiss-closed')).toHaveTextContent('normal');
     await waitFor(() => expect(canvas.queryByTestId('dismiss-normal')).toBeNull());
+};
+
+/**
+ * A timed action: `timer` draws a 4 px bar as the top cap, emptying over `delay`, and steps the
+ * corners from 12 to 4. The first action is Undo; the change commits in `onDismiss`. Hover or
+ * focus pauses the wait and dims the bar.
+ */
+export const UndoTimer = () => {
+    const [state, setState] = useState('timed');
+    return (
+        <FlagGroup containerPosition="static">
+            <Flag
+                title={state === 'restored' ? 'Session restored' : 'Session archived'}
+                timer={state === 'timed'}
+                show={state !== 'committed'}
+                delay={60000}
+                actions={state === 'timed' ? [{ text: 'Undo', onClick: () => setState('restored') }] : undefined}
+                onDismiss={() => setState((current) => (current === 'timed' ? 'committed' : current))}
+                data-testid="undo-flag"
+            />
+        </FlagGroup>
+    );
+};
+
+UndoTimer.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const flag = canvas.getByTestId('undo-flag');
+    const bar = flag.querySelector('.plus-flag-timer');
+    await expect(bar, 'the bar is the top cap').toBeInTheDocument();
+    await expect(Math.round(bar.getBoundingClientRect().height), 'bar is 4').toBe(4);
+    for (const corner of ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius']) {
+        await expect(getComputedStyle(flag)[corner], corner).toBe('4px');
+    }
+    // Hover pauses and dims.
+    await userEvent.hover(flag);
+    await expect(flag).toHaveAttribute('data-paused', 'true');
+    await waitFor(() => expect(Number(getComputedStyle(bar).opacity), 'the bar dims').toBeLessThan(1));
+    await userEvent.unhover(flag);
+    await waitFor(() => expect(flag).not.toHaveAttribute('data-paused'));
+    // Undo replaces it with a plain Flag, no timer.
+    await userEvent.click(canvas.getByRole('button', { name: 'Undo' }));
+    await waitFor(() => expect(canvas.getByText('Session restored')).toBeInTheDocument());
+    await expect(canvasElement.querySelector('.plus-flag-timer')).toBeNull();
 };
 
 /**
@@ -570,3 +615,117 @@ const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selecto
 Overview.play = async ({ canvasElement }) => {
     await expect(radiusOf(canvasElement, '.plus-flag'), 'Flag radius is 12').toBe('12px');
 };
+
+const MotionFlag = () => {
+    const [show, setShow] = useState(false);
+    return <><Button text="Show flag" onClick={() => setShow(true)} /><Flag show={show} title="Session saved" autohide={false} sound={false} onDismiss={() => setShow(false)} /></>;
+};
+const flagMotionPlay = (reduced = false) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Show flag' }));
+    const flag = await canvas.findByRole('status');
+    await expectOverlayExit(flag, () => canvas.getByRole('button', { name: 'Dismiss flag' }).click(), reduced);
+};
+export const MotionOpenClose = { render: MotionFlag, play: flagMotionPlay() };
+export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: flagMotionPlay(true) };
+
+/** A paused exit outlives the old timer, and removal follows completion. */
+export const MotionExitCompletes = {
+    render: MotionFlag,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Show flag' }));
+        const flag = await canvas.findByRole('status');
+        canvas.getByRole('button', { name: 'Dismiss flag' }).click();
+        await waitFor(() => expect(flag).toHaveAttribute('data-leaving', 'hand'));
+        const exits = flag.getAnimations();
+        await expect(exits.length).toBeGreaterThan(0);
+        exits.forEach((animation) => animation.pause());
+        // A timer must never win over an unfinished spring.
+        await new Promise((resolve) => setTimeout(resolve, 850));
+        await expect(flag.isConnected).toBe(true);
+        exits.forEach((animation) => animation.finish());
+        await waitFor(() => expect(flag.isConnected).toBe(false));
+    },
+};
+
+const QueueStackDemo = ({ reducedMotion }) => {
+    const queue = useFlagQueue([
+        { id: 'f-note', title: 'Note saved', children: 'Maya can read it now.', autohide: false, sound: false },
+        { id: 'f-sched', title: 'Schedule updated', children: 'Thursday moved to 4:30 PM.', autohide: false, sound: false },
+    ], { maxVisible: 3 });
+
+    return (
+        <div style={{ position: 'relative', minBlockSize: 340, padding: 'var(--page-pad)' }}>
+            <div style={{ display: 'flex', gap: 'var(--inline-md)', alignItems: 'center' }}>
+                <Button
+                    text="Queue two notices"
+                    appearance="primary"
+                    spacing="compact"
+                    onClick={() => queue.pushBurst([
+                        { id: 'f-session', title: 'Session logged', children: 'Supervisor notified.', autohide: false, sound: false },
+                        { id: 'f-roster', title: 'Roster synced', children: 'Lincoln Middle.', autohide: false, sound: false },
+                    ])}
+                />
+                <span data-testid="queued-count">{queue.queued.length} queued</span>
+            </div>
+            <FlagGroup
+                position="top-end"
+                containerPosition="absolute"
+                reducedMotion={reducedMotion}
+                flags={queue.visible}
+                onDismiss={queue.dismiss}
+                data-testid="flag-queue-group"
+            />
+        </div>
+    );
+};
+
+const playQueueStack = (reduced = false) => async ({ canvasElement }) => {
+    await settleAnimations(canvasElement);
+    const canvas = within(canvasElement);
+    const group = canvas.getByTestId('flag-queue-group');
+
+    // Initial two flags: newest ('Schedule updated') sits above 'Note saved'.
+    const initialTitles = () => Array.from(group.querySelectorAll(':scope > .plus-flag:not([data-leaving]) .plus-flag-title')).map((el) => el.textContent);
+    await expect(initialTitles()).toEqual(['Schedule updated', 'Note saved']);
+    await expect(canvas.getByTestId('queued-count')).toHaveTextContent('0 queued');
+
+    // Push a burst of two notices onto a cap-3 stack: 'Session logged' enters on top, 'Roster synced' waits in queue.
+    await userEvent.click(canvas.getByRole('button', { name: 'Queue two notices' }));
+    await expect(canvas.getByTestId('queued-count')).toHaveTextContent('1 queued');
+    await expect(initialTitles()).toEqual(['Session logged', 'Schedule updated', 'Note saved']);
+
+    await settleAnimations(canvasElement);
+
+    // Dismiss 'Schedule updated' in the middle: it stays mounted for its exit while 'Roster synced' promotes from the queue.
+    const schedFlag = canvas.getByText('Schedule updated').closest('.plus-flag');
+    await userEvent.click(within(schedFlag).getByRole('button', { name: 'Dismiss flag' }));
+    if (!reduced) {
+        await expect(schedFlag.isConnected, 'dismissed flag stays mounted during its exit').toBe(true);
+        await expect(schedFlag).toHaveAttribute('data-leaving', 'hand');
+    }
+    await expect(canvas.getByTestId('queued-count')).toHaveTextContent('0 queued');
+    await expect(initialTitles()).toEqual(['Roster synced', 'Session logged', 'Note saved']);
+
+    await waitFor(() => expect(schedFlag.isConnected).toBe(false), { timeout: 4000 });
+    await settleAnimations(canvasElement);
+    const settledFlags = Array.from(group.querySelectorAll('.plus-flag'));
+    await expect(settledFlags).toHaveLength(3);
+    for (const flagEl of settledFlags) {
+        await expect(getComputedStyle(flagEl).opacity).toBe('1');
+    }
+};
+
+export const MotionQueueStack = {
+    name: 'Motion: Notifications stacking and queue',
+    render: () => <QueueStackDemo reducedMotion={false} />,
+    play: playQueueStack(false),
+};
+
+export const MotionQueueStackReduced = {
+    name: 'Motion: Notifications stacking and queue (reduced)',
+    render: () => <QueueStackDemo reducedMotion />,
+    play: playQueueStack(true),
+};
+

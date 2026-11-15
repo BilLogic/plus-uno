@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={SunburstChartStories} />
 
 <Title />
-Shows parts nested inside parts as rings around a center: each ring splits the
-arc of its parent. Click an arc to zoom into it.
+Shows nested parts as concentric rings around a root, with click-to-zoom into
+any branch.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/SunburstChart"
@@ -31,15 +31,13 @@ arc of its parent. Click an arc to zoom into it.
 
 ## When to use
 
-Use `SunburstChart` when a total breaks down in levels and the reader needs to
-see both the levels and the sizes: session hours by subject, then by topic;
-SMART competencies, then the skills inside each. It suits exploration, since a
-reader can click a branch to see only its parts.
+Use `SunburstChart` when a total breaks down across a shallow hierarchy (root
+plus two rings) and readers benefit from drilling into branches, such as session
+hours by subject and topic or SMART competencies by skill.
 
 For a single level of parts, use `PieChart` or `DonutChart`. For a flat split
-with many parts, use `TreemapChart`; tiles are easier to compare than arcs.
-For the shape of a hierarchy with no sizes attached, use `TreegraphChart`. For
-values that must be compared precisely, use `BarChart`.
+with many parts, use `TreemapChart`. For a hierarchy without sizes, use
+`TreegraphChart`. For exact comparisons, use `BarChart`.
 
 </div>
 
@@ -50,12 +48,12 @@ values that must be compared precisely, use `BarChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Center', 'The root node, the whole being split. It holds the first level of the hierarchy.'],
-        ['Rings', 'Each further level is a ring around the one before. An arc spans the share of its parent that it holds. The center and two rings each take a third of the radius.'],
-        ['Labels', 'Arcs are labeled with their names.'],
-        ['Drill-down', 'Clicking an arc makes it the new center and shows only its descendants.'],
-        ['Tooltip', 'Hovering an arc shows its name and value.'],
-        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 400.</>],
+        ['Center', 'Root node holding the whole being split.'],
+        ['Rings', 'Concentric levels around the root, each taking a third of the radius; arc length tracks share of its parent.'],
+        ['Labels', 'Labels each arc with its name.'],
+        ['Drill-down', 'Clicking an arc makes it the center and shows only its descendants.'],
+        ['Tooltip', 'Shows the hovered arc’s name and value.'],
+        ['Height', <>Pixel height from <C>height</C> (default 400).</>],
     ]}
 />
 
@@ -65,9 +63,10 @@ values that must be compared precisely, use `BarChart`.
 
 ## Data shape
 
-`data` is a flat array of `{ id, parent, name, value }`. The root has
-`parent: ''`; every other node names its parent's `id`. Give `value` to the
-leaves; a parent's size is the sum of its children.
+`data` is a flat array of `{ id, parent, name, value }`: the root sets
+`parent: ''`, other nodes reference their parent's `id`, and leaf nodes carry
+`value` (parent totals are summed automatically). Keep depth to the root plus
+two rings.
 
 ```jsx
 <SunburstChart
@@ -83,20 +82,16 @@ leaves; a parent's size is the sum of its children.
 />
 ```
 
-The chart sizes three levels: the root and two rings beneath it. Keep the
-hierarchy to that depth.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color comes from the theme.** The chart sets no colors of its own, so arcs draw from the theme's categorical order. Do not rely on color to say which branch an arc belongs to; its position under its parent says that.
-- **Position and labels carry the structure; arc length carries the size.** The chart reads without hue, but outer arcs are short and their labels crowd. The tooltip is the reliable place for an exact value.
-- **Keep it shallow and short.** More than a handful of parts per level makes outer arcs too thin to read or click.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the arcs. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Theme categorical color.** Arcs draw from the theme's [categorical order](?path=/docs/data-visualizations-color--docs); position under each parent, arc length and labels carry the structure without hue.
+- **Keep branches few.** Many parts per level make outer arcs too thin to label or click; rely on the tooltip for exact values on narrow arcs.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -104,11 +99,7 @@ hierarchy to that depth.
 
 ## States
 
-`SunburstChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`SunburstChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -125,12 +116,7 @@ hierarchy to that depth.
 
 <DocsInteractivePlayground
     of={SunburstChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

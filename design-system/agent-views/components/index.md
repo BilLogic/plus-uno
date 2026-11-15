@@ -4,7 +4,7 @@
 
 > **CRITICAL**: Only use components and patterns listed here. If it's not listed, it DOES NOT EXIST.
 
-Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Patterns import from `@/patterns` (§ Patterns).
+Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Templates import from `@/patterns` (§ Templates).
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
@@ -67,9 +67,9 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `--ds-on-surface` | `--ds-text`, `--ds-text-subtle` |
 | `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` (retired; these are the commonest replacements, and check:ds-usage names the exact one for each old name) |
 
-## Patterns: start a page, section, card, table or overlay here
+## Templates: start a page, section, card, table or overlay here
 
-A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leaves you slots to fill. Build a page or a container from these before writing a `div` with its own flex or grid. Each one's props are on its page (linked) and in its source.
+A template is a shell that owns the frame (fill, pad, radius, elevation) and leaves you slots to fill. Build a page or a container from these before writing a `div` with its own flex or grid. Each one's props are on its page (linked) and in its source.
 
 | Group | Name | Import | Reach for it when |
 |---|---|---|---|
@@ -84,7 +84,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 | Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
 | AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
-## UI components (86)
+## UI components (91)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
@@ -100,6 +100,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [Cascader](../../src/components/forms-and-inputs/Cascader/index.md)
 - [ChangeTag](../../src/components/labels/ChangeTag/index.md)
 - [Checkbox](../../src/components/forms-and-inputs/Checkbox/index.md)
+- [CheckboxGroup](../../src/components/forms-and-inputs/CheckboxGroup/index.md)
 - [ChoiceGrid](../../src/components/forms-and-inputs/ChoiceGrid/index.md)
 - [CloseButton](../../src/components/forms-and-inputs/CloseButton/index.md)
 - [Code](../../src/components/text-and-data-display/Code/index.md)
@@ -112,6 +113,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [DropdownMenu](../../src/components/forms-and-inputs/DropdownMenu/index.md)
 - [EmptyState](../../src/components/messaging/EmptyState/index.md)
 - [Fieldset](../../src/components/forms-and-inputs/Fieldset.md)
+- [FileItem](../../src/components/forms-and-inputs/FileItem/index.md)
 - [FileUpload](../../src/components/forms-and-inputs/FileUpload/index.md)
 - [FilterButton](../../src/components/forms-and-inputs/FilterButton/index.md)
 - [FilterMenu](../../src/components/forms-and-inputs/FilterMenu/index.md)
@@ -130,6 +132,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [LinkIconButton](../../src/components/forms-and-inputs/LinkIconButton/index.md)
 - Logo — exported here, implemented outside `src/components/`; read the source
 - [Modal](../../src/components/messaging/Modal/index.md)
+- [NotificationItem](../../src/components/messaging/NotificationItem/index.md)
 - [Object](../../src/components/images-and-icons/Object/index.md)
 - [PageHeader](../../src/components/layout-and-structure/PageHeader/index.md)
 - [Pagination](../../src/components/navigation/Pagination/index.md)
@@ -138,6 +141,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [PopupSelect](../../src/components/forms-and-inputs/PopupSelect/index.md)
 - [ProgressBar](../../src/components/loading/ProgressBar/index.md)
 - [ProgressIndicator](../../src/components/status-indicators/ProgressIndicator/index.md)
+- [ProgressRing](../../src/components/loading/ProgressRing/index.md)
 - [ProgressTracker](../../src/components/status-indicators/ProgressTracker/index.md)
 - [PromptInput](../../src/components/forms-and-inputs/PromptInput/index.md)
 - [PromptStarters](../../src/components/labels/PromptStarters/index.md)
@@ -150,6 +154,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [SearchField](../../src/components/forms-and-inputs/SearchField/index.md)
 - [SectionMessage](../../src/components/messaging/SectionMessage/index.md)
 - [Select](../../src/components/forms-and-inputs/Select/index.md)
+- [SettingRow](../../src/components/forms-and-inputs/SettingRow/index.md)
 - [Sidebar](../../src/components/navigation/Sidebar/index.md)
 - [Skeleton](../../src/components/loading/Skeleton/index.md)
 - [SmartTag](../../src/components/labels/SmartTag/index.md)
@@ -175,12 +180,6 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 
 ## Before you finish
 
-Re-read what you wrote, then fix each of these:
-
-1. Every component and pattern comes from these lists, imported from its barrel (`@/components` or `@/patterns`); a deep path becomes the barrel import.
-2. Every prop and value is in the component's generated doc (or `components.json`).
-3. Every color, size, radius and font is a token from `../tokens/tokens.md`, read at the ladder step for its role, in place of a raw value or a `--space-*`, `--radius-<n>` or `--palette-*` primitive.
-4. Every name in the tables above is replaced by its right-hand name.
-5. A page or card starts from its pattern: a full page sits in a template (`Frame` with the PLUS `Sidebar`), and a section, card, table or overlay is its pattern from the Patterns table, before any `div` with its own flex or grid.
+Re-read what you wrote for template and pattern fit: a full page sits in a template (`Frame` with the PLUS `Sidebar` and `Page`), each section, card, table or overlay uses its template from the Templates table above, and each situation (filtering, search, forms, common actions, notifications, empty, loading, errors) follows its governing pattern.
 
 Then run `npm run check:ds-usage -- <your files>` and fix what it reports; its rules are `docs/engineering/ds-usage-rules.md`.

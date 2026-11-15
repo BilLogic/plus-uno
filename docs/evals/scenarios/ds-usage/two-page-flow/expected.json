@@ -1,0 +1,84 @@
+{
+  "task": "two-page-flow",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/two-page-flow/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "escalation-list-page",
+      "screen": "Escalation list page",
+      "template": "Frame + Page + PatternSection + PatternTable",
+      "variant": "Frame · Default / Page · Default / PatternSection · Default / PatternTable · Dynamic table",
+      "page": "design-system/src/patterns/Page/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Frame/index.md",
+        "design-system/src/patterns/Page/index.md",
+        "design-system/src/patterns/PatternSection/index.md",
+        "design-system/src/patterns/PatternTable/index.md"
+      ],
+      "guides": ["frame", "page", "section", "table", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["Frame", "Page", "PatternSection", "PatternTable"]
+      },
+      "expectation": "Escalation list page built on Frame, Page, PatternSection, and PatternTable with open escalations listed first."
+    },
+    {
+      "id": "escalation-detail-page",
+      "screen": "Escalation detail page",
+      "template": "Page + Form",
+      "variant": "Page · Narrow / Form · On a Page",
+      "page": "design-system/agent-views/templates/Form.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Page/index.md",
+        "design-system/agent-views/templates/Form.md"
+      ],
+      "guides": ["page", "form"],
+      "scoring": "judge",
+      "expectation": "Detail page shows tutor, date, reflection text, priority control, and required closure note before closing and returning to the list."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "navigation",
+      "pattern": "Navigation",
+      "variant": "1 · Child page with address and back navigation",
+      "page": "design-system/agent-views/patterns/Navigation.md",
+      "section": "Opening a record",
+      "guide": "navigation",
+      "aliases": ["nav"],
+      "scoring": "judge",
+      "expectation": "List and detail views have distinct URL addresses so browser back/forward buttons navigate between them without losing committed state."
+    },
+    {
+      "id": "forms",
+      "pattern": "Forms",
+      "variant": "On a Page · Required closure note",
+      "page": "design-system/agent-views/patterns/Forms.md",
+      "section": "Validation",
+      "guide": "forms",
+      "scoring": "judge",
+      "expectation": "Priority control and required closure note validate inline before closing the escalation."
+    },
+    {
+      "id": "indicators",
+      "pattern": "Indicators",
+      "variant": "Status and priority in a row",
+      "page": "design-system/agent-views/patterns/Indicators.md",
+      "section": "The three tags",
+      "guide": "indicators",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["StatusTag"]
+      },
+      "expectation": "Each escalation row renders StatusTag / Tag for Open/Closed status and priority."
+    }
+  ],
+  "required_placements": [],
+  "against_placements": []
+}

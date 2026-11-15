@@ -10,7 +10,7 @@
     "Templates/",
     "AI UI/",
     "Data visualizations/",
-    "Libraries/"
+    "Tech stack/"
   ],
   "componentGroups": {
     "Forms and inputs": [
@@ -25,6 +25,7 @@
       "Vertical button",
       "Calendar",
       "Checkbox",
+      "Checkbox group",
       "Comment",
       "Date time picker",
       "Date picker",
@@ -32,6 +33,7 @@
       "Dropdown menu",
       "Fieldset",
       "File upload",
+      "File item",
       "Filter menu",
       "Form",
       "Popup select",
@@ -44,6 +46,7 @@
       "Select",
       "Cascader",
       "Tree select",
+      "Setting row",
       "Tag input",
       "Text area",
       "Text field",
@@ -77,6 +80,7 @@
     ],
     "Loading": [
       "Progress bar",
+      "Progress ring",
       "Skeleton",
       "Spinner"
     ],
@@ -86,6 +90,7 @@
       "Flag",
       "Inline message",
       "Modal dialog",
+      "Notification item",
       "Section message",
       "Spotlight"
     ],
@@ -166,53 +171,67 @@
       "Design",
       "Develop",
       "With AI",
-      "Content design",
       "About"
     ],
     "Foundations",
     [
-      "Basics",
+      "Overview",
+      "Brand",
       [
-        "Overview",
-        "Tokens",
-        "Accessibility"
+        "Content",
+        [
+          "Voice and tone",
+          "Language",
+          "Messages"
+        ],
+        "Logos",
+        "Illustrations"
       ],
       "Visual",
       [
         "Color",
         "Typography",
         "Iconography",
+        "Elevation",
         "Radius",
-        "Border",
-        "Elevation"
+        "Border"
       ],
       "Layout",
       [
         "Spacing",
         "Grid"
       ],
-      "Brand",
+      "Expression",
       [
-        "Logos",
-        "Illustrations"
+        "Motion",
+        [
+          "Principles",
+          "Physics",
+          "Choreography",
+          "Transitions",
+          "Library",
+          "Playground",
+          "Stage never blank",
+          "Engine speed"
+        ],
+        "Sound",
+        [
+          "Overview",
+          "Sounds",
+          "When to play",
+          "With motion",
+          "Settings and accessibility"
+        ]
       ],
-      "Motion",
+      "Accessibility",
+      "Tokens",
       [
-        "Principles",
-        "Physics",
-        "Choreography",
-        "Playground",
-        "Transitions",
-        "Library",
-        "Stage never blank"
-      ],
-      "Sound",
-      [
-        "Overview",
-        "Sounds",
-        "When to play",
-        "With motion",
-        "Settings and accessibility"
+        "Color",
+        "Typography",
+        "Spacing and size",
+        "Elevation and layers",
+        "Motion",
+        "Library"
       ]
     ],
     "Components",
@@ -233,16 +252,27 @@
         ],
         "Calendar",
         "Checkbox",
+        [
+          "Checkbox",
+          "Checkbox group"
+        ],
         "Comment",
         "Date time picker",
         [
           "Date time picker",
           "Date picker",
+          [
+            "Date picker"
+          ],
           "Time picker"
         ],
         "Dropdown menu",
         "Fieldset",
         "File upload",
+        [
+          "File upload",
+          "File item"
+        ],
         "Filter menu",
         "Form",
         "Popup select",
@@ -261,6 +291,7 @@
           "Cascader",
           "Tree select"
         ],
+        "Setting row",
         "Tag input",
         "Text area",
         "Text field",
@@ -301,6 +332,7 @@
       "Loading",
       [
         "Progress bar",
+        "Progress ring",
         "Skeleton",
         "Spinner"
       ],
@@ -311,6 +343,7 @@
         "Flag",
         "Inline message",
         "Modal dialog",
+        "Notification item",
         "Section message",
         "Spotlight"
       ],
@@ -376,9 +409,6 @@
       "Overview",
       "Frame",
       "Page",
-      [
-        "Page"
-      ],
       "Section",
       [
         "Section"
@@ -442,7 +472,7 @@
       "Part-to-whole",
       "Temporal"
     ],
-    "Libraries",
+    "Tech stack",
     [
       "Overview",
       "Base UI",

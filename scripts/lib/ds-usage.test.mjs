@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
+import { REPO_ROOT } from './corpus.mjs';
+import { loadFacts } from './ds-facts.mjs';
 import { RULES, closest, contextFrom, escapesIn, isPageModule, pagesOf } from './ds-usage.mjs';
 
 const ctx = contextFrom({
@@ -232,16 +234,17 @@ test('closest: the nearest name within a small edit distance, else null', () => 
 const pageRules = (path, text, page) => escapesIn({ path, text, page }, patternCtx).map((f) => [f.rule, f.level]);
 const SHELL = "export default function App() {\n  return (\n    <div style={{ display: 'grid', gap: 0 }}>\n      <h1>Sessions</h1>\n    </div>\n  );\n}\n";
 
-test('ds/page-starts-from-pattern: a page whose outer element is a hand-styled container warns', () => {
+test('ds/page-starts-from-pattern: a page whose outer element is a hand-styled container fails', () => {
   const [f, ...rest] = escapesIn({ path: 'p/src/App.jsx', text: SHELL }, patternCtx);
   assert.equal(rest.length, 0);
-  assert.deepEqual([f.rule, f.level, f.line, f.col], ['ds/page-starts-from-pattern', 'warn', 3, 5]);
+  assert.deepEqual([f.rule, f.level, f.line, f.col], ['ds/page-starts-from-pattern', 'fail', 3, 5]);
+  assert.equal(f.message, "the page's outer element is a hand-styled `<div>`, not a template");
   assert.match(f.fix, /Frame/);
   assert.deepEqual(pageRules('p/pages/Home.jsx', 'const Home = () => (\n  <main className="home-grid"><p>x</p></main>\n);\nexport default Home;\n'), [
-    ['ds/page-starts-from-pattern', 'warn'],
+    ['ds/page-starts-from-pattern', 'fail'],
   ]);
   assert.deepEqual(pageRules('p/src/SessionsPage.jsx', 'export default function SessionsPage({ rows }) {\n  if (!rows) return null;\n  return <section style={styles.page}>{rows.map((r) => {\n    return <div className="row">{r}</div>;\n  })}</section>;\n}\n'), [
-    ['ds/page-starts-from-pattern', 'warn'],
+    ['ds/page-starts-from-pattern', 'fail'],
   ]);
 });
 
@@ -251,7 +254,7 @@ test('ds/page-starts-from-pattern: a Frame or pattern root passes, through a fra
   const card = PATTERNS + 'export default function Home() {\n  return (\n    <>\n      <PatternCard title="x" />\n    </>\n  );\n}\n';
   assert.deepEqual(pageRules('p/pages/Home/Home.jsx', card), []);
   const provided = 'export default function App() {\n  return (\n    <ThemeProvider value={t}>\n      <div className="shell" />\n    </ThemeProvider>\n  );\n}\n';
-  assert.deepEqual(pageRules('p/src/App.jsx', provided), [['ds/page-starts-from-pattern', 'warn']]);
+  assert.deepEqual(pageRules('p/src/App.jsx', provided), [['ds/page-starts-from-pattern', 'fail']]);
   assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return <div><PatternCard title="x" /></div>;\n}\n'), [], 'a bare wrapper carries no layout of its own');
   assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return null;\n}\n'), []);
   assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return (\n    <>\n      {open && <div className="fab" />}\n    </>\n  );\n}\n'), [], 'a conditional child is not the outer element');
@@ -261,7 +264,7 @@ test('ds/page-starts-from-pattern: a module that is not a page is not checked', 
   assert.equal(isPageModule('prototypes/x/src/components/Panel.jsx'), false);
   assert.deepEqual(pageRules('prototypes/x/src/components/Panel.jsx', SHELL), []);
   assert.deepEqual(pageRules('p/src/App.jsx', SHELL, false), [], 'the caller may say a module is not a page');
-  assert.deepEqual(pageRules('p/src/Panel.jsx', SHELL, true), [['ds/page-starts-from-pattern', 'warn']], 'or that it is one');
+  assert.deepEqual(pageRules('p/src/Panel.jsx', SHELL, true), [['ds/page-starts-from-pattern', 'fail']], 'or that it is one');
   for (const page of ['prototypes/x/src/App.jsx', 'src/App.tsx', 'prototypes/x/src/pages/Home.jsx', 'src/pages/Market/Market.jsx', 'eval-x/src/HistoryPage.jsx']) {
     assert.equal(isPageModule(page), true, page);
   }
@@ -283,3 +286,132 @@ test('pagesOf: the module an app entry renders as its root is a page too', () =>
   ];
   assert.ok(pagesOf(provided).has('p/src/shell/index.jsx'));
 });
+
+test('ds/placement: Select or PopupSelect without trigger in a Section toolbar fails', () => {
+  const placementCtx = contextFrom({
+    components: {
+      components: [
+        { name: 'Select', kind: 'component', import: "import { Select } from '@/components';", props: [{ name: 'options', values: null }, { name: 'label', values: null }] },
+        { name: 'PopupSelect', kind: 'component', import: "import { PopupSelect } from '@/components';", props: [{ name: 'options', values: null }, { name: 'label', values: null }, { name: 'trigger', values: null }] },
+        { name: 'FilterButton', kind: 'component', import: "import { FilterButton } from '@/components';", props: [{ name: 'text', values: null }] },
+        { name: 'FilterMenu', kind: 'component', import: "import { FilterMenu } from '@/components';", props: [{ name: 'categories', values: null }] },
+        { name: 'PatternSection', kind: 'pattern', import: "import { PatternSection } from '@/patterns';", props: [{ name: 'title', values: null }, { name: 'toolbar', values: null }] },
+      ],
+    },
+    tokens: { tokens: [] },
+    exported: new Set(['Select', 'PopupSelect', 'FilterButton', 'FilterMenu']),
+    barrels: { '@/patterns': new Set(['PatternSection', 'SectionToolbar']) },
+  });
+  const head = "import { Select, PopupSelect, FilterButton, FilterMenu } from '@/components';\nimport { PatternSection, SectionToolbar } from '@/patterns';\n";
+  const warn = (code) => escapesIn({ path: 'p/src/Queue.jsx', text: head + code, page: false }, placementCtx);
+
+  const f1 = warn('<PatternSection title="Queue" toolbar={<PatternSection.Toolbar filters={<Select options={[]} />} />} />');
+  assert.deepEqual(f1.map((f) => [f.rule, f.level]), [['ds/placement', 'fail']]);
+  assert.match(f1[0].message, /Select/);
+  assert.match(f1[0].fix, /FilterButton/);
+  assert.match(f1[0].fix, /ds guide filtering/);
+
+  const f2 = warn('<SectionToolbar filters={<PopupSelect label="Status" options={[]} />} />');
+  assert.deepEqual(f2.map((f) => [f.rule, f.level]), [['ds/placement', 'fail']]);
+  assert.match(f2[0].message, /PopupSelect/);
+
+  // Passing a FilterButton trigger to PopupSelect, or using FilterButton / FilterMenu directly, or Select in the body passes.
+  assert.deepEqual(warn('<PatternSection.Toolbar filters={<PopupSelect label="Status" options={[]} trigger={<FilterButton text="Status" />} />} />'), []);
+  assert.deepEqual(warn('<PatternSection.Toolbar filters={<FilterMenu categories={[]} />} />'), []);
+  assert.deepEqual(warn('<PatternSection title="Form" toolbar={<PatternSection.Toolbar filters={<FilterButton text="Status" />} />}><Select label="Role" options={[]} /></PatternSection>'), []);
+});
+
+test('ds/placement: a Banner before a sibling PageHeader warns; the Page slots pass', () => {
+  const facts = loadFacts(REPO_ROOT);
+  const placementCtx = contextFrom({
+    components: facts.manifests.components,
+    tokens: facts.manifests.tokens,
+    exported: facts.importable,
+    barrels: facts.barrels,
+    placements: facts.placements,
+  });
+  const head = "import { Banner as Notice, PageHeader as Header } from '@/components';\nimport { Page } from '@/patterns';\n";
+  const findings = (code) => escapesIn({ path: 'p/src/Queue.jsx', text: head + code, page: false }, placementCtx);
+  const wrong = findings('<Page><Notice>Message</Notice><Header title="Queue" /></Page>');
+  assert.deepEqual(wrong.map((f) => [f.rule, f.level]), [['ds/placement', 'warn']]);
+  assert.match(wrong[0].fix, /banner/);
+  assert.match(wrong[0].fix, /ds guide notifications/);
+  assert.deepEqual(findings('<Page><Header title="Queue" /><Notice>Message</Notice></Page>'), []);
+  assert.deepEqual(findings('<Page header={<Header title="Queue" />} banner={<Notice>Message</Notice>} />'), []);
+  assert.deepEqual(findings('<Page><div><Notice>Other region</Notice></div><Header title="Queue" /></Page>'), []);
+  assert.deepEqual(findings('<><Page><Notice>Other page</Notice></Page><Page><Header title="Queue" /></Page></>'), []);
+});
+
+test('patterns: importing template and pattern motion helpers from @/patterns passes with 0 findings', () => {
+  const facts = loadFacts(REPO_ROOT);
+  const realCtx = contextFrom({
+    components: facts.manifests.components,
+    tokens: facts.manifests.tokens,
+    exported: facts.importable,
+    barrels: facts.barrels,
+  });
+  const code = [
+    "import { Frame, AreaStage, DrillStack, useDrillStack, SlideViews, StepStage, FocusedFrameSwitch, scrollToSpot, callAttention, SwapInPlace, LoadThenReveal, LoadRevealSlot, PresenceSlot, useMotionReduced, SPRINGS } from '@/patterns';",
+    'export default function App() {',
+    '  const reduced = useMotionReduced();',
+    '  const drill = useDrillStack();',
+    '  const spring = SPRINGS["spatial.default"].productive;',
+    '  return (',
+    '    <Frame>',
+    '      <AreaStage areaKey="main">',
+    '        <LoadThenReveal loading={false}>',
+    '          <LoadRevealSlot>',
+    '            <SwapInPlace swapKey={String(reduced)}>',
+    '              <PresenceSlot show>',
+    '                <StepStage step={0} labels={["One"]}>{spring.type}</StepStage>',
+    '              </PresenceSlot>',
+    '            </SwapInPlace>',
+    '          </LoadRevealSlot>',
+    '        </LoadThenReveal>',
+    '        <SlideViews activeKey="a" keys={["a"]}>{null}</SlideViews>',
+    '        <FocusedFrameSwitch focused={false} defaultFrame={null} focusedFrame={null} />',
+    '        <DrillStack controller={drill} renderView={() => null} />',
+    '      </AreaStage>',
+    '</Frame>',
+    '  );',
+    '}',
+    ].join('\n');
+    assert.deepEqual(escapesIn({ path: 'prototypes/x/src/App.jsx', text: code }, realCtx), []);
+    });
+
+    test('ds/no-raw-control: raw form controls and clickable divs fail outside a Base UI part', () => {
+    const found = escapesIn(
+    {
+      path: 'prototypes/x/src/App.jsx',
+      text: '<div><button>Save</button><input /><select /><textarea /><div onClick={go} /></div>',
+    },
+    ctx,
+    );
+    assert.deepEqual(
+    found.map((f) => [f.rule, f.level]),
+    [
+      ['ds/no-raw-control', 'fail'],
+      ['ds/no-raw-control', 'fail'],
+      ['ds/no-raw-control', 'fail'],
+      ['ds/no-raw-control', 'fail'],
+      ['ds/no-raw-control', 'fail'],
+    ],
+    );
+    assert.match(found[0].fix, /Button/);
+    assert.match(found[1].fix, /TextField/);
+    assert.match(found[2].fix, /Select/);
+    assert.match(found[3].fix, /TextArea/);
+    assert.match(found[4].fix, /PatternCard|@base-ui\/react/);
+    assert.deepEqual(
+    escapesIn(
+      {
+        path: 'prototypes/x/src/components/LocalMenu.jsx',
+        text: "import { Popover } from '@base-ui/react/popover';\nexport default () => <Popover.Trigger render={<button type=\"button\">Open</button>} />;",
+      },
+      ctx,
+    ),
+    [],
+    );
+    });
+
+

@@ -16,17 +16,19 @@ Also asked as: user photo, initials, profile image, user picture, tutor photo, s
 
 ## Usage
 
-Use `Avatar` wherever a person or an agent is named in a row, a thread or a
-list of attendees. Use `AvatarGroup` for a short set of people that would crowd
-a line: the attendees of a session, the members of a team.
+Use `Avatar` for a person's or an agent's profile picture, initials or icon
+wherever they are named in a row, a thread or a list of attendees. Circles
+represent people; squares represent teams and agents.
 
-Use `Tile` for a school, a tool or a lesson: a square picture of a thing, not
-a face. The signed-in person is shown by the Sidebar's account row, with the
-name and role beside the avatar.
+## Alternatives
+
+- For a short set of people that would crowd a line, use `AvatarGroup`.
+- For a school or tool or lesson in a square frame, use `Tile`.
+- For a workflow state or condition beside a name, use `StatusTag`.
 
 ## Best practices
 
-### Circle for people, square for teams and agents. {#circle-for-people-square-for-teams-and-agents}
+### Use a circle for people and a square for teams and agents. {#use-a-circle-for-people-and-a-square-for-teams-and-agents}
 
 Keep one shape per kind within a list, so the shape tells a person from an
 agent at a glance.
@@ -36,13 +38,13 @@ Don't: A person in a square and an agent in a circle.
 
 ### Keep the name beside bare initials. {#keep-the-name-beside-bare-initials}
 
-Two people can share initials. The name is what tells them apart, so drop it
-only where the person is named nearby.
+Two people can share initials. The name tells them apart, so drop it only where
+the person is already named nearby.
 
-### Let the group set the size. {#let-the-group-set-the-size}
+### Let `AvatarGroup` set the size and shape in a stack. {#let-avatargroup-set-the-size-and-shape-in-a-stack}
 
-`AvatarGroup` passes its `size` and `shape` to every avatar, so the row stays
-even.
+`AvatarGroup` passes its `size` and `shape` to every child avatar so the row
+stays even.
 
 ```jsx
 <AvatarGroup label="Session attendees" max={5}>
@@ -50,7 +52,7 @@ even.
 </AvatarGroup>
 ```
 
-### A color is a category, not a status. {#a-color-is-a-category-not-a-status}
+### Use color for a category, never a status. {#use-color-for-a-category-never-a-status}
 
 Keep one color per kind of person, or leave avatars blue. Green, yellow and red belong to the presence dot, so a green avatar reads as "online".
 
@@ -72,17 +74,14 @@ Don't: A dot on a tiny byline, where presence is not the question.
 - **A name makes it one image.** With a `name` or `label` it becomes
   `role="img"` with that name. A `status` is added to the name ("Jane Park,
   online"), since the dot's color alone says nothing to a screen reader.
-- **The group is a named group.** Give `AvatarGroup` a `label`. The `+n` is a
-  button named by its count ("+3, 3 more people"); it opens a menu of the
-  hidden people by name, reached with Tab and closed with Escape.
 - **Not a control.** An avatar has no hover or focus state of its own. To make
   one clickable, wrap it in a button or link that carries the name.
 
 ## Related
 
-- For the signed-in person, with a name and a role, use the Sidebar's account row.
-- For a school, a tool or a lesson in a square, use `Tile`.
-- For a role or state beside a name, use `Status`.
+- `AvatarGroup`: use when overlapping a row of avatars and folding overflow into a `+n` menu.
+- `Sidebar`: use when showing the signed-in person with a name and role in the account row.
+- `Tile`: use when framing a school, tool or lesson in a square.
 
 Same group: `AiIcon` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object` · `Tile`
 

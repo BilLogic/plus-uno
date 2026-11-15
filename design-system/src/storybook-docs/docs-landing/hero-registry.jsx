@@ -8,6 +8,9 @@ import {
   IconographyHero,
   IllustrationsHero,
   LogosHero,
+  VoiceAndToneHero,
+  LanguageHero,
+  MessagesHero,
   RadiusHero,
   SpacingHero,
   TokensHero,
@@ -64,12 +67,12 @@ import { OverviewHero as SoundOverviewHero, WhenToPlayHero, WithMotionHero, Soun
  * which is how the check reads it.
  */
 export const HEROES = {
-  'foundations-basics-overview': {
+  'foundations-overview': {
     Hero: FoundationsOverviewHero,
     description:
-      'One screen pulled apart into its foundations: grid, surface and space, content, and the accent.',
+      'The foundations side by side, sized by weight: color, type, grid and space, elevation, icons, motion.',
   },
-  'foundations-basics-accessibility': {
+  'foundations-accessibility': {
     Hero: AccessibilityHero,
     description:
       'One big button: its focus ring and the target around it.',
@@ -92,12 +95,27 @@ export const HEROES = {
   'foundations-visual-iconography': {
     Hero: IconographyHero,
     description:
-      'One glyph on its keyline grid, neighbors cropped.',
+      'A set of different icons in one style, each on its own tile.',
   },
   'foundations-brand-illustrations': {
     Hero: IllustrationsHero,
     description:
       'A fanned stack of heroes; the front shows the house style.',
+  },
+  'foundations-brand-content-voice-and-tone': {
+    Hero: VoiceAndToneHero,
+    description:
+      'Two speech bubbles in a conversation; the reply in the brand color.',
+  },
+  'foundations-brand-content-language': {
+    Hero: LanguageHero,
+    description:
+      'A short card of text, its action line picked out in the brand color.',
+  },
+  'foundations-brand-content-messages': {
+    Hero: MessagesHero,
+    description:
+      'A message card: an icon and title, a body, and one action in the brand color.',
   },
   'foundations-brand-logos': {
     Hero: LogosHero,
@@ -114,11 +132,32 @@ export const HEROES = {
     description:
       'The scale itself: each step a square its own size.',
   },
-  'foundations-basics-tokens': {
-    Hero: TokensHero,
+  'foundations-tokens-color': {
+    Hero: ColorHero,
     description:
-      'Chips repeat; one value threads through them.',
+      'One card painted by its role tokens, shown in light on the left and dark on the right; the primary button is the subject.',
   },
+  'foundations-tokens-typography': {
+    Hero: TypographyHero,
+    description:
+      'Serif and sans on one set of guides: cap height, x-height, and the baseline in the brand color.',
+  },
+  'foundations-tokens-spacing-and-size': {
+    Hero: SpacingHero,
+    description:
+      'The scale itself: each step a square its own size.',
+  },
+  'foundations-tokens-elevation-and-layers': {
+    Hero: ElevationHero,
+    description:
+      'The layers lifted apart, light on the left and dark on the right.',
+  },
+  'foundations-tokens-motion': {
+    Hero: PhysicsHero,
+    description:
+      'One shape drawn at equal time steps, fast at first, then settling past its target and back.',
+  },
+  'foundations-tokens-library': { Hero: TokensHero, description: 'Every token in one list, found by name or by filter.' },
   'foundations-visual-typography': {
     Hero: TypographyHero,
     description:
@@ -129,52 +168,52 @@ export const HEROES = {
     description:
       'One card painted by its role tokens, shown in light on the left and dark on the right; the primary button is the subject.',
   },
-  'foundations-sound-overview': {
+  'foundations-expression-sound-overview': {
     Hero: SoundOverviewHero,
     description: 'Three sounds as three waveforms; the chime is ringed.',
   },
-  'foundations-sound-when-to-play': {
+  'foundations-expression-sound-when-to-play': {
     Hero: WhenToPlayHero,
     description: 'A run of events along one line; only a few make a sound.',
   },
-  'foundations-sound-with-motion': {
+  'foundations-expression-sound-with-motion': {
     Hero: WithMotionHero,
     description: 'Two tracks, motion over sound; the tick where the shape lands is where the sound starts.',
   },
-  'foundations-sound-sounds': {
+  'foundations-expression-sound-sounds': {
     Hero: SoundsHero,
     description: 'The library as a list: play, waveform, name; one sound playing.',
   },
-  'foundations-sound-settings-and-accessibility': {
+  'foundations-expression-sound-settings-and-accessibility': {
     Hero: SettingsHero,
     description: 'Sound off, volume down: the person decides.',
   },
-  'foundations-motion-principles': {
+  'foundations-expression-motion-principles': {
     Hero: PrinciplesHero,
     description:
-      'The four principles as four small scenes: show what changed, always responsive, move like real things, quiet until it counts.',
+      'The four principles as four small scenes: always responsive, build understanding, lead with empathy, cut the noise.',
   },
-  'foundations-motion-physics': {
+  'foundations-expression-motion-physics': {
     Hero: PhysicsHero,
     description:
       'One shape drawn at equal time steps, fast at first, then settling past its target and back.',
   },
-  'foundations-motion-transitions': {
+  'foundations-expression-motion-transitions': {
     Hero: TransitionsHero,
     description:
       'Before and after: a list row becomes a card, and each part moves from where it was to where it lands, all downward, none crossing.',
   },
-  'foundations-motion-choreography': {
+  'foundations-expression-motion-choreography': {
     Hero: ChoreographyHero,
     description:
       'An editing timeline: an exit, a parent with its children, a burst of three short clips that do not overlap, a late pop and the playhead.',
   },
-  'foundations-motion-playground': {
+  'foundations-expression-motion-playground': {
     Hero: PlaygroundHero,
     description:
       'Three dials on the left and the shape they move on the right, drawn as stills settling past the target.',
   },
-  'foundations-motion-library': {
+  'foundations-expression-motion-library': {
     Hero: LibraryHero,
     description:
       'A shelf of named motions as stills, one large and ringed with its neighbors cropped.',
@@ -182,12 +221,12 @@ export const HEROES = {
   'patterns-overview': {
     Hero: OverviewHero,
     description:
-      'Four situations in four cards: a focused field, a filter menu, an empty state and a notification.',
+      'Real moments, sized by scope: Filtering big, a Flag wide, a Spinner and a badge small.',
   },
   'patterns-common-actions': {
     Hero: CommonActionsHero,
     description:
-      'The end of a view bar: a More menu open, a default button, and the Primary button ringed.',
+      'The button group itself: the secondary Default button and the Primary, ringed.',
   },
   'patterns-forms': {
     Hero: FormsHero,
@@ -197,7 +236,7 @@ export const HEROES = {
   'patterns-filtering': {
     Hero: FilteringHero,
     description:
-      'The filter menu open from the end of the view bar, two options checked.',
+      'A view bar with two filter buttons; Grade has picks and is open, its menu below it with two options checked.',
   },
   'patterns-navigation': {
     Hero: NavigationHero,
@@ -207,22 +246,22 @@ export const HEROES = {
   'patterns-search': {
     Hero: SearchHero,
     description:
-      'The search field open with its results below it.',
+      'The search field, focused with a word typed, and its results open under it.',
   },
   'patterns-indicators': {
     Hero: IndicatorsHero,
     description:
-      'A status column cropped big; the new status and the count are in the brand color.',
+      'Three status tags, the new one ringed; counts and a change beneath them.',
   },
   'patterns-notifications': {
     Hero: NotificationsHero,
     description:
-      'Flags stacked at the corner, the newest ringed.',
+      'One Flag, whole where it lands and ringed; the one before it peeks out behind.',
   },
   'patterns-states-disabled': {
     Hero: DisabledHero,
     description:
-      'A Primary button you cannot press yet, with the reason in text beside it.',
+      'A settings card: two rows faded because they cannot be used yet, the Primary faded with the pointer refusing it, and the reason in words.',
   },
   'patterns-states-empty': {
     Hero: EmptyHero,
@@ -252,19 +291,19 @@ export const HEROES = {
   'templates-overview': {
     Hero: TemplatesOverviewHero,
     description:
-      'The templates pulled apart: Frame, Page, Section ringed, Modal on top.',
+      'The app exploded into its templates: the Frame, the Sidebar and Page, a Section, its rows (one selected) in front.',
   },
-  'templates-frame-frame': {
+  'templates-frame': {
     Hero: FrameHero,
     description:
-      'The app frame: sidebar ringed, top bar, panel.',
+      'The app frame ringed whole: the docked Sidebar, the Page and a docked Panel.',
   },
-  'templates-page-page': {
+  'templates-page': {
     Hero: PageHero,
     description:
-      'The page header and its Sections, the page ringed.',
+      'The page header and its Sections; the Page ringed beside the docked Sidebar.',
   },
-  'templates-section-section': {
+  'templates-section': {
     Hero: SectionHero,
     description:
       'Header, view bar, body and side, ringed.',
@@ -284,17 +323,17 @@ export const HEROES = {
     description:
       'Fields in a column, the commit at the end.',
   },
-  'templates-modal-modal': {
+  'templates-modal': {
     Hero: ModalHero,
     description:
       'One task over a Backdrop; the Modal ringed.',
   },
-  'templates-panel-panel': {
+  'templates-panel': {
     Hero: PanelHero,
     description:
       'A full-height layer beside the page, ringed.',
   },
-  'templates-popup-popup': {
+  'templates-popup': {
     Hero: PopupHero,
     description:
       'A Popup opening bottom-end from its trigger at the bar end, 4 below it, ringed.',

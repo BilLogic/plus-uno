@@ -11,7 +11,7 @@ import { Flag, FlagGroup, Button, Popup, Tooltip } from '@/components';
  *
  * Floating layers behave the same everywhere, and these stories hold them to
  * the Popups pattern page: popups auto 160 to 320 or a column step, padded 16,
- * tooltips 4 · 8 up to 240, flags 400 wide stacking 16 apart bottom-left, and
+ * tooltips 4 · 8 up to 240, flags 400 wide stacking 16 apart top-right, and
  * every one of them at least 8 from the screen edge, 4 from its trigger.
  *
  * Popups and tooltips portal out of the story canvas, so those queries run
@@ -254,9 +254,9 @@ FlagsStack.play = async ({ canvasElement }) => {
     const second = canvas.getByTestId('pf-flag-2').getBoundingClientRect();
     const view = { width: doc.documentElement.clientWidth, height: doc.defaultView.innerHeight };
 
-    // Bottom-left, 8 from the screen edge.
-    await expect(Math.round(first.left)).toBe(8);
-    await expect(Math.round(view.height - second.bottom)).toBe(8);
+    // Top right by default, 8 from the screen edge.
+    await expect(Math.round(view.width - first.right)).toBe(8);
+    await expect(Math.round(first.top)).toBe(8);
     // 400 wide, 16 apart.
     await expect(first.width).toBe(400);
     await expect(Math.round(second.top - first.bottom)).toBe(16);

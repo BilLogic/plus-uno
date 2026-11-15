@@ -101,6 +101,7 @@ Space owned by a pattern: page, section, card, table, modal, popover. Inside a p
 --section-pad-y-default  /* Vertical padding of a PatternSection with default spacing. */
 --section-pad-y-spacious  /* Vertical padding of a PatternSection with spacious spacing. */
 --section-radius  /* Corner rounding of a PatternSection that has a fill. */
+--table-footer-height  /* Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line. */
 --table-overflow-reach  /* How far a PatternTable lets a row's overflow, such as a focus ring, reach past its clip. */
 --table-radius  /* Corner rounding of a PatternTable. */
 ```
@@ -131,12 +132,19 @@ Tokens one component owns, named for it.
 --carousel-slide-min-height-compact  /* Minimum height of a Carousel slide with compact spacing. */
 --carousel-slide-min-height-spacious  /* Minimum height of a Carousel slide with spacious spacing. */
 --checkbox-control-size  /* Size of the Checkbox box. */
+--checklist-action-min-width  /* Narrowest a checklist card's trailing action column may shrink. */
+--checklist-action-width  /* Width of the trailing action column in a checklist card, and of its header progress slot. */
 --choice-grid-control-size-10  /* Size of the control in a ChoiceGrid with size 12. */
 --choice-grid-control-size-12  /* Size of the control in a ChoiceGrid with size 14 or 16. */
+--choice-tile-width  /* Width of a choice tile in a Radio, RadioGroup, Checkbox or CheckboxGroup with tile appearance. */
 --count-tag-dot-size  /* Size of the dot in a CountTag. */
+--file-item-height  /* Fixed height of a FileItem row across queued, uploading, done and error states. */
 --flag-min-height  /* Minimum height of a Flag. */
 --flag-offset  /* Distance between a Flag and the edge of the screen. */
 --flag-pad  /* Padding inside a Flag. */
+--flag-radius-timer  /* Corner radius of a Flag with a countdown bar: stepped down from the popup radius to match the bar height. */
+--flag-timer-height  /* Height of the countdown bar on a Flag. */
+--inbox-width  /* Width of the Inbox Panel when it opens beside the Sidebar. */
 --join-row-width  /* Width of the Home page join row: the Join button with its session Select beside it. */
 --listbox-max-height  /* Tallest a Select or Cascader listbox may grow before it scrolls. */
 --listbox-max-width  /* Widest a Select or Cascader listbox may grow. */
@@ -156,6 +164,7 @@ Tokens one component owns, named for it.
 --progress-bar-height  /* Height of a ProgressBar track. */
 --progress-indicator-dot-size-12  /* Dot size of a ProgressIndicator with size 12. */
 --progress-indicator-dot-size-8  /* Dot size of a ProgressIndicator with size 8. */
+--progress-ring-stroke  /* Stroke width of a ProgressRing track and fill. */
 --radio-control-size  /* Size of the Radio circle. */
 --radio-control-size-10  /* Size of the circle in a RadioGroup with size 10. */
 --radio-control-size-14  /* Size of the circle in a RadioGroup with size 14. */
@@ -168,6 +177,9 @@ Tokens one component owns, named for it.
 --range-track-height-8  /* Track height of a Range with size 16. */
 --scroll-bar-max-height  /* Maximum height of a scrolling area that shows a scroll bar. */
 --scroll-bar-size  /* Thickness of a scroll bar. */
+--setting-row-end-min-height  /* Minimum height of a SettingRow end slot so compact controls align with the first line of the label. */
+--setting-row-pad-y  /* Vertical padding of a SettingRow. */
+--setting-row-select-min-width  /* Minimum width of a compact Select inside a SettingRow end slot. */
 --skeleton-circle-size  /* Size of a round Skeleton, such as an avatar placeholder. */
 --skeleton-height  /* Height of a block Skeleton. */
 --skeleton-status-width  /* Width of a Skeleton standing in for a status tag. */

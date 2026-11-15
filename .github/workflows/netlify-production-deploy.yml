@@ -3,8 +3,15 @@ name: Netlify production deploy
 # Production on Netlify does not publish on merges (see netlify.toml
 # [context.production]). It publishes only when Bill calls a release: run this
 # workflow by hand from the Actions tab (or `gh workflow run netlify-production-deploy.yml`).
+#
+# Give it the release `tag` and it also publishes @plus-uno/cli at that version by
+# dispatching publish-cli.yml after the deploy; leave it empty for a deploy alone.
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag (for example v1.4.0); publishes @plus-uno/cli at that version
+        required: false
 
 permissions:
   contents: read
@@ -19,3 +26,16 @@ jobs:
         run: |
           test -n "$HOOK" || { echo "NETLIFY_PRODUCTION_HOOK secret is missing"; exit 1; }
           curl -fsS -X POST -d '{}' "$HOOK?trigger_title=release"
+
+  publish-cli:
+    needs: deploy
+    if: inputs.tag != ''
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch the @plus-uno/cli publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: gh workflow run publish-cli.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME" -f tag="$RELEASE_TAG"

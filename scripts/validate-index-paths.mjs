@@ -22,9 +22,14 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // registries that index-manifest.json itself declares as indexes. The manifest
 // names them; a path inside a file the manifest calls an index is exactly as
 // load-bearing as a path inside the manifest.
+const COMPONENTS_INDEX =
+  !fs.existsSync(path.join(ROOT, 'design-system/guidelines/components-index.json')) &&
+  fs.existsSync(path.join(ROOT, 'design-system/guidelines/components/components-index.json'))
+    ? 'design-system/guidelines/components/components-index.json'
+    : 'design-system/guidelines/components-index.json';
 const INDEXES = [
   'design-system/guidelines/index-manifest.json',
-  'design-system/guidelines/components/components-index.json',
+  COMPONENTS_INDEX,
   'skills/uno-research/references/foundations-index.json',
   'skills/uno-research/references/patterns-index.json',
   'design-system/figma/component-registry.json',

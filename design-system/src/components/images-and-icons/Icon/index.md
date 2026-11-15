@@ -6,6 +6,10 @@ One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: reg
 
 **Import:** `import { Icon } from '@/components';`
 
+**Used in:** Frame (`ds guide frame`); Modal (`ds guide modal`); Section (`ds guide section`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Errors (`ds guide errors`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/images-and-icons/Icon/Icon.jsx`
 
 **Stories:** `design-system/src/components/images-and-icons/Icon/Icon.stories.jsx` — Names, Styles, Sizes, Colors, Inherited, Labeled, InAComponent, Interactive, Rest
@@ -14,7 +18,7 @@ One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: reg
 
 ## Usage
 
-Pass the icon's name to the component that shows it. Where no component takes the name, draw it with Icon:
+Pass the icon's name to the component that shows it. Where no component takes the name, draw it with `Icon`:
 
 ```jsx
 import { Icon } from '@/components';
@@ -23,7 +27,14 @@ import { Icon } from '@/components';
 <Icon name="circle-check" size={16} color="success" label="Approved" />
 ```
 
-Navigation icons are always outlined: a selected row shows a fill, not a filled icon, and brand marks (`fa-brands`) are the only exception. Pass a plain name and set `iconStyle` only when a glyph must be solid outside navigation; never write `fa-solid` or `fa-regular` into the name. Use a glyph's current name: an alias is not in the regular list, so it draws solid. A `fa-brands` name carries its family: `fa-brands fa-figma`.
+Navigation icons are always outlined: a selected row shows a fill, not a filled icon, and brand marks (`fa-brands`) are the only exception. Pass a plain Font Awesome Free name in its current spelling (an alias is not in the regular list, so it draws solid) and set `iconStyle` only when a glyph must be solid outside navigation; never write `fa-solid` or `fa-regular` into the name. A `fa-brands` name carries its family: `fa-brands fa-figma`. When to use an icon, outline vs solid rules, and size steps live on Iconography.
+
+## Alternatives
+
+- For AI actions such as generate or summarize or rewrite, use `AiIcon`.
+- For an action shown as an icon alone, use `IconButton`.
+- For a framed mark or logo or thumbnail, use `Tile`.
+- For a typed record glyph such as a task or bug, use `Object`.
 
 ## Best practices
 
@@ -42,20 +53,18 @@ Don't: The brand role on a status mark.
 ## Accessibility
 
 - **Labeled or hidden.** With `label` the icon is `role="img"` named by it. Without, it is `aria-hidden`.
-- **An icon-only control is named by the control.** Icon button takes a required `label`, and the glyph inside stays hidden.
+- **An icon-only control is named by the control.** `IconButton` takes a required `label`, and the glyph inside stays hidden.
 
 ## Related
 
-- Iconography for when to use an icon and which one.
-- AI icon for AI actions.
-- Icon button for an action shown as an icon alone.
-- Tile for a mark above 24.
+- Iconography: use when choosing which glyph, style or size step fits a surface.
+- `IconButton`: use when an icon is an interactive trigger with no visible text label.
 
 Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile`
 
 ## Parts
 
-1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it is 16 (`--icon-md`), or the size the component around it sets.
+1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it takes `--icon-md` or the size the component around it sets.
 
 ### States
 

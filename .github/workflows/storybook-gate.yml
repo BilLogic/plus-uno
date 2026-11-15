@@ -103,6 +103,12 @@ jobs:
       - name: npm run check:docs-chrome
         run: npm run check:docs-chrome
 
+      # Cover heroes against their cards: a hero's drawn box must not extend past
+      # the card that holds it, at four widths. Starts its own Storybook, so it
+      # sits beside check:docs-chrome.
+      - name: npm run check:docs-hero-fit
+        run: npm run check:docs-hero-fit
+
       # Every link to a Storybook page against the built index of ids. A page move
       # changes its id, and links written with the old one open nothing without
       # turning any build red. This builds Storybook, so it goes after the suite.

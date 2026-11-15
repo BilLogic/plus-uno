@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={BoxPlotChartStories} />
 
 <Title />
-Summarizes each group's spread in five numbers: low, lower quartile, median,
-upper quartile and high. Groups sit side by side so their spreads compare.
+Summarizes each group's spread in five numbers — low, Q1, median, Q3 and high —
+side by side across categories.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/distribution/BoxPlotChart"
@@ -31,17 +31,13 @@ upper quartile and high. Groups sit side by side so their spreads compare.
 
 ## When to use
 
-Use `BoxPlotChart` to compare how spread out a measure is across groups: test
-scores by class, session length by subject, tutor ratings by school. It shows
-whether groups differ in their middle and in how far they stretch, which an
-average alone hides.
+Use `BoxPlotChart` to compare medians and spreads across groups, such as test
+scores by class, session length by subject or tutor ratings by school. For a
+general audience, add a short note explaining what the box and whiskers mean.
 
 For the full shape of one distribution, use `HistogramChart`. For a plain
-low-to-high span with no quartiles, use `ColumnRangeChart`. For one value per
+min-to-max span without quartiles, use `ColumnRangeChart`. For one value per
 group, use `BarChart`; for change over time, use `LineChart`.
-
-Box plots assume readers know what a quartile is. For a general audience, add
-a line of copy saying what the box and whiskers mean.
 
 </div>
 
@@ -52,12 +48,12 @@ a line of copy saying what the box and whiskers mean.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Box', 'Spans the lower to the upper quartile: the middle half of the group.'],
+        ['Box', 'Spans the lower to upper quartile (the middle half of the group).'],
         ['Median line', <>Crosses the box at the median, a step bolder than the outline, in <C>--ds-border-inverse</C>.</>],
-        ['Whiskers', 'Run from the box to the low and high values, capped at half the box width.'],
+        ['Whiskers', 'Run from the box to low and high values, capped at half the box width.'],
         ['Category axis', <>Names each group from <C>categories</C>.</>],
-        ['Value axis', <><C>yAxisLabel</C> titles it; it defaults to "Value".</>],
-        ['Tooltip', "A group's five numbers."],
+        ['Value axis', <>Titled by <C>yAxisLabel</C> (default <C>"Value"</C>).</>],
+        ['Tooltip', "Shows a group's five summary numbers."],
     ]}
 />
 
@@ -67,9 +63,11 @@ a line of copy saying what the box and whiskers mean.
 
 ## Data shape
 
-`categories` is an array of strings. `data` holds one array per category, in
-the same order: `[low, q1, median, q3, high]`. The chart draws the numbers it is
-given; compute them before passing them in. `height` defaults to 400.
+`categories` is an array of strings. `data` holds one precomputed
+`[low, q1, median, q3, high]` array per category in `categories` order. There is
+one series and no outlier points; if low and high are trimmed (such as to the
+5th and 95th percentiles), state that in the description. `height` defaults to
+400.
 
 ```jsx
 <BoxPlotChart
@@ -83,20 +81,16 @@ given; compute them before passing them in. `height` defaults to 400.
 />
 ```
 
-There is one series and no outlier points. If the low and high are trimmed
-(say, to the 5th and 95th percentiles), say so in the description.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **One color.** Box, stem and whiskers take `--ds-chart-categorical-1`; there is only one series, so color names nothing and the chart reads without hue.
-- **Position carries the values.** Every number is read off the value axis, and the median line contrasts with the box fill rather than relying on hue.
-- **Keep the groups few.** Past about ten boxes, the category labels crowd and comparison gets hard; split the chart or filter.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Single series color.** Box, stem and whiskers use `--ds-chart-categorical-1`; position and the contrasting `--ds-border-inverse` median line carry the reading without hue.
+- **Limit group count.** Keep to roughly ten or fewer groups so category labels do not crowd.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -104,11 +98,7 @@ There is one series and no outlier points. If the low and high are trimmed
 
 ## States
 
-`BoxPlotChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`BoxPlotChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -125,12 +115,7 @@ There is one series and no outlier points. If the low and high are trimmed
 
 <DocsInteractivePlayground
     of={BoxPlotChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

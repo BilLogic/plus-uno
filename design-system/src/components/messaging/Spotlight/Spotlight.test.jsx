@@ -1,5 +1,7 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { OverlayContainer } from '@/lib/overlay';
 import Spotlight, { SpotlightAction, SpotlightProvider, SpotlightTarget } from './Spotlight';
 
 function renderSpotlight(extraProps = {}) {
@@ -34,6 +36,28 @@ describe('Spotlight', () => {
     it('renders the step count when given', () => {
         renderSpotlight({ stepCount: '2 of 4' });
         expect(screen.getByText('2 of 4')).toBeInTheDocument();
+    });
+
+    it('portals to document.body in the app, and stays inside an OverlayContainer when bounded', () => {
+        const { container: appRoot, unmount } = renderSpotlight({ headline: 'App spotlight' });
+        expect(appRoot.querySelector('.plus-spotlight')).toBeNull();
+        expect(document.body.querySelector('.plus-spotlight')).not.toBeNull();
+        unmount();
+
+        const canvas = document.createElement('div');
+        document.body.appendChild(canvas);
+        render(
+            <OverlayContainer container={canvas}>
+                <SpotlightProvider>
+                    <SpotlightTarget><button type="button">Target</button></SpotlightTarget>
+                    <Spotlight headline="Docs spotlight" placement="bottom">Body text</Spotlight>
+                </SpotlightProvider>
+            </OverlayContainer>,
+        );
+        const popup = canvas.querySelector('.plus-spotlight');
+        expect(popup).not.toBeNull();
+        expect(popup.closest('[data-side]')).toHaveAttribute('data-side', 'bottom');
+        canvas.remove();
     });
 });
 

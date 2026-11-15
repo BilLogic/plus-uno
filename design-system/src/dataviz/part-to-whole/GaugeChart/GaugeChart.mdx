@@ -8,7 +8,7 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Title />
 Shows one value on a half-circle dial between a minimum and a maximum, with the
-number and a label under the arc.
+number and label printed beneath the arc.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/GaugeChart"
@@ -31,16 +31,13 @@ number and a label under the arc.
 
 ## When to use
 
-Use `GaugeChart` for one key figure that sits on a known scale: a course
-completion rate, the share of sessions a tutor attended, an average student
-satisfaction score out of 100. One or two gauges on a dashboard draw the eye to
-the number that matters most.
+Use `GaugeChart` sparingly for one or two headline figures on a known scale,
+such as course completion rate, tutor attendance share or average satisfaction
+out of 100.
 
-Use it sparingly. For several of these figures at once, use `BarChart`; a row
-of dials is harder to scan than a column of bars. For a value against a
-target that must be read precisely, use `BulletChart`. For a completion share
-with room for a label in the middle, use `DonutChart`. For the same figure over
-time, use `LineChart`.
+For several figures at once, use `BarChart`. For a value against a target read
+precisely, use `BulletChart`. For a completion share with a centered label, use
+`DonutChart`. For change over time, use `LineChart`.
 
 </div>
 
@@ -51,11 +48,11 @@ time, use `LineChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Track', <>The full half-circle arc behind the fill, in <C>--ds-background-neutral</C>. It spans <C>min</C> to <C>max</C>, 0 to 100 by default.</>],
-        ['Fill', <>Grows from the left end to <C>value</C>. Its color is <C>color</C>, or the brand chart color when <C>color</C> is not set.</>],
-        ['Scale labels', <>Only the two ends are labeled, with <C>min</C> and <C>max</C>. There are no tick marks.</>],
-        ['Value and label', <>The value in bold under the arc, and <C>label</C> beneath it in subtle text.</>],
-        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 300.</>],
+        ['Track', <>Half-circle arc behind the fill in <C>--ds-background-neutral</C>, spanning <C>min</C> to <C>max</C> (default 0 to 100).</>],
+        ['Fill', <>Grows from the left end to <C>value</C> in <C>color</C> (default <C>--ds-chart-brand</C>).</>],
+        ['Scale labels', <>Labels only <C>min</C> and <C>max</C> at the two ends, with no intermediate ticks.</>],
+        ['Value and label', <>Prints <C>value</C> in bold beneath the arc with <C>label</C> under it in subtle text.</>],
+        ['Height', <>Pixel height from <C>height</C> (default 300).</>],
     ]}
 />
 
@@ -65,14 +62,12 @@ time, use `LineChart`.
 
 ## Data shape
 
-`value` is a single number. `min` and `max` set the scale; `label` says what
-the number is.
+`value` is a single number (printed as given with no automatic unit), `min` and
+`max` set the scale, and `label` names the measure and its unit.
 
 ```jsx
 <GaugeChart value={82} min={0} max={100} label="Sessions attended (%)" />
 ```
-
-The value shows as given, with no unit added. Put the unit in `label`.
 
 </div>
 
@@ -80,12 +75,11 @@ The value shows as given, with no unit added. Put the unit in `label`.
 
 ## Color and accessibility
 
-- **One color, brand by default.** The fill is `--ds-chart-brand` unless you pass `color`. The fill does not change color as the value moves; it stays the color you set.
-- **Status needs words, not just hue.** When the value is a status, pass a status chart color (`STATUS.success`, `STATUS.warning`, `STATUS.danger` from the palette) and say the status in `label` or the surrounding text. Color alone will not reach every reader.
-- **Arc length carries the value, and the number confirms it.** The value is always printed under the arc, so the gauge reads without hue.
-- **Keep the scale honest.** A `min` above zero makes a small value look large; set it only when the scale truly starts there.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, a per-point label, and keyboard navigation to the value. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting.
+- **Brand by default, status when meaningful.** The fill uses `--ds-chart-brand` unless `color` is set (it does not change dynamically with `value`). When encoding status with `STATUS.success`, `STATUS.warning` or `STATUS.danger`, state the status in `label` or surrounding copy.
+- **Arc length and printed value.** Because `value` is always printed under the arc, the gauge reads without hue.
+- **Keep the scale honest.** Setting `min` above zero exaggerates small values; use a non-zero `min` only when the scale genuinely starts there.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, a per-point label, and keyboard navigation to the value. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting ([Chart color](?path=/docs/data-visualizations-color--docs)).
 
 </div>
 
@@ -93,11 +87,7 @@ The value shows as given, with no unit added. Put the unit in `label`.
 
 ## States
 
-`GaugeChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`GaugeChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={300} />
@@ -114,12 +104,7 @@ The value shows as given, with no unit added. Put the unit in `label`.
 
 <DocsInteractivePlayground
     of={GaugeChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

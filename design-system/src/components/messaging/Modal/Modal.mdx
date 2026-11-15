@@ -28,7 +28,7 @@ export const figmaMeta = {
 };
 
 {/* Pairs draw the inline panel, never a live dialog. A narrow stand-in screen keeps every width inside a pair card. */}
-export const narrowScreen = { '--plus-overlay-screen': '480px', width: '100%' };
+export const narrowScreen = { '--plus-overlay-screen': 'calc(var(--size-2000) * 1.5)', width: '100%' };
 // Pair one draws both widths at three quarters, so ten columns fit beside six at the same scale.
 export const scaledScreen = { ...narrowScreen, zoom: 0.75 };
 export const shortCap = { ...narrowScreen, '--blanket-max-height-modal': 'var(--size-2000)' };
@@ -47,8 +47,6 @@ a confirmation, a short form, or a detail view the user closes and returns from.
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Modal"
-    sets={figmaMeta.sets}
-    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -97,7 +95,7 @@ The width examples are drawn at the 1024 screen.
 
 <ComponentExample of={ModalStories.Pressed} title="Pressed" description="The close button takes the subtle pressed step." />
 
-<ComponentExample of={ModalStories.Focused} title="Focused" description="The 2px ring, 2px off the close button." />
+<ComponentExample of={ModalStories.Focused} title="Focused" description="Shows the focus ring on the close button." />
 
 </div>
 
@@ -115,12 +113,7 @@ The width examples are drawn at the 1024 screen.
 
 <DocsInteractivePlayground
     of={ModalStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -196,7 +189,7 @@ height hugs its content up to the cap the Backdrop sets
 5. **Dividers.** Optional rules under the header and over the footer.
 
 The tokens each part draws are read from `Modal.scss` and listed under Tokens
-touched in the Agent view tab.
+touched in the Harness tab.
 
 ### States
 

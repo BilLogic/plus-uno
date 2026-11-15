@@ -4,7 +4,7 @@ import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-block
 import { iconClass } from '../lib/icon';
 
 export default {
-    title: 'Foundations/Basics/Accessibility',
+    title: 'Foundations/Accessibility',
     tags: ['!dev', '!autodocs'],
 };
 

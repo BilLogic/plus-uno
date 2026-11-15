@@ -8,13 +8,17 @@ Also asked as: surface.
 
 **Import:** `import { Page } from '@/patterns';`
 
+**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`); Modal (`ds guide modal`); Section (`ds guide section`); Popup (`ds guide popup`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); +1 more
+
 **Source:** `design-system/src/patterns/Page/Page.jsx`
 
-**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepSmall, StepMedium, StepLarge, Bordered, WithTitle, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth
+**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepSmall, StepMedium, StepLarge, Bordered, WithTitle, HeaderAndBanner, OptionalSlots, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, AnatomyRecordScaledDown, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth, MotionSwitchViews, MotionSwitchViewsReduced, MotionScrollToSpot, MotionScrollToSpotReduced
 
 **Storybook page:** `design-system/src/patterns/Page/Page.mdx`
 
-**Motion:** title `linear` · anchor `linear` · tabs-shadow `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** title `linear` · anchor `linear` · tabs-shadow `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -121,7 +125,7 @@ Same group: `AiChat` · `Backdrop` · `Frame` · `PatternCard` · `PatternModal`
 
 ## Anatomy
 
-A record page, one level down, with everything the header can carry. Each marker sits in the gutter beside its part.
+A record page one level down shows every header slot, with markers in the gutter beside each part.
 
 1. **Breadcrumb** (optional). The record's parents on their own row, above the title.
 2. **Title.** The page's one h1, with its StatusTag after the text when the page is one record.
@@ -136,10 +140,10 @@ A record page, one level down, with everything the header can carry. Each marker
 | Slot or prop | Holds |
 | --- | --- |
 | `title` | The page's one h1, at the heading-large size, above the content. |
-| `children` | The page header, the banner and the Sections, in order. Today the `PageHeader` goes first in `children`. |
-| `header` | Planned. One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. |
+| `children` | The Sections and other page content. Existing pages may still supply the header and banner here. |
+| `header` | One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. Replaces `title`. |
 | `description` · `status` | Planned. `PageHeader` has neither slot; the title block holds them. |
-| `banner` | Planned. The page banner, one at a time. Today it goes in `children` under the header. |
+| `banner` | One page `Banner`, below the header. Page separates the slots and content with `--page-stack-md`. |
 | `width` | Planned. `default` or `full`; today the Frame's `width` sets `content` or `reading`. |
 | Scrolled header | Planned. The sticky one-row header. |
 | `level` · `padding` · `radius` · `border` · `as` | The container: its fill and shadow as a pair, its pad and corner, and its element. |
@@ -177,6 +181,8 @@ A record page, one level down, with everything the header can carry. Each marker
 | `border` | bool | `false` | A bold border on/off |
 | `as` | elementType | — | Render element / component |
 | `title` | node | — | The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page. |
+| `header` | node | — | One PageHeader with the page's h1, actions and tabs. Replaces title. |
+| `banner` | node | — | One page Banner below the header. Governed by Notifications (ds guide notifications). |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `children` | node | — | Content slot |

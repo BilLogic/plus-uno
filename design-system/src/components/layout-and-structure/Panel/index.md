@@ -10,21 +10,25 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 **Import:** `import { Panel } from '@/components';`
 
+**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Panel (`ds guide panel`); Popup (`ds guide popup`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/layout-and-structure/Panel/Panel.jsx`
 
 **Stories:** `design-system/src/components/layout-and-structure/Panel/Panel.stories.jsx` — FullComposition, MinimalHeaderAndBody, WidthFromProvider, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Panel/Panel.mdx`
 
-**Motion:** enter `spatial.slow` · exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.slow` · exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
 Use `Panel` for context or a focused task beside the page's main content — a
 detail view opened from a list, a filter set, a secondary thread — where
-leaving the page behind, as a `Modal` does, would lose that context. For
-something that must be decided before the page continues, use `Modal`
-instead.
+leaving the page behind, as a `Modal` does, would lose that context. Compose it
+from `PanelHeader`, `PanelSubheader`, `PanelBody` and `PanelFooter` inside
+`PanelContainer`.
 
 Fixed action components cover the common icons: `PanelBackAction`,
 `PanelCloseAction`, `PanelMoreAction`, `PanelUpAction`, `PanelDownAction`,
@@ -39,6 +43,11 @@ Panel reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Dock and undock a panel | `--ds-motion-spatial-slow` | Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Backdrop. |
 | exit | Dock and undock a panel | `--ds-motion-spatial-default` | Floating panels leave on spatial.fast. |
+
+## Alternatives
+
+- For something that must be decided before the page continues, use `Modal`.
+- For the page's persistent navigation rail, use `Sidebar`.
 
 ## Best practices
 
@@ -97,17 +106,15 @@ job only risks a different icon or label than the rest of the system uses.
 
 ## Related
 
-- For something that must be decided before the page continues, use `Modal`.
-- The Panel pattern, for the Panel as a Frame area with its docked, peek and overlay states; this page is the component inside it.
-- For the page's persistent navigation rail, see `Sidebar`.
-- Frame for where the Panel docks, peeks or opens as an overlay at each width.
+- Panel template: use when placing Panel as a Frame area with its docked, peek and overlay states.
+- Frame: use when configuring where the Panel docks, peeks or opens as an overlay at each width.
 
 Same group: `Accordion` · `Carousel` · `PageHeader` · `ScrollBar`
 
 ## Parts
 
-1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default` (400); inside the Frame's Panel area it fills the area instead.
-2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (close, more, …).
+1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default`; inside the Frame's Panel area it fills the area instead.
+2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (`PanelCloseAction`, `PanelMoreAction`).
 3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
 4. **Body** (`PanelBody`). The main content, which scrolls.
 5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.

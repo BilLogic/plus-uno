@@ -204,7 +204,7 @@ test('Templates and Patterns sit above Components, Templates first, and there is
 
 test('a template page and a pattern page in their own roots are green', () => {
   const root = fixture({
-    'design-system/src/patterns/Frame/Frame.stories.jsx': story('Templates/Frame/Frame'),
+    'design-system/src/patterns/Frame/Frame.stories.jsx': story('Templates/Frame'),
     'design-system/src/storybook-docs/templates/Overview.mdx': '<Meta title="Templates/Overview" />\n',
     'design-system/src/storybook-docs/patterns/Overview.mdx': '<Meta title="Patterns/Overview" />\n',
   });
@@ -265,68 +265,81 @@ test('the illustration kit is a Get started page, not a Templates source', () =>
   assert.equal(docsTitle(mdx), 'Get started/Illustration kit');
 });
 
-/** Lists the Foundations · Motion pages in the fixture's sidebar sort. */
+/** Lists the Foundations › Expression › Motion pages in the fixture's sidebar sort. */
 function listMotion(root, entries) {
   const file = path.join(root, 'storybook.taxonomy.json');
   const taxonomy = JSON.parse(fs.readFileSync(file, 'utf8'));
-  taxonomy.storySortOrder.splice(2, 0, 'Foundations', ['Motion', entries]);
+  taxonomy.storySortOrder.splice(2, 0, 'Foundations', ['Expression', ['Motion', entries]]);
   taxonomy.storySortOrder.splice(1, 1);
   fs.writeFileSync(file, JSON.stringify(taxonomy));
 }
-const motionPage = (name) => `<Meta title="Foundations/Motion/${name}" />\n`;
+const motionPage = (name) => `<Meta title="Foundations/Expression/Motion/${name}" />\n`;
 const motionFiles = (...names) =>
   Object.fromEntries(names.map((n) => [`design-system/src/styles/Motion${n.replace(/ /g, '')}.mdx`, motionPage(n)]));
 
-test('Foundations · Motion pages that the sort lists, Library among them, are green', () => {
+test('Foundations › Expression › Motion pages that the sort lists, Library among them, are green', () => {
   const root = fixture(motionFiles('Physics', 'Library'));
   listMotion(root, ['Physics', 'Library']);
   assert.deepEqual(messages(root), []);
 });
 
-test('a Foundations · Motion page the sort does not list goes red', () => {
+test('a Foundations › Expression › Motion page the sort does not list goes red', () => {
   const root = fixture(motionFiles('Physics', 'Library', 'Durations and easings'));
   listMotion(root, ['Physics', 'Library']);
   assert.match(messages(root).join('\n'), /Durations and easings/);
 });
 
-test('a Foundations · Motion entry in the sort with no page, Library included, goes red', () => {
+test('a Foundations › Expression › Motion entry in the sort with no page, Library included, goes red', () => {
   const root = fixture(motionFiles('Physics'));
   listMotion(root, ['Physics', 'Library']);
   assert.match(messages(root).join('\n'), /Library/);
 });
 
-test('a Foundations · Motion list without Library goes red', () => {
+test('a Foundations › Expression › Motion list without Library goes red', () => {
   const root = fixture(motionFiles('Physics'));
   listMotion(root, ['Physics']);
   assert.match(messages(root).join('\n'), /Library/);
 });
 
-// ── Foundations · Sound ──
+// ── Foundations › Expression › Sound ──
 
 const soundFiles = (...names) =>
-  Object.fromEntries(names.map((n) => [`design-system/src/styles/Sound${n.replace(/ /g, '')}.mdx`, `<Meta title="Foundations/Sound/${n}" />\n`]));
+  Object.fromEntries(names.map((n) => [`design-system/src/styles/Sound${n.replace(/ /g, '')}.mdx`, `<Meta title="Foundations/Expression/Sound/${n}" />\n`]));
 function listSound(root, entries) {
   const file = path.join(root, 'storybook.taxonomy.json');
   const taxonomy = JSON.parse(fs.readFileSync(file, 'utf8'));
-  taxonomy.storySortOrder.splice(2, 0, 'Foundations', ['Sound', entries]);
+  taxonomy.storySortOrder.splice(2, 0, 'Foundations', ['Expression', ['Sound', entries]]);
   taxonomy.storySortOrder.splice(1, 1);
   fs.writeFileSync(file, JSON.stringify(taxonomy));
 }
 
-test('Foundations · Sound pages that the sort lists are green', () => {
+test('Foundations › Expression › Sound pages that the sort lists are green', () => {
   const root = fixture(soundFiles('Overview', 'With motion'));
   listSound(root, ['Overview', 'With motion']);
   assert.deepEqual(messages(root), []);
 });
 
-test('a Foundations · Sound page the sort does not list goes red', () => {
+test('a Foundations › Expression › Sound page the sort does not list goes red', () => {
   const root = fixture(soundFiles('Overview', 'Extra'));
   listSound(root, ['Overview']);
-  assert.match(messages(root).join('\n'), /a Foundations · Sound page the sidebar sort does not list/);
+  assert.match(messages(root).join('\n'), /a Foundations › Expression › Sound page the sidebar sort does not list/);
 });
 
-test('a Foundations · Sound entry in the sort with no page goes red', () => {
+test('a Foundations › Expression › Sound entry in the sort with no page goes red', () => {
   const root = fixture(soundFiles('Overview'));
   listSound(root, ['Overview', 'Sounds']);
-  assert.match(messages(root).join('\n'), /Foundations > Sound lists "Sounds", but no page is titled Foundations\/Sound\/Sounds/);
+  assert.match(messages(root).join('\n'), /Foundations > Expression > Sound lists "Sounds", but no page is titled Foundations\/Expression\/Sound\/Sounds/);
+});
+
+test('a component page titled as the folder of its sub-pages goes red; Name/Name is green', () => {
+  const bad = fixture({
+    'design-system/src/components/forms-and-inputs/Radio.stories.jsx': story('Components/Forms and inputs/Radio'),
+    'design-system/src/components/forms-and-inputs/RadioGroup.stories.jsx': story('Components/Forms and inputs/Radio/Radio group'),
+  });
+  assert.ok(messages(bad).some((m) => m.includes('Radio.stories.jsx') && m.includes('"Docs" entry')));
+  const good = fixture({
+    'design-system/src/components/forms-and-inputs/Radio.stories.jsx': story('Components/Forms and inputs/Radio/Radio'),
+    'design-system/src/components/forms-and-inputs/RadioGroup.stories.jsx': story('Components/Forms and inputs/Radio/Radio group'),
+  });
+  assert.ok(!messages(good).some((m) => m.includes('"Docs" entry')));
 });

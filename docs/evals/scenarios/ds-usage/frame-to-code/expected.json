@@ -1,0 +1,41 @@
+{
+  "task": "frame-to-code",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/frame-to-code/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "summary-card",
+      "screen": "Weekly summary card",
+      "template": "PatternCard",
+      "variant": "PatternCard · Default",
+      "page": "design-system/src/patterns/PatternCard/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/PatternCard/index.md"
+      ],
+      "guides": ["card", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["PatternCard"]
+      },
+      "expectation": "Weekly summary card built on PatternCard matching the hierarchy and states in frame.png."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "indicators",
+      "pattern": "Indicators",
+      "variant": "Status and progress indicators",
+      "page": "design-system/agent-views/patterns/Indicators.md",
+      "section": "The three tags",
+      "guide": "indicators",
+      "scoring": "judge",
+      "expectation": "Uses PLUS indicator components (StatusTag, Badge, or ProgressBar) and semantic typography/spacing tokens matching the design frame."
+    }
+  ],
+  "required_placements": [],
+  "against_placements": []
+}

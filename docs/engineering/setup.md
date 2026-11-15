@@ -15,6 +15,10 @@ Implementation requirements only. For design rules, load `design-system/guidelin
 - Every interactive component's behavior is built on Base UI (`@base-ui/react`, headless), styled on `--ds-*` tokens — ADR-037, widening the AI-only scope ADR-036 set.
 - Versions live in `package.json` and nowhere else — read them there rather than from a doc that goes stale on the next bump.
 
+## PR branches
+
+Fetch `origin` and cut each ticket's PR branch from fresh `origin/main` in its own worktree.
+
 ## Import Aliases
 
 | Alias | Resolves to |
@@ -40,14 +44,22 @@ import '@/styles/main.scss';
 ```
 design-system/
   src/           # DS source (components, patterns, tokens, styles, MDX)
-  guidelines/    # Authored DS protocol (foundations, components, composition, figma)
-  agent-views/   # Generated facts — component index, forms redirect, token list
+  guidelines/    # Authored DS protocol (foundations, figma)
+  agent-views/   # Generated facts — component index, pattern/template/foundation copies, token list
   figma/         # Registries + alignment runbooks
+packages/
+  cli/           # @plus-uno/cli (`ds add`, `ds check`, `ds mcp`)
 prototypes/{name}/     # Standalone prototypes
 .storybook/            # Storybook config
 scripts/               # Token sync, registry + agent-view generation
-skills/         # Workflow skills (uno-prototype, uno-review, …)
+skills/                # Workflow skills (uno-prototype, uno-review, …)
 ```
+
+## Design-system CLI and lookup (`npm run ds` / `@plus-uno/cli`)
+
+- **Repo lookup and checker:** `npm run ds -- <find|get|tokens|guide|check>` and the local `plus-ds` stdio MCP (`docs/connectors/ds-mcp.md`).
+- **Published package (`packages/cli`, `@plus-uno/cli`):** `ds add`, `ds check`, and `ds mcp` (`packages/cli/README.md`).
+- **Agent-view generation:** `npm run generate:agent` (includes `generate:docs-agent-files` for template, pattern, foundation and component agent copies).
 
 ## Prototype conventions
 
@@ -241,6 +253,8 @@ produced:
 ```bash
 npm run regenerate
 ```
+
+- **uno-bot bundle (`agents/uno-bot/harness-bundle.md`):** sections, order, `ide-only` stripping and char budgets (`BUDGETS` in `agents/uno-bot/scripts/bundle-harness.mjs`) are exposed in-process through `scripts/lib/bundled-set.mjs` and held by `check:harness-budgets` (cite budgets by key, such as `BUDGETS.constitution`, rather than by number). Rebuild with `node agents/uno-bot/scripts/bundle-harness.mjs` (included in `npm run regenerate`).
 
 ### Harness seams
 

@@ -8,22 +8,23 @@ Also asked as: dots, carousel dots, step dots, slide marker.
 
 **Import:** `import { ProgressIndicator } from '@/components';`
 
+**Governed by:** Forms (`ds guide forms`)
+
 **Source:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.jsx`
 
 **Stories:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.stories.jsx` — Default, Interactive, Appearances, Sizes, Spacing, Rest, Hovered, Pressed, Focused, Decorative, SizeTokens, Timed, Clock, TimedInteractive
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
 Use `ProgressIndicator` for a short sequence where position matters more than
-the name of each step — a carousel, an onboarding flight, a slide deck. When
-each step has its own label people need to see, use `ProgressTracker` instead.
+the name of each step — a carousel, an onboarding flight, a slide deck.
 
 When each step lasts a set time and moves on by itself, pass `progress` so the
-current dot shows how much of its time is left.
+current marker shows how much of its time is left.
 
 ## Motion
 
@@ -33,14 +34,19 @@ ProgressIndicator reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Step states change in place: the step left becomes visited, the next current. |
 
+## Alternatives
+
+- For steps with their own visible labels, use `ProgressTracker`.
+- For a single bar showing percent complete, use `ProgressBar`.
+
 ## Best practices
 
 ### Pass `onSelect` only when jumping ahead makes sense. {#pass-onselect-only-when-jumping-ahead-makes-sense}
 
-Without `onSelect` the dots are decorative and only `aria-current` marks the active one. With it, every dot becomes a button a person can press to jump there directly. That suits a carousel, not a linear flow someone must complete in order.
+Without `onSelect` the markers are decorative and only `aria-current` marks the active one. With it, every marker becomes a button a person can press to jump there directly. That suits a carousel, not a linear flow someone must complete in order.
 
-Do: Interactive dots on a carousel, where any slide can be opened.
-Don't: Interactive dots on a flow that must be finished in order.
+Do: Interactive markers on a carousel, where any slide can be opened.
+Don't: Interactive markers on a flow that must be finished in order.
 
 ```jsx
 <ProgressIndicator
@@ -51,23 +57,23 @@ Don't: Interactive dots on a flow that must be finished in order.
 />
 ```
 
-### Keep the number of dots small. {#keep-the-number-of-dots-small}
+### Keep the number of steps small. {#keep-the-number-of-steps-small}
 
-A row of dots reads at a glance. With many dots, position stops being readable.
+A short row reads at a glance. With many steps, position stops being readable.
 
-Do: A handful of dots, so the current one is easy to find.
-Don't: Two dozen dots, where the current one is lost in the row.
+Do: A handful of steps, so the current one is easy to find.
+Don't: Two dozen steps, where the current one is lost in the row.
 
 ### Match the appearance to the surface. {#match-the-appearance-to-the-surface}
 
 `inverted` is for a dark surface; on a light one use `default`, `primary` or `help`.
 
-Do: Inverted dots on a dark ground.
-Don't: Inverted dots on a light surface, where they vanish.
+Do: Inverted indicator on a dark ground.
+Don't: Inverted indicator on a light surface, where it vanishes.
 
-### `values` supplies a count and each dot's name. {#values-supplies-a-count-and-each-dot-s-name}
+### Use `values` to supply the step count and each button's accessible name. {#use-values-to-supply-the-step-count-and-each-button-s-accessible-name}
 
-The array's content never renders. Its length becomes the number of dots, and when `onSelect` is set each entry becomes a dot's accessible name.
+The array's content never renders visually. Its length becomes the number of step markers, and when `onSelect` is set each entry becomes a button's accessible name.
 
 ## Accessibility
 
@@ -75,57 +81,56 @@ The array's content never renders. Its length becomes the number of dots, and wh
   default), so a screen reader announces it as one control.
 - **The current step is `aria-current="step"`.** This is the only state a
   non-interactive indicator exposes.
-- **Interactive dots are real buttons**, each named from its `values` entry
-  and linked to the content it controls with `ariaControls`, each with a 24
-  target.
+- **Interactive markers are real buttons**, each named from its `values` entry
+  and linked to the content it controls with `ariaControls`.
 - **The bar is hidden from assistive technology.** Its fill is a picture of
   time; `aria-current` still names the current step.
 - **Reduced motion shows the bar full**, so nothing grows on screen.
 
 ## Related
 
-- For steps with their own visible labels, use `ProgressTracker`.
-- For a single bar showing percent complete, use `ProgressBar`.
+- `Carousel`: use when pairing `ProgressIndicator` with an autoplaying slide stage.
+- `ProgressTracker`: use when each step needs a visible label beside its marker.
 
 Same group: `ProgressTracker`
 
 ## Parts
 
-1. **Dot.** One per step: 8 or 12 across, a circle.
-2. **Current dot.** The brand ground (discovery for help, inverse icon for inverted), with `aria-current="step"`.
+1. **Step marker.** One circle per step (`8` or `12` across).
+2. **Current marker.** The brand ground (discovery for help, inverse icon for inverted), with `aria-current="step"`.
 3. **Group.** The row, named by `label`.
-4. **Bar.** With `progress`, the current dot is 32 long: the subtlest icon ground is the track, and the fill, in the current dot's color, grows from the start edge. Under reduced motion it shows full.
-5. **Target.** A dot that is a button keeps a 24 target, so the gap between buttons widens to fit it.
+4. **Bar.** With `progress`, the current marker stretches to `--control-md`: the subtlest icon ground is the track, and the fill grows from the start edge. Under reduced motion it shows full.
+5. **Target.** A marker that is a button keeps a `--control-sm` target, so the gap between buttons widens to fit it.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Rest | Subtlest icon ground; the current dot is on its appearance ground. |
-| Hovered | Interactive only: an unselected dot takes the subtle icon ground. |
-| Pressed | Interactive only: an unselected dot takes the default icon ground. |
-| Focused | Interactive only: the 2px ring, 2 off the dot. |
+| Rest | Subtlest icon ground; the current marker is on its appearance ground. |
+| Hovered | Interactive only: an unselected marker takes the subtle icon ground. |
+| Pressed | Interactive only: an unselected marker takes the default icon ground. |
+| Focused | Interactive only: shows the focus ring; see Border. |
 | Disabled | A progress indicator has no disabled state; without `onSelect` it is decorative. |
 
 ### Tokens
 
 | Part | Token |
 | --- | --- |
-| Dot ground | `--ds-icon-subtlest`, `--ds-icon-subtle`, `--ds-icon` |
-| Current dot | `--ds-background-brand-bold`, `--ds-background-discovery-bold`, `--ds-icon-inverse` |
-| Inverted dot | `--ds-background-inverse-subtle` and its states |
+| Marker ground | `--ds-icon-subtlest`, `--ds-icon-subtle`, `--ds-icon` |
+| Current marker | `--ds-background-brand-bold`, `--ds-background-discovery-bold`, `--ds-icon-inverse` |
+| Inverted marker | `--ds-background-inverse-subtle` and its states |
 | Size | `--progress-indicator-dot-size-8`, `--progress-indicator-dot-size-12` |
-| Bar | `--control-md` long; track `--ds-icon-subtlest`, fill the current dot's color |
-| Gap | `--inline-md`, `--inline-sm`, `--stack-sm`; between buttons at least `--control-sm` less the dot |
+| Bar | `--control-md` long; track `--ds-icon-subtlest`, fill the current marker's color |
+| Gap | `--inline-md`, `--inline-sm`, `--stack-sm`; between buttons at least `--control-sm` less the marker |
 | Ring | `--ds-border-focused`, `--focus-ring-width` |
 
 ## Content guidelines
 
 | Do | Don't |
 | --- | --- |
-| Name each dot for its step when the dots are buttons: "Step 2, Reflection". | Leave interactive dots unnamed or number them only. |
+| Name each entry for its step when the markers are buttons: "Step 2, Reflection". | Leave interactive steps unnamed or number them only. |
 | Give the group a `label` that says what it tracks: "Carousel slides". | Keep the default "Progress" when a page holds two indicators. |
-| Use it where steps have no labels of their own. | Use it where each step needs a title; use the progress tracker. |
+| Use it where steps have no labels of their own. | Use it where each step needs a title; use Progress tracker. |
 
 ## Props
 

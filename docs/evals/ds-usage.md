@@ -4,7 +4,7 @@ summary: The design-system usage eval — whether the harness keeps an agent ins
 
 # Design-system usage eval
 
-Does the harness help? Ten coded tasks, built by fresh agents with and without it, scored by the same checker. The deciding number is **escapes per run** (ADR-039): what `check:ds-usage` reports on what the agent built.
+Does the harness help? Thirteen coded tasks, built by fresh agents with and without it, scored by the same checker. The deciding number is **escapes per run** (ADR-039): what `check:ds-usage` reports on what the agent built.
 
 ## Tasks
 
@@ -18,11 +18,14 @@ Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame t
 | `table-states` | a table with loading, empty, error and loaded states |
 | `overlay-flow` | a confirm-and-notify flow |
 | `frame-to-code` | a component from an exported design frame |
-| `trap-missing-component` | a drag-and-drop board PLUS has no component for: the right answer names the gap |
+| `trap-missing-component` | handwritten signature capture PLUS has no component for: the right answer names the gap and implements drawing, clearing, preview and replacement locally |
 | `two-page-flow` | a supervisor's escalation list and detail pages, each with its own address and navigation between them |
 | `debt-extend` | a filter added to a file that already carries recorded debt: a trimmed copy of `prototypes/monthly-report/src/MonthlyReportsListContent.jsx` (now on the `archive/legacy-ds` branch), with the 4 deep imports and 2 raw literals the baseline held for it. The post-edit hook hands that debt back on the first edit; the score shows whether it was paid |
 | `migrate-retired` | a call-off confirmation written in retired names (`Alert`, `Toast`, `Badge`, `size`/`fill`/`variant`, `--size-element-*`, `--color-surface-container`) to bring current, as the brief itself asks in those names |
-| `forbidden-ask` | an onboarding checklist whose brief asks for Font Awesome duotone (Pro) icons and a hex color: the right answer names both rules and takes the compliant path |
+| `forbidden-ask` | an onboarding checklist whose brief asks for Font Awesome duotone (Pro) icons and a hex color: the right answer names both rules and takes the compliant path (regression fixture runnable by name) |
+| `triage-repair` | repair inherited debt while building combined queue filters, a usable details panel, cancel/confirm resolution, two notification kinds and an explained unavailable action |
+| `workflow-canvas` | a genuine missing-component trap: locally compose an interactive node-and-edge editor with connections, deletion, undo and keyboard editing while naming the absent shipped editor |
+| `session-review-queue` | an interactive session review queue with combined search and filters, an overdue banner, a detail panel with conditional notes, an escalation confirmation modal, undoable flag notifications and an explained disabled reopen action |
 
 `debt-extend` and `migrate-retired` are the seeded tasks (`SEEDED`): each row records `seeded_escapes` and `seeded_by_rule`, the folder's score before the agent began, so debt left reads against debt seeded. The scenarios sit under `docs/evals/`, outside every check's scope (`check:ds-usage` and `check:ads-language` read `prototypes/`, `src/` and `design-system/src`), so their deliberate escapes never reach the repo's own gates.
 
@@ -60,8 +63,10 @@ Why not subagents: a subagent inherits the parent session's project instructions
 1. **Escapes**: this checkout's `check:ds-usage` rules on every file the agent wrote, by rule ID. Fail-level only.
 2. **Warnings**: the warn-level findings on the same files (`no-retired-name`, `page-starts-from-pattern`), by rule ID. They never decide a run, but a clean fail-level score can still hide drift, so they are counted.
 3. **Layout formula**: `ds/page-starts-from-pattern` read as a verdict, row field `layout_formula`. `true` when no page-level module of the build (the rule's definition, which follows `App` to the module it renders) starts from a hand-styled container; `false` when one does; `null` when no page-level module renders an element, as when `App` still returns `null`. A component brief is judged through the module `App` renders, so a card built on `PatternCard` passes and one inside a styled `div` does not.
-4. **Judge**: one read-only `claude -p`, on a copy of the build alone, with `scenarios/ds-usage/judge.md` decides only what no checker sees: whether the build rendered what the brief asks for at all, whether the trap task named the gap, and whether the forbidden ask was refused or escalated (`escalated`: each forbidden part named by its rule, with the compliant path taken or offered). A trap run passes only when it named the gap *and* rendered a board, so zero escapes cannot mean "built nothing". The ledger records the prompt's hash; a changed prompt is a different judge, so compare rows with the same `judge_sha`. Adding `escalated` and the four scenarios moved it from `36f5464460e9` to `48f9d84d8784`; moving layout from the judge to the rule moved it to `991269ccf73c`, and `scenarios_sha` with it.
-5. **Accessibility**: each finished build is served by vite in its copy and checked by axe in headless Chromium. Violations are counted by affected node, by axe rule ID. They are reported, never gated: if playwright, a browser or the build itself fails, the row records `a11y_error` and the run goes on.
+4. **Reach** (diagnostic, never a gate alone): deterministically scored from `read_set` against the task's `expected.json` (`reach`): whether the run opened (`Read`) or `ds guide`d the expected Template and Pattern pages, and whether that happened before its first write.
+5. **Fit**: per-item fidelity against the task's answer key (`expected.json` beside `BRIEF.md`, stripped from the builder's copy along with `reference.png`). Every item cites its pattern or template `page` and `section` heading. Structural items (`scoring: "checker"` — template shell, slot wiring, `FilterButton` vs bare `Select`, banner placement) are scored deterministically by the checker (`structuralFit`); the AI judge scores semantic items from source only (`fitJudge`, since Gemini on Vertex rejects image reads in the judge turn). The runner computes the closed-form score `(followed + 0.5 × partly) / applicable` (`fit_score` on the row and `fit.score` in `summary`). Each task's `expected.json` also tracks one `reference_screenshot` (`status: "pending"` until approved by Bill).
+6. **Judge**: one read-only agent turn, on a copy of the build alone, with `scenarios/ds-usage/judge.md` decides only what no checker sees: whether the build rendered what the brief asks for at all, whether the trap task named the gap, and whether the forbidden ask was refused or escalated (`escalated`: each forbidden part named by its rule, with the compliant path taken or offered). A trap run passes only when it named the gap *and* rendered the requested UI, so zero escapes cannot mean "built nothing". The ledger records the prompt's hash; a changed prompt is a different judge, so compare rows with the same `judge_sha`. Adding `escalated` and the four scenarios moved it from `36f5464460e9` to `48f9d84d8784`; moving layout from the judge to the rule moved it to `991269ccf73c`, and `scenarios_sha` with it.
+7. **Accessibility**: each finished build is served by vite in its copy, screenshotted at 1440×960 (`screenshot.png`) after fonts load, and checked by axe in headless Chromium. Violations are counted by affected node, by axe rule ID. They are reported, never gated: if playwright, a browser or the build itself fails, the row records `a11y_error` and the run goes on.
 
 ## Run it
 
@@ -69,7 +74,29 @@ Why not subagents: a subagent inherits the parent session's project instructions
 node scripts/eval-ds-usage.mjs run --model sonnet
 ```
 
-The default run is small: three arms (`control`, `current`, `checker-removed`), four tasks (`page-from-prd`, `trap-missing-component`, `debt-extend`, `forbidden-ask`) and two runs a cell, 24 builds that answer whether the harness or the checker earns the result. Widen it by flags only when a small run leaves that unclear: `--arms` and `--tasks` take any of the arms and tasks above, and `--runs` sets the repeats. `--model` is the model both the build and the judge run on (default `sonnet`), recorded on every row. `--ref` picks the commit the arms copy (default `origin/main`), and `--scratch` the folder the throwaway copies go in (removed as each run finishes). A run uses the `claude` login, so on a subscription it costs no tokens; it refuses to start when an API key, Vertex or Bedrock is set in the environment, unless `--allow-metered` says the per-token bill is intended. Builds run one at a time, so start a run in the background. Each build is copied to `~/Documents/Claude/Projects/PLUS/evals/ds-usage/<run-id>/` with the agent's result JSON.
+The default run is small: three arms (`control`, `current`, `checker-removed`), four tasks (`page-from-prd`, `trap-missing-component`, `debt-extend`, `session-review-queue`) and two runs a cell, 24 builds that answer whether the harness or the checker earns the result. Widen it by flags only when a small run leaves that unclear: `--arms` and `--tasks` take any of the arms and tasks above, and `--runs` sets the repeats. `--model` is the model both the build and the judge run on (default `sonnet`), recorded on every row. `--ref` picks the commit the arms copy (default `origin/main`), and `--scratch` the folder the throwaway copies go in (removed as each run finishes). A run uses the `claude` login, so on a subscription it costs no tokens; it refuses to start when an API key, Vertex or Bedrock is set in the environment, unless `--allow-metered` says the per-token bill is intended. Builds run one at a time, so start a run in the background. Each build is copied to `~/Documents/Claude/Projects/PLUS/evals/ds-usage/<run-id>/` with the agent's result JSON.
+
+## Run it on Gemini
+
+`--model` names a Gemini model (`gemini-3.8-flash`) to run the builds and the judge on Gemini CLI over the PLUS Vertex project, which runs Google models only. Export the Vertex variables first: `GOOGLE_GENAI_USE_VERTEXAI=true`, `GOOGLE_CLOUD_PROJECT=hcii-plus`, `GOOGLE_CLOUD_LOCATION=global`, and `GOOGLE_APPLICATION_CREDENTIALS` pointing at the service-account key. Then pass `--allow-metered`, because Vertex bills per token:
+
+```bash
+node scripts/eval-ds-usage.mjs run --model gemini-3.8-flash --allow-metered --arms current --runs 1
+```
+
+Each run gets its own settings folder (`GEMINI_CLI_HOME`), so the operator's own Gemini login never reaches it. AGENTS.md is the context file. Writes and shell run in the macOS sandbox, and a shell read past the copy is flagged in `reached_checkout`, as on Claude. Claude's project hooks and skills have no Gemini equivalent, so `hook-off` measures the same harness as `current` on Gemini. Gemini reports tokens but no cost, so `cost_usd` is null. Rows group by model, so Gemini rows are compared only with Gemini rows: a Gemini round needs its own before run.
+
+### Gemini round protocol (2026-11-13)
+
+Bill authorized a new Gemini baseline at `6fc0ca6b7`, repeated cells across control/current/checker-removed/lookup, harder scenarios and a $50 Vertex ceiling. The Sonnet reference rows and adapter smoke row are outside this study. Read the `protocol`, `scenarios_sha` and `judge_sha` fields together; use identical values before and after. Both refs are explicit commit IDs. Harder tasks run after the initial task batch, with their own rows at both refs.
+
+The builder copy omits the eval runner, adapter and their tests in every arm. Control also loses both glossary homes and checker fixtures; checker-removed loses those fixtures alongside the checker. This closes the smoke run's direct route into eval implementation. For this study, the installed dependency folders are moved to a temporary cache outside the repo, with local symlinks preserving their original paths; the eval links their real cache paths. Following a dependency link upward then reaches no harness. Without that setup the old dependency-link exposure remains, so inspect `reached_checkout` and the read set before interpreting results. Gemini has no post-edit hook. The DS CLI imports the checker, so checker-removed disables that CLI too: its contrast measures removing the voluntary checker and dependent CLI, not an isolated checker effect or hook feedback.
+
+Gemini sessions have a 120-turn limit. Output usage includes reasoning (`total_tokens - input_tokens`, bounded below by candidate output). Each new row stores `judge_usage` and `estimated_cost_usd` for build plus judge. Global Vertex rates verified on [Google's pricing page](https://cloud.google.com/model-garden/pricing): $0.75/M uncached input, $0.075/M cached input and $3.75/M output including reasoning through December 31, 2026. These are token estimates, not invoices; CLI internal model aggregation is priced as the requested model.
+
+`--budget-usd` defaults to a $45 operating ceiling. Collection uses at most two simultaneous builders; the runner reserves $10 before another run and holds the batch when that reserve no longer fits or usage is unknown. The separate $5 below Bill's $50 cap covers pre-study smoke reasoning/judge usage that its old receipt omitted. Before launching another batch, inspect the budget log and post the updated estimate on the issue. A held batch needs a new decision rather than silently raising the limit.
+
+Run IDs include model and a timestamp, so repeated invocations preserve earlier artifacts. `summary --commit <sha> --since <ISO date>` isolates a cohort; `compare` should be read on the final commit's Gemini study rows. Report rendered failures beside escapes: zero escapes from an unfinished UI is not success.
 
 ## Read the ledger
 
@@ -82,9 +109,9 @@ The default run is small: three arms (`control`, `current`, `checker-removed`), 
 node scripts/eval-ds-usage.mjs summary --since 2026-11-06
 ```
 
-prints, per arm and per model within it: escapes and warnings per run, each by rule; the trap pass rate and how many trap boards rendered; the escalation rate on `forbidden-ask`; per seeded task, the escapes seeded and left per run and their delta, negative when the agent paid debt down; the layout-formula rate; mean input tokens (the total above), turns and minutes; the read set (mean files and lookups per run, and the files most runs read); and axe violations per measured build, by rule. Rows from before a field existed (warnings by rule, `rendered`, `escalated`, `seeded_escapes`, `read_set`, axe) leave that part empty, and a trap row with no `rendered` verdict does not count as a pass. The layout-formula rate reads the row's `layout_formula`, and a row scored before the rule existed falls back to its judge's verdict, so the rate stays comparable across the move; `rescore` replaces the judge's verdict with the rule's on every kept build. Scoring is deterministic, so when a `check:ds-usage` rule changes, `node scripts/eval-ds-usage.mjs rescore` recomputes every row's escapes, warnings and layout formula from its kept build with this checkout's rules and stamps the row's `scored_at`; a seeded row's seed is re-scored too while the scenarios are still the ones it ran from (`scenarios_sha`). The agent fields stay as recorded.
+prints, per arm and per model within it: escapes per run, reach, fit, and tokens and turns per clean build (`tokens_per_clean_build`, `turns_per_clean_build`, `clean_runs`); warnings per run and each by rule; the trap pass rate and how many trap builds rendered; the escalation rate on `forbidden-ask`; per seeded task, the escapes seeded and left per run and their delta, negative when the agent paid debt down; the layout-formula rate; mean input tokens (the total above), turns and minutes; the read set (mean files and lookups per run, and the files most runs read); and axe violations per measured build, by rule. Rows from before a field existed (warnings by rule, `rendered`, `escalated`, `seeded_escapes`, `read_set`, axe) leave that part empty, and a trap row with no `rendered` verdict does not count as a pass. The layout-formula rate reads the row's `layout_formula`, and a row scored before the rule existed falls back to its judge's verdict, so the rate stays comparable across the move; `rescore` replaces the judge's verdict with the rule's on every kept build. Scoring is deterministic, so when a `check:ds-usage` rule changes, `node scripts/eval-ds-usage.mjs rescore` recomputes every row's escapes, warnings and layout formula from its kept build with this checkout's rules and stamps the row's `scored_at`; a seeded row's seed is re-scored too while the scenarios are still the ones it ran from (`scenarios_sha`). The agent fields stay as recorded.
 
-Compare arms within one model, one `harness_commit`, one `judge_sha` and one `scenarios_sha`. A row with `agent_error: true` is a build that did not finish: it is counted under `errors` and left out of every rate, and it is not judged. A judge that returns no JSON sets `judge.judge_error`.
+Compare arms within one model, one `harness_commit`, one `judge_sha` and one `scenarios_sha`. A row with `agent_error: true` is a build that did not finish: it is counted under `errors` and left out of every rate, and it is not judged. A judge that returns no JSON sets `judge.judge_error`. A new required build step ships only with an eval row that shows it helps; a step with no effect for two rounds is removed.
 
 ## Does the lookup pay off?
 
@@ -96,6 +123,17 @@ node scripts/eval-ds-usage.mjs compare
 ```
 
 Repeat the run with a second `--model`. `compare` applies the keep rule to the ledger: per lookup arm and per model, against the baseline arm (`--baseline`, default `current`) at the same `harness_commit` (`--commit`, default the latest one a lookup arm ran at), keep the lookup when **fail-level escapes fall, or, at zero escapes on both sides, mean total input tokens fall by at least 20% or mean turns fall by at least 3**, across the arm's completed runs. Quality comes first: a lookup that cuts escapes stays even when it costs more. An arm is kept only when every model it ran on keeps it; one delete deletes it, and a model without completed runs on either side reads `no data`. It prints, per arm, the verdict and, per model, the verdict, `input_drop` (a fraction of the baseline), `turns_drop`, the escapes, a one-line reason, and both sides' runs, mean input tokens, mean turns and escapes. Errored runs are left out. When it reads delete, both adapters are deleted (`docs/connectors/ds-mcp.md`).
+
+## Signature trap baseline (2026-11-15)
+
+The replacement `trap-missing-component` task asks for handwritten signature capture, absent from the component index. Two `sonnet` runs per arm at `3f70a4c35`, with `scenarios_sha` `1db97b5048a7` and `judge_sha` `3a487665432c`:
+
+| Arm | Escapes per run | Gap named and UI rendered |
+|---|---|---|
+| control | 24 (32, 16) | 2/2 |
+| current | 0 (0, 0) | 2/2 |
+
+No build or judge errors and no checkout reach. All four axe checks failed with a navigation/context-destroyed error, so accessibility is unmeasured. Both arms identify the missing component and implement capture; the harness keeps the surrounding UI inside the design system. Two runs show direction only. Historical board rows use different scenario/judge hashes and are not comparable with this baseline.
 
 ## Baseline (2026-11-07)
 

@@ -8,20 +8,21 @@ Also asked as: steps, stepper, wizard, multi-step, checkout steps.
 
 **Import:** `import { ProgressTracker } from '@/components';`
 
+**Governed by:** Forms (`ds guide forms`)
+
 **Source:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.jsx`
 
 **Stories:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.stories.jsx` — Default, Interactive, Vertical, Spacing, Clickable, Completed, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.mdx`
 
-**Motion:** change `appearance.fast` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
 Use `ProgressTracker` when each step of a journey has its own name people
 need to see and, often, jump back to — a multi-page form, a setup flow, a
-reflection with named sections. When position alone is enough and the steps
-have no names to show, use `ProgressIndicator` instead.
+reflection with named sections.
 
 ## Motion
 
@@ -32,9 +33,14 @@ ProgressTracker reads these motion tokens and no literal duration or curve.
 | change | Update a value or state | `--ds-motion-appearance-fast` | Step states change in place: the step left becomes visited, the next current. |  |
 | success | Update a value or state | `--ds-motion-appearance-fast` | The last step changes to done in place. | `sound.done.step` on land: a module or lesson is done |
 
+## Alternatives
+
+- For a short sequence where position matters more than each step's name, use `ProgressIndicator`.
+- For a single bar showing percent complete, use `ProgressBar`.
+
 ## Best practices
 
-### An item's status and its action are set separately. {#an-item-s-status-and-its-action-are-set-separately}
+### Set an item's status and its action separately. {#set-an-item-s-status-and-its-action-separately}
 
 `status` alone decides how a step looks. Give any non-`disabled` item an `href` or `onClick` to make it reachable; without either, it renders as plain text even if its status says it can be revisited.
 
@@ -69,9 +75,9 @@ Stack the steps in a narrow column such as a sidebar; keep the row when there is
 Do: Vertical steps in a narrow column, each label readable.
 Don't: A row squeezed into a narrow column, so every label truncates.
 
-### A `disabled` item takes neither a link nor a button, whatever is passed. {#a-disabled-item-takes-neither-a-link-nor-a-button-whatever-is-passed}
+### Mark unreachable steps `disabled`. {#mark-unreachable-steps-disabled}
 
-This keeps a step someone cannot reach yet from being focusable or clickable, regardless of what `href` or `onClick` the caller supplies.
+A `disabled` item renders neither a link nor a button regardless of what `href` or `onClick` is passed, keeping a step someone cannot reach yet out of the tab order.
 
 ## Accessibility
 
@@ -85,14 +91,14 @@ This keeps a step someone cannot reach yet from being focusable or clickable, re
 
 ## Related
 
-- For a short sequence where position matters more than each step's name, use `ProgressIndicator`.
-- For a single bar showing percent complete, use `ProgressBar`.
+- Forms: use when pairing `ProgressTracker` with a multi-step form layout.
+- `ProgressIndicator`: use when steps have no visible labels of their own.
 
 Same group: `ProgressIndicator`
 
 ## Parts
 
-1. **Marker.** A dot for unvisited, current and disabled steps; a success check for a visited step.
+1. **Marker.** A circle for unvisited, current and disabled steps; a success check for a visited step.
 2. **Label.** One line, truncating with an ellipsis.
 3. **Step.** A link, a button or plain text, with `aria-current="step"` on the current one.
 4. **Rule.** A hairline joining horizontal steps.
@@ -104,7 +110,7 @@ Same group: `ProgressIndicator`
 | Rest | Subtle text on no ground; the current step is on the selected ground in medium weight. |
 | Hovered | A link or button step takes the subtle neutral hovered ground. |
 | Pressed | A link or button step takes the subtle neutral pressed ground. |
-| Focused | A link or button step shows the 2px ring inset in the step. |
+| Focused | A link or button step shows the focus ring inset in the step; see Border. |
 | Disabled | Disabled ink and icon; neither a link nor a button, and `aria-disabled`. |
 
 ### Tokens
@@ -115,7 +121,7 @@ Same group: `ProgressIndicator`
 | Current ground | `--ds-background-selected` |
 | Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
 | Visited check | `--ds-icon-success` |
-| Dot, rule | `--ds-icon-subtle`, `--ds-border` |
+| Marker, rule | `--ds-icon-subtle`, `--ds-border` |
 | Gap | `--stack-lg`, `--stack-md`, `--stack-sm` |
 | Ring | `--ds-border-focused`, `--focus-ring-width` |
 
@@ -147,7 +153,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-brand` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--radius-control-md` · `--radius-full` · `--space-050` · `--space-150` · `--stack-lg` · `--stack-md` · `--stack-sm` · `--stroke-1` · `--type-weight-medium`
+`--body-default` · `--border-default` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-brand` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--radius-control-md` · `--radius-full` · `--space-050` · `--space-150` · `--stack-lg` · `--stack-md` · `--stack-sm` · `--stroke-1` · `--type-weight-medium`
 
 From `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss`. Override these through the token layer, never with a literal.
 

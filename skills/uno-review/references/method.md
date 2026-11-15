@@ -48,6 +48,8 @@ Every finding carries **severity · lens · evidence (what's in the artifact) ·
 | **major** | unjustified divergence from PRD / DS patterns, hierarchy skipping, missing required state | flips the gate |
 | **minor** | terminology drift, copy-case, polish | advisory — travels with the artifact, never blocks |
 
+**Touched-file debt.** A coded build that edits a file carrying recorded `check:ds-usage` debt fixes the escapes in that file before review passes. Compare the touched files with the recorded baseline; report remaining fail-level escapes as blockers and route their repair through the artifact workflow. The review remains diagnose-only.
+
 ## Verdict & re-entry
 
 - **Stage-lens:** `Issues? = Yes` **only when at least one finding is major or above.** Yes → re-enter `uno-prototype` at the reflection (`reflect_learn`) — a failed review can invalidate the approach, not just the artifact; each finding's re-entry point says which (re-choose fidelity vs. content fix). No → "Ready to share?" stays the designer's call; review passing is necessary, not sufficient.

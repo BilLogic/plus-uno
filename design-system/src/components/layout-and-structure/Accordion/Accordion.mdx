@@ -45,8 +45,6 @@ Accordion component for organizing content into collapsible sections.
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Accordion"
-    sets={figmaMeta.sets}
-    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -83,7 +81,7 @@ Accordion component for organizing content into collapsible sections.
 
 <ComponentExample of={AccordionStories.Pressed} title="Pressed" description="The neutral subtle pressed ground." />
 
-<ComponentExample of={AccordionStories.Focused} title="Focused" description="The 2px focus ring, 2px off the edge. The ground stays put." />
+<ComponentExample of={AccordionStories.Focused} title="Focused" description="Shows the focus ring while the ground stays put." />
 
 <ComponentExample of={AccordionStories.Expanded} title="Expanded" description="The selected ground, chevron turned up. Press again to close." />
 
@@ -105,12 +103,7 @@ Accordion component for organizing content into collapsible sections.
 
 <DocsInteractivePlayground
     of={AccordionStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -134,7 +127,16 @@ shape and the headers stay a readable index of what is there.
 
 It is uncontrolled by default: give it `defaultActiveKey` and it tracks the open
 item itself. Pass `activeKey` and `onSelect` together to control it. `alwaysOpen`
-lets more than one item stay open at once.
+lets more than one item stay open at once, and `flush` removes the outer border
+and rounded corners when the accordion sits inside a card or panel. Use an accordion for several long, independent sections where only one matters at a time.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For switching between alternative views of the same content, use `Tabs`.
 
 </div>
 
@@ -157,9 +159,9 @@ lets more than one item stay open at once.
 <tr><td>Rest</td><td>Surface ground, subtle text, chevron down.</td></tr>
 <tr><td>Hovered</td><td><code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
 <tr><td>Pressed</td><td><code>--ds-background-neutral-subtle-pressed</code>.</td></tr>
-<tr><td>Focused</td><td>A 2px ring 2px off the edge; no fill change.</td></tr>
+<tr><td>Focused</td><td>Shows the focus ring with no fill change; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Expanded</td><td><code>--ds-background-selected</code>, and <code>--ds-background-selected-hovered</code> under the pointer. The chevron turns up.</td></tr>
-<tr><td>Disabled</td><td>The item is dimmed to <code>--ds-opacity-disabled</code>. The trigger is announced as disabled, stays in the tab order, and a press never opens it.</td></tr>
+<tr><td>Disabled</td><td>The item is dimmed to <code>--ds-opacity-disabled</code>. The trigger is announced as disabled, leaves the tab order, and a press never opens it.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -186,8 +188,6 @@ lets more than one item stay open at once.
 
 ## Best practices
 
-Use an accordion for several long, independent sections where only one matters at a time.
-
 ### Open one section at a time.
 
 A stack answers one question at a time; leaving every item open turns it into a long page.
@@ -212,7 +212,7 @@ The title is the only thing visible when closed, so it has to name the content a
 
 ### Stack the items in one accordion.
 
-Items share borders so the group reads as one control. This is not the `flush` prop, which is covered below.
+Items share borders so the group reads as one control.
 
 <DoDontPair
     doExample={<Accordion items={sessionItems} />}
@@ -221,41 +221,33 @@ Items share borders so the group reads as one control. This is not the `flush` p
     dontCaption="Items spaced apart like separate cards."
 />
 
-### There are two ways to author items, and `children` wins.
+### Author items with either `items` or `children`; `children` wins.
 
 ```jsx
-// Incorrect — the items array is dropped without warning. The component
-// returns children whenever children exist, and never looks at items.
+// Incorrect — the items array is dropped when children exist.
 <Accordion items={sections}>
     <Accordion.Item eventKey="0" header="One">…</Accordion.Item>
 </Accordion>
 
-// Correct — pick one. The array for uniform, data-driven sections:
+// Correct — pick one:
 <Accordion items={sections} />
-
-// or children when a body needs its own markup:
-<Accordion>
-    <Accordion.Item eventKey="0" header="One">…</Accordion.Item>
-</Accordion>
 ```
 
-### `alwaysOpen` needs an array key, even for one item.
+### Pass an array key when `alwaysOpen` is set.
 
 ```jsx
-// Incorrect — the open item snaps shut on the first click elsewhere. With
-// alwaysOpen set and a non-array key, opening any item replaces the whole
-// selection with just that item.
+// Incorrect — with alwaysOpen and a string key, opening another item replaces the selection.
 <Accordion alwaysOpen defaultActiveKey="0" items={sections} />
 
 // Correct.
 <Accordion alwaysOpen defaultActiveKey={['0']} items={sections} />
 ```
 
-### `flush` is for accordions inside another bordered surface.
+### Use `flush` inside another bordered surface.
 
-It removes the outer border and the corner radius so the item rows sit flat
-against their container. Inside a Card pattern that is what you want; on the bare page
-it leaves the accordion with no edge to hold it.
+`flush` removes the outer border and corner radius so the item rows sit flat
+against a bordered container such as a card. On the bare page, keep the default
+border.
 
 </div>
 
@@ -284,20 +276,17 @@ it leaves the accordion with no edge to hold it.
   `aria-controls`, wrapped in a heading. Tab reaches every header; Enter and
   Space toggle; the heading list shows the whole index.
 - **The body is associated with its header.** The panel's `role="region"` is
-  labelled by the header that opened it, so a screen reader can jump straight
+  labeled by the header that opened it, so a screen reader can jump straight
   to it, not just land there in document order.
 - **Write `header` as a heading.** It becomes the text of a heading, so it is
-  read both in place and in the heading list. A short noun phrase, not a
-  sentence.
-- **`disabled` is a real disabled button.** It leaves the tab order and a press,
-  by mouse or keyboard, never opens it. Say why in text inside or beside the
-  item, never in a tooltip on the header. It is still not a way to withhold
-  content: the body stays in the DOM, so leave the item out if what is inside
-  it is not for this reader.
+  read both in place and in the heading list.
+- **`disabled` is a real disabled button.** It leaves the tab order and a press
+  never opens it. Say why in text inside or beside the item, never in a tooltip
+  on the header. The body stays in the DOM, so omit the item if its content is
+  not for this reader.
 - **Focus stays on the header after a toggle.** Opening an item does not move
-  focus into the body and does not scroll it into view. That is the right
-  behavior — the user keeps their place — but it means a tall body opened low
-  in the viewport is off-screen until they scroll.
+  focus into the body and does not scroll it into view, so the user keeps their
+  place.
 
 </div>
 
@@ -305,11 +294,8 @@ it leaves the accordion with no edge to hold it.
 
 ## Related
 
-- For switching between alternative views of the same content, use `Tabs`.
-  Tabs say "one of these"; an accordion says "these, some of which are open".
-- When every section has to be readable at once, use none of them and lay the
-  sections out. Comparing two collapsed items means opening, reading, closing,
-  opening.
+- `Tabs`: use when switching between mutually exclusive views of the same area.
+- [Section](?path=/docs/templates-section--docs): use when every section should stay visible at once so people can compare them without opening and closing rows.
 
 </div>
 

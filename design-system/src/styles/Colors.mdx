@@ -1,5 +1,5 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
-import { RefTable, TokenTable, C, Do, Dont, DoDont, RingDemo } from '@/storybook-docs/foundation-blocks.jsx';
+import { RefTable, C, Do, Dont, DoDont, RingDemo } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
@@ -7,6 +7,7 @@ import {
     FoundationRelated,
     FoundationExample,
     TokenSwatches,
+    DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
 import { AccentPalette, ChartPalette } from '@/storybook-docs/token-blocks.jsx';
 import * as ColorsStories from './Colors.stories.jsx';
@@ -31,22 +32,14 @@ import * as ColorsStories from './Colors.stories.jsx';
 
 <FoundationSection title="Overview">
 
-Color in PLUS is a set of tokens, each named for the job it does: the text on a page, the edge of a field, the fill of the primary button. A token has one value in each color mode, so a component that uses the right token is right in light, dark and increased contrast without any work of its own.
+Every color is a semantic token named for the job it does: page text, field edge, or primary button fill. Each token resolves per mode, so components adapt to light, dark and increased contrast automatically.
 
 ```css
 color: var(--ds-text-danger);
 background: var(--ds-background-danger-subtler);
 ```
 
-Figma holds them in `color / semantics`, with modes Light, Dark, Light IC and Dark IC; `color / primitives` stay hidden. Code reads them as `--ds-*` custom properties.
-
-</FoundationSection>
-
-<FoundationSection title="About color">
-
-Color distinguishes PLUS and keeps the tutor and student apps consistent. A color is applied with a design token, so rather than choosing a shade you choose the token for the job: color, then the property (text, icon, border, background), then a role, an emphasis level and an interaction state.
-
-Saturated colors carry meaning, highlight UI or tie related UI together. Neutral colors cover most backgrounds, text and shapes and carry no meaning of their own, though they can imply disabled. Alpha colors have varying transparency so UI adapts to the color or elevation under it.
+Figma holds them in `color / semantics` (modes Light, Dark, Light IC and Dark IC); `color / primitives` stay hidden. See <DocsLink id="foundations-tokens-color">Tokens: Color</DocsLink> for the full collection.
 
 <Canvas of={ColorsStories.Overview} sourceState="none" />
 
@@ -54,49 +47,31 @@ Saturated colors carry meaning, highlight UI or tie related UI together. Neutral
 
 <FoundationSection title="How the tokens are built">
 
-Two layers. Primitives are the raw ramps and stay hidden; never bind one. Semantic tokens point at a primitive and name a job, and they are the only color tokens you bind.
-
-A name reads from the general to the specific: property, role, emphasis, state. In Figma the parts join with slashes, so `color/background/danger/bold/hovered`. In CSS, drop the leading `color` and join the parts with dashes behind `--ds-`, so `--ds-background-danger-bold-hovered`. That is the fill of a bold danger surface under the pointer.
+Primitives hold raw ramps and stay hidden; bind only semantic tokens. Names read from general to specific: property, role, emphasis, state. In Figma, parts join with slashes (`color/background/danger/bold/hovered`); in CSS, drop `color` and join with dashes behind `--ds-` (`--ds-background-danger-bold-hovered`).
 
 <RefTable
-    head={['Part', 'In `color/background/danger/bold/hovered`', 'What it says']}
+    head={['Part', 'In `color/background/danger/bold/hovered`', 'Values', 'What it says']}
     rows={[
-        ['color', 'Namespace', 'Dropped in CSS. Surface and shadow tokens start with elevation.'],
-        ['background', 'Property', 'What it paints: text, icon, border, background, link, chart, backdrop, skeleton or interaction.'],
-        ['danger', 'Role', 'What it means. Left out for the default neutral.'],
-        ['bold', 'Emphasis', 'How far it stands from the surface. Only the steps a role defines exist.'],
-        ['hovered', 'State', 'hovered, pressed or visited. Interactive backgrounds and links only.'],
+        ['color', 'Namespace', <C>color</C>, 'Dropped in CSS. Surface and shadow tokens start with elevation.'],
+        ['background', 'Property', <><C>text</C> · <C>icon</C> · <C>border</C> · <C>background</C> · <C>link</C> · <C>surface</C> · <C>shadow</C> · <C>backdrop</C> · <C>skeleton</C> · <C>interaction</C> · <C>chart</C></>, 'What the color paints.'],
+        ['danger', 'Role', <><C>brand</C> · <C>neutral</C> · <C>selected</C> · <C>input</C> · <C>inverse</C> · <C>disabled</C> · <C>focused</C> · <C>danger</C> · <C>warning</C> · <C>success</C> · <C>information</C> · <C>discovery</C> · <C>accent-*</C> · <C>smart-*</C></>, 'What it means. Omitted for default neutral.'],
+        ['bold', 'Emphasis', <><C>subtlest</C> · <C>subtler</C> · <C>subtle</C> · (default) · <C>bold</C> · <C>bolder</C> · <C>boldest</C></>, 'Contrast against the surface.'],
+        ['hovered', 'State', <><C>hovered</C> · <C>pressed</C> · <C>visited</C></>, 'Interactive backgrounds and links only.'],
     ]}
 />
 
-<RefTable
-    head={['Part', 'Values', 'What it says']}
-    rows={[
-        ['property', <><C>text</C> · <C>icon</C> · <C>border</C> · <C>background</C> · <C>link</C> · <C>surface</C> · <C>shadow</C> · <C>backdrop</C> · <C>skeleton</C> · <C>interaction</C> · <C>chart</C></>, 'What the color paints. Always there.'],
-        ['role', <><C>brand</C> · <C>neutral</C> · <C>selected</C> · <C>input</C> · <C>inverse</C> · <C>disabled</C> · <C>focused</C> · <C>danger</C> · <C>warning</C> · <C>success</C> · <C>information</C> · <C>discovery</C> · <C>accent-teal</C> · <C>smart-advocacy</C></>, 'What it means. Left out for the default neutral.'],
-        ['emphasis', <><C>subtlest</C> · <C>subtler</C> · <C>subtle</C> · (default) · <C>bold</C> · <C>bolder</C> · <C>boldest</C></>, 'How far it stands from the surface.'],
-        ['state', <><C>hovered</C> · <C>pressed</C> · <C>visited</C></>, 'Interactive backgrounds and links only.'],
-    ]}
-/>
-
-Pick the family by job:
-
-- A fill takes `--ds-background-<role>`, with `-subtler`, `-subtle` and `-bold` where the role defines them.
-- A ground takes `--ds-surface`, `--ds-surface-sunken`, `--ds-surface-raised` or `--ds-surface-overlay`.
-- Text takes `--ds-text-<role>`, and a glyph `--ds-icon-<role>`.
-- An edge takes `--ds-border-<role>`; `--ds-border-<role>-subtle` is the pale edge of an outlined label, such as a Tag or a date Status.
+`--ds-border-<role>-subtle` is the pale edge of an outlined label, such as a Tag or a date Status.
 
 </FoundationSection>
 
 <FoundationSection title="Modes">
 
-PLUS has two color modes, light and dark, and each has an increased contrast version for people who need stronger text and edges. That makes four modes. A fifth setting, auto, follows the operating system: `prefers-color-scheme` picks light or dark, and `prefers-contrast` turns increased contrast on.
+PLUS ships four modes: light and dark, each at standard and increased contrast. `auto` follows OS `prefers-color-scheme` and `prefers-contrast`.
 
-- Dark is not light inverted. Raised and overlay surfaces get lighter as they rise, because a shadow is hard to see on a dark page.
-- Increased contrast darkens text and meaningful borders in light and lightens them in dark. Text then reaches 7:1, and borders, icons and the focus ring reach 4.5:1. Tints, surfaces and the Backdrop stay as they are.
-- Tokens map per theme. Design in dark mode by choosing the same token, and never map your own values.
-- In code, the page sets `data-color-mode` (light, dark or auto) and `data-contrast-mode` (no-preference, more or auto). No attribute means light at standard contrast.
-- In Figma, set the mode on the frame: Light, Dark, Light IC or Dark IC. Each swatch below shows the value the page resolves for its token right now, so switching the toolbar changes it at once.
+- **Dark mode** is not light inverted: raised and overlay surfaces step lighter as they rise, because shadows are subtle on dark grounds. Design in dark mode by choosing the same token; never map your own values.
+- **Increased contrast** pushes text to 7:1 and borders, icons and the focus ring to 4.5:1. Tints, surfaces and the Backdrop stay unchanged.
+- **In code**, set `data-color-mode` (`light`, `dark`, `auto`) and `data-contrast-mode` (`no-preference`, `more`, `auto`) on `<html>`. No attribute means light at standard contrast.
+- **In Figma**, set the frame mode to Light, Dark, Light IC or Dark IC.
 
 <Canvas of={ColorsStories.Modes} sourceState="none" />
 
@@ -104,14 +79,27 @@ PLUS has two color modes, light and dark, and each has an increased contrast ver
 
 <FoundationSection title="Roles">
 
-Danger, warning, success, information and discovery carry meaning; brand marks the primary action. Each ships a subtle ground, a bold ground, and text, border and icon colors that pair with them. Pick the role by meaning, never by how the hue looks.
+Pick the role for the intention, then the emphasis. Never pick a role by how the hue looks or by a matching value: a danger fill, its border and its icon are three tokens even when two of them share a value today.
 
-Danger, warning, success, information and discovery each come in four emphasis levels: the default tint for a Banner, subtler for a status label, subtle for a chip that is not interactive, and bold, the filled version. Discovery marks something new or proposed, such as a Suggestion.
+<RefTable
+    head={['Role', 'Default fill', 'Text', 'Use for']}
+    rows={[
+        [<C>neutral</C>, <C>--ds-background-neutral</C>, <C>--ds-text-subtle</C>, 'Default text, secondary buttons and navigation.'],
+        [<C>brand</C>, <C>--ds-background-brand-bold</C>, <C>--ds-text-brand</C>, 'Primary actions and brand marks.'],
+        [<C>information</C>, <C>--ds-background-information-bold</C>, <C>--ds-text-information</C>, 'Informative UI or work in progress.'],
+        [<C>success</C>, <C>--ds-background-success-bold</C>, <C>--ds-text-success</C>, 'A completed or favorable outcome, such as a booked session.'],
+        [<C>warning</C>, <C>--ds-background-warning-bold</C>, <C>--ds-text-warning</C>, 'Caution before a mistake happens. Bold warning uses --ds-text-warning-inverse.'],
+        [<C>danger</C>, <C>--ds-background-danger-bold</C>, <C>--ds-text-danger</C>, 'Errors or destructive actions, such as a failed payment.'],
+        [<C>discovery</C>, <C>--ds-background-discovery-bold</C>, <C>--ds-text-discovery</C>, 'New features, onboarding or a Suggestion.'],
+        [<C>accent</C>, <C>--ds-background-accent-teal-subtle</C>, <C>--ds-text-accent-teal</C>, 'Categorization without status meaning.'],
+        [<C>inverse</C>, '—', <C>--ds-text-inverse</C>, 'Text, icons and borders on bold backgrounds.'],
+        [<C>input</C>, <C>--ds-background-input</C>, <C>--ds-text</C>, 'Form fields.'],
+    ]}
+/>
+
+Danger, warning, success, information and discovery each ship four emphasis levels: default tint for a Banner, `subtler` for a Status tag, `subtle` for a non-interactive Tag, and `bold` for a filled Count tag or button.
 
 <Canvas of={ColorsStories.StatusRoles} sourceState="none" />
-
-Tokens: `color/background/<role>/subtler` or `bold`, `color/text/<role>`, `color/border/<role>` and `color/icon/<role>`. A neutral border that bounds a control takes `color/border/bold`; `color/border/default` is a divider. A bold warning ground is a light yellow, so its text is the dark `color/text/warning/inverse`.
-
 <Canvas of={ColorsStories.TextRoles} sourceState="none" />
 <Canvas of={ColorsStories.IconRoles} sourceState="none" />
 <Canvas of={ColorsStories.BorderRoles} sourceState="none" />
@@ -119,50 +107,9 @@ Tokens: `color/background/<role>/subtler` or `bold`, `color/text/<role>`, `color
 
 </FoundationSection>
 
-<FoundationSection title="Choosing a role">
-
-A role describes the intention behind a color. Pick the role for the job, then the emphasis.
-
-<RefTable
-    head={['Role', 'Use for']}
-    rows={[
-        [<C>neutral</C>, 'Default text and secondary UI, such as secondary buttons and navigation.'],
-        [<C>brand</C>, 'Primary actions and elements that carry the PLUS brand.'],
-        [<C>information</C>, 'Informative UI, such as an information icon, or UI that says something is in progress.'],
-        [<C>success</C>, 'A favorable outcome, such as a session booked.'],
-        [<C>warning</C>, 'Caution that prevents a mistake or error before it happens.'],
-        [<C>danger</C>, 'Danger or a serious error state, such as a failed payment.'],
-        [<C>discovery</C>, 'Something new, such as onboarding or a new feature.'],
-        [<C>accent</C>, 'Color with no meaning tied to it. You should be able to swap one accent for another and the experience stays the same.'],
-        [<C>inverse</C>, 'UI that sits on a bold-emphasis background.'],
-        [<C>input</C>, 'Form fields. PLUS form fields already carry these tokens.'],
-    ]}
-/>
-
-Each role's usual fill and text pair:
-
-<RefTable
-    head={['Role', 'Fill', 'Text', 'Use for']}
-    rows={[
-        ['Brand', <C>--ds-background-brand-bold</C>, <C>--ds-text-brand</C>, 'Primary actions'],
-        ['Neutral', <C>--ds-background-neutral</C>, <C>--ds-text-subtle</C>, 'Secondary actions, quiet fills'],
-        ['Accent teal', <C>--ds-background-accent-teal-subtle</C>, <C>--ds-text-accent-teal</C>, 'Accents with no meaning'],
-        ['Success', <C>--ds-background-success-bold</C>, <C>--ds-text-success</C>, 'Success states, confirmations'],
-        ['Warning', <C>--ds-background-warning-bold</C>, <C>--ds-text-warning</C>, 'Warning states, cautions'],
-        ['Danger', <C>--ds-background-danger-bold</C>, <C>--ds-text-danger</C>, 'Error states, destructive actions'],
-        ['Information', <C>--ds-background-information-bold</C>, <C>--ds-text-information</C>, 'Informational'],
-    ]}
-/>
-
-- Emphasis is how much contrast a color has against the default surface, from subtlest to boldest. Bolder colors draw more attention than subtle ones.
-- Use the inverse tokens (`color/text/inverse`, `color/icon/inverse`, `color/border/inverse`) on bold backgrounds. On a bold warning background, which is yellow, use the warning inverse tokens, which are made to pass WCAG AA.
-- Pick by meaning, never by a matching value. A danger fill, its border and its icon are three tokens even when two of them share a value today.
-
-</FoundationSection>
-
 <FoundationSection title="Accent hues">
 
-Eleven hues decorate: tags, charts, avatars and illustrations. A hue means nothing on its own. When the color carries meaning, use a role instead.
+Eleven hues decorate tags, charts, avatars and illustrations. An accent hue carries no status meaning; when color carries meaning, use a role.
 
 <AccentPalette />
 
@@ -172,9 +119,7 @@ Eleven hues decorate: tags, charts, avatars and illustrations. A hue means nothi
 
 <FoundationSection title="SMART subjects">
 
-The five SMART areas of tutoring each have a role of their own: `background/smart/<subject>` for a chip, with `text/smart/<subject>` and `border/smart/<subject>`; bold for a filled mark; and subtle, a middle step made for illustration bodies. The subjects are social-emotional, mastering-content, advocacy, relationship and technology-tools. Use a SMART color only to name its subject.
-
-Each subject's tokens are the `--ds-*-smart-<subject>` family, on one hue: social-emotional orange, mastering content teal, advocacy lime, relationship magenta, technology tools brown.
+The five SMART tutoring areas each have their own role (`social-emotional` orange, `mastering-content` teal, `advocacy` lime, `relationship` magenta, `technology-tools` brown): `background/smart/<subject>` with `text/smart/<subject>` and `border/smart/<subject>` for a Tag, `subtle` for illustration bodies, and `bold` for filled marks. Use a SMART color only for its subject.
 
 <Canvas of={ColorsStories.SmartSubjects} sourceState="none" />
 
@@ -186,22 +131,22 @@ Each subject's tokens are the `--ds-*-smart-<subject>` family, on one hue: socia
     head={['Token', 'Use for']}
     rows={[
         [<C>--ds-surface</C>, 'The page'],
-        [<C>--ds-surface-sunken</C>, 'The ground behind grouped things: a sidebar column, a well inside a card'],
-        [<C>--ds-surface-raised</C>, <>A card, with <C>--ds-shadow-raised</C></>],
-        [<C>--ds-surface-overlay</C>, <>A modal, menu, popup, tooltip or flag, with <C>--ds-shadow-overlay</C></>],
-        [<C>--ds-border</C>, 'Borders and dividers'],
+        [<C>--ds-surface-sunken</C>, 'Grouped grounds: sidebar column, sunken well'],
+        [<C>--ds-surface-raised</C>, <>Cards, paired with <C>--ds-shadow-raised</C></>],
+        [<C>--ds-surface-overlay</C>, <>Modals, menus, popups, tooltips and flags, paired with <C>--ds-shadow-overlay</C></>],
+        [<C>--ds-border</C>, <>Standard dividers; <C>--ds-border-bold</C> bounds controls</>],
     ]}
 />
 
-A surface lifts by shadow, never by a different gray: a raised card or an overlay takes its role's surface and shadow, as the Elevation page sets out.
+A surface lifts by shadow, never by a different gray. Surface levels and shadows are owned by <DocsLink id="foundations-visual-elevation">Elevation</DocsLink>; stroke widths and the focus ring are owned by <DocsLink id="foundations-visual-border">Border</DocsLink>.
 
 </FoundationSection>
 
 <FoundationSection title="States">
 
-A state steps along the token's own ladder. Hover and press have their own tokens; focus is a ring, never a fill, and [Border](?path=/docs/foundations-visual-border--docs) owns the ring. The colors that mark AI are on [AI UI › Color](?path=/docs/ai-ui-foundations-color--docs).
+Hover and press step along the token's own ladder. Focus is always a ring, never a fill (<DocsLink id="foundations-visual-border">Border</DocsLink>). AI color tokens live on <DocsLink id="ai-ui-foundations-color">AI UI › Color</DocsLink>.
 
-<FoundationExample caption="Each ladder reads left to right: default, hovered, pressed. The fill never changes with focus.">
+<FoundationExample caption="Each ladder reads left to right: default, hovered, pressed. Focus never changes the fill.">
 <TokenSwatches
     items={[
         { token: '--ds-background-brand-bold', text: '--ds-text-inverse', label: 'Brand bold' },
@@ -217,44 +162,34 @@ A state steps along the token's own ladder. Hover and press have their own token
 />
 </FoundationExample>
 
-- A state takes the token that matches what the element is. A selected element takes `color/background/selected`, and `color/background/selected/hovered` when hovered.
-- A row, menu item or sidebar item takes `color/background/neutral/subtle/hovered` and `/pressed`.
-- A bold fill takes its own role's hovered and pressed steps, such as `color/background/brand/bold/hovered` or `color/background/danger/bold/pressed`.
-- Only an avatar or an image, whose fill cannot change, keeps a translucent overlay: `color/interaction/hovered` and `color/interaction/pressed`.
-- There are no icon hovered or pressed tokens. Show an icon's state with a subtle neutral background behind it.
-- Keep selected and focused distinct. Selected persists after an interaction to show a current choice; focused shows where keyboard focus is. Use the selected tokens (background, text, icon, border) for selection and the focus ring only for focus. Selected stays blue, with a second cue such as a check or a border. Never use link, brand or focused tokens to show selection. When an element is both, keep the selected treatment and add the ring.
-- Hovered and pressed are temporary: use the matching token for the element's current state, and keep a selected item recognizable while it is hovered or pressed.
+- **Rows, menu items and sidebar items** take `color/background/neutral/subtle/hovered` and `/pressed`.
+- **Selected elements** take `color/background/selected` (`selected/hovered` and `/pressed` on interaction), paired with a second cue such as a check mark or border. Never use brand, link or focused tokens for selection. Keep selected and focused distinct: selected persists to show a current choice, focus shows where the keyboard is, and a selected item stays recognizable while hovered or pressed.
+- **Fields** take `color/background/input/hovered` with `color/border/input` on hover; on focus they keep their fill and add the focus ring.
+- **Icons** have no hovered or pressed color tokens; show interaction with a subtle neutral background behind the icon.
+- **Avatars and images** whose fill cannot change use `color/interaction/hovered` and `color/interaction/pressed` overlays.
 
 ```css
 .my-element:hover {
   background-color: var(--ds-background-neutral-subtle-hovered);
 }
-
 .my-element:active {
   background-color: var(--ds-background-neutral-subtle-pressed);
 }
-
 .my-element.is-selected {
   background-color: var(--ds-background-selected);
 }
-
 ```
-
-<FoundationSubsection title="Field hover and focus">
-
-Hover only hints that a field is interactive. Focus is the signal for keyboard input, and it is a ring around the field, never a change of fill. A field at hover takes `color/background/input/hovered` with the `color/border/input` edge; at focus it keeps its fill and gains the ring.
-
-</FoundationSubsection>
 
 </FoundationSection>
 
 <FoundationSection title="Partner pairs and contrast">
 
-Every foreground token has a ground it is made for, and the pair clears the WCAG bar in all four modes: 4.5:1 for text and 3:1 for icons, borders and the focus ring, rising to 7:1 and 4.5:1 under increased contrast. Use 3:1 for UI that is essential to understanding. Each ratio below is measured from the rendered colors.
+Every foreground token pairs with a ground that clears WCAG AA across all four modes: 4.5:1 for text (7:1 in IC) and 3:1 for icons, borders and the focus ring (4.5:1 in IC).
 
-- On a bold fill, text and icons take `color/text/inverse` and `color/icon/inverse`. Warning is the exception: `color/text/warning/inverse`, the dark ink.
-- On a status tint, text takes the role's text token, or its bolder step on the subtler and subtle grounds.
-- On any surface, text takes `color/text/default`, subtle or subtlest. Never carry meaning by color alone: a status has an icon or a word, and a chart has a legend or direct labels.
+- **Bold fills** take `color/text/inverse` and `color/icon/inverse`, except bold warning which takes dark `color/text/warning/inverse`.
+- **Status tints** take the role's text token, or its `-bolder` step on `-subtler` and `-subtle` grounds.
+- **Surfaces** take `color/text/default`, `subtle` or `subtlest`.
+- Never carry meaning by color alone: a status has an icon or a word, and a chart has a legend or direct labels. Use 3:1 for UI essential to understanding.
 
 <Canvas of={ColorsStories.PartnerPairs} sourceState="none" />
 
@@ -262,38 +197,32 @@ Every foreground token has a ground it is made for, and the pair clears the WCAG
 
 <FoundationSection title="Data-viz color">
 
-Charts take the chart tokens, and every chart color does one job. Never reach for an accent hue or a role color to draw a series.
+Charts use `--ds-chart-*` tokens (`chartPalette` from `@/components`). Never reach for an accent hue or a UI role token to draw a series. Color is the one foundation with chart rules of its own; charts take spacing, radius, elevation, stroke, type, layers and motion from the same component tokens as the rest of the system.
 
 <RefTable
     head={['Job', 'What it encodes', 'Tokens']}
     rows={[
-        ['One series', 'The data, with nothing to tell apart', <><C>--ds-chart-brand</C>; a comparison or reference line takes <C>--ds-chart-neutral</C></>],
-        ['Categorical', 'Which series', <><C>--ds-chart-categorical-1</C> to <C>-8</C>, in order</>],
-        ['Sequential', 'How much', 'One hue from its bold to its boldest step; the strongest tone is the biggest value'],
-        ['Diverging', 'Which side of a baseline', 'Two hues around a gray midpoint, orange and blue by default'],
-        ['Status', 'On track, at risk, off track', <><C>--ds-chart-success</C>, <C>-warning</C>, <C>-danger</C>, each with <C>-bold</C></>],
-        ['SMART subject', 'Which subject', <C>--ds-chart-smart-&lt;subject&gt;</C>],
+        ['One series', 'Single measure', <><C>--ds-chart-brand</C>; reference line takes <C>--ds-chart-neutral</C></>],
+        ['Categorical', 'Distinct series', <><C>--ds-chart-categorical-1</C> to <C>-8</C>, in order</>],
+        ['Sequential', 'Magnitude', <>One hue from <C>subtler</C> to <C>bold</C>, <C>bolder</C>, <C>boldest</C> (darkest = largest)</>],
+        ['Diverging', 'Direction from a baseline', <>Two hues around <C>--ds-background-accent-gray-subtler</C> (orange and blue by default; never red and green)</>],
+        ['Status', 'On track, at risk, off track', <><C>--ds-chart-success</C>, <C>-warning</C>, <C>-danger</C>, <C>-information</C>, <C>-discovery</C> (plus <C>-bold</C> for the more extreme level)</>],
+        ['SMART subject', 'SMART area', <C>--ds-chart-smart-&lt;subject&gt;</C>],
     ]}
 />
 
 <ChartPalette />
 
-- Use five or six categories at most and group the rest.
-- Never mix categorical and status colors in one chart, and give every color a second cue: a label, a shape or a pattern.
-- Titles, axes and grid lines wear text and border tokens, never a chart color.
-
-In code, never name a chart color by hand: `chartPalette`, exported from `@/components`, says which token does which job. Color is the one foundation with chart rules of its own; a chart takes every other foundation (spacing, radius, elevation, stroke, type, layers, motion) from the same component tokens as the rest of the design system.
-
-A single-series chart takes `--ds-chart-brand`, not slot 1 of categorical, and a de-emphasized comparison or reference line takes `--ds-chart-neutral`. Slot 1 of categorical is tuned to the brand chart hue for this reason: a one-series chart and the first series of a many-series chart read as the same color. The series identity stays put when a second series is added.
-
-State tokens are for a value that means a state. The `-bold` step is the more extreme level of the same state: highest priority on `--ds-chart-danger-bold`, high on `--ds-chart-danger`. State colors are hard to tell apart with a color-vision deficiency, so a state always carries an icon, a label or a signed value too. The state tokens are success, warning, danger, information and discovery.
+- Use five or six categories at most and group the rest into "Other".
+- Never mix categorical and status colors in one chart, and give every series or state a second cue (label, shape, pattern, icon or backing table).
+- Titles, axes, gridlines, tooltips and threshold lines wear text and border tokens, never a chart color.
 
 <FoundationSubsection title="Categorical order">
 
-Assign series in this order, never skipping a slot.
+Assign series in slot order without skipping.
 
 <RefTable
-    head={['Slot', 'Hue', 'Light', 'Dark', 'Light, increased contrast', 'Dark, increased contrast']}
+    head={['Slot', 'Hue', 'Light', 'Dark', 'Light IC', 'Dark IC']}
     rows={[
         ['1 (brand)', 'lagoon', '600', '500', '850', '300'],
         ['2', 'orange', '800', '700', '1000', '500'],
@@ -306,52 +235,21 @@ Assign series in this order, never skipping a slot.
     ]}
 />
 
-Three rules produced this order, and all three hold at once:
+Three rules govern this sequence:
 
-- **Brand leads.** Slot 1 is lagoon, the brand chart color's own hue, so a one-series chart and the first series of a six-series chart look like the same chart.
-- **Neighbors alternate light and dark steps.** Slot 2 (orange-800, dark) sits between slot 1 (lagoon-600, lighter) and slot 3 (blue-500, lighter again), and the sequence keeps alternating through slot 6. That is what makes the order read in grayscale and for a color-blind viewer: two adjacent series on the same lightness would look identical once hue drops out.
-- **Hues spread across the wheel.** No two adjacent slots share a hue family or sit beside each other on the wheel: lagoon, orange, blue, magenta, lime and purple are six stops spread wide.
-
-Three hues stay out of the order, each for a reading reason: yellow reads as warning, red reads as danger, and teal sits too close to the brand hue. Lime and purple-500 double as the success and discovery state colors, so a chart uses categorical colors or state colors, never both.
-
-Slots 7 and 8 reprise 2 (orange) and 3 (blue), for overflow past six series only. The sequence wraps back to slot 1 after 8 and repeats a color, so an eight-series chart is already past the point where it should have grouped its smallest categories into "Other".
-
-Dark mode mostly steps one lighter than light mode: lagoon (1) 600 → 500, orange (2) 800 → 700, magenta (4) 800 → 700, lime (5) 500 → 400, blue (8) 800 → 700. The generated token carries the step, so no chart picks its own. Three slots hold their light step:
-
-- Blue (3) and orange (7) hold at 500: a softer step would lose their place in the lightness alternation.
-- Purple (6) keeps 700, because 600 crowded both of its dark-mode neighbors.
-
-The mapping is by family and step, not by hex, so it is the same in every color plan.
+- **Brand leads:** slot 1 is lagoon (`--ds-chart-brand`), so a one-series chart and the first series of a multi-series chart share their lead color.
+- **Neighbors alternate light and dark steps:** slot 2 (orange-800) sits between slot 1 (lagoon-600) and slot 3 (blue-500), alternating through slot 6 so adjacent series remain distinct in grayscale and under color-vision deficiency.
+- **Hues spread across the wheel:** lagoon, orange, blue, magenta, lime and purple never place two adjacent slots in the same hue family. Yellow (warning), red (danger) and teal (too close to brand) stay out; lime and purple-500 double as success and discovery, which is why categorical and status colors never mix.
+- **Overflow and dark mode:** slots 7 and 8 reprise orange and blue for overflow past six series. Dark mode steps one lighter except blue (3) and orange (7), which hold at 500 to preserve lightness alternation, and purple (6), which holds at 700 so it does not crowd its neighbors.
 
 </FoundationSubsection>
 
-<FoundationSubsection title="Separators">
+<FoundationSubsection title="Separators, ramps, SMART subjects and hover">
 
-A separator, a gap or the `--ds-border-inverse` line between adjacent marks, marks where marks touch: an adjacent pair in a stacked bar, a histogram bin boundary, a waterfall step. The lightness alternation marks which series is which. Keep both: a viewer who cannot tell two near-touching hues apart at the seam needs the separator, and a viewer who cannot see hue at all needs the alternation even where two series never touch.
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Sequential and diverging ramps">
-
-Both ramps are built from the chart tokens.
-
-- **Sequential** runs `--ds-background-accent-<hue>-subtler`, then `--ds-chart-<hue>-bold`, `-bolder` and `-boldest`. Each step sits further from the surface than the last, so the strongest tone is the biggest value: darker in light mode, lighter in dark.
-- **Diverging** runs one hue's three chart emphases down to `--ds-background-accent-gray-subtler` at the midpoint, then the other hue's back up. The midpoint always sits nearer the surface than either arm's first step. The default pair is orange and blue; red with green is never a pair.
-</FoundationSubsection>
-
-<FoundationSubsection title="SMART subjects in a chart">
-
-Each subject charts in its accent hue at the emphasis that keeps neighbors in S-M-A-R-T order apart: social-emotional orange (bold), mastering content teal (boldest), advocacy lime (bold), relationship magenta (boldest), technology tools brown (bold). Five subjects is near the categorical limit, so label them directly or keep the legend beside the chart.
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Text, hover and chrome">
-
-- A label sits beside its mark, so no foreground and background pair has to clear a contrast ratio. Where a label must sit on a fill anyway, such as a heatmap cell or a stacked segment, it takes `--ds-text` or `--ds-text-inverse`, whichever reads.
-- A shape, a pattern, a direct label or a backing data table carries the same information the color carries, for every series and every state.
-- A hovered mark takes its own `-hovered` token (`--ds-chart-categorical-1-hovered` and so on; every chart token has one). To bring one series forward, fade the others with `--ds-opacity-disabled`.
-- Chart chrome (axis labels, gridlines, the tooltip, threshold lines) wears text and border tokens.
-- Spacing and type inside a chart (label size, legend gaps, padding around a plot area) come from the same ladder and type tokens as every other component, so a chart carries no pixel value of its own.
+- **Separators:** keep a gap or `--ds-border-inverse` line where marks touch (stacked bars, histogram bins, waterfall steps). Lightness alternation identifies the series; the separator marks the boundary.
+- **Sequential and diverging ramps:** sequential runs `--ds-background-accent-<hue>-subtler` through `--ds-chart-<hue>-bold`, `-bolder` and `-boldest` (strongest tone = largest value). Diverging runs two hues around `--ds-background-accent-gray-subtler` (orange and blue by default; never red and green).
+- **SMART subjects:** each subject uses the emphasis that keeps S-M-A-R-T neighbors apart: social-emotional orange (`bold`), mastering content teal (`boldest`), advocacy lime (`bold`), relationship magenta (`boldest`), technology tools brown (`bold`). Label directly or keep the legend beside the chart.
+- **Labels and hover:** place labels beside marks; when a label must sit on a fill (heatmap cell, stacked segment), use `--ds-text` or `--ds-text-inverse`. Hovered marks take their `-hovered` token, and unselected series fade with `--ds-opacity-disabled`.
 
 </FoundationSubsection>
 
@@ -359,12 +257,7 @@ Each subject charts in its accent hue at the emphasis that keeps neighbors in S-
 
 <FoundationSection title="Chart order, targets and ranges">
 
-Order and tone carry the reading before anyone hovers. Put the biggest first and the darkest first, and keep targets and ranges out of the bars.
-
-- Sort categories from most to least. An ordinal set such as grades or tiers takes one hue ramp instead of separate hues.
-- Darker means more: the strongest tone is the biggest value.
-- A target is a green tick across the bar. A range is a green outline on the track. Do not shade bands or write values beside the bar: the numbers go in the hover tooltip.
-- Text on a chart fill uses the partner token, `text/inverse` on a bold fill. Separate neighboring marks with a gap or an inverse border, never a second color.
+Sort categories from most to least (an ordinal set such as grades takes one hue ramp), put the strongest tone on the largest value, and mark targets and ranges without shading bands or repeating tooltip numbers beside the bar.
 
 <FoundationSubsection title="Sort biggest first and darken with the value">
 
@@ -419,74 +312,9 @@ Attendance for one class against a 90% target.
 
 </FoundationSection>
 
-<FoundationSection title="Usage">
-
-Pick the pair, then the role, then the state.
-
-<FoundationSubsection title="Pair text with its ground">
-
-Take the text color from the same role as the ground. Gray text on a bold ground falls well below 4.5:1, in both modes.
-
-<DoDont>
-<Do caption="Danger text on the subtle danger ground.">
-<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-subtler)' }}>
-    <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text-danger)' }}>Payment failed</strong>
-    <div style={{ font: 'var(--body-small)', color: 'var(--ds-text)' }}>Update your card to keep sessions booked.</div>
-</div>
-</Do>
-<Dont caption="Gray text on the bold danger ground. The role is right and the pair is wrong.">
-<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-bold)' }}>
-    <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text-subtle)' }}>Payment failed</strong>
-    <div style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Update your card to keep sessions booked.</div>
-</div>
-</Dont>
-</DoDont>
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Show focus with a ring, never a fill">
-
-A filled field looks selected or disabled. The focus ring is the one signal for keyboard focus.
-
-<DoDont>
-<Do caption="The field keeps its fill and gains the focus ring, color/border/focused.">
-<RingDemo style={{ borderRadius: 'var(--radius-lg)' }}><div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', color: 'var(--ds-text-subtlest)' }}>Placeholder</div></RingDemo>
-</Do>
-<Dont caption="A brand fill on the field to show focus. It reads as a selected value and hides what is typed.">
-<div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Lincoln Middle Thursday</div>
-</Dont>
-</DoDont>
-
-</FoundationSubsection>
-
-<FoundationSubsection title="One series, one color">
-
-A single series is drawn in the brand chart color. Reaching for the categorical set makes a legend that says nothing.
-
-<DoDont>
-<Do caption="Five weeks of one measure, all in color/chart/brand.">
-<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
-    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-brand)' }} />)}
-</div>
-</Do>
-<Dont caption="A rainbow on one measure suggests five series. The color does no job, and a reader looks for a legend that is not there.">
-<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
-    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: `var(--ds-chart-categorical-${i + 1})` }} />)}
-</div>
-</Dont>
-</DoDont>
-
-</FoundationSubsection>
-
-</FoundationSection>
-
 <FoundationSection title="Disabled">
 
-Disabled is a color, not an opacity. Fading a control with opacity makes it unreadable on some grounds and gives every control a different gray.
-
-- Use `color/text/disabled`, `color/background/disabled` and `color/border/disabled`. They are the same in every control and keep their contrast pair in all four modes.
-- The opacity token is for images only.
-- Disabled still needs a reason a person can find: the session has ended, the form is incomplete. Say it in nearby text instead of leaving the control dead.
+Disabled is a dedicated color token (`color/text/disabled`, `color/background/disabled`, `color/border/disabled`), not an opacity fade. `--ds-opacity-disabled` is reserved for dimmed images and de-emphasized chart series. State the reason a control is disabled in nearby text (see <DocsLink id="foundations-accessibility">Accessibility</DocsLink>).
 
 <FoundationSubsection title="Disable with color tokens">
 
@@ -507,11 +335,7 @@ The Reschedule button after the session has ended.
 
 <FoundationSection title="Links">
 
-A link takes `color/link/default`. In running text it is also underlined at rest, because the blue alone sits too close to body text.
-
-- Menus, navigation, buttons and card titles may drop the underline: their position already says they are clickable.
-- The link color has a pressed step but no hovered step. The underline stays on hover.
-- Never use brand, selected or focused colors for a link.
+Links take `color/link/default` (`--ds-link`, with `--ds-link-pressed` on press and no hovered color step). Underline links in running text at rest and on hover; standalone navigation links, menus, buttons and card titles may omit the underline. Never use brand, selected or focused colors for a link.
 
 <FoundationSubsection title="Underline links in running text">
 
@@ -530,14 +354,12 @@ The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--
 
 <FoundationSection title="Pattern colors">
 
-Beyond the surfaces, each pattern takes its colors from these tokens. Use them as written instead of choosing a shade.
-
 <RefTable
     head={['Pattern', 'Part', 'Tokens']}
     rows={[
         ['Tile', 'Rest · hovered · selected', <><C>color/background/neutral/subtle</C> · <C>…/subtle/hovered</C> · <C>color/background/selected</C> with <C>color/border/selected</C></>],
         ['Input', 'Field · edge · placeholder · helper', <><C>color/background/input</C> · <C>color/border/input</C> · <C>color/text/subtlest</C> · <C>color/text/subtle</C></>],
-        ['Progress and meter', 'Track · fill', <><C>color/background/neutral</C> · <C>color/background/brand/bold</C> (success or warning bold for a status)</>],
+        ['Progress and meter', 'Track · fill', <><C>color/background/neutral</C> · <C>color/background/brand/bold</C> (success or warning bold for status)</>],
         ['Empty state', 'Icon · message', <><C>color/icon/subtlest</C> · <C>color/text/subtle</C></>],
         ['Skeleton', 'Blocks', <><C>color/skeleton/default</C> · <C>color/skeleton/subtle</C></>],
         ['Table', 'Grid lines · head rule · selected row', <><C>color/border/default</C> · <C>color/border/bold</C> · <C>color/background/selected</C> across the whole row</>],
@@ -564,7 +386,30 @@ Pick the role for the job. A failed payment is danger; an accent has no meaning,
 
 </FoundationSubsection>
 
+<FoundationSubsection title="Pair text with its ground">
+
+Take the text color from the same role as the ground. Gray text on a bold ground falls well below 4.5:1 in both modes.
+
+<DoDont>
+<Do caption="Danger text on the subtle danger ground.">
+<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-subtler)' }}>
+    <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text-danger)' }}>Payment failed</strong>
+    <div style={{ font: 'var(--body-small)', color: 'var(--ds-text)' }}>Update your card to keep sessions booked.</div>
+</div>
+</Do>
+<Dont caption="Gray text on the bold danger ground. The role is right and the pair is wrong.">
+<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-bold)' }}>
+    <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text-subtle)' }}>Payment failed</strong>
+    <div style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Update your card to keep sessions booked.</div>
+</div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
 <FoundationSubsection title="Use inverse tokens on bold backgrounds">
+
+On a bold fill, text and icons take `color/text/inverse` and `color/icon/inverse` (`color/text/warning/inverse` on bold warning).
 
 <DoDont>
 <Do caption="color/text/inverse on a bold danger fill.">
@@ -572,6 +417,21 @@ Pick the role for the job. A failed payment is danger; an accent has no meaning,
 </Do>
 <Dont caption="color/text/default on a bold fill loses contrast.">
 <span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text)' }}>Delete session</span>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Show focus with a ring, never a fill">
+
+A filled field looks selected or disabled. The focus ring is the one signal for keyboard focus.
+
+<DoDont>
+<Do caption="The field keeps its fill and gains the focus ring, color/border/focused.">
+<RingDemo style={{ borderRadius: 'var(--radius-lg)' }}><div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', color: 'var(--ds-text-subtlest)' }}>Placeholder</div></RingDemo>
+</Do>
+<Dont caption="A brand fill on the field to show focus. It reads as a selected value and hides what is typed.">
+<div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Lincoln Middle Thursday</div>
 </Dont>
 </DoDont>
 
@@ -594,16 +454,33 @@ Selection uses the selected tokens and another cue such as a check mark. The foc
 
 </FoundationSubsection>
 
+<FoundationSubsection title="One series, one color">
+
+A single series is drawn in the brand chart color. Reaching for the categorical set makes a legend that says nothing.
+
+<DoDont>
+<Do caption="Five weeks of one measure, all in color/chart/brand.">
+<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
+    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-brand)' }} />)}
+</div>
+</Do>
+<Dont caption="A rainbow on one measure suggests five series. The color does no job, and a reader looks for a legend that is not there.">
+<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
+    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: `var(--ds-chart-categorical-${i + 1})` }} />)}
+</div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
 </FoundationSection>
 
 <FoundationSection title="Accessibility">
 
-- Every foreground token is made for a ground, and the pair clears the WCAG bar in all four modes: 4.5:1 for text and 3:1 for icons, borders and the focus ring, rising to 7:1 and 4.5:1 under increased contrast.
-- Never carry meaning by color alone: a status has an icon or a word beside its color.
-- Warning is the one intent whose edge and glyph differ from its fill: an icon takes `color/icon/warning` and an edge `color/border/warning`, because the yellow fill is 2.87:1 on the darkest surface.
-- The WCAG AA bar: 3:1 for UI essential to understanding the experience and for text 24px or larger (1.4.11), 4.5:1 for text smaller than 24px (1.4.3).
-- Pair a selected color with another cue, such as a check mark, underline, border or change in shape, so selection never relies on color alone.
-- Check a new screen in all four modes before review: the toolbar's Color mode and Contrast switches set them here.
+- Foreground/background partner pairs clear WCAG 2.1 AA in all four modes: 4.5:1 for text smaller than 24 px (1.4.3) and 3:1 for essential UI, icons, borders, the focus ring and text 24 px or larger (1.4.11), rising to 7:1 and 4.5:1 in increased contrast.
+- Never convey meaning by color alone: pair status colors with an icon or text, selection with a check mark or 2 px border, and chart series with labels, shapes or a table.
+- Warning icons and borders use `color/icon/warning` and `color/border/warning` rather than the yellow fill (2.87:1 on the darkest surface) so they clear 3:1.
+- Check new screens in all four modes with the toolbar's Color mode and Contrast switches, and see <DocsLink id="foundations-accessibility">Accessibility</DocsLink> for cross-cutting rules.
 
 </FoundationSection>
 
@@ -614,7 +491,7 @@ Selection uses the selected tokens and another cue such as a check mark. The foc
         { title: 'Elevation', description: 'Which surface pairs with which shadow.', href: '?path=/docs/foundations-visual-elevation--docs' },
         { title: 'Typography', description: 'The text styles these colors are set in.', href: '?path=/docs/foundations-visual-typography--docs' },
         { title: 'Border', description: 'Stroke widths and the focus color pair.', href: '?path=/docs/foundations-visual-border--docs' },
-        { title: 'Tokens', description: 'How token names read and which layer to bind.', href: '?path=/docs/foundations-basics-tokens--docs' },
+        { title: 'Tokens: Color', description: 'Every palette step and color role.', href: '?path=/docs/foundations-tokens-color--docs' },
     ]}
 />
 

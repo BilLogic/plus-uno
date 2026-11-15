@@ -14,7 +14,7 @@ Also asked as: slideshow, gallery.
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Carousel/Carousel.mdx`
 
-**Motion:** change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -23,11 +23,11 @@ new, a short tour, a handful of featured items. Every slide but one is hidden at
 any moment, so nothing a person must read or act on belongs in it.
 
 `slides` takes `{ media, title, description }`. `media` is the card; `title`
-and `description` fill the caption under the controls and name each dot.
-Autoplay is on, at `interval` 5000 ms a slide, and loops. `peek` shows the
-neighbors; turn it off to show the current slide alone. `onSlideChange` gets
-the new index. Give the region a name
-with `aria-label` or `aria-labelledby`.
+and `description` fill the caption under the controls and name each step in the
+progress indicator. Autoplay is on by default (`interval` `5000`), and loops.
+`peek` shows the neighbors; turn it off to show the current slide alone.
+`onSlideChange` gets the new index. Give the region a name with `aria-label` or
+`aria-labelledby`.
 
 ## Motion
 
@@ -37,21 +37,26 @@ Carousel reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Step to the next or previous | `--ds-motion-spatial-default` | No autoplay by default; if it plays, it has a visible pause. |
 
+## Alternatives
+
+- For switching between alternative views of the same content, use `Tabs`.
+- For a short guided tour of a new feature, use `Spotlight`.
+
 ## Best practices
 
 ### Keep it to three to six slides. {#keep-it-to-three-to-six-slides}
 
-The dots are the map. Past six, nobody gets to the end.
+The progress indicator is the map. Past six, nobody gets to the end.
 
 Do: Three slides, each worth seeing.
-Don't: Ten slides and a row of dots to match.
+Don't: Ten slides and a long progress indicator to match.
 
 ### Give every slide a title. {#give-every-slide-a-title}
 
-The title is the caption a sighted reader sees and the name a screen reader hears on each dot.
+The title is the caption a sighted reader sees and the name a screen reader hears on each step button.
 
 Do: A title and one line for each slide.
-Don't: No titles: the dots say only Slide 1 of 3.
+Don't: No titles: the step buttons say only the slide number.
 
 ### Keep the caption to one line. {#keep-the-caption-to-one-line}
 
@@ -68,12 +73,11 @@ Autoplay moves on whether or not a person finished. Turn it off with `autoplay={
 - **The pause control comes first.** Autoplay can always be stopped from the
   play button, which is the first control in the row. Its name says what a
   press will do: Pause, then Play.
-- **Each dot is a button.** The dots are a group named "Choose a slide"; each
-  is named "Slide 2 of 5" and the slide's title, and the current one carries
-  `aria-current="step"`. Each dot is its own tab stop, with a 24px target.
-- **Only the active slide is read.** Each slide is a group named "2 of 5";
-  the others are `aria-hidden` and inert, so focus never lands behind the
-  front card.
+- **Each indicator step is a button.** The `ProgressIndicator` is a group named
+  "Choose a slide"; each button is named with the slide number and title, and
+  the current one carries `aria-current="step"`.
+- **Only the active slide is read.** Each slide is a group; the others are
+  `aria-hidden` and inert, so focus never lands behind the front card.
 - **Keyboard focus holds the clock.** Tabbing into the carousel stops
   autoplay so nothing moves under a keyboard user; pressing Play starts it
   again. A mouse click on a control does not hold it.
@@ -87,9 +91,8 @@ Autoplay moves on whether or not a person finished. Turn it off with `autoplay={
 
 ## Related
 
-- To show a few items side by side, all at once, lay them out as cards in a grid. Nothing is hidden and nothing moves.
-- For switching between alternative views of the same content, use `Tabs`.
-- For a short guided tour of a new feature, use `Spotlight`.
+- `ProgressIndicator`: use when displaying step indicators below the stage.
+- [Card](?path=/docs/templates-card--docs): use when laying out a few items side by side in a grid so nothing is hidden and nothing moves.
 
 Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 
@@ -98,8 +101,8 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 1. **Stage.** Full width, with the edges fading out.
 2. **Slide.** A card, centered. A neighbor on each side sits in the same row, scaled down and faded; clicking one brings it to the front.
 3. **Play button.** A subtle circle `IconButton`, Pause while playing and Play while paused, inside a ring whose arc fills over the slide's time.
-4. **Progress indicator.** A selectable `ProgressIndicator`, one dot per slide. The current dot stretches into a 32px bar whose fill grows from the start edge over the slide's time. When it fills, the next slide comes up and its dot takes the bar. Choosing a dot moves to its slide and starts its clock over.
-5. **Arrows.** Circle `IconButton`s, only when the carousel does not autoplay, in place of the play button.
+4. **Progress indicator.** A selectable `ProgressIndicator`, one step per slide. The current step stretches into a bar (`--control-md`) whose fill grows from the start edge over the slide's time. Choosing a step moves to its slide and restarts the clock.
+5. **Arrows.** Circle `IconButton`s, shown when the carousel does not autoplay, in place of the play button.
 6. **Caption.** The active slide's title as a `Heading` and one line of body text, centered under the controls.
 
 ### States
@@ -109,7 +112,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 | Playing | The ring arc and the bar fill together in `--ds-background-brand-bold`. |
 | Paused | The play icon shows. The arc and the bar hold where they stopped. |
 | Held | The clock stops while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. It resumes where it held. Pressing Play starts it again even with focus inside. |
-| Hovered, pressed, focused | The play button and the arrows keep the states of `IconButton`. The dots keep the states of `ProgressIndicator`. |
+| Hovered, pressed, focused | The play button and the arrows keep the states of `IconButton`. The indicator steps keep the states of `ProgressIndicator`. |
 | Reduced motion or no autoplay | No ring; the bar shows full. |
 | Disabled arrow | Without `loop`, at the first or last slide. |
 
@@ -120,7 +123,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 | Card | `--ds-surface-raised` with `--ds-shadow-raised`, corners `--card-radius`. |
 | Neighbors | Faded under `--ds-surface` at 45%, `--section-stack-lg` apart (`--inline-lg` on a narrow stage). |
 | Ring | `--control-lg` across, `--border-selected` wide. Track `--ds-border`; progress `--ds-background-brand-bold`. |
-| Progress indicator | The default `ProgressIndicator`: dots `--progress-indicator-dot-size-8`, the bar `--control-md` long, each dot a `--control-sm` target. |
+| Progress indicator | The default `ProgressIndicator`: steps `--progress-indicator-dot-size-8`, the bar `--control-md` long, each step a `--control-sm` target. |
 | Motion | A move takes `--ds-motion-spatial-default`, fading on `--ds-motion-appearance-slow`. The caption lifts out over `--ds-motion-appearance-fast` and rises in over `--ds-motion-appearance-default`. |
 | Caption | `Heading` size small; line in `--body-default` and `--ds-text-subtle`; at most `--content-max-width-reading` wide. |
 | Spacing | `--section-stack-md` between the stage, the controls and the caption; `--inline-md` between controls. |
@@ -142,7 +145,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 
 ## Tokens touched
 
-`--body-default` · `--border-selected` · `--carousel-aspect` · `--carousel-edge-fade` · `--carousel-neighbor-dim` · `--carousel-neighbor-gap` · `--carousel-neighbor-scale` · `--carousel-offset` · `--carousel-progress` · `--carousel-ring-size` · `--carousel-ring-stroke` · `--carousel-slide-max` · `--carousel-slide-share` · `--carousel-slide-share-md` · `--carousel-slide-share-sm` · `--carousel-slide-width` · `--carousel-step` · `--content-max-width-reading` · `--control-lg` · `--ds-background-brand-bold` · `--ds-border` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-appearance-slow` · `--ds-motion-appearance-slow-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-raised` · `--ds-text` · `--ds-text-subtle` · `--inline-lg` · `--inline-md` · `--page-stack-md` · `--radius-xxl` · `--section-stack-lg` · `--section-stack-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--border-selected` · `--card-radius` · `--carousel-aspect` · `--carousel-edge-fade` · `--carousel-neighbor-dim` · `--carousel-neighbor-gap` · `--carousel-neighbor-scale` · `--carousel-offset` · `--carousel-progress` · `--carousel-ring-size` · `--carousel-ring-stroke` · `--carousel-slide-max` · `--carousel-slide-share` · `--carousel-slide-share-md` · `--carousel-slide-share-sm` · `--carousel-slide-width` · `--carousel-step` · `--content-max-width-reading` · `--control-lg` · `--ds-background-brand-bold` · `--ds-border` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-appearance-slow` · `--ds-motion-appearance-slow-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-raised` · `--ds-text` · `--ds-text-subtle` · `--inline-lg` · `--inline-md` · `--page-stack-md` · `--section-stack-lg` · `--section-stack-md` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/layout-and-structure/Carousel/Carousel.scss`. Override these through the token layer, never with a literal.
 

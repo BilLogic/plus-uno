@@ -21,6 +21,9 @@
     border-radius: var(--radius-full);
     background-color: var(--ds-surface);
     overflow: hidden;
+    // The outer height is the spacing's height, border included.
+    box-sizing: border-box;
+    height: var(--_pagination-height);
 
     --_pagination-height: var(--item-height-md);
     --_pagination-pad: var(--pad-x-md);
@@ -50,8 +53,9 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    height: var(--_pagination-height);
-    min-width: var(--_pagination-height);
+    // Fills the item, which fills the pill's inner height (the row less the border).
+    height: auto;
+    min-width: calc(var(--_pagination-height) - 2 * var(--border-default));
     margin: 0;
     padding: 0 var(--_pagination-pad);
     border: none;

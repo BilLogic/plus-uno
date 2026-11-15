@@ -1,11 +1,13 @@
 ---
 embodiment: ide
-summary: PLUS AI components use Base UI (@base-ui/react, pinned) as their headless behavior layer, styled with SCSS on --ds-* tokens; Assistant UI is gone, and the rest of product UI stays on React-Bootstrap (2026-11-03)
-status: active
-verified: 2026-11-03
+summary: PLUS AI components use Base UI (@base-ui/react, pinned) as their headless behavior layer, styled with SCSS on --ds-* tokens; Assistant UI is gone, later widened by ADR-037 and corrected by ADR-042 to remove Bootstrap (2026-11-03)
+status: active-with-correction
+verified: 2026-11-13
 ---
 
 # ADR-036: Base UI for AI components (2026-11-03)
+
+> **Correction (2026-11-13).** [ADR-042](042-plus-ships-no-bootstrap.md) removes Bootstrap from all product UI; the Bootstrap fallback below is historical. Base UI remains the behavior layer under ADR-037.
 
 **Decision.** Components for AI surfaces (chat, streaming messages, tool and result cards, composers) take their behavior from `@base-ui/react`, pinned to exactly `1.7.0`, the version uno-blueprint pins. Base UI is headless: PLUS styles it with SCSS on `--ds-*` tokens, targeting its `data-*` state attributes and the named state tokens. Each AI component wraps Base UI parts; Base UI's behavior is never patched in place. Assistant UI (`@assistant-ui/react`) and Radix do not appear in AI code, and the one Assistant UI importer, the Research Assistant demo, now keeps its thread in plain React state. Every other product surface is unchanged and stays on PLUS components, then React-Bootstrap.
 

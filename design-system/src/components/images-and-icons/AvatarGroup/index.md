@@ -18,8 +18,10 @@ Use `AvatarGroup` for a short set of people that would crowd a line: the
 attendees of a session, the members of a team. Past `max`, the rest fold into
 a `+n` menu, reachable by name.
 
-Use plain `Avatar` elements, not `AvatarGroup`, where there is room to name
-each person beside their picture.
+## Alternatives
+
+- For a single person or agent with room to name each person beside their picture, use `Avatar`.
+- For the signed-in person with a name and a role, use `Sidebar`.
 
 ## Best practices
 
@@ -31,13 +33,13 @@ row stays even even when a child sets its own.
 Do: The group sets one size and shape for every child.
 Don't: Children that set their own size and shape, which the group ignores.
 
-### `max` counts the `+n` in. {#max-counts-the-n-in}
+### Count the `+n` slot inside `max`. {#count-the-n-slot-inside-max}
 
-Five people with `max={5}` show all five; a sixth pushes one into `+2` —
-`max` is the most avatars the row ever shows, the `+n` included.
+Five people with `max={5}` show all five; a sixth pushes one into the overflow
+slot — `max` is the most slots the row ever shows, the `+n` included.
 
-Do: Three people fit in max 3, with no +n.
-Don't: A fourth person shows two avatars and +2, because the +n takes a slot.
+Do: Three people fit in the cap with no +n.
+Don't: A fourth person shows two avatars and +n, because the +n takes a slot.
 
 ### Keep the group short. {#keep-the-group-short}
 
@@ -50,21 +52,21 @@ Don't: Folding most of a roster behind +n: link to the list instead.
 
 - **Name the group.** `label` names the group for assistive technology —
   "Session attendees" — the same way `Avatar`'s `label` names a person.
-- **The `+n` is a named button.** It reads "+3, 3 more people", opens a menu
-  of the hidden people by name, reached with Tab and closed with Escape.
+- **The `+n` is a named button.** It announces the count of hidden people and
+  opens a menu of their names, reached with Tab and closed with Escape.
 - **Every shown avatar keeps its own name.** The group changes `size` and
   `shape`, never an avatar's accessible name.
 
 ## Related
 
-- For a single person or agent, use `Avatar`.
-- For the signed-in person, with a name and a role, use the Sidebar's account row.
+- `Avatar`: use when configuring each child avatar's name, picture, initials or fallback.
+- `Popup`: use when building a custom anchored overlay outside an avatar stack.
 
 Same group: `AiIcon` · `Avatar` · `Icon` · `Illustration` · `Image` · `Object` · `Tile`
 
 ## Parts
 
-1. **Avatars.** Up to `max`; when people overflow, `max` minus one plus the `+n`. Each the group's size and shape, overlapping by a quarter.
+1. **Avatars.** Up to `max`; when people overflow, `max` minus one plus the `+n`. Each takes the group's size and shape, overlapping by a quarter.
 2. **Ring.** A surface-colored ring around each avatar that separates neighbors.
 3. **Overflow.** A gray `+n` button that opens a menu of the people left out, by name.
 
@@ -75,7 +77,7 @@ Same group: `AiIcon` · `Avatar` · `Icon` · `Illustration` · `Image` · `Obje
 | Rest | Overlapping avatars; the `+n` in `--ds-background-accent-gray-subtler`. |
 | Hovered | The `+n` takes `--ds-background-accent-gray-subtle`. The avatars do not change. |
 | Pressed | Opens the menu and sets `aria-expanded`. Escape closes it. |
-| Focused | A 2px ring in `--ds-border-focused` on the `+n`, for keyboard focus only. |
+| Focused | Shows the focus ring on the `+n` for keyboard focus; see Border. |
 | Disabled | None. With nothing to fold there is no `+n`, only pictures. |
 
 ### Tokens

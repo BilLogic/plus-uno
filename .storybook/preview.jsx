@@ -5,6 +5,9 @@ import './storybook-overrides.css';
 import '../design-system/src/storybook-docs/docs-rhythm.css';
 import { TocDocsContainer } from './docs-toc.jsx';
 import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.js';
+import { keepDocsAtTop } from '../design-system/src/storybook-docs/lib/docs-open-at-top.js';
+import { DocsOverlayBoundary } from '../design-system/src/storybook-docs/lib/docs-overlay-boundary.jsx';
+import { mountInPageAnchors } from '../design-system/src/storybook-docs/lib/in-page-anchors.js';
 import BrowserFrame from '../design-system/src/storybook-docs/chrome/BrowserFrame';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
@@ -13,12 +16,13 @@ import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storyb
  */
 
 import { addons } from 'storybook/preview-api';
-import { GLOBALS_UPDATED, SET_GLOBALS } from 'storybook/internal/core-events';
+import { GLOBALS_UPDATED, SET_GLOBALS, STORY_CHANGED } from 'storybook/internal/core-events';
 import { BACKGROUND_OPTIONS, DEFAULT_BACKGROUND } from './backgrounds.js';
 import { assertContained } from '../design-system/src/storybook-docs/lib/contained-demos';
 
 // ---- Docs floating button (AI agent, Marketplace, Uno Blueprint) -----------------------
 mountDocsFab();
+mountInPageAnchors();
 
 // ---- Console noise filters (Storybook-only) ---------------------------------
 // Goal: keep the console clean for design review by hiding known, non-actionable
@@ -56,6 +60,13 @@ if (!globalThis.__PLUS_STORYBOOK_CONSOLE_PATCHED__) {
     if (shouldSuppressConsoleMessage(args)) return;
     originalError(...args);
   };
+}
+
+// A docs page opens at its top: an open-by-default demo must not scroll the page
+// when it takes focus. Docs pages only; stories keep their real focus behavior.
+// Re-armed whenever the manager moves the preview to another page.
+if (typeof window !== 'undefined' && addons.hasChannel?.()) {
+  keepDocsAtTop(window, (rearm) => addons.getChannel().on(STORY_CHANGED, rearm));
 }
 
 // ---- Color and contrast modes -----------------------------------------------
@@ -166,53 +177,67 @@ const preview = {
             "Design",
             "Develop",
             "With AI",
-            "Content design",
             "About"
           ],
           "Foundations",
           [
-            "Basics",
+            "Overview",
+            "Brand",
             [
-              "Overview",
-              "Tokens",
-              "Accessibility"
+              "Content",
+              [
+                "Voice and tone",
+                "Language",
+                "Messages"
+              ],
+              "Logos",
+              "Illustrations"
             ],
             "Visual",
             [
               "Color",
               "Typography",
               "Iconography",
+              "Elevation",
               "Radius",
-              "Border",
-              "Elevation"
+              "Border"
             ],
             "Layout",
             [
               "Spacing",
               "Grid"
             ],
-            "Brand",
+            "Expression",
             [
-              "Logos",
-              "Illustrations"
+              "Motion",
+              [
+                "Principles",
+                "Physics",
+                "Choreography",
+                "Transitions",
+                "Library",
+                "Playground",
+                "Stage never blank",
+                "Engine speed"
+              ],
+              "Sound",
+              [
+                "Overview",
+                "Sounds",
+                "When to play",
+                "With motion",
+                "Settings and accessibility"
+              ]
             ],
-            "Motion",
+            "Accessibility",
+            "Tokens",
             [
-              "Principles",
-              "Physics",
-              "Choreography",
-              "Playground",
-              "Transitions",
-              "Library",
-              "Stage never blank"
-            ],
-            "Sound",
-            [
-              "Overview",
-              "Sounds",
-              "When to play",
-              "With motion",
-              "Settings and accessibility"
+              "Color",
+              "Typography",
+              "Spacing and size",
+              "Elevation and layers",
+              "Motion",
+              "Library"
             ]
           ],
           "Components",
@@ -233,16 +258,27 @@ const preview = {
               ],
               "Calendar",
               "Checkbox",
+              [
+                "Checkbox",
+                "Checkbox group"
+              ],
               "Comment",
               "Date time picker",
               [
                 "Date time picker",
                 "Date picker",
+                [
+                  "Date picker"
+                ],
                 "Time picker"
               ],
               "Dropdown menu",
               "Fieldset",
               "File upload",
+              [
+                "File upload",
+                "File item"
+              ],
               "Filter menu",
               "Form",
               "Popup select",
@@ -261,6 +297,7 @@ const preview = {
                 "Cascader",
                 "Tree select"
               ],
+              "Setting row",
               "Tag input",
               "Text area",
               "Text field",
@@ -301,6 +338,7 @@ const preview = {
             "Loading",
             [
               "Progress bar",
+              "Progress ring",
               "Skeleton",
               "Spinner"
             ],
@@ -311,6 +349,7 @@ const preview = {
               "Flag",
               "Inline message",
               "Modal dialog",
+              "Notification item",
               "Section message",
               "Spotlight"
             ],
@@ -376,9 +415,6 @@ const preview = {
             "Overview",
             "Frame",
             "Page",
-            [
-              "Page"
-            ],
             "Section",
             [
               "Section"
@@ -442,7 +478,7 @@ const preview = {
             "Part-to-whole",
             "Temporal"
           ],
-          "Libraries",
+          "Tech stack",
           [
             "Overview",
             "Base UI",
@@ -577,20 +613,19 @@ const preview = {
       </ColorModes>
     ),
     (Story, context) => {
-      // Docs-only: disable pointer interaction on static component examples so
-      // scroll stays stable. Canvas / Interactive / Overview stay fully usable
-      // (Controls, play functions, a11y checks).
-      if (
-        context.viewMode === 'docs' &&
-        context.name !== 'Interactive' &&
-        context.name !== 'Overview' &&
-        context.title.startsWith('Components/')
-      ) {
-         return (
-           <div style={{ pointerEvents: 'none' }}>
-             <Story />
-           </div>
-         );
+      // Docs-only: keep floating overlays inside their own example canvas, and
+      // disable pointer interaction on static component examples so scroll stays
+      // stable. Canvas / Interactive / Overview stay fully usable.
+      if (context.viewMode === 'docs') {
+        const staticComponentExample =
+          context.name !== 'Interactive' &&
+          context.name !== 'Overview' &&
+          context.title.startsWith('Components/');
+        return (
+          <DocsOverlayBoundary disablePointerEvents={staticComponentExample}>
+            <Story />
+          </DocsOverlayBoundary>
+        );
       }
 
       return <Story />;

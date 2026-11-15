@@ -1,3 +1,6 @@
+import { useMotionReduced } from '@/lib/motionPreference';
+import { useOverlayPresence, useOverlayOrigin } from '@/lib/overlayMotion';
+import { BackdropOpenContext } from '../Backdrop/Backdrop';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Icon, IconButton, Tabs, Skeleton } from '@/components';
@@ -34,6 +37,7 @@ import './PatternModal.scss';
  * Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.
  */
 const PatternModal = ({
+    show = true,
     id,
     title,
     onClose,
@@ -52,6 +56,12 @@ const PatternModal = ({
     children,
     ...props
 }) => {
+    const reduced = useMotionReduced();
+    const backdropOpen = React.useContext(BackdropOpenContext);
+    const open = show && backdropOpen;
+    const surface = React.useRef(null);
+    const present = useOverlayPresence(open, surface);
+    useOverlayOrigin(open, surface);
     const reactId = React.useId();
     const tabState = useTabs(tabs, { activeTab, defaultActiveTab, onTabChange });
 
@@ -114,8 +124,14 @@ const PatternModal = ({
         ? { role: 'tabpanel', id: panelId, 'aria-labelledby': tabId(tabState.current), tabIndex: 0 }
         : { tabIndex: bodyScrolls ? 0 : undefined };
 
+    if (!present) return null;
     return (
         <div
+            data-reduced={reduced ? 'true' : undefined}
+            ref={surface}
+            data-ending-style={!open ? '' : undefined}
+            aria-hidden={!open ? true : undefined}
+            inert={!open ? true : undefined}
             id={id}
             className={classes}
             style={style}
@@ -208,12 +224,17 @@ function useOverflows(ref) {
 }
 
 PatternModal.propTypes = {
+    /** Keep mounted and set false to finish the exit before removal; also follows its Backdrop. */
+    show: PropTypes.bool,
     id: PropTypes.string,
-    /** Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name */
+    /** Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name
+     * @ds-context Used in: Modal.title (ds guide modal)
+     */
     title: PropTypes.node,
     /**
      * Custom header slot, Figma's `_Modal header` type=custom. It replaces the title row
      * (the title and the close button), so name the dialog with `aria-label`.
+     * @ds-context Used in: Modal.header (ds guide modal)
      */
     header: PropTypes.node,
     /** A rule under the header and above the footer, as Figma's `divider?`. Off by default. */
@@ -222,7 +243,9 @@ PatternModal.propTypes = {
     loading: PropTypes.bool,
     /** Close handler — renders the close button when provided */
     onClose: PropTypes.func,
-    /** Footer slot (typically action buttons) */
+    /** Footer slot (typically action buttons)
+     * @ds-context Used in: Modal.footer (ds guide modal)
+     */
     footer: PropTypes.node,
     /**
      * `sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the modal pad
@@ -240,7 +263,13 @@ PatternModal.propTypes = {
      */
     tabs: PropTypes.arrayOf(PropTypes.shape({
         key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+        /**
+         * @ds-context Used in: Modal.label (ds guide modal)
+         */
         label: PropTypes.node.isRequired,
+        /**
+         * @ds-context Used in: Modal.content (ds guide modal)
+         */
         content: PropTypes.node,
         disabled: PropTypes.bool,
     })),
@@ -252,7 +281,9 @@ PatternModal.propTypes = {
     onTabChange: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** Body content slot; with `tabs`, the selected tab's `content` takes its place */
+    /** Body content slot; with `tabs`, the selected tab's `content` takes its place
+     * @ds-context Used in: Modal.children (ds guide modal)
+     */
     children: PropTypes.node,
 };
 

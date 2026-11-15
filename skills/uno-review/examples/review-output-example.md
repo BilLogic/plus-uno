@@ -51,10 +51,10 @@ PLUS Review: prototypes/parent-dashboard/src
     src/components/StatusBadge.jsx:12: color: '#44bb44'
     ...
   PASS  No raw HTML form elements (using DS components)
-  FAIL  Found 3 deep imports (use @/ alias)
-    src/pages/Dashboard.jsx:2: from 'design-system/src/components/Card/Card.jsx'
+  FAIL  Found 3 deep imports (use the @/components barrel)
+    src/pages/Dashboard.jsx:2: from 'design-system/src/components/forms-and-inputs/Button/Button.jsx'
     src/pages/Dashboard.jsx:3: from 'design-system/src/components/labels/StatusTag/StatusTag.jsx'
-    src/pages/Settings.jsx:1: from 'design-system/src/tokens/colors.scss'
+    src/pages/Settings.jsx:1: from 'design-system/src/components/messaging/Flag/Flag.jsx'
   PASS  No hardcoded pixel values in inline styles
   FAIL  Found 2 FA Pro icon references (only fa-solid, fa-regular, fa-brands allowed)
     src/components/Nav.jsx:5: fa-light fa-house

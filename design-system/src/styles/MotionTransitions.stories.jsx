@@ -14,8 +14,8 @@ import { reducedStory, story } from '@/storybook-docs/illustrations/motion-story
 
 export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
-  // The page itself is Foundations/Motion/Transitions (MotionTransitions.mdx).
-  title: 'Foundations/Motion/Transitions',
+  // The page itself is Foundations/Expression/Motion/Transitions (MotionTransitions.mdx).
+  title: 'Foundations/Expression/Motion/Transitions',
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };
@@ -45,6 +45,8 @@ export const SwitchViews = story(TRANSITION_DEMOS.switch);
 export const SwitchViewsReduced = reducedStory(TRANSITION_DEMOS.switch);
 export const Step = story(TRANSITION_DEMOS.step);
 export const StepReduced = reducedStory(TRANSITION_DEMOS.step);
+export const StepDown = story(TRANSITION_DEMOS.stepDown);
+export const StepDownReduced = reducedStory(TRANSITION_DEMOS.stepDown);
 
 // ---------- Within a place ----------
 export const ScrollToSpot = story(TRANSITION_DEMOS.scroll);

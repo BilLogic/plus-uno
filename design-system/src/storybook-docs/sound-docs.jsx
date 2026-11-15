@@ -7,7 +7,7 @@ import { C, RefTable } from './foundation-blocks.jsx';
 import { silentGroupsOf, soundCellsOf, soundSheetOf } from './lib/sound-sheet.js';
 
 /**
- * Foundations · Sound's live parts: a player per token, the one switch, and the
+ * Foundations › Expression › Sound's live parts: a player per token, the one switch, and the
  * tables, every one read from the generated sound spec and the registry
  * (`lib/sound-sheet.js`). Docs only: the app plays sound through `@/sound`.
  */

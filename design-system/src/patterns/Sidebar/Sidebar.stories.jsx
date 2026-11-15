@@ -10,6 +10,7 @@ import PatternSidebar, {
 } from '@/patterns/Sidebar';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
  * `PatternSidebar` — the app's side navigation.
@@ -134,8 +135,12 @@ const Live = ({ view = 'supervisor', tabSet = 'few', boxHeight, account, ...args
     );
 };
 
+/** These stories read settled layouts, so the Frame's space motion is held off; its own motion stories live in Frame.stories. */
+const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story /></MotionPreferenceContext.Provider>;
+
 export default {
-    title: 'Components/Navigation/Navigation system',
+    decorators: [settledLayout],
+    title: 'Components/Navigation/Navigation system/Navigation system',
     component: PatternSidebar,
     tags: ['!dev', '!autodocs'],
     render: (args) => <Live {...args} />,
@@ -268,6 +273,33 @@ export const Tutor = {
         const titles = [...nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__title-text')].map((t) => t.textContent);
         await expect(titles).toEqual(['Training', 'Toolkit']);
         await expect(within(canvasElement).getByText('· Tutor')).toBeVisible();
+    },
+};
+
+/** A prototype: keeps the role's navigation with its own area added to the Toolkit and selected. */
+export const PrototypeAreas = {
+    render: () => (
+        <Box>
+            <RoleSidebar
+                user="tutor"
+                groups={[
+                    {
+                        id: 'toolkit',
+                        items: [{ id: 'reviews', text: 'Reviews', icon: 'clipboard-check' }],
+                    },
+                ]}
+                activeTabId="reviews"
+                account={TUTOR}
+            />
+        </Box>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(rowNamed(canvasElement, 'Home')).toBeVisible();
+        await expect(rowNamed(canvasElement, 'Sessions')).toBeVisible();
+        const reviews = rowNamed(canvasElement, 'Reviews');
+        await expect(reviews).toHaveAttribute('aria-current', 'page');
+        await expect(getComputedStyle(reviews).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expectGrid(canvasElement);
     },
 };
 

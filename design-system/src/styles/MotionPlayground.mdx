@@ -11,7 +11,7 @@ import * as PlaygroundStories from './MotionPlayground.stories.jsx';
 <Meta of={PlaygroundStories} />
 
 <DocsLanding
-    page="foundations-motion-playground"
+    page="foundations-expression-motion-playground"
     eyebrow="Foundation · Motion"
     title="Playground"
     purpose="Try the springs on a real move, and check how they feel at real speed."
@@ -30,7 +30,7 @@ The same menu at the two extremes of the dial. A very stiff spring snaps; a very
 
 <FoundationSubsection title="Your own spring">
 
-Pick a token and a mode to load its generated spring, then move stiffness and damping ratio. The next move uses exactly the config shown, built the way the token generator builds it (damping = 2 × ratio × √(stiffness × mass)), and the curve and the 90% time update with it. With the controls untouched, it is the generated config, unchanged. Playback speed slows the move so you can study it.
+Pick a token and a mode to load its generated spring, then move stiffness and damping ratio (`damping = 2 × ratio × √(stiffness × mass)`). The curve and the 90% time update with the controls, and playback speed slows the move so you can study it. Anything tuned here is for feel only: to change a token, ask the design team; the numbers in Physics are the only source.
 
 <Canvas of={PlaygroundStories.ControlsStartAtTheGeneratorsConfig} sourceState="none" />
 
@@ -48,6 +48,14 @@ A blocked Save shakes once, at real speed.
 
 </FoundationSubsection>
 
+<FoundationSubsection title="Dragged past a limit">
+
+Drag the Panel's edge to the left, past the dashed line (or focus the edge and hold ArrowLeft). Past the limit the Panel follows less and less; on release it springs back with the hand's speed.
+
+<Canvas of={PlaygroundStories.DragPastTheLimit} sourceState="none" />
+
+</FoundationSubsection>
+
 <FoundationSubsection title="The three Productive speeds">
 
 Each on its real job, at real speed.
@@ -56,16 +64,14 @@ Each on its real job, at real speed.
 
 </FoundationSubsection>
 
-Anything tuned here is for feel only. To change a token, ask the design team; the numbers in Physics are the only source.
-
 </FoundationSection>
 
 <FoundationSection title="Related">
 
 <FoundationRelated
     items={[
-        { title: 'Physics', description: 'The token table and what each spring does.', href: '?path=/docs/foundations-motion-physics--docs' },
-        { title: 'Choreography', description: 'How several moving parts stay coherent.', href: '?path=/docs/foundations-motion-choreography--docs' },
+        { title: 'Physics', description: 'The token table and what each spring does.', href: '?path=/docs/foundations-expression-motion-physics--docs' },
+        { title: 'Choreography', description: 'How several moving parts stay coherent.', href: '?path=/docs/foundations-expression-motion-choreography--docs' },
     ]}
 />
 

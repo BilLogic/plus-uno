@@ -8,13 +8,17 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Import:** `import { PatternSection } from '@/patterns';`
 
+**Used in:** Frame (`ds guide frame`); Page (`ds guide page`); Card (`ds guide card`); Section (`ds guide section`); Table (`ds guide table`)
+
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); +6 more
+
 **Source:** `design-system/src/patterns/PatternSection/PatternSection.jsx`
 
 **Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, FillSubtle, CardNesting, Footer, Anatomy, Levels, ToolbarSearch, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, DetailWithPanel, DetailWithPanelNoSectionDetail, DetailSplitAt1440, DetailSplitHoldsWithPanelAt1440, DetailReplacesListBelow960, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, HeaderTypeTitle, HeaderTypeTitleAndActions, HeaderTypeViewBarOneView, HeaderTypeViewBarSeveralViews, HeaderTypeFormatSwitch, HeaderTypeViewBarAlone, HeaderTypeUnderPageTabs, HeaderTypeSubsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, RowsSelected, EmptyInTable, AnatomyQueue
 
 **Storybook page:** `design-system/src/patterns/PatternSection/PatternSection.mdx`
 
-**Motion:** view-bar `spatial.fast` + `appearance.fast` · side-open `spatial.default` · side-close `spatial.default` · detail `spatial.default` + `appearance.default` · body `spatial.fast` + `appearance.fast` · footer `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** view-bar `spatial.fast` + `appearance.fast` · side-open `spatial.default` · side-close `spatial.default` · detail `spatial.default` + `appearance.default` · body `spatial.fast` + `appearance.fast` · footer `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -147,7 +151,7 @@ Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `Pat
 
 ## Types
 
-Common starting types of the one Section, not new components. Each is a header type, a body, and sometimes a side or a detail.
+Each Section type combines a header and body, with an optional side or detail. These are starting layouts of the same component.
 
 - **List.** The view bar alone, one table, paging. The default for an area page.
 - **Queue.** A list with a detail, for working through records one by one.

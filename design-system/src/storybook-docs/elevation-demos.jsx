@@ -2,12 +2,15 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { Button, Toggle } from '@/components';
 import { Page, PatternCard } from '@/patterns';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
-import { C } from '@/storybook-docs/foundation-blocks.jsx';
+import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 import { settleMsOf, springBack } from '@/lib/damping';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
-import { Backdrop, Card, Frame as FrameShape, Modal as ModalShape, Page as PageShape, PageHeader, Popup as PopupShape, Sidebar as SidebarShape, SkeletonBar, Tooltip as TooltipShape } from '@/storybook-docs/illustrations/primitives.jsx';
+import { Layer, Rule, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
+import { CORNER, HAIRLINE, PAINT } from '@/storybook-docs/illustrations/paint.js';
+import { staggerDelays } from '@/storybook-docs/illustrations/motion-choreography.jsx';
+import { TURN, turnPoint, turnTransform } from '@/storybook-docs/lib/iso-turn.js';
 import { composeShadow, groundDarkness, ink, parseShadow, shadowReach, slotted } from '@/storybook-docs/lib/shadow-anatomy';
 
 /**
@@ -197,126 +200,341 @@ const levelOf = (id) => LEVELS.find((l) => l.id === id);
 const px = (n) => `${Math.round(n * 10) / 10}`;
 const alphaPct = (a) => `${Math.round(a * 1000) / 10}%`;
 
-/* ------------------------------------------------------- exploded stack */
-
-/** The stage every plate draws on, in kit units (one unit is 2px of product UI). */
-const STAGE = { w: 320, h: 200 };
+/* ------------------------------------------------------------ layer diagram */
 
 /**
- * The plates of the stack, bottom to top, each drawn from the illustration kit
- * with no words: the lesson holds without them, so the names and the
- * `--layer-*` values sit in the numbered legend. `at` is where the plate's
- * number pins, in stage units.
+ * The exploded stack's geometry, in kit units. Every plate is the same screen,
+ * drawn on the docs' flat turn (`lib/iso-turn`, the Templates cover's angle) and
+ * set one even step up and to the right of the plate below. A plate's subject
+ * sits low on it, in the band the plate above leaves bare, so its leaders land
+ * on the plate below where they can be seen.
+ */
+const PLATE = { w: 160, h: 80 };
+const STEP = { dx: 24, dy: 48 };
+const PAD = 8;
+/** How far a plate's right edge climbs once turned. */
+const CLIMB = -turnPoint(0, 0, PLATE.w, 0).y;
+/** Where each label's tick meets its plate, on the plate's right edge. */
+const TICK_Y = 64;
+/** How far below its place a plate starts its rise. */
+const RISE = 24;
+const COUNT = 7;
+const STAGE = {
+    w: PAD + (COUNT - 1) * STEP.dx + PLATE.w * TURN.scaleX + 16,
+    h: PAD + CLIMB + (COUNT - 1) * STEP.dy + PLATE.h + PAD,
+};
+const LABEL_W = 264;
+/** Below this width the labels leave the right-hand column for a list under the plates. */
+const NARROW_PX = 560;
+const plateAt = (i) => ({ x: PAD + i * STEP.dx, y: PAD + CLIMB + (COUNT - 1 - i) * STEP.dy });
+
+/** The accent's quiet fill: the brand's subtlest background, under the accent hairline. */
+const ACCENT_FILL = 'var(--ds-background-brand-subtlest)';
+
+/** The highlighted subject of a plate: the accent fill and an accent hairline, over the real shadow. */
+const Subject = ({ x, y, w, h, corner, shadow, fill = ACCENT_FILL, children }) => (
+    <>
+        <Layer x={x} y={y} w={w} h={h} fill={fill} shadow={shadow} corner={corner} />
+        <Hairline x={x} y={y} w={w} h={h} corner={corner} stroke={PAINT.accent} />
+        {children}
+    </>
+);
+
+/** A 1px outline at any zoom: the stroke stays one screen pixel through the turn and the viewBox. */
+const Hairline = ({ x, y, w, h, corner, stroke }) => (
+    <rect
+        x={x}
+        y={y}
+        width={w}
+        height={h}
+        fill="none"
+        stroke={stroke}
+        vectorEffect="non-scaling-stroke"
+        style={{ strokeWidth: 'var(--stroke-hairline)', rx: CORNER[corner], ry: CORNER[corner] }}
+    />
+);
+
+/**
+ * The plates, bottom to top. `subject` is the highlighted part in plate units;
+ * `ground` paints the plate itself (the page surface, the Frame's sunken
+ * ground, or the Backdrop's blanket); `draw` adds the wireframe. No words: the lesson holds without them.
  */
 const PLATES = [
     {
-        id: 'frame', title: 'Frame', level: 'sunken', layer: null, at: [0, 0],
-        draw: <><FrameShape x={0} y={0} w={STAGE.w} h={STAGE.h} /><SidebarShape x={0} y={12} w={64} h={STAGE.h - 12} /></>,
-    },
-    {
-        id: 'page', title: 'Page', level: 'default', layer: null, at: [70, 18],
-        draw: (
+        id: 'frame', title: 'Frame', level: 'sunken', layer: null, ground: PAINT.frameSunken,
+        subject: { x: 4, y: 14, w: 24, h: 60 },
+        draw: (s) => (
             <>
-                <PageShape x={70} y={18} w={244} h={176} />
-                <PageHeader x={80} y={28} w={224} />
-                {[0, 1, 2].map((i) => <SkeletonBar key={i} x={80} y={56 + i * 10} w={200 - i * 40} />)}
+                <Rule x1={0} x2={PLATE.w} y1={10} y2={10} stroke={PAINT.frameDivider} />
+                <Subject {...s} corner="card">
+                    {[0, 1, 2, 3].map((i) => <SkeletonBar key={i} x={s.x + 5} y={s.y + 6 + i * 9} w={14} h={3} />)}
+                </Subject>
             </>
         ),
     },
-    { id: 'card', title: 'Card', level: 'raised', layer: null, at: [80, 104], draw: <Card x={80} y={104} w={100} h={72} /> },
-    { id: 'popup', title: 'Popup', level: 'overlay', layer: '--layer-popup', at: [196, 92], draw: <PopupShape x={196} y={92} w={96} h={50} /> },
-    { id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-blanket', at: [0, 0], draw: <Backdrop x={0} y={0} w={STAGE.w} h={STAGE.h} /> },
-    { id: 'modal', title: 'Modal', level: 'blocking', layer: '--layer-modal', at: [90, 46], draw: <ModalShape x={90} y={46} w={140} h={104} accent /> },
-    { id: 'tooltip', title: 'Tooltip', level: null, layer: '--layer-tooltip', at: [236, 126], draw: <TooltipShape x={236} y={126} w={56} /> },
+    {
+        id: 'page', title: 'Page', level: 'default', layer: null, ground: PAINT.pageSurface,
+        subject: { x: 32, y: 14, w: 124, h: 60 },
+        draw: (s) => (
+            <Subject {...s} corner="card">
+                <SkeletonBar x={s.x + 8} y={s.y + 8} w={48} h={5} heading />
+                {[0, 1, 2].map((i) => <SkeletonBar key={i} x={s.x + 8} y={s.y + 22 + i * 9} w={96 - i * 24} h={3} />)}
+            </Subject>
+        ),
+    },
+    {
+        id: 'card', title: 'Card', level: 'raised', layer: null, ground: PAINT.pageSurface,
+        subject: { x: 44, y: 40, w: 64, h: 34 },
+        draw: (s) => (
+            <Subject {...s} corner="card" shadow={PAINT.cardShadow}>
+                <SkeletonBar x={s.x + 7} y={s.y + 7} w={30} h={4} heading />
+                <SkeletonBar x={s.x + 7} y={s.y + 17} w={48} h={3} />
+                <SkeletonBar x={s.x + 7} y={s.y + 25} w={36} h={3} />
+            </Subject>
+        ),
+    },
+    {
+        id: 'popup', title: 'Popup', level: 'overlay', layer: '--layer-popup', ground: PAINT.pageSurface,
+        subject: { x: 100, y: 40, w: 48, h: 34 },
+        draw: (s) => (
+            <Subject {...s} corner="popup" shadow={PAINT.popupShadow}>
+                {[0, 1, 2].map((i) => <SkeletonBar key={i} x={s.x + 6} y={s.y + 7 + i * 9} w={36 - i * 6} h={3} />)}
+            </Subject>
+        ),
+    },
+    {
+        // The Backdrop is the whole plate: the blanket, ringed as the subject.
+        id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-blanket', ground: PAINT.backdrop,
+        subject: { x: 0, y: 0, w: PLATE.w, h: PLATE.h },
+        draw: (s) => <Hairline {...s} corner="window" stroke={PAINT.accent} />,
+    },
+    {
+        id: 'modal', title: 'Modal', level: 'blocking', layer: '--layer-modal', ground: PAINT.pageSurface,
+        subject: { x: 28, y: 40, w: 100, h: 36 },
+        draw: (s) => (
+            <Subject {...s} corner="modal" shadow={PAINT.modalShadow}>
+                <SkeletonBar x={s.x + 8} y={s.y + 6} w={40} h={4} heading />
+                <SkeletonBar x={s.x + 8} y={s.y + 14} w={72} h={3} />
+                <Rule x1={s.x} x2={s.x + s.w} y1={s.y + s.h - 12} y2={s.y + s.h - 12} stroke={PAINT.modalDivider} />
+                <SkeletonBar x={s.x + s.w - 54} y={s.y + s.h - 9} w={20} h={6} />
+                <SkeletonBar x={s.x + s.w - 30} y={s.y + s.h - 9} w={22} h={6} accent />
+            </Subject>
+        ),
+    },
+    {
+        // A Tooltip keeps its own fill: the inverse label is the lesson, and it has no shadow.
+        id: 'tooltip', title: 'Tooltip', level: null, layer: '--layer-tooltip', ground: PAINT.pageSurface,
+        subject: { x: 60, y: 52, w: 40, h: 14 },
+        draw: (s) => (
+            <Subject {...s} corner="tooltip" fill={PAINT.tooltipSurface}>
+                <SkeletonBar x={s.x + 6} y={s.y + 5.5} w={22} h={3} tone={PAINT.tooltipText} />
+            </Subject>
+        ),
+    },
 ];
 
-const badge = {
-    display: 'grid',
-    placeItems: 'center',
-    width: 'var(--image-xs)',
-    height: 'var(--image-xs)',
-    borderRadius: 'var(--radius-full)',
-    background: 'var(--ds-background-brand-bold)',
-    color: 'var(--ds-text-inverse)',
-    font: 'var(--heading-xsmall)',
+/** The two lower corners of a plate's subject, where its leaders start. */
+const footOf = ({ x, y, w, h }) => [[x, y + h], [x + w, y + h]];
+
+/** Rises each plate into place once, bottom first, when the figure scrolls into view. */
+const useRise = (ref) => {
+    const reduced = useReducedMotion();
+    const [offsets, setOffsets] = useState(() => PLATES.map(() => (reduced ? 0 : 1)));
+    useEffect(() => {
+        const node = ref.current;
+        if (reduced || !node || typeof IntersectionObserver === 'undefined') {
+            setOffsets(PLATES.map(() => 0));
+            return undefined;
+        }
+        const settleMs = settleMsOf(SPRINGS['appearance.default'].productive);
+        const cancels = [];
+        const observer = new IntersectionObserver((entries) => {
+            if (!entries.some((e) => e.isIntersecting)) return;
+            observer.disconnect();
+            staggerDelays(PLATES.length).forEach((delay, i) => {
+                const timer = setTimeout(() => {
+                    cancels.push(springBack(1, { settleMs, onUpdate: (v) => setOffsets((o) => o.map((x, j) => (j === i ? v : x))) }));
+                }, delay);
+                cancels.push(() => clearTimeout(timer));
+            });
+        }, { threshold: 0.25 });
+        observer.observe(node);
+        return () => {
+            observer.disconnect();
+            cancels.forEach((cancel) => cancel());
+        };
+    }, [ref, reduced]);
+    return offsets;
+};
+
+/** True when the figure is too narrow for the label column beside it. */
+const useNarrow = (ref) => {
+    const [narrow, setNarrow] = useState(false);
+    useLayoutEffect(() => {
+        const node = ref.current;
+        if (!node || typeof ResizeObserver === 'undefined') return undefined;
+        const observer = new ResizeObserver(([entry]) => setNarrow(entry.contentRect.width < NARROW_PX));
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [ref]);
+    return narrow;
+};
+
+const resetButton = {
+    display: 'inline-flex',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
+    gap: 'var(--inline-sm)',
+    padding: 0,
+    border: 0,
+    background: 'none',
+    font: 'var(--body-small)',
+    color: 'inherit',
+    textAlign: 'start',
+    cursor: 'default',
+    borderRadius: 'var(--radius-sm)',
 };
 
 /**
- * One screen taken apart into its layers: the Frame, the Page, a Card, a
- * Popup, the Backdrop, the Modal and a Tooltip. Collapsed it is the screen; exploded each
- * plate lifts by its place in the stack, on `--ds-motion-appearance-slow`.
+ * One screen taken apart into its layers, as an exploded view: the Frame, the
+ * Page, a Card, a Popup, the Backdrop, the Modal and a Tooltip, each on its own
+ * plate one even step above the last. Each plate's subject joins the plate below
+ * it with dashed accent leaders, and the label column gives each plate its name,
+ * its `--layer-*` token and its shadow. Hovering or focusing a label or a plate
+ * makes that pair active; the top pair is active by default.
  */
 export const ExplodedStack = () => {
-    const [exploded, setExploded] = useState(true);
-    const p = useSpring(exploded ? 1 : 0, 'appearance.slow');
     const stage = useRef(null);
     const layers = useVarsOn(stage, LAYERS.map((l) => l.token));
+    const offsets = useRise(stage);
+    const narrow = useNarrow(stage);
+    const [active, setActive] = useState(PLATES[PLATES.length - 1].id);
+    const [focusRing, setFocusRing] = useState(null);
+    const share = (STAGE.w / (STAGE.w + LABEL_W)) * 100;
 
+    const placed = PLATES.map((plate, i) => {
+        const at = plateAt(i);
+        const rise = offsets[i] * RISE;
+        return { ...plate, x: at.x, y: at.y + rise, opacity: 1 - offsets[i] };
+    });
+    const point = (p, lx, ly) => turnPoint(p.x, p.y, lx, ly);
+
+    const figure = (
+        <Illustration viewBox={`0 0 ${STAGE.w} ${STAGE.h}`} capped={false} title="One screen drawn as seven layers, each plate one step above the one below">
+            {placed.map((plate, i) => {
+                const below = placed[i - 1];
+                const on = plate.id === active;
+                const tick = point(plate, PLATE.w, TICK_Y);
+                return (
+                    <React.Fragment key={plate.id}>
+                        <g data-plate={plate.id} data-active={on} opacity={plate.opacity} onMouseEnter={() => setActive(plate.id)} onClick={() => setActive(plate.id)}>
+                            <g data-turn="" transform={turnTransform(plate.x, plate.y)}>
+                                <rect x={0} y={0} width={PLATE.w} height={PLATE.h} fill={plate.ground} style={{ rx: CORNER.window, ry: CORNER.window }} />
+                                {plate.draw(plate.subject)}
+                                <Hairline x={0} y={0} w={PLATE.w} h={PLATE.h} corner="window" stroke={on ? PAINT.accent : PAINT.frameDivider} />
+                            </g>
+                        </g>
+                        {below && footOf(plate.subject).map(([lx, ly], k) => {
+                            const from = point(plate, lx, ly);
+                            const to = point(below, lx, ly);
+                            return (
+                                <line
+                                    key={k}
+                                    data-leader={plate.id}
+                                    x1={from.x}
+                                    y1={from.y}
+                                    x2={to.x}
+                                    y2={to.y}
+                                    stroke={PAINT.accent}
+                                    strokeDasharray="3 3"
+                                    vectorEffect="non-scaling-stroke"
+                                    opacity={Math.min(plate.opacity, below.opacity)}
+                                    style={HAIRLINE}
+                                />
+                            );
+                        })}
+                        {!narrow && (
+                            <line
+                                data-tick={plate.id}
+                                x1={tick.x + 3}
+                                y1={tick.y}
+                                x2={STAGE.w}
+                                y2={tick.y}
+                                stroke={on ? PAINT.accent : PAINT.frameDivider}
+                                vectorEffect="non-scaling-stroke"
+                                opacity={plate.opacity}
+                                style={HAIRLINE}
+                            />
+                        )}
+                    </React.Fragment>
+                );
+            })}
+        </Illustration>
+    );
+
+    // Top first in the DOM, as both layouts show them, so tab order follows what is seen.
+    const labels = placed.map((plate, i) => {
+        const on = plate.id === active;
+        const tickY = point(plateAt(i), PLATE.w, TICK_Y).y;
+        return (
+            <li
+                key={plate.id}
+                data-legend={plate.id}
+                data-active={on}
+                onMouseEnter={() => setActive(plate.id)}
+                style={narrow ? null : { position: 'absolute', insetInline: 0, insetBlockStart: `${(tickY / STAGE.h) * 100}%`, transform: 'translateY(-50%)', paddingInlineStart: 'var(--inline-sm)' }}
+            >
+                <button
+                    type="button"
+                    aria-current={on ? 'true' : undefined}
+                    onFocus={(e) => {
+                        setActive(plate.id);
+                        setFocusRing(e.currentTarget.matches(':focus-visible') ? plate.id : null);
+                    }}
+                    onBlur={() => setFocusRing(null)}
+                    style={{
+                        ...resetButton,
+                        color: on ? 'var(--ds-text-brand)' : 'var(--ds-text)',
+                        outline: focusRing === plate.id ? 'var(--border-focused) solid var(--ds-border-focused)' : 'none',
+                        outlineOffset: 'var(--stroke-1)',
+                    }}
+                >
+                    <strong>{plate.title}</strong>
+                    <code style={{ ...codeText, color: on ? 'var(--ds-text-brand)' : 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : 'no layer'}</code>
+                    <span style={{ ...(shadowNote(plate).startsWith('--') ? codeText : null), color: on ? 'var(--ds-text-brand)' : 'var(--ds-text-subtle)' }}>{shadowNote(plate)}</span>
+                </button>
+            </li>
+        );
+    }).reverse();
+
+    const list = { margin: 0, padding: 0, listStyle: 'none' };
     return (
-        <div style={stack} data-testid="exploded-stack" data-state={exploded ? 'exploded' : 'collapsed'} data-progress={Math.round(p * 100)}>
-            <div style={row}>
-                <Button text={exploded ? 'Collapse' : 'Explode'} spacing="compact" isSelected={exploded} onClick={() => setExploded((e) => !e)} />
-                <span style={small}>{exploded ? 'Each layer lifted by its place in the stack.' : 'The screen as a person sees it.'}</span>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
-                <div ref={stage} data-docs-stage style={{ ...well, perspective: 'calc(var(--image-xl) * 14)', paddingBlockStart: `calc(var(--card-pad-spacious) + ${p} * var(--image-xl) * 2)`, paddingBlockEnd: `calc(var(--card-pad-spacious) + ${p} * var(--image-xl) / 2)` }}>
-                    <div
-                        style={{
-                            position: 'relative',
-                            aspectRatio: `${STAGE.w} / ${STAGE.h}`,
-                            margin: '0 auto',
-                            width: `calc(100% - ${p} * var(--card-min-width-sm) / 2)`,
-                            transformStyle: 'preserve-3d',
-                            transform: `rotateX(${p * 58}deg) rotateZ(${p * -38}deg)`,
-                        }}
-                    >
-                        {PLATES.map((plate, i) => (
-                            <div
-                                key={plate.id}
-                                data-plate={plate.id}
-                                style={{ position: 'absolute', inset: 0, transform: `translateZ(calc(${p * i} * var(--image-md)))`, transformStyle: 'preserve-3d' }}
-                            >
-                                <Illustration viewBox={`0 0 ${STAGE.w} ${STAGE.h}`} capped={false} title={`Layer ${i + 1}: ${plate.title}`}>
-                                    {plate.draw}
-                                </Illustration>
-                                <span
-                                    aria-hidden="true"
-                                    style={{
-                                        ...badge,
-                                        position: 'absolute',
-                                        insetInlineStart: `calc(${(plate.at[0] / STAGE.w) * 100}% - var(--image-xs) / 2)`,
-                                        insetBlockStart: `calc(${(plate.at[1] / STAGE.h) * 100}% - var(--image-xs) / 2)`,
-                                        opacity: p,
-                                    }}
-                                >
-                                    {i + 1}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
+        <div ref={stage} data-docs-stage style={well} data-testid="exploded-stack" data-layout={narrow ? 'list' : 'column'}>
+            {narrow ? (
+                <div style={stack}>
+                    <div style={{ maxInlineSize: `${STAGE.w * 1.5}px`, marginInline: 'auto', inlineSize: '100%' }}>{figure}</div>
+                    <ol data-testid="stack-legend" aria-label="Layers, top first" style={{ ...list, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>{labels}</ol>
                 </div>
-                <ol data-testid="stack-legend" aria-label="Layers, top first" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column-reverse', gap: 'var(--stack-md)' }}>
-                    {PLATES.map((plate, i) => (
-                        <li key={plate.id} data-legend={plate.id} style={{ display: 'grid', gridTemplateColumns: 'var(--image-xs) 1fr', columnGap: 'var(--inline-md)', alignItems: 'center' }}>
-                            <span aria-hidden="true" style={badge}>{i + 1}</span>
-                            <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-                                <strong>{plate.title}</strong>
-                                <span style={{ color: 'var(--ds-text-subtle)' }}>{plate.level ? levelOf(plate.level).name.toLowerCase() : 'label, no shadow'}</span>
-                                <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : 'no layer'}</code>
-                            </span>
-                        </li>
-                    ))}
-                </ol>
-            </div>
+            ) : (
+                <div style={{ position: 'relative', aspectRatio: `${STAGE.w + LABEL_W} / ${STAGE.h}`, maxInlineSize: `${(STAGE.w + LABEL_W) * 1.4}px`, marginInline: 'auto' }}>
+                    <div style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: `${share}%` }}>{figure}</div>
+                    <ol data-testid="stack-legend" aria-label="Layers, top first" style={{ ...list, position: 'absolute', insetBlock: 0, insetInlineEnd: 0, width: `${100 - share}%` }}>{labels}</ol>
+                </div>
+            )}
         </div>
     );
 };
 
-/* ------------------------------------------------------------ level tiles */
+/** The label's shadow cell: the level's shadow token, or none. */
+const shadowNote = (plate) => {
+    if (plate.id === 'backdrop') return 'blanket fill';
+    const level = plate.level ? levelOf(plate.level) : null;
+    return level?.shadow ?? 'no shadow';
+};
 
 /** One tile per level: its surface with its shadow, on the ground it sits on. */
 export const LevelTiles = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(calc(var(--image-xl) * 2), 1fr))', gap: 'var(--grid-gutter)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))', gap: 'var(--grid-gutter)' }}>
         {LEVELS.map((l) => {
             const onBackdrop = l.id === 'blocking';
             return (
@@ -505,7 +723,7 @@ export const ShadowComposer = () => {
                 <Choice name="Level" options={SLOTTED_LEVELS.map((l) => ({ id: l.id, label: l.name }))} value={levelId} onChange={setLevelId} />
                 <Choice name="Color mode" options={MODE_OPTIONS} value={mode} onChange={setMode} />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--grid-gutter)', alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))', gap: 'var(--grid-gutter)', alignItems: 'start' }}>
                 <div
                     ref={ground}
                     data-color-mode={mode}
@@ -720,7 +938,7 @@ const LadderPane = ({ mode }) => {
 
 /** The surface ladder in light and dark: in dark, each step up is lighter. */
 export const SurfaceLadder = () => (
-    <div data-testid="surface-ladder" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--grid-gutter)' }}>
+    <div data-testid="surface-ladder" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))', gap: 'var(--grid-gutter)' }}>
         <LadderPane mode="light" />
         <LadderPane mode="dark" />
     </div>
@@ -728,48 +946,20 @@ export const SurfaceLadder = () => (
 
 /* ------------------------------------------------------------ layer stack */
 
-/** The z stack drawn as plates, bottom to top, each with its token and value. */
+/** The z stack as a table, highest first: each `--layer-*` token, its z-index and what sits there. */
 export const LayerStack = () => {
     const ref = useRef(null);
     const values = useVarsOn(ref, LAYERS.map((l) => l.token));
-    const notes = {
-        '--layer-popup': 'Opened inside a Modal, a Popup portals into it and sits over it.',
-        '--layer-modal': 'A confirm Modal may open over a Panel, a Popup or a focused task, with its own Backdrop. Never a Modal on a Modal.',
-        '--layer-flag': 'A Flag stays in view over the Modal.',
-    };
     return (
-        <div ref={ref} data-docs-stage style={{ ...well, display: 'flex', flexDirection: 'column-reverse', gap: 'var(--stack-sm)' }} data-testid="layer-stack">
-            <div style={{ padding: 'var(--pad-y-md) var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-default)' }}>
-                <strong>Page</strong> <span style={small}>no layer: the ground every layer sits on</span>
-            </div>
-            {LAYERS.map((l, i) => (
-                <div
-                    key={l.token}
-                    data-layer={l.token}
-                    style={{
-                        marginInlineStart: `calc(${i + 1} * var(--pad-x-md))`,
-                        minInlineSize: 0,
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        alignItems: 'baseline',
-                        gap: 'var(--inline-md)',
-                        padding: 'var(--pad-y-md) var(--pad-x-md)',
-                        borderRadius: 'var(--radius-md)',
-                        background: 'var(--ds-surface-overlay)',
-                        color: 'var(--ds-text)',
-                        boxShadow: l.token === '--layer-modal' ? 'var(--ds-shadow-blocking)' : 'var(--ds-shadow-raised)',
-                        font: 'var(--body-default)',
-                    }}
-                >
-                    {l.token === '--layer-blanket' && (
-                        <span aria-hidden="true" style={{ alignSelf: 'center', width: 'var(--image-xxs)', height: 'var(--image-xxs)', borderRadius: 'var(--radius-sm)', background: 'var(--ds-blanket)' }} />
-                    )}
-                    <code style={codeText}>{l.token}</code>
-                    <strong>{values[l.token]}</strong>
-                    <span style={small}>{l.who}</span>
-                    {notes[l.token] && <span style={small}>{notes[l.token]}</span>}
-                </div>
-            ))}
+        <div ref={ref} data-testid="layer-stack">
+            <RefTable
+                head={['Token', 'z-index', 'What sits there']}
+                rows={[...LAYERS].reverse().map((l) => [
+                    <span key="t" data-layer={l.token}><C>{l.token}</C></span>,
+                    <strong key="v">{values[l.token]}</strong>,
+                    l.who,
+                ])}
+            />
         </div>
     );
 };
@@ -910,7 +1100,7 @@ export const ContrastDemo = () => {
             <div
                 data-color-mode={mode}
                 data-contrast-mode={more ? 'more' : 'no-preference'}
-                data-docs-stage style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)' }}
+                data-docs-stage style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)' }}
             >
                 <PatternCard title="Card" description="The raised ring." />
                 <div className="plus-popup" style={{ position: 'relative', width: 'auto' }}>

@@ -17,7 +17,7 @@
     ],
     "sessionEnd": [
       {
-        "command": ".cursor/hooks/uno-prototype/session-end.mjs",
+        "command": "node .cursor/hooks/uno-prototype/run.mjs --session-end",
         "timeout": 5
       }
     ],

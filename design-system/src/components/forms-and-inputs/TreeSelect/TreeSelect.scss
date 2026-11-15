@@ -1,7 +1,7 @@
 /**
  * TreeSelect — a `_Field` trigger over a `_Listbox` surface holding a flat run
  * of OptionRows in the `treeitem` role. The field, the surface and the rows
- * draw themselves, and `.plus-listbox--anchored` places the panel; this file
+ * draw themselves, and AnchoredListboxSurface places the panel; this file
  * turns the caret.
  */
 
@@ -22,9 +22,20 @@
 }
 
 .plus-tree-select-arrow {
-    transition: transform 0.15s ease-in-out;
+    transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
 
     &.plus-tree-select-arrow-open {
         transform: rotate(180deg);
     }
+}
+
+.plus-tree-select-menu {
+    --transform-origin: left top;
+    &[data-placement='bottom'] { --plus-popup-clip-bottom: 100%; }
+    &[data-placement='top'] { --plus-popup-clip-top: 100%; }
+    --plus-popup-clip-right: 100%;
+    &[data-align='end'] { --plus-popup-clip-right: var(--plus-popup-reach); --plus-popup-clip-left: 100%; }
+    &[data-placement='top'] { --transform-origin: left bottom; }
+    &[data-align='end'] { --transform-origin: right top; }
+    &[data-placement='top'][data-align='end'] { --transform-origin: right bottom; }
 }

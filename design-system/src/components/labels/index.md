@@ -5,6 +5,43 @@
 10 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
+## Which component to reach for
+
+- **[AiMessage](AiMessage/index.md)** — Use `AiMessage` for every AI reply, in chat, a panel or elsewhere. Choose its status from the table below.
+- **[ChangeTag](ChangeTag/index.md)** — Use `ChangeTag` beside a number to say how it moved since the last period: in a card header, a table cell or a chart tooltip. For the number itself, use plain text.
+  - For a count on its own, use `CountTag`.
+  - For the condition something is in, use `StatusTag`.
+- **[CountTag](CountTag/index.md)** — Use `CountTag` for a number on its own: unread messages on a nav item, results on a tab, errors in a section header, a notification on a bell.
+  - For the condition something is in, use `StatusTag`.
+  - For a change over time such as "+3 vs last week", use `ChangeTag`.
+  - For a due or event date, use `DateTag`.
+  - For a category or subject or person, use `Tag`.
+  - For progress toward a total, use `ProgressBar`.
+- **[DateTag](DateTag/index.md)** — Use `DateTag` for a due or event date beside the thing it belongs to: an assignment, a session, a report. Write `children` as people say the date, such as "Due tomorrow" or "2 days overdue", never a raw timestamp. `DateTag`'s outline, icon and three appearances are reserved for dates.
+  - For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
+  - For a category or subject or person, use `Tag`.
+  - For a numeric count, use `CountTag`.
+- **[PromptStarters](PromptStarters/index.md)** — Use `PromptStarters` before a person types into an empty chat, new reflection or blank prompt field. For a single follow-up during a conversation, use `Suggestion`.
+- **[SmartTag](SmartTag/index.md)** — Use `SmartTag` wherever training content, a tutor's strengths or a feedback item is tagged by SMART area. `SmartTag` fixes the color and icon per subject and delegates every other behavior to `Tag`.
+  - For a category outside the five SMART subjects, use `Tag`.
+  - For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
+- **[StatusTag](StatusTag/index.md)** — Use `StatusTag` for the condition something is in when that condition can change: completed, needs review, missed, in progress. It is the same component whether the system calculated the state or a person set it.
+  - For a number on its own, use `CountTag`.
+  - For a due or event date, use `DateTag`.
+  - For a change over time such as "+3 vs last week", use `ChangeTag`.
+  - For a category or subject or person, use `Tag` or `SmartTag`.
+- **[Suggestion](Suggestion/index.md)** — Use `Suggestion` when the system proposes a value and a person decides whether to take it: an AI-suggested focus area beside the ones already chosen, or a suggested question beside a chat box. Put it in the row where the accepted value will land, after the tags already there.
+- **[Tag](Tag/index.md)** — Use `Tag` for a subject, a focus area, a person, an agent, a team or a category. A tag is outlined and a status is filled, so a reader tells a category from a workflow state without reading the words.
+  - For one of the five SMART competency areas, use `SmartTag`.
+  - For the condition something is in when that condition can change, use `StatusTag`.
+  - For a number on its own, use `CountTag`.
+  - For a due or event date, use `DateTag`.
+  - For a labeled field where the person picks and removes tags, use `TagInput`.
+- **[TagGroup](TagGroup/index.md)** — Use `TagGroup` wherever more than one `Tag` appears together: the subjects on a profile, the filters above a table, the recipients on a message. It is the right wrapper even when the set is short, because the spacing, wrapping, alignment and disabled state belong to the set rather than to any tag in it. `Suggestion` items offered for the field go in the same group; they always sit at the end of the row, after the tags and `+n`.
+  - For one value rather than a set, use `Tag`.
+  - For a labeled field where the person picks and removes tags, use `TagInput`.
+  - For a long list that needs paging rather than an overflow count, use `Pagination`.
+
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [AiMessage](AiMessage/index.md) | 11 | ✅ | ✅ | ✅ |

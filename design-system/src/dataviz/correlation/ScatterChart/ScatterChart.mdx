@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={ScatterChartStories} />
 
 <Title />
-Plots each record as a dot at two values, so a reader can see whether one
-measure rises with the other.
+Plots each record as a point on two numeric axes to show relationships,
+clusters and outliers.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/correlation/ScatterChart"
@@ -31,17 +31,13 @@ measure rises with the other.
 
 ## When to use
 
-Use `ScatterChart` to look for a relationship between two numeric measures of
-the same records: minutes of tutoring against score gain per student, sessions
-attended against final grade. It also shows clusters and the outliers that sit
-away from them.
+Use `ScatterChart` to examine how two numeric measures move together across
+records, such as weekly tutoring minutes vs. score gain or attendance vs. final
+grade. Clarify in surrounding copy when correlation does not imply causation.
 
-For a third measure shown as size, use `BubbleChart`. For so many points that
-they pile on top of each other, use `HeatmapChart`. For one measure across
-named categories, use `BarChart`; for one measure over time, use `LineChart`.
-
-A scatter shows that two measures move together, not that one causes the
-other. Say so in the surrounding copy when the reader might assume it.
+For a third measure encoded as size, use `BubbleChart`. When points are dense
+enough to overlap heavily, use `HeatmapChart`. For one measure across named
+categories, use `BarChart`; for one measure over time, use `LineChart`.
 
 </div>
 
@@ -52,11 +48,11 @@ other. Say so in the surrounding copy when the reader might assume it.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Points', <>One dot per <C>[x, y]</C> pair, at a fixed size. A series' <C>color</C> overrides the assigned one.</>],
-        ['X axis', <>The first measure. <C>xAxisLabel</C> titles it; it starts and ends on a tick.</>],
-        ['Y axis', <>The second measure. <C>yAxisLabel</C> titles it.</>],
-        ['Legend', 'Names each series. Always shown; the component has no prop to hide it.'],
-        ['Tooltip', 'The series name, then the point as "x, y". It carries no units, so put them in the axis labels.'],
+        ['Points', <>One dot per <C>[x, y]</C> pair at a fixed size. Series <C>color</C> overrides the assigned slot.</>],
+        ['X axis', <>First measure, starting and ending on a tick; titled by <C>xAxisLabel</C>.</>],
+        ['Y axis', <>Second measure; titled by <C>yAxisLabel</C>.</>],
+        ['Legend', 'Names each series; always shown (no prop to hide it).'],
+        ['Tooltip', <>Series name, then the point as <C>x, y</C> without units; include units in axis labels.</>],
     ]}
 />
 
@@ -66,8 +62,9 @@ other. Say so in the surrounding copy when the reader might assume it.
 
 ## Data shape
 
-`data` is required: an array of series, each `{ name, data }`, where `data`
-holds `[x, y]` pairs. `height` defaults to 300.
+`data` (required) is an array of `{ name, data, color }` series, where `data`
+holds `[x, y]` pairs. `height` defaults to 300. Omit `color` to assign one
+automatically.
 
 ```jsx
 <ScatterChart
@@ -80,20 +77,18 @@ holds `[x, y]` pairs. `height` defaults to 300.
 />
 ```
 
-A series may carry its own `color`; leave it out and the chart assigns one.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color is assigned for you.** One series takes `--ds-chart-brand`. Two or more take the categorical order, slot 1 first, never skipping a slot. Keep to a few series; past six, group the rest or split the chart.
-- **Position carries the values.** Color tells series apart, and the chart sets no marker symbol of its own, so Highcharts' default gives each series its own marker shape too. A single-series scatter reads without hue; with several series, the legend and tooltip name a point's group.
-- **Dense data hides points.** Markers are solid and the same size, so overlapping points stack into one dot. There is no transparency prop; when points pile up, use `HeatmapChart`.
-- **No trend line.** The chart draws the points only. If the relationship is the message, state it in the header or description.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Automatic series color.** One series uses `--ds-chart-brand`; two or more follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 without skipping. Past six series, group the rest or split the chart.
+- **Position and marker shape.** Position carries the values, and Highcharts assigns each series a distinct marker shape alongside its color.
+- **Overlapping points.** Markers are solid with no transparency prop, so identical points stack into one dot; switch to `HeatmapChart` for dense data.
+- **No trend line.** The chart draws points only; state the relationship in the header or description when it is the takeaway.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -101,11 +96,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 
 ## States
 
-`ScatterChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`ScatterChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={300} />
@@ -122,12 +113,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 
 <DocsInteractivePlayground
     of={ScatterChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

@@ -4,6 +4,8 @@ import { Meta, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PopupStories from './Popup.stories.jsx';
+import * as HeadingOutlineStories from '../HeadingOutline.stories.jsx';
+import { DocsCanvasShell, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -25,19 +27,19 @@ import {
     WiderThanCap,
 } from '@/storybook-docs/illustrations/popup.jsx';
 
-<Meta title="Templates/Popup/Popup" tags={['manifest']} />
+<Meta title="Templates/Popup" tags={['manifest']} />
 
 <DocsLanding
-    page="templates-popup-popup"
+    page="templates-popup"
     eyebrow="Template"
     title="Popup"
     purpose="A floating layer that hangs off its trigger and closes on an outside click. Six types: menu, profile menu, select list, content, filter menu and stacked filter menu."
     links={{
         label: 'Uses',
         items: [
-            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
-            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
-            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal--docs' },
             { title: 'Popup component', href: './?path=/docs/components-overlays-and-layering-popup--docs' },
         ],
     }}
@@ -53,7 +55,7 @@ import {
 
 ## Types
 
-Each is a composition on the Popup component, which owns placement, the outside click and Escape.
+Each type composes the Popup component, which handles placement, outside clicks and Escape.
 
 <TypeGrid>
 <TypeCard of={PopupStories.TypeMenu} title="Menu" stage={480}>Actions from a More button, at auto width. Applies on pick.</TypeCard>
@@ -75,9 +77,13 @@ A filter menu off the Filter icon. Every part once; the layer is padded 16 and r
 <Story of={PopupStories.AnatomyFilterMenu} inline />
 
 1. **Trigger.** The control it hangs off. It shows the open state and, for the Filter icon, the count.
-2. **Layer.** Hangs 4 below the trigger, aligned to the trigger's end edge because the trigger sits at the end of the bar.
+2. **Layer.** Hangs 4 below the trigger, aligned to the trigger's end edge because the trigger sits at the end of the bar. A titled layer's title is 14, whatever level the page around it is at.
 3. **Rows or categories.** Menu rows; a list of checkboxes or radios; columns or stacked categories.
 4. **Footer** (filter menu only). Reset (Default) and Apply (Primary), full bleed, half each.
+
+<DocsCanvasShell description="A popup with its title.">
+    <DsCanvasQuiet of={HeadingOutlineStories.PopupTitle} />
+</DocsCanvasShell>
 
 </div>
 
@@ -352,9 +358,9 @@ When a list applies, and the words Reset and Reset filters: <DocsLink id="patter
 
 ## Related
 
-- <DocsLink id="templates-section-section">Section</DocsLink>: use when placing the Filter icon, the view picker or More in the view bar.
-- <DocsLink id="templates-modal-modal">Modal</DocsLink>: use when the content must be finished before going on.
-- <DocsLink id="templates-panel-panel">Panel</DocsLink>: use when the content is wider than 4-col or outlives a click.
+- <DocsLink id="templates-section">Section</DocsLink>: use when placing the Filter icon, the view picker or More in the view bar.
+- <DocsLink id="templates-modal">Modal</DocsLink>: use when the content must be finished before going on.
+- <DocsLink id="templates-panel">Panel</DocsLink>: use when the content is wider than 4-col or outlives a click.
 - <DocsLink id="patterns-overview">Patterns</DocsLink>: use when you need the rules around a Popup: Filtering, Overflow, Loading, Disabled.
 - <DocsLink id="components-overlays-and-layering-popup">Popup</DocsLink>: use when you need its props and states.
 

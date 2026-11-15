@@ -1,29 +1,20 @@
+import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import useFieldId from '../useFieldId';
 import PropTypes from 'prop-types';
 import FieldBox from '../_internal/FieldBox';
 import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import OptionRow from '../_internal/OptionRow';
-import { useAnchoredPopup } from '../_internal/anchorPlacement';
+import AnchoredListboxSurface from '../_internal/AnchoredListboxSurface';
+import {
+    getOptionChildren,
+    getOptionLabel,
+    getOptionValue,
+    isOptionDisabled,
+} from '../_internal/optionShape';
 import Icon from '../../images-and-icons/Icon';
 import '../_internal/Listbox.scss';
 import './TreeSelect.scss';
-
-// ---------------------------------------------------------------------------
-// Option helpers — tolerate { label | text, value, children } shapes as well
-// as plain strings, mirroring the Cascader normalization rules.
-// ---------------------------------------------------------------------------
-const getOptionValue = (option) =>
-    typeof option === 'string' ? option : (option.value ?? option.label ?? option.text);
-
-const getOptionLabel = (option) =>
-    typeof option === 'string' ? option : (option.label ?? option.text ?? String(option.value));
-
-const getOptionChildren = (option) =>
-    (typeof option === 'object' && Array.isArray(option.children)) ? option.children : [];
-
-const isOptionDisabled = (option) =>
-    typeof option === 'object' && Boolean(option.disabled);
 
 /** Collect the value of a node plus every descendant value (pre-order). */
 const collectSubtreeValues = (option) => {
@@ -150,9 +141,7 @@ const TreeSelect = ({
     const [expandedValues, setExpandedValues] = useState(() => new Set());
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
-    const menuRef = useRef(null);
     const close = useCallback(() => setIsOpen(false), []);
-    const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef, onClose: close });
     /**
      * Focus moves between real elements rather than through
      * `aria-activedescendant`: every treeitem is in the DOM already, so a
@@ -510,25 +499,27 @@ const TreeSelect = ({
                     />
                 </FieldBox>
 
-                {isOpen && (
-                    <div
-                        ref={menuRef}
-                        className="plus-listbox plus-listbox--anchored plus-tree-select-menu"
-                        data-placement={place?.placement}
-                        data-side={place?.side}
-                    >
-                        <div className="plus-listbox-body">
-                            <div
-                                className="plus-listbox-options"
-                                role="tree"
-                                id={treeId}
-                                aria-multiselectable={isMulti || undefined}
-                            >
-                                {visibleNodes.map(renderRow)}
-                            </div>
+                <AnchoredListboxSurface
+                    open={isOpen}
+                    anchorRef={wrapperRef}
+                    onClose={close}
+                    className="plus-tree-select-menu"
+                >
+                    <div className="plus-listbox-body">
+                        <div
+                            className="plus-listbox-options"
+                            role="tree"
+                            id={treeId}
+                            aria-multiselectable={isMulti || undefined}
+                        >
+                            <AnimatePresence initial={false}>
+                                {visibleNodes.map((node) => (
+                                    <HeightSurface key={node.value} role="presentation">{renderRow(node)}</HeightSurface>
+                                ))}
+                            </AnimatePresence>
                         </div>
                     </div>
-                )}
+                </AnchoredListboxSurface>
             </div>
             {name && selectedValues.map((v) => (
                 <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />

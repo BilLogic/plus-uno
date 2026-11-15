@@ -8,13 +8,17 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window, 
 
 **Import:** `import { Modal } from '@/components';`
 
+**Used in:** Form (`ds guide form`); Panel (`ds guide panel`); Card (`ds guide card`); Modal (`ds guide modal`); Popup (`ds guide popup`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
 **Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
-**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -154,7 +158,7 @@ focused task, each with its own Backdrop.
 - `Backdrop`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
 - Templates: use when choosing between a Modal and a focused page; its Usage section weighs the two.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMessage` · `Spotlight`
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 
@@ -165,7 +169,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMes
 5. **Dividers.** Optional rules under the header and over the footer.
 
 The tokens each part draws are read from `Modal.scss` and listed under Tokens
-touched in the Agent view tab.
+touched in the Harness tab.
 
 ### States
 

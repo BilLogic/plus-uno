@@ -1,9 +1,36 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { DS_FACTS_BYTE_BUDGET, bakeFacts, budgetOverrun, generatedDocFor, renderDsFacts } from "./generate-ds-facts.mjs";
+import { dirname, join } from "node:path";
+import {
+  DS_FACTS_BYTE_BUDGET,
+  DS_FACTS_PATH,
+  artifacts,
+  bakeFacts,
+  budgetOverrun,
+  generatedDocFor,
+  renderDsFacts,
+  run,
+} from "./generate-ds-facts.mjs";
+
+function writeFixtureFacts(root, components) {
+  const views = join(root, "design-system/agent-views");
+  mkdirSync(views, { recursive: true });
+  writeFileSync(join(views, "components.json"), JSON.stringify({ components }, null, 2), "utf8");
+  writeFileSync(
+    join(views, "tokens.json"),
+    JSON.stringify({
+      tokens: [{ name: "--stack-md", tier: "semantic", group: "Ladder Semantics", value: "var(--space-050)", intent: "Gap between items." }],
+    }),
+    "utf8",
+  );
+  writeFileSync(
+    join(views, "_inventions.json"),
+    JSON.stringify({ components: [{ not: "Card", use: ["PatternCard"], why: "a pattern" }], props: [], tokens: [] }),
+    "utf8",
+  );
+}
 
 /** The facts module's surface, as much of it as the bake reads. */
 function fakeFacts() {
@@ -71,5 +98,69 @@ describe("the baked DS facts", () => {
     assert.equal(budgetOverrun("x".repeat(DS_FACTS_BYTE_BUDGET)), null);
     assert.match(budgetOverrun("x".repeat(DS_FACTS_BYTE_BUDGET + 1)), /1 byte over/);
     assert.match(budgetOverrun("—".repeat(DS_FACTS_BYTE_BUDGET / 3 + 1)), /3 bytes over/);
+  });
+
+  it("holds the committed DS facts module in sync with the root facts module", () => {
+    assert.deepEqual(run(), []);
+  });
+
+  it("detects missing output, edited output, and stale source without writing in verification mode, and regenerates deterministically", () => {
+    const root = mkdtempSync(join(tmpdir(), "ds-facts-check-"));
+    try {
+      writeFixtureFacts(root, [
+        {
+          name: "Button",
+          kind: "component",
+          import: "import { Button } from '@/components';",
+          group: "forms",
+          source: "design-system/src/components/forms/Button/Button.jsx",
+          props: [{ name: "appearance", type: "enum", values: ["primary", "subtle"], default: "primary" }],
+        },
+      ]);
+      const outAbs = join(root, DS_FACTS_PATH);
+
+      assert.deepEqual(
+        run({ repoRoot: root }).map((f) => f.file),
+        [DS_FACTS_PATH],
+      );
+      assert.equal(existsSync(outAbs), false, "check mode must not create a missing output file");
+
+      const [first] = artifacts(root);
+      const [second] = artifacts(root);
+      assert.equal(first.path, DS_FACTS_PATH);
+      assert.equal(first.content, second.content, "regeneration must be deterministic");
+
+      mkdirSync(dirname(outAbs), { recursive: true });
+      writeFileSync(outAbs, first.content, "utf8");
+      assert.deepEqual(run({ repoRoot: root }), []);
+      assert.match(run({ repoRoot: root, budget: 10 })[0]?.message ?? "", /over DS_FACTS_BYTE_BUDGET/);
+
+      const edited = `${first.content}// hand-edited\n`;
+      writeFileSync(outAbs, edited, "utf8");
+      assert.deepEqual(
+        run({ repoRoot: root }).map((f) => f.file),
+        [DS_FACTS_PATH],
+      );
+      assert.equal(readFileSync(outAbs, "utf8"), edited, "check mode must not overwrite an edited output file");
+
+      writeFileSync(outAbs, first.content, "utf8");
+      writeFixtureFacts(root, [
+        {
+          name: "Button",
+          kind: "component",
+          import: "import { Button } from '@/components';",
+          group: "forms",
+          source: "design-system/src/components/forms/Button/Button.jsx",
+          props: [{ name: "appearance", type: "enum", values: ["primary", "subtle", "danger"], default: "primary" }],
+        },
+      ]);
+      assert.deepEqual(
+        run({ repoRoot: root }).map((f) => f.file),
+        [DS_FACTS_PATH],
+      );
+      assert.equal(readFileSync(outAbs, "utf8"), first.content, "check mode must not write when source moves ahead");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });

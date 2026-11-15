@@ -1,0 +1,22 @@
+{
+  "_comment": "Hand-kept ordering rules that slot acceptance cannot express. Slot acceptance lives in _slots.json.",
+  "placements": [
+    {
+      "id": "page-banner",
+      "before": [
+        "PageHeader"
+      ],
+      "components": [
+        "Banner"
+      ],
+      "use": [
+        "Page.banner"
+      ],
+      "pattern": "Notifications",
+      "guide": "notifications",
+      "message": "before the page header reverses the page message order",
+      "fix": "put PageHeader in Page's header slot and Banner in its banner slot; run `ds guide notifications`",
+      "level": "warn"
+    }
+  ]
+}

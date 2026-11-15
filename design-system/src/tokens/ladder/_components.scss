@@ -25,6 +25,12 @@
     /* Checkbox */
     --checkbox-control-size: 18px;
 
+    /* Choice tile */
+    --choice-tile-width: var(--size-1400);
+
+    /* File item */
+    --file-item-height: calc(var(--space-300) + var(--space-050));
+
     /* Radio */
     --radio-control-size: 12px;
     --radio-control-size-10: 10px; /* RadioGroup size 10 */
@@ -50,6 +56,11 @@
     --toggle-track-width-20: 40px; /* Toggle size 20 */
     --toggle-pad: var(--space-0125); /* both sizes */
 
+    /* Setting row */
+    --setting-row-pad-y: var(--space-075);
+    --setting-row-end-min-height: var(--line-height-125);
+    --setting-row-select-min-width: var(--size-1000);
+
     /* Listbox */
     --listbox-max-width: 320px;
     --listbox-min-height: 140px;
@@ -60,6 +71,10 @@
 
     /* Option menu */
     --option-menu-width: 240px;
+
+    /* Checklist */
+    --checklist-action-width: calc(var(--space-400) * 2); /* 128px; 96px remains for the ProgressBar when a 32px dismiss IconButton takes the end */
+    --checklist-action-min-width: var(--size-750); /* 120px floor */
 
     /* Option row */
     --option-row-indent-step: var(--space-125);
@@ -108,6 +123,8 @@
     --flag-min-height: calc(var(--size-1000) + var(--size-750));
     --flag-pad: var(--space-125);
     --flag-offset: var(--space-125);
+    --flag-radius-timer: var(--radius-025);
+    --flag-timer-height: var(--space-025);
 
     /* Spotlight */
     --spotlight-width: var(--width-2500);
@@ -128,6 +145,9 @@
     /* AI chat */
     --ai-chat-width: var(--width-2500);
 
+    /* Inbox */
+    --inbox-width: calc(var(--width-2000) + var(--space-250)); /* 360px */
+
     /* Table */
     --table-cell-max-width: var(--size-300);
 
@@ -142,4 +162,7 @@
 
     /* Progress bar */
     --progress-bar-height: var(--space-050);
+
+    /* Progress ring */
+    --progress-ring-stroke: var(--stroke-2);
 }

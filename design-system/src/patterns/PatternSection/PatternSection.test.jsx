@@ -6,7 +6,7 @@ import PatternSection, { SectionToolbar } from './PatternSection';
  * The Section pattern follows the Figma Section: no fill and no pad of its
  * own, a `_Section header` of five types, a body laid out single, split or
  * as subsections, an optional footer, a toolbar, and a loading header. Sizes and colors are asserted in the browser,
- * in the `Templates/Section/Section` stories; this file holds structure.
+ * in the `Templates/Section` stories; this file holds structure.
  */
 const section = (container) => container.querySelector('section');
 

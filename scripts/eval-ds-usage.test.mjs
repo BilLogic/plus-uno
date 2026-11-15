@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { compare, DEFAULT_ARMS, LOOKUP_ARMS, lookupWiring, meteredIn, rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
+import { compare, DEFAULT_ARMS, DEFAULT_TASKS, expectedFor, expectedItems, FIT_VERDICTS, fitJudge, fitPrompt, fitScore, LOOKUP_ARMS, lookupWiring, meteredIn, parseFit, reach, rejudge, rescore, seedScore, SEEDED, structuralFit, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf, withHeadLinks } from './eval-ds-usage.mjs';
+import { headLinks } from './lib/registry.mjs';
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -116,20 +117,20 @@ test('score: escapes by rule from this checkout\'s rules; the untouched template
     assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 0, byRule: {}, warnByRule: {}, layoutFormula: null });
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Buton } from '@/components';\nexport default () => <div style={{ padding: '12px' }} />;\n");
     const scored = score({ folder: dir, label: 'eval-x' });
-    assert.deepEqual(scored.byRule, { 'ds/no-unknown-component': 1, 'ds/no-raw-literal': 1 });
-    assert.deepEqual(scored.warnByRule, { 'ds/page-starts-from-pattern': 1 });
+    assert.deepEqual(scored.byRule, { 'ds/no-unknown-component': 1, 'ds/no-raw-literal': 1, 'ds/page-starts-from-pattern': 1 });
+    assert.deepEqual(scored.warnByRule, {});
     assert.equal(scored.layoutFormula, false);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('score: warnings are counted by rule beside the fail-level escapes', () => {
+test('score: a page that does not start from a template counts as a fail-level escape', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-warn-'));
   try {
     fs.cpSync(path.join(REPO_ROOT, SCENARIOS, '_template'), dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Button } from '@/components';\nexport default () => <div style={{ display: 'flex' }}><Button appearance=\"primary\" /></div>;\n");
-    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 1, byRule: {}, warnByRule: { 'ds/page-starts-from-pattern': 1 }, layoutFormula: false });
+    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 1, warnings: 0, byRule: { 'ds/page-starts-from-pattern': 1 }, warnByRule: {}, layoutFormula: false });
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -204,6 +205,9 @@ test('a11y: a missing browser or server is recorded as a11y_error, never thrown'
 test('options: the default run is small; one arm and a model are taken as given', () => {
   const d = options([]);
   assert.deepEqual([d.runs, d.arms, d.tasks.length, d.allowMetered], [2, ['control', 'current', 'checker-removed'], 4, false]);
+  assert.ok(!DEFAULT_TASKS.includes('forbidden-ask'), 'forbidden-ask is retired from the default active task set');
+  assert.ok(DEFAULT_TASKS.includes('session-review-queue'), 'session-review-queue is in the default active task set');
+  assert.deepEqual(options(['--tasks', 'forbidden-ask']).tasks, ['forbidden-ask']);
   assert.equal(options(['--allow-metered']).allowMetered, true);
   assert.equal(options(['--runs', '2']).runs, 2);
   const o = options(['run', '--arms', 'control', '--model', 'haiku']);
@@ -269,8 +273,8 @@ test('scenariosSha is stable for the same tree, and a seeded file is part of it'
   }
 });
 
-test('the four harder scenarios are tasks, each prepared with its brief and its seeded files in the scored folder', () => {
-  for (const task of ['two-page-flow', 'debt-extend', 'migrate-retired', 'forbidden-ask']) assert.ok(TASKS.includes(task), task);
+test('the harder scenarios are tasks, each prepared with its brief and its seeded files in the scored folder', () => {
+  for (const task of ['two-page-flow', 'debt-extend', 'migrate-retired', 'forbidden-ask', 'triage-repair', 'workflow-canvas', 'session-review-queue']) assert.ok(TASKS.includes(task), task);
   const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-harder-'));
   try {
     const seeded = {
@@ -278,6 +282,7 @@ test('the four harder scenarios are tasks, each prepared with its brief and its 
       'debt-extend': ['src/App.jsx', 'src/MonthlyReviews.jsx'],
       'migrate-retired': ['src/App.jsx', 'src/CallOffConfirmation.jsx'],
       'forbidden-ask': [],
+      'session-review-queue': [],
     };
     for (const [task, files] of Object.entries(seeded)) {
       const { folder } = prepare({ ref: 'HEAD', arm: 'current', task, into: path.join(into, task) });
@@ -303,7 +308,10 @@ test('seedScore: the debt scenario starts with recorded debt, the migration with
   assert.ok(migration.byRule['ds/no-unknown-token'] >= 1, JSON.stringify(migration));
 
   for (const task of TASKS.filter((t) => !SEEDED.includes(t))) assert.equal(seedScore({ task }).escapes, 0, task);
-  assert.deepEqual(SEEDED, ['debt-extend', 'migrate-retired']);
+  const triage = seedScore({ task: 'triage-repair' });
+  assert.equal(triage.byRule['ds/no-deep-import'], 2);
+  assert.equal(triage.byRule['ds/no-raw-literal'], 3);
+  assert.deepEqual(SEEDED, ['debt-extend', 'migrate-retired', 'triage-repair']);
 });
 
 test('judge.md scopes each task-specific field to its brief by title', () => {
@@ -313,6 +321,9 @@ test('judge.md scopes each task-specific field to its brief by title', () => {
     const line = judge.split('\n').find((l) => l.includes(`**${field}**`));
     assert.ok(line, field);
     assert.ok(line.includes(`"${title(task)}"`), `${field} names "${title(task)}"`);
+  }
+  for (const task of ['trap-missing-component', 'triage-repair', 'workflow-canvas', 'session-review-queue']) {
+    assert.ok(judge.includes(`"${title(task)}" passes rendered only when`), `rendered names "${title(task)}"`);
   }
   assert.match(judge, /"escalated": true\|false\|null/);
 });
@@ -496,3 +507,369 @@ test('options: compare reads a baseline arm and a commit', () => {
   assert.equal(options([]).baseline, 'current');
   assert.throws(() => options(['--baseline', 'bogus']), /unknown bogus/);
 });
+
+test('prepare hides the eval implementation from builders, and control has no glossary or checker fixtures', () => {
+  const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-isolation-'));
+  try {
+    for (const arm of ['current', 'control', 'checker-removed']) {
+      const { root } = prepare({ ref: 'HEAD', arm, task: 'forbidden-ask', into: path.join(into, arm) });
+      for (const rel of ['scripts/eval-ds-usage.mjs', 'scripts/eval-ds-usage.test.mjs']) assert.equal(fs.existsSync(path.join(root, rel)), false, `${arm}: ${rel}`);
+      if (arm === 'control') assert.equal(fs.existsSync(path.join(root, 'GLOSSARY.md')), false);
+      if (arm !== 'current') assert.equal(fs.existsSync(path.join(root, 'scripts/lib/__fixtures__/ds-usage')), false);
+    }
+  } finally { fs.rmSync(into, { recursive: true, force: true }); }
+});
+
+test('scaffold head: prepare writes index.html with fonts and Font Awesome 7.2 from preview-head.html, without a second copy in _template', () => {
+  const templateHtml = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, '_template/index.html'), 'utf8');
+  assert.doesNotMatch(templateHtml, /fonts\.googleapis\.com|fontawesome-free/, '_template/index.html holds no second copy of head links');
+  const shared = headLinks(REPO_ROOT);
+  assert.ok(shared.some((l) => /fonts\.googleapis\.com.*Noto\+Sans/.test(l)), 'shared head links include Noto fonts');
+  assert.ok(shared.some((l) => /@fortawesome\/fontawesome-free@7\.2\.0/.test(l)), 'shared head links include Font Awesome Free 7.2');
+
+  const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-head-'));
+  try {
+    const { folder } = prepare({ ref: 'HEAD', arm: 'current', task: 'session-review-queue', into });
+    const html = fs.readFileSync(path.join(folder, 'index.html'), 'utf8');
+    for (const link of shared) assert.ok(html.includes(link), `scaffold index.html includes ${link}`);
+    assert.equal(withHeadLinks(html, REPO_ROOT), html, 'withHeadLinks is idempotent');
+  } finally {
+    fs.rmSync(into, { recursive: true, force: true });
+  }
+});
+
+test('expectedFor: loads answer keys for every active task, validates page + section citations, removes expected.json from agent copy, and returns null where none exists', () => {
+  for (const task of TASKS) {
+    const key = expectedFor(task);
+    assert.ok(key, `${task} has an answer key`);
+    assert.equal(key.task, task);
+    assert.equal(key.reference_screenshot?.status, 'pending', `${task} holds reference screenshot pending approval`);
+    const items = expectedItems(key);
+    assert.ok(items.length >= 2, `${task} has answer-key items`);
+    for (const item of items) {
+      assert.ok(item.page && fs.existsSync(path.join(REPO_ROOT, item.page)), `${task}/${item.id} cites live page ${item.page}`);
+      assert.ok(typeof item.section === 'string' && item.section.length > 0, `${task}/${item.id} cites section ${item.section}`);
+    }
+  }
+  const expected = expectedFor('session-review-queue');
+  assert.ok(expected.screens.length >= 3, 'lists template per screen');
+  assert.ok(expected.patterns.some((p) => p.id === 'filtering' && p.variant === '1 · Quick filters'), 'lists Filtering variant');
+  assert.ok(expected.required_placements.length >= 3, 'lists required placements');
+  assert.ok(expected.against_placements.length >= 3, 'lists placements that count against');
+  assert.equal(expectedFor('no-such-task'), null, 'tasks without an answer key return null');
+
+  const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-expected-'));
+  try {
+    const { root, folder } = prepare({ ref: 'HEAD', arm: 'current', task: 'session-review-queue', into });
+    assert.equal(fs.existsSync(path.join(folder, 'expected.json')), false, 'expected.json is removed from the task folder');
+    assert.equal(fs.existsSync(path.join(folder, 'reference.png')), false, 'reference.png is removed from the task folder');
+    assert.equal(fs.existsSync(path.join(root, SCENARIOS, 'session-review-queue/expected.json')), false, 'expected.json is removed with docs/evals');
+  } finally {
+    fs.rmSync(into, { recursive: true, force: true });
+  }
+});
+
+test('reach: deterministically scores opened and ds-guided template/pattern pages and whether they were before the first write', () => {
+  const expected = expectedFor('session-review-queue');
+  assert.equal(reach({ files: [], lookups: [] }, null), null);
+
+  const none = reach({ files: ['design-system/guidelines/overview.md'], lookups: ['ds_guide {"topic":"layout"}'] }, expected);
+  assert.equal(none.hit, false);
+  assert.deepEqual(none.reached, []);
+  assert.deepEqual(none.before_first_write, []);
+
+  const call = (name, input) => JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name, input }] } });
+  const stdout = [
+    call('Read', { file_path: '/c/design-system/src/patterns/Frame/index.md' }),
+    call('mcp__plus-ds__ds_guide', { topic: 'filtering' }),
+    call('Write', { file_path: '/c/prototypes/eval-session-review-queue/src/App.jsx', content: 'export default () => null;' }),
+    call('Read', { file_path: '/c/design-system/agent-views/patterns/CommonActions.md' }),
+    call('Bash', { command: 'npm run ds -- guide notifications' }),
+  ].join('\n');
+  const rs = readSet(stdout, '/c');
+  const r = reach(rs, expected);
+  assert.equal(r.hit, true);
+  assert.equal(r.all_before_write, false, 'some pages were reached only after the first write');
+  assert.deepEqual(r.templates.reached, ['design-system/src/patterns/Frame/index.md']);
+  assert.deepEqual(r.templates.before_first_write, ['design-system/src/patterns/Frame/index.md']);
+  assert.deepEqual(r.patterns.reached, [
+    'design-system/agent-views/patterns/Filtering.md',
+    'design-system/agent-views/patterns/CommonActions.md',
+    'design-system/agent-views/patterns/Notifications.md',
+  ]);
+  assert.deepEqual(r.patterns.before_first_write, ['design-system/agent-views/patterns/Filtering.md']);
+});
+
+test('a11y: captures screenshot.png at 1440x960 after fonts load', async () => {
+  const events = [];
+  const out = await a11y({
+    folder: '/fake',
+    screenshotPath: '/fake/screenshot.png',
+    load: async () => ({
+      axePath: '/fake/axe.min.js',
+      vite: {
+        createServer: async () => ({
+          listen: async () => {},
+          resolvedUrls: { local: ['http://127.0.0.1:4173/'] },
+          close: async () => {},
+        }),
+      },
+      chromium: {
+        launch: async () => ({
+          newPage: async (opts) => {
+            events.push(['newPage', opts]);
+            return {
+              setViewportSize: async (vp) => events.push(['viewport', vp]),
+              goto: async (url) => events.push(['goto', url]),
+              evaluate: async (fn) => {
+                events.push(['evaluate', String(fn).includes('fonts') ? 'fonts' : 'axe']);
+                return { violations: [] };
+              },
+              screenshot: async (sOpts) => events.push(['screenshot', sOpts]),
+              addScriptTag: async () => events.push(['axeScript']),
+            };
+          },
+          close: async () => {},
+        }),
+      },
+    }),
+  });
+  assert.deepEqual(out, { a11y_violations: { count: 0, by_rule: {} }, a11y_error: null });
+  assert.deepEqual(events[0], ['newPage', { viewport: { width: 1440, height: 960 } }]);
+  const fontIdx = events.findIndex((e) => e[0] === 'evaluate' && e[1] === 'fonts');
+  const shotIdx = events.findIndex((e) => e[0] === 'screenshot');
+  const axeIdx = events.findIndex((e) => e[0] === 'axeScript');
+  assert.ok(fontIdx !== -1 && shotIdx > fontIdx && axeIdx > shotIdx, 'waits for fonts, then screenshots before injecting axe');
+  assert.deepEqual(events[shotIdx][1], { path: '/fake/screenshot.png' });
+});
+
+test('rejudge: writes reach, screenshot and per-item fit as new rows marked rejudge, and fit is null where no answer key exists', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-rejudge-'));
+  try {
+    const srqDir = path.join(dir, 'srq');
+    const trDir = path.join(dir, 'tr');
+    for (const d of [srqDir, trDir]) {
+      fs.mkdirSync(path.join(d, 'src'), { recursive: true });
+      fs.writeFileSync(
+        path.join(d, 'src/App.jsx'),
+        "import { Frame } from '@/patterns';\nexport default function App() { return <Frame />; }\n",
+      );
+    }
+    const expected = expectedFor('session-review-queue');
+    const fakeJudgeJson = JSON.stringify(
+      Object.fromEntries(expectedItems(expected).map((item, i) => [item.id, { verdict: FIT_VERDICTS[i % 3], reason: `reason for ${item.id}` }])),
+    );
+    const rows = [
+      {
+        date: '2026-11-14T15:17:22.946Z',
+        model: 'gemini-3.8-flash',
+        harness_commit: 'd4d96b1cb',
+        scenarios_sha: '58d50ccb7403',
+        arm: 'current',
+        task: 'session-review-queue',
+        run: 1,
+        read_set: { files: ['design-system/agent-views/patterns/Filtering.md'], lookups: [] },
+        output: srqDir,
+      },
+      {
+        date: '2026-11-14T14:49:25.301Z',
+        model: 'gemini-3.8-flash',
+        harness_commit: 'd4d96b1cb',
+        scenarios_sha: '58d50ccb7403',
+        arm: 'current',
+        task: 'no-answer-key-task',
+        run: 1,
+        read_set: { files: ['design-system/agent-views/patterns/Disabled.md'], lookups: [] },
+        output: trDir,
+      },
+    ];
+    const shots = [];
+    const out = await rejudge(rows, {
+      commit: 'd4d96b1cb',
+      scorer: 'testsha',
+      screenshotFn: async ({ screenshotPath }) => {
+        shots.push(screenshotPath);
+        fs.writeFileSync(screenshotPath, 'PNG');
+        return screenshotPath;
+      },
+      judgeFn: async ({ expected: exp }) => ({
+        fit: parseFit(fakeJudgeJson, exp),
+        usage: { input_tokens: 1000, output_tokens: 200, cache_read_tokens: 0, cache_creation_tokens: 0, total_input_tokens: 1000, turns: 2, cost_usd: null },
+      }),
+    });
+    assert.equal(out.length, 2);
+    const [srq, tr] = out;
+    assert.equal(srq.rejudge, true);
+    assert.equal(srq.scored_at, 'testsha');
+    assert.equal(srq.screenshot, path.join(srqDir, 'screenshot.png'));
+    assert.equal(srq.reach.hit, true);
+    assert.deepEqual(srq.reach.patterns.before_first_write, ['design-system/agent-views/patterns/Filtering.md']);
+    assert.ok(srq.fit, 'session-review-queue gets per-item fit');
+    assert.ok(srq.fit_score && typeof srq.fit_score.score === 'number', 'rejudge records closed-form fit_score');
+    for (const item of expectedItems(expected)) {
+      assert.ok(FIT_VERDICTS.includes(srq.fit[item.id]?.verdict), `fit verdict for ${item.id}`);
+      assert.match(srq.fit[item.id]?.reason ?? '', /reason for/);
+    }
+    assert.ok(srq.estimated_cost_usd > 0 && srq.estimated_cost_usd < 0.01, 'records judge token cost only');
+
+    assert.equal(tr.rejudge, true);
+    assert.equal(tr.reach, null, 'no answer key -> reach is null');
+    assert.equal(tr.fit, null, 'no answer key -> fit is null');
+    assert.equal(tr.fit_score, null);
+    assert.equal(tr.judge_usage, null);
+    assert.equal(tr.estimated_cost_usd, 0);
+    assert.equal(shots.length, 2);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('structuralFit + fitJudge: structural items are scored by the checker while the AI judge scores semantic items from source only', () => {
+  const expected = expectedFor('session-review-queue');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-structural-fit-'));
+  try {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(dir, 'src/App.jsx'),
+      [
+        "import { Frame, Page, PageHeader, PatternSection, PatternTable } from '@/patterns';",
+        "import { Banner, FilterButton, Panel, SearchField, usePanelControl } from '@/components';",
+        'export default function App() {',
+        '  const panel = usePanelControl();',
+        '  return (',
+        '    <Frame panel={<Panel>Details</Panel>}>',
+        '      <Page header={<PageHeader title="Queue" />} banner={<Banner appearance="warning">Overdue</Banner>}>',
+        '        <PatternSection title="Sessions" toolbar={<PatternSection.Toolbar search={<SearchField label="Search" />} filters={<FilterButton label="Status" />} />}>',
+        '          <PatternTable />',
+        '        </PatternSection>',
+        '      </Page>',
+        '    </Frame>',
+        '  );',
+        '}',
+      ].join('\n'),
+    );
+    const structural = structuralFit({ folder: dir, expected });
+    assert.equal(structural['queue-page']?.verdict, 'followed');
+    assert.equal(structural.filtering?.verdict, 'followed');
+    assert.equal(structural['banner-under-page-header']?.verdict, 'followed');
+    assert.equal(structural['controls-in-section-toolbar']?.verdict, 'followed');
+    assert.equal(structural['detail-in-frame-panel']?.verdict, 'followed');
+    assert.equal(structural['bare-select-in-toolbar']?.verdict, 'followed');
+    assert.equal(structural['banner-above-or-flush-page-header']?.verdict, 'followed');
+
+    let promptSeen = '';
+    const semanticItems = expectedItems(expected).filter((i) => i.scoring !== 'checker');
+    const fakeSemanticJson = JSON.stringify(
+      Object.fromEntries(semanticItems.map((item) => [item.id, { verdict: 'followed', reason: `semantic ${item.id}` }])),
+    );
+    const judged = fitJudge({
+      folder: dir,
+      expected,
+      model: 'gemini-3.8-flash',
+      runAgent: ({ prompt }) => {
+        promptSeen = prompt;
+        return { result: { result: fakeSemanticJson, usage: { input_tokens: 500, output_tokens: 100 } } };
+      },
+    });
+    assert.doesNotMatch(promptSeen, /"queue-page"/, 'structural items are not sent to the AI judge');
+    assert.match(promptSeen, /"review-panel"/, 'semantic items are sent to the AI judge');
+    assert.equal(judged.fit['queue-page'].scored_by, 'checker');
+    assert.equal(judged.fit['review-panel'].verdict, 'followed');
+    assert.deepEqual(judged.fit_score, {
+      score: 1,
+      followed: expectedItems(expected).length,
+      partly: 0,
+      ignored: 0,
+      applicable: expectedItems(expected).length,
+    });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('PRD-style briefs: active build briefs do not hand over template or component names', () => {
+  const srqBrief = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, 'session-review-queue/BRIEF.md'), 'utf8');
+  const trBrief = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, 'triage-repair/BRIEF.md'), 'utf8');
+  for (const name of ['PatternSection', 'PatternTable', 'PageHeader', 'FilterButton', 'FilterMenu', 'SearchField', 'StatusTag', 'RadioGroup', 'FlagGroup', 'EmptyState']) {
+    assert.doesNotMatch(srqBrief, new RegExp(`\\b${name}\\b`), `session-review-queue brief does not name ${name}`);
+    assert.doesNotMatch(trBrief, new RegExp(`\\b${name}\\b`), `triage-repair brief does not name ${name}`);
+  }
+});
+
+test('summarize reports tokens and turns per clean build next to escapes, reach and fit', () => {
+  const s = summarize([
+    {
+      arm: 'lookup',
+      model: 'gemini-3.8-flash',
+      task: 'session-review-queue',
+      escapes: 0,
+      by_rule: {},
+      warnings: 0,
+      warn_by_rule: {},
+      turns: 12,
+      total_input_tokens: 100000,
+      agent_error: false,
+      judge: { rendered: true },
+      reach: {
+        expected: ['a.md', 'b.md', 'c.md', 'd.md'],
+        reached: ['a.md', 'b.md'],
+        before_first_write: ['a.md'],
+        hit: true,
+        all_before_write: false,
+      },
+      fit: {
+        i1: { verdict: 'followed', reason: 'ok' },
+        i2: { verdict: 'partly', reason: 'half' },
+        i3: { verdict: 'ignored', reason: 'miss' },
+        i4: { verdict: 'n/a', reason: 'skip' },
+      },
+    },
+    {
+      arm: 'lookup',
+      model: 'gemini-3.8-flash',
+      task: 'debt-extend',
+      escapes: 2,
+      by_rule: { 'ds/no-raw-literal': 2 },
+      warnings: 0,
+      warn_by_rule: {},
+      turns: 28,
+      total_input_tokens: 300000,
+      agent_error: false,
+      judge: { rendered: true },
+    },
+    {
+      arm: 'lookup',
+      model: 'gemini-3.8-flash',
+      task: 'page-from-prd',
+      escapes: 0,
+      by_rule: {},
+      warnings: 0,
+      warn_by_rule: {},
+      turns: 16,
+      total_input_tokens: 140000,
+      agent_error: false,
+      judge: { rendered: true },
+    },
+  ]).lookup['gemini-3.8-flash'];
+
+  assert.equal(s.escapes_per_run, 0.67);
+  assert.deepEqual(s.reach, {
+    runs: 1,
+    hit_rate: '1/1',
+    reached: '2/4',
+    before_first_write: '1/4',
+  });
+  assert.deepEqual(s.fit, {
+    runs: 1,
+    score: 0.5,
+    followed: 1,
+    partly: 1,
+    ignored: 1,
+    applicable: 3,
+  });
+  assert.equal(s.clean_runs, 2);
+  assert.equal(s.tokens_per_clean_build, 120000);
+  assert.equal(s.turns_per_clean_build, 14);
+});
+
+

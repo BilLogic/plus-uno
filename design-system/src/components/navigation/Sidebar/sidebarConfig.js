@@ -57,17 +57,45 @@ export const SIDEBAR_GROUPS = [
 /**
  * The groups one role sees, ready for `PatternSidebar`.
  *
+ * Pass `groups` to add or override groups and rows by `id` while keeping the
+ * role's navigation: matching group and item ids merge in place; new items and
+ * groups append.
+ *
  * @param {SidebarUser} user
- * @param {{ slackUrl?: string, badges?: Record<string, { count?: number, countLabel?: string, dot?: boolean, dotLabel?: string }> }} [options]
+ * @param {{ slackUrl?: string, badges?: Record<string, { count?: number, countLabel?: string, dot?: boolean, dotLabel?: string }>, groups?: Array<{ id: string, title?: string, lockedDuringOnboarding?: boolean, items?: Array<object> }> }} [options]
  */
-export function sidebarGroups(user, { slackUrl = SLACK_URL, badges = {} } = {}) {
+export function sidebarGroups(user, { slackUrl = SLACK_URL, badges = {}, groups = [] } = {}) {
     const shape = (item) => ({
         ...item,
         ...(item.id === 'slack' ? { href: slackUrl } : {}),
         ...(badges[item.id] ?? {}),
     });
-    return SIDEBAR_GROUPS
+    const merged = SIDEBAR_GROUPS
         .filter((group) => !group.roles || group.roles.includes(user))
         // eslint-disable-next-line no-unused-vars
-        .map(({ roles, ...group }) => ({ ...group, items: group.items.map(shape) }));
+        .map(({ roles, ...group }) => ({ ...group, items: [...group.items] }));
+
+    for (const override of groups ?? []) {
+        const target = merged.find((group) => group.id === override.id);
+        if (target) {
+            if (override.title !== undefined) target.title = override.title;
+            if (override.lockedDuringOnboarding !== undefined) {
+                target.lockedDuringOnboarding = override.lockedDuringOnboarding;
+            }
+            for (const item of override.items ?? []) {
+                const index = target.items.findIndex((existing) => existing.id === item.id);
+                if (index >= 0) target.items[index] = { ...target.items[index], ...item };
+                else target.items.push(item);
+            }
+        } else {
+            const known = SIDEBAR_GROUPS.find((group) => group.id === override.id);
+            merged.push({
+                ...(known?.title ? { title: known.title } : {}),
+                ...override,
+                items: [...(override.items ?? [])],
+            });
+        }
+    }
+
+    return merged.map((group) => ({ ...group, items: group.items.map(shape) }));
 }

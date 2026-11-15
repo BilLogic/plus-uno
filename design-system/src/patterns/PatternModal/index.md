@@ -8,13 +8,17 @@ Also asked as: dialog layout, confirm layout.
 
 **Import:** `import { PatternModal } from '@/patterns';`
 
+**Used in:** Form (`ds guide form`); Panel (`ds guide panel`); Card (`ds guide card`); Modal (`ds guide modal`); Popup (`ds guide popup`)
+
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
+
 **Source:** `design-system/src/patterns/PatternModal/PatternModal.jsx`
 
-**Stories:** `design-system/src/patterns/PatternModal/PatternModal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthSmall, WidthMedium, WidthLarge, HugLong, HeightFill, TabsStill, Interactive, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused
+**Stories:** `design-system/src/patterns/PatternModal/PatternModal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthSmall, WidthMedium, WidthLarge, HugLong, HeightFill, TabsStill, Interactive, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, MotionOpenClose, MotionReduced
 
 **Storybook page:** `design-system/src/patterns/PatternModal/PatternModal.mdx`
 
-**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast` · swap `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.exit` + `appearance.fast` · swap `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -34,7 +38,7 @@ PatternModal reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Scales from 96% and fades in; the Backdrop dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts. |
-| exit | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Leaves at 98%, fading. |
+| exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Leaves at 98%, fading; stays mounted until the exit completes. |
 | swap | Swap content in place | `--ds-motion-appearance-fast` | One Modal at a time: a confirm replaces the content in place, never a second Modal. |
 | rejected | Call attention | `--ds-motion-spatial-fast` | A blocked submit shakes it once; never in reduced motion. |
 
@@ -57,7 +61,7 @@ A button, a link, an icon. Never on its own.
 
 **Checked:** Review
 
-One rule, so nobody guesses. A short form is 8-col; a table, an editor or steps is 10-col. Never pick a width to make content look a certain way. A confirm takes 6-col today; 4-col is Planned (see Widths).
+A short form is 8-col; a table, editor or steps is 10-col. Choose width by task. A confirm takes 6-col today; 4-col is Planned (see Widths).
 
 Do: A confirm at the narrow step: the title, one line and two buttons.
 Don't: The same confirm at a wide step: empty width around one line, picked to make it look a certain way.
@@ -122,7 +126,7 @@ Picked by what the person has to do. The component page holds every prop and sta
 An Active Modal at 8-col with a short form. Every part once; the pad is 16 on every side, the radius 16, and the parts sit 16 apart.
 
 1. **Backdrop.** Dims the page and holds the Modal centered.
-2. **Header.** The title at 20/24 and the Close icon button. With tabs, the tab group sits 8 under the title.
+2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 80 tall.
 4. **Footer** (optional). Full-bleed buttons; Cancel (Default) left, Primary right.
 
@@ -173,6 +177,7 @@ The Modal's maximum height is the screen less `--space-400` above and below.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `show` | bool | `true` | Keep mounted and set false to finish the exit before removal; also follows its Backdrop. |
 | `id` | string | — | — |
 | `title` | node | — | Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name |
 | `header` | node | — | Custom header slot, Figma's `_Modal header` type=custom. It replaces the title row (the title and the close button), so name the dialog with `aria-label`. |
@@ -200,7 +205,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-medium` · `--modal-body-min-height` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--modal-stack-sm` · `--stack-lg` · `--stack-md`
+`--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-medium` · `--modal-body-min-height` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--modal-stack-sm` · `--plus-overlay-origin` · `--stack-lg` · `--stack-md` · `--transform-origin`
 
 From `design-system/src/patterns/PatternModal/PatternModal.scss`. Override these through the token layer, never with a literal.
 

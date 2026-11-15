@@ -27,7 +27,7 @@
  *   6. The sidebar's roots lead with the benchmark site's sections plus our
  *      Patterns and Templates, in order: Get started, Foundations, Components,
  *      Patterns, Templates, AI UI. Our own extras (Data visualizations,
- *      Libraries) follow.
+ *      Tech stack) follow.
  *   7. Every docs page and story file under `design-system/src/` is titled
  *      under a root the sidebar sort lists, so a page left under a retired
  *      root (`Getting started/…`, `Foundations/Patterns/…`) cannot open a
@@ -37,11 +37,11 @@
  *      Templates and Patterns: a page titled under one of those roots sits in
  *      one of that root's sources, and a page in one of a root's sources is
  *      titled under that root.
- *   9. Foundations · Motion is exactly the pages the sidebar sort lists under
- *      Foundations > Motion, Library among them: a page titled
- *      `Foundations/Motion/<name>` is listed, and a listed name has a page.
+ *   9. Foundations › Expression › Motion is exactly the pages the sidebar sort lists under
+ *      Foundations > Expression > Motion, Library among them: a page titled
+ *      `Foundations/Expression/Motion/<name>` is listed, and a listed name has a page.
  *      This is where the first-pass "Durations and easings" page was caught.
- *      Foundations · Sound follows the same rule, with no required Library page.
+ *      Foundations › Expression › Sound follows the same rule, with no required Library page.
  *
  * An AI component (Icon, Prompt input) is listed in the taxonomy's
  * `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays
@@ -59,18 +59,8 @@ import { fileURLToPath } from 'node:url';
 
 import { byRoot, main } from './lib/findings.mjs';
 
-/**
- * The `title:` of a story file's default export. Anchored on `export default {`
- * rather than the first `title:` in the file: story files are full of `title`
- * props on sample data.
- * @returns {string | null}
- */
-export function metaTitle(src) {
-  const start = src.indexOf('export default {');
-  if (start === -1) return null;
-  const m = /(?:^|\n)\s*title:\s*['"]([^'"]+)['"]/.exec(src.slice(start));
-  return m ? m[1] : null;
-}
+import { readStorybookPage } from './lib/storybook-pages.mjs';
+export { storyMetaTitle as metaTitle, storybookTitle as docsTitle } from './lib/storybook-pages.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -122,29 +112,25 @@ export function isSentenceCase(segment) {
   return words.slice(1).every((w) => !/^[A-Z][a-z]/.test(w));
 }
 
-/** A docs file's title: a story file's default export, or an MDX page's `<Meta title>`. */
-export function docsTitle(src) {
-  const meta = /<Meta\b[^>]*?\btitle=["']([^"']+)["']/.exec(src);
-  return meta ? meta[1] : metaTitle(src);
-}
-
 /** The sidebar sort's roots, in order, without the `*` catch-all. */
 const sortRoots = (taxonomy) =>
   (taxonomy.storySortOrder ?? []).filter((e) => typeof e === 'string' && e !== '*');
 
-/** Where Foundations · Motion pages live, and the page the component docs link to. */
-export const MOTION_ROOT = 'Foundations/Motion';
+/** Where Foundations › Expression › Motion pages live, and the page the component docs link to. */
+export const MOTION_ROOT = 'Foundations/Expression/Motion';
 export const MOTION_LIBRARY = 'Library';
 
-/** Where Foundations · Sound pages live. */
-export const SOUND_ROOT = 'Foundations/Sound';
+/** Where Foundations › Expression › Sound pages live. */
+export const SOUND_ROOT = 'Foundations/Expression/Sound';
 
-/** The Foundations > `name` entries of the sidebar sort, or null when it lists none. */
+/** The Foundations > Expression > `name` entries of the sidebar sort, or null when it lists none. */
 function sortFoundation(taxonomy, name) {
   const order = taxonomy.storySortOrder ?? [];
   const foundations = order[order.indexOf('Foundations') + 1];
   if (!Array.isArray(foundations)) return null;
-  const nested = foundations[foundations.indexOf(name) + 1];
+  const expression = foundations[foundations.indexOf('Expression') + 1];
+  if (!Array.isArray(expression)) return null;
+  const nested = expression[expression.indexOf(name) + 1];
   return Array.isArray(nested) ? nested.filter((e) => typeof e === 'string') : null;
 }
 
@@ -167,11 +153,11 @@ const inputs = byRoot((repoRoot) => {
     .filter(Boolean);
   const stories = tracked
     .filter((rel) => rel.startsWith('design-system/src/components/') && /\.stories\.[jt]sx?$/.test(rel))
-    .map((rel) => ({ rel, title: metaTitle(fs.readFileSync(path.join(repoRoot, rel), 'utf8')) }));
+    .map((rel) => ({ rel, title: readStorybookPage(repoRoot, rel).title }));
   const pages = tracked
     .filter((rel) => rel.startsWith('design-system/src/'))
     .filter((rel) => /(\.stories\.[jt]sx?|\.mdx)$/.test(rel))
-    .map((rel) => ({ rel, title: docsTitle(fs.readFileSync(path.join(repoRoot, rel), 'utf8')) }));
+    .map((rel) => ({ rel, title: readStorybookPage(repoRoot, rel).title }));
   return { taxonomy, folders, tracked, stories, pages };
 });
 
@@ -294,34 +280,48 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     }
   }
 
-  // (9) Foundations · Motion and Foundations · Sound: the listed pages, and no others.
+  // (9) Foundations › Expression › Motion and Foundations › Expression › Sound: the listed pages, and no others.
   const listed = (name, rootPath) => {
     const entries = sortFoundation(taxonomy, name);
     if (!entries) return;
     const titled = new Set(
-      pages.filter(({ title }) => title?.startsWith(`${rootPath}/`)).map(({ title }) => title.split('/')[2]),
+      pages.filter(({ title }) => title?.startsWith(`${rootPath}/`)).map(({ title }) => title.split('/')[3]),
     );
     for (const { rel, title } of pages) {
       if (!title?.startsWith(`${rootPath}/`)) continue;
-      if (!entries.includes(title.split('/')[2])) {
+      if (!entries.includes(title.split('/')[3])) {
         found.push(
-          `${rel}  is titled "${title}", a Foundations · ${name} page the sidebar sort does not list.\n` +
-            `      -> List it under Foundations > ${name} in storybook.taxonomy.json, or delete the page.`,
+          `${rel}  is titled "${title}", a Foundations › Expression › ${name} page the sidebar sort does not list.\n` +
+            `      -> List it under Foundations > Expression > ${name} in storybook.taxonomy.json, or delete the page.`,
         );
       }
     }
     for (const entry of entries) {
       if (!titled.has(entry)) {
-        found.push(`storybook.taxonomy.json  Foundations > ${name} lists "${entry}", but no page is titled ${rootPath}/${entry}.`);
+        found.push(`storybook.taxonomy.json  Foundations > Expression > ${name} lists "${entry}", but no page is titled ${rootPath}/${entry}.`);
       }
     }
     return entries;
   };
   const motion = listed('Motion', MOTION_ROOT);
   if (motion && !motion.includes(MOTION_LIBRARY)) {
-    found.push(`storybook.taxonomy.json  Foundations > Motion does not list ${MOTION_LIBRARY}.`);
+    found.push(`storybook.taxonomy.json  Foundations > Expression > Motion does not list ${MOTION_LIBRARY}.`);
   }
   listed('Sound', SOUND_ROOT);
+
+  // (10) No component page is titled a path-prefix of another: a page that is also a folder
+  // shows up in the sidebar as a "Docs" child. The parent's own page is titled Name/Name.
+  const titles = new Set(stories.map(({ title }) => title).filter(Boolean));
+  for (const { rel, title } of stories) {
+    if (!title) continue;
+    const child = [...titles].find((other) => other.startsWith(`${title}/`));
+    if (child) {
+      found.push(
+        `${rel}  is titled "${title}", which is also the folder of "${child}", so the sidebar lists it as a "Docs" entry.\n` +
+          `      -> Title the page ${title}/${title.split("/").pop()}.`,
+      );
+    }
+  }
 
   // (5) Retired paths.
   const self = new Set(['scripts/check-storybook-categories.mjs', 'scripts/check-storybook-categories.test.mjs']);

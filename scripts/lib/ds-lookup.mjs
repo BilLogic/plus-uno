@@ -47,31 +47,41 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { REFERENCE_SCREENS } from './story-examples.mjs';
+
+import { componentContext, contextLines, contextList } from './component-context.mjs';
 
 import { contextOf, escapes, expandPaths } from '../check-ds-usage.mjs';
 import { BARRELS, loadFacts } from './ds-facts.mjs';
 import { createPageFinder, pageText, readDocsPage, sectionText } from './docs-page.mjs';
 import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
+import { INSTALL_FOLDER } from './ds-add.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
-import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, renderComponent, sectionsOf } from './component-render.mjs';
+import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, governedByOf, governedNamesOf, renderComponent, sectionsOf } from './component-render.mjs';
 
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
 
-export const ORIENTATION = `PLUS design system: the React components, patterns and tokens every PLUS prototype is built from. A name the lookup does not know does not exist here: propose it rather than write it.
+export const ORIENTATION = `PLUS design system: the React components, templates, patterns and tokens every PLUS prototype is built from. A name the lookup does not know does not exist here: propose it rather than write it.
 
 Barrels (import only from these):
-- ${BARRELS[1]}: the shells (Frame, which every full page starts from, PatternCard, PatternSection, PatternTable, overlays)
+- ${BARRELS[1]}: the templates (Frame, which every full page starts from, Page, PatternSection, PatternCard, PatternTable, overlays)
 - ${BARRELS[0]}: the components (Button, TextField, SectionMessage...)
 
-Order: ds_find (what exists for the task) → ds_get (props, usage, practices, a11y, figma) → ds_tokens (steps for a role) → ds_guide (layout, content, a rule) → write → ds_check (findings to zero).
+Build in five stages:
+1. Template — which template each screen sits in and what fills its slots: ds_find (a brief or component list returns the kit), ds_guide("templates")
+2. Blocks — the Sections and Cards on the grid, and which pattern governs each situation: ds_guide("patterns"), then ds_guide("<pattern>")
+3. Pieces — the components in each slot and their props: ds_find → ds_get
+4. Polish — spacing, type, color, radius and elevation tokens by role: ds_tokens("<role>")
+5. Motion — which state changes animate and with which transition: ds_guide("motion")
 
 Hard rules:
-- Patterns first, then components; build new interactive behavior on @base-ui/react styled with tokens.
+- Template, then blocks, then pieces; build new interactive behavior on @base-ui/react styled with tokens.
 - Props and values come from ds_get, never from memory.
 - Style with semantic, pattern or component tokens (ds_tokens); never a literal, never a primitive (--palette-*, --space-<n>).
 - Icons are Font Awesome Free: fa-solid, fa-regular, fa-brands.
-- A full page starts from a template: Frame with the PLUS Sidebar (ds_guide layout).`;
+- A full page starts from a template: Frame with the PLUS Sidebar (ds_guide("templates")).
+- Run ds_check once at the end.`;
 
 const FIND_LIMIT = 10;
 const PER_KIND = { token: 3, icon: 3 };
@@ -102,6 +112,7 @@ const TOPIC_ALIASES = {
   a11y: 'accessibility',
   'layout formulas': 'layout',
   formulas: 'layout',
+  'form-behavior': 'forms',
   page: 'layout',
   pages: 'layout',
   icons: 'iconography',
@@ -123,6 +134,70 @@ const TOPIC_ALIASES = {
   elevation: 'elevation',
   content: 'content',
   grid: 'grid',
+  filter: 'filtering',
+  filters: 'filtering',
+  filtering: 'filtering',
+  toolbar: 'section',
+  'view bar': 'section',
+  'view-bar': 'section',
+  viewbar: 'section',
+  validation: 'forms',
+  forms: 'forms',
+  search: 'search',
+  empty: 'empty',
+  'empty state': 'empty',
+  'empty-state': 'empty',
+  error: 'errors',
+  errors: 'errors',
+  'error state': 'errors',
+  'error-state': 'errors',
+  loading: 'loading',
+  notification: 'notifications',
+  notifications: 'notifications',
+  toast: 'notifications',
+  toasts: 'notifications',
+  banner: 'notifications',
+  banners: 'notifications',
+  alert: 'notifications',
+  alerts: 'notifications',
+  action: 'common-actions',
+  actions: 'common-actions',
+  bulk: 'common-actions',
+  'bulk actions': 'common-actions',
+  'bulk-actions': 'common-actions',
+  'row actions': 'common-actions',
+  'row-actions': 'common-actions',
+  'common-actions': 'common-actions',
+  commonactions: 'common-actions',
+  nav: 'navigation',
+  sidebar: 'navigation',
+  breadcrumb: 'navigation',
+  breadcrumbs: 'navigation',
+  navigation: 'navigation',
+  disabled: 'disabled',
+  unavailable: 'disabled',
+  'tooltip on disabled': 'disabled',
+  readonly: 'read-only',
+  'read-only': 'read-only',
+  'read only': 'read-only',
+  overflow: 'overflow',
+  truncation: 'overflow',
+  indicator: 'indicators',
+  indicators: 'indicators',
+  badge: 'indicators',
+  tag: 'indicators',
+  status: 'indicators',
+  templates: 'templates',
+  template: 'templates',
+  patterns: 'patterns',
+  pattern: 'patterns',
+  foundations: 'foundations',
+  foundation: 'foundations',
+  motion: 'motion',
+  transitions: 'transitions',
+  choreography: 'choreography',
+  sound: 'sound',
+  sounds: 'sound',
 };
 /** Topic words that are everyday English too ("copy to clipboard", "grid of cards"). */
 const GUIDE_WEAK = new Set('copy content grid icon icons page pages type writing voice shadow charts formulas'.split(' '));
@@ -142,7 +217,9 @@ const headed = (page, title) => {
 };
 const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
 const GUIDELINES = 'design-system/guidelines';
-const FOUNDATION_PAGES = 'design-system/src/styles';
+const AGENT_VIEWS = 'design-system/agent-views';
+const PATTERNS_SRC = 'design-system/src/patterns';
+const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'PatternSection', 'PatternCard', 'PatternTable', 'PatternModal'];
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
   if (!text) return null;
@@ -185,12 +262,15 @@ export class PathsRefused extends Error {
 
 /**
  * `readPaths: false` is the hosted server's; `aliases: false` zeroes the alias field (the retrieval bench's second arm);
+ * `consumerRoot` is where `check` reads `paths` from when that is not the facts' tree (the packaged `ds check` reads the caller's project);
  * `iconMetadata` stands in for the committed Free icon lists (the `icons.json` shape), for a test that needs a small set.
  */
-export function createLookup(root, { readPaths = true, aliases = true, iconMetadata = null } = {}) {
+export function createLookup(root, { readPaths = true, aliases = true, iconMetadata = null, consumerRoot = root } = {}) {
   const facts = loadFacts(root);
   const registry = JSON.parse(readIf(path.join(root, 'design-system/figma/component-registry.json')) ?? '{"components":{},"patterns":{}}');
   const records = facts.manifests.components.components;
+  let context;
+  const contexts = () => context ??= componentContext(root, records);
   const findPage = createPageFinder(root, registry);
   /** A component's docs page, found by its Storybook meta or the registry: `{path, page}`, or null. Read once. */
   const pages = new Map();
@@ -281,7 +361,8 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   /** A component or pattern as a find row. */
   const item = (name, extra = {}) => {
     const a = facts.lookup(name);
-    return { kind: a.kind, name, status: 'exists', import: a.import, summary: shortSummary(a.summary), aliasOf: a.aliasOf, ...extra };
+    // A component is a registry item; `ds add <registryItem>` installs it (an alias installs its target).
+    return { kind: a.kind, name, status: 'exists', import: a.import, summary: shortSummary(a.summary), aliasOf: a.aliasOf, ...(a.kind === 'component' ? { registryItem: a.aliasOf ?? name } : {}), ...extra };
   };
   /** A not-here row: the name, why, and what to use instead. */
   const notHereRow = (row) => {
@@ -428,24 +509,74 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       out.push(row);
     };
 
-    for (const row of exactLane(c)) push(row);
+    const referenceRows = [];
+    const exact = exactLane(c);
+    const named = records.filter((r) => hasPhrase(c.ql, r.name.toLowerCase()));
+    const kitQuery = named.length >= 3 || (c.raw.length >= 6 && /\b(build|create|design|screen|dashboard|page|with)\b/.test(c.ql));
+    const situation = /\b(narrow|nothing|confirm|delet\w*|filter\w*|search|empty|loading|error\w*|disabled|overflow|navigation|notification\w*)\b/.test(c.ql) && !exact.length && !speaksTokens(q) && !c.raw.some((w) => ICON_WORDS.has(w)) && c.raw.length >= 2;
+    const pages = contexts().pages;
+    const pageRank = (kind) => createRanker(pages.filter((p) => p.kind === kind && p.name !== 'Overview').map((p) => ({
+      id: p.name, fields: { name: p.name, summary: p.intro, usage: p.text },
+    })), { name: 5, summary: 8, usage: 0.2 }).score(q.replace(/\byet\b/gi, '')).filter((r) => r.score > 0).map((r) => pages.find((p) => p.name === r.id && p.kind === kind));
+    const pageRow = (p) => ({ kind: p.kind, name: p.name, doc: p.doc, use: p.components.map(brief), next: `ds_guide("${p.name.toLowerCase().replace(/ /g, '-')}")` });
+    const patternPages = situation || kitQuery ? pageRank('pattern') : [];
+    const explicitPattern = topicsOf(c).map((topic) => pages.find((p) => p.kind === 'pattern' && p.name.toLowerCase().replace(/ /g, '-') === topic)).find(Boolean);
+    if (explicitPattern && patternPages.includes(explicitPattern)) {
+      patternPages.splice(patternPages.indexOf(explicitPattern), 1);
+      patternPages.unshift(explicitPattern);
+    }
+    const exactPattern = pages.find((p) => p.kind === 'pattern' && p.name.toLowerCase().replace(/ /g, '-') === c.ql.replace(/ /g, '-'));
+    if (exactPattern && !exact.length) push(pageRow(exactPattern));
+    const exactTemplate = pages.find((p) => p.kind === 'template' && p.name.toLowerCase() === c.ql);
+    if (exactTemplate && !exact.some((r) => r.kind === 'not-here')) push({ ...(exactTemplate.component ? item(exactTemplate.component) : {}), ...pageRow(exactTemplate) });
+    if (situation && patternPages.length) {
+      push(pageRow(patternPages[0]));
+    }
+    if (!exact.length && /\b(list|queue|review|detail)\b/.test(c.ql) && !speaksTokens(q) && !c.raw.some((w) => ICON_WORDS.has(w))) {
+      const kind = /\bdetail\b/.test(c.ql) ? 'detail' : 'list';
+      const reference = JSON.parse(readIf(path.join(root, REFERENCE_SCREENS)) ?? '[]').find((r) => r.reference === kind);
+      if (reference) referenceRows.push({ kind: 'reference', name: reference.name, file: reference.file, export: reference.export, url: reference.url });
+    }
+    for (const row of exact) push(row);
     for (const row of notHereLane(c)) push(row);
     // The band is scored before the token lane: its best score decides how many token steps lead.
     const { top, band } = rankedBand(c);
     for (const row of tokenLane(c, top)) push(row);
     for (const row of iconLane(c)) push(row);
     for (const row of meaningLane(c, band)) push(row);
+    if (c.raw.length >= 2 && !exact.length && !speaksTokens(q) && !c.raw.some((w) => ICON_WORDS.has(w))) {
+      const template = pageRank('template')[0];
+      if (template) push(pageRow(template));
+    }
     for (const row of exportLane(c)) push(row);
 
     // Lane 7: a pointer to the guideline a query word names, always kept as the last row.
     const topics = topicsOf(c);
     const guideRow = topics.length ? [{ kind: 'guide', name: topics[0], next: `ds_guide("${topics[0]}")` }] : [];
-    const results = [...out.slice(0, FIND_LIMIT - guideRow.length), ...guideRow];
+    const results = [...out.slice(0, FIND_LIMIT - guideRow.length - referenceRows.length), ...referenceRows, ...guideRow];
 
-    const next = out.length
+    let kit;
+    if (kitQuery) {
+      const template = /\b(frame|screen|page|dashboard)\b/.test(c.ql) ? pages.find((p) => p.component === 'Frame') : pageRank('template')[0] ?? pages.find((p) => p.component === 'Frame');
+      const components = [...new Set([...named.map((r) => r.name), ...out.filter((r) => ['component', 'pattern', 'template'].includes(r.kind) && r.import).map((r) => r.name), ...(patternPages[0]?.components ?? [])])].slice(0, 16);
+      const governing = components.flatMap((name) => contexts().edges[name]?.governedBy ?? []);
+      const frequency = (page) => governing.filter((p) => p.name === page.name).length;
+      const patterns = [...new Map([...patternPages.slice(0, 3), ...governing.sort((a, b) => frequency(b) - frequency(a))].map((p) => [p.name, pageRow(p)])).values()].slice(0, 6);
+      kit = {
+        template: pageRow(template), patterns,
+        components: components.map(brief),
+        tokenRoles: ['stack', 'inline', 'pad', 'ds-text', 'ds-background', 'radius'].map((role) => ({ role, steps: tokens(role).steps.slice(0, 3) })),
+      };
+    }
+    const next = kit ? `These fill ${kit.template.name}. Start from that template: ${kit.template.next}; ds_get for the components.` : out.length
       ? 'Next: ds_get with the names you will use (section "props" first); ds_tokens for a styling role.'
       : `Nothing matches "${q}". Try one plain word (card, table, date); ds_tokens for a token role; ${topics.length ? `ds_guide(${topics.map((t) => `"${t}"`).join(', ')})` : 'ds_guide for a guideline topic'}.`;
-    return { query: q, results, next };
+    const backEdges = Object.fromEntries(results.filter((r) => contexts().edges[r.aliasOf ?? r.name]).map((r) => {
+      const name = r.aliasOf ?? r.name;
+      const edges = contexts().edges[name];
+      return [r.name, { usedIn: contextList(edges.usedIn.map((p) => p.name), 48), governedBy: contextList(governedNamesOf(name, edges), 48) }];
+    }));
+    return { query: q, results, backEdges, ...(kit ? { kit } : {}), next };
   }
 
   // ── get ─────────────────────────────────────────────────────────────────
@@ -500,8 +631,13 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     };
     // The text is the generated doc's: one render (`component-render.mjs`) from the manifest record and the page.
     const homeName = a.aliasOf ?? a.name;
+    const edges = contexts().edges[homeName];
+    const { usedIn } = contextLines(edges);
+    const governedBy = governedByOf(homeName, edges);
+    if (usedIn) record.usedIn = usedIn;
+    if (governedBy) record.governedBy = governedBy;
     const componentFactsOf = componentFacts(facts.manifests.components, homeName, { [homeName]: facts.lookup(homeName).aliases });
-    const text = componentFactsOf?.source ? renderComponent(componentFactsOf, docs) : null;
+    const text = componentFactsOf?.source ? renderComponent(componentFactsOf, docs, edges) : null;
     if (text) record.doc = docPathOf(componentFactsOf);
     const wanted = section ? [section] : SECTIONS;
     for (const s of wanted) {
@@ -509,8 +645,11 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       else if (s === 'figma') record.figma = figmaFor(a.aliasOf ?? a.name);
       else record[s] = text ? sectionsOf(text, SECTION_TITLES[s]) : null;
     }
-    if (text) record.text = section ? [`# ${a.name}`, a.import, sectionsOf(text, SECTION_TITLES[section]) ?? `## ${section}\n\nNone in the generated doc.`].join('\n\n') + '\n' : text;
-    else record.next = 'Next: ds_tokens for the roles you style; ds_check once the code is written.';
+    if (text) {
+      record.text = section
+        ? [`# ${a.name}`, a.import, ...(section !== 'a11y' && usedIn ? [`**Used in:** ${usedIn}`] : []), ...(section !== 'a11y' && governedBy ? [`**Governed by:** ${governedBy}`] : []), sectionsOf(text, SECTION_TITLES[section]) ?? `## ${section}\n\nNone in the generated doc.`].join('\n\n') + '\n'
+        : text;
+    } else record.next = 'Next: ds_tokens for the roles you style; ds_check once the code is written.';
     return record;
   }
 
@@ -542,36 +681,104 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   // ── guide ───────────────────────────────────────────────────────────────
 
   /** A folder's `.md` files other than its overview; none when the folder is empty or gone. */
-  const mdIn = (dir) => (fs.existsSync(path.join(root, dir)) ? fs.readdirSync(path.join(root, dir)).filter((f) => f.endsWith('.md') && f !== 'overview.md') : []);
+  const mdIn = (dir) => (fs.existsSync(path.join(root, dir)) ? fs.readdirSync(path.join(root, dir)).filter((f) => f.endsWith('.md') && f !== 'overview.md' && f !== 'index.md') : []);
   /**
-   * Topic → the file that answers it. A guideline file answers its topic while
-   * it exists; a foundation topic with none is answered by its Storybook
-   * foundation page (`Colors.mdx` → color), read through the page model.
+   * Topic → the file that answers it: generated template, pattern and
+   * foundation agent views (`agent-views/<root>/<Name>.md` and component-backed
+   * templates under `src/patterns/<Name>/index.md`), plus any surviving
+   * `guidelines/` pages.
    */
   const topics = () => {
     const map = {};
-    for (const dir of ['foundations', 'composition']) {
-      for (const f of mdIn(`${GUIDELINES}/${dir}`)) map[f.replace(/\.md$/, '')] ??= `${GUIDELINES}/${dir}/${f}`;
+    for (const dir of ['patterns', 'templates', 'foundations']) {
+      for (const f of mdIn(`${AGENT_VIEWS}/${dir}`)) {
+        const rel = `${AGENT_VIEWS}/${dir}/${f}`;
+        const stem = f.replace(/(?:Overview)?\.md$/, '');
+        const kebab = stem.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+        const lower = stem.toLowerCase();
+        map[kebab] = rel;
+        map[lower] = rel;
+        if (TOPIC_ALIASES[lower]) map[TOPIC_ALIASES[lower]] = rel;
+        if (dir === 'foundations' && /^motion-/.test(kebab)) {
+          const sub = kebab.slice('motion-'.length);
+          if (sub === 'physics') map.motion = rel;
+          else map[sub] ??= rel;
+        }
+      }
+    }
+    for (const sub of TEMPLATE_COMPONENTS) {
+      const rel = `${PATTERNS_SRC}/${sub}/index.md`;
+      if (!fs.existsSync(path.join(root, rel))) continue;
+      const kebab = sub.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+      const short = sub.replace(/^Pattern/, '').replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+      if (short === 'page') {
+        map['page-template'] ??= rel;
+      } else {
+        map[kebab] ??= rel;
+        map[sub.toLowerCase()] ??= rel;
+        map[short] ??= rel;
+      }
+    }
+    if (map.templates) map.layout = map.templates;
+    for (const f of mdIn(`${GUIDELINES}/foundations`)) {
+      const key = f.replace(/\.md$/, '');
+      map[key] ??= `${GUIDELINES}/foundations/${f}`;
     }
     if (fs.existsSync(path.join(root, GUIDELINES, 'foundations/content/overview.md'))) map.content = `${GUIDELINES}/foundations/content/overview.md`;
     for (const f of mdIn(`${GUIDELINES}/foundations/content`)) map[f.replace(/\.md$/, '')] = `${GUIDELINES}/foundations/content/${f}`;
-    for (const f of fs.existsSync(path.join(root, FOUNDATION_PAGES)) ? fs.readdirSync(path.join(root, FOUNDATION_PAGES)) : []) {
-      const base = f.match(/^([A-Z][A-Za-z]*)\.mdx$/)?.[1]?.toLowerCase();
-      if (base && base !== 'foundationsoverview') map[TOPIC_ALIASES[base] ?? base] ??= `${FOUNDATION_PAGES}/${f}`;
-    }
     for (const [key, file] of [['components', 'components/overview.md'], ['figma', 'figma/overview.md']]) {
       if (fs.existsSync(path.join(root, GUIDELINES, file))) map[key] = `${GUIDELINES}/${file}`;
     }
     return map;
   };
-  /** A topic file's text: a guideline as written, a foundation page as its page model's markdown. */
+  /** A topic file's text, with generated HTML comments stripped. */
   const topicText = (rel) => {
     const source = fs.readFileSync(path.join(root, rel), 'utf8');
-    return rel.endsWith('.mdx') ? pageText(readDocsPage(source, { kind: 'foundation', root, file: rel })) : source.trim();
+    return rel.endsWith('.mdx')
+      ? pageText(readDocsPage(source, { kind: 'foundation', root, file: rel }))
+      : source
+          .replace(/^<!--\s*DO NOT EDIT[\s\S]*?-->\n+/, '')
+          .replace(/\n*<!--\s*authored coverage:[\s\S]*?-->\s*$/, '')
+          .trim();
+  };
+  const CHOOSER_HEADING = /^(?:Usage|Alternatives|Types|Header types|Slots|The nine templates|Which .*|Frame, Modal, Panel or Popup\?)$/;
+  const isBriefGuide = (rel) =>
+    rel.startsWith(`${AGENT_VIEWS}/patterns/`) ||
+    rel.startsWith(`${AGENT_VIEWS}/templates/`) ||
+    rel.startsWith(`${PATTERNS_SRC}/`);
+  const summarizeGuide = (rel, fullText) => {
+    const parts = fullText.split(/\n(?=## )/);
+    const header = parts[0].trim();
+    const blocks = parts.slice(1);
+    const sections = blocks.map((b) => b.match(/^## ([^\n]+)/)?.[1]?.trim()).filter(Boolean);
+    const includeFirst = rel.startsWith(`${AGENT_VIEWS}/`);
+    const chosen = blocks.filter((b, idx) => {
+      const title = b.match(/^## ([^\n]+)/)?.[1]?.trim() ?? '';
+      return (includeFirst && idx === 0) || CHOOSER_HEADING.test(title);
+    });
+    const text = [header, ...chosen.map((b) => b.trim()), `## Sections\n\n${sections.map((s) => `- ${s}`).join('\n')}`].join('\n\n');
+    return { text, sections };
   };
 
-  function guide(arg) {
-    const t = String(arg ?? '').trim().toLowerCase();
+  function guide(arg, opts = {}) {
+    let rawArg = String(arg ?? '').trim();
+    const optObj = typeof opts === 'string' ? (opts.toLowerCase() === 'full' ? { full: true } : { section: opts }) : (opts ?? {});
+    let wantFull = Boolean(optObj.full);
+    let wantSection = optObj.section ? String(optObj.section).trim() : null;
+    if (/(?:^|\s)--full$/i.test(rawArg) || /\s+full$/i.test(rawArg)) {
+      wantFull = true;
+      rawArg = rawArg.replace(/(?:^|\s)--full$/i, '').replace(/\s+full$/i, '').trim();
+    }
+    const secFlag = rawArg.match(/\s+--section(?:=|\s+)(.+)$/i);
+    if (secFlag) {
+      wantSection = secFlag[1].trim().replace(/^["']|["']$/g, '');
+      rawArg = rawArg.slice(0, secFlag.index).trim();
+    }
+    if (wantSection && wantSection.toLowerCase() === 'full') {
+      wantFull = true;
+      wantSection = null;
+    }
+    const t = rawArg.toLowerCase();
     if (!t) return { topic: null, path: null, text: ORIENTATION, next: 'Start with ds_find.' };
     const rule = Object.keys(RULES).find((id) => id === t || id === `ds/${t}`);
     if (rule) {
@@ -581,7 +788,27 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     const map = topics();
     const key = map[t] ? t : TOPIC_ALIASES[t] ?? Object.keys(map).find((k) => t.split(/[\s/-]+/).includes(k)) ?? Object.entries(TOPIC_ALIASES).find(([a]) => t.includes(a))?.[1];
     if (key && map[key]) {
-      return { topic: key, path: map[key], text: topicText(map[key]), next: 'Next: ds_find for the parts the guideline names.' };
+      const rel = map[key];
+      const fullText = topicText(rel);
+      const allParts = fullText.split(/\n(?=## )/);
+      const sections = allParts.slice(1).map((b) => b.match(/^## ([^\n]+)/)?.[1]?.trim()).filter(Boolean);
+      if (wantSection) {
+        const match = allParts.slice(1).find((b) => b.match(/^## ([^\n]+)/)?.[1]?.trim().toLowerCase() === wantSection.toLowerCase());
+        const text = match ? `${allParts[0].trim()}\n\n${match.trim()}` : fullText;
+        return { topic: key, path: rel, brief: false, sections, text, next: 'Next: ds_find for the parts the guideline names.' };
+      }
+      if (!wantFull && isBriefGuide(rel)) {
+        const { text } = summarizeGuide(rel, fullText);
+        return {
+          topic: key,
+          path: rel,
+          brief: true,
+          sections,
+          text,
+          next: `Full page: ds_guide("${key}", { full: true }) or ds guide ${key} --full. Next: ds_find for the parts the guideline names.`,
+        };
+      }
+      return { topic: key, path: rel, brief: false, sections, text: fullText, next: 'Next: ds_find for the parts the guideline names.' };
     }
     return {
       topic: t,
@@ -597,11 +824,15 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
 
   function check({ code, path: file, paths } = {}) {
     let found;
+    let checked = null;
     if (typeof code === 'string' && code.trim()) {
       found = escapesIn({ path: file ?? 'prototypes/snippet.jsx', text: code }, contextOf(root));
-    } else if (paths?.length) {
+    } else if (paths?.length || consumerRoot !== root) {
       if (!readPaths) throw new PathsRefused();
-      found = escapes(root, expandPaths(root, paths));
+      // In a project, the `plus-ds/` folder `ds add` copied in is the design system's own source (it defines the raw values), not the project's code.
+      const files = expandPaths(consumerRoot, paths?.length ? paths : ['.']).filter((f) => consumerRoot === root || !new RegExp(`(^|/)${INSTALL_FOLDER}/`).test(f));
+      checked = files.length;
+      found = escapes(consumerRoot, files, root);
     } else {
       return { findings: [], next: 'Pass code (with a file name for its language) or paths.' };
     }
@@ -610,11 +841,12 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     return {
       findings,
       failing,
+      ...(checked === null ? {} : { checked }),
       next: failing
         ? 'Fix each finding as its fix says; ds_guide(<rule>) explains a rule. Then ds_check again.'
         : findings.length
           ? 'No escapes; the warnings are worth a look.'
-          : 'Clean: no escapes.',
+          : 'Clean: no escapes. Template and pattern fit is not checked here.',
     };
   }
 
@@ -635,12 +867,24 @@ function renderFind(r) {
       return `${pad(x.status, 10)}${x.name} → ${use}${x.why ? `  (${x.why})` : ''}`;
     }
     if (x.kind === 'token') return `${pad('token', 10)}${x.name}  ${shortSummary(x.intent) ?? ''}`.trimEnd();
+    if (x.kind === 'reference') return `${pad('reference', 10)}${x.name}  → ${x.file}#${x.export}\n          ${x.url}`;
+    if (['template', 'pattern'].includes(x.kind) && x.doc) return `${pad(x.kind, 10)}${x.name}  → ${x.next}`;
     if (x.kind === 'guide') return `${pad('guide', 10)}${x.name}  → ${x.next}`;
     if (x.kind === 'icon') return `${pad('icon', 10)}${x.name}${x.status === 'pro' ? `  PRO: ${x.why}` : ''}`;
+    const { usedIn, governedBy } = r.backEdges?.[x.name] ?? {};
     const via = x.figma ? `  (Figma "${x.figma}")` : x.aliasOf ? `  (alias of ${x.aliasOf})` : '';
-    return `${pad(x.kind, 10)}${x.import ?? x.name}${via}${x.summary ? `  ${x.summary}` : ''}`;
+    return `${pad(x.kind, 10)}${x.import ?? x.name}${via}${!usedIn && !governedBy && x.summary ? `  ${x.summary}` : ''}${usedIn ? `  Used in: ${usedIn}` : ''}${governedBy ? `  Governed by: ${governedBy}` : ''}`.slice(0, 160);
   });
-  return [...lines, r.next].join('\n');
+  // One line names what to install, so no result row grows past the width a find line holds.
+  const add = [...new Set(r.results.map((x) => x.registryItem).filter(Boolean))];
+  const kit = r.kit ? [
+    `Template: ${r.kit.template.name} → ${r.kit.template.next}`,
+    `Patterns: ${r.kit.patterns.map((p) => `${p.name} → ${p.next}`).join('; ')}`,
+    `Components: ${r.kit.components.map((c) => c.import?.replace(/;$/, '') ?? c.name).join('; ')}`,
+    `Token roles: ${r.kit.tokenRoles.map((r) => `${r.role}: ${r.steps.map((s) => s.name).join(', ')}`).join('; ')}`,
+  ] : [];
+  const wrap = (line) => line.match(/.{1,160}(?:\s|$)|.{1,160}/g)?.map((part) => part.trimEnd()) ?? [];
+  return [...kit.flatMap(wrap), ...lines, ...(add.length ? [`Add to a project: ds add ${add.slice(0, 5).join(' ')}`] : []), r.next].join('\n');
 }
 
 function renderGet(r) {

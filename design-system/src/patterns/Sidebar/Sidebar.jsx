@@ -1,7 +1,11 @@
-import React, { useCallback, useEffect, useId, useState } from 'react';
+import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { animate } from 'motion/react';
 import { CountTag, Icon, IconButton, Logo, Tooltip } from '@/components';
+import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { ClippedTooltip } from '@/lib/ClippedTooltip';
+import { useMotionReduced } from '@/lib/motionPreference';
+import { measureRelativeBox } from '@/lib/navigationMotion';
 import { useSidebarControl } from '../Frame/SidebarControl';
 import SidebarAccount, { ACCOUNT_ROLES } from './SidebarAccount';
 import { SIDEBAR_RECENT_TABS } from './openTabs';
@@ -108,10 +112,79 @@ const PatternSidebar = ({
 }) => {
     const baseId = useId();
     const control = useSidebarControl();
+    const reduced = useMotionReduced();
+    const navRef = useRef(null);
+    const glideRef = useRef(null);
+    const mountedRef = useRef(false);
+    const lastRowRef = useRef(null);
+    const glideAnimRef = useRef(null);
     const sectionsKey = storageKey && account?.id ? `${storageKey}:${account.id}` : null;
     const [shutGroups, setShutGroups] = useState(() => readCollapsed(sectionsKey));
     const [shutRows, setShutRows] = useState({});
     const [showingAll, setShowingAll] = useState({});
+
+    useLayoutEffect(() => {
+        const navEl = navRef.current;
+        const glideEl = glideRef.current;
+        if (!navEl || !glideEl) return undefined;
+        const activeEl = navEl.querySelector('[aria-current="page"]');
+        const readRow = (el) => {
+            const box = measureRelativeBox(el, navEl);
+            return box
+                ? { id: activeId, x: box.x, y: box.y + navEl.scrollTop, width: box.width, height: box.height }
+                : null;
+        };
+        if (!activeEl) {
+            lastRowRef.current = null;
+            return undefined;
+        }
+        if (!mountedRef.current) {
+            mountedRef.current = true;
+            lastRowRef.current = readRow(activeEl);
+            return undefined;
+        }
+        const prev = lastRowRef.current;
+        const next = readRow(activeEl);
+        if (!prev || !next || prev.id === activeId) {
+            if (!navEl.dataset.gliding) lastRowRef.current = next;
+            return undefined;
+        }
+        if (reduced) {
+            glideAnimRef.current?.stop?.();
+            delete navEl.dataset.gliding;
+            lastRowRef.current = next;
+            return undefined;
+        }
+        glideAnimRef.current?.stop?.();
+        navEl.dataset.gliding = 'true';
+        const from = { ...prev };
+        const apply = (p) => {
+            const lerp = (a, b) => a + (b - a) * p;
+            const x = lerp(from.x, next.x);
+            const y = lerp(from.y, next.y);
+            const w = Math.max(0, lerp(from.width, next.width));
+            const h = Math.max(0, lerp(from.height, next.height));
+            glideEl.style.transform = `translate(${x}px, ${y}px)`;
+            glideEl.style.width = `${w}px`;
+            glideEl.style.height = `${h}px`;
+            lastRowRef.current = { id: activeId, x, y, width: w, height: h };
+        };
+        apply(0);
+        const anim = animate(0, 1, {
+            ...SPRINGS['spatial.fast'].productive,
+            onUpdate: apply,
+        });
+        glideAnimRef.current = anim;
+        Promise.resolve(anim.finished).then(() => {
+            if (glideAnimRef.current !== anim) return;
+            glideAnimRef.current = null;
+            delete navEl.dataset.gliding;
+            lastRowRef.current = readRow(activeEl);
+        });
+        return undefined;
+    }, [activeId, reduced]);
+
+    useLayoutEffect(() => () => { glideAnimRef.current?.stop?.(); }, []);
 
     // A different person has their own sections.
     useEffect(() => { setShutGroups(readCollapsed(sectionsKey)); }, [sectionsKey]);
@@ -477,7 +550,8 @@ const PatternSidebar = ({
                 {brand}
                 {toggleButton}
             </div>
-            <nav aria-label={label} className="plus-pattern-sidebar__nav">
+            <nav ref={navRef} aria-label={label} className="plus-pattern-sidebar__nav">
+                <span ref={glideRef} className="plus-pattern-sidebar__glide" aria-hidden="true" />
                 {groups.map(renderGroup)}
             </nav>
             {account ? (

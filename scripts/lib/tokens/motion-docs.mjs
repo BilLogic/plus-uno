@@ -60,7 +60,7 @@ export function soundTextOf(sound) {
 /** The one-line summary for the agent file's header facts: `enter spatial.fast + appearance.fast · exit …`. */
 export function motionLineOf(row) {
   const parts = motionEventsOf(row).map((e) => `${e.event} ${e.tokens.map(code).join(' + ')}${e.sound ? `, sound ${code(soundNameOf(e.sound.token))}` : ''}`);
-  return `**Motion:** ${parts.join(' · ')}. Read the tokens through ${code('--ds-motion-*')}; see Foundations · Motion.\n\n`;
+  return `**Motion:** ${parts.join(' · ')}. Read the tokens through ${code('--ds-motion-*')}; see Foundations › Expression › Motion.\n\n`;
 }
 
 /**

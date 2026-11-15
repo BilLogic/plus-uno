@@ -1,12 +1,13 @@
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps } from '../../../patterns/Form/formDemo.jsx';
-import { BoundInputs, Marks, STAGE } from './formsDemo.jsx';
+import { alpha, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
+import { BoundInputs, FIVE_QUESTION_STEPS, Marks, QuestionStepInWindow, SettingsPageInWindow, STAGE } from './formsDemo.jsx';
 
 /**
  * Forms: the pattern page's examples, run in the Storybook tests. The hosts and
@@ -35,11 +36,51 @@ const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitSta
 
 export const HostPage = {
     name: 'Host: In a page',
-    render: () => staged(<FormInPage />),
+    render: () => staged(<FormInPage />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         await expect(rect(save).left, 'buttons left-aligned under the fields').toBeCloseTo(rect(canvasElement.querySelector('.plus-fieldset')).left, 0);
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** Instant settings on a page: grouped SettingRows with Toggle, compact Select, and Button + StatusTag, confirming saves with a Flag. */
+export const SettingsInPage = {
+    name: 'Host: Settings on a page',
+    render: () => staged(<SettingsPageInWindow />, PAGE_WIDTH),
+    play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const canvas = within(canvasElement);
+
+        await expect(canvas.getByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
+        await expect(canvas.getByRole('heading', { level: 2, name: 'Notifications' })).toBeInTheDocument();
+        await expect(canvas.getByRole('heading', { level: 2, name: 'Connected accounts' })).toBeInTheDocument();
+        await expect(canvasElement.querySelector('.plus-pattern-card'), 'no card per row').toBeNull();
+        await expect(canvas.queryByRole('button', { name: /^Save/i }), 'instant settings need no Save button').toBeNull();
+
+        const rows = canvasElement.querySelectorAll('.plus-setting-row');
+        await expect(rows.length).toBeGreaterThanOrEqual(4);
+        await expect(tokenLength(rows[0], '--setting-row-pad-y')).toBe(12);
+        await expect(parseFloat(getComputedStyle(rows[1]).borderTopWidth), 'adjacent rows divide with --border-default').toBe(
+            tokenLength(rows[1], '--border-default')
+        );
+
+        const reminders = canvas.getByRole('switch', { name: 'Session reminders' });
+        const leadTime = canvas.getByRole('combobox', { name: 'Reminder lead time' });
+        const status = canvas.getByText('Connected');
+        const disconnect = canvas.getByRole('button', { name: 'Disconnect Google Calendar' });
+        const calendarEnd = rows[rows.length - 1].querySelector('.plus-setting-row__end');
+
+        await expect(reminders).toHaveAttribute('aria-checked', 'true');
+        await expect(leadTime).toBeInTheDocument();
+        await expect(calendarEnd.contains(status), 'StatusTag sits beside the label, never in the end slot').toBe(false);
+        await expect(disconnect).toBeInTheDocument();
+
+        await userEvent.click(reminders);
+        await expect(reminders).toHaveAttribute('aria-checked', 'false');
+        await expect(await canvas.findByText('Session reminders turned off')).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };
@@ -48,6 +89,7 @@ export const HostPanel = {
     name: 'Host: In a Panel',
     render: () => staged(<FormInPanel />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         await expect(rect(footer).height, 'the full-bleed footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
         await fitsCanvas(canvasElement);
@@ -58,6 +100,7 @@ export const HostModal = {
     name: 'Host: In a Modal',
     render: () => staged(<FormInModal />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const dialog = within(canvasElement).getByRole('dialog');
         await expect(within(dialog).getAllByRole('textbox').length, 'fewer than five fields').toBeLessThan(5);
         await fitsCanvas(canvasElement);
@@ -68,7 +111,90 @@ export const HostSteps = {
     name: 'Host: In steps',
     render: () => staged(<FormInSteps />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         await expect(within(canvasElement).getByRole('button', { name: 'Next' }), 'the bar carries Back and Next').toBeInTheDocument();
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** One question per step in the In steps host: centered dots under five steps, tiles, centered Back and Continue, and validation on press. */
+export const OneQuestionPerStep = {
+    name: 'Host: In steps (one question per step)',
+    render: () => staged(<QuestionStepInWindow />),
+    play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const canvas = within(canvasElement);
+        const centerX = (el) => {
+            const box = rect(el);
+            return (box.left + box.right) / 2;
+        };
+
+        await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'Frame is focused without a Sidebar').toBeNull();
+        await expect(canvas.queryByRole('navigation', { name: 'Steps' }), 'under five steps omits the left step list').toBeNull();
+
+        const progress = canvas.getByRole('group', { name: 'Setup progress' });
+        const heading = canvas.getByRole('heading', { level: 1, name: 'How would you like to tutor?' });
+        const group = canvas.getByRole('radiogroup', { name: 'How would you like to tutor?' });
+        const actions = canvas.getByRole('group', { name: 'Step actions' });
+        const back = canvas.getByRole('button', { name: 'Back' });
+        const next = canvas.getByRole('button', { name: 'Continue' });
+
+        await expect(progress.children).toHaveLength(3);
+        await expect(progress.children[0]).toHaveAttribute('aria-current', 'step');
+        await expect(rect(progress).bottom, 'dots sit above the heading').toBeLessThanOrEqual(rect(heading).top);
+        await expect(centerX(progress), 'dots are centered above the question').toBeCloseTo(centerX(heading), 0);
+
+        await expect(rect(actions).top, 'actions sit under the tiles').toBeGreaterThanOrEqual(rect(group).bottom - 0.5);
+        await expect(centerX(actions), 'Back and Continue are centered').toBeCloseTo(centerX(heading), 0);
+        await expect(rect(back).right, 'Back sits before Continue').toBeLessThanOrEqual(rect(next).left);
+        await expect(back, 'Back is disabled on the first step').toBeDisabled();
+        await expect(next, 'Continue stays enabled while unanswered').not.toBeDisabled();
+        await expect(alpha(getComputedStyle(back).backgroundColor), 'Back uses the subtle transparent fill').toBe(0);
+        await expect(getComputedStyle(next).backgroundColor, 'Continue uses the primary fill').toBe(tokenColor(canvasElement, '--ds-background-brand-bold'));
+
+        // Continue stays enabled and validates on press.
+        await userEvent.click(next);
+        await expect(await canvas.findByRole('alert')).toHaveTextContent('Choose a tutoring format to continue.');
+        await expect(next, 'Continue remains enabled after validation').not.toBeDisabled();
+        const firstOption = canvas.getByRole('radio', { name: 'One-on-one' });
+        await expect(firstOption, 'focus moves to the first tile').toHaveFocus();
+
+        // Step forward and back, keeping selections.
+        await userEvent.click(canvas.getByText('One-on-one'));
+        await waitFor(() => expect(canvas.queryByRole('alert')).toBeNull());
+        await userEvent.click(next);
+
+        await expect(await canvas.findByRole('heading', { level: 1, name: 'Which subjects can you tutor?' })).toBeInTheDocument();
+        await expect(progress.children[1]).toHaveAttribute('aria-current', 'step');
+        await expect(canvas.getByRole('button', { name: 'Back' })).not.toBeDisabled();
+
+        await userEvent.click(canvas.getByText('Algebra'));
+        await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
+
+        await expect(await canvas.findByRole('heading', { level: 1, name: 'How would you like to tutor?' })).toBeInTheDocument();
+        await expect(progress.children[0]).toHaveAttribute('aria-current', 'step');
+        await expect(canvas.getByRole('radio', { name: 'One-on-one' })).toHaveAttribute('aria-checked', 'true');
+
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** At five or more steps, the question step switches from dots to the host's left step list. */
+export const QuestionStepFiveOrMore = {
+    name: 'Test: In steps at five or more steps',
+    render: () => staged(<QuestionStepInWindow steps={FIVE_QUESTION_STEPS} />),
+    play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const canvas = within(canvasElement);
+
+        await expect(canvas.queryByRole('group', { name: 'Setup progress' }), 'dots give way to the step list at five steps').toBeNull();
+        const tracker = canvas.getByRole('navigation', { name: 'Steps' });
+        const heading = canvas.getByRole('heading', { level: 1, name: 'How would you like to tutor?' });
+        await expect(rect(tracker).right, 'the left step list sits before the question').toBeLessThanOrEqual(rect(heading).left);
+
+        const actions = canvas.getByRole('group', { name: 'Step actions' });
+        await expect((rect(actions).left + rect(actions).right) / 2, 'Back and Continue stay centered under the question').toBeCloseTo((rect(heading).left + rect(heading).right) / 2, 0);
+
         await fitsCanvas(canvasElement);
     },
 };
@@ -80,6 +206,7 @@ export const RequiredMarks = {
     name: 'Required marks and help',
     render: () => staged(<Marks />, 480),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         const student = canvas.getByLabelText(/Student/);
         await expect(student, 'a required field reports it').toHaveAttribute('aria-required', 'true');
@@ -99,8 +226,9 @@ export const RequiredMarks = {
 /** Student was touched and left empty: its error is showing; Site was not touched, so it is not marked. */
 export const ShownOnBlur = {
     name: 'Validation: On blur (shown)',
-    render: () => staged(<FormInPage initial={EMPTY} marked="student" />),
+    render: () => staged(<FormInPage initial={EMPTY} marked="student" />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.getByLabelText(/Student/), 'touched and empty').toHaveAttribute('aria-invalid', 'true');
         await expect(canvas.getByText('Enter the student’s name.'), 'the error says what to fix').toBeInTheDocument();
@@ -112,8 +240,9 @@ export const ShownOnBlur = {
 /** After the press: the Primary is still enabled and every missing field is marked. */
 export const ShownSubmitStaysEnabled = {
     name: 'Validation: Submit stays enabled (shown)',
-    render: () => staged(<FormInPage initial={EMPTY} marked />),
+    render: () => staged(<FormInPage initial={EMPTY} marked />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.getByLabelText(/Student/)).toHaveAttribute('aria-invalid', 'true');
         await expect(canvas.getByText('Choose a site.'), 'every missing field is marked').toBeInTheDocument();
@@ -127,6 +256,7 @@ export const ShownBlockedSubmit = {
     name: 'Validation: Blocked submit in a Modal (shown)',
     render: () => staged(<FormInModal initial={EMPTY} marked height="fill" stageHeight={MARKED_HEIGHT} />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.queryAllByRole('dialog'), 'one dialog').toHaveLength(1);
         await expect(canvas.getByLabelText(/Student/)).toHaveAttribute('aria-invalid', 'true');
@@ -140,6 +270,7 @@ export const ShownSending = {
     name: 'Validation: Sending (shown)',
     render: () => staged(<FormInModal initial={FILLED} sending />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'the spinner button is the one that disables').toBeDisabled();
         await expect(canvas.getByRole('button', { name: 'Cancel' }), 'Cancel stays live').not.toBeDisabled();
@@ -150,8 +281,9 @@ export const ShownSending = {
 /** A field checks itself when it loses focus, and clears once the rule is met. */
 export const OnBlur = {
     name: 'Test: On blur',
-    render: () => staged(<FormInPage />),
+    render: () => staged(<FormInPage />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         const student = canvas.getByLabelText(/Student/);
         await userEvent.click(student);
@@ -169,8 +301,9 @@ export const OnBlur = {
 /** The submit stays enabled with a field missing; pressing it marks the field and moves focus there. */
 export const SubmitStaysEnabled = {
     name: 'Test: Submit stays enabled',
-    render: () => staged(<FormInPage />),
+    render: () => staged(<FormInPage />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         await expect(save, 'enabled with a field missing').not.toBeDisabled();
@@ -189,6 +322,7 @@ export const BlockedSubmit = {
     // A filled Modal keeps its size when the errors appear, so the footer holds still; a hugging one grows from the middle.
     render: () => staged(<FormInModal height="fill" stageHeight={MARKED_HEIGHT} />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const before = rect(footer);
@@ -207,6 +341,7 @@ export const ServerRefuses = {
     name: 'Validation: Rejected by the server',
     render: () => staged(<FormInModal server initial={FILLED} height="fill" stageHeight={SERVER_HEIGHT} />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         const message = canvasElement.querySelector('[data-probe="message"]');
         const body = canvasElement.querySelector('[data-probe="body"], .plus-pattern-modal-body');
@@ -222,6 +357,7 @@ export const Sending = {
     name: 'Test: Sending',
     render: () => staged(<FormInModal initial={FILLED} sendingForever />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         const width = rect(save).width;
@@ -240,6 +376,7 @@ export const LeavingWithEdits = {
     name: 'Leaving with edits',
     render: () => staged(<FormInModal />),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
         await expect(canvas.queryByRole('heading', { name: 'Discard changes?' }), 'a form with no edits leaves at once').toBeNull();
@@ -259,6 +396,7 @@ export const BoundInput = {
     name: 'Bound inputs',
     render: () => staged(<BoundInputs />, 480),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.getAllByRole('radio'), 'three choices are visible at once').toHaveLength(3);
         for (const radio of canvas.getAllByRole('radio')) await expect(radio, 'a radio group starts unanswered').not.toBeChecked();

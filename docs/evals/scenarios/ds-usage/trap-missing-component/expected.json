@@ -1,0 +1,67 @@
+{
+  "task": "trap-missing-component",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/trap-missing-component/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "signature-page",
+      "screen": "Tutor signature capture page",
+      "template": "Frame + Page + PatternCard",
+      "variant": "Frame \u00b7 Default / Page \u00b7 Default / PatternCard",
+      "page": "design-system/src/patterns/Page/index.md",
+      "section": "Usage",
+      "pages": [
+        "design-system/src/patterns/Frame/index.md",
+        "design-system/src/patterns/Page/index.md",
+        "design-system/src/patterns/PatternCard/index.md"
+      ],
+      "guides": [
+        "frame",
+        "page",
+        "card",
+        "templates"
+      ],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": [
+          "Frame",
+          "Page",
+          "PatternCard"
+        ]
+      },
+      "expectation": "Page starts from Frame and Page, with the local signature capture area inside PatternCard."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "signature-actions",
+      "pattern": "Common actions",
+      "variant": "Small actions",
+      "page": "design-system/agent-views/patterns/CommonActions.md",
+      "section": "Small actions",
+      "guide": "common-actions",
+      "scoring": "judge",
+      "expectation": "Clear, Save and Edit use labeled Button controls; Save is unavailable until a stroke exists."
+    }
+  ],
+  "required_placements": [
+    {
+      "id": "signature-in-card",
+      "placement": "Local signature drawing surface inside PatternCard",
+      "page": "design-system/src/patterns/PatternCard/index.md",
+      "section": "Usage",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": [
+          "PatternCard"
+        ]
+      },
+      "expectation": "The handwritten-signature surface is local code inside PatternCard."
+    }
+  ],
+  "against_placements": []
+}

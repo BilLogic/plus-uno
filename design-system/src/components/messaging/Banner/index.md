@@ -8,13 +8,17 @@ Also asked as: announcement, top of page, system message, outage.
 
 **Import:** `import { Banner } from '@/components';`
 
+**Used in:** Frame (`ds guide frame`); Page (`ds guide page`)
+
+**Governed by:** Errors (`ds guide errors`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/messaging/Banner/Banner.jsx`
 
 **Stories:** `design-system/src/components/messaging/Banner/Banner.stories.jsx` — Overview, Appearances, Warning, Danger, Announcement, WithoutIcon, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Banner/Banner.mdx`
 
-**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -22,15 +26,11 @@ Use `Banner` for a condition that applies to the whole page, for as long as it
 holds: scheduled maintenance, an outage, an account-wide notice. It has no
 timeout and no dismiss, so only mount it while the condition is true.
 
-For something that belongs to one part of the page and stays until resolved
-or dismissed, use `SectionMessage`. For a confirmation that something already
-happened and needs no reply, use `Flag`.
-
 ### Appearance guidance
 
 | Appearance | When to use |
 | --- | --- |
-| Warning | The default, cautionary form. Example: "Scheduled maintenance begins at 9:00 PM EST." |
+| Warning | The default, cautionary form. Example: "Scheduled maintenance begins tonight." |
 | Danger | Something that needs immediate attention, such as an outage. |
 | Announcement | A general notice with nothing wrong. No icon and no severity. |
 
@@ -42,6 +42,12 @@ Banner reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Add or remove an item | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Pushes the page down, then fades in. |
 | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Fades, then the page closes the gap. |
+
+## Alternatives
+
+- For a message scoped to one region of the page that stays until resolved or dismissed, use `SectionMessage`.
+- For a timed confirmation that something already happened, use `Flag`.
+- For a short note tied to one control or field, use `Popup` or `Tooltip`.
 
 ## Best practices
 
@@ -76,16 +82,15 @@ Don't: A paragraph in the banner.
   a notice with no severity.
 - **No focus trap.** A banner never captures focus or keyboard navigation; it
   sits in the page's reading order like any other content.
-- **A banner link takes focus like any link.** It shows the 2px focus ring and
+- **A banner link takes focus like any link.** It shows the focus ring and
   its text names the destination.
 
 ## Related
 
-- For a message scoped to one region of the page, use `SectionMessage`.
-- For a timed confirmation that something already happened, use `Flag`.
-- For a short note tied to one object on the page, use `InlineMessage`.
+- `Link`: use when embedding an inline action or destination inside the banner message.
+- Frame: use when placing a site-wide banner above the application layout.
 
-Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
+Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 
@@ -99,7 +104,7 @@ Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMess
 | Rest | Fill and text per appearance. |
 | Hovered | Not a control, so nothing changes. |
 | Pressed | Nothing changes; there is no pressed layer. |
-| Focused | Tab skips the banner; a link inside shows the 2px focus ring. |
+| Focused | Tab skips the banner; a link inside shows the focus ring. |
 | Disabled | Not supported. Unmount the banner once the condition clears. |
 | Truncated | Not supported. Keep the message short enough to fit. |
 

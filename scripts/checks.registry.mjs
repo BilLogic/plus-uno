@@ -108,6 +108,14 @@ export const CHECKS = [
     guards: 'the seven generated artifacts (cheat sheet, indexes, component docs, Figma and token registries, knowledge audit) against the design-system source.',
   },
   {
+    name: 'check:registry',
+    script: 'node scripts/generate-registry.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-registry.mjs',
+    guards: 'the copy-in registry: every item builds from source, and none imports an internal, deprecated or retired part.',
+  },
+  {
     name: 'check:deps',
     script: 'node scripts/check-deps.mjs',
     pkg: 'root',
@@ -162,6 +170,14 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/generate-icon-lists.mjs',
     guards: 'the committed Free icon lists in design-system/src/lib/ against the generator that writes them; a hand edit shows as drift.',
+  },
+  {
+    name: 'check:brand-image',
+    script: 'node scripts/generate-brand-image.js --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-brand-image.js',
+    guards: 'the generated `.storybook/brand-image.js` data-URI module against `design-system/src/assets/storybook-brand.svg`.',
   },
   {
     name: 'check:figma-node-types',
@@ -635,6 +651,14 @@ export const CHECKS = [
     guards: 'the intake FSM that gates every uno-prototype run.',
   },
   {
+    name: 'check:build-load',
+    script: 'node scripts/check-build-load.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-build-load.mjs',
+    guards: 'the total bytes of the always-loaded and mandatory docs on the coded-build path, ratcheted so the ceiling can only fall.',
+  },
+  {
     name: 'test:scripts',
     script: 'node --test .cursor/hooks/ds-usage/*.test.mjs scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs netlify/functions/docs-agent/*.test.mjs netlify/functions/ds-mcp/*.test.mjs',
     pkg: 'root',
@@ -676,6 +700,22 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'agents/uno-bot/scripts/check-harness-bundle.mjs',
     guards: 'the Worker prompt bundle against the root docs it is assembled from, and its char budgets.',
+  },
+  {
+    name: 'check:storybook-docs',
+    script: 'node agents/uno-bot/scripts/generate-storybook-docs.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'agents/uno-bot/scripts/generate-storybook-docs.mjs',
+    guards: "the Worker's committed `src/generated/storybook-docs.ts` map against `design-system/figma/component-registry.json`.",
+  },
+  {
+    name: 'check:ds-facts',
+    script: 'node agents/uno-bot/scripts/generate-ds-facts.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'agents/uno-bot/scripts/generate-ds-facts.mjs',
+    guards: "the Worker's committed `src/generated/ds-facts.ts` module against `scripts/lib/ds-facts.mjs` and its byte budget.",
   },
   {
     name: 'typecheck',
@@ -823,6 +863,15 @@ export const EXCLUDED = [
     reason: 'it needs `npm ci`, Playwright Chromium and a Storybook server, so it runs in the storybook-gate job beside check:storybook.',
   },
   {
+    name: 'check:docs-hero-fit',
+    script: 'node scripts/check-docs-hero-fit.mjs',
+    pkg: 'root',
+    trigger: 'storybook-gate',
+    kind: 'spawn',
+    spawnReason: 'it starts a Storybook and drives a real Chromium; see check:storybook.',
+    reason: 'it needs `npm ci`, Playwright Chromium and a Storybook server, so it runs in the storybook-gate job beside check:docs-chrome.',
+  },
+  {
     name: 'test:design-system',
     script: 'npm --prefix design-system test',
     pkg: 'root',
@@ -902,6 +951,17 @@ export const WORKFLOW_STEPS = [
   {
     workflow: ".github/workflows/storybook-gate.yml",
     region: "storybook-checks",
+    name: "npm run check:docs-hero-fit",
+    note: [
+      "Cover heroes against their cards: a hero's drawn box must not extend past",
+      "the card that holds it, at four widths. Starts its own Storybook, so it",
+      "sits beside check:docs-chrome.",
+    ],
+    runs: ["check:docs-hero-fit"],
+  },
+  {
+    workflow: ".github/workflows/storybook-gate.yml",
+    region: "storybook-checks",
     name: "npm run check:storybook-links",
     note: [
       "Every link to a Storybook page against the built index of ids. A page move",
@@ -976,9 +1036,7 @@ export const DEPLOY_CHAIN = [
       'it WRITES. Each component\'s Storybook docs id is baked from design-system/figma/' +
       'component-registry.json into src/generated/storybook-docs.ts before anything is ' +
       'typechecked or bundled, so the link `github_read` hands back is the registry on main ' +
-      'at deploy (#1563). Not a pull-request check on purpose: the registry changes with ' +
-      'every component PR, and a drift gate here would redden those PRs for a file only the ' +
-      'deploy reads.',
+      'at deploy (#1563); `check:storybook-docs` is the pull-request row that holds the committed map.',
   },
   {
     step: 'npm run generate:ds-facts',
@@ -986,8 +1044,7 @@ export const DEPLOY_CHAIN = [
       'it WRITES. The design-system facts (scripts/lib/ds-facts.mjs: components, patterns, ' +
       'tokens and the names that are not here) are baked into src/generated/ds-facts.ts before ' +
       'anything is typechecked or bundled, so `github_read`\'s `lookup` and the weekly precedence ' +
-      'check read the facts on main at deploy, as the IDE does. Not a pull-request check, for the ' +
-      'Storybook docs map\'s reason: the facts change with every component PR.',
+      'check read the facts on main at deploy; `check:ds-facts` is the pull-request row that holds the committed module.',
   },
   { step: 'npm run typecheck', runs: 'typecheck' },
   { step: 'npm run check:fetch', runs: 'check:fetch' },

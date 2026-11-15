@@ -1,0 +1,86 @@
+/*
+ * ProgressRing — a determinate ring for a known amount of progress.
+ *
+ * THE TRACK AND FILL. `--ds-background-neutral` for the track,
+ * `--ds-background-brand-bold` for the default fill. `inverse` sits on a bold
+ * or colored ground: `--ds-background-inverse-subtle` for the track and
+ * `--ds-icon-inverse` for the fill.
+ *
+ * THE GEOMETRY. 2px stroke (`--progress-ring-stroke`) across all three sizes
+ * (16 on `--icon-md`, 20 on `--image-xs`, 24 on `--icon-lg`). The SVG turns
+ * -90deg so the circle's 3 o'clock origin moves to 12 o'clock and the dash
+ * fills clockwise. At 0% the round cap is hidden so a zero-length dash leaves
+ * no dot on the track.
+ */
+
+.plus-progress-ring {
+    --_progress-ring-size: var(--image-xs);
+
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--_progress-ring-size);
+    height: var(--_progress-ring-size);
+    vertical-align: middle;
+}
+
+.plus-progress-ring[data-size='16'] {
+    --_progress-ring-size: var(--icon-md);
+}
+
+.plus-progress-ring[data-size='24'] {
+    --_progress-ring-size: var(--icon-lg);
+}
+
+.plus-progress-ring__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.plus-progress-ring__track,
+.plus-progress-ring__fill {
+    fill: none;
+    stroke-width: var(--progress-ring-stroke);
+}
+
+.plus-progress-ring__track {
+    stroke: var(--ds-background-neutral);
+}
+
+.plus-progress-ring__fill {
+    stroke: var(--ds-background-brand-bold);
+    stroke-linecap: round;
+    transition: stroke-dashoffset var(--ds-motion-spatial-fast-duration) var(--ds-motion-linear);
+}
+
+.plus-progress-ring--empty .plus-progress-ring__fill {
+    stroke-linecap: butt;
+    opacity: 0;
+}
+
+.plus-progress-ring--inverse .plus-progress-ring__track {
+    stroke: var(--ds-background-inverse-subtle);
+}
+
+.plus-progress-ring--inverse .plus-progress-ring__fill {
+    stroke: var(--ds-icon-inverse);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-progress-ring__fill {
+        transition: none;
+    }
+}
+
+@media (forced-colors: active) {
+    .plus-progress-ring__track {
+        stroke: GrayText;
+    }
+
+    .plus-progress-ring__fill {
+        stroke: Highlight;
+    }
+}

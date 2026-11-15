@@ -189,3 +189,39 @@ test('a component in its own folder is written as index.md, a flat one as <Name>
   assert.equal(docPathOf({ name: 'Fieldset', source: 'a/forms/Fieldset.jsx' }), 'a/forms/Fieldset.md');
   assert.equal(docPathOf({ name: 'PatternSidebar', source: 'p/Sidebar/Sidebar.jsx' }), 'p/Sidebar/index.md');
 });
+
+test('generated template slot JSDoc carries the governing pattern where source readers look', async () => {
+  const fs = await import('node:fs');
+  const source = fs.readFileSync('design-system/src/patterns/PatternSection/PatternSection.jsx', 'utf8');
+  const toolbar = source.match(/\/\*\*([^*]|\*(?!\/))*\*\/\s*toolbar: PropTypes.node/)[0];
+  assert.match(toolbar, /@ds-context Used in: Section\.toolbar/);
+  assert.match(toolbar, /@ds-context Governed by:.*Filtering/);
+  for (const line of toolbar.split('\n').filter((l) => l.includes('@ds-context'))) assert.ok(line.length <= 400);
+});
+
+test('the template index lists the nine current templates and their overview', async () => {
+  const fs = await import('node:fs');
+  const text = fs.readFileSync('design-system/agent-views/templates/index.md', 'utf8');
+  for (const name of ['Form', 'Frame', 'Page', 'Panel', 'Card', 'Modal', 'Section', 'Table', 'Popup', 'Overview']) assert.ok(text.includes(`[${name}](`));
+  assert.equal(text.split('\n').filter((line) => line.startsWith('- [')).length, 10);
+});
+
+test('group indexes carry a generated chooser from each page\'s Usage and Alternatives, replacing guidelines/components/*.md', async () => {
+  const fs = await import('node:fs');
+  assert.equal(fs.existsSync('design-system/guidelines/components'), false);
+  const messaging = fs.readFileSync('design-system/src/components/messaging/index.md', 'utf8');
+  assert.match(messaging, /## Which component to reach for/);
+  for (const name of ['Banner', 'EmptyState', 'Flag', 'InlineMessage', 'Modal', 'NotificationItem', 'SectionMessage', 'Spotlight']) {
+    assert.match(messaging, new RegExp(`- \\*\\*\\[${name}\\]\\(${name}/index\\.md\\)\\*\\* — `), name);
+  }
+  assert.match(messaging, /For a transient confirmation that needs no reply, use `Flag`\./);
+  const forms = fs.readFileSync('design-system/src/components/forms-and-inputs/index.md', 'utf8');
+  for (const name of ['CheckboxGroup', 'FileItem', 'SettingRow', 'InlineEditableTextfield']) {
+    assert.match(forms, new RegExp(`\\*\\*\\[${name}\\]\\(`), name);
+  }
+  const layout = fs.readFileSync('design-system/src/components/layout-and-structure/index.md', 'utf8');
+  for (const name of ['PageHeader', 'Panel']) {
+    assert.match(layout, new RegExp(`\\*\\*\\[${name}\\]\\(`), name);
+  }
+});
+

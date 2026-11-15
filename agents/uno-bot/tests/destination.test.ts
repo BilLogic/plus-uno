@@ -4,7 +4,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { PILLAR_CHANNELS, resolveDestination, routeFinding, type ChannelRole } from "../src/destination/index";
+import { PILLAR_CHANNELS, relaysToDesign, resolveDestination, routeFinding, type ChannelRole } from "../src/destination/index";
 
 const publicThread = { channel: "C0DESIGN", channelKind: "public" as const, threadTs: "1790000000.000100" };
 const noThread = { ...publicThread, threadTs: null };
@@ -26,6 +26,24 @@ test("private evidence stays where it was read, whatever the card says", () => {
     channel: "D0DM",
     threadTs: null,
   });
+});
+
+test("evidence from a channel that relays to #plus-design goes to #plus-design, whatever the card says", () => {
+  const card = { pillars: ["Toolkit"], designOwner: "U0OWNER" };
+  for (const channelKind of ["private", "public"] as const) {
+    assert.deepEqual(
+      routeFinding({ evidence: { channel: "G0FEEDBACK", channelKind, threadTs: "1.2", relayToDesign: true }, card }).destination,
+      { rung: "design", channel: "plus-design" },
+      channelKind,
+    );
+  }
+});
+
+test("relaysToDesign reads the configured relay list, trimmed", () => {
+  const ids = { relayToDesign: [" G0FEEDBACK "] };
+  assert.equal(relaysToDesign("G0FEEDBACK", ids), true);
+  assert.equal(relaysToDesign("G0OTHER", ids), false);
+  assert.equal(relaysToDesign("G0FEEDBACK", {}), false);
 });
 
 test("evidence in a public thread is answered in that thread", () => {

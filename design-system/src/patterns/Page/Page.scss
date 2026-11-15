@@ -5,10 +5,25 @@
  */
 
 @use '../../styles/surface-edge' as *;
+@use '../../styles/navigation-motion';
 
 .plus-pattern-page {
     display: block;
     color: var(--ds-text);
+}
+
+// Slots own the gap; legacy children keep their existing layout.
+.plus-pattern-page > .plus-pattern-page-header + .plus-pattern-page-banner,
+.plus-pattern-page > .plus-pattern-page-title + .plus-pattern-page-banner,
+.plus-pattern-page > .plus-pattern-page-header + .plus-pattern-page-content,
+.plus-pattern-page > .plus-pattern-page-title + .plus-pattern-page-content,
+.plus-pattern-page > .plus-pattern-page-banner + .plus-pattern-page-content {
+    margin-block-start: var(--page-stack-md);
+}
+
+// The title's optical negative margin must not reduce the new banner gap.
+.plus-pattern-page > .plus-pattern-page-title:has(+ .plus-pattern-page-banner) {
+    margin-block: 0;
 }
 
 /* Levels: a fill and its shadow, always together */

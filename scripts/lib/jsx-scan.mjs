@@ -143,11 +143,15 @@ export function jsxElementsOf(text) {
 }
 
 function tagAt(text, index, name) {
-  const el = { name, index, spread: false, attributes: [] };
+  const el = { name, index, end: index, selfClosing: false, spread: false, attributes: [] };
   let i = index + 1 + name.length;
   for (;;) {
     while (/\s/.test(text[i] ?? '')) i += 1;
-    if (text[i] === '>' || (text[i] === '/' && text[i + 1] === '>')) return el;
+    if (text[i] === '>' || (text[i] === '/' && text[i + 1] === '>')) {
+      el.selfClosing = text[i] === '/';
+      el.end = el.selfClosing ? i + 2 : i + 1;
+      return el;
+    }
     if (text[i] === '{') {
       if (!/^\{\s*\.\.\./.test(text.slice(i, i + 8))) return null;
       const end = closeOf(text, i);
@@ -175,6 +179,7 @@ function tagAt(text, index, name) {
         const end = closeOf(text, j);
         if (end === -1) return null;
         attr.value = literalOf(text.slice(j + 1, end - 1));
+        attr.end = end;
         i = end;
       } else return null;
     } else if (j === i && !/[\s/>]/.test(text[i] ?? '')) return null;

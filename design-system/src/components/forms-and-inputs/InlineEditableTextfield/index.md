@@ -8,7 +8,7 @@ InlineEditableTextfield — `InlineEdit` with a Text field for its edit view. It
 
 **Source:** `design-system/src/components/forms-and-inputs/InlineEditableTextfield/InlineEditableTextfield.jsx`
 
-**Motion:** change `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Motion
 
@@ -21,7 +21,7 @@ InlineEditableTextfield reads these motion tokens and no literal duration or cur
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Props
 

@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={StreamgraphChartStories} />
 
 <Title />
-Shows how a mix of categories shifts over time as layers flowing around a
-center line. It shows the overall shape of change, not exact values.
+Stacks category layers around a center line to show how a mix shifts over time
+at a glance.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/StreamgraphChart"
@@ -31,14 +31,13 @@ center line. It shows the overall shape of change, not exact values.
 
 ## When to use
 
-Use `StreamgraphChart` for an overview of how a mix changes: which subjects
-grow in enrollment across a year, which session types rise and fall over a
-term. It works for a broad story with a few layers, read at a glance.
+Use `StreamgraphChart` for a high-level view of how a mix of categories rises
+and falls over time, such as subject enrollment across a year or session types
+over a term.
 
-For values someone needs to read or compare precisely, use `LineChart`: the
-streamgraph has no value axis. For composition on a fixed zero baseline, use
-`AreaChart` with `stacking`. For composition at one moment, use `TreemapChart`
-or `DonutChart`.
+When exact readings matter, use `LineChart`. For composition on a fixed zero
+baseline, use `AreaChart` with `stacking`. For composition at a single moment,
+use `TreemapChart` or `DonutChart`.
 
 </div>
 
@@ -49,10 +48,10 @@ or `DonutChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Layers', 'One per series, stacked around a center line. The thickness of a layer at a period is its value.'],
+        ['Layers', 'One per series, stacked around a center line; thickness at each period encodes value.'],
         ['Time axis', <>Labels each period from <C>categories</C>.</>],
-        ['Value axis', 'Hidden. The stream has no zero baseline to read against.'],
-        ['Legend', 'Names each layer. Always shown.'],
+        ['Value axis', 'Hidden; the stream has no zero baseline.'],
+        ['Legend', 'Names each layer; always shown.'],
         ['Tooltip', 'Shared: hovering a period lists every layer’s value for it.'],
     ]}
 />
@@ -64,8 +63,8 @@ or `DonutChart`.
 ## Data shape
 
 `categories` is an array of period labels. `series` is an array of
-`{ name, data }`, where `data` holds one number per period, in the same order
-as `categories`.
+`{ name, data }` with one number per period in `categories` order. `height`
+defaults to 400.
 
 ```jsx
 <StreamgraphChart
@@ -78,19 +77,16 @@ as `categories`.
 />
 ```
 
-`height` defaults to 400.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Color and accessibility
 
-- **Color follows series order.** Layers take the categorical colors in order, slot 1 first, even when there is only one; a series `color` is ignored. Past six series, group the smallest into "Other".
-- **Color is the only thing naming a layer.** Layers carry no labels or patterns, so the legend and the tooltip do the identifying. Keep to a few layers the legend can name.
-- **Thickness is hard to judge.** With no axis and every layer floating on the ones beside it, only the overall shape reads reliably. Put exact figures in the tooltip or in text, never in the reader's estimate.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Color by series order.** Layers take the [categorical order](?path=/docs/data-visualizations-color--docs) starting at slot 1 (even for one series; per-series `color` is ignored). Past six series, group the smallest into "Other".
+- **Legend and tooltip carry exact values.** Because layers have no inline labels, patterns or value axis, keep the layer count low and provide exact figures in the tooltip or surrounding text.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -98,11 +94,7 @@ as `categories`.
 
 ## States
 
-`StreamgraphChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`StreamgraphChart` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -119,12 +111,7 @@ as `categories`.
 
 <DocsInteractivePlayground
     of={StreamgraphChartStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

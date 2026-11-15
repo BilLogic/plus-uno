@@ -6,17 +6,19 @@ Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar
 
 **Import:** `import { Calendar } from '@/components';`
 
+**Governed by:** Read-only (`ds guide read-only`)
+
 **Source:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Size28, Size36, Size44, PickADay, TurnMonths, Default, Selected, Range, Disabled, HoveredState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
-Use a calendar directly only when a date grid needs to be visible on the page without a field or a popup around it: a scheduling view, an embedded picker. For a single date field, use Date picker; for a date and time together, use Date time picker. Both already use this same grid.
+Use `Calendar` directly only when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
 
 ## Motion
 
@@ -28,11 +30,16 @@ Calendar reads these motion tokens and no literal duration or curve.
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 | change | Step to the next or previous | `--ds-motion-spatial-default` | A month change slides the grid flat. |
 
+## Alternatives
+
+- For a date or date range field that opens this grid in a popup, use `DatePicker`.
+- For a combined date and time answer, use `DateTimePicker`.
+
 ## Best practices
 
 ### Name the month in full, with the year. {#name-the-month-in-full-with-the-year}
 
-The header says which month the grid shows, such as "October 2026". The calendar writes it this way itself; numbers alone make people count.
+The header states the full month name and year rather than numeric month codes so people do not have to count.
 
 ### Dim unavailable days, do not hide them. {#dim-unavailable-days-do-not-hide-them}
 
@@ -83,10 +90,10 @@ Six weeks render every month, including the days of neighboring months that fill
 
 ## Related
 
-- For a single date field with this grid in a popup, use Date picker.
-- For a date and time together, use Date time picker.
+- `DatePicker`: use when a single date or date range field opens the calendar in a popup.
+- `DateTimePicker`: use when a date and a time are answered together.
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 

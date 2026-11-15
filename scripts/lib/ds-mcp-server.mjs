@@ -27,7 +27,7 @@ export const TOOLS = [
     name: 'ds_find',
     op: 'find',
     description:
-      'Step 1 of 5, the entry point: what PLUS has for a task, a name or an alias. Returns short ranked matches across patterns, components, tokens and Font Awesome Free icons; Figma component names resolve to their code name; a not-here name (Alert, Card, a Pro icon) comes back with its replacement. Ranks on name, aliases, summary and the Usage text; a token or icon query says so in its words. Next: ds_get for the names you will use.',
+      'A screen starts from a template. A brief or three or more component names returns a kit: template, patterns, components and token roles. Step 1 of 5, the entry point: what PLUS has for a task, a name or an alias. Returns short ranked matches across patterns, components, tokens and Font Awesome Free icons; Figma component names resolve to their code name; a not-here name (Alert, Card, a Pro icon) comes back with its replacement. Ranks on name, aliases, summary and the Usage text; a token or icon query says so in its words. Next: ds_get for the names you will use.',
     inputSchema: { type: 'object', properties: { query: str('A task in words ("a table of students"), a name ("PatternCard"), a Figma name or an icon.') }, required: ['query'] },
     call: (l, a) => l.find(a.query),
   },
@@ -58,9 +58,16 @@ export const TOOLS = [
     name: 'ds_guide',
     op: 'guide',
     description:
-      'Step 4 of 5: a guideline (layout formulas, grid, content, accessibility, color…) or why a ds_check rule fired, with what to write instead. With no argument, the orientation: what the system is, the barrels, the tool order and the hard rules. Next: write the code, then ds_check.',
-    inputSchema: { type: 'object', properties: { topic: str('A guideline topic ("layout") or a rule id ("ds/no-raw-literal"); leave out for the orientation.') } },
-    call: (l, a) => l.guide(a.topic),
+      'A screen starts from a template. Step 4 of 5: a guideline (layout formulas, grid, content, accessibility, color…) or why a ds_check rule fired, with what to write instead. Pattern and template guides return the brief chooser and section list by default; pass full: true for the whole page. With no argument, the orientation: what the system is, the barrels, the tool order and the hard rules. Next: write the code, then ds_check.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        topic: str('A guideline topic ("layout", "filter", "toolbar") or a rule id ("ds/no-raw-literal"); leave out for the orientation.'),
+        section: str('One section of the page ("Best practices", "Slots"), or "full" for the whole page.'),
+        full: { type: 'boolean', description: 'Return the full page instead of the brief chooser and section list.' },
+      },
+    },
+    call: (l, a) => l.guide(a.topic, { section: a.section, full: a.full }),
   },
   {
     name: 'ds_check',

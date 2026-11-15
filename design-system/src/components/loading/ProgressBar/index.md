@@ -8,26 +8,27 @@ Also asked as: percent complete, determinate loading.
 
 **Import:** `import { ProgressBar } from '@/components';`
 
+**Governed by:** Indicators (`ds guide indicators`); Loading (`ds guide loading`)
+
 **Source:** `design-system/src/components/loading/ProgressBar/ProgressBar.jsx`
 
 **Stories:** `design-system/src/components/loading/ProgressBar/ProgressBar.stories.jsx` — Overview, Appearances, Default, Success, Inverse, WithACaption, Indeterminate, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/loading/ProgressBar/ProgressBar.mdx`
 
-**Motion:** change `linear` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
 Use `ProgressBar` for progress through a task: an upload, a course, a
-multi-step form. When the task's length is unknown, set `isIndeterminate`. For
-a short wait with no task to track, use a `Spinner`.
+multi-step form. When the task's length is unknown, set `isIndeterminate`.
 
 ### Appearance guidance
 
 | Appearance | When to use |
 | --- | --- |
 | Default | Most bars: a brand fill on a neutral track. |
-| Success | Marks completion. Show a finished task at 100 in success. |
+| Success | Marks completion. Show a finished task at `100` in success. |
 | Inverse | On a bold or colored background. |
 
 ## Motion
@@ -39,9 +40,16 @@ ProgressBar reads these motion tokens and no literal duration or curve.
 | change | Load content | `--ds-motion-linear` | Fills with the work, never ahead of it. |  |
 | success | Update a value or state | `--ds-motion-appearance-fast` | The bar reaches its end and its fill changes to done. | `sound.done.step` on land: a module or lesson is done |
 
+## Alternatives
+
+- For an indeterminate wait with no track at all, use `Spinner`.
+- For a compact determinate ring beside a title or a file row, use `ProgressRing`.
+- For the outcome when a task finishes, use `Flag` or `SectionMessage`.
+- For position in a hierarchy rather than progress through a task, use `Breadcrumb`.
+
 ## Best practices
 
-### Indeterminate when the length is unknown. {#indeterminate-when-the-length-is-unknown}
+### Use `isIndeterminate` when the length is unknown. {#use-isindeterminate-when-the-length-is-unknown}
 
 A bar that fills implies a known total; use the moving bar when the work has
 no measurable end. `isIndeterminate` drops `value` and the value attributes.
@@ -53,7 +61,7 @@ The default track disappears on a bold ground; inverse keeps the bar readable.
 Do: Inverse appearance on a bold surface.
 Don't: Default appearance on a bold surface.
 
-### One bar per task. {#one-bar-per-task}
+### Show one bar per task. {#show-one-bar-per-task}
 
 Stacked bars for one task read as separate jobs; show a single bar for the whole.
 
@@ -62,14 +70,14 @@ Don't: Three bars for one task.
 
 ### Put the number in text beside the bar. {#put-the-number-in-text-beside-the-bar}
 
-The bar is 8 tall and carries no text of its own.
+The bar (`--progress-bar-height`) carries no visible text of its own.
 
 Do: A caption beside the bar says what the fill means.
 Don't: A bare bar leaves the reader to guess the number.
 
 ### Show a finished task as success. {#show-a-finished-task-as-success}
 
-Do: At 100, the success appearance marks the task done.
+Do: When complete, the success appearance marks the task done.
 Don't: A finished task left as a brand bar.
 
 ## Accessibility
@@ -80,26 +88,25 @@ Don't: A finished task left as a brand bar.
 - **Reduced motion is handled.** The indeterminate sweep stops under
   `prefers-reduced-motion: reduce`.
 - **Color is not the message.** `appearance` colors the bar and says nothing
-  to a screen reader; the `ariaLabel` and a caption carry the meaning.
+  to a screen reader; `ariaLabel` and a caption carry the meaning.
 
 ## Related
 
-- For an indeterminate wait with no track at all, use `Spinner`.
-- For the outcome when it finishes, use `Flag` or `SectionMessage`.
-- For position in a hierarchy rather than progress through a task, use `Breadcrumb`.
+- `ProgressRing`: use when showing determinate progress in a compact circular slot.
+- `ProgressTracker`: use when showing discrete named steps in a multi-step flow.
 
-Same group: `GenerativeBorder` · `Skeleton` · `Spinner`
+Same group: `GenerativeBorder` · `ProgressRing` · `Skeleton` · `Spinner`
 
 ## Parts
 
-1. **Track.** The full-width bar the fill runs along, a pill 8 tall.
+1. **Track.** The full-width bar the fill runs along, a pill (`--progress-bar-height` tall).
 2. **Fill.** The done part, a percent of the track. Indeterminate, it is a moving segment.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Rest | Determinate: the fill width is `value`, clamped to 0 to 100 together with `aria-valuenow`. |
+| Rest | Determinate: the fill width is `value`, clamped to `0` to `100` together with `aria-valuenow`. |
 | Indeterminate | A segment slides along the track. No value is announced. Under reduced motion the segment holds still. |
 | Hovered | None. It is not a control. |
 | Pressed | None. |
@@ -140,7 +147,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-background-brand-bold` · `--ds-background-inverse-subtle` · `--ds-background-inverse-subtle-pressed` · `--ds-background-neutral` · `--ds-background-success-bold` · `--plus-progressbar-fill-color` · `--progress-bar-height` · `--radius-full`
+`--ds-background-brand-bold` · `--ds-background-inverse-subtle` · `--ds-background-inverse-subtle-pressed` · `--ds-background-neutral` · `--ds-background-success-bold` · `--ds-motion-linear` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--ds-motion-spatial-fast-duration` · `--plus-progressbar-fill-color` · `--progress-bar-height` · `--radius-full`
 
 From `design-system/src/components/loading/ProgressBar/ProgressBar.scss`. Override these through the token layer, never with a literal.
 

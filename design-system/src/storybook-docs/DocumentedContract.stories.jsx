@@ -201,7 +201,7 @@ function baseProps(props, componentName) {
 /**
  * Mount, and hand back everything the component put in the document.
  *
- * Not just the host: Modal, Tooltip and Popover render through a portal onto
+ * Not just the host: Modal, Tooltip and Popup render through a portal onto
  * `document.body`, so a host-only reading calls every overlay variant empty.
  * React 19 does not rethrow a render error out of `flushSync` — it reports it
  * and commits nothing — so a crash arrives here as empty markup. `onCaughtError`

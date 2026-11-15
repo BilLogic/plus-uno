@@ -17,8 +17,8 @@ import { PHYSICS_DEMOS, SpringTokenTable, OneSpringFiveWays } from '@/storybook-
 
 export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
-  // The page itself is Foundations/Motion/Physics (MotionPhysics.mdx).
-  title: 'Foundations/Motion/Physics',
+  // The page itself is Foundations/Expression/Motion/Physics (MotionPhysics.mdx).
+  title: 'Foundations/Expression/Motion/Physics',
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };
@@ -76,8 +76,12 @@ const reducedStory = (demo) => ({
   play: stillAtItsLanding(demo),
 });
 
-export const Families = story(PHYSICS_DEMOS.families);
-export const FamiliesReduced = reducedStory(PHYSICS_DEMOS.families);
+export const FamilySpatial = story(PHYSICS_DEMOS.spatial);
+export const FamilySpatialReduced = reducedStory(PHYSICS_DEMOS.spatial);
+export const FamilyAppearance = story(PHYSICS_DEMOS.appearance);
+export const FamilyAppearanceReduced = reducedStory(PHYSICS_DEMOS.appearance);
+export const FamilyLinear = story(PHYSICS_DEMOS.linear);
+export const FamilyLinearReduced = reducedStory(PHYSICS_DEMOS.linear);
 export const Modes = story(PHYSICS_DEMOS.modes);
 export const ModesReduced = reducedStory(PHYSICS_DEMOS.modes);
 export const Size = story(PHYSICS_DEMOS.size);

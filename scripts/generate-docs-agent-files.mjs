@@ -1,7 +1,7 @@
 /**
- * Generate the agent file for every template and pattern docs page.
+ * Generate the agent file for every template, pattern and foundation docs page.
  *
- *   design-system/agent-views/pages/<templates|patterns>/<Name>.md
+ *   design-system/agent-views/<templates|patterns|foundations>/<Name>.md
  *
  * Usage:
  *   node scripts/generate-docs-agent-files.mjs
@@ -19,7 +19,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const check = process.argv.includes('--check');
 const unserved = pagesMissingManifestTag(REPO_ROOT);
 if (unserved.length) {
-  console.error(`✗ ${unserved.length} template, pattern, Foundations · Motion or Foundations · Sound page(s) lack the \`manifest\` tag, so the Storybook MCP \`get-documentation\` cannot serve them — add it to their <Meta tags>:\n${unserved.map((f) => `  ${f}`).join('\n')}`);
+  console.error(`✗ ${unserved.length} template, pattern, Foundations › Expression › Motion or Foundations › Expression › Sound page(s) lack the \`manifest\` tag, so the Storybook MCP \`get-documentation\` cannot serve them — add it to their <Meta tags>:\n${unserved.map((f) => `  ${f}`).join('\n')}`);
   process.exit(1);
 }
 const { stale, count } = syncDocsAgentFiles(REPO_ROOT, { check });

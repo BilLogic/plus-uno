@@ -6,6 +6,10 @@ An inline chip for a short piece of code inside a sentence. It is a `code` eleme
 
 **Import:** `import { Code } from '@/components';`
 
+**Used in:** Card (`ds guide card`)
+
+**Governed by:** Empty (`ds guide empty`); Errors (`ds guide errors`)
+
 **Source:** `design-system/src/components/text-and-data-display/Code/Code.jsx`
 
 **Stories:** `design-system/src/components/text-and-data-display/Code/Code.stories.jsx` — Overview, InHeading, WrapsAtTheEdge, Interactive, Rest, Hovered, Pressed, NotAControl
@@ -17,60 +21,63 @@ An inline chip for a short piece of code inside a sentence. It is a `code` eleme
 Use `Code` for a name, command, value or snippet that sits inside a sentence:
 a function, a file path, a flag, a token.
 
-The typeface and size are the `--code` text style (0.875em, so the chip scales
-with the text around it). The fill is `--ds-background-neutral` and the ink is
-`--ds-text-code-default`.
+The typeface and size come from the `--code` text style (`0.875em`, scaling
+with the surrounding text).
+
+## Alternatives
+
+- For several lines of code or a snippet with line numbers, use `CodeBlock`.
 
 ## Best practices
 
-### Keep the chip to a short phrase. {#keep-the-chip-to-a-short-phrase}
+### Keep inline code to a short phrase. {#keep-inline-code-to-a-short-phrase}
 
-A long chip wraps awkwardly and loses its structure. A block keeps lines and scroll.
+A long inline span wraps awkwardly and loses its structure. A block keeps lines and scroll.
 
 Do: Several lines go in a code block.
-Don't: A whole instruction in a chip.
+Don't: A whole instruction in inline code.
 
 ### Do not use it for emphasis. {#do-not-use-it-for-emphasis}
 
-The chip tells readers "this is literal text to type". Use bold or a button label for emphasis.
+`Code` tells readers "this is literal text to type". Use bold or a button label for emphasis.
 
 Do: Bold for emphasis, in the reader's words.
-Don't: A chip on a word that is not code.
+Don't: Inline code on a word that is not code.
 
 ### Write it as the reader would type it. {#write-it-as-the-reader-would-type-it}
 
 Do: The exact name, with its brackets.
-Don't: A trailing period inside the chip, which the reader may type.
+Don't: A trailing period inside the span, which the reader may type.
 
 ## Accessibility
 
-- **Announced as text.** The chip is a `code` element; screen readers read it as
+- **Announced as text.** `Code` renders a `code` element; screen readers read it as
   ordinary text, so write the code so it makes sense spoken.
-- **Contrast.** The ink on the chip fill passes in every color mode, because both
+- **Contrast.** The ink on the fill passes in every color mode, because both
   come from the neutral background and code ink tokens.
-- **It wraps.** Long values break inside the chip, so reflow at narrow widths and
+- **It wraps.** Long values break inside the element, so reflow at narrow widths and
   200% zoom does not scroll the page.
 
 ## Related
 
-- For several lines, `CodeBlock`.
+- `CodeBlock`: use when displaying several lines of code with line numbers or line highlights.
 
 Same group: `CodeBlock` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 ## Parts
 
-1. **Chip.** A `code` element in the code typeface at 0.875 of the text around it.
-2. **Fill.** The neutral ground, with a small radius.
-3. **Text.** The code ink; long values wrap inside the chip.
+1. **Element.** A `code` element in the code typeface at `0.875` of the text around it.
+2. **Fill.** The neutral ground (`--ds-background-neutral`), with `--radius-md`.
+3. **Text.** The code ink (`--ds-text-code-default`); long values wrap inside the span.
 
 ### States
 
 | State | What changes |
 | --- | --- |
 | Rest | Neutral fill with the code ink. |
-| Hovered, pressed | The chip does not react. |
-| Focused | The chip is not a control; Tab skips it. |
-| Disabled | Not applicable; the chip is never dimmed. |
+| Hovered, pressed | Does not react. |
+| Focused | Not a control; Tab skips it. |
+| Disabled | Not applicable; never dimmed. |
 
 ### Tokens
 
@@ -86,7 +93,7 @@ Same group: `CodeBlock` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidd
 | Do | Don't |
 | --- | --- |
 | Use it for a name, command, value or flag: `getSession()`. | Use it for emphasis or a product name. |
-| Write the code exactly as the reader would type it. | Add punctuation or a trailing period inside the chip. |
+| Write the code exactly as the reader would type it. | Add punctuation or a trailing period inside the element. |
 | Keep it to a short phrase. | Put several lines in it; use a code block. |
 
 ## Props

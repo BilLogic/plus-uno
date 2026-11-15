@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import { useMotionReduced } from '@/lib/motionPreference';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
-import { overlayMountOf } from '@/lib/overlay';
+import { useFloatingOverlay } from '@/lib/overlay';
 import './Tooltip.scss';
 
 /**
@@ -29,34 +30,25 @@ const Tooltip = ({
     delayShow = 250,
     delayHide = 400,
 }) => {
+    const reduced = useMotionReduced();
     const baseTriggerElement = React.isValidElement(children) ? children : <span>{children}</span>;
     const disabled = Array.isArray(trigger) ? trigger.length === 0 : !trigger;
 
-    // Where the tooltip portals to: the page, or the modal the trigger sits
-    // in, through the shared overlay module.
-    const triggerNodeRef = useRef(null);
-    const containerRef = useRef(null);
-    containerRef.current = overlayMountOf(triggerNodeRef.current);
-    const ownRef = baseTriggerElement.props?.ref ?? baseTriggerElement.ref;
-    const triggerElement = React.cloneElement(baseTriggerElement, {
-        ref: (node) => {
-            triggerNodeRef.current = node;
-            if (typeof ownRef === 'function') ownRef(node);
-            else if (ownRef) ownRef.current = node;
-        },
-    });
+    const floating = useFloatingOverlay({ trigger: baseTriggerElement, placement });
 
     return (
         <BaseTooltip.Root
             open={show}
+            onOpenChange={floating.onOpenChange}
             disabled={disabled}
             delay={delayShow}
             closeDelay={delayHide}
         >
-            <BaseTooltip.Trigger render={triggerElement} />
-            <BaseTooltip.Portal container={containerRef}>
-                <BaseTooltip.Positioner side={placement} sideOffset={4} collisionPadding={8}>
+            <BaseTooltip.Trigger render={floating.triggerProps.render} />
+            <BaseTooltip.Portal container={floating.container}>
+                <BaseTooltip.Positioner {...floating.positionerProps}>
                     <BaseTooltip.Popup
+                        data-reduced={reduced ? 'true' : undefined}
                         id={id}
                         role="tooltip"
                         className={`plus-tooltip ${className}`}

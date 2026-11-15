@@ -249,6 +249,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Table', new: '--table-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a PatternTable.' },
   { tier: 'patterns', group: 'Table', new: '--table-stack', old: '--table-stack', use: 'Vertical gap between a PatternTable and its toolbar or footer.' },
   { tier: 'patterns', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a PatternTable footer, such as its Pagination row.' },
+  { tier: 'patterns', group: 'Table', new: '--table-footer-height', old: null, ref: 'var(--space-300)', use: 'Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line.' },
   { tier: 'patterns', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
 
   // ─── Patterns / Backdrop (renamed from Overlay) ───────────────────────
@@ -321,6 +322,8 @@ export const TOKEN_LADDER = [
 
   // ─── Components / Checkbox, Radio ─────────────────────────────────────
   { tier: 'components', group: 'Checkbox', new: '--checkbox-control-size', old: '--layout-control-checkbox', ref: '18px', use: 'Size of the Checkbox box.' },
+  { tier: 'components', group: 'Choice tile', new: '--choice-tile-width', old: null, ref: 'var(--size-1400)', use: 'Width of a choice tile in a Radio, RadioGroup, Checkbox or CheckboxGroup with tile appearance.' },
+  { tier: 'components', group: 'File item', new: '--file-item-height', old: null, ref: 'calc(var(--space-300) + var(--space-050))', use: 'Fixed height of a FileItem row across queued, uploading, done and error states.' },
   { tier: 'components', group: 'Radio', new: '--radio-control-size', old: '--layout-control-radio', ref: '12px', use: 'Size of the Radio circle.' },
   // The `size` prop's px values (Radio group, Choice grid, Range, Toggle) are rows too, so the
   // components read a named token and never a literal. Each name ends in the `size` step it serves.
@@ -340,15 +343,20 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Toggle', new: '--toggle-track-width-16', old: null, ref: '32px', note: 'Toggle size 16', use: 'Track width of a Toggle with size 16.' },
   { tier: 'components', group: 'Toggle', new: '--toggle-track-width-20', old: null, ref: '40px', note: 'Toggle size 20', use: 'Track width of a Toggle with size 20.' },
   { tier: 'components', group: 'Toggle', new: '--toggle-pad', old: null, ref: 'var(--space-0125)', note: 'both sizes', use: 'Gap between a Toggle\'s track and its knob, at both sizes.' },
+  { tier: 'components', group: 'Setting row', new: '--setting-row-pad-y', old: null, ref: 'var(--space-075)', use: 'Vertical padding of a SettingRow.' },
+  { tier: 'components', group: 'Setting row', new: '--setting-row-end-min-height', old: null, ref: 'var(--line-height-125)', use: 'Minimum height of a SettingRow end slot so compact controls align with the first line of the label.' },
+  { tier: 'components', group: 'Setting row', new: '--setting-row-select-min-width', old: null, ref: 'var(--size-1000)', use: 'Minimum width of a compact Select inside a SettingRow end slot.' },
 
   // ─── Components / Listbox ─────────────────────────────────────────────
   { tier: 'components', group: 'Listbox', new: '--listbox-max-width', old: '--layout-max-width-listbox', ref: '320px', use: 'Widest a Select or Cascader listbox may grow.' },
   { tier: 'components', group: 'Listbox', new: '--listbox-min-height', old: '--layout-min-height-listbox', ref: '140px', use: 'Shortest a Select or Cascader listbox may be.' },
   { tier: 'components', group: 'Listbox', new: '--listbox-max-height', old: '--layout-max-height-listbox', ref: '300px', use: 'Tallest a Select or Cascader listbox may grow before it scrolls.' },
 
-  // ─── Components / Join row, Option menu ───────────────────────────────
+  // ─── Components / Join row, Option menu, Checklist ────────────────────
   { tier: 'components', group: 'Join row', new: '--join-row-width', old: '--layout-width-join-row', ref: '520px', use: 'Width of the Home page join row: the Join button with its session Select beside it.' },
   { tier: 'components', group: 'Option menu', new: '--option-menu-width', old: '--layout-width-option-menu', ref: '240px', use: 'Width of a fixed-width option menu.' },
+  { tier: 'components', group: 'Checklist', new: '--checklist-action-width', old: null, ref: 'calc(var(--space-400) * 2)', note: '128px; 96px remains for the ProgressBar when a 32px dismiss IconButton takes the end', use: 'Width of the trailing action column in a checklist card, and of its header progress slot.' },
+  { tier: 'components', group: 'Checklist', new: '--checklist-action-min-width', old: null, ref: 'var(--size-750)', note: '120px floor', use: 'Narrowest a checklist card\'s trailing action column may shrink.' },
 
   // ─── Components / sizes once written with primitives ─────────────────
   { tier: 'components', group: 'Button', new: '--button-vertical-size', old: null, ref: 'var(--space-400)', use: 'Height of a Button laid out vertically, with its icon above its label.' },
@@ -386,6 +394,8 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Flag', new: '--flag-min-height', old: null, ref: 'calc(var(--size-1000) + var(--size-750))', use: 'Minimum height of a Flag.' },
   { tier: 'components', group: 'Flag', new: '--flag-pad', old: null, ref: 'var(--space-125)', use: 'Padding inside a Flag.' },
   { tier: 'components', group: 'Flag', new: '--flag-offset', old: null, ref: 'var(--space-125)', use: 'Distance between a Flag and the edge of the screen.' },
+  { tier: 'components', group: 'Flag', new: '--flag-radius-timer', old: null, ref: 'var(--radius-025)', use: 'Corner radius of a Flag with a countdown bar: stepped down from the popup radius to match the bar height.' },
+  { tier: 'components', group: 'Flag', new: '--flag-timer-height', old: null, ref: 'var(--space-025)', use: 'Height of the countdown bar on a Flag.' },
   { tier: 'components', group: 'Spotlight', new: '--spotlight-width', old: null, ref: 'var(--width-2500)', use: 'Width of a Spotlight.' },
   { tier: 'components', group: 'Spotlight', new: '--spotlight-media-height', old: null, ref: 'calc(var(--size-750) + var(--space-150))', use: 'Height of the media area in a Spotlight.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-min-width', old: null, ref: 'var(--size-1400)', use: 'Minimum width of a menu group.' },
@@ -396,6 +406,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Popup', new: '--popup-max-width', old: null, ref: 'var(--width-2000)', use: 'Widest an auto-width Popup grows to fit its content, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-clip-reach', old: null, ref: 'var(--space-300)', use: 'How far past its edges a Popup\'s opening clip stays, so the overlay shadow is never cut.' },
   { tier: 'components', group: 'AI chat', new: '--ai-chat-width', old: null, ref: 'var(--width-2500)', use: 'Width of the AI chat when it opens as a popup or floats beside the page.' },
+  { tier: 'components', group: 'Inbox', new: '--inbox-width', old: null, ref: 'calc(var(--width-2000) + var(--space-250))', note: '360px', use: 'Width of the Inbox Panel when it opens beside the Sidebar.' },
   { tier: 'components', group: 'Popup', new: '--popup-pad', old: null, ref: 'var(--space-125)', use: 'Padding inside a Popup.' },
   { tier: 'components', group: 'Table', new: '--table-cell-max-width', old: null, ref: 'var(--size-300)', use: 'Maximum width of a table cell before its text truncates.' },
   { tier: 'components', group: 'Avatar', new: '--avatar-size-96', old: null, ref: 'calc(var(--space-300) * 2)', use: 'Size of an extra-large UserAvatar, such as in a profile header.' },
@@ -410,6 +421,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--size-150', use: 'Size of a default Spinner.' },
   { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--size-300', use: 'Size of a large Spinner, such as one loading a whole section.' },
   { tier: 'components', group: 'Progress bar', new: '--progress-bar-height', old: null, value: '--space-050', use: 'Height of a ProgressBar track.' },
+  { tier: 'components', group: 'Progress ring', new: '--progress-ring-stroke', old: null, value: '--stroke-2', use: 'Stroke width of a ProgressRing track and fill.' },
 
   // ─── Layers (own non-spacing family, code only) ───────────────────────
   { tier: 'layers', group: 'Layer', new: '--layer-card', old: '--layout-z-index-card', ref: '100', use: 'Stacking order of a card raised above page content, such as a sticky table part.' },

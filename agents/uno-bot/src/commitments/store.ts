@@ -233,6 +233,9 @@ export interface CommitmentText {
   card?: { title: string; url: string; status: string | null };
   /** Where a card to-do was read: the thread's permalink or the note's link. */
   sourceUrl?: string;
+  /** A card to-do from a channel that relays to #plus-design: asked at
+   *  #plus-design's top, with `sourceUrl` its thread's message. */
+  relayed?: boolean;
   /** A thread card to-do's other posters, whose ✅ reaction may ask for the
    *  draft too (a tap is anyone's). */
   participants?: string[];

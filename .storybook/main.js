@@ -105,7 +105,7 @@ const config = {
 
     // Ensure proper ES module handling
     config.optimizeDeps.include = config.optimizeDeps.include || [];
-    config.optimizeDeps.include.push('react', 'react-dom', 'prop-types');
+    config.optimizeDeps.include.push('react', 'react-dom', 'prop-types', 'motion', 'motion/react');
 
     // Deduplicate React to avoid invalid hook call errors
     config.resolve.dedupe = config.resolve.dedupe || [];

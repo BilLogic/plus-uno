@@ -45,7 +45,8 @@ describe('TreeSelect', () => {
         items.forEach((item) => {
             expect(item).toHaveClass('plus-option-row');
             // Flat: no treeitem nests inside another.
-            expect(item.parentElement).toBe(items[0].parentElement);
+            expect(item.closest('[role="tree"]')).toBe(tree);
+            expect(item.parentElement.closest('[role="treeitem"]')).toBeNull();
         });
         expect(items[1]).toHaveAttribute('aria-level', '2');
     });

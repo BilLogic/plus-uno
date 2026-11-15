@@ -14,3 +14,13 @@ export function RuleTag({ kind }) {
     if (!label) return null;
     return <Tag text={label} color={kind === 'automatic' ? 'green' : 'gray'} />;
 }
+
+/** The voice word a content rule serves, and the Tag color that finds it on the page. */
+export const VOICE_WORDS = { helpful: ['Helpful', 'blue'], honest: ['Honest', 'purple'], warm: ['Warm', 'orange'], clear: ['Clear', 'teal'] };
+
+/** Placed on the line under a content rule's heading: which of the four voice words the rule serves. */
+export function VoiceTag({ word }) {
+    const entry = VOICE_WORDS[word];
+    if (!entry) return null;
+    return <Tag text={entry[0]} color={entry[1]} />;
+}

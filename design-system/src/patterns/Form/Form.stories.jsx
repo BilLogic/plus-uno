@@ -1,11 +1,15 @@
+import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { TextField } from '@/components';
 
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps } from './formDemo.jsx';
+import { FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from './formDemo.jsx';
+import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 /**
  * Form: the template page's examples, run in the Storybook tests. There is no
@@ -30,8 +34,9 @@ const STAGE = 1024; // docs-literal
 
 export const TypePage = {
     name: 'Type: In a page',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInPage /></div>,
+    render: () => <ScreenStage width={PAGE_WIDTH}><FormInPage /></ScreenStage>,
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const save = canvas.getByRole('button', { name: 'Save session' });
@@ -39,13 +44,16 @@ export const TypePage = {
         await expect(rect(save).left, 'Primary comes first, left-aligned under the fields').toBeLessThan(rect(cancel).left);
         await expect(rect(footer).left, 'the footer starts at the fields’ edge').toBeCloseTo(rect(canvasElement.querySelector('.plus-fieldset')).left, 0);
         await expect(cancel.className, 'Cancel is Subtle').toContain('subtle');
+        await expect(canvas.getByRole('heading', { level: 1, name: 'Log a session' }), 'the form’s title is the page’s h1').toBeInTheDocument();
+        await expect(canvasElement.querySelector('.plus-pattern-section-fill-subtle'), 'the form sits on the Page, not in a subtle Section').toBeNull();
     },
 };
 
 export const TypePanel = {
     name: 'Type: In a Panel',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInPanel /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInPanel /></ScreenStage>,
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         await expect(rect(footer).height, 'the full-bleed footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
     },
@@ -53,8 +61,9 @@ export const TypePanel = {
 
 export const TypeModal = {
     name: 'Type: In a Modal',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal height="fill" stageHeight={680} /></div>, // docs-literal
+    render: () => <ScreenStage width={STAGE}><FormInModal height="fill" stageHeight={680} /></ScreenStage>, // docs-literal
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         await expect(rect(footer).height, 'the full-bleed footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
@@ -74,8 +83,9 @@ export const TypeModal = {
 
 export const TypeSteps = {
     name: 'Type: In steps',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInSteps /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInSteps /></ScreenStage>,
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'four steps run across the top').toHaveClass('plus-progress-tracker--horizontal');
         await expect(canvas.getByRole('button', { name: 'Back' }), 'Back on the first step is disabled').toHaveAttribute('aria-disabled', 'true');
@@ -95,11 +105,12 @@ const ANATOMY_PAGE_PARTS = [
 export const AnatomyPage = {
     name: 'Anatomy: In a page',
     render: () => (
-        <LiveAnatomy width={STAGE} title="A form in a page with its parts numbered" parts={ANATOMY_PAGE_PARTS}>
+        <LiveAnatomy width={PAGE_WIDTH} title="A form in a page with its parts numbered" parts={ANATOMY_PAGE_PARTS}>
             <FormInPage server />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         await markersLevelWithParts(canvasElement, ANATOMY_PAGE_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PAGE_PARTS);
     },
@@ -119,6 +130,7 @@ export const AnatomyPanel = {
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         await markersLevelWithParts(canvasElement, ANATOMY_PANEL_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PANEL_PARTS);
     },
@@ -138,6 +150,7 @@ export const AnatomyModal = {
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         await markersLevelWithParts(canvasElement, ANATOMY_MODAL_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_MODAL_PARTS);
     },
@@ -157,6 +170,7 @@ export const AnatomySteps = {
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         await markersLevelWithParts(canvasElement, ANATOMY_STEPS_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_STEPS_PARTS);
     },
@@ -167,8 +181,9 @@ export const AnatomySteps = {
 /** A field takes its error look on blur, and the message says what to fix. */
 export const KeyFieldError = {
     name: 'Key state: Field error on blur',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInPage /></div>,
+    render: () => <ScreenStage width={PAGE_WIDTH}><FormInPage /></ScreenStage>,
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const student = canvas.getByLabelText(/Student/);
         await userEvent.click(student);
@@ -184,8 +199,9 @@ export const KeyFieldError = {
 /** A field waiting on another says so in its caption; Save stays enabled. */
 export const KeyDisabledReason = {
     name: 'Key state: Disabled with its reason',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInPage subjectWaits /></div>,
+    render: () => <ScreenStage width={PAGE_WIDTH}><FormInPage subjectWaits /></ScreenStage>,
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         await expect(canvas.getByText('Choose a student first.'), 'the reason is visible text on the field').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'Save stays enabled').not.toBeDisabled();
@@ -195,8 +211,9 @@ export const KeyDisabledReason = {
 /** A blocked submit keeps the Modal open, marks the field, and the footer never moves. */
 export const KeyBlockedSubmit = {
     name: 'Key state: Blocked submit',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal height="fill" stageHeight={680} /></div>, // docs-literal
+    render: () => <ScreenStage width={STAGE}><FormInModal height="fill" stageHeight={680} /></ScreenStage>, // docs-literal
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const before = rect(footer);
@@ -215,8 +232,9 @@ export const KeyBlockedSubmit = {
 /** The server says no: a danger message at the top of the body, plus field errors. */
 export const KeyServerSaysNo = {
     name: 'Key state: The server says no',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal server initial={FILLED} /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInModal server initial={FILLED} /></ScreenStage>,
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const message = canvasElement.querySelector('[data-probe="message"]');
         const body = canvasElement.querySelector('.plus-pattern-modal-body');
@@ -229,8 +247,9 @@ export const KeyServerSaysNo = {
 /** Sending: the button swaps its label for a spinner in place at the same width; Cancel stays live. */
 export const KeySending = {
     name: 'Key state: Sending',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal initial={FILLED} sendingForever /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInModal initial={FILLED} sendingForever /></ScreenStage>,
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -247,8 +266,9 @@ export const KeySending = {
 /** Leaving with edits asks first, in the same Modal; Back keeps what was typed. */
 export const KeyLeaving = {
     name: 'Key state: Leaving with edits',
-    render: () => <div style={{ inlineSize: STAGE }}><FormInModal /></div>,
+    render: () => <ScreenStage width={STAGE}><FormInModal /></ScreenStage>,
     play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         await userEvent.type(canvas.getByLabelText(/Student/), 'Ana');
         await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
@@ -258,3 +278,115 @@ export const KeyLeaving = {
         await expect(canvas.getByLabelText(/Student/), 'Back returns without losing anything typed').toHaveValue('Ana');
     },
 };
+
+/* ------------------------------------------------------------------- motion */
+
+const withProductiveMotion = (Story) => (
+    <MotionPreferenceContext.Provider value={false}>
+        <Story />
+    </MotionPreferenceContext.Provider>
+);
+
+const InlineValidationDemo = () => {
+    const [school, setSchool] = React.useState('');
+    const [notes, setNotes] = React.useState('');
+    const [touched, setTouched] = React.useState(false);
+    const error = touched && school.trim().length < 3 ? 'Enter the school name.' : undefined;
+
+    return (
+        <div style={{ maxInlineSize: 'var(--card-min-width-lg)', padding: 'var(--page-pad)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+                <div data-testid="school-field-wrap">
+                    <FormFieldSchool
+                        value={school}
+                        error={error}
+                        onChange={(next) => setSchool(next)}
+                        onBlur={() => setTouched(true)}
+                    />
+                </div>
+                <div data-testid="notes-field-wrap">
+                    <FormFieldNotes value={notes} onChange={setNotes} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const FormFieldSchool = ({ value, error, onChange, onBlur }) => (
+    <TextField
+        label="School"
+        isRequired
+        value={value}
+        isInvalid={Boolean(error)}
+        errorMessage={error}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+    />
+);
+
+const FormFieldNotes = ({ value, onChange }) => (
+    <TextField
+        label="Notes (optional)"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+    />
+);
+
+const playInlineValidation = (reduced = false) => async ({ canvasElement }) => {
+    await settleAnimations(canvasElement);
+    const canvas = within(canvasElement);
+    const school = canvas.getByLabelText(/School/);
+    const notesWrap = canvas.getByTestId('notes-field-wrap');
+    const notesTopInitial = notesWrap.getBoundingClientRect().top;
+
+    // Typing before leaving never flags the field.
+    await userEvent.type(school, 'Li');
+    await expect(school).not.toHaveAttribute('aria-invalid', 'true');
+    await expect(canvasElement.querySelector('[data-field-caption-slot]')).toBeNull();
+
+    // Leaving the incomplete field makes room on spatial.fast and fades the error in.
+    await userEvent.tab();
+    await expect(school).toHaveAttribute('aria-invalid', 'true');
+    const slot = canvasElement.querySelector('[data-field-caption-slot]');
+    await expect(slot, 'caption presence slot mounts').not.toBeNull();
+    await expect(slot).toHaveAttribute('data-reduced', reduced ? 'true' : 'false');
+
+    await settleAnimations(canvasElement);
+    await waitFor(() => expect(slot).toHaveAttribute('data-presence-phase', 'settled'));
+    await expect(canvas.getByText('Enter the school name.')).toBeVisible();
+    const notesTopWithError = notesWrap.getBoundingClientRect().top;
+    await expect(notesTopWithError, 'field below moved down for the error message').toBeGreaterThan(notesTopInitial);
+
+    // Once red, typing rechecks immediately: fixing the field fades the error out before closing the room.
+    await userEvent.click(school);
+    await userEvent.type(school, 'ncoln Middle');
+    await expect(school).not.toHaveAttribute('aria-invalid', 'true');
+
+    const exitingSlot = canvasElement.querySelector('[data-field-caption-slot]');
+    await expect(exitingSlot, 'slot stays mounted during exit fade').not.toBeNull();
+    await expect(exitingSlot.getAttribute('data-presence-phase')).toMatch(/^exit-/);
+    if (!reduced && exitingSlot.getAttribute('data-presence-phase') === 'exit-fade') {
+        await expect(notesWrap.getBoundingClientRect().top, 'field below waits for exit fade before closing up')
+            .toBeCloseTo(notesTopWithError, 1);
+    }
+
+    await waitFor(() => expect(canvasElement.querySelector('[data-field-caption-slot]')).toBeNull(), { timeout: 4000 });
+    await settleAnimations(canvasElement);
+    await expect(notesWrap.getBoundingClientRect().top, 'field below returned to its resting position')
+        .toBeCloseTo(notesTopInitial, 1);
+};
+
+export const MotionInlineValidation = {
+    name: 'Motion: Inline validation in a field',
+    decorators: [withProductiveMotion],
+    render: () => <InlineValidationDemo />,
+    play: playInlineValidation(false),
+};
+
+export const MotionInlineValidationReduced = {
+    name: 'Motion: Inline validation in a field (reduced)',
+    decorators: [withReducedMotion],
+    render: () => <InlineValidationDemo />,
+    play: playInlineValidation(true),
+};
+

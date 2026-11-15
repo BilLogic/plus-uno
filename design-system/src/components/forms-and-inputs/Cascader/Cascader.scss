@@ -22,14 +22,14 @@
 }
 
 .plus-cascader-arrow {
-    transition: transform 0.15s ease-in-out;
+    transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
 
     &.plus-cascader-arrow-open {
         transform: rotate(180deg);
     }
 }
 
-// The listbox surface is placed by `.plus-listbox--anchored`. Its columns are
+// AnchoredListboxSurface places the listbox. Its columns are
 // exempt from the 320px cap: they grow it up to the viewport.
 .plus-listbox.plus-cascader-menu {
     max-width: var(--plus-listbox-viewport-width);

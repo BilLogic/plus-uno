@@ -121,77 +121,6 @@ export function ResourcesCard({ href, icon, title }) {
 }
 
 /**
- * Build a Figma node URL from a file key + node id (e.g. "33:2470" → node-id=33-2470).
- * Falls back to a provided explicit url when available.
- */
-function figmaNodeUrl({ url, fileKey, componentSetNodeId, nodeId }) {
-    if (url) return url;
-    const node = componentSetNodeId || nodeId;
-    if (!fileKey || !node) return null;
-    return `https://www.figma.com/design/${fileKey}/?node-id=${String(node).replace(':', '-')}`;
-}
-
-/**
- * Pick the rows worth showing in the Figma nodes table.
- * Drops the generic "storybook-resources" docs-page entry when real component
- * sets (variants/styles) exist; otherwise keeps the single available entry.
- */
-function figmaVariantRows(sets) {
-    if (!Array.isArray(sets) || sets.length === 0) return [];
-    const variants = sets.filter((set) => set && set.id !== 'storybook-resources');
-    return variants.length ? variants : sets;
-}
-
-/**
- * Maps each Figma component set (style/variant) of a component to its node id + link.
- * Sourced from the component MDX `figmaMeta.sets`.
- */
-export function FigmaNodesTable({ sets, fileKey }) {
-    const rows = figmaVariantRows(sets);
-    if (rows.length === 0) return null;
-
-    return (
-        <div className="sb-ds-figma-nodes not-prose">
-            <div className="sb-ds-figma-nodes__label">Figma nodes</div>
-            <DocsTable>
-                <thead>
-                    <tr>
-                        <th>Style / variant</th>
-                        <th>Node ID</th>
-                        <th>Figma link</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows.map((set, index) => {
-                        const nodeId = set.componentSetNodeId || set.nodeId || '—';
-                        const href = figmaNodeUrl({
-                            url: set.url,
-                            fileKey: set.fileKey || fileKey,
-                            componentSetNodeId: set.componentSetNodeId,
-                            nodeId: set.nodeId,
-                        });
-                        return (
-                            <tr key={set.id || nodeId || index}>
-                                <td>{set.name || set.id || '—'}</td>
-                                <td><code>{nodeId}</code></td>
-                                <td>
-                                    {href ? (
-                                        <a href={href} target="_blank" rel="noreferrer noopener">
-                                            Open in Figma{' '}
-                                            <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
-                                        </a>
-                                    ) : '—'}
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </DocsTable>
-        </div>
-    );
-}
-
-/**
  * Catalog / states table for MDX inside `.not-prose` wrappers.
  * Prefer this over Markdown pipe tables — those do not style under `not-prose` and look malformed.
  *
@@ -212,12 +141,9 @@ export function DocsTable({ children, className = '' }) {
  * Design + repo links above the docs body.
  * Figma: specs and tokens. GitHub: full source tree, history, and PR context — unlike the Overview code snippet,
  * which is usually a curated web-app/JSP-style excerpt, not the whole React implementation.
- *
- * When `sets` is provided (a component's `figmaMeta.sets`), a table mapping each
- * style/variant to its Figma node id + link is rendered below the resource cards.
  */
-export function ResourcesBlock({ figmaLink, githubLink, sets, figmaFileKey }) {
-    if (!figmaLink && !githubLink && (!sets || sets.length === 0)) return null;
+export function ResourcesBlock({ figmaLink, githubLink }) {
+    if (!figmaLink && !githubLink) return null;
     return (
         <div className="sb-ds-resources sb-docs-section">
             <h2>Resources</h2>
@@ -237,7 +163,6 @@ export function ResourcesBlock({ figmaLink, githubLink, sets, figmaFileKey }) {
                     />
                 )}
             </div>
-            <FigmaNodesTable sets={sets} fileKey={figmaFileKey} />
         </div>
     );
 }
@@ -341,7 +266,71 @@ export function ComponentExample({ of: ofStory, title, description }) {
 const CANVAS_OVERLAY_GAP = 'var(--stack-lg)';
 
 /**
- * One do or don't card: a live example above a one-line caption.
+ * The filled Do or Don't caption block below an example well or a motion demo stage.
+ *
+ * @param {'do' | 'dont'} tone
+ * @param {React.ReactNode} children - the rule, in one sentence
+ * @param {React.CSSProperties} [style]
+ */
+export function DoDontCaption({ tone, children, style }) {
+    const isDo = tone === 'do';
+    return (
+        <figcaption
+            className="sb-ds-dodont-caption"
+            data-verdict={tone}
+            style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--inline-lg)',
+                padding: 'var(--card-pad-compact) var(--card-pad-default)',
+                borderRadius: 'var(--radius-lg)',
+                backgroundColor: isDo
+                    ? 'var(--ds-background-success-subtler)'
+                    : 'var(--ds-background-danger-subtler)',
+                color: 'var(--ds-text)',
+                font: 'var(--body-default)',
+                ...style,
+            }}
+        >
+            <span
+                className="sb-ds-dodont-caption__icon"
+                aria-hidden="true"
+                style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 'var(--icon-md)',
+                    height: 'var(--line-height-125)',
+                    flexShrink: 0,
+                    color: 'var(--ds-text)',
+                    fontSize: 'var(--icon-md)',
+                }}
+            >
+                <i className={`fa-solid ${isDo ? 'fa-circle-check' : 'fa-circle-xmark'}`} />
+            </span>
+            <span
+                className="sb-ds-dodont-caption__body"
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--stack-md)',
+                    minWidth: 0,
+                    flex: 1,
+                }}
+            >
+                <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>
+                    {isDo ? 'Do' : "Don't"}
+                </strong>
+                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                    {children}
+                </span>
+            </span>
+        </figcaption>
+    );
+}
+
+/**
+ * One do or don't card: a sunken example well above a filled caption block.
  * Compose with `DoDontPair`, or pass several pairs to `DoDontGrid`.
  *
  * @param {'do' | 'dont'} tone
@@ -349,51 +338,46 @@ const CANVAS_OVERLAY_GAP = 'var(--stack-lg)';
  * @param {React.ReactNode} caption - the rule, in one sentence
  */
 export function DoDontCard({ tone, children, caption }) {
-    const isDo = tone === 'do';
     return (
         <figure
             className="sb-ds-dodont-card"
+            data-verdict={tone}
             style={{
                 margin: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
+                // Subgrid rows: both cards in a pair share the well row and the
+                // caption row, so wells and captions line up across the pair.
+                display: 'grid',
+                gridTemplateRows: 'subgrid',
+                gridRow: 'span 2',
+                rowGap: 'var(--section-stack-md)',
+                minInlineSize: 0,
+                boxSizing: 'border-box',
+                padding: 'var(--card-pad-default)',
                 borderRadius: 'var(--card-radius)',
+                border: 'var(--border-default) solid var(--ds-border)',
                 backgroundColor: 'var(--ds-surface-raised)',
                 boxShadow: 'var(--ds-shadow-raised)',
             }}
         >
             <div
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--inline-md)',
-                    padding: 'var(--pad-y-md) var(--pad-x-lg)',
-                    backgroundColor: isDo ? 'var(--ds-background-success-subtler)' : 'var(--ds-background-danger-subtler)',
-                    color: 'var(--ds-text)',
-                    font: 'var(--heading-xsmall)',
-                }}
-            >
-                <i
-                    className={`fa-solid ${isDo ? 'fa-circle-check' : 'fa-circle-xmark'}`}
-                    style={{ color: isDo ? 'var(--ds-icon-success)' : 'var(--ds-icon-danger)' }}
-                    aria-hidden="true"
-                />
-                <span>{isDo ? 'Do' : "Don't"}</span>
-            </div>
-            <div
+                className="sb-ds-dodont-card__well"
                 style={{
                     flex: 1,
-                    padding: 'var(--section-stack-lg) var(--pad-x-lg)',
+                    minHeight: 'calc(var(--height-500) * 2)',
+                    padding: 'var(--card-pad-default)',
+                    boxSizing: 'border-box',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: 'var(--ds-surface)',
+                    borderRadius: 'var(--radius-lg)',
+                    backgroundColor: 'var(--ds-surface-sunken)',
+                    color: 'var(--ds-text)',
+                    font: 'var(--body-default)',
                 }}
             >
-                <div style={{ width: '100%' }}>{children}</div>
+                <div className="sb-ds-dodont-card__example">{children}</div>
             </div>
-            <figcaption style={{ padding: 'var(--stack-lg) var(--pad-x-lg)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>{caption}</figcaption>
+            <DoDontCaption tone={tone}>{caption}</DoDontCaption>
         </figure>
     );
 }
@@ -403,7 +387,12 @@ export function DoDontPair({ doExample, doCaption, dontExample, dontCaption }) {
     return (
         <div
             className="sb-ds-dodont-pair"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--section-stack-md)', alignItems: 'stretch' }}
+            style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(max(min(100%, var(--card-min-width-md)), calc((100% - var(--section-stack-lg)) / 2)), 1fr))',
+                gap: 'var(--section-stack-lg)',
+                alignItems: 'stretch',
+            }}
         >
             <DoDontCard tone="do" caption={doCaption}>{doExample}</DoDontCard>
             <DoDontCard tone="dont" caption={dontCaption}>{dontExample}</DoDontCard>

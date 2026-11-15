@@ -145,7 +145,7 @@ describe('hero line weight', () => {
 
 describe('hero window corners', () => {
     it('draws the Frame hero window with the window corner, not a card or section radius', () => {
-        const { container } = render(React.createElement(HEROES['templates-frame-frame'].Hero));
+        const { container } = render(React.createElement(HEROES['templates-frame'].Hero));
         const clip = container.querySelector('clipPath rect');
         expect(clip.style.rx).toContain(CORNER_WINDOW);
     });

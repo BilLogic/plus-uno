@@ -81,6 +81,17 @@ export function run({
   }
 
   for (const file of sources ?? trackedSources(repoRoot, SOURCE_ROOTS, SCANNED)) {
+    if (/\.test\.[cm]?[jt]sx?$/.test(file.path)) continue;
+    // Runtime lookup also rejects dynamic unknowns; literal calls fail in CI
+    // before a component or docs page has to exercise them.
+    const source = file.text.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, (m) => m.replace(/[^\n]/g, ' '));
+    for (const call of source.matchAll(/\b(?:resolveMoment|playMoment)\(\s*['"]([^'"]+)['"]\s*,\s*['"]([^'"]+)['"]/g)) {
+      const [, row, event] = call;
+      if (!registry.some((r) => r.name === row && r.events?.[event]?.sound)) {
+        findings.push({ file: file.path, line: source.slice(0, call.index).split('\n').length,
+          message: `Unknown sound moment: ${row}.${event}` });
+      }
+    }
     if (RUNTIME.test(file.path)) continue;
     file.text.split('\n').forEach((line, i) => {
       for (const api of AUDIO_API) {

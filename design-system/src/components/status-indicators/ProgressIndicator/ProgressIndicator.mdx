@@ -15,14 +15,16 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 <Meta of={ProgressIndicatorStories} />
 
 <Title />
-A row of dots showing where you are along the steps of a journey. Unlike
-`ProgressTracker`, each dot carries no label of its own, only a position.
+A row of step markers showing where you are along the steps of a journey. Unlike
+`ProgressTracker`, each step marker carries no visible label of its own, only a
+position.
 
 <DocsTabs of={ProgressIndicatorStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-5467"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/status-indicators/ProgressIndicator"
 />
 
@@ -32,7 +34,7 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 ## Appearance
 
-<ComponentExample of={ProgressIndicatorStories.Default} title="Default" description="Four dots, the second one current." />
+<ComponentExample of={ProgressIndicatorStories.Default} title="Default" description="Four steps, the second one current." />
 
 <ComponentExample of={ProgressIndicatorStories.Appearances} title="Appearances" description={<><code>default</code>, <code>primary</code> and <code>help</code> for light surfaces; <code>inverted</code> for a dark one.</>} />
 
@@ -42,9 +44,9 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 ## Size and spacing
 
-<ComponentExample of={ProgressIndicatorStories.Sizes} title="Size" description={<><code>size</code> sets the dot diameter, 8 or 12.</>} />
+<ComponentExample of={ProgressIndicatorStories.Sizes} title="Size" description={<><code>size</code> sets the marker diameter, 8 or 12.</>} />
 
-<ComponentExample of={ProgressIndicatorStories.Spacing} title="Spacing" description={<><code>spacing</code> sets the gap between dots: <code>comfortable</code>, <code>cozy</code> or <code>compact</code>.</>} />
+<ComponentExample of={ProgressIndicatorStories.Spacing} title="Spacing" description={<><code>spacing</code> sets the gap between markers: <code>comfortable</code>, <code>cozy</code> or <code>compact</code>.</>} />
 
 </div>
 
@@ -52,11 +54,11 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 ## Timed bar
 
-<ComponentExample of={ProgressIndicatorStories.Timed} title="Progress" description={<>With <code>progress</code>, the current dot stretches into a bar whose fill grows to that fraction, from 0 to 1. A step with no clock passes <code>1</code>, so the bar shows full.</>} />
+<ComponentExample of={ProgressIndicatorStories.Timed} title="Progress" description={<>With <code>progress</code>, the current marker stretches into a bar whose fill grows to that fraction, from 0 to 1. A step with no clock passes <code>1</code>, so the bar shows full.</>} />
 
-<ComponentExample of={ProgressIndicatorStories.Clock} title="On a clock" description={<>A clock drives <code>progress</code>: the bar fills over the step's time, then the next dot stretches and starts over. A carousel that moves on its own works this way.</>} />
+<ComponentExample of={ProgressIndicatorStories.Clock} title="On a clock" description={<>A clock drives <code>progress</code>: the bar fills over the step's time, then the next marker stretches and starts over. A carousel that moves on its own works this way.</>} />
 
-<ComponentExample of={ProgressIndicatorStories.TimedInteractive} title="Timed and selectable" description={<>With <code>onSelect</code> as well, every dot is a button a person can press to jump there.</>} />
+<ComponentExample of={ProgressIndicatorStories.TimedInteractive} title="Timed and selectable" description={<>With <code>onSelect</code> as well, every marker is a button a person can press to jump there.</>} />
 
 </div>
 
@@ -64,15 +66,15 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 ## State
 
-<ComponentExample of={ProgressIndicatorStories.Rest} title="Rest" description="Dots on the subtlest icon ground; the current dot on the brand ground." />
+<ComponentExample of={ProgressIndicatorStories.Rest} title="Rest" description="Markers on the subtlest icon ground; the current marker on the brand ground." />
 
-<ComponentExample of={ProgressIndicatorStories.Hovered} title="Hovered" description="An unselected dot steps to the subtle icon ground; the current dot keeps its ground." />
+<ComponentExample of={ProgressIndicatorStories.Hovered} title="Hovered" description="An unselected marker steps to the subtle icon ground; the current marker keeps its ground." />
 
-<ComponentExample of={ProgressIndicatorStories.Pressed} title="Pressed" description="An unselected dot steps to the default icon ground." />
+<ComponentExample of={ProgressIndicatorStories.Pressed} title="Pressed" description="An unselected marker steps to the default icon ground." />
 
-<ComponentExample of={ProgressIndicatorStories.Focused} title="Focused" description="Tab reaches each dot and draws the 2px ring." />
+<ComponentExample of={ProgressIndicatorStories.Focused} title="Focused" description="Tab reaches each marker and draws the focus ring." />
 
-<ComponentExample of={ProgressIndicatorStories.Decorative} title="Disabled" description={<>No disabled state. Without <code>onSelect</code> the dots are not buttons and Tab skips them.</>} />
+<ComponentExample of={ProgressIndicatorStories.Decorative} title="Disabled" description={<>No disabled state. Without <code>onSelect</code> the markers are not buttons and Tab skips them.</>} />
 
 </div>
 
@@ -90,13 +92,7 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 <DocsInteractivePlayground
     of={ProgressIndicatorStories.Interactive}
-    description={
-        <>
-            Click a dot to jump to that step. Use the table below to change props.
-            The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Click a marker to jump to that step, or change props in the table below."
 />
 
 </div>
@@ -114,11 +110,19 @@ A row of dots showing where you are along the steps of a journey. Unlike
 ## Usage
 
 Use `ProgressIndicator` for a short sequence where position matters more than
-the name of each step — a carousel, an onboarding flight, a slide deck. When
-each step has its own label people need to see, use `ProgressTracker` instead.
+the name of each step — a carousel, an onboarding flight, a slide deck.
 
 When each step lasts a set time and moves on by itself, pass `progress` so the
-current dot shows how much of its time is left.
+current marker shows how much of its time is left.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For steps with their own visible labels, use `ProgressTracker`.
+- For a single bar showing percent complete, use `ProgressBar`.
 
 </div>
 
@@ -126,11 +130,11 @@ current dot shows how much of its time is left.
 
 ## Parts
 
-1. **Dot.** One per step: 8 or 12 across, a circle.
-2. **Current dot.** The brand ground (discovery for help, inverse icon for inverted), with <code>aria-current="step"</code>.
-3. **Group.** The row, named by <code>label</code>.
-4. **Bar.** With <code>progress</code>, the current dot is 32 long: the subtlest icon ground is the track, and the fill, in the current dot's color, grows from the start edge. Under reduced motion it shows full.
-5. **Target.** A dot that is a button keeps a 24 target, so the gap between buttons widens to fit it.
+1. **Step marker.** One circle per step (`8` or `12` across).
+2. **Current marker.** The brand ground (discovery for help, inverse icon for inverted), with `aria-current="step"`.
+3. **Group.** The row, named by `label`.
+4. **Bar.** With `progress`, the current marker stretches to `--control-md`: the subtlest icon ground is the track, and the fill grows from the start edge. Under reduced motion it shows full.
+5. **Target.** A marker that is a button keeps a `--control-sm` target, so the gap between buttons widens to fit it.
 
 ### States
 
@@ -139,10 +143,10 @@ current dot shows how much of its time is left.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>Subtlest icon ground; the current dot is on its appearance ground.</td></tr>
-<tr><td>Hovered</td><td>Interactive only: an unselected dot takes the subtle icon ground.</td></tr>
-<tr><td>Pressed</td><td>Interactive only: an unselected dot takes the default icon ground.</td></tr>
-<tr><td>Focused</td><td>Interactive only: the 2px ring, 2 off the dot.</td></tr>
+<tr><td>Rest</td><td>Subtlest icon ground; the current marker is on its appearance ground.</td></tr>
+<tr><td>Hovered</td><td>Interactive only: an unselected marker takes the subtle icon ground.</td></tr>
+<tr><td>Pressed</td><td>Interactive only: an unselected marker takes the default icon ground.</td></tr>
+<tr><td>Focused</td><td>Interactive only: shows the focus ring; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Disabled</td><td>A progress indicator has no disabled state; without <code>onSelect</code> it is decorative.</td></tr>
 </tbody>
 </DocsTable>
@@ -154,12 +158,12 @@ current dot shows how much of its time is left.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Dot ground</td><td><code>--ds-icon-subtlest</code>, <code>--ds-icon-subtle</code>, <code>--ds-icon</code></td></tr>
-<tr><td>Current dot</td><td><code>--ds-background-brand-bold</code>, <code>--ds-background-discovery-bold</code>, <code>--ds-icon-inverse</code></td></tr>
-<tr><td>Inverted dot</td><td><code>--ds-background-inverse-subtle</code> and its states</td></tr>
+<tr><td>Marker ground</td><td><code>--ds-icon-subtlest</code>, <code>--ds-icon-subtle</code>, <code>--ds-icon</code></td></tr>
+<tr><td>Current marker</td><td><code>--ds-background-brand-bold</code>, <code>--ds-background-discovery-bold</code>, <code>--ds-icon-inverse</code></td></tr>
+<tr><td>Inverted marker</td><td><code>--ds-background-inverse-subtle</code> and its states</td></tr>
 <tr><td>Size</td><td><code>--progress-indicator-dot-size-8</code>, <code>--progress-indicator-dot-size-12</code></td></tr>
-<tr><td>Bar</td><td><code>--control-md</code> long; track <code>--ds-icon-subtlest</code>, fill the current dot's color</td></tr>
-<tr><td>Gap</td><td><code>--inline-md</code>, <code>--inline-sm</code>, <code>--stack-sm</code>; between buttons at least <code>--control-sm</code> less the dot</td></tr>
+<tr><td>Bar</td><td><code>--control-md</code> long; track <code>--ds-icon-subtlest</code>, fill the current marker's color</td></tr>
+<tr><td>Gap</td><td><code>--inline-md</code>, <code>--inline-sm</code>, <code>--stack-sm</code>; between buttons at least <code>--control-sm</code> less the marker</td></tr>
 <tr><td>Ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
 </tbody>
 </DocsTable>
@@ -172,13 +176,13 @@ current dot shows how much of its time is left.
 
 ### Pass `onSelect` only when jumping ahead makes sense.
 
-Without `onSelect` the dots are decorative and only `aria-current` marks the active one. With it, every dot becomes a button a person can press to jump there directly. That suits a carousel, not a linear flow someone must complete in order.
+Without `onSelect` the markers are decorative and only `aria-current` marks the active one. With it, every marker becomes a button a person can press to jump there directly. That suits a carousel, not a linear flow someone must complete in order.
 
 <DoDontPair
     doExample={<ProgressIndicator values={['Slide 1', 'Slide 2', 'Slide 3', 'Slide 4']} selectedIndex={1} onSelect={() => {}} label="Carousel slides" />}
-    doCaption="Interactive dots on a carousel, where any slide can be opened."
+    doCaption="Interactive markers on a carousel, where any slide can be opened."
     dontExample={<ProgressIndicator values={['Step 1', 'Step 2', 'Step 3', 'Step 4']} selectedIndex={1} onSelect={() => {}} label="Checkout steps" />}
-    dontCaption="Interactive dots on a flow that must be finished in order."
+    dontCaption="Interactive markers on a flow that must be finished in order."
 />
 
 ```jsx
@@ -190,15 +194,15 @@ Without `onSelect` the dots are decorative and only `aria-current` marks the act
 />
 ```
 
-### Keep the number of dots small.
+### Keep the number of steps small.
 
-A row of dots reads at a glance. With many dots, position stops being readable.
+A short row reads at a glance. With many steps, position stops being readable.
 
 <DoDontPair
     doExample={<ProgressIndicator values={['a', 'b', 'c', 'd', 'e']} selectedIndex={2} />}
-    doCaption="A handful of dots, so the current one is easy to find."
+    doCaption="A handful of steps, so the current one is easy to find."
     dontExample={<ProgressIndicator values={Array.from({ length: 24 }, (_, i) => String(i))} selectedIndex={11} size={8} spacing="compact" />}
-    dontCaption="Two dozen dots, where the current one is lost in the row."
+    dontCaption="Two dozen steps, where the current one is lost in the row."
 />
 
 ### Match the appearance to the surface.
@@ -207,14 +211,14 @@ A row of dots reads at a glance. With many dots, position stops being readable.
 
 <DoDontPair
     doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-inverse-subtle)' }}><ProgressIndicator values={['a', 'b', 'c', 'd']} selectedIndex={1} appearance="inverted" /></div>}
-    doCaption="Inverted dots on a dark ground."
+    doCaption="Inverted indicator on a dark ground."
     dontExample={<ProgressIndicator values={['a', 'b', 'c', 'd']} selectedIndex={1} appearance="inverted" />}
-    dontCaption="Inverted dots on a light surface, where they vanish."
+    dontCaption="Inverted indicator on a light surface, where it vanishes."
 />
 
-### `values` supplies a count and each dot's name.
+### Use `values` to supply the step count and each button's accessible name.
 
-The array's content never renders. Its length becomes the number of dots, and when `onSelect` is set each entry becomes a dot's accessible name.
+The array's content never renders visually. Its length becomes the number of step markers, and when `onSelect` is set each entry becomes a button's accessible name.
 
 </div>
 
@@ -227,9 +231,9 @@ The array's content never renders. Its length becomes the number of dots, and wh
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Name each dot for its step when the dots are buttons: "Step 2, Reflection".</td><td>Leave interactive dots unnamed or number them only.</td></tr>
+<tr><td>Name each entry for its step when the markers are buttons: "Step 2, Reflection".</td><td>Leave interactive steps unnamed or number them only.</td></tr>
 <tr><td>Give the group a <code>label</code> that says what it tracks: "Carousel slides".</td><td>Keep the default "Progress" when a page holds two indicators.</td></tr>
-<tr><td>Use it where steps have no labels of their own.</td><td>Use it where each step needs a title; use the progress tracker.</td></tr>
+<tr><td>Use it where steps have no labels of their own.</td><td>Use it where each step needs a title; use Progress tracker.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -243,9 +247,8 @@ The array's content never renders. Its length becomes the number of dots, and wh
   default), so a screen reader announces it as one control.
 - **The current step is `aria-current="step"`.** This is the only state a
   non-interactive indicator exposes.
-- **Interactive dots are real buttons**, each named from its `values` entry
-  and linked to the content it controls with `ariaControls`, each with a 24
-  target.
+- **Interactive markers are real buttons**, each named from its `values` entry
+  and linked to the content it controls with `ariaControls`.
 - **The bar is hidden from assistive technology.** Its fill is a picture of
   time; `aria-current` still names the current step.
 - **Reduced motion shows the bar full**, so nothing grows on screen.
@@ -256,8 +259,8 @@ The array's content never renders. Its length becomes the number of dots, and wh
 
 ## Related
 
-- For steps with their own visible labels, use `ProgressTracker`.
-- For a single bar showing percent complete, use `ProgressBar`.
+- `Carousel`: use when pairing `ProgressIndicator` with an autoplaying slide stage.
+- `ProgressTracker`: use when each step needs a visible label beside its marker.
 
 </div>
 

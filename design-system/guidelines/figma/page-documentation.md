@@ -271,3 +271,7 @@ library stays unpublished until Bill signs off.
 - `overview.md` — the canonical file and where Figma knowledge lives
 - `component-alignment.md` — the write-back gate every library edit passes
 - `../documentation-ia.md` — the names this standard's titles speak
+
+## Diagram text
+
+Draw text as soft `--ds-skeleton` bars, with real text only on the real subject in a real-context picture. Use the illustration palette and fidelity rules in `design-system/src/storybook-docs/illustrations/IllustrationKit.mdx`; black or dark bars are outside that palette.

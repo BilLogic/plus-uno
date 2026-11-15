@@ -1,0 +1,80 @@
+{
+  "task": "overlay-flow",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/overlay-flow/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "session-card",
+      "screen": "Upcoming session card",
+      "template": "Page + PatternCard",
+      "variant": "PatternCard · Default",
+      "page": "design-system/src/patterns/PatternCard/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Page/index.md",
+        "design-system/src/patterns/PatternCard/index.md"
+      ],
+      "guides": ["page", "card", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["PatternCard"]
+      },
+      "expectation": "Upcoming session rendered in a PatternCard with student, date, time, status, and Cancel session action."
+    },
+    {
+      "id": "cancel-modal",
+      "screen": "Cancel session confirmation modal",
+      "template": "PatternModal",
+      "variant": "Modal · Destructive / Active",
+      "page": "design-system/src/patterns/PatternModal/index.md",
+      "section": "Types",
+      "pages": [
+        "design-system/src/patterns/PatternModal/index.md"
+      ],
+      "guides": ["modal"],
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["Modal", "PatternModal"]
+      },
+      "expectation": "Choosing Cancel session opens a Modal dialog naming the session and asking for a cancellation reason."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "forms",
+      "pattern": "Forms",
+      "variant": "In a Modal · Reason selection + conditional field",
+      "page": "design-system/agent-views/patterns/Forms.md",
+      "section": "The hosts",
+      "guide": "forms",
+      "scoring": "judge",
+      "expectation": "Reason selection (Student unavailable, Tutor unavailable, Scheduling conflict, Other) reveals a text field when Other is picked."
+    },
+    {
+      "id": "common-actions",
+      "pattern": "Common actions",
+      "variant": "In a Modal",
+      "page": "design-system/agent-views/patterns/CommonActions.md",
+      "section": "Placement",
+      "guide": "common-actions",
+      "scoring": "judge",
+      "expectation": "Modal footer pairs dismiss/cancel on the left with the confirm cancellation action on the right."
+    },
+    {
+      "id": "notifications",
+      "pattern": "Notifications",
+      "variant": "Flag or Banner confirmation",
+      "page": "design-system/agent-views/patterns/Notifications.md",
+      "section": "The carriers",
+      "guide": "notifications",
+      "scoring": "judge",
+      "expectation": "Confirming cancellation surfaces a brief confirmation notice (Flag or Banner) and updates the card status to Cancelled."
+    }
+  ],
+  "required_placements": [],
+  "against_placements": []
+}

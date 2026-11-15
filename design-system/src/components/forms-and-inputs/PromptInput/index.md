@@ -14,16 +14,15 @@ Also asked as: ask the assistant, prompt box, chat input.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
-Use `PromptInput` as the one place a person writes to the AI — a chat panel,
-a feature that drafts from a free-text ask. For a plain multi-line field with
-no AI behavior (no send-on-Enter, no loading state), use `TextArea` instead.
+Use `PromptInput` for AI chat or a feature that drafts from a free-text request.
+For a plain multiline field without send-on-Enter or loading behavior, use `TextArea`.
 
-`PromptInput` does not carry the fallibility line. `AiChat` shows it once
-under its input; any other consumer shows the same line under the field itself.
+`PromptInput` does not include the fallibility line.
+`AiChat` supplies it; other consumers must place it under the field.
 
 ## Motion
 
@@ -37,7 +36,7 @@ PromptInput reads these motion tokens and no literal duration or curve.
 
 ### Keep the field visible while generating. {#keep-the-field-visible-while-generating}
 
-The loading state shows progress inside the field. Pair `isLoading` with `onStop` rather than disabling the field: the question stays in view, and Stop stays reachable.
+Pair `isLoading` with `onStop` to show progress while keeping the question visible and Stop reachable. Keep the field enabled.
 
 Do: The loading state shows progress inside the field.
 Don't: A field emptied while generating loses the question.
@@ -60,7 +59,7 @@ Don't: A disabled idle field blocks the next question.
 
 ### Send only real text. {#send-only-real-text}
 
-`onSubmit` fires only when there is text to act on: never for an empty, disabled or loading field, and never on a mid-composition Enter.
+`onSubmit` never fires for an empty, disabled or loading field, or on Enter during IME composition.
 
 ```jsx
 <PromptInput
@@ -88,7 +87,7 @@ Don't: A disabled idle field blocks the next question.
 - For the border treatment shown while loading, see `GenerativeBorder`.
 - For a short, tappable prompt suggestion, use `Suggestion` or `PromptStarters`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 

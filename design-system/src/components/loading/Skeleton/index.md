@@ -8,21 +8,25 @@ Also asked as: loading placeholder, shimmer, ghost.
 
 **Import:** `import { Skeleton } from '@/components';`
 
+**Used in:** Card (`ds guide card`)
+
+**Governed by:** Empty (`ds guide empty`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Search (`ds guide search`)
+
 **Source:** `design-system/src/components/loading/Skeleton/Skeleton.jsx`
 
 **Stories:** `design-system/src/components/loading/Skeleton/Skeleton.stories.jsx` — LabelPresets, PresetWinsOverShape, TagGroupPreset, Shapes, Rect, Circle, Text, PresetNamesAShape, Paragraph, Shimmer, ReducedMotion, LoadingTable, LoadingCard, IgnoredPropsWarn, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/loading/Skeleton/Skeleton.mdx`
 
-**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
-Use `Skeleton` while content loads, so the space it will fill is already on
-screen and the layout does not jump when it arrives.
+Use `Skeleton` for a loading state while content loads, so the space it will
+fill is already on screen and the layout does not jump when it arrives.
 
 - **One label loading on its own** (a status calculated after the row appears, a
-  tag list fetched separately): the matching preset.
+  tag group fetched separately): the matching preset.
 - **A thumbnail, avatar or header:** a rectangle or circle with its own size.
 
 ## Motion
@@ -32,6 +36,11 @@ Skeleton reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Load content | `--ds-motion-linear` | Shimmer from top-left to bottom-right; content fades in over it. |
+
+## Alternatives
+
+- For an action in progress or a short wait with no layout shape yet, use `Spinner`.
+- For a wait whose percentage is known, use `ProgressBar` or `ProgressRing`.
 
 ## Best practices
 
@@ -79,7 +88,7 @@ For a `CountTag` inside a `StatusTag` or `Tag`, use one `preset="status"` for th
 
 ### Leave flags, modals, menus and spinners out. {#leave-flags-modals-menus-and-spinners-out}
 
-They appear when they have something to say. A Tag saving a change keeps its
+They appear when they have something to say. A `Tag` saving a change keeps its
 own spinner (`isLoading`), so saving and loading look different.
 
 ## Accessibility
@@ -88,15 +97,13 @@ own spinner (`isLoading`), so saving and loading look different.
   with no role, never takes focus and ignores the pointer, so a screen reader
   does not read a list of empty items and a placeholder cannot be clicked.
 - **The loading region carries the busy state.** Set `aria-busy="true"` once on
-  the container that is loading, and remove it when the content arrives. The
-  component does not set it, because it cannot see the region.
-- **Pair the busy state with a live label.** `aria-busy` alone is not announced
-  by every screen reader. Render a visually hidden `role="status"` element
-  **beside** the busy region, not inside it: content inside a busy region may
-  be held back until it is no longer busy. Mount the status **empty** and set
-  its text after mount ("Loading students…"), because text a status already
-  holds when it mounts is not announced. Keep it mounted, and when the content
-  arrives, set its text again ("Students loaded").
+  the container that is loading, and remove it when the content arrives.
+- **Pair the busy state with a live label.** Render a visually hidden
+  `role="status"` element **beside** the busy region, not inside it. Mount the
+  status empty and set its text after mount ("Loading students…"), keep it
+  mounted, and update its text when content arrives ("Students loaded"). `aria-busy` alone is not announced by every screen reader.
+- **Contrast in any theme.** The fill is `--ds-skeleton` and the shimmer
+  `--ds-skeleton-subtle`, both theme tokens.
 
 ```jsx
 const [message, setMessage] = useState('');
@@ -112,16 +119,14 @@ useEffect(() => {
 ```
 - **Reduced motion.** Under `prefers-reduced-motion: reduce` the shimmer stops
   and the fill is flat.
-- **Contrast in any theme.** The fill is `--ds-skeleton` and the shimmer
-  `--ds-skeleton-subtle`, both theme tokens.
 
 ## Related
 
-- `StatusTag`, `CountTag` and `Tag` are the labels the presets are sized to.
-- `Spinner` is for an action in progress and for full-page transitions; a Tag saving a change uses its own spinner.
-- The loading guidance in the surfaces guideline points here.
+- `StatusTag`: use when replacing a `preset="status"` placeholder once the status resolves.
+- `TagGroup`: use when replacing a `preset="tag-group"` placeholder once the tags load.
+- Loading: use when deciding between `Skeleton`, `Spinner` and `ProgressBar` across a view.
 
-Same group: `GenerativeBorder` · `ProgressBar` · `Spinner`
+Same group: `GenerativeBorder` · `ProgressBar` · `ProgressRing` · `Spinner`
 
 ## Parts
 
@@ -186,7 +191,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--control-sm` · `--ds-skeleton` · `--ds-skeleton-subtle` · `--plus-skeleton-duration` · `--plus-skeleton-height` · `--plus-skeleton-radius` · `--plus-skeleton-width` · `--radius-full` · `--radius-lg` · `--radius-md` · `--skeleton-circle-size` · `--skeleton-height` · `--skeleton-status-width` · `--skeleton-status-width-spacious` · `--skeleton-tag-width` · `--skeleton-tag-width-narrow` · `--skeleton-tag-width-person` · `--skeleton-tag-width-widest` · `--skeleton-text-height` · `--stack-md`
+`--border-default` · `--control-sm` · `--ds-motion-linear` · `--ds-motion-loop-duration` · `--ds-skeleton` · `--ds-skeleton-subtle` · `--plus-skeleton-duration` · `--plus-skeleton-height` · `--plus-skeleton-radius` · `--plus-skeleton-width` · `--radius-control-md` · `--radius-full` · `--radius-md` · `--skeleton-circle-size` · `--skeleton-height` · `--skeleton-status-width` · `--skeleton-status-width-spacious` · `--skeleton-tag-width` · `--skeleton-tag-width-narrow` · `--skeleton-tag-width-person` · `--skeleton-tag-width-widest` · `--skeleton-text-height` · `--stack-md`
 
 From `design-system/src/components/loading/Skeleton/Skeleton.scss`. Override these through the token layer, never with a literal.
 

@@ -1,0 +1,19 @@
+{
+  "why": "Ratchet: total bytes of every doc the build path loads always or as MANDATORY (constitution, staged-build overview, coded-build reference and its mandates). The ceiling can only go down; a new mandatory read must replace an old one.",
+  "recorded": "2026-11-14",
+  "docs": [
+    "AGENTS.md",
+    "design-system/guidelines/overview.md",
+    "skills/uno-prototype/references/deliverables/coded-build.md",
+    "design-system/agent-views/components/index.md"
+  ],
+  "sets": {
+    "main": {
+      "entries": {
+        "bytes": {
+          "count": 38969
+        }
+      }
+    }
+  }
+}

@@ -38,9 +38,23 @@
     gap: var(--stack-md);
 }
 
-// Inline choices size to their content rather than filling the row.
-.plus-radio-group-inline .plus-radio-group-item > [class*='-wrapper'] {
+// Inline choices size to their content rather than filling the row; choice tiles keep their fixed 224px width.
+.plus-radio-group-inline .plus-radio-group-item > [class*='-wrapper']:not(.plus-choice-tile) {
     width: auto;
+}
+
+.plus-radio-group-tile .plus-radio-group-options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--inline-lg);
+}
+
+.plus-radio-group-tile .plus-radio-group-item {
+    display: flex;
+
+    > .plus-choice-tile {
+        flex: 1 0 auto;
+    }
 }
 
 // Under the option's label, past its control and the label gap.

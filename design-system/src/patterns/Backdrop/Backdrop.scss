@@ -1,3 +1,4 @@
+@use '../../styles/overlay-motion' as *;
 /**
  * Backdrop pattern (Patterns/Backdrop)
  * The full-screen layer a modal is placed in: the backdrop fill (color.blanket,
@@ -45,4 +46,9 @@
     > * {
         z-index: auto;
     }
+}
+
+.plus-pattern-backdrop {
+    @include overlay-motion($fade: default);
+    transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
 }

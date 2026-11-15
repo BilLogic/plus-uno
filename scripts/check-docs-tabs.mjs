@@ -202,7 +202,7 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
   if (unknown.length) {
     found.push(
       `${file}: only "examples", "usage" and a template's "code" Slots are authored — ` +
-        `the rest of Code and Agent view are generated. Found: ${unknown.join(', ')}.`,
+        `the rest of Code and Harness are generated. Found: ${unknown.join(', ')}.`,
     );
   }
 

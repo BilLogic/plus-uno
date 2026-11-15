@@ -6,17 +6,19 @@ Radio — single option within a named radio group. Supports controlled (`isChec
 
 **Import:** `import { Radio } from '@/components';`
 
+**Governed by:** Forms (`ds guide forms`)
+
 **Source:** `design-system/src/components/forms-and-inputs/Radio/Radio.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Radio/Radio.stories.jsx` — Overview, Content, States, Invalid, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep, Unselected, Selected, Hovered, Focused, Disabled, DisabledWithReason, Required
+**Stories:** `design-system/src/components/forms-and-inputs/Radio/Radio.stories.jsx` — Overview, Content, States, Invalid, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep, Unselected, Selected, Hovered, Focused, Disabled, DisabledWithReason, Required, Tile
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Radio/Radio.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
-Use Radio when the options need custom presentation, such as options listed in a table. For a plain list of options, use RadioGroup, which owns the group label, the value and the error.
+Use `Radio` directly only when options need custom layout, such as radio cells inside a table.
 
 Make one option the default: the safest and lowest-risk one. If a person may decline all options, add a "None" option; if the list cannot be complete, add "Other".
 
@@ -28,7 +30,21 @@ Radio reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |
 
+## Alternatives
+
+- For a standard radio question with a shared legend and error, use `RadioGroup`.
+- For a question where several options may be chosen, use `CheckboxGroup` or `Checkbox`.
+- For a list of six or more options, use `Select`.
+- For a setting that turns on or off immediately, use `Toggle`.
+
 ## Best practices
+
+### Reserve choice tiles for one big question with two to four pictured options. {#reserve-choice-tiles-for-one-big-question-with-two-to-four-pictured-options}
+
+Use `appearance="tile"` when a step asks one focal question with two to four options and every option carries an `illustration`. Keep ordinary form lists and sets of five or more options in `plain` or `card`.
+
+Do: Two pictured tiles for one focal question.
+Don't: Plain text options without illustrations drawn as tiles.
 
 ### Show one answer selected at a time. {#show-one-answer-selected-at-a-time}
 
@@ -64,28 +80,27 @@ Radios that share a `name` are one group; each option gets its own id. ARIA allo
 
 ### Avoid long lists and overlapping ranges. {#avoid-long-lists-and-overlapping-ranges}
 
-For a long list, use Select. Do not write numeric options that overlap ("0-20", "20-40") or skip a number.
+For six or more options, use `Select`. Do not write numeric options that overlap (`0–20`, `20–40`) or skip a number.
 
-### A description describes; the label names. {#a-description-describes-the-label-names}
+### Keep extra detail in `description`. {#keep-extra-detail-in-description}
 
 `description` renders under the label and is read after the name.
 
 ## Accessibility
 
-- **Each option has its own id.** The component derives one per instance, so labels never resolve to the first radio of the group.
-- **A radio with no `label` has no accessible name.** Pass `aria-label` where the design has no room for visible text.
-- **Include an error message for a required or invalid group**, for example "Select an option".
-- **Disable an option only for something the person can fix on the same screen.** Put the reason in the option's `description`, at full contrast, and never in a tooltip. A disabled option leaves the tab order. For a choice that must stay reachable, keep it enabled and use validation, so a screen reader user hears why it cannot be chosen.
-- **Keyboard focus is a 2px ring on `border.focused`, 2px off the radio.** Arrow keys move between the radios of a group.
+- **Unique ids.** Each instance derives its own id so labels never resolve to the first radio of the group; pass `aria-label` only when there is no visible label.
+- **Required or invalid group.** Include an error message, for example "Select an option".
+- **Disabled options.** Disable an option only for something the person can fix on the same screen, and put the reason in `description` at full contrast, never a tooltip; a disabled option leaves the tab order. For a choice that must stay reachable, keep it enabled and use validation, so a screen reader user hears why it cannot be chosen. See [Disabled](?path=/docs/patterns-states-disabled--docs).
+- **Keyboard.** Arrow keys move between radios that share a `name`. Focus is a 2px ring on `border.focused`, 2px off the radio.
 
 ## Related
 
-- For several answers from a list, use Checkbox.
-- For a longer list of options, use Select.
-- To turn something on or off, use Toggle.
-- For a whole group with its label, value and error, use RadioGroup.
+- `RadioGroup`: use when asking a complete radio question with a legend, value and error.
+- `CheckboxGroup`: use when any number of options may be chosen.
+- `Select`: use when choosing one option from a list of six or more.
+- `Toggle`: use when flipping a single setting on or off immediately.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -113,7 +128,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Circle size, edge width | `--radio-control-size` (12); `--stroke-2`. |
 | Row | `--item-height-sm` (24); gap `--space-050`. |
 | Label | `--ds-text`, body default. |
-| Card | `--radius-025`, `--stroke-1` edge in `--ds-border`, `--ds-surface` fill. |
+| Card | `--radius-control-md`, `--stroke-1` edge in `--ds-border`, `--ds-surface` fill. |
+| Choice tile | `--choice-tile-width` (224px), `--radius-control-md`, `--ds-surface` fill; selected 2px `--ds-border-selected` and `--ds-background-selected`. |
 
 ## Content guidelines
 
@@ -140,7 +156,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `isReadOnly` | bool | `false` | Shows the option without letting the user change it. |
 | `isRequired` | bool | `false` | Shows an asterisk on the label and sets the native `required` attribute. |
 | `description` | node | — | Secondary text under the label. It describes the option; it does not name it. |
-| `appearance` | enum | `'plain'` | `plain` (default) is a radio beside its label; `card` draws the option as a bordered tile. |
+| `illustration` | node | — | Decorative picture shown above the label when `appearance` is `tile`. |
+| `appearance` | enum | `'plain'` | `plain` (default) is a radio beside its label; `card` draws a bordered row; `tile` draws a centered pictured tile. |
 | `grouped` | bool | `false` | Set by `RadioGroup`. Not for direct use. |
 | `onChange` | func | — | Called with `{ target: { name, value, checked: true } }` when the option is chosen. A radio never reports being unchecked. |
 | `onFocus` | func | — | Called with the focus event when the radio gains focus. |
@@ -152,13 +169,13 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Variants
 
-**`appearance`** — `plain` · `card`
+**`appearance`** — `plain` · `card` · `tile`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-surface` · `--ds-text` · `--item-height-sm` · `--pad-x-md` · `--plus-choice-indent` · `--radio-control-size` · `--radius-full` · `--radius-lg` · `--space-025` · `--space-0375` · `--space-050` · `--stroke-1` · `--stroke-2` · `--type-weight-regular`
+`--body-default` · `--border-default` · `--border-selected` · `--card-pad-default` · `--choice-tile-width` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--item-height-sm` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radio-control-size` · `--radius-control-md` · `--radius-full` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Radio/Radio.scss`. Override these through the token layer, never with a literal.
 

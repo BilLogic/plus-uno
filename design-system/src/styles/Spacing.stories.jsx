@@ -39,7 +39,7 @@ export const ThreeKinds = () => (
         <div style={col('var(--stack-md)')}>
             <PatternCard title="Container" description="Card/pad-md, 20 on every side." />
             <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Container</span>
-            <span style={tag}>A background and one pad on every side; the height hugs. Card, Modal, Popover, Flag, Section message.</span>
+            <span style={tag}>A background and one pad on every side; the height hugs. Card, Modal, Popup, Flag, Section message.</span>
         </div>
         <div style={col('var(--stack-md)')}>
             <span style={row('var(--inline-md)')}>

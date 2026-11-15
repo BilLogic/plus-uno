@@ -8,6 +8,7 @@ export { default as ButtonGroup } from '@/components/forms-and-inputs/ButtonGrou
 export { default as Calendar } from '@/components/forms-and-inputs/Calendar';
 export { default as Cascader, CASCADER_SPACINGS } from '@/components/forms-and-inputs/Cascader';
 export { default as Checkbox } from '@/components/forms-and-inputs/Checkbox';
+export { default as CheckboxGroup } from '@/components/forms-and-inputs/CheckboxGroup';
 export { default as ChoiceGrid } from '@/components/forms-and-inputs/ChoiceGrid';
 export { default as CloseButton } from '@/components/forms-and-inputs/CloseButton';
 export { default as Comment } from '@/components/forms-and-inputs/Comment';
@@ -15,6 +16,7 @@ export { default as DatePicker } from '@/components/forms-and-inputs/DatePicker'
 export { default as DateTimePicker } from '@/components/forms-and-inputs/DateTimePicker';
 export { default as DropdownMenu, ButtonItem, CustomItem, LinkItem, Section } from '@/components/forms-and-inputs/DropdownMenu';
 export { default as Fieldset } from '@/components/forms-and-inputs/Fieldset';
+export { default as FileItem, FILE_ITEM_KINDS, FILE_ITEM_REMOVALS, FILE_ITEM_STATUSES } from '@/components/forms-and-inputs/FileItem';
 export { default as FileUpload } from '@/components/forms-and-inputs/FileUpload';
 export { default as FilterButton, FILTER_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/FilterButton';
 export { default as FilterMenu, FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WIDTHS } from '@/components/forms-and-inputs/FilterMenu';
@@ -31,6 +33,7 @@ export { default as Rating } from '@/components/forms-and-inputs/Rating';
 export { default as RichTextEditor } from '@/components/forms-and-inputs/RichTextEditor';
 export { default as SearchField, SEARCH_DEBOUNCE_MS, SEARCH_FIELD_MODES, SEARCH_FIELD_SPACINGS, SearchFieldAction } from '@/components/forms-and-inputs/SearchField';
 export { default as Select, SEARCH_FIRST_ABOVE, SELECT_SPACINGS } from '@/components/forms-and-inputs/Select';
+export { default as SettingRow } from '@/components/forms-and-inputs/SettingRow';
 export { default as SplitButton } from '@/components/forms-and-inputs/SplitButton';
 export { default as TagInput } from '@/components/forms-and-inputs/TagInput';
 export { default as TextArea } from '@/components/forms-and-inputs/TextArea';
@@ -69,14 +72,16 @@ export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBa
 
 export { default as GenerativeBorder, GENERATIVE_BORDER_RADII } from '@/components/loading/GenerativeBorder';
 export { default as ProgressBar, PROGRESS_BAR_APPEARANCES } from '@/components/loading/ProgressBar';
+export { default as ProgressRing, PROGRESS_RING_APPEARANCES, PROGRESS_RING_SIZES } from '@/components/loading/ProgressRing';
 export { default as Skeleton } from '@/components/loading/Skeleton';
 export { default as Spinner, SPINNER_APPEARANCES, SPINNER_SIZES } from '@/components/loading/Spinner';
 
 export { default as Banner, BANNER_APPEARANCES, BANNER_ICONS } from '@/components/messaging/Banner';
 export { default as EmptyState, EMPTY_STATE_SPACINGS } from '@/components/messaging/EmptyState';
-export { default as Flag, FLAG_APPEARANCES, FLAG_AUTO_CLOSE_MS, FlagGroup } from '@/components/messaging/Flag';
+export { default as Flag, FLAG_APPEARANCES, FLAG_AUTO_CLOSE_MS, FlagGroup, useFlagQueue } from '@/components/messaging/Flag';
 export { default as InlineMessage, INLINE_MESSAGE_APPEARANCES } from '@/components/messaging/InlineMessage';
 export { default as Modal, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS, MODAL_WIDTHS } from '@/components/messaging/Modal';
+export { default as NotificationItem } from '@/components/messaging/NotificationItem';
 export { default as SectionMessage, SECTION_MESSAGE_APPEARANCES, SECTION_MESSAGE_ICONS } from '@/components/messaging/SectionMessage';
 export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
 

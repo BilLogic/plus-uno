@@ -92,7 +92,7 @@ function fixtureRepo({ glossary = GLOSSARY, pages }) {
     fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
     fs.writeFileSync(path.join(root, rel), text);
   };
-  write('GLOSSARY.md', glossary);
+  write('docs/conventions/design-system-glossary.md', glossary);
   const records = [{ name: 'Flag', kind: 'component', source: 'design-system/src/components/messaging/Flag/Flag.jsx' }];
   for (const [name, page] of Object.entries(pages)) {
     const dir = `design-system/src/components/messaging/${name}`;
@@ -125,7 +125,7 @@ test('run: an avoid-word equal to another component\'s name fails, on any page s
   const found = run({ repoRoot: root, enforceStrict: false });
   const errors = found.filter((f) => f.severity === 'error');
   assert.equal(errors.length, 1, JSON.stringify(found));
-  assert.equal(errors[0].file, 'GLOSSARY.md');
+  assert.equal(errors[0].file, 'docs/conventions/design-system-glossary.md');
   assert.match(errors[0].message, /\[collision\] "flag".*Section message.*Flag/);
 });
 

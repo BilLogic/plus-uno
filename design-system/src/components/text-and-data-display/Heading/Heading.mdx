@@ -40,8 +40,7 @@ on any level of the page.
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    sets={figmaMeta.sets}
-    figmaFileKey={figmaMeta.fileKey}
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-7227"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Heading"
 />
 
@@ -101,12 +100,7 @@ on any level of the page.
 
 <DocsInteractivePlayground
     of={HeadingStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -128,14 +122,26 @@ header, a card title. Never style plain text to look like a heading: a
 sighted-only "heading" breaks navigation by heading for anyone using
 assistive technology.
 
+Nest content in a `HeadingContextProvider`, or rely on the one a template like
+`Section` already provides, and `Heading` picks `h1` to `h6` from how deep it
+sits. Pass `size` for the look; reach for `as` only to break that link on purpose.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a page's top title row with breadcrumbs and actions, use `PageHeader`.
+
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Parts
 
-1. **Text.** Set in the text style of <code>size</code>, from xxlarge to xxsmall.
-2. **Tag.** Follows the ambient heading level, or <code>as</code> when given.
+1. **Text.** Set in the text style of `size`, from `xxlarge` to `xxsmall`.
+2. **Tag.** Follows the ambient heading level, or `as` when given.
 3. **Color.** Default ink, inverse ink on a dark ground, or the warning inverse ink.
 
 ### States
@@ -171,8 +177,6 @@ assistive technology.
 <div className="sb-ds-doc-section">
 
 ## Best practices
-
-Nest content in a `HeadingContextProvider`, or rely on the one a pattern like `Section` already provides, and `Heading` picks `h1` to `h6` from how deep it sits. Pass `size` for the look; reach for `as` only to break that link on purpose.
 
 ### Choose `size` for the look.
 
@@ -229,7 +233,7 @@ Nest content in a `HeadingContextProvider`, or rely on the one a pattern like `S
 
 - **The tag is the real heading level**, not a visual effect: a screen
   reader's "jump to heading" list is built from the actual tag, which is why
-  nesting through `HeadingContextProvider` matters more than it looks.
+  nesting through `HeadingContextProvider` matters.
 - **`as` can break the outline if misused.** Overriding the tag to something
   that isn't `h1`–`h6` (like `div` or `span`) removes it from the heading
   outline entirely: correct for a styled label, wrong for an actual section
@@ -244,10 +248,8 @@ Nest content in a `HeadingContextProvider`, or rely on the one a pattern like `S
 
 ## Related
 
-- For the component that supplies the ambient heading level, see
-  `HeadingContextProvider` in this same module.
-- For a page's own title row, see `PageHeader`, which renders its title in a
-  `Heading` by default.
+- `PageHeader`: use when rendering a page's top title row, which uses `Heading` by default.
+- <a href="?path=/docs/foundations-visual-typography--docs">Typography</a>: use when checking the heading scale and document outline rules.
 
 </div>
 

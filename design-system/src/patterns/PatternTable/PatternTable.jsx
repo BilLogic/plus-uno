@@ -1,5 +1,6 @@
 import React, { Children, Fragment, isValidElement, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { TableBodyMotion } from '@/lib/listMotion';
 import './PatternTable.scss';
 
 /** Children with fragments opened, so a `thead` passed inside one is found. */
@@ -8,6 +9,13 @@ const flatten = (children) => Children.toArray(children).flatMap((child) => (
 ));
 
 const isElementOf = (type) => (child) => isValidElement(child) && child.type === type;
+
+/** Wrap `tbody` children in `TableBodyMotion` so keyed rows animate presence and reorder. */
+const withBodyMotion = (children) => flatten(children).map((child, index) => (
+    isElementOf('tbody')(child)
+        ? <TableBodyMotion key={child.key ?? `tbody-${index}`} tbodyElement={child} />
+        : child
+));
 
 /** The rows an empty table drops; the head row, a caption and column groups stay. */
 const isBody = (child) => isElementOf('tbody')(child) || isElementOf('tfoot')(child);
@@ -34,7 +42,7 @@ const renderedColumnCount = (table) => {
 /**
  * Table pattern for PLUS design system.
  * Table shell: table children (consumers pass their own thead/tbody), a
- * pagination slot under the rows, and an empty-state slot. The table has no
+ * footer slot under the rows, and an empty-state slot. The table has no
  * toolbar of its own: the Section header above it carries the title, search,
  * filters and actions. With `empty`, the header stays and the empty state
  * takes the body as one message row spanning every column, so the columns
@@ -59,7 +67,7 @@ const renderedColumnCount = (table) => {
  */
 const PatternTable = ({
     id,
-    pagination,
+    footer,
     emptyState,
     empty = false,
     stickyHeader = false,
@@ -135,11 +143,11 @@ const PatternTable = ({
                                 </tr>
                             </tbody>
                         </>
-                    ) : children}
+                    ) : withBodyMotion(children)}
                 </table>
             </div>
-            {pagination && !showEmptyState && (
-                <div className="plus-pattern-table-pagination">{pagination}</div>
+            {footer && !showEmptyState && (
+                <div className="plus-pattern-table-footer">{footer}</div>
             )}
         </div>
     );
@@ -147,9 +155,15 @@ const PatternTable = ({
 
 PatternTable.propTypes = {
     id: PropTypes.string,
-    /** Pagination slot under the rows; hidden while the empty state shows */
-    pagination: PropTypes.node,
-    /** Empty-state slot: a message row under the head row, spanning every column, when `empty` is true */
+    /** Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows
+     * @ds-context Used in: Table.footer (ds guide table)
+     * @ds-context Governed by: Empty (ds guide empty)
+     */
+    footer: PropTypes.node,
+    /** Empty-state slot: a message row under the head row, spanning every column, when `empty` is true
+     * @ds-context Used in: Table.emptyState (ds guide table)
+     * @ds-context Governed by: Empty (ds guide empty)
+     */
     emptyState: PropTypes.node,
     /** Swap the body rows for the empty-state message row; the head row stays */
     empty: PropTypes.bool,
@@ -163,7 +177,9 @@ PatternTable.propTypes = {
     tableProps: PropTypes.object,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** Table content slot — pass thead/tbody elements */
+    /** Table content slot — pass thead/tbody elements
+     * @ds-context Used in: Table.children (ds guide table)
+     */
     children: PropTypes.node,
 };
 

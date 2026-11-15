@@ -8,19 +8,19 @@ Also asked as: multi-select, checklist, tick box.
 
 **Import:** `import { Checkbox } from '@/components';`
 
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card
+**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card, Tile
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx`
 
-**Motion:** change `appearance.fast` · goal `appearance.fast`, sound `sound.goal`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · goal `appearance.fast`, sound `sound.goal`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
-Use a checkbox when a person needs to select one or more options from a list of related items, or when a setting needs an explicit confirmation before it applies, such as accepting terms or saving a form. A group of checkboxes lets a person choose many options, or none, from a short list they can see whole; a long list goes in a `Select` with `isMulti`.
-
-Individual checkboxes have two states, selected and unselected. When checkboxes are grouped, a parent shows a third, mixed state while some, not all, of its children are selected.
+Use `Checkbox` when a person needs to select one or more options from a list of related items, or when a setting needs an explicit confirmation before it applies. Checkboxes let a person choose many options, or none, from a short list they can see whole, and a parent checkbox shows the mixed (`isIndeterminate`) state while some of its children are selected.
 
 ## Motion
 
@@ -31,7 +31,22 @@ Checkbox reads these motion tokens and no literal duration or curve.
 | change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |  |
 | goal | Update a value or state | `--ds-motion-appearance-fast` | A session goal set or checked off together: the mark and fill change color, like any change. | `sound.goal` on land: only the session goal check-in done together, shared with the student; other checkboxes stay silent |
 
+## Alternatives
+
+- For a question offering a list of checkboxes under a shared legend and error, use `CheckboxGroup`.
+- For a setting that takes effect immediately without submitting a form, use `Toggle`.
+- For mutually exclusive answers where only one may be chosen, use `RadioGroup` or `Radio`.
+- For a long list of multi-select options, use `Select` with `isMulti`.
+- For a rows-by-columns matrix of checkboxes, use `ChoiceGrid`.
+
 ## Best practices
+
+### Reserve choice tiles for one big question with two to four pictured options. {#reserve-choice-tiles-for-one-big-question-with-two-to-four-pictured-options}
+
+Use `appearance="tile"` when a step asks one focal question with two to four options and every option carries an `illustration`. Keep ordinary form lists and sets of five or more options in `plain` or `card`.
+
+Do: Two pictured tiles with top-end checkboxes for one focal question.
+Don't: Plain text options without illustrations drawn as tiles.
 
 ### Say what is being agreed to. {#say-what-is-being-agreed-to}
 
@@ -64,13 +79,13 @@ Don't: The label tells the person what to do with the box.
 Do: The invalid box keeps full contrast and stays in the tab order.
 Don't: A disabled box cannot be tabbed to.
 
-### Read-only is not disabled. {#read-only-is-not-disabled}
+### Use read-only for fixed answers and disabled for unavailable ones. {#use-read-only-for-fixed-answers-and-disabled-for-unavailable-ones}
 
-`isReadOnly` shows an answer the person may read but not change: the box stays in the tab order at full contrast, takes the neutral fill when unchecked, has no hover, says `aria-readonly`, and ignores clicks and Space. Say why in the description. `isDisabled` takes it out of the tab order and grays it, for a box that waits on something the person can fix on the same screen. Put the reason in `description`, which stays at full contrast, and never in a tooltip. When it blocks the main action or several boxes, add a warning Section message above that says how to turn them on.
+`isReadOnly` shows an answer that cannot be changed: the box stays in the tab order at full contrast with no hover (`aria-readonly`), ignores clicks and Space, and takes the neutral fill when unchecked. `isDisabled` removes it from the tab order and grays it when a prerequisite on the same screen is unmet. Put the reason in `description`, which stays at full contrast, never a tooltip. When it blocks the main action or several boxes, add a warning `SectionMessage` above that says how to turn them on. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
-### A description describes; the label names. {#a-description-describes-the-label-names}
+### Keep extra detail in `description`. {#keep-extra-detail-in-description}
 
-`description` renders under the label and is wired with `aria-describedby`, so it is read after the name instead of becoming part of it.
+`description` renders under the label and is wired with `aria-describedby`, so it is read after the name.
 
 ### Pick controlled or uncontrolled and stay there. {#pick-controlled-or-uncontrolled-and-stay-there}
 
@@ -83,30 +98,27 @@ Don't: A disabled box cannot be tabbed to.
 <Checkbox id="terms" label="I accept" isChecked={accepted} onChange={onAccept} />
 ```
 
-### `isIndeterminate` is display only. {#isindeterminate-is-display-only}
+### Treat `isIndeterminate` as display only. {#treat-isindeterminate-as-display-only}
 
 The underlying value is still checked or unchecked. Clicking a mixed box resolves it like any other, so it cannot be used as a third stored value.
 
 ## Accessibility
 
-- **The label is wired for you, `id` or no `id`.** The component derives an id and hands it to the input and the label, so a caller who passes neither `id` nor `name` still gets a label that names the input.
-- **A checkbox with no `label` has no accessible name.** Where the design has no room for visible text, pass `aria-label`; it is spread onto the input.
-- **Do not disable a box that must stay reachable.** Use `isInvalid` with a message linked by `aria-describedby`, so a screen reader user hears why the option cannot be chosen.
-- **Include an error message for a required or invalid box**, for example "Select an option".
+- **Label association.** The component derives an id for the input and label automatically; pass `aria-label` only when there is no visible label.
+- **Do not disable a box that must stay reachable.** Use `isInvalid` with a message linked by `aria-describedby`, so a screen reader user hears why the option cannot be chosen. Include an error message for a required or invalid box, for example "Select an option".
 - **`isRequired` reaches the input**, so native validation applies. The marker is decoration, hidden from assistive technology.
-- **`isIndeterminate` is set on the DOM node**, the only way to express it. Screen readers report it as "mixed".
-- **Keyboard focus is a 2px ring on `border.focused`, 2px off the box.** A pointer focus draws none. Space toggles the box; Enter does not.
-- **Group related boxes** in a Fieldset with a `legend`: a Checkbox group.
+- **`isIndeterminate` is set on the DOM node** and announced as "mixed".
+- **Keyboard.** `Space` toggles the focused checkbox; `Enter` does not. Keyboard focus is a 2px ring on `border.focused`, 2px off the box; pointer focus draws none.
 
 ## Related
 
-- To turn a setting on or off at once, use Toggle.
-- For one answer from several options, use Radio, or Radio group for the whole set.
-- For a group of checkboxes, use a Checkbox group: Checkboxes inside a Fieldset with a legend.
-- For a rows-by-columns matrix of choices, use Choice grid.
-- For choices in a popup, use Select.
+- `CheckboxGroup`: use when grouping checkboxes under a shared legend, value array and error.
+- `Toggle`: use when turning a setting on or off takes effect immediately.
+- `RadioGroup`: use when only one option may be chosen from a short list.
+- `ChoiceGrid`: use when asking the same checkbox question across multiple rows.
+- `Select`: use when choosing from a long list of options (`isMulti`).
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -137,6 +149,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid
 | Row | `--item-height-sm` (24); gap `--space-050`. |
 | Label | `--ds-text`, body default. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+| Choice tile | `--choice-tile-width` (224px), `--radius-control-md`, `--ds-surface` fill; selected 2px `--ds-border-selected` and `--ds-background-selected`, with the Checkbox at the top end. |
 
 ## Content guidelines
 
@@ -164,7 +177,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid
 | `isReadOnly` | bool | `false` | Shown and announced, not changeable |
 | `isRequired` | bool | `false` | Show the required marker and require it natively |
 | `description` | node | — | Secondary text under the label. It describes the box and does not name it. |
-| `appearance` | enum | `'plain'` | `plain` (default) draws the box and label inline; `card` draws the choice as a bordered tile. |
+| `illustration` | node | — | Decorative picture shown above the label when `appearance` is `tile`. |
+| `appearance` | enum | `'plain'` | `plain` (default) draws the box and label inline; `card` draws a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end. |
 | `onChange` | func | — | Called with `{ target: { name, value, checked } }` when the box is toggled. |
 | `onFocus` | func | — | Called with the focus event when the checkbox gains focus. |
 | `onBlur` | func | — | Called with the blur event when the checkbox loses focus. |
@@ -175,13 +189,13 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid
 
 ## Variants
 
-**`appearance`** — `plain` · `card`
+**`appearance`** — `plain` · `card` · `tile`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--body-default` · `--checkbox-control-size` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-surface` · `--ds-text` · `--item-height-sm` · `--pad-x-md` · `--plus-choice-indent` · `--radius-lg` · `--radius-md` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-regular`
+`--body-default` · `--border-default` · `--border-selected` · `--card-pad-default` · `--checkbox-control-size` · `--choice-tile-width` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--item-height-sm` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radius-control-md` · `--radius-md` · `--space-025` · `--space-0375` · `--space-050` · `--stack-lg` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss`. Override these through the token layer, never with a literal.
 

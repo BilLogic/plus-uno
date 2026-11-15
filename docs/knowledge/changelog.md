@@ -17,7 +17,7 @@ scope and left untouched. Four promotions, two conversions, nine deletions.
 - `lessons/ui-patterns.md` → `docs/engineering/coding.md` § Known gotchas — one Router provider per tree, and how a shell mounted under a prefixed route finds its content.
 - `lessons/2026-07-10-harness-consistency-sweep.md` → `docs/engineering/coding.md` § Renames — a rename is finished when `validate-doc-links.sh` passes.
 - `lessons/2026-08-25-storybook-vitest-setup-import-race.md` → `docs/engineering/coding.md` § Known gotchas — a setup-file import failure with a bogus `SyntaxError` is a mid-run Vite re-optimize; pin the dependency in `optimizeDeps.include`.
-- `preferences.md` → `docs/engineering/setup.md` § Prototype conventions — the pinned Font Awesome jsdelivr URL. Its other six entries were already AGENTS.md hard rules or ADRs 002/003/004/009, and the capitalization rule already lived in `design-system/guidelines/foundations/content/voice-and-tone.md` § Capitalization.
+- `preferences.md` → `docs/engineering/setup.md` § Prototype conventions — the pinned Font Awesome jsdelivr URL. Its other six entries were already AGENTS.md hard rules or ADRs 002/003/004/009, and the capitalization rule already lived in `design-system/guidelines/foundations/content/language.md` § Mechanics.
 
 **Converted to ADRs**
 
@@ -72,3 +72,19 @@ define `--color-scrim` may keep the word until token removal is decided.
 ## 2026-11-12 — Figma Core clipping and layout audit
 
 The audit of Figma Core's docs pages (clipping, section hugging, absolute layout, unbound spacing, hand-built blocks) landed with the fix runs. Its one durable lesson, how to run a bulk Figma fix safely (node-count guard, saved before and after shots, per-minute limit), went to `design-system/guidelines/figma/mcp-guide.md` § Bulk fix runs. The findings file stays only as the receipt; the next sweep deletes it.
+
+## 2026-11-13 — touched-file debt at review
+
+`skills/uno-review/references/method.md` now makes recorded escapes in edited files review blockers until the build pays them down. Review still diagnoses; the artifact workflow repairs. Stale examples and the blueprint instance count were corrected at their sources.
+
+## 2026-11-13 — DS vocabulary loads on demand
+
+Design-system terms moved from GLOSSARY.md to `docs/conventions/design-system-glossary.md`, disclosed through read_reference for uno-bot and pointed to by the root glossary and DS entry guide. The root keeps product, estate and harness terms; existing component definitions are retained and missing foundation vocabulary is sourced to its owning pages.
+
+## 2026-11-13 — existing DS decisions in the ADR trail
+
+The harness round records the merged Panel, Radius and drag decisions in ADR-044 through ADR-046. ADR-036 points to the Bootstrap removal; ADR-038 marks its historical pattern and radius names as corrected. No component behavior or ruling changes.
+
+## 2026-11-13 — routing and authoring conventions
+
+The animation load points to the generated event-to-token library, and rule 5 names the drag exception recorded in ADR-046. Setup owns the fresh-origin/main branch rule. Page documentation and the illustration kit carry the existing soft skeleton-bar convention; the component overview drops the vendor-name map.

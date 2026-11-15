@@ -1,0 +1,244 @@
+{
+  "task": "session-review-queue",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/session-review-queue/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "queue-page",
+      "screen": "Session review queue page",
+      "template": "Frame + Page + PatternSection + PatternTable",
+      "variant": "Frame · Default / Page · Default / PatternSection · Toolbar / PatternTable · Dynamic table",
+      "page": "design-system/src/patterns/Frame/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Frame/index.md",
+        "design-system/src/patterns/Page/index.md",
+        "design-system/src/patterns/PatternSection/index.md",
+        "design-system/src/patterns/PatternTable/index.md"
+      ],
+      "guides": ["frame", "page", "section", "table", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["Frame", "Page", "PatternSection", "PatternTable"]
+      },
+      "expectation": "Full-page shell on Frame with Sidebar and Page containing PageHeader, a PatternSection with PatternSection.Toolbar for search and quick filters, and a Dynamic PatternTable."
+    },
+    {
+      "id": "review-panel",
+      "screen": "Session review detail panel",
+      "template": "Panel + Form",
+      "variant": "Panel · Details / Form · In a Panel",
+      "page": "design-system/agent-views/templates/Panel.md",
+      "section": "Details",
+      "pages": [
+        "design-system/agent-views/templates/Panel.md",
+        "design-system/agent-views/templates/Form.md"
+      ],
+      "guides": ["panel", "form"],
+      "scoring": "judge",
+      "expectation": "Details Panel wired through Frame's panel slot and usePanelControl, with PanelHeader, fields in PanelBody, and full-bleed Cancel (Default) and Save review (Primary) actions in PanelFooter."
+    },
+    {
+      "id": "escalation-modal",
+      "screen": "Escalation confirmation dialog",
+      "template": "PatternModal",
+      "variant": "Modal · Active",
+      "page": "design-system/src/patterns/PatternModal/index.md",
+      "section": "Types",
+      "pages": [
+        "design-system/src/patterns/PatternModal/index.md"
+      ],
+      "guides": ["modal"],
+      "scoring": "judge",
+      "expectation": "Active confirmation Modal opened before committing an Escalate to lead review, with Cancel (Default) and confirm action in the footer."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "filtering",
+      "pattern": "Filtering",
+      "variant": "1 · Quick filters",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "guide": "filtering",
+      "aliases": ["filter", "filters"],
+      "scoring": "checker",
+      "check": {
+        "kind": "toolbar-filters",
+        "accepts": ["FilterButton", "FilterMenu"],
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Quick filters at the end of the Section's view bar use FilterButton (or FilterMenu) per category (Affiliation, Status), applied as picked, rather than bare Select or PopupSelect controls."
+    },
+    {
+      "id": "search",
+      "pattern": "Search",
+      "variant": "Active",
+      "page": "design-system/agent-views/patterns/Search.md",
+      "section": "Active search",
+      "guide": "search",
+      "scoring": "judge",
+      "expectation": "Compact SearchField in the Section's view bar narrows rows in place as the coordinator types while the view bar stays put."
+    },
+    {
+      "id": "navigation",
+      "pattern": "Navigation",
+      "variant": "3 · Details Panel",
+      "page": "design-system/agent-views/patterns/Navigation.md",
+      "section": "Opening a record",
+      "guide": "navigation",
+      "aliases": ["nav"],
+      "scoring": "judge",
+      "expectation": "Selecting a table row opens the Details Panel beside the table via Frame's panel slot and usePanelControl while keeping the selected row highlighted."
+    },
+    {
+      "id": "forms",
+      "pattern": "Forms",
+      "variant": "In a Panel · Details",
+      "page": "design-system/agent-views/patterns/Forms.md",
+      "section": "The hosts",
+      "guide": "forms",
+      "scoring": "judge",
+      "expectation": "RadioGroup for review outcome and conditionally required TextArea for coordinator notes on follow-up or escalation, with inline validation message on the field and actions in PanelFooter."
+    },
+    {
+      "id": "common-actions",
+      "pattern": "Common actions",
+      "variant": "In a Panel / In a Modal / Table row actions",
+      "page": "design-system/agent-views/patterns/CommonActions.md",
+      "section": "Placement",
+      "guide": "common-actions",
+      "aliases": ["bulk", "row actions", "buttons"],
+      "scoring": "judge",
+      "expectation": "Panel and Modal footers pair Cancel (Default) on the left with the primary action on the right; table row actions use distinct button controls rather than plain subtle text."
+    },
+    {
+      "id": "notifications",
+      "pattern": "Notifications",
+      "variant": "Banner · Page + Flag with Undo",
+      "page": "design-system/agent-views/patterns/Notifications.md",
+      "section": "The carriers",
+      "guide": "notifications",
+      "aliases": ["toast", "banner", "alert"],
+      "scoring": "judge",
+      "expectation": "Page-tier warning Banner sits under PageHeader when overdue sessions exist; committing a review surfaces an auto-dismissing Flag in a FlagGroup with an Undo action."
+    },
+    {
+      "id": "empty",
+      "pattern": "Empty",
+      "variant": "No matches · In a table",
+      "page": "design-system/agent-views/patterns/Empty.md",
+      "section": "The types",
+      "guide": "empty",
+      "scoring": "judge",
+      "expectation": "When combined search and filters match no sessions, EmptyState renders inside the table with a Clear filters action while the Section toolbar remains usable."
+    },
+    {
+      "id": "disabled",
+      "pattern": "Disabled",
+      "variant": "Explains on focus/hover or press",
+      "page": "design-system/agent-views/patterns/Disabled.md",
+      "section": "The four answers",
+      "guide": "disabled",
+      "aliases": ["unavailable", "tooltip on disabled"],
+      "scoring": "judge",
+      "expectation": "For a Resolved session older than 7 days, the unavailable Reopen action provides a keyboard- and touch-reachable explanation."
+    },
+    {
+      "id": "indicators",
+      "pattern": "Indicators",
+      "variant": "Status in a row",
+      "page": "design-system/agent-views/patterns/Indicators.md",
+      "section": "The three tags",
+      "guide": "indicators",
+      "scoring": "judge",
+      "expectation": "Each session row displays one StatusTag with semantic appearance matching its status (Flagged, In review, Resolved)."
+    }
+  ],
+  "required_placements": [
+    {
+      "id": "banner-under-page-header",
+      "placement": "Banner under PageHeader with stack spacing",
+      "page": "design-system/src/patterns/Page/index.md",
+      "section": "Slots",
+      "scoring": "checker",
+      "check": {
+        "kind": "banner-placement",
+        "slot": "Page.banner"
+      },
+      "expectation": "The overdue warning Banner sits in Page's banner slot or below PageHeader inside Page, separated by stack spacing."
+    },
+    {
+      "id": "controls-in-section-toolbar",
+      "placement": "Search and filters in PatternSection.Toolbar",
+      "page": "design-system/src/patterns/PatternSection/index.md",
+      "section": "Slots",
+      "scoring": "checker",
+      "check": {
+        "kind": "slot-use",
+        "owner": "PatternSection",
+        "prop": "toolbar",
+        "components": ["SearchField"]
+      },
+      "expectation": "SearchField and filter controls sit in PatternSection's toolbar prop via PatternSection.Toolbar, above PatternTable."
+    },
+    {
+      "id": "detail-in-frame-panel",
+      "placement": "Session review form in Frame panel slot",
+      "page": "design-system/src/patterns/Frame/index.md",
+      "section": "Slots",
+      "scoring": "checker",
+      "check": {
+        "kind": "slot-use",
+        "owner": "Frame",
+        "prop": "panel",
+        "components": ["Panel", "PanelContainer"]
+      },
+      "expectation": "The detail Panel renders in Frame's panel slot controlled by usePanelControl, with fields in PanelBody and actions in PanelFooter."
+    },
+    {
+      "id": "escalation-confirm-modal",
+      "placement": "Escalation confirmation in Modal",
+      "page": "design-system/src/patterns/PatternModal/index.md",
+      "section": "Best practices",
+      "scoring": "judge",
+      "expectation": "Saving an Escalate to lead review opens a confirmation Modal before committing the status change and surfacing the Undo Flag."
+    }
+  ],
+  "against_placements": [
+    {
+      "id": "bare-select-in-toolbar",
+      "placement": "Bare Select or PopupSelect in Section toolbar",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-bare-select-in-toolbar",
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Counts against: placing bare Select or PopupSelect controls in PatternSection's toolbar instead of FilterButton or FilterMenu."
+    },
+    {
+      "id": "banner-above-or-flush-page-header",
+      "placement": "Banner above or flush against PageHeader",
+      "page": "design-system/agent-views/patterns/Notifications.md",
+      "section": "Banner tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-banner-before-header"
+      },
+      "expectation": "Counts against: placing Banner before PageHeader or flush against PageHeader with no stack gap."
+    },
+    {
+      "id": "subtle-text-row-action",
+      "placement": "Plain subtle text button for row action",
+      "page": "design-system/agent-views/patterns/CommonActions.md",
+      "section": "Placement",
+      "scoring": "judge",
+      "expectation": "Counts against: styling a table row action as Button appearance=\"subtle\" so it reads as plain text rather than a control."
+    }
+  ]
+}

@@ -166,7 +166,7 @@ body,
 }
 
 /*
- * Measure. The longest paragraph on Foundations/Basics/Accessibility ran 134 characters
+ * Measure. The longest paragraph on Foundations/Accessibility ran 134 characters
  * per line at a 1140px docs column, against a comfortable 45–75. The cap is on
  * the text, not on the column: canvases stay full-bleed at 864px while prose
  * narrows, and splitting the two is what lets both be right.
@@ -208,6 +208,12 @@ body,
     font-family: var(--type-family-code) !important;
 }
 
+/* A code block scrolls inside its own box instead of widening the page. */
+.sbdocs pre {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
 .sbdocs code {
     color: var(--ds-text-subtle);
 }
@@ -215,6 +221,22 @@ body,
 /* Inline code is set apart by its fill; Storybook's border around it adds a second edge. */
 .sbdocs :not(pre) > code:not(:where(.docs-story *)) {
     border: 0 !important;
+    /* A long path breaks where it must, so prose never widens the page. */
+    overflow-wrap: anywhere;
+    white-space: normal !important;
+    display: inline !important;
+}
+
+/* A wide block (a swatch row, a table) scrolls inside its own box. */
+.sbdocs .sb-docs-scroll {
+    position: relative;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* A token name wraps inside its swatch cell instead of spilling out of it. */
+.sbdocs .sb-docs-scroll span {
+    overflow-wrap: anywhere;
 }
 
 /*
@@ -302,101 +324,6 @@ a.sbdocs-a {
  */
 
 
-
-/*
- * `.sb-plus-intro-mini-grid` was the other half of both of these selector lists.
- * #250 named it as 0 uses and #251 swept this file by hand and left it — which is the
- * whole argument for `check:docs-dead-selectors` existing. `Introduction.mdx` emits
- * `-mini-canvas`, `-mini-card`, `-mini-copy` and `-mini-title`, but never a `-mini-grid`
- * to hold them; the cards are laid out by `-sections-stack` below.
- */
-.sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
-  display: grid;
-  gap: var(--section-stack-md);
-  margin-top: var(--space-125);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-sections-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--section-stack-md);
-  margin-top: var(--space-125);
-}
-
-@media (min-width: 900px) {
-  .sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--inline-md);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--stack-md);
-}
-
-/* A color chip beside its token name. */
-.sbdocs .sb-plus-intro-page .sb-plus-intro-swatch {
-  display: inline-block;
-  inline-size: calc(var(--icon-sm) * 2);
-  block-size: var(--icon-sm);
-  border-radius: var(--radius-sm);
-  border: var(--border-default) solid var(--ds-border);
-}
-
-/* A boxed aside: a card, so its edge comes from elevation. */
-.sbdocs .sb-plus-intro-page .sb-plus-intro-box {
-  padding: var(--card-pad-default);
-  border-radius: var(--card-radius-compact);
-  background: var(--ds-surface-raised);
-  box-shadow: var(--ds-shadow-raised);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-card {
-  border-radius: var(--card-radius-compact);
-  background: var(--ds-surface-raised);
-  box-shadow: var(--ds-shadow-raised);
-  padding: var(--card-pad-default);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-title {
-  margin: 0;
-  font-weight: 600;
-  color: var(--ds-text);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-copy {
-  margin: var(--stack-sm) 0 var(--stack-lg);
-  font-size: var(--font-size-0875);
-  color: var(--ds-text-subtle);
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .sbdocs.sbdocs-preview {
-  margin: 0 !important;
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story > div:first-child {
-  padding: 0 !important;
-}
-
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .innerZoomElementWrapper > * {
-  border: none !important;
-}
 
 /*
  * Preview well: flatten inner Storybook Canvas chrome; outer card only.
@@ -500,7 +427,9 @@ a.sbdocs-a {
  * Prefer `<DocsTable>` / `<table class="sb-ds-doc-table">` over Markdown pipe tables.
  */
 .sbdocs .sb-ds-doc-table-wrap {
-  overflow: hidden;
+  /* Positioned, so screen-reader text inside it scrolls with the table instead of widening the page. */
+  position: relative;
+  overflow-x: auto;
   width: 100%;
   margin: var(--stack-md) 0 0;
   border: var(--border-default) solid var(--ds-border);
@@ -664,7 +593,8 @@ a.sbdocs-a {
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 0 !important;
-    overflow: visible !important;
+    min-width: 0;
+    overflow-x: auto !important;
     background: transparent !important;
     padding: 0 !important;
     width: 100% !important;
@@ -817,7 +747,6 @@ a.sbdocs-a {
 }
 
 /* Flush / custom wells: zero Storybook’s own padding (outer card supplies it). */
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story > div[scale="1"],
 .sbdocs .sb-ds-docs-preview-well .docs-story > div[scale="1"] {
   padding: 0 !important;
 }
@@ -1014,7 +943,7 @@ a.sbdocs-a {
     outline-offset: var(--stack-sm);
 }
 
-/* Agent view (ADR-040): a lead line, one row of actions, then the file. */
+/* Harness tab (ADR-040): a lead line, one row of actions, then the file. */
 .sb-ds-agent-view__lead {
     color: var(--ds-text-subtle);
     margin: 0 0 var(--space-150);
@@ -1173,6 +1102,26 @@ html[data-color-mode="dark"] .docs-story {
   padding: var(--page-stack-lg);
 }
 
+/* A demo never widens the page: the well shrinks to its column and a demo wider
+   than the screen scrolls inside the well. */
+.sbdocs .sb-docs-demo,
+.sbdocs .sb-ds-docs-preview-well {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sbdocs .sb-ds-docs-preview-well__inner {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* The attached canvas (a story shown as its own block) scrolls the same way. */
+.sbdocs .sb-ds-docs-canvas-attached-root .docs-story {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 /* The Resources block: a docs section (docs-rhythm.css sets its spacing). */
 .sbdocs .sb-ds-resources-block {
   display: flex;
@@ -1221,21 +1170,6 @@ html[data-color-mode="dark"] .docs-story {
   inset-inline-end: var(--card-pad-default);
   font-size: var(--icon-sm);
   color: var(--ds-icon-subtle);
-}
-
-.sb-ds-figma-nodes__label {
-  font: var(--heading-xxsmall);
-  color: var(--ds-text-subtle);
-}
-
-.sbdocs .sb-ds-figma-nodes {
-  display: flex;
-  flex-direction: column;
-  gap: var(--section-stack-sm);
-}
-
-.sbdocs .sb-ds-figma-nodes .sb-ds-doc-table-wrap {
-  margin: 0;
 }
 
 /*

@@ -17,7 +17,7 @@ import Code from './Code';
  */
 
 export default {
-    title: 'Components/Text and data display/Code',
+    title: 'Components/Text and data display/Code/Code',
     component: Code,
     tags: ['!dev', '!autodocs'],
     parameters: {

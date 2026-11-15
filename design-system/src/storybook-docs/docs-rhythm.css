@@ -227,11 +227,11 @@
 }
 
 /*
- * An overview card's hero: the landing's frame, cropped to its 300 x 160-unit
- * stage (3/5 of the frame's width, 4/5 of its height, centered). The card is
- * the tile; the frame inside is laid out 5/3 as wide and
- * shifted by the stage's origin (100 of 500 units across, 20 of 200 down), so
- * the same drawing shows without being redrawn.
+ * An overview card's hero: the landing's frame, fitted to the card. The card is
+ * the tile (15:8); the frame fills it and its drawing keeps `meet`, so the whole
+ * 500 x 200-unit drawing shows at the card's width, on the same dot ground, with
+ * nothing past the card's edge. Nothing is redrawn, so a change to a hero reaches
+ * its card, and a card of any width or shape fits the same way.
  */
 .sbdocs .sb-docs-hero-card {
     position: relative;
@@ -244,10 +244,102 @@
 }
 
 .sbdocs .sb-docs-hero-card > .sb-docs-hero--framed {
-    inline-size: calc(100% * 5 / 3);
-    margin-inline-start: calc(-100% * 1 / 3);
-    margin-block-start: calc(-100% * 1 / 15);
+    position: absolute;
+    inset: 0;
+    inline-size: auto;
+    block-size: auto;
+    aspect-ratio: auto;
     border-radius: 0;
+}
+
+/*
+ * An overview page's thumbnail grid (HeroThumbs.jsx): three columns; a tile
+ * spans two columns (wide) or two rows (tall). Every picture is at least one
+ * cell's 8:5 tall, measured on the grid's own width, so a row's pictures line
+ * up and a tall tile grows into its two rows. The picture is a sunken tile with
+ * no outline, its hero covering it.
+ */
+.sbdocs .sb-docs-thumbs {
+    container-type: inline-size;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* Dense: a one-cell tile fills the cell a wide tile leaves, so the source stays in page order. */
+    grid-auto-flow: dense;
+    column-gap: var(--section-stack-md);
+    row-gap: var(--card-stack-md);
+}
+
+/* Each tile takes two row tracks, its picture's and its caption's, through a
+   subgrid, so every picture in a row shares one height whatever its caption. */
+.sbdocs .sb-docs-thumb {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 2;
+    margin: 0;
+    min-inline-size: 0;
+}
+
+.sbdocs .sb-docs-thumb--wide {
+    grid-column: span 2;
+}
+
+/* Two rows: the picture runs through the first row's caption track into the second row. */
+.sbdocs .sb-docs-thumb--tall {
+    grid-row: span 4;
+}
+
+.sbdocs .sb-docs-thumb--tall > .sb-docs-thumb__picture {
+    grid-row: 1 / 4;
+}
+
+.sbdocs .sb-docs-thumb__picture {
+    position: relative;
+    min-block-size: calc((100cqi - 2 * var(--section-stack-md)) / 3 * 5 / 8);
+    overflow: hidden;
+    border-radius: var(--card-radius);
+    background-color: var(--ds-surface-sunken);
+}
+
+.sbdocs .sb-docs-thumb__picture > svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+}
+
+/* The caption's foot pad is the space to the next row of tiles. */
+.sbdocs .sb-docs-thumb__caption {
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-stack-sm);
+    padding-block-end: var(--section-stack-md);
+}
+
+.sbdocs .sb-docs-thumb__title {
+    font: var(--heading-xsmall);
+    color: var(--ds-link);
+    text-decoration: underline;
+}
+
+.sbdocs .sb-docs-thumb__text {
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+}
+
+/* A narrow column: one tile per row, each its own 8:5. docs-literal: a container query takes no custom property, and no token is the width under which three thumbnails stop reading. */
+@container (max-width: 34rem) {
+    .sbdocs .sb-docs-thumbs > .sb-docs-thumb {
+        grid-column: 1 / -1;
+        grid-row: span 2;
+    }
+
+    .sbdocs .sb-docs-thumbs > .sb-docs-thumb--tall > .sb-docs-thumb__picture {
+        grid-row: auto;
+    }
+
+    .sbdocs .sb-docs-thumbs .sb-docs-thumb__picture {
+        min-block-size: calc(100cqi * 5 / 8);
+    }
 }
 
 .sbdocs .sb-docs-hero > svg {
@@ -313,3 +405,43 @@
 .sbdocs .sbdocs-preview:has([data-docs-stage]) .innerZoomElementWrapper > * {
     border-width: 0 !important;
 }
+
+/*
+ * Do and Don't example well: the live example sits centered in the sunken well,
+ * while full-width containers (banners, section messages, tables, 12-column grids)
+ * fill the well's width.
+ */
+.sbdocs .sb-ds-dodont-card__example {
+    inline-size: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.sbdocs .sb-ds-dodont-card__example > :where(
+    .plus-banner,
+    .plus-section-message,
+    .plus-accordion,
+    .plus-page-header,
+    .plus-empty-state,
+    .plus-progress-bar,
+    .plus-range,
+    .plus-file-upload,
+    .plus-prompt-input,
+    .plus-rich-text-editor,
+    .plus-comment,
+    .plus-pattern-section,
+    .plus-pattern-card,
+    .plus-pattern-table,
+    .plus-table-container,
+    .plus-dynamic-table,
+    .plus-static-table,
+    .plus-tree-table,
+    table,
+    [style*="display: grid"],
+    :has(.plus-pattern-section, .plus-pattern-card, .plus-pattern-table, .plus-banner, .plus-section-message, .plus-progress-bar, .plus-range, table)
+) {
+    align-self: stretch;
+}
+

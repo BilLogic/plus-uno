@@ -42,7 +42,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-/** The qualifier that keeps a word plain but avoids it only as a name: `"region" as a name`. */
+/** Repo-relative home of the on-demand design-system terms. */
+export const DS_GLOSSARY = 'docs/conventions/design-system-glossary.md';
+
+/** The qualifier that keeps a word plain but avoids it only as a name. */
 export const NAMED = 'as a name';
 
 /** The `###` headings whose terms feed DS search. */

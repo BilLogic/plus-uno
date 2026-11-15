@@ -14,13 +14,11 @@ Also asked as: stars, score.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Rating/Rating.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
-Use a rating for a single satisfaction score out of five: the end of a session, a piece of feedback, a quick judgment the person makes in one gesture. Five items is the whole scale; there is no other length.
-
-`variant` chooses what the row says about itself: `comments` puts one caption under the row, `numeric` puts 1 to 5 above each item. `icon` is `star` or `thumbs-up`.
+Use `Rating` for a five-point satisfaction score given in one gesture, such as end-of-session feedback. Five items is the whole scale; there is no other length. `variant` is `comments` (one caption below the row) or `numeric` (1 to 5 above each item); `icon` is `star` or `thumbs-up`.
 
 ## Motion
 
@@ -29,6 +27,12 @@ Rating reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Stars fill as a color change, staggered 20 ms. |
+
+## Alternatives
+
+- For a continuous or wider numeric span, use `Range`.
+- For a labeled Likert scale or mutually exclusive options, use `RadioGroup`.
+- For the written feedback that accompanies a score, use `TextArea`.
 
 ## Best practices
 
@@ -90,11 +94,11 @@ Don't: Without a label the row falls back to the generic name "Rating". `comment
 
 ## Related
 
-- For a value on a longer scale, use Range.
-- For a choice among labeled options rather than a score, use Radio group or Radio.
-- For the comment that usually accompanies a rating, use Text area.
+- `Range`: use when choosing an approximate value along a continuous track.
+- `RadioGroup`: use when choosing among labeled options or a custom linear scale.
+- `TextArea`: use when collecting a written comment alongside the rating.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 ## Parts
 
@@ -177,7 +181,7 @@ Implemented as `RatingItem`.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-danger` · `--icon-lg` · `--icon-md` · `--item-height-md` · `--radius-full` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--icon-lg` · `--icon-md` · `--item-height-md` · `--radius-full` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Rating/Rating.scss`. Override these through the token layer, never with a literal.
 

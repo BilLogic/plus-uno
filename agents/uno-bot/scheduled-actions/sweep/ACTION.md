@@ -28,6 +28,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 
 A finding takes the posting ladder (`docs/connectors/slack/overview.md` § The posting ladder), and reaches only people who could already see its evidence (ADR-031):
 
+- **Relayed channel** (`SWEEP_RELAY_TO_DESIGN` in `wrangler.toml`: #plus-design-feedback): read like any swept channel, but its cards go on #plus-design's morning message, each linking back to its thread ("from a thread"). Its owner is someone in #plus-design: whoever claimed it, else a Contributor, else the starter, else anyone in the thread who is there.
 - **Private channel:** the card goes in the source thread there, its owner and confirmers are people in that channel, and its text, links and names appear in no other message.
 - **Group DM:** the report goes back in that group DM, and a fix's Approve applies that fix only. Once a fix has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. It is decided from Review: Approve posts that note, Reject drops it. It has the fix's confirmers and 24 weekday hours. A re-staged fix offers no share.
 - **DM with uno-bot:** the card goes back in that DM, for its person alone (§ DMs with uno-bot).

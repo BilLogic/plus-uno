@@ -86,7 +86,7 @@ secondary note out of the page's reading order until someone asks for it.
 
 <ComponentExample of={InlineMessageStories.Pressed} title="Pressed" description="The trigger takes the subtle pressed fill." />
 
-<ComponentExample of={InlineMessageStories.Focused} title="Focused" description="The 2px ring, 2px off the trigger; Enter opens the popup." />
+<ComponentExample of={InlineMessageStories.Focused} title="Focused" description="Shows the focus ring on the trigger; Enter opens the popup." />
 
 </div>
 
@@ -104,12 +104,7 @@ secondary note out of the page's reading order until someone asks for it.
 
 <DocsInteractivePlayground
     of={InlineMessageStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Change props in the table below."
 />
 
 </div>
@@ -131,10 +126,6 @@ beside it, such as why a field is required or what a score means, without
 taking up space until someone asks. It is built on `Popup`, so placement,
 dismissal and focus return are shared with every other popup in the system.
 
-For a message that belongs to a whole page or section and should always be
-visible, use `Banner` or `SectionMessage` instead. `InlineMessage` is for
-detail that most people will never need to open.
-
 ### Appearance guidance
 
 <DocsTable>
@@ -153,9 +144,18 @@ detail that most people will never need to open.
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For a message that belongs to a page or section and should always be visible, use `SectionMessage`.
+- For a short plain-text label on hover or focus over a control, use `Tooltip`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
-1. **Trigger.** A subtle, compact icon button in the appearance color, named by <code>label</code>.
+1. **Trigger.** A subtle, compact icon button in the appearance color, named by `label`.
 2. **Popup.** Opens on press with a title, optional secondary line and body.
 
 ### States
@@ -168,7 +168,7 @@ detail that most people will never need to open.
 <tr><td>Rest</td><td>The icon in its appearance color; the popup closed.</td></tr>
 <tr><td>Hovered</td><td>The subtle neutral fill behind the icon button.</td></tr>
 <tr><td>Pressed</td><td>A stronger neutral fill.</td></tr>
-<tr><td>Focused</td><td>The 2px ring, 2px off the trigger, for keyboard focus only.</td></tr>
+<tr><td>Focused</td><td>Shows the focus ring on the trigger for keyboard focus; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
 <tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Open</td><td>The Popup is shown with its own fill, shadow and radius.</td></tr>
 </tbody>
@@ -273,9 +273,8 @@ accessible name and its tooltip. Write "Why this field is required", not
 
 ## Related
 
-- For the popup mechanics this component is built on, see `Popup`.
-- For a message that stays visible without being opened, use `SectionMessage`
-  or `Banner`.
+- `Popup`: use when configuring the anchored overlay surface this component is built on.
+- `IconButton`: use when rendering the compact icon trigger button.
 
 </div>
 

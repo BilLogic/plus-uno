@@ -1,5 +1,5 @@
 /**
- * Foundations · Sound's live parts, run in the Storybook tests: every player
+ * Foundations › Expression › Sound's live parts, run in the Storybook tests: every player
  * plays a generated token, the switch turns them all off, and the land figure
  * draws from the generated spring and score.
  *
@@ -14,8 +14,8 @@ import { SoundPlayers, SoundSheetTable } from '@/storybook-docs/sound-docs.jsx';
 
 export default {
   // The Sounds page's figures: `!dev` keeps them out of the sidebar. The page
-  // itself is Foundations/Sound/Sounds (SoundSounds.mdx).
-  title: 'Foundations/Sound/Sounds',
+  // itself is Foundations/Expression/Sound/Sounds (SoundSounds.mdx).
+  title: 'Foundations/Expression/Sound/Sounds',
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };

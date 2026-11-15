@@ -22,16 +22,6 @@ npm run generate:agent
 | agent-views/tokens/tokens.md | `design-system/agent-views/tokens/tokens.md` | yes | ⏳ No | — | — | Generated from design-system/src/tokens/*.scss |
 | guidelines/figma/token-mapping.md | `design-system/guidelines/figma/token-mapping.md` | yes | ⏳ No | — | — | Hand-authored Figma ↔ CSS mapping |
 
-## Composition (hand-authored)
-
-| Composition doc | Path | Verified | Notes |
-| --- | --- | --- | --- |
-| guidelines/composition/form-behavior.md | `design-system/guidelines/composition/form-behavior.md` | — | — |
-| guidelines/composition/forms.md | `design-system/guidelines/composition/forms.md` | — | — |
-| guidelines/composition/hierarchy.md | `design-system/guidelines/composition/hierarchy.md` | — | — |
-| guidelines/composition/layout.md | `design-system/guidelines/composition/layout.md` | — | — |
-| guidelines/composition/surfaces.md | `design-system/guidelines/composition/surfaces.md` | — | — |
-
 ## How designers verify
 
 1. Compare the doc against Storybook + Figma.

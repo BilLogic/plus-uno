@@ -8,18 +8,15 @@ TreeSelect: a field that picks from options that nest, at any level of the tree.
 
 **Source:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.stories.jsx` — Overview, SingleSelect, MultiSelect, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid
+**Stories:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.stories.jsx` — Overview, SingleSelect, MultiSelect, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, MotionOpenClose, MotionReduced, MotionKeyboardOpen
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.exit` + `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
-Use `TreeSelect` when the options genuinely nest and someone may need to see
-or pick at more than one level — a curriculum with units and lessons, a
-category tree. For options that nest but are chosen one level at a time in
-sequence, use `Cascader` instead. For a flat list, use `Select`.
+Use `TreeSelect` when options nest in a hierarchy and someone needs to expand branches in place or pick nodes across multiple branches, such as curriculum units and lessons.
 
 ## Motion
 
@@ -28,8 +25,13 @@ TreeSelect reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
-| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
+| exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Clips back to the trigger and fades; stays mounted until the exit completes. |
 | change | Expand and collapse | `--ds-motion-spatial-fast` | Columns and branches expand. |
+
+## Alternatives
+
+- For a single hierarchical path chosen one column per level in sequence, use `Cascader`.
+- For a flat list of options with no hierarchy, use `Select`.
 
 ## Best practices
 
@@ -93,10 +95,10 @@ subtree is complete.
 
 ## Related
 
-- For options chosen one level at a time in sequence, use `Cascader`.
-- For a flat list with no hierarchy, use `Select`.
+- `Cascader`: use when building a single path one level at a time across columns.
+- `Select`: use when choosing from a flat list of options.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `VerticalButton`
 
 ## Parts
 
@@ -164,5 +166,11 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 **`spacing`** — `default` · `compact`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
+
+## Tokens touched
+
+`--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--plus-popup-reach`
+
+From `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.scss`. Override these through the token layer, never with a literal.
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

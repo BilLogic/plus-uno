@@ -7,8 +7,8 @@ import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 <Meta of={ArcDiagramStories} />
 
 <Title />
-Lines nodes up on a single axis and joins connected pairs with arcs. Each arc
-is as thick as the connection's weight.
+Lines nodes up along one axis and connects pairs with arcs whose thickness
+encodes connection weight.
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/ArcDiagram"
@@ -31,15 +31,14 @@ is as thick as the connection's weight.
 
 ## When to use
 
-Use `ArcDiagram` for weighted connections among a small set of items where a
-straight line-up helps: which subjects students take together, which lessons
-lead into which, or which units share skills.
+Use `ArcDiagram` for weighted connections across a small, ordered set of items,
+such as subjects students take together, lessons that lead into one another or
+units that share skills. Keep the node count small enough that every label fits
+along the axis.
 
-For a larger or messier set of connections, use `NetworkGraph`. For the same
-weighted connections around a circle, use `DependencyWheel`. For an amount
-moving through stages, use `SankeyDiagram`.
-
-Keep the node count small enough that every label fits along the axis.
+For larger or un-ordered networks, use `NetworkGraph`. For weighted connections
+around a circle, use `DependencyWheel`. For quantities flowing through stages,
+use `SankeyDiagram`.
 
 </div>
 
@@ -50,10 +49,10 @@ Keep the node count small enough that every label fits along the axis.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Nodes', <>One per distinct name in <C>data</C>, generated for you and placed along one axis.</>],
-        ['Arcs', <>One per <C>[from, to, weight]</C> row, centered on the nodes they join. Thickness is the <C>weight</C>.</>],
-        ['Node labels', 'Always on: each node shows its name.'],
-        ['Height', <>The chart is <C>height</C> pixels tall, 400 by default.</>],
+        ['Nodes', <>One per distinct name in <C>data</C>, generated automatically along one axis.</>],
+        ['Arcs', <>One per <C>[from, to, weight]</C> row, centered on the joined nodes; thickness encodes <C>weight</C>.</>],
+        ['Node labels', 'Always shown on every node.'],
+        ['Height', <>Pixel height from <C>height</C> (default 400).</>],
     ]}
 />
 
@@ -63,8 +62,8 @@ Keep the node count small enough that every label fits along the axis.
 
 ## Data shape
 
-`data` is an array of `[from, to, weight]` rows. `from` and `to` are node
-names; `weight` sets the arc's thickness.
+`data` is an array of `[from, to, weight]` rows where `from` and `to` are node
+names and `weight` sets arc thickness.
 
 ```jsx
 <ArcDiagram
@@ -83,11 +82,11 @@ names; `weight` sets the arc's thickness.
 
 ## Color and accessibility
 
-- **Every node gets its own color.** Nodes take the categorical colors in order, starting at `--ds-chart-categorical-1`. There are eight, so past eight nodes the colors repeat. Color separates nodes; it carries no value.
-- **Position, thickness and labels carry the reading.** Each node is named on the axis and each arc's thickness is its weight, so the chart reads without hue.
-- **Overlapping arcs are the hazard.** Many connections from one node stack into a fan that is hard to trace. Filter out weak connections before drawing.
-- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
-- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+- **Per-node color.** Nodes cycle through the [categorical order](?path=/docs/data-visualizations-color--docs) starting at `--ds-chart-categorical-1` and repeat past eight; color separates nodes and encodes no value.
+- **Position, thickness and labels carry the reading.** Every node is named on the axis and arc thickness shows weight, so the chart reads without hue.
+- **Filter weak links.** Many arcs from one node stack into a dense fan; filter out minor connections before rendering.
+- **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
+- **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
 </div>
 
@@ -95,11 +94,7 @@ names; `weight` sets the arc's thickness.
 
 ## States
 
-`ArcDiagram` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
-
-- **Loading:** a `Skeleton` the height of the chart.
-- **Empty:** a compact `EmptyState` saying what data belongs here.
-- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+`ArcDiagram` has no empty, loading or error state. Mount a `Skeleton` matching the chart's height, a compact `EmptyState` naming the missing data, or a `SectionMessage` (`appearance="danger"`) with a retry action:
 
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
@@ -116,12 +111,7 @@ names; `weight` sets the arc's thickness.
 
 <DocsInteractivePlayground
     of={ArcDiagramStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
+    description="Use the table below to change props."
 />
 
 </div>

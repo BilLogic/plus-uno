@@ -45,7 +45,7 @@ export const FoundationContents = () => {
             </h2>
             <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-md) var(--section-stack-md)' }}>
                 {items.map((item) => (
-                    <li key={item.id}>
+                    <li key={item.id} style={{ margin: 0 }}>
                         <a href={`#${item.id}`} style={linkStyle}>{item.title}</a>
                     </li>
                 ))}
@@ -84,7 +84,7 @@ export const FoundationRelated = ({ items }) => (
             padding: 0,
             listStyle: 'none',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))',
             gap: 'var(--grid-gutter)',
         }}
     >
@@ -151,7 +151,7 @@ export const TokenSwatches = ({ items, min = 'var(--card-min-width-sm)' }) => (
             padding: 0,
             listStyle: 'none',
             display: 'grid',
-            gridTemplateColumns: `repeat(auto-fill, minmax(${min}, 1fr))`,
+            gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${min}), 1fr))`,
             gap: 'var(--stack-md)',
         }}
     >

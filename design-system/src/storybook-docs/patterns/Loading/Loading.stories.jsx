@@ -1,14 +1,17 @@
 import React from 'react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import {
     BANDS,
     LoadingAction,
     LoadingList,
     LoadingMenu,
     LoadingPage,
+    LoadingRevealDemo,
     LoadingTimeline,
     KIND_STAGE,
     STAGE,
@@ -36,6 +39,8 @@ export default {
 
 /** The picture's shimmer is held explicitly: CI's Chromium reports reduced motion, and a docs picture must read the same everywhere. */
 const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
+/** A kind card's story on the Page's pad, as the other patterns' type cards draw theirs. */
+const kindCard = (story) => staged(<div style={{ padding: 'var(--page-pad)' }}>{story}</div>, KIND_STAGE);
 const rect = (el) => el.getBoundingClientRect();
 
 const bars = (root) => [...root.querySelectorAll('[aria-hidden="true"]')].filter((el) => el.className?.toString().includes('plus-skeleton'));
@@ -63,7 +68,7 @@ export const BandsAreOneAndTen = {
 /** A list or cards: a skeleton in the rows' own shape, the container busy, the label beside it. */
 export const KindList = {
     name: 'Kind: A list',
-    render: () => staged(<LoadingList band="shape" reduced={false} />, KIND_STAGE),
+    render: () => kindCard(<LoadingList band="shape" reduced={false} />),
     play: async ({ canvasElement }) => {
         const region = busy(canvasElement);
         await expect(region, 'the loading region is busy').not.toBeNull();
@@ -78,7 +83,7 @@ export const KindList = {
 /** A button action: a spinner inside the button that started it; the fields stay as they are. */
 export const KindAction = {
     name: 'Kind: A button action',
-    render: () => staged(<LoadingAction band="shape" />, KIND_STAGE),
+    render: () => kindCard(<LoadingAction band="shape" />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
@@ -92,7 +97,7 @@ export const KindAction = {
 /** A whole page: the Frame and header draw at once; each Section holds a skeleton. */
 export const KindPage = {
     name: 'Kind: A whole page',
-    render: () => staged(<LoadingPage band="shape" reduced={false} />, KIND_STAGE),
+    render: () => kindCard(<LoadingPage band="shape" reduced={false} />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('heading', { name: 'Roster' }), 'each Section\'s header is drawn').toBeInTheDocument();
@@ -259,3 +264,54 @@ export const TimelineReducedMotion = {
         }
     },
 };
+
+/* ------------------------------------------------------------------- motion */
+
+const withProductiveMotion = (Story) => (
+    <MotionPreferenceContext.Provider value={false}>
+        <Story />
+    </MotionPreferenceContext.Provider>
+);
+
+const playLoadReveal = (reduced = false) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const stage = canvasElement.querySelector('[data-load-reveal]');
+    await expect(stage, 'LoadThenReveal mounts').not.toBeNull();
+    await expect(stage).toHaveAttribute('data-load-phase', 'loading');
+    await expect(stage).toHaveAttribute('aria-busy', 'true');
+    await expect(stage).toHaveAttribute('data-reduced', reduced ? 'true' : 'false');
+
+    const skeletonBars = stage.querySelectorAll('.plus-skeleton');
+    await expect(skeletonBars.length).toBeGreaterThan(0);
+    if (reduced) {
+        for (const bar of skeletonBars) {
+            await expect(getComputedStyle(bar).animationName, 'shimmer holds still under reduced motion').toBe('none');
+        }
+    }
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Finish loading' }));
+    await expect(stage.getAttribute('data-load-phase')).toBe('revealing');
+    await expect(stage.querySelector('[data-load-skeleton-exiting]'), 'skeleton cross-fades underneath arriving content').not.toBeNull();
+    await expect(stage.querySelectorAll('[data-load-slot]').length, 'slots reveal in load order').toBeGreaterThanOrEqual(3);
+
+    await waitFor(() => expect(stage).toHaveAttribute('data-load-phase', 'settled'), { timeout: 4000 });
+    await settleAnimations(canvasElement);
+    await expect(stage).not.toHaveAttribute('aria-busy');
+    await expect(stage.querySelector('[data-load-skeleton-exiting]')).toBeNull();
+    await expect(canvas.getByRole('table')).toBeVisible();
+};
+
+export const MotionLoadReveal = {
+    name: 'Motion: Load then reveal',
+    decorators: [withProductiveMotion],
+    render: () => staged(<LoadingRevealDemo />),
+    play: playLoadReveal(false),
+};
+
+export const MotionLoadRevealReduced = {
+    name: 'Motion: Load then reveal (reduced)',
+    decorators: [withReducedMotion],
+    render: () => staged(<LoadingRevealDemo />),
+    play: playLoadReveal(true),
+};
+

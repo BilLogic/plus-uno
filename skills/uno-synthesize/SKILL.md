@@ -37,8 +37,9 @@ this skill summons.
 
 ## Sources — how context arrives here
 
-Only Notion and Figma have MCP in this repo; everything else arrives as pasted text
-or an exported file/query result. Say so — never claim a connection that isn't there.
+Connected MCPs and their tools are listed in `docs/connectors/overview.md`; sources
+without a connector here arrive as pasted text or an exported file/query result.
+Say so — never claim a connection that isn't there.
 
 | Source | Path in |
 |---|---|

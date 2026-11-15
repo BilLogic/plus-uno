@@ -45,8 +45,6 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table"
-    sets={figmaMeta.sets}
-    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -125,7 +123,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 <ComponentExample of={DynamicTableStories.Pressed} title="Pressed" description={<>The head cell takes the subtle pressed step.</>} />
 
-<ComponentExample of={DynamicTableStories.Focused} title="Focused" description={<>The sort button shows the 2px ring inset in the cell, and the arrow appears.</>} />
+<ComponentExample of={DynamicTableStories.Focused} title="Focused" description="The sort button shows the focus ring inset in the cell, and the arrow appears." />
 
 <ComponentExample of={DynamicTableStories.DisabledRow} title="Disabled row" description={<>A row can be disabled and takes the disabled ink.</>} />
 
@@ -159,9 +157,17 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Usage
 
-Use the Dynamic table where people act on the data: sort a column, filter the
-rows, select some for a bulk action, or page through a long result. Use
-`StaticTable` instead for a grid people only read.
+Use `DynamicTable` for a table of sessions or records where people act on the
+data: sort a column, filter or search the rows, select some for a bulk action,
+or page through a long result with pagination. It holds its own sort and page until the page passes `sortKey` or `page`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a fixed grid people only read or a nested hierarchy, use `Table`.
 
 </div>
 
@@ -170,7 +176,7 @@ rows, select some for a bulk action, or page through a long result. Use
 ## Parts
 
 1. **Head cell.** A label with an optional type icon; a sortable one holds a button across the whole cell.
-2. **Sort arrow.** 12 tall; hidden until hover or focus, kept once sorted.
+2. **Sort arrow.** `12` tall; hidden until hover or focus, kept once sorted.
 3. **Row.** Cells in a band, with hover and selected grounds.
 4. **Footer.** States the range on a table that pages.
 5. **Message row.** The empty, no results, loading and error states, spanning every column.
@@ -188,7 +194,7 @@ rows, select some for a bulk action, or page through a long result. Use
 <tr><td>Rest</td><td>Head cells clear; sorted columns keep their arrow.</td></tr>
 <tr><td>Hovered</td><td>A sortable head cell takes the subtle hovered ground and shows its arrow.</td></tr>
 <tr><td>Pressed</td><td>A sortable head cell takes the subtle pressed ground.</td></tr>
-<tr><td>Focused</td><td>The sort button shows the 2px ring inset; focus is never a fill.</td></tr>
+<tr><td>Focused</td><td>The sort button shows the focus ring inset; focus is never a fill.</td></tr>
 <tr><td>Disabled</td><td>A row takes the disabled ink and ignores the pointer; there is no disabled sort.</td></tr>
 <tr><td>Rows selected</td><td>The head row becomes the bulk bar, at the same height; selected rows keep the selected ground.</td></tr>
 </tbody>
@@ -217,17 +223,15 @@ rows, select some for a bulk action, or page through a long result. Use
 
 ## Best practices
 
-A dynamic table is one people sort, page or act on. It holds its own sort and page until the page passes `sortKey` or `page`.
-
 ### Give a column a sortable key.
 
 A date needs a key that sorts, such as `20261024`, and its readable text as `content`.
 
 <DoDontPair
     doExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" defaultSortKey="date" defaultSortOrder="ascending" />}
-    doCaption="A key per cell sorts by date: Oct 9, Oct 24, Nov 2."
+    doCaption="A key per cell sorts chronologically rather than alphabetically."
     dontExample={<DynamicTable head={sortHead} rows={plainRows} label="Sessions" defaultSortKey="date" defaultSortOrder="ascending" />}
-    dontCaption="No key, so the text sorts: Nov 2 lands first."
+    dontCaption="No key, so the formatted strings sort alphabetically instead."
 />
 
 ### Say what an empty table is for.
@@ -243,11 +247,11 @@ Every state keeps the head row, so the columns still say what will appear. Word 
 
 ### Page on the server when the list is long.
 
-With `totalRows`, `rows` is the current page only, and the footer counts against the total.
+With `totalRows`, `rows` is the current page only (`rowsPerPage`), and the footer counts against the total.
 
 <DoDontPair
     doExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" rowsPerPage={3} totalRows={8500} />}
-    doCaption="One page of rows, counted against the 8500 total."
+    doCaption="One page of rows, counted against the total."
     dontExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" rowsPerPage={3} />}
     dontCaption="The whole list loaded to page on the screen, when it is thousands of rows."
 />
@@ -276,7 +280,7 @@ With `totalRows`, `rows` is the current page only, and the footer counts against
 ## Accessibility
 
 - **Sorting is announced.** A sortable header carries `aria-sort` (`none`, `ascending` or `descending`) and holds a real button, so a keyboard reaches it with Tab and a press asks for the next sort.
-- **Focus is a ring.** The ring is inset in the cell and is at least 3:1 on the surface; focus never changes the fill.
+- **Focus is a ring.** The ring is inset in the cell and focus never changes the fill.
 - **The arrow is decorative.** The sort state is in `aria-sort`, so color and the arrow never carry it alone.
 - **A disabled row is announced.** It is `aria-disabled` and takes no pointer events.
 - **Row selection is named and announced.** Each checkbox is "Select row N" and the head's is "Select all rows", mixed when only some rows are selected; a status says how many are selected, from the first one. The bulk bar's count is not announced a second time.
@@ -287,10 +291,8 @@ With `totalRows`, `rows` is the current page only, and the footer counts against
 
 ## Related
 
-- For a grid people only read, use the Static table.
-- For records that nest, use the Tree table.
-- For splitting a long result set across pages, use `Pagination`.
-- For search, filters and actions above the table, use the Section toolbar. Selected rows never change it.
+- `Pagination`: use when splitting a long result set across numbered pages.
+- <a href="?path=/docs/templates-section--docs">Section</a>: use when placing search, filters and actions in the toolbar above the table; selected rows never change it.
 
 </div>
 

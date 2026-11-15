@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StatusTag, Icon } from '@/components';
-import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsTable, DoDontCard } from '@/storybook-docs/ds-docs-layout.jsx';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 
 /**
@@ -115,68 +115,30 @@ export const RefTable = ({ head, rows }) => (
     </DocsTable>
 );
 
-const pairCard = {
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-    borderRadius: 'var(--card-radius)',
-    background: 'var(--ds-surface-raised)',
-    boxShadow: 'var(--ds-shadow-raised)',
-    overflow: 'hidden',
-};
-
-const Verdict = ({ tone, caption, children }) => {
+/** The Do or Don’t tag a verdict carries; kept for callers that render the badge inline. */
+export const VerdictTag = ({ tone }) => {
     const isDo = tone === 'do';
     return (
-        <figure style={{ ...pairCard, margin: 0 }} data-verdict={tone}>
-            <div
-                style={{
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 'var(--card-pad-spacious)',
-                    background: 'var(--ds-surface-sunken)',
-                    color: 'var(--ds-text)',
-                    font: 'var(--body-default)',
-                }}
-            >
-                <div style={{ width: '100%' }}>{children}</div>
-            </div>
-            <figcaption
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--card-stack-sm)',
-                    padding: 'var(--card-pad-compact)',
-                    font: 'var(--body-default)',
-                    color: 'var(--ds-text)',
-                }}
-            >
-                <span>
-                    <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} iconBefore={isDo ? 'circle-check' : 'circle-xmark'}>
-                        {isDo ? 'Do' : 'Don’t'}
-                    </StatusTag>
-                </span>
-                <span>{caption}</span>
-            </figcaption>
-        </figure>
+        <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} iconBefore={isDo ? 'circle-check' : 'circle-xmark'}>
+            {isDo ? 'Do' : 'Don’t'}
+        </StatusTag>
     );
 };
 
 /** The Do half of a pair: a live example over its caption. */
-export const Do = ({ caption, children }) => <Verdict tone="do" caption={caption}>{children}</Verdict>;
+export const Do = ({ caption, children }) => <DoDontCard tone="do" caption={caption}>{children}</DoDontCard>;
 
 /** The Don't half of a pair. */
-export const Dont = ({ caption, children }) => <Verdict tone="dont" caption={caption}>{children}</Verdict>;
+export const Dont = ({ caption, children }) => <DoDontCard tone="dont" caption={caption}>{children}</DoDontCard>;
 
 /** A Do and its Don't side by side, on the same topic. */
 export const DoDont = ({ children }) => (
     <div
+        className="sb-ds-dodont-pair"
         style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))',
-            gap: 'var(--grid-gutter)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(max(min(100%, var(--card-min-width-md)), calc((100% - var(--section-stack-lg)) / 2)), 1fr))',
+            gap: 'var(--section-stack-lg)',
             alignItems: 'stretch',
         }}
     >
@@ -195,8 +157,9 @@ const MODES = [
  * the toolbar is set to. Each pane sets `data-color-mode` on itself, and the
  * generated tokens key off that attribute on any element, so the pane reads
  * its own mode's values. The page's contrast setting carries into both panes.
+ * `stacked` puts the panes one above the other at full width, for a figure too wide to halve.
  */
-export const ModeCompare = ({ children, initial = 'both' }) => {
+export const ModeCompare = ({ children, initial = 'both', stacked = false }) => {
     const [mode, setMode] = useState(initial);
     const contrast = usePageContrast();
     const panes = mode === 'both' ? ['light', 'dark'] : [mode];
@@ -228,7 +191,7 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
             <div
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: `repeat(${panes.length}, minmax(0, 1fr))`,
+                    gridTemplateColumns: stacked ? '1fr' : 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))',
                     gap: 'var(--grid-gutter)',
                 }}
             >

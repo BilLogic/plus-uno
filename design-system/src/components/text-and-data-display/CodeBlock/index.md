@@ -15,13 +15,11 @@ A block of code in the code typeface on the code surface, with optional line num
 ## Usage
 
 Use `CodeBlock` for code a reader may copy or follow line by line: an example,
-a command sequence, a config file. For a name or short phrase inside a
-sentence, use `Code`.
+a command sequence, a config file.
 
-The typeface is the `--code` text style at 0.875rem on a 1.25rem line. The
-surface is `--ds-background-code-default`, the ink `--ds-text-code-default`, the
-gutter `--ds-background-code-gutter` with `--ds-text-code-gutter`, and a
-highlighted line `--ds-background-code-highlight`.
+## Alternatives
+
+- For a name or short phrase inside a sentence, use `Code`.
 
 ## Best practices
 
@@ -37,12 +35,12 @@ Don't: A command folded onto a second line reads like two commands.
 Do: Each region says what it holds: Install command.
 Don't: Every block named Code snippet.
 
-### Do not rely on a highlight alone. {#do-not-rely-on-a-highlight-alone}
+### State what a highlight points at in prose. {#state-what-a-highlight-points-at-in-prose}
 
 Do: The sentence says which line to read, and the highlight supports it.
 Don't: The fill is the only cue.
 
-### Keep the numbers for code you discuss. {#keep-the-numbers-for-code-you-discuss}
+### Keep line numbers for code you discuss. {#keep-line-numbers-for-code-you-discuss}
 
 Do: A one-line command with no gutter.
 Don't: A line number beside a single command.
@@ -62,14 +60,13 @@ Don't: A line number beside a single command.
 
 ## Related
 
-- For code inside a sentence, `Code`.
-- Syntax coloring is not part of this component.
+- `Code`: use when formatting a short identifier or command inline within prose.
 
 Same group: `Code` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 ## Parts
 
-1. **Surface.** The code ground with a hairline edge and a small radius.
+1. **Surface.** The code ground with a hairline edge and `--radius-md`.
 2. **Gutter.** Optional line numbers, skipped by screen readers.
 3. **Line.** One per line of text; a highlighted line has its own ground.
 4. **Region.** The scrolling block, focusable and named when it does not wrap.
@@ -80,7 +77,7 @@ Same group: `Code` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
 | --- | --- |
 | Rest | Code ground and ink; highlighted lines on the highlight fill. |
 | Hovered, pressed | The block does not react. |
-| Focused | A scrolling block shows the 2px ring inset; a wrapping block is not focusable. |
+| Focused | A scrolling block shows the focus ring inset; a wrapping block is not focusable. |
 | Disabled | Not applicable. |
 
 ### Tokens
@@ -117,7 +114,7 @@ Same group: `Code` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 ## Tokens touched
 
-`--border-default` · `--code` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--font-size-0875` · `--line-height-125` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-lg` · `--plus-code-block-digits` · `--plus-code-block-gutter` · `--radius-xl`
+`--border-default` · `--card-radius-compact` · `--code` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--font-size-0875` · `--line-height-125` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-lg` · `--plus-code-block-digits` · `--plus-code-block-gutter`
 
 From `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scss`. Override these through the token layer, never with a literal.
 

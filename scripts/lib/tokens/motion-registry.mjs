@@ -83,7 +83,7 @@ export const MOTION_REGISTRY = [
     tier: 'template',
     events: {
       enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% and fades in; the Backdrop dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts.' },
-      exit: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Leaves at 98%, fading.' },
+      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', appearance: 'appearance.fast', note: 'Leaves at 98%, fading; stays mounted until the exit completes.' },
       swap: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'One Modal at a time: a confirm replaces the content in place, never a second Modal.' },
       rejected: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes it once; never in reduced motion.' },
     },
@@ -332,6 +332,20 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'CheckboxGroup',
+    tier: 'component',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Mark and fill change color.' },
+    },
+  },
+  {
+    name: 'SettingRow',
+    tier: 'component',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Row state and inline control transitions.' },
+    },
+  },
+  {
     name: 'Radio',
     tier: 'component',
     events: {
@@ -429,7 +443,7 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: "Clips open from the trigger's corner on the side it is aligned to." },
-      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades. The exit is the fade.' },
+      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', appearance: 'appearance.fast', note: 'Clips back to the trigger and fades; stays mounted until the exit completes.' },
     },
   },
   {
@@ -598,7 +612,7 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opens as a Popup.' },
-      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
+      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', appearance: 'appearance.fast', note: 'Clips back to the trigger and fades; stays mounted until the exit completes.' },
       change: { transition: 'Expand and collapse', spatial: 'spatial.fast', note: 'Columns and branches expand.' },
     },
   },
@@ -629,6 +643,7 @@ export const MOTION_REGISTRY = [
     name: 'Table',
     tier: 'component',
     events: {
+      expand: { transition: 'Expand and collapse', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Tree rows reveal from their parent by spring height; collapse completes before removal. Reduced motion holds the final size and fades.' },
       change: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Rows are added, removed and reordered; sort is Reorder, a filter is Swap content. Ticking rows cross-fades the head row into the bulk bar, same height, nothing slides.' },
       roster: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A student joins or leaves the session roster: the row is added or removed.', sound: { token: 'roster', when: 'in a session; changes within 2 s play once' } },
     },
@@ -646,6 +661,21 @@ export const MOTION_REGISTRY = [
     events: {
       change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The drag-over highlight.' },
       progress: { transition: 'Load content', appearance: 'linear', note: 'Progress fills with the work.' },
+    },
+  },
+  {
+    name: 'FileItem',
+    tier: 'component',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Row state and action hover transitions.' },
+      progress: { transition: 'Load content', appearance: 'linear', note: 'The uploading ProgressRing fills clockwise with the upload.' },
+    },
+  },
+  {
+    name: 'NotificationItem',
+    tier: 'component',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Row fill and Mark as read fade on hover, press and read state changes.' },
     },
   },
   {
@@ -715,6 +745,13 @@ export const MOTION_REGISTRY = [
     events: {
       change: { transition: 'Load content', appearance: 'linear', note: 'Fills with the work, never ahead of it.' },
       success: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The bar reaches its end and its fill changes to done.', sound: { token: 'done.step', when: 'a module or lesson is done' } },
+    },
+  },
+  {
+    name: 'ProgressRing',
+    tier: 'component',
+    events: {
+      change: { transition: 'Load content', appearance: 'linear', note: 'Fills clockwise from twelve o\'clock with the work, never ahead of it.' },
     },
   },
   {

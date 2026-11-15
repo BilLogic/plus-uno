@@ -8,7 +8,7 @@ import DatePicker from './DatePicker';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
-    title: 'Components/Forms and inputs/Date time picker/Date picker',
+    title: 'Components/Forms and inputs/Date time picker/Date picker/Date picker',
     component: DatePicker,
     tags: ['!dev', '!autodocs'],
     parameters: {
@@ -143,11 +143,7 @@ export const PickDate = () => {
 
     return (
         <div style={{ paddingBottom: 'var(--size-1900)', maxWidth: 'var(--size-1900)' }}>
-            <h6 style={{ marginBottom: 'var(--space-100)' }}>Select a Single Date</h6>
-            <p style={{ fontSize: 'var(--font-size-0875)', color: 'var(--ds-text-subtle)', marginBottom: 'var(--space-100)' }}>
-                Click on the input to open the calendar and select a date.
-            </p>
-            <DatePicker value={date} onChange={setDate} placeholder="Select a date" />
+            <DatePicker aria-label="Session date" value={date} onChange={setDate} placeholder="Select a date" />
             {date && (
                 <div
                     style={{

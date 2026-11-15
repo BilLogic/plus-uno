@@ -1,10 +1,12 @@
 import React, { useRef, useState } from 'react';
 
 import { Button, Fieldset, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader, SectionMessage, Select, Skeleton, TextField } from '@/components';
+import { PresenceSlot } from '@/lib/listMotion';
+import { SwapInPlace } from '@/lib/swapMotion';
 import { Backdrop, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { CELL, FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
+import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { BAR_TOKEN, FocusedType, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 
 /**
@@ -26,7 +28,12 @@ const HOST_RADIUS = '--modal-radius';
 /** A page form needs more room than the other windows: the fields, the footer below them, and a server message above. */
 const PAGE_HEIGHT = 540; // docs-literal
 
+/** The Frame docks its Sidebar from 1024 of its own width, so the page example's stage is a little wider than the window's border. */
+export const PAGE_WIDTH = 1060; // docs-literal
+
 export const SCREEN = { width: 1024, height: 580 }; // docs-literal
+
+const PAGE_BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions', href: '#' }, { text: 'Log a session' }];
 
 const SUBJECTS = [
     { value: 'lincoln', label: 'Lincoln Middle' },
@@ -108,8 +115,8 @@ export const PageFooter = ({ sending, onSave }) => (
  */
 export const FullBleedFooter = ({ sending, onSave, onCancel, primary = 'Save session', cancel = 'Cancel', cancelAppearance = 'default', bleed }) => (
     <FooterCells bleed={bleed} radius={HOST_RADIUS}>
-        <Button text={cancel} appearance={cancelAppearance} shouldFitContainer onClick={onCancel} style={CELL} />
-        <Button text={primary} appearance="primary" shouldFitContainer isLoading={sending} onClick={onSave} style={CELL} />
+        <Button text={cancel} appearance={cancelAppearance} shouldFitContainer onClick={onCancel} />
+        <Button text={primary} appearance="primary" shouldFitContainer isLoading={sending} onClick={onSave} />
     </FooterCells>
 );
 
@@ -122,13 +129,27 @@ const Behind = () => (
 
 /** The fields' state, with the blur, submit and server rules each host shares. */
 const useFormState = ({ initial = EMPTY, sendingForever = false, server = false, marked = false, sending: sendingNow = false } = {}) => {
-    const [values, setValues] = useState(initial);
+    const [values, setValuesState] = useState(initial);
     // `marked` draws the state after a press or a blur, for a docs picture that cannot run a play.
     const [errors, setErrors] = useState(() => (marked ? marksFor(initial, marked) : {}));
     const [sending, setSending] = useState(sendingNow);
     const [serverError, setServerError] = useState(server);
     const refs = useRef({});
     const setRef = (name) => (el) => { refs.current[name] = el; };
+    const setValues = (nextValues) => {
+        setValuesState(nextValues);
+        // Once a field is marked invalid, recheck while typing so it clears the moment it is fixed.
+        setErrors((prev) => {
+            const activeKeys = Object.keys(prev).filter((key) => Boolean(prev[key]));
+            if (activeKeys.length === 0) return prev;
+            const nowMissing = missing(nextValues);
+            const next = { ...prev };
+            for (const key of activeKeys) {
+                next[key] = nowMissing[key];
+            }
+            return next;
+        });
+    };
     const onBlurField = (name) => setErrors((e) => ({ ...e, [name]: missing(values)[name] }));
     const submit = () => {
         const found = missing(values);
@@ -141,14 +162,20 @@ const useFormState = ({ initial = EMPTY, sendingForever = false, server = false,
     return { values, setValues, errors, sending, serverError, setServerError, setRef, onBlurField, submit };
 };
 
-/** A form in a page: in a Section with the subtle fill, buttons left under the fields. */
+/**
+ * A form in a page: drawn in the Frame with the Sidebar docked, straight on the
+ * Page. The form's title is the page-level Section header (the page's h1), then
+ * the fields and the left-aligned footer follow with no Section around them.
+ */
 export const FormInPage = ({ initial, server, subjectWaits, sendingForever, marked, sending }) => {
     const f = useFormState({ initial, server, sendingForever, marked, sending });
     return (
-        <BrowserWindow address="app.plus.org/settings/sessions" height={PAGE_HEIGHT}>
-            <InAppFrame height="100%" panelStorageKey={null}>
-                <PatternSection title="Log a session" fill="subtle">
-                    {f.serverError && <FormMessage>{SERVER_MESSAGE}</FormMessage>}
+        <BrowserWindow address="app.plus.org/sessions/new" height={PAGE_HEIGHT}>
+            <InAppFrame height="100%" activeTabId="sessions" breadcrumbs={PAGE_BREADCRUMBS} panelStorageKey={null}>
+                <PatternSection level="page" title="Log a session">
+                    <PresenceSlot show={Boolean(f.serverError)}>
+                        <FormMessage>{SERVER_MESSAGE}</FormMessage>
+                    </PresenceSlot>
                     <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} subjectWaits={subjectWaits} setRef={f.setRef} />
                     <PageFooter sending={f.sending} onSave={f.submit} />
                 </PatternSection>
@@ -162,7 +189,7 @@ export const FormInPanel = () => {
     const f = useFormState();
     return (
         <BrowserWindow address="app.plus.org/students" height={WINDOW_HEIGHT}>
-            <div style={{ display: 'flex', blockSize: '100%', background: 'var(--ds-surface-sunken)' }}>
+            <div style={{ display: 'flex', blockSize: '100%', background: 'var(--ds-surface)' }}>
                 <div style={{ flex: '1 1 auto', minInlineSize: 0, padding: 'var(--page-pad)' }}><Behind /></div>
                 <PanelContainer width="var(--panel-width-default)">
                     <PanelHeader title="Ana Ruiz" actions={<PanelCloseAction onClick={() => {}} />} />
@@ -216,7 +243,9 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
                         onClose={close}
                         footer={<FullBleedFooter bleed={MODAL_PAD} sending={f.sending} onSave={f.submit} onCancel={close} />}
                     >
-                        {f.serverError && <FormMessage>{SERVER_MESSAGE}</FormMessage>}
+                        <PresenceSlot show={Boolean(f.serverError)}>
+                            <FormMessage>{SERVER_MESSAGE}</FormMessage>
+                        </PresenceSlot>
                         <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />
                     </PatternModal>
                 )}

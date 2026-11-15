@@ -5,17 +5,25 @@ import { HEROES } from './hero-registry.jsx';
 import { PAINT } from '../illustrations/paint.js';
 
 const FOUNDATION_IDS = [
-    'foundations-basics-overview',
-    'foundations-basics-accessibility',
+    'foundations-overview',
+    'foundations-accessibility',
     'foundations-visual-border',
     'foundations-visual-elevation',
     'foundations-layout-grid',
     'foundations-visual-iconography',
     'foundations-brand-illustrations',
     'foundations-brand-logos',
+    'foundations-brand-content-voice-and-tone',
+    'foundations-brand-content-language',
+    'foundations-brand-content-messages',
     'foundations-visual-radius',
     'foundations-layout-spacing',
-    'foundations-basics-tokens',
+    'foundations-tokens-color',
+    'foundations-tokens-typography',
+    'foundations-tokens-spacing-and-size',
+    'foundations-tokens-elevation-and-layers',
+    'foundations-tokens-motion',
+    'foundations-tokens-library',
     'foundations-visual-typography',
 ];
 
@@ -29,13 +37,13 @@ describe('Foundations heroes', () => {
         expect(HEROES[id].description).toMatch(/^[A-Z].*\.$/);
     });
 
-    it.each(FOUNDATION_IDS.filter((id) => id !== 'foundations-visual-typography'))('%s draws no text', (id) => {
+    it.each(FOUNDATION_IDS.filter((id) => !['foundations-visual-typography', 'foundations-tokens-typography', 'foundations-overview'].includes(id)))('%s draws no text', (id) => {
         const { container } = render(React.createElement(HEROES[id].Hero));
         expect(container.querySelector('text')).toBeNull();
         expect(container.textContent).toBe('');
     });
 
-    it('Typography is the one hero with letterforms: Aa twice, serif and sans', () => {
+    it('Typography sets the full specimen: Aa twice, serif and sans', () => {
         const { container } = render(React.createElement(HEROES['foundations-visual-typography'].Hero));
         const glyphs = [...container.querySelectorAll('text')];
         expect(glyphs.map((t) => t.textContent)).toEqual(['Aa', 'Aa']);
@@ -84,5 +92,40 @@ describe('Foundations heroes', () => {
         expect(surface.getAttribute('rx')).toBe(circle.getAttribute('r'));
         expect(+circle.getAttribute('cx')).toBe(+surface.getAttribute('x') + +surface.getAttribute('rx'));
         expect(+circle.getAttribute('cy')).toBe(+surface.getAttribute('y') + +surface.getAttribute('ry'));
+    });
+});
+
+describe('Foundations Overview: a bento of the foundations', () => {
+    const draw = () => render(React.createElement(HEROES['foundations-overview'].Hero)).container;
+    const ACCENT_RING = ':scope > g > rect[stroke="' + ACCENT + '"]';
+
+    it('draws six cells: color tall, type, grid, elevation ringed, icons and motion small', () => {
+        const cells = [...draw().querySelectorAll('[data-cell]')];
+        expect(cells.map((c) => c.dataset.cell)).toEqual(['color', 'type', 'grid', 'elevation', 'icons', 'motion']);
+        expect(cells.filter((c) => c.querySelector(ACCENT_RING)).map((c) => c.dataset.cell)).toEqual(['elevation']);
+        const [color, type, , , icons] = cells;
+        expect(+color.dataset.h).toBeGreaterThan(+type.dataset.h);
+        expect(+icons.dataset.w).toBeLessThan(+type.dataset.w);
+    });
+
+    it('sets one specimen, Aa, in the type cell', () => {
+        expect([...draw().querySelectorAll('text')].map((t) => t.textContent)).toEqual(['Aa']);
+    });
+});
+
+describe('Iconography: ten icons in one style', () => {
+    const draw = () => render(React.createElement(HEROES['foundations-visual-iconography'].Hero)).container;
+
+    it('draws ten different icons, five by two, the bell alone in the brand color', () => {
+        const glyphs = [...draw().querySelectorAll('[data-glyph]')];
+        expect(new Set(glyphs.map((g) => g.dataset.glyph)).size).toBe(10);
+        expect(glyphs.filter((g) => g.getAttribute('stroke') === ACCENT).map((g) => g.dataset.glyph)).toEqual(['bell']);
+        expect(new Set(glyphs.map((g) => g.getAttribute('stroke-width'))).size).toBe(1);
+    });
+
+    it('draws no construction grid, keyline or ring on any tile', () => {
+        const c = draw();
+        expect(c.querySelector('[data-shape="icon-construction"]')).toBeNull();
+        expect(c.querySelectorAll(`rect[stroke="${ACCENT}"]`)).toHaveLength(0);
     });
 });

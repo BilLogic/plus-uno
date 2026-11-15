@@ -33,14 +33,14 @@ import {
 <Meta of={PageStories} />
 
 <DocsLanding
-    page="templates-page-page"
+    page="templates-page"
     eyebrow="Template · Page"
     title="Page"
     purpose="The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width."
     links={{
         label: 'Uses',
         items: [
-            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section--docs' },
             { title: 'Card', href: './?path=/docs/templates-card--docs' },
         ],
     }}
@@ -51,7 +51,7 @@ import {
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46582"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21757-21082"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Page"
 />
 
@@ -61,7 +61,7 @@ import {
 
 ## Types
 
-<TypeGrid>
+<TypeGrid wide>
 <TypeCard of={PageStories.TypeDefault} title="Default" stage={1920}>The content grid, centered and capped at its content width. Nearly every page.</TypeCard>
 <TypeCard of={PageStories.TypeFullWidth} title="Full width" stage={1920}>The content runs to the pad with no cap, for a page that fills it, such as chat or a board.</TypeCard>
 </TypeGrid>
@@ -72,7 +72,7 @@ import {
 
 ## Anatomy
 
-A record page, one level down, with everything the header can carry. Each marker sits in the gutter beside its part.
+A record page one level down shows every header slot, with markers in the gutter beside each part.
 
 <Story of={PageStories.AnatomyRecord} inline />
 
@@ -104,7 +104,7 @@ A record page, one level down, with everything the header can carry. Each marker
 
 ## Width behavior
 
-Drag the width through the content cap. Past it the content stops at the cap and centers; under it the content takes the width. The header keeps one h1 at every width.
+Drag the width control. Above the content cap, content centers at the cap; below it, content fills the available width. The header keeps one h1 at every width.
 
 <DocsInteractivePlayground of={PageStories.ResponsiveWidth} description="The width control sets the page's own width." />
 
@@ -115,6 +115,8 @@ Drag the width through the content cap. Past it the content stops at the cap and
 ## Key states
 
 <ComponentExample of={PageStories.KeyBanner} title="Page banner" description="A message about this page sits under the page header and scrolls with the content. Which tier a message belongs to is the Notifications pattern, listed in the Patterns overview." />
+
+<ComponentExample of={PageStories.HeaderAndBanner} title="Header and banner slots" description="Page owns the spacing from its header to the banner and content, including when the banner is removed." />
 
 </div>
 
@@ -162,23 +164,7 @@ The outline keeps a page's headings in one order, so a reader and assistive tech
     <DsCanvasQuiet of={HeadingOutlineStories.PageSectionSubsection} />
 </DocsCanvasShell>
 
-Use one h1 per page. Each Section opens with an h2, and a subsection inside it with an h3. Do not skip a level to get a different size: the size follows from the level.
-
-### Container titles
-
-Container titles are fixed whatever level they sit at.
-
-<DocsCanvasShell description={<>A card's tag is one level below its section; its title and description sizes are on <DocsLink id="templates-card">Card</DocsLink>.</>}>
-    <DsCanvasQuiet of={HeadingOutlineStories.CardTitles} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A modal's title is 20. It is the dialog's own h1 and names it.</>}>
-    <DsCanvasQuiet of={HeadingOutlineStories.ModalTitle} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A popup's and a flag's titles are 14.</>}>
-    <DsCanvasQuiet of={HeadingOutlineStories.PopupAndFlagTitles} />
-</DocsCanvasShell>
+Use one h1 per page. Each Section opens with an h2, and a subsection inside it with an h3. Do not skip a level to get a different size: the size follows from the level. Container titles keep their own sizes on their templates: <DocsLink id="templates-card">Card</DocsLink>, <DocsLink id="templates-modal">Modal</DocsLink> and <DocsLink id="templates-popup">Popup</DocsLink>.
 
 ### Group labels
 
@@ -191,7 +177,6 @@ A menu's label names a group, and a table's labels are column headers. Neither j
 ### Heading outline accessibility
 
 - **Tags follow nesting.** Heading levels are real `h1` to `h3` elements, not styled text, so screen reader users can move by heading.
-- **A modal names itself.** Its title is the dialog's accessible name.
 
 </div>
 
@@ -221,10 +206,10 @@ A menu's label names a group, and a table's labels are column headers. Neither j
 </thead>
 <tbody>
 <tr><td><code>title</code></td><td>The page's one h1, at the heading-large size, above the content.</td></tr>
-<tr><td><code>children</code></td><td>The page header, the banner and the Sections, in order. Today the <code>PageHeader</code> goes first in <code>children</code>.</td></tr>
-<tr><td><code>header</code> <PlannedTag /></td><td>Planned. One <code>PageHeader</code>: the h1 with <code>breadcrumbs</code> after a drill-in, <code>actions</code> and page tabs in <code>bottomBar</code>.</td></tr>
+<tr><td><code>children</code></td><td>The Sections and other page content. Existing pages may still supply the header and banner here.</td></tr>
+<tr><td><code>header</code></td><td>One <code>PageHeader</code>: the h1 with <code>breadcrumbs</code> after a drill-in, <code>actions</code> and page tabs in <code>bottomBar</code>. Replaces <code>title</code>.</td></tr>
 <tr><td><code>description</code> · <code>status</code> <PlannedTag /></td><td>Planned. <code>PageHeader</code> has neither slot; the title block holds them.</td></tr>
-<tr><td><code>banner</code> <PlannedTag /></td><td>Planned. The page banner, one at a time. Today it goes in <code>children</code> under the header.</td></tr>
+<tr><td><code>banner</code></td><td>One page <code>Banner</code>, below the header. Page separates the slots and content with <code>--page-stack-md</code>.</td></tr>
 <tr><td><code>width</code> <PlannedTag /></td><td>Planned. <code>default</code> or <code>full</code>; today the Frame's <code>width</code> sets <code>content</code> or <code>reading</code>.</td></tr>
 <tr><td>Scrolled header <PlannedTag /></td><td>Planned. The sticky one-row header.</td></tr>
 <tr><td><code>level</code> · <code>padding</code> · <code>radius</code> · <code>border</code> · <code>as</code></td><td>The container: its fill and shadow as a pair, its pad and corner, and its element.</td></tr>
@@ -377,8 +362,8 @@ Which tier a message belongs to: the <DocsLink id="patterns-notifications">Notif
 
 ## Related
 
-- <DocsLink id="templates-frame-frame">Frame</DocsLink>: use when deciding which type the page sits in.
-- <DocsLink id="templates-section-section">Section</DocsLink>: use when a region needs its own heading, view bar or detail.
+- <DocsLink id="templates-frame">Frame</DocsLink>: use when deciding which type the page sits in.
+- <DocsLink id="templates-section">Section</DocsLink>: use when a region needs its own heading, view bar or detail.
 - <DocsLink id="templates-card">Card</DocsLink>: use when one object has a shape already agreed.
 - <DocsLink id="foundations-visual-elevation">Elevation</DocsLink>: use when picking which shadow goes with which level.
 - <DocsLink id="patterns-overview">Patterns</DocsLink>: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).

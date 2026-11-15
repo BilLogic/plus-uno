@@ -9,7 +9,7 @@ import { Rect, Rule } from './primitives.jsx';
 import { ChartAxis, ChartCurve } from './primitives-motion.jsx';
 
 /**
- * Foundations · Sound's one figure: the land rule, drawn from the generated
+ * Foundations › Expression › Sound's one figure: the land rule, drawn from the generated
  * spring and the generated score. The plot is the motion's position over time;
  * the lane under it is the sound, its pickup ticks and then its notes. Both
  * guides are read from the runtime, so the figure moves when a token does.
