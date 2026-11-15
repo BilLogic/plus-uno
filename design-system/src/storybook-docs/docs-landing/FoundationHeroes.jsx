@@ -90,7 +90,7 @@ export const OverviewHero = () => (
         y={45}
         aria-hidden="true"
         fill={PAINT.glyph}
-        style={{ fontFamily: "var(--type-family-heading-serif)", fontWeight: "var(--type-weight-medium)", fontSize: 46 }}
+        style={{ fontFamily: "var(--type-family-brand-heading)", fontWeight: "var(--type-weight-medium)", fontSize: 46 }}
       >
         Aa
       </text>
@@ -485,7 +485,7 @@ export const TypographyHero = () => (
     />
     <Specimen
       x={35}
-      family="var(--type-family-heading-serif)"
+      family="var(--type-family-brand-heading)"
       weight="var(--type-weight-medium)"
     />
     <Specimen

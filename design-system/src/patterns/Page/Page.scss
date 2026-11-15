@@ -98,9 +98,5 @@
     margin: 0 0 var(--page-stack-md);
     font: var(--heading-lg);
     letter-spacing: var(--heading-lg-tracking);
-    // Noto Serif's glyph box is taller than this line: padding and an equal
-    // negative margin hold the box where it was and keep the glyphs inside it.
-    padding-block: 0.125em;
-    margin-block: -0.125em;
     color: var(--ds-text);
 }

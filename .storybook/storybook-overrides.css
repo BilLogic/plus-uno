@@ -61,10 +61,10 @@ body,
  * h1 and h2 the same 32px, and h3 and h4 the same 28px, so the outline had no
  * visible steps.
  *
- *   h1 page title     --heading-xxl   32 / 36 serif
- *   h2 section        --heading-xl     28 / 32 serif
- *   h3 example, sub   --heading-lg     24 / 28 serif
- *   h4                --heading-md     20 / 24 serif
+ *   h1 page title     --heading-xxl   32 / 36 sans semibold
+ *   h2 section        --heading-xl     28 / 32 sans semibold
+ *   h3 example, sub   --heading-lg     24 / 28 sans semibold
+ *   h4                --heading-md     20 / 24 sans semibold
  *   h5                --heading-sm     16 / 20 sans semibold
  *   h6                --heading-xs     14 / 20 sans semibold
  *

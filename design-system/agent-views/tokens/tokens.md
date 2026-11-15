@@ -414,7 +414,6 @@ The text styles, generated from Figma: `font: var(--heading-lg)`. A button or ta
 --type-family-brand-heading
 --type-family-code
 --type-family-heading
---type-family-heading-serif
 --type-line-height-100
 --type-line-height-125
 --type-line-height-150

@@ -1,8 +1,7 @@
 /**
  * The bare heading elements take the Heading size paired with their level:
  * h1 xxlarge (32), h2 xlarge (28), h3 large (24), h4 medium (20), h5 small (16),
- * h6 xsmall (14). The serif sizes (32 to 20) are Noto Serif at 500; 16 and 14
- * are Noto Sans at 600.
+ * h6 xsmall (14). Every level is Noto Sans at 600.
  *
  * `_fonts.scss` gives each bare `h1`-`h6` a heading text style. This compiles
  * it and reads what each element's `font` resolves to, so a heading that drifts
@@ -58,13 +57,7 @@ for (const [level, size] of Object.entries(LEVEL_SIZES)) {
   });
 }
 
-for (const level of ['h1', 'h2', 'h3', 'h4']) {
-  test(`${level} is Noto Serif at 500`, () => {
-    assert.match(font(level), /^500 \S+ \/ \S+ "Noto Serif"/);
-  });
-}
-
-for (const level of ['h5', 'h6']) {
+for (const level of ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']) {
   test(`${level} is Noto Sans at 600`, () => {
     assert.match(font(level), /^600 \S+ \/ \S+ "Noto Sans"/);
   });

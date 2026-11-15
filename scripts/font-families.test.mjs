@@ -30,7 +30,7 @@ const TOKENS = file(
   ':root {\n' +
     '  --type-family-heading: "Lato", sans-serif;\n' +
     '  --type-family-body: "Merriweather Sans", "Open Sans", sans-serif;\n' +
-    '  --type-family-heading-serif: var(--type-family-heading);\n' +
+    '  --type-family-heading-alias: var(--type-family-heading);\n' +
     '  --type-family-code: "Source Code Pro", monospace;\n' +
     '}\n',
 );
@@ -97,14 +97,14 @@ test('a fallback of nothing but a generic claims no face, so it claims nothing w
 test('a fallback that is another family token cannot disagree with anything', () => {
   const found = failures([
     TOKENS,
-    file('a.scss', '.a { font-family: var(--type-family-heading-serif, var(--type-family-heading)); }'),
+    file('a.scss', '.a { font-family: var(--type-family-heading-alias, var(--type-family-heading)); }'),
   ]);
   assert.deepEqual(found, []);
 });
 
 test('an alias resolves to the stack it points at', () => {
   const tokens = familyTokens([TOKENS]);
-  assert.deepEqual(resolve('--type-family-heading-serif', tokens), ['Lato', 'sans-serif']);
+  assert.deepEqual(resolve('--type-family-heading-alias', tokens), ['Lato', 'sans-serif']);
   assert.equal(resolve('--type-family-nope', tokens), null);
 });
 
