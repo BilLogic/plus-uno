@@ -20,7 +20,7 @@ const flag = check ? ' --check' : '';
 
 const steps = [
   ['Agent views (tokens)', `node scripts/generate-cheat-sheet.js${flag}`],
-  ['Agent views (component + forms index)', `node scripts/generate-knowledge-components.js${flag}`],
+  ['Agent views (component index)', `node scripts/generate-knowledge-components.js${flag}`],
   ['Component docs (generated half + group coverage)', `node scripts/generate-component-docs.mjs${flag}`],
   ['Template and pattern agent files', `node scripts/generate-docs-agent-files.mjs${flag}`],
   ['Motion Library agent file', `node scripts/generate-motion-library.mjs${flag}`],
