@@ -41,10 +41,8 @@ and any named export it chooses to carry alongside it); `design-system/src/compo
 is generated from the folder tree by `npm run generate:component-barrel`
 (`npm run check:component-barrel` in CI) — a source for regeneration, same as
 the generated token files. Every component folder in
-every group is re-exported one hop from its own folder, even in a group that
-also owns its own `index.js` (today, only `forms-and-inputs`, kept for the
-handful of callers that import it directly): a chained re-export through that
-second file is a hop this generator does not take. `_internal/` sits outside
+every group is re-exported one hop from its own folder: a chained re-export through a
+group barrel is a hop this generator does not take. `_internal/` sits outside
 the scan entirely, so the public barrel only ever surfaces a component that
 lives in a group folder. A flat file still converging toward this shape
 stays that way until its own family PR touches it, rather than as a side
@@ -62,15 +60,13 @@ component on its way to this shape.
 **Barrel exports — the rule for every new file:**
 
 ```js
-import { Button, SectionMessage, Modal } from '@/components';
-import { TextField, Select, Checkbox } from '@/components'; // forms-and-inputs re-exports through the components barrel
+import { Button, SectionMessage, Modal, TextField, Select, Checkbox } from '@/components';
 import '@/styles/globals.scss';
 ```
 
 **Explicit entry points:**
 - `design-system/src/index.js`
 - `design-system/src/components/index.js`
-- `design-system/src/components/forms-and-inputs/index.js` (also re-exported from the components barrel)
 
 **Out of new files:** file-level and category-folder paths
 (`@/components/forms-and-inputs/Button/Button`), `_internal/` paths, and the `@plus-ds`
@@ -94,22 +90,7 @@ A component names a before or after slot by what the slot accepts, so the right 
 
 ## Token usage
 
-Use design tokens everywhere — never hardcode colors, spacing, typography, or elevation.
-
-| Category | Correct | Incorrect |
-|----------|---------|-----------|
-| Color | `var(--ds-background-brand-bold)`, `var(--ds-text)` | `#3B82F6`, `rgba(0,0,0,0.1)` |
-| Spacing | `var(--card-pad-default)`, `var(--section-stack-lg)` | `16px`, `24px` |
-| Typography | `font: var(--body-default)`, `var(--type-family-heading)` | `14px`, `'Inter'` |
-| Elevation | `var(--ds-shadow-raised)` | `0 2px 4px rgba(0,0,0,0.1)` |
-
-**Real token examples:**
-
-- Spacing: `--pad-x-lg`, `--card-pad-default`, `--section-stack-lg`, `--modal-radius`, `--page-pad-x-default`
-- Color: `--ds-background-brand-bold`, `--ds-text-inverse`, `--ds-surface`, `--ds-surface-sunken`, `--ds-text-danger`
-- Typography: `--heading-large`, `--body-default`, `--type-family-heading`, `--type-weight-medium`, `--font-size-0875`
-- Elevation: `--ds-shadow-raised`, `--ds-shadow-overlay`
-- Breakpoints: `@media (min-width: 1024px)` and `@media (min-width: 1440px)`, where the token ladder switches modes (a media query takes the number itself)
+Token legality, literal bans, motion rules and placement checks are enforced by `npm run check:ds-usage` (`npm run ds -- check`) — see `docs/engineering/ds-usage-rules.md` for the rule list and `design-system/guidelines/foundations/overview.md` § Token rules for tier selection (`design-system/agent-views/tokens/tokens.md` lists token names). Breakpoints switch modes at `@media (min-width: 1024px)` and `@media (min-width: 1440px)`.
 
 ## Playground
 

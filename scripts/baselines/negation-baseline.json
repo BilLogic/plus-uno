@@ -73,9 +73,6 @@
         "docs/conventions/writing.md": {
           "count": 8
         },
-        "docs/engineering/coding.md": {
-          "count": 1
-        },
         "docs/engineering/setup.md": {
           "count": 2
         },
@@ -142,9 +139,6 @@
         "skills/uno-research/SKILL.md": {
           "count": 7
         },
-        "skills/uno-research/references/component-discovery.md": {
-          "count": 1
-        },
         "skills/uno-research/references/method.md": {
           "count": 6
         },
@@ -153,9 +147,6 @@
         },
         "skills/uno-review/references/method.md": {
           "count": 4
-        },
-        "skills/uno-review/references/storybook.md": {
-          "count": 1
         },
         "skills/uno-synthesize/SKILL.md": {
           "count": 5
@@ -169,7 +160,7 @@
       "direction": "grow-only",
       "entries": {
         "docs": {
-          "count": 57
+          "count": 58
         }
       }
     },

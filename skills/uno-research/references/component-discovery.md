@@ -7,25 +7,18 @@ summary: How to find out whether a component already exists before proposing a n
 
 # Component Discovery Process
 
-0. **Mandatory Existing Component Check:** You MUST always check if there is a similar or exact component that already exists within the design system FIRST before starting to implement any new custom component. Do not build from scratch if the design system already provides it.
+1. **Query the design-system lookup first (`docs/connectors/ds-mcp.md`):**
+   - Run `ds_find` (`npm run ds -- find "<query>"`) and `ds_get` (`npm run ds -- get <Name>`) — or read `design-system/agent-views/components/index.md` — before proposing a custom component (`AGENTS.md` § Hard rules 1–2).
+   - For screen layout and stage order, start from `design-system/guidelines/overview.md` (`ds_guide`).
 
-0a. **Mandatory Figma Registry Load:** When a Figma link, design-to-code mapping, or Figma audit is involved, read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json` before any other discovery. See `../../../design-system/guidelines/figma/registry-load-gate.md`.
+2. **Figma design-to-code mapping:**
+   - When a Figma link or audit is involved, load `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json` first (`../../../design-system/guidelines/figma/registry-load-gate.md`), then cross-check with `ds_find` / `ds_get`.
 
-1. Check design-to-code mapping first
-- If a design link is provided, fetch design context/screenshot first.
-- Resolve components via `component-registry.json` (primary) and `search_design_system` MCP (secondary).
-- If MCP suggests a component, cross-check against registry before using imports or props.
+3. **Source hierarchy (when inspecting implementation):**
+   - Templates: `design-system/src/patterns/*`
+   - Components (re-exported via `@/components`): `design-system/src/components/*` and `design-system/src/dataviz/*`
+   - Tokens: `design-system/src/tokens/*` (`ds_tokens` / `npm run ds -- tokens`)
 
-2. Check component documentation
-- Start with `design-system/guidelines/overview.md`
-- Then inspect story files: `design-system/src/**/*.stories.jsx`
-- Use `.storybook/main.js` story globs to locate authoritative examples.
-
-3. Understand hierarchy before implementing
-- Primitives/tokens: `design-system/src/tokens/*`
-- Reusable components: `design-system/src/components/*`, `design-system/src/components/forms-and-inputs/*`, `design-system/src/DataViz/*`
-- Higher-level compositions (Frame, Page, Section, Card, Table, overlays, templates): `design-system/src/patterns/*`
-
-4. Decide when to ask vs proceed
-- Ask when design intent is ambiguous, target context level is unclear, or multiple component families fit equally.
-- Proceed when a direct component/story/spec precedent exists.
+4. **Decide when to ask vs proceed:**
+   - Ask when design intent is ambiguous, target context level is unclear, or multiple component families fit equally.
+   - Proceed when a direct template, pattern, or component match exists (`docs/engineering/local-components.md`).
