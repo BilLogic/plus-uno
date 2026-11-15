@@ -272,7 +272,7 @@ async function measureManager(context, baseUrl) {
           probe.remove();
           return color;
         };
-        const out = { mode: document.documentElement.dataset.colorMode, sidebar: resolved('--ds-surface-sunken'), selected: resolved('--ds-background-brand-bold') };
+        const out = { mode: document.documentElement.dataset.colorMode, sidebar: resolved('--ds-surface-sunken'), selected: resolved('--ds-background-selected') };
         const clear = 'rgba(0, 0, 0, 0)';
         return out.mode === c && out.sidebar !== clear && out.selected !== clear && out;
       },
