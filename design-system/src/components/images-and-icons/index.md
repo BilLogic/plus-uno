@@ -5,6 +5,40 @@
 8 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
+## Which component to reach for
+
+- **[AiIcon](AiIcon/index.md)** — Use `AiIcon` for AI actions. For other actions, use a plain Font Awesome Free glyph.
+- **[Avatar](Avatar/index.md)** — Use `Avatar` for a person's or an agent's profile picture, initials or icon wherever they are named in a row, a thread or a list of attendees. Circles represent people; squares represent teams and agents.
+  - For a short set of people that would crowd a line, use `AvatarGroup`.
+  - For a school or tool or lesson in a square frame, use `Tile`.
+  - For a workflow state or condition beside a name, use `StatusTag`.
+- **[AvatarGroup](AvatarGroup/index.md)** — Use `AvatarGroup` for a short set of people that would crowd a line: the attendees of a session, the members of a team. Past `max`, the rest fold into a `+n` menu, reachable by name.
+  - For a single person or agent with room to name each person beside their picture, use `Avatar`.
+  - For the signed-in person with a name and a role, use `Sidebar`.
+- **[Icon](Icon/index.md)** — Pass the icon's name to the component that shows it. Where no component takes the name, draw it with `Icon`:
+  - For AI actions such as generate or summarize or rewrite, use `AiIcon`.
+  - For an action shown as an icon alone, use `IconButton`.
+  - For a framed mark or logo or thumbnail, use `Tile`.
+  - For a typed record glyph such as a task or bug, use `Object`.
+- **[Illustration](Illustration/index.md)** — Use `Illustration` in empty states, onboarding and feature moments where a PLUS character sets the tone. In an empty state, the header and action do the work; the illustration is decorative and hidden from assistive technology. Pass a `title` only when the character sits alone with no heading beside it. Which character pairs with which SMART area or math moment is on Illustrations.
+  - For a small square picture of a school or tool or lesson, use `Tile`.
+  - For a person or an agent, use `Avatar`.
+  - For a photo or raster screenshot, use `Image`.
+- **[Image](Image/index.md)** — Use `Image` for a bitmap — a photo, a screenshot or a raster graphic — especially when it has a dark-mode asset to swap via `srcDark`.
+  - For a square picture of a school or tool or lesson, use `Tile`.
+  - For a typed glyph standing in for a kind of record, use `Object`.
+  - For a person or an agent's picture or initials, use `Avatar`.
+  - For a vector PLUS character, use `Illustration`.
+- **[Object](Object/index.md)** — Use an `Object` icon (`TaskIcon`, `BugIcon`, `IdeaIcon`, `PullRequestIcon`, `ProjectIcon` or `PageIcon`) beside the name of the record it represents — a task in a list, a bug in a reference, a page in a breadcrumb. Each kind is its own fixed Font Awesome Free glyph (`size` is `12` or `16`, and `label` defaults to the kind's name unless `label=""` marks it decorative) — there is no `icon` prop to swap it for another kind.
+  - For a larger square picture of a school or tool or lesson, use `Tile`.
+  - For a general-purpose Font Awesome Free glyph, use `Icon`.
+  - For a bitmap photo or screenshot, use `Image`.
+  - For a person or an agent, use `Avatar`.
+- **[Tile](Tile/index.md)** — Use `Tile` wherever a small square picture stands for a thing: a tool's logo in a list of integrations, a school's crest beside its name, a lesson's thumbnail, or an icon marking the kind of item in a row. Putting all of them in one frame keeps them the same size and shape wherever they appear.
+  - For a person or an agent, use `Avatar`.
+  - For an unframed glyph inline with text, use `Icon`.
+  - For a value someone picked with a text label, use `Tag`.
+
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [AiIcon](AiIcon/index.md) | 5 | ✅ | ✅ | ✅ |

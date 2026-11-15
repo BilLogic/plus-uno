@@ -29,7 +29,7 @@ import { fileURLToPath } from 'url';
 import { documents } from './lib/corpus.mjs';
 import { AUTHORED_SECTIONS, coverageOf } from './lib/authored-coverage.mjs';
 import { GENERATED_HEADER, componentFacts, docPathOf, renderComponent } from './lib/component-render.mjs';
-import { createPageFinder, readDocsPage } from './lib/docs-page.mjs';
+import { createPageFinder, readDocsPage, sectionText } from './lib/docs-page.mjs';
 import { resolveNamedOneOf } from './doc-identifiers.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 import { readBarrel } from './lib/ds-facts.mjs';
@@ -484,6 +484,19 @@ function groupIndex(group, results) {
   d += `${group.components.length} component${group.components.length === 1 ? '' : 's'}. `;
   d += `Each row links to the generated facts; the three columns after it are the\n`;
   d += `authored half, counted rather than assumed.\n\n`;
+
+  const chooserRows = group.name === '_internal' ? [] : group.components.flatMap((c) => {
+    const r = results[c.name];
+    if (!r || (!r.lead && !r.alternatives?.length)) return [];
+    const link = c.flat ? `${c.name}.md` : `${c.name}/index.md`;
+    const head = `- **[${c.name}](${link})**${r.lead ? ` — ${r.lead}` : ''}`;
+    const alts = (r.alternatives ?? []).map((a) => `  - ${a}`);
+    return [head, ...alts];
+  });
+  if (chooserRows.length) {
+    d += `## Which component to reach for\n\n${chooserRows.join('\n')}\n\n`;
+  }
+
   d += `| Component | Props | ${AUTHORED_SECTIONS.map((s) => s.label).join(' | ')} |\n`;
   d += `|-----------|------:|${AUTHORED_SECTIONS.map(() => ':---:').join('|')}|\n`;
 
@@ -580,7 +593,10 @@ const rendered = new Map();
 const renderOne = (facts) => {
   const docs = docsOf(facts);
   written.push([path.join(REPO_ROOT, docPathOf(facts)), renderComponent(facts, docs, context.edges[facts.name])]);
-  rendered.set(facts.name, { coverage: coverageOf(docs?.page), propCount: (facts.props ?? []).length });
+  const usage = docs?.page ? sectionText(docs.page, 'Usage') : '';
+  const lead = usage ? usage.split(/\n\n+/)[0].replace(/\s*\n\s*/g, ' ').trim() : (facts.summary || '').replace(/\s*\n\s*/g, ' ').trim();
+  const alternatives = docs?.page?.alternatives?.map((a) => a.text.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean) ?? [];
+  rendered.set(facts.name, { coverage: coverageOf(docs?.page), propCount: (facts.props ?? []).length, lead, alternatives });
 };
 for (const record of manifest.components) if (record.source) renderOne(componentFacts(manifest, record.name, aliasRows));
 for (const [name, entry] of parsedByName) {

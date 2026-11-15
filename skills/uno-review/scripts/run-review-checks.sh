@@ -31,8 +31,8 @@ count_matches() { wc -l <<< "$1" | tr -d ' '; }
 echo "PLUS Review Checks: $TARGET"
 echo "==="
 
-# 1. Escapes from the design system: raw literals, deep imports, unknown
-#    components, props and tokens, primitive reads, Font Awesome Pro and
+# 1. Escapes from the design system: raw literals, raw controls, deep imports,
+#    unknown components, props and tokens, primitive reads, Font Awesome Pro and
 #    retired names. One checker owns the
 #    definition (ADR-039); rules: docs/engineering/ds-usage-rules.md.
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
@@ -46,17 +46,6 @@ if ESCAPES=$(node "$REPO_ROOT/scripts/check-ds-usage.mjs" "$(cd "$TARGET" && pwd
 else
     fail "Escapes from the design system (check:ds-usage):"
     echo "$ESCAPES" | head -40
-    echo ""
-fi
-
-# 2. Raw HTML elements that should be DS components
-HITS=$(grep -rn '<button\|<input\|<select\|<textarea' --include="*.jsx" "$TARGET" 2>/dev/null || true)
-if [ -z "$HITS" ]; then
-    pass "No raw HTML form elements (using DS components)"
-else
-    N=$(count_matches "$HITS")
-    warn "Found $N lines with raw HTML elements (use DS components)"
-    echo "$HITS" | head -5
     echo ""
 fi
 

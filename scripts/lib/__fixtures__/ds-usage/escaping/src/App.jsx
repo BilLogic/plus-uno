@@ -12,6 +12,7 @@ export default function App() {
       <span style={{ color: 'var(--palette-neutral-1000)' }} />
       <span style={{ color: 'var(--ds-txt)' }} />
       <PatternSection title="Queue" toolbar={<PatternSection.Toolbar filters={<Select options={[]} />} />} />
+      <button type="button">Raw</button>
     </div>
   );
 }

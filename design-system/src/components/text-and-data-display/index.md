@@ -5,6 +5,23 @@
 6 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
+## Which component to reach for
+
+- **[Code](Code/index.md)** — Use `Code` for a name, command, value or snippet that sits inside a sentence: a function, a file path, a flag, a token.
+  - For several lines of code or a snippet with line numbers, use `CodeBlock`.
+- **[CodeBlock](CodeBlock/index.md)** — Use `CodeBlock` for code a reader may copy or follow line by line: an example, a command sequence, a config file.
+  - For a name or short phrase inside a sentence, use `Code`.
+- **[Heading](Heading/index.md)** — Use `Heading` for every heading in the product: a page title, a section header, a card title. Never style plain text to look like a heading: a sighted-only "heading" breaks navigation by heading for anyone using assistive technology.
+  - For a page's top title row with breadcrumbs and actions, use `PageHeader`.
+- **[InlineEdit](InlineEdit/index.md)** — Use `InlineEdit` for a value that is read far more often than it is changed and that can be saved on its own: a title, a name or a short note on a record or a profile page.
+  - For a field in a form where a Save button submits every field together, use `TextField`: an inline edit saves when confirmed and has no say in the form's submit, so placing one in a form leaves two ways to save.
+  - For several lines edited in a form, use `TextArea`.
+- **[Table](Table/index.md)** — Use `StaticTable` for a grid people only read: a record, a summary, a rate card.
+  - For a table people sort or filter or page, use `Table`.
+- **[VisuallyHidden](VisuallyHidden/index.md)** — Use `VisuallyHidden` when the words a screen reader needs are not words a sighted person needs: the name of an icon-only button, the title of a table column that holds only checkboxes, the count in a status message, a table caption the layout already explains.
+  - For an icon-only button that already takes a required `label` prop, use `IconButton`.
+  - For a short visible label on hover and focus over a control, use `Tooltip`.
+
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Code](Code/index.md) | 2 | ✅ | ✅ | ✅ |

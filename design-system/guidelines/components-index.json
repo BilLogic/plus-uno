@@ -14,7 +14,7 @@
     "../design-system/src/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "discovery_docs": [
-    "design-system/guidelines/components/overview.md",
+    "design-system/guidelines/overview.md",
     "design-system/agent-views/components/index.md"
   ]
 }

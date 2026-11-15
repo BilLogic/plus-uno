@@ -17,7 +17,7 @@ summary: How to find out whether a component already exists before proposing a n
 - If MCP suggests a component, cross-check against registry before using imports or props.
 
 2. Check component documentation
-- Start with `design-system/guidelines/components/overview.md`
+- Start with `design-system/guidelines/overview.md`
 - Then inspect story files: `design-system/src/**/*.stories.jsx`
 - Use `.storybook/main.js` story globs to locate authoritative examples.
 

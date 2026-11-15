@@ -87,14 +87,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input or button to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
-| [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status tag, Date tag, Count tag, Change tag, Tag, Smart tag, TagGroup and Suggestion — and how to choose between them |
-| [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | The remaining container components sorted by what is being contained |
-| [`design-system/guidelines/components/loading.md`](design-system/guidelines/components/loading.md) | ProgressBar, ProgressRing, Skeleton, Spinner or GenerativeBorder — showing work in flight |
-| [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | SectionMessage, Flag or Modal — choosing by how long the message lives and whether it blocks |
-| [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Five navigation components sorted by what the user is moving between |
-| [`design-system/guidelines/components/overlays-and-layering.md`](design-system/guidelines/components/overlays-and-layering.md) | Tooltip or Popup — hover description versus click-triggered content, and where every popup opens |
-| [`design-system/guidelines/components/overview.md`](design-system/guidelines/components/overview.md) | What each component is for, when to reach for it, and how it composes |
 | [`design-system/guidelines/documentation-ia.md`](design-system/guidelines/documentation-ia.md) | The documentation IA contract — the shared tree Storybook titles, repo folders and Figma all speak, plus the MDX page shell. |
 | [`design-system/guidelines/figma/component-alignment.md`](design-system/guidelines/figma/component-alignment.md) | How to keep Figma component instances and PLUS code imports (@/components/) consistent when implementing designs in Cursor or writing prototypes back to Figma |
 | [`design-system/guidelines/figma/mcp-guide.md`](design-system/guidelines/figma/mcp-guide.md) | The registry load gate is design-system/guidelines/figma/registry-load-gate.md — MANDATORY, registries first, not restated here |
@@ -118,6 +110,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/engineering/coding.md`](docs/engineering/coding.md) | How to write code in this repo — barrel imports, tokens over literals, styling conventions, and what not to reach for. |
 | [`docs/engineering/ds-usage-rules.md`](docs/engineering/ds-usage-rules.md) | The escape rules `check:ds-usage` holds consumer code to — one section per rule ID, each saying what fails and what to write instead. |
 | [`docs/engineering/foundation-docs.md`](docs/engineering/foundation-docs.md) | Code-side notes behind the Foundations docs pages — the checks, helpers and generated files a designer page does not carry. |
+| [`docs/engineering/local-components.md`](docs/engineering/local-components.md) | The reuse ladder (use, arrange, local component, core candidate) and when a prototype builds a local piece on PLUS components and Base UI. |
 | [`docs/engineering/measurement-window.md`](docs/engineering/measurement-window.md) | How to run uno-bot's measurement window each week and close it — the five numbers, where each comes from, where it is recorded, and what stays private. |
 | [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, owner and a link to its home. |
 | [`docs/engineering/setup.md`](docs/engineering/setup.md) | Aliases, package structure, prototype conventions, token workflow, local preview. |
@@ -216,6 +209,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+138 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

@@ -28,8 +28,7 @@
  *     why this pass carries its own token grammar rather than borrowing
  *     `links()`. `docs/adr/` is absent: an ADR's job includes naming a path
  *     that was retired, and rewriting those would erase the decision's own
- *     record. `design-system/guidelines/components/overview.md` carries its own
- *     staleness banner (#165/#166 own its rebuild) and the two vendored
+ *     record. The vendored
  *     blueprint pages name their SOURCE repo's paths. A `read_reference` NAME
  *     resolves too: outside `skills/` a disclosed doc's name is its path
  *     without `.md` (`docs/engineering/operations`), so it passes when that
@@ -113,7 +112,6 @@ const ROOTED = /^(AGENTS\.md|docs\/|skills\/|agents\/|scripts\/|design-system\/|
 const CODE_SPAN = /`([^`\n]+)`/g;
 
 const VENDORED_POINTERS = [
-  /^design-system\/guidelines\/components\/overview\.md$/,
   /^docs\/connectors\/supabase\/blueprint\.md$/,
   /^docs\/connectors\/supabase\/blueprint-direct-access\.md$/,
   /^docs\/connectors\/supabase\/blueprint-schema\.md$/,
@@ -122,9 +120,12 @@ const VENDORED_POINTERS = [
 /** A bare filename: no slash, no space, and a `.md` tail. */
 const BARE_MD = /^[^`/ ]+\.md$/;
 
-const REQUIRED_INDEXES = [
+const requiredIndexes = (repoRoot) => [
   'design-system/guidelines/index-manifest.json',
-  'design-system/guidelines/components/components-index.json',
+  !existsSync(path.join(repoRoot, 'design-system/guidelines/components-index.json')) &&
+  existsSync(path.join(repoRoot, 'design-system/guidelines/components/components-index.json'))
+    ? 'design-system/guidelines/components/components-index.json'
+    : 'design-system/guidelines/components-index.json',
   'skills/uno-research/references/foundations-index.json',
   'skills/uno-research/references/patterns-index.json',
 ];
@@ -282,7 +283,7 @@ const inputs = byRoot((repoRoot) => {
 
   notes.push('[check] validating JSON index files');
 
-  for (const idx of REQUIRED_INDEXES) {
+  for (const idx of requiredIndexes(repoRoot)) {
     const abs = path.join(repoRoot, idx);
     if (!existsSync(abs)) {
       fail(`[missing] required index: ${idx}`);

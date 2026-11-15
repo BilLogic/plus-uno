@@ -98,3 +98,10 @@ Start the page from a template (`Frame` with the PLUS `Sidebar`; `import { Frame
 Hand-kept rows with `before` (`_placements.json`) check direct JSX siblings: a `Banner` before a `PageHeader` belongs in Page's `banner` slot, below its `header` (Notifications). This row remains **warn**.
 
 Use the component the pattern names and read the pattern guide the fix points to.
+
+## ds/no-raw-control
+
+**fail.** A raw `<button>`, `<input>`, `<select>` or `<textarea>`, or a click handler (`onClick`) on a raw `<div>`, outside a Base UI part (`@base-ui/react` or a `render` prop).
+
+Use the PLUS component the fix names (`Button`, `IconButton`, `CloseButton`, `TextField`, `SearchField`, `Checkbox`, `Radio`, `Toggle`, `Range`, `Select`, `PopupSelect`, `FilterButton`, `FilterMenu`, `TextArea`, `PatternCard`), or build new interactive behavior on `@base-ui/react`.
+

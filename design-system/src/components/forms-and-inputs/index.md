@@ -5,6 +5,161 @@
 39 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
+## Which component to reach for
+
+- **[Button](Button/index.md)** — Use `Button` for an action on the current page: submit a form, mark attendance, close a dialog.
+  - For navigation to another page or site in the look of a button, use `LinkButton`.
+  - For an action shown as an icon with no visible label, use `IconButton`.
+  - For a primary action joined to a menu of related variations, use `SplitButton`.
+  - For a menu of actions behind one trigger, use `DropdownMenu`.
+- **[ButtonGroup](ButtonGroup/index.md)** — Use `ButtonGroup` for a short row of related actions or view toggles that read as one unit.
+  - For a single standalone action, use `Button`.
+  - For one primary action joined to a menu of variations, use `SplitButton`.
+  - For mutually exclusive form answers, use `RadioGroup`.
+  - For two to four large icon-over-label choices, use `VerticalButton`.
+- **[Calendar](Calendar/index.md)** — Use `Calendar` directly only when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
+  - For a date or date range field that opens this grid in a popup, use `DatePicker`.
+  - For a combined date and time answer, use `DateTimePicker`.
+- **[Cascader](Cascader/index.md)** — Use `Cascader` when a single path through a hierarchy is chosen one level at a time in sequence, such as district, then school, then grade.
+  - For a hierarchy where someone may pick or view several nodes across branches at once, use `TreeSelect`.
+  - For a flat list of options with no hierarchy, use `Select`.
+- **[Checkbox](Checkbox/index.md)** — Use `Checkbox` when a person needs to select one or more options from a list of related items, or when a setting needs an explicit confirmation before it applies. Checkboxes let a person choose many options, or none, from a short list they can see whole, and a parent checkbox shows the mixed (`isIndeterminate`) state while some of its children are selected.
+  - For a question offering a list of checkboxes under a shared legend and error, use `CheckboxGroup`.
+  - For a setting that takes effect immediately without submitting a form, use `Toggle`.
+  - For mutually exclusive answers where only one may be chosen, use `RadioGroup` or `Radio`.
+  - For a long list of multi-select options, use `Select` with `isMulti`.
+  - For a rows-by-columns matrix of checkboxes, use `ChoiceGrid`.
+- **[CheckboxGroup](CheckboxGroup/index.md)** — Use `CheckboxGroup` for one question where a person may pick several answers — or none — from a short list visible all at once. It mirrors `RadioGroup` on `Fieldset`, owning the `legend`, the array `value`, and a single group `error` so each option stays a plain `Checkbox`.
+  - For a single standalone confirmation or a select-all tree, use `Checkbox`.
+  - For mutually exclusive answers where only one may be chosen, use `RadioGroup`.
+  - For a long list of multi-select options, use `Select` with `isMulti`.
+- **[ChoiceGrid](ChoiceGrid/index.md)** — Use `ChoiceGrid` when the same question is asked of several items at once, as a matrix with the answer scale in the column headers and one subject per row.
+  - For a single question with mutually exclusive answers, use `RadioGroup`.
+  - For a single question with multi-select answers, use `CheckboxGroup`.
+  - For displaying rows and columns of read-only data, use `Table`.
+- **[CloseButton](CloseButton/index.md)** — Use `CloseButton` wherever a surface closes as a whole, such as the corner of a `Modal`, the end of a `SectionMessage`, a `Flag` or a `Panel`.
+  - For removing one item from a set or using a different glyph, use `IconButton`.
+  - For a labeled Cancel action in a footer, use `Button`.
+- **[Comment](Comment/index.md)** — Use `Comment` for one entry in a threaded discussion, such as a note on a session or a reply in a review thread.
+  - For a plain multi-line input with no author or thread context, use `TextArea`.
+  - For formatted notes with lists or links, use `RichTextEditor`.
+- **[DatePicker](DatePicker/index.md)** — Use `DatePicker` for a single date or a date range typed or chosen from a popup calendar, such as a session date or a billing period.
+  - For a time of day with no date, use `TimePicker`.
+  - For a combined date and time answer, use `DateTimePicker`.
+  - For an always-visible month grid on the page, use `Calendar`.
+- **[DateTimePicker](DateTimePicker/index.md)** — Use `DateTimePicker` when a date and a time are one combined answer, such as a session's start or a deadline.
+  - For a date or date range with no time, use `DatePicker`.
+  - For a time of day with no date, use `TimePicker`.
+- **[DropdownMenu](DropdownMenu/index.md)** — Use `DropdownMenu` for a trigger that opens a menu of actions or navigation links (`Section`, `ButtonItem`, `LinkItem`, `CustomItem`).
+  - For picking a value in a form field, use `Select`.
+  - For picking a single view or filter value from a button, use `PopupSelect`.
+  - For one primary action joined to a chevron menu of related actions, use `SplitButton`.
+- **[Fieldset](Fieldset.md)** — Use `Fieldset` when a set of mixed controls shares one legend and one validation message, such as related text fields asked together.
+  - For a group of radio buttons under one question, use `RadioGroup`.
+  - For a group of checkboxes under one question, use `CheckboxGroup`.
+  - For a single field with its own label and caption, use `TextField` or `Select`.
+- **[FileItem](FileItem/index.md)** — Use `FileItem` inside `FileUpload`'s `children` slot to represent every chosen file or folder, or standalone to display attachments on session notes, comments, and messages. Every row stays locked to `--file-item-height` (`56px`) across `queued`, `uploading`, `done`, and `error` so a list never shifts height as uploads progress.
+  - For choosing or dropping files from a device, use `FileUpload`.
+  - For overall progress across a checklist or page section rather than a row's lead slot, use `ProgressBar`.
+  - For a compact inline token representing a person or category rather than an attachment, use `Tag`.
+- **[FileUpload](FileUpload/index.md)** — Use `FileUpload` where a form needs documents, recordings, or archives from the user. It wraps a native `input type="file"` inside a bordered drop zone, optionally adds a directory picker via `allowFolders`, and renders chosen `FileItem` rows through `children` without taking a `files` prop.
+  - For a standalone attachment row without a picker, use `FileItem`.
+  - For text the user types rather than a file they hold, use `TextField` or `TextArea`.
+  - For a message composer that mixes typed text with inline attachments, use `PromptInput`.
+- **[FilterButton](FilterButton/index.md)** — Use `FilterButton` for a control in a view bar that opens a filter's options or toggles a filter on and off.
+  - For a single-list filter menu that applies on pick, use `PopupSelect`.
+  - For several filter categories staged and applied together from one trigger, use `FilterMenu`.
+  - For showing a chosen filter value that can be removed directly, use `Tag`.
+  - For a general action that is not a filter, use `Button`.
+- **[FilterMenu](FilterMenu/index.md)** — Use `FilterMenu` when a section's content takes two or more filter categories staged and applied together from one Filter icon trigger.
+  - For one category in a menu that applies as you pick, use `PopupSelect`.
+  - For one to three quick filter triggers in a bar, use `FilterButton`.
+- **[IconButton](IconButton/index.md)** — Use `IconButton` when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header.
+  - For an action where space allows a text label, use `Button`.
+  - For an icon that navigates to another page or site, use `LinkIconButton`.
+  - For dismissing a surface as a whole, use `CloseButton`.
+- **[InlineEditableTextfield](InlineEditableTextfield/index.md)** — InlineEditableTextfield — `InlineEdit` with a Text field for its edit view. It reads as the text, or the placeholder when there is none, and opens as the standard text field at the same size. Validation shows under the field through the field's own caption, and a failed `onConfirm` shows there too. With `value` the parent holds the text; without it, the field keeps what was last confirmed.
+- **[LinkButton](LinkButton/index.md)** — Use `LinkButton` to open another page, site or section when the link needs the visual weight of a button.
+  - For an action on the current page, use `Button`.
+  - For navigation shown as an icon alone, use `LinkIconButton`.
+  - For a link inside a sentence or paragraph, use `Link`.
+- **[LinkIconButton](LinkIconButton/index.md)** — Use `LinkIconButton` when an icon alone opens another page or site and space is limited, such as a Help Center link in a toolbar.
+  - For an icon that performs an action on the current page, use `IconButton`.
+  - For a button-styled link with a visible text label, use `LinkButton`.
+  - For an inline text link, use `Link`.
+- **[PopupSelect](PopupSelect/index.md)** — Use `PopupSelect` when one pick from one list immediately changes what the page shows, with no field and no Apply button:
+  - For a value that belongs to a form field, use `Select`.
+  - For several filter categories staged and applied together, use `FilterMenu`.
+  - For a menu of actions rather than values, use `DropdownMenu`.
+- **[PromptInput](PromptInput/index.md)** — Use `PromptInput` for AI chat or a feature that drafts from a free-text request. For a plain multiline field without send-on-Enter or loading behavior, use `TextArea`.
+- **[Radio](Radio/index.md)** — Use `Radio` directly only when options need custom layout, such as radio cells inside a table.
+  - For a standard radio question with a shared legend and error, use `RadioGroup`.
+  - For a question where several options may be chosen, use `CheckboxGroup` or `Checkbox`.
+  - For a list of six or more options, use `Select`.
+  - For a setting that turns on or off immediately, use `Toggle`.
+- **[RadioGroup](RadioGroup/index.md)** — Use `RadioGroup` for one question with mutually exclusive answers visible all at once: a handful of options someone picks by scanning, not searching. The group owns the `legend`, the `value` and a single group `error` on `Fieldset`.
+  - For a question where several answers may be chosen, use `CheckboxGroup`.
+  - For a list of six or more options, use `Select`.
+  - For asking the same radio question across multiple rows, use `ChoiceGrid`.
+  - For a single radio placed in a custom layout such as a table, use `Radio`.
+- **[Range](Range/index.md)** — Use `Range` when an approximate value between a minimum and maximum is enough, such as a zoom level or volume. Avoid it for exact numbers, non-numeric choices, or spans under four steps or over a hundred steps.
+  - For an exact numeric value, use `TextField` with `type="number"`.
+  - For a five-point satisfaction score, use `Rating`.
+  - For a choice among a few discrete options, use `RadioGroup` or `Select`.
+- **[Rating](Rating/index.md)** — Use `Rating` for a five-point satisfaction score given in one gesture, such as end-of-session feedback. Five items is the whole scale; there is no other length. `variant` is `comments` (one caption below the row) or `numeric` (1 to 5 above each item); `icon` is `star` or `thumbs-up`.
+  - For a continuous or wider numeric span, use `Range`.
+  - For a labeled Likert scale or mutually exclusive options, use `RadioGroup`.
+  - For the written feedback that accompanies a score, use `TextArea`.
+- **[RichTextEditor](RichTextEditor/index.md)** — Use `RichTextEditor` when formatting such as emphasis, lists or links is part of the content's meaning. `toolbarPreset` is `compact` or `full` (or pass `toolbarButtons` by name, which implies the full toolbar); `value` and `onChange` are HTML strings. Giving it a `name` also renders a hidden input, so the HTML posts with a plain form.
+  - For plain multi-line text with no formatting toolbar, use `TextArea`.
+  - For single-line text, use `TextField`.
+  - For a threaded discussion entry with an author and timestamp, use `Comment`.
+- **[SearchField](SearchField/index.md)** — Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field (except in `focused` mode): the count sits in that header, and the no-matches message in its body.
+  - For picking a value from a known option list, use `Select`.
+  - For narrowing a list by a category in a view bar, use `FilterButton`, `PopupSelect` or `FilterMenu`.
+  - For general single-line text entry in a form, use `TextField`.
+- **[Select](Select/index.md)** — Use `Select` for a form field with six or more options, where typing to filter helps more than scanning, such as a tutor roster or a school name.
+  - For up to five mutually exclusive options, use `RadioGroup`.
+  - For up to five multi-select options, use `CheckboxGroup`.
+  - For hierarchical options, use `Cascader` or `TreeSelect`.
+  - For free-form tags a person can create and manage in place, use `TagInput`.
+  - For switching a view or setting one filter from a button, use `PopupSelect`.
+  - For a menu of actions, use `DropdownMenu`.
+- **[SettingRow](SettingRow/index.md)** — Use `SettingRow` on settings and preference pages where each row adjusts one independent setting or external connection that takes effect immediately. Stack related rows directly under a section heading: adjacent `SettingRow` elements divide with a `1px` border at `--setting-row-pad-y` (`12px`) vertical padding, with no card per row.
+  - For fields edited and submitted together with a Save button, use stacked form fields inside `Fieldset` (see Forms).
+  - For an option inside a submitted form, use `Checkbox` rather than `Toggle` or `SettingRow`.
+  - For one value on a record page read far more often than edited, use `InlineEdit`.
+- **[SplitButton](SplitButton/index.md)** — Use `SplitButton` when one action is clearly primary and a few related variations belong in an attached menu, such as "Send" with "Send and close" or "Save as draft".
+  - For a connected row of actions with no single primary, use `ButtonGroup`.
+  - For a single trigger that opens a menu of actions without a separate primary button, use `DropdownMenu`.
+  - For a single action with no menu, use `Button`.
+- **[TagInput](TagInput/index.md)** — Use `TagInput` when a field's value is a set of short labels the person picks from a list and may create, rename, recolor or reorder in place, such as the topics a session covered. The field holds the picked values as `Tag`s in a `TagGroup`, with a text entry after them, and focusing it opens the option list under it.
+  - For one value from a list, use `Select`.
+  - For several values from a fixed list nobody adds to, use `Select` with `isMulti`.
+  - For up to five multi-select options visible all at once, use `CheckboxGroup`.
+- **[TextArea](TextArea/index.md)** — Use `TextArea` for free-form plain text over several lines, such as session notes, feedback or a reason.
+  - For a single-line answer, use `TextField`.
+  - For multi-line text that requires formatting such as lists or links, use `RichTextEditor`.
+- **[TextField](TextField/index.md)** — Use `TextField` for single-line text entry: names, emails, search boxes and numbers. It owns its label, its validation state and its message, which makes it the right home for an error rather than a `SectionMessage` at the top of the form. Use `type="number"` only for stepped quantities; IDs, phone numbers and ZIP codes use `type="text"` with `inputMode`.
+  - For multi-line text, use `TextArea`.
+  - For finding a record in a list by typing, use `SearchField`.
+  - For picking a value from a list of options, use `Select`.
+  - For dates or times, use `DatePicker`, `TimePicker` or `DateTimePicker`.
+- **[TimePicker](TimePicker/index.md)** — Use `TimePicker` to enter or choose a time of day, such as a reminder time or a recurring slot's start.
+  - For a date or date range with no time, use `DatePicker`.
+  - For a combined date and time answer, use `DateTimePicker`.
+- **[Toggle](Toggle/index.md)** — Use `Toggle` to let a person turn a single setting on or off with immediate effect, such as making a resource public.
+  - For an option in a form that waits for a Save or Submit button to apply, use `Checkbox`.
+  - For choosing one option from a short set of labeled choices, use `RadioGroup`.
+  - For choosing one option from a list of six or more, use `Select`.
+- **[TreeSelect](TreeSelect/index.md)** — Use `TreeSelect` when options nest in a hierarchy and someone needs to expand branches in place or pick nodes across multiple branches, such as curriculum units and lessons.
+  - For a single hierarchical path chosen one column per level in sequence, use `Cascader`.
+  - For a flat list of options with no hierarchy, use `Select`.
+- **[VerticalButton](VerticalButton/index.md)** — Use `VerticalButton` for a small set of large, equally weighted actions picked at a glance, such as a role or mode at the start of a flow. Its fixed 64 by 64 size suits two to four options.
+  - For actions in a standard horizontal row, use `Button` or `ButtonGroup`.
+  - For an icon-only action with no visible label, use `IconButton`.
+  - For a form question with pictured 224px choice tiles, use `RadioGroup` or `CheckboxGroup`.
+
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Button](Button/index.md) | 21 | ✅ | ✅ | ✅ |
