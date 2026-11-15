@@ -117,6 +117,7 @@
     "check:docs-landing": "node scripts/check-docs-landing.mjs",
     "check:storybook-categories": "node scripts/check-storybook-categories.mjs",
     "check:intake-fsm": "node .cursor/hooks/uno-prototype/test-fsm.mjs",
+    "check:build-load": "node scripts/check-build-load.mjs",
     "check:text-contrast": "node scripts/check-text-contrast.mjs",
     "check:harness": "node scripts/check-harness.mjs",
     "check:component-docs": "node scripts/generate-component-docs.mjs --check",

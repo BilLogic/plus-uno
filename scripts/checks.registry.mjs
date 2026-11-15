@@ -643,6 +643,14 @@ export const CHECKS = [
     guards: 'the intake FSM that gates every uno-prototype run.',
   },
   {
+    name: 'check:build-load',
+    script: 'node scripts/check-build-load.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-build-load.mjs',
+    guards: 'the total bytes of the always-loaded and mandatory docs on the coded-build path, ratcheted so the ceiling can only fall.',
+  },
+  {
     name: 'test:scripts',
     script: 'node --test .cursor/hooks/ds-usage/*.test.mjs scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs netlify/functions/docs-agent/*.test.mjs netlify/functions/ds-mcp/*.test.mjs',
     pkg: 'root',

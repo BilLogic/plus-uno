@@ -710,3 +710,80 @@ test('rejudge: writes reach, screenshot and per-item fit as new rows marked reju
   }
 });
 
+test('summarize reports tokens and turns per clean build next to escapes, reach and fit', () => {
+  const s = summarize([
+    {
+      arm: 'lookup',
+      model: 'gemini-3.8-flash',
+      task: 'session-review-queue',
+      escapes: 0,
+      by_rule: {},
+      warnings: 0,
+      warn_by_rule: {},
+      turns: 12,
+      total_input_tokens: 100000,
+      agent_error: false,
+      judge: { rendered: true },
+      reach: {
+        expected: ['a.md', 'b.md', 'c.md', 'd.md'],
+        reached: ['a.md', 'b.md'],
+        before_first_write: ['a.md'],
+        hit: true,
+        all_before_write: false,
+      },
+      fit: {
+        i1: { verdict: 'followed', reason: 'ok' },
+        i2: { verdict: 'partly', reason: 'half' },
+        i3: { verdict: 'ignored', reason: 'miss' },
+        i4: { verdict: 'n/a', reason: 'skip' },
+      },
+    },
+    {
+      arm: 'lookup',
+      model: 'gemini-3.8-flash',
+      task: 'debt-extend',
+      escapes: 2,
+      by_rule: { 'ds/no-raw-literal': 2 },
+      warnings: 0,
+      warn_by_rule: {},
+      turns: 28,
+      total_input_tokens: 300000,
+      agent_error: false,
+      judge: { rendered: true },
+    },
+    {
+      arm: 'lookup',
+      model: 'gemini-3.8-flash',
+      task: 'page-from-prd',
+      escapes: 0,
+      by_rule: {},
+      warnings: 0,
+      warn_by_rule: {},
+      turns: 16,
+      total_input_tokens: 140000,
+      agent_error: false,
+      judge: { rendered: true },
+    },
+  ]).lookup['gemini-3.8-flash'];
+
+  assert.equal(s.escapes_per_run, 0.67);
+  assert.deepEqual(s.reach, {
+    runs: 1,
+    hit_rate: '1/1',
+    reached: '2/4',
+    before_first_write: '1/4',
+  });
+  assert.deepEqual(s.fit, {
+    runs: 1,
+    score: 0.5,
+    followed: 1,
+    partly: 1,
+    ignored: 1,
+    applicable: 3,
+  });
+  assert.equal(s.clean_runs, 2);
+  assert.equal(s.tokens_per_clean_build, 120000);
+  assert.equal(s.turns_per_clean_build, 14);
+});
+
+

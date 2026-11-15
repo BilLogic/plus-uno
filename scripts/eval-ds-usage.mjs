@@ -957,6 +957,9 @@ export function summarize(rows) {
       errors: 0,
       completed: 0,
       escapes: 0,
+      reach: { runs: 0, hits: 0, expected: 0, reached: 0, beforeWrite: 0 },
+      fit: { runs: 0, followed: 0, partly: 0, ignored: 0, applicable: 0 },
+      clean: { runs: 0, inputRuns: 0, tokens: 0, turns: 0 },
       byRule: {},
       warnings: 0,
       warnByRule: {},
@@ -980,6 +983,23 @@ export function summarize(rows) {
     add(a.byRule, row.by_rule);
     a.warnings += row.warnings ?? 0;
     add(a.warnByRule, row.warn_by_rule);
+    if (row.reach && Array.isArray(row.reach.expected)) {
+      a.reach.runs += 1;
+      if (row.reach.hit) a.reach.hits += 1;
+      a.reach.expected += row.reach.expected.length;
+      a.reach.reached += (row.reach.reached ?? []).length;
+      a.reach.beforeWrite += (row.reach.before_first_write ?? []).length;
+    }
+    if (row.fit && typeof row.fit === 'object') {
+      const items = row.fit.items && typeof row.fit.items === 'object' ? Object.values(row.fit.items) : Object.values(row.fit);
+      a.fit.runs += 1;
+      for (const item of items) {
+        if (item?.verdict === 'followed') a.fit.followed += 1;
+        else if (item?.verdict === 'partly') a.fit.partly += 1;
+        else if (item?.verdict === 'ignored') a.fit.ignored += 1;
+      }
+      a.fit.applicable = a.fit.followed + a.fit.partly + a.fit.ignored;
+    }
     if (['trap-missing-component', 'workflow-canvas'].includes(row.task)) {
       a.trap.runs += 1;
       if (row.judge.rendered === true) a.trap.rendered += 1;
@@ -1008,6 +1028,14 @@ export function summarize(rows) {
     }
     a.turns += row.turns ?? 0;
     a.wallMs += row.wall_ms ?? 0;
+    if (row.escapes === 0) {
+      a.clean.runs += 1;
+      a.clean.turns += row.turns ?? 0;
+      if (input !== null) {
+        a.clean.inputRuns += 1;
+        a.clean.tokens += input;
+      }
+    }
     if (row.read_set) {
       a.read.runs += 1;
       a.read.files += row.read_set.files.length;
@@ -1024,7 +1052,28 @@ export function summarize(rows) {
   const report = (a) => ({
     runs: a.runs,
     errors: a.errors,
+    clean_runs: a.clean.runs,
     escapes_per_run: per(a.escapes, a.completed),
+    reach: a.reach.runs
+      ? {
+          runs: a.reach.runs,
+          hit_rate: `${a.reach.hits}/${a.reach.runs}`,
+          reached: `${a.reach.reached}/${a.reach.expected}`,
+          before_first_write: `${a.reach.beforeWrite}/${a.reach.expected}`,
+        }
+      : null,
+    fit: a.fit.runs
+      ? {
+          runs: a.fit.runs,
+          score: per(a.fit.followed + 0.5 * a.fit.partly, a.fit.applicable),
+          followed: a.fit.followed,
+          partly: a.fit.partly,
+          ignored: a.fit.ignored,
+          applicable: a.fit.applicable,
+        }
+      : null,
+    tokens_per_clean_build: a.clean.inputRuns ? Math.round(a.clean.tokens / a.clean.inputRuns) : null,
+    turns_per_clean_build: per(a.clean.turns, a.clean.runs),
     by_rule: a.byRule,
     warnings_per_run: per(a.warnings, a.completed),
     warn_by_rule: a.warnByRule,
