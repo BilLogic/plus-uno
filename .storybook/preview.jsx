@@ -266,9 +266,6 @@ const preview = {
               [
                 "Date time picker",
                 "Date picker",
-                [
-                  "Date picker"
-                ],
                 "Time picker"
               ],
               "Dropdown menu",

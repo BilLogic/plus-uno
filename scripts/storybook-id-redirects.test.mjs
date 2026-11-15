@@ -15,18 +15,22 @@ const FAMILIES = {
   'components-forms-and-inputs-radio': 'Components/Forms and inputs/Radio/Radio',
   'components-forms-and-inputs-select': 'Components/Forms and inputs/Select/Select',
   'components-forms-and-inputs-date-time-picker': 'Components/Forms and inputs/Date time picker/Date time picker',
-  'components-forms-and-inputs-date-time-picker-date-picker': 'Components/Forms and inputs/Date time picker/Date picker/Date picker',
   'components-labels-tag': 'Components/Labels/Tag/Tag',
   'components-text-and-data-display-code': 'Components/Text and data display/Code/Code',
   'components-navigation-navigation-system': 'Components/Navigation/Navigation system/Navigation system',
   'ai-ui-components-ai-message': 'AI UI/Components/AI message/AI message',
 };
 
+const FLATTENED = {
+  'components-forms-and-inputs-date-time-picker-date-picker-date-picker':
+    'Components/Forms and inputs/Date time picker/Date picker',
+};
+
 test('the renamed and folded docs ids each redirect to a live page', () => {
   assert.equal(rules.length, 54);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
-    if (r.from in FAMILIES) continue;
+    if (r.from in FAMILIES || r.from in FLATTENED) continue;
     assert.ok(ids.has(r.to), `${r.from} redirects to ${r.to}, which is not a page`);
   }
 });
@@ -77,7 +81,7 @@ test('a component family parent redirects to its Name/Name page, whose story is 
     .filter((f) => f.endsWith('.stories.jsx'))
     .map((f) => fs.readFileSync(root + f, 'utf8'))
     .join('\n');
-  for (const [from, title] of Object.entries(FAMILIES)) {
+  for (const [from, title] of Object.entries({ ...FAMILIES, ...FLATTENED })) {
     const rule = rules.find((r) => r.from === from);
     assert.equal(rule?.to + '--docs', storybookId(title, 'Docs'), `${from} target`);
     assert.ok(sources.includes(`title: '${title}',`), `no story is titled ${title}`);
