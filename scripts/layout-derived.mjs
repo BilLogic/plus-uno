@@ -42,7 +42,7 @@ const MIN_CONTENT = 720;
 const COLUMNS = 12;
 const GUTTER = 16;
 const MODAL_PAD = 16;
-const MODAL_SPANS = { sm: 6, md: 8, lg: 10 };
+const MODAL_SPANS = { xs: 4, sm: 6, md: 8, lg: 10 };
 
 const clamp = (n) => Math.min(MAX_CONTENT, Math.max(MIN_CONTENT, n));
 const column = (content) => (content - (COLUMNS - 1) * GUTTER) / COLUMNS;
@@ -52,8 +52,8 @@ const span = (n, col) => n * col + (n - 1) * GUTTER;
  * @param {number} width the screen width a mode stands for
  * @returns {{ 'width-screen': number, 'pad-x-screen': number,
  *   'width-content': number, 'width-column': number,
- *   'width-column-screen': number, 'width-modal-sm': number,
- *   'width-modal-md': number, 'width-modal-lg': number }}
+ *   'width-column-screen': number, 'width-modal-xs': number,
+ *   'width-modal-sm': number, 'width-modal-md': number, 'width-modal-lg': number }}
  */
 export function deriveLayout(width) {
   const docked = width >= DOCK_FROM;
@@ -67,6 +67,7 @@ export function deriveLayout(width) {
     'width-content': content,
     'width-column': column(content),
     'width-column-screen': screenColumn,
+    'width-modal-xs': modal(MODAL_SPANS.xs),
     'width-modal-sm': modal(MODAL_SPANS.sm),
     'width-modal-md': modal(MODAL_SPANS.md),
     'width-modal-lg': modal(MODAL_SPANS.lg),

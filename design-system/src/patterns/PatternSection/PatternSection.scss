@@ -77,6 +77,19 @@
     font: var(--heading-sm);
 }
 
+/* Inside a Modal (whose h1 is already Heading/medium 20), a section steps down to Heading/small 16 and its header-to-body gap to Section/stack-sm 8. */
+:is(.plus-modal, .plus-pattern-modal) .plus-pattern-section-title--section {
+    font: var(--heading-sm);
+}
+
+:is(.plus-modal, .plus-pattern-modal) .plus-pattern-section-title--subsection {
+    font: var(--heading-xs);
+}
+
+:is(.plus-modal, .plus-pattern-modal) .plus-pattern-section-gap-md {
+    gap: var(--section-stack-sm);
+}
+
 .plus-pattern-section-description {
     margin: 0;
     font: var(--body-default);
@@ -112,6 +125,11 @@
 /* Body */
 .plus-pattern-section-content {
     min-width: 0;
+    font: var(--body-default);
+
+    > p:last-child {
+        margin-bottom: 0;
+    }
 }
 
 /* Subsections: nested sections, Section/stack-lg apart. */

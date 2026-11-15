@@ -36,6 +36,10 @@
     max-height: var(--blanket-max-height-modal);
 }
 
+.plus-modal-width-4-col {
+    --plus-overlay-span: 4;
+}
+
 .plus-modal-width-8-col {
     --plus-overlay-span: 8;
 }

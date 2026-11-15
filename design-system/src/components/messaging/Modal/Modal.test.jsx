@@ -13,7 +13,7 @@ describe('Modal width by column count', () => {
         expect(panel()).toHaveClass('plus-modal-width-6-col');
     });
 
-    it.each(['8-col', '10-col'])('draws %s from the screen grid', (width) => {
+    it.each(['4-col', '8-col', '10-col'])('draws %s from the screen grid', (width) => {
         render(<Modal show renderAs="inline" title="T" width={width} data-testid="modal" />);
         expect(panel()).toHaveClass(`plus-modal-width-${width}`);
         expect(panel().style.width).toBe('');

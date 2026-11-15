@@ -75,13 +75,13 @@ export default {
 
 /** Figma's Modal/width-modal-* per mode, and what 1280 and wider hold. */
 const WIDTHS = {
-    768: { '6-col': 384, '8-col': 507, '10-col': 629 },
-    1024: { '6-col': 512, '8-col': 677, '10-col': 843 },
-    1280: { '6-col': 640, '8-col': 848, '10-col': 1056 },
+    768: { '4-col': 261, '6-col': 384, '8-col': 507, '10-col': 629 },
+    1024: { '4-col': 347, '6-col': 512, '8-col': 677, '10-col': 843 },
+    1280: { '4-col': 432, '6-col': 640, '8-col': 848, '10-col': 1056 },
     // Content caps at 1232, so the modal grid stops growing at 1280.
-    1600: { '6-col': 640, '8-col': 848, '10-col': 1056 },
+    1600: { '4-col': 432, '6-col': 640, '8-col': 848, '10-col': 1056 },
     // Under 768 it never shrinks: content never goes under 720.
-    600: { '6-col': 384, '8-col': 507, '10-col': 629 },
+    600: { '4-col': 261, '6-col': 384, '8-col': 507, '10-col': 629 },
 };
 
 function ScreenFrame({ screen, sidebar, children }) {
@@ -100,7 +100,7 @@ export const WidthPerScreen = () => (
     <div style={stack}>
         {Object.keys(WIDTHS).flatMap((screen) => [false, true].map((sidebar) => (
             <ScreenFrame key={`${screen}-${sidebar}`} screen={screen} sidebar={sidebar}>
-                {['6-col', '8-col', '10-col'].map((size) => (
+                {['4-col', '6-col', '8-col', '10-col'].map((size) => (
                     <Modal
                         key={size}
                         renderAs="inline"

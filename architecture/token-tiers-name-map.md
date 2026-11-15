@@ -159,6 +159,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Modal | `--modal-inline-md` (declared elsewhere) |  |
 | Modal | `--modal-inline-lg` (declared elsewhere) |  |
 | Modal | `--modal-radius` |  |
+| Modal | `--modal-width-xs` | 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 |
 | Modal | `--modal-width-sm` | lifted out of spacing / layout, beside the pattern’s pad/stack tokens |
 | Modal | `--modal-width-md` |  |
 | Modal | `--modal-width-lg` |  |

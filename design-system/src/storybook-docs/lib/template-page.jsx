@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Story } from '@storybook/addon-docs/blocks';
 
 import { Tag } from '@/components';
+import { MotionPreferenceContext } from '@/lib/motionPreference.jsx';
 import { useFitScale } from './use-fit-scale.js';
 import { ANATOMY_REGIONS, isOwnRegion } from './anatomy-regions.js';
 import { HeroCard } from '../docs-landing/HeroCard.jsx';
@@ -45,7 +46,7 @@ export const ScaledStory = ({ width, children }) => {
     }, []);
     return (
         // `docs-story` puts the picture's headings on Tocbot's ignore list, so "On this page" lists the page's own.
-        <div ref={ref} className="docs-story not-prose sb-unstyled" inert aria-hidden="true" style={{ width: '100%', height: height * scale, flexShrink: 0, overflow: 'hidden' }}>
+        <div ref={ref} data-scaled-story className="docs-story not-prose sb-unstyled" inert aria-hidden="true" style={{ width: '100%', height: height * scale, flexShrink: 0, overflow: 'hidden' }}>
             <div ref={inner} style={{ width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
                 {children}
             </div>
@@ -210,7 +211,9 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
         if (!root) return undefined;
         const read = () => {
             const origin = root.getBoundingClientRect();
-            setBoxWidth(origin.width);
+            const zoom = root.offsetWidth > 0 && origin.width > 0 ? origin.width / root.offsetWidth : 1;
+            const localWidth = origin.width / zoom;
+            setBoxWidth(localWidth);
             const regions = [...root.querySelectorAll(ANATOMY_REGIONS)];
             const els = parts.map((part) => root.querySelector(part.selector));
             const placed = parts.map((part, i) => {
@@ -221,21 +224,47 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                 const others = [...regions, ...parts.flatMap((other, j) => (j === i || other.holds || !els[j] ? [] : [els[j]]))];
                 const blockers = others.filter((o) => !isOwnRegion(o, el)).map((o) => {
                     const g = o.getBoundingClientRect();
-                    return { top: g.top - origin.top, bottom: g.bottom - origin.top, left: g.left - origin.left, right: g.right - origin.left };
+                    return {
+                        top: (g.top - origin.top) / zoom,
+                        bottom: (g.bottom - origin.top) / zoom,
+                        left: (g.left - origin.left) / zoom,
+                        right: (g.right - origin.left) / zoom,
+                    };
                 });
-                return { part, rect: { top: r.top - origin.top, left: r.left - origin.left, width: r.width, height: r.height }, blockers };
+                return {
+                    part,
+                    rect: {
+                        top: (r.top - origin.top) / zoom,
+                        left: (r.left - origin.left) / zoom,
+                        width: r.width / zoom,
+                        height: r.height / zoom,
+                    },
+                    blockers,
+                };
             });
-            setMarks(placeMarkers(placed, origin.width));
+            setMarks(placeMarkers(placed, localWidth));
         };
         read();
-        if (typeof ResizeObserver === 'undefined') return undefined;
+        root.addEventListener('animationend', read);
+        root.addEventListener('transitionend', read);
+        if (typeof ResizeObserver === 'undefined') {
+            return () => {
+                root.removeEventListener('animationend', read);
+                root.removeEventListener('transitionend', read);
+            };
+        }
         const observer = new ResizeObserver(read);
         observer.observe(root);
         root.querySelectorAll('*').forEach((el) => observer.observe(el));
         // A layer that mounts or is placed after the first read (a Popup floating into its stage) moves a part: read again.
         const mutations = typeof MutationObserver === 'undefined' ? null : new MutationObserver(read);
         mutations?.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
-        return () => { observer.disconnect(); mutations?.disconnect(); };
+        return () => {
+            root.removeEventListener('animationend', read);
+            root.removeEventListener('transitionend', read);
+            observer.disconnect();
+            mutations?.disconnect();
+        };
     }, [parts]);
     return (
         <figure
@@ -245,7 +274,9 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
             style={{ margin: 0, position: 'relative', paddingInline: GUTTER, paddingBlockStart: parts.some((p) => p.side === 'top') ? GUTTER : 0 }}
         >
             <div ref={box} style={{ position: 'relative' }}>
-                <ScaledStory width={width}>{children}</ScaledStory>
+                <MotionPreferenceContext.Provider value>
+                    <ScaledStory width={width}>{children}</ScaledStory>
+                </MotionPreferenceContext.Provider>
                 {marks.map((m, i) => m && (
                     <React.Fragment key={parts[i].selector}>
                         <span

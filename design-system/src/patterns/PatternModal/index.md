@@ -2,7 +2,7 @@
 
 # PatternModal
 
-Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors "Pattern/Modal" in the Figma design system file. For a real overlay dialog (blanket, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.
+Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (xs · sm · md · lg: 4 · 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors "Pattern/Modal" in the Figma design system file. For a real overlay dialog (blanket, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.
 
 Also asked as: dialog layout, confirm layout.
 
@@ -14,7 +14,7 @@ Also asked as: dialog layout, confirm layout.
 
 **Source:** `design-system/src/patterns/PatternModal/PatternModal.jsx`
 
-**Stories:** `design-system/src/patterns/PatternModal/PatternModal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthSmall, WidthMedium, WidthLarge, HugLong, HeightFill, TabsStill, Interactive, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, MotionOpenClose, MotionReduced
+**Stories:** `design-system/src/patterns/PatternModal/PatternModal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthXSmall, WidthSmall, WidthMedium, WidthLarge, HugLong, HeightFill, TabsStill, Interactive, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, MotionOpenClose, MotionReduced
 
 **Storybook page:** `design-system/src/patterns/PatternModal/PatternModal.mdx`
 
@@ -61,7 +61,7 @@ A button, a link, an icon. Never on its own.
 
 **Checked:** Review
 
-A short form is 8-col; a table, editor or steps is 10-col. Choose width by task. A confirm takes 6-col today; 4-col is Planned (see Widths).
+A confirm takes 4-col or 6-col; a short form is 8-col; a table, editor or steps is 10-col. Choose width by task.
 
 Do: A confirm at the narrow step: the title, one line and two buttons.
 Don't: The same confirm at a wide step: empty width around one line, picked to make it look a certain way.
@@ -141,8 +141,7 @@ Modal is the component: Blanket, focus trap, Escape and focus return. The templa
 | Slot or prop | Holds |
 | --- | --- |
 | `title` · `onClose` | The h1 and the Close icon button. |
-| `width` | `6-col` · `8-col` · `10-col`. |
-| `width="4-col"` | Planned. The confirm width, 4 columns plus the pad. Today the smallest step is 6-col. |
+| `width` | `4-col` · `6-col` · `8-col` · `10-col`. |
 | `body` | Text, a list, fields or a table. It scrolls past the cap. |
 | `footer` or `primaryButton` · `secondaryButton` | The footer's buttons. Leave them out for Passive. |
 | Full-bleed footer | Planned. Cells that fill the footer edge to edge at `--space-300` with the inner corners squared. Today the page composes it from Button. |
@@ -185,7 +184,7 @@ The Modal's maximum height is the screen less `--space-400` above and below.
 | `loading` | bool | `false` | Swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. Off by default. |
 | `onClose` | func | — | Close handler — renders the close button when provided |
 | `footer` | node | — | Footer slot (typically action buttons) |
-| `width` | oneOf | `'sm'` | `sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the modal pad (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440). Grows with the screen, never shrinks, ignores the sidebar. |
+| `width` | oneOf | `'sm'` | `xs` · `sm` · `md` · `lg`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad (261 · 384 · 507 · 629 at 768, 347 · 512 · 677 · 843 at 1024, 432 · 640 · 848 · 1056 at 1440). Grows with the screen, never shrinks, ignores the sidebar. |
 | `height` | oneOf | `'hug'` | `hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap. |
 | `tabs` | arrayOf (required) | — | A tab group under the title: `{ key, label, content, disabled? }` per tab. The tabs stay put in the header and the body, now the tab panel, shows the selected tab's content in place of `children`. Arrow keys move between tabs, Home and End jump to the ends. |
 | `activeTab` | string or number | — | The selected tab's key, when the caller holds it; move it from `onTabChange`. |
@@ -197,7 +196,7 @@ The Modal's maximum height is the screen less `--space-400` above and below.
 
 ## Variants
 
-**`width`** — `sm` · `md` · `lg`
+**`width`** — `xs` · `sm` · `md` · `lg`
 
 **`height`** — `hug` · `fill`
 

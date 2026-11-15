@@ -137,9 +137,9 @@ export const AnatomyPanel = {
 };
 
 const ANATOMY_MODAL_PARTS = [
-    { selector: '.plus-pattern-modal-header', label: 'Header', at: 'middle' },
+    { selector: '.plus-pattern-modal-header', label: 'Header', at: 'start' },
     { selector: '.plus-pattern-modal-body', label: 'Body', at: 'middle' },
-    { selector: '.plus-pattern-modal-footer', label: 'Footer', at: 'middle' },
+    { selector: '[data-probe="footer"]', label: 'Footer', at: 'end' },
 ];
 
 export const AnatomyModal = {
