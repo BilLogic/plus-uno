@@ -544,6 +544,10 @@ const { patterns, parsed: parsedPatterns } = patternEntries();
 manifestEntries.push(...assetEntries(exports, new Set(manifestEntries.map((e) => e.name))));
 const manifest = buildComponentsManifest({ exports, components: manifestEntries, patterns, parsedPatterns, version });
 written.push([path.join(AGENT_ROOT, 'components.json'), serializeManifest(manifest, 'npm run generate:agent')]);
+const slots = documents('design-system/src', { root: REPO_ROOT, ext: ['.json'] })
+  .filter((file) => file.endsWith('.slots.json'))
+  .flatMap((file) => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, file), 'utf8')).slots);
+written.push([path.join(AGENT_ROOT, '_slots.json'), serializeManifest({ slots }, 'npm run generate:component-docs')]);
 
 /**
  * Each doc is rendered from the manifest built above, in memory, never the

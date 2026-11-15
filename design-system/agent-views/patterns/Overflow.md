@@ -136,3 +136,19 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 
 Do: A button under the list that names how many more it holds, and the list grows in place.
 Don't: A fade over the list, hiding how much is there.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Overflow`.
+
+```jsx
+import { PatternSection } from '@/patterns';
+
+function OverflowExample() {
+    return (
+        <PatternSection title="Fractions, decimals and percentages: weekly review for the seventh grade group">
+            <p>The section title wraps so the full topic stays readable.</p>
+        </PatternSection>
+    );
+}
+```

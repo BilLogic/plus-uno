@@ -81,8 +81,7 @@ export function handle(
   };
   if (!fail.length) return { ran: true, exitCode: 0, stderr: '', log };
   const stderr =
-    `check:ds-usage found ${fail.length} escape(s) from the design system in ${rel}. Fix them before going on ` +
-    `(rules: docs/engineering/ds-usage-rules.md):\n${fail.map(print).join('\n')}\n`;
+    `check:ds-usage found ${fail.length} escape(s) from the design system in ${rel}:\n${fail.map(print).join('\n')}\n`;
   return { ran: true, exitCode: 2, stderr, log };
 }
 

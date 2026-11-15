@@ -161,3 +161,26 @@ Esc empties the text and keeps the field. In focused, the first Esc closes the p
 **Checked:** Review
 
 The view bar holds controls of one height, so the field takes `spacing="compact"` there. A search in a page body takes the default spacing and stays open.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Search`.
+
+```jsx
+import { useState } from 'react';
+import { SearchField } from '@/components';
+import { PatternSection } from '@/patterns';
+
+function SearchExample() {
+    const [query, setQuery] = useState('');
+    return (
+        <PatternSection title="Students" toolbar={
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <SearchField placeholder="Search students" mode="active" value={query} onValueChange={setQuery} />
+            </div>
+        }>
+            <p role="status">{['Ana Ruiz', 'Ben Okafor'].filter((name) => name.toLowerCase().includes(query.toLowerCase())).join(', ')}</p>
+        </PatternSection>
+    );
+}
+```

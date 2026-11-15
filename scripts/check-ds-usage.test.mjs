@@ -13,6 +13,22 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURES = 'scripts/lib/__fixtures__/ds-usage';
 const cli = (...args) => spawnSync(process.execPath, ['scripts/check-ds-usage.mjs', ...args], { cwd: ROOT, encoding: 'utf8' });
 
+test('reference stories, pattern code stories and MDX code blocks are held to zero', () => {
+  for (const file of [
+    'design-system/src/patterns/Page/ReferenceScreens.stories.jsx',
+    'design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx',
+    'design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx',
+  ]) assert.ok(inScope(file), file);
+  const text = `# Example\n\nA sentence mentioning 16px is prose.\n\n\`\`\`jsx\nimport { Select, PatternSection } from '@/patterns';\n\`\`\`\n`;
+  const found = escapesIn({ path: 'design-system/src/Example.mdx', text }, contextOf(REPO_ROOT));
+  assert.ok(found.some((f) => f.rule === 'ds/no-unknown-component' && f.line === 6));
+  assert.equal(found.some((f) => f.rule === 'ds/no-raw-literal'), false);
+  const placement = `# Filtering\n\n\`\`\`jsx\nimport { Select } from '@/components';\nimport { PatternSection } from '@/patterns';\n<PatternSection toolbar={<Select options={['All']} />} />;\n\`\`\``;
+  assert.ok(escapesIn({ path: 'design-system/src/Example.mdx', text: placement }, contextOf(REPO_ROOT)).some((f) => f.rule === 'ds/placement' && f.line === 6));
+  const outerImport = `import { PatternSection } from '@/patterns';\nimport { Select } from '@/components';\n\n\`\`\`jsx\n<PatternSection toolbar={<Select options={['All']} />} />;\n\`\`\``;
+  assert.ok(escapesIn({ path: 'design-system/src/Example.mdx', text: outerImport }, contextOf(REPO_ROOT)).some((f) => f.rule === 'ds/placement' && f.line === 5));
+});
+
 test('a prototype with one escape per fail-level rule exits 1, naming file, line, column, rule and fix', () => {
   const out = cli(`${FIXTURES}/escaping`);
   assert.equal(out.status, 1);
@@ -124,4 +140,57 @@ test('the real facts hold patterns: invented name, wrong prop and wrong value fa
   assert.deepEqual(rules(head + '<PatternCard heading="x" />'), ['ds/no-unknown-prop']);
   assert.deepEqual(rules(head + '<PatternCard padding="xl" />'), ['ds/no-unknown-prop']);
   assert.deepEqual(rules(head + '<Frame width="wide" />'), ['ds/no-unknown-prop']);
+});
+
+test('repeated toolbar mistakes and hand-styled pages fail with actionable fixes', () => {
+  const code = `import { Select } from '@/components';
+import { PatternSection } from '@/patterns';
+export default function App() {
+  return <div className="shell"><PatternSection toolbar={<Select options={[]} />} /></div>;
+}`;
+  const found = escapesIn({ path: 'prototypes/x/src/App.jsx', text: code }, contextOf(REPO_ROOT));
+  for (const rule of ['ds/placement', 'ds/page-starts-from-pattern']) {
+    const finding = found.find((f) => f.rule === rule);
+    assert.equal(finding?.level, 'fail', rule);
+    assert.match(finding.fix, rule === 'ds/placement' ? /FilterButton/ : /Frame/);
+  }
+});
+
+test('MDX examples and reference-screen stories use the same placement checker', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-examples-'));
+  const mdx = 'design-system/src/storybook-docs/Example.mdx';
+  const story = 'design-system/src/storybook-docs/Reference.stories.jsx';
+  try {
+    fs.mkdirSync(path.dirname(path.join(root, mdx)), { recursive: true });
+    fs.writeFileSync(path.join(root, mdx), '# Example\n\n```jsx\n<PatternSection.Toolbar filters={<Select options={[]} />} />\n```\n');
+    fs.writeFileSync(path.join(root, story), `import { Select } from '@/components';
+import { PatternSection } from '@/patterns';
+export default { tags: ['reference-screen'] };
+export const Queue = { render: () => <PatternSection.Toolbar filters={<Select options={[]} />} /> };`);
+    const found = escapes(root, [mdx, story], ROOT).filter((f) => f.rule === 'ds/placement');
+    assert.deepEqual(found.map((f) => [f.file, f.line, f.level]), [[mdx, 4, 'fail'], [story, 4, 'fail']]);
+    assert.ok(inScope(mdx));
+    assert.ok(inScope(story));
+    assert.ok(found.every((f) => /FilterButton/.test(f.fix)));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('promoted placements have repeated misses in the ledger and stay within five rows', () => {
+  const rows = contextOf(ROOT).placements.filter((r) => r.level !== 'warn');
+  assert.ok(rows.length > 0 && rows.length <= 5);
+  const ledger = fs.readFileSync(path.join(ROOT, 'docs/evals/ds-usage-ledger.jsonl'), 'utf8').trim().split('\n').map(JSON.parse);
+  for (const row of rows) {
+    const misses = ledger.filter((r) => r.task === row.evidence.task && r.fit?.[row.evidence.item]?.verdict === 'ignored');
+    assert.ok(misses.length >= 2, row.id);
+  }
+});
+
+test('every reference-screen render starts from a template', () => {
+  const code = `export default { tags: ['reference-screen'] };
+export const Good = { render: () => <Page /> };
+export const Bad = { render: () => <div className="shell" /> };`;
+  const found = escapesIn({ path: 'Reference.stories.jsx', text: code, page: true }, contextOf(ROOT));
+  assert.ok(found.some((f) => f.rule === 'ds/page-starts-from-pattern' && f.level === 'fail' && f.line === 3));
 });

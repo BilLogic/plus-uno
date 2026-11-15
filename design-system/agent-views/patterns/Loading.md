@@ -119,3 +119,15 @@ Don't: A menu full of skeleton rows, promising items it may not have.
 **Checked:** Review
 
 `aria-busy` on the container that is loading, and a visually hidden status beside it whose text is set after mount: "Loading students…", then "Students loaded". Skeletons themselves are hidden from assistive technology.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Loading`.
+
+```jsx
+import { Skeleton } from '@/components';
+
+function LoadingExample() {
+    return <div role="status" aria-label="Loading session notes"><Skeleton preset="paragraph" /></div>;
+}
+```

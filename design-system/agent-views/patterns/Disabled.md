@@ -113,3 +113,20 @@ Tutors see what training unlocks. The Sidebar item shows a lock and a line that 
 **Checked:** Automatic
 
 Disabled fades and leaves the tab order; read-only stays readable at full contrast. The two are never swapped.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Disabled`.
+
+```jsx
+import { Button } from '@/components';
+
+function DisabledExample() {
+    return (
+        <div>
+            <p id="review-reason">Add review notes before saving.</p>
+            <Button text="Save review" isDisabled aria-describedby="review-reason" />
+        </div>
+    );
+}
+```

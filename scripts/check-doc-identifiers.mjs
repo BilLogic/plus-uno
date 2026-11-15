@@ -64,6 +64,8 @@ import { fileURLToPath } from 'node:url';
 
 import { directories, documents } from './lib/corpus.mjs';
 import { byRoot, main, renderFindings } from './lib/findings.mjs';
+import { loadFacts } from './lib/ds-facts.mjs';
+import { contextFrom, escapesIn } from './lib/ds-usage.mjs';
 
 import {
   DOM_EVENTS,
@@ -71,7 +73,9 @@ import {
   PLATFORM_NAMES,
   STANDARD_ATTRIBUTES,
   definedTokens,
+  exampleFences,
   implSymbol,
+  isTokenTierPage,
   jsxClaims,
   parsePropTypes,
   parseSignatureProps,
@@ -240,6 +244,8 @@ const isPassThrough = (attr) =>
 function check(repoRoot = REPO_ROOT) {
   const tokens = collectTokens(repoRoot);
   const components = collectComponents(repoRoot);
+  const facts = loadFacts(repoRoot);
+  const usage = contextFrom({ components: facts.manifests.components, tokens: facts.manifests.tokens });
 
   const allProps = new Set();
   const allEnumValues = new Set();
@@ -284,6 +290,16 @@ function check(repoRoot = REPO_ROOT) {
     findings.push({ file: rel(page.file, repoRoot), line, kind, identifier, message });
 
   for (const page of pages) {
+    const examples = exampleFences(page.text);
+    if (!isTokenTierPage(page.file)) {
+      for (const fence of examples) {
+        if (fence.negative) continue;
+        for (const finding of escapesIn({ path: 'example.jsx', text: fence.code, page: false }, usage)) {
+          if (finding.rule !== 'ds/no-primitive-read') continue;
+          record(page, fence.startLine + finding.line - 1, 'token', '', `${finding.message}; ${finding.fix}`);
+        }
+      }
+    }
     /* ---- tokens: every page, every position ---- */
     for (const claim of tokenClaims(page.text)) {
       if (tokens.has(claim.name)) continue;
@@ -292,7 +308,13 @@ function check(repoRoot = REPO_ROOT) {
 
     /* ---- props and variants in fenced JSX examples ---- */
     for (const el of jsxClaims(page.text)) {
-      if (el.markedIncorrect) continue;
+      const fence = examples.find((f) => el.line >= f.startLine && el.line < f.startLine + f.code.split('\n').length);
+      if (el.markedIncorrect || fence?.negative) continue;
+      const fact = facts.lookup(el.tag);
+      if (fact.status === 'not-here') {
+        record(page, el.line, 'component', el.tag, `is not here; use ${fact.replacement.join(' or ')}. ${fact.why ?? ''}`);
+        continue;
+      }
       const target = components.get(el.tag);
       // A component whose props we could not read accepts every claim about it,
       // which is the shape of a check that cannot fail: the page asserting the
@@ -310,6 +332,11 @@ function check(repoRoot = REPO_ROOT) {
       }
       if (!target) continue;
       for (const attr of el.attrs) {
+        const prop = facts.lookup(`${el.tag}.${attr.name}`);
+        if (prop.deprecated && !/\bdeprecat(?:ed|ion)\b/i.test(fence?.context ?? '')) {
+          record(page, el.line, 'prop', `<${el.tag} ${attr.name}=…>`,
+            `${attr.name} is deprecated; use ${prop.replacement.join(' or ') || `${el.tag}'s current API`}`);
+        }
         if (isPassThrough(attr.name)) continue;
         if (!target.props.has(attr.name)) {
           record(page, el.line, 'prop', `<${el.tag} ${attr.name}=…>`,

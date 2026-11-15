@@ -70,16 +70,14 @@ numeric string from `0` to `100`, `letter` labels the column, and `color` fills
 it. The chart's `height` prop sets its pixel height (default 200).
 
 ```jsx
-import { BRAND } from '@/dataviz/palette';
-
 <SmartBarChart
     height={200}
     data={[
-        { letter: 'M', height: '72', color: BRAND },
-        { letter: 'T', height: '85', color: BRAND },
-        { letter: 'W', height: '64', color: BRAND },
-        { letter: 'T', height: '90', color: BRAND },
-        { letter: 'F', height: '48', color: BRAND },
+        { letter: 'M', height: '72', color: 'var(--ds-chart-brand)' },
+        { letter: 'T', height: '85', color: 'var(--ds-chart-brand)' },
+        { letter: 'W', height: '64', color: 'var(--ds-chart-brand)' },
+        { letter: 'T', height: '90', color: 'var(--ds-chart-brand)' },
+        { letter: 'F', height: '48', color: 'var(--ds-chart-brand)' },
     ]}
 />
 ```

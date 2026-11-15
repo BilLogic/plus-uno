@@ -55,6 +55,47 @@ function fixture(files) {
 
 const PAGE_PATH = 'design-system/src/storybook-docs/patterns/Disabled.mdx';
 
+test('a tagged story supplies executable code and only its used imports to the pattern copy', () => {
+  const story = 'design-system/src/storybook-docs/patterns/Code.stories.jsx';
+  const root = fixture({
+    [PAGE_PATH]: PAGE,
+    [story]: `import { Button, SearchField } from '@/components';
+export default { title: 'Patterns/Code' };
+export const Disabled = {
+  tags: ['pattern:Disabled'],
+  render: function DisabledExample() {
+    return <Button text="Save" disabled />;
+  },
+  play: () => { throw new Error('not snippet code'); },
+};`,
+  });
+  syncDocsAgentFiles(root);
+  const read = () => fs.readFileSync(path.join(root, agentFilePath(PAGE_PATH, 'Patterns')), 'utf8');
+  assert.match(read(), /## In code\n\n.*Code\.stories\.jsx#Disabled/);
+  assert.match(read(), /import \{ Button \} from '@\/components';/);
+  assert.match(read(), /function DisabledExample\(\)/);
+  assert.doesNotMatch(read(), /SearchField|not snippet code/);
+  assert.equal(fs.readFileSync(path.join(root, PAGE_PATH), 'utf8'), PAGE);
+  fs.writeFileSync(path.join(root, story), fs.readFileSync(path.join(root, story), 'utf8').replace('text="Save"', 'text="Send"'));
+  assert.deepEqual(syncDocsAgentFiles(root, { check: true }).stale, [agentFilePath(PAGE_PATH, 'Patterns')]);
+  syncDocsAgentFiles(root);
+  assert.match(read(), /text="Send"/);
+});
+
+test('all thirteen pattern examples reach their generated copies and both reference stories have live story IDs', () => {
+  const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+  for (const name of ['CommonActions', 'Disabled', 'Empty', 'Errors', 'Filtering', 'Forms', 'Indicators', 'Loading', 'Navigation', 'Notifications', 'Overflow', 'ReadOnly', 'Search']) {
+    const text = fs.readFileSync(path.join(root, `design-system/agent-views/patterns/${name}.md`), 'utf8');
+    assert.match(text, new RegExp(`## In code\\n\\nFrom .*CodeExamples\\.stories\\.jsx#${name}`));
+    assert.match(text, /import .* from '@\/(?:components|patterns)'/);
+  }
+  const rows = JSON.parse(fs.readFileSync(path.join(root, 'design-system/agent-views/reference-screens.json'), 'utf8'));
+  assert.deepEqual(rows.map((r) => [r.reference, r.url.split('--').at(-1)]), [
+    ['list', 'list-with-filters'], ['detail', 'detail-with-panel'],
+  ]);
+  assert.deepEqual(syncDocsAgentFiles(root, { check: true }).stale, []);
+});
+
 test('each rule renders as its slug id with its tag; an untagged rule reads as Review', () => {
   const text = renderDocsAgentFile(PAGE, { file: PAGE_PATH, kind: 'Pattern' });
   assert.match(text, /### Give every disabled control a reason in visible text\. \{#give-every-disabled-control-a-reason-in-visible-text\}\n\n\*\*Checked:\*\* Automatic/);

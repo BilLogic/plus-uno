@@ -147,3 +147,15 @@ Don't: Each item carries everything, and the time it is found by is cut off.
 **Checked:** Automatic
 
 "Add student" is the Primary at the end of the Students view bar. Page actions sit at the end of the title row and are only about the page.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Navigation`.
+
+```jsx
+import { Breadcrumb } from '@/components';
+
+function NavigationExample() {
+    return <Breadcrumb items={[{ text: 'Sessions', href: '#sessions' }, { text: 'Session review' }]} />;
+}
+```

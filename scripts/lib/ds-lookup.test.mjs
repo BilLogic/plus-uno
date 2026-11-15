@@ -15,6 +15,20 @@ import { ORIENTATION, PATHS_REFUSAL, PathsRefused, createLookup, render } from '
 
 const lookup = createLookup(REPO_ROOT);
 
+test('brief-shaped list, queue, review and detail queries return reference stories', () => {
+  for (const query of ['review queue with filters', 'a list of students', 'review sessions', 'session detail with a panel']) {
+    const result = lookup.find(query);
+    const reference = result.results.find((r) => r.kind === 'reference');
+    assert.ok(reference, query);
+    assert.equal(reference.name, query.includes('detail') ? 'Detail with panel' : 'List with filters');
+    assert.match(reference.file, /ReferenceScreens\.stories\.jsx$/);
+    assert.match(reference.url, /\/storybook\/\?path=\/story\/templates-page-reference-screens--/);
+    assert.match(render('find', result), /reference.*ReferenceScreens\.stories\.jsx#/);
+    assert.match(render('find', result), /https:\/\/plus-uno.netlify.app\/storybook/);
+  }
+  assert.equal(lookup.find('Button').results.some((r) => r.kind === 'reference'), false);
+});
+
 test('check refuses paths when built with readPaths off, and still checks code', () => {
   const closed = createLookup(REPO_ROOT, { readPaths: false });
   assert.throws(() => closed.check({ paths: ['package.json'] }), (err) => err instanceof PathsRefused && err.message === PATHS_REFUSAL);
