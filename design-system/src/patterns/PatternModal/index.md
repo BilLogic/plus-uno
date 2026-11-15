@@ -2,7 +2,7 @@
 
 # PatternModal
 
-Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Backdrop`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors "Pattern/Modal" in the Figma design system file. For a real overlay dialog (backdrop, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.
+Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors "Pattern/Modal" in the Figma design system file. For a real overlay dialog (blanket, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.
 
 Also asked as: dialog layout, confirm layout.
 
@@ -22,7 +22,7 @@ Also asked as: dialog layout, confirm layout.
 
 ## Usage
 
-Use a Modal when the next step has to happen before anything else can: a confirm, a rare critical task with fewer than five fields, something to read before going on. It is always centered over a Backdrop. A Panel that needs full attention becomes a Modal.
+Use a Modal when the next step has to happen before anything else can: a confirm, a rare critical task with fewer than five fields, something to read before going on. It is always centered over a Blanket. A Panel that needs full attention becomes a Modal.
 
 | Type | Use when | Footer |
 | --- | --- | --- |
@@ -37,7 +37,7 @@ PatternModal reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Scales from 96% and fades in; the Backdrop dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts. |
+| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Scales from 96% and fades in; the Blanket dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts. |
 | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Leaves at 98%, fading; stays mounted until the exit completes. |
 | swap | Swap content in place | `--ds-motion-appearance-fast` | One Modal at a time: a confirm replaces the content in place, never a second Modal. |
 | rejected | Call attention | `--ds-motion-spatial-fast` | A blocked submit shakes it once; never in reduced motion. |
@@ -73,7 +73,7 @@ Don't: The same confirm at a wide step: empty width around one line, picked to m
 Stacking holds the rule. The overlay module keeps a second Modal closed and calls its `onClose`.
 
 Do: One Modal that confirms inside itself, with a message and its own buttons.
-Don't: A Modal opened on another Modal, a second Backdrop dimming the first.
+Don't: A Modal opened on another Modal, a second Blanket dimming the first.
 
 ### Scroll the body between a fixed header and footer. {#scroll-the-body-between-a-fixed-header-and-footer}
 
@@ -98,7 +98,7 @@ Footer buttons, Cancel and Close, and which destructive tier, including type the
 ## Accessibility
 
 - The Modal is a dialog named by its title, which is its h1; a Section inside opens at h2. A Modal with a custom header needs its own name.
-- Focus goes to the first input on open, or to the Primary when there are no fields, and stays trapped until it closes. Escape, Close and the Backdrop close it, and focus returns to what opened it.
+- Focus goes to the first input on open, or to the Primary when there are no fields, and stays trapped until it closes. Escape, Close and the Blanket close it, and focus returns to what opened it.
 - A body that scrolls is a tab stop. With tabs, Left and Right move between tabs and the panel is named by its tab.
 - A blocked submit announces the first error; with reduced motion the color, icon, message and focus move carry it without the shake.
 - Close is named "Close". The Danger button in a type-the-name confirm stays disabled until the name matches, and the caption carries the reason.
@@ -110,7 +110,7 @@ Footer buttons, Cancel and Close, and which destructive tier, including type the
 - Popup: use when the content is a menu or a short list.
 - Patterns: use when you need the rules across Modals: Common actions, Forms, Errors, Loading.
 
-Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Types
 
@@ -125,7 +125,7 @@ Picked by what the person has to do. The component page holds every prop and sta
 
 An Active Modal at 8-col with a short form. Every part once; the pad is 16 on every side, the radius 16, and the parts sit 16 apart.
 
-1. **Backdrop.** Dims the page and holds the Modal centered.
+1. **Blanket.** Dims the page and holds the Modal centered.
 2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 80 tall.
 4. **Footer** (optional). Full-bleed buttons; Cancel (Default) left, Primary right.
@@ -136,7 +136,7 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 16 on ev
 import { Modal, Button } from '@/components';
 ```
 
-Modal is the component: Backdrop, focus trap, Escape and focus return. The template is its filled layout, one per type.
+Modal is the component: Blanket, focus trap, Escape and focus return. The template is its filled layout, one per type.
 
 | Slot or prop | Holds |
 | --- | --- |
@@ -159,8 +159,8 @@ Modal is the component: Backdrop, focus trap, Escape and focus return. The templ
 | `--modal-stack-sm`, `-md`, `-lg` | 8, 16, 24 | Title to tabs; header, body and footer; groups of fields. |
 | `--modal-body-min-height` | 80 | The least the body draws. |
 | `--space-300` | 48 | The full-bleed footer's height: a 32 button plus 16 pad, so full bleed never changes the Modal's height. |
-| `--ds-surface-overlay`, `--ds-shadow-blocking` | pair | The Modal's fill and its elevation, the one surface that lifts above a Backdrop. |
-| `--ds-backdrop` | color | The Backdrop's fill. |
+| `--ds-surface-overlay`, `--ds-shadow-blocking` | pair | The Modal's fill and its elevation, the one surface that lifts above a Blanket. |
+| `--ds-blanket` | color | The Blanket's fill. |
 
 The Modal's maximum height is the screen less `--space-400` above and below.
 
@@ -177,7 +177,7 @@ The Modal's maximum height is the screen less `--space-400` above and below.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `show` | bool | `true` | Keep mounted and set false to finish the exit before removal; also follows its Backdrop. |
+| `show` | bool | `true` | Keep mounted and set false to finish the exit before removal; also follows its Blanket. |
 | `id` | string | — | — |
 | `title` | node | — | Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name |
 | `header` | node | — | Custom header slot, Figma's `_Modal header` type=custom. It replaces the title row (the title and the close button), so name the dialog with `aria-label`. |

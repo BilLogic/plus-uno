@@ -123,7 +123,7 @@ export const BorderRoles = () => (
 );
 
 export const BackgroundRoles = () => (
-    <Swatches kind="background" tokens={['--ds-background-neutral-subtle', '--ds-background-neutral', '--ds-background-neutral-bold', '--ds-background-brand-subtlest', '--ds-background-brand-bold', '--ds-background-selected', '--ds-background-selected-bold', '--ds-background-input', '--ds-background-disabled', '--ds-backdrop']} />
+    <Swatches kind="background" tokens={['--ds-background-neutral-subtle', '--ds-background-neutral', '--ds-background-neutral-bold', '--ds-background-brand-subtlest', '--ds-background-brand-bold', '--ds-background-selected', '--ds-background-selected-bold', '--ds-background-input', '--ds-background-disabled', '--ds-blanket']} />
 );
 
 export const SurfaceRoles = () => (

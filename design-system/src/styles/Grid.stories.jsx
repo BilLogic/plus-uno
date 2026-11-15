@@ -95,10 +95,10 @@ const ModalBox = ({ width }) => (
 export const ModalFromScreenGrid = () => (
     <DoDont>
         <Do caption={<>Modal <C>md</C>: <C>--modal-width-md</C>, 8 screen-grid columns plus 16 a side, centered.</>}>
-            <div style={{ ...ground, background: 'var(--ds-backdrop)' }}><ModalBox width="var(--modal-width-md)" /></div>
+            <div style={{ ...ground, background: 'var(--ds-blanket)' }}><ModalBox width="var(--modal-width-md)" /></div>
         </Do>
         <Dont caption="A fixed pixel width. It ignores the screen grid, so it sits off the page columns and does not grow with the screen.">
-            <div style={{ ...ground, background: 'var(--ds-backdrop)' }}><ModalBox width="var(--width-1900)" /></div>
+            <div style={{ ...ground, background: 'var(--ds-blanket)' }}><ModalBox width="var(--width-1900)" /></div>
         </Dont>
     </DoDont>
 );

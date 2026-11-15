@@ -41,7 +41,7 @@ Panel reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Dock and undock a panel | `--ds-motion-spatial-slow` | Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Backdrop. |
+| enter | Dock and undock a panel | `--ds-motion-spatial-slow` | Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Blanket. |
 | exit | Dock and undock a panel | `--ds-motion-spatial-default` | Floating panels leave on spatial.fast. |
 
 ## Alternatives

@@ -250,11 +250,11 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Table', new: '--table-footer-height', old: null, ref: 'var(--space-300)', use: 'Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line.' },
   { tier: 'patterns', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
 
-  // ─── Patterns / Backdrop (renamed from Overlay) ───────────────────────
-  { tier: 'patterns', group: 'Backdrop', new: '--backdrop-pad-x', old: '--overlay-pad-x', ref: 'var(--space-100)', use: 'Horizontal space between the screen edge and a Modal on its Backdrop.' },
-  { tier: 'patterns', group: 'Backdrop', new: '--backdrop-pad-y', old: '--overlay-pad-y', ref: 'var(--space-400)', at: { '(max-height: 639.98px)': 'var(--space-150)' }, use: 'Vertical space between the screen edge and a Modal on its Backdrop; shrinks on short screens.' },
-  { tier: 'patterns', group: 'Backdrop', new: '--backdrop-fill', old: '--overlay-scrim', type: 'COLOR', ref: 'rgba(0, 0, 0, 0.38)', note: "the Backdrop's own fill color; the old declaration's value, written directly so this file carries no old-language word", use: 'Fill of the Backdrop that dims the page behind a Modal.' },
-  { tier: 'patterns', group: 'Backdrop', new: '--backdrop-max-height-modal', old: '--layout-max-height-modal', ref: 'calc(100dvh - 2 * var(--backdrop-pad-y))', codeOnly: true, note: 'a calc() of the pad above: code only, no Figma variable', use: 'Tallest a Modal may grow inside its Backdrop.' },
+  // ─── Patterns / Blanket (renamed from Overlay) ───────────────────────
+  { tier: 'patterns', group: 'Blanket', new: '--blanket-pad-x', old: '--overlay-pad-x', ref: 'var(--space-100)', use: 'Horizontal space between the screen edge and a Modal on its Blanket.' },
+  { tier: 'patterns', group: 'Blanket', new: '--blanket-pad-y', old: '--overlay-pad-y', ref: 'var(--space-400)', at: { '(max-height: 639.98px)': 'var(--space-150)' }, use: 'Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens.' },
+  { tier: 'patterns', group: 'Blanket', new: '--blanket-fill', old: '--overlay-scrim', type: 'COLOR', ref: 'rgba(0, 0, 0, 0.38)', note: "the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word", use: 'Fill of the Blanket that dims the page behind a Modal.' },
+  { tier: 'patterns', group: 'Blanket', new: '--blanket-max-height-modal', old: '--layout-max-height-modal', ref: 'calc(100dvh - 2 * var(--blanket-pad-y))', codeOnly: true, note: 'a calc() of the pad above: code only, no Figma variable', use: 'Tallest a Modal may grow inside its Blanket.' },
 
   // ─── Patterns / Modal ─────────────────────────────────────────────────
   { tier: 'patterns', group: 'Modal', new: '--modal-pad', old: '--modal-pad', use: 'Padding inside a Modal at the current breakpoint.' },
@@ -425,8 +425,8 @@ export const TOKEN_LADDER = [
   { tier: 'layers', group: 'Layer', new: '--layer-navigation', old: '--layout-z-index-navigation', ref: '200', use: 'Stacking order of the Frame\'s top bar and Sidebar.' },
   { tier: 'layers', group: 'Layer', new: '--layer-dialog', old: '--layout-z-index-dialog', ref: '300', use: 'Stacking order of a non-modal dialog over the page, below popups.' },
   { tier: 'layers', group: 'Layer', new: '--layer-popup', old: '--layout-z-index-popup', ref: '400', use: 'Stacking order of a Popup, DropdownMenu or listbox.' },
-  { tier: 'layers', group: 'Layer', new: '--layer-backdrop', old: '--layout-z-index-scrim', ref: '500', note: "the Backdrop's z-index; the old declaration's value, written directly so this file carries no old-language word", use: 'Stacking order of the Backdrop behind a Modal.' },
-  { tier: 'layers', group: 'Layer', new: '--layer-modal', old: '--layout-z-index-modal', ref: '510', use: 'Stacking order of a Modal, above its Backdrop.' },
+  { tier: 'layers', group: 'Layer', new: '--layer-blanket', old: '--layout-z-index-scrim', ref: '500', note: "the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word", use: 'Stacking order of the Blanket behind a Modal.' },
+  { tier: 'layers', group: 'Layer', new: '--layer-modal', old: '--layout-z-index-modal', ref: '510', use: 'Stacking order of a Modal, above its Blanket.' },
   { tier: 'layers', group: 'Layer', new: '--layer-flag', old: '--layout-z-index-flag', ref: '600', use: 'Stacking order of a Flag, above any Modal.' },
   { tier: 'layers', group: 'Layer', new: '--layer-spotlight', old: '--layout-z-index-spotlight', ref: '700', use: 'Stacking order of a Spotlight, above Flags.' },
   { tier: 'layers', group: 'Layer', new: '--layer-tooltip', old: '--layout-z-index-tooltip', ref: '800', use: 'Stacking order of a Tooltip, above everything else.' },

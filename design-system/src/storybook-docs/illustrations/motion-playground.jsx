@@ -5,7 +5,7 @@ import { useReducedMotion } from 'motion/react';
 import { Button, Range, RadioGroup } from '@/components';
 import { Illustration } from './Illustration.jsx';
 import { HERO_HAIRLINE, PAINT } from './paint.js';
-import { Backdrop, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule } from './primitives.jsx';
+import { Blanket, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule } from './primitives.jsx';
 import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
 import { SPEEDS, SPEED_LABELS, measure, ratioOf, resisted, springFor, stepOf, unresisted } from './motion.jsx';
 import { PHYSICS_DEMOS } from './motion-physics.jsx';
@@ -260,7 +260,7 @@ const shake = {
     <>
       <Frame x={8} y={6} w={144} h={88} />
       <PageHeader x={16} y={24} w={128} />
-      <Backdrop x={8} y={20} w={144} h={74} />
+      <Blanket x={8} y={20} w={144} h={74} />
       <g transform={`translate(${x} 0)`}>
         <Modal x={34} y={32} w={92} h={52} accent />
       </g>

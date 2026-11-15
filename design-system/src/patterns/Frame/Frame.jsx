@@ -68,7 +68,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  * - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on
  *   its Page-facing edge. Floating (a peek, or opened by hand under 1024) it
  *   lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay`
- *   and no Backdrop.
+ *   and no Blanket.
  * - Hovering the left edge peeks a closed Sidebar. An outside press, Escape,
  *   or the pointer leaving closes the peek.
  * - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and
@@ -82,7 +82,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  * - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks
  *   it beside the Page at a hairline when the content keeps 720, collapsing a
  *   default Sidebar first (and restoring it when the Panel closes); otherwise
- *   it floats over the Page on the overlay fill and shadow, with no Backdrop,
+ *   it floats over the Page on the overlay fill and shadow, with no Blanket,
  *   and a press outside or Escape closes it. Under 1024 it is an overlay
  *   capped at 320, and only one overlay is open at a time; under 768 it is
  *   full width. As an overlay the Panel is modal: focus moves into it and
@@ -411,7 +411,7 @@ const Frame = ({
     /**
      * Base UI reports each attempt to dismiss the Panel's dialog; the Frame
      * keeps the rules. Only an overlay or a peek is dismissed, by a press on
-     * the Backdrop or by Escape. A press inside an open modal, in
+     * the Blanket or by Escape. A press inside an open modal, in
      * a popup drawn outside the Frame, or on a trigger that controls the Panel
      * (which toggles it itself) leaves it open. So does Escape while a modal
      * is open, since that Escape is the modal's, and an Escape a control in
@@ -650,7 +650,7 @@ const Frame = ({
 
                 <div ref={rowRef} className="plus-frame__row">
                     {dockedPresent && hasSidebar ? sidebarPanel(false, !docked, dockedEnteringRef.current) : null}
-                    {/* Under an overlay Panel's Backdrop the Page is out of reach for keyboards too. */}
+                    {/* Under an overlay Panel's Blanket the Page is out of reach for keyboards too. */}
                     <SurfaceTag className="plus-frame__surface" inert={panelModal}>
                         {(() => {
                             const body = surfaceDirect ? children : (
@@ -727,7 +727,7 @@ Frame.propTypes = {
     onPanelOpenChange: PropTypes.func,
     /** The width (px) the Panel opens at when the tab has nothing remembered: 320 to 640, default 400. */
     panelDefaultWidth: PropTypes.number,
-    /** Hovering the Frame's right edge peeks a closed Panel over the Page, with no Backdrop. Off by default. */
+    /** Hovering the Frame's right edge peeks a closed Panel over the Page, with no Blanket. Off by default. */
     panelPeek: PropTypes.bool,
     /** The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. */
     panelStorageKey: PropTypes.string,

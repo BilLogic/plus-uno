@@ -504,24 +504,24 @@
           }
         },
         {
-          "name": "Backdrop/pad-x",
+          "name": "Blanket/pad-x",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--backdrop-pad-x)"
+            "WEB": "var(--blanket-pad-x)"
           }
         },
         {
-          "name": "Backdrop/pad-y",
+          "name": "Blanket/pad-y",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--backdrop-pad-y)"
+            "WEB": "var(--blanket-pad-y)"
           }
         },
         {
-          "name": "Backdrop/fill",
+          "name": "Blanket/fill",
           "resolvedType": "COLOR",
           "codeSyntax": {
-            "WEB": "var(--backdrop-fill)"
+            "WEB": "var(--blanket-fill)"
           }
         },
         {
@@ -1319,10 +1319,10 @@
           }
         },
         {
-          "name": "Layer/backdrop",
+          "name": "Layer/blanket",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--layer-backdrop)"
+            "WEB": "var(--layer-blanket)"
           }
         },
         {

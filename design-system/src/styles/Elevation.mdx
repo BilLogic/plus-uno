@@ -87,7 +87,7 @@ Higher is lighter. In light the lifted surfaces share the page color and the sha
 
 <Canvas of={ElevationStories.Ladder} sourceState="none" />
 
-Dark blocking is the same as dark overlay. On the dark Backdrop a shadow barely shows, so the lighter overlay surface is what lifts the Modal.
+Dark blocking is the same as dark overlay. On the dark Blanket a shadow barely shows, so the lighter overlay surface is what lifts the Modal.
 
 </FoundationSection>
 
@@ -97,9 +97,9 @@ Each layer is a `--layer-*` z-index token, set in code only. Components name the
 
 <Canvas of={ElevationStories.Layers} sourceState="none" />
 
-- **A confirm Modal may open over a Panel, a Popup or a focused task,** with its own Backdrop.
+- **A confirm Modal may open over a Panel, a Popup or a focused task,** with its own Blanket.
 - **Never a Modal on a Modal.** A Modal confirms inside itself, with a warning SectionMessage and the danger button.
-- **A Panel never has a Backdrop.** It floats beside a usable page.
+- **A Panel never has a Blanket.** It floats beside a usable page.
 - **Popups and Tooltips open over a Modal.** A Popup opened inside a Modal portals into it.
 - **A Flag sits above all of it**, so a message is never hidden.
 - **`--layer-dialog`** holds a view that replaces the page: Frame · focused and AiChat full screen.
@@ -126,7 +126,7 @@ Raised at rest; a clickable Card lifts to overlay on hover and while dragged.
 
 <FoundationSubsection title="Floating Sidebar and floating Panel">
 
-Both take the overlay pair, with no Backdrop: the page beside them stays usable.
+Both take the overlay pair, with no Blanket: the page beside them stays usable.
 
 <Canvas of={ElevationStories.FloatingSidebar} sourceState="none" />
 
@@ -134,9 +134,9 @@ Both take the overlay pair, with no Backdrop: the page beside them stays usable.
 
 </FoundationSubsection>
 
-<FoundationSubsection title="Modal over its Backdrop">
+<FoundationSubsection title="Modal over its Blanket">
 
-<Canvas of={ElevationStories.ModalOnBackdrop} sourceState="none" />
+<Canvas of={ElevationStories.ModalOnBlanket} sourceState="none" />
 
 </FoundationSubsection>
 
@@ -224,11 +224,11 @@ A level's surface and shadow travel together.
 
 </FoundationSubsection>
 
-<FoundationSubsection title="Blocking only on the Backdrop">
+<FoundationSubsection title="Blocking only on the Blanket">
 
-The blocking shadow belongs to the Modal over its Backdrop, and nothing else.
+The blocking shadow belongs to the Modal over its Blanket, and nothing else.
 
-<Canvas of={ElevationStories.BlockingOnBackdrop} sourceState="none" />
+<Canvas of={ElevationStories.BlockingOnBlanket} sourceState="none" />
 
 </FoundationSubsection>
 

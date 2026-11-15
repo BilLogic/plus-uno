@@ -34,7 +34,7 @@ padding: var(--card-pad-default);
 gap: var(--card-stack-md);
 ```
 
-Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Backdrop, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
+Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Blanket, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
 
 </FoundationSection>
 
@@ -258,14 +258,14 @@ Plain and full-span by default.
 
 </FoundationSubsection>
 
-<FoundationSubsection title="Backdrop and Modal">
+<FoundationSubsection title="Blanket and Modal">
 
-The Backdrop pads the screen. A modal pads 16 on every side at every width.
+The Blanket pads the screen. A modal pads 16 on every side at every width.
 
 <TokenTable
     rows={[
-        { token: '--backdrop-pad-x', figma: 'Backdrop/pad-x' },
-        { token: '--backdrop-pad-y', figma: 'Backdrop/pad-y' },
+        { token: '--blanket-pad-x', figma: 'Blanket/pad-x' },
+        { token: '--blanket-pad-y', figma: 'Blanket/pad-y' },
         { token: '--modal-pad', figma: 'Modal/pad' },
         { token: '--modal-stack-sm', figma: 'Modal/stack-sm' },
         { token: '--modal-stack-md', figma: 'Modal/stack-md', use: 'Between related fields' },
@@ -280,7 +280,7 @@ The Backdrop pads the screen. A modal pads 16 on every side at every width.
 
 <FoundationSubsection title="Popup, menu and tooltip">
 
-Menu, popup, flag and tooltip float without a Backdrop. The outer box of a menu pads 4, and a popup or flag pads 16.
+Menu, popup, flag and tooltip float without a Blanket. The outer box of a menu pads 4, and a popup or flag pads 16.
 
 <TokenTable
     rows={[

@@ -53,7 +53,7 @@ test('every pre-regroup Foundations id lands on its page in the new groups', () 
 test('a folded page lands on its parent section, a renamed page on the page', () => {
   const folded = rules.filter((r) => r.anchor);
   assert.deepEqual(folded.map((r) => r.from).sort(), [
-    'templates-modal-backdrop',
+    'templates-modal-blanket',
     'templates-page-heading-outline',
     'templates-templates-and-patterns',
   ]);

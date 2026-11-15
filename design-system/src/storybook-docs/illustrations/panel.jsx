@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Backdrop, ButtonShape, Panel, Rect, Row, Rule, Section } from './primitives.jsx';
+import { Blanket, ButtonShape, Panel, Rect, Row, Rule, Section } from './primitives.jsx';
 
 /**
  * The Panel template's do and don't drawings. Each lesson is about how a Panel
@@ -31,18 +31,18 @@ const PageBehind = ({ w = W - 2 * X }) => (
 );
 
 /** Do: a Panel floats over the page on the overlay fill and shadow, and the page is still there. */
-export const FloatsNoBackdrop = ({ title = 'A Panel floating over the right of the page on a shadow, the page beside it undimmed' }) => (
+export const FloatsNoBlanket = ({ title = 'A Panel floating over the right of the page on a shadow, the page beside it undimmed' }) => (
   <Canvas title={title}>
     <PageBehind />
     <Panel x={96} y={0} w={72} h={H} accent floating />
   </Canvas>
 );
 
-/** Don't: the same Panel with a Backdrop dimming the page. */
-export const PanelOnBackdrop = ({ title = 'The same Panel with a Backdrop dimming the whole page behind it' }) => (
+/** Don't: the same Panel with a Blanket dimming the page. */
+export const PanelOnBlanket = ({ title = 'The same Panel with a Blanket dimming the whole page behind it' }) => (
   <Canvas title={title}>
     <PageBehind />
-    <Backdrop x={0} y={0} w={W} h={H} />
+    <Blanket x={0} y={0} w={W} h={H} />
     <Panel x={96} y={0} w={72} h={H} accent floating />
   </Canvas>
 );

@@ -197,9 +197,9 @@ Something joins the page from above or beside it.
 
 | Component | Enter | Exit |
 | --- | --- | --- |
-| Modal | scales up from 96% and fades in; the Backdrop dims | scales to 98% and fades |
+| Modal | scales up from 96% and fades in; the Blanket dims | scales to 98% and fades |
 | Popup, FilterMenu | clips open from the trigger's top-right corner along one axis | fades |
-| Floating Panel | slides in from its edge over the page, with no Backdrop | slides back to the same edge and stays there |
+| Floating Panel | slides in from its edge over the page, with no Blanket | slides back to the same edge and stays there |
 | Flag | slides in from the top-right corner | leaves the way it came, by the exit rules in Physics |
 | Tooltip | fades in after a short wait | fades out shortly after the pointer leaves |
 
@@ -221,7 +221,7 @@ Cancel plays the entrance backward, one speed faster, and nothing else changes. 
 | Panel | slides in from its edge | `spatial.slow` | 0 |
 | Panel content | opacity in | `appearance.fast` | When the page is about 90% done making room |
 
-Below the docking width the Panel slides over with a Backdrop.
+Below the docking width the Panel slides over with a Blanket.
 
 ## Feedback
 

@@ -329,7 +329,7 @@ export const FAMILIES = [
   { family: 'section', prefix: '--section-', what: 'a span of the page grid: its stacks and column minimums' },
   { family: 'card', prefix: '--card-', what: 'card pad, stack, inline, minimum width and radius' },
   { family: 'table', prefix: '--table-', what: 'table cell pad and maximum width, footer pad-x, tree indent, minimum title width, radius and overflow shadow reach' },
-  { family: 'backdrop', prefix: '--backdrop-', what: 'the full-screen layer under a modal: its pad, fill and height limit' },
+  { family: 'blanket', prefix: '--blanket-', what: 'the full-screen layer under a modal: its pad, fill and height limit' },
   { family: 'button', prefix: '--button-', what: 'Button radius, where a size has no shared radius role, and the vertical button size' },
   { family: 'calendar', prefix: '--calendar-', what: 'calendar day and navigation button sizes' },
   { family: 'checkbox', prefix: '--checkbox-', what: 'the checkbox box size' },

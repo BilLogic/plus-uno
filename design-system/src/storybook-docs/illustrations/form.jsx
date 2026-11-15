@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Backdrop, ButtonShape, Field, Panel, Rect, Row, Rule, SkeletonBar } from './primitives.jsx';
+import { Blanket, ButtonShape, Field, Panel, Rect, Row, Rule, SkeletonBar } from './primitives.jsx';
 
 /**
  * The Form template's do and don't drawings. Each lesson is about where the
@@ -59,10 +59,10 @@ export const PageButtonsFarRight = ({ title = 'A page form with its buttons at t
 
 const MODAL = { x: 34, y: 10, w: 100, h: 84 };
 
-/** The Modal's surface over a Backdrop, with its header and fields; the footer is the caller's. */
+/** The Modal's surface over a Blanket, with its header and fields; the footer is the caller's. */
 const ModalShell = ({ children }) => (
   <g>
-    <Backdrop x={0} y={0} w={W} h={H} />
+    <Blanket x={0} y={0} w={W} h={H} />
     <Rect x={MODAL.x} y={MODAL.y} w={MODAL.w} h={MODAL.h} fill={PAINT.modalSurface} corner="modal" />
     <SkeletonBar x={MODAL.x + 8} y={MODAL.y + 8} w={36} h={5} heading />
     <Field x={MODAL.x + 8} y={MODAL.y + 20} w={MODAL.w - 16} />
@@ -104,11 +104,11 @@ export const EditInPanel = ({ title = 'A short edit in a Panel at the end, with 
 );
 
 /** Don't: the same short edit in a Modal that covers the page. */
-export const EditInModal = ({ title = 'A short edit in a Modal over a Backdrop, with the page and its rows covered' }) => (
+export const EditInModal = ({ title = 'A short edit in a Modal over a Blanket, with the page and its rows covered' }) => (
   <Canvas title={title}>
     <Rect x={0} y={0} w={W} h={H} fill={PAINT.pageSurface} />
     {[0, 1, 2, 3].map((i) => <Row key={i} x={10} y={14 + i * 18} w={W - 20} />)}
-    <Backdrop x={0} y={0} w={W} h={H} />
+    <Blanket x={0} y={0} w={W} h={H} />
     <Rect x={44} y={14} w={80} h={76} fill={PAINT.modalSurface} stroke={PAINT.accent} corner="modal" />
     <Field x={52} y={24} w={64} />
     <Field x={52} y={52} w={64} />

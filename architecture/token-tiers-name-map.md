@@ -141,10 +141,10 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Table | `--table-pad-x-footer` (declared elsewhere) |  |
 | Table | `--table-footer-height` |  |
 | Table | `--table-min-width-title` (declared elsewhere) |  |
-| Backdrop | `--backdrop-pad-x` |  |
-| Backdrop | `--backdrop-pad-y` |  |
-| Backdrop | `--backdrop-fill` | the Backdrop's own fill color; the old declaration's value, written directly so this file carries no old-language word |
-| Backdrop | `--backdrop-max-height-modal` | a calc() of the pad above: code only, no Figma variable |
+| Blanket | `--blanket-pad-x` |  |
+| Blanket | `--blanket-pad-y` |  |
+| Blanket | `--blanket-fill` | the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word |
+| Blanket | `--blanket-max-height-modal` | a calc() of the pad above: code only, no Figma variable |
 | Modal | `--modal-pad` (declared elsewhere) |  |
 | Modal | `--modal-pad-x-compact` |  |
 | Modal | `--modal-pad-x-default` |  |
@@ -295,7 +295,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Layer | `--layer-navigation` |  |
 | Layer | `--layer-dialog` |  |
 | Layer | `--layer-popup` |  |
-| Layer | `--layer-backdrop` | the Backdrop's z-index; the old declaration's value, written directly so this file carries no old-language word |
+| Layer | `--layer-blanket` | the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word |
 | Layer | `--layer-modal` |  |
 | Layer | `--layer-flag` |  |
 | Layer | `--layer-spotlight` |  |

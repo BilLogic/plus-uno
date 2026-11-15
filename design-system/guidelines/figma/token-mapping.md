@@ -103,7 +103,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | Raised shadow (cards; a clickable card lifts to the overlay shadow on hover or drag) | `var(--ds-shadow-raised)` |
 | Overlay surface (Popups, menus, listboxes, Flags, the floating Sidebar and Panel; the Modal too) | `var(--ds-surface-overlay)` |
 | Overlay shadow (Popups, menus, listboxes, Flags, the floating Sidebar and Panel; the Tooltip takes none) | `var(--ds-shadow-overlay)` |
-| Blocking shadow (the Modal on its Backdrop, only) | `var(--ds-shadow-blocking)` |
+| Blocking shadow (the Modal on its Blanket, only) | `var(--ds-shadow-blocking)` |
 
 ## Layout Tokens
 

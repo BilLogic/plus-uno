@@ -2,7 +2,7 @@ import React from 'react';
 import { PAINT, HAIRLINE } from './paint.js';
 import { Illustration } from './Illustration.jsx';
 import {
-  Backdrop, ButtonShape, Frame, Modal, Panel, Rect, Rule, Row, Screen, Section, SkeletonBar, pageBody, screenLayout,
+  Blanket, ButtonShape, Frame, Modal, Panel, Rect, Rule, Row, Screen, Section, SkeletonBar, pageBody, screenLayout,
 } from './primitives.jsx';
 
 /** One dotted joint between two layers. */
@@ -84,7 +84,7 @@ export const OpeningARecord = ({
               {[0, 1, 2, 3].map((k) => (
                 <SkeletonBar key={k} x={x + 6} y={y + 20 + k * 9} w={w * 0.6} />
               ))}
-              <Backdrop x={x} y={y} w={w} h={h} />
+              <Blanket x={x} y={y} w={w} h={h} />
               <Modal x={x + 6} y={y + 26} w={w - 12} h={50} accent />
             </>
           )}
@@ -115,7 +115,7 @@ const REFLOW = {
   },
   768: {
     sidebar: 'overlay',
-    title: 'At 768 wide the Sidebar opens as an overlay on a Backdrop over the same single-column Section',
+    title: 'At 768 wide the Sidebar opens as an overlay on a Blanket over the same single-column Section',
   },
 };
 

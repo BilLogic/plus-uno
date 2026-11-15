@@ -96,14 +96,14 @@ describe('getOverlayPortalRoot', () => {
 });
 
 describe('overlayMountOf', () => {
-    it('mounts in the nearest .plus-pattern-backdrop ancestor, when there is one', () => {
-        const backdrop = document.createElement('div');
-        backdrop.className = 'plus-pattern-backdrop';
+    it('mounts in the nearest .plus-pattern-blanket ancestor, when there is one', () => {
+        const blanket = document.createElement('div');
+        blanket.className = 'plus-pattern-blanket';
         const trigger = document.createElement('button');
-        backdrop.appendChild(trigger);
-        document.body.appendChild(backdrop);
-        expect(overlayMountOf(trigger)).toBe(backdrop);
-        backdrop.remove();
+        blanket.appendChild(trigger);
+        document.body.appendChild(blanket);
+        expect(overlayMountOf(trigger)).toBe(blanket);
+        blanket.remove();
     });
 
     it('falls back to the shared portal root outside a modal', () => {
@@ -162,7 +162,7 @@ describe('isPressInRaisedOverlay', () => {
         document.body.innerHTML = `
             <button id="chat"></button>
             <div id="popup"><span id="popup-text"></span></div>
-            <div class="plus-pattern-backdrop" id="backdrop">
+            <div class="plus-pattern-blanket" id="blanket">
                 <div role="dialog"><p id="modal-text"></p><button id="inner"></button></div>
             </div>
             <main id="page"></main>`;
@@ -174,7 +174,7 @@ describe('isPressInRaisedOverlay', () => {
     it('is true for a press in a Modal the owner sits outside of', () => {
         const el = build();
         expect(isPressInRaisedOverlay(el('modal-text'), el('chat'))).toBe(true);
-        expect(isPressInRaisedOverlay(el('backdrop'), el('popup'))).toBe(true);
+        expect(isPressInRaisedOverlay(el('blanket'), el('popup'))).toBe(true);
     });
 
     it('is false for a press on the page or in the popup itself', () => {
@@ -204,7 +204,7 @@ describe('isOverlayRaisedOver', () => {
     });
 
     it('is true for an owner outside the open Modal, false for one inside it', () => {
-        document.body.innerHTML = '<button id="chat"></button><div class="plus-pattern-backdrop"><button id="inner"></button></div>';
+        document.body.innerHTML = '<button id="chat"></button><div class="plus-pattern-blanket"><button id="inner"></button></div>';
         open();
         expect(isOverlayRaisedOver(document.getElementById('chat'))).toBe(true);
         expect(isOverlayRaisedOver(document.getElementById('inner'))).toBe(false);
@@ -231,14 +231,14 @@ describe('useBoundedOverlay', () => {
         });
     });
 
-    it('yields to an explicit container prop or a Modal Backdrop ancestor', () => {
+    it('yields to an explicit container prop or a Modal Blanket ancestor', () => {
         const canvas = document.createElement('div');
         const explicit = document.createElement('div');
-        const backdrop = document.createElement('div');
-        backdrop.className = 'plus-pattern-backdrop';
+        const blanket = document.createElement('div');
+        blanket.className = 'plus-pattern-blanket';
         const trigger = document.createElement('button');
-        backdrop.appendChild(trigger);
-        document.body.appendChild(backdrop);
+        blanket.appendChild(trigger);
+        document.body.appendChild(blanket);
 
         const wrapper = ({ children }) => React.createElement(OverlayContainer, { container: canvas }, children);
         expect(renderHook(() => useBoundedOverlay({ container: explicit }), { wrapper }).result.current).toBeNull();

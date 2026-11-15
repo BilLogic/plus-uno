@@ -28,7 +28,7 @@ describe.each(fields)('%s field popup contract', (_name, field) => {
         const trigger = await screen.findByRole('combobox', { name: 'Field' });
         fireEvent.keyDown(trigger, { key: 'ArrowDown' });
         const surface = document.querySelector('.plus-listbox');
-        expect(surface.parentElement).toBe(trigger.closest('.plus-pattern-backdrop'));
+        expect(surface.parentElement).toBe(trigger.closest('.plus-pattern-blanket'));
         expect(surface).toHaveAttribute('data-instant', 'keyboard');
         expect(surface).toHaveAttribute('data-side', 'bottom');
         fireEvent.pointerDown(surface);

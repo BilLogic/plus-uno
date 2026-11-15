@@ -2,7 +2,7 @@
 
 # Panel
 
-A full-height layer on the right with no Backdrop: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame.
+A full-height layer on the right with no Blanket: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame.
 
 Import the Panel component from `@/components`. This template documents its layout within the Frame.
 
@@ -12,7 +12,7 @@ Import the Panel component from `@/components`. This template documents its layo
 
 ## Types
 
-Both open on the right with no Backdrop: docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths). Floating at every width is Planned.
+Both open on the right with no Blanket: docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths). Floating at every width is Planned.
 
 - **Details.** A quick look at a row, floating over the right of the Page. The picked row stays highlighted.
 - **Notifications.** The Inbox, opened from the Bell. It lists items by time and stays open as you pick one.
@@ -40,7 +40,7 @@ The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with th
 
 ## Width behavior
 
-Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay fill and shadow, capped at 320 under 1024 and full width under 768. It never has a Backdrop.
+Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay fill and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
 
 ## Key states
 
@@ -80,7 +80,7 @@ The Panel components are the parts: header with its fixed actions, body, footer,
 
 ## Usage
 
-Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Backdrop, so the page behind stays usable. Details floats over the right of the Page; the Inbox floats out of the Sidebar on the left. One floating Panel is open at a time; opening another replaces it.
+Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details floats over the right of the Page; the Inbox floats out of the Sidebar on the left. One floating Panel is open at a time; opening another replaces it.
 
 The AI panel is not a floating Panel. It is a region of the Frame, docked where there is room, so it persists across pages.
 
@@ -122,23 +122,23 @@ Panel reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| docked-enter | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | The AI Panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked Panel never has a Backdrop. |
+| docked-enter | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | The AI Panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked Panel never has a Blanket. |
 | docked-exit | Dock and undock a panel | `--ds-motion-spatial-default` | Reverses and stays at the edge. |
 | floating-enter | Dock and undock a panel | `--ds-motion-spatial-default` | Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself. |
 | floating-exit | Dock and undock a panel | `--ds-motion-spatial-fast` | Reverses. |
-| narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` | At narrow widths it slides over with a Backdrop. |
+| narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` | At narrow widths it slides over with a Blanket. |
 | narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` | The same way back. |
 
 ## Best practices
 
-### Float a Panel with no Backdrop. {#float-a-panel-with-no-backdrop}
+### Float a Panel with no Blanket. {#float-a-panel-with-no-blanket}
 
 **Checked:** Automatic
 
-The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Narrow, it is capped and then full width, still with no Backdrop. A confirm Modal over a Panel brings its own Backdrop.
+The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Narrow, it is capped and then full width, still with no Blanket. A confirm Modal over a Panel brings its own Blanket.
 
 Do: The Panel floats on its shadow and the page beside it stays undimmed.
-Don't: The same Panel with a Backdrop dimming the whole page.
+Don't: The same Panel with a Blanket dimming the whole page.
 
 ### Open one floating Panel at a time. {#open-one-floating-panel-at-a-time}
 

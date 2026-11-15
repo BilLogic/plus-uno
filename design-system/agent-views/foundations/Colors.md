@@ -26,7 +26,7 @@ Primitives hold raw ramps and stay hidden; bind only semantic tokens. Names read
 | Part | In `color/background/danger/bold/hovered` | Values | What it says |
 | --- | --- | --- | --- |
 | color | Namespace | `color` | Dropped in CSS. Surface and shadow tokens start with elevation. |
-| background | Property | `text` · `icon` · `border` · `background` · `link` · `surface` · `shadow` · `backdrop` · `skeleton` · `interaction` · `chart` | What the color paints. |
+| background | Property | `text` · `icon` · `border` · `background` · `link` · `surface` · `shadow` · `blanket` · `skeleton` · `interaction` · `chart` | What the color paints. |
 | danger | Role | `brand` · `neutral` · `selected` · `input` · `inverse` · `disabled` · `focused` · `danger` · `warning` · `success` · `information` · `discovery` · `accent-*` · `smart-*` | What it means. Omitted for default neutral. |
 | bold | Emphasis | `subtlest` · `subtler` · `subtle` · (default) · `bold` · `bolder` · `boldest` | Contrast against the surface. |
 | hovered | State | `hovered` · `pressed` · `visited` | Interactive backgrounds and links only. |
@@ -38,7 +38,7 @@ Primitives hold raw ramps and stay hidden; bind only semantic tokens. Names read
 PLUS ships four modes: light and dark, each at standard and increased contrast. `auto` follows OS `prefers-color-scheme` and `prefers-contrast`.
 
 - **Dark mode** is not light inverted: raised and overlay surfaces step lighter as they rise, because shadows are subtle on dark grounds. Design in dark mode by choosing the same token; never map your own values.
-- **Increased contrast** pushes text to 7:1 and borders, icons and the focus ring to 4.5:1. Tints, surfaces and the Backdrop stay unchanged.
+- **Increased contrast** pushes text to 7:1 and borders, icons and the focus ring to 4.5:1. Tints, surfaces and the Blanket stay unchanged.
 - **In code**, set `data-color-mode` (`light`, `dark`, `auto`) and `data-contrast-mode` (`no-preference`, `more`, `auto`) on `<html>`. No attribute means light at standard contrast.
 - **In Figma**, set the frame mode to Light, Dark, Light IC or Dark IC.
 

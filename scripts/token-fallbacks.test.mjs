@@ -77,7 +77,7 @@ test('rgb() in space syntax and hsla() are captured too, with room before the cl
 });
 
 test('an uppercase color function is captured, since CSS function names are case-insensitive', () => {
-  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--ds-backdrop, RGBA(0, 0, 0, 0.32));' }]);
+  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--ds-blanket, RGBA(0, 0, 0, 0.32));' }]);
   assert.deepEqual(uses.map((use) => use.literal), ['RGBA(0, 0, 0, 0.32)']);
 });
 

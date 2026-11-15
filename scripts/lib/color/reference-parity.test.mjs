@@ -40,7 +40,7 @@ import { figmaSpec } from './figma.mjs';
 const REF = process.env.COLOR_REFERENCE_DIR ?? join(homedir(), 'Documents/Claude/Projects/PLUS/color-system');
 const skip = existsSync(join(REF, 'generator')) ? false : `reference folder not found at ${REF}`;
 const json = (rel) => JSON.parse(readFileSync(join(REF, rel), 'utf8'));
-const currentNames = (text) => text.replace(/--ds-(chart-|skeleton-)/g, '--$1').replace(/--ds-blanket/g, '--ds-backdrop');
+const currentNames = (text) => text.replace(/--ds-(chart-|skeleton-)/g, '--$1');
 const body = (text) => currentNames(text.slice(text.indexOf('\n') + 1));
 const VALUE_KEYS = ['name', 'light_ref', 'light', 'dark_ref', 'dark', 'light_ic_ref', 'light_ic', 'dark_ic_ref', 'dark_ic'];
 const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) => [k, r[k]])));

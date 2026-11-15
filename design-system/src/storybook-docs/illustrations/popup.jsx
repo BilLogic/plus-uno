@@ -1,13 +1,13 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Backdrop, ButtonShape, Field, Modal, Popup, Rect, SkeletonBar } from './primitives.jsx';
+import { Blanket, ButtonShape, Field, Modal, Popup, Rect, SkeletonBar } from './primitives.jsx';
 
 /**
  * The Popup template's do and don't drawings. Each lesson is about where a
  * Popup sits or how wide it is, so every drawing is blocked out: no words,
  * buttons as flat strips, one accent on the subject. A Popup draws on the
- * overlay pair with no Backdrop. Every pair shares one canvas, so a do and its
+ * overlay pair with no Blanket. Every pair shares one canvas, so a do and its
  * don't compare at one scale.
  */
 
@@ -34,11 +34,11 @@ const Behind = () => (
   </g>
 );
 
-/** Do: fields the person must finish go in a Modal, over its Backdrop. */
-export const FieldsInModal = ({ title = 'A Modal over its Backdrop holding two fields and a Primary button' }) => (
+/** Do: fields the person must finish go in a Modal, over its Blanket. */
+export const FieldsInModal = ({ title = 'A Modal over its Blanket holding two fields and a Primary button' }) => (
   <Illustration width={W} height={H} title={title}>
     <Rect x={0} y={0} w={W} h={H} fill={PAINT.pageSurface} />
-    <Backdrop x={0} y={0} w={W} h={H} />
+    <Blanket x={0} y={0} w={W} h={H} />
     <Modal x={36} y={10} w={96} h={84} accent />
     <Field x={46} y={28} w={76} />
     <Field x={46} y={50} w={76} />

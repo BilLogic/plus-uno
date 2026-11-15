@@ -7,7 +7,7 @@ import { OverlayContainer } from '@/lib/overlay';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 describe('DropdownMenu in a Modal', () => {
-    it('mounts the opened menu inside the Modal backdrop', async () => {
+    it('mounts the opened menu inside the Modal blanket', async () => {
         const user = userEvent.setup();
         render(
             <Modal show title="Actions dialog">
@@ -20,8 +20,8 @@ describe('DropdownMenu in a Modal', () => {
         const trigger = await screen.findByRole('button', { name: 'Actions' });
         await user.click(trigger);
         const menu = await screen.findByTestId('actions-menu');
-        expect(menu.closest('.plus-pattern-backdrop')).toBe(trigger.closest('.plus-pattern-backdrop'));
-        expect(menu.closest('.plus-pattern-backdrop')).not.toBeNull();
+        expect(menu.closest('.plus-pattern-blanket')).toBe(trigger.closest('.plus-pattern-blanket'));
+        expect(menu.closest('.plus-pattern-blanket')).not.toBeNull();
     });
 });
 

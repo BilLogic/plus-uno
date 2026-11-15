@@ -23,7 +23,7 @@ import { IconButton, Select } from '@/components';
 
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', alignItems: 'flex-start' };
 
-/** Backdrop positions fixed over the page rather than canvas-local; query from the document. */
+/** Blanket positions fixed over the page rather than canvas-local; query from the document. */
 const documentOf = (canvasElement) => within(canvasElement.ownerDocument.body);
 
 /** Rounded to a whole pixel, as Figma's modes hold the widths. */
@@ -41,7 +41,7 @@ function lengthOf(doc, token) {
     return px;
 }
 
-/** The backdrop color the token resolves to, read the same way. */
+/** The blanket color the token resolves to, read the same way. */
 function colorOf(doc, token) {
     const probe = doc.createElement('div');
     probe.style.backgroundColor = `var(${token})`;
@@ -62,7 +62,7 @@ export default {
             description: {
                 component:
                     'Interaction cover for the modal grid: width per layout mode with the sidebar '
-                    + 'open and closed, Hug and Fill with short and long content, the backdrop, and the '
+                    + 'open and closed, Hug and Fill with short and long content, the blanket, and the '
                     + 'layer a menu takes inside a modal.',
             },
         },
@@ -168,7 +168,7 @@ function HeightCase({ height, body, title }) {
     );
 }
 
-const capOf = (canvasElement) => lengthOf(canvasElement.ownerDocument, '--backdrop-max-height-modal');
+const capOf = (canvasElement) => lengthOf(canvasElement.ownerDocument, '--blanket-max-height-modal');
 const dialogOf = async (canvasElement, title) => (await documentOf(canvasElement).findByText(title)).closest('.plus-modal');
 
 export const HugShort = () => <HeightCase height="hug" body={SHORT} title="Hug, short" />;
@@ -208,21 +208,21 @@ FillLong.play = async ({ canvasElement }) => {
 };
 
 /* -------------------------------------------------------------------------- */
-/* Backdrop and layers                                                            */
+/* Blanket and layers                                                            */
 /* -------------------------------------------------------------------------- */
 
-export const Backdrop = () => <HeightCase height="hug" body={SHORT} title="Over the backdrop" />;
-Backdrop.play = async ({ canvasElement }) => {
+export const Blanket = () => <HeightCase height="hug" body={SHORT} title="Over the blanket" />;
+Blanket.play = async ({ canvasElement }) => {
     const doc = canvasElement.ownerDocument;
-    const dialog = await dialogOf(canvasElement, 'Over the backdrop');
-    const backdrop = dialog.closest('.plus-pattern-backdrop');
-    await expect(backdrop).not.toBeNull();
-    // The backdrop's fill is color.blanket, in whichever mode is in force, and nothing else tints it.
-    await expect(getComputedStyle(backdrop).backgroundColor).toBe(colorOf(doc, '--ds-backdrop'));
-    // The layers: backdrop 500, modal 510. The dialog is the backdrop's
-    // direct child, so it takes the modal layer straight from Backdrop's own
+    const dialog = await dialogOf(canvasElement, 'Over the blanket');
+    const blanket = dialog.closest('.plus-pattern-blanket');
+    await expect(blanket).not.toBeNull();
+    // The blanket's fill is color.blanket, in whichever mode is in force, and nothing else tints it.
+    await expect(getComputedStyle(blanket).backgroundColor).toBe(colorOf(doc, '--ds-blanket'));
+    // The layers: blanket 500, modal 510. The dialog is the blanket's
+    // direct child, so it takes the modal layer straight from Blanket's own
     // `> *` rule, with no intermediate wrapper.
-    await expect(getComputedStyle(backdrop).zIndex).toBe('500');
+    await expect(getComputedStyle(blanket).zIndex).toBe('500');
     await expect(getComputedStyle(dialog).zIndex).toBe('510');
 };
 
@@ -241,10 +241,10 @@ MenuInsideModal.play = async ({ canvasElement }) => {
     const listbox = await doc.findByRole('listbox');
     const option = within(listbox).getByRole('option', { name: 'South High' });
     // A menu is on the popup layer (400), under a modal (510). Opened from a
-    // field inside one, it takes the modal's backdrop: it mounts in the
+    // field inside one, it takes the modal's blanket: it mounts in the
     // modal's overlay, after the dialog.
-    const overlay = doc.getByText('Pick a site').closest('.plus-pattern-backdrop');
-    await expect(listbox.closest('.plus-pattern-backdrop')).toBe(overlay);
+    const overlay = doc.getByText('Pick a site').closest('.plus-pattern-blanket');
+    await expect(listbox.closest('.plus-pattern-blanket')).toBe(overlay);
     await expect(getComputedStyle(listbox.closest('.plus-listbox')).zIndex).toBe('400');
     // The menu is drawn above the modal it opened from: the topmost element
     // at the option's center is the option, not the dialog under it.
@@ -255,7 +255,7 @@ MenuInsideModal.play = async ({ canvasElement }) => {
 };
 
 /**
- * Page chrome sits under the backdrop: a sticky table header on the card layer
+ * Page chrome sits under the blanket: a sticky table header on the card layer
  * and a floating control on the navigation layer, as an app's floating nav
  * sits. Both stay below a modal at 510.
  */
@@ -278,7 +278,7 @@ const FLOATING_NAV = {
     height: 'var(--control-md)',
     background: 'var(--ds-background-brand-subtlest)',
 };
-export const ChromeUnderTheBackdrop = () => (
+export const ChromeUnderTheBlanket = () => (
     <div>
         <div style={{ height: 'var(--size-2000)', overflow: 'auto' }}>
             <table style={{ width: '100%' }}>
@@ -295,22 +295,22 @@ export const ChromeUnderTheBackdrop = () => (
     </div>
 );
 
-ChromeUnderTheBackdrop.play = async ({ canvasElement }) => {
+ChromeUnderTheBlanket.play = async ({ canvasElement }) => {
     const doc = canvasElement.ownerDocument;
     const dialog = await dialogOf(canvasElement, 'Over the page chrome');
-    const backdrop = dialog.closest('.plus-pattern-backdrop');
-    const backdropLayer = Number(getComputedStyle(backdrop).zIndex);
+    const blanket = dialog.closest('.plus-pattern-blanket');
+    const blanketLayer = Number(getComputedStyle(blanket).zIndex);
     const head = within(canvasElement).getByTestId('sticky-head');
     const fab = doc.querySelector('[data-testid="floating-nav"]');
     await expect(getComputedStyle(head).zIndex).toBe('100');
     await expect(getComputedStyle(fab).zIndex).toBe('200');
     for (const el of [head, fab]) {
-        await expect(Number(getComputedStyle(el).zIndex)).toBeLessThan(backdropLayer);
+        await expect(Number(getComputedStyle(el).zIndex)).toBeLessThan(blanketLayer);
         // Nothing of the chrome is the top element where it is drawn: the overlay covers it.
         const box = el.getBoundingClientRect();
         const hit = doc.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
         await expect(el.contains(hit)).toBe(false);
-        await expect(Boolean(hit.closest('.plus-pattern-backdrop'))).toBe(true);
+        await expect(Boolean(hit.closest('.plus-pattern-blanket'))).toBe(true);
     }
 };
 

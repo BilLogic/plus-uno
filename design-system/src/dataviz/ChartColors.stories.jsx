@@ -98,7 +98,7 @@ export default {
 
 /** Every mark color a chart may draw, by token name. */
 const markTokens = () => {
-    const name = (value) => value.match(/^var\((--ds-[\w-]+)\)$/)[1];
+    const name = (value) => value.match(/^var\((--[\w-]+)\)$/)[1];
     return [
         ...CATEGORICAL, BRAND, NEUTRAL, ...Object.values(STATUS), ...Object.values(SMART),
         CHROME.track, CHROME.separator, CHROME.grid, CHROME.link,

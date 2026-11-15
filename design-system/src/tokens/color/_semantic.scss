@@ -329,9 +329,9 @@
   --ds-interaction-pressed: var(--palette-neutral-alpha-500);
   --ds-skeleton: var(--palette-neutral-alpha-200);
   --skeleton-subtle: var(--palette-neutral-alpha-100);
-  --ds-backdrop: var(--palette-neutral-alpha-850);
-  --ds-backdrop-selected: var(--palette-neutral-alpha-250);
-  --ds-backdrop-danger: var(--palette-red-500-a8);
+  --ds-blanket: var(--palette-neutral-alpha-850);
+  --ds-blanket-selected: var(--palette-neutral-alpha-250);
+  --ds-blanket-danger: var(--palette-red-500-a8);
   --chart-categorical-1: var(--palette-lagoon-600);
   --chart-categorical-1-hovered: var(--palette-lagoon-700);
   --chart-categorical-2: var(--palette-orange-800);
@@ -869,9 +869,9 @@
   --ds-interaction-pressed: var(--palette-dark-neutral-alpha-500);
   --ds-skeleton: var(--palette-dark-neutral-alpha-200);
   --skeleton-subtle: var(--palette-dark-neutral-alpha-100);
-  --ds-backdrop: var(--palette-black-alpha-60);
-  --ds-backdrop-selected: var(--palette-dark-neutral-alpha-200);
-  --ds-backdrop-danger: var(--palette-red-600-a8);
+  --ds-blanket: var(--palette-black-alpha-60);
+  --ds-blanket-selected: var(--palette-dark-neutral-alpha-200);
+  --ds-blanket-danger: var(--palette-red-600-a8);
   --chart-categorical-1: var(--palette-lagoon-500);
   --chart-categorical-1-hovered: var(--palette-lagoon-400);
   --chart-categorical-2: var(--palette-orange-700);
@@ -1410,9 +1410,9 @@
     --ds-interaction-pressed: var(--palette-dark-neutral-alpha-500);
     --ds-skeleton: var(--palette-dark-neutral-alpha-200);
     --skeleton-subtle: var(--palette-dark-neutral-alpha-100);
-    --ds-backdrop: var(--palette-black-alpha-60);
-    --ds-backdrop-selected: var(--palette-dark-neutral-alpha-200);
-    --ds-backdrop-danger: var(--palette-red-600-a8);
+    --ds-blanket: var(--palette-black-alpha-60);
+    --ds-blanket-selected: var(--palette-dark-neutral-alpha-200);
+    --ds-blanket-danger: var(--palette-red-600-a8);
     --chart-categorical-1: var(--palette-lagoon-500);
     --chart-categorical-1-hovered: var(--palette-lagoon-400);
     --chart-categorical-2: var(--palette-orange-700);

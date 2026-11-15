@@ -81,7 +81,7 @@ Don't: Everything in the label, and the time is cut off.
 - `SidebarTab`: use when configuring a single row inside a custom sidebar section.
 - `CountTag`: use when rendering a count on the trailing edge of a row.
 
-Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternTable`
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternTable`
 
 ## Parts
 

@@ -12031,7 +12031,7 @@
     {
      "name": "color/blanket/default",
      "codeSyntax": {
-      "WEB": "var(--ds-backdrop)"
+      "WEB": "var(--ds-blanket)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12061,7 +12061,7 @@
     {
      "name": "color/blanket/selected",
      "codeSyntax": {
-      "WEB": "var(--ds-backdrop-selected)"
+      "WEB": "var(--ds-blanket-selected)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12091,7 +12091,7 @@
     {
      "name": "color/blanket/danger",
      "codeSyntax": {
-      "WEB": "var(--ds-backdrop-danger)"
+      "WEB": "var(--ds-blanket-danger)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -20023,7 +20023,7 @@
   },
   {
    "name": "elevation/shadow/blocking",
-   "description": "Box shadow of the Modal on its Backdrop, the one surface that blocks the page. Pair with elevation.surface.overlay.",
+   "description": "Box shadow of the Modal on its Blanket, the one surface that blocks the page. Pair with elevation.surface.overlay.",
    "layers": [
     {
      "type": "DROP_SHADOW",

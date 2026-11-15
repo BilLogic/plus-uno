@@ -17,7 +17,7 @@ padding: var(--card-pad-default);
 gap: var(--card-stack-md);
 ```
 
-Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Backdrop, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
+Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Blanket, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
 
 ## Principles
 
@@ -161,12 +161,12 @@ Plain and full-span by default.
 - `--table-pad-x-footer` (Table/pad-x-footer)
 - `--table-min-width-title` (Table/min-width-title)
 
-### Backdrop and Modal
+### Blanket and Modal
 
-The Backdrop pads the screen. A modal pads 16 on every side at every width.
+The Blanket pads the screen. A modal pads 16 on every side at every width.
 
-- `--backdrop-pad-x` (Backdrop/pad-x)
-- `--backdrop-pad-y` (Backdrop/pad-y)
+- `--blanket-pad-x` (Blanket/pad-x)
+- `--blanket-pad-y` (Blanket/pad-y)
 - `--modal-pad` (Modal/pad)
 - `--modal-stack-sm` (Modal/stack-sm)
 - `--modal-stack-md` (Modal/stack-md): Between related fields
@@ -177,7 +177,7 @@ The Backdrop pads the screen. A modal pads 16 on every side at every width.
 
 ### Popup, menu and tooltip
 
-Menu, popup, flag and tooltip float without a Backdrop. The outer box of a menu pads 4, and a popup or flag pads 16.
+Menu, popup, flag and tooltip float without a Blanket. The outer box of a menu pads 4, and a popup or flag pads 16.
 
 - `--popup-pad` (Popup and flag/pad)
 - `--popup-width-sm` (Popup and flag/width-sm)

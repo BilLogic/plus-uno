@@ -37,7 +37,7 @@ import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 /** A token table small enough to hold in your head, shaped like the real one. */
 const defs = new Map([
   ['--ds-border', { value: '#bec8ca', file: 'color/_semantic.scss' }],
-  ['--ds-backdrop', { value: 'rgba(0, 0, 0, 0.38)', file: 'color/_semantic.scss' }],
+  ['--ds-blanket', { value: 'rgba(0, 0, 0, 0.38)', file: 'color/_semantic.scss' }],
   ['--space-100', { value: '16px', file: '_scales.scss' }],
   ['--pad-x-lg', { value: 'var(--space-100)', file: 'ladder/_semantics.scss' }],
   ['--stack-lg', { value: '12px', file: 'ladder/_semantics.scss' }],
@@ -88,7 +88,7 @@ test('1b. shorthand hex is the same color — `#BCA` is `#bbccaa`, and case does
 test('1c. `rgba()` is compared by value, not by spelling', () => {
   const found = findings(rule('  background: rgba(0,0,0,.38);'), index);
   assert.equal(found.length, 1);
-  assert.deepEqual(found[0].tokens, ['--ds-backdrop']);
+  assert.deepEqual(found[0].tokens, ['--ds-blanket']);
 });
 
 test('2. a hand-planted px with a token equivalent is caught', () => {

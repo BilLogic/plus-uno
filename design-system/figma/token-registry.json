@@ -111,7 +111,7 @@
       "Raised shadow (cards; a clickable card lifts to the overlay shadow on hover or drag)": "var(--ds-shadow-raised)",
       "Overlay surface (Popups, menus, listboxes, Flags, the floating Sidebar and Panel; the Modal too)": "var(--ds-surface-overlay)",
       "Overlay shadow (Popups, menus, listboxes, Flags, the floating Sidebar and Panel; the Tooltip takes none)": "var(--ds-shadow-overlay)",
-      "Blocking shadow (the Modal on its Backdrop, only)": "var(--ds-shadow-blocking)"
+      "Blocking shadow (the Modal on its Blanket, only)": "var(--ds-shadow-blocking)"
     }
   },
   "figmaVariableMappings": {
@@ -635,9 +635,9 @@
       "color/interaction/pressed": "var(--ds-interaction-pressed)",
       "color/skeleton/default": "var(--ds-skeleton)",
       "color/skeleton/subtle": "var(--skeleton-subtle)",
-      "color/blanket/default": "var(--ds-backdrop)",
-      "color/blanket/selected": "var(--ds-backdrop-selected)",
-      "color/blanket/danger": "var(--ds-backdrop-danger)",
+      "color/blanket/default": "var(--ds-blanket)",
+      "color/blanket/selected": "var(--ds-blanket-selected)",
+      "color/blanket/danger": "var(--ds-blanket-danger)",
       "color/chart/categorical/1/default": "var(--chart-categorical-1)",
       "color/chart/categorical/1/hovered": "var(--chart-categorical-1-hovered)",
       "color/chart/categorical/2/default": "var(--chart-categorical-2)",

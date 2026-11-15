@@ -43,7 +43,7 @@ export const markersLevelWithParts = async (canvasElement, parts) => {
 
 /**
  * No leader line passes through a part other than its own: the line's box against every other part's box, ignoring a 1px touch.
- * A part flagged `holds` contains the others (a Backdrop around its Modal), so a leader crossing it is not a crossing.
+ * A part flagged `holds` contains the others (a Blanket around its Modal), so a leader crossing it is not a crossing.
  */
 export const leadersCrossNoOtherPart = (canvasElement, parts) => {
     parts.forEach(({ label }, i) => {

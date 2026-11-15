@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Backdrop, ButtonShape, Modal, ProgressTracker, Rect, Rule, SkeletonBar, Tabs } from './primitives.jsx';
+import { Blanket, ButtonShape, Modal, ProgressTracker, Rect, Rule, SkeletonBar, Tabs } from './primitives.jsx';
 
 /**
  * The Modal template's do and don't drawings. Each lesson is about the Modal's
@@ -16,7 +16,7 @@ const H = 104;
 const Canvas = ({ title, children }) => (
   <Illustration width={W} height={H} title={title}>
     <Rect x={0} y={0} w={W} h={H} fill={PAINT.pageSurface} />
-    <Backdrop x={0} y={0} w={W} h={H} />
+    <Blanket x={0} y={0} w={W} h={H} />
     {children}
   </Illustration>
 );
@@ -44,11 +44,11 @@ export const ConfirmsInside = ({ title = 'One Modal that confirms inside itself:
   </Canvas>
 );
 
-/** Don't: a Modal opened on another Modal, a second Backdrop over the first. */
-export const ModalOnModal = ({ title = 'A Modal opened on another Modal, a second Backdrop dimming the first' }) => (
+/** Don't: a Modal opened on another Modal, a second Blanket over the first. */
+export const ModalOnModal = ({ title = 'A Modal opened on another Modal, a second Blanket dimming the first' }) => (
   <Canvas title={title}>
     <Modal x={22} y={10} w={104} h={72} />
-    <Backdrop x={0} y={0} w={W} h={H} />
+    <Blanket x={0} y={0} w={W} h={H} />
     <Modal x={52} y={30} w={96} h={66} accent />
   </Canvas>
 );

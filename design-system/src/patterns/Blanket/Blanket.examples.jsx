@@ -1,17 +1,17 @@
 import React from 'react';
 
 import { Button, SectionMessage } from '@/components';
-import { Backdrop, PatternModal } from '@/patterns';
+import { Blanket, PatternModal } from '@/patterns';
 import { DetailsPanel } from '../Panel/panelDemo.jsx';
 import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 
 /**
- * The do and don't examples on the Backdrop and Modal docs pages: the
+ * The do and don't examples on the Blanket and Modal docs pages: the
  * overlays at a 1024 stand-in screen, scaled down to the card. Stage sizes are
  * docs geometry, not design values.
  *
  * The stacking rule follows `lib/overlay.js`: a confirm Modal may open over a
- * Panel, a Popup or a focused task, with its own Backdrop (a Panel floats with none), and a Modal never
+ * Panel, a Popup or a focused task, with its own Blanket (a Panel floats with none), and a Modal never
  * opens on another Modal. The `ConfirmOverPanel` story draws it.
  */
 
@@ -32,24 +32,24 @@ const Stage = ({ children }) => (
     </ScaledPreview>
 );
 
-/** A second Backdrop over the first, as a stacked overlay is drawn. */
+/** A second Blanket over the first, as a stacked overlay is drawn. */
 const Over = ({ children }) => (
-    <Backdrop inline screenWidth={SCREEN.width} screenHeight={SCREEN.height} style={{ position: 'absolute', inset: 0 }}>
+    <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height} style={{ position: 'absolute', inset: 0 }}>
         {children}
-    </Backdrop>
+    </Blanket>
 );
 
 const settings = (
-    <Backdrop inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>
+    <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>
         <PatternModal title="Session settings" width="lg" height="fill" onClose={() => {}} footer={footer('Save')}>
             {text('Thursday · 4:00–5:00 PM with Ana Ruiz.')}
         </PatternModal>
-    </Backdrop>
+    </Blanket>
 );
 
 /**
  * A Details Panel floating over the right of the stand-in screen: on the
- * overlay fill and shadow, with no Backdrop under it, which is how a Panel
+ * overlay fill and shadow, with no Blanket under it, which is how a Panel
  * always floats. Docs geometry, px.
  */
 export const FloatingPanel = ({ screenHeight = SCREEN.height }) => (
@@ -114,11 +114,11 @@ export const PanelWithUnrelatedModal = () => (
 /** Do: a Modal confirms inside itself, with a warning SectionMessage and the danger button. */
 export const ModalConfirmsInside = () => (
     <Stage>
-        <Backdrop inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>
+        <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>
             <PatternModal title="Delete session?" width="sm" onClose={() => {}} footer={footer('Delete session', 'danger')}>
                 <SectionMessage appearance="warning">This removes the session for Ana and her tutor. This cannot be undone.</SectionMessage>
             </PatternModal>
-        </Backdrop>
+        </Blanket>
     </Stage>
 );
 
@@ -133,13 +133,13 @@ export const ModalOverModal = () => (
 /** Do: a confirm on its own in the small width. */
 export const ConfirmSmallDo = () => (
     <Stage>
-        <Backdrop inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>{discard('sm')}</Backdrop>
+        <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>{discard('sm')}</Blanket>
     </Stage>
 );
 
 /** Don't: the same confirm in the large width. */
 export const ConfirmSmallDont = () => (
     <Stage>
-        <Backdrop inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>{discard('lg')}</Backdrop>
+        <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>{discard('lg')}</Blanket>
     </Stage>
 );

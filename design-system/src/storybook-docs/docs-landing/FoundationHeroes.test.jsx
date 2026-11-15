@@ -53,7 +53,7 @@ describe('Foundations heroes', () => {
 
     it.each(FOUNDATION_IDS)('%s paints only through tokens', (id) => {
         const { container } = render(React.createElement(HEROES[id].Hero));
-        for (const value of paints(container)) expect(value === PAINT.markTile || /^var\(--ds-[a-z-]+\)$/.test(value), value).toBe(true);
+        for (const value of paints(container)) expect(value === PAINT.markTile || /^var\(--(?:ds-|chart-)[a-z-]+\)$/.test(value), value).toBe(true);
     });
 
     it.each(FOUNDATION_IDS)('%s puts the brand accent on its subject', (id) => {

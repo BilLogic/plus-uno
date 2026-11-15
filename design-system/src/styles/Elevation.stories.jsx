@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button, HeadingContextProvider, Modal, PanelBody, PanelContainer, PanelHeader, Popup, Select, Tooltip } from '@/components';
-import { Backdrop, PatternCard, PatternSection, PatternTable } from '@/patterns';
+import { Blanket, PatternCard, PatternSection, PatternTable } from '@/patterns';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import {
@@ -41,7 +41,7 @@ export const Stack = {
         // Seven plates, bottom first, each drawn from the illustration kit with no words:
         // the names and the --layer-* values live in the labels beside it.
         const plates = [...root.querySelectorAll('[data-plate]')];
-        await expect(plates.map((p) => p.dataset.plate)).toEqual(['frame', 'page', 'card', 'popup', 'backdrop', 'modal', 'tooltip']);
+        await expect(plates.map((p) => p.dataset.plate)).toEqual(['frame', 'page', 'card', 'popup', 'blanket', 'modal', 'tooltip']);
         for (const plate of plates) await expect(plate.querySelector('svg text, text'), `${plate.dataset.plate} draws no words`).toBeNull();
         // Flat turn, no perspective: every plate wears the same skew, and none is 3D.
         await expect(root.querySelector('[style*="preserve-3d"], [style*="rotateX"]')).toBeNull();
@@ -79,16 +79,16 @@ export const Stack = {
         await expect(shadowOf('modal')).toBe('var(--ds-shadow-blocking)');
         await expect(plates[6].querySelector('[style*="box-shadow"]')).toBeNull();
         // Labels read top first, in the DOM as on screen.
-        await expect([...root.querySelectorAll('[data-legend]')].map((li) => li.dataset.legend)).toEqual(['tooltip', 'modal', 'backdrop', 'popup', 'card', 'page', 'frame']);
+        await expect([...root.querySelectorAll('[data-legend]')].map((li) => li.dataset.legend)).toEqual(['tooltip', 'modal', 'blanket', 'popup', 'card', 'page', 'frame']);
 
         const legend = within(root.querySelector('[data-testid="stack-legend"]'));
         await waitFor(() => expect(legend.getByText(/--layer-modal \d+/)).toBeInTheDocument());
-        await expect(legend.getByText('Backdrop')).toBeInTheDocument();
+        await expect(legend.getByText('Blanket')).toBeInTheDocument();
         await waitFor(() => expect(legend.getByText(/--layer-tooltip \d+/)).toBeInTheDocument());
         await expect(legend.getAllByRole('listitem')).toHaveLength(7);
         // Each label names its shadow; the Tooltip has none.
         await expect(legend.getByText('--ds-shadow-blocking', { selector: '[data-legend="modal"] span' })).toBeInTheDocument();
-        await expect(legend.getByText('blanket fill', { selector: '[data-legend="backdrop"] span' })).toBeInTheDocument();
+        await expect(legend.getByText('blanket fill', { selector: '[data-legend="blanket"] span' })).toBeInTheDocument();
         await expect(legend.getByText('no shadow', { selector: '[data-legend="tooltip"] span' })).toBeInTheDocument();
         // Card is raised with no layer: --layer-card belongs to sticky headers and columns.
         await expect(root.querySelector('[data-legend="card"]')).toHaveTextContent(/no layer\s*--ds-shadow-raised/);
@@ -303,10 +303,10 @@ const expectOverlay = async (canvasElement, selector) => {
     await waitFor(() => expect(canvasElement.querySelector(selector)).not.toBeNull());
     const box = canvasElement.querySelector(selector);
     await waitFor(() => expect(getComputedStyle(box).boxShadow).not.toBe('none'));
-    await expect(canvasElement.querySelector('.plus-frame__backdrop'), 'no Backdrop under it').toBeNull();
+    await expect(canvasElement.querySelector('.plus-frame__blanket'), 'no Blanket under it').toBeNull();
 };
 
-/** The real Sidebar peeked from the left edge: it floats over the page with no Backdrop. */
+/** The real Sidebar peeked from the left edge: it floats over the page with no Blanket. */
 export const FloatingSidebar = {
     render: () => <SessionsFrame edge=".plus-frame__edge" sidebarDocked={false} columns={2} />,
     play: async ({ canvasElement }) => {
@@ -318,10 +318,10 @@ export const FloatingSidebar = {
     },
 };
 
-/** The Modal on its Backdrop. */
-export const ModalOnBackdrop = {
+/** The Modal on its Blanket. */
+export const ModalOnBlanket = {
     render: () => (
-        <Backdrop inline screenWidth={768} screenHeight={420}>
+        <Blanket inline screenWidth={768} screenHeight={420}>
             <Modal
                 show
                 renderAs="inline"
@@ -332,7 +332,7 @@ export const ModalOnBackdrop = {
                 secondaryButton={{ text: 'Cancel', onClick: () => {} }}
                 onClose={() => {}}
             />
-        </Backdrop>
+        </Blanket>
     ),
     play: async ({ canvasElement }) => {
         const modal = canvasElement.querySelector('.plus-modal');
@@ -368,7 +368,7 @@ export const OpenSelect = {
     },
 };
 
-/** The real Panel peeked from the right edge: it floats over the page with no Backdrop. */
+/** The real Panel peeked from the right edge: it floats over the page with no Blanket. */
 export const FloatingPanel = {
     render: () => (
         <SessionsFrame
@@ -531,15 +531,15 @@ export const AlwaysPair = () => (
     </DoDont>
 );
 
-/** Blocking belongs to the Modal on its Backdrop. */
-export const BlockingOnBackdrop = () => (
+/** Blocking belongs to the Modal on its Blanket. */
+export const BlockingOnBlanket = () => (
     <DoDont>
-        <Do caption="The Modal on the Backdrop takes the blocking shadow.">
-            <Backdrop inline screenWidth={360} screenHeight={300}>
+        <Do caption="The Modal on the Blanket takes the blocking shadow.">
+            <Blanket inline screenWidth={360} screenHeight={300}>
                 <Modal show renderAs="inline" width={280} title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
-            </Backdrop>
+            </Blanket>
         </Do>
-        <Dont caption="A Panel with the blocking shadow and no Backdrop. If it needs full attention, make it a Modal.">
+        <Dont caption="A Panel with the blocking shadow and no Blanket. If it needs full attention, make it a Modal.">
             <div style={ground}>
                 <div style={{ boxShadow: 'var(--ds-shadow-blocking)', borderRadius: 'var(--card-radius)' }}>
                     <HeadingContextProvider value={2}>

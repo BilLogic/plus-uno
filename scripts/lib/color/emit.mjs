@@ -33,7 +33,7 @@ export const paletteVar = (ref) => (ref === 'transparent' ? 'transparent' : `var
 
 /** `color.background.brand.bold` -> `--ds-background-brand-bold`. */
 export const dsName = (name) => {
-  const family = name.replace(/^(color|elevation)[.]/, '').replaceAll('.', '-').replace(/^blanket(?=-|$)/, 'backdrop');
+  const family = name.replace(/^(color|elevation)[.]/, '').replaceAll('.', '-');
   return `--${/^(chart|skeleton)-/.test(family) ? '' : 'ds-'}${family}`;
 };
 

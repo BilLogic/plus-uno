@@ -326,7 +326,7 @@ export const HEROES = {
   'templates-modal': {
     Hero: ModalHero,
     description:
-      'One task over a Backdrop; the Modal ringed.',
+      'One task over a Blanket; the Modal ringed.',
   },
   'templates-panel': {
     Hero: PanelHero,

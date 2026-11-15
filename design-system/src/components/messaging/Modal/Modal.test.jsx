@@ -40,7 +40,7 @@ describe('Modal sizing props', () => {
 
 /**
  * The dialog behavior comes from Base UI's Dialog: focus in on open, focus
- * kept in, Escape, a press on the backdrop, focus back on close, and the page
+ * kept in, Escape, a press on the blanket, focus back on close, and the page
  * behind hidden from assistive tech while it is open.
  */
 describe('Modal behavior', () => {
@@ -105,15 +105,15 @@ describe('Modal behavior', () => {
         expect(screen.getByRole('dialog', { name: 'Settings' })).toBeInTheDocument();
     });
 
-    it('closes on a press on the backdrop', async () => {
+    it('closes on a press on the blanket', async () => {
         const { user, dialog } = await open();
-        await user.click(dialog.closest('.plus-pattern-backdrop'));
+        await user.click(dialog.closest('.plus-pattern-blanket'));
         await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     });
 
-    it.each(['static', false])('keeps open on a press on the backdrop with backdrop=%s', async (backdrop) => {
-        const { user, dialog } = await open({ backdrop });
-        await user.click(dialog.closest('.plus-pattern-backdrop'));
+    it.each(['static', false])('keeps open on a press on the blanket with blanket=%s', async (blanket) => {
+        const { user, dialog } = await open({ blanket });
+        await user.click(dialog.closest('.plus-pattern-blanket'));
         expect(screen.getByRole('dialog', { name: 'Settings' })).toBeInTheDocument();
     });
 

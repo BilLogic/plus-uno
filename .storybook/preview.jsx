@@ -643,7 +643,7 @@ const preview = {
 
   tags: ['autodocs'],
 
-  // A demo shown in the docs stays inside its canvas: no modal, Backdrop or
+  // A demo shown in the docs stays inside its canvas: no modal, Blanket or
   // fixed Flag stack over the docs page (test-only `!dev` stories are exempt).
   afterEach: assertContained,
 };

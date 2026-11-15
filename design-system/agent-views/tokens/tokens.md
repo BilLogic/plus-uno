@@ -56,10 +56,10 @@ Start here for space, size and radius (ADR-038). A component reads its component
 Space owned by a pattern: page, section, card, table, modal, popup. Inside a pattern, read its token before a semantics step.
 
 ```css
---backdrop-fill  /* Fill of the Backdrop that dims the page behind a Modal. */
---backdrop-max-height-modal  /* Tallest a Modal may grow inside its Backdrop. */
---backdrop-pad-x  /* Horizontal space between the screen edge and a Modal on its Backdrop. */
---backdrop-pad-y  /* Vertical space between the screen edge and a Modal on its Backdrop; shrinks on short screens. */
+--blanket-fill  /* Fill of the Blanket that dims the page behind a Modal. */
+--blanket-max-height-modal  /* Tallest a Modal may grow inside its Blanket. */
+--blanket-pad-x  /* Horizontal space between the screen edge and a Modal on its Blanket. */
+--blanket-pad-y  /* Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens. */
 --card-pad-compact  /* Padding inside a PatternCard with compact spacing. */
 --card-pad-default  /* Padding inside a PatternCard with default spacing. */
 --card-pad-spacious  /* Padding inside a PatternCard with spacious spacing. */
@@ -210,11 +210,11 @@ Tokens one component owns, named for it.
 Stacking order: `z-index: var(--layer-modal)`.
 
 ```css
---layer-backdrop  /* Stacking order of the Backdrop behind a Modal. */
+--layer-blanket  /* Stacking order of the Blanket behind a Modal. */
 --layer-card  /* Stacking order of a card raised above page content, such as a sticky table part. */
 --layer-dialog  /* Stacking order of a non-modal dialog over the page, below popups. */
 --layer-flag  /* Stacking order of a Flag, above any Modal. */
---layer-modal  /* Stacking order of a Modal, above its Backdrop. */
+--layer-modal  /* Stacking order of a Modal, above its Blanket. */
 --layer-navigation  /* Stacking order of the Frame's top bar and Sidebar. */
 --layer-popup  /* Stacking order of a Popup, DropdownMenu or listbox. */
 --layer-spotlight  /* Stacking order of a Spotlight, above Flags. */
@@ -559,9 +559,6 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-ai-background-bold  /* Ground of the one primary AI action in a region (Button, AI appearance). Pair its label with --ds-text-inverse. */
 --ds-ai-background-bold-hovered  /* Hovered ground of an AI action. */
 --ds-ai-background-bold-pressed  /* Pressed ground of an AI action. */
---ds-backdrop  /* The screen overlay that appears with a Modal */
---ds-backdrop-danger  /* An overlay to communicate danger states when a simple background color change isn't possible, such as deleting a block in a RichTextEditor */
---ds-backdrop-selected  /* A translucent blanket to communicate selection when changing the background of the selected content is not possible, such as selected blocks in a RichTextEditor. The content beneath remains visible. Do not use to indicate keyboard focus or hover alone */
 --ds-background-accent-blue-bolder  /* Blue backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-blue-bolder-hovered
 --ds-background-accent-blue-bolder-pressed
@@ -817,6 +814,9 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-background-warning-subtler  /* Backgrounds of warning status tags and count tags to ensure accessibility and desired visual appearance */
 --ds-background-warning-subtler-hovered
 --ds-background-warning-subtler-pressed
+--ds-blanket  /* The screen overlay that appears with a Modal */
+--ds-blanket-danger  /* An overlay to communicate danger states when a simple background color change isn't possible, such as deleting a block in a RichTextEditor */
+--ds-blanket-selected  /* A translucent blanket to communicate selection when changing the background of the selected content is not possible, such as selected blocks in a RichTextEditor. The content beneath remains visible. Do not use to indicate keyboard focus or hover alone */
 --ds-border  /* Visually group or separate UI elements, such as flat cards or side panel dividers */
 --ds-border-accent-blue  /* Blue borders on non-bold backgrounds when there is no meaning tied to the color */
 --ds-border-accent-blue-subtle  /* Decorative blue borders that do not need to meet 3:1 contrast requirements */
@@ -984,7 +984,7 @@ Pick the level by what the surface does (Foundations/Visual/Elevation § Choose 
 ```css
 --ds-opacity-disabled  /* Images and whole elements in a disabled state. */
 --ds-opacity-loading  /* Content under a loading spinner. */
---ds-shadow-blocking  /* Box shadow of the Modal on its Backdrop, the one surface that blocks the page. Pair with --ds-surface-overlay. */
+--ds-shadow-blocking  /* Box shadow of the Modal on its Blanket, the one surface that blocks the page. Pair with --ds-surface-overlay. */
 --ds-shadow-overflow  /* Shadow where content scrolls under a part that stays put, such as a table's sticky header or column. A border marks the cut first. */
 --ds-shadow-overflow-perimeter  /* Fallback for overflow when a box shadow is not feasible; pair with .spread. */
 --ds-shadow-overflow-spread  /* Fallback for overflow when a box shadow is not feasible; pair with .perimeter. */

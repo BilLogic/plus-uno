@@ -18,8 +18,8 @@ Templates run from broadest to smallest. Each page covers types, anatomy, key st
 - **Card.** A raised container for one object on a page, such as a student, a session or a metric: an optional image, a header over a body, and an optional footer.
 - **Table.** How a table sits on a page: the Section header carries the title and toolbar, and the table spans the section under it.
 - **Form.** A stack of fields with a footer, in one of four places: in a page, in a Panel, in a Modal, or in steps.
-- **Modal.** One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps.
-- **Panel.** A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications.
+- **Modal.** One task before anything else can happen, centered over a Blanket. Four types: Passive, Active, Acknowledge and Steps.
+- **Panel.** A full-height layer beside or over the Page with no Blanket. Two floating types: Details and Notifications.
 - **Popup.** A floating layer that hangs off its trigger and closes on an outside click. Six types, from menu to stacked filter menu.
 
 ## Templates and patterns
@@ -78,7 +78,7 @@ One chooser for the four layers that take over from the page or sit above it. A 
 | takes a form | Yes | Yes | Yes | No |
 | is a destructive confirm | No | Yes | No | No |
 | hangs off its trigger | No | No | No | Yes |
-| dims the page under a Backdrop | No | Yes | No | No |
+| dims the page under a Blanket | No | Yes | No | No |
 | has its own URL | Yes | No | No | No |
 | closes on Escape and returns focus | No | Yes | Yes | Yes |
 

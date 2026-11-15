@@ -30,7 +30,7 @@ export const LEVELS = [
     { id: 'default', name: 'Default', surface: '--ds-surface', shadow: null, use: 'The page, and everything that flows in it.' },
     { id: 'raised', name: 'Raised', surface: '--ds-surface-raised', shadow: '--ds-shadow-raised', use: 'One object the person can act on: a Card.' },
     { id: 'overlay', name: 'Overlay', surface: '--ds-surface-overlay', shadow: '--ds-shadow-overlay', use: 'A layer that floats while the page stays usable.' },
-    { id: 'blocking', name: 'Blocking', surface: '--ds-surface-overlay', shadow: '--ds-shadow-blocking', use: 'The Modal, on its Backdrop. Nothing else.' },
+    { id: 'blocking', name: 'Blocking', surface: '--ds-surface-overlay', shadow: '--ds-shadow-blocking', use: 'The Modal, on its Blanket. Nothing else.' },
     { id: 'overflow', name: 'Overflow', surface: null, shadow: '--ds-shadow-overflow', use: 'A shadow only, where content scrolls under a part that stays put.' },
 ];
 
@@ -50,7 +50,7 @@ export const BEHAVIORS = [
     { id: 'marks', behavior: 'Marks one object', level: 'raised', layer: null, uses: 'Card, Carousel slide, Range thumb' },
     { id: 'stays', behavior: 'Stays put while content scrolls', level: 'overflow', layer: '--layer-card', uses: 'Sticky table header and column, with a border first' },
     { id: 'floats', behavior: 'Floats, page usable', level: 'overlay', layer: ['--layer-navigation', '--layer-popup', '--layer-flag', '--layer-spotlight'], uses: 'Floating Sidebar, floating Panel, Popup types (Popup, DropdownMenu, a Select list), Inline edit, Flag, Spotlight, a dragged Card' },
-    { id: 'blocks', behavior: 'Blocks the page', level: 'blocking', layer: '--layer-modal', uses: 'Modal only, on the Backdrop (--layer-backdrop)' },
+    { id: 'blocks', behavior: 'Blocks the page', level: 'blocking', layer: '--layer-modal', uses: 'Modal only, on the Blanket (--layer-blanket)' },
     { id: 'replaces', behavior: 'Replaces the page', level: 'default', layer: '--layer-dialog', uses: 'Frame · focused, AiChat full screen' },
     { id: 'labels', behavior: 'Labels a control', level: null, layer: '--layer-tooltip', uses: 'Tooltip, with no shadow' },
 ];
@@ -61,8 +61,8 @@ export const LAYERS = [
     { token: '--layer-navigation', who: 'The floating Sidebar and Panel' },
     { token: '--layer-dialog', who: 'A page that replaces the page: Frame · focused, AiChat full screen' },
     { token: '--layer-popup', who: 'Popups, menus, a Select list' },
-    { token: '--layer-backdrop', who: 'The Backdrop' },
-    { token: '--layer-modal', who: 'The Modal, above its Backdrop' },
+    { token: '--layer-blanket', who: 'The Blanket' },
+    { token: '--layer-modal', who: 'The Modal, above its Blanket' },
     { token: '--layer-flag', who: 'Flags, above a Modal' },
     { token: '--layer-spotlight', who: 'Onboarding spotlights' },
     { token: '--layer-tooltip', who: 'Tooltips, above everything' },
@@ -257,7 +257,7 @@ const Hairline = ({ x, y, w, h, corner, stroke }) => (
 /**
  * The plates, bottom to top. `subject` is the highlighted part in plate units;
  * `ground` paints the plate itself (the page surface, the Frame's sunken
- * ground, or the Backdrop's blanket); `draw` adds the wireframe. No words: the lesson holds without them.
+ * ground, or the Blanket's blanket); `draw` adds the wireframe. No words: the lesson holds without them.
  */
 const PLATES = [
     {
@@ -303,8 +303,8 @@ const PLATES = [
         ),
     },
     {
-        // The Backdrop is the whole plate: the blanket, ringed as the subject.
-        id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-backdrop', ground: PAINT.backdrop,
+        // The Blanket is the whole plate: the blanket, ringed as the subject.
+        id: 'blanket', title: 'Blanket', level: 'blocking', layer: '--layer-blanket', ground: PAINT.blanket,
         subject: { x: 0, y: 0, w: PLATE.w, h: PLATE.h },
         draw: (s) => <Hairline {...s} corner="window" stroke={PAINT.accent} />,
     },
@@ -397,7 +397,7 @@ const resetButton = {
 
 /**
  * One screen taken apart into its layers, as an exploded view: the Frame, the
- * Page, a Card, a Popup, the Backdrop, the Modal and a Tooltip, each on its own
+ * Page, a Card, a Popup, the Blanket, the Modal and a Tooltip, each on its own
  * plate one even step above the last. Each plate's subject joins the plate below
  * it with dashed accent leaders, and the label column gives each plate its name,
  * its `--layer-*` token and its shadow. Hovering or focusing a label or a plate
@@ -527,7 +527,7 @@ export const ExplodedStack = () => {
 
 /** The label's shadow cell: the level's shadow token, or none. */
 const shadowNote = (plate) => {
-    if (plate.id === 'backdrop') return 'blanket fill';
+    if (plate.id === 'blanket') return 'blanket fill';
     const level = plate.level ? levelOf(plate.level) : null;
     return level?.shadow ?? 'no shadow';
 };
@@ -536,7 +536,7 @@ const shadowNote = (plate) => {
 export const LevelTiles = () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))', gap: 'var(--grid-gutter)' }}>
         {LEVELS.map((l) => {
-            const onBackdrop = l.id === 'blocking';
+            const onBlanket = l.id === 'blocking';
             return (
                 <div
                     key={l.id}
@@ -544,7 +544,7 @@ export const LevelTiles = () => (
                     style={{
                         padding: 'var(--card-pad-compact)',
                         borderRadius: 'var(--card-radius)',
-                        background: onBackdrop ? 'linear-gradient(var(--ds-backdrop), var(--ds-backdrop)), var(--ds-surface)' : l.id === 'sunken' ? 'var(--ds-surface)' : 'var(--ds-surface-sunken)',
+                        background: onBlanket ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : l.id === 'sunken' ? 'var(--ds-surface)' : 'var(--ds-surface-sunken)',
                     }}
                 >
                     <div
@@ -728,7 +728,7 @@ export const ShadowComposer = () => {
                     ref={ground}
                     data-color-mode={mode}
                     {...(contrast ? { 'data-contrast-mode': contrast } : {})}
-                    data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center', minHeight: 'calc(var(--image-xl) * 3.5)', background: levelId === 'blocking' ? 'linear-gradient(var(--ds-backdrop), var(--ds-backdrop)), var(--ds-surface)' : 'var(--ds-surface)' }}
+                    data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center', minHeight: 'calc(var(--image-xl) * 3.5)', background: levelId === 'blocking' ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : 'var(--ds-surface)' }}
                 >
                     <div
                         data-testid="composer-surface"

@@ -1,11 +1,11 @@
 import { useMotionReduced } from '@/lib/motionPreference';
 import { useOverlayPresence, useOverlayOrigin } from '@/lib/overlayMotion';
-import { BackdropOpenContext } from '../Backdrop/Backdrop';
+import { BlanketOpenContext } from '../Blanket/Blanket';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Icon, IconButton, Tabs, Skeleton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { BACKDROP_HEIGHTS, BACKDROP_WIDTHS } from '../Backdrop';
+import { BLANKET_HEIGHTS, BLANKET_WIDTHS } from '../Blanket';
 import './PatternModal.scss';
 
 /**
@@ -14,12 +14,12 @@ import './PatternModal.scss';
  * title and close button, body slot, footer slot. Width is a step of the
  * screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and
  * height hugs the content up to the screen less 128 or fills to it, the body
- * scrolling past it. Place it in `Backdrop`.
+ * scrolling past it. Place it in `Blanket`.
  * Baked-in tokens: the overlay pair (`--ds-surface-overlay` with
  * `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad,
  * Modal/stack-md and Modal/radius.
  * Mirrors "Pattern/Modal" in the Figma design system file.
- * For a real overlay dialog (backdrop, focus trap), use the core Modal component.
+ * For a real overlay dialog (blanket, focus trap), use the core Modal component.
  *
  * A dialog is its own page: the title is its h1, at Heading/medium 20, and a
  * section inside it opens at h2.
@@ -57,8 +57,8 @@ const PatternModal = ({
     ...props
 }) => {
     const reduced = useMotionReduced();
-    const backdropOpen = React.useContext(BackdropOpenContext);
-    const open = show && backdropOpen;
+    const blanketOpen = React.useContext(BlanketOpenContext);
+    const open = show && blanketOpen;
     const surface = React.useRef(null);
     const present = useOverlayPresence(open, surface);
     useOverlayOrigin(open, surface);
@@ -224,7 +224,7 @@ function useOverflows(ref) {
 }
 
 PatternModal.propTypes = {
-    /** Keep mounted and set false to finish the exit before removal; also follows its Backdrop. */
+    /** Keep mounted and set false to finish the exit before removal; also follows its Blanket. */
     show: PropTypes.bool,
     id: PropTypes.string,
     /** Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name
@@ -252,9 +252,9 @@ PatternModal.propTypes = {
      * (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440).
      * Grows with the screen, never shrinks, ignores the sidebar.
      */
-    width: PropTypes.oneOf(BACKDROP_WIDTHS),
+    width: PropTypes.oneOf(BLANKET_WIDTHS),
     /** `hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap. */
-    height: PropTypes.oneOf(BACKDROP_HEIGHTS),
+    height: PropTypes.oneOf(BLANKET_HEIGHTS),
     /**
      * A tab group under the title: `{ key, label, content, disabled? }` per tab.
      * The tabs stay put in the header and the body, now the tab panel, shows the

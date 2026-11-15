@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Backdrop, Field, Modal, Popup, Rect, SkeletonBar } from './primitives.jsx';
+import { Blanket, Field, Modal, Popup, Rect, SkeletonBar } from './primitives.jsx';
 
 /**
  * The Forms pattern's do and don't drawings. Each lesson is about where a
@@ -23,10 +23,10 @@ const Canvas = ({ title, children }) => (
   </Illustration>
 );
 
-/** A Modal over its Backdrop with one field and its footer strip; the caller adds what the lesson is about. */
+/** A Modal over its Blanket with one field and its footer strip; the caller adds what the lesson is about. */
 const FormModal = ({ invalid = false, children }) => (
   <g>
-    <Backdrop x={0} y={0} w={W} h={H} />
+    <Blanket x={0} y={0} w={W} h={H} />
     <Modal x={MODAL.x} y={MODAL.y} w={MODAL.w} h={MODAL.h} />
     <SkeletonBar x={FIELD_X} y={MODAL.y + 8} w={36} h={5} heading />
     <Field x={FIELD_X} y={MODAL.y + 22} w={FIELD_W} invalid={invalid} />
@@ -48,7 +48,7 @@ export const ErrorOnField = ({ title = 'A Modal whose invalid field carries its 
 export const ErrorInSecondDialog = ({ title = 'A Modal whose invalid field has no message of its own while a second small Modal opens over it' }) => (
   <Canvas title={title}>
     <FormModal invalid />
-    <Backdrop x={0} y={0} w={W} h={H} />
+    <Blanket x={0} y={0} w={W} h={H} />
     <Modal x={52} y={30} w={64} h={40} accent />
   </Canvas>
 );

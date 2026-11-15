@@ -10,7 +10,7 @@ Two 12-column grids with a 16 gutter at every width; page content caps at 1232.
 
 ## Overview
 
-PLUS is desktop only, from 768 up. The screen grid spans the screen on the Backdrop layer: modals and floating Panels size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its breakpoint mode, never by hand-editing its grid. The grid decides where containers sit; spacing tokens decide everything inside them.
+PLUS is desktop only, from 768 up. The screen grid spans the screen on the Blanket layer: modals and floating Panels size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its breakpoint mode, never by hand-editing its grid. The grid decides where containers sit; spacing tokens decide everything inside them.
 
 ```css
 display: grid;
@@ -18,7 +18,7 @@ grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
 gap: var(--grid-gutter);
 ```
 
-Figma holds the breakpoint modes (768, 1024 and 1440) on `spacing / semantics` and `spacing / patterns`. The content grid sits on the Page's content frame; the screen grid sits on the Backdrop only.
+Figma holds the breakpoint modes (768, 1024 and 1440) on `spacing / semantics` and `spacing / patterns`. The content grid sits on the Page's content frame; the screen grid sits on the Blanket only.
 
 ## Breakpoints
 
@@ -56,16 +56,16 @@ Take the grid from the template and set its variable mode rather than drawing co
 
 | Grid | Carried by | How to apply |
 | --- | --- | --- |
-| Screen grid | The Backdrop: 12 columns, centered, each column Grid/width-column-screen wide, gutter Grid/gutter. | Put the Modal in the Backdrop. Change the breakpoint with the frame’s variable mode in the appearance panel, never by resizing. |
+| Screen grid | The Blanket: 12 columns, centered, each column Grid/width-column-screen wide, gutter Grid/gutter. | Put the Modal in the Blanket. Change the breakpoint with the frame’s variable mode in the appearance panel, never by resizing. |
 | Content grid | The Content frame of the Page inside the Frame: 12 columns, stretched, gutter Grid/gutter; the margin is Page/pad. | Build the page inside the Frame and set the mode on the frame. Place containers on the columns with auto layout. |
-| Grid styles | Grid and Grid/Adaptive (12-col) are the content grid; Grid/Viewport (adaptive) is the screen grid. | Apply Grid or Grid/Adaptive (12-col) to a Page content frame and Grid/Viewport (adaptive) to a Backdrop. All three follow the frame mode. |
+| Grid styles | Grid and Grid/Adaptive (12-col) are the content grid; Grid/Viewport (adaptive) is the screen grid. | Apply Grid or Grid/Adaptive (12-col) to a Page content frame and Grid/Viewport (adaptive) to a Blanket. All three follow the frame mode. |
 
 Shift + G (Mac) or Control + G (Windows) shows and hides the grid. Each layer owns one part of the layout:
 
 - The **template** owns the width (`Screen/width-screen`) and the breakpoint mode.
 - **Frame** fills it: the Sidebar beside the Page. The Page carries the content grid and the Content slot.
 - The **Sidebar** docks by `Sidebar/sidebar-docked` (false · true · true across Medium · Large · X-Large).
-- The **Backdrop** sits above the Frame and carries the screen grid, which shows and hides with it.
+- The **Blanket** sits above the Frame and carries the screen grid, which shows and hides with it.
 
 ## Content widths
 
@@ -89,7 +89,7 @@ The [Frame](?path=/docs/templates-frame--docs) draws the layout the content grid
 - `--panel-width-default`: The width a Panel opens at
 - `--panel-max-width`: The widest the splitter allows a Panel
 
-The Frame has no seams, no pad and no stack: the Page runs to the window edges and meets the sidebar at a hairline. A Panel opens at 400, and its splitter holds it between 320 and 640. The topbar is 32 with no vertical pad. Below 1024 the sidebar opens over the page (240 wide, full height, overlay shadow, no Backdrop) and an outside click closes it, so the page never reflows when it opens. At 1024 the sidebar docks and content steps from 975 to 736, so cards reflow there while modals keep their width.
+The Frame has no seams, no pad and no stack: the Page runs to the window edges and meets the sidebar at a hairline. A Panel opens at 400, and its splitter holds it between 320 and 640. The topbar is 32 with no vertical pad. Below 1024 the sidebar opens over the page (240 wide, full height, overlay shadow, no Blanket) and an outside click closes it, so the page never reflows when it opens. At 1024 the sidebar docks and content steps from 975 to 736, so cards reflow there while modals keep their width.
 
 ## Column spans
 
@@ -114,8 +114,8 @@ A modal spans 6, 8 or 10 screen-grid columns, the gutters between them, and its 
 - `--modal-width-sm` (Modal/width-modal-sm)
 - `--modal-width-md` (Modal/width-modal-md)
 - `--modal-width-lg` (Modal/width-modal-lg)
-- `--backdrop-pad-x` (Backdrop/pad-x)
-- `--backdrop-pad-y` (Backdrop/pad-y)
+- `--blanket-pad-x` (Blanket/pad-x)
+- `--blanket-pad-y` (Blanket/pad-y)
 
 ## Size roles
 

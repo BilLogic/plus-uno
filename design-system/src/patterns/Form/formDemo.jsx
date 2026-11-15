@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Button, Fieldset, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader, SectionMessage, Select, Skeleton, TextField } from '@/components';
 import { PresenceSlot } from '@/lib/listMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
-import { Backdrop, PatternModal, PatternSection } from '@/patterns';
+import { Blanket, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
@@ -217,7 +217,7 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
     const close = () => { if (dirty) setConfirming(true); };
     return (
         <BrowserWindow address="app.plus.org/students" height={stageHeight}>
-            <Backdrop inline screenWidth={SCREEN.width} screenHeight={screenHeight}>
+            <Blanket inline screenWidth={SCREEN.width} screenHeight={screenHeight}>
                 {confirming ? (
                     <PatternModal
                         width="sm"
@@ -249,7 +249,7 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
                         <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />
                     </PatternModal>
                 )}
-            </Backdrop>
+            </Blanket>
         </BrowserWindow>
     );
 };

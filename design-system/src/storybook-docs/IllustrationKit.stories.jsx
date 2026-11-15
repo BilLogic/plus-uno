@@ -21,7 +21,7 @@ export default {
 };
 
 const PAINTED = ['fill', 'stroke'];
-const TOKEN_OR_NONE = /^(?:var\(--ds-[\w-]+\)|none)$/;
+const TOKEN_OR_NONE = /^(?:var\(--(?:ds-|chart-)[\w-]+\)|none)$/;
 
 const everyPaintIsAToken = (svg) =>
   [...svg.querySelectorAll('*')].every((el) =>
@@ -99,11 +99,11 @@ export const ResponsiveReflowDrawings = {
       await expect(svg.querySelectorAll('text').length).toBe(0);
       await expect(everyPaintIsAToken(svg)).toBe(true);
     }
-    // The Sidebar docks at 1280 (an edge line), collapses at 960, and floats on a Backdrop at 768.
+    // The Sidebar docks at 1280 (an edge line), collapses at 960, and floats on a Blanket at 768.
     const has = (svg, token) => svg.outerHTML.includes(token);
-    await expect(has(svgs[0], '--ds-backdrop')).toBe(false);
-    await expect(has(svgs[1], '--ds-backdrop')).toBe(false);
-    await expect(has(svgs[2], '--ds-backdrop')).toBe(true);
+    await expect(has(svgs[0], '--ds-blanket')).toBe(false);
+    await expect(has(svgs[1], '--ds-blanket')).toBe(false);
+    await expect(has(svgs[2], '--ds-blanket')).toBe(true);
     await expect(has(svgs[2], '--ds-shadow-overlay')).toBe(true);
     // The Section's side column sits beside the body only at 1280: one Section fewer below.
     const sections = (svg) => svg.querySelectorAll('[data-part="section"]').length;
