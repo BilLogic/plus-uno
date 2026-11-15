@@ -9,7 +9,9 @@ import { sidebarGroups } from './sidebarConfig';
 /**
  * The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups
  * for the role (`sidebarConfig.js`), the signed-in person's account row, and
- * the open tabs. Home is selected when nothing else is.
+ * the open tabs. Home is selected when nothing else is. Pass `groups` to add
+ * or override a prototype's own area(s) by `id` while keeping the role's
+ * navigation.
  *
  * Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a
  * student) calls `open(parentId, record)`, and the record shows here as a tab
@@ -21,6 +23,7 @@ import { sidebarGroups } from './sidebarConfig';
  */
 const Sidebar = ({
     user = 'tutor',
+    groups,
     account,
     modulesLeft = 0,
     lessonsLeft = 0,
@@ -63,7 +66,7 @@ const Sidebar = ({
         <PatternSidebar
             className={['plus-sidebar', className].filter(Boolean).join(' ')}
             style={style}
-            groups={sidebarGroups(user, { slackUrl, badges })}
+            groups={sidebarGroups(user, { slackUrl, badges, groups })}
             activeId={activeId}
             onSelect={handleSelect}
             tabs={tabs}
@@ -88,8 +91,30 @@ const Sidebar = ({
     );
 };
 
+const groupItemShape = PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    text: PropTypes.string,
+    icon: PropTypes.string,
+    href: PropTypes.string,
+    external: PropTypes.bool,
+    count: PropTypes.number,
+    countLabel: PropTypes.string,
+    dot: PropTypes.bool,
+    dotLabel: PropTypes.string,
+    training: PropTypes.oneOf(['lessons', 'modules']),
+});
+
+const groupShape = PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    lockedDuringOnboarding: PropTypes.bool,
+    items: PropTypes.arrayOf(groupItemShape).isRequired,
+});
+
 Sidebar.propTypes = {
     user: PropTypes.oneOf(['tutor', 'supervisor']),
+    /** Extra or overridden groups merged by `id` into the role's config (`sidebarConfig.js`): e.g. `[{ id: 'toolkit', items: [{ id: 'reviews', text: 'Reviews', icon: 'clipboard-check' }] }]` */
+    groups: PropTypes.arrayOf(groupShape),
     /** The signed-in person: name, preferred name, one-word role, and an id that keys their remembered sections */
     account: PropTypes.shape({
         id: PropTypes.string,

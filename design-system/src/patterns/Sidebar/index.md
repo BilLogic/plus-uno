@@ -12,15 +12,17 @@ Sidebar pattern: the app's side navigation, 240 wide, padded 12, on the sunken f
 
 **Source:** `design-system/src/patterns/Sidebar/Sidebar.jsx`
 
-**Stories:** `design-system/src/patterns/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, Tutor, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabsClipped, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, Interactive, Light, Dark
+**Stories:** `design-system/src/patterns/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, Tutor, PrototypeAreas, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabsClipped, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, Interactive, Light, Dark
 
 **Storybook page:** `design-system/src/patterns/Sidebar/Sidebar.mdx`
 
 ## Usage
 
 Use `Sidebar` for the app's main areas. `Sidebar` (`@/components`) fills the
-rail from the role's config, and the Frame decides whether it docks, collapses
-or floats; this page covers what is inside it.
+rail from the role's config (`user`), and a prototype passes `groups` to add
+or override its own areas by `id` while keeping the role's navigation. The
+Frame decides whether it docks, collapses or floats; this page covers what is
+inside it.
 
 Content is data. The Sidebar draws the `groups` it is given and never changes
 the URL: the caller handles `onSelect` and decides which groups a role sees.

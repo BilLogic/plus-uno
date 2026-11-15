@@ -51,6 +51,8 @@ The Sidebar, the app's side navigation: the logo row, the groups with their sect
 
 <ComponentExample of={SidebarStories.Tutor} title="Tutor" description="Home and Slack, Training and the Toolkit, with no Admin: which groups a role sees is the caller's config." />
 
+<ComponentExample of={SidebarStories.PrototypeAreas} title="Prototype areas" description="A prototype passes groups to Sidebar to add its own area to the role's config and select it." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -111,8 +113,10 @@ Hover and focus are the browser's own states and are described under Usage.
 ## Usage
 
 Use `Sidebar` for the app's main areas. `Sidebar` (`@/components`) fills the
-rail from the role's config, and the Frame decides whether it docks, collapses
-or floats; this page covers what is inside it.
+rail from the role's config (`user`), and a prototype passes `groups` to add
+or override its own areas by `id` while keeping the role's navigation. The
+Frame decides whether it docks, collapses or floats; this page covers what is
+inside it.
 
 Content is data. The Sidebar draws the `groups` it is given and never changes
 the URL: the caller handles `onSelect` and decides which groups a role sees.
