@@ -2,7 +2,7 @@
 
 # Sidebar
 
-The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for the role (`sidebarConfig.js`), the signed-in person's account row, and the open tabs. Home is selected when nothing else is. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under its row. A tab is selected while its row is the current page (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Signing out clears the tabs. Nothing here changes the URL.
+The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for the role (`sidebarConfig.js`), the signed-in person's account row, and the open tabs. Home is selected when nothing else is. Pass `groups` to add or override a prototype's own area(s) by `id` while keeping the role's navigation. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under its row. A tab is selected while its row is the current page (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Signing out clears the tabs. Nothing here changes the URL.
 
 Also asked as: left nav, side nav.
 
@@ -34,6 +34,7 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Tabs`
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `user` | enum | `'tutor'` | — |
+| `groups` | arrayOf | — | Extra or overridden groups merged by `id` into the role's config (`sidebarConfig.js`): e.g. `[{ id: 'toolkit', items: [{ id: 'reviews', text: 'Reviews', icon: 'clipboard-check' }] }]` |
 | `account` | shape (required) | — | The signed-in person: name, preferred name, one-word role, and an id that keys their remembered sections |
 | `modulesLeft` | number | `0` | A tutor's onboarding modules left. Above 0 the Toolkit is locked; supervisors are never locked. |
 | `lessonsLeft` | number | `0` | A tutor's assigned lessons left; counted on the Lessons row |

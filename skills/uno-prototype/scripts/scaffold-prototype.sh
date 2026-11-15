@@ -32,6 +32,8 @@ dest="$repo_root/prototypes/$slug"
 max_port=$(grep -rhoE 'port: *[0-9]+' "$repo_root"/prototypes/*/vite.config.js 2>/dev/null \
   | grep -oE '[0-9]+' | sort -n | tail -1)
 port=$(( ${max_port:-3000} + 1 ))
+words="${slug//-/ }"
+title="$(printf '%s%s' "$(printf '%s' "${words:0:1}" | tr '[:lower:]' '[:upper:]')" "${words:1}")"
 
 mkdir -p "$dest/src"
 
@@ -110,18 +112,32 @@ html, body, #root { height: 100%; }
 body { margin: 0; background: var(--ds-surface-sunken); }
 EOF
 
-cat > "$dest/src/App.jsx" <<'EOF'
+cat > "$dest/src/App.jsx" <<EOF
 import React from 'react';
 import { Breadcrumb, Sidebar } from '@/components';
 import { Frame, PatternSection } from '@/patterns';
 
+const GROUPS = [
+    {
+        id: 'toolkit',
+        items: [{ id: '$slug', text: '$title', icon: 'compass' }],
+    },
+];
+
 /** The prototype's first page, on the default template. Build against the confirmed plan. */
 const App = () => (
     <Frame
-        header={<Breadcrumb items={[{ text: 'Home' }]} />}
-        sidebar={<Sidebar user="tutor" activeTabId="home" account={{ id: 'ana', name: 'Ana Ruiz', role: 'Tutor' }} />}
+        header={<Breadcrumb items={[{ text: 'Toolkit' }, { text: '$title' }]} />}
+        sidebar={(
+            <Sidebar
+                user="tutor"
+                groups={GROUPS}
+                activeTabId="$slug"
+                account={{ id: 'ana', name: 'Ana Ruiz', role: 'Tutor' }}
+            />
+        )}
     >
-        <PatternSection level="page" title="Home" description="Start here." />
+        <PatternSection level="page" title="$title" description="Start here." />
     </Frame>
 );
 

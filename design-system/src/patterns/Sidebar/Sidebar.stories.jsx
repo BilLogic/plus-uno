@@ -276,6 +276,33 @@ export const Tutor = {
     },
 };
 
+/** A prototype: keeps the role's navigation with its own area added to the Toolkit and selected. */
+export const PrototypeAreas = {
+    render: () => (
+        <Box>
+            <RoleSidebar
+                user="tutor"
+                groups={[
+                    {
+                        id: 'toolkit',
+                        items: [{ id: 'reviews', text: 'Reviews', icon: 'clipboard-check' }],
+                    },
+                ]}
+                activeTabId="reviews"
+                account={TUTOR}
+            />
+        </Box>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(rowNamed(canvasElement, 'Home')).toBeVisible();
+        await expect(rowNamed(canvasElement, 'Sessions')).toBeVisible();
+        const reviews = rowNamed(canvasElement, 'Reviews');
+        await expect(reviews).toHaveAttribute('aria-current', 'page');
+        await expect(getComputedStyle(reviews).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expectGrid(canvasElement);
+    },
+};
+
 /** A tutor mid-onboarding: the Toolkit locked, not hidden; its rows dimmed, with no tabs. */
 export const OnboardingInProgress = {
     args: { view: 'tutor', modulesLeft: 3, lessonsLeft: 2, activeId: 'onboarding' },
