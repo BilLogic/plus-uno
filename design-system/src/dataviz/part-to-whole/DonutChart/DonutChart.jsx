@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import Highcharts from '@/dataviz/highchartsModules';
-import HighchartsReact from 'highcharts-react-official';
+import PlusChart from '@/dataviz/PlusChart';
 
 /**
  * DonutChart Component
@@ -115,7 +114,7 @@ const DonutChart = ({
               * describes itself, and hiding it would bury the focusable
               * keyboard-navigation proxies the module renders inside it.
               */}
-            <HighchartsReact highcharts={Highcharts} options={options} />
+            <PlusChart options={options} />
             <div style={{
                 position: 'absolute',
                 top: '50%',

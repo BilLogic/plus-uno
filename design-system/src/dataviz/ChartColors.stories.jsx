@@ -12,6 +12,7 @@ import {
     WaterfallChart,
     chartPalette,
 } from '@/components';
+import { ChartMotionArea } from '@/dataviz/chartMotion';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
@@ -37,57 +38,59 @@ const Playground = ({ mod }) => {
 };
 
 const Gallery = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
-        <section data-chart="bar">
-            <h3 style={heading}>Bar, two series</h3>
-            <BarChart height={220} categories={['A', 'B', 'C']} series={[{ name: 'This term', data: [45, 72, 58] }, { name: 'Last term', data: [32, 55, 48] }]} />
-        </section>
-        <section data-chart="line">
-            <h3 style={heading}>Line, one series</h3>
-            <LineChart height={220} data={[{ name: 'Average score', data: [60, 66, 71, 74], categories: ['W1', 'W2', 'W3', 'W4'] }]} />
-        </section>
-        <section data-chart="stacked">
-            <h3 style={heading}>Stacked bar</h3>
-            <StackedBarChart height={220} dates={['Mon', 'Tue']} data={[
-                { segments: [{ value: '10', height: '20' }, { value: '40', height: '80' }] },
-                { segments: [{ value: '30', height: '60' }, { value: '20', height: '40' }] },
-            ]} />
-        </section>
-        <section data-chart="pie">
-            <h3 style={heading}>Pie</h3>
-            <PieChart height={220} data={[{ name: 'Lincoln Middle', y: 40 }, { name: 'Roosevelt K-8', y: 30 }, { name: 'North High', y: 20 }, { name: 'Other', y: 10 }]} />
-        </section>
-        <section data-chart="donut">
-            <h3 style={heading}>Donut</h3>
-            <DonutChart size={180} value="75%" label="Completed" segments={[{ value: 75, color: BRAND, label: 'Done' }, { value: 25, color: CHROME.track, label: 'Remaining' }]} />
-        </section>
-        <section data-chart="gauge">
-            <h3 style={heading}>Gauge</h3>
-            <GaugeChart height={220} value={82} label="Attendance" color={STATUS.success} />
-        </section>
-        <section data-chart="waterfall">
-            <h3 style={heading}>Waterfall</h3>
-            <WaterfallChart height={220} categories={['Start', 'Gained', 'Lost', 'End']} data={[{ y: 100, color: BRAND }, 40, -25, { isSum: true, color: BRAND }]} />
-        </section>
-        <section data-chart="heatmap">
-            <h3 style={heading}>Heatmap</h3>
-            <HeatmapChart height={220} xCategories={['Mon', 'Tue', 'Wed']} yCategories={['AM', 'PM']} data={heat} showLegend={false} />
-        </section>
-        <section data-chart="diverging">
-            <h3 style={heading}>Heatmap, diverging</h3>
-            <HeatmapChart height={220} xCategories={['Mon', 'Tue', 'Wed']} yCategories={['AM', 'PM']} data={heat} diverging={['orange', 'blue']} showLegend={false} />
-        </section>
-        <section data-chart="sparkline">
-            <h3 style={heading}>Sparkline</h3>
-            <Sparkline label="Average score" data={[60, 66, 71, 74]} />
-        </section>
-        {PLAYGROUNDS.map(({ name, mod }) => (
-            <section key={name} data-chart={name}>
-                <h3 style={heading}>{name}</h3>
-                <Playground mod={mod} />
+    <ChartMotionArea>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+            <section data-chart="bar">
+                <h3 style={heading}>Bar, two series</h3>
+                <BarChart height={220} categories={['A', 'B', 'C']} series={[{ name: 'This term', data: [45, 72, 58] }, { name: 'Last term', data: [32, 55, 48] }]} />
             </section>
-        ))}
-    </div>
+            <section data-chart="line">
+                <h3 style={heading}>Line, one series</h3>
+                <LineChart height={220} data={[{ name: 'Average score', data: [60, 66, 71, 74], categories: ['W1', 'W2', 'W3', 'W4'] }]} />
+            </section>
+            <section data-chart="stacked">
+                <h3 style={heading}>Stacked bar</h3>
+                <StackedBarChart height={220} dates={['Mon', 'Tue']} data={[
+                    { segments: [{ value: '10', height: '20' }, { value: '40', height: '80' }] },
+                    { segments: [{ value: '30', height: '60' }, { value: '20', height: '40' }] },
+                ]} />
+            </section>
+            <section data-chart="pie">
+                <h3 style={heading}>Pie</h3>
+                <PieChart height={220} data={[{ name: 'Lincoln Middle', y: 40 }, { name: 'Roosevelt K-8', y: 30 }, { name: 'North High', y: 20 }, { name: 'Other', y: 10 }]} />
+            </section>
+            <section data-chart="donut">
+                <h3 style={heading}>Donut</h3>
+                <DonutChart size={180} value="75%" label="Completed" segments={[{ value: 75, color: BRAND, label: 'Done' }, { value: 25, color: CHROME.track, label: 'Remaining' }]} />
+            </section>
+            <section data-chart="gauge">
+                <h3 style={heading}>Gauge</h3>
+                <GaugeChart height={220} value={82} label="Attendance" color={STATUS.success} />
+            </section>
+            <section data-chart="waterfall">
+                <h3 style={heading}>Waterfall</h3>
+                <WaterfallChart height={220} categories={['Start', 'Gained', 'Lost', 'End']} data={[{ y: 100, color: BRAND }, 40, -25, { isSum: true, color: BRAND }]} />
+            </section>
+            <section data-chart="heatmap">
+                <h3 style={heading}>Heatmap</h3>
+                <HeatmapChart height={220} xCategories={['Mon', 'Tue', 'Wed']} yCategories={['AM', 'PM']} data={heat} showLegend={false} />
+            </section>
+            <section data-chart="diverging">
+                <h3 style={heading}>Heatmap, diverging</h3>
+                <HeatmapChart height={220} xCategories={['Mon', 'Tue', 'Wed']} yCategories={['AM', 'PM']} data={heat} diverging={['orange', 'blue']} showLegend={false} />
+            </section>
+            <section data-chart="sparkline">
+                <h3 style={heading}>Sparkline</h3>
+                <Sparkline label="Average score" data={[60, 66, 71, 74]} />
+            </section>
+            {PLAYGROUNDS.map(({ name, mod }) => (
+                <section key={name} data-chart={name}>
+                    <h3 style={heading}>{name}</h3>
+                    <Playground mod={mod} />
+                </section>
+            ))}
+        </div>
+    </ChartMotionArea>
 );
 
 export default {

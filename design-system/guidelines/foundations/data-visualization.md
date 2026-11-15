@@ -79,23 +79,13 @@ own `title` option (every chart sets `title: { text: null }`).
 
 ## Motion
 
-Series entrance and state transitions come from `chartMotion.js` (wired into
-`chartTheme.js` and the Highcharts lifecycle):
+Charts follow the same spring physics and choreography as the rest of the design system:
 
-- **Entrance** (`chartEntrance`): marks grow to their value on `spatial.default`,
-  with the spring's analytic step response (`springStep`) as the Highcharts
-  easing function and its settle time (`measureSpring`) as the duration. Inside
-  an `[data-motion="expressive"]` container, entrance uses the expressive spring.
-- **States** (`chartStateTransition`): hover and inactive series transitions run
-  on `appearance.fast`.
-- **Reduced motion:** under `prefers-reduced-motion` or
-  `MotionPreferenceContext`, entrance and state transitions collapse to the
-  `appearance.fast` fade.
-- **One orchestrated moment per area:** charts inside a `ChartMotionArea`
-  stagger 20 ms apart within the 500 ms cap (`staggerDelays`) in mount order;
-  outside a provider a chart defers 0 ms.
-- **No replay:** a chart animates on first render only; subsequent data updates,
-  redraws and container resizes run with `animation: false`.
+- **Entrance:** charts grow to their value on the default spatial spring (`spatial.default`), or the expressive spring inside an expressive container.
+- **State changes:** hover and inactive series transitions fade on `appearance.fast`.
+- **Reduced motion:** reduced motion makes every entrance a fade (`appearance.fast`), even inside an expressive container.
+- **One orchestrated moment per area:** charts in one area arrive 20 ms apart within half a second (500 ms cap); a standalone chart enters with no delay.
+- **No replay:** a chart animates on its first render only; nothing replays on redraw, resize or data update, and micro-charts such as a sparkline opt out of entrance motion altogether.
 
 ## Token checks
 

@@ -1,7 +1,7 @@
 import React, { Children, cloneElement, isValidElement, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { animate } from 'motion/react';
-import { measureSpring } from '@/tokens/spring.js';
+import { measureSpring, springStep } from '@/tokens/spring.js';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { useMotionReduced } from './motionPreference';
 import '@/styles/_pattern-motion.scss';
@@ -22,16 +22,19 @@ export function staggerDelays(count, gap = staggerGap(count)) {
     return Array.from({ length: count }, (_, index) => index * gap);
 }
 
-/** Measure a semantic spring's 90% and settle times in ms from the generated spring table. */
+/** Measure a semantic spring's 90% and settle times in ms, plus its step function, from the generated spring table. */
 export function measureSpringToken(token, mode = 'productive') {
     const entry = SPRINGS[token]?.[mode] ?? SPRINGS[token]?.productive;
-    if (!entry) return { t90Ms: 0, settleMs: 0 };
+    if (!entry) return { t90Ms: 0, settleMs: 0, settle: 0, step: () => 1 };
     const { stiffness, damping, mass = 1 } = entry;
     const ratio = damping / (2 * Math.sqrt(stiffness * mass));
-    const measured = measureSpring({ stiffness, ratio, mass });
+    const config = { stiffness, ratio, mass };
+    const measured = measureSpring(config);
     return {
         t90Ms: Math.round((measured.t90 ?? 0) * 1000),
         settleMs: Math.round((measured.settle ?? 0) * 1000),
+        settle: measured.settle ?? 0,
+        step: springStep(config),
     };
 }
 
