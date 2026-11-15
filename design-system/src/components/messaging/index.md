@@ -5,6 +5,43 @@
 8 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
+## Which component to reach for
+
+- **[Banner](Banner/index.md)** — Use `Banner` for a condition that applies to the whole page, for as long as it holds: scheduled maintenance, an outage, an account-wide notice. It has no timeout and no dismiss, so only mount it while the condition is true.
+  - For a message scoped to one region of the page that stays until resolved or dismissed, use `SectionMessage`.
+  - For a timed confirmation that something already happened, use `Flag`.
+  - For a short note tied to one control or field, use `Popup` or `Tooltip`.
+- **[EmptyState](EmptyState/index.md)** — Use `EmptyState` when a view, panel, card or table has no content yet, in place of a blank area or a bare "No results". It carries a picture, a header, one line and one primary action.
+  - For a rejected form submit at the top of a form, use `SectionMessage`.
+  - For a background failure such as a sync or autosave that failed out of sight, use `Flag`.
+  - For a view that is still fetching its data, use `Skeleton` or `Spinner`.
+- **[Flag](Flag/index.md)** — Use `Flag` to confirm something that has already happened and needs no reply: saved, sent, copied. `show` and `onDismiss` are yours; the component holds no state. `FlagGroup` positions a stack of them.
+  - For something the user must read or act on in the page flow, use `SectionMessage`.
+  - For a decision that blocks the task until answered, use `Modal`.
+  - For help attached to a specific control, use `Tooltip` or `Popup`.
+- **[InlineMessage](InlineMessage/index.md)** — Use `InlineMessage` for a note that explains or qualifies something right beside it, such as why a field is required or what a score means, without taking up space until someone asks. It is built on `Popup`, so placement, dismissal and focus return are shared with every other popup in the system.
+  - For a message that belongs to a page or section and should always be visible, use `SectionMessage`.
+  - For a short plain-text label on hover or focus over a control, use `Tooltip`.
+- **[Modal](Modal/index.md)** — Use `Modal` when the next step has to happen before anything else can: a destructive confirmation, a short form that would derail the page, a detail view the person closes and returns from. It is the one messaging component that takes focus from the page, so it fits when interrupting is the point.
+  - For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
+  - For a task that takes more than a screen or has sections, use `Frame`: the focused template, with no sidebar.
+  - For a task that keeps the page in view, use `Panel`, floating: a row's details, filters, a short edit.
+  - For a small aside anchored to a control, use `Popup`.
+  - For a list of actions or a value to pick, use `DropdownMenu` or `Select`.
+- **[NotificationItem](NotificationItem/index.md)** — Use `NotificationItem` for updates that arrived over time: in the Inbox Notifications panel, in a recent-updates card on Home, or on a full notifications page. Every row says who, what, where and when in two compact lines and opens its destination as one link.
+  - For a passing confirmation of an action that just finished, use `Flag`.
+  - For something to read or act on inside part of a page, use `SectionMessage`.
+  - For a condition that holds across a whole surface, use `Banner`.
+- **[SectionMessage](SectionMessage/index.md)** — Use `SectionMessage` for a message that belongs to the page and stays there until it is resolved or dismissed: why a session cannot be booked, a notice that a report is out of date, a confirmation that survives a scroll. It takes children, so the message can carry a link or emphasis, and up to two `actions` after the body.
+  - For validation on a single field, use `TextField` or the field's own error state.
+  - For a transient confirmation that needs no reply, use `Flag`.
+  - For something that must be acknowledged before continuing, use `Modal`.
+  - For a status label on a row, use `StatusTag`.
+- **[Spotlight](Spotlight/index.md)** — Use `Spotlight` to point out one feature the first time someone can use it: a new button, a changed control, a place to start. It is a single step or a short, explicit sequence with a `stepCount`, not an ongoing help system.
+  - For a message that stays in the page until resolved, use `SectionMessage`.
+  - For a short label on hover or focus over a control, use `Tooltip`.
+  - For an interactive anchored overlay with arbitrary content, use `Popup`.
+
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Banner](Banner/index.md) | 5 | ✅ | ✅ | ✅ |

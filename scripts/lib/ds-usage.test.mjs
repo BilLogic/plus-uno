@@ -372,10 +372,46 @@ test('patterns: importing template and pattern motion helpers from @/patterns pa
     '        <FocusedFrameSwitch focused={false} defaultFrame={null} focusedFrame={null} />',
     '        <DrillStack controller={drill} renderView={() => null} />',
     '      </AreaStage>',
-    '    </Frame>',
+    '</Frame>',
     '  );',
     '}',
-  ].join('\n');
-  assert.deepEqual(escapesIn({ path: 'prototypes/x/src/App.jsx', text: code }, realCtx), []);
-});
+    ].join('\n');
+    assert.deepEqual(escapesIn({ path: 'prototypes/x/src/App.jsx', text: code }, realCtx), []);
+    });
+
+    test('ds/no-raw-control: raw form controls and clickable divs fail outside a Base UI part', () => {
+    const found = escapesIn(
+    {
+      path: 'prototypes/x/src/App.jsx',
+      text: '<div><button>Save</button><input /><select /><textarea /><div onClick={go} /></div>',
+    },
+    ctx,
+    );
+    assert.deepEqual(
+    found.map((f) => [f.rule, f.level]),
+    [
+      ['ds/no-raw-control', 'fail'],
+      ['ds/no-raw-control', 'fail'],
+      ['ds/no-raw-control', 'fail'],
+      ['ds/no-raw-control', 'fail'],
+      ['ds/no-raw-control', 'fail'],
+    ],
+    );
+    assert.match(found[0].fix, /Button/);
+    assert.match(found[1].fix, /TextField/);
+    assert.match(found[2].fix, /Select/);
+    assert.match(found[3].fix, /TextArea/);
+    assert.match(found[4].fix, /PatternCard|@base-ui\/react/);
+    assert.deepEqual(
+    escapesIn(
+      {
+        path: 'prototypes/x/src/components/LocalMenu.jsx',
+        text: "import { Popover } from '@base-ui/react/popover';\nexport default () => <Popover.Trigger render={<button type=\"button\">Open</button>} />;",
+      },
+      ctx,
+    ),
+    [],
+    );
+    });
+
 

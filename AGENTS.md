@@ -127,7 +127,7 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 | Writing or editing a bot skill | `skills/README.md` § Bot skills, then `npm run check:bot-skills` |
 | Editing anything an agent reads — this file, a skill, a convention, an agent doc | load the `writing-for-agents` skill first. It is the standard harness prose is reviewed against, and it lives upstream so there is no second copy here to drift. |
 | Product / in-app UI copy (labels, errors, empty states) | `design-system/guidelines/foundations/content/` — what a tutor reads inside the app |
-| Component architecture questions | `design-system/guidelines/components/overview.md` |
+| Component architecture questions | `docs/engineering/local-components.md` |
 | Product context, users, or domain terms | `docs/product-and-service/*.md` (foundation) + uno-blueprint (live truth) |
 | New teammate orientation | `docs/product-and-service/onboarding.md` |
 

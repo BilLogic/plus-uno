@@ -5,6 +5,16 @@
 2 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
+## Which component to reach for
+
+- **[Popup](Popup/index.md)** — Use `Popup` for a small panel of secondary content anchored to a control: a definition, a preview or a short list. Its body is text or a short list, never a form. It holds more than a `Tooltip` and less than a `Modal`, and unlike a modal it does not take the page.
+  - For one line of non-interactive help on a control, use `Tooltip`.
+  - For a form or a decision that must be made before continuing, use `Modal`.
+  - For detail that belongs inline with the content rather than over it, use `Accordion`.
+- **[Tooltip](Tooltip/index.md)** — Use `Tooltip` for a short label on a control whose purpose is not obvious from what you can see — an icon-only `IconButton`, a truncated cell, an abbreviation. It wraps a single trigger element and shows on hover and focus by default, after `250` ms, hiding `400` ms after you leave.
+  - For anything the user must click or focus inside the overlay, use `Popup`.
+  - For a transient confirmation after an action, use `Flag`.
+
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Popup](Popup/index.md) | 16 | ✅ | ✅ | ✅ |

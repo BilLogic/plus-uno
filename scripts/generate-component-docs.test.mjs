@@ -205,3 +205,23 @@ test('the template index lists the nine current templates and their overview', a
   for (const name of ['Form', 'Frame', 'Page', 'Panel', 'Card', 'Modal', 'Section', 'Table', 'Popup', 'Overview']) assert.ok(text.includes(`[${name}](`));
   assert.equal(text.split('\n').filter((line) => line.startsWith('- [')).length, 10);
 });
+
+test('group indexes carry a generated chooser from each page\'s Usage and Alternatives, replacing guidelines/components/*.md', async () => {
+  const fs = await import('node:fs');
+  assert.equal(fs.existsSync('design-system/guidelines/components'), false);
+  const messaging = fs.readFileSync('design-system/src/components/messaging/index.md', 'utf8');
+  assert.match(messaging, /## Which component to reach for/);
+  for (const name of ['Banner', 'EmptyState', 'Flag', 'InlineMessage', 'Modal', 'NotificationItem', 'SectionMessage', 'Spotlight']) {
+    assert.match(messaging, new RegExp(`- \\*\\*\\[${name}\\]\\(${name}/index\\.md\\)\\*\\* — `), name);
+  }
+  assert.match(messaging, /For a transient confirmation that needs no reply, use `Flag`\./);
+  const forms = fs.readFileSync('design-system/src/components/forms-and-inputs/index.md', 'utf8');
+  for (const name of ['CheckboxGroup', 'FileItem', 'SettingRow', 'InlineEditableTextfield']) {
+    assert.match(forms, new RegExp(`\\*\\*\\[${name}\\]\\(`), name);
+  }
+  const layout = fs.readFileSync('design-system/src/components/layout-and-structure/index.md', 'utf8');
+  for (const name of ['PageHeader', 'Panel']) {
+    assert.match(layout, new RegExp(`\\*\\*\\[${name}\\]\\(`), name);
+  }
+});
+

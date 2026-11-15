@@ -33,6 +33,7 @@ export const RULES = {
   'ds/no-retired-name': { level: 'warn' },
   'ds/page-starts-from-pattern': { level: 'fail' },
   'ds/placement': { level: 'fail' },
+  'ds/no-raw-control': { level: 'fail' },
 };
 
 /** The rule's section in the rules doc, as a link a terminal can open. */
@@ -273,7 +274,8 @@ function scriptEscapes(text, ctx, add) {
     }
   };
 
-  for (const imp of importsOf(text)) {
+  const imports = importsOf(text);
+  for (const imp of imports) {
     if (BARREL.test(imp.source)) {
       const barrel = barrelOf(imp.source);
       if (imp.namespace) namespaces.set(imp.namespace, barrel);
@@ -356,11 +358,40 @@ function scriptEscapes(text, ctx, add) {
   }
 
   placementEscapes(text, elements, importedNames, namespaces, ctx.placements ?? [], add);
+  rawControlEscapes(imports, elements, add);
 
   for (const obj of styleObjectsOf(text)) {
     for (const { key, value, index } of obj.properties) {
       const reason = rawInJsxStyle(key, value);
       if (reason) add('ds/no-raw-literal', index, `\`${key}: ${value}\` is a raw ${reason}`, rawFix(reason, key, literalOf(value).text, ctx));
+    }
+  }
+}
+
+const RAW_CONTROL_FIX = {
+  button: 'use `Button`, `IconButton` or `CloseButton` from `@/components` (or a Base UI part for new interactive behavior)',
+  input: 'use `TextField`, `SearchField`, `Checkbox`, `Radio`, `Toggle` or `Range` from `@/components`',
+  select: 'use `Select`, `PopupSelect`, `FilterButton` or `FilterMenu` from `@/components`',
+  textarea: 'use `TextArea` from `@/components`',
+};
+
+function rawControlEscapes(imports, elements, add) {
+  if (imports.some((imp) => /^@base-ui\/react(?:\/|$)/.test(imp.source))) return;
+  const renderSpans = elements.flatMap((el) =>
+    el.attributes.filter((a) => a.name === 'render' && a.end !== undefined).map((a) => [a.index, a.end]),
+  );
+  const inRenderProp = (idx) => renderSpans.some(([s, e]) => idx >= s && idx < e);
+  for (const el of elements) {
+    if (inRenderProp(el.index)) continue;
+    if (Object.hasOwn(RAW_CONTROL_FIX, el.name)) {
+      add('ds/no-raw-control', el.index + 1, `raw \`<${el.name}>\` where a design-system control belongs`, RAW_CONTROL_FIX[el.name]);
+    } else if (el.name === 'div' && el.attributes.some((a) => a.name === 'onClick')) {
+      add(
+        'ds/no-raw-control',
+        el.index + 1,
+        'click handler on a raw `<div>` is not an accessible control',
+        'use `Button`, `IconButton`, `PatternCard` (with `onClick`), or a Base UI part (`@base-ui/react`)',
+      );
     }
   }
 }

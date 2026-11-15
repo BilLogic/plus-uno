@@ -8,7 +8,7 @@
 // that breaks the rule in a place the pass is supposed to leave alone.
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -273,3 +273,18 @@ test('the committed trees have no broken links', () => {
   const found = run().map((finding) => finding.message);
   assert.deepEqual(found, [], found.join('\n'));
 });
+
+test('components-index.json lives at design-system/guidelines/components-index.json and overview.md routes Pieces to local-components.md', () => {
+  assert.equal(existsSync(path.join(REPO_ROOT, 'design-system/guidelines/components-index.json')), true);
+  assert.equal(existsSync(path.join(REPO_ROOT, 'design-system/guidelines/components')), false);
+  const overview = readFileSync(path.join(REPO_ROOT, 'design-system/guidelines/overview.md'), 'utf8');
+  assert.match(overview, /docs\/engineering\/local-components\.md/);
+  const localComponents = readFileSync(path.join(REPO_ROOT, 'docs/engineering/local-components.md'), 'utf8');
+  assert.match(localComponents, /1\. \*\*Use\.\*\*/);
+  assert.match(localComponents, /2\. \*\*Arrange\.\*\*/);
+  assert.match(localComponents, /3\. \*\*Local component\.\*\*/);
+  assert.match(localComponents, /4\. \*\*Core candidate\.\*\*/);
+  const reviewScript = readFileSync(path.join(REPO_ROOT, 'skills/uno-review/scripts/run-review-checks.sh'), 'utf8');
+  assert.doesNotMatch(reviewScript, /<button\\|<input/);
+});
+

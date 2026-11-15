@@ -73,8 +73,7 @@ An instruction that is invisible to people who can see is one they cannot
 find. Say it to everyone, and let the field point at it.
 
 ```jsx
-<p id="pw-help">Passwords must be at least 12 characters.</p>
-<input aria-describedby="pw-help" />
+<TextField label="Password" caption="Passwords must be at least 12 characters." />
 ```
 
 ### Keep it out of the focus order. {#keep-it-out-of-the-focus-order}
