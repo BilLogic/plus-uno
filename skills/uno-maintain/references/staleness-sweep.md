@@ -31,5 +31,5 @@ One intake per finding (evidence + suggested severity), through the normal pipel
 ## D. Token & DS integrity
 
 - [ ] Token docs align with `design-system/src/tokens/*.scss`; no guidance conflicts with generated sources.
-- [ ] Export barrels (`design-system/src/index.js`, `components/index.js`, `components/forms-and-inputs/index.js`) match the components docs reference.
+- [ ] Export barrels (`design-system/src/index.js`, `design-system/src/components/index.js`) match the components docs reference (`npm run check:component-barrel`).
 - [ ] Storybook story paths referenced in docs still resolve under `.storybook/main.js` config.

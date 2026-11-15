@@ -2,10 +2,11 @@
 // breaks it, not by the committed router passing.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { sweep, pointersIn, triggersIn } from './check-pointers.mjs';
+import { frontmatter } from './lib/corpus.mjs';
+import { REPO_ROOT, sweep, pointersIn, triggersIn } from './check-pointers.mjs';
 
 /** A throwaway repo: a router plus whatever files the test says exist. */
 function repo(router, files = {}) {
@@ -259,3 +260,56 @@ test('a link outside the Templates and Patterns roots is left to check:storybook
   const r = crossRepo('components-forms-and-inputs-filter-menu--docs');
   try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
 });
+
+test('#2513: router, engineering docs, and skills point at @plus-uno/cli, ds-mcp, and check:ds-usage without stale rules', () => {
+  const read = (rel) => readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+
+  const agents = read('AGENTS.md');
+  assert.match(agents, /Verifying a component's API, or writing a story's code[^\n]*`docs\/connectors\/ds-mcp\.md`[^\n]*`docs\/connectors\/storybook-mcp\.md`/);
+  assert.ok(
+    frontmatter(agents).body.length < 18_000,
+    `expected dieted AGENTS.md body < 18,000 chars, got ${frontmatter(agents).body.length}`,
+  );
+
+  const setup = read('docs/engineering/setup.md');
+  assert.match(setup, /npm run ds/);
+  assert.match(setup, /@plus-uno\/cli/);
+  assert.match(setup, /generate:docs-agent-files/);
+
+  const coding = read('docs/engineering/coding.md');
+  assert.match(coding, /check:ds-usage/);
+  assert.match(coding, /docs\/engineering\/ds-usage-rules\.md/);
+  assert.doesNotMatch(coding, /forms-and-inputs\/index\.js/);
+
+  const synthesize = read('skills/uno-synthesize/SKILL.md');
+  assert.match(synthesize, /docs\/connectors\/overview\.md/);
+  assert.doesNotMatch(synthesize, /Only Notion and Figma have MCP/);
+
+  const discovery = read('skills/uno-research/references/component-discovery.md');
+  assert.match(discovery, /ds_find/);
+  assert.match(discovery, /ds_get/);
+  assert.match(discovery, /docs\/connectors\/ds-mcp\.md/);
+
+  for (const rel of [
+    'skills/uno-maintain/references/production-checklist.md',
+    'skills/uno-maintain/references/staleness-sweep.md',
+    'skills/uno-maintain/references/ds-fix.md',
+  ]) {
+    assert.doesNotMatch(read(rel), /forms-and-inputs\/index\.js/, rel);
+  }
+  assert.match(read('skills/uno-maintain/references/production-checklist.md'), /check:ds-usage/);
+
+  const sbReview = read('skills/uno-review/references/storybook.md');
+  assert.match(sbReview, /design-system\/guidelines\/documentation-ia\.md/);
+  assert.match(sbReview, /docs\/connectors\/storybook-mcp\.md/);
+  assert.doesNotMatch(sbReview, /\bvariant\b|\bdismissable\b|Components\/Buttons\/Button/);
+
+  const sbDocs = read('skills/uno-review/references/storybook-component-docs.md');
+  assert.match(sbDocs, /design-system\/agent-views\/components\/index\.md/);
+  assert.match(sbDocs, /storybook\.taxonomy\.json/);
+  assert.match(sbDocs, /Harness/);
+  assert.match(sbDocs, /Templates/);
+  assert.match(sbDocs, /Patterns/);
+  assert.doesNotMatch(sbDocs, /\|\s*Forms and inputs\s*\|/);
+});
+

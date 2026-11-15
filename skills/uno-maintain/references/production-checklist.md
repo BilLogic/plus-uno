@@ -34,10 +34,9 @@ See also `design-system/src/styles/Accessibility.mdx`.
 
 ## Before Finishing
 
-- [ ] Tokens only — no hardcoded visual values where DS tokens exist
-- [ ] PLUS components and patterns before generic framework substitutions
+- [ ] `npm run check:ds-usage` (`npm run ds -- check`) passes with zero escapes (`docs/engineering/ds-usage-rules.md`)
 - [ ] New slot props use the four slot names (`docs/engineering/coding.md` § Slot names)
-- [ ] Storybook stories updated for changed behavior/states
+- [ ] Storybook stories updated for changed behavior/states (`docs/connectors/storybook-mcp.md`)
 - [ ] Responsive at `md`, `lg`, `xl` — page-level work sits in a template, whose Frame resolves the layout from its own width
 - [ ] Accessibility pass (focus, keyboard, labels, contrast)
 

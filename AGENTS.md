@@ -65,10 +65,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 **uno-bot's Tier 2 is `read_reference`.** A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name — `draft-a-prd` — on the turns whose pointer fires; the text lasts the turn and a later turn re-reads it in one call. Everything else in the bundle is always in context.
 
 <!-- ide-only -->
-**Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names.
-
-**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the char budgets — this file, the persona, each bot skill, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` names the file and the distance for each: this file's overrun warns, and a stale bundle, any other overrun or a shortfall fails the build. Its `assemble()` returns a manifest of what it computed, and the root checks read that in-process through `scripts/lib/bundled-set.mjs`. A doc cites a budget by its `BUDGETS` key and leaves the number to the bundler; `check:harness-budgets` holds every doc under a section root to that.
-
+**Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names. Bundle assembly, `ide-only` stripping and `BUDGETS` keys live in `agents/uno-bot/scripts/bundle-harness.mjs` (`docs/engineering/setup.md` § The harness gate).
 <!-- /ide-only -->
 
 ## Hard rules
@@ -103,7 +100,7 @@ Each rule is one line here and its body lives in the document it names; the lead
 
 ## Knowledge
 
-Finished work leaves behind a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, an **archive** entry in `docs/knowledge/archive/` while a live doc, ADR or code comment cites it as its decision trail, or — most often — **nothing**: git keeps the trail, and a finding worth less than the context it costs is worth deleting. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. The same test clears `docs/plans/`, `todos/` and the archive itself: a plan, todo or archived doc whose work has landed or been abandoned is deleted once nothing live cites it.
+Finished work leaves a **rule** in the doc that owns the subject, an **ADR** under `docs/adr/`, an **archive** entry in `docs/knowledge/archive/` while something live cites it, or **nothing** (`docs/knowledge/INDEX.md`, enforced by `npm run check:knowledge-disposition` via `skills/uno-maintain`).
 
 <!-- ide-only -->
 ## Progressive loading
@@ -114,7 +111,7 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 | Building UI, using components or tokens, or a component's facts (usage, rules, props, variants) | `design-system/agent-views/components/index.md` (existence) + `tokens/tokens.md` (names), then the component's generated file, `design-system/src/components/<group>/<Name>/index.md` (`<Name>.md` when filed flat): one read answers it, the same text `ds_get` returns and Storybook's Harness tab shows. A disabled state follows `design-system/agent-views/patterns/Disabled.md`; a slot prop, `docs/engineering/coding.md` § Slot names |
 | Animating anything | Foundations › Expression › Motion (`design-system/src/styles/MotionPhysics.mdx`, then the page for the transition), then `design-system/agent-views/motion/library.md` for the component's event-to-token row and the component's own Motion section, in its generated file under `src/components/` |
 | Adding or changing a sound | Foundations › Expression › Sound (`design-system/src/styles/SoundOverview.mdx`, then `SoundWhenToPlay.mdx`), then the row's Motion section for its `sound` cell; the code half is `docs/engineering/sound.md` |
-| Verifying a component's API, or writing a story's code | `docs/connectors/storybook-mcp.md` |
+| Verifying a component's API, or writing a story's code | `docs/connectors/ds-mcp.md` (`plus-ds` / `npm run ds`) + `docs/connectors/storybook-mcp.md` |
 | Laying out on the grid, or matching a Figma frame's breakpoint modes | `design-system/src/styles/Grid.mdx` (`npm run ds -- guide grid`) |
 | Titling a story, renaming a docs folder, or authoring an MDX page | `design-system/guidelines/documentation-ia.md` |
 | Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
@@ -131,39 +128,7 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 | Product context, users, or domain terms | `docs/product-and-service/*.md` (foundation) + uno-blueprint (live truth) |
 | New teammate orientation | `docs/product-and-service/onboarding.md` |
 
-<!-- Every `ide-only` region in this file is stripped from the uno-bot system
-     prompt when the harness is bundled (agents/uno-bot/scripts/bundle-harness.mjs,
-     stripIdeOnly), because the Worker has no filesystem, npm, or localhost, and
-     its prompt is fixed at build time. They stay here as the single source for
-     the IDE agent. The comment sits INSIDE the fence on purpose: a note about
-     removed sections is itself meaningless to the reader they were removed for. -->
-<!-- /ide-only -->
-
-<!-- ide-only -->
-
 ## Agent skills
 
-Config the `mattpocock-skills` plugin's skills read — `/tdd`, `/code-review`,
-`/triage`, `/implement` and the rest. Each sub-section summarizes its file in a
-line; open the file itself only when a skill asks for it, since loading three
-config docs up front spends context no task has asked for. IDE-only: these
-skills run against a filesystem and the `gh` CLI, and the Worker has neither, so
-this region is stripped from its prompt.
-
-### Issue tracker
-
-GitHub Issues on `BilLogic/plus-uno`, inferred from `git remote`.
-See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-The five canonical roles, label strings unchanged (`needs-triage`, `needs-info`,
-`ready-for-agent`, `ready-for-human`, `wontfix`) — all created in GitHub.
-See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context. `GLOSSARY.md` at the root is the glossary (`npm run check:glossary`
-keeps it glossary-only); `docs/adr/` holds the decisions, indexed by
-`docs/adr/overview.md`. See `docs/agents/domain.md`.
+Config for engineering skills (`/tdd`, `/code-review`, `/triage`, `/implement`): `docs/agents/issue-tracker.md` (GitHub Issues on `BilLogic/plus-uno`), `docs/agents/triage-labels.md` (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`), and `docs/agents/domain.md` (`GLOSSARY.md` + `docs/adr/overview.md`).
 <!-- /ide-only -->
