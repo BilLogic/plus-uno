@@ -79,13 +79,23 @@ own `title` option (every chart sets `title: { text: null }`).
 
 ## Motion
 
-Series entrance and hover transitions take the `--ds-motion-appearance-*` tokens
-(`design-system/src/tokens/ladder/_springs.scss`). `prefers-reduced-motion` is
-handled once, globally, at `:root` — every spatial token becomes a fade under it
-— so a chart that reads the token needs no reduced-motion branch of its own. A
-chart's `animationDuration`-style prop should default to
-`CHART_ANIMATION_DURATION_MS` (exported from `chartTheme.js`), not a literal
-`900`/`1000`/`1200`; a prop still lets a caller opt into a different value.
+Series entrance and state transitions come from `chartMotion.js` (wired into
+`chartTheme.js` and the Highcharts lifecycle):
+
+- **Entrance** (`chartEntrance`): marks grow to their value on `spatial.default`,
+  with the spring's analytic step response (`springStep`) as the Highcharts
+  easing function and its settle time (`measureSpring`) as the duration. Inside
+  an `[data-motion="expressive"]` container, entrance uses the expressive spring.
+- **States** (`chartStateTransition`): hover and inactive series transitions run
+  on `appearance.fast`.
+- **Reduced motion:** under `prefers-reduced-motion` or
+  `MotionPreferenceContext`, entrance and state transitions collapse to the
+  `appearance.fast` fade.
+- **One orchestrated moment per area:** charts inside a `ChartMotionArea`
+  stagger 20 ms apart within the 500 ms cap (`staggerDelays`) in mount order;
+  outside a provider a chart defers 0 ms.
+- **No replay:** a chart animates on first render only; subsequent data updates,
+  redraws and container resizes run with `animation: false`.
 
 ## Token checks
 

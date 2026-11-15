@@ -1,19 +1,18 @@
 /**
  * The Highcharts theme every chart spreads.
  *
- * Data marks wear chart tokens and chrome wears text and border tokens, as
- * Atlassian's data-visualization guidance splits them (palette.js says which
- * token does which job): series take `--chart-categorical-*` in order,
- * tick labels `--ds-text-subtle`, titles, legends and tooltips `--ds-text`,
- * grid lines and axes `--ds-border`. No value carries a fallback: the tokens
- * resolve in every color mode, so a chart follows light, dark and increased
- * contrast with no code of its own. The Highcharts defaults this theme does not
- * set are pointed at the same tokens in `chartTheme.css`.
+ * Data marks wear chart tokens and chrome wears text and border tokens
+ * (palette.js says which token does which job): series take
+ * `--chart-categorical-*` in order, tick labels `--ds-text-subtle`, titles,
+ * legends and tooltips `--ds-text`, grid lines and axes `--ds-border`. No value
+ * carries a fallback: the tokens resolve in every color mode, so a chart
+ * follows light, dark and increased contrast with no code of its own. The
+ * Highcharts defaults this theme does not set are pointed at the same tokens in
+ * `chartTheme.css`.
  *
  * Every other foundation (spacing, radius, elevation, stroke, type, motion)
- * takes the same component tokens as the rest of the design system — Atlassian's
- * chart guidance is color-only, so there is no chart-specific precedent to
- * follow for the rest. The chart container is a Card, so `chart.spacing` reads
+ * takes the same component tokens as the rest of the design system. The chart
+ * container is a Card, so `chart.spacing` reads
  * `--card-pad-compact` (the density this component already rendered at: 16px,
  * component tokens defined in `chartTheme.css`). The tooltip is a floating
  * layer, so it takes the Popup pattern's surface, overlay shadow and radius —
@@ -21,15 +20,16 @@
  * filter-based shadow, not a design-system shadow token; the CSS lives beside
  * the other chart-only tokens in `chartTheme.css`.
  */
+import { CHART_UPDATE_ARGS, ChartMotionArea, ChartMotionContext, chartAnimationOptions, chartEntrance, chartStateTransition, useChartMotion } from '@/dataviz/chartMotion';
 import { CATEGORICAL, CHROME } from '@/dataviz/palette';
 import '@/dataviz/chartTheme.css';
 
 const BODY = 'var(--type-family-body)';
 
 /**
- * Highcharts' numeric chart options (spacing, animation duration) do SVG
+ * Highcharts' numeric chart options (spacing, stroke width, radius) do SVG
  * layout math and cannot take a CSS `var()` string the way `style.fontSize`
- * can. This resolves a token to its current pixel/ms value once, in the
+ * can. This resolves a token to its current pixel value once, in the
  * browser, so a ladder change still reaches the chart without a code edit;
  * `fallback` only fires where no stylesheet is loaded (SSR, unit tests).
  *
@@ -53,8 +53,9 @@ export const CHART_SPACING_COMPACT = tokenNumber('--pad-y-md', 6);
 /** The near-zero inset a micro-chart (e.g. Sparkline) renders at — tight, but still a named step, not a bare `4`. */
 export const CHART_SPACING_MICRO = tokenNumber('--pad-x-xs', 4);
 
-/** Series-entrance and hover-transition duration: the appearance.default motion token (a fade under `prefers-reduced-motion`). */
-const CHART_ANIMATION_DURATION = tokenNumber('--ds-motion-appearance-default-duration', 160);
+/** Series entrance (`spatial.default`) and state transition (`appearance.fast`) spring animations. */
+const CHART_ENTRANCE_ANIMATION = chartEntrance();
+const CHART_STATE_ANIMATION = chartStateTransition();
 
 /**
  * Stroke widths: SVG presentation attributes (how Highcharts draws lines and
@@ -138,7 +139,7 @@ const chartTheme = {
     chart: {
         backgroundColor: 'transparent',
         spacing: [CHART_SPACING, CHART_SPACING, CHART_SPACING, CHART_SPACING],
-        animation: { duration: CHART_ANIMATION_DURATION },
+        animation: CHART_ENTRANCE_ANIMATION,
         style: {
             fontFamily: BODY,
             color: CHROME.text
@@ -162,6 +163,13 @@ const chartTheme = {
     xAxis: axis(0),
     yAxis: axis(CHART_GRID_WIDTH, 'Dash'),
     plotOptions: {
+        series: {
+            animation: CHART_ENTRANCE_ANIMATION,
+            states: {
+                hover: { animation: CHART_STATE_ANIMATION },
+                inactive: { animation: CHART_STATE_ANIMATION }
+            }
+        },
         column: barRadius,
         bar: barRadius
     },
@@ -212,7 +220,17 @@ export const CHART_LINE_WIDTH_NUMBER = CHART_LINE_WIDTH;
 export const CHART_GRID_WIDTH_NUMBER = CHART_GRID_WIDTH;
 
 /** The series-entrance duration charts should default `animationDuration`-style props to, instead of a literal ms value. */
-export const CHART_ANIMATION_DURATION_MS = CHART_ANIMATION_DURATION;
+export const CHART_ANIMATION_DURATION_MS = CHART_ENTRANCE_ANIMATION.duration;
+
+export {
+    CHART_UPDATE_ARGS,
+    ChartMotionArea,
+    ChartMotionContext,
+    chartAnimationOptions,
+    chartEntrance,
+    chartStateTransition,
+    useChartMotion,
+};
 
 /**
  * Set as a chart's own `plotOptions.column.borderRadius` /
