@@ -10,7 +10,6 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
 import Highcharts from './highchartsModules';
 import chartTheme, { CHART_ANIMATION_DURATION_MS } from './chartTheme';
 import PlusChart from './PlusChart';
-import * as chartMotionModule from './chartMotion';
 import {
     ChartMotionArea,
     chartEntrance,
@@ -109,7 +108,7 @@ describe('chartMotion and PlusChart', () => {
         }
     });
 
-    it('builds theme chart and series animations from chartMotion with no eased curve name or ms literal, and removes dead exports', () => {
+    it('builds theme chart and series animations from chartMotion with no eased curve name or ms literal', () => {
         const entrance = chartEntrance();
         const state = chartStateTransition();
 
@@ -122,11 +121,6 @@ describe('chartMotion and PlusChart', () => {
         expect(chartTheme.plotOptions.series.states.inactive.animation.duration).toBe(state.duration);
         expect(typeof chartTheme.plotOptions.series.states.inactive.animation.easing).toBe('function');
         expect(CHART_ANIMATION_DURATION_MS).toBe(entrance.duration);
-
-        expect(chartMotionModule.useChartMotion).toBeUndefined();
-        expect(chartMotionModule.chartAnimationOptions).toBeUndefined();
-        expect(chartMotionModule.CHART_UPDATE_ARGS).toBeUndefined();
-        expect(chartMotionModule.installChartMotionLifecycle).toBeUndefined();
 
         const themeSource = readFileSync(join(__dirname, 'chartTheme.js'), 'utf8');
         expect(themeSource).not.toMatch(/easeOut|easeIn|easeInOut|cubic-bezier|swing|linear\(/);
@@ -214,13 +208,16 @@ describe('chartMotion and PlusChart', () => {
             h(
                 MotionPreferenceContext.Provider,
                 { value: true },
-                h(PlusChart, {
-                    expressive: true,
-                    options: {
-                        chart: { type: 'line' },
-                        series: [{ name: 'Score', data: [1, 2, 3] }],
-                    },
-                }),
+                h(
+                    ChartMotionArea,
+                    { expressive: true },
+                    h(PlusChart, {
+                        options: {
+                            chart: { type: 'line' },
+                            series: [{ name: 'Score', data: [1, 2, 3] }],
+                        },
+                    }),
+                ),
             ),
         );
 

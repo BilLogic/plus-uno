@@ -60,9 +60,6 @@ const GaugeChart = ({
         },
         plotOptions: {
             solidgauge: {
-                animation: {
-                    duration: 1200
-                },
                 dataLabels: {
                     y: 5,
                     borderWidth: 0,
