@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { compare, DEFAULT_ARMS, DEFAULT_TASKS, expectedFor, expectedItems, FIT_VERDICTS, LOOKUP_ARMS, lookupWiring, meteredIn, parseFit, reach, rejudge, rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf, withHeadLinks } from './eval-ds-usage.mjs';
+import { compare, DEFAULT_ARMS, DEFAULT_TASKS, expectedFor, expectedItems, FIT_VERDICTS, fitJudge, fitPrompt, fitScore, LOOKUP_ARMS, lookupWiring, meteredIn, parseFit, reach, rejudge, rescore, seedScore, SEEDED, structuralFit, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf, withHeadLinks } from './eval-ds-usage.mjs';
 import { headLinks } from './lib/registry.mjs';
 import { spawnSync } from 'node:child_process';
 
@@ -538,19 +538,31 @@ test('scaffold head: prepare writes index.html with fonts and Font Awesome 7.2 f
   }
 });
 
-test('expectedFor: loads session-review-queue answer key, removes it from the agent copy, and returns null where none exists', () => {
+test('expectedFor: loads answer keys for every active task, validates page + section citations, removes expected.json from agent copy, and returns null where none exists', () => {
+  for (const task of TASKS) {
+    const key = expectedFor(task);
+    assert.ok(key, `${task} has an answer key`);
+    assert.equal(key.task, task);
+    assert.equal(key.reference_screenshot?.status, 'pending', `${task} holds reference screenshot pending approval`);
+    const items = expectedItems(key);
+    assert.ok(items.length >= 2, `${task} has answer-key items`);
+    for (const item of items) {
+      assert.ok(item.page && fs.existsSync(path.join(REPO_ROOT, item.page)), `${task}/${item.id} cites live page ${item.page}`);
+      assert.ok(typeof item.section === 'string' && item.section.length > 0, `${task}/${item.id} cites section ${item.section}`);
+    }
+  }
   const expected = expectedFor('session-review-queue');
-  assert.ok(expected, 'session-review-queue has an answer key');
   assert.ok(expected.screens.length >= 3, 'lists template per screen');
   assert.ok(expected.patterns.some((p) => p.id === 'filtering' && p.variant === '1 · Quick filters'), 'lists Filtering variant');
   assert.ok(expected.required_placements.length >= 3, 'lists required placements');
   assert.ok(expected.against_placements.length >= 3, 'lists placements that count against');
-  assert.equal(expectedFor('triage-repair'), null, 'tasks without an answer key return null');
+  assert.equal(expectedFor('no-such-task'), null, 'tasks without an answer key return null');
 
   const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-expected-'));
   try {
     const { root, folder } = prepare({ ref: 'HEAD', arm: 'current', task: 'session-review-queue', into });
     assert.equal(fs.existsSync(path.join(folder, 'expected.json')), false, 'expected.json is removed from the task folder');
+    assert.equal(fs.existsSync(path.join(folder, 'reference.png')), false, 'reference.png is removed from the task folder');
     assert.equal(fs.existsSync(path.join(root, SCENARIOS, 'session-review-queue/expected.json')), false, 'expected.json is removed with docs/evals');
   } finally {
     fs.rmSync(into, { recursive: true, force: true });
@@ -665,7 +677,7 @@ test('rejudge: writes reach, screenshot and per-item fit as new rows marked reju
         harness_commit: 'd4d96b1cb',
         scenarios_sha: '58d50ccb7403',
         arm: 'current',
-        task: 'triage-repair',
+        task: 'no-answer-key-task',
         run: 1,
         read_set: { files: ['design-system/agent-views/patterns/Disabled.md'], lookups: [] },
         output: trDir,
@@ -693,6 +705,7 @@ test('rejudge: writes reach, screenshot and per-item fit as new rows marked reju
     assert.equal(srq.reach.hit, true);
     assert.deepEqual(srq.reach.patterns.before_first_write, ['design-system/agent-views/patterns/Filtering.md']);
     assert.ok(srq.fit, 'session-review-queue gets per-item fit');
+    assert.ok(srq.fit_score && typeof srq.fit_score.score === 'number', 'rejudge records closed-form fit_score');
     for (const item of expectedItems(expected)) {
       assert.ok(FIT_VERDICTS.includes(srq.fit[item.id]?.verdict), `fit verdict for ${item.id}`);
       assert.match(srq.fit[item.id]?.reason ?? '', /reason for/);
@@ -702,11 +715,84 @@ test('rejudge: writes reach, screenshot and per-item fit as new rows marked reju
     assert.equal(tr.rejudge, true);
     assert.equal(tr.reach, null, 'no answer key -> reach is null');
     assert.equal(tr.fit, null, 'no answer key -> fit is null');
+    assert.equal(tr.fit_score, null);
     assert.equal(tr.judge_usage, null);
     assert.equal(tr.estimated_cost_usd, 0);
     assert.equal(shots.length, 2);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('structuralFit + fitJudge: structural items are scored by the checker while the AI judge scores semantic items from source only', () => {
+  const expected = expectedFor('session-review-queue');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-structural-fit-'));
+  try {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(dir, 'src/App.jsx'),
+      [
+        "import { Frame, Page, PageHeader, PatternSection, PatternTable } from '@/patterns';",
+        "import { Banner, FilterButton, Panel, SearchField, usePanelControl } from '@/components';",
+        'export default function App() {',
+        '  const panel = usePanelControl();',
+        '  return (',
+        '    <Frame panel={<Panel>Details</Panel>}>',
+        '      <Page header={<PageHeader title="Queue" />} banner={<Banner appearance="warning">Overdue</Banner>}>',
+        '        <PatternSection title="Sessions" toolbar={<PatternSection.Toolbar search={<SearchField label="Search" />} filters={<FilterButton label="Status" />} />}>',
+        '          <PatternTable />',
+        '        </PatternSection>',
+        '      </Page>',
+        '    </Frame>',
+        '  );',
+        '}',
+      ].join('\n'),
+    );
+    const structural = structuralFit({ folder: dir, expected });
+    assert.equal(structural['queue-page']?.verdict, 'followed');
+    assert.equal(structural.filtering?.verdict, 'followed');
+    assert.equal(structural['banner-under-page-header']?.verdict, 'followed');
+    assert.equal(structural['controls-in-section-toolbar']?.verdict, 'followed');
+    assert.equal(structural['detail-in-frame-panel']?.verdict, 'followed');
+    assert.equal(structural['bare-select-in-toolbar']?.verdict, 'followed');
+    assert.equal(structural['banner-above-or-flush-page-header']?.verdict, 'followed');
+
+    let promptSeen = '';
+    const semanticItems = expectedItems(expected).filter((i) => i.scoring !== 'checker');
+    const fakeSemanticJson = JSON.stringify(
+      Object.fromEntries(semanticItems.map((item) => [item.id, { verdict: 'followed', reason: `semantic ${item.id}` }])),
+    );
+    const judged = fitJudge({
+      folder: dir,
+      expected,
+      model: 'gemini-3.8-flash',
+      runAgent: ({ prompt }) => {
+        promptSeen = prompt;
+        return { result: { result: fakeSemanticJson, usage: { input_tokens: 500, output_tokens: 100 } } };
+      },
+    });
+    assert.doesNotMatch(promptSeen, /"queue-page"/, 'structural items are not sent to the AI judge');
+    assert.match(promptSeen, /"review-panel"/, 'semantic items are sent to the AI judge');
+    assert.equal(judged.fit['queue-page'].scored_by, 'checker');
+    assert.equal(judged.fit['review-panel'].verdict, 'followed');
+    assert.deepEqual(judged.fit_score, {
+      score: 1,
+      followed: expectedItems(expected).length,
+      partly: 0,
+      ignored: 0,
+      applicable: expectedItems(expected).length,
+    });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('PRD-style briefs: active build briefs do not hand over template or component names', () => {
+  const srqBrief = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, 'session-review-queue/BRIEF.md'), 'utf8');
+  const trBrief = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, 'triage-repair/BRIEF.md'), 'utf8');
+  for (const name of ['PatternSection', 'PatternTable', 'PageHeader', 'FilterButton', 'FilterMenu', 'SearchField', 'StatusTag', 'RadioGroup', 'FlagGroup', 'EmptyState']) {
+    assert.doesNotMatch(srqBrief, new RegExp(`\\b${name}\\b`), `session-review-queue brief does not name ${name}`);
+    assert.doesNotMatch(trBrief, new RegExp(`\\b${name}\\b`), `triage-repair brief does not name ${name}`);
   }
 });
 

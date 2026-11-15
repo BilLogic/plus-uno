@@ -1,0 +1,160 @@
+{
+  "task": "triage-repair",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/triage-repair/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "queue-page",
+      "screen": "Supervisor triage queue page",
+      "template": "Frame + Page + PatternSection + PatternTable",
+      "variant": "Frame · Default / Page · Default / PatternSection · Toolbar / PatternTable · Dynamic table",
+      "page": "design-system/src/patterns/Frame/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Frame/index.md",
+        "design-system/src/patterns/Page/index.md",
+        "design-system/src/patterns/PatternSection/index.md",
+        "design-system/src/patterns/PatternTable/index.md"
+      ],
+      "guides": ["frame", "page", "section", "table", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["Frame", "Page", "PatternSection", "PatternTable"]
+      },
+      "expectation": "Full-page shell on Frame and Page with a PatternSection and PatternTable replacing the hand-styled main wrapper."
+    },
+    {
+      "id": "record-panel",
+      "screen": "Record detail panel",
+      "template": "Panel + Form",
+      "variant": "Panel · Details / Form · In a Panel",
+      "page": "design-system/agent-views/templates/Panel.md",
+      "section": "Details",
+      "pages": [
+        "design-system/agent-views/templates/Panel.md",
+        "design-system/agent-views/templates/Form.md"
+      ],
+      "guides": ["panel", "form"],
+      "scoring": "judge",
+      "expectation": "Details Panel opened beside or over the queue showing the record's state, a notes field, and the Resolve action."
+    },
+    {
+      "id": "resolve-modal",
+      "screen": "Resolve confirmation dialog",
+      "template": "PatternModal",
+      "variant": "Modal · Active",
+      "page": "design-system/src/patterns/PatternModal/index.md",
+      "section": "Types",
+      "pages": [
+        "design-system/src/patterns/PatternModal/index.md"
+      ],
+      "guides": ["modal"],
+      "scoring": "judge",
+      "expectation": "Active confirmation Modal blocking interaction until Cancel or Confirm when resolving a record."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "filtering",
+      "pattern": "Filtering",
+      "variant": "1 · Quick filters",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "guide": "filtering",
+      "aliases": ["filter", "filters"],
+      "scoring": "checker",
+      "check": {
+        "kind": "toolbar-filters",
+        "accepts": ["FilterButton", "FilterMenu"],
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Status quick filter in the Section's view bar uses FilterButton (or FilterMenu) rather than a bare Select or PopupSelect control."
+    },
+    {
+      "id": "search",
+      "pattern": "Search",
+      "variant": "Active",
+      "page": "design-system/agent-views/patterns/Search.md",
+      "section": "Active search",
+      "guide": "search",
+      "scoring": "judge",
+      "expectation": "Compact SearchField in the Section's view bar combines with the status filter and preserves state across updates."
+    },
+    {
+      "id": "notifications",
+      "pattern": "Notifications",
+      "variant": "Banner · Page + Flag",
+      "page": "design-system/agent-views/patterns/Notifications.md",
+      "section": "The carriers",
+      "guide": "notifications",
+      "aliases": ["toast", "banner", "alert"],
+      "scoring": "judge",
+      "expectation": "Dismissible passing Flag note and an actionable warning Banner or Flag with a Review action, each using its own close/action behavior."
+    },
+    {
+      "id": "empty",
+      "pattern": "Empty",
+      "variant": "No matches · In a table",
+      "page": "design-system/agent-views/patterns/Empty.md",
+      "section": "The types",
+      "guide": "empty",
+      "scoring": "judge",
+      "expectation": "When combined search and status filter match no records, an EmptyState renders with a Clear filters action."
+    },
+    {
+      "id": "disabled",
+      "pattern": "Disabled",
+      "variant": "Explains on focus/hover or press",
+      "page": "design-system/agent-views/patterns/Disabled.md",
+      "section": "The four answers",
+      "guide": "disabled",
+      "aliases": ["unavailable", "tooltip on disabled"],
+      "scoring": "judge",
+      "expectation": "Unavailable Resolve action for an already-complete record provides a keyboard- and touch-reachable explanation."
+    }
+  ],
+  "required_placements": [
+    {
+      "id": "controls-in-section-toolbar",
+      "placement": "Search and status filter in PatternSection.Toolbar",
+      "page": "design-system/src/patterns/PatternSection/index.md",
+      "section": "Slots",
+      "scoring": "checker",
+      "check": {
+        "kind": "slot-use",
+        "owner": "PatternSection",
+        "prop": "toolbar",
+        "components": ["SearchField"]
+      },
+      "expectation": "SearchField and filter controls sit in PatternSection's toolbar prop via PatternSection.Toolbar."
+    }
+  ],
+  "against_placements": [
+    {
+      "id": "bare-select-in-toolbar",
+      "placement": "Bare Select or PopupSelect in Section toolbar",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-bare-select-in-toolbar",
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Counts against: placing bare Select or PopupSelect controls in PatternSection's toolbar instead of FilterButton or FilterMenu."
+    },
+    {
+      "id": "banner-above-or-flush-page-header",
+      "placement": "Banner above or flush against PageHeader",
+      "page": "design-system/agent-views/patterns/Notifications.md",
+      "section": "Banner tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-banner-before-header"
+      },
+      "expectation": "Counts against: placing Banner before PageHeader or flush against PageHeader with no stack gap."
+    }
+  ]
+}

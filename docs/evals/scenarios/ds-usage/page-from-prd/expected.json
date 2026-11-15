@@ -1,0 +1,118 @@
+{
+  "task": "page-from-prd",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/page-from-prd/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "history-page",
+      "screen": "Session history page",
+      "template": "Frame + Page + PatternSection + PatternTable",
+      "variant": "Frame · Default / Page · Default / PatternSection · Toolbar / PatternTable · Dynamic table",
+      "page": "design-system/src/patterns/Page/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Frame/index.md",
+        "design-system/src/patterns/Page/index.md",
+        "design-system/src/patterns/PatternSection/index.md",
+        "design-system/src/patterns/PatternTable/index.md"
+      ],
+      "guides": ["frame", "page", "section", "table", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["Frame", "Page", "PatternSection", "PatternTable"]
+      },
+      "expectation": "Full-page shell on Frame and Page with PageHeader (title, description, Export action), a PatternSection with PatternSection.Toolbar, and a PatternTable."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "filtering",
+      "pattern": "Filtering",
+      "variant": "1 · Quick filters",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "guide": "filtering",
+      "aliases": ["filter", "filters"],
+      "scoring": "checker",
+      "check": {
+        "kind": "toolbar-filters",
+        "accepts": ["FilterButton", "FilterMenu"],
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Status quick filter in the Section's view bar uses FilterButton (or FilterMenu) rather than a bare Select or PopupSelect control."
+    },
+    {
+      "id": "search",
+      "pattern": "Search",
+      "variant": "Active",
+      "page": "design-system/agent-views/patterns/Search.md",
+      "section": "Active search",
+      "guide": "search",
+      "scoring": "judge",
+      "expectation": "Compact SearchField in the Section's view bar filters sessions by student name in place as the tutor types."
+    },
+    {
+      "id": "indicators",
+      "pattern": "Indicators",
+      "variant": "Status in a row",
+      "page": "design-system/agent-views/patterns/Indicators.md",
+      "section": "The three tags",
+      "guide": "indicators",
+      "scoring": "judge",
+      "expectation": "Each session row displays one StatusTag with semantic appearance matching Reflected, Reflection due, or Missed."
+    },
+    {
+      "id": "empty",
+      "pattern": "Empty",
+      "variant": "No matches · In a table",
+      "page": "design-system/agent-views/patterns/Empty.md",
+      "section": "The types",
+      "guide": "empty",
+      "scoring": "judge",
+      "expectation": "When search and status filters match no sessions, an EmptyState renders in the table with an action to clear filters."
+    },
+    {
+      "id": "overflow",
+      "pattern": "Overflow",
+      "variant": "Paging a table",
+      "page": "design-system/agent-views/patterns/Overflow.md",
+      "section": "The four answers",
+      "guide": "overflow",
+      "scoring": "judge",
+      "expectation": "When more than 20 sessions are listed, the table pages via Pagination in the Section footer."
+    }
+  ],
+  "required_placements": [
+    {
+      "id": "controls-in-section-toolbar",
+      "placement": "Search and status filter in PatternSection.Toolbar",
+      "page": "design-system/src/patterns/PatternSection/index.md",
+      "section": "Slots",
+      "scoring": "checker",
+      "check": {
+        "kind": "slot-use",
+        "owner": "PatternSection",
+        "prop": "toolbar",
+        "components": ["SearchField"]
+      },
+      "expectation": "SearchField and filter controls sit in PatternSection's toolbar prop via PatternSection.Toolbar."
+    }
+  ],
+  "against_placements": [
+    {
+      "id": "bare-select-in-toolbar",
+      "placement": "Bare Select or PopupSelect in Section toolbar",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-bare-select-in-toolbar",
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Counts against: placing bare Select or PopupSelect controls in PatternSection's toolbar instead of FilterButton or FilterMenu."
+    }
+  ]
+}

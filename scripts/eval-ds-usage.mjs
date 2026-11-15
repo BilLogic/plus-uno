@@ -38,7 +38,7 @@ import path from 'node:path';
 import { contextOf } from './check-ds-usage.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { escapesIn, pageRootOf, pagesOf } from './lib/ds-usage.mjs';
-import { blankComments } from './lib/jsx-scan.mjs';
+import { blankComments, jsxElementsOf } from './lib/jsx-scan.mjs';
 import { isEntry } from './lib/findings.mjs';
 import { estimateGeminiCost, GEMINI_PRICE, isGemini, runGemini, vertexBudget, vertexMissing } from './lib/gemini-agent.mjs';
 import { headLinks } from './lib/registry.mjs';
@@ -165,7 +165,7 @@ function filesUnder(dir) {
 export function scenariosSha(repoRoot = REPO_ROOT) {
   const root = path.join(repoRoot, SCENARIOS);
   const hash = createHash('sha256');
-  for (const file of filesUnder(root).filter((f) => path.basename(f) !== 'expected.json')) {
+  for (const file of filesUnder(root).filter((f) => !['expected.json', 'reference.png'].includes(path.basename(f)))) {
     hash.update(path.relative(root, file)).update(fs.readFileSync(file));
   }
   return hash.digest('hex').slice(0, 12);
@@ -201,6 +201,15 @@ export function expectedFor(task, repoRoot = REPO_ROOT) {
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
   for (const key of ['screens', 'patterns', 'required_placements', 'against_placements']) {
     if (!Array.isArray(data[key])) throw new Error(`${task}/expected.json: missing ${key} array`);
+    for (const item of data[key]) {
+      if (!item?.id) throw new Error(`${task}/expected.json: item in ${key} missing id`);
+      if (!item.page && !(Array.isArray(item.pages) && item.pages.length)) {
+        throw new Error(`${task}/expected.json: item ${item.id} in ${key} missing page citation`);
+      }
+      if (!item.section || typeof item.section !== 'string') {
+        throw new Error(`${task}/expected.json: item ${item.id} in ${key} missing section citation`);
+      }
+    }
   }
   return data;
 }
@@ -209,11 +218,18 @@ export const loadExpected = expectedFor;
 /** Every expected item in an answer key, in section order. */
 export function expectedItems(expected) {
   if (!expected) return [];
+  const withKind = (item, kind) => ({
+    ...item,
+    kind,
+    page: item.page ?? item.pages?.[0] ?? null,
+    section: item.section ?? kind,
+    scoring: item.scoring ?? 'judge',
+  });
   return [
-    ...(expected.screens ?? []).map((s) => ({ ...s, section: 'screen' })),
-    ...(expected.patterns ?? []).map((p) => ({ ...p, section: 'pattern' })),
-    ...(expected.required_placements ?? []).map((r) => ({ ...r, section: 'required_placement' })),
-    ...(expected.against_placements ?? []).map((a) => ({ ...a, section: 'against_placement' })),
+    ...(expected.screens ?? []).map((s) => withKind(s, 'screen')),
+    ...(expected.patterns ?? []).map((p) => withKind(p, 'pattern')),
+    ...(expected.required_placements ?? []).map((r) => withKind(r, 'required_placement')),
+    ...(expected.against_placements ?? []).map((a) => withKind(a, 'against_placement')),
   ];
 }
 
@@ -308,6 +324,7 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
   copyDir(path.join(repoRoot, SCENARIOS, '_template'), folder);
   copyDir(path.join(repoRoot, SCENARIOS, task), folder);
   fs.rmSync(path.join(folder, 'expected.json'), { force: true });
+  fs.rmSync(path.join(folder, 'reference.png'), { force: true });
   ensureHeadLinks(folder, repoRoot);
   return { root: into, folder };
 }
@@ -352,6 +369,7 @@ export function seedScore({ repoRoot = REPO_ROOT, task }) {
     copyDir(path.join(repoRoot, SCENARIOS, '_template'), dir);
     copyDir(path.join(repoRoot, SCENARIOS, task), dir);
     fs.rmSync(path.join(dir, 'expected.json'), { force: true });
+    fs.rmSync(path.join(dir, 'reference.png'), { force: true });
     ensureHeadLinks(dir, repoRoot);
     return score({ repoRoot, folder: dir, label: `eval-${task}` });
   } finally {
@@ -772,13 +790,153 @@ export async function screenshot({ folder, screenshotPath = path.join(folder, 's
 
 export const FIT_VERDICTS = ['followed', 'partly', 'ignored', 'n/a'];
 
-/** Prompt for judging a build's per-item fit against `expected.json`. */
-export function fitPrompt(expected) {
-  const ids = expectedItems(expected).map((item) => item.id);
+/** Closed-form fit score `(followed + 0.5 * partly) / applicable` and counts over per-item verdicts. */
+export function fitScore(items) {
+  if (!items || typeof items !== 'object') return null;
+  const entries = items.items && typeof items.items === 'object' ? Object.values(items.items) : Object.values(items).filter((v) => v && typeof v === 'object' && 'verdict' in v);
+  let followed = 0;
+  let partly = 0;
+  let ignored = 0;
+  for (const item of entries) {
+    if (item?.verdict === 'followed') followed += 1;
+    else if (item?.verdict === 'partly') partly += 1;
+    else if (item?.verdict === 'ignored') ignored += 1;
+  }
+  const applicable = followed + partly + ignored;
+  const score = applicable ? Number(((followed + 0.5 * partly) / applicable).toFixed(2)) : null;
+  return { score, followed, partly, ignored, applicable };
+}
+
+/**
+ * Deterministic structural fit verdicts from the checker and JSX structure for
+ * answer-key items with `scoring === 'checker'`.
+ */
+export function structuralFit({ folder, expected, repoRoot = REPO_ROOT }) {
+  if (!expected || !folder || !fs.existsSync(folder)) return {};
+  const ctx = contextOf(repoRoot);
+  const files = filesUnder(folder)
+    .filter((abs) => /\.[jt]sx$/.test(abs))
+    .map((abs) => ({
+      path: `eval-${expected.task ?? 'x'}/${path.relative(folder, abs).split(path.sep).join('/')}`,
+      text: fs.readFileSync(abs, 'utf8'),
+    }));
+  const pages = pagesOf(files);
+  const findings = files.flatMap((file) => escapesIn({ ...file, page: pages.has(file.path) }, ctx));
+  const elements = files.flatMap((file) => jsxElementsOf(blankComments(file.text)).map((el) => ({ ...el, file })));
+  const names = new Set(elements.map((el) => el.name.split('.')[0]));
+  const hasToolbarViolation = findings.some((f) => f.rule === 'ds/placement' && /toolbar|view-bar filter/i.test(f.message));
+  const hasBannerViolation = findings.some((f) => f.rule === 'ds/placement' && /page header|page message order/i.test(f.message));
+  const hasShellViolation = findings.some((f) => f.rule === 'ds/page-starts-from-pattern');
+
+  const out = {};
+  for (const item of expectedItems(expected)) {
+    if (item.scoring !== 'checker') continue;
+    const check = item.check ?? {};
+    let verdict = 'ignored';
+    let reason = '';
+    if (check.kind === 'template') {
+      const comps = check.components ?? [];
+      const present = comps.filter((c) => names.has(c));
+      if (!hasShellViolation && present.length === comps.length && comps.length > 0) {
+        verdict = 'followed';
+        reason = `checker: page starts from template (${present.join(', ')})`;
+      } else if (present.length > 0) {
+        verdict = 'partly';
+        reason = `checker: uses ${present.join(', ')}; missing ${comps.filter((c) => !names.has(c)).join(', ') || 'template page root'}`;
+      } else {
+        verdict = 'ignored';
+        reason = `checker: missing expected template components (${comps.join(', ')})`;
+      }
+    } else if (check.kind === 'toolbar-filters') {
+      const accepts = check.accepts ?? ['FilterButton', 'FilterMenu'];
+      const rejects = check.rejects ?? ['Select', 'PopupSelect'];
+      const usedAccepted = accepts.filter((c) => names.has(c));
+      const usedRejected = rejects.filter((c) => names.has(c));
+      if (!hasToolbarViolation && usedAccepted.length > 0) {
+        verdict = 'followed';
+        reason = `checker: uses ${usedAccepted.join(', ')} with no toolbar placement violation`;
+      } else if (hasToolbarViolation || usedRejected.length > 0) {
+        verdict = 'ignored';
+        reason = `checker: uses ${usedRejected.join(', ') || 'non-filter control'} in toolbar instead of ${accepts.join(' or ')}`;
+      } else {
+        verdict = 'ignored';
+        reason = `checker: no ${accepts.join(' or ')} found`;
+      }
+    } else if (check.kind === 'no-bare-select-in-toolbar') {
+      if (!hasToolbarViolation) {
+        verdict = 'followed';
+        reason = 'checker: no bare Select or PopupSelect in Section toolbar';
+      } else {
+        verdict = 'ignored';
+        reason = 'checker: ds/placement flagged bare Select or PopupSelect in Section toolbar';
+      }
+    } else if (check.kind === 'banner-placement') {
+      const hasBanner = names.has('Banner');
+      const pageSlot = elements.some((el) => el.name === 'Page' && el.attributes.some((a) => a.name === 'banner'));
+      if (pageSlot || (hasBanner && !hasBannerViolation)) {
+        verdict = 'followed';
+        reason = pageSlot ? 'checker: Banner placed in Page.banner slot' : 'checker: Banner placed after PageHeader with no placement violation';
+      } else if (hasBanner && hasBannerViolation) {
+        verdict = 'ignored';
+        reason = 'checker: ds/placement flagged Banner before PageHeader';
+      } else {
+        verdict = 'ignored';
+        reason = 'checker: no Banner rendered on Page';
+      }
+    } else if (check.kind === 'no-banner-before-header') {
+      if (!hasBannerViolation) {
+        verdict = 'followed';
+        reason = 'checker: Banner is not placed before PageHeader';
+      } else {
+        verdict = 'ignored';
+        reason = 'checker: ds/placement flagged Banner before PageHeader';
+      }
+    } else if (check.kind === 'slot-use') {
+      const owner = check.owner;
+      const prop = check.prop;
+      const hasSlot = elements.some((el) => el.name === owner && el.attributes.some((a) => a.name === prop))
+        || (owner === 'PatternSection' && prop === 'toolbar' && elements.some((el) => el.name === 'PatternSection.Toolbar' || el.name === 'SectionToolbar'))
+        || (owner === 'Frame' && prop === 'panel' && files.some((f) => /\busePanelControl\b/.test(f.text)));
+      const comps = check.components ?? [];
+      const hasComp = !comps.length || comps.some((c) => names.has(c));
+      if (hasSlot && hasComp) {
+        verdict = 'followed';
+        reason = `checker: ${owner}.${prop} slot wired with ${comps.filter((c) => names.has(c)).join(', ') || prop}`;
+      } else if (hasSlot || hasComp) {
+        verdict = 'partly';
+        reason = `checker: partial ${owner}.${prop} wiring`;
+      } else {
+        verdict = 'ignored';
+        reason = `checker: ${owner}.${prop} slot not used`;
+      }
+    } else if (check.kind === 'component-present') {
+      const comps = check.components ?? [];
+      const present = comps.filter((c) => names.has(c));
+      if (present.length === comps.length && comps.length > 0) {
+        verdict = 'followed';
+        reason = `checker: uses ${present.join(', ')}`;
+      } else if (present.length > 0) {
+        verdict = 'partly';
+        reason = `checker: uses ${present.join(', ')}; missing ${comps.filter((c) => !names.has(c)).join(', ')}`;
+      } else {
+        verdict = 'ignored';
+        reason = `checker: missing ${comps.join(', ')}`;
+      }
+    }
+    out[item.id] = { verdict, reason, scored_by: 'checker' };
+  }
+  return out;
+}
+
+/** Prompt for judging a build's semantic fit items from source against `expected.json`. */
+export function fitPrompt(expected, { semanticOnly = false } = {}) {
+  const all = expectedItems(expected);
+  const items = semanticOnly ? all.filter((item) => item.scoring !== 'checker') : all;
+  const ids = items.map((item) => item.id);
   return [
     'You are scoring one prototype an agent built against its task answer key (`expected.json`).',
-    'Read `BRIEF.md`, `NOTES.md` (if present), `expected.json` and every file under `src/` in the current folder. Use no other files.',
-    'For every item id in `expected.json` (`screens`, `patterns`, `required_placements`, `against_placements`), judge whether the build followed that expectation:',
+    'Read `BRIEF.md`, `NOTES.md` (if present), `expected.json` and every file under `src/` in the current folder. Read source files only; do not read images.',
+    'For every listed item id in `expected.json`, judge from the source code whether the build followed that expectation:',
     '- `"followed"`: the build implements the expected template, pattern variant or required placement (or, for `against_placements`, avoided the anti-pattern).',
     '- `"partly"`: the build partially follows the expectation but misses part of the variant or placement.',
     '- `"ignored"`: the build ignores the expected template, pattern variant or required placement (or, for `against_placements`, committed the anti-pattern).',
@@ -788,42 +946,62 @@ export function fitPrompt(expected) {
   ].join('\n\n');
 }
 
-/** Parse the judge's per-item `fit` JSON against `expected`. */
-export function parseFit(text, expected) {
+/** Parse the judge's per-item `fit` JSON against `expected` and merge any structural checker verdicts. */
+export function parseFit(text, expected, structural = {}) {
   const items = expectedItems(expected);
   if (!items.length) return null;
   const s = String(text ?? '');
+  let parsed = null;
   for (let start = s.indexOf('{'); start !== -1; start = s.indexOf('{', start + 1)) {
     for (let end = s.lastIndexOf('}'); end > start; end = s.lastIndexOf('}', end - 1)) {
       try {
         const j = JSON.parse(s.slice(start, end + 1));
         if (!j || typeof j !== 'object' || !items.some((item) => item.id in j)) continue;
-        return Object.fromEntries(
-          items.map(({ id }) => {
-            const entry = j[id];
-            const v = FIT_VERDICTS.includes(entry?.verdict) ? entry.verdict : 'ignored';
-            return [id, { verdict: v, reason: String(entry?.reason ?? '') }];
-          }),
-        );
+        parsed = j;
+        break;
       } catch {
         // keep narrowing
       }
     }
+    if (parsed) break;
   }
-  return Object.fromEntries(items.map(({ id }) => [id, { verdict: 'ignored', reason: 'judge gave no JSON' }]));
+  const byId = Object.fromEntries(
+    items.map(({ id }) => {
+      if (structural[id]) return [id, structural[id]];
+      const entry = parsed?.[id];
+      if (!parsed) return [id, { verdict: 'ignored', reason: 'judge gave no JSON' }];
+      const v = FIT_VERDICTS.includes(entry?.verdict) ? entry.verdict : 'ignored';
+      return [id, { verdict: v, reason: String(entry?.reason ?? '') }];
+    }),
+  );
+  const summary = fitScore(byId);
+  Object.defineProperty(byId, 'score', { value: summary.score, enumerable: false });
+  Object.defineProperty(byId, 'followed', { value: summary.followed, enumerable: false });
+  Object.defineProperty(byId, 'partly', { value: summary.partly, enumerable: false });
+  Object.defineProperty(byId, 'ignored', { value: summary.ignored, enumerable: false });
+  Object.defineProperty(byId, 'applicable', { value: summary.applicable, enumerable: false });
+  return byId;
 }
 
-/** Judge a kept build folder against its task's answer key (`expected`). */
-export function fitJudge({ folder, expected, model, runAgent = agent }) {
-  if (!expected) return { fit: null, usage: null };
+/** Judge a kept build folder against its task's answer key (`expected`): structural items by checker, semantic items by AI judge from source only. */
+export function fitJudge({ folder, expected, model, repoRoot = REPO_ROOT, runAgent = agent }) {
+  if (!expected) return { fit: null, fit_score: null, usage: null };
+  const structural = structuralFit({ folder, expected, repoRoot });
+  const semanticItems = expectedItems(expected).filter((item) => item.scoring !== 'checker');
+  if (!semanticItems.length) {
+    const fit = parseFit('{}', expected, structural);
+    return { fit, fit_score: fitScore(fit), usage: null };
+  }
   const bench = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-fit-judge-'));
   try {
     copyDir(folder, bench);
     // Gemini on Vertex rejects a turn that reads an image back ("Requests ending with a model turn"), so the judge reads source only.
     fs.rmSync(path.join(bench, 'screenshot.png'), { force: true });
+    fs.rmSync(path.join(bench, 'reference.png'), { force: true });
     writeJson(path.join(bench, 'expected.json'), expected);
-    const out = runAgent({ cwd: bench, prompt: fitPrompt(expected), model, readOnly: true }).result;
-    return { fit: parseFit(out.result, expected), usage: usageOf(out) };
+    const out = runAgent({ cwd: bench, prompt: fitPrompt(expected, { semanticOnly: true }), model, readOnly: true }).result;
+    const fit = parseFit(out.result, expected, structural);
+    return { fit, fit_score: fitScore(fit), usage: usageOf(out) };
   } finally {
     fs.rmSync(bench, { recursive: true, force: true });
   }
@@ -913,7 +1091,8 @@ export async function rejudge(
     const reachResult = reach(row.read_set, expected);
     const shotPath = path.join(row.output, 'screenshot.png');
     await screenshotFn({ folder: row.output, screenshotPath: shotPath, repoRoot });
-    const { fit, usage } = expected ? await judgeFn({ folder: row.output, expected, model: row.model }) : { fit: null, usage: null };
+    const { fit, usage } = expected ? await judgeFn({ folder: row.output, expected, model: row.model, repoRoot }) : { fit: null, usage: null };
+    const fitSummary = fit ? fitScore(fit) : null;
     const judgeCost = isGemini(row.model) ? (usage ? estimateGeminiCost(usage) : 0) : null;
     out.push({
       ...row,
@@ -928,6 +1107,7 @@ export async function rejudge(
       reach: reachResult,
       screenshot: shotPath,
       fit,
+      fit_score: fitSummary,
       judge_usage: usage,
       ...(isGemini(row.model) ? { estimated_cost_usd: judgeCost } : {}),
     });
@@ -1239,10 +1419,11 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
     copyDir(folder, kept);
     fs.writeFileSync(path.join(kept, 'agent-result.json'), JSON.stringify(build.result, null, 2));
     const expected = expectedFor(task);
+    const { fit, fit_score: fitSummary, usage: fitUsage } = !failed && expected ? fitJudge({ folder, expected, model: opts.model }) : { fit: null, fit_score: null, usage: null };
     const shotPath = path.join(kept, 'screenshot.png');
     const buildUsage = usageOf(build.result);
     const buildEstimate = isGemini(opts.model) ? estimateGeminiCost(buildUsage) : null;
-    const judgeEstimate = judgeUsage ? estimateGeminiCost(judgeUsage) : 0;
+    const judgeEstimate = (judgeUsage ? estimateGeminiCost(judgeUsage) : 0) + (fitUsage ? estimateGeminiCost(fitUsage) : 0);
     append({
       date: new Date().toISOString(),
       model: opts.model,
@@ -1261,8 +1442,10 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
       scored_at: scorerCommit(),
       judge: judged,
       judge_sha: judge.sha,
+      fit,
+      fit_score: fitSummary,
       ...buildUsage,
-      ...(isGemini(opts.model) ? { judge_usage: judgeUsage, estimated_cost_usd: buildEstimate == null || judgeEstimate == null ? null : Number((buildEstimate + judgeEstimate).toFixed(8)), vertex_price: GEMINI_PRICE, protocol: 'gemini-r1-isolated-v1' } : {}),
+      ...(isGemini(opts.model) ? { judge_usage: judgeUsage, fit_judge_usage: fitUsage, estimated_cost_usd: buildEstimate == null ? null : Number((buildEstimate + judgeEstimate).toFixed(8)), vertex_price: GEMINI_PRICE, protocol: 'gemini-r1-isolated-v1' } : {}),
       wall_ms: build.wallMs,
       agent_error: failed,
       reached_checkout: build.reached,
