@@ -2305,7 +2305,8 @@
         "Required",
         "Description",
         "Card",
-        "Tile"
+        "Tile",
+        "TileNarrowLargeIllustrations"
       ],
       "tokens": [
         "--body-default",
@@ -11160,7 +11161,8 @@
         "Disabled",
         "DisabledWithReason",
         "Required",
-        "Tile"
+        "Tile",
+        "TileNarrowLargeIllustrations"
       ],
       "tokens": [
         "--body-default",

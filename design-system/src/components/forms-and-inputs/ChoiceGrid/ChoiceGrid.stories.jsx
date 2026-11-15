@@ -422,4 +422,8 @@ export const Disabled = {
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Overview.play = async ({ canvasElement }) => {
     await expect(radiusOf(canvasElement, '.plus-choice-grid-table'), 'Choice grid radius is 12').toBe('12px');
+    const corner = canvasElement.querySelector('.plus-choice-grid-row-header');
+    const column = canvasElement.querySelector('.plus-choice-grid-column-header');
+    await expect(getComputedStyle(corner).backgroundColor, 'Corner cell matches a column header').toBe(getComputedStyle(column).backgroundColor);
+    await expect(getComputedStyle(corner).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-container'));
 };

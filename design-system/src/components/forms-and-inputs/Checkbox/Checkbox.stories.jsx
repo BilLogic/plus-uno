@@ -441,3 +441,36 @@ Tile.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
     await expect(tile.querySelector('.plus-choice-tile-illustration')).toHaveAttribute('aria-hidden', 'true');
 };
+
+export const TileNarrowLargeIllustrations = () => (
+    <div style={{ width: 320, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+        <Checkbox id="cb-narrow-character" name="cb-narrow-a" label="Character" illustration={<Illustration character="advocacy" size={240} />} appearance="tile" />
+        <Checkbox
+            id="cb-narrow-svg"
+            name="cb-narrow-b"
+            label="Svg"
+            illustration={<svg viewBox="0 0 240 240" width="240" height="240" aria-hidden="true"><circle cx="120" cy="120" r="110" fill="var(--ds-icon-subtle)" /></svg>}
+            appearance="tile"
+        />
+        <Checkbox
+            id="cb-narrow-img"
+            name="cb-narrow-c"
+            label="Image"
+            illustration={<img alt="" width="300" height="300" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Crect width='10' height='10'/%3E%3C/svg%3E" />}
+            appearance="tile"
+        />
+    </div>
+);
+TileNarrowLargeIllustrations.play = async ({ canvasElement }) => {
+    const tiles = canvasElement.querySelectorAll('.plus-choice-tile');
+    await expect(tiles.length).toBe(3);
+    for (const tile of tiles) {
+        const card = tile.getBoundingClientRect();
+        const art = tile.querySelector('.plus-choice-tile-illustration > *').getBoundingClientRect();
+        await expect(art.width).toBeGreaterThan(0);
+        await expect(art.left).toBeGreaterThanOrEqual(card.left);
+        await expect(art.right).toBeLessThanOrEqual(card.right);
+        await expect(art.top).toBeGreaterThanOrEqual(card.top);
+        await expect(art.bottom).toBeLessThanOrEqual(card.bottom);
+    }
+};

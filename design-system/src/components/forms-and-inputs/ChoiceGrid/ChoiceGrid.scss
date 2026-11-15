@@ -57,6 +57,12 @@
     background-color: var(--ds-surface-container);
 }
 
+// Corner cell above the row labels: same surface as the column headers
+.plus-choice-grid-row-header {
+    padding: var(--pad-y-md) var(--pad-x-md);
+    background-color: var(--ds-surface-container);
+}
+
 // Row label column
 .plus-choice-grid-row-label {
     padding: var(--pad-y-md) var(--pad-x-md);

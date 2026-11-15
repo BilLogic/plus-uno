@@ -86,7 +86,7 @@ export const Illustration = ({
     return (
         <span
             className={classes}
-            style={{ inlineSize: `${size}px`, blockSize: `${size}px`, ...style }}
+            style={{ inlineSize: `${size}px`, aspectRatio: '1 / 1', ...style }}
             data-character={character}
             {...rest}
             {...a11y}
