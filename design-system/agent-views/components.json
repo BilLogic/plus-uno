@@ -3469,7 +3469,13 @@
         "ReadOnly",
         "Disabled",
         "HoveredState",
-        "KeyboardFocus"
+        "KeyboardFocus",
+        "CalendarOpensFourPixelsBelow",
+        "CalendarFlipsAboveNearTheBottom",
+        "RangePicksASpan",
+        "BoundedDatesBehavior",
+        "TypedEntry",
+        "DaysAnnounceTheirDate"
       ],
       "tokens": [
         "--ds-icon-subtle"

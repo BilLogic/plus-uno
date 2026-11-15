@@ -157,7 +157,7 @@ const inputs = byRoot((repoRoot) => {
   const pages = tracked
     .filter((rel) => rel.startsWith('design-system/src/'))
     .filter((rel) => /(\.stories\.[jt]sx?|\.mdx)$/.test(rel))
-    .map((rel) => ({ rel, title: readStorybookPage(repoRoot, rel).title }));
+    .map((rel) => ({ rel, ...readStorybookPage(repoRoot, rel) }));
   return { taxonomy, folders, tracked, stories, pages };
 });
 
@@ -320,6 +320,36 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
         `${rel}  is titled "${title}", which is also the folder of "${child}", so the sidebar lists it as a "Docs" entry.\n` +
           `      -> Title the page ${title}/${title.split("/").pop()}.`,
       );
+    }
+  }
+
+  // (11) No same-name single-child wrapper folder in the visible sidebar.
+  const visibleTitles = new Set(
+    pages
+      .filter(({ rel, title, tags }) => title && (rel.endsWith('.mdx') || !tags.includes('!dev') || !tags.includes('!autodocs')))
+      .map(({ title }) => title),
+  );
+  const reportedWrappers = new Set();
+  for (const { rel, title, storiesFile } of pages) {
+    if (!title || !visibleTitles.has(title)) continue;
+    if (storiesFile && rel !== storiesFile) continue;
+    const segs = title.split('/');
+    for (let i = 1; i < segs.length; i++) {
+      if (segs[i] !== segs[i - 1]) continue;
+      const parent = segs.slice(0, i).join('/');
+      const children = new Set(
+        [...visibleTitles]
+          .filter((other) => other.startsWith(`${parent}/`))
+          .map((other) => other.slice(parent.length + 1).split('/')[0]),
+      );
+      if (children.size === 1 && !reportedWrappers.has(`${rel}:${parent}`)) {
+        reportedWrappers.add(`${rel}:${parent}`);
+        const tail = segs.slice(i + 1).join('/');
+        found.push(
+          `${rel}  is titled "${title}", inside a same-name single-child wrapper folder "${parent}".\n` +
+            `      -> Flatten it to "${tail ? `${parent}/${tail}` : parent}".`,
+        );
+      }
     }
   }
 

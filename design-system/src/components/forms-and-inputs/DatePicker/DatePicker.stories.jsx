@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -8,7 +8,7 @@ import DatePicker from './DatePicker';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
-    title: 'Components/Forms and inputs/Date time picker/Date picker/Date picker',
+    title: 'Components/Forms and inputs/Date time picker/Date picker',
     component: DatePicker,
     tags: ['!dev', '!autodocs'],
     parameters: {
@@ -379,4 +379,155 @@ Bounds.play = async ({ canvasElement }) => {
     await userEvent.type(input, '10/30/2026{Enter}');
     await expect(input).toHaveAttribute('aria-invalid', 'true');
     await expect(input).toHaveValue('10/30/2026');
+};
+
+const page = within(document.body);
+const calendar = () => document.body.querySelector('.plus-date-popup');
+const box = (input) => input.closest('.plus-field').getBoundingClientRect();
+
+/** The calendar opens 4px under the field, its left edge on the field's. */
+export const CalendarOpensFourPixelsBelow = () => (
+    <div style={{ maxWidth: '296px', marginLeft: '16px' }}>
+        <DatePicker aria-label="Session date" value="2026-10-21" />
+    </div>
+);
+CalendarOpensFourPixelsBelow.parameters = { docs: { disable: true } };
+CalendarOpensFourPixelsBelow.play = async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', { name: 'Session date' });
+    await userEvent.click(input);
+    await waitFor(() => expect(calendar()).toBeVisible());
+    const rect = box(input);
+    const popup = calendar().getBoundingClientRect();
+    await expect(calendar()).toHaveAttribute('data-placement', 'bottom');
+    await expect(Math.round(popup.top - rect.bottom)).toBe(4);
+    await expect(Math.round(popup.left)).toBe(Math.round(rect.left));
+};
+
+/** With no room below, the calendar opens above, the same 4px away. */
+export const CalendarFlipsAboveNearTheBottom = () => (
+    <div style={{ position: 'fixed', left: '16px', bottom: '16px', width: '296px' }}>
+        <DatePicker aria-label="Session date" value="2026-10-21" />
+    </div>
+);
+CalendarFlipsAboveNearTheBottom.parameters = { docs: { disable: true } };
+CalendarFlipsAboveNearTheBottom.play = async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', { name: 'Session date' });
+    await userEvent.click(input);
+    await waitFor(() => expect(calendar()).toHaveAttribute('data-placement', 'top'));
+    const rect = box(input);
+    const popup = calendar().getBoundingClientRect();
+    await expect(Math.round(rect.top - popup.bottom)).toBe(4);
+};
+
+/** Two clicks pick a range: the first day, then the last; the days between are marked. */
+export const RangePicksASpan = (args) => {
+    const [value, setValue] = useState(['2026-10-05', '2026-10-06']);
+    return (
+        <div style={{ maxWidth: '296px' }}>
+            <DatePicker
+                aria-label="Report period"
+                range
+                value={value}
+                onChange={(next) => { setValue(next); args.onChange(next); }}
+            />
+        </div>
+    );
+};
+RangePicksASpan.args = { onChange: fn() };
+RangePicksASpan.parameters = { docs: { disable: true } };
+RangePicksASpan.play = async ({ args, canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', { name: 'Report period' });
+    await expect(input).toHaveValue('10/05/2026 – 10/06/2026');
+    await userEvent.click(input);
+
+    // A click on a full range starts a new one.
+    await userEvent.click(await page.findByRole('button', { name: /October 19, 2026/ }));
+    await expect(args.onChange).toHaveBeenLastCalledWith(['2026-10-19', null]);
+    await userEvent.click(page.getByRole('button', { name: /October 23, 2026/ }));
+    await expect(args.onChange).toHaveBeenLastCalledWith(['2026-10-19', '2026-10-23']);
+
+    await waitFor(() => expect(input).toHaveValue('10/19/2026 – 10/23/2026'));
+    await userEvent.click(input);
+    const day = (n) => page.getByRole('button', { name: new RegExp(`October ${n}, 2026`) });
+    await expect(day(19)).toHaveAttribute('aria-pressed', 'true');
+    await expect(day(23)).toHaveAttribute('aria-pressed', 'true');
+    for (const n of [20, 21, 22]) await expect(day(n)).toHaveAttribute('data-in-range', 'true');
+    await expect(day(24)).not.toHaveAttribute('data-in-range');
+};
+
+/** Days before the earliest date or after the latest can't be picked. */
+export const BoundedDatesBehavior = () => (
+    <div style={{ maxWidth: '296px' }}>
+        <DatePicker aria-label="Session date" value="2026-10-21" minDate="2026-10-12" maxDate="2026-10-25" />
+    </div>
+);
+BoundedDatesBehavior.parameters = { docs: { disable: true } };
+BoundedDatesBehavior.play = async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('combobox', { name: 'Session date' }));
+    const day = (n) => page.getByRole('button', { name: new RegExp(`October ${n}, 2026`) });
+    await waitFor(() => expect(day(11)).toBeDisabled());
+    await expect(day(26)).toBeDisabled();
+    await expect(day(12)).toBeEnabled();
+    await expect(day(25)).toBeEnabled();
+};
+
+/** A typed date is checked against the same span the calendar enforces. */
+export const TypedEntry = (args) => (
+    <div style={{ maxWidth: '296px' }}>
+        <DatePicker aria-label="Session date" maxDate="2026-10-25" onChange={args.onChange} />
+    </div>
+);
+TypedEntry.args = { onChange: fn() };
+TypedEntry.parameters = { docs: { disable: true } };
+TypedEntry.play = async ({ args, canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', { name: 'Session date' });
+
+    await userEvent.click(input);
+    await userEvent.type(input, '10/21/2026{Enter}');
+    await expect(args.onChange).toHaveBeenLastCalledWith('2026-10-21');
+    await expect(input).toHaveValue('10/21/2026');
+    await expect(input).not.toHaveAttribute('aria-invalid', 'true');
+
+    // The calendar follows the typed date.
+    await userEvent.click(input);
+    await waitFor(() => expect(page.getByRole('button', { name: /October 21, 2026/ })).toHaveAttribute('aria-pressed', 'true'));
+    await userEvent.keyboard('{Escape}');
+
+    // Past the latest date: kept as typed, marked invalid, not reported.
+    args.onChange.mockClear();
+    await userEvent.clear(input);
+    await userEvent.type(input, '11/30/2026');
+    await userEvent.tab();
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    await expect(input).toHaveValue('11/30/2026');
+    await expect(args.onChange).not.toHaveBeenCalled();
+};
+
+/** Regression cover for #331: every day button announces its full date and selected state. */
+export const DaysAnnounceTheirDate = () => {
+    const [date, setDate] = useState('2026-08-17');
+    return (
+        <div style={{ maxWidth: '360px' }}>
+            <label htmlFor="dpd-starts">Session date</label>
+            <DatePicker id="dpd-starts" value={date} onChange={setDate} />
+        </div>
+    );
+};
+DaysAnnounceTheirDate.parameters = { docs: { disable: true } };
+DaysAnnounceTheirDate.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', { name: 'Session date' });
+
+    await userEvent.click(trigger);
+
+    const seventeenth = await waitFor(() => page.getByRole('button', { name: /August 17, 2026/ }));
+    await expect(seventeenth).toBeTruthy();
+    await expect(seventeenth.getAttribute('aria-pressed')).toBe('true');
+
+    const pressed = page.getAllByRole('button')
+        .filter((button) => button.getAttribute('aria-pressed') === 'true');
+    await expect(pressed).toHaveLength(1);
+
+    const eighteenth = page.getByRole('button', { name: /August 18, 2026/ });
+    await expect(eighteenth.getAttribute('aria-pressed')).toBe('false');
 };

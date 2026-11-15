@@ -40,7 +40,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/forms-and-inputs/DatePicker/",
     "DatePicker",
-    "components-forms-and-inputs-date-time-picker-date-picker-date-picker--docs"
+    "components-forms-and-inputs-date-time-picker-date-picker--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/DateTimePicker/",
