@@ -234,17 +234,17 @@ test('closest: the nearest name within a small edit distance, else null', () => 
 const pageRules = (path, text, page) => escapesIn({ path, text, page }, patternCtx).map((f) => [f.rule, f.level]);
 const SHELL = "export default function App() {\n  return (\n    <div style={{ display: 'grid', gap: 0 }}>\n      <h1>Sessions</h1>\n    </div>\n  );\n}\n";
 
-test('ds/page-starts-from-pattern: a page whose outer element is a hand-styled container warns', () => {
+test('ds/page-starts-from-pattern: a page whose outer element is a hand-styled container fails', () => {
   const [f, ...rest] = escapesIn({ path: 'p/src/App.jsx', text: SHELL }, patternCtx);
   assert.equal(rest.length, 0);
-  assert.deepEqual([f.rule, f.level, f.line, f.col], ['ds/page-starts-from-pattern', 'warn', 3, 5]);
+  assert.deepEqual([f.rule, f.level, f.line, f.col], ['ds/page-starts-from-pattern', 'fail', 3, 5]);
   assert.equal(f.message, "the page's outer element is a hand-styled `<div>`, not a template");
   assert.match(f.fix, /Frame/);
   assert.deepEqual(pageRules('p/pages/Home.jsx', 'const Home = () => (\n  <main className="home-grid"><p>x</p></main>\n);\nexport default Home;\n'), [
-    ['ds/page-starts-from-pattern', 'warn'],
+    ['ds/page-starts-from-pattern', 'fail'],
   ]);
   assert.deepEqual(pageRules('p/src/SessionsPage.jsx', 'export default function SessionsPage({ rows }) {\n  if (!rows) return null;\n  return <section style={styles.page}>{rows.map((r) => {\n    return <div className="row">{r}</div>;\n  })}</section>;\n}\n'), [
-    ['ds/page-starts-from-pattern', 'warn'],
+    ['ds/page-starts-from-pattern', 'fail'],
   ]);
 });
 
@@ -254,7 +254,7 @@ test('ds/page-starts-from-pattern: a Frame or pattern root passes, through a fra
   const card = PATTERNS + 'export default function Home() {\n  return (\n    <>\n      <PatternCard title="x" />\n    </>\n  );\n}\n';
   assert.deepEqual(pageRules('p/pages/Home/Home.jsx', card), []);
   const provided = 'export default function App() {\n  return (\n    <ThemeProvider value={t}>\n      <div className="shell" />\n    </ThemeProvider>\n  );\n}\n';
-  assert.deepEqual(pageRules('p/src/App.jsx', provided), [['ds/page-starts-from-pattern', 'warn']]);
+  assert.deepEqual(pageRules('p/src/App.jsx', provided), [['ds/page-starts-from-pattern', 'fail']]);
   assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return <div><PatternCard title="x" /></div>;\n}\n'), [], 'a bare wrapper carries no layout of its own');
   assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return null;\n}\n'), []);
   assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return (\n    <>\n      {open && <div className="fab" />}\n    </>\n  );\n}\n'), [], 'a conditional child is not the outer element');
@@ -264,7 +264,7 @@ test('ds/page-starts-from-pattern: a module that is not a page is not checked', 
   assert.equal(isPageModule('prototypes/x/src/components/Panel.jsx'), false);
   assert.deepEqual(pageRules('prototypes/x/src/components/Panel.jsx', SHELL), []);
   assert.deepEqual(pageRules('p/src/App.jsx', SHELL, false), [], 'the caller may say a module is not a page');
-  assert.deepEqual(pageRules('p/src/Panel.jsx', SHELL, true), [['ds/page-starts-from-pattern', 'warn']], 'or that it is one');
+  assert.deepEqual(pageRules('p/src/Panel.jsx', SHELL, true), [['ds/page-starts-from-pattern', 'fail']], 'or that it is one');
   for (const page of ['prototypes/x/src/App.jsx', 'src/App.tsx', 'prototypes/x/src/pages/Home.jsx', 'src/pages/Market/Market.jsx', 'eval-x/src/HistoryPage.jsx']) {
     assert.equal(isPageModule(page), true, page);
   }
@@ -287,7 +287,7 @@ test('pagesOf: the module an app entry renders as its root is a page too', () =>
   assert.ok(pagesOf(provided).has('p/src/shell/index.jsx'));
 });
 
-test('ds/placement: Select or PopupSelect without trigger in a Section toolbar warns', () => {
+test('ds/placement: Select or PopupSelect without trigger in a Section toolbar fails', () => {
   const placementCtx = contextFrom({
     components: {
       components: [
@@ -306,13 +306,13 @@ test('ds/placement: Select or PopupSelect without trigger in a Section toolbar w
   const warn = (code) => escapesIn({ path: 'p/src/Queue.jsx', text: head + code, page: false }, placementCtx);
 
   const f1 = warn('<PatternSection title="Queue" toolbar={<PatternSection.Toolbar filters={<Select options={[]} />} />} />');
-  assert.deepEqual(f1.map((f) => [f.rule, f.level]), [['ds/placement', 'warn']]);
+  assert.deepEqual(f1.map((f) => [f.rule, f.level]), [['ds/placement', 'fail']]);
   assert.match(f1[0].message, /Select/);
   assert.match(f1[0].fix, /FilterButton/);
   assert.match(f1[0].fix, /ds guide filtering/);
 
   const f2 = warn('<SectionToolbar filters={<PopupSelect label="Status" options={[]} />} />');
-  assert.deepEqual(f2.map((f) => [f.rule, f.level]), [['ds/placement', 'warn']]);
+  assert.deepEqual(f2.map((f) => [f.rule, f.level]), [['ds/placement', 'fail']]);
   assert.match(f2[0].message, /PopupSelect/);
 
   // Passing a FilterButton trigger to PopupSelect, or using FilterButton / FilterMenu directly, or Select in the body passes.

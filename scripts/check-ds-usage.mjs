@@ -13,8 +13,8 @@
  *
  * WHAT IT READS. Consumer code under `prototypes/`, plus CSS/SCSS under
  * design-system/src/{components,patterns,templates} for the motion rule only.
- * The reference screens and pattern code stories are checked too, along with
- * fenced code examples in DS MDX. Other tests and stories are skipped. The
+ * MDX examples and stories tagged `reference-screen` are checked too; other
+ * stories and tests are skipped. The
  * facts come from the generated manifests
  * (`design-system/agent-views/components.json`, `tokens.json`), never from
  * component source. A custom property counts as defined when the manifest
@@ -44,24 +44,21 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
-import { CONSUMER_ROOTS, LIBRARY_ROOT, SOURCE_ROOTS, loadFacts } from './lib/ds-facts.mjs';
+import { CONSUMER_ROOTS, SOURCE_ROOTS, loadFacts } from './lib/ds-facts.mjs';
 import { contextFrom, docLink, escapesIn, isDsStyle, pagesOf } from './lib/ds-usage.mjs';
 import { readIconLists } from './lib/icon-lists.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import { TOKEN_LADDER } from './lib/tokens/plan.mjs';
 import { definitions } from './undefined-tokens.mjs';
+import { exampleFences, isTokenTierPage } from './doc-identifiers.mjs';
+import { importsOf, jsxElementsOf } from './lib/jsx-scan.mjs';
 
 export { REPO_ROOT };
 
 export const BASELINE = 'scripts/baselines/ds-usage.json';
-export const SCOPE = [...CONSUMER_ROOTS, 'design-system/src/components', 'design-system/src/patterns', 'design-system/src/templates'];
+export const SCOPE = [...CONSUMER_ROOTS, 'design-system/src/components', 'design-system/src/patterns', 'design-system/src/templates', 'design-system/src/storybook-docs', 'design-system/src/styles'];
 export const SEARCHED = /\.(jsx|js|mjs|tsx|ts|scss|css|html|mdx)$/;
-const EXAMPLE_STORIES = [
-  'design-system/src/patterns/Page/ReferenceScreens.stories.jsx',
-  'design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx',
-];
-const exampleFile = (rel) => EXAMPLE_STORIES.includes(rel) || (rel.startsWith(`${LIBRARY_ROOT}/`) && rel.endsWith('.mdx'));
 const SKIPPED = /(?:^|\/)(?:node_modules|dist|build)\/|\.(?:test|spec|stories)\.[cm]?[jt]sx?$|\.d\.ts$/;
 const DEFINITION_ROOTS = SOURCE_ROOTS;
 
@@ -102,7 +99,10 @@ export function filesUnder(repoRoot, roots) {
 }
 
 /** Whether a repo-relative path is one this check reads. */
-export const inScope = (rel) => exampleFile(rel) || ((isDsStyle(rel) || CONSUMER_ROOTS.some((root) => rel.startsWith(`${root}/`))) && SEARCHED.test(rel) && !SKIPPED.test(rel));
+const docsPage = (rel) => /^design-system\/src\/.+\.mdx$/.test(rel);
+const docsStory = (rel) => /^design-system\/src\/.+\.stories\.[jt]sx$/.test(rel);
+export const inScope = (rel) => docsPage(rel) || docsStory(rel) ||
+  (isDsStyle(rel) || CONSUMER_ROOTS.some((root) => rel.startsWith(`${root}/`))) && SEARCHED.test(rel) && !SKIPPED.test(rel);
 
 const read = (repoRoot, rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') });
 
@@ -136,7 +136,7 @@ export const contextOf = byRoot((repoRoot) => {
 });
 
 /** Every tracked file in scope. */
-export const scopeFiles = (repoRoot) => filesUnder(repoRoot, [...new Set([...SCOPE, LIBRARY_ROOT])]).filter(inScope);
+export const scopeFiles = (repoRoot) => filesUnder(repoRoot, SCOPE).filter(inScope);
 
 /** Files changed against main: committed on this branch, staged, unstaged and untracked. */
 export function changedFiles(repoRoot) {
@@ -152,7 +152,7 @@ export function changedFiles(repoRoot) {
   }
   const changed = new Set();
   if (base) for (const f of lines(git(repoRoot, ['diff', '--name-only', '--diff-filter=d', base]))) changed.add(f);
-  for (const f of lines(git(repoRoot, ['ls-files', '--others', '--exclude-standard', ...SCOPE, LIBRARY_ROOT]))) changed.add(f);
+  for (const f of lines(git(repoRoot, ['ls-files', '--others', '--exclude-standard', ...SCOPE]))) changed.add(f);
   return [...changed].filter((f) => inScope(f) && fs.existsSync(path.join(repoRoot, f))).sort();
 }
 
@@ -166,7 +166,7 @@ export function expandPaths(repoRoot, given) {
       if (entry.isDirectory()) walk(child);
       else {
         const rel = path.relative(repoRoot, child).split(path.sep).join('/');
-        if (SEARCHED.test(rel) && (!SKIPPED.test(rel) || exampleFile(rel))) out.add(rel);
+        if (SEARCHED.test(rel) && (!SKIPPED.test(rel) || docsStory(rel))) out.add(rel);
       }
     }
   };
@@ -208,7 +208,26 @@ export function escapes(repoRoot, files, factsRoot = repoRoot) {
   const ctx = contextOf(factsRoot);
   const texts = files.map((rel) => read(repoRoot, rel));
   const pages = pagesOf([...texts, ...entriesBeside(repoRoot, files)]);
-  return texts.flatMap((file) => escapesIn({ ...file, page: pages.has(file.path) }, ctx));
+  return texts.flatMap((file) => {
+    if (docsPage(file.path)) return exampleEscapes(file, ctx);
+    if (docsStory(file.path) && !/\btags\s*:\s*\[[^\]]*['"]reference-screen['"]/.test(file.text)) return [];
+    return escapesIn({ ...file, page: docsStory(file.path) || pages.has(file.path) }, ctx);
+  });
+}
+
+function exampleEscapes(file, ctx) {
+  return exampleFences(file.text).flatMap((fence) => {
+    if (fence.negative || !/^(jsx|tsx|js|javascript|ts|typescript|react|css|scss)$/.test(fence.lang)) return [];
+    const style = /^(css|scss)$/.test(fence.lang);
+    const bound = new Set(importsOf(fence.code).flatMap((i) => [i.default, i.namespace, ...i.named.map((n) => n.local)]));
+    const names = new Set(jsxElementsOf(fence.code).map((el) => el.name.split('.')[0]));
+    const imports = [...names].filter((name) => !bound.has(name)).map((name) => ctx.components.get(name)?.import).filter(Boolean);
+    const text = `${fence.code}\n${imports.join('\n')}`;
+    return escapesIn({ path: `example.${style ? 'css' : 'jsx'}`, text, page: !style && /\bexport\s+default\b/.test(fence.code) }, ctx)
+      .filter((f) => f.line <= fence.code.split('\n').length)
+      .filter((f) => !(isTokenTierPage(file.path) && f.rule === 'ds/no-primitive-read'))
+      .map((f) => ({ ...f, file: file.path, line: fence.startLine + f.line - 1 }));
+  });
 }
 
 const keyOf = (f) => `${f.rule} ${f.file}`;
