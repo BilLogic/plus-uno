@@ -12001,7 +12001,7 @@
     {
      "name": "color/skeleton/subtle",
      "codeSyntax": {
-      "WEB": "var(--ds-skeleton-subtle)"
+      "WEB": "var(--skeleton-subtle)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12031,7 +12031,7 @@
     {
      "name": "color/blanket/default",
      "codeSyntax": {
-      "WEB": "var(--ds-blanket)"
+      "WEB": "var(--ds-backdrop)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12061,7 +12061,7 @@
     {
      "name": "color/blanket/selected",
      "codeSyntax": {
-      "WEB": "var(--ds-blanket-selected)"
+      "WEB": "var(--ds-backdrop-selected)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12091,7 +12091,7 @@
     {
      "name": "color/blanket/danger",
      "codeSyntax": {
-      "WEB": "var(--ds-blanket-danger)"
+      "WEB": "var(--ds-backdrop-danger)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12121,7 +12121,7 @@
     {
      "name": "color/chart/categorical/1/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-1)"
+      "WEB": "var(--chart-categorical-1)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12152,7 +12152,7 @@
     {
      "name": "color/chart/categorical/1/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-1-hovered)"
+      "WEB": "var(--chart-categorical-1-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12183,7 +12183,7 @@
     {
      "name": "color/chart/categorical/2/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-2)"
+      "WEB": "var(--chart-categorical-2)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12214,7 +12214,7 @@
     {
      "name": "color/chart/categorical/2/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-2-hovered)"
+      "WEB": "var(--chart-categorical-2-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12245,7 +12245,7 @@
     {
      "name": "color/chart/categorical/3/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-3)"
+      "WEB": "var(--chart-categorical-3)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12276,7 +12276,7 @@
     {
      "name": "color/chart/categorical/3/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-3-hovered)"
+      "WEB": "var(--chart-categorical-3-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12307,7 +12307,7 @@
     {
      "name": "color/chart/categorical/4/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-4)"
+      "WEB": "var(--chart-categorical-4)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12338,7 +12338,7 @@
     {
      "name": "color/chart/categorical/4/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-4-hovered)"
+      "WEB": "var(--chart-categorical-4-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12369,7 +12369,7 @@
     {
      "name": "color/chart/categorical/5/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-5)"
+      "WEB": "var(--chart-categorical-5)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12400,7 +12400,7 @@
     {
      "name": "color/chart/categorical/5/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-5-hovered)"
+      "WEB": "var(--chart-categorical-5-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12431,7 +12431,7 @@
     {
      "name": "color/chart/categorical/6/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-6)"
+      "WEB": "var(--chart-categorical-6)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12462,7 +12462,7 @@
     {
      "name": "color/chart/categorical/6/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-6-hovered)"
+      "WEB": "var(--chart-categorical-6-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12493,7 +12493,7 @@
     {
      "name": "color/chart/categorical/7/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-7)"
+      "WEB": "var(--chart-categorical-7)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12524,7 +12524,7 @@
     {
      "name": "color/chart/categorical/7/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-7-hovered)"
+      "WEB": "var(--chart-categorical-7-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12555,7 +12555,7 @@
     {
      "name": "color/chart/categorical/8/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-8)"
+      "WEB": "var(--chart-categorical-8)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12586,7 +12586,7 @@
     {
      "name": "color/chart/categorical/8/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-8-hovered)"
+      "WEB": "var(--chart-categorical-8-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12617,7 +12617,7 @@
     {
      "name": "color/chart/lime/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-lime-bold)"
+      "WEB": "var(--chart-lime-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12648,7 +12648,7 @@
     {
      "name": "color/chart/lime/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-lime-bold-hovered)"
+      "WEB": "var(--chart-lime-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12679,7 +12679,7 @@
     {
      "name": "color/chart/lime/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-lime-bolder)"
+      "WEB": "var(--chart-lime-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12710,7 +12710,7 @@
     {
      "name": "color/chart/lime/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-lime-bolder-hovered)"
+      "WEB": "var(--chart-lime-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12741,7 +12741,7 @@
     {
      "name": "color/chart/lime/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-lime-boldest)"
+      "WEB": "var(--chart-lime-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12772,7 +12772,7 @@
     {
      "name": "color/chart/lime/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-lime-boldest-hovered)"
+      "WEB": "var(--chart-lime-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12803,7 +12803,7 @@
     {
      "name": "color/chart/neutral/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-neutral)"
+      "WEB": "var(--chart-neutral)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12834,7 +12834,7 @@
     {
      "name": "color/chart/neutral/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-neutral-hovered)"
+      "WEB": "var(--chart-neutral-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12865,7 +12865,7 @@
     {
      "name": "color/chart/red/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-red-bold)"
+      "WEB": "var(--chart-red-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12896,7 +12896,7 @@
     {
      "name": "color/chart/red/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-red-bold-hovered)"
+      "WEB": "var(--chart-red-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12927,7 +12927,7 @@
     {
      "name": "color/chart/red/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-red-bolder)"
+      "WEB": "var(--chart-red-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12958,7 +12958,7 @@
     {
      "name": "color/chart/red/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-red-bolder-hovered)"
+      "WEB": "var(--chart-red-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12989,7 +12989,7 @@
     {
      "name": "color/chart/red/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-red-boldest)"
+      "WEB": "var(--chart-red-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13020,7 +13020,7 @@
     {
      "name": "color/chart/red/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-red-boldest-hovered)"
+      "WEB": "var(--chart-red-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13051,7 +13051,7 @@
     {
      "name": "color/chart/orange/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-orange-bold)"
+      "WEB": "var(--chart-orange-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13082,7 +13082,7 @@
     {
      "name": "color/chart/orange/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-orange-bold-hovered)"
+      "WEB": "var(--chart-orange-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13113,7 +13113,7 @@
     {
      "name": "color/chart/orange/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-orange-bolder)"
+      "WEB": "var(--chart-orange-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13144,7 +13144,7 @@
     {
      "name": "color/chart/orange/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-orange-bolder-hovered)"
+      "WEB": "var(--chart-orange-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13175,7 +13175,7 @@
     {
      "name": "color/chart/orange/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-orange-boldest)"
+      "WEB": "var(--chart-orange-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13206,7 +13206,7 @@
     {
      "name": "color/chart/orange/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-orange-boldest-hovered)"
+      "WEB": "var(--chart-orange-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13237,7 +13237,7 @@
     {
      "name": "color/chart/yellow/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-yellow-bold)"
+      "WEB": "var(--chart-yellow-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13268,7 +13268,7 @@
     {
      "name": "color/chart/yellow/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-yellow-bold-hovered)"
+      "WEB": "var(--chart-yellow-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13299,7 +13299,7 @@
     {
      "name": "color/chart/yellow/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-yellow-bolder)"
+      "WEB": "var(--chart-yellow-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13330,7 +13330,7 @@
     {
      "name": "color/chart/yellow/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-yellow-bolder-hovered)"
+      "WEB": "var(--chart-yellow-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13361,7 +13361,7 @@
     {
      "name": "color/chart/yellow/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-yellow-boldest)"
+      "WEB": "var(--chart-yellow-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13392,7 +13392,7 @@
     {
      "name": "color/chart/yellow/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-yellow-boldest-hovered)"
+      "WEB": "var(--chart-yellow-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13423,7 +13423,7 @@
     {
      "name": "color/chart/green/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-green-bold)"
+      "WEB": "var(--chart-green-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13454,7 +13454,7 @@
     {
      "name": "color/chart/green/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-green-bold-hovered)"
+      "WEB": "var(--chart-green-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13485,7 +13485,7 @@
     {
      "name": "color/chart/green/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-green-bolder)"
+      "WEB": "var(--chart-green-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13516,7 +13516,7 @@
     {
      "name": "color/chart/green/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-green-bolder-hovered)"
+      "WEB": "var(--chart-green-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13547,7 +13547,7 @@
     {
      "name": "color/chart/green/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-green-boldest)"
+      "WEB": "var(--chart-green-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13578,7 +13578,7 @@
     {
      "name": "color/chart/green/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-green-boldest-hovered)"
+      "WEB": "var(--chart-green-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13609,7 +13609,7 @@
     {
      "name": "color/chart/teal/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-teal-bold)"
+      "WEB": "var(--chart-teal-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13640,7 +13640,7 @@
     {
      "name": "color/chart/teal/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-teal-bold-hovered)"
+      "WEB": "var(--chart-teal-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13671,7 +13671,7 @@
     {
      "name": "color/chart/teal/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-teal-bolder)"
+      "WEB": "var(--chart-teal-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13702,7 +13702,7 @@
     {
      "name": "color/chart/teal/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-teal-bolder-hovered)"
+      "WEB": "var(--chart-teal-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13733,7 +13733,7 @@
     {
      "name": "color/chart/teal/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-teal-boldest)"
+      "WEB": "var(--chart-teal-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13764,7 +13764,7 @@
     {
      "name": "color/chart/teal/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-teal-boldest-hovered)"
+      "WEB": "var(--chart-teal-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13795,7 +13795,7 @@
     {
      "name": "color/chart/blue/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-blue-bold)"
+      "WEB": "var(--chart-blue-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13826,7 +13826,7 @@
     {
      "name": "color/chart/blue/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-blue-bold-hovered)"
+      "WEB": "var(--chart-blue-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13857,7 +13857,7 @@
     {
      "name": "color/chart/blue/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-blue-bolder)"
+      "WEB": "var(--chart-blue-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13888,7 +13888,7 @@
     {
      "name": "color/chart/blue/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-blue-bolder-hovered)"
+      "WEB": "var(--chart-blue-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13919,7 +13919,7 @@
     {
      "name": "color/chart/blue/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-blue-boldest)"
+      "WEB": "var(--chart-blue-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13950,7 +13950,7 @@
     {
      "name": "color/chart/blue/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-blue-boldest-hovered)"
+      "WEB": "var(--chart-blue-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -13981,7 +13981,7 @@
     {
      "name": "color/chart/purple/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-purple-bold)"
+      "WEB": "var(--chart-purple-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14012,7 +14012,7 @@
     {
      "name": "color/chart/purple/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-purple-bold-hovered)"
+      "WEB": "var(--chart-purple-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14043,7 +14043,7 @@
     {
      "name": "color/chart/purple/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-purple-bolder)"
+      "WEB": "var(--chart-purple-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14074,7 +14074,7 @@
     {
      "name": "color/chart/purple/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-purple-bolder-hovered)"
+      "WEB": "var(--chart-purple-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14105,7 +14105,7 @@
     {
      "name": "color/chart/purple/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-purple-boldest)"
+      "WEB": "var(--chart-purple-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14136,7 +14136,7 @@
     {
      "name": "color/chart/purple/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-purple-boldest-hovered)"
+      "WEB": "var(--chart-purple-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14167,7 +14167,7 @@
     {
      "name": "color/chart/magenta/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-magenta-bold)"
+      "WEB": "var(--chart-magenta-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14198,7 +14198,7 @@
     {
      "name": "color/chart/magenta/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-magenta-bold-hovered)"
+      "WEB": "var(--chart-magenta-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14229,7 +14229,7 @@
     {
      "name": "color/chart/magenta/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-magenta-bolder)"
+      "WEB": "var(--chart-magenta-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14260,7 +14260,7 @@
     {
      "name": "color/chart/magenta/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-magenta-bolder-hovered)"
+      "WEB": "var(--chart-magenta-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14291,7 +14291,7 @@
     {
      "name": "color/chart/magenta/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-magenta-boldest)"
+      "WEB": "var(--chart-magenta-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14322,7 +14322,7 @@
     {
      "name": "color/chart/magenta/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-magenta-boldest-hovered)"
+      "WEB": "var(--chart-magenta-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14353,7 +14353,7 @@
     {
      "name": "color/chart/gray/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-gray-bold)"
+      "WEB": "var(--chart-gray-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14384,7 +14384,7 @@
     {
      "name": "color/chart/gray/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-gray-bold-hovered)"
+      "WEB": "var(--chart-gray-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14415,7 +14415,7 @@
     {
      "name": "color/chart/gray/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-gray-bolder)"
+      "WEB": "var(--chart-gray-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14446,7 +14446,7 @@
     {
      "name": "color/chart/gray/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-gray-bolder-hovered)"
+      "WEB": "var(--chart-gray-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14477,7 +14477,7 @@
     {
      "name": "color/chart/gray/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-gray-boldest)"
+      "WEB": "var(--chart-gray-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14508,7 +14508,7 @@
     {
      "name": "color/chart/gray/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-gray-boldest-hovered)"
+      "WEB": "var(--chart-gray-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14539,7 +14539,7 @@
     {
      "name": "color/chart/brand/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-brand)"
+      "WEB": "var(--chart-brand)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14570,7 +14570,7 @@
     {
      "name": "color/chart/brand/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-brand-hovered)"
+      "WEB": "var(--chart-brand-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14601,7 +14601,7 @@
     {
      "name": "color/chart/danger/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-danger)"
+      "WEB": "var(--chart-danger)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14632,7 +14632,7 @@
     {
      "name": "color/chart/danger/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-danger-hovered)"
+      "WEB": "var(--chart-danger-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14663,7 +14663,7 @@
     {
      "name": "color/chart/danger/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-danger-bold)"
+      "WEB": "var(--chart-danger-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14694,7 +14694,7 @@
     {
      "name": "color/chart/danger/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-danger-bold-hovered)"
+      "WEB": "var(--chart-danger-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14725,7 +14725,7 @@
     {
      "name": "color/chart/warning/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-warning)"
+      "WEB": "var(--chart-warning)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14756,7 +14756,7 @@
     {
      "name": "color/chart/warning/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-warning-hovered)"
+      "WEB": "var(--chart-warning-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14787,7 +14787,7 @@
     {
      "name": "color/chart/warning/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-warning-bold)"
+      "WEB": "var(--chart-warning-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14818,7 +14818,7 @@
     {
      "name": "color/chart/warning/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-warning-bold-hovered)"
+      "WEB": "var(--chart-warning-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14849,7 +14849,7 @@
     {
      "name": "color/chart/success/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-success)"
+      "WEB": "var(--chart-success)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14880,7 +14880,7 @@
     {
      "name": "color/chart/success/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-success-hovered)"
+      "WEB": "var(--chart-success-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14911,7 +14911,7 @@
     {
      "name": "color/chart/success/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-success-bold)"
+      "WEB": "var(--chart-success-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14942,7 +14942,7 @@
     {
      "name": "color/chart/success/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-success-bold-hovered)"
+      "WEB": "var(--chart-success-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -14973,7 +14973,7 @@
     {
      "name": "color/chart/discovery/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-discovery)"
+      "WEB": "var(--chart-discovery)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -15004,7 +15004,7 @@
     {
      "name": "color/chart/discovery/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-discovery-hovered)"
+      "WEB": "var(--chart-discovery-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -15035,7 +15035,7 @@
     {
      "name": "color/chart/discovery/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-discovery-bold)"
+      "WEB": "var(--chart-discovery-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -15066,7 +15066,7 @@
     {
      "name": "color/chart/discovery/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-discovery-bold-hovered)"
+      "WEB": "var(--chart-discovery-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -15097,7 +15097,7 @@
     {
      "name": "color/chart/information/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-information)"
+      "WEB": "var(--chart-information)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -15128,7 +15128,7 @@
     {
      "name": "color/chart/information/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-information-hovered)"
+      "WEB": "var(--chart-information-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -15159,7 +15159,7 @@
     {
      "name": "color/chart/information/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-information-bold)"
+      "WEB": "var(--chart-information-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -15190,7 +15190,7 @@
     {
      "name": "color/chart/information/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-information-bold-hovered)"
+      "WEB": "var(--chart-information-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -16148,7 +16148,7 @@
     {
      "name": "color/chart/brown/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-brown-bold)"
+      "WEB": "var(--chart-brown-bold)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -16179,7 +16179,7 @@
     {
      "name": "color/chart/brown/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-brown-bold-hovered)"
+      "WEB": "var(--chart-brown-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -16210,7 +16210,7 @@
     {
      "name": "color/chart/brown/bolder/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-brown-bolder)"
+      "WEB": "var(--chart-brown-bolder)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -16241,7 +16241,7 @@
     {
      "name": "color/chart/brown/bolder/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-brown-bolder-hovered)"
+      "WEB": "var(--chart-brown-bolder-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -16272,7 +16272,7 @@
     {
      "name": "color/chart/brown/boldest/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-brown-boldest)"
+      "WEB": "var(--chart-brown-boldest)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -16303,7 +16303,7 @@
     {
      "name": "color/chart/brown/boldest/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-brown-boldest-hovered)"
+      "WEB": "var(--chart-brown-boldest-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -18079,7 +18079,7 @@
     {
      "name": "color/chart/smart/social-emotional/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-smart-social-emotional)"
+      "WEB": "var(--chart-smart-social-emotional)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -18110,7 +18110,7 @@
     {
      "name": "color/chart/smart/social-emotional/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-smart-social-emotional-hovered)"
+      "WEB": "var(--chart-smart-social-emotional-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -18141,7 +18141,7 @@
     {
      "name": "color/chart/smart/mastering-content/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-smart-mastering-content)"
+      "WEB": "var(--chart-smart-mastering-content)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -18172,7 +18172,7 @@
     {
      "name": "color/chart/smart/mastering-content/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-smart-mastering-content-hovered)"
+      "WEB": "var(--chart-smart-mastering-content-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -18203,7 +18203,7 @@
     {
      "name": "color/chart/smart/advocacy/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-smart-advocacy)"
+      "WEB": "var(--chart-smart-advocacy)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -18234,7 +18234,7 @@
     {
      "name": "color/chart/smart/advocacy/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-smart-advocacy-hovered)"
+      "WEB": "var(--chart-smart-advocacy-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -18265,7 +18265,7 @@
     {
      "name": "color/chart/smart/relationship/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-smart-relationship)"
+      "WEB": "var(--chart-smart-relationship)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -18296,7 +18296,7 @@
     {
      "name": "color/chart/smart/relationship/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-smart-relationship-hovered)"
+      "WEB": "var(--chart-smart-relationship-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -18327,7 +18327,7 @@
     {
      "name": "color/chart/smart/technology-tools/default",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-smart-technology-tools)"
+      "WEB": "var(--chart-smart-technology-tools)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -18358,7 +18358,7 @@
     {
      "name": "color/chart/smart/technology-tools/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-smart-technology-tools-hovered)"
+      "WEB": "var(--chart-smart-technology-tools-hovered)"
      },
      "scopes": [
       "FRAME_FILL",

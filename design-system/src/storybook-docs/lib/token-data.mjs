@@ -57,8 +57,8 @@ export function chartGroups(scss) {
     rows.get(key).colors[label] = var_(name);
   };
   for (const name of declarations(scss).keys()) {
-    if (!name.startsWith('--ds-chart-') || name.endsWith('-hovered')) continue;
-    const rest = name.slice('--ds-chart-'.length);
+    if (!name.startsWith('--chart-') || name.endsWith('-hovered')) continue;
+    const rest = name.slice('--chart-'.length);
     let m;
     if (rest === 'brand' || rest === 'neutral') add('series', 'One series', 'chart / brand, neutral', rest, name);
     else if ((m = rest.match(/^categorical-(\d+)$/))) add('categorical', 'Categorical', 'chart / categorical, in order', m[1], name);
@@ -88,7 +88,7 @@ export function typeGroups(scss) {
   for (const [name, value] of decl) {
     const m = name.match(/^--(heading|body|metric)-([a-z]+)$/);
     if (!m || name.endsWith('-tracking')) continue;
-    const parts = value.match(/^var\((--type-weight-[a-z]+)\)\s+var\((--font-size-[0-9]+)\)\s*\/\s*var\((--line-height-[0-9]+)\)\s+var\((--type-family-[a-z-]+)\)$/);
+    const parts = value.match(/^var\((--type-weight-[a-z]+)\)\s+var\((--type-size-[0-9]+)\)\s*\/\s*var\((--type-line-height-[0-9]+)\)\s+var\((--type-family-[a-z-]+)\)$/);
     if (!parts) continue;
     const [, weightToken, sizeToken, lineToken, familyToken] = parts;
     const key = `${m[1]}|${familyToken}|${weightToken}`;

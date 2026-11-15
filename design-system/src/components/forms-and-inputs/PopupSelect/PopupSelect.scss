@@ -3,18 +3,18 @@
  * the width (auto: at least the trigger, 160 to 320) and the motion: it
  * clips open from the trigger's corner and fades on close, so a pick reads
  * as the row's color change and then the fade. This file only sets the
- * menu's inner spacing: rows inset Popover/pad-menu 4, as every menu, and a
- * list that scrolls past Popover/max-height-menu 320.
+ * menu's inner spacing: rows inset Popup/pad-menu 4, as every menu, and a
+ * list that scrolls past Popup/max-height-menu 320.
  */
 .plus-popup.plus-popup-select {
-    padding: var(--popover-pad-menu);
+    padding: var(--dropdown-menu-pad);
 
     .plus-listbox-header {
-        padding-bottom: var(--popover-pad-menu);
-        margin-bottom: var(--popover-pad-menu);
+        padding-bottom: var(--dropdown-menu-pad);
+        margin-bottom: var(--dropdown-menu-pad);
     }
 
     .plus-listbox-body {
-        max-height: var(--popover-max-height-menu);
+        max-height: var(--dropdown-menu-max-height);
     }
 }

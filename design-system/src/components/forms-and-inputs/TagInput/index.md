@@ -2,7 +2,7 @@
 
 # TagInput
 
-TagInput — a field of Tags with a text entry after them, modeled on Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A "Create *text*" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag color it will get, and creating reports that color once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. People can tidy the options where they pick them, as in Notion. With `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a "…" that opens the option's menu: its name, Delete, and Tag's ten colors. With `onReorder`, each row has a handle to drag, or to pick up with Space and move with the arrows. Without these handlers neither appears. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into "+n"; with focus they wrap, up to three rows, then scroll.
+TagInput — a field of Tags with a text entry after them, modeled on Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A "Create *text*" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag color it will get, and creating reports that color once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. People can tidy the options where they pick them, as in Notion. With `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a "…" that opens the option's menu: its name, Delete, and Tag's ten colors. With `onReorder`, each row has a handle to drag, or to pick up with Space and move with the arrows. Without these handlers neither appears. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the tags are Tags in a TagGroup. Without focus the tags collapse into "+n"; with focus they wrap, up to three rows, then scroll.
 
 **Import:** `import { TagInput } from '@/components';`
 
@@ -172,7 +172,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Rest | The input fill with a `--border-default` input edge. Tags past one line collapse into "+n". |
+| Rest | The input fill with a `--border-width-default` input edge. Tags past one line collapse into "+n". |
 | Hovered | The edge turns `--ds-border-focused`. |
 | Pressed | No step of its own. The hovered edge holds while the pointer is down. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box; the tags wrap and the list opens. |
@@ -208,15 +208,15 @@ On a row's handle and in its menu:
 
 | Part | Token |
 | --- | --- |
-| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
-| Height | Starts at 40: `--height-250`. Compact 32: `--item-height-md`. Grows as tags wrap. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
+| Box | `--ds-background-input` fill, `--border-width-default` edge in `--ds-border-input`. |
+| Height | Starts at 40: `--height-250`. Compact 32: `--control-md`. Grows as tags wrap. |
+| Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Tags and entry | `--stack-md` between them; with focus, up to three rows of tags before the content scrolls. |
 | Entry text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | List | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | List hint | `--body-small` in `--ds-text-subtle`, `--space-025` `--pad-x-md`. |
 | Row handle | `--ds-icon-subtle`. |
-| Option menu | `--option-menu-width` wide; the name field `--space-025` `--pad-x-sm`; a `--border-default` rule in `--ds-border` above the colors. |
+| Option menu | `--option-menu-width` wide; the name field `--space-025` `--pad-x-sm`; a `--border-width-default` rule in `--ds-border` above the colors. |
 
 The tags take Tag's own tokens.
 
@@ -269,7 +269,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--border-default` · `--ds-border` · `--ds-icon-subtle` · `--ds-text-subtle` · `--option-menu-width` · `--pad-x-md` · `--pad-x-sm` · `--plus-tag-input-max-height` · `--space-025` · `--stack-md`
+`--body-small` · `--border-width-default` · `--ds-border` · `--ds-icon-subtle` · `--ds-text-subtle` · `--option-menu-width` · `--pad-x-md` · `--pad-x-sm` · `--plus-tag-input-max-height` · `--space-025` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/TagInput/TagInput.scss`. Override these through the token layer, never with a literal.
 

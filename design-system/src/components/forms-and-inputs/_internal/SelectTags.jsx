@@ -7,9 +7,9 @@ import TagGroup from '@/components/labels/TagGroup';
  * (`displayMode="tags"`), which collapse into "+n" when `collapsed`. The
  * `text` display mode draws nothing here; Select renders it inline instead.
  *
- * `live` false makes every chip read-only.
+ * `live` false makes every tag read-only.
  */
-export default function SelectChips({
+export default function SelectTags({
     displayMode,
     values,
     textFor,

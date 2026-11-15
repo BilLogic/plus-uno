@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { isPrimitive, measure } from './check-no-primitive-reads.mjs';
 
 test('numbered space, radius, size and stroke steps are primitives', () => {
-  for (const name of ['--space-050', '--radius-025', '--size-200', '--stroke-2']) assert.ok(isPrimitive(name), name);
+  for (const name of ['--space-050', '--space-025', '--size-200', '--stroke-2']) assert.ok(isPrimitive(name), name);
 });
 
 test('tier tokens and --radius-full are not primitives', () => {

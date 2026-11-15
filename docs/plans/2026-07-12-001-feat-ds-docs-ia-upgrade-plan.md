@@ -15,7 +15,7 @@ Research inputs: live extraction of atlassian.design (components nav tree, found
 2. `Components` (26) and `Forms` (19) are flat sibling lists with no functional grouping layer.
 3. `specs/Admin/` has three parallel folder sets (`Group Admin/`, `GroupAdmin/`, `group/`); only the spaced ones are canonical.
 4. Toolkit folders are lowercase/spaced (`pre-session/tables/`, `CTA Sign-Up Related Buttons/`) while titles are Title Case; legacy Title-Case type folders coexist.
-5. Base components re-implemented inside specs: Toast, SidebarTab, Rating (×6), OverviewCard, SessionInfoCard, Pre-/In-Session badge & dropdown twins.
+5. Base components re-implemented inside specs: Toast, SidebarTab, Rating (×6), OverviewCard, SessionInfoCard, Pre-/In-Session countTag & dropdown twins.
 6. Figma File 1 fakes page hierarchy with leading spaces; variant-prop casing inconsistent per page. File 2's `Components (Local organisms)` sub-section order varies by page.
 7. `Textarea ver 2` is a versioned title; stray casing splits (`Pre-session`, `onboarding/` vs `TrainingLessons/`).
 
@@ -36,8 +36,8 @@ Color · Typography · Layout & grid · Elevation · Iconography · Logos · Ima
 | Layout and structure | Accordion, Card, Carousel, Collapse, Divider, Jumbotron, List group, Media object |
 | Messaging | Alert, Modal, Toast |
 | Navigation | Breadcrumb, Nav pills, Nav tabs, Pagination, Scrollspy, Sidebar tab |
-| Overlays | Popover, Tooltip |
-| Status and loading | Badge, Loading, Progress, Spinner |
+| Overlays | Popup, Tooltip |
+| Status and loading | CountTag, Loading, Progress, Spinner |
 
 ### Data visualizations
 Keep Comparison / Correlation / Distribution / Part-to-whole / Temporal; rename **Other → Flow & relationships**.
@@ -74,7 +74,7 @@ Promotion rule: a spec-local organism used in 2+ product areas is promoted to th
 3. **Repo folder alignment + cleanups.** `foundations/`, `components/<group>/<Component>/`, `dataviz/`, `patterns/`, `specs/<Area>/(<Phase>/)<Type>/<Component>/`. Collapse Admin triplicates; fix Toolkit casing/de-space folders; resolve Textarea ver 2; apply promotion rule to duplicates. Imports go through barrels, so moves are contained.
 4. **Figma core library.** Order component pages by the 7 groups with `———` divider pages (drop leading-space indentation); rename sets to code exports; normalize variant casing; adopt `[wip]/[deprecated]` + Archive page. Re-verify File 1's full page list in the desktop app first (MCP enumeration was partial).
 5. **Specs Figma file.** Fix `Components (Local organisms)` sub-section order on every page; align page names to grammar (`Toolkit / Pre-Session`); promote shared organisms; Context blocks name the core components each organism composes.
-6. **Docs contract enforcement** across component MDX and spec docs component sections; lifecycle badges in the sidebar.
+6. **Docs contract enforcement** across component MDX and spec docs component sections; lifecycle countTags in the sidebar.
 
 ## Open decisions
 
@@ -228,7 +228,7 @@ All Storybook builds green (exit 0).
 - **Patterns docs** (skip the `--page` wrapper, off styling) — deferred to the
   Storybook-finalization phase per the user's gate.
 
-## Round 10 — full docs-shell sweep, adaptive mode-driven grid, Badge parity fix
+## Round 10 — full docs-shell sweep, adaptive mode-driven grid, CountTag parity fix
 
 - **Storybook shell consistency (370 MDX audited, 131 fixed).** Canonical shell
   ratified from Button.mdx: `<Title/>` → intro → ResourcesBlock → `--page` wrapper
@@ -258,10 +258,10 @@ All Storybook builds green (exit 0).
     per-SSOT intentional; nothing numeric left unbound.
 - **Naming sync (Web App Specs)**: `Side Bar`→`Sidebar`, `Side Bar Tab`→`Sidebar
   Tab`, `App Outer Layout`→`Page Layout`; `Top Bar` already matched Storybook.
-- **Badge parity FIXED (user's example).** Figma truth (Static Badges 25:568):
+- **CountTag parity FIXED (user's example).** Figma truth (Static Badges 25:568):
   rounded rectangles, radius by tier — h1–h3 radius-lg 8, h4–h6 radius-150 6,
   b1–b3 radius-md 4; state-08 fills (already matched). Code rendered a 999px PILL.
-  Badge.scss now applies the tiered radii; verified in-browser (b2 → 4px).
+  CountTag.scss now applies the tiered radii; verified in-browser (b2 → 4px).
 - **NEXT (user gate)**: user publishes the BS4 library → then rebuild Page Layout
   in Web App Specs as ONE mode-adaptive component: insert Pattern/Surface
   container instance as Main, bind width to Breakpoints/min width, Sidebar

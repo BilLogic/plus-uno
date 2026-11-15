@@ -38,8 +38,8 @@ test('a percentage is a literal', () => {
 });
 
 test('a primitive radius step is a literal', () => {
-  assert.equal(at('.a { border-radius: var(--radius-0625); }').length, 1);
-  assert.equal(at('.a { border-radius: var(--radius-025); }').length, 1);
+  assert.equal(at('.a { border-radius: var(--space-0625); }').length, 1);
+  assert.equal(at('.a { border-radius: var(--space-025); }').length, 1);
 });
 
 test('a literal fallback is a literal', () => {
@@ -57,7 +57,7 @@ test('JSX style objects are read the same way, and an identifier is not judged',
   assert.deepEqual(at(`<i style={{ borderRadius: r }} />`, file), []);
   assert.equal(at(`<i style={{ borderRadius: '4px' }} />`, file).length, 1);
   assert.equal(at(`<i style={{ borderRadius: '50%' }} />`, file).length, 1);
-  assert.equal(at(`<i style={{ borderRadius: 'var(--radius-050)' }} />`, file).length, 1);
+  assert.equal(at(`<i style={{ borderRadius: 'var(--space-050)' }} />`, file).length, 1);
 });
 
 test('comments are not declarations', () => {
@@ -88,9 +88,9 @@ test('role enforcement covers every raw scale read and ignores comments, docs an
     { path: file.replace('.scss', '.jsx'), text: 'var(--radius-md)' }], []), []);
 });
 
-test('raw primitive reads in arbitrary component properties also require a role', async () => {
+test('radius semantics in arbitrary component properties also require a component role', async () => {
   const { roleRadii } = await import('./check-radius-literals.mjs');
-  assert.equal(roleRadii([{ path: 'design-system/src/components/x/X.scss', text: '.x { --corner: var(--radius-025); }' }], []).length, 1);
+  assert.equal(roleRadii([{ path: 'design-system/src/components/x/X.scss', text: '.x { --corner: var(--radius-md); }' }], []).length, 1);
 });
 
 test('role substitutions resolve to the same primitive in the single-mode radius ladder', async () => {

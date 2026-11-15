@@ -120,7 +120,7 @@ export function Dismissible() {
 /** A SpotlightAction on the callout's brand bold ground, without opening a popup. */
 const actionStory = (appearance, label) => ({
     render: () => (
-        <div style={{ display: 'inline-flex', padding: 'var(--space-150)', borderRadius: 'var(--radius-100)', background: 'var(--ds-background-brand-bold)' }}>
+        <div style={{ display: 'inline-flex', padding: 'var(--space-150)', borderRadius: 'var(--radius-xxl)', background: 'var(--ds-background-brand-bold)' }}>
             <SpotlightAction appearance={appearance}>{label}</SpotlightAction>
         </div>
     ),

@@ -175,8 +175,8 @@ A modal spans 6, 8 or 10 screen-grid columns, the gutters between them, and its 
         { token: '--modal-width-sm', figma: 'Modal/width-modal-sm', value: '384 · 512 · 640' },
         { token: '--modal-width-md', figma: 'Modal/width-modal-md', value: '507 · 677 · 848' },
         { token: '--modal-width-lg', figma: 'Modal/width-modal-lg', value: '629 · 843 · 1056' },
-        { token: '--blanket-pad-x', figma: 'Backdrop/pad-x', value: '16' },
-        { token: '--blanket-pad-y', figma: 'Backdrop/pad-y', value: '64' },
+        { token: '--backdrop-pad-x', figma: 'Backdrop/pad-x', value: '16' },
+        { token: '--backdrop-pad-y', figma: 'Backdrop/pad-y', value: '64' },
     ]}
 />
 
@@ -190,14 +190,14 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--section-stack-md)' }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <strong style={{ font: 'var(--heading-xsmall)' }}>Control</strong>
-        {[['--item-height-sm', 24], ['--item-height-md', 32]].map(([t, v]) => (
+        {[['--control-sm', 24], ['--control-md', 32]].map(([t, v]) => (
             <span key={t} style={{ display: 'flex', alignItems: 'center', height: `var(${t})`, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-neutral)', font: 'var(--body-small)' }}><C>{t}</C>&nbsp;{v}</span>
         ))}
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <strong style={{ font: 'var(--heading-xsmall)' }}>Row</strong>
         {[['--row-height-sm', 32], ['--row-height-md', 40], ['--row-height-lg', 48]].map(([t, v]) => (
-            <span key={t} style={{ display: 'flex', alignItems: 'center', minHeight: `var(${t})`, padding: '0 var(--table-pad-x-cell)', borderBottom: 'var(--border-default) solid var(--ds-border)', font: 'var(--body-small)' }}><C>{t}</C>&nbsp;{v}</span>
+            <span key={t} style={{ display: 'flex', alignItems: 'center', minHeight: `var(${t})`, padding: '0 var(--table-pad-x-cell)', borderBottom: 'var(--border-width-default) solid var(--ds-border)', font: 'var(--body-small)' }}><C>{t}</C>&nbsp;{v}</span>
         ))}
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
@@ -214,7 +214,7 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
 <RefTable
     head={['Role', 'Values', 'Tokens', 'Use']}
     rows={[
-        ['Control', '24 · 32', <><C>--item-height-sm</C> · <C>-md</C></>, 'Anything you click or type into. Buttons, tabs and menu rows are 32 (24 compact); fields are 40 (32 compact). Compact only inside table rows and inline toolbars.'],
+        ['Control', '24 · 32', <><C>--control-sm</C> · <C>-md</C></>, 'Anything you click or type into. Buttons, tabs and menu rows are 32 (24 compact); fields are 40 (32 compact). Compact only inside table rows and inline toolbars.'],
         ['Row', '32 · 40 · 48', <><C>--row-height-sm</C> · <C>-md</C> · <C>-lg</C></>, 'One record in a table or list. A minimum: rows grow with their content.'],
         ['Label', '16 · 20 · max 160', <><C>--label-height-sm</C> · <C>-md</C> · <C>--label-max-width</C></>, 'Tag, Status and Count.'],
         ['Media', '16 · 20 · 24 · 32 · 40 · 48', <><C>--image-xxs</C> … <C>--image-xl</C></>, 'Avatar, Tile and logos. Images keep their ratio (1:1, 4:3, 16:9, 3:2) and take their width from the grid or the card.'],
@@ -229,8 +229,8 @@ Card, Section, Popup and Menu sizes sit with their patterns on [Spacing](?path=/
 <TokenTable
     valueHeader="Value (px)"
     rows={[
-        { token: '--item-height-sm', figma: 'Size/Item/height-sm' },
-        { token: '--item-height-md', figma: 'Size/Item/height-md' },
+        { token: '--control-sm', figma: 'Size/Item/height-sm' },
+        { token: '--control-md', figma: 'Size/Item/height-md' },
         { token: '--row-height-sm', figma: 'Size/Row/height-sm' },
         { token: '--row-height-md', figma: 'Size/Row/height-md' },
         { token: '--row-height-lg', figma: 'Size/Row/height-lg' },
@@ -258,14 +258,14 @@ Card, Section, Popup and Menu sizes sit with their patterns on [Spacing](?path=/
 <DoDont>
 <Do caption="A form at 40 and 32: the field is 40 (compact 32), the button 32 (compact 24).">
 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)' }}>
-    <span style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 'var(--row-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)', font: 'var(--body-default)', color: 'var(--ds-text-subtlest)' }}>Search students</span>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
+    <span style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 'var(--row-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)', font: 'var(--body-default)', color: 'var(--ds-text-subtlest)' }}>Search students</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
 </div>
 </Do>
 <Dont caption="A compact 24 button beside a 40 field. Compact is for table rows and inline toolbars only.">
 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)' }}>
-    <span style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 'var(--row-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)', font: 'var(--body-default)', color: 'var(--ds-text-subtlest)' }}>Search students</span>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-sm)', padding: '0 var(--pad-x-sm)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
+    <span style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 'var(--row-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)', font: 'var(--body-default)', color: 'var(--ds-text-subtlest)' }}>Search students</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-sm)', padding: '0 var(--pad-x-sm)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
 </div>
 </Dont>
 </DoDont>
@@ -293,14 +293,14 @@ Every box either hugs its content or fills the space it is given. The container 
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
     <span style={{ flex: 1, fontWeight: 'var(--type-weight-medium)' }}>Maya Chen</span>
     <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
-    <span style={{ padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center' }}>View</span>
+    <span style={{ padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-bold)', height: 'var(--control-md)', display: 'inline-flex', alignItems: 'center' }}>View</span>
 </div>
 </Do>
 <Dont caption="The button fills the leftover space, so an action becomes a wide bar and the name crowds the edge.">
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
     <span style={{ fontWeight: 'var(--type-weight-medium)' }}>Maya Chen</span>
     <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
-    <span style={{ flex: 1, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View</span>
+    <span style={{ flex: 1, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-bold)', height: 'var(--control-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View</span>
 </div>
 </Dont>
 </DoDont>

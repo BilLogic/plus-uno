@@ -49,7 +49,7 @@ function font(selector) {
   return got;
 }
 
-const LEVEL_SIZES = { h1: 'xxlarge', h2: 'xlarge', h3: 'large', h4: 'medium', h5: 'small', h6: 'xsmall' };
+const LEVEL_SIZES = { h1: 'xxl', h2: 'xl', h3: 'lg', h4: 'md', h5: 'sm', h6: 'xsmall' };
 
 for (const [level, size] of Object.entries(LEVEL_SIZES)) {
   test(`${level} takes the ${size} heading style`, () => {

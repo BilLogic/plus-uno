@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './GenerativeBorder.scss';
 
 /** The radius tokens a ring can follow: the radius the wrapped content already uses. */
-export const GENERATIVE_BORDER_RADII = ['radius-025', 'radius-050', 'radius-075', 'radius-100', 'radius-full', 'radius-control-sm', 'radius-control-md', 'radius-control-lg'];
+export const GENERATIVE_BORDER_RADII = ['radius-md', 'radius-lg', 'radius-xl', 'radius-xxl', 'radius-full', 'radius-control-sm', 'radius-control-md', 'radius-control-lg'];
 
 /**
  * The border that shows the AI is generating content: a 2px rounded stroke in
@@ -12,7 +12,7 @@ export const GENERATIVE_BORDER_RADII = ['radius-025', 'radius-050', 'radius-075'
  * - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the
  *   children render inside the wrapper with no ring at all.
  * - **radius** names the radius token the ring follows; match the content it
- *   wraps. Defaults to `radius-100`.
+ *   wraps. Defaults to `radius-xxl`.
  *
  * The segments turn slowly while active. The ring is decorative and hidden from
  * assistive technology; `aria-busy` is what says content is changing. Under
@@ -22,13 +22,13 @@ export const GENERATIVE_BORDER_RADII = ['radius-025', 'radius-050', 'radius-075'
  */
 const GenerativeBorder = ({
     isActive = false,
-    radius = 'radius-100',
+    radius = 'radius-xxl',
     children,
     className = '',
     style,
     ...props
 }) => {
-    const token = GENERATIVE_BORDER_RADII.includes(radius) ? radius : 'radius-100';
+    const token = GENERATIVE_BORDER_RADII.includes(radius) ? radius : 'radius-xxl';
     const classes = ['plus-generative-border', className].filter(Boolean).join(' ');
 
     return (

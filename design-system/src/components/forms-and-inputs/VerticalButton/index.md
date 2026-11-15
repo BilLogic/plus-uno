@@ -102,7 +102,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Size | 64 by 64: `--button-vertical-size`. |
+| Size | 64 by 64: `--button-size-vertical`. |
 | Padding | `--pad-y-sm` and `--pad-x-xs`. |
 | Icon-to-label gap | 4: `--inline-sm`. |
 | Label | Body/small: `--body-small`, medium weight. |

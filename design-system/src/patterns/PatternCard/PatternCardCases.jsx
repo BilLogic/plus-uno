@@ -92,7 +92,7 @@ export const MetricsWithDividers = () => (
                         key={row[1]}
                         style={{
                             paddingBlock: 'var(--card-stack-md)',
-                            borderTop: i === 0 ? 'none' : 'var(--border-default) solid var(--ds-border)',
+                            borderTop: i === 0 ? 'none' : 'var(--border-width-default) solid var(--ds-border)',
                         }}
                     >
                         {tally(row)}

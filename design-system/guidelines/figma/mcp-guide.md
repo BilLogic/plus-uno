@@ -43,7 +43,7 @@ When implementing a design from a Figma link, follow all 7 steps:
 | Figma | CSS Token |
 |-------|-----------|
 | `color.background.brand.bold` | `var(--ds-background-brand-bold)` — every color variable, dots as dashes |
-| `Heading/large` | `var(--heading-large)` — every text style, as the `font` shorthand |
+| `Heading/large` | `var(--heading-lg)` — every text style, as the `font` shorthand |
 | Spacing (contextual) | Pick by layer: `var(--card-pad-{compact\|default\|spacious})`, `var(--stack-{sm\|md\|lg})`, etc. There is no single `Spacing/N` → one token. |
 | Surface tokens | `var(--ds-surface)`, `-sunken`, `-raised`, `-overlay` — a raised or overlay surface pairs with its shadow |
 

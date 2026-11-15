@@ -154,7 +154,7 @@ const groupByFamily = (tokens) => {
 
 const Family = ({ title, tokens, swatch }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-        <h4 style={{ margin: 0, font: 'var(--heading-small)', color: 'var(--ds-text)' }}>{title}</h4>
+        <h4 style={{ margin: 0, font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>{title}</h4>
         <TokenTable swatch={swatch} rows={tokens.map((t) => ({ token: t.name }))} />
     </div>
 );

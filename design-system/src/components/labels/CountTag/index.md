@@ -2,7 +2,7 @@
 
 # CountTag
 
-CountTag: a number on its own, as a near-square badge.
+CountTag: a number on its own, as a near-square countTag.
 
 Also asked as: counter, unread count, numeric badge.
 
@@ -131,7 +131,7 @@ Same group: `AiMessage` · `ChangeTag` · `DateTag` · `PromptStarters` · `Smar
 | `appearance` | enum | `'neutral'` | The intent. Use one only when the number carries it. |
 | `spacing` | enum | `'default'` | `default` (20) on its own; `compact` (16) is for use inside a label. A dot is always 8. |
 | `isBold` | bool | `false` | The solid fill: asks for action now (at most one per area). |
-| `isInverse` | bool | `false` | A solid white badge with dark text, for filled buttons and dark grounds. Always neutral. |
+| `isInverse` | bool | `false` | A solid white countTag with dark text, for filled buttons and dark grounds. Always neutral. |
 | `isDot` | bool | `false` | Presence without a number. Needs `label`. |
 | `hasRing` | bool | `false` | A 2px ring in the page color, for a count pinned to the corner of an icon or avatar. |
 | `label` | string | — | The accessible name. Required for `isDot`; on a number it replaces the bare digits for screen readers. |

@@ -425,7 +425,7 @@ Flag.propTypes = {
 
 /**
  * FlagGroup: where flags sit: top-right by default, fixed to the screen,
- * Popover/gap-screen 8 from its edges, stacking Popover/stack-flag 16 apart.
+ * Popup/gap-screen 8 from its edges, stacking Popup/stack-flag 16 apart.
  * Accepts either `<Flag>` children or a `flags` queue list (`useFlagQueue`) with `onDismiss`.
  */
 export const FlagGroup = ({

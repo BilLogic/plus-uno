@@ -52,8 +52,8 @@ fixed at 0 to 100.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Bar', <>One per item in <C>data</C>; length is <C>y</C>, filled with <C>--ds-chart-brand</C>.</>],
-        ['Target', <>A tick across the bar at <C>target</C> in <C>--ds-chart-gray-boldest</C> so it reads on every band.</>],
+        ['Bar', <>One per item in <C>data</C>; length is <C>y</C>, filled with <C>--chart-brand</C>.</>],
+        ['Target', <>A tick across the bar at <C>target</C> in <C>--chart-gray-boldest</C> so it reads on every band.</>],
         ['Bands', <>Fixed, non-configurable ranges: 0–60 in <C>--ds-background-danger</C>, 60–80 in <C>--ds-background-warning</C>, 80–100 in <C>--ds-background-success</C>.</>],
         ['Category axis', <>Names each row from <C>categories</C>.</>],
         ['Value axis', 'Fixed from 0 to 100.'],
@@ -88,7 +88,7 @@ the same order. `height` defaults to 200; allow roughly 60 to 80 px per row.
 
 ## Color and accessibility
 
-- **Fixed colors.** Bars use `--ds-chart-brand`, targets use `--ds-chart-gray-boldest`, and bands use the danger, warning and success backgrounds; no color is assigned per row.
+- **Fixed colors.** Bars use `--chart-brand`, targets use `--chart-gray-boldest`, and bands use the danger, warning and success backgrounds; no color is assigned per row.
 - **Position carries the value.** Bar length and tick position on the shared axis show distance from the goal without hue.
 - **Unlabeled status bands.** The red and green bands carry no printed labels and are easily confused under color-vision deficiency. State what the bands mean in surrounding text and never rely on them alone to flag a row.
 - **Fixed band thresholds.** Thresholds stay at 60 and 80 for every row. If a metric uses different thresholds, put it in its own chart or in `BarChart`.

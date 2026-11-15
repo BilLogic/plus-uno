@@ -213,7 +213,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | Detail split | The list spans 7 of 12 columns and the detail 5, from 960 up (`SECTION_DETAIL_FLOOR`). A grid span in the Section styles, with no token. |
 | `--section-radius` | 16: the corner of a Section with `fill="subtle"`. A Card inside it takes `--card-radius-compact` (12) instead of `--card-radius`. |
 | `--section-pad-x-default`, `--section-pad-y-default` | A Section with `fill="subtle"`, on `--ds-surface-sunken`. |
-| `--heading-medium`, `--heading-small` | A Section title and a subsection title. |
+| `--heading-md`, `--heading-sm` | A Section title and a subsection title. |
 
 ## Content guidelines
 
@@ -293,7 +293,7 @@ Implemented as `SectionToolbar`.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
+`--body-default` · `--body-small` · `--control-md` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-sm` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
 
 From `design-system/src/patterns/PatternSection/PatternSection.scss`. Override these through the token layer, never with a literal.
 

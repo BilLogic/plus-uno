@@ -7,7 +7,7 @@ import { Flag, FlagGroup, Button, Popup, Tooltip } from '@/components';
  * The Popups pattern: Popup, Flag and Tooltip. Menu's own behavior and size
  * cover lives on `DropdownMenu`'s own stories
  * (`Components/Forms and inputs/Dropdown menu`), since it draws from the
- * Menu family's own tokens rather than this page's older Popover numbers.
+ * Menu family's own tokens rather than this page's older Popup numbers.
  *
  * Floating layers behave the same everywhere, and these stories hold them to
  * the Popups pattern page: popups auto 160 to 320 or a column step, padded 16,
@@ -39,7 +39,7 @@ const documentOf = (canvasElement) => canvasElement.ownerDocument;
 
 /**
  * Open once the story has mounted. Popper measures the trigger through its
- * ref, which is only attached after the first render; a popover asked to show
+ * ref, which is only attached after the first render; a popup asked to show
  * on that first render has nothing to measure yet, so these stories open it
  * a beat later, the way a click would.
  */

@@ -721,8 +721,8 @@ const carryScene = ({ id, title, caption, token, card }) => ({
 });
 
 const carryChip = carryScene({
-  id: 'carry-chip',
-  title: 'A chip keeps close on fast',
+  id: 'carry-tag',
+  title: 'A tag keeps close on fast',
   caption: 'A tag or a name is light: it stays right under the pointer on spatial.fast.',
   token: 'spatial.fast',
 });

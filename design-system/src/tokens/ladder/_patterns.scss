@@ -51,11 +51,11 @@
     --table-footer-height: var(--space-300);
     --table-overflow-reach: var(--space-150);
 
-    /* Blanket */
-    --blanket-pad-x: var(--space-100);
-    --blanket-pad-y: var(--space-400);
-    --blanket-fill: rgba(0, 0, 0, 0.38); /* the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word */
-    --blanket-max-height-modal: calc(100dvh - 2 * var(--blanket-pad-y)); /* a calc() of the pad above: code only, no Figma variable */
+    /* Backdrop */
+    --backdrop-pad-x: var(--space-100);
+    --backdrop-pad-y: var(--space-400);
+    --backdrop-fill: rgba(0, 0, 0, 0.38); /* the Backdrop's own fill color; the old declaration's value, written directly so this file carries no old-language word */
+    --backdrop-max-height-modal: calc(100dvh - 2 * var(--backdrop-pad-y)); /* a calc() of the pad above: code only, no Figma variable */
 
     /* Modal */
     --modal-pad-x-compact: var(--space-0625);
@@ -70,13 +70,13 @@
     --modal-width-lg: 629px;
     --modal-body-min-height: var(--space-500);
 
-    /* Popover */
+    /* Popup */
     --popup-radius: var(--radius-xl);
 }
 
 @media (max-height: 639.98px) {
     :root {
-        --blanket-pad-y: var(--space-150);
+        --backdrop-pad-y: var(--space-150);
     }
 }
 

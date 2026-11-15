@@ -101,7 +101,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Rest | The input fill and `--border-default` input edge. Send is held back until there is text. |
+| Rest | The input fill and `--border-width-default` input edge. Send is held back until there is text. |
 | Hovered | The edge turns `--ds-border-focused`. |
 | Pressed | No step of its own on the field; the send button takes its own pressed fill. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. |
@@ -112,8 +112,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`, `--radius-control-lg`. |
-| Height | Starts at one line, `--height-250` (40, a single-line field), and grows to five lines: `--line-height-125` × 5 plus `--space-0375` top and bottom, then scrolls. |
+| Box | `--ds-background-input` fill, `--border-width-default` edge in `--ds-border-input`, `--radius-control-lg`. |
+| Height | Starts at one line, `--height-250` (40, a single-line field), and grows to five lines: `--type-line-height-125` × 5 plus `--space-0375` top and bottom, then scrolls. |
 | Padding | `--pad-y-md` top and bottom, `--pad-x-md` either side. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Attachments | `--stack-md` between files and under the row. |
@@ -156,7 +156,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--height-250` · `--item-height-md` · `--line-height-125` · `--pad-x-md` · `--pad-x-xs` · `--pad-y-md` · `--plus-prompt-input-max-height` · `--stack-md` · `--stack-sm`
+`--border-width-default` · `--control-md` · `--height-250` · `--pad-x-md` · `--pad-x-xs` · `--pad-y-md` · `--plus-prompt-input-max-height` · `--stack-md` · `--stack-sm` · `--type-line-height-125`
 
 From `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss`. Override these through the token layer, never with a literal.
 

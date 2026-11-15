@@ -7,13 +7,13 @@ import { Icon } from '@/components';
  * SidebarTab Component
  *
  * One row of a side navigation, matching the BS4 Foundation `Sidebar Tab`
- * (node 17118:127). A 32 row (`--item-height-md`) padded 12 at the sides, with
+ * (node 17118:127). A 32 row (`--control-md`) padded 12 at the sides, with
  * a 16 icon box and a Body/default 14/20 label that truncates.
  *
  * Slots, after Atlassian's side-nav item:
  * - `iconBefore`: the icon, by Font Awesome Free name. Leave it out for a row with no icon.
  * - `description`: a second line in Body/small. The row grows past 32 to hold it.
- * - `elemAfter`: a count, a badge or a status at the end of the row.
+ * - `elemAfter`: a count, a countTag or a status at the end of the row.
  * - `actionsOnHover`: controls (⋯, ×) that show on hover and while the row has
  *   focus. They render beside the row, never inside it, so a button does not
  *   nest in a button and pressing an action does not open the row.
@@ -147,7 +147,7 @@ SidebarTab.propTypes = {
     state: PropTypes.oneOf(['enabled', 'hover', 'selected', 'disabled', 'focus']),
     /** A second line under the label, in Body/small */
     description: PropTypes.node,
-    /** A count, badge or status at the end of the row */
+    /** A count, countTag or status at the end of the row */
     elemAfter: PropTypes.node,
     /** Controls shown on hover and focus, rendered beside the row (never inside it) */
     actionsOnHover: PropTypes.node,

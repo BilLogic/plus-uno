@@ -170,8 +170,8 @@
 }
 
 .sbdocs .sb-docs-landing__title {
-    font: var(--heading-xxlarge);
-    letter-spacing: var(--heading-xxlarge-tracking);
+    font: var(--heading-xxl);
+    letter-spacing: var(--heading-xxl-tracking);
     color: var(--ds-text);
 }
 

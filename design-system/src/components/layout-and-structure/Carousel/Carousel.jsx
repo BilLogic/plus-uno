@@ -115,7 +115,7 @@ const SlideMedia = ({ item, index }) => {
 
 // The progress indicator under the stage. It holds the clock's value itself,
 // so the frame loop re-renders the dots and not the whole carousel.
-const CarouselDots = ({ slides, index, timed, clockRef, onSelect }) => {
+const CarouselProgressIndicator = ({ slides, index, timed, clockRef, onSelect }) => {
     const [progress, setProgress] = useState(0);
     useEffect(() => {
         clockRef.current = setProgress;
@@ -182,10 +182,10 @@ const Carousel = ({
     const [pageHidden, setPageHidden] = useState(() => typeof document !== 'undefined' && document.hidden);
 
     const elapsedRef = useRef(0);
-    const dotsClockRef = useRef(null);
+    const progressClockRef = useRef(null);
     const paint = useCallback((progress) => {
         rootRef.current?.style.setProperty('--carousel-progress', progress.toFixed(4));
-        dotsClockRef.current?.(progress);
+        progressClockRef.current?.(progress);
     }, []);
 
     const onSlideChangeRef = useRef(onSlideChange);
@@ -392,7 +392,7 @@ const Carousel = ({
                       * that fills on the slide's clock; under reduced motion or
                       * without autoplay it shows full.
                       */}
-                    <CarouselDots slides={slides} index={index} timed={autoplays} clockRef={dotsClockRef} onSelect={goTo} />
+                    <CarouselProgressIndicator slides={slides} index={index} timed={autoplays} clockRef={progressClockRef} onSelect={goTo} />
                     {isStatic && (
                         <IconButton
                             icon="chevron-right"

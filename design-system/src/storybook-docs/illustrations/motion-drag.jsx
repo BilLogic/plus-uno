@@ -18,7 +18,7 @@ import { dropInto, dropOnto, locate, orderKey, step } from './drag-model.js';
  * Pragmatic drag and drop for the pointer and Base UI for the handle; every
  * motion reads a spring token, never a time of its own.
  *
- *  - What you carry follows by weight (02-physics § Weight): a chip trails on
+ *  - What you carry follows by weight (02-physics § Weight): a tag trails on
  *    `spatial.fast`, a card on `spatial.default`. Neither bounces.
  *  - On drop the item settles on `spatial.fast`, started from the release velocity.
  *  - Neighbors close up on `spatial.default`.
@@ -32,7 +32,7 @@ const LISTS = {
   single: { a: ['a', 'b', 'c'] },
   between: { left: ['a', 'b', 'c'], right: ['x', 'y', 'z'] },
 };
-const WEIGHT = { chip: 'spatial.fast', card: 'spatial.default' };
+const WEIGHT = { tag: 'spatial.fast', card: 'spatial.default' };
 const SUBJECT = 'a';
 const LABEL = (id) => `Item ${id.toUpperCase()}`;
 
@@ -53,13 +53,13 @@ const Item = ({ id, kind, held, accent, grabbed, onKeyDown, register }) => {
         display: 'flex',
         alignItems: 'center',
         gap: 'var(--stack-md)',
-        height: px(kind === 'chip' ? 24 : 40),
+        height: px(kind === 'tag' ? 24 : 40),
         width: '100%',
         padding: '0 var(--stack-md)',
         background: PAINT.cardSurface,
         boxShadow: PAINT.cardShadow,
         borderRadius: CORNER_TOKEN.card,
-        outline: accent ? `var(--border-default) solid ${PAINT.accent}` : undefined,
+        outline: accent ? `var(--border-width-default) solid ${PAINT.accent}` : undefined,
         // The slot stays while the copy travels: a held item reads as an empty place.
         opacity: held ? 0.35 : 1,
         listStyle: 'none',
@@ -104,8 +104,8 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
   const root = useRef(null);
   const pointerTrail = useRef([]);
 
-  // Cards in the single list; chips in the second list of the pair.
-  const kindOf = (id, list) => (between && list === 'right' ? 'chip' : between ? 'chip' : 'card');
+  // Cards in the single list; tags in the second list of the pair.
+  const kindOf = (id, list) => (between && list === 'right' ? 'tag' : between ? 'tag' : 'card');
   const register = useCallback((id, el, handle, kind) => {
     nodes.current.set(id, { el, handle, kind });
     return () => nodes.current.delete(id);
@@ -359,7 +359,7 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
           style={{
             position: 'fixed', left: 0, top: 0, width: float.w, height: float.h, pointerEvents: 'none', zIndex: 10,
             transform: `translate(${float.x}px, ${float.y}px)`,
-            background: PAINT.cardSurface, border: `var(--border-default) solid ${PAINT.accent}`, borderRadius: CORNER_TOKEN.card, boxShadow: PAINT.cardShadow,
+            background: PAINT.cardSurface, border: `var(--border-width-default) solid ${PAINT.accent}`, borderRadius: CORNER_TOKEN.card, boxShadow: PAINT.cardShadow,
           }}
         >
           <svg width="20" height="24" viewBox="0 0 20 24" style={{ position: 'absolute', right: -8, bottom: -14 }}>

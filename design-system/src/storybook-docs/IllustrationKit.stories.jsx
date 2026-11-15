@@ -101,9 +101,9 @@ export const ResponsiveReflowDrawings = {
     }
     // The Sidebar docks at 1280 (an edge line), collapses at 960, and floats on a Backdrop at 768.
     const has = (svg, token) => svg.outerHTML.includes(token);
-    await expect(has(svgs[0], '--ds-blanket')).toBe(false);
-    await expect(has(svgs[1], '--ds-blanket')).toBe(false);
-    await expect(has(svgs[2], '--ds-blanket')).toBe(true);
+    await expect(has(svgs[0], '--ds-backdrop')).toBe(false);
+    await expect(has(svgs[1], '--ds-backdrop')).toBe(false);
+    await expect(has(svgs[2], '--ds-backdrop')).toBe(true);
     await expect(has(svgs[2], '--ds-shadow-overlay')).toBe(true);
     // The Section's side column sits beside the body only at 1280: one Section fewer below.
     const sections = (svg) => svg.querySelectorAll('[data-part="section"]').length;

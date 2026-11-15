@@ -22,7 +22,7 @@
 }
 
 .plus-table-framed {
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--table-radius);
     overflow: hidden;
 }
@@ -47,7 +47,7 @@
     td {
         padding: 0 var(--table-pad-x-cell);
         border: none;
-        border-bottom: var(--border-default) solid var(--ds-border);
+        border-bottom: var(--border-width-default) solid var(--ds-border);
         vertical-align: middle;
         background-color: transparent;
     }
@@ -245,7 +245,7 @@
 .plus-table-vertical-lines {
     th:not(:last-child),
     td:not(:last-child) {
-        border-inline-end: var(--border-default) solid var(--ds-border);
+        border-inline-end: var(--border-width-default) solid var(--ds-border);
     }
 }
 

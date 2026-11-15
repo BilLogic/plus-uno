@@ -10,7 +10,7 @@ import AiIcon, { AI_ICON_NAMES, AI_ICON_SIZES, AI_ICON_ALL_SIZES } from './AiIco
  *
  * One icon per meaning, in
  * a square box exactly its size, filled with the icon color and paired with a
- * label unless its meaning is obvious. PLUS adds a sparkle badge on the actions
+ * label unless its meaning is obvious. PLUS adds a sparkle mark on the actions
  * that generate.
  *
  * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
@@ -28,7 +28,7 @@ export default {
             description: {
                 component:
                     'Icons for AI actions: generate, ask, rewrite, summarize, plan, suggest and stop generating. '
-                    + 'A Font Awesome Free glyph with a sparkle badge, or the sparkle alone.',
+                    + 'A Font Awesome Free glyph with a sparkle mark, or the sparkle alone.',
             },
         },
     },
@@ -52,10 +52,10 @@ const ModeSet = ({ mode }) => (
             background: 'var(--ds-surface)',
             color: 'var(--ds-text)',
             borderRadius: 'var(--card-radius)',
-            border: 'var(--border-default) solid var(--ds-border)',
+            border: 'var(--border-width-default) solid var(--ds-border)',
         }}
     >
-        <div style={{ font: 'var(--heading-small)', marginBottom: 'var(--inline-md)' }}>{mode === 'dark' ? 'Dark' : 'Light'}</div>
+        <div style={{ font: 'var(--heading-sm)', marginBottom: 'var(--inline-md)' }}>{mode === 'dark' ? 'Dark' : 'Light'}</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto)', gap: 'var(--grid-gutter)', justifyContent: 'start' }}>
             {AI_ICON_NAMES.flatMap((name) => AI_ICON_ALL_SIZES.filter((size) => AI_ICON_SIZES[name].includes(size)).map((size) => (
                 <div key={`${name}-${size}`} style={cell}>

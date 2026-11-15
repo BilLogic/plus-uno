@@ -351,7 +351,7 @@ export const ChecklistCard = ({
                                 gap: 'var(--card-inline-lg)',
                                 paddingBlockStart: index === 0 ? 0 : 'var(--card-stack-md)',
                                 paddingBlockEnd: index === steps.length - 1 ? 0 : 'var(--card-stack-md)',
-                                borderTop: index === 0 ? 'none' : 'var(--border-default) solid var(--ds-border)',
+                                borderTop: index === 0 ? 'none' : 'var(--border-width-default) solid var(--ds-border)',
                             }}
                         >
                             <Icon

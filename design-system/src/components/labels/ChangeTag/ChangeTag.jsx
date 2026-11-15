@@ -19,7 +19,7 @@ import './ChangeTag.scss';
  * arrow, so "up is bad" needs no hand-flipped color.
  *
  * COLOR NEVER CARRIES IT ALONE. The arrow and the sign say the direction, and
- * a screen reader hears it in words ("Up 3 vs last week"); the visible chip is
+ * a screen reader hears it in words ("Up 3 vs last week"); the visible tag is
  * `aria-hidden` so nothing is read twice.
  *
  * A CHANGE TAG IS NEVER A BUTTON. It is a `span` with no role, no click
@@ -121,7 +121,7 @@ export const ChangeTag = ({
     /*
      * A new value fades in. The value is keyed on how many times it has
      * changed, so a re-render with the same value keeps its element, and the
-     * first render does not animate at all: only a change does. The chip's
+     * first render does not animate at all: only a change does. The tag's
      * color change is a plain transition on the element that stays.
      */
     const lastText = useRef(text);
@@ -140,7 +140,7 @@ export const ChangeTag = ({
 
     return (
         <span id={id} className={classes} {...rest}>
-            <span className="plus-change-tag__chip" aria-hidden="true">
+            <span className="plus-change-tag__tag" aria-hidden="true">
                 {icon && (
                     <span className="plus-change-tag__visual">
                         <Icon name={icon} />

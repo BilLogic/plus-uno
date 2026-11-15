@@ -58,11 +58,11 @@
     min-width: var(--icon-lg);
 }
 
-// Rating Item (Circular Background with Star): a 32 control (`--item-height-md`)
+// Rating Item (Circular Background with Star): a 32 control (`--control-md`)
 // drawing a 16 icon (`--icon-md`).
 .plus-rating-item {
-    width: var(--item-height-md);
-    height: var(--item-height-md);
+    width: var(--control-md);
+    height: var(--control-md);
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;

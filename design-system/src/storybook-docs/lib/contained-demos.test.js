@@ -25,7 +25,7 @@ describe('findEscapes', () => {
         expect(findEscapes(canvas)).toEqual([]);
     });
 
-    it('flags a modal dialog portaled over the page', () => {
+    it('flags a Modal portaled over the page', () => {
         const canvas = mount('<div id="canvas"></div><div role="dialog" aria-modal="true" style="width:10px;height:10px">Edit</div>');
         expect(findEscapes(canvas)).toHaveLength(1);
     });

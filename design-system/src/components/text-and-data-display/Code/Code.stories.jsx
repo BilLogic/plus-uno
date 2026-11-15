@@ -8,10 +8,10 @@ import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/lab
 import Code from './Code';
 
 /**
- * `Code` -- an inline chip for code inside a sentence.
+ * `Code` -- an inline snippet for code inside a sentence.
  *
  * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
- * in a real browser. The chip is asserted as what a person sees: the monospace
+ * in a real browser. The snippet is asserted as what a person sees: the monospace
  * family, a size of 0.875 of the surrounding text, the neutral fill and the
  * code ink resolved from tokens in every color mode. Never a class name.
  */
@@ -24,7 +24,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'An inline chip for a short piece of code in a sentence: the code typeface at 0.875 of '
+                    'An inline snippet for a short piece of code in a sentence: the code typeface at 0.875 of '
                     + 'the text around it, on a neutral fill.',
             },
         },
@@ -44,19 +44,19 @@ export const Overview = () => (
 );
 
 /**
- * The chip is a `code` element in the code family, 0.875 of its parent, and its
+ * The snippet is a `code` element in the code family, 0.875 of its parent, and its
  * fill and ink are the code tokens, in every color mode.
  */
 Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const chip = canvas.getByText('getSession()');
-    await expect(chip.tagName, 'it is a code element').toBe('CODE');
-    const parent = px(getComputedStyle(chip.parentElement).fontSize);
-    await expect(px(getComputedStyle(chip).fontSize), 'it is 0.875 of the text around it').toBeCloseTo(parent * 0.875, 1);
-    await expect(getComputedStyle(chip).fontFamily, 'it uses the code family').toMatch(/Noto Sans Mono/);
+    const snippet = canvas.getByText('getSession()');
+    await expect(snippet.tagName, 'it is a code element').toBe('CODE');
+    const parent = px(getComputedStyle(snippet.parentElement).fontSize);
+    await expect(px(getComputedStyle(snippet).fontSize), 'it is 0.875 of the text around it').toBeCloseTo(parent * 0.875, 1);
+    await expect(getComputedStyle(snippet).fontFamily, 'it uses the code family').toMatch(/Noto Sans Mono/);
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
-        await expect(getComputedStyle(chip).backgroundColor, `fill, ${mode}`).toBe(token('--ds-background-neutral'));
-        await expect(getComputedStyle(chip).color, `ink, ${mode}`).toBe(token('--ds-text-code-default'));
+        await expect(getComputedStyle(snippet).backgroundColor, `fill, ${mode}`).toBe(token('--ds-background-neutral'));
+        await expect(getComputedStyle(snippet).color, `ink, ${mode}`).toBe(token('--ds-text-code-default'));
     });
     await expect(canvas.getByText(/Call/), 'the sentence around it is unchanged').toBeVisible();
 };
@@ -64,17 +64,17 @@ Overview.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------------- scaling */
 
 export const InHeading = () => (
-    <h2 className="plus-heading-small" style={{ margin: 0 }}>
+    <h2 className="plus-heading-sm" style={{ margin: 0 }}>
         The <Code>useSession</Code> hook
     </h2>
 );
 
-/** The chip follows the text it sits in: 0.875 of a heading, not of the body. */
+/** The snippet follows the text it sits in: 0.875 of a heading, not of the body. */
 InHeading.play = async ({ canvasElement }) => {
-    const chip = within(canvasElement).getByText('useSession');
-    const parent = px(getComputedStyle(chip.parentElement).fontSize);
-    await expect(px(getComputedStyle(chip).fontSize)).toBeCloseTo(parent * 0.875, 1);
-    await expect(chip.parentElement.tagName).toBe('H2');
+    const snippet = within(canvasElement).getByText('useSession');
+    const parent = px(getComputedStyle(snippet.parentElement).fontSize);
+    await expect(px(getComputedStyle(snippet).fontSize)).toBeCloseTo(parent * 0.875, 1);
+    await expect(snippet.parentElement.tagName).toBe('H2');
 };
 
 /* ------------------------------------------------------------------- wrapping */
@@ -85,10 +85,10 @@ export const WrapsAtTheEdge = () => (
     </p>
 );
 
-/** A long token breaks inside the chip instead of pushing the page sideways. */
+/** A long token breaks inside the snippet instead of pushing the page sideways. */
 WrapsAtTheEdge.play = async ({ canvasElement }) => {
-    const chip = within(canvasElement).getByText('a_very_long_identifier_with_no_spaces_in_it');
-    await expect(chip.parentElement.scrollWidth, 'nothing overflows its box').toBeLessThanOrEqual(chip.parentElement.clientWidth);
+    const snippet = within(canvasElement).getByText('a_very_long_identifier_with_no_spaces_in_it');
+    await expect(snippet.parentElement.scrollWidth, 'nothing overflows its box').toBeLessThanOrEqual(snippet.parentElement.clientWidth);
 };
 
 /* ---------------------------------------------------------------- playground */
@@ -101,23 +101,23 @@ export const Interactive = (args) => (
 Interactive.args = { children: 'npm run dev' };
 Interactive.argTypes = { children: { control: 'text' } };
 
-const chipOf = (canvasElement) => within(canvasElement).getByText('getSession()');
+const codeOf = (canvasElement) => within(canvasElement).getByText('getSession()');
 
 /** Rest: the neutral fill and the code ink. */
 export const Rest = {
     render: () => <Overview />,
     play: async ({ canvasElement }) => {
-        const chip = chipOf(canvasElement);
-        await expect(getComputedStyle(chip).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
-        await expect(getComputedStyle(chip).color).toBe(tokenColor(canvasElement, '--ds-text-code-default'));
+        const snippet = codeOf(canvasElement);
+        await expect(getComputedStyle(snippet).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(getComputedStyle(snippet).color).toBe(tokenColor(canvasElement, '--ds-text-code-default'));
     },
 };
 
-/** Hovered: the chip is text, so a pointer over it changes nothing. */
+/** Hovered: the snippet is text, so a pointer over it changes nothing. */
 export const Hovered = {
     render: () => <Overview />,
     play: async ({ canvasElement }) => {
-        await expectNoStateChange(chipOf(canvasElement), ':hover', 'code chip');
+        await expectNoStateChange(codeOf(canvasElement), ':hover', 'code snippet');
     },
 };
 
@@ -125,14 +125,14 @@ export const Hovered = {
 export const Pressed = {
     render: () => <Overview />,
     play: async ({ canvasElement }) => {
-        await expectNoStateChange(chipOf(canvasElement), ':active', 'code chip');
+        await expectNoStateChange(codeOf(canvasElement), ':active', 'code snippet');
     },
 };
 
-/** Focused and disabled: the chip is not a control, so Tab skips it and it is never dimmed. */
+/** Focused and disabled: the snippet is not a control, so Tab skips it and it is never dimmed. */
 export const NotAControl = {
     render: () => <Overview />,
     play: async ({ canvasElement }) => {
-        await expectNotAControl(chipOf(canvasElement), 'code chip');
+        await expectNotAControl(codeOf(canvasElement), 'code snippet');
     },
 };

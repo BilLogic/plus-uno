@@ -78,7 +78,7 @@ _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right
 
 **Backdrop**:
 The pattern for the layer that dims what sits behind it: full screen for a **Modal**, which it also holds and sizes. A **Panel** floats with none.
-_Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
+_Avoid_: "Blanket", "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
 
 **Modal**:
 The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time. `Modal` is the component; `PatternModal` draws its shell inline.
@@ -166,7 +166,7 @@ _Avoid_: "counter", "badge"
 
 **Tag**:
 A label a person can attach, filter by or remove: it names a category rather than a state. No color square unless `swatchBefore` opts in; `elemBefore` is its leading slot.
-_Avoid_: "chip"
+_Avoid_: "chip", `SelectChips`
 
 **Tag group**:
 A set of **Tag**s laid out together.
@@ -250,7 +250,7 @@ _Avoid_: "mascot", "avatar" for a character
 
 **Progress indicator**:
 A row of dots that shows the current step of a sequence. With `progress`, the current dot stretches into a bar that fills over the step's time, as in a **Carousel**; without a clock (autoplay off, or reduced motion) the stretched dot shows full.
-_Avoid_: "dots", "slide marker"
+_Avoid_: "dots", "slide marker", `CarouselDots`
 
 ### Design system: tokens
 

@@ -151,7 +151,7 @@
  * row-height in, and the edge moves to it.
  */
 $frozen: '.plus-pattern-table--sticky-column .plus-pattern-table-scroll[data-scrolled-x]';
-$edge-shadow: inset calc(-1 * var(--border-default)) 0 0 var(--ds-border-bold), var(--ds-shadow-overflow);
+$edge-shadow: inset calc(-1 * var(--border-width-default)) 0 0 var(--ds-border-bold), var(--ds-shadow-overflow);
 
 .plus-dynamic-table:not(.plus-dynamic-table--frozen-pair) #{$frozen} :is(th, td):first-child:not(.plus-pattern-table-message) {
     box-shadow: $edge-shadow;

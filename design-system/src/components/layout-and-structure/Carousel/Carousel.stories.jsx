@@ -44,7 +44,7 @@ const SlideArt = ({ accent, icon, eyebrow }) => (
         background: `var(--ds-background-accent-${accent}-subtler)`,
         color: `var(--ds-icon-accent-${accent})`,
     }}>
-        <i className={`fa-solid fa-${icon}`} aria-hidden="true" style={{ fontSize: 'var(--font-size-200)' }} />
+        <i className={`fa-solid fa-${icon}`} aria-hidden="true" style={{ fontSize: 'var(--type-size-200)' }} />
         <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text-subtle)' }}>{eyebrow}</span>
     </div>
 );

@@ -49,7 +49,7 @@ than a menu. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
 
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
 height hugs its content up to the cap the Backdrop sets
-(`--blanket-max-height-modal`); `height="fill"` sits at that cap.
+(`--backdrop-max-height-modal`); `height="fill"` sits at that cap.
 
 ## Motion
 
@@ -230,7 +230,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--body-default` · `--ds-border` · `--ds-shadow-blocking` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-medium` · `--inline-sm` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--stack-md` · `--stack-sm` · `--stroke-1`
+`--backdrop-max-height-modal` · `--body-default` · `--ds-border` · `--ds-shadow-blocking` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--inline-sm` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--stack-md` · `--stack-sm` · `--stroke-1`
 
 From `design-system/src/components/messaging/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

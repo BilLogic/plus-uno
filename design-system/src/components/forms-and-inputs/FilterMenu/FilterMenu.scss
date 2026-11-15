@@ -20,14 +20,14 @@
     .plus-popup-body {
         display: flex;
         flex-direction: column;
-        gap: var(--popover-pad);
+        gap: var(--popup-pad);
     }
 }
 
 .plus-filter-menu__categories {
     display: grid;
     gap: var(--stack-lg) var(--inline-lg);
-    max-height: var(--popover-max-height-menu);
+    max-height: var(--dropdown-menu-max-height);
     overflow-y: auto;
 }
 
@@ -48,7 +48,7 @@
 .plus-filter-menu__footer {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    --plus-filter-menu-bleed: calc(var(--popover-pad) + var(--border-default));
+    --plus-filter-menu-bleed: calc(var(--popup-pad) + var(--border-width-default));
     margin: 0 calc(-1 * var(--plus-filter-menu-bleed)) calc(-1 * var(--plus-filter-menu-bleed));
 
     .plus-btn {

@@ -514,7 +514,7 @@ export const NoBorder = () => (
             <div style={ground}>{menu()}</div>
         </Do>
         <Dont caption="A border on top doubles the edge and outlines the Popup.">
-            <div style={ground}>{menu({ border: 'var(--border-default) solid var(--ds-border-bold)' })}</div>
+            <div style={ground}>{menu({ border: 'var(--border-width-default) solid var(--ds-border-bold)' })}</div>
         </Dont>
     </DoDont>
 );

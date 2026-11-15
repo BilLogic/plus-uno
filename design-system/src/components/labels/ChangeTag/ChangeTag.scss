@@ -1,5 +1,5 @@
 /*
- * Change tag — change over time: a filled chip (arrow + signed value) and an
+ * Change tag — change over time: a filled tag (arrow + signed value) and an
  * optional comparison in subtle text after it.
  *
  * THE BOX. Default is 20 tall, compact 16 for table cells, from
@@ -11,7 +11,7 @@
  * inset shadow, so the height stays exact). The comparison sits outside the
  * fill, on the page's own ground, so subtle text keeps its contrast.
  *
- * MOTION. A new value fades in on the entrance easing while the chip's colors
+ * MOTION. A new value fades in on the entrance easing while the tag's colors
  * move on the standard one. Both read the motion duration tokens, which drop
  * to 0ms under reduced motion.
  */
@@ -27,7 +27,7 @@
     white-space: nowrap;
 }
 
-.plus-change-tag__chip {
+.plus-change-tag__tag {
     --plus-change-tag-height: #{label.$change-height};
 
     display: inline-flex;
@@ -39,13 +39,13 @@
     border-radius: var(--radius-md);
     background-color: var(--plus-change-tag-fill);
     color: var(--plus-change-tag-ink);
-    box-shadow: inset 0 0 0 var(--border-default) var(--plus-change-tag-edge);
+    box-shadow: inset 0 0 0 var(--border-width-default) var(--plus-change-tag-edge);
     transition-property: background-color, color, box-shadow;
     transition-duration: var(--ds-motion-appearance-default-duration);
     transition-timing-function: var(--ds-motion-appearance-default);
 }
 
-.plus-change-tag--compact .plus-change-tag__chip {
+.plus-change-tag--compact .plus-change-tag__tag {
     --plus-change-tag-height: #{label.$change-height-compact};
 }
 
@@ -100,7 +100,7 @@ $change-tone: (
 
 /* Forced colors drop box-shadows; a real border keeps the edge. */
 @media (forced-colors: active) {
-    .plus-change-tag__chip {
-        border: var(--border-default) solid CanvasText;
+    .plus-change-tag__tag {
+        border: var(--border-width-default) solid CanvasText;
     }
 }

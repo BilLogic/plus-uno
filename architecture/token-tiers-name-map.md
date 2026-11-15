@@ -37,9 +37,9 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Radius / Control | `--radius-control-sm` | pairs with --control-sm; height 24, 24÷4 = 6 |
 | Radius / Control | `--radius-control-md` | pairs with --control-md; height 32, 32÷4 = 8 |
 | Radius / Control | `--radius-control-lg` | pairs with --control-lg; height 40, 40÷4 = 10 |
-| Border | `--border-default` (declared elsewhere) |  |
-| Border | `--border-selected` (declared elsewhere) |  |
-| Border | `--border-focused` (declared elsewhere) |  |
+| Border | `--border-width-default` (declared elsewhere) |  |
+| Border | `--border-width-selected` (declared elsewhere) |  |
+| Border | `--border-width-focused` (declared elsewhere) |  |
 | Focus | `--focus-ring-width` | matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive |
 | Focus | `--focus-ring-offset` | defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both |
 | Grid | `--grid-gutter` |  |
@@ -63,8 +63,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Size | `--image-md` (declared elsewhere) |  |
 | Size | `--image-lg` (declared elsewhere) |  |
 | Size | `--image-xl` (declared elsewhere) |  |
-| Size | `--item-height-sm` (declared elsewhere) |  |
-| Size | `--item-height-md` (declared elsewhere) |  |
 | Size | `--label-height-sm` (declared elsewhere) |  |
 | Size | `--label-height-md` (declared elsewhere) |  |
 | Size | `--label-max-width` (declared elsewhere) |  |
@@ -143,10 +141,10 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Table | `--table-pad-x-footer` (declared elsewhere) |  |
 | Table | `--table-footer-height` |  |
 | Table | `--table-min-width-title` (declared elsewhere) |  |
-| Blanket | `--blanket-pad-x` |  |
-| Blanket | `--blanket-pad-y` |  |
-| Blanket | `--blanket-fill` | the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word |
-| Blanket | `--blanket-max-height-modal` | a calc() of the pad above: code only, no Figma variable |
+| Backdrop | `--backdrop-pad-x` |  |
+| Backdrop | `--backdrop-pad-y` |  |
+| Backdrop | `--backdrop-fill` | the Backdrop's own fill color; the old declaration's value, written directly so this file carries no old-language word |
+| Backdrop | `--backdrop-max-height-modal` | a calc() of the pad above: code only, no Figma variable |
 | Modal | `--modal-pad` (declared elsewhere) |  |
 | Modal | `--modal-pad-x-compact` |  |
 | Modal | `--modal-pad-x-default` |  |
@@ -167,21 +165,21 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Page | `--page-border-width` |  |
 | Table | `--table-overflow-reach` |  |
 | Modal | `--modal-body-min-height` |  |
-| Popover | `--popover-pad` (declared elsewhere) |  |
-| Popover | `--popover-width-sm` (declared elsewhere) |  |
-| Popover | `--popover-width-md` (declared elsewhere) |  |
-| Popover | `--popover-width-lg` (declared elsewhere) |  |
-| Popover | `--popover-width-flag` (declared elsewhere) |  |
-| Popover | `--popover-stack-flag` (declared elsewhere) |  |
-| Popover | `--popup-radius` |  |
-| Popover | `--popover-pad-menu` (declared elsewhere) |  |
-| Popover | `--popover-min-width-menu` (declared elsewhere) |  |
-| Popover | `--popover-max-width-menu` (declared elsewhere) |  |
-| Popover | `--popover-max-height-menu` (declared elsewhere) |  |
-| Popover | `--popover-pad-y-tooltip` (declared elsewhere) |  |
-| Popover | `--popover-max-width-tooltip` (declared elsewhere) |  |
-| Popover | `--popover-gap-screen` (declared elsewhere) |  |
-| Popover | `--popover-offset` (declared elsewhere) |  |
+| Popup | `--popup-pad` (declared elsewhere) |  |
+| Popup | `--popup-width-sm` (declared elsewhere) |  |
+| Popup | `--popup-width-md` (declared elsewhere) |  |
+| Popup | `--popup-width-lg` (declared elsewhere) |  |
+| Popup | `--flag-width` (declared elsewhere) |  |
+| Popup | `--flag-stack` (declared elsewhere) |  |
+| Popup | `--popup-radius` |  |
+| Popup | `--dropdown-menu-pad` (declared elsewhere) |  |
+| Popup | `--dropdown-menu-min-width` (declared elsewhere) |  |
+| Popup | `--dropdown-menu-max-width` (declared elsewhere) |  |
+| Popup | `--dropdown-menu-max-height` (declared elsewhere) |  |
+| Popup | `--tooltip-pad-y` (declared elsewhere) |  |
+| Popup | `--tooltip-max-width` (declared elsewhere) |  |
+| Popup | `--popup-gap-screen` (declared elsewhere) |  |
+| Popup | `--popup-offset` (declared elsewhere) |  |
 | Focused page | `--focused-page-pad-x` (declared elsewhere) |  |
 | Focused page | `--focused-page-pad-y` (declared elsewhere) |  |
 | Focused page | `--focused-page-stack-sm` (declared elsewhere) |  |
@@ -232,15 +230,15 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Option menu | `--option-menu-width` |  |
 | Checklist | `--checklist-action-width` | 128px; 96px remains for the ProgressBar when a 32px dismiss IconButton takes the end |
 | Checklist | `--checklist-action-min-width` | 120px floor |
-| Button | `--button-vertical-size` |  |
+| Button | `--button-size-vertical` |  |
 | Option row | `--option-row-indent-step` |  |
 | Option row | `--option-row-control-gap` |  |
 | Option row | `--option-row-dot-size` |  |
 | Count tag | `--count-tag-dot-size` |  |
 | Tag | `--tag-dot-size` |  |
-| Tag | `--tag-pad-end-compact` |  |
+| Tag | `--tag-pad-x-end-compact` |  |
 | Tag | `--tag-gap-compact` |  |
-| Tag | `--tag-pad-end` |  |
+| Tag | `--tag-pad-x-end` |  |
 | Tag | `--tag-gap` |  |
 | Carousel | `--carousel-control-offset` |  |
 | Carousel | `--carousel-control-pad` |  |
@@ -280,7 +278,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Popup | `--popup-clip-reach` |  |
 | AI chat | `--ai-chat-width` |  |
 | Inbox | `--inbox-width` | 360px |
-| Popup | `--popup-pad` |  |
 | Table | `--table-cell-max-width` |  |
 | Avatar | `--avatar-size-96` |  |
 | Avatar | `--avatar-size-128` |  |
@@ -298,7 +295,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Layer | `--layer-navigation` |  |
 | Layer | `--layer-dialog` |  |
 | Layer | `--layer-popup` |  |
-| Layer | `--layer-blanket` | the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word |
+| Layer | `--layer-backdrop` | the Backdrop's z-index; the old declaration's value, written directly so this file carries no old-language word |
 | Layer | `--layer-modal` |  |
 | Layer | `--layer-flag` |  |
 | Layer | `--layer-spotlight` |  |

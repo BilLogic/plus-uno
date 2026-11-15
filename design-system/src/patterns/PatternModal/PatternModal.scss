@@ -56,7 +56,7 @@
 
 .plus-pattern-modal-title {
     margin: 0;
-    font: var(--heading-medium);
+    font: var(--heading-md);
     color: var(--ds-text);
     min-width: 0;
 }
@@ -76,7 +76,7 @@
 /* Divider: the 1px rule under the header and above the footer, the modal stack on both sides */
 .plus-pattern-modal-divider {
     flex-shrink: 0;
-    height: var(--border-default);
+    height: var(--border-width-default);
     background-color: var(--ds-border);
 }
 

@@ -126,7 +126,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Circle fill and edge | `--ds-background-input` and `--ds-border-input`; selected `--ds-background-selected-bold` and `--ds-border-selected`. |
 | Circle size, edge width | `--radio-control-size` (12); `--stroke-2`. |
-| Row | `--item-height-sm` (24); gap `--space-050`. |
+| Row | `--control-sm` (24); gap `--space-050`. |
 | Label | `--ds-text`, body default. |
 | Card | `--radius-control-md`, `--stroke-1` edge in `--ds-border`, `--ds-surface` fill. |
 | Choice tile | `--choice-tile-width` (224px), `--radius-control-md`, `--ds-surface` fill; selected 2px `--ds-border-selected` and `--ds-background-selected`. |
@@ -175,7 +175,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--border-selected` · `--card-pad-default` · `--choice-tile-width` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--item-height-sm` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radio-control-size` · `--radius-control-md` · `--radius-full` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium` · `--type-weight-regular`
+`--body-default` · `--border-width-default` · `--border-width-selected` · `--card-pad-default` · `--choice-tile-width` · `--control-sm` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radio-control-size` · `--radius-control-md` · `--radius-full` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Radio/Radio.scss`. Override these through the token layer, never with a literal.
 

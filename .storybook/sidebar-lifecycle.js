@@ -1,11 +1,11 @@
-// Sidebar lifecycle badges and root grouping, the pure half of the manager's sidebar
+// Sidebar lifecycle countTags and root grouping, the pure half of the manager's sidebar
 // config (manager.js adds the React element and the painting).
 //
 // A component's meta carries one of three tags when its lifecycle is known: `new`
 // (a whole component just landed), `beta` (usable, still moving) or `deprecated`
 // (still ships, do not start new work on it). Storybook's own tag filter in the
 // sidebar lists every custom tag in the index, so tagging is also what makes the
-// list filterable; the badge is what makes it readable without opening the filter.
+// list filterable; the countTag is what makes it readable without opening the filter.
 
 export const LIFECYCLE_TAGS = ['new', 'beta', 'deprecated'];
 
@@ -33,20 +33,20 @@ export const lifecycleOfEntry = (item, getData) => {
 export const COLLAPSED_ROOTS = ['foundations', 'patterns', 'components', 'ai-ui', 'data-visualizations'];
 
 /**
- * The badge's CSS, written as a rule because the manager has no stylesheet that
+ * The countTag's CSS, written as a rule because the manager has no stylesheet that
  * could hold custom properties (same reason as the selected row). The look is the
  * Tag's: a hue on the border, neutral text, a transparent ground.
  */
-// The badge's colors are tokens. Its size (16px high, 10px type, 4px radius and padding)
+// The countTag's colors are tokens. Its size (16px high, 10px type, 4px radius and padding)
 // is literal: the manager has no stylesheet of tokens, and the theme's own type and
 // radius stay literal for the same reason (manager.js).
-export const badgeRules = (vars = {}) =>
+export const countTagRules = (vars = {}) =>
   [
     // docs-literal: the manager has no token stylesheet (above).
-    `.plus-lifecycle-badge { display: inline-flex; align-items: center; box-sizing: border-box; height: 16px; margin-left: 6px; padding: 0 4px; border: 1px solid; border-radius: 4px; font-size: 10px; font-weight: 600; line-height: 1; letter-spacing: 0.02em; text-transform: lowercase; white-space: nowrap; color: ${vars['--plus-manager-badge-text']}; }`,
-    // On the selected row the brand ground is dark: the badge takes the row's own ink.
-    `.sidebar-container [data-selected='true'] .plus-lifecycle-badge { color: inherit; border-color: currentColor; }`,
+    `.plus-lifecycle-count-tag { display: inline-flex; align-items: center; box-sizing: border-box; height: 16px; margin-left: 6px; padding: 0 4px; border: 1px solid; border-radius: 4px; font-size: 10px; font-weight: 600; line-height: 1; letter-spacing: 0.02em; text-transform: lowercase; white-space: nowrap; color: ${vars['--plus-manager-count-tag-text']}; }`,
+    // On the selected row the brand ground is dark: the countTag takes the row's own ink.
+    `.sidebar-container [data-selected='true'] .plus-lifecycle-count-tag { color: inherit; border-color: currentColor; }`,
     ...LIFECYCLE_TAGS.map(
-      (tag) => `.plus-lifecycle-badge[data-lifecycle='${tag}'] { border-color: ${vars[`--plus-manager-badge-${tag}-border`]}; }`,
+      (tag) => `.plus-lifecycle-count-tag[data-lifecycle='${tag}'] { border-color: ${vars[`--plus-manager-count-tag-${tag}-border`]}; }`,
     ),
   ].join('\n');

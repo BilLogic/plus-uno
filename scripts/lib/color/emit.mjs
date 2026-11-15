@@ -32,7 +32,10 @@ export function paletteProp(ref) {
 export const paletteVar = (ref) => (ref === 'transparent' ? 'transparent' : `var(${paletteProp(ref)})`);
 
 /** `color.background.brand.bold` -> `--ds-background-brand-bold`. */
-export const dsName = (name) => `--ds-${name.replace(/^(color|elevation)[.]/, '').replaceAll('.', '-')}`;
+export const dsName = (name) => {
+  const family = name.replace(/^(color|elevation)[.]/, '').replaceAll('.', '-').replace(/^blanket(?=-|$)/, 'backdrop');
+  return `--${/^(chart|skeleton)-/.test(family) ? '' : 'ds-'}${family}`;
+};
 
 const shadowCss = (v) => v.replace(/#[0-9a-fA-F]{6,8}/g, (m) => rgb(m));
 

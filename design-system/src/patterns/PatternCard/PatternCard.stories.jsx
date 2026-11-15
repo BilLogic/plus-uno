@@ -336,7 +336,7 @@ const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => (
             }
         }
         const typeProbe = document.createElement('span');
-        typeProbe.style.font = `var(${imagePlacement !== 'top' && imageSplit === '1/2' ? '--heading-medium' : '--heading-xsmall'})`;
+        typeProbe.style.font = `var(${imagePlacement !== 'top' && imageSplit === '1/2' ? '--heading-md' : '--heading-xsmall'})`;
         card.appendChild(typeProbe);
         await expect(getComputedStyle(heading).fontSize).toBe(getComputedStyle(typeProbe).fontSize);
         typeProbe.remove();

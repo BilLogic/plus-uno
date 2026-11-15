@@ -144,10 +144,10 @@ export const COLOR_TOKEN_FILES = [COLOR_PALETTE_FILE, COLOR_SEMANTIC_FILE, COLOR
 export const COLOR_TOKEN_PATHS = COLOR_TOKEN_FILES.map((file) => `${COLOR_TOKEN_DIR}/${file}`);
 
 /**
- * The color prefixes a check reads: the `--ds-*` tokens. A check that reads
+ * The global-role and component-color prefixes a check reads. A check that reads
  * color names reads this list rather than spelling the prefix itself.
  */
-export const COLOR_PREFIXES = ['--ds-'];
+export const COLOR_PREFIXES = ['--ds-', '--chart-', '--skeleton-subtle'];
 
 /**
  * What a color VALUE can resolve through: the `--ds-*` tokens and the ramps they
@@ -274,7 +274,7 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
  * Every family this design system mints, by name prefix.
  *
  * The order here is not the matching order — `familyOf` takes the LONGEST
- * prefix, so `--font-size-100` cannot be read as `--font-` — but it is the order
+ * prefix, so `--type-size-100` cannot be read as `--type-` — but it is the order
  * a reader wants: color, then type, then space, then the app shell.
  *
  * A family absent from this list is a token name nothing in the harness can
@@ -291,12 +291,12 @@ export const FAMILIES = [
   { family: 'page', prefix: '--page-', what: 'the Page: its pad, stack, radius and border width' },
   { family: 'panel', prefix: '--panel-', what: 'the Panel: its minimum, default and maximum width' },
   { family: 'frame', prefix: '--frame-', what: 'the Frame: the topbar height and the sidebar widths' },
-  { family: 'font-size', prefix: '--font-size-', what: 'the font size primitives, by rem × 100' },
-  { family: 'line-height', prefix: '--line-height-', what: 'line height primitives, by rem × 100' },
+  { family: 'type-size', prefix: '--type-size-', what: 'the font size primitives, by rem × 100' },
+  { family: 'type-line-height', prefix: '--type-line-height-', what: 'line height primitives, by rem × 100' },
   { family: 'heading', prefix: '--heading-', what: 'a heading text style: the `font` shorthand' },
   { family: 'body', prefix: '--body-', what: 'a body text style: the `font` shorthand' },
   { family: 'metric', prefix: '--metric-', what: 'a metric text style: the `font` shorthand' },
-  { family: 'code', prefix: '--code', what: 'the code text style, relative to the text around it' },
+  { family: 'code', prefix: '--code-default', what: 'the code text style, relative to the text around it' },
   {
     family: 'type',
     prefix: '--type-',
@@ -304,7 +304,7 @@ export const FAMILIES = [
   },
   { family: 'size', prefix: '--size-', what: 'the size primitives (`--size-200`)' },
   { family: 'space', prefix: '--space-', what: 'the space primitives, named by rem × 100' },
-  { family: 'radius', prefix: '--radius-', what: 'the radius primitives' },
+  { family: 'radius', prefix: '--radius-', what: 'the radius semantics' },
   { family: 'stroke', prefix: '--stroke-', what: 'the stroke-width primitives' },
   { family: 'pad-x', prefix: '--pad-x-', what: 'the horizontal pad inside an element, xs to lg' },
   { family: 'pad-y', prefix: '--pad-y-', what: 'the vertical pad inside an element, sm to lg' },
@@ -329,7 +329,7 @@ export const FAMILIES = [
   { family: 'section', prefix: '--section-', what: 'a span of the page grid: its stacks and column minimums' },
   { family: 'card', prefix: '--card-', what: 'card pad, stack, inline, minimum width and radius' },
   { family: 'table', prefix: '--table-', what: 'table cell pad and maximum width, footer pad-x, tree indent, minimum title width, radius and overflow shadow reach' },
-  { family: 'blanket', prefix: '--blanket-', what: 'the full-screen layer under a modal: its pad, fill and height limit' },
+  { family: 'backdrop', prefix: '--backdrop-', what: 'the full-screen layer under a modal: its pad, fill and height limit' },
   { family: 'button', prefix: '--button-', what: 'Button radius, where a size has no shared radius role, and the vertical button size' },
   { family: 'calendar', prefix: '--calendar-', what: 'calendar day and navigation button sizes' },
   { family: 'checkbox', prefix: '--checkbox-', what: 'the checkbox box size' },
@@ -353,6 +353,8 @@ export const FAMILIES = [
   { family: 'tag', prefix: '--tag-', what: 'the Tag dot, and the Date and Status tag end pad and gap' },
   { family: 'carousel', prefix: '--carousel-', what: 'Carousel control offset, pad and size, slide minimum heights and indicator sizes' },
   { family: 'scroll-bar', prefix: '--scroll-bar-', what: 'the scroll bar thumb size and the default maximum height' },
+  { family: 'chart', prefix: '--chart-', what: 'Chart colors by series and state' },
+  { family: 'dropdown-menu', prefix: '--dropdown-menu-', what: 'Dropdown menu size and padding' },
   { family: 'skeleton', prefix: '--skeleton-', what: 'Skeleton preset heights and widths' },
   { family: 'flag', prefix: '--flag-', what: 'the Flag minimum height, pad and offset' },
   { family: 'spotlight', prefix: '--spotlight-', what: 'the Spotlight media height' },
@@ -363,9 +365,9 @@ export const FAMILIES = [
   { family: 'avatar', prefix: '--avatar-', what: 'the two largest Avatar sizes, 96 and 128' },
   { family: 'layer', prefix: '--layer-', what: 'the z-index scale, card to tooltip' },
   { family: 'motion', prefix: '--motion-', what: 'motion durations and easings' },
-  { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline, radius and body floor' },
+  { family: 'modal', prefix: '--modal-', what: 'Modal pad, stack, inline, radius and body floor' },
   { family: 'focused-page', prefix: '--focused-page-', what: 'the focused page frame: its pad, stacks and inline gaps' },
-  { family: 'popover', prefix: '--popover-', what: 'menus, popups, tooltips and flags: pad, widths, radii, placement' },
+  { family: 'tooltip', prefix: '--tooltip-', what: 'Tooltip maximum width and vertical padding' },
   { family: 'tile', prefix: '--tile-', what: 'Tile radius where a size has no shared radius role' },
   { family: 'col', prefix: '--col-', what: 'grid column widths' },
   { family: 'breakpoint', prefix: '--breakpoint-', what: 'breakpoint minima' },
@@ -385,7 +387,7 @@ const BY_LENGTH = [...FAMILIES].sort((a, b) => b.prefix.length - a.prefix.length
 export function familyOf(name) {
   if (typeof name !== 'string') return null;
   // A prefix ending in `-` opens a family; one without names a family of one
-  // token, matched whole (`--code`).
+  // token, matched whole (`--code-default`).
   const family = BY_LENGTH.find((f) =>
     f.prefix.endsWith('-') ? name.startsWith(f.prefix) && name.length > f.prefix.length : name === f.prefix,
   );

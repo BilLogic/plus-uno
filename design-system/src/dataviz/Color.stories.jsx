@@ -4,7 +4,7 @@ import { chartPalette } from '@/components';
 const { CATEGORICAL, BRAND, NEUTRAL, STATUS, SMART_SUBJECTS, SMART, HUES, sequentialRamp } = chartPalette;
 
 /**
- * Specimens for Data visualizations/Color. Every swatch paints a `--ds-chart-*`
+ * Specimens for Data visualizations/Color. Every swatch paints a `--chart-*`
  * token, so the page shows the categorical order the page resolves right now
  * and follows the toolbar's Color mode and Contrast switches.
  */
@@ -23,10 +23,10 @@ const grid = {
 const cssVar = (token) => (token.startsWith('--') ? `var(${token})` : token);
 
 const swatchBox = (token, extraStyle = {}) => ({
-    minHeight: 'var(--item-height-md)',
+    minHeight: 'var(--control-md)',
     borderRadius: 'var(--radius-lg)',
     background: cssVar(token),
-    boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)',
+    boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
     ...extraStyle,
 });
 
@@ -100,9 +100,9 @@ export const SmartColors = () => <Swatches items={SMART_SUBJECTS.map((s) => [SMA
 
 /** A stacked bar; `separator` toggles the `--ds-border-inverse` line between segments. */
 const bar = (segments, { separator = true } = {}) => (
-    <div style={{ display: 'flex', height: 'var(--item-height-md)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: 'var(--control-md)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
         {segments.map(([token, flex], i) => (
-            <span key={i} style={{ flex, background: cssVar(token), ...(separator && i > 0 ? { borderInlineStart: 'var(--border-default) solid var(--ds-border-inverse)' } : {}) }} />
+            <span key={i} style={{ flex, background: cssVar(token), ...(separator && i > 0 ? { borderInlineStart: 'var(--border-width-default) solid var(--ds-border-inverse)' } : {}) }} />
         ))}
     </div>
 );
@@ -111,11 +111,11 @@ const bar = (segments, { separator = true } = {}) => (
 export const SeparatorCompare = () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(304px, 1fr))', gap: 'var(--grid-gutter)' }}>
         <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-            {bar([['--ds-chart-categorical-3', 1], ['--ds-chart-categorical-3-hovered', 1]])}
+            {bar([['--chart-categorical-3', 1], ['--chart-categorical-3-hovered', 1]])}
             <figcaption style={label}>With the separator line, the seam between two close tones still reads.</figcaption>
         </figure>
         <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-            {bar([['--ds-chart-categorical-3', 1], ['--ds-chart-categorical-3-hovered', 1]], { separator: false })}
+            {bar([['--chart-categorical-3', 1], ['--chart-categorical-3-hovered', 1]], { separator: false })}
             <figcaption style={label}>Without it, the seam disappears for anyone who cannot tell the two tones apart.</figcaption>
         </figure>
     </div>

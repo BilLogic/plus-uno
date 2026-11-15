@@ -3,12 +3,12 @@
 // count, so the first count widens the button by its own width. Set at the
 // end of a toolbar, the right edge stays put and the button grows left.
 .plus-btn.plus-icon-btn--metric {
-    padding-inline: calc((var(--item-height-md) - var(--icon-md)) / 2 - var(--border-default));
+    padding-inline: calc((var(--control-md) - var(--icon-md)) / 2 - var(--border-width-default));
     // The gap rides inside the count, so it opens with it.
     gap: 0;
 
     &.plus-btn--compact {
-        padding-inline: calc((var(--item-height-sm) - var(--icon-md)) / 2 - var(--border-default));
+        padding-inline: calc((var(--control-sm) - var(--icon-md)) / 2 - var(--border-width-default));
     }
 }
 

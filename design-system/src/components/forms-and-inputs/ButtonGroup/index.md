@@ -95,7 +95,7 @@ Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup
 | Part | Token |
 | --- | --- |
 | Outer corners | 6: `--button-radius-default`. |
-| Seam overlap | 1: `--border-default`. |
+| Seam overlap | 1: `--border-width-default`. |
 
 ## Content guidelines
 
@@ -118,7 +118,7 @@ Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup
 
 ## Tokens touched
 
-`--border-default` · `--button-radius-default`
+`--border-width-default` · `--button-radius-default`
 
 From `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.scss`. Override these through the token layer, never with a literal.
 

@@ -174,13 +174,13 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `Notificat
 
 | Part | Token |
 | --- | --- |
-| Surface | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`, `--popover-pad`, `--popover-width-flag` |
+| Surface | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`, `--popup-pad`, `--flag-width` |
 | Title, description | `--heading-xsmall`, `--ds-text`; `--body-default`, `--ds-text-subtle` |
 | Icon | `--ds-icon-subtle`, `--ds-icon-information`, `--ds-icon-success`, `--ds-icon-warning`, `--ds-icon-danger`, at `--icon-md` |
 | Bold fill | `--ds-background-neutral-bold` (information), `-success-bold`, `-warning-bold`, `-danger-bold`, with `--ds-text-inverse` (`--ds-text-warning-inverse` on warning) |
 | Dismiss, toggle | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
-| Gaps | `--inline-lg` before Dismiss, `--inline-md`, `--stack-sm`; `--popover-stack-flag` between flags |
-| Group | `--layer-flag`, `--popover-gap-screen` |
+| Gaps | `--inline-lg` before Dismiss, `--inline-md`, `--stack-sm`; `--flag-stack` between flags |
+| Group | `--layer-flag`, `--popup-gap-screen` |
 
 ## Content guidelines
 
@@ -224,7 +224,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-focused-inverse` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-opacity-disabled` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--flag-min-height` · `--flag-offset` · `--flag-pad` · `--flag-radius-timer` · `--flag-timer-height` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-stack-flag` · `--popover-width-flag` · `--popup-radius` · `--radius-md` · `--stack-sm` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--border-width-default` · `--ds-background-danger-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-focused-inverse` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-opacity-disabled` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--flag-min-height` · `--flag-offset` · `--flag-pad` · `--flag-radius-timer` · `--flag-stack` · `--flag-timer-height` · `--flag-width` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--label-height-md` · `--layer-flag` · `--popup-gap-screen` · `--popup-pad` · `--popup-radius` · `--radius-md` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Flag/Flag.scss`. Override these through the token layer, never with a literal.
 

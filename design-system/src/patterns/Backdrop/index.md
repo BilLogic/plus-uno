@@ -2,7 +2,7 @@
 
 # Backdrop
 
-Also asked as: scrim.
+Also asked as: blanket, scrim.
 
 **Import:** `import { Backdrop } from '@/patterns';`
 
@@ -44,7 +44,7 @@ Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternModal` · 
 
 ## Tokens touched
 
-`--blanket-pad-x` · `--blanket-pad-y` · `--ds-blanket` · `--layer-blanket` · `--layer-modal` · `--plus-overlay-origin` · `--plus-overlay-screen` · `--plus-overlay-screen-height` · `--transform-origin`
+`--backdrop-pad-x` · `--backdrop-pad-y` · `--ds-backdrop` · `--layer-backdrop` · `--layer-modal` · `--plus-overlay-origin` · `--plus-overlay-screen` · `--plus-overlay-screen-height` · `--transform-origin`
 
 From `design-system/src/patterns/Backdrop/Backdrop.scss`. Override these through the token layer, never with a literal.
 

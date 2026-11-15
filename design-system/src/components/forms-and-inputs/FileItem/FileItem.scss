@@ -12,7 +12,7 @@
     max-height: var(--file-item-height);
     padding: 0 var(--pad-x-lg);
     background-color: var(--ds-surface);
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--radius-control-md);
     color: var(--ds-text);
     transition:
@@ -125,7 +125,7 @@
 
 // Multiple FileItem rows inside a list container sit in one bordered list with 1px dividers.
 :where(.plus-file-item-list, .plus-file-upload-files):has(> .plus-file-item) {
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--radius-control-md);
     background-color: var(--ds-surface);
     overflow: hidden;
@@ -136,6 +136,6 @@
     }
 
     > .plus-file-item + .plus-file-item {
-        border-top: var(--border-default) solid var(--ds-border);
+        border-top: var(--border-width-default) solid var(--ds-border);
     }
 }

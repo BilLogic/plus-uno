@@ -2,7 +2,7 @@
 
 # Code
 
-An inline chip for a short piece of code inside a sentence. It is a `code` element in the code typeface at 0.875 of the text around it, on a neutral fill, so it follows a paragraph or a heading without a size of its own.
+An inline snippet for a short piece of code inside a sentence. It is a `code` element in the code typeface at 0.875 of the text around it, on a neutral fill, so it follows a paragraph or a heading without a size of its own.
 
 **Import:** `import { Code } from '@/components';`
 
@@ -21,7 +21,7 @@ An inline chip for a short piece of code inside a sentence. It is a `code` eleme
 Use `Code` for a name, command, value or snippet that sits inside a sentence:
 a function, a file path, a flag, a token.
 
-The typeface and size come from the `--code` text style (`0.875em`, scaling
+The typeface and size come from the `--code-default` text style (`0.875em`, scaling
 with the surrounding text).
 
 ## Alternatives
@@ -83,7 +83,7 @@ Same group: `CodeBlock` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidd
 
 | Part | Token |
 | --- | --- |
-| Typeface, size | `--code` |
+| Typeface, size | `--code-default` |
 | Fill | `--ds-background-neutral` |
 | Ink | `--ds-text-code-default` |
 | Padding, radius | `--space-025`, `--radius-md` |
@@ -105,7 +105,7 @@ Same group: `CodeBlock` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidd
 
 ## Tokens touched
 
-`--code` · `--ds-background-neutral` · `--ds-text-code-default` · `--pad-x-xs` · `--radius-md`
+`--code-default` · `--ds-background-neutral` · `--ds-text-code-default` · `--pad-x-xs` · `--radius-md`
 
 From `design-system/src/components/text-and-data-display/Code/Code.scss`. Override these through the token layer, never with a literal.
 

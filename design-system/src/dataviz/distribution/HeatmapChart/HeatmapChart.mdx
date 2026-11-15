@@ -92,7 +92,7 @@ control the entrance transition.
 <RefTable
     head={['Ramp', 'Prop', 'Tokens and rules']}
     rows={[
-        ['Sequential (default)', <><C>hue</C> (default <C>blue</C>; supports blue, teal, green, lime, yellow, orange, red, magenta, purple, gray, brown)</>, <>Four even stops from lowest to highest: <C>{'--ds-background-accent-{hue}-subtler'}</C>, <C>{'--ds-chart-{hue}-bold'}</C>, <C>{'--ds-chart-{hue}-bolder'}</C>, <C>{'--ds-chart-{hue}-boldest'}</C> (darker in light mode, lighter in dark mode).</>],
+        ['Sequential (default)', <><C>hue</C> (default <C>blue</C>; supports blue, teal, green, lime, yellow, orange, red, magenta, purple, gray, brown)</>, <>Four even stops from lowest to highest: <C>{'--ds-background-accent-{hue}-subtler'}</C>, <C>{'--chart-{hue}-bold'}</C>, <C>{'--chart-{hue}-bolder'}</C>, <C>{'--chart-{hue}-boldest'}</C> (darker in light mode, lighter in dark mode).</>],
         ['Diverging', <><C>{'diverging={[low, high]}'}</C> (overrides <C>hue</C>)</>, <>Seven stops: low hue <C>boldest</C> down to <C>bold</C>, midpoint <C>--ds-background-accent-gray-subtler</C>, high hue <C>bold</C> up to <C>boldest</C>. Orange and blue stay distinct under color-vision deficiency; never pair red with green.</>],
     ]}
 />

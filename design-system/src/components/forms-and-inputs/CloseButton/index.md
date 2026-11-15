@@ -102,7 +102,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Fill, default tone | `--ds-background-neutral-subtle`, hovered and pressed steps. |
 | Glyph, inverse tone | `--ds-icon-inverse`; text `--ds-text-inverse`. |
-| Size | 32: `--item-height-md`. 24: `--item-height-sm`. Square. |
+| Size | 32: `--control-md`. 24: `--control-sm`. Square. |
 
 ## Content guidelines
 

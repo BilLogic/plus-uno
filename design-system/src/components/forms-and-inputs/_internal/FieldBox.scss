@@ -4,7 +4,7 @@
 /**
  * FieldBox — one look for every text-like field.
  *
- * One 1px border (`--border-default`) in `border.input` on one fill,
+ * One 1px border (`--border-width-default`) in `border.input` on one fill,
  * `background.input`. Hover turns the border `border.focused`. Focus draws
  * the focus ring, 2px (`--stroke-2`) and 2px off the box onto
  * the surface, in `border.focused`: the ring is never drawn inset. Hover and
@@ -14,7 +14,7 @@
  * is taken out of the padding here.
  *
  * A single-line field is 40 (`--height-250`) at the default spacing and 32
- * (`--item-height-md`) when compact, with its content centered and side
+ * (`--control-md`) when compact, with its content centered and side
  * padding 12. Its radius is a quarter of its height: 10 and 8. A button in a
  * slot is 32 in the 40 field and 24 in the 32 field, centered, 4 from the
  * box's edge. A multi-line field starts at 80 and grows; a field whose tags
@@ -34,7 +34,7 @@
     gap: var(--space-0625);
     width: 100%;
     box-sizing: border-box;
-    border: var(--border-default) solid var(--ds-border-input);
+    border: var(--border-width-default) solid var(--ds-border-input);
     border-radius: var(--radius-control-lg);
     background-color: var(--ds-background-input);
     color: var(--ds-text);
@@ -44,13 +44,13 @@
     // One height per spacing: the content centers in it, so nothing pads the
     // top and bottom.
     height: var(--height-250);
-    padding: 0 calc(var(--pad-x-md) - var(--border-default));
+    padding: 0 calc(var(--pad-x-md) - var(--border-width-default));
     font: var(--body-default);
 
     // Several lines (Text area): 80 at least, growing with its rows, and the
     // first line sits where a single-line field's text does.
     &--compact {
-        height: var(--item-height-md);
+        height: var(--control-md);
         border-radius: var(--radius-control-md);
     }
 
@@ -58,7 +58,7 @@
         align-items: flex-start;
         height: auto;
         min-height: var(--field-min-height-sm);
-        padding-block: calc(var(--pad-y-md) - var(--border-default));
+        padding-block: calc(var(--pad-y-md) - var(--border-width-default));
     }
 
     // Tags that wrap (Tag field, a multi Select): one row of tags is 32, and
@@ -66,11 +66,11 @@
     &--grow {
         height: auto;
         min-height: var(--height-250);
-        padding-block: calc((var(--height-250) - #{label.$tag-height}) / 2 - var(--border-default));
+        padding-block: calc((var(--height-250) - #{label.$tag-height}) / 2 - var(--border-width-default));
 
         &.plus-field--compact {
-            min-height: var(--item-height-md);
-            padding-block: calc((var(--item-height-md) - #{label.$tag-height}) / 2 - var(--border-default));
+            min-height: var(--control-md);
+            padding-block: calc((var(--control-md) - #{label.$tag-height}) / 2 - var(--border-width-default));
         }
     }
 }
@@ -99,13 +99,13 @@
 
     // A button in a slot is 32 in the 40 field and 24 in the 32 field.
     .plus-btn {
-        height: var(--item-height-md);
+        height: var(--control-md);
     }
 
     // Steppers and icon-only buttons are square.
     .plus-btn.plus-field-stepper,
     .plus-btn.plus-btn--icon-only {
-        width: var(--item-height-md);
+        width: var(--control-md);
         padding: 0;
     }
 }
@@ -113,12 +113,12 @@
 .plus-field--compact .plus-field__leading,
 .plus-field--compact .plus-field__trailing {
     .plus-btn {
-        height: var(--item-height-sm);
+        height: var(--control-sm);
     }
 
     .plus-btn.plus-field-stepper,
     .plus-btn.plus-btn--icon-only {
-        width: var(--item-height-sm);
+        width: var(--control-sm);
     }
 }
 

@@ -39,12 +39,12 @@
 
     &__icon {
         color: var(--ds-icon-subtle);
-        font-size: var(--font-size-200);
+        font-size: var(--type-size-200);
         line-height: 1;
     }
 
     &--compact &__icon {
-        font-size: var(--font-size-150);
+        font-size: var(--type-size-150);
     }
 
     &__text {
@@ -57,12 +57,12 @@
 
     &__header {
         margin: 0;
-        font: var(--heading-medium);
+        font: var(--heading-md);
         color: var(--ds-text);
     }
 
     &--compact &__header {
-        font: var(--heading-small);
+        font: var(--heading-sm);
     }
 
     &__description {

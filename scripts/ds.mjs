@@ -10,7 +10,7 @@
  *   ds guide [topic | rule id]       a guideline, a rule, or the orientation
  *   ds add <item…> [--dir d] [--overwrite] [--no-install]   copy registry items into your project (the packaged one)
  *   ds check [paths…]                check:ds-usage on those paths (the packaged one: your project, `.` by default)
- *   ds check --code '<jsx>' [--path f.jsx]
+ *   ds check --code-default '<jsx>' [--path f.jsx]
  *   --json                           the answer as data
  *
  * Exit 1 when check finds a fail-level escape or the subcommand is unknown; 2 when it has nothing to check (a missing path, or no files).
@@ -27,7 +27,7 @@ const USAGE = `usage: ds <find|get|tokens|guide|add|check> …
   guide [topic | rule id]     no argument: the orientation
   add <item…> [--dir d] [--overwrite] [--no-install]
                               copy registry items into your project; find names the item
-  check [paths…] | --code '<jsx>' [--path f.jsx]
+  check [paths…] | --code-default '<jsx>' [--path f.jsx]
   --json                      the answer as data`;
 
 /** `--name value` out of argv; the rest stay positional. */
@@ -39,7 +39,7 @@ function parse(argv) {
     if (a === '--json') flags.json = true;
     else if (a === '--overwrite') flags.overwrite = true;
     else if (a === '--no-install') flags.noInstall = true;
-    else if (['--section', '--code', '--path', '--dir'].includes(a)) flags[a.slice(2)] = argv[(i += 1)];
+    else if (['--section', '--code-default', '--path', '--dir'].includes(a)) flags[a.slice(2)] = argv[(i += 1)];
     else rest.push(a);
   }
   return { flags, rest };

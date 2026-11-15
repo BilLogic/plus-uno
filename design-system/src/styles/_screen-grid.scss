@@ -47,6 +47,6 @@
 /**
  * The tallest a layer gets: the screen less Overlay/pad-y above and below.
  * An inline Backdrop sets `--plus-overlay-max-height` from its stand-in screen;
- * otherwise it is the viewport's (`--blanket-max-height-modal`).
+ * otherwise it is the viewport's (`--backdrop-max-height-modal`).
  */
-$overlay-max-height: var(--plus-overlay-max-height, var(--blanket-max-height-modal));
+$overlay-max-height: var(--plus-overlay-max-height, var(--backdrop-max-height-modal));

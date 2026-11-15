@@ -139,7 +139,7 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 | `--ds-surface-raised-hovered`, `--ds-surface-raised-pressed` | color | A clickable card while hovered and pressed. |
 | `--ds-surface-overlay`, `--ds-shadow-overlay` | color pair | A dragged card, and the hover lift's shadow. |
 | `--heading-xsmall`, `--body-default` | type | The regular title and the description. |
-| `--heading-medium` | type | The title beside a half-width side image. |
+| `--heading-md` | type | The title beside a half-width side image. |
 | `--ds-text`, `--ds-text-subtle` | color | The title and the description. |
 
 ## Content guidelines
@@ -187,7 +187,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-compact` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--heading-medium`
+`--body-default` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-compact` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--heading-md`
 
 From `design-system/src/patterns/PatternCard/PatternCard.scss`. Override these through the token layer, never with a literal.
 

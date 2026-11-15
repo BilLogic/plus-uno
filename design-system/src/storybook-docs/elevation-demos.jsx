@@ -50,7 +50,7 @@ export const BEHAVIORS = [
     { id: 'marks', behavior: 'Marks one object', level: 'raised', layer: null, uses: 'Card, Carousel slide, Range thumb' },
     { id: 'stays', behavior: 'Stays put while content scrolls', level: 'overflow', layer: '--layer-card', uses: 'Sticky table header and column, with a border first' },
     { id: 'floats', behavior: 'Floats, page usable', level: 'overlay', layer: ['--layer-navigation', '--layer-popup', '--layer-flag', '--layer-spotlight'], uses: 'Floating Sidebar, floating Panel, Popup types (Popup, DropdownMenu, a Select list), Inline edit, Flag, Spotlight, a dragged Card' },
-    { id: 'blocks', behavior: 'Blocks the page', level: 'blocking', layer: '--layer-modal', uses: 'Modal only, on the Backdrop (--layer-blanket)' },
+    { id: 'blocks', behavior: 'Blocks the page', level: 'blocking', layer: '--layer-modal', uses: 'Modal only, on the Backdrop (--layer-backdrop)' },
     { id: 'replaces', behavior: 'Replaces the page', level: 'default', layer: '--layer-dialog', uses: 'Frame · focused, AiChat full screen' },
     { id: 'labels', behavior: 'Labels a control', level: null, layer: '--layer-tooltip', uses: 'Tooltip, with no shadow' },
 ];
@@ -61,7 +61,7 @@ export const LAYERS = [
     { token: '--layer-navigation', who: 'The floating Sidebar and Panel' },
     { token: '--layer-dialog', who: 'A page that replaces the page: Frame · focused, AiChat full screen' },
     { token: '--layer-popup', who: 'Popups, menus, a Select list' },
-    { token: '--layer-blanket', who: 'The Backdrop' },
+    { token: '--layer-backdrop', who: 'The Backdrop' },
     { token: '--layer-modal', who: 'The Modal, above its Backdrop' },
     { token: '--layer-flag', who: 'Flags, above a Modal' },
     { token: '--layer-spotlight', who: 'Onboarding spotlights' },
@@ -174,7 +174,7 @@ const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' };
 const label = { font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' };
 const small = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
-const codeText = { font: 'var(--code)', color: 'var(--ds-text)', wordBreak: 'break-word' };
+const codeText = { font: 'var(--code-default)', color: 'var(--ds-text)', wordBreak: 'break-word' };
 /** A value that never breaks mid-value: a narrow table scrolls in its own container instead. */
 const valueText = { ...codeText, whiteSpace: 'nowrap', wordBreak: 'normal' };
 const well = {
@@ -304,7 +304,7 @@ const PLATES = [
     },
     {
         // The Backdrop is the whole plate: the blanket, ringed as the subject.
-        id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-blanket', ground: PAINT.backdrop,
+        id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-backdrop', ground: PAINT.backdrop,
         subject: { x: 0, y: 0, w: PLATE.w, h: PLATE.h },
         draw: (s) => <Hairline {...s} corner="window" stroke={PAINT.accent} />,
     },
@@ -495,7 +495,7 @@ export const ExplodedStack = () => {
                     style={{
                         ...resetButton,
                         color: on ? 'var(--ds-text-brand)' : 'var(--ds-text)',
-                        outline: focusRing === plate.id ? 'var(--border-focused) solid var(--ds-border-focused)' : 'none',
+                        outline: focusRing === plate.id ? 'var(--border-width-focused) solid var(--ds-border-focused)' : 'none',
                         outlineOffset: 'var(--stroke-1)',
                     }}
                 >
@@ -544,7 +544,7 @@ export const LevelTiles = () => (
                     style={{
                         padding: 'var(--card-pad-compact)',
                         borderRadius: 'var(--card-radius)',
-                        background: onBackdrop ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : l.id === 'sunken' ? 'var(--ds-surface)' : 'var(--ds-surface-sunken)',
+                        background: onBackdrop ? 'linear-gradient(var(--ds-backdrop), var(--ds-backdrop)), var(--ds-surface)' : l.id === 'sunken' ? 'var(--ds-surface)' : 'var(--ds-surface-sunken)',
                     }}
                 >
                     <div
@@ -679,7 +679,7 @@ export const BehaviorGuide = () => {
 /* -------------------------------------------------------- shadow anatomy */
 
 const SlotValues = ({ layer }) => (
-    <span style={{ ...row, gap: 'var(--inline-sm)', font: 'var(--code)', color: 'var(--ds-text)' }}>
+    <span style={{ ...row, gap: 'var(--inline-sm)', font: 'var(--code-default)', color: 'var(--ds-text)' }}>
         <span>offset {px(layer.x)} {px(layer.y)}</span>
         <span>blur {px(layer.blur)}</span>
         <span>spread {px(layer.spread)}</span>
@@ -693,7 +693,7 @@ const SlotValues = ({ layer }) => (
                     borderRadius: 'var(--radius-sm)',
                     // docs-literal: the swatch shows an ink read from a --ds-shadow-* token.
                     background: `rgb(${layer.color.r} ${layer.color.g} ${layer.color.b})`,
-                    boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)',
+                    boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
                 }}
             />
             ink {alphaPct(layer.color.a)}
@@ -728,7 +728,7 @@ export const ShadowComposer = () => {
                     ref={ground}
                     data-color-mode={mode}
                     {...(contrast ? { 'data-contrast-mode': contrast } : {})}
-                    data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center', minHeight: 'calc(var(--image-xl) * 3.5)', background: levelId === 'blocking' ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : 'var(--ds-surface)' }}
+                    data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center', minHeight: 'calc(var(--image-xl) * 3.5)', background: levelId === 'blocking' ? 'linear-gradient(var(--ds-backdrop), var(--ds-backdrop)), var(--ds-surface)' : 'var(--ds-surface)' }}
                 >
                     <div
                         data-testid="composer-surface"
@@ -767,9 +767,9 @@ export const ShadowComposer = () => {
 };
 
 const CHART_TONES = {
-    raised: 'var(--ds-chart-blue-bold)',
-    overlay: 'var(--ds-chart-blue-bolder)',
-    blocking: 'var(--ds-chart-blue-boldest)',
+    raised: 'var(--chart-blue-bold)',
+    overlay: 'var(--chart-blue-bolder)',
+    blocking: 'var(--chart-blue-boldest)',
 };
 
 /**
@@ -804,7 +804,7 @@ export const CrossSection = () => {
                 <ul aria-label="Levels" style={{ ...row, margin: 0, padding: 0, listStyle: 'none' }}>
                     {series.map((s) => (
                         <li key={s.level.id} style={{ ...row, gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-                            <span aria-hidden="true" style={{ width: 'var(--image-xs)', height: 'calc(var(--border-default) * 2)', background: CHART_TONES[s.level.id] }} />
+                            <span aria-hidden="true" style={{ width: 'var(--image-xs)', height: 'calc(var(--border-width-default) * 2)', background: CHART_TONES[s.level.id] }} />
                             {s.level.name} <span style={small}>reaches {Math.round(s.reach)}</span>
                         </li>
                     ))}
@@ -923,7 +923,7 @@ const LadderPane = ({ mode }) => {
                                 height: `calc(var(--image-md) + ${i} * var(--image-xs))`,
                                 borderRadius: 'var(--radius-md)',
                                 background: `var(${l.surface})`,
-                                boxShadow: l.shadow ? `var(${l.shadow})` : 'inset 0 0 0 var(--border-default) var(--ds-border)',
+                                boxShadow: l.shadow ? `var(${l.shadow})` : 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
                             }}
                         />
                         <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{l.name}</strong>
@@ -1026,7 +1026,7 @@ export const ClipDemo = () => {
                 <div
                     style={{
                         position: 'relative',
-                        width: 'min(100%, var(--popover-width-sm))',
+                        width: 'min(100%, var(--popup-width-sm))',
                         clipPath: `inset(calc(-1 * ${reachLen}) calc(-1 * ${reachLen}) calc(${(1 - t) * 100}% - ${t} * ${reachLen}) calc(-1 * ${reachLen}))`,
                     }}
                 >
@@ -1041,8 +1041,8 @@ export const ClipDemo = () => {
                     style={{
                         position: 'absolute',
                         insetBlock: 0,
-                        insetInline: `calc(50% - min(50%, var(--popover-width-sm) / 2) - ${reachLen})`,
-                        border: 'var(--border-default) dashed var(--ds-border-bold)',
+                        insetInline: `calc(50% - min(50%, var(--popup-width-sm) / 2) - ${reachLen})`,
+                        border: 'var(--border-width-default) dashed var(--ds-border-bold)',
                         borderRadius: 'var(--radius-md)',
                         pointerEvents: 'none',
                     }}

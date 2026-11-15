@@ -37,7 +37,7 @@ import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 /** A token table small enough to hold in your head, shaped like the real one. */
 const defs = new Map([
   ['--ds-border', { value: '#bec8ca', file: 'color/_semantic.scss' }],
-  ['--ds-blanket', { value: 'rgba(0, 0, 0, 0.38)', file: 'color/_semantic.scss' }],
+  ['--ds-backdrop', { value: 'rgba(0, 0, 0, 0.38)', file: 'color/_semantic.scss' }],
   ['--space-100', { value: '16px', file: '_scales.scss' }],
   ['--pad-x-lg', { value: 'var(--space-100)', file: 'ladder/_semantics.scss' }],
   ['--stack-lg', { value: '12px', file: 'ladder/_semantics.scss' }],
@@ -45,7 +45,7 @@ const defs = new Map([
   ['--size-page-full', { value: '100%', file: '_layout-ish.scss' }],
   ['--size-nothing', { value: '0px', file: '_scales.scss' }],
   ['--size-breakpoint-ish', { value: '768px', file: '_layout-ish.scss' }],
-  ['--font-size-100', { value: '1rem', file: '_type.scss' }],
+  ['--type-size-100', { value: '1rem', file: '_type.scss' }],
   // A family this check does not offer, holding a value the docs might use.
   ['--frame-sidebar-width-nav', { value: '164px', file: 'ladder/_patterns.scss' }],
 ]);
@@ -88,7 +88,7 @@ test('1b. shorthand hex is the same color — `#BCA` is `#bbccaa`, and case does
 test('1c. `rgba()` is compared by value, not by spelling', () => {
   const found = findings(rule('  background: rgba(0,0,0,.38);'), index);
   assert.equal(found.length, 1);
-  assert.deepEqual(found[0].tokens, ['--ds-blanket']);
+  assert.deepEqual(found[0].tokens, ['--ds-backdrop']);
 });
 
 test('2. a hand-planted px with a token equivalent is caught', () => {
@@ -114,12 +114,12 @@ test('2d. every literal in a shorthand is reported, not just the first', () => {
 });
 
 test('3. a `font-size` is never offered a spacing token, and vice versa', () => {
-  // `--font-size-100` is 16px and so is `--pad-x-lg`. Offering a
+  // `--type-size-100` is 16px and so is `--pad-x-lg`. Offering a
   // spacing step for a type size is the noise that gets a report ignored.
   const [size] = findings(rule('  font-size: 16px;'), index);
-  assert.deepEqual(size.tokens, ['--font-size-100']);
+  assert.deepEqual(size.tokens, ['--type-size-100']);
   const [gap] = findings(rule('  gap: 16px;'), index);
-  assert.ok(!gap.tokens.includes('--font-size-100'));
+  assert.ok(!gap.tokens.includes('--type-size-100'));
 });
 
 test('4. ALLOWANCE — zero, in any unit', () => {
@@ -305,7 +305,7 @@ test('chrome 2. a pre-ladder token name is caught, in a stylesheet and in a comp
 test('chrome 2b. green twin: the current vocabulary, and a definition that is not a use', () => {
   const clean =
     '@theme inline { --color-card: var(--card); }\n' +
-    '.a { color: var(--ds-text); gap: var(--section-stack-md); font-size: var(--font-size-100); font-size: var(--font-size-display9); font-family: var(--type-family-body); }';
+    '.a { color: var(--ds-text); gap: var(--section-stack-md); font-size: var(--type-size-100); font-size: var(--type-size-display9); font-family: var(--type-family-body); }';
   assert.deepEqual(chromeFindings(clean, { css: true }), []);
 });
 
@@ -371,7 +371,7 @@ test('kit 1. a paint, stroke width or corner radius that is not a token is caugh
 
 test('kit 1b. green twin: tokens, none and currentColor pass in the kit', () => {
   const jsx = [
-    '<rect fill="var(--ds-surface)" stroke="var(--ds-border)" style={{ rx: "var(--radius-025)" }} />',
+    '<rect fill="var(--ds-surface)" stroke="var(--ds-border)" style={{ rx: "var(--space-025)" }} />',
     '<rect fill="none" stroke="var(--ds-border-bold)" strokeWidth="var(--stroke-1)" />',
     '<path fill={fill} stroke={stroke} />',
   ].join('\n');

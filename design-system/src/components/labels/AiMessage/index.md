@@ -78,8 +78,8 @@ Don't: A finished answer with no way to rate it.
   screen reader waits for the finished text. A typed-out reply carries its full
   text for assistive technology and hides the character-by-character copy.
 - **Announced indicator.** The typing indicator is a status named "AI is writing";
-  its dots are hidden from assistive technology.
-- **Reduced motion.** The caret and dots stop animating, and typed-out text
+  its visual marks are hidden from assistive technology.
+- **Reduced motion.** The caret and progress indicator stop animating, and typed-out text
   shows at once.
 
 ## Related
@@ -95,7 +95,7 @@ Same group: `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 1. **AI icon.** The small AI icon at 16, named "AI", centered on the first line, so no answer reads as a person's.
 2. **Text.** The body style, keeping the reply's line breaks. With `parts`, text parts and other parts in order; `renderPart` draws a part that is not text.
 3. **Caret.** Streaming only: a thin bar after the last character, blinking.
-4. **Typing indicator.** Thinking only: three pulsing dots in place of the text.
+4. **Progress indicator.** Thinking only: three pulsing marks in place of the text.
 5. **Sources** (optional). Complete only: a counted "Sources" toggle, closed by default, with linked titles and types inside.
 6. **Feedback** (optional). Complete only, with `onFeedback`: thumbs up and down and a quiet thanks beside them.
 
@@ -106,7 +106,7 @@ Same group: `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 | Complete | The text, then the sources and the thumbs when they are passed. With `typeOut`, the text types out character by character (`TypingText` takes `speed`, in milliseconds per character, and `onComplete`). `linkTarget` sets where links open, such as `_top` from inside a frame, and `resolveHref` rewrites a link's address. |
 | Streaming | A caret follows the last character, and the message carries `aria-busy`. No sources and no thumbs yet. |
 | Thinking | The typing indicator, a status named "AI is writing", in place of the text. |
-| Reduced motion | The caret and dots stop animating, and typed-out text shows at once. |
+| Reduced motion | The caret and progress indicator stop animating, and typed-out text shows at once. |
 
 ### Tokens
 
@@ -115,8 +115,8 @@ Same group: `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 | Text | `--body-default` in `--ds-text`. |
 | Icon to text | `--inline-md`; the icon centers on the first line against `--icon-md`. |
 | Between parts | `--stack-md`. |
-| Typing dots | `--ds-text-subtle`, `--radius-full`, `--stack-sm` apart. |
-| Caret and dots motion | `--ds-motion-loop`, with the dots offset by a quarter and a half cycle. |
+| Progress indicator | `--ds-text-subtle`, `--radius-full`, `--stack-sm` apart. |
+| Caret and progress indicator motion | `--ds-motion-loop`, with its three marks offset by a quarter and a half cycle. |
 | Sources | Heading `--heading-xxsmall` in `--ds-text-subtle`; type `--body-small` in `--ds-text-subtle`; rows `--stack-sm` apart. |
 | Feedback | Thanks `--body-small` in `--ds-text-subtle`; buttons `--inline-sm` apart. |
 
@@ -154,7 +154,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--code` · `--ds-background-neutral` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--ds-text` · `--ds-text-subtle` · `--heading-xsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--code-default` · `--ds-background-neutral` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--ds-text` · `--ds-text-subtle` · `--heading-xsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
 

@@ -105,10 +105,10 @@ export const Overview = {
         await expect(style.borderTopLeftRadius, 'Modal radius is 16').toBe('16px');
         await expect(getComputedStyle(modal.querySelector('.plus-pattern-modal-footer')).borderBottomLeftRadius, 'footer inner corners are square').toBe('0px');
         const overlayStyle = getComputedStyle(overlay);
-        await expect(overlayStyle.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--blanket-pad-x')}px`);
-        await expect(overlayStyle.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);
+        await expect(overlayStyle.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--backdrop-pad-x')}px`);
+        await expect(overlayStyle.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--backdrop-pad-y')}px`);
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
-            await expect(getComputedStyle(overlay).backgroundColor, `backdrop fill (${mode})`).toBe(token('--ds-blanket'));
+            await expect(getComputedStyle(overlay).backgroundColor, `backdrop fill (${mode})`).toBe(token('--ds-backdrop'));
             await expect(getComputedStyle(modal).backgroundColor, `surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
             await expect(getComputedStyle(modal).boxShadow, `shadow overlay (${mode})`).toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-overlay)'));
         });
@@ -164,7 +164,7 @@ export const Heights = {
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const [short, long, fill] = dialogs(canvasElement);
-        const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--blanket-pad-y');
+        const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--backdrop-pad-y');
         await expect(short.getBoundingClientRect().height, 'a short hug modal hugs').toBeLessThan(cap);
         await expect(long.getBoundingClientRect().height, 'a long hug modal stops at the cap').toBeCloseTo(cap, 0);
         await expect(fill.getBoundingClientRect().height, 'fill sits at the cap').toBeCloseTo(cap, 0);
@@ -238,7 +238,7 @@ export const Tabs = {
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const [hug, fill] = dialogs(canvasElement);
-        const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--blanket-pad-y');
+        const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--backdrop-pad-y');
         const tabsOf = (modal) => within(modal).getAllByRole('tab');
         const panelOf = (modal) => within(modal).getByRole('tabpanel');
         const selectedOf = (modal) => tabsOf(modal).find((tab) => tab.getAttribute('aria-selected') === 'true');
@@ -326,7 +326,7 @@ export const CustomHeader = {
                 aria-label="Reschedule"
                 header={(
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <strong style={{ font: 'var(--heading-medium)' }}>Reschedule</strong>
+                        <strong style={{ font: 'var(--heading-md)' }}>Reschedule</strong>
                         <Button text="Help" spacing="compact" onClick={() => {}} />
                     </div>
                 )}
@@ -364,7 +364,7 @@ export const Divider = {
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
             for (const rule of rules) {
                 await expect(getComputedStyle(rule).backgroundColor, `rule color (${mode})`).toBe(token('--ds-border'));
-                await expect(getComputedStyle(rule).height, 'rule is one border wide').toBe(`${tokenLength(canvasElement, '--border-default')}px`);
+                await expect(getComputedStyle(rule).height, 'rule is one border wide').toBe(`${tokenLength(canvasElement, '--border-width-default')}px`);
             }
         });
     },

@@ -207,7 +207,7 @@ export const Interactive = (args) => {
                         marginTop: 'var(--space-100)',
                         padding: 'var(--space-075)',
                         backgroundColor: 'var(--ds-surface-container)',
-                        borderRadius: 'var(--radius-025)',
+                        borderRadius: 'var(--radius-md)',
                     }}
                 >
                     <p className="body-default" style={{ margin: 0 }}>

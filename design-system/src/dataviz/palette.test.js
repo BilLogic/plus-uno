@@ -18,12 +18,13 @@ import {
     sequentialRamp,
     seriesColor,
 } from './palette';
+import { dsName } from '../../../scripts/lib/color/emit.mjs';
 import { contrastRatio, inkFor } from './colorMode';
 
 const semantic = readFileSync(resolve(__dirname, '../tokens/color/_semantic.scss'), 'utf8');
-const defined = new Set(semantic.match(/--ds-[\w-]+(?=:)/g));
-const css = (token) => `--ds-${token.replace(/^color\./, '').replaceAll('.', '-')}`;
-const named = (value) => value.match(/^var\((--ds-[\w-]+)\)$/)[1];
+const defined = new Set(semantic.match(/--[\w-]+(?=:)/g));
+const css = dsName;
+const named = (value) => value.match(/^var\((--[\w-]+)\)$/)[1];
 
 describe('the data-viz palette', () => {
     it('names only tokens the generator emits', () => {
@@ -49,9 +50,9 @@ describe('the data-viz palette', () => {
 
     it('runs a diverging ramp from one hue at its strongest, through the midpoint, to the other', () => {
         expect(divergingRamp()).toEqual([
-            '--ds-chart-orange-boldest', '--ds-chart-orange-bolder', '--ds-chart-orange-bold',
+            '--chart-orange-boldest', '--chart-orange-bolder', '--chart-orange-bold',
             DIVERGING_MIDPOINT,
-            '--ds-chart-blue-bold', '--ds-chart-blue-bolder', '--ds-chart-blue-boldest',
+            '--chart-blue-bold', '--chart-blue-bolder', '--chart-blue-boldest',
         ]);
         expect(() => divergingRamp('blue', 'blue')).toThrow();
         expect(() => sequentialRamp('lagoon')).toThrow();

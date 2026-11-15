@@ -6,21 +6,21 @@
 
 :root {
     /* Font size primitives (hidden in Figma; named by rem × 100) */
-    --font-size-075: 0.75rem;
-    --font-size-0875: 0.875rem;
-    --font-size-100: 1rem;
-    --font-size-125: 1.25rem;
-    --font-size-150: 1.5rem;
-    --font-size-175: 1.75rem;
-    --font-size-200: 2rem;
+    --type-size-075: 0.75rem;
+    --type-size-0875: 0.875rem;
+    --type-size-100: 1rem;
+    --type-size-125: 1.25rem;
+    --type-size-150: 1.5rem;
+    --type-size-175: 1.75rem;
+    --type-size-200: 2rem;
 
     /* Line height primitives (hidden in Figma; named by rem × 100) */
-    --line-height-100: 1rem;
-    --line-height-125: 1.25rem;
-    --line-height-150: 1.5rem;
-    --line-height-175: 1.75rem;
-    --line-height-200: 2rem;
-    --line-height-225: 2.25rem;
+    --type-line-height-100: 1rem;
+    --type-line-height-125: 1.25rem;
+    --type-line-height-150: 1.5rem;
+    --type-line-height-175: 1.75rem;
+    --type-line-height-200: 2rem;
+    --type-line-height-225: 2.25rem;
 
     /* Families */
     --type-family-heading: "Noto Sans", "Noto Sans Fallback", sans-serif;
@@ -41,33 +41,33 @@
     --type-tracking-none: 0em;
 
     /* Text styles */
-    --heading-xxlarge-tracking: var(--type-tracking-tighter);
-    --heading-xxlarge: var(--type-weight-medium) var(--font-size-200) / var(--line-height-225) var(--type-family-heading-serif);
-    --heading-xlarge-tracking: var(--type-tracking-tight);
-    --heading-xlarge: var(--type-weight-medium) var(--font-size-175) / var(--line-height-200) var(--type-family-heading-serif);
-    --heading-large-tracking: var(--type-tracking-tight);
-    --heading-large: var(--type-weight-medium) var(--font-size-150) / var(--line-height-175) var(--type-family-heading-serif);
-    --heading-medium: var(--type-weight-medium) var(--font-size-125) / var(--line-height-150) var(--type-family-heading-serif);
-    --heading-small: var(--type-weight-semibold) var(--font-size-100) / var(--line-height-125) var(--type-family-heading);
-    --heading-xsmall: var(--type-weight-semibold) var(--font-size-0875) / var(--line-height-125) var(--type-family-heading);
-    --heading-xxsmall: var(--type-weight-semibold) var(--font-size-075) / var(--line-height-100) var(--type-family-heading);
-    --body-large: var(--type-weight-regular) var(--font-size-100) / var(--line-height-150) var(--type-family-body);
-    --body-default: var(--type-weight-regular) var(--font-size-0875) / var(--line-height-125) var(--type-family-body);
-    --body-small: var(--type-weight-regular) var(--font-size-075) / var(--line-height-100) var(--type-family-body);
-    --metric-large: var(--type-weight-semibold) var(--font-size-175) / var(--line-height-200) var(--type-family-heading);
-    --metric-medium: var(--type-weight-semibold) var(--font-size-150) / var(--line-height-175) var(--type-family-heading);
-    --metric-small: var(--type-weight-semibold) var(--font-size-100) / var(--line-height-125) var(--type-family-heading);
+    --heading-xxl-tracking: var(--type-tracking-tighter);
+    --heading-xxl: var(--type-weight-medium) var(--type-size-200) / var(--type-line-height-225) var(--type-family-heading-serif);
+    --heading-xl-tracking: var(--type-tracking-tight);
+    --heading-xl: var(--type-weight-medium) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading-serif);
+    --heading-lg-tracking: var(--type-tracking-tight);
+    --heading-lg: var(--type-weight-medium) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading-serif);
+    --heading-md: var(--type-weight-medium) var(--type-size-125) / var(--type-line-height-150) var(--type-family-heading-serif);
+    --heading-sm: var(--type-weight-semibold) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
+    --heading-xsmall: var(--type-weight-semibold) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-heading);
+    --heading-xxsmall: var(--type-weight-semibold) var(--type-size-075) / var(--type-line-height-100) var(--type-family-heading);
+    --body-large: var(--type-weight-regular) var(--type-size-100) / var(--type-line-height-150) var(--type-family-body);
+    --body-default: var(--type-weight-regular) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-body);
+    --body-small: var(--type-weight-regular) var(--type-size-075) / var(--type-line-height-100) var(--type-family-body);
+    --metric-large: var(--type-weight-semibold) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading);
+    --metric-medium: var(--type-weight-semibold) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading);
+    --metric-small: var(--type-weight-semibold) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
 
     /* Code only (CODE_ONLY_TYPE_STYLES) */
-    --code: var(--type-weight-regular) 0.875em / 1 var(--type-family-code);
+    --code-default: var(--type-weight-regular) 0.875em / 1 var(--type-family-code);
 }
 
 /* One class per text style, for markup with no stylesheet of its own: <p className="body-default">. */
-.heading-xxlarge { font: var(--heading-xxlarge); letter-spacing: var(--heading-xxlarge-tracking); }
-.heading-xlarge { font: var(--heading-xlarge); letter-spacing: var(--heading-xlarge-tracking); }
-.heading-large { font: var(--heading-large); letter-spacing: var(--heading-large-tracking); }
-.heading-medium { font: var(--heading-medium); }
-.heading-small { font: var(--heading-small); }
+.heading-xxl { font: var(--heading-xxl); letter-spacing: var(--heading-xxl-tracking); }
+.heading-xl { font: var(--heading-xl); letter-spacing: var(--heading-xl-tracking); }
+.heading-lg { font: var(--heading-lg); letter-spacing: var(--heading-lg-tracking); }
+.heading-md { font: var(--heading-md); }
+.heading-sm { font: var(--heading-sm); }
 .heading-xsmall { font: var(--heading-xsmall); }
 .heading-xxsmall { font: var(--heading-xxsmall); }
 .body-large { font: var(--body-large); }

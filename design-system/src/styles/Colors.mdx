@@ -197,17 +197,17 @@ Every foreground token pairs with a ground that clears WCAG AA across all four m
 
 <FoundationSection title="Data-viz color">
 
-Charts use `--ds-chart-*` tokens (`chartPalette` from `@/components`). Never reach for an accent hue or a UI role token to draw a series. Color is the one foundation with chart rules of its own; charts take spacing, radius, elevation, stroke, type, layers and motion from the same component tokens as the rest of the system.
+Charts use `--chart-*` tokens (`chartPalette` from `@/components`). Never reach for an accent hue or a UI role token to draw a series. Color is the one foundation with chart rules of its own; charts take spacing, radius, elevation, stroke, type, layers and motion from the same component tokens as the rest of the system.
 
 <RefTable
     head={['Job', 'What it encodes', 'Tokens']}
     rows={[
-        ['One series', 'Single measure', <><C>--ds-chart-brand</C>; reference line takes <C>--ds-chart-neutral</C></>],
-        ['Categorical', 'Distinct series', <><C>--ds-chart-categorical-1</C> to <C>-8</C>, in order</>],
+        ['One series', 'Single measure', <><C>--chart-brand</C>; reference line takes <C>--chart-neutral</C></>],
+        ['Categorical', 'Distinct series', <><C>--chart-categorical-1</C> to <C>-8</C>, in order</>],
         ['Sequential', 'Magnitude', <>One hue from <C>subtler</C> to <C>bold</C>, <C>bolder</C>, <C>boldest</C> (darkest = largest)</>],
         ['Diverging', 'Direction from a baseline', <>Two hues around <C>--ds-background-accent-gray-subtler</C> (orange and blue by default; never red and green)</>],
-        ['Status', 'On track, at risk, off track', <><C>--ds-chart-success</C>, <C>-warning</C>, <C>-danger</C>, <C>-information</C>, <C>-discovery</C> (plus <C>-bold</C> for the more extreme level)</>],
-        ['SMART subject', 'SMART area', <C>--ds-chart-smart-&lt;subject&gt;</C>],
+        ['Status', 'On track, at risk, off track', <><C>--chart-success</C>, <C>-warning</C>, <C>-danger</C>, <C>-information</C>, <C>-discovery</C> (plus <C>-bold</C> for the more extreme level)</>],
+        ['SMART subject', 'SMART area', <C>--chart-smart-&lt;subject&gt;</C>],
     ]}
 />
 
@@ -237,7 +237,7 @@ Assign series in slot order without skipping.
 
 Three rules govern this sequence:
 
-- **Brand leads:** slot 1 is lagoon (`--ds-chart-brand`), so a one-series chart and the first series of a multi-series chart share their lead color.
+- **Brand leads:** slot 1 is lagoon (`--chart-brand`), so a one-series chart and the first series of a multi-series chart share their lead color.
 - **Neighbors alternate light and dark steps:** slot 2 (orange-800) sits between slot 1 (lagoon-600) and slot 3 (blue-500), alternating through slot 6 so adjacent series remain distinct in grayscale and under color-vision deficiency.
 - **Hues spread across the wheel:** lagoon, orange, blue, magenta, lime and purple never place two adjacent slots in the same hue family. Yellow (warning), red (danger) and teal (too close to brand) stay out; lime and purple-500 double as success and discovery, which is why categorical and status colors never mix.
 - **Overflow and dark mode:** slots 7 and 8 reprise orange and blue for overflow past six series. Dark mode steps one lighter except blue (3) and orange (7), which hold at 500 to preserve lightness alternation, and purple (6), which holds at 700 so it does not crowd its neighbors.
@@ -247,7 +247,7 @@ Three rules govern this sequence:
 <FoundationSubsection title="Separators, ramps, SMART subjects and hover">
 
 - **Separators:** keep a gap or `--ds-border-inverse` line where marks touch (stacked bars, histogram bins, waterfall steps). Lightness alternation identifies the series; the separator marks the boundary.
-- **Sequential and diverging ramps:** sequential runs `--ds-background-accent-<hue>-subtler` through `--ds-chart-<hue>-bold`, `-bolder` and `-boldest` (strongest tone = largest value). Diverging runs two hues around `--ds-background-accent-gray-subtler` (orange and blue by default; never red and green).
+- **Sequential and diverging ramps:** sequential runs `--ds-background-accent-<hue>-subtler` through `--chart-<hue>-bold`, `-bolder` and `-boldest` (strongest tone = largest value). Diverging runs two hues around `--ds-background-accent-gray-subtler` (orange and blue by default; never red and green).
 - **SMART subjects:** each subject uses the emphasis that keeps S-M-A-R-T neighbors apart: social-emotional orange (`bold`), mastering content teal (`boldest`), advocacy lime (`bold`), relationship magenta (`boldest`), technology tools brown (`bold`). Label directly or keep the legend beside the chart.
 - **Labels and hover:** place labels beside marks; when a label must sit on a fill (heatmap cell, stacked segment), use `--ds-text` or `--ds-text-inverse`. Hovered marks take their `-hovered` token, and unselected series fade with `--ds-opacity-disabled`.
 
@@ -266,7 +266,7 @@ Students by grade in the tutoring cohort.
 <DoDont>
 <Do caption="Biggest at the top, darkest tone on the biggest value.">
 <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-    {[['Grade 9', 48, '--ds-chart-blue-boldest'], ['Grade 10', 36, '--ds-chart-blue-bolder'], ['Grade 11', 27, '--ds-chart-blue-bold'], ['Grade 12', 15, '--ds-chart-blue-subtle']].map(([label, n, tone]) => (
+    {[['Grade 9', 48, '--chart-blue-boldest'], ['Grade 10', 36, '--chart-blue-bolder'], ['Grade 11', 27, '--chart-blue-bold'], ['Grade 12', 15, '--chart-blue-subtle']].map(([label, n, tone]) => (
         <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-small)' }}>
             <span>{label}</span>
             <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: `var(${tone})` }} />
@@ -279,7 +279,7 @@ Students by grade in the tutoring cohort.
     {[['Grade 11', 27], ['Grade 9', 48], ['Grade 12', 15], ['Grade 10', 36]].map(([label, n]) => (
         <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-small)' }}>
             <span>{label}</span>
-            <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-neutral)' }} />
+            <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: 'var(--chart-neutral)' }} />
         </li>
     ))}
 </ul>
@@ -295,15 +295,15 @@ Attendance for one class against a 90% target.
 <DoDont>
 <Do caption="A green tick at 90 and a green outline on the track.">
 <div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended</div>
-<div style={{ position: 'relative', height: 'var(--icon-md)', borderRadius: 'var(--radius-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-chart-success)' }}>
-    <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-brand)' }} />
-    <span style={{ position: 'absolute', insetBlock: '-25%', insetInlineStart: '90%', width: 'var(--stroke-2)', background: 'var(--ds-chart-success-bold)' }} />
+<div style={{ position: 'relative', height: 'var(--icon-md)', borderRadius: 'var(--radius-sm)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--chart-success)' }}>
+    <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', borderRadius: 'var(--radius-sm)', background: 'var(--chart-brand)' }} />
+    <span style={{ position: 'absolute', insetBlock: '-25%', insetInlineStart: '90%', width: 'var(--stroke-2)', background: 'var(--chart-success-bold)' }} />
 </div>
 </Do>
 <Dont caption="A shaded band and a value beside the bar. The band hides the bar's own end and the text repeats the tooltip.">
 <div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended · Target 90%</div>
-<div style={{ position: 'relative', height: 'var(--icon-md)', background: 'var(--ds-chart-success)' }}>
-    <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', background: 'var(--ds-chart-brand)' }} />
+<div style={{ position: 'relative', height: 'var(--icon-md)', background: 'var(--chart-success)' }}>
+    <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', background: 'var(--chart-brand)' }} />
 </div>
 </Dont>
 </DoDont>
@@ -322,10 +322,10 @@ The Reschedule button after the session has ended.
 
 <DoDont>
 <Do caption="Disabled takes color/text/disabled on color/background/disabled.">
-<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
+<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
 </Do>
 <Dont caption="Opacity on the primary button. It still looks clickable and the gray is not the system one.">
-<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
+<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
 </Dont>
 </DoDont>
 
@@ -461,12 +461,12 @@ A single series is drawn in the brand chart color. Reaching for the categorical 
 <DoDont>
 <Do caption="Five weeks of one measure, all in color/chart/brand.">
 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
-    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-brand)' }} />)}
+    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: 'var(--chart-brand)' }} />)}
 </div>
 </Do>
 <Dont caption="A rainbow on one measure suggests five series. The color does no job, and a reader looks for a legend that is not there.">
 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
-    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: `var(--ds-chart-categorical-${i + 1})` }} />)}
+    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: `var(--chart-categorical-${i + 1})` }} />)}
 </div>
 </Dont>
 </DoDont>

@@ -65,7 +65,7 @@ but each one tracks a single idea through to its end rather than nesting three p
 Principles land through a concrete incident, not an abstract rule. Anthropic states what broke,
 then states what changed because of it.
 
-> "One subagent explored the 2021 automotive chip crisis while 2 others duplicated work" — [Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system)
+> "One subagent explored the 2021 automotive tag crisis while 2 others duplicated work" — [Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system)
 
 *2026 refinement:* recent pieces go a step further and put the failure in the heading itself,
 not just the paragraph under it — see "Risk we missed: The user as an injection vector" in

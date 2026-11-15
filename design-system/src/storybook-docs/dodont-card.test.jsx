@@ -28,7 +28,7 @@ describe('DoDontPair and DoDontCard', () => {
 
         for (const card of cards) {
             expect(card.style.backgroundColor).toBe('var(--ds-surface-raised)');
-            expect(card.style.border).toBe('var(--border-default) solid var(--ds-border)');
+            expect(card.style.border).toBe('var(--border-width-default) solid var(--ds-border)');
             expect(card.style.boxShadow).toBe('var(--ds-shadow-raised)');
             expect(card.style.borderRadius).toBe('var(--card-radius)');
             expect(card.style.padding).toBe('var(--card-pad-default)');

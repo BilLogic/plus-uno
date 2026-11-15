@@ -119,7 +119,7 @@ Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGr
 
 | Part | Token |
 | --- | --- |
-| Month | `--heading-small` in `--ds-text`. |
+| Month | `--heading-sm` in `--ds-text`. |
 | Month buttons | `--calendar-nav-size` square, `--ds-icon-subtle`, hovered `--ds-background-neutral-subtle-hovered`. |
 | Weekday names | `--body-small` in `--ds-text-subtle`. |
 | Day text | `--body-default` in `--ds-text`. |

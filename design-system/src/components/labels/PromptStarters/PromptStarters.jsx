@@ -5,11 +5,11 @@ import './PromptStarters.scss';
 
 /**
  * A few things a person could ask the AI, as a wrapping row of prompt
- * `Suggestion` chips.
+ * `Suggestion` tags.
  *
- * - **starters** are `{ id, label, text }`: the short `label` on the chip and
+ * - **starters** are `{ id, label, text }`: the short `label` on the tag and
  *   the longer `text` it stands for.
- * - **onSelect(starter)** runs when a chip is pressed, with the whole starter
+ * - **onSelect(starter)** runs when a tag is pressed, with the whole starter
  *   and nothing else. A starter suggests; it never sends on its own, so the
  *   caller decides what happens — usually putting `text` in a `PromptInput`
  *   for a person to read and send.
@@ -45,7 +45,7 @@ const PromptStarters = ({
 };
 
 PromptStarters.propTypes = {
-    /** What to offer: `id` for the key, `label` on the chip, `text` for the prompt it stands for. */
+    /** What to offer: `id` for the key, `label` on the tag, `text` for the prompt it stands for. */
     starters: PropTypes.arrayOf(
         PropTypes.shape({
             id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,

@@ -1,12 +1,12 @@
 @use '../../../styles/state' as *;
 /* breadcrumb trail */
 .plus-breadcrumb {
-    // Body/default, 14/20, in a 32 row (`--item-height-md`), like every other control.
+    // Body/default, 14/20, in a 32 row (`--control-md`), like every other control.
     font: var(--body-default);
 
     .plus-breadcrumb-list {
         list-style: none;
-        min-height: var(--item-height-md);
+        min-height: var(--control-md);
         margin: 0;
         padding: 0;
         background-color: transparent;

@@ -88,7 +88,7 @@ automatically.
 
 ## Color and accessibility
 
-- **Automatic series color.** One line uses `--ds-chart-brand`; two or more follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 without skipping. Past six series, group the smallest into "Other" or split the chart.
+- **Automatic series color.** One line uses `--chart-brand`; two or more follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 without skipping. Past six series, group the smallest into "Other" or split the chart.
 - **Keep line count low.** Because every line uses the same solid stroke and circle marker, crossings rely on color and the legend; name key lines in surrounding text when needed.
 - **Set `yDomain` deliberately.** Without `yDomain` the axis fits the data, which can exaggerate small changes; pass the full range for scores and percentages.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.

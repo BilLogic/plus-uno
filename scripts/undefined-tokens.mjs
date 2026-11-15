@@ -6,7 +6,7 @@
  * declaration is invalid at computed-value time and the element takes its
  * inherited weight instead. Text designed at 300 renders at 400, in `Select`,
  * `Dropdown`, `Carousel`, `Scrollspy`, `MediaObject` and `RichTextEditor`.
- * `Tooltip` reaches for `--font-size-body4` and `--font-line-height-body4`,
+ * `Tooltip` reaches for `--type-size-body4` and `--font-line-height-body4`,
  * neither of which exists, so its text has no size of its own at all.
  *
  * Measured 2026-08-29 over design-system/src, .storybook and prototypes: 145

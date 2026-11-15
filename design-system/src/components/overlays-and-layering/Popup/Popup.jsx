@@ -2,7 +2,7 @@ import { useMotionReduced } from '@/lib/motionPreference';
 import React, { useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Popover as BasePopover } from '@base-ui/react/popover';
-import { POPUP_PLACEMENTS, POPOVER_OFFSET, isButtonLike, useFloatingOverlay } from '@/lib/overlay';
+import { POPUP_PLACEMENTS, POPUP_OFFSET, isButtonLike, useFloatingOverlay } from '@/lib/overlay';
 import './Popup.scss';
 
 /**
@@ -66,7 +66,7 @@ const Popup = ({
 }) => {
     const reduced = useMotionReduced();
     const widthClass = POPUP_WIDTHS.includes(width) && width !== 'auto' ? `plus-popup--${width}` : '';
-    const [along = POPOVER_OFFSET, away] = offset ?? [];
+    const [along = POPUP_OFFSET, away] = offset ?? [];
 
     // Every trigger but `manual` dismisses on a click away and Escape, unless
     // the caller says otherwise with `rootClose={false}`.

@@ -54,7 +54,7 @@
     align-items: center;
     gap: var(--inline-sm);
     min-width: 0;
-    height: var(--item-height-md);
+    height: var(--control-md);
     padding: 0 var(--pad-x-md);
     border-radius: var(--radius-control-md);
     background-color: transparent;
@@ -90,7 +90,7 @@ button.plus-progress-tracker__item:focus-visible {
     width: var(--space-050);
     height: var(--space-050);
     border-radius: var(--radius-full);
-    border: var(--border-default) solid var(--ds-icon-subtle);
+    border: var(--border-width-default) solid var(--ds-icon-subtle);
 }
 
 .plus-progress-tracker__icon {

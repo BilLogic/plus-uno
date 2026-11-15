@@ -48,7 +48,7 @@ use `TreemapChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Step bars', <>One per change, starting where the previous bar ended (gains in <C>--ds-chart-success</C>, losses in <C>--ds-chart-danger</C>, outlined in <C>--ds-border-inverse</C>).</>],
+        ['Step bars', <>One per change, starting where the previous bar ended (gains in <C>--chart-success</C>, losses in <C>--chart-danger</C>, outlined in <C>--ds-border-inverse</C>).</>],
         ['Total bars', <><C>isSum: true</C> draws the full total from zero; <C>isIntermediateSum: true</C> draws a subtotal since the last one.</>],
         ['Connectors', 'Thin lines in the grid border token joining the end of each bar to the start of the next.'],
         ['Value labels', 'Whole-number value on every bar (losses carry a minus sign; gains carry no plus sign).'],
@@ -73,12 +73,12 @@ Totals compute `y` automatically; `height` defaults to 400.
     yAxisLabel="Enrolled students"
     categories={['Start of term', 'New sign-ups', 'Transfers in', 'Withdrawals', 'Graduated', 'Current']}
     data={[
-        { y: 420, color: 'var(--ds-chart-brand)' },
+        { y: 420, color: 'var(--chart-brand)' },
         85,
         12,
         -30,
         -18,
-        { isSum: true, color: 'var(--ds-chart-brand)' },
+        { isSum: true, color: 'var(--chart-brand)' },
     ]}
 />
 ```
@@ -89,7 +89,7 @@ Totals compute `y` automatically; `height` defaults to 400.
 
 ## Color and accessibility
 
-- **Override color on start and total bars.** Gains default to `--ds-chart-success` and losses to `--ds-chart-danger`. Pass `color: 'var(--ds-chart-brand)'` on starting and total bars so they do not take a status color.
+- **Override color on start and total bars.** Gains default to `--chart-success` and losses to `--chart-danger`. Pass `color: 'var(--chart-brand)'` on starting and total bars so they do not take a status color.
 - **Direction and labels carry the reading.** Every bar prints its value and steps up or down from the previous bar's end, so the chart reads without hue.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
 - **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).

@@ -348,7 +348,7 @@ const preview = {
               "Empty state",
               "Flag",
               "Inline message",
-              "Modal dialog",
+              "Modal",
               "Notification item",
               "Section message",
               "Spotlight"

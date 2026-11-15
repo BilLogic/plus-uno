@@ -28,7 +28,7 @@ const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 /** Twelve columns with a 16 gutter, inside the surface pad. */
 export const GridAnatomy = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <div style={{ padding: 'var(--page-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
+        <div style={{ padding: 'var(--page-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)' }}>
             <div style={grid12}>
                 {Array.from({ length: 12 }, (_, i) => (
                     <div key={i} style={{ ...columnFill, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 'var(--pad-y-md)', font: 'var(--body-small)', color: 'var(--ds-text-accent-blue)' }}>
@@ -43,7 +43,7 @@ export const GridAnatomy = () => (
 
 /** Regions span whole columns. */
 export const ColumnSpans = () => (
-    <div style={{ ...grid12, padding: 'var(--page-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
+    <div style={{ ...grid12, padding: 'var(--page-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)' }}>
         <div style={{ gridColumn: 'span 12' }}><PatternCard title="span 12" description="A table or a full-width chart" /></div>
         <div style={{ gridColumn: 'span 8' }}><PatternCard title="span 8" description="The main column" /></div>
         <div style={{ gridColumn: 'span 4' }}><PatternCard title="span 4" description="A side column" /></div>
@@ -83,7 +83,7 @@ export const SpanWholeColumns = () => (
 
 const ModalBox = ({ width }) => (
     <div style={{ width, maxWidth: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', padding: 'var(--modal-pad-x-default)', borderRadius: 'var(--modal-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)' }}>
-        <span style={{ font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>Add a tutor</span>
+        <span style={{ font: 'var(--heading-md)', color: 'var(--ds-text)' }}>Add a tutor</span>
         <span style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--modal-inline-sm)' }}>
             <Button text="Cancel" />
             <Button text="Add" appearance="primary" />
@@ -95,10 +95,10 @@ const ModalBox = ({ width }) => (
 export const ModalFromScreenGrid = () => (
     <DoDont>
         <Do caption={<>Modal <C>md</C>: <C>--modal-width-md</C>, 8 screen-grid columns plus 16 a side, centered.</>}>
-            <div style={{ ...ground, background: 'var(--ds-blanket)' }}><ModalBox width="var(--modal-width-md)" /></div>
+            <div style={{ ...ground, background: 'var(--ds-backdrop)' }}><ModalBox width="var(--modal-width-md)" /></div>
         </Do>
         <Dont caption="A fixed pixel width. It ignores the screen grid, so it sits off the page columns and does not grow with the screen.">
-            <div style={{ ...ground, background: 'var(--ds-blanket)' }}><ModalBox width="var(--width-1900)" /></div>
+            <div style={{ ...ground, background: 'var(--ds-backdrop)' }}><ModalBox width="var(--width-1900)" /></div>
         </Dont>
     </DoDont>
 );

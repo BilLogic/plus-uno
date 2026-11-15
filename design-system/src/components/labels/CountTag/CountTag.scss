@@ -1,5 +1,5 @@
 /*
- * Count tag — a number on its own, as a near-square badge.
+ * Count tag — a number on its own, as a near-square countTag.
  *
  * EVERY NUMBER IS A BADGE: 20 high on its own, 16 for use inside a label, a
  * 2 corner and a minimum width of 24, so one digit is a small rectangle and
@@ -90,7 +90,7 @@ $count-dot: (
 
 /*
  * Inverse is for counts on filled buttons and bold or brand fills. It is the
- * page surface with subtle text, so it reads as a badge cut out of the fill in
+ * page surface with subtle text, so it reads as a countTag cut out of the fill in
  * light and in dark, rather than depending on the ground beneath it. It is
  * neutral whatever `style` says.
  */
@@ -117,21 +117,21 @@ $count-dot: (
 
 /*
  * The ring, for a count pinned to the top right of an icon or avatar. It is a
- * box-shadow outside the box, as in Figma, so the badge keeps its exact height.
+ * box-shadow outside the box, as in Figma, so the countTag keeps its exact height.
  */
 .plus-count--ring {
     box-shadow: 0 0 0 var(--stroke-2) var(--ds-surface);
 }
 
 /*
- * The compact badge is 16 tall and the B3 line is 20; the flex box centers the
- * line, and a line height of the badge keeps the digits from being clipped.
+ * The compact countTag is 16 tall and the B3 line is 20; the flex box centers the
+ * line, and a line height of the countTag keeps the digits from being clipped.
  */
 .plus-count .plus-count__value {
     font: var(--body-small);
     line-height: var(--plus-count-size);
     // The `font` shorthand resets every font-variant longhand, so the tabular
-    // figures set on the badge are restored here, after it: a "11" is as wide
+    // figures set on the countTag are restored here, after it: a "11" is as wide
     // as a "44" and a changing count does not jiggle.
     font-variant-numeric: tabular-nums;
 }

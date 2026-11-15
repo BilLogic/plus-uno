@@ -48,7 +48,7 @@ const containerStyle = {
     flexWrap: 'wrap',
     padding: 'var(--space-250) var(--space-125)',
     backgroundColor: 'var(--ds-surface)',
-    borderRadius: 'var(--radius-075)',
+    borderRadius: 'var(--radius-xl)',
     border: '1px solid var(--ds-border)',
 };
 

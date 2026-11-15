@@ -2,7 +2,7 @@
 
 # GenerativeBorder
 
-The border that shows the AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-100`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.
+The border that shows the AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-xxl`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.
 
 **Import:** `import { GenerativeBorder } from '@/components';`
 
@@ -70,7 +70,7 @@ Same group: `ProgressBar` · `ProgressRing` · `Skeleton` · `Spinner`
 ## Parts
 
 1. **Content.** The content being generated, unchanged by the border.
-2. **Ring.** A stroke over the edge while `isActive`, so layout never moves. Its 2-unit width comes from `--border-selected`.
+2. **Ring.** A stroke over the edge while `isActive`, so layout never moves. Its 2-unit width comes from `--border-width-selected`.
 3. **Segments.** Four hard-edged, flat segments alternating brand and discovery colors.
 
 ### States
@@ -90,8 +90,8 @@ Same group: `ProgressBar` · `ProgressRing` · `Skeleton` · `Spinner`
 | Part | Token |
 | --- | --- |
 | Segments | `--ds-border-brand` and `--ds-border-discovery`. |
-| Stroke | `--border-selected`, through `--generative-border-width`. |
-| Corner | `--generative-border-radius`, set to the radius token named by `radius`: `--radius-025`, `--radius-050`, `--radius-075`, `--radius-100`, `--radius-full`, or a control radius (`--radius-control-sm`, `--radius-control-md`, `--radius-control-lg`) to follow a field. |
+| Stroke | `--border-width-selected`, through `--generative-border-width`. |
+| Corner | `--generative-border-radius`, set to the radius token named by `radius`: `--radius-md`, `--radius-lg`, `--radius-xl`, `--radius-xxl`, `--radius-full`, or a control radius (`--radius-control-sm`, `--radius-control-md`, `--radius-control-lg`) to follow a field. |
 | Turn | `--generative-border-angle`, from a rest of `--generative-border-rest`. |
 
 ## Content guidelines
@@ -105,20 +105,20 @@ Same group: `ProgressBar` · `ProgressRing` · `Skeleton` · `Spinner`
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `isActive` | bool | `false` | Whether content is being generated. Shows the ring and sets `aria-busy`. |
-| `radius` | enum | `'radius-100'` | The radius token the ring follows. Match the wrapped content. |
+| `radius` | enum | `'radius-xxl'` | The radius token the ring follows. Match the wrapped content. |
 | `children` | node | — | The content being generated into. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
 ## Variants
 
-**`radius`** — `radius-025` · `radius-050` · `radius-075` · `radius-100` · `radius-full` · `radius-control-sm` · `radius-control-md` · `radius-control-lg`
+**`radius`** — `radius-md` · `radius-lg` · `radius-xl` · `radius-xxl` · `radius-full` · `radius-control-sm` · `radius-control-md` · `radius-control-lg`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--border-selected` · `--ds-border-brand` · `--ds-border-discovery` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width`
+`--border-width-selected` · `--ds-border-brand` · `--ds-border-discovery` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width`
 
 From `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.scss`. Override these through the token layer, never with a literal.
 

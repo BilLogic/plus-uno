@@ -3,7 +3,7 @@
  *
  * Data marks wear chart tokens and chrome wears text and border tokens, as
  * Atlassian's data-visualization guidance splits them (palette.js says which
- * token does which job): series take `--ds-chart-categorical-*` in order,
+ * token does which job): series take `--chart-categorical-*` in order,
  * tick labels `--ds-text-subtle`, titles, legends and tooltips `--ds-text`,
  * grid lines and axes `--ds-border`. No value carries a fallback: the tokens
  * resolve in every color mode, so a chart follows light, dark and increased
@@ -71,7 +71,7 @@ const CHART_BAR_RADIUS_NUMBER = tokenNumber('--chart-bar-radius', 2);
 const barRadius = { borderRadius: { radius: CHART_BAR_RADIUS_NUMBER, where: 'end' } };
 
 /** A node or card-like mark that isn't a bar (e.g. a Treegraph box): the radius primitive at the same step as a 40px control, the closest existing match. */
-export const CHART_NODE_RADIUS = tokenNumber('--radius-0625', 10);
+export const CHART_NODE_RADIUS = tokenNumber('--radius-control-lg', 10);
 
 const axis = (gridLineWidth, gridLineDashStyle) => ({
     gridLineColor: CHROME.grid,
@@ -83,7 +83,7 @@ const axis = (gridLineWidth, gridLineDashStyle) => ({
         style: {
             color: CHROME.textSubtle,
             fontFamily: BODY,
-            fontSize: 'var(--font-size-075)',
+            fontSize: 'var(--type-size-075)',
             fontWeight: 'var(--type-weight-medium)'
         }
     },
@@ -149,14 +149,14 @@ const chartTheme = {
             color: CHROME.text,
             fontFamily: 'var(--type-family-heading-serif)',
             fontWeight: 'var(--type-weight-medium)',
-            fontSize: 'var(--font-size-150)'
+            fontSize: 'var(--type-size-150)'
         }
     },
     subtitle: {
         style: {
             color: CHROME.textSubtle,
             fontFamily: BODY,
-            fontSize: 'var(--font-size-0875)'
+            fontSize: 'var(--type-size-0875)'
         }
     },
     xAxis: axis(0),
@@ -197,7 +197,7 @@ const chartTheme = {
         style: {
             color: CHROME.text,
             fontFamily: BODY,
-            fontSize: 'var(--font-size-0875)'
+            fontSize: 'var(--type-size-0875)'
         }
     },
     credits: {

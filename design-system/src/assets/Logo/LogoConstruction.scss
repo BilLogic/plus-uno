@@ -37,7 +37,7 @@
 .plus-logo-construction__line {
     fill: none;
     stroke: var(--ds-border-danger);
-    stroke-width: var(--border-default);
+    stroke-width: var(--border-width-default);
     vector-effect: non-scaling-stroke;
 }
 
@@ -48,7 +48,7 @@
 
 .plus-logo-construction__label {
     fill: var(--ds-text-subtle);
-    font: var(--code);
+    font: var(--code-default);
     font-size: 11px;
     paint-order: stroke;
     stroke: var(--ds-surface);

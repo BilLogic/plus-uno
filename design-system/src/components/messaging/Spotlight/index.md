@@ -127,13 +127,13 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 
 | Part | Token |
 | --- | --- |
-| Surface | `--ds-background-brand-bold`, `--ds-shadow-overlay`, `--spotlight-width`, `--radius-100`, `--space-150` |
-| Text | `--ds-text-inverse`, `--heading-small`, `--body-default`; step count `--body-small` |
+| Surface | `--ds-background-brand-bold`, `--ds-shadow-overlay`, `--spotlight-width`, `--radius-xxl`, `--space-150` |
+| Text | `--ds-text-inverse`, `--heading-sm`, `--body-default`; step count `--body-small` |
 | Dismiss | `--ds-icon-inverse`, `--ds-interaction-inverse-hovered`, `--ds-interaction-inverse-pressed`, `--radius-md` |
 | Primary action | `--ds-surface-overlay`, `--ds-text` |
-| Secondary action | `--ds-text-inverse` text and `--border-default` edge |
-| Actions | `--radius-050`, `--space-050`, `--space-100`, `--space-075` between |
-| Media | `--radius-050` |
+| Secondary action | `--ds-text-inverse` text and `--border-width-default` edge |
+| Actions | `--radius-lg`, `--radius-lg`, `--radius-xxl`, `--space-075` between |
+| Media | `--radius-lg` |
 | Focus ring | `--ds-border-focused-inverse` |
 
 ## Content guidelines
@@ -169,7 +169,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-small` · `--popup-radius` · `--radius-lg` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width`
+`--body-default` · `--body-small` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-sm` · `--popup-radius` · `--radius-lg` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width`
 
 From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override these through the token layer, never with a literal.
 

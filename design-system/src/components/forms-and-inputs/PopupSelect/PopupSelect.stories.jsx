@@ -176,7 +176,7 @@ export const Placement = {
         const startBox = start.getBoundingClientRect();
         const menuBox = menu.getBoundingClientRect();
         await expect(menuBox.left, 'start edge meets the trigger').toBeCloseTo(startBox.left, 0);
-        await expect(menuBox.top - startBox.bottom, 'offset 4').toBeCloseTo(tokenLength(canvasElement, '--popover-offset'), 0);
+        await expect(menuBox.top - startBox.bottom, 'offset 4').toBeCloseTo(tokenLength(canvasElement, '--popup-offset'), 0);
         await expect(menuBox.width, 'at least the trigger').toBeGreaterThanOrEqual(startBox.width);
         await expect(menuBox.width, 'never under 160').toBeGreaterThanOrEqual(tokenLength(canvasElement, '--popup-min-width'));
         await userEvent.keyboard('{Escape}');
@@ -234,8 +234,8 @@ export const Spacing = {
     ),
     play: async ({ canvasElement }) => {
         const [regular, compact] = within(canvasElement).getAllByRole('button', { name: 'Status: Upcoming' });
-        await expect(regular.getBoundingClientRect().height).toBe(tokenLength(canvasElement, '--item-height-md'));
-        await expect(compact.getBoundingClientRect().height).toBe(tokenLength(canvasElement, '--item-height-sm'));
+        await expect(regular.getBoundingClientRect().height).toBe(tokenLength(canvasElement, '--control-md'));
+        await expect(compact.getBoundingClientRect().height).toBe(tokenLength(canvasElement, '--control-sm'));
     },
 };
 

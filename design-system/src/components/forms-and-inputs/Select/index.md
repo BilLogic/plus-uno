@@ -168,7 +168,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Rest | The input fill with a `--border-default` input edge; the placeholder until a value is picked. |
+| Rest | The input fill with a `--border-width-default` input edge; the placeholder until a value is picked. |
 | Hovered | The edge turns `--ds-border-focused`. |
 | Pressed | No step of its own. The hovered edge holds while the pointer is down, and the press opens the list. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
@@ -181,9 +181,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
-| Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
+| Box | `--ds-background-input` fill, `--border-width-default` edge in `--ds-border-input`. |
+| Height | 40: `--height-250`. Compact 32: `--control-md`. |
+| Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Caret | `--ds-icon-subtle`; the clear button `--ds-icon-subtlest`, hovered `--ds-icon-subtle`. |
 | Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
@@ -222,7 +222,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `defaultOpen` | bool | `false` | Whether the list starts open, when `open` is not controlling it. |
 | `onOpenChange` | func | — | `(open)`: the list asks to open or close. |
 | `defaultSearchTerm` | string | `''` | The text the search input starts with, so the list opens already filtered. Used by a searchable field. |
-| `displayMode` | enum | `'tags'` | With `isMulti`: `tags` (Tag chips) or `text` (comma-separated). |
+| `displayMode` | enum | `'tags'` | With `isMulti`: `tags` (Tag tags) or `text` (comma-separated). |
 | `lineWrap` | bool | `true` | `text` display mode only: wrap onto more lines. |
 | `truncate` | bool | `false` | `text` display mode only: clip the row with a fade. |
 | `spacing` | enum | `'default'` | `default` draws 40 and `compact` draws 32. |
@@ -262,7 +262,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--font-size-0875` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--space-025` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--border-width-default` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--space-025` · `--stack-md` · `--stack-sm` · `--type-size-0875`
 
 From `design-system/src/components/forms-and-inputs/Select/Select.scss`. Override these through the token layer, never with a literal.
 

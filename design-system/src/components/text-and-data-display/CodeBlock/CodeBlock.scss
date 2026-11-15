@@ -1,5 +1,5 @@
 /*
- * CodeBlock: the block. Typeface from the --code text style, with the block
+ * CodeBlock: the block. Typeface from the --code-default text style, with the block
  * line height; surface, ink, gutter and highlight from the code color roles.
  * The default width is the container's; lines scroll or wrap inside it.
  */
@@ -12,12 +12,12 @@
     margin: 0;
     padding: var(--pad-y-lg) 0;
     overflow-x: auto;
-    font: var(--code);
-    font-size: var(--font-size-0875);
-    line-height: var(--line-height-125);
+    font: var(--code-default);
+    font-size: var(--type-size-0875);
+    line-height: var(--type-line-height-125);
     background-color: var(--ds-background-code-default);
     color: var(--ds-text-code-default);
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--card-radius-compact);
     tab-size: 4;
 

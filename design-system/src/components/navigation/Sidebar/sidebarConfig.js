@@ -62,13 +62,13 @@ export const SIDEBAR_GROUPS = [
  * groups append.
  *
  * @param {SidebarUser} user
- * @param {{ slackUrl?: string, badges?: Record<string, { count?: number, countLabel?: string, dot?: boolean, dotLabel?: string }>, groups?: Array<{ id: string, title?: string, lockedDuringOnboarding?: boolean, items?: Array<object> }> }} [options]
+ * @param {{ slackUrl?: string, countTags?: Record<string, { count?: number, countLabel?: string, dot?: boolean, dotLabel?: string }>, groups?: Array<{ id: string, title?: string, lockedDuringOnboarding?: boolean, items?: Array<object> }> }} [options]
  */
-export function sidebarGroups(user, { slackUrl = SLACK_URL, badges = {}, groups = [] } = {}) {
+export function sidebarGroups(user, { slackUrl = SLACK_URL, countTags = {}, groups = [] } = {}) {
     const shape = (item) => ({
         ...item,
         ...(item.id === 'slack' ? { href: slackUrl } : {}),
-        ...(badges[item.id] ?? {}),
+        ...(countTags[item.id] ?? {}),
     });
     const merged = SIDEBAR_GROUPS
         .filter((group) => !group.roles || group.roles.includes(user))

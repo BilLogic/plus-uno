@@ -139,7 +139,7 @@ A record page one level down shows every header slot, with markers in the gutter
 
 | Slot or prop | Holds |
 | --- | --- |
-| `title` | The page's one h1, at the heading-large size, above the content. |
+| `title` | The page's one h1, at the heading-lg size, above the content. |
 | `children` | The Sections and other page content. Existing pages may still supply the header and banner here. |
 | `header` | One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. Replaces `title`. |
 | `description` · `status` | Planned. `PageHeader` has neither slot; the title block holds them. |
@@ -156,7 +156,7 @@ A record page one level down shows every header slot, with markers in the gutter
 | `--section-stack-sm` | Header to page tabs. |
 | `--page-stack-md` | Header to the first Section; between Sections. |
 | `--page-stack-sm` | Between related Sections. |
-| `--heading-large`, `--body-default`, `--body-small` | The title, the description, the breadcrumb. |
+| `--heading-lg`, `--body-default`, `--body-small` | The title, the description, the breadcrumb. |
 | `--content-max-width`, `--content-min-width` | The cap and the floor of the content grid. |
 | `--grid-columns`, `--grid-gutter`, `--page-pad` | The 12-column grid, its gutter and the pad. |
 | `--ds-surface-sunken`, `--ds-surface`, `--ds-surface-raised`, `--ds-surface-overlay` | The four levels' fills, each with its shadow from Elevation. |
@@ -199,7 +199,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-border-bold` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-sunken` · `--ds-text` · `--heading-large` · `--heading-large-tracking` · `--page-border-width` · `--page-pad` · `--page-pad-x-compact` · `--page-pad-x-spacious` · `--page-pad-y-compact` · `--page-pad-y-spacious` · `--page-stack-md` · `--radius-lg` · `--radius-xl` · `--radius-xxl`
+`--ds-border-bold` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-sunken` · `--ds-text` · `--heading-lg` · `--heading-lg-tracking` · `--page-border-width` · `--page-pad` · `--page-pad-x-compact` · `--page-pad-x-spacious` · `--page-pad-y-compact` · `--page-pad-y-spacious` · `--page-stack-md` · `--radius-lg` · `--radius-xl` · `--radius-xxl`
 
 From `design-system/src/patterns/Page/Page.scss`. Override these through the token layer, never with a literal.
 

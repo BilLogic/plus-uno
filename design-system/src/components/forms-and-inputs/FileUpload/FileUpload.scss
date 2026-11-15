@@ -38,7 +38,7 @@
         border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast),
         box-shadow var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
 
     &.plus-file-upload-invalid {
         border-color: var(--ds-border-danger);

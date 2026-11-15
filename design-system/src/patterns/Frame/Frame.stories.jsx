@@ -39,7 +39,7 @@ const slot = (label, minHeight = 'var(--height-500)') => (
             alignItems: 'center',
             justifyContent: 'center',
             minHeight,
-            border: 'var(--border-default) dashed var(--ds-border-bold)',
+            border: 'var(--border-width-default) dashed var(--ds-border-bold)',
             borderRadius: 'var(--radius-md)',
             color: 'var(--ds-text-subtle)',
             font: 'var(--body-default)',
@@ -169,7 +169,7 @@ const expectToggleHome = async (frame, toggle) => {
     const open = toggle.getAttribute('aria-label') === 'Close sidebar';
     await expect(at.x + r.width / 2, open ? 'toggle on the trailing column' : 'toggle on the icon column').toBeCloseTo(open ? 208 : 32, 0);
     await expect(at.y + r.height / 2, 'toggle on the logo row\'s center line').toBeCloseTo(28, 0);
-    await expect(r.height, 'toggle height').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
+    await expect(r.height, 'toggle height').toBeCloseTo(tokenLength(frame, '--control-md'), 0);
 };
 
 /** No top bar: nothing sits above the Sidebar and the Page. */
@@ -241,7 +241,7 @@ export const ColorModes = {
         await waitFor(() => expect(getComputedStyle(sidebar()).position, 'docked at 1024, in flow').not.toBe('absolute'));
         const aside = sidebar();
         await expect(rect(aside).right, 'the sidebar sits flush against the surface').toBeCloseTo(rect(surface).left, 0);
-        const edgeLine = 'var(--border-default) 0 0 0 var(--ds-border)';
+        const edgeLine = 'var(--border-width-default) 0 0 0 var(--ds-border)';
         await expect(tokenLength(frame, '--stroke-2'), 'the surface edge covers the divider')
             .toBeGreaterThanOrEqual(tokenLength(frame, '--stroke-1'));
         await inEveryColorMode(async (mode) => {
@@ -302,7 +302,7 @@ export const PairWithoutSidebar = { args: { sidebar: undefined } };
 
 /** Don't: a page title in the header row in place of the breadcrumb. */
 export const PairTitleInHeader = {
-    args: { header: <span style={{ font: 'var(--heading-large)', color: 'var(--ds-text)' }}>Dashboard</span> },
+    args: { header: <span style={{ font: 'var(--heading-lg)', color: 'var(--ds-text)' }}>Dashboard</span> },
 };
 
 /** The playground: the frame at the docs height, with its layout props live. */
@@ -429,7 +429,7 @@ export const Large1024 = {
 
         // The sidebar's rows are the 32 item height.
         const tab = within(sidebar()).getAllByRole('button')[0];
-        await expect(rect(tab).height, 'sidebar row height').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
+        await expect(rect(tab).height, 'sidebar row height').toBeCloseTo(tokenLength(frame, '--control-md'), 0);
 
         await userEvent.click(p.toggle);
         await waitFor(() => expect(sidebar()).toBeNull());
@@ -491,7 +491,7 @@ export const SidebarMeetsPage = {
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expect(rect(sidebar()).right, 'no gap between the Sidebar and the Page').toBeCloseTo(rect(surface).left, 0);
         await expect(getComputedStyle(sidebar()).boxShadow, 'a 1px edge in the border color')
-            .toBe(computedShadow(frame, 'var(--border-default) 0 0 0 var(--ds-border)'));
+            .toBe(computedShadow(frame, 'var(--border-width-default) 0 0 0 var(--ds-border)'));
         await expectNoSeam(frame, surface);
     }),
 };
@@ -1011,7 +1011,7 @@ export const OverlayPanelIsModalAt1100 = {
         await waitFor(() => expect(p.panel(), 'the Panel opens').not.toBeNull());
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
         const panel = p.panel();
-        await expect(panel, 'a modal dialog').toHaveAttribute('role', 'dialog');
+        await expect(panel, 'a Modal').toHaveAttribute('role', 'dialog');
         await expect(panel).toHaveAttribute('aria-modal', 'true');
         await expect(panel).toHaveAccessibleName('AI chat');
         await waitFor(() => expect(panel.contains(doc.activeElement), 'focus moves into the Panel').toBe(true));
@@ -2764,7 +2764,7 @@ const FocusedTaskTransitionDemo = () => {
                                         blockSize: `var(${BAR_TOKEN})`,
                                         paddingInline: 'var(--page-pad)',
                                         background: 'var(--ds-surface)',
-                                        borderBlockStart: 'var(--border-default) solid var(--ds-border)',
+                                        borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
                                     }}
                                 >
                                     <Button text="Cancel" appearance="subtle" onClick={requestLeave} />
@@ -2910,7 +2910,7 @@ const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
                             boxSizing: 'border-box',
                             paddingInline: 'var(--page-pad)',
                             background: 'var(--ds-surface)',
-                            borderBlockStart: 'var(--border-default) solid var(--ds-border)',
+                            borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
                         }}
                     >
                         <Button text="Cancel" appearance="subtle" onClick={() => {}} />

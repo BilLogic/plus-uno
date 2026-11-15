@@ -31,7 +31,7 @@ export const figmaMeta = {
 export const narrowScreen = { '--plus-overlay-screen': 'calc(var(--size-2000) * 1.5)', width: '100%' };
 // Pair one draws both widths at three quarters, so ten columns fit beside six at the same scale.
 export const scaledScreen = { ...narrowScreen, zoom: 0.75 };
-export const shortCap = { ...narrowScreen, '--blanket-max-height-modal': 'var(--size-2000)' };
+export const shortCap = { ...narrowScreen, '--backdrop-max-height-modal': 'var(--size-2000)' };
 export const longBody = `${'Long body copy. '.repeat(40)}The body scrolls once the content runs past the cap.`;
 
 <Meta of={ModalStories} />
@@ -162,7 +162,7 @@ than a menu. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
 
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
 height hugs its content up to the cap the Backdrop sets
-(`--blanket-max-height-modal`); `height="fill"` sits at that cap.
+(`--backdrop-max-height-modal`); `height="fill"` sits at that cap.
 
 </div>
 

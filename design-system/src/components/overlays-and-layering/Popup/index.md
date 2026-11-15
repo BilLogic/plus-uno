@@ -151,13 +151,13 @@ Same group: `Tooltip`
 | Part | Token |
 | --- | --- |
 | Surface | `--ds-surface-overlay`, `--ds-shadow-overlay` |
-| Radius, padding | `--popup-radius`, `--popover-pad` |
+| Radius, padding | `--popup-radius`, `--popup-pad` |
 | Width, auto | `--popup-min-width`, `--popup-max-width` |
 | Width, column steps | `--grid-columns`, `--grid-gutter`, `--content-min-width`, `--content-max-width` |
 | Motion | The Popup row of the motion registry, read through `--ds-motion-*` |
 | Gap between title and body | `--stack-md` |
 | Title, body | `--ds-text`, `--heading-xsmall`, `--body-default` |
-| Offset from the trigger | `--popover-offset` |
+| Offset from the trigger | `--popup-offset` |
 
 ## Content guidelines
 
@@ -199,7 +199,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--anchor-width` · `--body-default` · `--border-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--popover-offset` · `--popover-pad` · `--popup-max-width` · `--popup-min-width` · `--popup-pad` · `--popup-radius` · `--stack-md`
+`--anchor-width` · `--body-default` · `--border-width-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--popup-max-width` · `--popup-min-width` · `--popup-offset` · `--popup-pad` · `--popup-radius` · `--stack-md`
 
 From `design-system/src/components/overlays-and-layering/Popup/Popup.scss`. Override these through the token layer, never with a literal.
 

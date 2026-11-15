@@ -3,7 +3,7 @@
  *
  * The box, its sizes and its states (hover, focus, invalid, read-only,
  * disabled) are `_Field`'s. This file only lays out what Select puts in the
- * box: the chips, the combobox, the clear × and the caret.
+ * box: the tags, the combobox, the clear × and the caret.
  */
 @use '../../../styles/state' as *;
 
@@ -29,7 +29,7 @@
     overflow-wrap: anywhere;
 }
 
-// Chips and the combobox share the content slot, and wrap onto more lines.
+// Tags and the combobox share the content slot, and wrap onto more lines.
 .plus-select-wrapper .plus-field__content {
     flex-wrap: wrap;
     gap: var(--stack-sm);
@@ -44,7 +44,7 @@
     }
 }
 
-// The typed text sits after the last chip, and takes the rest of the line.
+// The typed text sits after the last tag, and takes the rest of the line.
 .plus-select-multi .plus-select-input {
     flex: 1 1 4ch;
     width: auto;
@@ -141,9 +141,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--font-size-0875);
-    height: var(--font-size-0875);
-    border: var(--border-default) solid var(--ds-border-input);
+    width: var(--type-size-0875);
+    height: var(--type-size-0875);
+    border: var(--border-width-default) solid var(--ds-border-input);
     background-color: var(--ds-background-input);
     border-radius: var(--radius-md);
     font-size: var(--icon-sm);

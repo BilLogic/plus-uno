@@ -73,11 +73,11 @@ it. The chart's `height` prop sets its pixel height (default 200).
 <SmartBarChart
     height={200}
     data={[
-        { letter: 'M', height: '72', color: 'var(--ds-chart-brand)' },
-        { letter: 'T', height: '85', color: 'var(--ds-chart-brand)' },
-        { letter: 'W', height: '64', color: 'var(--ds-chart-brand)' },
-        { letter: 'T', height: '90', color: 'var(--ds-chart-brand)' },
-        { letter: 'F', height: '48', color: 'var(--ds-chart-brand)' },
+        { letter: 'M', height: '72', color: 'var(--chart-brand)' },
+        { letter: 'T', height: '85', color: 'var(--chart-brand)' },
+        { letter: 'W', height: '64', color: 'var(--chart-brand)' },
+        { letter: 'T', height: '90', color: 'var(--chart-brand)' },
+        { letter: 'F', height: '48', color: 'var(--chart-brand)' },
     ]}
 />
 ```
@@ -88,7 +88,7 @@ it. The chart's `height` prop sets its pixel height (default 200).
 
 ## Color and accessibility
 
-- **Caller-assigned color.** `color` is required on every item. Use `BRAND` (`--ds-chart-brand`) for one measure across categories, or one hue from `sequentialRamp` (strongest step on the largest value) for ordered groups such as grades.
+- **Caller-assigned color.** `color` is required on every item. Use `BRAND` (`--chart-brand`) for one measure across categories, or one hue from `sequentialRamp` (strongest step on the largest value) for ordered groups such as grades.
 - **Fill height carries the value.** The chart reads without hue; never use color alone to flag a column as good or bad.
 - **Hover-only numbers.** With no axis or data labels, exact values appear only in the tooltip. State key numbers in surrounding text or use `BarChart`.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Explain single-letter category labels in nearby text, and name the chart in its surrounding Section or Card header.

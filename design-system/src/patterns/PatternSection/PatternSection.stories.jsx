@@ -156,7 +156,7 @@ export const HeaderCustom = {
             title="This week"
             header={(
                 <>
-                    <p style={{ margin: 0, font: 'var(--heading-medium)' }}>Week of October 20</p>
+                    <p style={{ margin: 0, font: 'var(--heading-md)' }}>Week of October 20</p>
                     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>12 sessions · 3 tutors out</p>
                 </>
             )}

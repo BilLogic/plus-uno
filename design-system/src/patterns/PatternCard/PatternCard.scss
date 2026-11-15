@@ -141,7 +141,7 @@ $-dragging: (
         }
         &.plus-pattern-card--image-half {
             > .plus-pattern-card-image { flex-basis: 50%; }
-            .plus-pattern-card-title { font: var(--heading-medium); }
+            .plus-pattern-card-title { font: var(--heading-md); }
         }
     }
     .plus-pattern-card--image-end > .plus-pattern-card-image { order: 1; }

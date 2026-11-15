@@ -72,7 +72,7 @@ const Template = (args) => {
 const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)', padding: 'var(--card-stack-md)', backgroundColor: 'var(--ds-surface)' };
 const contentVariantCard = {
     padding: 'var(--pad-x-md)',
-    border: 'var(--border-default) solid var(--ds-border)',
+    border: 'var(--border-width-default) solid var(--ds-border)',
     borderRadius: 'var(--radius-lg)',
     background: 'var(--ds-surface-container)',
 };

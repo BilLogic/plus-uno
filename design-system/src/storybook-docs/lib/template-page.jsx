@@ -256,7 +256,7 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                                 left: m.left,
                                 width: m.width,
                                 height: m.height,
-                                outline: 'var(--border-default) dashed var(--ds-border-brand)',
+                                outline: 'var(--border-width-default) dashed var(--ds-border-brand)',
                                 borderRadius: 'var(--radius-sm)',
                                 pointerEvents: 'none',
                             }}
@@ -273,13 +273,13 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                                         width: m.elbow ? ELBOW : 0,
                                         height: `calc(${m.top + (m.elbow ? MARKER / 2 : 0)}px + (${GUTTER} - ${MARKER}px) / 2)`,
                                         ...(m.elbow
-                                            ? { borderRight: 'var(--border-default) dashed var(--ds-border-brand)', borderBottom: 'var(--border-default) dashed var(--ds-border-brand)' }
-                                            : { borderLeft: 'var(--border-default) dashed var(--ds-border-brand)' }),
+                                            ? { borderRight: 'var(--border-width-default) dashed var(--ds-border-brand)', borderBottom: 'var(--border-width-default) dashed var(--ds-border-brand)' }
+                                            : { borderLeft: 'var(--border-width-default) dashed var(--ds-border-brand)' }),
                                     }
                                     : {
                                         top: m.markerTop + MARKER / 2,
                                         height: 0,
-                                        borderTop: 'var(--border-default) dashed var(--ds-border-brand)',
+                                        borderTop: 'var(--border-width-default) dashed var(--ds-border-brand)',
                                         ...(m.side === 'end'
                                             ? { left: m.left + m.width, width: Math.max(boxWidth - m.left - m.width, 0) }
                                             : { right: boxWidth - m.left, width: Math.max(m.left, 0) }),
@@ -343,14 +343,14 @@ export const BrowserWindow = ({ address = 'app.plus.org', height, fill = false, 
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
-            border: 'var(--border-default) solid var(--ds-border)',
+            border: 'var(--border-width-default) solid var(--ds-border)',
             borderRadius: 'var(--radius-md)',
             overflow: 'hidden',
             // The body is the Page's surface: a window that holds a Frame shows the Frame's own sunken fill.
             background: 'var(--ds-surface)',
         }}
     >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)', background: 'var(--ds-surface-sunken)', padding: 'var(--space-050) var(--space-100)', borderBottom: 'var(--border-default) solid var(--ds-border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)', background: 'var(--ds-surface-sunken)', padding: 'var(--space-050) var(--space-100)', borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}>
             <span aria-hidden="true" style={{ display: 'flex', gap: 'var(--space-050)' }}>
                 {[0, 1, 2].map((i) => (
                     <span key={i} style={{ inlineSize: 'var(--space-075)', blockSize: 'var(--space-075)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)' }} />

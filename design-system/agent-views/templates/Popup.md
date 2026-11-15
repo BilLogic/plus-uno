@@ -50,9 +50,9 @@ Aligned to the edge of the trigger on the side where it sits. A trigger at the s
 | Token | Value | Used for |
 | --- | --- | --- |
 | `--popup-min-width`, `--popup-max-width` | 160, 320 | The auto range. |
-| `--popover-offset`, `--popover-gap-screen` | 4, 8 | Below the trigger; from the screen edge. |
-| `--popover-pad`, `--popup-radius` | 16, 12 | The layer's pad and its corner radius (12, `--popup-radius`). |
-| `--popover-max-height-menu` | 320 | A menu's rows scroll past this height. |
+| `--popup-offset`, `--popup-gap-screen` | 4, 8 | Below the trigger; from the screen edge. |
+| `--popup-pad`, `--popup-radius` | 16, 12 | The layer's pad and its corner radius (12, `--popup-radius`). |
+| `--dropdown-menu-max-height` | 320 | A menu's rows scroll past this height. |
 | `--ds-surface-overlay`, `--ds-shadow-overlay` | pair | The layer's fill and its one edge, the shadow's ring. |
 | `--layer-popup` | 400 | The layer's place in the stack. |
 

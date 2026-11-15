@@ -60,7 +60,7 @@ const ROLES = {
   modalSurface: ['--ds-surface-overlay', 'components/messaging/Modal/Modal.scss'],
   modalShadow: ['--ds-shadow-blocking', 'components/messaging/Modal/Modal.scss'],
   modalDivider: ['--ds-border', 'components/messaging/Modal/Modal.scss'],
-  backdrop: ['--ds-blanket', 'patterns/Backdrop/Backdrop.scss'],
+  backdrop: ['--ds-backdrop', 'patterns/Backdrop/Backdrop.scss'],
   // Placeholder text: the Skeleton component's own bar
   placeholderText: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
   placeholderHeading: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
@@ -115,7 +115,7 @@ const ROLES = {
   tapRing: ['--ds-border-focused', 'styles/_state.scss'],
   // Drawing devices, no component behind them
   // A plotted series that is not the subject: the data-viz neutral series.
-  curve: ['--ds-chart-neutral', null],
+  curve: ['--chart-neutral', null],
   // A path a thing travels: the subtle stroke dividers use.
   trail: ['--ds-border', null],
   // The pointer: body in the text ink, edged in the page surface so it reads on any fill.
@@ -152,16 +152,16 @@ const ROLES = {
  */
 export const HEIGHTS = {
   field: ['--height-250', 'components/forms-and-inputs/_internal/FieldBox.scss', 20],
-  button: ['--item-height-md', 'components/forms-and-inputs/Button/Button.scss', 16],
-  tab: ['--item-height-md', 'components/navigation/Tabs/Tabs.scss', 16],
+  button: ['--control-md', 'components/forms-and-inputs/Button/Button.scss', 16],
+  tab: ['--control-md', 'components/navigation/Tabs/Tabs.scss', 16],
   count: ['--label-height-md', 'components/labels/_label-heights.scss', 10],
-  tracker: ['--item-height-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss', 16],
-  sidebarRow: ['--item-height-md', 'patterns/Sidebar/Sidebar.scss', 16],
+  tracker: ['--control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss', 16],
+  sidebarRow: ['--control-md', 'patterns/Sidebar/Sidebar.scss', 16],
 };
 
 /** corner role: [radius token, source SCSS]. Drawn at the kit's half scale. */
 const CORNERS = {
-  window: ['--radius-0375', null],
+  window: ['--radius-control-sm', null],
   button: ['--button-radius-default', 'components/forms-and-inputs/Button/Button.scss'],
   card: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
   section: ['--section-radius', 'patterns/PatternSection/PatternSection.scss'],
@@ -176,7 +176,7 @@ const CORNERS = {
   icon: ['--radius-sm', null],
   tracker: ['--radius-control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
   cardImage: ['--card-radius-compact', 'patterns/PatternCard/PatternCard.scss'],
-  shape: ['--radius-0375', null],
+  shape: ['--radius-control-sm', null],
   full: ['--radius-full', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
 };
 
@@ -212,7 +212,7 @@ export const HAIRLINE = { strokeWidth: 'var(--stroke-hairline)' };
 export const HERO_HAIRLINE = 'calc(var(--stroke-1) / 2)';
 
 /** A selected tab's underline: the Tabs component's selected-border width, halved. */
-export const TAB_UNDERLINE = { strokeWidth: 'var(--border-selected)' };
+export const TAB_UNDERLINE = { strokeWidth: 'var(--border-width-selected)' };
 
 /**
  * A real-fidelity label. Drawings show at up to twice their viewBox, so the
@@ -221,5 +221,5 @@ export const TAB_UNDERLINE = { strokeWidth: 'var(--border-selected)' };
 export const LABEL_FONT = {
   fontFamily: 'var(--type-family-body)',
   fontWeight: 'var(--type-weight-semibold)',
-  fontSize: 'calc(var(--font-size-0875) / 2)',
+  fontSize: 'calc(var(--type-size-0875) / 2)',
 };

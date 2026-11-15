@@ -25,11 +25,11 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 
 | Figma Text Style | PLUS CSS Token |
 |-----------------|----------------|
-| Heading/xxlarge | `var(--heading-xxlarge)` |
-| Heading/xlarge | `var(--heading-xlarge)` |
-| Heading/large | `var(--heading-large)` |
-| Heading/medium | `var(--heading-medium)` |
-| Heading/small | `var(--heading-small)` |
+| Heading/xxlarge | `var(--heading-xxl)` |
+| Heading/xlarge | `var(--heading-xl)` |
+| Heading/large | `var(--heading-lg)` |
+| Heading/medium | `var(--heading-md)` |
+| Heading/small | `var(--heading-sm)` |
 | Heading/xsmall | `var(--heading-xsmall)` |
 | Heading/xxsmall | `var(--heading-xxsmall)` |
 | Body/large | `var(--body-large)` |
@@ -53,7 +53,7 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 
 A variable bound to letter spacing renders in pixels in Figma, so `Heading/xxlarge`, `xlarge` and `large` hold their tracking as an explicit percent (-2%, -1%, -1%) on the style, and the `Letter spacing/*` variables (-1, -2) read as percent of font size. The token generator matches a style's percent to the variable of the same value.
 
-The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-large)`). A button or tab label is `Body/default` with `Weight/medium`.
+The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-lg)`). A button or tab label is `Body/default` with `Weight/medium`.
 
 ### Text that carries no style
 
@@ -84,16 +84,16 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 
 | Figma Variable | PLUS CSS Token | Notes |
 |----------------|----------------|-------|
-| spacing / primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--radius-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
+| spacing / primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--space-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
 | Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--pad-x-sm)` | 4 · 8 · 12 · 16 and 2 · 6 · 8 |
 | Foundations `Element/stack-*`, `inline-*` | `var(--stack-md)`, `var(--inline-sm)` | 4 · 8 · 12 |
 | Semantics `Radius/{sm\|md\|lg\|xl\|xxl\|full}`, `Radius/Control/{sm\|md\|lg}` | `var(--radius-control-md)` | 2 · 4 · 8 · 12 · 16, controls 6 · 8 · 10 |
 | Foundations `Size/Height/*`, `Width/*` | `var(--height-200)`, `var(--width-1400)` | Common scales, named by rem × 100 |
-| Foundations `Size/Item/height-{sm\|md}` | `var(--item-height-md)` | 24 · 32; there is no 40 Item |
+| Foundations `Size/Item/height-{sm\|md}` | `var(--control-md)` | 24 · 32; there is no 40 Item |
 | Foundations `Size/Row/height-{sm\|md\|lg}` | `var(--row-height-md)` | 32 · 40 · 48 |
 | Foundations `Size/Label/*`, `Field/*` | `var(--label-height-md)`, `var(--field-width-md)` | Label 16 · 20, max 160; Field widths 80 … 480, min heights 80 · 120 |
 | Foundations `Size/Icon/*`, `Image/*` | `var(--icon-md)`, `var(--image-sm)` | Icon 12 · 16 · 24; Image 16 … 48 |
-| Foundations `Border/default`, `selected`, `focused` | `var(--border-default)` | 1 · 2 · 2 |
+| Foundations `Border/default`, `selected`, `focused` | `var(--border-width-default)` | 1 · 2 · 2 |
 
 ## Elevation Tokens
 

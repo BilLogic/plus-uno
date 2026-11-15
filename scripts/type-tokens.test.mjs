@@ -56,14 +56,14 @@ const STACKS = {
   body: '"Noto Sans", "Noto Sans Fallback", sans-serif',
   code: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 };
-const cssName = (style) => `--${style.toLowerCase().replace('/', '-')}`;
+const cssName = (style) => `--${style.toLowerCase().replace('/', '-').replace(/^heading-(xxlarge|xlarge|large|medium|small)$/, (_, size) => `heading-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm' })[size]}`)}`;
 
 test('the font primitives are named by rem × 100 and resolve to their rem value', () => {
   for (const [step, px] of Object.entries(FONT_SIZES)) {
-    assert.equal(corpus.get(`--font-size-${step}`)?.value, rem(px), `--font-size-${step}`);
+    assert.equal(corpus.get(`--type-size-${step}`)?.value, rem(px), `--type-size-${step}`);
   }
   for (const [step, px] of Object.entries(LINE_HEIGHTS)) {
-    assert.equal(corpus.get(`--line-height-${step}`)?.value, rem(px), `--line-height-${step}`);
+    assert.equal(corpus.get(`--type-line-height-${step}`)?.value, rem(px), `--type-line-height-${step}`);
   }
 });
 
@@ -90,7 +90,7 @@ test('every text style resolves to its size, line height, weight and family', ()
 });
 
 test('code is 0.875em of the text around it, in the code stack', () => {
-  assert.equal(resolved('--code'), `400 0.875em / 1 ${STACKS.code}`);
+  assert.equal(resolved('--code-default'), `400 0.875em / 1 ${STACKS.code}`);
 });
 
 test('every library text style binds all four properties to a type variable', () => {

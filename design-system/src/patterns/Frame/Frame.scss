@@ -50,12 +50,12 @@
 // never two.
 .plus-frame__sidebar--docked {
     position: relative;
-    z-index: var(--frame-layer-docked-edge);
+    z-index: var(--layer-frame-docked-edge);
     flex-shrink: 0;
     // The line lies just outside the 240, over the Page's first pixel, so the
     // Sidebar's grid keeps its columns and the Page keeps its width. The layer
     // lifts it over the Page's fill.
-    box-shadow: var(--border-default) 0 0 0 var(--ds-border);
+    box-shadow: var(--border-width-default) 0 0 0 var(--ds-border);
 }
 
 // Floating (a peek, or an overlay under 1024): over the Page, full height, on
@@ -67,7 +67,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    z-index: var(--frame-layer-sidebar);
+    z-index: var(--layer-frame-sidebar);
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
 }
@@ -106,10 +106,10 @@
 // the toggle's row, so a pointer resting on the toggle opens nothing.
 .plus-frame__edge {
     position: absolute;
-    top: calc(var(--frame-sidebar-pad) + var(--item-height-md));
+    top: calc(var(--frame-sidebar-pad) + var(--control-md));
     bottom: 0;
     left: 0;
-    z-index: var(--frame-layer-edge);
+    z-index: var(--layer-frame-edge);
     width: var(--pad-x-sm);
 }
 
@@ -139,7 +139,7 @@
     flex-shrink: 0;
     gap: var(--inline-md);
     min-width: 0;
-    height: var(--item-height-md);
+    height: var(--control-md);
     margin-top: calc(var(--frame-sidebar-pad) - var(--page-pad));
     margin-bottom: var(--page-stack-sm);
 }
@@ -202,7 +202,7 @@
     width: var(--frame-panel-width, var(--panel-width-default));
     min-height: 0;
     box-sizing: border-box;
-    border-inline-start: var(--border-default) solid var(--ds-border);
+    border-inline-start: var(--border-width-default) solid var(--ds-border);
 
     // Focus lands here when what had it left the page, or when the Panel turns modal around it; the Panel is not a control, so no ring.
     &:focus {
@@ -213,7 +213,7 @@
     // so it is revealed, never squeezed.
     > .plus-panel {
         flex: 1 1 auto;
-        width: calc(var(--frame-panel-width, var(--panel-width-default)) - var(--border-default));
+        width: calc(var(--frame-panel-width, var(--panel-width-default)) - var(--border-width-default));
         height: auto;
         min-height: 0;
     }
@@ -276,7 +276,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: var(--frame-layer-panel-peek);
+    z-index: var(--layer-frame-panel-peek);
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
 
@@ -292,7 +292,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: var(--frame-layer-edge);
+    z-index: var(--layer-frame-edge);
     width: var(--pad-x-sm);
 }
 
@@ -304,7 +304,7 @@
     top: 0;
     bottom: 0;
     inset-inline-start: 0;
-    z-index: var(--frame-layer-splitter);
+    z-index: var(--layer-frame-splitter);
     width: var(--pad-x-sm);
     transform: translateX(-50%);
     cursor: col-resize;

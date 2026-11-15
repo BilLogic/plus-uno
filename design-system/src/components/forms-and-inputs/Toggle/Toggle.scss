@@ -22,10 +22,10 @@
     width: 100%;
     gap: var(--stack-md, 8px);
 
-    // A choice row is 24 (`--item-height-sm`); a bare track with no label
+    // A choice row is 24 (`--control-sm`); a bare track with no label
     // keeps its own, smaller height.
     &.plus-toggle-row {
-        min-height: var(--item-height-sm);
+        min-height: var(--control-sm);
     }
 }
 

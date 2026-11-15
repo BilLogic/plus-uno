@@ -1,8 +1,8 @@
 @use '../../../styles/state' as *;
 
 /*
- * Pagination: one pill of segments. A page is a 32 row (`--item-height-md`), 24
- * when compact (`--item-height-sm`), the label body/default, the current page
+ * Pagination: one pill of segments. A page is a 32 row (`--control-md`), 24
+ * when compact (`--control-sm`), the label body/default, the current page
  * on the selected tokens. Hovered and pressed come from the state mixin; the
  * focus ring sits inside the segment so its neighbors do not cover it.
  */
@@ -17,7 +17,7 @@
     align-items: stretch;
     gap: 0;
 
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--radius-full);
     background-color: var(--ds-surface);
     overflow: hidden;
@@ -25,11 +25,11 @@
     box-sizing: border-box;
     height: var(--_pagination-height);
 
-    --_pagination-height: var(--item-height-md);
+    --_pagination-height: var(--control-md);
     --_pagination-pad: var(--pad-x-md);
 
     &.plus-pagination--compact {
-        --_pagination-height: var(--item-height-sm);
+        --_pagination-height: var(--control-sm);
         --_pagination-pad: var(--pad-x-sm);
     }
 }
@@ -42,7 +42,7 @@
     align-items: stretch;
 
     & + & {
-        border-left: var(--border-default) solid var(--ds-border);
+        border-left: var(--border-width-default) solid var(--ds-border);
     }
 }
 
@@ -55,7 +55,7 @@
     box-sizing: border-box;
     // Fills the item, which fills the pill's inner height (the row less the border).
     height: auto;
-    min-width: calc(var(--_pagination-height) - 2 * var(--border-default));
+    min-width: calc(var(--_pagination-height) - 2 * var(--border-width-default));
     margin: 0;
     padding: 0 var(--_pagination-pad);
     border: none;
@@ -156,6 +156,6 @@
     }
 
     .plus-pagination__page[aria-current='page'] {
-        @include plus-ring($ring-offset: calc(-1 * var(--border-default)), $ring-token: Highlight, $ring-width: var(--border-default));
+        @include plus-ring($ring-offset: calc(-1 * var(--border-width-default)), $ring-token: Highlight, $ring-width: var(--border-width-default));
     }
 }

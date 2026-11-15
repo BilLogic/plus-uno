@@ -168,7 +168,7 @@ function HeightCase({ height, body, title }) {
     );
 }
 
-const capOf = (canvasElement) => lengthOf(canvasElement.ownerDocument, '--blanket-max-height-modal');
+const capOf = (canvasElement) => lengthOf(canvasElement.ownerDocument, '--backdrop-max-height-modal');
 const dialogOf = async (canvasElement, title) => (await documentOf(canvasElement).findByText(title)).closest('.plus-modal');
 
 export const HugShort = () => <HeightCase height="hug" body={SHORT} title="Hug, short" />;
@@ -218,7 +218,7 @@ Backdrop.play = async ({ canvasElement }) => {
     const backdrop = dialog.closest('.plus-pattern-backdrop');
     await expect(backdrop).not.toBeNull();
     // The backdrop's fill is color.blanket, in whichever mode is in force, and nothing else tints it.
-    await expect(getComputedStyle(backdrop).backgroundColor).toBe(colorOf(doc, '--ds-blanket'));
+    await expect(getComputedStyle(backdrop).backgroundColor).toBe(colorOf(doc, '--ds-backdrop'));
     // The layers: backdrop 500, modal 510. The dialog is the backdrop's
     // direct child, so it takes the modal layer straight from Backdrop's own
     // `> *` rule, with no intermediate wrapper.
@@ -274,8 +274,8 @@ const FLOATING_NAV = {
     bottom: 'var(--section-stack-sm)',
     right: 'var(--section-stack-sm)',
     zIndex: 'var(--layer-navigation)',
-    width: 'var(--item-height-md)',
-    height: 'var(--item-height-md)',
+    width: 'var(--control-md)',
+    height: 'var(--control-md)',
     background: 'var(--ds-background-brand-subtlest)',
 };
 export const ChromeUnderTheBackdrop = () => (

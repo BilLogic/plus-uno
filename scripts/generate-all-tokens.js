@@ -50,7 +50,7 @@ const stale = (constant, message) => staleExceptions.push(`${constant}: ${messag
  * A name as a token: `Social-Emotional` -> `social-emotional`,
  * `Spacing/Small/space-000` -> `spacing-small-space-000`.
  */
-const slug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-');
+const slug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-').replace(/^heading-(xxlarge|xlarge|large|medium|small)(?=-|$)/, (_, size) => `heading-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm' })[size]}`);
 
 /**
  * A Figma color ({r, g, b, a} in 0–1) as CSS: `#rrggbb` when opaque, `rgba()`
@@ -186,20 +186,20 @@ const NO_LIMIT_FRAME_LAYERS = { 'max-width-screen': 10000 };
  * is the variable that would replace each one.
  */
 const CODE_ONLY_FRAME_LAYERS = {
-    'popover-offset': {
+    'popup-offset': {
         value: 'var(--space-025)',
-        note: 'gap from a popover to its trigger',
+        note: 'gap from a Popup to its trigger',
         figmaName: 'Popover/Placement/offset',
     },
     // The Frame's own stacking steps around the navigation layer, named so
     // Frame.scss does arithmetic on none of them.
-    'frame-layer-edge': { value: 'calc(var(--layer-navigation) - 1)', note: 'the hover strips that peek a closed Sidebar or Panel', figmaName: 'Layer/frame-edge' },
-    'frame-layer-sidebar': { value: 'var(--layer-navigation)', note: 'the raised Sidebar', figmaName: 'Layer/frame-sidebar' },
-    'frame-layer-topbar-start': { value: 'calc(var(--layer-navigation) + 1)', note: 'the Topbar start, above a raised Sidebar', figmaName: 'Layer/frame-topbar-start' },
-    'frame-layer-blanket': { value: 'calc(var(--layer-navigation) + 2)', note: "the overlay Panel's Backdrop", figmaName: 'Layer/frame-blanket' },
-    'frame-layer-panel-peek': { value: 'calc(var(--layer-navigation) + 3)', note: 'a peeking or overlay Panel, above its Backdrop', figmaName: 'Layer/frame-panel-peek' },
-    'frame-layer-splitter': { value: '1', note: "local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip", figmaName: 'Layer/frame-splitter' },
-    'frame-layer-docked-edge': { value: '1', note: "local to the Frame's row, not a step on the navigation scale: lifts a docked Sidebar so its 1px edge lies over the Page's first pixel", figmaName: 'Layer/frame-docked-edge' },
+    'layer-frame-edge': { value: 'calc(var(--layer-navigation) - 1)', note: 'the hover strips that peek a closed Sidebar or Panel', figmaName: 'Layer/frame-edge' },
+    'layer-frame-sidebar': { value: 'var(--layer-navigation)', note: 'the raised Sidebar', figmaName: 'Layer/frame-sidebar' },
+    'layer-frame-topbar-start': { value: 'calc(var(--layer-navigation) + 1)', note: 'the Topbar start, above a raised Sidebar', figmaName: 'Layer/frame-topbar-start' },
+    'layer-frame-blanket': { value: 'calc(var(--layer-navigation) + 2)', note: "the overlay Panel's Backdrop", figmaName: 'Layer/frame-blanket' },
+    'layer-frame-panel-peek': { value: 'calc(var(--layer-navigation) + 3)', note: 'a peeking or overlay Panel, above its Backdrop', figmaName: 'Layer/frame-panel-peek' },
+    'layer-frame-splitter': { value: '1', note: "local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip", figmaName: 'Layer/frame-splitter' },
+    'layer-frame-docked-edge': { value: '1', note: "local to the Frame's row, not a step on the navigation scale: lifts a docked Sidebar so its 1px edge lies over the Page's first pixel", figmaName: 'Layer/frame-docked-edge' },
 };
 
 /**
@@ -330,7 +330,7 @@ ${Object.entries(CODE_ONLY_FRAME_LAYERS).map(([token, { value, note }]) => `    
  * `Family/*` and `Weight/*`. Beside it in the export are the text styles that
  * bind every property to one of those variables. Code takes the plain spec
  * names: `Weight/medium` is `--type-weight-medium`, and `Heading/large` is
- * `--heading-large`, a `font` shorthand built from the same variables the
+ * `--heading-lg`, a `font` shorthand built from the same variables the
  * style binds, so a family is written once, in its token.
  */
 
@@ -378,7 +378,7 @@ const FAMILY_FALLBACKS = {
  * Figma text style cannot express, so it is code only.
  */
 const CODE_ONLY_TYPE_STYLES = {
-    'Code': 'var(--type-weight-regular) 0.875em / 1 var(--type-family-code)',
+    'Code/default': 'var(--type-weight-regular) 0.875em / 1 var(--type-family-code)',
 };
 
 /** The style groups in the order they are written. */

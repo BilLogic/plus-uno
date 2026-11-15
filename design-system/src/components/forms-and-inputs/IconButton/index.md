@@ -61,7 +61,7 @@ Every icon button carries a `label` that is its accessible name and its tooltip.
 
 ### Keep it square. {#keep-it-square}
 
-Icon buttons stay square at `--item-height-md` (`default`) or `--item-height-sm` (`compact`), and round only in top navigation (`shape="circle"`). Never stretch one to fill a row; only a filter trigger's `trailingMetric` widens the button.
+Icon buttons stay square at `--control-md` (`default`) or `--control-sm` (`compact`), and round only in top navigation (`shape="circle"`). Never stretch one to fill a row; only a filter trigger's `trailingMetric` widens the button.
 
 ### Show the applied count on a filter trigger. {#show-the-applied-count-on-a-filter-trigger}
 
@@ -144,7 +144,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps; `--ds-background-disabled`. |
 | Icon | `--ds-icon-subtle` (default, subtle), `--ds-icon-inverse` (primary, discovery); the selected and disabled roles. 16, `--icon-md`. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
-| Size | 32: `--item-height-md`. 24: `--item-height-sm`. Square, except with a count. |
+| Size | 32: `--control-md`. 24: `--control-sm`. Square, except with a count. |
 | Count | `--ds-text-subtlest`, or the selected text color when selected. `--inline-sm` after the icon. Motion: `--ds-motion-appearance-default` to open, `--ds-motion-appearance-fast` to fade in. |
 | Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. Circle 50%. |
 
@@ -187,7 +187,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-subtlest` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--item-height-sm`
+`--border-width-default` · `--control-md` · `--control-sm` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-subtlest` · `--icon-md` · `--inline-sm`
 
 From `design-system/src/components/forms-and-inputs/IconButton/IconButton.scss`. Override these through the token layer, never with a literal.
 

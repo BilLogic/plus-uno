@@ -221,7 +221,7 @@ export const HEROES = {
   'patterns-overview': {
     Hero: OverviewHero,
     description:
-      'Real moments, sized by scope: Filtering big, a Flag wide, a Spinner and a badge small.',
+      'Real moments, sized by scope: Filtering big, a Flag wide, a Spinner and a countTag small.',
   },
   'patterns-common-actions': {
     Hero: CommonActionsHero,

@@ -79,13 +79,13 @@ const heard = (el) => {
     return walk(el).replace(/\s+/g, ' ').trim();
 };
 
-/** What a sighted reader sees: the chip and comparison text, never the spoken copy. */
+/** What a sighted reader sees: the tag and comparison text, never the spoken copy. */
 const seen = (el) => [...el.children]
     .filter((child) => child.getAttribute('aria-hidden') === 'true')
     .map((child) => child.textContent)
     .join(' ');
 
-const chipOf = (el) => el.firstElementChild;
+const tagOf = (el) => el.firstElementChild;
 const iconIn = (el) => el.querySelector('i');
 
 /* ----------------------------------------------------------------- stories */
@@ -119,11 +119,11 @@ Overview.play = async ({ canvasElement }) => {
     ];
     for (const [id, shown, spoken, tone, icon] of cases) {
         const el = canvas.getByTestId(id);
-        const chip = chipOf(el);
+        const tag = tagOf(el);
         await expect(seen(el), `${id} shows`).toBe(shown);
         await expect(heard(el), `${id} is heard as`).toBe(spoken);
-        await expect(getComputedStyle(chip).backgroundColor, `${id} fill`).toBe(token(TONE_LOOK[tone][0]));
-        await expect(getComputedStyle(chip).color, `${id} text`).toBe(token(TONE_LOOK[tone][1]));
+        await expect(getComputedStyle(tag).backgroundColor, `${id} fill`).toBe(token(TONE_LOOK[tone][0]));
+        await expect(getComputedStyle(tag).color, `${id} text`).toBe(token(TONE_LOOK[tone][1]));
         if (icon) {
             await expect(getComputedStyle(iconIn(el), '::before').content, `${id} arrow`).toBe(glyphOf(canvasElement, icon));
         } else {
@@ -151,12 +151,12 @@ Styles.play = async ({ canvasElement }) => {
     await inEveryColorModeOf(canvasElement, async (mode, themed) => {
         for (const size of CHANGE_TAG_SPACINGS) {
             for (const [tone, [fill, ink, edge]] of Object.entries(TONE_LOOK)) {
-                const chip = chipOf(canvas.getByTestId(`${tone}-${size}`));
+                const tag = tagOf(canvas.getByTestId(`${tone}-${size}`));
                 const name = `${mode}: ${tone}-${size}`;
-                chip.style.transition = 'none';
-                await expect(getComputedStyle(chip).backgroundColor, `${name} fill`).toBe(themed(fill));
-                await expect(getComputedStyle(chip).color, `${name} text`).toBe(themed(ink));
-                await expect(innerBorder(chip), `${name} border`).toBe(themed(edge));
+                tag.style.transition = 'none';
+                await expect(getComputedStyle(tag).backgroundColor, `${name} fill`).toBe(themed(fill));
+                await expect(getComputedStyle(tag).color, `${name} text`).toBe(themed(ink));
+                await expect(innerBorder(tag), `${name} border`).toBe(themed(edge));
             }
         }
     });
@@ -165,16 +165,16 @@ Styles.play = async ({ canvasElement }) => {
         for (const [tone, [, ink]] of Object.entries(TONE_LOOK)) {
             const name = `${tone}-${size}`;
             const el = canvas.getByTestId(name);
-            const chip = chipOf(el);
-            await expect(chip.getBoundingClientRect().height, `${name} height`).toBe(SIZE[size]);
-            await expect(px(getComputedStyle(chip).borderRadius), `${name} radius`).toBe(4);
+            const tag = tagOf(el);
+            await expect(tag.getBoundingClientRect().height, `${name} height`).toBe(SIZE[size]);
+            await expect(px(getComputedStyle(tag).borderRadius), `${name} radius`).toBe(4);
             const glyph = iconIn(el);
             await expect(glyph).toHaveAttribute('aria-hidden', 'true');
             await expect(getComputedStyle(glyph).color, `${name} arrow color`).toBe(token(ink));
             await expect(px(getComputedStyle(glyph).fontSize), `${name} arrow size`).toBe(12);
             const comparison = within(el).getByText('vs last week', { selector: '[aria-hidden="true"]' });
             await expect(getComputedStyle(comparison).color, `${name} comparison`).toBe(token('--ds-text-subtle'));
-            await expect(chip.contains(comparison), `${name} comparison sits outside the fill`).toBe(false);
+            await expect(tag.contains(comparison), `${name} comparison sits outside the fill`).toBe(false);
         }
     }
 };
@@ -219,7 +219,7 @@ CustomIcon.play = async ({ canvasElement }) => {
 };
 
 /**
- * A new value fades in while the chip's color moves to its new tone. The
+ * A new value fades in while the tag's color moves to its new tone. The
  * first render does not animate, and a re-render with the same value does not
  * replay it.
  */
@@ -238,7 +238,7 @@ ValueChange.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const token = (name) => tokenColor(canvasElement, name);
     const el = canvas.getByTestId('change');
-    const valueEl = () => within(chipOf(el)).getByText(/\d/);
+    const valueEl = () => within(tagOf(el)).getByText(/\d/);
 
     await expect(getComputedStyle(valueEl()).animationName, 'the first render does not animate').toBe('none');
 
@@ -247,10 +247,10 @@ ValueChange.play = async ({ canvasElement }) => {
     await expect(heard(el)).toBe('Up 5 vs last week');
     const entering = valueEl();
     await expect(getComputedStyle(entering).animationName, 'the new value fades in').not.toBe('none');
-    await expect(getComputedStyle(chipOf(el)).transitionProperty, 'the color moves').toContain('background-color');
+    await expect(getComputedStyle(tagOf(el)).transitionProperty, 'the color moves').toContain('background-color');
     // Read outside waitFor: a probe adds an element, which would wake waitFor again, forever.
     const success = token('--ds-background-success');
-    await waitFor(() => expect(getComputedStyle(chipOf(el)).backgroundColor).toBe(success));
+    await waitFor(() => expect(getComputedStyle(tagOf(el)).backgroundColor).toBe(success));
 
     await userEvent.click(canvas.getByRole('button', { name: 'Re-render' }));
     await expect(valueEl(), 'the same value keeps its element').toBe(entering);
@@ -320,8 +320,8 @@ UnknownValuesFallBack.play = async ({ canvasElement }) => {
         const fallback = canvas.getByTestId('fallback');
         const plain = canvas.getByTestId('plain');
         await expect(seen(fallback)).toBe(seen(plain));
-        await expect(getComputedStyle(chipOf(fallback)).backgroundColor).toBe(getComputedStyle(chipOf(plain)).backgroundColor);
-        await expect(chipOf(fallback).getBoundingClientRect().height).toBe(20);
+        await expect(getComputedStyle(tagOf(fallback)).backgroundColor).toBe(getComputedStyle(tagOf(plain)).backgroundColor);
+        await expect(tagOf(fallback).getBoundingClientRect().height).toBe(20);
     } finally {
         warn.mockRestore();
     }
@@ -356,7 +356,7 @@ export const Rest = {
     render: () => <ChangeTag value={3} goodDirection="up" comparison="vs last week" data-testid="change" />,
     play: async ({ canvasElement }) => {
         const el = within(canvasElement).getByTestId('change');
-        await expect(px(getComputedStyle(chipOf(el)).height), 'default is 20').toBe(20);
+        await expect(px(getComputedStyle(tagOf(el)).height), 'default is 20').toBe(20);
         await expect(el).not.toHaveAttribute('tabindex');
     },
 };
@@ -365,7 +365,7 @@ export const Rest = {
 export const Hovered = {
     render: () => <ChangeTag value={3} goodDirection="up" data-testid="change" />,
     play: async ({ canvasElement }) => {
-        await expectNoStateChange(chipOf(within(canvasElement).getByTestId('change')), ':hover', 'ChangeTag');
+        await expectNoStateChange(tagOf(within(canvasElement).getByTestId('change')), ':hover', 'ChangeTag');
     },
 };
 
@@ -373,7 +373,7 @@ export const Hovered = {
 export const Pressed = {
     render: () => <ChangeTag value={3} goodDirection="up" data-testid="change" />,
     play: async ({ canvasElement }) => {
-        await expectNoStateChange(chipOf(within(canvasElement).getByTestId('change')), ':active', 'ChangeTag');
+        await expectNoStateChange(tagOf(within(canvasElement).getByTestId('change')), ':active', 'ChangeTag');
     },
 };
 

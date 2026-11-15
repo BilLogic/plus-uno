@@ -109,7 +109,7 @@ Dependency from one cell to another
 | `created_at` | — |
 | `updated_at` | — |
 | `kind` | leads_to = temporal (this cell makes the other happen; drawn as an arrow); enables = functional (the other must already be in place). enables renders in the panel only. |
-| `name` | RETIRED (#550), and kept only so stage 1 is reversible. Documented as the word ON the arrow, it was never used as one: all 8 rows that carried it carried a sentence about why the edge exists, and 20260909040000 copied every one of them into note. Nothing writes it any more — not set_cell_dependency's argument, not the editor, not the agent tool. The dependency row still RENDERS it as a badge, because that row is held byte-identical to the template's and the change to stop belongs upstream; stage 2 drops the column and that badge together, and is a separate decision. |
+| `name` | RETIRED (#550), and kept only so stage 1 is reversible. Documented as the word ON the arrow, it was never used as one: all 8 rows that carried it carried a sentence about why the edge exists, and 20260909040000 copied every one of them into note. Nothing writes it any more — not set_cell_dependency's argument, not the editor, not the agent tool. The dependency row still RENDERS it as a countTag, because that row is held byte-identical to the template's and the change to stop belongs upstream; stage 2 drops the column and that countTag together, and is a separate decision. |
 | `note` | Anything worth knowing about this dependency, in the author's own words — rendered as the line under the dependency row, revealed on hover. General purpose, not "why this edge exists": the same kind of aside paths.note and scenarios.note carry, and since #550 the ONE prose field an edge has. Null means nothing was recorded, which is not the same as nothing worth recording. |
 
 ### `cell_touchpoints`
@@ -124,7 +124,7 @@ One touchpoint used at one cell: its own summary and role at this moment. Named 
 | `touchpoint_id` | — |
 | `position` | — |
 | `summary` | — |
-| `role` | What this touchpoint is to this moment: core (the step happens through it) or peripheral (present, but not what the step turns on), or null for the unmarked majority. Null is a state of its own and not a quiet "peripheral": it means nobody has judged this placement, so the panel renders nothing for it rather than a badge saying so. On the placement and not the catalog because the same artifact is central at one step and incidental at another. |
+| `role` | What this touchpoint is to this moment: core (the step happens through it) or peripheral (present, but not what the step turns on), or null for the unmarked majority. Null is a state of its own and not a quiet "peripheral": it means nobody has judged this placement, so the panel renders nothing for it rather than a countTag saying so. On the placement and not the catalog because the same artifact is central at one step and incidental at another. |
 | `origin` | — |
 | `created_at` | — |
 | `updated_at` | — |
@@ -378,7 +378,7 @@ Deployment-level cast list: one pool of actors a lane picks from, unique by name
 | `id` | — |
 | `name` | The identity: unique across the deployment, so the same actor recurs across services by name rather than as one row per service. |
 | `kind` | What sort of party this is. staff/recipient/partner/provider are ACTORS — they can be a lane's stakeholder. team is an accountable group — it can be a lane's owner_team and never its stakeholder. |
-| `summary` | What this party IS, in one line — a definition, not an aside. The lane panel and the owner badge read it; a lane never copies it, because one stakeholder owns many lanes and 37 copies is 37 chances to disagree. |
+| `summary` | What this party IS, in one line — a definition, not an aside. The lane panel and the owner countTag read it; a lane never copies it, because one stakeholder owns many lanes and 37 copies is 37 chances to disagree. |
 | `aliases` | — |
 | `created_at` | — |
 | `updated_at` | — |

@@ -5,7 +5,7 @@
     position: relative;
     display: inline-flex;
     padding: var(--logo-clear);
-    border: var(--border-default) dashed var(--ds-border-danger);
+    border: var(--border-width-default) dashed var(--ds-border-danger);
 }
 
 .plus-logo-clear__tag {
@@ -15,7 +15,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font: var(--code);
+    font: var(--code-default);
     color: var(--ds-text-subtle);
 }
 

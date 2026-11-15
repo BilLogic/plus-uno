@@ -62,7 +62,7 @@ export const CategoryAndStateMixed = () => (
             height={200}
             categories={categories}
             series={[
-                { name: 'Online', data: [40, 55, 30], color: 'var(--ds-chart-categorical-2)' },
+                { name: 'Online', data: [40, 55, 30], color: 'var(--chart-categorical-2)' },
                 { name: 'In person', data: [52, 48, 41], color: STATUS.success },
             ]}
         />

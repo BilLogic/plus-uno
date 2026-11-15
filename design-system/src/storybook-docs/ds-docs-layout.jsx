@@ -177,7 +177,7 @@ export function DocsPreviewCard({ children, innerClassName = '' }) {
                 overflow: 'visible',
                 borderRadius: 'var(--card-radius-compact)',
                 backgroundColor: 'var(--ds-surface-container)',
-                border: 'var(--border-default) solid var(--ds-border)',
+                border: 'var(--border-width-default) solid var(--ds-border)',
             }}
         >
             <div
@@ -300,7 +300,7 @@ export function DoDontCaption({ tone, children, style }) {
                     alignItems: 'center',
                     justifyContent: 'center',
                     width: 'var(--icon-md)',
-                    height: 'var(--line-height-125)',
+                    height: 'var(--type-line-height-125)',
                     flexShrink: 0,
                     color: 'var(--ds-text)',
                     fontSize: 'var(--icon-md)',
@@ -354,7 +354,7 @@ export function DoDontCard({ tone, children, caption }) {
                 boxSizing: 'border-box',
                 padding: 'var(--card-pad-default)',
                 borderRadius: 'var(--card-radius)',
-                border: 'var(--border-default) solid var(--ds-border)',
+                border: 'var(--border-width-default) solid var(--ds-border)',
                 backgroundColor: 'var(--ds-surface-raised)',
                 boxShadow: 'var(--ds-shadow-raised)',
             }}
@@ -494,7 +494,7 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                     overflow: 'visible',
                     borderRadius: 'var(--card-radius-compact)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: 'var(--border-default) solid var(--ds-border)',
+                    border: 'var(--border-width-default) solid var(--ds-border)',
                 }}
             >
                 <div
@@ -518,13 +518,13 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                     style={{
                         padding: 'var(--page-stack-md) var(--page-stack-lg)',
                         // Canvas and controls are two groups in one well; the line separates them.
-                        borderTop: 'var(--border-default) solid var(--ds-border)',
+                        borderTop: 'var(--border-width-default) solid var(--ds-border)',
                         backgroundColor: 'var(--ds-surface-container)',
-                        // The panel is overflow-visible (Controls popovers), so this
+                        // The panel is overflow-visible (Controls popups), so this
                         // last child's own background must follow the panel's curve
                         // or it squares off the bottom corners.
-                        borderBottomLeftRadius: 'calc(var(--card-radius-compact) - var(--border-default))',
-                        borderBottomRightRadius: 'calc(var(--card-radius-compact) - var(--border-default))',
+                        borderBottomLeftRadius: 'calc(var(--card-radius-compact) - var(--border-width-default))',
+                        borderBottomRightRadius: 'calc(var(--card-radius-compact) - var(--border-width-default))',
                     }}
                 >
                     <Controls of={ofStory} />

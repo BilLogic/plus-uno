@@ -2,7 +2,7 @@
 
 # Suggestion
 
-Suggestion: a chip for a value or question the system proposes, which a person accepts or leaves.
+Suggestion: a tag for a value or question the system proposes, which a person accepts or leaves.
 
 Also asked as: ai chip.
 
@@ -52,7 +52,7 @@ Name an insert suggestion for its value. Start a prompt label with a short verb
 and pass the full request as `text`.
 
 Do: A short verb.
-Don't: A sentence in the chip.
+Don't: A sentence in the tag.
 
 ### Pick insert or prompt by outcome. {#pick-insert-or-prompt-by-outcome}
 
@@ -118,7 +118,7 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStar
 
 | Part | Token |
 | --- | --- |
-| Edge | `--ds-border-discovery`, dashed, `--border-default` wide. |
+| Edge | `--ds-border-discovery`, dashed, `--border-width-default` wide. |
 | Words and glyph | `--ds-text-discovery` and `--ds-icon-discovery`. |
 | Hovered, pressed | `--ds-background-discovery` and `--ds-background-discovery-hovered`. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width` wide and offset. |
@@ -155,7 +155,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--border-default` · `--ds-background-disabled` · `--ds-background-discovery` · `--ds-background-discovery-hovered` · `--ds-border` · `--ds-border-discovery` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-discovery` · `--ds-text-disabled` · `--ds-text-discovery` · `--focus-ring-width` · `--icon-sm` · `--pad-x-xs` · `--plus-suggestion-height` · `--radius-md` · `--stack-sm`
+`--body-small` · `--border-width-default` · `--ds-background-disabled` · `--ds-background-discovery` · `--ds-background-discovery-hovered` · `--ds-border` · `--ds-border-discovery` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-discovery` · `--ds-text-disabled` · `--ds-text-discovery` · `--focus-ring-width` · `--icon-sm` · `--pad-x-xs` · `--plus-suggestion-height` · `--radius-md` · `--stack-sm`
 
 From `design-system/src/components/labels/Suggestion/Suggestion.scss`. Override these through the token layer, never with a literal.
 

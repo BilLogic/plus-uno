@@ -515,7 +515,7 @@ const Frame = ({
             <Dialog.Popup
                 ref={panelRef}
                 id={panelId}
-                // Docked or peeking it is the complementary landmark; as an overlay, a modal dialog.
+                // Docked or peeking it is the complementary landmark; as an overlay, a Modal.
                 role={panelModal ? 'dialog' : 'complementary'}
                 aria-modal={panelModal ? 'true' : undefined}
                 aria-label={panelLabel}

@@ -12,11 +12,11 @@ import TreeSelect from './TreeSelect';
  * shares it: `Select` and `TagInput` (the shared `Listbox`), `TreeSelect` and
  * `Cascader`. The `Dropdown` menu has its own placement stories beside it.
  *
- * - **Offset:** `--popover-offset` between the field and the popup, below
+ * - **Offset:** `--popup-offset` between the field and the popup, below
  *   it or, with no room below, above it.
  * - **Alignment:** left edges line up; a popup that would run past the
  *   viewport's right edge right-aligns to the field instead, and none comes
- *   nearer than `--popover-gap-screen` to the screen's edge.
+ *   nearer than `--popup-gap-screen` to the screen's edge.
  * - **Width:** at least the field's width, growing with its content up to
  *   320px; a field wider than that keeps its own width. `Cascader`'s columns
  *   are exempt from the 320px cap.
@@ -79,7 +79,7 @@ const openPopup = async (canvasElement, kind) => {
     return {
         field: field.getBoundingClientRect(),
         popup: surface.getBoundingClientRect(),
-        gap: tokenLength(canvasElement, '--popover-offset'),
+        gap: tokenLength(canvasElement, '--popup-offset'),
     };
 };
 
@@ -97,7 +97,7 @@ const expectRightAligned = async ({ field, popup }) => {
     await expect(popup.width, 'the popup is wider than the field').toBeGreaterThan(field.width);
     await expect(popup.right, 'right edges line up').toBeCloseTo(field.right, 0);
     await expect(popup.right, 'at least the screen gap inside the viewport')
-        .toBeLessThanOrEqual(document.documentElement.clientWidth - tokenLength(document.body, '--popover-gap-screen'));
+        .toBeLessThanOrEqual(document.documentElement.clientWidth - tokenLength(document.body, '--popup-gap-screen'));
 };
 
 /* --------------------------------------------------------------- layouts */

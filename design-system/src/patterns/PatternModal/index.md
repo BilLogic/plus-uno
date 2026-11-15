@@ -160,7 +160,7 @@ Modal is the component: Backdrop, focus trap, Escape and focus return. The templ
 | `--modal-body-min-height` | 80 | The least the body draws. |
 | `--space-300` | 48 | The full-bleed footer's height: a 32 button plus 16 pad, so full bleed never changes the Modal's height. |
 | `--ds-surface-overlay`, `--ds-shadow-blocking` | pair | The Modal's fill and its elevation, the one surface that lifts above a Backdrop. |
-| `--ds-blanket` | color | The Backdrop's fill. |
+| `--ds-backdrop` | color | The Backdrop's fill. |
 
 The Modal's maximum height is the screen less `--space-400` above and below.
 
@@ -205,7 +205,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-medium` · `--modal-body-min-height` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--modal-stack-sm` · `--plus-overlay-origin` · `--stack-lg` · `--stack-md` · `--transform-origin`
+`--border-width-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-md` · `--modal-body-min-height` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--modal-stack-sm` · `--plus-overlay-origin` · `--stack-lg` · `--stack-md` · `--transform-origin`
 
 From `design-system/src/patterns/PatternModal/PatternModal.scss`. Override these through the token layer, never with a literal.
 

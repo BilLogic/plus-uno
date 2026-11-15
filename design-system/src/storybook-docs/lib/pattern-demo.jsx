@@ -33,7 +33,7 @@ export const slotContent = (label) => (
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: 'calc(var(--control-lg) * 2)',
-            border: 'var(--border-default) dashed var(--ds-border-bold)',
+            border: 'var(--border-width-default) dashed var(--ds-border-bold)',
             borderRadius: 'var(--radius-md)',
             color: 'var(--ds-text-subtle)',
         }}

@@ -84,7 +84,7 @@ Same group: `Code` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 | Part | Token |
 | --- | --- |
-| Typeface | `--code` at `--font-size-0875`, line height `--line-height-125` |
+| Typeface | `--code-default` at `--type-size-0875`, line height `--type-line-height-125` |
 | Surface, ink | `--ds-background-code-default`, `--ds-text-code-default` |
 | Gutter | `--ds-background-code-gutter`, `--ds-text-code-gutter` |
 | Highlight | `--ds-background-code-highlight` |
@@ -114,7 +114,7 @@ Same group: `Code` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 ## Tokens touched
 
-`--border-default` · `--card-radius-compact` · `--code` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--font-size-0875` · `--line-height-125` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-lg` · `--plus-code-block-digits` · `--plus-code-block-gutter`
+`--border-width-default` · `--card-radius-compact` · `--code-default` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-lg` · `--plus-code-block-digits` · `--plus-code-block-gutter` · `--type-line-height-125` · `--type-size-0875`
 
 From `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scss`. Override these through the token layer, never with a literal.
 

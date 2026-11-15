@@ -81,8 +81,8 @@ in the tooltip.
 
 ## Color and accessibility
 
-- **Brand by default, status when meaningful.** Defaults to `--ds-chart-brand`. Set `tone` to `success`, `warning`, `danger` or `information` only when the trend carries that status, and state the status in adjacent text as well ([Chart color](?path=/docs/data-visualizations-color--docs)).
-- **Mode-verified rendering.** The latest-value marker is ringed in `--ds-border-inverse`, and the hidden `ColorModes` story test verifies token strokes (`--ds-chart-brand`, `--ds-chart-danger`), resting marker visibility and hidden axes across every color mode.
+- **Brand by default, status when meaningful.** Defaults to `--chart-brand`. Set `tone` to `success`, `warning`, `danger` or `information` only when the trend carries that status, and state the status in adjacent text as well ([Chart color](?path=/docs/data-visualizations-color--docs)).
+- **Mode-verified rendering.** The latest-value marker is ringed in `--ds-border-inverse`, and the hidden `ColorModes` story test verifies token strokes (`--chart-brand`, `--chart-danger`), resting marker visibility and hidden axes across every color mode.
 - **Descriptive `label` and surrounding context.** Because there are no axes or title, write what the line shows and over what span in `label`, and name the metric in the surrounding stat or table row. Renders a labeled group with a screen-reader summary, per-point labels, and arrow-key navigation.
 - **Contrast.** The line follows the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 

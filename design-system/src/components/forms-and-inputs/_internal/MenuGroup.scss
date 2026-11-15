@@ -16,7 +16,7 @@
 
 .plus-menu-section {
     &--separated {
-        border-top: var(--border-default) solid var(--ds-border);
+        border-top: var(--border-width-default) solid var(--ds-border);
         margin-top: var(--stack-md);
         padding-top: var(--stack-md);
     }

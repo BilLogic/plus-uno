@@ -96,7 +96,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Row vertical padding and gap | `--setting-row-pad-y` (`12px`), horizontal gap `--inline-lg`. |
-| Row divider | `--border-default` solid `--ds-border` between adjacent rows. |
+| Row divider | `--border-width-default` solid `--ds-border` between adjacent rows. |
 | Label and status | `--body-default` with `--type-weight-medium` in `--ds-text` (`--ds-text-disabled` when disabled); status gap `--inline-md`. |
 | Description and error | `--body-small` in `--ds-text-subtle`; error in `--ds-text-danger` with `--icon-sm` glyph. |
 
@@ -126,7 +126,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Tokens touched
 
-`--body-small` · `--border-default` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--icon-sm` · `--inline-lg` · `--inline-md` · `--listbox-max-width` · `--setting-row-end-min-height` · `--setting-row-pad-y` · `--setting-row-select-min-width` · `--stack-sm` · `--type-weight-medium`
+`--body-small` · `--border-width-default` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--icon-sm` · `--inline-lg` · `--inline-md` · `--listbox-max-width` · `--setting-row-end-min-height` · `--setting-row-pad-y` · `--setting-row-select-min-width` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.scss`. Override these through the token layer, never with a literal.
 

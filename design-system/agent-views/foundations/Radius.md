@@ -24,7 +24,7 @@ Nine rules decide a corner. Take the first one that matches. A radius comes only
 
 ## Scale
 
-Eight steps, each aliasing the Space step of the same name (`--radius-0625` is 0.625rem, 10); `--radius-full` is the only literal. Components bind the semantic tokens below, never a primitive.
+Semantic radius and control-radius tokens point directly at their matching Space step (`--radius-control-lg` is 0.625rem, 10). The scale below shows the resulting values; `--radius-full` is the only literal. Components bind the semantic tokens below.
 
 ## Controls
 

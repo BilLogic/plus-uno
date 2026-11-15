@@ -219,8 +219,8 @@ A card has no border.
 
 <TokenTable
     rows={[
-        { token: '--border-default', figma: 'Border/default', use: 'Every standard border, divider and rule.' },
-        { token: '--border-focused', figma: 'Border/focused', use: 'The focus ring.' },
+        { token: '--border-width-default', figma: 'Border/default', use: 'Every standard border, divider and rule.' },
+        { token: '--border-width-focused', figma: 'Border/focused', use: 'The focus ring.' },
     ]}
     valueHeader="Value"
 />
@@ -234,7 +234,7 @@ A card has no border.
 <RefTable
     head={['Fact', 'Rule']}
     rows={[
-        ['Width', <>2, <C>--border-focused</C></>],
+        ['Width', <>2, <C>--border-width-focused</C></>],
         ['Color', <><C>color/border/focused</C> on light; inverse on dark</>],
     ]}
 />
@@ -279,11 +279,11 @@ test('a foundation page is recognized without being told its kind', () => {
 
 test('token and reference tables become text lines; examples are dropped', () => {
   const page = readDocsPage(FOUNDATION_PAGE);
-  assert.match(sectionText(page, 'Width tokens'), /^- `--border-default` \(Border\/default\): Every standard border, divider and rule\.$/m);
+  assert.match(sectionText(page, 'Width tokens'), /^- `--border-width-default` \(Border\/default\): Every standard border, divider and rule\.$/m);
   const focus = sectionText(page, 'Focus ring');
   assert.match(focus, /^### Facts$/m);
   assert.match(focus, /^\| Fact \| Rule \|$/m);
-  assert.match(focus, /^\| Width \| 2, `--border-focused` \|$/m);
+  assert.match(focus, /^\| Width \| 2, `--border-width-focused` \|$/m);
   assert.match(focus, /^\| Color \| `color\/border\/focused` on light; inverse on dark \|$/m);
   assert.match(focus, /^Do: The field keeps its fill and gains the ring\.$/m);
   assert.match(focus, /^Don't: A filled field reads as selected\.$/m);

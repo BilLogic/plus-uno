@@ -154,10 +154,10 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 | --- | --- |
 | Ground | `--ds-background-brand-subtlest`, `--ds-background-neutral`, `--ds-background-success`, `--ds-background-danger`, `--ds-background-warning`, `--ds-background-information` |
 | Icon | `--ds-icon-brand`, `--ds-icon-subtle`, `--ds-icon-success`, `--ds-icon-danger`, `--ds-icon-warning`, `--ds-icon-information` |
-| Title, body, link | `--heading-small`, `--body-default`, `--ds-text`; actions at `--type-weight-medium` |
-| Divider | `--ds-border`, `--border-default` |
+| Title, body, link | `--heading-sm`, `--body-default`, `--ds-text`; actions at `--type-weight-medium` |
+| Divider | `--ds-border`, `--border-width-default` |
 | Padding, gaps, corner | `--card-pad-compact`, `--card-stack-sm`, `--stack-md`, `--radius-md` |
-| Dismiss | `--item-height-md` |
+| Dismiss | `--control-md` |
 
 ## Content guidelines
 
@@ -192,7 +192,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--card-inline-sm` · `--card-pad-compact` · `--card-radius-compact` · `--ds-border` · `--ds-text` · `--heading-small` · `--icon-lg` · `--item-height-md` · `--stack-md` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--card-inline-sm` · `--card-pad-compact` · `--card-radius-compact` · `--control-md` · `--ds-border` · `--ds-text` · `--heading-sm` · `--icon-lg` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/SectionMessage/SectionMessage.scss`. Override these through the token layer, never with a literal.
 

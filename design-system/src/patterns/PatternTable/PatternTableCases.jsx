@@ -211,7 +211,7 @@ const PlainTableCase = () => <InSection>{studentTable}</InSection>;
 /** The table in its own padded frame, out of line with the Section header. */
 const FramedTableCase = () => (
     <InSection>
-        <div style={{ padding: 'var(--pad-x-md)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)' }}>
+        <div style={{ padding: 'var(--pad-x-md)', border: 'var(--border-width-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)' }}>
             {studentTable}
         </div>
     </InSection>

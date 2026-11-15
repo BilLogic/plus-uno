@@ -9,7 +9,7 @@
     background: var(--ds-surface);
     outline: var(--stroke-1) solid var(--ds-border);
     outline-offset: calc(-1 * var(--stroke-1));
-    border-radius: var(--radius-075);
+    border-radius: var(--radius-xl);
     overflow: hidden;
 }
 
@@ -34,12 +34,12 @@
 
 .plus-browser-frame__lights {
     display: flex;
-    gap: var(--space-050);
-    padding-inline: var(--space-0125) var(--space-025);
+    gap: var(--radius-lg);
+    padding-inline: var(--space-0125) var(--radius-md);
 
     b {
-        width: var(--space-075);
-        height: var(--space-075);
+        width: var(--radius-xl);
+        height: var(--radius-xl);
         border-radius: var(--radius-full);
         background: var(--ds-background-accent-red-bolder);
     }
@@ -50,9 +50,9 @@
 .plus-browser-frame__tabs {
     display: flex;
     align-items: flex-end;
-    gap: var(--space-075);
+    gap: var(--radius-xl);
     height: var(--size-250);
-    padding-inline: var(--space-075);
+    padding-inline: var(--radius-xl);
     background: var(--ds-surface-sunken);
 
     .plus-browser-frame__lights,
@@ -62,12 +62,12 @@
 .plus-browser-frame__tab {
     display: flex;
     align-items: center;
-    gap: var(--space-050);
+    gap: var(--radius-lg);
     width: var(--size-1500);
     height: var(--size-200);
-    padding-inline: var(--space-075);
+    padding-inline: var(--radius-xl);
     background: var(--ds-surface);
-    border-radius: var(--radius-050) var(--radius-050) 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .plus-browser-frame__tab-title {
@@ -81,16 +81,16 @@
     flex: none;
     width: var(--icon-sm);
     height: var(--icon-sm);
-    border-radius: var(--radius-025);
+    border-radius: var(--radius-md);
     background: var(--ds-background-brand-bold);
 }
 
 .plus-browser-frame__toolbar {
     display: flex;
     align-items: center;
-    gap: var(--space-075);
+    gap: var(--radius-xl);
     height: var(--size-250);
-    padding-inline: var(--space-075);
+    padding-inline: var(--radius-xl);
     background: var(--ds-surface);
     border-bottom: var(--stroke-1) solid var(--ds-border);
 }
@@ -106,7 +106,7 @@
     flex: 1;
     display: flex;
     align-items: center;
-    gap: var(--space-050);
+    gap: var(--radius-lg);
     height: var(--size-200);
     padding-inline: var(--space-100);
     border-radius: var(--radius-full);
@@ -125,9 +125,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-050);
+    gap: var(--radius-lg);
     height: var(--size-200);
-    border-radius: var(--radius-050);
+    border-radius: var(--radius-lg);
     background: var(--ds-background-neutral);
     font: var(--body-default);
 }
@@ -140,6 +140,6 @@
 // Edge: Chrome's layout with rounder tabs and a pill address bar.
 .plus-browser-frame--edge {
     .plus-browser-frame__tab {
-        border-radius: var(--radius-075) var(--radius-075) 0 0;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
 }

@@ -16,8 +16,8 @@ test('the archived color and size collections are not mapped', () => {
 });
 
 test('a typography variable maps by its folder: the same rule the type generator uses', () => {
-  assert.deepEqual(deriveCandidates('typography', 'Font size/0875'), ['--font-size-0875']);
-  assert.deepEqual(deriveCandidates('typography', 'Line height/125'), ['--line-height-125']);
+  assert.deepEqual(deriveCandidates('typography', 'Font size/0875'), ['--type-size-0875']);
+  assert.deepEqual(deriveCandidates('typography', 'Line height/125'), ['--type-line-height-125']);
   assert.deepEqual(deriveCandidates('typography', 'Family/heading'), ['--type-family-heading']);
   assert.deepEqual(deriveCandidates('typography', 'Weight/medium'), ['--type-weight-medium']);
 });
@@ -64,7 +64,7 @@ test('the live spec maps every --ds- semantic token, and every one exists in the
   const foundations = syntax.get('color / foundations');
   assert.ok(foundations.size > 500, `${foundations.size} foundations with code syntax`);
   const defined = new Set(
-    tokenSources().flatMap((source) => [...source.text.matchAll(tokenDeclarationPattern('--ds-'))].map((m) => m[1])),
+    tokenSources().flatMap((source) => [...source.text.matchAll(tokenDeclarationPattern())].map((m) => m[1])),
   );
   const missing = [...foundations.values()].filter((token) => !defined.has(token));
   assert.deepEqual(missing, []);

@@ -2,18 +2,18 @@
 /*
  * Tooltip Component Styles: the Popups pattern's Tooltip (Figma
  * Pattern/Tooltip). body.small 12/16 on the inverse surface, pad-y
- * Popover/pad-y-tooltip 4, pad-x Element/pad-x-sm 8, radius
- * Popover/radius-tooltip 6, and it wraps past Popover/max-width-tooltip 240.
+ * Popup/pad-y-tooltip 4, pad-x Element/pad-x-sm 8, radius
+ * Popup/radius-tooltip 6, and it wraps past Popup/max-width-tooltip 240.
  * Its fill is color.background.neutral.bold with color.text.inverse, so it
- * flips with the mode. No arrow: it sits Popover/offset 4 from its trigger.
+ * flips with the mode. No arrow: it sits Popup/offset 4 from its trigger.
  * It is a label, not something you act on, so it takes no shadow; under
- * forced colors the fill is dropped, so an outline keeps the chip's edge.
+ * forced colors the fill is dropped, so an outline keeps the tag's edge.
  */
 
 .plus-tooltip {
     box-sizing: border-box;
-    padding: var(--popover-pad-y-tooltip) var(--pad-x-sm);
-    max-width: var(--popover-max-width-tooltip);
+    padding: var(--tooltip-pad-y) var(--pad-x-sm);
+    max-width: var(--tooltip-max-width);
     border-radius: var(--radius-control-sm);
     background-color: var(--ds-background-neutral-bold);
     color: var(--ds-text-inverse);

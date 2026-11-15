@@ -33,7 +33,7 @@
       "section": "The three tags",
       "guide": "indicators",
       "scoring": "judge",
-      "expectation": "Uses PLUS indicator components (StatusTag, Badge, or ProgressBar) and semantic typography/spacing tokens matching the design frame."
+      "expectation": "Uses PLUS indicator components (StatusTag, CountTag, or ProgressBar) and semantic typography/spacing tokens matching the design frame."
     }
   ],
   "required_placements": [],

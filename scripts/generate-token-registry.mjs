@@ -204,7 +204,13 @@ export function deriveCandidates(collection, name, { codeSyntax } = {}) {
   // "Size/Height/200" -> --height-200); a spacing / primitives variable is its
   // leaf ("Space/space-025" -> --space-025), the candidate every collection
   // ends with. A candidate that misses shows up as unresolved.
-  if (collection === 'spacing / foundations') out.push(`--${slug(name.replace(/^Size\//, ''))}`);
+  if (collection === 'spacing / primitives' && /^Radius\/radius-\d+$/.test(name)) return [`--${leaf.replace('radius-', 'space-')}`];
+  if (collection === 'spacing / foundations') {
+    const token = `--${slug(name.replace(/^Size\//, ''))}`;
+    if (/^--item-height-(sm|md)$/.test(token)) return [token.replace('--item-height-', '--control-')];
+    if (/^--border-(default|selected|focused)$/.test(token)) return [token.replace('--border-', '--border-width-')];
+    out.push(token);
+  }
   out.push(`--${slug(leaf)}`);
   return out;
 }

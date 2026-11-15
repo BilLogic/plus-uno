@@ -13,7 +13,7 @@ Heading, Body, Metric and Code are the text styles for all work.
 PLUS uses Noto Serif (500) for headings 20 to 32, Noto Sans for headings 12 to 16, metrics and body text, and Noto Sans Mono for code. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
-font: var(--heading-medium);
+font: var(--heading-md);
 font: var(--body-default);
 font: var(--metric-large);
 ```
@@ -40,7 +40,7 @@ Every text style binds to a typography variable and is sized in `rem` (1 rem = 1
 
 ## In code
 
-Set component text with `font: var(--heading-small)` or `font: var(--body-default)`, and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (Iconography). Never hardcode a font size, family or weight.
+Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`, and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (Iconography). Never hardcode a font size, family or weight.
 
 ### Family, weight and tracking tokens
 
@@ -54,15 +54,15 @@ Set component text with `font: var(--heading-small)` or `font: var(--body-defaul
 | `--type-weight-regular` | 400 | Body text |
 | `--type-weight-medium` | 500 | Labels, icon-paired text, and Noto Serif headings 20 and up |
 | `--type-weight-semibold` | 600 | Noto Sans headings 16 and under, metrics, bold body |
-| `--heading-xxlarge-tracking` · `-xlarge-tracking` · `-large-tracking` | −2% · −1% · −1% | Companion letter-spacing for headings 32, 28 and 24 (20 and below use 0) |
+| `--heading-xxl-tracking` · `-xlarge-tracking` · `-large-tracking` | −2% · −1% · −1% | Companion letter-spacing for headings 32, 28 and 24 (20 and below use 0) |
 
 ### Text-style classes
 
-Markup without its own stylesheet can use the generated utility classes (`.heading-xxlarge` to `.heading-xxsmall`, `.body-large`, `.body-default`, `.body-small`, `.metric-large` to `.metric-small`), which set `font` and tracking together. Component stylesheets use `font: var(--…)` directly.
+Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxsmall`, `.body-large`, `.body-default`, `.body-small`, `.metric-large` to `.metric-small`), which set `font` and tracking together. Component stylesheets use `font: var(--…)` directly.
 
 ```jsx
 <p className="body-default">Helper text</p>
-<h2 className="heading-medium">Section title</h2>
+<h2 className="heading-md">Section title</h2>
 ```
 
 ## Heading levels
@@ -89,7 +89,7 @@ Don't: Regular or bold weight, or a heading style, on a button or tab label.
 
 ## Code
 
-`Code/default` (12/16, Noto Sans Mono) sets code samples, token names and property values. In CSS, `var(--code)` sets `0.875em` of the parent size so inline code scales with surrounding text.
+`Code/default` (12/16, Noto Sans Mono) sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.
 
 ## Truncate and wrap
 

@@ -150,10 +150,10 @@ export const PickDate = () => {
                         marginTop: 'var(--space-100)',
                         padding: 'var(--space-075)',
                         backgroundColor: 'var(--ds-surface-container)',
-                        borderRadius: 'var(--radius-025)',
+                        borderRadius: 'var(--radius-md)',
                     }}
                 >
-                    <p style={{ margin: 0, fontSize: 'var(--font-size-0875)' }}>
+                    <p style={{ margin: 0, fontSize: 'var(--type-size-0875)' }}>
                         <strong>Selected:</strong> {date}
                     </p>
                 </div>
@@ -177,7 +177,7 @@ export const PickRange = () => {
     return (
         <div style={{ paddingBottom: 'var(--size-1900)', maxWidth: 'var(--size-2000)' }}>
             <h6 style={{ marginBottom: 'var(--space-100)' }}>Select a Date Range</h6>
-            <p style={{ fontSize: 'var(--font-size-0875)', color: 'var(--ds-text-subtle)', marginBottom: 'var(--space-100)' }}>
+            <p style={{ fontSize: 'var(--type-size-0875)', color: 'var(--ds-text-subtle)', marginBottom: 'var(--space-100)' }}>
                 Click a first day, then a last day. The days between are marked.
             </p>
             <DatePicker range value={range} onChange={setRange} />
@@ -187,10 +187,10 @@ export const PickRange = () => {
                         marginTop: 'var(--space-100)',
                         padding: 'var(--space-075)',
                         backgroundColor: 'var(--ds-surface-container)',
-                        borderRadius: 'var(--radius-025)',
+                        borderRadius: 'var(--radius-md)',
                     }}
                 >
-                    <p style={{ margin: 0, fontSize: 'var(--font-size-0875)' }}>
+                    <p style={{ margin: 0, fontSize: 'var(--type-size-0875)' }}>
                         <strong>Range:</strong> {start || '(not set)'} → {end || '(not set)'}
                     </p>
                 </div>

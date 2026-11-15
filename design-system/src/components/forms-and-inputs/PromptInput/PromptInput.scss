@@ -8,7 +8,7 @@
  * (`--plus-prompt-input-max-height`), then scrolls.
  */
 .plus-prompt-input {
-    --plus-prompt-input-max-height: calc(var(--line-height-125) * 5 + var(--pad-y-md) * 2);
+    --plus-prompt-input-max-height: calc(var(--type-line-height-125) * 5 + var(--pad-y-md) * 2);
 
     display: block;
     min-width: 0;
@@ -37,12 +37,12 @@
 // text centers in that 32.
 .plus-prompt-input .plus-prompt-input__field.plus-field--multiline {
     min-height: var(--height-250);
-    padding-block: calc(var(--pad-x-xs) - var(--border-default));
+    padding-block: calc(var(--pad-x-xs) - var(--border-width-default));
 }
 
 .plus-prompt-input .plus-prompt-input__control {
     box-sizing: border-box;
-    min-height: var(--item-height-md);
+    min-height: var(--control-md);
     padding-block: var(--pad-y-md);
 }
 

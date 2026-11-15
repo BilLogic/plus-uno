@@ -39,7 +39,7 @@
     left: 0;
     box-sizing: border-box;
     background-color: var(--ds-surface);
-    border: var(--border-default) solid var(--ds-border-surface);
+    border: var(--border-width-default) solid var(--ds-border-surface);
     pointer-events: none;
     z-index: 1;
 }

@@ -232,10 +232,10 @@ export function isOverlayRaisedOver(ownerNode) {
     return !ownerNode?.closest?.('.plus-pattern-backdrop');
 }
 
-/** The offset in px when the token can't be read; matches `--popover-offset`. */
-export const POPOVER_OFFSET = 4;
+/** The offset in px when the token can't be read; matches `--popup-offset`. */
+export const POPUP_OFFSET = 4;
 
-/** The screen gap in px when the token can't be read; matches `--popover-gap-screen`. */
+/** The screen gap in px when the token can't be read; matches `--popup-gap-screen`. */
 export const SCREEN_GAP = 8;
 
 /** A length token's value in px, read from the document, or `fallback`. */
@@ -251,8 +251,8 @@ function readPx(name, fallback) {
  *
  * @returns {number}
  */
-export function readPopoverOffset() {
-    return readPx('--popover-offset', POPOVER_OFFSET);
+export function readPopupOffset() {
+    return readPx('--popup-offset', POPUP_OFFSET);
 }
 
 /**
@@ -261,7 +261,7 @@ export function readPopoverOffset() {
  * @returns {number}
  */
 export function readScreenGap() {
-    return readPx('--popover-gap-screen', SCREEN_GAP);
+    return readPx('--popup-gap-screen', SCREEN_GAP);
 }
 
 /** Placement vocabulary shared by the floating surfaces; only Popup accepts `auto`. */
@@ -299,7 +299,7 @@ export function useFloatingOverlay({
     placement,
     container,
     anchor,
-    sideOffset = POPOVER_OFFSET,
+    sideOffset = POPUP_OFFSET,
     collisionAvoidance,
     dismissible = true,
     onOpenChange,

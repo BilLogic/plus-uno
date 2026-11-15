@@ -235,7 +235,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/messaging/Modal/",
     "Modal",
-    "components-messaging-modal-dialog--docs"
+    "components-messaging-modal--docs"
   ],
   [
     "design-system/src/components/messaging/NotificationItem/",

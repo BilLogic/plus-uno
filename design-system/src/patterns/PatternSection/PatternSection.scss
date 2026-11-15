@@ -63,8 +63,8 @@
 
 /* The page header: Heading/large 24/28. */
 .plus-pattern-section-title--page {
-    font: var(--heading-large);
-    letter-spacing: var(--heading-large-tracking);
+    font: var(--heading-lg);
+    letter-spacing: var(--heading-lg-tracking);
     // Noto Serif's glyph box is taller than this line: padding and an equal
     // negative margin hold the box where it was and keep the glyphs inside it.
     padding-block: 0.125em;
@@ -73,12 +73,12 @@
 
 /* A section on a page: Heading/medium 20/24. */
 .plus-pattern-section-title--section {
-    font: var(--heading-medium);
+    font: var(--heading-md);
 }
 
 /* A section inside a section: Heading/small 16/20. */
 .plus-pattern-section-title--subsection {
-    font: var(--heading-small);
+    font: var(--heading-sm);
 }
 
 .plus-pattern-section-description {
@@ -212,7 +212,7 @@
     justify-content: space-between;
     column-gap: var(--inline-lg);
     row-gap: var(--section-stack-sm);
-    min-height: var(--item-height-md);
+    min-height: var(--control-md);
     min-width: 0;
 }
 

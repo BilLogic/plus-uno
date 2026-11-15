@@ -16,10 +16,10 @@ export default {
 const meta = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 
 const LEVELS = [
-    ['Page title', '--heading-large', 'Heading/large · 24 · the page’s one h1'],
-    ['Section title', '--heading-medium', 'Heading/medium · 20 · h2'],
-    ['Subsection title', '--heading-small', 'Heading/small · 16 · h3'],
-    ['Modal title', '--heading-medium', 'Heading/medium · 20 · the modal’s h1, named by aria-labelledby'],
+    ['Page title', '--heading-lg', 'Heading/large · 24 · the page’s one h1'],
+    ['Section title', '--heading-md', 'Heading/medium · 20 · h2'],
+    ['Subsection title', '--heading-sm', 'Heading/small · 16 · h3'],
+    ['Modal title', '--heading-md', 'Heading/medium · 20 · the modal’s h1, named by aria-labelledby'],
     ['Card, popup and flag title', '--heading-xsmall', 'Heading/xsmall · 14 · one level below its section'],
     ['Group label', '--heading-xxsmall', 'Heading/xxsmall · 12 · a menu group or a head cell, never a heading'],
 ];
@@ -56,10 +56,10 @@ const Outline = ({ sizes }) => (
 export const OneStepPerLevel = () => (
     <DoDont>
         <Do caption="Page 24, section 20, subsection 16: one step per level.">
-            <Outline sizes={['--heading-large', '--heading-medium', '--heading-small']} />
+            <Outline sizes={['--heading-lg', '--heading-md', '--heading-sm']} />
         </Do>
         <Dont caption="Sizes picked by feel: a hero size for the page, and a section smaller than its subsection.">
-            <Outline sizes={['--heading-xxlarge', '--heading-xsmall', '--heading-medium']} />
+            <Outline sizes={['--heading-xxl', '--heading-xsmall', '--heading-md']} />
         </Dont>
     </DoDont>
 );
@@ -71,7 +71,7 @@ export const LabelStyle = () => (
             <span><Button text="Save changes" appearance="primary" /></span>
         </Do>
         <Dont caption="A heading style on a button label. It changes the Item’s height and reads as a title.">
-            <span><Button appearance="primary"><span style={{ font: 'var(--heading-medium)' }}>Save changes</span></Button></span>
+            <span><Button appearance="primary"><span style={{ font: 'var(--heading-md)' }}>Save changes</span></Button></span>
         </Dont>
     </DoDont>
 );

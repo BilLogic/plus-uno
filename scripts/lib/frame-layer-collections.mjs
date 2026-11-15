@@ -17,7 +17,7 @@
  *
  * A variable's code name is its folder plus its last name segment, with no
  * family prefix: Patterns > `Card/pad-sm` is `--card-pad-sm`, Patterns >
- * `Popover/Menu/pad-menu` is `--popover-pad-menu`, Color > `Overlay/scrim` is
+ * `Popover/Menu/pad-menu` is `--dropdown-menu-pad`, Color > `Overlay/scrim` is
  * `--overlay-scrim`. In `spacing / layout` every folder is `--layout-*`
  * (`Topbar/height-topbar` is `--layout-height-topbar`) except Page, which
  * keeps its own name (`Page/pad` is `--page-pad`).
@@ -53,7 +53,14 @@ export function frameLayerToken(collection, variable) {
   if (parts.length < 2) throw new Error(`${collection} > ${variable} sits in no folder; its folder names it.`);
   const folder = parts[0].toLowerCase().replace(/\s+/g, '-');
   const head = c.layout && folder !== 'page' ? 'layout' : folder;
-  return `${head}-${parts[parts.length - 1]}`;
+  const leaf = parts[parts.length - 1];
+  if (head === 'popover') {
+    if (leaf.endsWith('-menu')) return `dropdown-menu-${leaf.slice(0, -5)}`;
+    if (leaf.endsWith('-tooltip')) return `tooltip-${leaf.slice(0, -8)}`;
+    if (leaf.endsWith('-flag')) return `flag-${leaf.slice(0, -5)}`;
+    return `popup-${leaf}`;
+  }
+  return `${head}-${leaf}`;
 }
 
 /** The folder a variable is grouped under in the stylesheet: `Popover/Menu/pad-menu` -> `Popover`. */

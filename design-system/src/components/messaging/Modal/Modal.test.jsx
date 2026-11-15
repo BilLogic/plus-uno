@@ -43,7 +43,7 @@ describe('Modal sizing props', () => {
  * kept in, Escape, a press on the backdrop, focus back on close, and the page
  * behind hidden from assistive tech while it is open.
  */
-describe('Modal dialog behavior', () => {
+describe('Modal behavior', () => {
     const Harness = (props) => {
         const [open, setOpen] = React.useState(false);
         return (

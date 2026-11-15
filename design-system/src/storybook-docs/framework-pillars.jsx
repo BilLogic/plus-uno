@@ -38,12 +38,12 @@ export const PILLARS = [
     },
 ];
 
-const lede = { margin: 0, font: 'var(--heading-medium)', color: 'var(--ds-text)' };
+const lede = { margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' };
 
 const Pillar = ({ name, axis, promise }) => (
     <article style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', margin: 0 }}>
         <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>{axis}</span>
-        <h3 style={{ margin: 0, font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>{name}</h3>
+        <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>{name}</h3>
         <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{promise}</p>
     </article>
 );

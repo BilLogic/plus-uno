@@ -104,10 +104,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Surface | Those of `Popup`: `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`. |
-| Inset of the rows | 4: `--popover-pad-menu`. |
+| Inset of the rows | 4: `--dropdown-menu-pad`. |
 | Width | `--popup-min-width` to `--popup-max-width`, and at least the trigger. |
-| Height of the list | Scrolls past 320: `--popover-max-height-menu`. |
-| Gap to the trigger | 4: `--popover-offset`. |
+| Height of the list | Scrolls past 320: `--dropdown-menu-max-height`. |
+| Gap to the trigger | 4: `--popup-offset`. |
 
 ## Content guidelines
 
@@ -151,7 +151,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--popover-max-height-menu` · `--popover-pad-menu`
+`--dropdown-menu-max-height` · `--dropdown-menu-pad`
 
 From `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.scss`. Override these through the token layer, never with a literal.
 

@@ -7,7 +7,7 @@ import { IconButton, Button, Select } from '@/components';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
-    title: 'Components/Messaging/Modal dialog',
+    title: 'Components/Messaging/Modal',
     component: Modal,
     tags: ['!dev', '!autodocs'],
     argTypes: {
@@ -268,7 +268,7 @@ const heightStory = (height, title, body) => () => (
     <div
         style={{
             ...modalDocsHostStyle,
-            '--blanket-max-height-modal': 'var(--size-2000)',
+            '--backdrop-max-height-modal': 'var(--size-2000)',
             minHeight: 'calc(var(--size-2000) + 2 * var(--space-100))',
         }}
     >

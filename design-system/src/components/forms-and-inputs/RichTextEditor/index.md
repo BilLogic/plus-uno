@@ -114,7 +114,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Fill, edge | `--ds-background-input`; `--ds-border-input` at `--border-default`; corner `--radius-control-lg`, the same as the 40-high fields. |
+| Fill, edge | `--ds-background-input`; `--ds-border-input` at `--border-width-default`; corner `--radius-control-lg`, the same as the 40-high fields. |
 | Toolbar | Subtle icon buttons; gap `--stack-md` between clusters, `--stack-sm` inside one; padding `--pad-x-xs`; keyline `--ds-border`. |
 | Writing area | Body default in `--ds-text`; padding `--pad-y-lg` and `--pad-x-md`; minimum height `--field-min-height-lg` (120). |
 | Placeholder | `--ds-text-subtlest`. |
@@ -161,7 +161,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--ds-background-input` · `--ds-background-neutral` · `--ds-border` · `--ds-border-input` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-lg` · `--pad-y-md` · `--radius-control-lg` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--border-width-default` · `--ds-background-input` · `--ds-background-neutral` · `--ds-border` · `--ds-border-input` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-lg` · `--pad-y-md` · `--radius-control-lg` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss`. Override these through the token layer, never with a literal.
 

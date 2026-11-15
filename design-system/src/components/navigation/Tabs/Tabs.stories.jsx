@@ -351,7 +351,7 @@ export const Selected = {
         await expectInk(canvasElement, selected, undefined, '--ds-text-selected', 'selected tab');
         const style = getComputedStyle(selected);
         await expect(style.borderBottomColor, 'the bar').toBe(tokenColor(canvasElement, '--ds-border-selected'));
-        await expect(px(style.borderBottomWidth), 'bar width').toBe(tokenLength(canvasElement, '--border-selected'));
+        await expect(px(style.borderBottomWidth), 'bar width').toBe(tokenLength(canvasElement, '--border-width-selected'));
         await expect(selected).toHaveAttribute('aria-selected', 'true');
     },
 };

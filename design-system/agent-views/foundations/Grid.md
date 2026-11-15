@@ -114,8 +114,8 @@ A modal spans 6, 8 or 10 screen-grid columns, the gutters between them, and its 
 - `--modal-width-sm` (Modal/width-modal-sm)
 - `--modal-width-md` (Modal/width-modal-md)
 - `--modal-width-lg` (Modal/width-modal-lg)
-- `--blanket-pad-x` (Backdrop/pad-x)
-- `--blanket-pad-y` (Backdrop/pad-y)
+- `--backdrop-pad-x` (Backdrop/pad-x)
+- `--backdrop-pad-y` (Backdrop/pad-y)
 
 ## Size roles
 
@@ -123,7 +123,7 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
 
 | Role | Values | Tokens | Use |
 | --- | --- | --- | --- |
-| Control | 24 · 32 | `--item-height-sm` · `-md` | Anything you click or type into. Buttons, tabs and menu rows are 32 (24 compact); fields are 40 (32 compact). Compact only inside table rows and inline toolbars. |
+| Control | 24 · 32 | `--control-sm` · `-md` | Anything you click or type into. Buttons, tabs and menu rows are 32 (24 compact); fields are 40 (32 compact). Compact only inside table rows and inline toolbars. |
 | Row | 32 · 40 · 48 | `--row-height-sm` · `-md` · `-lg` | One record in a table or list. A minimum: rows grow with their content. |
 | Label | 16 · 20 · max 160 | `--label-height-sm` · `-md` · `--label-max-width` | Tag, Status and Count. |
 | Media | 16 · 20 · 24 · 32 · 40 · 48 | `--image-xxs` … `--image-xl` | Avatar, Tile and logos. Images keep their ratio (1:1, 4:3, 16:9, 3:2) and take their width from the grid or the card. |
@@ -133,8 +133,8 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
 
 Card, Section, Popup and Menu sizes sit with their patterns on [Spacing](?path=/docs/foundations-layout-spacing--docs#foundation-pattern-tokens), and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full scale.
 
-- `--item-height-sm` (Size/Item/height-sm)
-- `--item-height-md` (Size/Item/height-md)
+- `--control-sm` (Size/Item/height-sm)
+- `--control-md` (Size/Item/height-md)
 - `--row-height-sm` (Size/Row/height-sm)
 - `--row-height-md` (Size/Row/height-md)
 - `--row-height-lg` (Size/Row/height-lg)

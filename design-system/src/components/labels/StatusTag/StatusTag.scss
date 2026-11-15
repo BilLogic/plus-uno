@@ -32,19 +32,19 @@
     /* The cap from `maxWidth` (200 by default), never wider than the container. */
     max-width: min(var(--plus-status-max), 100%);
     margin: 0;
-    padding: 0 var(--tag-pad-end-compact) 0 var(--pad-x-xs);
+    padding: 0 var(--tag-pad-x-end-compact) 0 var(--pad-x-xs);
     gap: var(--tag-gap-compact);
     border-radius: var(--radius-md);
     vertical-align: middle;
     white-space: nowrap;
-    box-shadow: inset 0 0 0 var(--border-default) var(--plus-status-edge);
+    box-shadow: inset 0 0 0 var(--border-width-default) var(--plus-status-edge);
 }
 
 .plus-status__content {
     display: inline-flex;
     align-items: center;
     min-width: 0;
-    padding-right: var(--tag-pad-end-compact);
+    padding-right: var(--tag-pad-x-end-compact);
     gap: var(--stack-sm);
 }
 
@@ -52,12 +52,12 @@
     --plus-status-height: #{label.$status-height-spacious};
     --plus-status-icon-box: calc(var(--image-xs) + var(--tag-gap-compact));
 
-    padding: 0 var(--tag-pad-end) 0 var(--pad-x-md);
+    padding: 0 var(--tag-pad-x-end) 0 var(--pad-x-md);
     gap: 0;
     border-radius: var(--radius-control-md);
 
     .plus-status__content {
-        padding-right: var(--tag-pad-end);
+        padding-right: var(--tag-pad-x-end);
         gap: var(--tag-gap);
     }
 
@@ -132,6 +132,6 @@ $status-state: (
 /* Forced colors drop box-shadows; a real border keeps the edge. */
 @media (forced-colors: active) {
     .plus-status {
-        border: var(--border-default) solid CanvasText;
+        border: var(--border-width-default) solid CanvasText;
     }
 }

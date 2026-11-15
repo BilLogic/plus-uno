@@ -46,7 +46,7 @@ Nothing collides with a neighbor or shares its place mid-move. What leaves fades
 
 ### Clean fades
 
-New content begins when the old is about 90% out (`appearance.fast`, about ). A true crossfade is kept for non-text content: an image, the Blanket, or content arriving over a Skeleton.
+New content begins when the old is about 90% out (`appearance.fast`, about ). A true crossfade is kept for non-text content: an image, the Backdrop, or content arriving over a Skeleton.
 
 ### Stable layouts
 

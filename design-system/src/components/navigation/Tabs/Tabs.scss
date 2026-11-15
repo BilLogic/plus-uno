@@ -5,8 +5,8 @@
  *
  * Underline indicator by default (`appearance="default"`); `appearance="pill"`
  * swaps the underline for a pill-shaped selected fill. `spacing="default"` is a
- * 32px tab (`--item-height-md`), matching a medium button; `spacing="compact"`
- * is 24px (`--item-height-sm`).
+ * 32px tab (`--control-md`), matching a medium button; `spacing="compact"`
+ * is 24px (`--control-sm`).
  *
  * Colors: an unselected tab is text.subtle on a clear ground; hover and press
  * are the neutral subtle steps. The selected tab is text.selected, carried by
@@ -45,7 +45,7 @@
 .plus-tabs--appearance-default[data-gliding='true'] {
     > .plus-tabs-indicator {
         // Sits on the bottom edge of the tab row; y tracks the tab's top, so margin-top places it at the baseline.
-        height: var(--border-selected);
+        height: var(--border-width-selected);
         background-color: var(--ds-border-selected);
         z-index: 2;
     }
@@ -56,11 +56,11 @@
 }
 
 .plus-tabs--spacing-default.plus-tabs--appearance-default[data-gliding='true'] > .plus-tabs-indicator {
-    margin-top: calc(var(--item-height-md) - var(--border-selected));
+    margin-top: calc(var(--control-md) - var(--border-width-selected));
 }
 
 .plus-tabs--spacing-compact.plus-tabs--appearance-default[data-gliding='true'] > .plus-tabs-indicator {
-    margin-top: calc(var(--item-height-sm) - var(--border-selected));
+    margin-top: calc(var(--control-sm) - var(--border-width-selected));
 }
 
 .plus-tabs--appearance-pill[data-gliding='true'] {
@@ -117,7 +117,7 @@
 // Default (underline) appearance: a shared bottom border across the strip,
 // each tab's own bottom border serving as its selected indicator.
 .plus-tabs--appearance-default .plus-tabs-list {
-    border-bottom: var(--border-default) solid var(--ds-border);
+    border-bottom: var(--border-width-default) solid var(--ds-border);
     width: fit-content;
 
     &--justified {
@@ -164,21 +164,21 @@
 // Sizing
 .plus-tabs--spacing-default .plus-tab {
     --tab-radius: var(--radius-control-md);
-    height: var(--item-height-md);
+    height: var(--control-md);
     padding: 0 var(--pad-x-lg);
 }
 
 .plus-tabs--spacing-compact .plus-tab {
     --tab-radius: var(--radius-control-sm);
-    height: var(--item-height-sm);
+    height: var(--control-sm);
     padding: 0 var(--pad-x-md);
 }
 
 
 // Default (underline) appearance
 .plus-tabs--appearance-default .plus-tab {
-    margin-bottom: calc(-1 * var(--border-default));
-    border-bottom: var(--border-default) solid var(--ds-border);
+    margin-bottom: calc(-1 * var(--border-width-default));
+    border-bottom: var(--border-width-default) solid var(--ds-border);
     // Tab tops round by the tab's height (Radius / Control): 32 md, 24 sm.
     border-radius: var(--tab-radius) var(--tab-radius) 0 0;
 
@@ -199,8 +199,8 @@
         selected: (
             color: var(--ds-text-selected),
             border-bottom-color: var(--ds-border-selected),
-            border-bottom-width: var(--border-selected),
-            margin-bottom: calc(var(--border-default) - var(--border-selected)),
+            border-bottom-width: var(--border-width-selected),
+            margin-bottom: calc(var(--border-width-default) - var(--border-width-selected)),
         ),
     ), $ring: false);
 
@@ -254,7 +254,7 @@
     padding-top: var(--section-stack-sm);
 
     &:focus-visible {
-        outline: var(--border-selected) solid var(--ds-border-focused);
-        outline-offset: var(--border-default);
+        outline: var(--border-width-selected) solid var(--ds-border-focused);
+        outline-offset: var(--border-width-default);
     }
 }

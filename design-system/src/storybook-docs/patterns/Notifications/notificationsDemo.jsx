@@ -363,7 +363,7 @@ export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) =
                             zIndex: 'var(--layer-dialog)',
                             display: 'flex',
                             boxShadow: 'var(--ds-shadow-overlay)',
-                            borderInlineEnd: 'var(--border-default) solid var(--ds-border)',
+                            borderInlineEnd: 'var(--border-width-default) solid var(--ds-border)',
                         }}
                     >
                         <NotificationsInboxPanel

@@ -24,8 +24,8 @@
  *   color     `#abc` / `#aabbcc` / `rgb()` / `rgba()` / `hsl()` / `hsla()`
  *              matched against every `--ds-*` and `--palette-*` token, by value.
  *   dimension  `<n>px` / `<n>rem` / `<n>%`, normalized to px at 16px/rem, and
- *              matched against `--font-size-*` for a `font-size`,
- *              `--line-height-*` for a `line-height`, and the size, space,
+ *              matched against `--type-size-*` for a `font-size`,
+ *              `--type-line-height-*` for a `line-height`, and the size, space,
  *              radius and stroke primitives and spacing semantics otherwise.
  *
  * THE DOCS CHROME IS STRICTER. In `.storybook/` and `design-system/src/storybook-docs/`
@@ -55,7 +55,7 @@
  * same honesty is owed here.
  *
  *  1. A NEAR MISS. `13px` is not `12px`, so `font-size: 13px` passes even
- *     though `--font-size-075` is plainly what was meant. This check tests
+ *     though `--type-size-075` is plainly what was meant. This check tests
  *     equality, never proximity. Choosing a tolerance would mean choosing which
  *     deliberate one-off is a mistake, and that is a judgment no exit code
  *     should make.
@@ -174,8 +174,8 @@ const PRIMITIVES_FILES = new Set(['_scales.scss', 'color/_palette.scss']);
 const BUCKET_OF = {
   ds: 'color',
   palette: 'color',
-  'font-size': 'font-size',
-  'line-height': 'font-line-height',
+  'type-size': 'font-size',
+  'type-line-height': 'font-line-height',
   size: 'size',
   space: 'size',
   radius: 'size',

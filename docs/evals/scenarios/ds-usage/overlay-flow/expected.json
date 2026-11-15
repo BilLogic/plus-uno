@@ -40,7 +40,7 @@
         "kind": "component-present",
         "components": ["Modal", "PatternModal"]
       },
-      "expectation": "Choosing Cancel session opens a Modal dialog naming the session and asking for a cancellation reason."
+      "expectation": "Choosing Cancel session opens a Modal naming the session and asking for a cancellation reason."
     }
   ],
   "patterns": [

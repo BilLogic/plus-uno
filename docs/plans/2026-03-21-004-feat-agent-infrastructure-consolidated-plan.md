@@ -325,7 +325,7 @@ The product landscape is the most critical doc — it gives agents the domain co
 
 **4. Core User Flows**
 - **Session Lifecycle**: Create session → Assign tutors/students → In-session tracking → Post-session reflection
-- **Training Progression**: Onboarding → Lessons → Badge completions → Performance improvement
+- **Training Progression**: Onboarding → Lessons → CountTag completions → Performance improvement
 - **Performance Monitoring**: Dashboard overview → Drill-down by tutor → Alerts → Intervention
 - **Toolkit Navigation**: Sidebar categories → Spawned sub-tabs for detail views → Dismissible on session end
 
@@ -339,10 +339,10 @@ The product landscape is the most critical doc — it gives agents the domain co
 | Sign-Up | Recurring or one-time session registration |
 | Toolkit | Primary workspace hub: sessions, students, reflections |
 | Engagement | In-session student participation (1-5 scale) |
-| Badge | Training achievement earned upon lesson completion |
+| CountTag | Training achievement earned upon lesson completion |
 
 **6. Key Metrics**
-- Attendance rate (%), Sign-up rate (%), Completion rate (training), Engagement scale (1-5), Tutoring load (hours/week), Badge completions
+- Attendance rate (%), Sign-up rate (%), Completion rate (training), Engagement scale (1-5), Tutoring load (hours/week), CountTag completions
 
 **7. Product Direction** (from ideation docs + Notion)
 - Sidebar IA revision: hierarchical navigation with spawned sub-tabs

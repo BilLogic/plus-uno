@@ -32,7 +32,7 @@ Live swatches for every chart color in the current mode, grouped by job. See [Co
 
 <FoundationSection title="The categorical order">
 
-Multi-series charts assign colors in slot order from <C>--ds-chart-categorical-1</C> through <C>-8</C>. Slots 7 and 8 are overflow for charts past six series, which you should usually avoid by grouping smaller categories into "Other". See [Color](?path=/docs/foundations-visual-color--docs) for how the sequence is constructed.
+Multi-series charts assign colors in slot order from <C>--chart-categorical-1</C> through <C>-8</C>. Slots 7 and 8 are overflow for charts past six series, which you should usually avoid by grouping smaller categories into "Other". See [Color](?path=/docs/foundations-visual-color--docs) for how the sequence is constructed.
 
 </FoundationSection>
 
@@ -57,10 +57,10 @@ Lightness alternation identifies *which series* a mark belongs to; a separator (
 <RefTable
     head={['Job', 'What it encodes', 'Use']}
     rows={[
-        ['Identity', 'Which series', <>The categorical order above (<C>--ds-chart-categorical-1</C> through <C>-8</C>), or one of the five SMART subject colors (<C>--ds-chart-smart-*</C>)</>],
-        ['Magnitude', 'How much', <>One hue's 4-step sequential ramp, light to strong (<C>--ds-background-accent-&lt;hue&gt;-subtler</C> to <C>--ds-chart-&lt;hue&gt;-boldest</C>)</>],
+        ['Identity', 'Which series', <>The categorical order above (<C>--chart-categorical-1</C> through <C>-8</C>), or one of the five SMART subject colors (<C>--chart-smart-*</C>)</>],
+        ['Magnitude', 'How much', <>One hue's 4-step sequential ramp, light to strong (<C>--ds-background-accent-&lt;hue&gt;-subtler</C> to <C>--chart-&lt;hue&gt;-boldest</C>)</>],
         ['Polarity', 'Which side of a baseline', <>Two hues around <C>--ds-background-accent-gray-subtler</C>, orange and blue by default. Never pair red with green.</>],
-        ['State', 'On track, at risk, off track', <>Success, warning, danger, information or discovery (<C>--ds-chart-*</C>), each with a <C>-bold</C> step for extreme cases</>],
+        ['State', 'On track, at risk, off track', <>Success, warning, danger, information or discovery (<C>--chart-*</C>), each with a <C>-bold</C> step for extreme cases</>],
     ]}
 />
 
@@ -73,7 +73,7 @@ Never mix categorical and state colors in one chart; two categorical hues share 
 <RefTable
     head={['Rule', 'Guidance']}
     rows={[
-        ['One color by default', <>Single-series charts use <C>--ds-chart-brand</C>, never a categorical slot. De-emphasized comparison or reference lines use <C>--ds-chart-neutral</C>.</>],
+        ['One color by default', <>Single-series charts use <C>--chart-brand</C>, never a categorical slot. De-emphasized comparison or reference lines use <C>--chart-neutral</C>.</>],
         ['Five or six series maximum', 'Past six series, fold the smallest categories into "Other" rather than reaching for overflow slots 7 and 8.'],
         ['Never color alone', 'Pair every series or state with a shape, pattern, direct label or table.'],
         ['No text on a chart color', <>Place labels beside marks, never on top of them. When a label must sit on a fill, such as a heatmap cell, use <C>--ds-text</C> or <C>--ds-text-inverse</C>.</>],

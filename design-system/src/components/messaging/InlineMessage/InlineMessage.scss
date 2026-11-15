@@ -1,7 +1,7 @@
 /*
  * InlineMessage: the trigger is an IconButton (its own styles, tinted inline
  * per appearance); this file only styles the popup's content. The popup
- * surface itself is Popover's.
+ * surface itself is Popup's.
  */
 
 .plus-inline-message-content {
@@ -17,7 +17,7 @@
 }
 
 .plus-inline-message-title {
-    font: var(--heading-small);
+    font: var(--heading-sm);
 }
 
 .plus-inline-message-secondary {

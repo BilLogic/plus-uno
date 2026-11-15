@@ -52,17 +52,17 @@ const Rows = ({ x = VIEW.x0, w = VIEW.x1 - VIEW.x0, y, n, pitch = 14 }) => (
 /**
  * Real moments, sized by scope: Filtering big and ringed (a view bar with its
  * filter buttons over rows), a Flag wide, a Spinner and a bell with its count
- * badge small. The bento runs the frame's width, past the stage.
+ * countTag small. The bento runs the frame's width, past the stage.
  */
 export const OverviewHero = () => {
     const filtering = { x: -70, y: -5, w: 235, h: 170 };
     const flag = { x: 175, y: -5, w: 205, h: 80 };
     const small = { y: 85, w: 97.5, h: 80 };
     const spinner = { x: 175, ...small };
-    const badge = { x: 282.5, ...small };
+    const countTag = { x: 282.5, ...small };
     const mid = (c) => ({ cx: c.x + c.w / 2, cy: c.y + c.h / 2 });
     const s = mid(spinner);
-    const b = mid(badge);
+    const b = mid(countTag);
     const rowsX = filtering.x + 14;
     return (
         <HeroDrawing>
@@ -89,7 +89,7 @@ export const OverviewHero = () => {
                 <circle cx={s.cx} cy={s.cy} r={11} fill="none" stroke={PAINT.trail} strokeWidth={2.5} />
                 <path d={`M${s.cx} ${s.cy - 11} A11 11 0 0 1 ${s.cx + 11} ${s.cy}`} fill="none" stroke={PAINT.accent} strokeWidth={2.5} strokeLinecap="round" />
             </BentoCell>
-            <BentoCell name="badge" {...badge}>
+            <BentoCell name="countTag" {...countTag}>
                 <Glyph name="bell" x={b.cx - 10} y={b.cy - 10} size={20} />
                 <Rect x={b.cx + 4} y={b.cy - 15} w={13} h={10} fill={PAINT.accent} corner="count" />
                 <SkeletonBar x={b.cx + 7.5} y={b.cy - 11} w={6} h={2} tone={PAINT.buttonPrimaryText} />
@@ -329,7 +329,7 @@ const Toggle = ({ x, y, on }) => (
     </g>
 );
 
-/** The arrow pointer with the not-allowed badge: the pointer refuses what it rests on. */
+/** The arrow pointer with the not-allowed countTag: the pointer refuses what it rests on. */
 const NotAllowed = ({ x, y }) => (
     <g>
         <path d={`M${x} ${y} l0 13 l3.5 -3 l2.5 5.5 l2 -1 l-2.5 -5.5 l4.5 0 z`} fill={PAINT.pointer} stroke={PAINT.pointerEdge} strokeLinejoin="round" style={HAIRLINE} />

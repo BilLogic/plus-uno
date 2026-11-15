@@ -19,8 +19,8 @@
     display: flex;
     align-items: center;
     gap: var(--space-050);
-    // A choice row is 24 at every size (`--item-height-sm`), its label 14/20.
-    min-height: var(--item-height-sm);
+    // A choice row is 24 at every size (`--control-sm`), its label 14/20.
+    min-height: var(--control-sm);
 }
 
 .plus-form-checkbox {
@@ -184,7 +184,7 @@
 .plus-form-checkbox-wrapper.plus-choice-tile {
     width: var(--choice-tile-width);
     padding: var(--card-pad-default) var(--pad-x-lg);
-    border: var(--border-default) solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--radius-control-md);
     background-color: var(--ds-surface);
     align-items: center;
@@ -243,13 +243,13 @@
     &:has(.plus-form-checkbox[data-checked]):not(.plus-field-stack--disabled),
     &:has(.plus-form-checkbox[data-indeterminate]):not(.plus-field-stack--disabled) {
         background-color: var(--ds-background-selected);
-        border-width: var(--border-selected);
+        border-width: var(--border-width-selected);
         border-color: var(--ds-border-selected);
-        padding: calc(var(--card-pad-default) - var(--border-selected) + var(--border-default)) calc(var(--pad-x-lg) - var(--border-selected) + var(--border-default));
+        padding: calc(var(--card-pad-default) - var(--border-width-selected) + var(--border-width-default)) calc(var(--pad-x-lg) - var(--border-width-selected) + var(--border-width-default));
 
         .plus-form-checkbox {
-            inset-block-start: calc(var(--stack-lg) - var(--border-selected) + var(--border-default));
-            inset-inline-end: calc(var(--stack-lg) - var(--border-selected) + var(--border-default));
+            inset-block-start: calc(var(--stack-lg) - var(--border-width-selected) + var(--border-width-default));
+            inset-inline-end: calc(var(--stack-lg) - var(--border-width-selected) + var(--border-width-default));
         }
     }
 

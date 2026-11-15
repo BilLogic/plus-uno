@@ -13,7 +13,7 @@ export default {
 
 const col = (gap) => ({ display: 'flex', flexDirection: 'column', gap });
 const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
-const code = { font: 'var(--code)', color: 'var(--ds-text-subtle)' };
+const code = { font: 'var(--code-default)', color: 'var(--ds-text-subtle)' };
 
 const Glyph = ({ name, family = 'fa-solid', size = '--icon-md', color = '--ds-icon-subtle' }) => (
     <i

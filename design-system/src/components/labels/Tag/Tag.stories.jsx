@@ -1560,15 +1560,15 @@ export const ElevatedOnlyReadOnlyAndLink = {
     },
 };
 
-/* ------------------------------------------------------------- answer chips */
+/* ------------------------------------------------------------- answer tags */
 
 /**
- * A row of answer chips: each is a selectable tag, so it toggles with Space or
+ * A row of answer tags: each is a selectable tag, so it toggles with Space or
  * Enter, publishes `aria-pressed`, and shows the selected step. The caller owns
  * which are on. This is the shape a form uses where a person picks from a short
  * list of options.
  */
-export const AnswerChips = () => {
+export const AnswerTags = () => {
     const options = ['Fractions', 'Ratios', 'Roosevelt K-8', 'Statistics'];
     const [chosen, setChosen] = useState(['Ratios']);
     const toggle = (name) => setChosen((now) => (now.includes(name) ? now.filter((n) => n !== name) : [...now, name]));
@@ -1581,7 +1581,7 @@ export const AnswerChips = () => {
     );
 };
 
-AnswerChips.play = async ({ canvasElement }) => {
+AnswerTags.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const ratios = canvas.getByRole('button', { name: 'Ratios' });
     const fractions = canvas.getByRole('button', { name: 'Fractions' });

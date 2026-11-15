@@ -59,7 +59,7 @@ Don't: Stretched across a wide row.
 
 ### Align with the button group. {#align-with-the-button-group}
 
-Right-align in focused tasks and modal dialogs; left-align on full-page forms and content-heavy screens.
+Right-align in focused tasks and Modals; left-align on full-page forms and content-heavy screens.
 
 ## Accessibility
 
@@ -115,7 +115,7 @@ Hover, pressed and focus are the browser's own. A link button has no `ai`, disab
 | --- | --- |
 | Fill, label, icon | The same named tokens as Button for each appearance, with hovered and pressed steps. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
-| Height | 32: `--item-height-md`. 24: `--item-height-sm`. |
+| Height | 32: `--control-md`. 24: `--control-sm`. |
 | Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. |
 | Padding | 12: `--pad-x-md`. Compact 8: `--pad-x-sm`. |
 | Icon-to-label gap | 4: `--inline-sm`. |

@@ -123,7 +123,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Item | `--item-height-md` (32) circle on `--ds-background-neutral`. |
+| Item | `--control-md` (32) circle on `--ds-background-neutral`. |
 | Icon | `--icon-md` (16). |
 | Gaps | `--space-0625` between items; `--stack-sm` inside an item group; `--stack-md` between label and row, plus `--stack-sm` under the label. |
 | Label, number | `--ds-text`, body default. |
@@ -181,7 +181,7 @@ Implemented as `RatingItem`.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--icon-lg` · `--icon-md` · `--item-height-md` · `--radius-full` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--icon-lg` · `--icon-md` · `--radius-full` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Rating/Rating.scss`. Override these through the token layer, never with a literal.
 

@@ -180,7 +180,7 @@ const RadarChart = ({
                     enabled: showDataLabels && filled,
                     format: '{y}%',
                     style: {
-                        fontSize: 'var(--font-size-075)',
+                        fontSize: 'var(--type-size-075)',
                         fontWeight: 'var(--type-weight-medium)',
                         fontFamily: 'var(--type-family-body)',
                         color: 'var(--ds-text)',
@@ -195,7 +195,7 @@ const RadarChart = ({
                     enabled: showDataLabels && !filled,
                     format: '{y}%',
                     style: {
-                        fontSize: 'var(--font-size-075)',
+                        fontSize: 'var(--type-size-075)',
                         fontWeight: 'var(--type-weight-medium)',
                         fontFamily: 'var(--type-family-body)',
                         color: 'var(--ds-text)',

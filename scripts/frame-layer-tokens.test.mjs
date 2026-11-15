@@ -119,8 +119,8 @@ const FIXED = {
   '--table-indent': '24px',
   '--table-radius': '12px',
   '--table-stack': '8px',
-  '--blanket-pad-x': '16px',
-  '--blanket-pad-y': '64px',
+  '--backdrop-pad-x': '16px',
+  '--backdrop-pad-y': '64px',
   '--modal-stack-sm': '8px',
   '--modal-stack-md': '16px',
   '--modal-stack-lg': '24px',
@@ -135,20 +135,20 @@ const FIXED = {
   '--focused-page-stack-lg': '24px',
   '--focused-page-inline-sm': '8px',
   '--focused-page-inline-md': '12px',
-  '--popover-pad': '16px',
-  '--popover-width-sm': '320px',
-  '--popover-width-md': '400px',
-  '--popover-width-lg': '480px',
-  '--popover-width-flag': '400px',
-  '--popover-stack-flag': '16px',
-  '--popover-pad-menu': '4px',
-  '--popover-min-width-menu': '160px',
-  '--popover-max-width-menu': '320px',
-  '--popover-max-height-menu': '320px',
-  '--popover-pad-y-tooltip': '4px',
-  '--popover-max-width-tooltip': '240px',
-  '--popover-gap-screen': '8px',
-  '--popover-offset': '4px',
+  '--popup-pad': '16px',
+  '--popup-width-sm': '320px',
+  '--popup-width-md': '400px',
+  '--popup-width-lg': '480px',
+  '--flag-width': '400px',
+  '--flag-stack': '16px',
+  '--dropdown-menu-pad': '4px',
+  '--dropdown-menu-min-width': '160px',
+  '--dropdown-menu-max-width': '320px',
+  '--dropdown-menu-max-height': '320px',
+  '--tooltip-pad-y': '4px',
+  '--tooltip-max-width': '240px',
+  '--popup-gap-screen': '8px',
+  '--popup-offset': '4px',
 };
 
 test('every Layout token resolves to its value at Medium, Large and X-Large', () => {
@@ -236,15 +236,15 @@ test('every one-mode frame and layer token resolves to its value', () => {
 });
 
 test('the scrim is black at 38%', () => {
-  assert.equal(corpus.get('--blanket-fill')?.value, 'rgba(0, 0, 0, 0.38)');
+  assert.equal(corpus.get('--backdrop-fill')?.value, 'rgba(0, 0, 0, 0.38)');
 });
 
 test('a modal is never taller than the screen less the overlay pad above and below', () => {
-  assert.equal(corpus.get('--blanket-max-height-modal')?.raw, 'calc(100dvh - 2 * var(--blanket-pad-y))');
+  assert.equal(corpus.get('--backdrop-max-height-modal')?.raw, 'calc(100dvh - 2 * var(--backdrop-pad-y))');
 });
 
 test('no new token name uses a banned word', () => {
-  const names = [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--blanket-fill'];
+  const names = [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--backdrop-fill'];
   for (const name of names) {
     assert.doesNotMatch(name, /margin|shell|slot|viewport|top-bar/, name);
   }
@@ -280,7 +280,7 @@ test('every exported variable offers itself only where it belongs: explicit scop
 });
 
 test('the new names take no family prefix, and never land on an old --size-* name', () => {
-  for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--blanket-fill']) {
+  for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--backdrop-fill']) {
     assert.doesNotMatch(name, /^--(size|color)-/, name);
   }
   // Specs reference these ahead of time with fallbacks; they stay undefined until the Modal migration.
@@ -303,8 +303,8 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
     '--screen-pad-x': 'var(--space-150)',
     '--section-min-width-main': 'var(--width-3000)',
     '--modal-radius': 'var(--radius-xxl)',
-    '--popover-max-height-menu': 'var(--height-2000)',
-    '--popover-offset': 'var(--space-025)',
+    '--dropdown-menu-max-height': 'var(--height-2000)',
+    '--popup-offset': 'var(--space-025)',
   };
   for (const [name, raw] of Object.entries(ALIASES)) assert.equal(corpus.get(name)?.raw, raw, name);
   for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad']) {
@@ -323,7 +323,7 @@ test('the code-only frame tokens resolve, unchanged', () => {
 });
 
 // `--modal-pad-x-default` (ADR-038, tokens/ladder, outside this file's corpus) is
-// non-responsive, same 16px the old `--modal-pad` held at every mode. `--popover-pad` is 16 too.
+// non-responsive, same 16px the old `--modal-pad` held at every mode. `--popup-pad` is 16 too.
 const MODAL_PAD_PX = 16;
 
 /*
@@ -386,7 +386,7 @@ test('Modal takes its 6 · 8 · 10 column widths from the shared screen grid', (
 
 test('Popup\'s 3-col and 4-col take the same screen grid, and POPUP_WIDTH_PX is that rule at 768 · 1024 · 1280', () => {
   assert.match(POPUP_SCSS, /@use '[./]*styles\/screen-grid' as \*;/);
-  assert.match(POPUP_SCSS, /@include screen-grid-width\(var\(--popover-pad\)\);/);
+  assert.match(POPUP_SCSS, /@include screen-grid-width\(var\(--popup-pad\)\);/);
   assert.match(POPUP_SCSS, /&\.plus-popup--3-col \{\s*--plus-overlay-span: 3;/);
   assert.match(POPUP_SCSS, /&\.plus-popup--4-col \{\s*--plus-overlay-span: 4;/);
   const px = exportedValue(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Popup/Popup.jsx', 'POPUP_WIDTH_PX');
@@ -406,7 +406,7 @@ test('the Frame stacks its layers by name: no arithmetic on --layer-navigation a
 });
 
 test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start < Backdrop < Panel peek', () => {
-  const order = ['edge', 'sidebar', 'topbar-start', 'blanket', 'panel-peek'].map((n) => `--frame-layer-${n}`);
+  const order = ['edge', 'sidebar', 'topbar-start', 'blanket', 'panel-peek'].map((n) => `--layer-frame-${n}`);
   const values = order.map((n) => {
     const token = corpus.get(n);
     assert.ok(token, `${n} is not declared`);
@@ -420,7 +420,7 @@ test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start 
   });
   assert.deepEqual(resolved, [...resolved].sort((a, b) => a - b));
   assert.equal(new Set(resolved).size, resolved.length);
-  assert.ok(corpus.get('--frame-layer-splitter'), 'the splitter layer is named');
+  assert.ok(corpus.get('--layer-frame-splitter'), 'the splitter layer is named');
 });
 
 test('one hairline token across the Frame: the semantic border width, never the primitive', () => {
