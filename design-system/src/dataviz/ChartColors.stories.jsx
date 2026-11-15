@@ -1,5 +1,6 @@
 import React from 'react';
 import { expect, waitFor } from 'storybook/test';
+import Highcharts from '@/dataviz/highchartsModules';
 import {
     BarChart,
     DonutChart,
@@ -191,6 +192,63 @@ export const EveryChartInEveryMode = {
             }
         });
         await expect([...new Set(strays)], 'paints that are not chart, text or border tokens').toEqual([]);
+
+        // Type & numbers: every chart text node renders in Noto Sans at 500 or 600
+        // (never 700, 300 or system-font fallback), and number slots compute tabular-nums.
+        const typeStrays = [];
+        for (const section of canvasElement.querySelectorAll('[data-chart]')) {
+            const chart = section.dataset.chart;
+            const container = section.querySelector('.highcharts-container');
+            if (!container) continue;
+
+            const textNodes = container.querySelectorAll(
+                'text, tspan, .highcharts-data-label span, .highcharts-data-labels span, .plus-chart-value',
+            );
+            for (const node of textNodes) {
+                if (!node.textContent?.trim()) continue;
+                const style = getComputedStyle(node);
+                if (
+                    !style.fontFamily.includes('Noto Sans') ||
+                    style.fontFamily.includes('-apple-system') ||
+                    style.fontFamily.includes('BlinkMacSystemFont')
+                ) {
+                    typeStrays.push(`${chart} family: ${style.fontFamily}`);
+                }
+                if (style.fontWeight === '700' || style.fontWeight === '300' || !['500', '600'].includes(style.fontWeight)) {
+                    typeStrays.push(`${chart} weight: ${style.fontWeight} (${node.textContent.trim()})`);
+                }
+            }
+
+            const numberNodes = container.querySelectorAll(
+                '.highcharts-axis-labels text, .highcharts-data-label text, .highcharts-data-labels text, .highcharts-data-labels span, .highcharts-legend-item text, .plus-chart-value',
+            );
+            for (const node of numberNodes) {
+                if (!node.textContent?.trim()) continue;
+                const style = getComputedStyle(node);
+                if (style.fontVariantNumeric !== 'tabular-nums') {
+                    typeStrays.push(`${chart} tabular: ${style.fontVariantNumeric}`);
+                }
+            }
+        }
+        await expect([...new Set(typeStrays)], 'chart text family, weight or tabular-nums strays').toEqual([]);
+
+        // States: selecting a point uses --ds-background-selected + --ds-border-selected, never --chart-brand.
+        const pieContainer = canvasElement.querySelector('[data-chart="pie"] .highcharts-container');
+        const pieChart = Highcharts.charts.find((c) => c && c.container === pieContainer);
+        expect(pieChart, 'pie chart instance').toBeDefined();
+        const slice = pieChart.series[0].points[0];
+        slice.select(true, false);
+        try {
+            const sliceStyle = getComputedStyle(slice.graphic.element);
+            const selectedFill = tokenColor(canvasElement, '--ds-background-selected');
+            const selectedBorder = tokenColor(canvasElement, '--ds-border-selected');
+            const brandFill = tokenColor(canvasElement, '--chart-brand');
+            expect(sliceStyle.fill).toBe(selectedFill);
+            expect(sliceStyle.fill).not.toBe(brandFill);
+            expect(sliceStyle.stroke).toBe(selectedBorder);
+        } finally {
+            slice.select(false, false);
+        }
     },
 };
 

@@ -5,10 +5,9 @@
  * data-label outlines, the reset-zoom button, a gauge's pane, the loading
  * veil) from `--highcharts-*` variables it injects at :root with fixed light
  * values. Redefined on the chart container, they follow the color mode like
- * every other token: separators take `--ds-border-inverse`, as Atlassian
- * separates adjacent chart colors; inks take the text tokens; tints take the
- * neutral and selected backgrounds. A chart option still wins where a chart
- * sets one.
+ * every other token: separators take `--ds-border-inverse`; inks take the text
+ * tokens; tints take the neutral and selected backgrounds. A chart option still
+ * wins where a chart sets one.
  */
 :root {
     /*
@@ -41,10 +40,10 @@
     --highcharts-neutral-color-10: var(--ds-border);
     --highcharts-neutral-color-5: var(--ds-background-neutral-subtle-hovered);
     --highcharts-neutral-color-3: var(--ds-background-neutral-subtle-hovered);
-    --highcharts-highlight-color: var(--chart-brand);
-    --highcharts-highlight-color-100: var(--chart-brand);
-    --highcharts-highlight-color-80: var(--chart-brand);
-    --highcharts-highlight-color-60: var(--chart-brand-hovered);
+    --highcharts-highlight-color: var(--ds-background-selected);
+    --highcharts-highlight-color-100: var(--ds-border-selected);
+    --highcharts-highlight-color-80: var(--ds-border-selected);
+    --highcharts-highlight-color-60: var(--ds-background-selected-pressed);
     --highcharts-highlight-color-40: var(--ds-border-selected);
     --highcharts-highlight-color-20: var(--ds-background-selected-hovered);
     --highcharts-highlight-color-10: var(--ds-background-selected);
@@ -52,6 +51,79 @@
     --highcharts-highlight-color-3: var(--ds-background-selected);
     --highcharts-positive-color: var(--chart-success);
     --highcharts-negative-color: var(--chart-danger);
+}
+
+/*
+ * Shared chart typography and tabular figures.
+ *
+ * Every chart text slot wears `--type-family-body` (Noto Sans) at either
+ * medium (500) for labels or semibold (600) for titles and emphasized values.
+ * Number slots (axis tick labels, data labels, tooltips, legend items and
+ * `.plus-chart-value` spans) set `font-variant-numeric: tabular-nums` in CSS
+ * as well as in the Highcharts theme object so SVG `<text>` and `<tspan>` nodes
+ * keep tabular figures even when Highcharts strips unknown style keys.
+ */
+.highcharts-container,
+.highcharts-container text,
+.highcharts-container tspan,
+.highcharts-tooltip-container,
+:has(> .highcharts-container) ~ div {
+    font-family: var(--type-family-body);
+}
+
+.highcharts-title,
+.highcharts-axis-title {
+    font-family: var(--type-family-body);
+    font-weight: var(--type-weight-semibold);
+}
+
+.highcharts-subtitle,
+.highcharts-caption,
+.highcharts-no-data text {
+    font-family: var(--type-family-body);
+    font-weight: var(--type-weight-medium);
+}
+
+.highcharts-axis-labels,
+.highcharts-axis-labels text,
+.highcharts-axis-labels tspan,
+.highcharts-data-label,
+.highcharts-data-label text,
+.highcharts-data-label tspan,
+.highcharts-data-labels,
+.highcharts-data-labels text,
+.highcharts-data-labels tspan,
+.highcharts-legend-item,
+.highcharts-legend-item text,
+.highcharts-legend-item tspan,
+.highcharts-tooltip,
+.highcharts-tooltip text,
+.highcharts-tooltip tspan,
+.highcharts-tooltip-container,
+:has(> .highcharts-container) ~ div {
+    font-family: var(--type-family-body);
+    font-variant-numeric: tabular-nums;
+}
+
+.plus-chart-value,
+.highcharts-strong,
+.highcharts-container b,
+.highcharts-container strong,
+.highcharts-tooltip-container b,
+.highcharts-tooltip-container strong {
+    font-family: var(--type-family-body);
+    font-weight: var(--type-weight-semibold);
+    font-variant-numeric: tabular-nums;
+}
+
+.highcharts-series-inactive {
+    opacity: var(--ds-opacity-disabled);
+}
+
+.highcharts-point-select {
+    fill: var(--ds-background-selected);
+    stroke: var(--ds-border-selected);
+    stroke-width: var(--stroke-1);
 }
 
 /*

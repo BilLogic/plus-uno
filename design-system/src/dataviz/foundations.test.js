@@ -1,6 +1,17 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import chartTheme from '@/dataviz/chartTheme';
+import {
+    CHART_VALUE_CLASS,
+    dataLabelFormat,
+    formatValue,
+    seriesSwatch,
+    tooltipHeaderFormat,
+    tooltipPointFormat,
+    valueSpan,
+} from '@/dataviz/chartFormat';
+import { BRAND, CATEGORICAL, hoveredColor } from '@/dataviz/palette';
 
 /**
  * Every other foundation (spacing, radius, elevation, stroke, type, motion)
@@ -73,5 +84,122 @@ describe('data-viz foundations', () => {
             text.includes('HighchartsReact'),
         );
         expect(offenders.map((f) => f.path)).toEqual([]);
+    });
+
+    it('sets the Noto Sans body family token on chart.style and explicitly on every theme text slot', () => {
+        const slots = {
+            chart: chartTheme.chart?.style,
+            title: chartTheme.title?.style,
+            subtitle: chartTheme.subtitle?.style,
+            caption: chartTheme.caption?.style,
+            xAxisLabels: chartTheme.xAxis?.labels?.style,
+            xAxisTitle: chartTheme.xAxis?.title?.style,
+            yAxisLabels: chartTheme.yAxis?.labels?.style,
+            yAxisTitle: chartTheme.yAxis?.title?.style,
+            legendItem: chartTheme.legend?.itemStyle,
+            dataLabels: chartTheme.plotOptions?.series?.dataLabels?.style,
+            tooltip: chartTheme.tooltip?.style,
+            noData: chartTheme.noData?.style,
+        };
+        for (const [slot, style] of Object.entries(slots)) {
+            expect(style?.fontFamily, `${slot}.fontFamily`).toBe('var(--type-family-body)');
+        }
+    });
+
+    it('uses only weights 500 (medium) and 600 (semibold) across theme text slots and kills Highcharts default data-label outline and bold', () => {
+        const titleSlots = [
+            chartTheme.title?.style,
+            chartTheme.xAxis?.title?.style,
+            chartTheme.yAxis?.title?.style,
+        ];
+        for (const style of titleSlots) {
+            expect(style?.fontWeight).toBe('var(--type-weight-semibold)');
+        }
+
+        const labelSlots = [
+            chartTheme.chart?.style,
+            chartTheme.subtitle?.style,
+            chartTheme.caption?.style,
+            chartTheme.xAxis?.labels?.style,
+            chartTheme.yAxis?.labels?.style,
+            chartTheme.legend?.itemStyle,
+            chartTheme.plotOptions?.series?.dataLabels?.style,
+            chartTheme.tooltip?.style,
+            chartTheme.noData?.style,
+        ];
+        for (const style of labelSlots) {
+            expect(style?.fontWeight).toBe('var(--type-weight-medium)');
+        }
+
+        expect(chartTheme.plotOptions?.series?.dataLabels?.style?.textOutline).toBe('none');
+    });
+
+    it('sets tabular-nums on every number slot in the theme and in chartTheme.css without a monospace font', () => {
+        const numberSlots = {
+            xAxisLabels: chartTheme.xAxis?.labels?.style,
+            yAxisLabels: chartTheme.yAxis?.labels?.style,
+            dataLabels: chartTheme.plotOptions?.series?.dataLabels?.style,
+            tooltip: chartTheme.tooltip?.style,
+            legendItem: chartTheme.legend?.itemStyle,
+        };
+        for (const [slot, style] of Object.entries(numberSlots)) {
+            expect(style?.fontVariantNumeric, `${slot}.fontVariantNumeric`).toBe('tabular-nums');
+            expect(style?.fontFamily, `${slot}.fontFamily`).not.toContain('code');
+            expect(style?.fontFamily, `${slot}.fontFamily`).not.toContain('mono');
+        }
+
+        const css = readFileSync(join(ROOT, 'chartTheme.css'), 'utf8');
+        expect(css).toContain('font-variant-numeric: tabular-nums');
+        expect(css).toContain(`.${CHART_VALUE_CLASS}`);
+    });
+
+    it('formats values with a semibold tabular value span and uses the format helper in theme tooltip and dataLabels defaults', () => {
+        expect(valueSpan('{point.y}')).toBe('<span class="plus-chart-value">{point.y}</span>');
+        expect(formatValue('{point.percentage:.1f}%')).toBe('<span class="plus-chart-value">{point.percentage:.1f}%</span>');
+        expect(seriesSwatch()).toBe('<span style="color:{point.color}">●</span>');
+        expect(tooltipHeaderFormat()).toBe('<span class="plus-chart-value">{point.key}</span><br/>');
+        expect(tooltipPointFormat()).toBe(
+            '<span style="color:{point.color}">●</span> {series.name}: <span class="plus-chart-value">{point.y}</span><br/>',
+        );
+        expect(dataLabelFormat()).toBe('<span class="plus-chart-value">{point.y}</span>');
+        expect(dataLabelFormat('{point.percentage:.1f}%', '{point.name}')).toBe(
+            '{point.name}: <span class="plus-chart-value">{point.percentage:.1f}%</span>',
+        );
+
+        expect(chartTheme.tooltip.pointFormat).toBe(tooltipPointFormat());
+        expect(chartTheme.tooltip.headerFormat).toBe(tooltipHeaderFormat());
+        expect(chartTheme.plotOptions.series.dataLabels.format).toBe(dataLabelFormat());
+        expect(chartTheme.tooltip.pointFormat).not.toContain('<b>');
+        expect(chartTheme.tooltip.pointFormat).not.toMatch(/style="color:\{series\.color\}">[^●]/);
+    });
+
+    it('declares hover, inactive and select states once in the theme and repoints Highcharts highlight CSS variables off --chart-brand', () => {
+        expect(hoveredColor(BRAND)).toBe('var(--chart-brand-hovered)');
+        expect(hoveredColor(CATEGORICAL[0])).toBe('var(--chart-categorical-1-hovered)');
+        expect(hoveredColor('#123456')).toBeUndefined();
+
+        const { hover, inactive, select } = chartTheme.plotOptions?.series?.states ?? {};
+        expect(hover?.enabled).toBe(true);
+        expect(hover?.color).toBe('var(--chart-brand-hovered)');
+        expect(hover?.animation?.duration).toBeGreaterThan(0);
+
+        expect(inactive?.enabled).toBe(true);
+        expect(inactive?.opacity).toBe(0.4);
+        expect(inactive?.animation?.duration).toBeGreaterThan(0);
+
+        expect(select?.enabled).toBe(true);
+        expect(select?.color).toBe('var(--ds-background-selected)');
+        expect(select?.borderColor).toBe('var(--ds-border-selected)');
+        expect(select?.borderWidth).toBe(1);
+        expect(select?.animation?.duration).toBeGreaterThan(0);
+
+        const css = readFileSync(join(ROOT, 'chartTheme.css'), 'utf8');
+        const highlightLines = css
+            .split('\n')
+            .filter((line) => line.includes('--highcharts-highlight-color'));
+        expect(highlightLines.length).toBeGreaterThan(0);
+        for (const line of highlightLines) {
+            expect(line).not.toContain('--chart-brand');
+        }
     });
 });

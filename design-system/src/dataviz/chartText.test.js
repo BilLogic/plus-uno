@@ -56,9 +56,11 @@ describe('chart text contrast', () => {
     it('sets every theme text color from a semantic text token', () => {
         const inks = [
             chartTheme.chart.style.color, chartTheme.title.style.color, chartTheme.subtitle.style.color,
-            chartTheme.xAxis.labels.style.color, chartTheme.yAxis.labels.style.color,
-            chartTheme.xAxis.title.style.color, chartTheme.legend.itemStyle.color,
-            chartTheme.legend.itemHoverStyle.color, chartTheme.tooltip.style.color,
+            chartTheme.caption.style.color, chartTheme.xAxis.labels.style.color, chartTheme.yAxis.labels.style.color,
+            chartTheme.xAxis.title.style.color, chartTheme.yAxis.title.style.color,
+            chartTheme.legend.itemStyle.color, chartTheme.legend.itemHoverStyle.color,
+            chartTheme.plotOptions.series.dataLabels.style.color, chartTheme.tooltip.style.color,
+            chartTheme.noData.style.color,
         ];
         for (const ink of inks) expect(ink).toMatch(/^var\(--ds-text(-subtle|-subtlest)?\)$/);
     });
@@ -75,5 +77,32 @@ describe('chart sources', () => {
         const bad = /color:\s*['"](black|white|#[0-9a-f]{3,8})['"]|textOutline:\s*['"][^'"]*contrast/i;
         const offenders = collect(__dirname).filter((p) => bad.test(readFileSync(p, 'utf8')));
         expect(offenders).toEqual([]);
+    });
+
+    it('reports remaining per-chart type and state overrides as a soft list for #2581–#2585', () => {
+        const sharedFiles = new Set(['PlusChart.jsx']);
+        const rules = [
+            { id: 'b-tag', pattern: /<b\b/i },
+            { id: 'inline-font-weight', pattern: /font-weight\s*:/i },
+            { id: 'weight-300-or-700', pattern: /fontWeight\s*:\s*['"]?(?:300|700|bold)['"]?/ },
+            { id: 'raw-px-font-size', pattern: /font-size\s*:\s*\d+px|fontSize\s*:\s*['"]?\d+px/i },
+            { id: 'series-color-tooltip-text', pattern: /style=["']color:\s*\{series\.color\}["'][^>]*>[^●<]/ },
+            { id: 'per-chart-states', pattern: /\bstates\s*:/ },
+            { id: 'allow-point-select', pattern: /\ballowPointSelect\s*:/ },
+        ];
+        const report = [];
+        for (const file of collect(__dirname)) {
+            const rel = file.slice(__dirname.length + 1);
+            if (sharedFiles.has(rel)) continue;
+            const text = readFileSync(file, 'utf8');
+            const matched = rules.filter(({ pattern }) => pattern.test(text)).map(({ id }) => id);
+            if (matched.length > 0) {
+                report.push(`${rel}: ${matched.join(', ')}`);
+            }
+        }
+        if (report.length > 0) {
+            console.info(`[dataviz soft guard — ${report.length} chart files remaining for #2581–#2585]\n${report.join('\n')}`);
+        }
+        expect(report.length).toBeGreaterThan(0);
     });
 });

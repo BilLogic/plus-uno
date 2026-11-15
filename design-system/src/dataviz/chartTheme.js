@@ -10,21 +10,25 @@
  * Highcharts defaults this theme does not set are pointed at the same tokens in
  * `chartTheme.css`.
  *
- * Every other foundation (spacing, radius, elevation, stroke, type, motion)
- * takes the same component tokens as the rest of the design system. The chart
- * container is a Card, so `chart.spacing` reads
- * `--card-pad-compact` (the density this component already rendered at: 16px,
- * component tokens defined in `chartTheme.css`). The tooltip is a floating
- * layer, so it takes the Popup pattern's surface, overlay shadow and radius —
- * via `useHTML`, since Highcharts' native SVG tooltip can only draw its own
- * filter-based shadow, not a design-system shadow token; the CSS lives beside
- * the other chart-only tokens in `chartTheme.css`.
+ * Every other foundation (spacing, radius, elevation, stroke, type, states,
+ * motion) takes the same component tokens as the rest of the design system.
+ * The chart container is a Card, so `chart.spacing` reads `--card-pad-compact`
+ * (the density this component already rendered at: 16px, component tokens
+ * defined in `chartTheme.css`). The tooltip is a floating layer, so it takes
+ * the Popup pattern's surface, overlay shadow and radius — via `useHTML`,
+ * since Highcharts' native SVG tooltip can only draw its own filter-based
+ * shadow, not a design-system shadow token; the CSS lives beside the other
+ * chart-only tokens in `chartTheme.css`.
  */
+import { CHART_VALUE_CLASS, dataLabelFormat, formatValue, seriesSwatch, tooltipHeaderFormat, tooltipPointFormat, valueSpan } from '@/dataviz/chartFormat';
 import { chartEntrance, chartStateTransition } from '@/dataviz/chartMotion';
-import { CATEGORICAL, CHROME } from '@/dataviz/palette';
+import { BRAND, CATEGORICAL, CHROME, hoveredColor } from '@/dataviz/palette';
 import '@/dataviz/chartTheme.css';
 
 const BODY = 'var(--type-family-body)';
+const MEDIUM = 'var(--type-weight-medium)';
+const SEMIBOLD = 'var(--type-weight-semibold)';
+const TABULAR = 'tabular-nums';
 
 /**
  * Highcharts' numeric chart options (spacing, stroke width, radius) do SVG
@@ -67,6 +71,9 @@ const CHART_STATE_ANIMATION = chartStateTransition();
 const CHART_GRID_WIDTH = tokenNumber('--chart-grid-width', 1);
 const CHART_LINE_WIDTH = tokenNumber('--chart-line-width', 2);
 
+/** `--ds-opacity-disabled` (0.4) — inactive series fade when another series is hovered. */
+export const CHART_INACTIVE_OPACITY = tokenNumber('--ds-opacity-disabled', 0.4);
+
 /** Bars and columns round only the value end (`where: 'end'`) — rounding both ends or a bigger radius distorts length reading. Pies, donuts and areas take none, so this lives on `column`/`bar` only, not the shared theme root. */
 const CHART_BAR_RADIUS_NUMBER = tokenNumber('--chart-bar-radius', 2);
 const barRadius = { borderRadius: { radius: CHART_BAR_RADIUS_NUMBER, where: 'end' } };
@@ -85,15 +92,18 @@ const axis = (gridLineWidth, gridLineDashStyle) => ({
             color: CHROME.textSubtle,
             fontFamily: BODY,
             fontSize: 'var(--type-size-075)',
-            fontWeight: 'var(--type-weight-medium)'
-        }
+            fontWeight: MEDIUM,
+            fontVariantNumeric: TABULAR,
+        },
     },
     title: {
         style: {
             color: CHROME.text,
-            fontFamily: BODY
-        }
-    }
+            fontFamily: BODY,
+            fontSize: 'var(--type-size-075)',
+            fontWeight: SEMIBOLD,
+        },
+    },
 });
 
 const chartTheme = {
@@ -123,7 +133,8 @@ const chartTheme = {
         enabled: true,
         landmarkVerbosity: 'disabled',
         screenReaderSection: {
-            beforeChartFormat: '<div>{chartTitle}</div>' +
+            beforeChartFormat:
+                '<div>{chartTitle}</div>' +
                 '<div>{typeDescription}</div>' +
                 '<div>{chartSubtitle}</div>' +
                 '<div>{chartLongdesc}</div>' +
@@ -131,8 +142,8 @@ const chartTheme = {
                 '<div>{viewTableButton}</div>' +
                 '<div>{xAxisDescription}</div>' +
                 '<div>{yAxisDescription}</div>' +
-                '<div>{annotationsTitle}{annotationsList}</div>'
-        }
+                '<div>{annotationsTitle}{annotationsList}</div>',
+        },
     },
     // Series colors, in assignment order. Past six series, fold the rest into "Other".
     colors: CATEGORICAL,
@@ -142,49 +153,117 @@ const chartTheme = {
         animation: CHART_ENTRANCE_ANIMATION,
         style: {
             fontFamily: BODY,
-            color: CHROME.text
-        }
+            fontWeight: MEDIUM,
+            color: CHROME.text,
+        },
     },
     title: {
         style: {
             color: CHROME.text,
-            fontFamily: 'var(--type-family-heading)',
-            fontWeight: 'var(--type-weight-semibold)',
-            fontSize: 'var(--type-size-150)'
-        }
+            fontFamily: BODY,
+            fontWeight: SEMIBOLD,
+            fontSize: 'var(--type-size-150)',
+        },
     },
     subtitle: {
         style: {
             color: CHROME.textSubtle,
             fontFamily: BODY,
-            fontSize: 'var(--type-size-0875)'
-        }
+            fontWeight: MEDIUM,
+            fontSize: 'var(--type-size-0875)',
+        },
+    },
+    caption: {
+        style: {
+            color: CHROME.textSubtle,
+            fontFamily: BODY,
+            fontWeight: MEDIUM,
+            fontSize: 'var(--type-size-075)',
+        },
     },
     xAxis: axis(0),
     yAxis: axis(CHART_GRID_WIDTH, 'Dash'),
     plotOptions: {
         series: {
             animation: CHART_ENTRANCE_ANIMATION,
+            dataLabels: {
+                format: dataLabelFormat(),
+                style: {
+                    color: CHROME.text,
+                    fontFamily: BODY,
+                    fontSize: 'var(--type-size-075)',
+                    fontWeight: MEDIUM,
+                    fontVariantNumeric: TABULAR,
+                    textOutline: 'none',
+                },
+            },
             states: {
-                hover: { animation: CHART_STATE_ANIMATION },
-                inactive: { animation: CHART_STATE_ANIMATION }
-            }
+                hover: {
+                    enabled: true,
+                    color: hoveredColor(BRAND),
+                    brightness: 0,
+                    halo: null,
+                    animation: CHART_STATE_ANIMATION,
+                },
+                inactive: {
+                    enabled: true,
+                    opacity: CHART_INACTIVE_OPACITY,
+                    animation: CHART_STATE_ANIMATION,
+                },
+                select: {
+                    enabled: true,
+                    color: 'var(--ds-background-selected)',
+                    borderColor: 'var(--ds-border-selected)',
+                    borderWidth: CHART_GRID_WIDTH,
+                    animation: CHART_STATE_ANIMATION,
+                },
+            },
+            marker: {
+                states: {
+                    hover: {
+                        enabled: true,
+                        lineWidthPlus: 0,
+                    },
+                    select: {
+                        enabled: true,
+                        fillColor: 'var(--ds-background-selected)',
+                        lineColor: 'var(--ds-border-selected)',
+                        lineWidth: CHART_GRID_WIDTH,
+                    },
+                },
+            },
         },
         column: barRadius,
-        bar: barRadius
+        bar: barRadius,
+        wordcloud: {
+            style: {
+                fontFamily: BODY,
+                fontWeight: SEMIBOLD,
+            },
+        },
+        treegraph: {
+            collapseButton: {
+                style: {
+                    fontFamily: BODY,
+                    fontWeight: SEMIBOLD,
+                },
+            },
+        },
     },
     legend: {
         itemStyle: {
             color: CHROME.text,
             fontFamily: BODY,
-            fontWeight: 'var(--type-weight-medium)'
+            fontSize: 'var(--type-size-075)',
+            fontWeight: MEDIUM,
+            fontVariantNumeric: TABULAR,
         },
         itemHoverStyle: {
-            color: CHROME.text
+            color: CHROME.text,
         },
         itemHiddenStyle: {
-            color: CHROME.textDisabled
-        }
+            color: CHROME.textDisabled,
+        },
     },
     tooltip: {
         // The Popup pattern's surface, styled in `chartTheme.css` via
@@ -202,15 +281,27 @@ const chartTheme = {
         backgroundColor: 'transparent',
         borderWidth: 0,
         shadow: false,
+        headerFormat: tooltipHeaderFormat(),
+        pointFormat: tooltipPointFormat(),
         style: {
             color: CHROME.text,
             fontFamily: BODY,
-            fontSize: 'var(--type-size-0875)'
-        }
+            fontSize: 'var(--type-size-0875)',
+            fontWeight: MEDIUM,
+            fontVariantNumeric: TABULAR,
+        },
+    },
+    noData: {
+        style: {
+            color: CHROME.textSubtle,
+            fontFamily: BODY,
+            fontSize: 'var(--type-size-0875)',
+            fontWeight: MEDIUM,
+        },
     },
     credits: {
-        enabled: false
-    }
+        enabled: false,
+    },
 };
 
 /** A series line or a box-plot whisker: the chart-only stroke width. */
@@ -231,5 +322,16 @@ export const CHART_ANIMATION_DURATION_MS = CHART_ENTRANCE_ANIMATION.duration;
  * stacked column only rounds the outer end of the stack, not every segment.
  */
 export const CHART_BAR_RADIUS = barRadius.borderRadius;
+
+export {
+    CHART_VALUE_CLASS,
+    dataLabelFormat,
+    formatValue,
+    hoveredColor,
+    seriesSwatch,
+    tooltipHeaderFormat,
+    tooltipPointFormat,
+    valueSpan,
+};
 
 export default chartTheme;

@@ -137,3 +137,19 @@ export const rampStops = (tokens, resolve) =>
  * @returns {T[]}  a new array
  */
 export const mostToLeast = (items, value = (item) => item.y) => [...items].sort((a, b) => value(b) - value(a));
+
+/**
+ * Given a chart mark color (`var(--chart-*)` or `var(--ds-background-*)`),
+ * returns its `-hovered` token (`var(--chart-*-hovered)`), or `undefined` when
+ * the color is not a token with a `-hovered` step.
+ *
+ * @param {string} [color]
+ * @returns {string | undefined}
+ */
+export const hoveredColor = (color) => {
+    if (typeof color !== 'string') return undefined;
+    const match = color.match(/^var\((--(chart-[\w-]+|ds-background-[\w-]+))\)$/);
+    if (!match || match[1].endsWith('-hovered')) return undefined;
+    return `var(${match[1]}-hovered)`;
+};
+

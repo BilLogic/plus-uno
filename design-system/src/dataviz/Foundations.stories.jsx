@@ -4,6 +4,16 @@ import { Button } from '@/components';
 import BarChart from '@/dataviz/comparison/BarChart/BarChart';
 import LineChart from '@/dataviz/temporal/LineChart/LineChart';
 import PieChart from '@/dataviz/part-to-whole/PieChart/PieChart';
+import PlusChart from '@/dataviz/PlusChart';
+import chartTheme, {
+    dataLabelFormat,
+    hoveredColor,
+    seriesSwatch,
+    tooltipHeaderFormat,
+    tooltipPointFormat,
+    valueSpan,
+} from '@/dataviz/chartTheme';
+import { CATEGORICAL } from '@/dataviz/palette';
 import Highcharts from '@/dataviz/highchartsModules';
 import {
     ChartMotionArea,
@@ -11,11 +21,12 @@ import {
     chartStateTransition,
 } from '@/dataviz/chartMotion';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
+import { resolveColor } from '@/dataviz/colorMode';
 
 /**
  * Specimens for Data visualizations/Foundations — the chart foundations
- * besides color: spacing, radius, elevation, stroke, type, motion. All come
- * off the same component tokens as the rest of the design system.
+ * besides color: spacing, radius, elevation, stroke, type, states, motion.
+ * All come off the same component tokens as the rest of the design system.
  */
 export default {
     title: 'Data visualizations/Foundations',
@@ -45,9 +56,12 @@ export const TooltipSurface = () => (
                 color: 'var(--ds-text)',
                 fontFamily: 'var(--type-family-body)',
                 fontSize: 'var(--type-size-0875)',
+                fontWeight: 'var(--type-weight-medium)',
+                fontVariantNumeric: 'tabular-nums',
             }}
         >
-            Thursday: <b>24 sessions</b>
+            <span style={{ color: 'var(--chart-brand)' }}>●</span> Thursday:{' '}
+            <span className="plus-chart-value">24 sessions</span>
         </div>
     </div>
 );
@@ -92,6 +106,8 @@ const labelStyle = {
     color: 'var(--ds-text-subtle)',
     fontFamily: 'var(--type-family-body)',
     fontSize: 'var(--type-size-0875)',
+    fontWeight: 'var(--type-weight-medium)',
+    fontVariantNumeric: 'tabular-nums',
 };
 
 const gridStyle = {
@@ -108,6 +124,233 @@ const cardStyle = {
 
 const findChart = (containerEl) =>
     Highcharts.charts.find((c) => c && c.renderTo && containerEl.contains(c.renderTo));
+
+const TYPE_OPTIONS = {
+    ...chartTheme,
+    chart: {
+        ...chartTheme.chart,
+        type: 'column',
+        height: 260,
+    },
+    title: {
+        ...chartTheme.title,
+        text: 'Weekly tutoring sessions',
+    },
+    subtitle: {
+        ...chartTheme.subtitle,
+        text: 'Completed vs scheduled across 4 cohorts',
+    },
+    caption: {
+        ...chartTheme.caption,
+        text: 'Figures align on tabular numerals across axes, data labels and legends.',
+    },
+    xAxis: {
+        ...chartTheme.xAxis,
+        categories: ['Cohort 1', 'Cohort 2', 'Cohort 3', 'Cohort 4'],
+        title: {
+            ...chartTheme.xAxis.title,
+            text: 'Cohort',
+        },
+    },
+    yAxis: {
+        ...chartTheme.yAxis,
+        title: {
+            ...chartTheme.yAxis.title,
+            text: 'Sessions',
+        },
+    },
+    plotOptions: {
+        ...chartTheme.plotOptions,
+        column: {
+            ...chartTheme.plotOptions.column,
+            dataLabels: {
+                enabled: true,
+                format: dataLabelFormat('{point.y:,.0f}'),
+            },
+        },
+    },
+    tooltip: {
+        ...chartTheme.tooltip,
+        headerFormat: tooltipHeaderFormat(),
+        pointFormat: tooltipPointFormat({ value: '{point.y:,.0f}' }),
+    },
+    series: [
+        {
+            name: 'Completed (1,110)',
+            color: CATEGORICAL[0],
+            data: [118, 245, 312, 435],
+        },
+        {
+            name: 'Scheduled (1,240)',
+            color: CATEGORICAL[1],
+            data: [130, 260, 340, 510],
+        },
+    ],
+};
+
+/**
+ * Noto Sans (`--type-family-body`) across every text slot, weights 500 and 600
+ * only, tabular figures (`tabular-nums`) on every number slot, and tooltip
+ * text in `--ds-text` with the series color confined to the leading swatch.
+ */
+export const TypeAndNumbers = {
+    render: () => (
+        <div style={stackStyle}>
+            <div data-specimen="type-chart" style={cardStyle}>
+                <PlusChart options={TYPE_OPTIONS} />
+            </div>
+            <div
+                data-specimen="type-tooltip"
+                style={{
+                    background: 'var(--ds-surface-overlay)',
+                    borderRadius: 'var(--popup-radius)',
+                    boxShadow: 'var(--ds-shadow-overlay)',
+                    padding: 'var(--popup-pad)',
+                    color: 'var(--ds-text)',
+                    fontFamily: 'var(--type-family-body)',
+                    fontSize: 'var(--type-size-0875)',
+                    fontWeight: 'var(--type-weight-medium)',
+                    fontVariantNumeric: 'tabular-nums',
+                    alignSelf: 'flex-start',
+                }}
+                dangerouslySetInnerHTML={{
+                    __html: `${valueSpan('Cohort 4')}<br/>${seriesSwatch('var(--chart-categorical-1)')} Completed: ${valueSpan('435')}`,
+                }}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelector('[data-specimen="type-chart"] .highcharts-container')).not.toBeNull();
+        });
+
+        const container = canvasElement.querySelector('[data-specimen="type-chart"] .highcharts-container');
+        const title = container.querySelector('.highcharts-title');
+        const subtitle = container.querySelector('.highcharts-subtitle');
+        const caption = container.querySelector('.highcharts-caption');
+        const axisLabel = container.querySelector('.highcharts-axis-labels text');
+        const dataLabelValue = container.querySelector('.highcharts-data-label .plus-chart-value');
+        const legendItem = container.querySelector('.highcharts-legend-item text');
+        const tooltipValue = canvasElement.querySelector('[data-specimen="type-tooltip"] .plus-chart-value');
+
+        expect(getComputedStyle(title).fontFamily).toContain('Noto Sans');
+        expect(getComputedStyle(title).fontWeight).toBe('600');
+        expect(getComputedStyle(subtitle).fontWeight).toBe('500');
+        expect(getComputedStyle(caption).fontWeight).toBe('500');
+
+        for (const numEl of [axisLabel, dataLabelValue, legendItem, tooltipValue]) {
+            expect(numEl).not.toBeNull();
+            const cs = getComputedStyle(numEl);
+            expect(cs.fontFamily).toContain('Noto Sans');
+            expect(cs.fontVariantNumeric).toBe('tabular-nums');
+        }
+        expect(getComputedStyle(dataLabelValue).fontWeight).toBe('600');
+        expect(getComputedStyle(tooltipValue).fontWeight).toBe('600');
+    },
+};
+
+function StatesSpecimen() {
+    const [selectedIndex, setSelectedIndex] = useState(1);
+
+    const options = {
+        ...chartTheme,
+        chart: {
+            ...chartTheme.chart,
+            type: 'column',
+            height: 220,
+        },
+        title: { text: null },
+        xAxis: {
+            ...chartTheme.xAxis,
+            categories: ['Mon', 'Tue', 'Wed', 'Thu'],
+        },
+        plotOptions: {
+            ...chartTheme.plotOptions,
+            column: {
+                ...chartTheme.plotOptions.column,
+                allowPointSelect: true,
+            },
+        },
+        series: [
+            {
+                name: 'Algebra',
+                color: CATEGORICAL[0],
+                data: [18, 26, 21, 30].map((y, idx) => ({
+                    y,
+                    selected: idx === selectedIndex,
+                })),
+            },
+            {
+                name: 'Geometry',
+                color: CATEGORICAL[1],
+                data: [14, 19, 17, 23],
+            },
+        ],
+    };
+
+    return (
+        <div style={stackStyle}>
+            <div style={barStyle}>
+                <span style={labelStyle}>
+                    Hover a bar for its hovered token; selected bar wears selected background and border.
+                </span>
+                <Button
+                    appearance="subtle"
+                    spacing="compact"
+                    onClick={() => setSelectedIndex((prev) => (prev + 1) % 4)}
+                >
+                    Cycle selected bar
+                </Button>
+            </div>
+            <div data-specimen="states-chart" style={cardStyle}>
+                <PlusChart options={options} />
+            </div>
+        </div>
+    );
+}
+
+/**
+ * Hover shifts a mark to its `-hovered` chart token while inactive series fade
+ * to `--ds-opacity-disabled`; selected marks take `--ds-background-selected`
+ * and a 1px `--ds-border-selected` outline, never `--chart-brand`.
+ */
+export const States = {
+    render: () => <StatesSpecimen />,
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelector('[data-specimen="states-chart"] .highcharts-container')).not.toBeNull();
+        });
+
+        const slot = canvasElement.querySelector('[data-specimen="states-chart"]');
+        const chart = findChart(slot);
+        expect(chart).toBeDefined();
+
+        // Hover state uses the series' -hovered chart token, and inactive series uses --ds-opacity-disabled (0.4).
+        expect(chart.series[0].options.states.hover.color).toBe(hoveredColor(CATEGORICAL[0]));
+        expect(chart.series[1].options.states.hover.color).toBe(hoveredColor(CATEGORICAL[1]));
+        expect(chart.options.plotOptions.series.states.inactive.opacity).toBe(0.4);
+
+        const hoveredFill = resolveColor('--chart-categorical-1-hovered', canvasElement);
+        const selectedFill = resolveColor('--ds-background-selected', canvasElement);
+        const brandFill = resolveColor('--chart-brand', canvasElement);
+        const selectedBorder = resolveColor('--ds-border-selected', canvasElement);
+
+        const firstPoint = chart.series[0].points[0];
+        firstPoint.setState('hover');
+        await waitFor(() => {
+            expect(getComputedStyle(firstPoint.graphic.element).fill).toBe(hoveredFill);
+        });
+        firstPoint.setState('');
+
+        // Selected point uses --ds-background-selected fill and --ds-border-selected stroke, never --chart-brand.
+        const selectedPoint = chart.series[0].points[1];
+        expect(selectedPoint.selected).toBe(true);
+        const selectedStyle = getComputedStyle(selectedPoint.graphic.element);
+        expect(selectedStyle.fill).toBe(selectedFill);
+        expect(selectedStyle.fill).not.toBe(brandFill);
+        expect(selectedStyle.stroke).toBe(selectedBorder);
+    },
+};
 
 function MotionSpecimen() {
     const [term, setTerm] = useState('current');
