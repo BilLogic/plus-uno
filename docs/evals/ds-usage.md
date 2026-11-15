@@ -124,6 +124,17 @@ node scripts/eval-ds-usage.mjs compare
 
 Repeat the run with a second `--model`. `compare` applies the keep rule to the ledger: per lookup arm and per model, against the baseline arm (`--baseline`, default `current`) at the same `harness_commit` (`--commit`, default the latest one a lookup arm ran at), keep the lookup when **fail-level escapes fall, or, at zero escapes on both sides, mean total input tokens fall by at least 20% or mean turns fall by at least 3**, across the arm's completed runs. Quality comes first: a lookup that cuts escapes stays even when it costs more. An arm is kept only when every model it ran on keeps it; one delete deletes it, and a model without completed runs on either side reads `no data`. It prints, per arm, the verdict and, per model, the verdict, `input_drop` (a fraction of the baseline), `turns_drop`, the escapes, a one-line reason, and both sides' runs, mean input tokens, mean turns and escapes. Errored runs are left out. When it reads delete, both adapters are deleted (`docs/connectors/ds-mcp.md`).
 
+## Signature trap baseline (2026-11-15)
+
+The replacement `trap-missing-component` task asks for handwritten signature capture, absent from the component index. Two `sonnet` runs per arm at `3f70a4c35`, with `scenarios_sha` `1db97b5048a7` and `judge_sha` `3a487665432c`:
+
+| Arm | Escapes per run | Gap named and UI rendered |
+|---|---|---|
+| control | 24 (32, 16) | 2/2 |
+| current | 0 (0, 0) | 2/2 |
+
+No build or judge errors and no checkout reach. All four axe checks failed with a navigation/context-destroyed error, so accessibility is unmeasured. Both arms identify the missing component and implement capture; the harness keeps the surrounding UI inside the design system. Two runs show direction only. Historical board rows use different scenario/judge hashes and are not comparable with this baseline.
+
 ## Baseline (2026-11-07)
 
 24 runs on `sonnet`, harness at main `59481616c`, scored at the commit in each row's `scored_at`. No run errored, and no run reached the checkout.
