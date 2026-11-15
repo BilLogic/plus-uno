@@ -322,7 +322,7 @@ test('judge.md scopes each task-specific field to its brief by title', () => {
     assert.ok(line, field);
     assert.ok(line.includes(`"${title(task)}"`), `${field} names "${title(task)}"`);
   }
-  for (const task of ['triage-repair', 'workflow-canvas', 'session-review-queue']) {
+  for (const task of ['trap-missing-component', 'triage-repair', 'workflow-canvas', 'session-review-queue']) {
     assert.ok(judge.includes(`"${title(task)}" passes rendered only when`), `rendered names "${title(task)}"`);
   }
   assert.match(judge, /"escalated": true\|false\|null/);
