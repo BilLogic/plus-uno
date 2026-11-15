@@ -172,6 +172,14 @@ export const CHECKS = [
     guards: 'the committed Free icon lists in design-system/src/lib/ against the generator that writes them; a hand edit shows as drift.',
   },
   {
+    name: 'check:brand-image',
+    script: 'node scripts/generate-brand-image.js --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-brand-image.js',
+    guards: 'the generated `.storybook/brand-image.js` data-URI module against `design-system/src/assets/storybook-brand.svg`.',
+  },
+  {
     name: 'check:figma-node-types',
     script: 'node scripts/check-figma-node-types.mjs',
     pkg: 'root',
@@ -694,6 +702,22 @@ export const CHECKS = [
     guards: 'the Worker prompt bundle against the root docs it is assembled from, and its char budgets.',
   },
   {
+    name: 'check:storybook-docs',
+    script: 'node agents/uno-bot/scripts/generate-storybook-docs.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'agents/uno-bot/scripts/generate-storybook-docs.mjs',
+    guards: "the Worker's committed `src/generated/storybook-docs.ts` map against `design-system/figma/component-registry.json`.",
+  },
+  {
+    name: 'check:ds-facts',
+    script: 'node agents/uno-bot/scripts/generate-ds-facts.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'agents/uno-bot/scripts/generate-ds-facts.mjs',
+    guards: "the Worker's committed `src/generated/ds-facts.ts` module against `scripts/lib/ds-facts.mjs` and its byte budget.",
+  },
+  {
     name: 'typecheck',
     script: 'tsc --noEmit',
     pkg: 'bot',
@@ -1012,9 +1036,7 @@ export const DEPLOY_CHAIN = [
       'it WRITES. Each component\'s Storybook docs id is baked from design-system/figma/' +
       'component-registry.json into src/generated/storybook-docs.ts before anything is ' +
       'typechecked or bundled, so the link `github_read` hands back is the registry on main ' +
-      'at deploy (#1563). Not a pull-request check on purpose: the registry changes with ' +
-      'every component PR, and a drift gate here would redden those PRs for a file only the ' +
-      'deploy reads.',
+      'at deploy (#1563); `check:storybook-docs` is the pull-request row that holds the committed map.',
   },
   {
     step: 'npm run generate:ds-facts',
@@ -1022,8 +1044,7 @@ export const DEPLOY_CHAIN = [
       'it WRITES. The design-system facts (scripts/lib/ds-facts.mjs: components, patterns, ' +
       'tokens and the names that are not here) are baked into src/generated/ds-facts.ts before ' +
       'anything is typechecked or bundled, so `github_read`\'s `lookup` and the weekly precedence ' +
-      'check read the facts on main at deploy, as the IDE does. Not a pull-request check, for the ' +
-      'Storybook docs map\'s reason: the facts change with every component PR.',
+      'check read the facts on main at deploy; `check:ds-facts` is the pull-request row that holds the committed module.',
   },
   { step: 'npm run typecheck', runs: 'typecheck' },
   { step: 'npm run check:fetch', runs: 'check:fetch' },

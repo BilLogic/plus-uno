@@ -28,12 +28,17 @@
 
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
+
+import { loadFacts } from "../../../scripts/lib/ds-facts.mjs";
+import { isEntry, main as runMain } from "../../../scripts/lib/findings.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(process.env.PLUS_UNO_ROOT ?? resolve(HERE, "../../.."));
-const OUT = "agents/uno-bot/src/generated/ds-facts.ts";
+export const DS_FACTS_PATH = "agents/uno-bot/src/generated/ds-facts.ts";
+const OUT = DS_FACTS_PATH;
 const COMPONENTS_DIR = "design-system/src/components";
+const NORM = (text) => text.replace(/\r\n/g, "\n");
 
 /** Drop the fields that say nothing: null, undefined, false and empty lists. */
 function compact(record) {
@@ -130,29 +135,51 @@ export function renderDsFacts(baked) {
   );
 }
 
-async function main() {
-  const check = process.argv.includes("--check");
-  const { loadFacts } = await import(pathToFileURL(join(ROOT, "scripts/lib/ds-facts.mjs")).href);
-  const facts = loadFacts(ROOT);
-  const inventions = JSON.parse(readFileSync(join(ROOT, "design-system/agent-views/_inventions.json"), "utf8"));
-  const text = renderDsFacts(bakeFacts(facts, { docFor: (name) => generatedDocFor(ROOT, name), inventions }));
-  const out = resolve(ROOT, OUT);
-  const committed = existsSync(out) ? readFileSync(out, "utf8") : null;
-  const overrun = budgetOverrun(text);
-  if (overrun) {
-    console.error(overrun);
-    process.exit(1);
-  }
-  if (check) {
-    if (committed !== text) {
-      console.error(`${OUT} is stale: run npm run generate:ds-facts`);
-      process.exit(1);
-    }
-    console.log(`${OUT} is current`);
-    return;
-  }
-  if (committed !== text) writeFileSync(out, text, "utf8");
-  console.log(`${OUT}: ${text === committed ? "unchanged" : "written"} (${text.length} chars)`);
+/** @returns {{path: string, content: string}[]} the rendered DS facts module, without writing */
+export function artifacts(repoRoot = ROOT) {
+  const facts = loadFacts(repoRoot);
+  const inventionsPath = join(repoRoot, "design-system/agent-views/_inventions.json");
+  const inventions = existsSync(inventionsPath)
+    ? JSON.parse(readFileSync(inventionsPath, "utf8"))
+    : { components: [], props: [], tokens: [] };
+  const content = renderDsFacts(
+    bakeFacts(facts, { docFor: (name) => generatedDocFor(repoRoot, name), inventions }),
+  );
+  return [{ path: OUT, content }];
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
+/** The drift check. Reports and never writes. */
+export function run({ repoRoot = ROOT, budget = DS_FACTS_BYTE_BUDGET } = {}) {
+  const found = [];
+  for (const { path, content } of artifacts(repoRoot)) {
+    const overrun = budgetOverrun(content, budget);
+    if (overrun) found.push({ file: path, message: overrun });
+    const abs = join(repoRoot, path);
+    if (!existsSync(abs) || NORM(readFileSync(abs, "utf8")) !== content) {
+      found.push({
+        file: path,
+        message: "is stale or missing — run: npm --prefix agents/uno-bot run generate:ds-facts",
+      });
+    }
+  }
+  return found;
+}
+
+export const summary = () => `${OUT} matches the DS facts module and fits within ${DS_FACTS_BYTE_BUDGET} bytes`;
+
+if (isEntry(import.meta.url)) {
+  if (process.argv.includes("--check")) {
+    runMain(import.meta.url, "check:ds-facts", { run, summary });
+  } else {
+    const [{ content: text }] = artifacts(ROOT);
+    const out = resolve(ROOT, OUT);
+    const committed = existsSync(out) ? readFileSync(out, "utf8") : null;
+    const overrun = budgetOverrun(text);
+    if (overrun) {
+      console.error(overrun);
+      process.exit(1);
+    }
+    if (committed !== text) writeFileSync(out, text, "utf8");
+    console.log(`${OUT}: ${text === committed ? "unchanged" : "written"} (${text.length} chars)`);
+  }
+}
