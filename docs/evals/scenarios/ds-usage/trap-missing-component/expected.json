@@ -6,70 +6,62 @@
   },
   "screens": [
     {
-      "id": "board-page",
-      "screen": "Tutor task board page",
+      "id": "signature-page",
+      "screen": "Tutor signature capture page",
       "template": "Frame + Page + PatternCard",
-      "variant": "Frame · Default / Page · Default / PatternCard",
+      "variant": "Frame \u00b7 Default / Page \u00b7 Default / PatternCard",
       "page": "design-system/src/patterns/Page/index.md",
-      "section": "Anatomy",
+      "section": "Usage",
       "pages": [
         "design-system/src/patterns/Frame/index.md",
         "design-system/src/patterns/Page/index.md",
         "design-system/src/patterns/PatternCard/index.md"
       ],
-      "guides": ["frame", "page", "card", "templates"],
+      "guides": [
+        "frame",
+        "page",
+        "card",
+        "templates"
+      ],
       "scoring": "checker",
       "check": {
         "kind": "template",
-        "components": ["Frame", "Page", "PatternCard"]
+        "components": [
+          "Frame",
+          "Page",
+          "PatternCard"
+        ]
       },
-      "expectation": "Page starts from Frame or Page and renders task cards with PatternCard inside a local three-column board layout."
+      "expectation": "Page starts from Frame and Page, with the local signature capture area inside PatternCard."
     }
   ],
   "patterns": [
     {
-      "id": "indicators",
-      "pattern": "Indicators",
-      "variant": "Count in a header",
-      "page": "design-system/agent-views/patterns/Indicators.md",
-      "section": "The three tags",
-      "guide": "indicators",
-      "scoring": "judge",
-      "expectation": "Each column header shows its card count using a quiet count indicator or Badge, and task cards display the assignee Avatar and due date."
-    },
-    {
-      "id": "common-actions",
+      "id": "signature-actions",
       "pattern": "Common actions",
       "variant": "Small actions",
       "page": "design-system/agent-views/patterns/CommonActions.md",
       "section": "Small actions",
       "guide": "common-actions",
       "scoring": "judge",
-      "expectation": "Column collapse and card reorder/move controls use accessible IconButton or Button controls."
+      "expectation": "Clear, Save and Edit use labeled Button controls; Save is unavailable until a stroke exists."
     }
   ],
   "required_placements": [
     {
-      "id": "cards-in-columns",
-      "placement": "PatternCard task items inside board columns",
+      "id": "signature-in-card",
+      "placement": "Local signature drawing surface inside PatternCard",
       "page": "design-system/src/patterns/PatternCard/index.md",
       "section": "Usage",
       "scoring": "checker",
       "check": {
         "kind": "component-present",
-        "components": ["PatternCard", "Avatar"]
+        "components": [
+          "PatternCard"
+        ]
       },
-      "expectation": "Task cards use PatternCard with Avatar rather than raw hand-styled card divs."
+      "expectation": "The handwritten-signature surface is local code inside PatternCard."
     }
   ],
-  "against_placements": [
-    {
-      "id": "nested-pattern-card",
-      "placement": "PatternCard nested inside PatternCard",
-      "page": "design-system/src/patterns/PatternCard/index.md",
-      "section": "Best practices",
-      "scoring": "judge",
-      "expectation": "Counts against: wrapping a board column in a PatternCard that nests task PatternCards inside it."
-    }
-  ]
+  "against_placements": []
 }
