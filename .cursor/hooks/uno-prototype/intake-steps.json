@@ -1,0 +1,159 @@
+{
+  "totalSteps": 8,
+  "totalQuestions": 4,
+  "flowMap": "PRD → goal & audience → your words → five fidelity dials → deliverable suggestion → what to leave out → confirm the brief → build",
+  "dimensions": [
+    {
+      "id": "Visual",
+      "definition": "How closely the look and styling match production (rough boxes ↔ design-system tokens and components).",
+      "example": "Visual        low ──●───── high — wireframe-clean is enough"
+    },
+    {
+      "id": "Interaction",
+      "definition": "How much of the UI responds to user input (static ↔ clickable transitions ↔ working controls and state).",
+      "example": "Interaction   low ────●─── high — the filter flow must actually work"
+    },
+    {
+      "id": "Breadth",
+      "definition": "How much of the product or journey is covered (one moment ↔ a few screens ↔ an end-to-end flow).",
+      "example": "Breadth       low ──●───── high — 3 screens, no settings"
+    },
+    {
+      "id": "Depth",
+      "definition": "How fully a single feature or path is worked through (happy path ↔ edge cases, empty/error states, and branching logic).",
+      "example": "Depth         low ─●────── high — happy path only"
+    },
+    {
+      "id": "Data/Content",
+      "definition": "How realistic the copy and data are (labels only ↔ representative sample rows ↔ real copy and production-shaped data).",
+      "example": "Data/Content  low ───●──── high — realistic sample rows, real labels"
+    }
+  ],
+  "deliverables": [
+    "user flow",
+    "journey map",
+    "data-flow map",
+    "ASCII wireframe",
+    "Figma wireframe",
+    "concept image",
+    "storyboard",
+    "static hi-fi mockup",
+    "interactive prototype",
+    "functional prototype",
+    "hi-fi build on the design system"
+  ],
+  "steps": [
+    {
+      "id": "prd_check",
+      "stepNumber": 1,
+      "type": "choice",
+      "progressLabel": "PRD gate · 1 of 2",
+      "question": "Do you have a PRD?",
+      "options": ["Yes", "No"],
+      "guidance": "Show the one-line flow map first and explain that a PRD (Notion link, local .md path, or inline text with user flows and acceptance criteria) is required at entry. If the designer answers No, write \"No\" to prd_check on the brief card and route them to skills/uno-synthesize (or @uno-bot in Slack)."
+    },
+    {
+      "id": "prd_paste",
+      "stepNumber": 2,
+      "type": "upload",
+      "progressLabel": "PRD gate · 2 of 2",
+      "question": "Paste a PRD link or text, or attach a PRD file.",
+      "guidance": "Record the PRD reference or summary in prd_paste on the brief card. Before asking Q1, complete Step 1 (Understand): ground against uno-blueprint and prior art, and summarize the PRD back without recommending a deliverable yet."
+    },
+    {
+      "id": "reflect_learn",
+      "stepNumber": 3,
+      "questionIndex": 1,
+      "questionTotal": 4,
+      "type": "reflection",
+      "multiSelect": true,
+      "progressLabel": "Reflection · Q1 of 4",
+      "question": "Step 2 · Q1 — What are you trying to achieve, and who will see it?",
+      "options": [
+        "validate usability",
+        "explore concepts",
+        "compare alternatives",
+        "evaluate visual direction",
+        "communicate product vision",
+        "align stakeholders",
+        "reduce engineering ambiguity"
+      ],
+      "guidance": "Recommend the most likely goal(s) AND ask who the audience is (teammates, students/tutors in a study, stakeholders, engineers) — audience drives Visual and Data/Content. Anchor each recommended option in concrete PRD evidence."
+    },
+    {
+      "id": "reflect_artifact_open",
+      "stepNumber": 4,
+      "questionIndex": 2,
+      "questionTotal": 4,
+      "type": "reflection",
+      "openEnded": true,
+      "multiSelect": false,
+      "progressLabel": "Reflection · Q2 of 4 (your words first)",
+      "question": "Step 2 · Q2 — In your own words, what do you picture making?",
+      "guidance": "OPEN-ENDED beat — ask the designer to describe in their own words what they imagine making (a rough sketch, a clickable flow, a polished screen, a flow map). Offer no recommendation and no options list on this turn (anti-anchoring)."
+    },
+    {
+      "id": "reflect_fidelity",
+      "stepNumber": 5,
+      "questionIndex": 3,
+      "questionTotal": 4,
+      "type": "reflection",
+      "multiSelect": false,
+      "progressLabel": "Reflection · Q3 of 4 (five fidelity dials)",
+      "question": "Step 2 · Q3 — What fidelity is actually needed across the five dimensions?",
+      "options": [
+        "Visual",
+        "Interaction",
+        "Breadth",
+        "Depth",
+        "Data/Content"
+      ],
+      "guidance": "Render all five dimensions (Visual, Interaction, Breadth, Depth, Data/Content) as labeled low↔high dial lines, each justified by PRD evidence, the audience from Q1, and the designer's words from Q2. Ask ONE question to confirm or adjust the five dials; the confirm label must restate the five dial settings."
+    },
+    {
+      "id": "reflect_artifact",
+      "stepNumber": 6,
+      "questionIndex": 3,
+      "questionTotal": 4,
+      "type": "reflection",
+      "multiSelect": false,
+      "progressLabel": "Reflection · Q3 of 4 (deliverable suggestion)",
+      "question": "Step 2 · Q3 — Given your words and those dials, here is the deliverable I would suggest — does it fit?",
+      "options": [
+        "user flow",
+        "journey map",
+        "data-flow map",
+        "ASCII wireframe",
+        "Figma wireframe",
+        "concept image",
+        "storyboard",
+        "static hi-fi mockup",
+        "interactive prototype",
+        "functional prototype",
+        "hi-fi build on the design system"
+      ],
+      "guidance": "Acknowledge the designer's framing from Q2 and route from the confirmed five dials using the routing table in skills/uno-prototype/SKILL.md: only Interaction high or Data/Content high sends work to a coded build; high Visual with none–low Interaction routes to the static hi-fi mockup in Figma on DS components. Recommend the deliverable the dials select plus 1–2 competing alternatives from the vocabulary, naming the tradeoff for each."
+    },
+    {
+      "id": "reflect_exclude",
+      "stepNumber": 7,
+      "questionIndex": 4,
+      "questionTotal": 4,
+      "type": "reflection",
+      "multiSelect": false,
+      "progressLabel": "Reflection · Q4 of 4",
+      "question": "Step 2 · Q4 — What should the prototype intentionally NOT include?",
+      "guidance": "State the won't-include list in prose (screens skipped, interactions left fake, flows omitted), each item traceable to the PRD, goal, or low dials. Confirm with an option that restates the key exclusions, plus room to adjust."
+    },
+    {
+      "id": "reflect_confirm",
+      "stepNumber": 8,
+      "type": "reflection",
+      "confirm": true,
+      "multiSelect": false,
+      "progressLabel": "Reflection · confirm the brief",
+      "question": "Step 2 · Brief — Here is the prototype brief we built together. Ship it to the build?",
+      "guidance": "Assemble the answers from the brief card into ONE compact markdown table (Goal & audience · Designer's words · Fidelity dials · Deliverable · Won't include) and ask ONE confirmation question whose confirm label restates the brief."
+    }
+  ]
+}
