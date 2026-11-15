@@ -158,7 +158,7 @@ export const Radii = () => (
         {GENERATIVE_BORDER_RADII.map((radius) => (
             <GenerativeBorder key={radius} isActive radius={radius}>
                 <div style={{ ...box, minWidth: 'var(--card-min-width-sm)' }}>
-                    <span style={{ font: 'var(--body-small)' }}>{radius}</span>
+                    <span style={{ font: 'var(--body-sm)' }}>{radius}</span>
                 </div>
             </GenerativeBorder>
         ))}

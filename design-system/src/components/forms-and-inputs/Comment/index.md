@@ -140,7 +140,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-width-default` · `--card-radius-compact` · `--ds-background-selected` · `--ds-border` · `--ds-text-subtle` · `--space-025` · `--space-050` · `--space-075` · `--space-100` · `--space-150` · `--type-weight-semibold`
+`--body-default` · `--body-sm` · `--border-width-default` · `--card-radius-compact` · `--ds-background-selected` · `--ds-border` · `--ds-text-subtle` · `--space-025` · `--space-050` · `--space-075` · `--space-100` · `--space-150` · `--type-weight-semibold`
 
 From `design-system/src/components/forms-and-inputs/Comment/Comment.scss`. Override these through the token layer, never with a literal.
 

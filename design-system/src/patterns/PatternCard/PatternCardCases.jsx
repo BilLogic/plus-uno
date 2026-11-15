@@ -11,7 +11,7 @@ import { PatternCard } from '@/patterns';
 const metric = (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
         <p style={{ margin: 0, font: 'var(--body-default)' }}>Sessions this week</p>
-        <p style={{ margin: 0, font: 'var(--metric-medium)', fontVariantNumeric: 'tabular-nums' }}>24</p>
+        <p style={{ margin: 0, font: 'var(--metric-md)', fontVariantNumeric: 'tabular-nums' }}>24</p>
         <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>+3 from last week</p>
     </div>
 );
@@ -46,7 +46,7 @@ export const CardJobs = () => (
         <PatternCard title="Math fluency" description="Grade 7 · this term" minWidth="var(--card-min-width-md)">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <ProgressBar value={68} ariaLabel="68% of goals met" />
-                <p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>68% of goals met</p>
+                <p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>68% of goals met</p>
             </div>
         </PatternCard>
         <PatternCard
@@ -70,7 +70,7 @@ const tallies = [['128', 'Completed'], ['12', 'Canceled'], ['4', 'No-shows']];
 
 const tally = ([value, label]) => (
     <>
-        <p style={{ margin: 0, font: 'var(--metric-medium)', fontVariantNumeric: 'tabular-nums' }}>{value}</p>
+        <p style={{ margin: 0, font: 'var(--metric-md)', fontVariantNumeric: 'tabular-nums' }}>{value}</p>
         <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{label}</p>
     </>
 );

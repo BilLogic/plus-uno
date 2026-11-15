@@ -242,7 +242,7 @@ const load = (jsxPath, name) => {
  * rather than an empty canvas.
  */
 const Manifest = ({ subjects }) => (
-  <div style={{ font: 'var(--body-small)', color: 'var(--ds-text)' }}>
+  <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text)' }}>
     <p>
       <strong>{subjects.length}</strong> documented components ·{' '}
       <strong>{subjects.reduce((n, s) => n + [...s.variants.values()].flat().length, 0)}</strong>{' '}

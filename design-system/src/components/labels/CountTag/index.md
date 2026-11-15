@@ -86,7 +86,7 @@ Same group: `AiMessage` · `ChangeTag` · `DateTag` · `PromptStarters` · `Smar
 
 ## Parts
 
-1. **Number.** The count in the body-small size with tabular digits, hidden at 0 unless `showZero`, capped at `max` with a `+`.
+1. **Number.** The count in the body-sm size with tabular digits, hidden at 0 unless `showZero`, capped at `max` with a `+`.
 2. **Pill.** `20` tall on its own and `16` inside a label, `24` wide at minimum, so one digit is a small rectangle and more digits grow it from the trailing edge.
 3. **Dot.** Presence without a number: an `8` circle that needs a `label` for its name.
 4. **Ring.** Optional, in the surface color, for a count pinned to the corner of an icon or an avatar.
@@ -148,7 +148,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--control-sm` · `--count-tag-dot-size` · `--ds-background-danger` · `--ds-background-danger-bold` · `--ds-background-information` · `--ds-background-information-bold` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-bold` · `--ds-background-success` · `--ds-background-success-bold` · `--ds-background-warning` · `--ds-background-warning-bold` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-smart-mastering-content` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-surface` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-inverse` · `--ds-text-smart-mastering-content` · `--ds-text-subtle` · `--ds-text-success` · `--ds-text-warning` · `--ds-text-warning-inverse` · `--pad-x-xs` · `--plus-count-min` · `--plus-count-size` · `--radius-full` · `--radius-md` · `--stroke-2`
+`--body-sm` · `--control-sm` · `--count-tag-dot-size` · `--ds-background-danger` · `--ds-background-danger-bold` · `--ds-background-information` · `--ds-background-information-bold` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-bold` · `--ds-background-success` · `--ds-background-success-bold` · `--ds-background-warning` · `--ds-background-warning-bold` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-smart-mastering-content` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-surface` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-inverse` · `--ds-text-smart-mastering-content` · `--ds-text-subtle` · `--ds-text-success` · `--ds-text-warning` · `--ds-text-warning-inverse` · `--pad-x-xs` · `--plus-count-min` · `--plus-count-size` · `--radius-full` · `--radius-md` · `--stroke-2`
 
 From `design-system/src/components/labels/CountTag/CountTag.scss`. Override these through the token layer, never with a literal.
 

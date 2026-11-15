@@ -135,7 +135,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Padding | `--pad-y-md` top and bottom, `--pad-x-md` either side. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
-| Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`; the count `--ds-text-subtle`, over the limit `--ds-text-danger`. |
+| Label and caption | `--body-sm`; label `--ds-text`, caption `--ds-text-subtle`; the count `--ds-text-subtle`, over the limit `--ds-text-danger`. |
 | Save and Cancel | `--stack-sm` apart, aligned to the end. |
 
 ## Content guidelines

@@ -482,8 +482,8 @@ export const LoadingCard = () => {
             >
                 {loaded ? (
                     <>
-                        <p className="body-large" style={{ margin: 0 }}>Unit 3 review</p>
-                        <p className="body-small" style={{ margin: 0 }}>Four students worked through ratios and rates.</p>
+                        <p className="body-lg" style={{ margin: 0 }}>Unit 3 review</p>
+                        <p className="body-sm" style={{ margin: 0 }}>Four students worked through ratios and rates.</p>
                         <span style={{ display: 'flex', gap: '8px' }}>
                             <Tag text="Ratios" />
                             <Tag text="Rates" />

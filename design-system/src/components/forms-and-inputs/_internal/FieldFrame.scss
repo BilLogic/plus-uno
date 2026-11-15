@@ -41,7 +41,7 @@
 .plus-field-label {
     margin-bottom: 0;
     color: var(--ds-text);
-    font: var(--body-small);
+    font: var(--body-sm);
 }
 
 .plus-field-required {
@@ -69,7 +69,7 @@
     border: 0;
     background: none;
     color: var(--ds-icon-subtle);
-    font: var(--body-small);
+    font: var(--body-sm);
     cursor: help;
 
     &:focus-visible {
@@ -86,7 +86,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--stack-md);
-    font: var(--body-small);
+    font: var(--body-sm);
 }
 
 .plus-field-caption__message {

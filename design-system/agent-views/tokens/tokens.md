@@ -393,8 +393,8 @@ The text styles, generated from Figma: `font: var(--heading-lg)`. A button or ta
 
 ```css
 --body-default
---body-large
---body-small
+--body-lg
+--body-sm
 --code-default
 --heading-lg
 --heading-lg-tracking
@@ -402,13 +402,13 @@ The text styles, generated from Figma: `font: var(--heading-lg)`. A button or ta
 --heading-sm
 --heading-xl
 --heading-xl-tracking
---heading-xsmall
+--heading-xs
 --heading-xxl
 --heading-xxl-tracking
---heading-xxsmall
---metric-large
---metric-medium
---metric-small
+--heading-xxs
+--metric-lg
+--metric-md
+--metric-sm
 --type-family-body
 --type-family-brand-body
 --type-family-brand-heading

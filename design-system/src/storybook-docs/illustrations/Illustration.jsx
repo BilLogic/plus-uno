@@ -43,7 +43,7 @@ export const IllustrationFigure = ({ caption, children }) => (
   >
     {children}
     <figcaption
-      style={{ marginBlockStart: 'var(--stack-sm)', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}
+      style={{ marginBlockStart: 'var(--stack-sm)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}
     >
       {caption}
     </figcaption>

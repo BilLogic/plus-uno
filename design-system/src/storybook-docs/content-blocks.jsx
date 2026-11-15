@@ -21,7 +21,7 @@ export const Sample = ({ icon = 'circle-info', title, children, action, secondar
                 <Icon name={icon} />
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{title}</strong>
+                <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{title}</strong>
                 {children && <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{children}</span>}
             </div>
         </div>

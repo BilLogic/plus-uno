@@ -368,11 +368,11 @@ A gap tells the eye there is a boundary, but it cannot say what the boundary is.
 <Do caption="A 24 gap and a subsection heading say the same thing twice.">
 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <strong style={{ font: 'var(--heading-xsmall)' }}>Student</strong>
+        <strong style={{ font: 'var(--heading-xs)' }}>Student</strong>
         <span style={{ font: 'var(--body-default)' }}>School · Teacher</span>
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <strong style={{ font: 'var(--heading-xsmall)' }}>Schedule</strong>
+        <strong style={{ font: 'var(--heading-xs)' }}>Schedule</strong>
         <span style={{ font: 'var(--body-default)' }}>Session date · Time</span>
     </div>
 </div>
@@ -394,13 +394,13 @@ Keep a label near its own field and put the larger gap between groups.
 
 <DoDont>
 <Do caption="Label to field 8 (Stack/stack-md), group to group 24 (Modal/stack-lg), so each label attaches to its field.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', font: 'var(--body-small)' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', font: 'var(--body-sm)' }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><span>School</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)' }}>Select a school</span></div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><span>Teacher</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)' }}>Select a teacher</span></div>
 </div>
 </Do>
 <Dont caption="Label to field 24 and group to group 8: each label sits nearer the previous field than its own.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-sm)', font: 'var(--body-small)' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-sm)', font: 'var(--body-sm)' }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>School</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)' }}>Select a school</span></div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>Teacher</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)' }}>Select a teacher</span></div>
 </div>

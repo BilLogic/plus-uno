@@ -147,7 +147,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-width-default` · `--dropdown-menu-max-height` · `--heading-xsmall` · `--inline-lg` · `--plus-filter-menu-bleed` · `--plus-filter-menu-columns` · `--popup-pad` · `--stack-lg`
+`--border-width-default` · `--dropdown-menu-max-height` · `--heading-xs` · `--inline-lg` · `--plus-filter-menu-bleed` · `--plus-filter-menu-columns` · `--popup-pad` · `--stack-lg`
 
 From `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.scss`. Override these through the token layer, never with a literal.
 

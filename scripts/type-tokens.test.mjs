@@ -56,7 +56,7 @@ const STACKS = {
   body: '"Noto Sans", "Noto Sans Fallback", sans-serif',
   code: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 };
-const cssName = (style) => `--${style.toLowerCase().replace('/', '-').replace(/^heading-(xxlarge|xlarge|large|medium|small)$/, (_, size) => `heading-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm' })[size]}`)}`;
+const cssName = (style) => `--${style.toLowerCase().replace('/', '-').replace(/^(heading|body|metric)-(xxlarge|xlarge|large|medium|small|xsmall|xxsmall)$/, (_, family, size) => `${family}-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm', xsmall: 'xs', xxsmall: 'xxs' })[size]}`)}`;
 
 test('the font primitives are named by rem × 100 and resolve to their rem value', () => {
   for (const [step, px] of Object.entries(FONT_SIZES)) {

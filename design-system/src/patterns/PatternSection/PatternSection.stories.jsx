@@ -758,7 +758,7 @@ const Facts = ({ pairs, columns = 2 }) => (
     <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: 'var(--stack-lg) var(--grid-gutter)' }}>
         {pairs.map(([label, value]) => (
             <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <dt style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{label}</dt>
+                <dt style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{label}</dt>
                 <dd style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{value}</dd>
             </div>
         ))}

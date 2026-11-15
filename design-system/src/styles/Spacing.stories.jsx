@@ -22,7 +22,7 @@ const box = {
 };
 const col = (gap) => ({ display: 'flex', flexDirection: 'column', gap });
 const row = (gap) => ({ display: 'flex', alignItems: 'center', gap, flexWrap: 'wrap' });
-const tag = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const tag = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 
 const School = ({ id }) => <TextField id={`${id}-school`} label="School" placeholder="Select a school" />;
 const Teacher = ({ id }) => <TextField id={`${id}-teacher`} label="Teacher" placeholder="Select a teacher" />;
@@ -33,12 +33,12 @@ export const ThreeKinds = () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
         <div style={col('var(--stack-md)')}>
             <span><Button text="Save changes" appearance="primary" /></span>
-            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Item</span>
+            <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Item</span>
             <span style={tag}>A minimum height, and pad-x larger than pad-y: 32 = 20 line + 2 × 6, pad-x 12. Button, Text field, Tag, a menu or table row.</span>
         </div>
         <div style={col('var(--stack-md)')}>
             <PatternCard title="Container" description="Card/pad-md, 20 on every side." />
-            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Container</span>
+            <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Container</span>
             <span style={tag}>A background and one pad on every side; the height hugs. Card, Modal, Popup, Flag, Section message.</span>
         </div>
         <div style={col('var(--stack-md)')}>
@@ -46,7 +46,7 @@ export const ThreeKinds = () => (
                 <Button text="Cancel" />
                 <Button text="Save" appearance="primary" />
             </span>
-            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Wrapper</span>
+            <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Wrapper</span>
             <span style={tag}>No fill and no pad. It only arranges its children with a gap or a grid. Section, Button group, Tag group, a form row.</span>
         </div>
     </div>
@@ -211,8 +211,8 @@ export const NeverHandSpace = () => (
 
 const Metric = ({ value, label, divider }) => (
     <div style={{ ...col('var(--card-stack-sm)'), paddingTop: divider ? 'var(--card-stack-lg)' : 0, borderTop: divider ? 'var(--border-width-default) solid var(--ds-border)' : 'none' }}>
-        <span style={{ font: 'var(--metric-medium)', color: 'var(--ds-text)' }}>{value}</span>
-        <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{label}</span>
+        <span style={{ font: 'var(--metric-md)', color: 'var(--ds-text)' }}>{value}</span>
+        <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{label}</span>
     </div>
 );
 

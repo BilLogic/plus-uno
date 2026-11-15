@@ -211,7 +211,7 @@ export const ModeCompare = ({ children, initial = 'both', stacked = false }) => 
                             font: 'var(--body-default)',
                         }}
                     >
-                        <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>
+                        <span style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' }}>
                             {p === 'light' ? 'Light' : 'Dark'}
                         </span>
                         {typeof children === 'function' ? children(p) : children}

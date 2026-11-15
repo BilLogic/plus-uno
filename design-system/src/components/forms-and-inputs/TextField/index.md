@@ -169,7 +169,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Slot button | `--control-md` in the 40 field, `--control-sm` in the 32 field. |
 | Slots | `--ds-text-subtle`, `--stack-sm` apart; `--radius-control-lg` between slot and control. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
-| Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`; the count `--ds-text-subtle`, over the limit `--ds-text-danger`. |
+| Label and caption | `--body-sm`; label `--ds-text`, caption `--ds-text-subtle`; the count `--ds-text-subtle`, over the limit `--ds-text-danger`. |
 
 ## Content guidelines
 

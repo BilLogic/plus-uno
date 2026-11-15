@@ -19,7 +19,7 @@ export default {
 };
 
 const name = { font: 'var(--code-default)', color: 'var(--ds-text-subtle)', wordBreak: 'break-word' };
-const label = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const label = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 
 const grid = () => ({
     display: 'grid',
@@ -92,11 +92,11 @@ export const Overview = () => (
                 boxShadow: 'var(--ds-shadow-raised)',
             }}
         >
-            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Session with Maya</span>
+            <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Session with Maya</span>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Tuesday, June 3 · 11:00 am</span>
             <span style={{ display: 'inline-flex', gap: 'var(--inline-md)', flexWrap: 'wrap' }}>
-                <span style={{ font: 'var(--body-small)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-success)', color: 'var(--ds-text-success)' }}>Confirmed</span>
-                <span style={{ font: 'var(--body-small)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-warning)', color: 'var(--ds-text-warning)' }}>Reflection due</span>
+                <span style={{ font: 'var(--body-sm)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-success)', color: 'var(--ds-text-success)' }}>Confirmed</span>
+                <span style={{ font: 'var(--body-sm)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-warning)', color: 'var(--ds-text-warning)' }}>Reflection due</span>
             </span>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-link)', textDecoration: 'underline' }}>View the lesson plan</span>
             <span style={{ display: 'inline-flex', gap: 'var(--inline-md)' }}>
@@ -251,14 +251,14 @@ export const AccentOnComponents = () => (
         <Do caption={<>Body text in <C>--ds-text</C> and <C>--ds-text-subtle</C>. The brand color marks the button and the link only.</>}>
             <div style={sample}>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>Your next session starts in 10 minutes.</span>
-                <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Maya joined the waiting room.</span>
+                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Maya joined the waiting room.</span>
                 <span><Button text="Join session" appearance="primary" /></span>
             </div>
         </Do>
         <Dont caption="Running text in the brand color. Nothing reads as the action any more, and links look like plain text.">
             <div style={sample}>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-brand)' }}>Your next session starts in 10 minutes.</span>
-                <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-brand)' }}>Maya joined the waiting room.</span>
+                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-brand)' }}>Maya joined the waiting room.</span>
                 <span><Button text="Join session" appearance="primary" /></span>
             </div>
         </Dont>
@@ -456,7 +456,7 @@ export const Modes = () => {
                 {SWATCHES.map(({ label, tokens, style }) => (
                     <figure key={label} style={{ margin: 0, display: 'grid', gap: 'var(--stack-md)' }}>
                         <div style={{ ...swatchBase, ...style }}>{label}</div>
-                        <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                        <figcaption style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                             {tokens.map((name) => (
                                 <div key={name} style={{ overflowWrap: 'anywhere' }}>
                                     <code>{name}</code>: <span data-token={name}>{values[name]}</span>

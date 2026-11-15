@@ -23,7 +23,7 @@ const columnFill = {
     borderRadius: 'var(--radius-md)',
     background: 'var(--ds-background-accent-blue-subtler)',
 };
-const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 
 /** Twelve columns with a 16 gutter, inside the surface pad. */
 export const GridAnatomy = () => (
@@ -31,7 +31,7 @@ export const GridAnatomy = () => (
         <div style={{ padding: 'var(--page-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)' }}>
             <div style={grid12}>
                 {Array.from({ length: 12 }, (_, i) => (
-                    <div key={i} style={{ ...columnFill, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 'var(--pad-y-md)', font: 'var(--body-small)', color: 'var(--ds-text-accent-blue)' }}>
+                    <div key={i} style={{ ...columnFill, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 'var(--pad-y-md)', font: 'var(--body-sm)', color: 'var(--ds-text-accent-blue)' }}>
                         {i + 1}
                     </div>
                 ))}

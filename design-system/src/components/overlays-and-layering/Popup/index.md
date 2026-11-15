@@ -132,7 +132,7 @@ Same group: `Tooltip`
 
 1. **Trigger.** The control the popup hangs off. A string becomes a real button.
 2. **Surface.** One fill, padded, with no arrow and no border of its own.
-3. **Title.** Optional, `--heading-xsmall`. It also names the popup.
+3. **Title.** Optional, `--heading-xs`. It also names the popup.
 4. **Body.** Text or a short list, `--body-default`.
 
 ### States
@@ -156,7 +156,7 @@ Same group: `Tooltip`
 | Width, column steps | `--grid-columns`, `--grid-gutter`, `--content-min-width`, `--content-max-width` |
 | Motion | The Popup row of the motion registry, read through `--ds-motion-*` |
 | Gap between title and body | `--stack-md` |
-| Title, body | `--ds-text`, `--heading-xsmall`, `--body-default` |
+| Title, body | `--ds-text`, `--heading-xs`, `--body-default` |
 | Offset from the trigger | `--popup-offset` |
 
 ## Content guidelines
@@ -199,7 +199,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--anchor-width` · `--body-default` · `--border-width-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--popup-max-width` · `--popup-min-width` · `--popup-offset` · `--popup-pad` · `--popup-radius` · `--stack-md`
+`--anchor-width` · `--body-default` · `--border-width-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xs` · `--layer-popup` · `--popup-max-width` · `--popup-min-width` · `--popup-offset` · `--popup-pad` · `--popup-radius` · `--stack-md`
 
 From `design-system/src/components/overlays-and-layering/Popup/Popup.scss`. Override these through the token layer, never with a literal.
 

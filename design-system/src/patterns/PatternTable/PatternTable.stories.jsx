@@ -19,17 +19,17 @@ const tableContent = (
     <>
         <thead>
             <tr>
-                <th className="body-small">Name</th>
-                <th className="body-small">Role</th>
-                <th className="body-small">Status</th>
+                <th className="body-sm">Name</th>
+                <th className="body-sm">Role</th>
+                <th className="body-sm">Status</th>
             </tr>
         </thead>
         <tbody>
             {sampleRows.map((row) => (
                 <tr key={row.name}>
-                    <td className="body-large">{row.name}</td>
-                    <td className="body-large">{row.role}</td>
-                    <td className="body-large">{row.status}</td>
+                    <td className="body-lg">{row.name}</td>
+                    <td className="body-lg">{row.role}</td>
+                    <td className="body-lg">{row.status}</td>
                 </tr>
             ))}
         </tbody>
@@ -42,7 +42,7 @@ const sectionActions = (
 );
 
 const paginationSlot = (
-    <span className="body-small" style={{ color: 'var(--ds-text-subtle)' }}>
+    <span className="body-sm" style={{ color: 'var(--ds-text-subtle)' }}>
         Pagination slot — 1 of 4
     </span>
 );
@@ -51,8 +51,8 @@ const paginationSlot = (
 const emptyStateSlot = (
     <>
         <i className="fa-regular fa-folder" aria-hidden="true" style={{ fontSize: 'var(--icon-lg)', color: 'var(--ds-icon-subtle)' }} />
-        <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>No members yet</span>
-        <span style={{ font: 'var(--body-small)' }}>Members you invite show up here.</span>
+        <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>No members yet</span>
+        <span style={{ font: 'var(--body-sm)' }}>Members you invite show up here.</span>
         <Button text="Invite a member" appearance="subtle" spacing="compact" onClick={() => {}} />
     </>
 );

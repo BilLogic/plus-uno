@@ -109,7 +109,7 @@
         "MotionReduced"
       ],
       "tokens": [
-        "--body-large",
+        "--body-lg",
         "--border-width-default",
         "--card-pad-default",
         "--card-radius-compact",
@@ -356,7 +356,7 @@
       "tokens": [
         "--ai-chat-width",
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--content-max-width-reading",
         "--ds-shadow-overlay",
         "--ds-surface",
@@ -587,14 +587,14 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--code-default",
         "--ds-background-neutral",
         "--ds-motion-loop",
         "--ds-motion-loop-duration",
         "--ds-text",
         "--ds-text-subtle",
-        "--heading-xsmall",
+        "--heading-xs",
         "--icon-md",
         "--inline-md",
         "--inline-sm",
@@ -1397,7 +1397,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--button-radius-compact",
         "--button-radius-default",
@@ -2057,7 +2057,7 @@
         "Disabled"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-background-danger",
         "--ds-background-danger-pressed",
@@ -2683,8 +2683,8 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-large",
-        "--body-small",
+        "--body-lg",
+        "--body-sm",
         "--checkbox-control-size",
         "--choice-grid-control-size-10",
         "--choice-grid-control-size-12",
@@ -3078,7 +3078,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--card-radius-compact",
         "--ds-background-selected",
@@ -3236,7 +3236,7 @@
         "Disabled"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--control-sm",
         "--count-tag-dot-size",
         "--ds-background-danger",
@@ -3560,7 +3560,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-border",
         "--ds-border-danger-subtle",
@@ -3893,7 +3893,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--ds-text",
         "--ds-text-danger",
         "--ds-text-subtle",
@@ -4326,7 +4326,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--ds-text",
         "--ds-text-danger",
         "--stack-md"
@@ -4505,7 +4505,7 @@
         "Interactive"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-background-disabled",
         "--ds-border",
@@ -4732,7 +4732,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--card-radius-compact",
         "--ds-background-brand-subtlest",
@@ -5064,7 +5064,7 @@
       "tokens": [
         "--border-width-default",
         "--dropdown-menu-max-height",
-        "--heading-xsmall",
+        "--heading-xs",
         "--inline-lg",
         "--plus-filter-menu-bleed",
         "--plus-filter-menu-columns",
@@ -5306,7 +5306,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-background-danger-bold",
         "--ds-background-neutral-bold",
@@ -5342,7 +5342,7 @@
         "--flag-stack",
         "--flag-timer-height",
         "--flag-width",
-        "--heading-xsmall",
+        "--heading-xs",
         "--icon-md",
         "--inline-lg",
         "--inline-md",
@@ -5938,10 +5938,10 @@
         "--heading-sm",
         "--heading-xl",
         "--heading-xl-tracking",
-        "--heading-xsmall",
+        "--heading-xs",
         "--heading-xxl",
         "--heading-xxl-tracking",
-        "--heading-xxsmall"
+        "--heading-xxs"
       ]
     },
     {
@@ -8186,7 +8186,7 @@
         "Focused"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--space-075",
         "--space-100",
         "--space-150"
@@ -8474,7 +8474,7 @@
         "Focused"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-border",
         "--ds-surface-overlay",
@@ -9345,7 +9345,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--control-md",
         "--ds-surface-sunken",
         "--ds-text",
@@ -9642,7 +9642,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--control-md",
         "--ds-background-neutral-subtle-hovered",
@@ -9821,7 +9821,7 @@
         "--ds-text-subtle",
         "--ds-utility-elevation-surface-current",
         "--focus-ring-width",
-        "--heading-xxsmall",
+        "--heading-xxs",
         "--layer-card",
         "--pattern-table-overflow-reach",
         "--pattern-table-z-corner",
@@ -10046,7 +10046,7 @@
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
-        "--heading-xsmall",
+        "--heading-xs",
         "--layer-popup",
         "--popup-max-width",
         "--popup-min-width",
@@ -13063,7 +13063,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-background-input",
         "--ds-background-neutral-subtle-hovered",
@@ -13211,7 +13211,7 @@
         "Interactive"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-border",
         "--ds-motion-appearance-fast",
@@ -13898,7 +13898,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--ds-background-brand-bold",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
@@ -14042,7 +14042,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-background-danger",
         "--ds-background-danger-pressed",
@@ -14189,7 +14189,7 @@
         "Disabled"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-background-disabled",
         "--ds-background-discovery",
@@ -14380,7 +14380,7 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
@@ -14396,7 +14396,7 @@
         "--ds-text-disabled",
         "--ds-text-subtle",
         "--focus-ring-width",
-        "--heading-xxsmall",
+        "--heading-xxs",
         "--icon-md",
         "--icon-sm",
         "--inline-md",
@@ -14889,7 +14889,7 @@
         "Disabled"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-background-accent-blue-subtler",
         "--ds-background-accent-blue-subtlest",
@@ -15430,7 +15430,7 @@
         "FieldDisabled"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--border-width-default",
         "--ds-border",
         "--ds-icon-subtle",
@@ -16761,7 +16761,7 @@
         "MotionReduced"
       ],
       "tokens": [
-        "--body-small",
+        "--body-sm",
         "--ds-background-neutral-bold",
         "--ds-text-inverse",
         "--layer-tooltip",

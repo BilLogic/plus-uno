@@ -241,7 +241,7 @@ function InteractionStatesDemos() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 <div>
-                    <p className="body-small" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Unselected tab states</p>
+                    <p className="body-sm" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Unselected tab states</p>
                     <Tabs defaultActiveKey="none">
                         <Tabs.Tab eventKey="default">Default</Tabs.Tab>
                         <Tabs.Tab eventKey="hover" className="pseudo-hover">Hovered</Tabs.Tab>
@@ -250,7 +250,7 @@ function InteractionStatesDemos() {
                     </Tabs>
                 </div>
                 <div>
-                    <p className="body-small" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Disabled</p>
+                    <p className="body-sm" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Disabled</p>
                     <Tabs defaultActiveKey="none">
                         <Tabs.Tab eventKey="disabled" isDisabled>Disabled</Tabs.Tab>
                     </Tabs>

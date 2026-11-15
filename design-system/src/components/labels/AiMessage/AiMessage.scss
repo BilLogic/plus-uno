@@ -94,7 +94,7 @@
 .plus-ai-markdown {
     &__heading {
         margin: 0;
-        font: var(--heading-xsmall);
+        font: var(--heading-xs);
     }
 
     &__list {
@@ -180,7 +180,7 @@
 
     &__type {
         flex: none;
-        font: var(--body-small);
+        font: var(--body-sm);
         color: var(--ds-text-subtle);
     }
 }
@@ -201,7 +201,7 @@
     }
 
     &__thanks {
-        font: var(--body-small);
+        font: var(--body-sm);
         color: var(--ds-text-subtle);
     }
 

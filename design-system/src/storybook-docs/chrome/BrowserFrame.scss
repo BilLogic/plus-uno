@@ -16,7 +16,7 @@
 // Type, icon and selection rules sit on the chrome alone, so the framed page inherits nothing.
 .plus-browser-frame__chrome {
     color: var(--ds-text);
-    font: var(--body-small);
+    font: var(--body-sm);
     user-select: none;
 
     i {
@@ -34,12 +34,12 @@
 
 .plus-browser-frame__lights {
     display: flex;
-    gap: var(--radius-lg);
-    padding-inline: var(--space-0125) var(--radius-md);
+    gap: var(--space-050);
+    padding-inline: var(--space-0125) var(--space-025);
 
     b {
-        width: var(--radius-xl);
-        height: var(--radius-xl);
+        width: var(--space-075);
+        height: var(--space-075);
         border-radius: var(--radius-full);
         background: var(--ds-background-accent-red-bolder);
     }
@@ -50,9 +50,9 @@
 .plus-browser-frame__tabs {
     display: flex;
     align-items: flex-end;
-    gap: var(--radius-xl);
+    gap: var(--space-075);
     height: var(--size-250);
-    padding-inline: var(--radius-xl);
+    padding-inline: var(--space-075);
     background: var(--ds-surface-sunken);
 
     .plus-browser-frame__lights,
@@ -62,10 +62,10 @@
 .plus-browser-frame__tab {
     display: flex;
     align-items: center;
-    gap: var(--radius-lg);
+    gap: var(--space-050);
     width: var(--size-1500);
     height: var(--size-200);
-    padding-inline: var(--radius-xl);
+    padding-inline: var(--space-075);
     background: var(--ds-surface);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
@@ -88,9 +88,9 @@
 .plus-browser-frame__toolbar {
     display: flex;
     align-items: center;
-    gap: var(--radius-xl);
+    gap: var(--space-075);
     height: var(--size-250);
-    padding-inline: var(--radius-xl);
+    padding-inline: var(--space-075);
     background: var(--ds-surface);
     border-bottom: var(--stroke-1) solid var(--ds-border);
 }
@@ -106,7 +106,7 @@
     flex: 1;
     display: flex;
     align-items: center;
-    gap: var(--radius-lg);
+    gap: var(--space-050);
     height: var(--size-200);
     padding-inline: var(--space-100);
     border-radius: var(--radius-full);
@@ -125,7 +125,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--radius-lg);
+    gap: var(--space-050);
     height: var(--size-200);
     border-radius: var(--radius-lg);
     background: var(--ds-background-neutral);

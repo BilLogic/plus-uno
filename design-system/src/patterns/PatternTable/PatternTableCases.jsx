@@ -153,7 +153,7 @@ const TreeAsExpandableCase = () => (
             </tr>
             <tr>
                 <td colSpan={4} style={{ paddingInlineStart: 'calc(var(--table-indent) + var(--icon-sm))' }}>
-                    <div style={{ font: 'var(--heading-xxsmall)', ...subtle }}>Classes</div>
+                    <div style={{ font: 'var(--heading-xxs)', ...subtle }}>Classes</div>
                     <div>Grade 7 · Math: Ava Thompson, Sofia Ramirez. Grade 8 · Math: Marcus Lee, Jordan Patel.</div>
                 </td>
             </tr>

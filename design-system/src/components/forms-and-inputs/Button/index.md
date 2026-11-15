@@ -180,7 +180,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--button-size-vertical` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-sm` · `--radius-full` · `--type-weight-medium`
+`--body-default` · `--body-sm` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--button-size-vertical` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-sm` · `--radius-full` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 

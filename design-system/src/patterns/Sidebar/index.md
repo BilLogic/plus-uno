@@ -119,7 +119,7 @@ The Sidebar's width, 240, belongs to the Frame: see Frame.
 | Row text and icon | `--ds-text-subtle` and `--ds-icon-subtle`, at `--body-default`. |
 | Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `-pressed`. |
 | Selected | `--ds-background-selected` with hovered and pressed steps; `--ds-text-selected`, `--ds-icon-selected`. |
-| Section title and locked rows | `--ds-text-subtlest`, `--ds-icon-subtlest`; titles at `--body-small`. |
+| Section title and locked rows | `--ds-text-subtlest`, `--ds-icon-subtlest`; titles at `--body-sm`. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width`, inside the row. |
 | Account row divider | `--ds-border`. |
 
@@ -162,7 +162,7 @@ Docked, collapsed, peeking and overlay are the Frame's states, on the Frame page
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-width-default` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-icon` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--frame-sidebar-group-gap` · `--frame-sidebar-pad` · `--frame-sidebar-row-gap` · `--frame-sidebar-row-radius` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--inline-sm` · `--pad-x-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--radius-sm` · `--stack-lg` · `--stack-md` · `--type-weight-medium`
+`--body-default` · `--body-sm` · `--border-width-default` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-icon` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--frame-sidebar-group-gap` · `--frame-sidebar-pad` · `--frame-sidebar-row-gap` · `--frame-sidebar-row-radius` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--inline-sm` · `--pad-x-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--radius-sm` · `--stack-lg` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/patterns/Sidebar/Sidebar.scss`. Override these through the token layer, never with a literal.
 

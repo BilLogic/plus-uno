@@ -122,7 +122,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Label and batch status | `--ds-text` in `--body-default`; batch status in `--body-small` and `--ds-text-subtle`; disabled `--ds-text-subtle`. |
+| Label and batch status | `--ds-text` in `--body-default`; batch status in `--body-sm` and `--ds-text-subtle`; disabled `--ds-text-subtle`. |
 | Drop zone container | Padding `--pad-y-md` and `--pad-x-md`; radius `--card-radius-compact`; border `--ds-border`; drag-over `--ds-background-brand-subtlest` and `--ds-border-brand`. |
 | Required marker, error | `--ds-text-danger`, `--ds-icon-danger`. |
 | Success message | `--ds-text-success`, `--ds-icon-success`. |
@@ -170,7 +170,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-width-default` · `--card-radius-compact` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--inline-md` · `--pad-x-md` · `--pad-y-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-sm` · `--border-width-default` · `--card-radius-compact` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--inline-md` · `--pad-x-md` · `--pad-y-md` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.scss`. Override these through the token layer, never with a literal.
 

@@ -40,7 +40,7 @@ export function placeToken(name, file = '') {
   if (/^--palette-/.test(name)) return place('color', 'primitive');
   if (/^--ds-(shadow|opacity)-/.test(name)) return place('elevation', 'semantic', 'global');
   if (/^--ds-motion-/.test(name)) return place('motion', 'semantic', 'global');
-  if (/^--(chart|skeleton)-/.test(name)) return place('color', 'semantic', 'components');
+  if (/^--chart-/.test(name) || name === '--skeleton-subtle') return place('color', 'semantic', 'components');
   if (/^--ds-/.test(name)) return place('color', 'semantic', 'global');
 
   if (/^--type-(size|line-height)-\d/.test(name) || /^--type-(family|weight|tracking)-/.test(name)) {

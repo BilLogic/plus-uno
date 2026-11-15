@@ -138,7 +138,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--border-width-default` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--icon-sm` · `--inline-sm` · `--pad-x-xs` · `--plus-change-tag-edge` · `--plus-change-tag-fill` · `--plus-change-tag-height` · `--plus-change-tag-ink` · `--radius-md` · `--tag-gap-compact`
+`--body-sm` · `--border-width-default` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--icon-sm` · `--inline-sm` · `--pad-x-xs` · `--plus-change-tag-edge` · `--plus-change-tag-fill` · `--plus-change-tag-height` · `--plus-change-tag-ink` · `--radius-md` · `--tag-gap-compact`
 
 From `design-system/src/components/labels/ChangeTag/ChangeTag.scss`. Override these through the token layer, never with a literal.
 

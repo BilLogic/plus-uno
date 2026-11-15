@@ -9,7 +9,7 @@ import { CardJobs } from './PatternCardCases.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 const bodyCopy = (
-    <p className="body-large" style={{ margin: 0 }}>
+    <p className="body-lg" style={{ margin: 0 }}>
         Some quick example text to fill the body slot of the card shell.
     </p>
 );
@@ -19,7 +19,7 @@ const DemoCaption = ({ children }) => (
         style={{
             display: 'block',
             marginBottom: 'var(--stack-md)',
-            font: 'var(--heading-xxsmall)',
+            font: 'var(--heading-xxs)',
             color: 'var(--ds-text-subtle)',
         }}
     >
@@ -336,7 +336,7 @@ const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => (
             }
         }
         const typeProbe = document.createElement('span');
-        typeProbe.style.font = `var(${imagePlacement !== 'top' && imageSplit === '1/2' ? '--heading-md' : '--heading-xsmall'})`;
+        typeProbe.style.font = `var(${imagePlacement !== 'top' && imageSplit === '1/2' ? '--heading-md' : '--heading-xs'})`;
         card.appendChild(typeProbe);
         await expect(getComputedStyle(heading).fontSize).toBe(getComputedStyle(typeProbe).fontSize);
         typeProbe.remove();
@@ -365,7 +365,7 @@ export const ImageStartHalf = placementStory('start', 'rest', '1/2');
 export const ImageEndHalf = placementStory('end', 'rest', '1/2');
 export const ImageTopIgnoresSplit = placementStory('top', 'rest', '1/2');
 
-const slotNote = (text) => <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{text}</span>;
+const slotNote = (text) => <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{text}</span>;
 
 /** No header: the body carries its own title, as a metric tile does. */
 export const BodyOnly = () => (

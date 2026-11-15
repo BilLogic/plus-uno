@@ -178,7 +178,7 @@
 
 [[redirects]]
   from = "/storybook/"
-  query = { path = "/docs/templates-modal-blanket--docs" }
+  query = { path = "/docs/templates-modal-backdrop--docs" }
   to = "/storybook/?path=/docs/templates-modal--docs#blanket"
   status = 301
   force = true

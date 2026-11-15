@@ -118,13 +118,13 @@
     .plus-flag-title {
         flex: 0 1 auto;
         min-width: 0;
-        font: var(--heading-xsmall);
+        font: var(--heading-xs);
         color: var(--ds-text);
     }
 
     .plus-flag-timestamp {
         flex-shrink: 0;
-        font: var(--body-small);
+        font: var(--body-sm);
         color: var(--ds-text-subtle);
     }
 

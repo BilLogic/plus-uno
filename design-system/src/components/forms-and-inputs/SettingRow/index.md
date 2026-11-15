@@ -76,7 +76,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Parts
 
 1. **Label (`label`) and status (`status`).** Strong `--body-default` setting name at the start, with an optional `StatusTag` beside it so the end slot holds only the interactive control.
-2. **Description (`description`).** One line of `--body-small` subtle context under the label, or the visible prerequisite/permission reason when disabled or read-only.
+2. **Description (`description`).** One line of `--body-sm` subtle context under the label, or the visible prerequisite/permission reason when disabled or read-only.
 3. **Inline error (`error`).** Optional danger error message rendered directly under `description` when a background save fails.
 4. **Control (`control` at `end`).** Top-aligned to the label row: a `Toggle` (with no `label` prop), a compact `Select` (`spacing="compact"`), or a compact `Button`.
 
@@ -84,7 +84,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Rest | `--body-default` medium label in `--ds-text`, `--body-small` description in `--ds-text-subtle`, and control at the end. |
+| Rest | `--body-default` medium label in `--ds-text`, `--body-sm` description in `--ds-text-subtle`, and control at the end. |
 | Saving | `Toggle` sets `isLoading`, showing its saving spinner and `aria-busy="true"` while the request completes. |
 | Saved | Change takes effect immediately and confirms via a `Flag` in `FlagGroup`. |
 | Error | `error` renders under `description` with `role="alert"` in `--ds-text-danger` and sets `aria-invalid="true"` on the control. |
@@ -98,7 +98,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Row vertical padding and gap | `--setting-row-pad-y` (`12px`), horizontal gap `--inline-lg`. |
 | Row divider | `--border-width-default` solid `--ds-border` between adjacent rows. |
 | Label and status | `--body-default` with `--type-weight-medium` in `--ds-text` (`--ds-text-disabled` when disabled); status gap `--inline-md`. |
-| Description and error | `--body-small` in `--ds-text-subtle`; error in `--ds-text-danger` with `--icon-sm` glyph. |
+| Description and error | `--body-sm` in `--ds-text-subtle`; error in `--ds-text-danger` with `--icon-sm` glyph. |
 
 ## Content guidelines
 
@@ -126,7 +126,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Tokens touched
 
-`--body-small` · `--border-width-default` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--icon-sm` · `--inline-lg` · `--inline-md` · `--listbox-max-width` · `--setting-row-end-min-height` · `--setting-row-pad-y` · `--setting-row-select-min-width` · `--stack-sm` · `--type-weight-medium`
+`--body-sm` · `--border-width-default` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--icon-sm` · `--inline-lg` · `--inline-md` · `--listbox-max-width` · `--setting-row-end-min-height` · `--setting-row-pad-y` · `--setting-row-select-min-width` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.scss`. Override these through the token layer, never with a literal.
 

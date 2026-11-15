@@ -2744,7 +2744,7 @@ const FocusedTaskTransitionDemo = () => {
                                     header={(
                                         <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--space-100)', minInlineSize: 0 }}>
                                             <IconButton appearance="subtle" icon="xmark" label="Close" onClick={requestLeave} />
-                                            <h1 style={{ margin: 0, font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Log a session</h1>
+                                            <h1 style={{ margin: 0, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Log a session</h1>
                                         </div>
                                     )}
                                     width="reading"
@@ -2865,9 +2865,9 @@ const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
                             <div data-probe="step-head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: '1 1 auto', gap: 'var(--space-100)', minInlineSize: 0 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)' }}>
                                     <IconButton appearance="subtle" icon="xmark" label="Close" onClick={() => {}} />
-                                    <h1 style={{ margin: 0, font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Plan a tutoring term</h1>
+                                    <h1 style={{ margin: 0, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Plan a tutoring term</h1>
                                 </div>
-                                <span data-probe="step-position" style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                                <span data-probe="step-position" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                                     {`${at + 1} of ${labels.length}`}
                                 </span>
                             </div>

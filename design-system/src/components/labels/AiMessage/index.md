@@ -117,8 +117,8 @@ Same group: `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 | Between parts | `--stack-md`. |
 | Progress indicator | `--ds-text-subtle`, `--radius-full`, `--stack-sm` apart. |
 | Caret and progress indicator motion | `--ds-motion-loop`, with its three marks offset by a quarter and a half cycle. |
-| Sources | Heading `--heading-xxsmall` in `--ds-text-subtle`; type `--body-small` in `--ds-text-subtle`; rows `--stack-sm` apart. |
-| Feedback | Thanks `--body-small` in `--ds-text-subtle`; buttons `--inline-sm` apart. |
+| Sources | Heading `--heading-xxs` in `--ds-text-subtle`; type `--body-sm` in `--ds-text-subtle`; rows `--stack-sm` apart. |
+| Feedback | Thanks `--body-sm` in `--ds-text-subtle`; buttons `--inline-sm` apart. |
 
 ## Content guidelines
 
@@ -154,7 +154,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--code-default` · `--ds-background-neutral` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--ds-text` · `--ds-text-subtle` · `--heading-xsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-sm` · `--code-default` · `--ds-background-neutral` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--ds-text` · `--ds-text-subtle` · `--heading-xs` · `--icon-md` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
 

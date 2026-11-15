@@ -30,7 +30,7 @@ const swatchBox = (token, extraStyle = {}) => ({
     ...extraStyle,
 });
 
-const label = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const label = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 
 /** A labeled row of swatches, one per token. */
 const Swatches = ({ items }) => (

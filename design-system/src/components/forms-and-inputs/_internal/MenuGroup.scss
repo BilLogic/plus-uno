@@ -23,7 +23,7 @@
 }
 
 .plus-menu-section-title {
-    font: var(--heading-xxsmall);
+    font: var(--heading-xxs);
     color: var(--ds-text-subtlest);
     text-transform: uppercase;
     padding: var(--stack-lg) var(--menu-group-pad-x) var(--stack-sm);
@@ -73,6 +73,6 @@
 }
 
 .plus-menu-item-description {
-    font: var(--body-small);
+    font: var(--body-sm);
     color: var(--ds-text-subtle);
 }

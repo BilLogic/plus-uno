@@ -126,7 +126,7 @@ Use `SettingRow` on settings and preference pages where each row adjusts one ind
 ## Parts
 
 1. **Label (`label`) and status (`status`).** Strong `--body-default` setting name at the start, with an optional `StatusTag` beside it so the end slot holds only the interactive control.
-2. **Description (`description`).** One line of `--body-small` subtle context under the label, or the visible prerequisite/permission reason when disabled or read-only.
+2. **Description (`description`).** One line of `--body-sm` subtle context under the label, or the visible prerequisite/permission reason when disabled or read-only.
 3. **Inline error (`error`).** Optional danger error message rendered directly under `description` when a background save fails.
 4. **Control (`control` at `end`).** Top-aligned to the label row: a `Toggle` (with no `label` prop), a compact `Select` (`spacing="compact"`), or a compact `Button`.
 
@@ -137,7 +137,7 @@ Use `SettingRow` on settings and preference pages where each row adjusts one ind
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td><code>--body-default</code> medium label in <code>--ds-text</code>, <code>--body-small</code> description in <code>--ds-text-subtle</code>, and control at the end.</td></tr>
+<tr><td>Rest</td><td><code>--body-default</code> medium label in <code>--ds-text</code>, <code>--body-sm</code> description in <code>--ds-text-subtle</code>, and control at the end.</td></tr>
 <tr><td>Saving</td><td><code>Toggle</code> sets <code>isLoading</code>, showing its saving spinner and <code>aria-busy="true"</code> while the request completes.</td></tr>
 <tr><td>Saved</td><td>Change takes effect immediately and confirms via a <code>Flag</code> in <code>FlagGroup</code>.</td></tr>
 <tr><td>Error</td><td><code>error</code> renders under <code>description</code> with <code>role="alert"</code> in <code>--ds-text-danger</code> and sets <code>aria-invalid="true"</code> on the control.</td></tr>
@@ -156,7 +156,7 @@ Use `SettingRow` on settings and preference pages where each row adjusts one ind
 <tr><td>Row vertical padding and gap</td><td><code>--setting-row-pad-y</code> (<code>12px</code>), horizontal gap <code>--inline-lg</code>.</td></tr>
 <tr><td>Row divider</td><td><code>--border-width-default</code> solid <code>--ds-border</code> between adjacent rows.</td></tr>
 <tr><td>Label and status</td><td><code>--body-default</code> with <code>--type-weight-medium</code> in <code>--ds-text</code> (<code>--ds-text-disabled</code> when disabled); status gap <code>--inline-md</code>.</td></tr>
-<tr><td>Description and error</td><td><code>--body-small</code> in <code>--ds-text-subtle</code>; error in <code>--ds-text-danger</code> with <code>--icon-sm</code> glyph.</td></tr>
+<tr><td>Description and error</td><td><code>--body-sm</code> in <code>--ds-text-subtle</code>; error in <code>--ds-text-danger</code> with <code>--icon-sm</code> glyph.</td></tr>
 </tbody>
 </DocsTable>
 

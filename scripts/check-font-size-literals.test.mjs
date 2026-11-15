@@ -48,7 +48,7 @@ test('JSX style objects are read the same way, and an identifier is not judged',
 });
 
 test('comments are not declarations', () => {
-  assert.deepEqual(at('/* font-size: 16px; */\n.a { font: var(--body-small); } // font-size: 12px'), []);
+  assert.deepEqual(at('/* font-size: 16px; */\n.a { font: var(--body-sm); } // font-size: 12px'), []);
 });
 
 test('the components and patterns hold no literal font size', () => {

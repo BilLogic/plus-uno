@@ -364,7 +364,7 @@ export const QuestionStep = ({
             header={(
                 <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--inline-md)', minInlineSize: 0 }}>
                     <IconButton appearance="subtle" icon="xmark" label="Close" onClick={() => {}} />
-                    <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{title}</span>
+                    <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{title}</span>
                 </div>
             )}
             width="reading"

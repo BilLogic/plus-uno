@@ -340,7 +340,7 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
       // when a title wraps.
       style={{ margin: 0, display: 'grid', gridTemplateRows: 'subgrid', gridRow: 'span 3', gap: 'var(--stack-sm)', minInlineSize: 0 }}
     >
-      <div style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text)' }}>{scene.title}</div>
+      <div style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text)' }}>{scene.title}</div>
       <div
         style={{
           borderRadius: 'var(--radius-lg)',
@@ -383,7 +383,7 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
             flexDirection: 'column',
             alignItems: 'flex-start',
             gap: 'var(--stack-sm)',
-            font: 'var(--body-small)',
+            font: 'var(--body-sm)',
             color: 'var(--ds-text-subtle)',
             marginBlockEnd: 'var(--stack-md)',
           }}
@@ -543,7 +543,7 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)' }}>
         {title && (
-          <span id={titleId} style={{ flex: 1, font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>
+          <span id={titleId} style={{ flex: 1, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
             {title}
           </span>
         )}

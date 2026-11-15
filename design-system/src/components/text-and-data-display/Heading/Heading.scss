@@ -31,11 +31,11 @@
     }
 
     &[data-size='xsmall'] {
-        font: var(--heading-xsmall);
+        font: var(--heading-xs);
     }
 
     &[data-size='xxsmall'] {
-        font: var(--heading-xxsmall);
+        font: var(--heading-xxs);
     }
 
     &[data-color='color.text'] {

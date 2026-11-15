@@ -118,7 +118,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 | Full screen | `--ds-surface`, on `--layer-dialog`; the conversation is capped at `--content-max-width-reading`. |
 | Conversation | `--stack-md` between messages, `--body-default` in `--ds-text`. |
 | The person's message | `--ds-surface-sunken`, `--pad-y-sm` by `--pad-x-md`, `--radius-md`. |
-| Empty state and fallibility line | `--ds-text-subtle`; the line at `--body-small`. |
+| Empty state and fallibility line | `--ds-text-subtle`; the line at `--body-sm`. |
 | Footer | `--stack-sm` between the starters, the input and the line. |
 
 ## Content guidelines
@@ -161,7 +161,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ai-chat-width` · `--body-default` · `--body-small` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popup-radius` · `--radius-md` · `--stack-lg` · `--stack-md` · `--stack-sm`
+`--ai-chat-width` · `--body-default` · `--body-sm` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popup-radius` · `--radius-md` · `--stack-lg` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/patterns/AiChat/AiChat.scss`. Override these through the token layer, never with a literal.
 

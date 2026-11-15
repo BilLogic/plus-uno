@@ -33,28 +33,28 @@
         "var(--heading-sm)"
       ],
       "Heading/xsmall": [
-        "var(--heading-xsmall)"
+        "var(--heading-xs)"
       ],
       "Heading/xxsmall": [
-        "var(--heading-xxsmall)"
+        "var(--heading-xxs)"
       ],
       "Body/large": [
-        "var(--body-large)"
+        "var(--body-lg)"
       ],
       "Body/default": [
         "var(--body-default)"
       ],
       "Body/small": [
-        "var(--body-small)"
+        "var(--body-sm)"
       ],
       "Metric/large": [
-        "var(--metric-large)"
+        "var(--metric-lg)"
       ],
       "Metric/medium": [
-        "var(--metric-medium)"
+        "var(--metric-md)"
       ],
       "Metric/small": [
-        "var(--metric-small)"
+        "var(--metric-sm)"
       ],
       "Family/heading": [
         "var(--type-family-heading)"

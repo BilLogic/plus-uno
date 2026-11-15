@@ -39,7 +39,7 @@ export default {
 
 const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--grid-gutter)' };
 const cell = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--inline-sm)' };
-const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 
 const SIZE_TOKEN = { 12: '--icon-sm', 16: '--icon-md', 24: '--icon-lg' };
 const colorToken = (role) => (role === 'default' ? '--ds-icon' : `--ds-icon-${role}`);
@@ -161,7 +161,7 @@ Colors.play = async ({ canvasElement }) => {
 /* ---------------------------------------------------------- inherits */
 
 export const Inherited = () => (
-    <span data-testid="text" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-large)', color: 'var(--ds-text-danger)' }}>
+    <span data-testid="text" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-lg)', color: 'var(--ds-text-danger)' }}>
         <Icon name="circle-exclamation" data-testid="glyph" />
         Payment failed
     </span>

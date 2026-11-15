@@ -41,7 +41,7 @@ export default {
 };
 
 const cell = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--inline-sm)', minWidth: 'var(--card-min-width-sm)' };
-const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 
 const ModeSet = ({ mode }) => (
     <div

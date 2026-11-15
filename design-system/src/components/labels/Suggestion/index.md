@@ -155,7 +155,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--border-width-default` · `--ds-background-disabled` · `--ds-background-discovery` · `--ds-background-discovery-hovered` · `--ds-border` · `--ds-border-discovery` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-discovery` · `--ds-text-disabled` · `--ds-text-discovery` · `--focus-ring-width` · `--icon-sm` · `--pad-x-xs` · `--plus-suggestion-height` · `--radius-md` · `--stack-sm`
+`--body-sm` · `--border-width-default` · `--ds-background-disabled` · `--ds-background-discovery` · `--ds-background-discovery-hovered` · `--ds-border` · `--ds-border-discovery` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-discovery` · `--ds-text-disabled` · `--ds-text-discovery` · `--focus-ring-width` · `--icon-sm` · `--pad-x-xs` · `--plus-suggestion-height` · `--radius-md` · `--stack-sm`
 
 From `design-system/src/components/labels/Suggestion/Suggestion.scss`. Override these through the token layer, never with a literal.
 

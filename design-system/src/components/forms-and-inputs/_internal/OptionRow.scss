@@ -116,7 +116,7 @@
 .plus-option-row--group {
     min-height: 0;
     color: var(--ds-text-subtle);
-    font: var(--heading-xxsmall);
+    font: var(--heading-xxs);
     cursor: default;
 
     @include plus-state(
@@ -174,7 +174,7 @@
 
 .plus-option-row-description {
     color: var(--ds-text-subtle);
-    font: var(--body-small);
+    font: var(--body-sm);
 }
 
 .plus-option-row-selected-mark {

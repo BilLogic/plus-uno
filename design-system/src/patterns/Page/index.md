@@ -156,7 +156,7 @@ A record page one level down shows every header slot, with markers in the gutter
 | `--section-stack-sm` | Header to page tabs. |
 | `--page-stack-md` | Header to the first Section; between Sections. |
 | `--page-stack-sm` | Between related Sections. |
-| `--heading-lg`, `--body-default`, `--body-small` | The title, the description, the breadcrumb. |
+| `--heading-lg`, `--body-default`, `--body-sm` | The title, the description, the breadcrumb. |
 | `--content-max-width`, `--content-min-width` | The cap and the floor of the content grid. |
 | `--grid-columns`, `--grid-gutter`, `--page-pad` | The 12-column grid, its gutter and the pad. |
 | `--ds-surface-sunken`, `--ds-surface`, `--ds-surface-raised`, `--ds-surface-overlay` | The four levels' fills, each with its shadow from Elevation. |

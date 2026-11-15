@@ -161,7 +161,7 @@ export const UpIsBad = ({ goodDirection = 'down' }) => (
 export const RollUp = () => (
     <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' }}>
         <div style={{ ...line, justifyContent: 'space-between' }}>
-            <span style={{ ...text, font: 'var(--heading-xsmall)' }}>Group: Fractions</span>
+            <span style={{ ...text, font: 'var(--heading-xs)' }}>Group: Fractions</span>
             <StatusTag appearance="danger">Missed</StatusTag>
         </div>
         {SESSIONS.slice(0, 3).map(([when, , appearance, status]) => (
@@ -294,7 +294,7 @@ export const ChecklistCard = ({
     const headerActions = (
         <>
             <span
-                className="body-small"
+                className="body-sm"
                 data-checklist-count=""
                 style={{
                     color: 'var(--ds-text-subtle)',
@@ -377,7 +377,7 @@ export const ChecklistCard = ({
                                 >
                                     {step.title}
                                 </span>
-                                <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+                                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                                     {step.fact}
                                 </span>
                             </div>
@@ -400,7 +400,7 @@ export const ChecklistCard = ({
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             gap: 'var(--inline-sm)',
-                                            font: 'var(--body-small)',
+                                            font: 'var(--body-sm)',
                                             color: 'var(--ds-text-subtle)',
                                         }}
                                     >
@@ -453,9 +453,9 @@ export const CompactChecklist = ({
                         gap: 'var(--card-inline-sm)',
                     }}
                 >
-                    <span style={{ font: 'var(--body-small)', color: 'var(--ds-text)' }}>{title}</span>
+                    <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text)' }}>{title}</span>
                     <span
-                        className="body-small"
+                        className="body-sm"
                         style={{
                             color: 'var(--ds-text-subtle)',
                             fontVariantNumeric: 'tabular-nums',

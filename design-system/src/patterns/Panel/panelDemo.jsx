@@ -151,8 +151,8 @@ export const InboxPanel = ({ onClose = () => {}, items = INBOX }) => (
                         <Avatar name={n.name} size={32} />
                         <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>{`${n.name} ${n.what} in ${n.where}`}</span>
-                            <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{n.excerpt}</span>
-                            <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{n.time}</span>
+                            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.excerpt}</span>
+                            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.time}</span>
                         </div>
                         {n.unread ? (
                             <>

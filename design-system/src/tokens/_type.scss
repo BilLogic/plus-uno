@@ -49,14 +49,14 @@
     --heading-lg: var(--type-weight-medium) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading-serif);
     --heading-md: var(--type-weight-medium) var(--type-size-125) / var(--type-line-height-150) var(--type-family-heading-serif);
     --heading-sm: var(--type-weight-semibold) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
-    --heading-xsmall: var(--type-weight-semibold) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-heading);
-    --heading-xxsmall: var(--type-weight-semibold) var(--type-size-075) / var(--type-line-height-100) var(--type-family-heading);
-    --body-large: var(--type-weight-regular) var(--type-size-100) / var(--type-line-height-150) var(--type-family-body);
+    --heading-xs: var(--type-weight-semibold) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-heading);
+    --heading-xxs: var(--type-weight-semibold) var(--type-size-075) / var(--type-line-height-100) var(--type-family-heading);
+    --body-lg: var(--type-weight-regular) var(--type-size-100) / var(--type-line-height-150) var(--type-family-body);
     --body-default: var(--type-weight-regular) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-body);
-    --body-small: var(--type-weight-regular) var(--type-size-075) / var(--type-line-height-100) var(--type-family-body);
-    --metric-large: var(--type-weight-semibold) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading);
-    --metric-medium: var(--type-weight-semibold) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading);
-    --metric-small: var(--type-weight-semibold) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
+    --body-sm: var(--type-weight-regular) var(--type-size-075) / var(--type-line-height-100) var(--type-family-body);
+    --metric-lg: var(--type-weight-semibold) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading);
+    --metric-md: var(--type-weight-semibold) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading);
+    --metric-sm: var(--type-weight-semibold) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
 
     /* Code only (CODE_ONLY_TYPE_STYLES) */
     --code-default: var(--type-weight-regular) 0.875em / 1 var(--type-family-code);
@@ -68,11 +68,11 @@
 .heading-lg { font: var(--heading-lg); letter-spacing: var(--heading-lg-tracking); }
 .heading-md { font: var(--heading-md); }
 .heading-sm { font: var(--heading-sm); }
-.heading-xsmall { font: var(--heading-xsmall); }
-.heading-xxsmall { font: var(--heading-xxsmall); }
-.body-large { font: var(--body-large); }
+.heading-xs { font: var(--heading-xs); }
+.heading-xxs { font: var(--heading-xxs); }
+.body-lg { font: var(--body-lg); }
 .body-default { font: var(--body-default); }
-.body-small { font: var(--body-small); }
-.metric-large { font: var(--metric-large); }
-.metric-medium { font: var(--metric-medium); }
-.metric-small { font: var(--metric-small); }
+.body-sm { font: var(--body-sm); }
+.metric-lg { font: var(--metric-lg); }
+.metric-md { font: var(--metric-md); }
+.metric-sm { font: var(--metric-sm); }

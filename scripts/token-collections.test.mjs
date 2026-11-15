@@ -84,3 +84,19 @@ test('the audit names no token twice and gives each a proposed name', () => {
     assert.notEqual(r.token, r.proposed, JSON.stringify(r));
   }
 });
+
+
+test('Skeleton colors stay in Color and all Skeleton dimensions stay in Spacing and size', () => {
+  const skeleton = [...corpus].filter(([name]) => name.startsWith('--skeleton-'));
+  assert.equal(skeleton.length, 10);
+  for (const [name, entry] of skeleton) {
+    assert.deepEqual(placeToken(name, entry.file), {
+      collection: name === '--skeleton-subtle' ? 'color' : 'spacing',
+      tier: 'semantic', scope: 'components',
+    }, name);
+  }
+});
+
+test('typography size spelling has zero naming outliers', () => {
+  assert.deepEqual(tokenNamingAudit(corpus).filter((row) => row.problem.startsWith('Size step spelled out')), []);
+});

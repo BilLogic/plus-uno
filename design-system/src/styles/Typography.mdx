@@ -37,7 +37,7 @@ PLUS uses Noto Serif (500) for headings 20 to 32, Noto Sans for headings 12 to 1
 ```css
 font: var(--heading-md);
 font: var(--body-default);
-font: var(--metric-large);
+font: var(--metric-lg);
 ```
 
 Figma holds `Heading/*`, `Body/*`, `Metric/*` and `Code/default`, bound to the typography variables (<DocsLink id="foundations-tokens-typography">Tokens: Typography</DocsLink>).
@@ -96,7 +96,7 @@ Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`
 
 <FoundationSubsection title="Text-style classes">
 
-Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxsmall`, `.body-large`, `.body-default`, `.body-small`, `.metric-large` to `.metric-small`), which set `font` and tracking together. Component stylesheets use `font: var(--…)` directly.
+Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and tracking together. Component stylesheets use `font: var(--…)` directly.
 
 ```jsx
 <p className="body-default">Helper text</p>
@@ -170,13 +170,13 @@ A student name in a roster row.
 <Do caption="One line with an ellipsis. The Status keeps its place.">
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
 <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Lincoln Middle</span>
-<span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
+<span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-success)' }}>Active</span>
 </div>
 </Do>
 <Dont caption="The name wraps onto extra lines and makes the row taller than its neighbors.">
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
 <span style={{ flex: 1, minWidth: 0, font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Lincoln Middle</span>
-<span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
+<span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-success)' }}>Active</span>
 </div>
 </Dont>
 </DoDont>
@@ -230,10 +230,10 @@ Use Metric to emphasize a number; a serif heading style makes the figure read as
 
 <DoDont>
 <Do caption="Metric/large for the figure.">
-<Sample font="--metric-large">1,284</Sample><div style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+<Sample font="--metric-lg">1,284</Sample><div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
 </Do>
 <Dont caption="Heading/medium for a number.">
-<Sample font="--heading-md">1,284</Sample><div style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+<Sample font="--heading-md">1,284</Sample><div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
 </Dont>
 </DoDont>
 

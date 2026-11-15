@@ -138,7 +138,7 @@ const bandStyle = (extra) => ({
     pointerEvents: 'none',
     background: guideFill('--ds-background-information-bold', 24),
     color: 'var(--ds-text-information-bolder)',
-    font: 'var(--body-small)',
+    font: 'var(--body-sm)',
     zIndex: 1,
     ...extra,
 });

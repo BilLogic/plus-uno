@@ -171,10 +171,10 @@ export const SpringPlayground = ({ reduced: forcedReduced }) => {
             Reset
           </Button>
         </div>
-        <code style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+        <code style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
           {`{ stiffness: ${config.stiffness}, damping: ${config.damping}, mass: ${config.mass ?? 1} }`}
         </code>
-        <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+        <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
           {`90% at ${ms(m.t90)} · settled at ${ms(m.settle)} · overshoot ${(m.overshoot * 100).toFixed(1)}%`}
         </span>
       </div>
@@ -429,7 +429,7 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
           </Illustration>
         </div>
       </div>
-      <p id={describedBy} style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+      <p id={describedBy} style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
         Drag the edge left, or focus it and hold ArrowLeft; let go to release.
       </p>
     </section>

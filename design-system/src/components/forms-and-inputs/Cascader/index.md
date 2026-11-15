@@ -103,7 +103,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `CheckboxGr
 | Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Side padding | `--pad-x-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
-| Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
+| Label and caption | `--body-sm`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
 | Menu | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | Column rule | `--border-width-default` in `--ds-border` between columns. |
 | Option | `--control-md` high; hovered `--ds-background-neutral-subtle-hovered`, chosen `--ds-background-selected` with `--ds-text-selected`. |

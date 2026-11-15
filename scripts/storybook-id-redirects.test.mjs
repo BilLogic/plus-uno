@@ -53,7 +53,7 @@ test('every pre-regroup Foundations id lands on its page in the new groups', () 
 test('a folded page lands on its parent section, a renamed page on the page', () => {
   const folded = rules.filter((r) => r.anchor);
   assert.deepEqual(folded.map((r) => r.from).sort(), [
-    'templates-modal-blanket',
+    'templates-modal-backdrop',
     'templates-page-heading-outline',
     'templates-templates-and-patterns',
   ]);
@@ -82,4 +82,11 @@ test('a component family parent redirects to its Name/Name page, whose story is 
     assert.equal(rule?.to + '--docs', storybookId(title, 'Docs'), `${from} target`);
     assert.ok(sources.includes(`title: '${title}',`), `no story is titled ${title}`);
   }
+});
+
+
+test('historical Modal Backdrop bookmarks land on the Blanket section', () => {
+  assert.deepEqual(rules.find((r) => r.from === 'templates-modal-backdrop'), {
+    from: 'templates-modal-backdrop', to: 'templates-modal', anchor: '#blanket',
+  });
 });

@@ -62,10 +62,11 @@ body,
  * visible steps.
  *
  *   h1 page title     --heading-xxl   32 / 36 serif
- *   h2 section        --heading-lg     24 / 28 serif
- *   h3 example, sub   --heading-md    20 / 24 serif
- *   h4                --heading-sm     16 / 20 sans semibold
- *   h5, h6            --heading-xsmall    14 / 20 sans semibold
+ *   h2 section        --heading-xl     28 / 32 serif
+ *   h3 example, sub   --heading-lg     24 / 28 serif
+ *   h4                --heading-md     20 / 24 serif
+ *   h5                --heading-sm     16 / 20 sans semibold
+ *   h6                --heading-xs     14 / 20 sans semibold
  *
  * The space above a heading is the Page pattern's: `--page-stack-lg` before a
  * section, `--page-stack-md` before a sub-heading, `--section-stack-sm` between
@@ -100,23 +101,29 @@ body,
 }
 
 .sbdocs h2:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
-    font: var(--heading-lg) !important;
+    font: var(--heading-xl) !important;
+    letter-spacing: var(--heading-xl-tracking) !important;
     color: var(--ds-text) !important;
 }
 
 .sbdocs h3:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
-    font: var(--heading-md) !important;
+    font: var(--heading-lg) !important;
+    letter-spacing: var(--heading-lg-tracking) !important;
     color: var(--ds-text) !important;
 }
 
 .sbdocs h4:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
+    font: var(--heading-md) !important;
+    color: var(--ds-text) !important;
+}
+
+.sbdocs h5:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-sm) !important;
     color: var(--ds-text) !important;
 }
 
-.sbdocs h5:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)),
 .sbdocs h6:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
-    font: var(--heading-xsmall) !important;
+    font: var(--heading-xs) !important;
     color: var(--ds-text) !important;
 }
 
@@ -441,7 +448,7 @@ a.sbdocs-a {
   width: 100%;
   margin: 0 !important;
   border-collapse: collapse;
-  font: var(--body-small);
+  font: var(--body-sm);
   color: var(--ds-text);
 }
 
@@ -498,7 +505,7 @@ a.sbdocs-a {
 .sbdocs .sbdocs-toc h2,
 .toc-wrapper h2,
 .sbdocs-wrapper aside h2 {
-  font: var(--heading-xsmall) !important;
+  font: var(--heading-xs) !important;
   margin-top: 0 !important;
   margin-bottom: var(--section-stack-lg) !important;
   color: var(--ds-text-subtle) !important;
@@ -550,23 +557,11 @@ a.sbdocs-a {
     border-radius: 0 !important;
 }
 
-/*
- * Variant subheadings design within each story section.
- * Differentiates from normal headers by using a subtle body-copy typography token feel.
- *
- * Matched by SIZE CLASS as well as by tag. The tag is the outline position and the
- * text-style class is the appearance (see design-system/src/styles/Accessibility.mdx §
- * Heading levels), so a subheading that has to sit at level 3 in its page's
- * outline is written `<h3 className="heading-sm">` and still has to look like the rest of
- * them. Keying this rule to the tag alone made the docs treatment fall off the
- * moment a story's outline was corrected. The tag selectors stay for headings
- * that carry no size class.
- */
+/* Story-section headings keep their product text styles and docs spacing. */
 .docs-story section > h5,
 .docs-story section > h6,
 .docs-story section > .heading-md,
 .docs-story section > .heading-sm {
-    font: var(--heading-xsmall) !important;
     color: var(--ds-text-subtle) !important;
     margin-bottom: var(--stack-lg) !important;
     margin-top: 0 !important;
@@ -1058,7 +1053,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .sbdocs .sb-ds-docs-all-props > summary {
-    font: var(--body-large);
+    font: var(--body-lg);
     font-weight: var(--type-weight-semibold);
     color: var(--ds-text);
     cursor: pointer;
@@ -1090,7 +1085,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .sbdocs p.sb-ds-canvas-description {
-  font: var(--body-large);
+  font: var(--body-lg);
   color: var(--ds-text-subtle);
   max-width: 55ch;
   margin: 0;
@@ -1160,7 +1155,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .sb-ds-resource-card__title {
-  font: var(--heading-xsmall);
+  font: var(--heading-xs);
   color: var(--ds-text);
 }
 

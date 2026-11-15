@@ -121,7 +121,7 @@ Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGr
 | --- | --- |
 | Month | `--heading-sm` in `--ds-text`. |
 | Month buttons | `--calendar-nav-size` square, `--ds-icon-subtle`, hovered `--ds-background-neutral-subtle-hovered`. |
-| Weekday names | `--body-small` in `--ds-text-subtle`. |
+| Weekday names | `--body-sm` in `--ds-text-subtle`. |
 | Day text | `--body-default` in `--ds-text`. |
 | Day size | `--calendar-day-sm` (28), `--calendar-day-md` (36), `--calendar-day-lg` (44). |
 | Day radius | `--radius-md`. |

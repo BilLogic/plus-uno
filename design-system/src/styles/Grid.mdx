@@ -189,19 +189,19 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
 <FoundationExample caption="Control, Row and Media at each size, drawn from the size tokens.">
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--section-stack-md)' }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <strong style={{ font: 'var(--heading-xsmall)' }}>Control</strong>
+        <strong style={{ font: 'var(--heading-xs)' }}>Control</strong>
         {[['--control-sm', 24], ['--control-md', 32]].map(([t, v]) => (
-            <span key={t} style={{ display: 'flex', alignItems: 'center', height: `var(${t})`, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-neutral)', font: 'var(--body-small)' }}><C>{t}</C>&nbsp;{v}</span>
+            <span key={t} style={{ display: 'flex', alignItems: 'center', height: `var(${t})`, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-neutral)', font: 'var(--body-sm)' }}><C>{t}</C>&nbsp;{v}</span>
         ))}
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <strong style={{ font: 'var(--heading-xsmall)' }}>Row</strong>
+        <strong style={{ font: 'var(--heading-xs)' }}>Row</strong>
         {[['--row-height-sm', 32], ['--row-height-md', 40], ['--row-height-lg', 48]].map(([t, v]) => (
-            <span key={t} style={{ display: 'flex', alignItems: 'center', minHeight: `var(${t})`, padding: '0 var(--table-pad-x-cell)', borderBottom: 'var(--border-width-default) solid var(--ds-border)', font: 'var(--body-small)' }}><C>{t}</C>&nbsp;{v}</span>
+            <span key={t} style={{ display: 'flex', alignItems: 'center', minHeight: `var(${t})`, padding: '0 var(--table-pad-x-cell)', borderBottom: 'var(--border-width-default) solid var(--ds-border)', font: 'var(--body-sm)' }}><C>{t}</C>&nbsp;{v}</span>
         ))}
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <strong style={{ font: 'var(--heading-xsmall)' }}>Media</strong>
+        <strong style={{ font: 'var(--heading-xs)' }}>Media</strong>
         <span style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)' }}>
             {[['--image-xxs', 16], ['--image-xs', 20], ['--image-sm', 24], ['--image-md', 32], ['--image-lg', 40], ['--image-xl', 48]].map(([t, v]) => (
                 <span key={t} title={`${t} ${v}`} style={{ width: `var(${t})`, height: `var(${t})`, borderRadius: 'var(--radius-md)', background: 'var(--ds-background-accent-teal-subtle)' }} />
@@ -292,14 +292,14 @@ Every box either hugs its content or fills the space it is given. The container 
 <Do caption="The name fills; the tag and the button keep their own width.">
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
     <span style={{ flex: 1, fontWeight: 'var(--type-weight-medium)' }}>Maya Chen</span>
-    <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
+    <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-success)' }}>Active</span>
     <span style={{ padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-bold)', height: 'var(--control-md)', display: 'inline-flex', alignItems: 'center' }}>View</span>
 </div>
 </Do>
 <Dont caption="The button fills the leftover space, so an action becomes a wide bar and the name crowds the edge.">
 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
     <span style={{ fontWeight: 'var(--type-weight-medium)' }}>Maya Chen</span>
-    <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
+    <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-success)' }}>Active</span>
     <span style={{ flex: 1, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-bold)', height: 'var(--control-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View</span>
 </div>
 </Dont>

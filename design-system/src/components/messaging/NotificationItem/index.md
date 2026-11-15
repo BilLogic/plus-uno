@@ -70,7 +70,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 
 1. **Actor (`actor` at `start`).** A `32px` (`--image-md`) `Avatar` for a person or `Tile` for the system. Hidden from the link's accessible name because `title` already says who acted.
 2. **Title (`title` at `label`).** Who and what on `--body-default` in `--ds-text`, promoted to `--type-weight-medium` while `unread` is true.
-3. **Meta (`meta` at `description`).** Context and relative time separated by a middle dot (`"Sessions · 2m"`) on `--body-small` in `--ds-text-subtle`.
+3. **Meta (`meta` at `description`).** Context and relative time separated by a middle dot (`"Sessions · 2m"`) on `--body-sm` in `--ds-text-subtle`.
 4. **Unread indicator and action (`end`).** An `8px` (`--count-tag-dot-size`) dot in `--ds-background-brand-bold` paired with visually hidden `"Unread"`, replaced on hover and keyboard focus by a compact `"Mark as read"` `IconButton` when `onMarkRead` is provided.
 
 ### States
@@ -90,7 +90,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · 
 | Row padding, gap and radius | `--pad-y-lg` × `--pad-x-md`, gap `--inline-lg`, radius `--radius-control-md`. |
 | Row state fills | `--ds-background-selected` / `-hovered` / `-pressed` when unread; `--ds-background-neutral-subtle` / `-hovered` / `-pressed` when read. |
 | Actor and trailing slots | `--image-md` (`32px`) start slot; `--control-sm` (`24px`) end slot with `--count-tag-dot-size` (`8px`) dot in `--ds-background-brand-bold`. |
-| Title and meta | `--body-default` (`--type-weight-medium` when unread) in `--ds-text`; `--body-small` in `--ds-text-subtle`; stack gap `--stack-sm`. |
+| Title and meta | `--body-default` (`--type-weight-medium` when unread) in `--ds-text`; `--body-sm` in `--ds-text-subtle`; stack gap `--stack-sm`. |
 
 ## Content guidelines
 

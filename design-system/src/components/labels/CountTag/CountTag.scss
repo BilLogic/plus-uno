@@ -128,7 +128,7 @@ $count-dot: (
  * line, and a line height of the countTag keeps the digits from being clipped.
  */
 .plus-count .plus-count__value {
-    font: var(--body-small);
+    font: var(--body-sm);
     line-height: var(--plus-count-size);
     // The `font` shorthand resets every font-variant longhand, so the tabular
     // figures set on the countTag are restored here, after it: a "11" is as wide

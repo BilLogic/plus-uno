@@ -67,7 +67,7 @@
     // A head cell is a group label, not a heading: Heading/xxsmall, over the
     // head rule.
     thead th {
-        font: var(--heading-xxsmall);
+        font: var(--heading-xxs);
         color: var(--ds-text-subtle);
         border-bottom-color: var(--ds-border-bold);
     }

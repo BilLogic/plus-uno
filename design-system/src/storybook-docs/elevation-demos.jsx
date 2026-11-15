@@ -172,8 +172,8 @@ const useModeVars = (names) => {
 
 const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' };
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' };
-const label = { font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' };
-const small = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const label = { font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' };
+const small = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 const codeText = { font: 'var(--code-default)', color: 'var(--ds-text)', wordBreak: 'break-word' };
 /** A value that never breaks mid-value: a narrow table scrolls in its own container instead. */
 const valueText = { ...codeText, whiteSpace: 'nowrap', wordBreak: 'normal' };
@@ -388,7 +388,7 @@ const resetButton = {
     padding: 0,
     border: 0,
     background: 'none',
-    font: 'var(--body-small)',
+    font: 'var(--body-sm)',
     color: 'inherit',
     textAlign: 'start',
     cursor: 'default',
@@ -560,8 +560,8 @@ export const LevelTiles = () => (
                             color: 'var(--ds-text)',
                         }}
                     >
-                        <strong style={{ font: 'var(--heading-xsmall)' }}>{l.name}</strong>
-                        <span style={{ font: 'var(--body-small)' }}>{l.use}</span>
+                        <strong style={{ font: 'var(--heading-xs)' }}>{l.name}</strong>
+                        <span style={{ font: 'var(--body-sm)' }}>{l.use}</span>
                         <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{l.surface ?? 'no surface'}</code>
                         <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{l.shadow ?? 'no shadow'}</code>
                     </div>
@@ -658,7 +658,7 @@ export const BehaviorGuide = () => {
                                 aria-current={current ? 'true' : undefined}
                                 style={current ? { background: 'var(--ds-background-selected)', color: 'var(--ds-text-selected)' } : undefined}
                             >
-                                <th scope="row" style={{ font: 'var(--heading-xsmall)' }}>{b.behavior}</th>
+                                <th scope="row" style={{ font: 'var(--heading-xs)' }}>{b.behavior}</th>
                                 <td>{level ? level.name : 'none'}</td>
                                 <td>{level?.shadow ? <code style={{ ...codeText, whiteSpace: 'nowrap' }}>{level.shadow}</code> : 'none'}</td>
                                 <td>
@@ -742,7 +742,7 @@ export const ShadowComposer = () => {
                             background: `var(${level.surface})`,
                             boxShadow: composed,
                             color: 'var(--ds-text)',
-                            font: 'var(--heading-xsmall)',
+                            font: 'var(--heading-xs)',
                         }}
                     >
                         {level.name}
@@ -819,16 +819,16 @@ export const CrossSection = () => {
                     <line x1={L} y1={H - B} x2={W - 8} y2={H - B} stroke="var(--ds-border)" />
                     <line x1={L} y1={12} x2={L} y2={H - B} stroke="var(--ds-border)" />
                     {[0, 0.5, 1].map((t) => (
-                        <text key={t} x={L - 6} y={y(t * peak) + 4} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-small)' }}>
+                        <text key={t} x={L - 6} y={y(t * peak) + 4} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>
                             {`${Math.round(t * peak * 100)}%`}
                         </text>
                     ))}
                     {[0, 0.25, 0.5, 0.75, 1].map((t) => (
-                        <text key={t} x={x(t * span)} y={H - B + 16} textAnchor="middle" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-small)' }}>
+                        <text key={t} x={x(t * span)} y={H - B + 16} textAnchor="middle" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>
                             {Math.round(t * span)}
                         </text>
                     ))}
-                    <text x={W - 8} y={H - 2} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-small)' }}>px below the edge</text>
+                    <text x={W - 8} y={H - 2} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>px below the edge</text>
                     {series.map((s) => {
                         const pts = samples(s.layers).filter(([d]) => d >= 1);
                         return (
@@ -926,7 +926,7 @@ const LadderPane = ({ mode }) => {
                                 boxShadow: l.shadow ? `var(${l.shadow})` : 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
                             }}
                         />
-                        <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{l.name}</strong>
+                        <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{l.name}</strong>
                         <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{toHex(colors[l.id])}</code>
                         <span style={small} data-lightness={lightness(colors[l.id])}>L {lightness(colors[l.id])}</span>
                     </div>
@@ -1071,7 +1071,7 @@ export const ScrollShadowDemo = () => {
                 onScroll={(e) => setScroll(e.currentTarget.scrollTop)}
                 style={{ maxHeight: 'calc(var(--image-xl) * 3)', overflowY: 'auto', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}
             >
-                <div data-header style={{ position: 'sticky', top: 0, zIndex: 'var(--layer-card)', padding: 'var(--pad-y-md) var(--pad-x-md)', background: 'var(--ds-surface)', font: 'var(--heading-xsmall)', boxShadow: shadow, color: 'var(--ds-text)' }}>
+                <div data-header style={{ position: 'sticky', top: 0, zIndex: 'var(--layer-card)', padding: 'var(--pad-y-md) var(--pad-x-md)', background: 'var(--ds-surface)', font: 'var(--heading-xs)', boxShadow: shadow, color: 'var(--ds-text)' }}>
                     Sessions
                 </div>
                 {Array.from({ length: 12 }, (_, i) => (

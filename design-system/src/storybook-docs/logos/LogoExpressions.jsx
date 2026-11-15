@@ -6,11 +6,11 @@ import { Logo } from '@/components';
 // the wordmark starts a quarter-mark gap after it, so they take the size in px.
 const LOCKUP_SIZE = 64;
 
-const label = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const label = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 const tag = {
     alignSelf: 'flex-start',
-    font: 'var(--body-small)',
-            fontWeight: 600, // docs-literal: no weight token pairs with the body-small style
+    font: 'var(--body-sm)',
+            fontWeight: 600, // docs-literal: no weight token pairs with the body-sm style
     color: 'var(--ds-text-inverse)',
     background: 'var(--ds-background-neutral-bold)',
     borderRadius: 'var(--radius-full)',
@@ -40,8 +40,8 @@ const Bracket = ({ children, style }) => (
             justifyContent: 'center',
             borderBottom: 'var(--border-width-default) solid var(--ds-border-bold)',
             paddingBottom: 'var(--stack-sm)',
-            font: 'var(--body-small)',
-            fontWeight: 600, // docs-literal: no weight token pairs with the body-small style
+            font: 'var(--body-sm)',
+            fontWeight: 600, // docs-literal: no weight token pairs with the body-sm style
             color: 'var(--ds-text)',
             ...style,
         }}

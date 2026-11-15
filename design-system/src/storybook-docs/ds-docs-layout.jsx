@@ -318,7 +318,7 @@ export function DoDontCaption({ tone, children, style }) {
                     flex: 1,
                 }}
             >
-                <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>
+                <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
                     {isDo ? 'Do' : "Don't"}
                 </strong>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>

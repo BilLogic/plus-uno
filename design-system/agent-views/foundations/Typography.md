@@ -15,7 +15,7 @@ PLUS uses Noto Serif (500) for headings 20 to 32, Noto Sans for headings 12 to 1
 ```css
 font: var(--heading-md);
 font: var(--body-default);
-font: var(--metric-large);
+font: var(--metric-lg);
 ```
 
 Figma holds `Heading/*`, `Body/*`, `Metric/*` and `Code/default`, bound to the typography variables (Tokens: Typography).
@@ -58,7 +58,7 @@ Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`
 
 ### Text-style classes
 
-Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxsmall`, `.body-large`, `.body-default`, `.body-small`, `.metric-large` to `.metric-small`), which set `font` and tracking together. Component stylesheets use `font: var(--…)` directly.
+Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and tracking together. Component stylesheets use `font: var(--…)` directly.
 
 ```jsx
 <p className="body-default">Helper text</p>

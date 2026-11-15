@@ -138,7 +138,7 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 | `--ds-surface-raised`, `--ds-shadow-raised` | color pair | The card at rest. |
 | `--ds-surface-raised-hovered`, `--ds-surface-raised-pressed` | color | A clickable card while hovered and pressed. |
 | `--ds-surface-overlay`, `--ds-shadow-overlay` | color pair | A dragged card, and the hover lift's shadow. |
-| `--heading-xsmall`, `--body-default` | type | The regular title and the description. |
+| `--heading-xs`, `--body-default` | type | The regular title and the description. |
 | `--heading-md` | type | The title beside a half-width side image. |
 | `--ds-text`, `--ds-text-subtle` | color | The title and the description. |
 

@@ -103,7 +103,7 @@ export const TypeCard = ({ of, thumb, hero, title, stage = TYPE_STAGE, to, thumb
             )}
         </div>
         <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)' }}>
-            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>
+            <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
                 {to ? <a href={`?path=/docs/${to}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{title}</a> : title}
             </span>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{children}</span>
@@ -300,7 +300,7 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                                 borderRadius: 'var(--radius-full)',
                                 background: 'var(--ds-background-brand-bold)',
                                 color: 'var(--ds-text-inverse)',
-                                font: 'var(--body-small)',
+                                font: 'var(--body-sm)',
                                 fontWeight: 'var(--type-weight-semibold)',
                             }}
                         >
@@ -356,7 +356,7 @@ export const BrowserWindow = ({ address = 'app.plus.org', height, fill = false, 
                     <span key={i} style={{ inlineSize: 'var(--space-075)', blockSize: 'var(--space-075)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)' }} />
                 ))}
             </span>
-            <span style={{ flex: '1 1 auto', padding: 'var(--space-025) var(--space-100)', borderRadius: 'var(--radius-full)', background: 'var(--ds-surface)', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+            <span style={{ flex: '1 1 auto', padding: 'var(--space-025) var(--space-100)', borderRadius: 'var(--radius-full)', background: 'var(--ds-surface)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                 {address}
             </span>
         </div>

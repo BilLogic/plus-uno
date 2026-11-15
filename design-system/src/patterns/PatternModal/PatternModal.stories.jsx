@@ -179,7 +179,7 @@ const fields = (rows) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         {rows.map(([label, value]) => (
             <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{label}</span>
+                <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{label}</span>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{value}</span>
             </div>
         ))}

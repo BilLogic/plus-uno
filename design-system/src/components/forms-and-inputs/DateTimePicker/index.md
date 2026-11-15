@@ -184,7 +184,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-medium`
+`--body-default` · `--body-sm` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.scss`. Override these through the token layer, never with a literal.
 

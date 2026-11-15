@@ -50,7 +50,7 @@ const stale = (constant, message) => staleExceptions.push(`${constant}: ${messag
  * A name as a token: `Social-Emotional` -> `social-emotional`,
  * `Spacing/Small/space-000` -> `spacing-small-space-000`.
  */
-const slug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-').replace(/^heading-(xxlarge|xlarge|large|medium|small)(?=-|$)/, (_, size) => `heading-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm' })[size]}`);
+const slug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-').replace(/^(heading|body|metric)-(xxlarge|xlarge|large|medium|small|xsmall|xxsmall)(?=-|$)/, (_, family, size) => `${family}-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm', xsmall: 'xs', xxsmall: 'xxs' })[size]}`);
 
 /**
  * A Figma color ({r, g, b, a} in 0–1) as CSS: `#rrggbb` when opaque, `rgba()`

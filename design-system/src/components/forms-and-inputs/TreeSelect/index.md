@@ -126,7 +126,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Height | 40: `--height-250`. Compact 32: `--control-md`. |
 | Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
-| Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
+| Label and caption | `--body-sm`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
 | Tree panel | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | Row | `--control-md` high; hovered `--ds-background-neutral-subtle-hovered`, picked `--ds-background-selected` with `--ds-text-selected`; the expand toggle `--ds-icon-subtle`. |
 

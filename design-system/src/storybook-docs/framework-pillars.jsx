@@ -42,7 +42,7 @@ const lede = { margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' };
 
 const Pillar = ({ name, axis, promise }) => (
     <article style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', margin: 0 }}>
-        <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>{axis}</span>
+        <span style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' }}>{axis}</span>
         <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>{name}</h3>
         <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{promise}</p>
     </article>
@@ -55,7 +55,7 @@ export const FrameworkPillars = () => (
             <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{VILLAGE}</p>
             <p style={lede}>{PROMISE}</p>
         </div>
-        <p style={{ margin: 0, font: 'var(--body-large)', color: 'var(--ds-text)' }}>
+        <p style={{ margin: 0, font: 'var(--body-lg)', color: 'var(--ds-text)' }}>
             Our design strategy prompts productivity, learning, uplift and simplicity.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--section-stack-lg) var(--section-stack-md)' }}>
