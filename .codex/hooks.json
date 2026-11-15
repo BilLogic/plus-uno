@@ -5,19 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .cursor/hooks/uno-prototype/claude-code-run.mjs",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "AskUserQuestion",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .cursor/hooks/uno-prototype/claude-code-answer.mjs",
+            "command": "node .cursor/hooks/uno-prototype/run.mjs",
             "timeout": 10
           }
         ]

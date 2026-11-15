@@ -2,14 +2,13 @@
 name: uno-prototype
 description: >
   Turns a PRD or direction into a design artifact at a chosen fidelity —
-  grounds the brief against uno-blueprint, then either engineers prompt-specs
-  for external generative tools (low/mid fidelity) or builds hi-fi directly on
-  the design system in the prototypes. Use when the user says "prototype this",
-  "sketch the flow", "map the data flow", "generate a draft to validate",
-  "build this PRD", "scaffold a prototype", "implement this Figma design",
-  or has an approved requirement and needs a reviewable artifact. Not for
-  critique (uno-review), sharing/handoff (uno-publish), or writing the PRD
-  itself (uno-synthesize).
+  grounds the brief against uno-blueprint, sets the five fidelity dimensions
+  (Visual, Interaction, Breadth, Depth, Data/Content), then routes to the
+  matching deliverable: flow map, wireframe, concept image, storyboard, static
+  hi-fi mockup in Figma, interactive prompt-spec, or coded build on the design
+  system. Use when the user invokes /uno-prototype or has an approved
+  requirement and needs a reviewable artifact. Not for critique (uno-review),
+  sharing/handoff (uno-publish), or writing the PRD itself (uno-synthesize).
 argument-hint: "[prd-required] [fidelity]"
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__figma-plus__*, mcp__figma-parsnip__*, mcp__notion-plus__*
 embodiment: ide

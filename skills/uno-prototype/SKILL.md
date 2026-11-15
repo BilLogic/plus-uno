@@ -2,14 +2,13 @@
 name: uno-prototype
 description: >
   Turns a PRD or direction into a design artifact at a chosen fidelity —
-  grounds the brief against uno-blueprint, then either engineers prompt-specs
-  for external generative tools (low/mid fidelity) or builds hi-fi directly on
-  the design system in the prototypes. Use when the user says "prototype this",
-  "sketch the flow", "map the data flow", "generate a draft to validate",
-  "build this PRD", "scaffold a prototype", "implement this Figma design",
-  or has an approved requirement and needs a reviewable artifact. Not for
-  critique (uno-review), sharing/handoff (uno-publish), or writing the PRD
-  itself (uno-synthesize).
+  grounds the brief against uno-blueprint, sets the five fidelity dimensions
+  (Visual, Interaction, Breadth, Depth, Data/Content), then routes to the
+  matching deliverable: flow map, wireframe, concept image, storyboard, static
+  hi-fi mockup in Figma, interactive prompt-spec, or coded build on the design
+  system. Use when the user invokes /uno-prototype or has an approved
+  requirement and needs a reviewable artifact. Not for critique (uno-review),
+  sharing/handoff (uno-publish), or writing the PRD itself (uno-synthesize).
 argument-hint: "[prd-required] [fidelity]"
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__figma-plus__*, mcp__figma-parsnip__*, mcp__notion-plus__*
 embodiment: ide
@@ -41,16 +40,18 @@ work — the designer's manual path carries no skill; it re-joins at review.
 
 ## The workflow
 
-1. **Gate + interview** — PRD check, then the 8-question intake ending in a
-   confirmed **brief card** (goal · artifact · fidelity dials · won't-include).
-   The card is the contract for everything after.
+1. **Gate + interview** — eight steps across four questions (`references/intake.md`
+   and `.cursor/hooks/uno-prototype/intake-steps.json`): PRD check + PRD paste,
+   then Q1 (goal and audience), Q2 (designer's own words), Q3 (the five fidelity
+   dials → suggested deliverable), Q4 (won't-include), and brief confirmation.
+   Ends in a confirmed **brief card** — the contract for everything after.
 2. **Understand** — ground via writers/blueprint + researchers/explorer
    (method §1), summarize the PRD back; recommend nothing yet.
-3. **Deliver** — the confirmed artifact selects ONE deliverable doc (table
-   below); plan, produce, validate per that doc.
+3. **Deliver** — the five fidelity dials select the deliverable and its ONE
+   reference doc (table below); plan, produce, validate per that doc.
 4. **Exit** — ds-lens pass · one-line manifest · hand to `skills/uno-review`
-   (method §5). Iteration or a failed review re-enters at the reflection, not
-   at "fix the artifact".
+   (method §5). Iteration or a failed review re-enters at the reflection
+   (`reflect_learn`), not at "fix the artifact".
 
 Always optimize for **learning, not completeness**: the successful prototype is
 the smallest artifact that lets the designer confidently answer their current
@@ -58,37 +59,43 @@ design question. Help the designer reduce scope, not grow it.
 
 ## Deliverables & routing
 
-The designer chooses; UNO routes — no gold-plating past the ask.
+The five fidelity dimensions (`Visual`, `Interaction`, `Breadth`, `Depth`,
+`Data/Content`) choose the deliverable; UNO routes without gold-plating past the
+dials. **Rule: only Interaction high or Data/Content high sends work to a coded
+build; high Visual with none–low Interaction routes to the static hi-fi mockup
+in Figma on DS components, not a coded build.**
 
-| Confirmed artifact | Mode | Load |
-|---|---|---|
-| user flow · journey map · data-flow map | spec → FigJam / Stitch | `references/deliverables/flow-map.md` |
-| wireframe · static mockup | ASCII in-chat · Figma MCP · spec → Stitch / Figma Make | `references/deliverables/wireframe.md` |
-| concept image | spec → GPT / Gemini image gen | `references/deliverables/concept-image.md` |
-| storyboard | spec → sequenced image prompts + captions | `references/deliverables/storyboard.md` |
-| interactive · functional prototype | spec → Claude design / Figma Make / Stitch / v0 / AI Studio | `references/deliverables/interactive.md` |
-| hi-fi build (approved PRD, settled direction) | UNO builds on the DS in `prototypes/`, or outside this repo with the `@plus-uno/cli` registry | `references/deliverables/coded-build.md` |
+| Visual | Interaction | Breadth | Depth | Data | Deliverable, tool | Load |
+|---|---|---|---|---|---|---|
+| any | none | wide | shallow | none | Flow map (user flow · journey map · data-flow map), FigJam / Stitch | `references/deliverables/flow-map.md` |
+| low | none–low | few screens | low | low | ASCII wireframe, in chat | `references/deliverables/wireframe.md` |
+| low–mid | none | few screens | low | low–mid | Figma wireframe, Figma MCP | `references/deliverables/wireframe.md` |
+| high | none | one moment / a sequence | none | — | Concept image / storyboard, image generation | `references/deliverables/concept-image.md` · `references/deliverables/storyboard.md` |
+| high | none–low | few screens | low | mid–high | **Static hi-fi mockup, Figma MCP on DS components** | `references/deliverables/static-mockup.md` |
+| low–mid | mid–high | narrow | mid | low–mid | Interactive / functional prototype, Figma Make / Stitch / v0 / Claude design | `references/deliverables/interactive.md` |
+| any | high | any | high or Data high | | Coded build on the design system, `prototypes/` (or `@plus-uno/cli`) | `references/deliverables/coded-build.md` |
 
 WIP ladder: flow map → ASCII → concept image / storyboard → Figma wireframe →
-interactive → coded build. Each rung optional; WIP artifacts exist to converge
-cheaply before the next rung.
+static hi-fi mockup → interactive → coded build. Each rung optional; WIP
+artifacts exist to converge cheaply before the next rung.
 
 ## Load table
 
 | Moment | Load |
 |---|---|
 | Always, on invocation | `references/method.md` (the shared core) |
-| A prototype run starts | `references/intake.md` (the interview + fidelity dials) |
-| Brief card confirmed | the ONE deliverable doc the artifact selects (table above) |
-| Figma design input | `design-system/guidelines/figma/registry-load-gate.md` (MANDATORY, registries first) → `design-system/guidelines/figma/mcp-guide.md` |
+| A prototype run starts | `references/intake.md` + `.cursor/hooks/uno-prototype/intake-steps.json` (the 8-step, 4-question interview + five fidelity dials) |
+| Brief card confirmed | the ONE deliverable doc the confirmed deliverable selects (table above) |
+| Figma design input or static hi-fi mockup | `design-system/guidelines/figma/registry-load-gate.md` (MANDATORY, registries first) → `design-system/guidelines/figma/mcp-guide.md` |
 | Building UI (components/tokens) | DS agent-views per **AGENTS.md § Progressive loading**; estate conventions per **AGENTS.md § The loading contract** |
 
 ## Constraints
 
-- **The intake owns its eight steps** (`references/intake.md`) — one question
-  per message, never skipped, never batched; ends only at the confirmed brief
-  card. The "do you have a Figma file?" question belongs to the coded-build
-  doc, asked right before generation.
+- **The intake owns its eight steps and four questions** (`references/intake.md`,
+  `.cursor/hooks/uno-prototype/intake-steps.json`) — one step per message, never
+  skipped, never batched; ends only at the confirmed brief card. The "do you
+  have a Figma file?" question belongs to the coded-build doc, asked right
+  before generation.
 - **PRD gate is never skipped** (method §0). Exit the hook with
   `terminate this process` / `skip PRD upload` — that releases the workflow,
   it does not grant a PRD bypass.
@@ -97,15 +104,15 @@ cheaply before the next rung.
 - **Generate only after the brief and plan are confirmed**, and stay within
   the agreed scope — never expand it because the PRD lists more.
 - **The deliverable doc is not optional.** Planning, spec-writing or building
-  without loading the one the confirmed artifact selects is a defect — it
+  without loading the one the confirmed deliverable selects is a defect — it
   carries rules that exist nowhere else. If you cannot name the doc you loaded,
   stop and load it.
 - External-tool routes: the output is the prompt-spec, never the generated
   artifact. Direct production is sanctioned only where UNO holds the medium
   (in-chat ASCII, or a gated MCP writer — Figma, image gen); each deliverable
   doc names its own routes.
-- Hi-fi: `AGENTS.md` § Hard rules apply in full, and `check:ds-usage` is their
-  gate at exit (`references/deliverables/coded-build.md`).
+- Hi-fi coded builds: `AGENTS.md` § Hard rules apply in full, and
+  `check:ds-usage` is their gate at exit (`references/deliverables/coded-build.md`).
 - This skill builds; it does not judge (uno-review), share (uno-publish), or
   change the DS library (uno-maintain).
 - New packages, Figma writes, and blueprint writes require explicit approval

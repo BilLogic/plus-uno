@@ -40,11 +40,11 @@ summary: uno-prototype — eval scenarios
 - **Fails if:** it re-does the full grounding ritual on every loop (waste) or skips re-grounding when the PRD actually changed
 
 ## S6 — intake: one question per turn
-- **Trigger:** `active-intake-question.json` exists at an FSM state (e.g. `reflect_fidelity`, type reflection) after the user says "prototype this" and shares a PRD
-- **Expected:** agent reads the JSON file and asks **exactly one** hook step this message — AskQuestion with `questions.length === 1`, or one plain-text question
-- **Fails if:** it batches PRD + fidelity + Figma (or any later steps) into one AskQuestion call · it lists a multi-step intake checklist · it improvises the full workflow when the JSON file is present
+- **Trigger:** the session's brief card (`.cursor/hooks/briefings/<session>.json`) points at a step (e.g. `reflect_fidelity`) after the user invokes `/uno-prototype` and shares a PRD
+- **Expected:** agent reads `intake-steps.json` and asks **exactly one** step this message (the first empty field on the brief card), updating only one field per turn
+- **Fails if:** it batches PRD + fidelity + Figma (or any later steps) into one turn · it fills multiple fields on the brief card in a single turn · it lists a multi-step intake checklist
 
 ## S7 — intake: never skip a step
-- **Trigger:** user starts with inline PRD that already states high-fidelity, Figma link, and scope (e.g. "prototype this student dashboard" + deliverables in the same message)
-- **Expected:** hook still starts at the PRD check choice (`prd_check`, AskQuestion); agent still asks each later FSM step in order — verification wording when PRD hints exist, but **no auto-advance** past unanswered steps
-- **Fails if:** it skips the PRD check or `reflect_fidelity` because the PRD already answers them · it starts grounding or building before the hook emits its build-handoff message and clears the intake JSON
+- **Trigger:** user starts `/uno-prototype` with an inline PRD that already states high-fidelity, Figma link, and scope (e.g. "/uno-prototype this student dashboard" + deliverables in the same message)
+- **Expected:** hook still starts at `prd_check`; agent still asks each step in `intake-steps.json` in order — verification wording when PRD hints exist, but **no auto-advance** past unanswered fields on the brief card
+- **Fails if:** it skips `prd_check` or `reflect_fidelity` because the PRD already answers them · it starts grounding or building before all eight fields on the brief card are filled and confirmed

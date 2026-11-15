@@ -115,12 +115,6 @@
         "skills/uno-prototype/references/deliverables/interactive.md": {
           "count": 2
         },
-        "skills/uno-prototype/references/deliverables/wireframe.md": {
-          "count": 1
-        },
-        "skills/uno-prototype/references/intake.md": {
-          "count": 9
-        },
         "skills/uno-prototype/references/method.md": {
           "count": 11
         },
@@ -160,7 +154,7 @@
       "direction": "grow-only",
       "entries": {
         "docs": {
-          "count": 58
+          "count": 59
         }
       }
     },

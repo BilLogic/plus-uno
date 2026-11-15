@@ -14,23 +14,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/uno-prototype/claude-code-run.mjs\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/uno-prototype/run.mjs\"",
             "timeout": 10
           }
         ]
       }
     ],
     "PostToolUse": [
-      {
-        "matcher": "AskUserQuestion",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/uno-prototype/claude-code-answer.mjs\"",
-            "timeout": 10
-          }
-        ]
-      },
       {
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
@@ -47,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/uno-prototype/session-end.mjs\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/uno-prototype/run.mjs\" --session-end",
             "timeout": 5
           }
         ]
