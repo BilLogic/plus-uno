@@ -1,0 +1,39 @@
+// The illustration slot of a choice tile (Radio and Checkbox, `appearance="tile"`).
+// Shared so the two tiles cannot drift.
+@mixin illustration-slot {
+    // A character's line art reaches past its 1000-unit frame (characters.js:
+    // the largest overhangs, all from `dot`, are 0.60 right, 0.33 left, 0.14 top
+    // and 0.50 bottom). Centered, the art spans at most 1 + 2 * 0.60 frames, so
+    // the frame takes 1 / 2.2 = 45% of the slot. The margins are percentages of
+    // the slot's width: 0.14 * 45% = 7% above, 0.50 * 45% = 23% below.
+    --_tile-frame-share: 45%;
+    --_tile-overhang-top: 7%;
+    --_tile-overhang-bottom: 23%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--stack-sm);
+    inline-size: 100%;
+    min-inline-size: 0;
+
+    // Whatever fills the slot (img, svg, Illustration or any node) scales down
+    // to the slot's width and keeps its ratio; it never grows past it.
+    > * {
+        max-inline-size: 100%;
+        min-inline-size: 0;
+        flex: 0 1 auto;
+    }
+
+    > img,
+    > svg,
+    > video {
+        block-size: auto;
+        object-fit: contain;
+    }
+
+    > .plus-illustration {
+        max-inline-size: var(--_tile-frame-share);
+        margin-block: var(--_tile-overhang-top) var(--_tile-overhang-bottom);
+    }
+}

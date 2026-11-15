@@ -2301,7 +2301,8 @@
         "Required",
         "Description",
         "Card",
-        "Tile"
+        "Tile",
+        "TileNarrowLargeIllustrations"
       ],
       "tokens": [
         "--body-default",
@@ -6342,7 +6343,8 @@
         "Pi",
         "Equal",
         "Divider",
-        "Interactive"
+        "Interactive",
+        "WidthCappedStaysSquare"
       ],
       "tokens": [
         "--ds-background-accent-blue-subtle",
@@ -11162,7 +11164,8 @@
         "Disabled",
         "DisabledWithReason",
         "Required",
-        "Tile"
+        "Tile",
+        "TileNarrowLargeIllustrations"
       ],
       "tokens": [
         "--body-default",
