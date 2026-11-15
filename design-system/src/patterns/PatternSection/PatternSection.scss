@@ -125,6 +125,10 @@
 /* Body */
 .plus-pattern-section-content {
     min-width: 0;
+}
+
+/* Inside a Modal, body text sets in Body/default and the last paragraph keeps no trailing margin. */
+:is(.plus-modal, .plus-pattern-modal) .plus-pattern-section-content {
     font: var(--body-default);
 
     > p:last-child {

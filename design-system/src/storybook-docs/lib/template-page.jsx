@@ -274,7 +274,8 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
             style={{ margin: 0, position: 'relative', paddingInline: GUTTER, paddingBlockStart: parts.some((p) => p.side === 'top') ? GUTTER : 0 }}
         >
             <div ref={box} style={{ position: 'relative' }}>
-                <MotionPreferenceContext.Provider value>
+                {/* Anatomy figures render with reduced motion. */}
+                <MotionPreferenceContext.Provider value={true}>
                     <ScaledStory width={width}>{children}</ScaledStory>
                 </MotionPreferenceContext.Provider>
                 {marks.map((m, i) => m && (

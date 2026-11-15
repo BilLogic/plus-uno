@@ -82,7 +82,7 @@ Space owned by a pattern: page, section, card, table, modal, popup. Inside a pat
 --modal-radius  /* Corner rounding of a Modal. */
 --modal-width-lg  /* Width of a large Modal, such as a table or a long form. */
 --modal-width-md  /* Width of a default Modal, such as a short form. */
---modal-width-sm  /* Width of a small Modal, such as a confirmation. */
+--modal-width-sm  /* Width of a small Modal, such as a single question or a one-field form. */
 --modal-width-xs  /* Width of a compact Modal, such as a confirmation. */
 --page-border-width  /* Width of the edge drawn around a Page frame. */
 --page-pad-x-compact  /* Horizontal padding of a Page with compact spacing. */
