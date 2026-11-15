@@ -23,13 +23,17 @@
 // Run: npm run generate:storybook-docs  (`-- --check` to compare only)
 
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { dirname, posix, resolve } from "node:path";
+import { dirname, join, posix, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { isEntry, main as runMain } from "../../../scripts/lib/findings.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(process.env.PLUS_UNO_ROOT ?? resolve(HERE, "../../.."));
 const REGISTRY = "design-system/figma/component-registry.json";
-const OUT = "agents/uno-bot/src/generated/storybook-docs.ts";
+export const STORYBOOK_DOCS_PATH = "agents/uno-bot/src/generated/storybook-docs.ts";
+const OUT = STORYBOOK_DOCS_PATH;
+const NORM = (text) => text.replace(/\r\n/g, "\n");
 
 /**
  * The map's entries, sorted by key: `[path prefix, component name, Storybook id]`.
@@ -68,22 +72,35 @@ export function renderStorybookDocs(entries) {
   );
 }
 
-function main() {
-  const check = process.argv.includes("--check");
-  const registry = JSON.parse(readFileSync(resolve(ROOT, REGISTRY), "utf8"));
-  const text = renderStorybookDocs(storybookDocEntries(registry));
-  const out = resolve(ROOT, OUT);
-  const committed = existsSync(out) ? readFileSync(out, "utf8") : null;
-  if (check) {
-    if (committed !== text) {
-      console.error(`${OUT} is stale: run npm run generate:storybook-docs`);
-      process.exit(1);
-    }
-    console.log(`${OUT} is current`);
-    return;
-  }
-  if (committed !== text) writeFileSync(out, text, "utf8");
-  console.log(`${OUT}: ${text === committed ? "unchanged" : "written"}`);
+/** @returns {{path: string, content: string}[]} the rendered Storybook docs map, without writing */
+export function artifacts(repoRoot = ROOT) {
+  const registry = JSON.parse(readFileSync(resolve(repoRoot, REGISTRY), "utf8"));
+  return [{ path: OUT, content: renderStorybookDocs(storybookDocEntries(registry)) }];
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+/** The drift check. Reports and never writes. */
+export function run({ repoRoot = ROOT } = {}) {
+  return artifacts(repoRoot)
+    .filter(({ path, content }) => {
+      const abs = join(repoRoot, path);
+      return !existsSync(abs) || NORM(readFileSync(abs, "utf8")) !== content;
+    })
+    .map(({ path }) => ({
+      file: path,
+      message: "is stale or missing — run: npm --prefix agents/uno-bot run generate:storybook-docs",
+    }));
+}
+
+export const summary = () => `${OUT} matches ${REGISTRY}`;
+
+if (isEntry(import.meta.url)) {
+  if (process.argv.includes("--check")) {
+    runMain(import.meta.url, "check:storybook-docs", { run, summary });
+  } else {
+    const [{ content: text }] = artifacts(ROOT);
+    const out = resolve(ROOT, OUT);
+    const committed = existsSync(out) ? readFileSync(out, "utf8") : null;
+    if (committed !== text) writeFileSync(out, text, "utf8");
+    console.log(`${OUT}: ${text === committed ? "unchanged" : "written"}`);
+  }
+}

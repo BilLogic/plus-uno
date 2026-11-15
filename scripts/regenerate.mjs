@@ -50,6 +50,7 @@ const GENERATORS = [
   'npm run generate:component-barrel',
   'npm run generate:figma-links',
   'npm run generate:icon-lists',
+  'npm run generate:brand-image',
   'npm run generate:knowledge-components',
   'npm run generate:index',
   'npm run generate:color-tokens',
@@ -60,8 +61,12 @@ const GENERATORS = [
   'npm run generate:check-registry',
 ];
 
-/** `agents/uno-bot`'s harness bundle, run from its own package so its own deps resolve. */
+/** `agents/uno-bot`'s generated maps and harness bundle. */
 const BOT_DIR = path.join(REPO_ROOT, 'agents/uno-bot');
+const BOT_GENERATORS = [
+  { cwd: BOT_DIR, command: 'npm run generate:storybook-docs' },
+  { cwd: BOT_DIR, command: 'npm run generate:ds-facts' },
+];
 const BUNDLE_HARNESS = { cwd: BOT_DIR, command: 'npm run bundle:harness' };
 
 /** Every ratchet this repo can regenerate on its own; a record kept by hand has no `update`. */
@@ -76,6 +81,7 @@ function step(command, { cwd = REPO_ROOT } = {}) {
 function main() {
   const steps = [
     ...GENERATORS.map((command) => ({ command })),
+    ...BOT_GENERATORS,
     fs.existsSync(path.join(BOT_DIR, 'node_modules'))
       ? { command: BUNDLE_HARNESS.command, cwd: BOT_DIR }
       : null,
