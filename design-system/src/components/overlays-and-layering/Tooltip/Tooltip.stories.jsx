@@ -31,13 +31,7 @@ export default {
             control: false,
             table: { disable: true, category: 'Development' }
         },
-        delay: {
-            table: { disable: true, category: 'Development' }
-        },
         delayShow: {
-            table: { disable: true, category: 'Development' }
-        },
-        flip: {
             table: { disable: true, category: 'Development' }
         }
     },
