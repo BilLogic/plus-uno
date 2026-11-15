@@ -213,19 +213,4 @@ $btn-appearances: (
             --plus-spinner-size: var(--icon-md);
         }
     }
-
-    // --- VERTICAL LAYOUT ---
-    // Vertical button: one size, 64 by 64, the icon stacked over the label.
-    &.plus-btn--vertical {
-        width: var(--button-size-vertical);
-        height: var(--button-size-vertical);
-        padding: var(--pad-y-sm) var(--pad-x-xs);
-        flex-direction: column;
-        gap: var(--inline-sm);
-
-        .plus-btn-text {
-            font: var(--body-sm);
-            font-weight: var(--type-weight-medium);
-        }
-    }
 }

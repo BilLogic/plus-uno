@@ -894,13 +894,6 @@
           }
         },
         {
-          "name": "Button/size-vertical",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--button-size-vertical)"
-          }
-        },
-        {
           "name": "Option/row-indent-step",
           "resolvedType": "FLOAT",
           "codeSyntax": {

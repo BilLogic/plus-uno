@@ -569,24 +569,6 @@
         },
         "TreeSelect value": {
           "count": 1
-        },
-        "VerticalButton appearance": {
-          "count": 1
-        },
-        "VerticalButton className": {
-          "count": 1
-        },
-        "VerticalButton isDisabled": {
-          "count": 1
-        },
-        "VerticalButton isLoading": {
-          "count": 1
-        },
-        "VerticalButton isSelected": {
-          "count": 1
-        },
-        "VerticalButton onClick": {
-          "count": 1
         }
       }
     }

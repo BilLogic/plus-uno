@@ -358,7 +358,6 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Checklist', new: '--checklist-action-min-width', old: null, ref: 'var(--size-750)', note: '120px floor', use: 'Narrowest a checklist card\'s trailing action column may shrink.' },
 
   // ─── Components / sizes once written with primitives ─────────────────
-  { tier: 'components', group: 'Button', new: '--button-size-vertical', old: null, ref: 'var(--space-400)', use: 'Height of a Button laid out vertically, with its icon above its label.' },
   { tier: 'components', group: 'Option row', new: '--option-row-indent-step', old: null, ref: 'var(--space-125)', use: 'Indent added for each level of a nested option row.' },
   { tier: 'components', group: 'Option row', new: '--option-row-control-gap', old: null, ref: 'var(--space-0625)', use: 'Horizontal gap between an option row\'s control and its label.' },
   { tier: 'components', group: 'Option row', new: '--option-row-dot-size', old: null, ref: 'var(--space-050)', use: 'Size of the dot in an option row, such as a radio\'s selected mark.' },

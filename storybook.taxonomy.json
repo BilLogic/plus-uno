@@ -22,7 +22,6 @@
       "Filter button",
       "Button group",
       "Close button",
-      "Vertical button",
       "Calendar",
       "Checkbox",
       "Checkbox group",
@@ -247,8 +246,7 @@
           "Split button",
           "Filter button",
           "Button group",
-          "Close button",
-          "Vertical button"
+          "Close button"
         ],
         "Calendar",
         "Checkbox",

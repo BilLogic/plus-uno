@@ -12,7 +12,7 @@ import path from 'node:path';
 const root = path.resolve(__dirname, '../..');
 const read = (rel) => fs.readFileSync(path.join(root, rel), 'utf8');
 
-const BUTTONS = ['Button', 'ButtonGroup', 'CloseButton', 'FilterButton', 'IconButton', 'LinkButton', 'LinkIconButton', 'SplitButton', 'VerticalButton'].map(
+const BUTTONS = ['Button', 'ButtonGroup', 'CloseButton', 'FilterButton', 'IconButton', 'LinkButton', 'LinkIconButton', 'SplitButton'].map(
   (name) => `design-system/src/components/forms-and-inputs/${name}/${name}.mdx`,
 );
 
@@ -94,5 +94,15 @@ describe('generated docs blocks', () => {
   it('canvases default to code behind a Show code button', () => {
     const preview = read('.storybook/preview.jsx');
     expect(preview).toMatch(/canvas:\s*\{\s*(?:\/\/[^\n]*\n\s*)*sourceState:\s*'hidden'/);
+  });
+
+  it('retired vertical button is removed and ButtonGroup points to ChoiceGrid instead', () => {
+    const retired = ['Vertical', 'Button'].join('');
+    expect(fs.existsSync(path.join(root, `design-system/src/components/forms-and-inputs/${retired}`))).toBe(false);
+    expect(read('design-system/src/components/index.js')).not.toContain(retired);
+    expect(read('design-system/src/components/forms-and-inputs/Button/Button.scss')).not.toMatch(/plus-btn--vertical|--button-size-[v]ertical/);
+    const buttonGroup = read('design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.mdx');
+    expect(buttonGroup).not.toContain(retired);
+    expect(buttonGroup).toMatch(/`ChoiceGrid`/);
   });
 });

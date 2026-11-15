@@ -253,8 +253,7 @@ const preview = {
                 "Split button",
                 "Filter button",
                 "Button group",
-                "Close button",
-                "Vertical button"
+                "Close button"
               ],
               "Calendar",
               "Checkbox",
@@ -348,7 +347,7 @@ const preview = {
               "Empty state",
               "Flag",
               "Inline message",
-              "Modal",
+              "Modal dialog",
               "Notification item",
               "Section message",
               "Spotlight"

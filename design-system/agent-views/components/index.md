@@ -84,7 +84,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 | Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
 | AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
-## UI components (91)
+## UI components (90)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
@@ -175,7 +175,6 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 - [Toggle](../../src/components/forms-and-inputs/Toggle/index.md)
 - [Tooltip](../../src/components/overlays-and-layering/Tooltip/index.md)
 - [TreeSelect](../../src/components/forms-and-inputs/TreeSelect/index.md)
-- [VerticalButton](../../src/components/forms-and-inputs/VerticalButton/index.md)
 - [VisuallyHidden](../../src/components/text-and-data-display/VisuallyHidden/index.md)
 
 ## Before you finish
