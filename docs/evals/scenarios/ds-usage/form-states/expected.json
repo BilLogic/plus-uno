@@ -1,0 +1,76 @@
+{
+  "task": "form-states",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/form-states/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "availability-form",
+      "screen": "Add availability form",
+      "template": "Page + Form",
+      "variant": "Page · Default / Form · On a Page",
+      "page": "design-system/agent-views/templates/Form.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Page/index.md",
+        "design-system/agent-views/templates/Form.md"
+      ],
+      "guides": ["page", "form", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["Page", "PatternSection", "PatternCard"]
+      },
+      "expectation": "Form hosted on a Page, PatternSection, or PatternCard template with stacked fields and footer actions."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "forms",
+      "pattern": "Forms",
+      "variant": "On a Page · Single-column fields + inline validation",
+      "page": "design-system/agent-views/patterns/Forms.md",
+      "section": "Validation",
+      "guide": "forms",
+      "scoring": "judge",
+      "expectation": "Day of week, start/end time, session format (Online / In person), and optional 200-char note use PLUS form controls with inline field error messages on invalid save."
+    },
+    {
+      "id": "disabled",
+      "pattern": "Disabled",
+      "variant": "Submit disabled until required fields filled",
+      "page": "design-system/agent-views/patterns/Disabled.md",
+      "section": "The four answers",
+      "guide": "disabled",
+      "aliases": ["unavailable", "tooltip on disabled"],
+      "scoring": "judge",
+      "expectation": "Save action is disabled until required fields are filled and explains or indicates why."
+    },
+    {
+      "id": "notifications",
+      "pattern": "Notifications",
+      "variant": "Save confirmation",
+      "page": "design-system/agent-views/patterns/Notifications.md",
+      "section": "The carriers",
+      "guide": "notifications",
+      "aliases": ["toast", "banner", "alert"],
+      "scoring": "judge",
+      "expectation": "Valid save surfaces a confirmation Flag or Banner and clears the form."
+    }
+  ],
+  "required_placements": [],
+  "against_placements": [
+    {
+      "id": "banner-above-or-flush-page-header",
+      "placement": "Banner above or flush against PageHeader",
+      "page": "design-system/agent-views/patterns/Notifications.md",
+      "section": "Banner tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-banner-before-header"
+      },
+      "expectation": "Counts against: placing Banner before PageHeader or flush against PageHeader."
+    }
+  ]
+}

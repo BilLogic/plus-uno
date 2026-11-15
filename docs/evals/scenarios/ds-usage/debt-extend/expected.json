@@ -1,0 +1,94 @@
+{
+  "task": "debt-extend",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/debt-extend/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "reviews-page",
+      "screen": "Monthly reviews list page",
+      "template": "Page + PatternSection + PatternTable",
+      "variant": "Page · Default / PatternSection · Toolbar / PatternTable",
+      "page": "design-system/src/patterns/PatternSection/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Page/index.md",
+        "design-system/src/patterns/PatternSection/index.md",
+        "design-system/src/patterns/PatternTable/index.md"
+      ],
+      "guides": ["page", "section", "table", "templates"],
+      "scoring": "judge",
+      "expectation": "Monthly reviews list brought onto PLUS Page / PatternSection structure or clean token-styled table container with status filter above the table and footer pagination."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "filtering",
+      "pattern": "Filtering",
+      "variant": "1 · Quick filters",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "guide": "filtering",
+      "aliases": ["filter", "filters"],
+      "scoring": "judge",
+      "expectation": "Status filter above the table (All, Not viewed, Viewed) uses FilterButton, Tabs or a PLUS filter control to narrow rows in place and keep the result count and Pagination synchronized."
+    },
+    {
+      "id": "empty",
+      "pattern": "Empty",
+      "variant": "No matches · In a table",
+      "page": "design-system/agent-views/patterns/Empty.md",
+      "section": "The types",
+      "guide": "empty",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["EmptyState"]
+      },
+      "expectation": "When a status filter matches no reviews, an EmptyState renders with an action to clear the filter."
+    },
+    {
+      "id": "indicators",
+      "pattern": "Indicators",
+      "variant": "Status in a row",
+      "page": "design-system/agent-views/patterns/Indicators.md",
+      "section": "The three tags",
+      "guide": "indicators",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["StatusTag", "ProgressBar"]
+      },
+      "expectation": "Each review row shows a StatusTag for Viewed / Not viewed and a ProgressBar for feedback completion."
+    }
+  ],
+  "required_placements": [
+    {
+      "id": "pagination-in-footer",
+      "placement": "Pagination in table/section footer",
+      "page": "design-system/src/patterns/PatternSection/index.md",
+      "section": "Best practices",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["Pagination"]
+      },
+      "expectation": "Pagination sits in the footer alongside the filtered 'Showing X to Y of Z results' count."
+    }
+  ],
+  "against_placements": [
+    {
+      "id": "bare-select-in-toolbar",
+      "placement": "Bare Select or PopupSelect in Section toolbar",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-bare-select-in-toolbar",
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Counts against: placing a bare Select or PopupSelect inside PatternSection's toolbar instead of FilterButton or Tabs."
+    }
+  ]
+}

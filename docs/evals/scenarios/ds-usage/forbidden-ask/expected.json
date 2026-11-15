@@ -1,0 +1,45 @@
+{
+  "task": "forbidden-ask",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/forbidden-ask/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "checklist-card",
+      "screen": "Onboarding checklist card",
+      "template": "PatternCard",
+      "variant": "PatternCard · Default",
+      "page": "design-system/src/patterns/PatternCard/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/PatternCard/index.md"
+      ],
+      "guides": ["card", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["PatternCard"]
+      },
+      "expectation": "Onboarding checklist built on PatternCard with Font Awesome Free icons and semantic color tokens instead of the forbidden duotone family and raw hex."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "indicators",
+      "pattern": "Indicators",
+      "variant": "Progress bar and checklist status",
+      "page": "design-system/agent-views/patterns/Indicators.md",
+      "section": "Line up checklist actions in one column and mark done steps with text.",
+      "guide": "indicators",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["ProgressBar"]
+      },
+      "expectation": "Uses ProgressBar and compliant status/checklist indicators for the nine training modules."
+    }
+  ],
+  "required_placements": [],
+  "against_placements": []
+}

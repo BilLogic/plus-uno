@@ -1,0 +1,104 @@
+{
+  "task": "workflow-canvas",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/workflow-canvas/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "canvas-page",
+      "screen": "Workflow editor page",
+      "template": "Frame + Page + Panel",
+      "variant": "Frame · Default / Page · Default / Panel · Details",
+      "page": "design-system/src/patterns/Frame/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Frame/index.md",
+        "design-system/src/patterns/Page/index.md",
+        "design-system/agent-views/templates/Panel.md"
+      ],
+      "guides": ["frame", "page", "panel", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["Frame", "Page"]
+      },
+      "expectation": "Full-page shell on Frame and Page hosting the local workflow canvas and toolbar, with node details inspected in a non-blocking Panel."
+    },
+    {
+      "id": "delete-node-modal",
+      "screen": "Delete node confirmation dialog",
+      "template": "PatternModal",
+      "variant": "Modal · Destructive",
+      "page": "design-system/src/patterns/PatternModal/index.md",
+      "section": "Types",
+      "pages": [
+        "design-system/src/patterns/PatternModal/index.md"
+      ],
+      "guides": ["modal"],
+      "scoring": "judge",
+      "expectation": "Confirmation Modal opened before deleting a node and its attached edges, where Cancel leaves the graph unchanged."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "common-actions",
+      "pattern": "Common actions",
+      "variant": "Destructive tiers + Undo",
+      "page": "design-system/agent-views/patterns/CommonActions.md",
+      "section": "Destructive tiers",
+      "guide": "common-actions",
+      "aliases": ["bulk", "row actions", "buttons"],
+      "scoring": "judge",
+      "expectation": "Toolbar and node actions use PLUS Button / IconButton controls, with destructive confirmation on node deletion and Undo restoring affected nodes and edges."
+    },
+    {
+      "id": "indicators",
+      "pattern": "Indicators",
+      "variant": "Type and status on a node",
+      "page": "design-system/agent-views/patterns/Indicators.md",
+      "section": "The three tags",
+      "guide": "indicators",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["StatusTag"]
+      },
+      "expectation": "Each workflow node shows its type and status using Tag / StatusTag indicators."
+    },
+    {
+      "id": "navigation",
+      "pattern": "Navigation",
+      "variant": "3 · Details Panel",
+      "page": "design-system/agent-views/patterns/Navigation.md",
+      "section": "Opening a record",
+      "guide": "navigation",
+      "aliases": ["nav"],
+      "scoring": "judge",
+      "expectation": "Selecting a node opens its details in a non-blocking Panel while keeping the selected node clearly indicated on the canvas."
+    }
+  ],
+  "required_placements": [
+    {
+      "id": "node-details-in-panel",
+      "placement": "Selected node details in Panel",
+      "page": "design-system/agent-views/templates/Panel.md",
+      "section": "Details",
+      "scoring": "judge",
+      "expectation": "Node inspection and rename controls render in a non-blocking Panel beside the canvas."
+    }
+  ],
+  "against_placements": [
+    {
+      "id": "banner-above-or-flush-page-header",
+      "placement": "Banner above or flush against PageHeader",
+      "page": "design-system/agent-views/patterns/Notifications.md",
+      "section": "Banner tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-banner-before-header"
+      },
+      "expectation": "Counts against: placing Banner before PageHeader or flush against PageHeader."
+    }
+  ]
+}

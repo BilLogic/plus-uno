@@ -1,0 +1,75 @@
+{
+  "task": "trap-missing-component",
+  "reference_screenshot": {
+    "path": "docs/evals/scenarios/ds-usage/trap-missing-component/reference.png",
+    "status": "pending"
+  },
+  "screens": [
+    {
+      "id": "board-page",
+      "screen": "Tutor task board page",
+      "template": "Frame + Page + PatternCard",
+      "variant": "Frame · Default / Page · Default / PatternCard",
+      "page": "design-system/src/patterns/Page/index.md",
+      "section": "Anatomy",
+      "pages": [
+        "design-system/src/patterns/Frame/index.md",
+        "design-system/src/patterns/Page/index.md",
+        "design-system/src/patterns/PatternCard/index.md"
+      ],
+      "guides": ["frame", "page", "card", "templates"],
+      "scoring": "checker",
+      "check": {
+        "kind": "template",
+        "components": ["Frame", "Page", "PatternCard"]
+      },
+      "expectation": "Page starts from Frame or Page and renders task cards with PatternCard inside a local three-column board layout."
+    }
+  ],
+  "patterns": [
+    {
+      "id": "indicators",
+      "pattern": "Indicators",
+      "variant": "Count in a header",
+      "page": "design-system/agent-views/patterns/Indicators.md",
+      "section": "The three tags",
+      "guide": "indicators",
+      "scoring": "judge",
+      "expectation": "Each column header shows its card count using a quiet count indicator or Badge, and task cards display the assignee Avatar and due date."
+    },
+    {
+      "id": "common-actions",
+      "pattern": "Common actions",
+      "variant": "Small actions",
+      "page": "design-system/agent-views/patterns/CommonActions.md",
+      "section": "Small actions",
+      "guide": "common-actions",
+      "scoring": "judge",
+      "expectation": "Column collapse and card reorder/move controls use accessible IconButton or Button controls."
+    }
+  ],
+  "required_placements": [
+    {
+      "id": "cards-in-columns",
+      "placement": "PatternCard task items inside board columns",
+      "page": "design-system/src/patterns/PatternCard/index.md",
+      "section": "Usage",
+      "scoring": "checker",
+      "check": {
+        "kind": "component-present",
+        "components": ["PatternCard", "Avatar"]
+      },
+      "expectation": "Task cards use PatternCard with Avatar rather than raw hand-styled card divs."
+    }
+  ],
+  "against_placements": [
+    {
+      "id": "nested-pattern-card",
+      "placement": "PatternCard nested inside PatternCard",
+      "page": "design-system/src/patterns/PatternCard/index.md",
+      "section": "Best practices",
+      "scoring": "judge",
+      "expectation": "Counts against: wrapping a board column in a PatternCard that nests task PatternCards inside it."
+    }
+  ]
+}
