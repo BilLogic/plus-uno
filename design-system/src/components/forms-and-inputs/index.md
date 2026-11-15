@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-39 components. Each row links to the generated facts; the three columns after it are the
+38 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
@@ -16,7 +16,7 @@ authored half, counted rather than assumed.
   - For a single standalone action, use `Button`.
   - For one primary action joined to a menu of variations, use `SplitButton`.
   - For mutually exclusive form answers, use `RadioGroup`.
-  - For two to four large icon-over-label choices, use `VerticalButton`.
+  - For large illustrated choices with a title and an illustration, use `ChoiceGrid` (or `RadioGroup` / `CheckboxGroup` in `tile` appearance).
 - **[Calendar](Calendar/index.md)** — Use `Calendar` directly only when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
   - For a date or date range field that opens this grid in a popup, use `DatePicker`.
   - For a combined date and time answer, use `DateTimePicker`.
@@ -155,10 +155,6 @@ authored half, counted rather than assumed.
 - **[TreeSelect](TreeSelect/index.md)** — Use `TreeSelect` when options nest in a hierarchy and someone needs to expand branches in place or pick nodes across multiple branches, such as curriculum units and lessons.
   - For a single hierarchical path chosen one column per level in sequence, use `Cascader`.
   - For a flat list of options with no hierarchy, use `Select`.
-- **[VerticalButton](VerticalButton/index.md)** — Use `VerticalButton` for a small set of large, equally weighted actions picked at a glance, such as a role or mode at the start of a flow. Its fixed 64 by 64 size suits two to four options.
-  - For actions in a standard horizontal row, use `Button` or `ButtonGroup`.
-  - For an icon-only action with no visible label, use `IconButton`.
-  - For a form question with pictured 224px choice tiles, use `RadioGroup` or `CheckboxGroup`.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
@@ -200,9 +196,8 @@ authored half, counted rather than assumed.
 | [TimePicker](TimePicker/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Toggle](Toggle/index.md) | 17 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✅ | ✅ |
-| [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 38/39 (97%) · Correct/incorrect 36/39 (92%) · Accessibility 38/39 (97%)
+**Authored coverage:** When to use 37/38 (97%) · Correct/incorrect 35/38 (92%) · Accessibility 37/38 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

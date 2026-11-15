@@ -169,11 +169,6 @@ const AUDIT_RULES = [
     match: (n) => /^--tag-pad-end/.test(n),
     propose: (n) => n.replace('pad-end', 'pad-x-end'),
   },
-  {
-    problem: 'Property segment is `vertical-size`; other sizes are `size` or `height`',
-    match: (n) => n === '--button-vertical-size',
-    propose: () => '--button-size-vertical',
-  },
 ];
 
 /**

@@ -39,7 +39,6 @@ Each component (e.g. `Button`) may map to **multiple Figma component sets** when
 | Figma set | Code prop | Example |
 |-----------|-----------|---------|
 | Button | `appearance`, `spacing` | The Updated section on the Core Button page |
-| Vertical button | `vertical` | Its own page in Core |
 
 One code component (`Button`) + `appearance` and `spacing` props → pick the correct Figma set from registry.
 

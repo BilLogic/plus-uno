@@ -116,7 +116,6 @@ Tokens one component owns, named for it.
 --avatar-size-96  /* Size of an extra-large UserAvatar, such as in a profile header. */
 --button-radius-compact  /* Corner rounding of a Button with compact spacing. */
 --button-radius-default  /* Corner rounding of a Button with default spacing. */
---button-size-vertical  /* Height of a Button laid out vertically, with its icon above its label. */
 --calendar-day-lg  /* Size of a day cell in a large Calendar. */
 --calendar-day-md  /* Size of a day cell in a default Calendar. */
 --calendar-day-sm  /* Size of a day cell in a compact Calendar. */

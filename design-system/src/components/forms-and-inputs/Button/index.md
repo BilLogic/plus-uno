@@ -96,7 +96,7 @@ Right-align buttons in focused tasks and Modals, with the primary on the right. 
 - `DropdownMenu`: use when a trigger opens a list of actions.
 - `ProgressBar`: use when showing progress on the page rather than inside the button.
 
-Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 
@@ -180,7 +180,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--button-size-vertical` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-sm` · `--radius-full` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 
