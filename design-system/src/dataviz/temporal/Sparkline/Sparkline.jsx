@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Highcharts from '@/dataviz/highchartsModules';
-import HighchartsReact from 'highcharts-react-official';
+import PlusChart from '@/dataviz/PlusChart';
 import chartTheme, { CHART_LINE_WIDTH_NUMBER, CHART_SPACING_MICRO } from '@/dataviz/chartTheme';
 import { BRAND, STATUS } from '@/dataviz/palette';
 
@@ -95,7 +94,7 @@ const Sparkline = ({
 
     return (
         <div style={{ width, height }}>
-            <HighchartsReact highcharts={Highcharts} options={options} />
+            <PlusChart options={options} />
         </div>
     );
 };

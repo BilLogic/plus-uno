@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import Highcharts from '@/dataviz/highchartsModules';
-import HighchartsReact from 'highcharts-react-official';
+import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
 import { seriesColor } from '@/dataviz/palette';
 import { iconClass } from '@/lib/icon';
@@ -216,7 +215,7 @@ const RadarChart = ({
 
     return (
         <div ref={containerRef} style={wrapperStyle}>
-            <HighchartsReact highcharts={Highcharts} options={options} />
+            <PlusChart options={options} />
         </div>
     );
 };

@@ -127,10 +127,11 @@ function MotionSpecimen() {
             </div>
 
             <MotionPreferenceContext.Provider value={false}>
-                <ChartMotionArea data-motion-specimen="productive">
+                <ChartMotionArea>
                     <div style={gridStyle}>
                         <div data-chart-slot="0" style={cardStyle}>
                             <BarChart
+                                animate
                                 height={200}
                                 categories={['W1', 'W2', 'W3', 'W4']}
                                 series={[{ name: 'Sessions', data: active.bars }]}
@@ -157,9 +158,10 @@ function MotionSpecimen() {
             </MotionPreferenceContext.Provider>
 
             <MotionPreferenceContext.Provider value={true}>
-                <ChartMotionArea data-motion-specimen="reduced">
+                <ChartMotionArea>
                     <div data-chart-slot="reduced" style={cardStyle}>
                         <BarChart
+                            animate
                             height={180}
                             categories={['W1', 'W2', 'W3', 'W4']}
                             series={[{ name: 'Reduced motion', data: active.bars }]}
@@ -194,20 +196,26 @@ export const Motion = {
         );
         for (const [index, chart] of productiveSlots.entries()) {
             expect(chart, `productive chart ${index}`).toBeDefined();
-            expect(chart.__plusInitialEntrance.duration).toBe(productiveExpected.duration);
-            expect(typeof chart.__plusInitialEntrance.easing).toBe('function');
-            expect(chart.__plusInitialEntrance.easing(1)).toBe(1);
-            expect(chart.__plusInitialEntrance.defer ?? 0).toBe(index * 20);
-            expect(chart.__plusInitialStateTransition.duration).toBe(stateExpected.duration);
-            expect(chart.options.chart.animation).toBe(false);
-            expect(chart.series[0].options.animation).toBe(false);
+            const entrance = chart.options.chart.animation;
+            const seriesEntrance = chart.options.plotOptions.series.animation;
+            const hoverState = chart.options.plotOptions.series.states.hover.animation;
+
+            expect(entrance.duration).toBe(productiveExpected.duration);
+            expect(typeof entrance.easing).toBe('function');
+            expect(entrance.easing(1)).toBe(1);
+            expect(entrance.defer).toBe(index * 20);
+            expect(seriesEntrance.duration).toBe(productiveExpected.duration);
+            expect(seriesEntrance.defer).toBe(index * 20);
+            expect(hoverState.duration).toBe(stateExpected.duration);
         }
 
         const reducedChart = findChart(canvasElement.querySelector('[data-chart-slot="reduced"]'));
         expect(reducedChart).toBeDefined();
-        expect(reducedChart.__plusInitialEntrance.duration).toBe(reducedExpected.duration);
-        expect(reducedChart.__plusInitialEntrance.easing(1)).toBe(1);
-        expect(reducedChart.options.chart.animation).toBe(false);
+        expect(reducedChart.options.chart.animation.duration).toBe(reducedExpected.duration);
+        expect(reducedChart.options.chart.animation.easing(1)).toBe(1);
+        expect(reducedChart.options.plotOptions.series.animation.duration).toBe(
+            reducedExpected.duration,
+        );
 
         await userEvent.click(canvas.getByRole('button', { name: /switch term data/i }));
         await waitFor(() => {
@@ -216,6 +224,7 @@ export const Motion = {
 
         for (const chart of [...productiveSlots, reducedChart]) {
             expect(chart.options.chart.animation).toBe(false);
+            expect(chart.options.plotOptions.series.animation).toBe(false);
             expect(chart.renderer.globalAnimation).toBe(false);
             expect(chart.series[0].options.animation).toBe(false);
         }

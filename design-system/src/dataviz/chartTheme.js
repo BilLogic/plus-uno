@@ -20,7 +20,7 @@
  * filter-based shadow, not a design-system shadow token; the CSS lives beside
  * the other chart-only tokens in `chartTheme.css`.
  */
-import { CHART_UPDATE_ARGS, ChartMotionArea, ChartMotionContext, chartAnimationOptions, chartEntrance, chartStateTransition, useChartMotion } from '@/dataviz/chartMotion';
+import { chartEntrance, chartStateTransition } from '@/dataviz/chartMotion';
 import { CATEGORICAL, CHROME } from '@/dataviz/palette';
 import '@/dataviz/chartTheme.css';
 
@@ -221,16 +221,6 @@ export const CHART_GRID_WIDTH_NUMBER = CHART_GRID_WIDTH;
 
 /** The series-entrance duration charts should default `animationDuration`-style props to, instead of a literal ms value. */
 export const CHART_ANIMATION_DURATION_MS = CHART_ENTRANCE_ANIMATION.duration;
-
-export {
-    CHART_UPDATE_ARGS,
-    ChartMotionArea,
-    ChartMotionContext,
-    chartAnimationOptions,
-    chartEntrance,
-    chartStateTransition,
-    useChartMotion,
-};
 
 /**
  * Set as a chart's own `plotOptions.column.borderRadius` /

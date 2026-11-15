@@ -57,11 +57,21 @@ describe('data-viz foundations', () => {
         expect(offenders.map((f) => f.path)).toEqual([]);
     });
 
-    it('the shared chart theme and motion module carry no eased curve name or animation millisecond literal', () => {
-        for (const name of ['chartTheme.js', 'chartMotion.js']) {
+    it('the shared chart theme, wrapper and motion module carry no eased curve name or animation millisecond literal', () => {
+        for (const name of ['chartTheme.js', 'chartMotion.js', 'PlusChart.jsx']) {
             const text = readFileSync(join(ROOT, name), 'utf8');
             expect(text, `${name} eased curve`).not.toMatch(/\b(easeOut|easeIn|easeInOut|easeOutQuad|easeOutCubic|easeOutQuart|swing)\b|cubic-bezier\s*\(/);
             expect(text, `${name} ms literal`).not.toMatch(/\bduration\s*:\s*\d+/);
         }
+    });
+
+    it('every Highcharts chart component renders through PlusChart rather than HighchartsReact directly', () => {
+        const offenders = files.filter(({ path, text }) =>
+            path.endsWith('.jsx') &&
+            !path.endsWith('PlusChart.jsx') &&
+            !path.endsWith('.stories.jsx') &&
+            text.includes('HighchartsReact'),
+        );
+        expect(offenders.map((f) => f.path)).toEqual([]);
     });
 });

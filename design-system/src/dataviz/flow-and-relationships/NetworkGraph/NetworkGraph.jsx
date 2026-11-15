@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Highcharts from '@/dataviz/highchartsModules';
-import HighchartsReact from 'highcharts-react-official';
+import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
 import { CHROME } from '@/dataviz/palette';
 
@@ -50,7 +49,7 @@ const NetworkGraph = ({
 
     return (
         <div style={{ width: '100%', height: height }}>
-            <HighchartsReact highcharts={Highcharts} options={options} />
+            <PlusChart options={options} />
         </div>
     );
 };
