@@ -165,3 +165,23 @@ The form's title is the page, Panel or Modal heading. Groups take a `Fieldset` l
 **Checked:** Automatic
 
 When the In steps host asks one focal question per step with two to four pictured `RadioGroup` or `CheckboxGroup` tiles, center `ProgressIndicator` dots above the heading while there are fewer than five steps, and center Back (Subtle) and Continue (Primary) under the tiles. At five steps or more, switch to the host's left step list. Continue stays enabled and validates on press.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Forms`.
+
+```jsx
+import { useState } from 'react';
+import { Button, TextField } from '@/components';
+
+function FormExample() {
+    const [name, setName] = useState('');
+    return (
+        <form onSubmit={(event) => event.preventDefault()}>
+            <TextField label="Student name" value={name} onChange={(event) => setName(event.target.value)}
+                caption="Use the name the student goes by." />
+            <Button text="Add student" appearance="primary" type="submit" />
+        </form>
+    );
+}
+```

@@ -152,3 +152,27 @@ A one-list menu is a Popup select: radios for one choice, not searchable for a s
 **Checked:** Automatic
 
 Below 960 the side hides and the Filter icon returns with its count; pressing it gives the filters the Section's whole width, with "Show results" to go back: Section › Drop the Filter icon while a filter side shows. Below 768 quick filters become a stacked menu.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Filtering`.
+
+```jsx
+import { useState } from 'react';
+import { FilterButton, PopupSelect } from '@/components';
+import { PatternSection } from '@/patterns';
+
+function QuickFilterExample() {
+    const [status, setStatus] = useState('All');
+    return (
+        <PatternSection title="Sessions" toolbar={
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}><PopupSelect label="Status" options={['All', 'Needs review', 'Reviewed']}
+                value={status} onChange={setStatus}
+                trigger={<FilterButton text="Status" trailingMetric={status === 'All' ? undefined : 1} />}
+            /></div>
+        }>
+            <p role="status">Showing: {status}</p>
+        </PatternSection>
+    );
+}
+```

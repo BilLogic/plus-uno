@@ -100,3 +100,15 @@ Don't: A field for a value that was never editable: it promises an input.
 **Checked:** Automatic
 
 Disabled is for a prerequisite fixable on this screen and leaves the tab order. Read-only is for content people must read.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#ReadOnly`.
+
+```jsx
+import { TextField } from '@/components';
+
+function ReadOnlyExample() {
+    return <TextField label="Student ID" value="S-1042" isReadOnly caption="Assigned by the school." />;
+}
+```

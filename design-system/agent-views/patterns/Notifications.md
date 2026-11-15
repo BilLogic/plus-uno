@@ -154,3 +154,15 @@ A bold fill competes with the page; it is for what must be seen. Routine news st
 **Checked:** Review
 
 A Flag is for now; the Inbox is for later. The Inbox opens from the Sidebar at `--inbox-width` over the start of the page with no Backdrop, carrying `Mark all as read`, settings and close in the header, `Unread` (with count) and `All` tabs, and `NotificationItem` rows grouped by day. Clearing every unread item shows `"You are all caught up."` in `EmptyState`; pressing `Escape` or clicking outside closes the panel.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Notifications`.
+
+```jsx
+import { Banner } from '@/components';
+
+function NotificationExample() {
+    return <Banner appearance="announcement">Session reports will be available Friday.</Banner>;
+}
+```

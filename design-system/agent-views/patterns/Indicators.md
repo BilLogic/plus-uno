@@ -158,3 +158,15 @@ Choose the layout by where the checklist appears:
 | Dismissible card | Home | When complete, shrinks to one line for a day, then disappears. |
 | Persistent card | Required work on a page | Keeps every completed row visible. |
 | Compact card | Foot of the Sidebar | Shows the count, progress bar and next step, which opens the full list. |
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Indicators`.
+
+```jsx
+import { StatusTag } from '@/components';
+
+function IndicatorExample() {
+    return <StatusTag appearance="warning">Needs review</StatusTag>;
+}
+```

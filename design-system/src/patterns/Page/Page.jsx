@@ -96,9 +96,14 @@ Page.propTypes = {
      * @ds-context Used in: Page.title (ds guide page)
      */
     title: PropTypes.node,
-    /** One PageHeader with the page's h1, actions and tabs. Replaces title. */
+    /** One PageHeader with the page's h1, actions and tabs. Replaces title.
+     * @ds-context Used in: Page.header (ds guide page)
+     * @ds-context Governed by: Common actions (ds guide common-actions)
+     */
     header: PropTypes.node,
-    /** One page Banner below the header. Governed by Notifications (ds guide notifications). */
+    /** One page Banner below the header. Governed by Notifications (ds guide notifications).
+     * @ds-context Used in: Page.banner (ds guide page)
+     */
     banner: PropTypes.node,
     className: PropTypes.string,
     style: PropTypes.object,

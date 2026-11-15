@@ -13,6 +13,22 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURES = 'scripts/lib/__fixtures__/ds-usage';
 const cli = (...args) => spawnSync(process.execPath, ['scripts/check-ds-usage.mjs', ...args], { cwd: ROOT, encoding: 'utf8' });
 
+test('reference stories, pattern code stories and MDX code blocks are held to zero', () => {
+  for (const file of [
+    'design-system/src/patterns/Page/ReferenceScreens.stories.jsx',
+    'design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx',
+    'design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx',
+  ]) assert.ok(inScope(file), file);
+  const text = `# Example\n\nA sentence mentioning 16px is prose.\n\n\`\`\`jsx\nimport { Select, PatternSection } from '@/patterns';\n\`\`\`\n`;
+  const found = escapesIn({ path: 'design-system/src/Example.mdx', text }, contextOf(REPO_ROOT));
+  assert.ok(found.some((f) => f.rule === 'ds/no-unknown-component' && f.line === 6));
+  assert.equal(found.some((f) => f.rule === 'ds/no-raw-literal'), false);
+  const placement = `# Filtering\n\n\`\`\`jsx\nimport { Select } from '@/components';\nimport { PatternSection } from '@/patterns';\n<PatternSection toolbar={<Select options={['All']} />} />;\n\`\`\``;
+  assert.ok(escapesIn({ path: 'design-system/src/Example.mdx', text: placement }, contextOf(REPO_ROOT)).some((f) => f.rule === 'ds/placement' && f.line === 6));
+  const outerImport = `import { PatternSection } from '@/patterns';\nimport { Select } from '@/components';\n\n\`\`\`jsx\n<PatternSection toolbar={<Select options={['All']} />} />;\n\`\`\``;
+  assert.ok(escapesIn({ path: 'design-system/src/Example.mdx', text: outerImport }, contextOf(REPO_ROOT)).some((f) => f.rule === 'ds/placement' && f.line === 5));
+});
+
 test('a prototype with one escape per fail-level rule exits 1, naming file, line, column, rule and fix', () => {
   const out = cli(`${FIXTURES}/escaping`);
   assert.equal(out.status, 1);

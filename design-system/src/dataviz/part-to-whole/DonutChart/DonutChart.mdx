@@ -67,14 +67,12 @@ donuts, use `BarChart`.
 required; `label` names the segment in the tooltip), drawn in array order.
 
 ```jsx
-import { BRAND, CHROME } from '@/dataviz/palette';
-
 <DonutChart
     value="18/24"
     label="Sessions this term"
     segments={[
-        { value: 18, color: BRAND, label: 'Completed' },
-        { value: 6, color: CHROME.track, label: 'Remaining' },
+        { value: 18, color: 'var(--ds-chart-brand)', label: 'Completed' },
+        { value: 6, color: 'var(--ds-background-neutral)', label: 'Remaining' },
     ]}
 />
 ```

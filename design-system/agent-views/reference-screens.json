@@ -1,0 +1,16 @@
+[
+  {
+    "reference": "list",
+    "name": "List with filters",
+    "file": "design-system/src/patterns/Page/ReferenceScreens.stories.jsx",
+    "export": "ListWithFilters",
+    "url": "https://plus-uno.netlify.app/storybook/?path=/story/templates-page-reference-screens--list-with-filters"
+  },
+  {
+    "reference": "detail",
+    "name": "Detail with panel",
+    "file": "design-system/src/patterns/Page/ReferenceScreens.stories.jsx",
+    "export": "DetailWithPanel",
+    "url": "https://plus-uno.netlify.app/storybook/?path=/story/templates-page-reference-screens--detail-with-panel"
+  }
+]

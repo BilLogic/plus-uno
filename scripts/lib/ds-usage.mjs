@@ -202,6 +202,22 @@ const didYouMean = (name, candidates, otherwise) => {
  * @returns {{rule: string, level: 'fail'|'warn', file: string, line: number, col: number, message: string, fix: string}[]}
  */
 export function escapesIn({ path, text: raw, page = isPageModule(path) }, ctx) {
+  if (path.endsWith('.mdx')) {
+    const found = [];
+    // Check each fenced example independently; padding keeps source locations.
+    const fences = [...raw.matchAll(/^([ \t]*)(`{3,}|~{3,})(jsx?|tsx?|javascript|typescript|html|css|scss)[^\n]*\n([\s\S]*?)^\1\2[ \t]*$/gm)];
+    let outside = raw;
+    for (const fence of fences) outside = outside.slice(0, fence.index) + fence[0].replace(/[^\n]/g, ' ') + outside.slice(fence.index + fence[0].length);
+    const imports = [...outside.matchAll(/import\s+\{[^}]*\}\s+from\s+['"]@\/(?:components|patterns)['"];?/g)];
+    for (const fence of fences) {
+      const offset = fence.index + fence[0].indexOf('\n') + 1;
+      let prefix = raw.slice(0, offset).replace(/[^\n]/g, ' ');
+      for (const i of imports.filter((i) => i.index + i[0].length <= offset)) prefix = prefix.slice(0, i.index) + i[0] + prefix.slice(i.index + i[0].length);
+      const ext = { javascript: 'js', typescript: 'ts' }[fence[3]] ?? fence[3];
+      found.push(...escapesIn({ path: path.replace(/\.mdx$/, `.${ext}`), text: prefix + fence[4], page: false }, ctx).map((f) => ({ ...f, file: path })));
+    }
+    return found;
+  }
   const text = blankComments(raw);
   const found = [];
   const add = (rule, index, message, fix) => {

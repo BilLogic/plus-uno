@@ -191,3 +191,25 @@ The bar and its words: Section › Turn the head row into the bulk bar when rows
 **Checked:** Review
 
 A clickable card has no inner buttons; the whole card is the action. When a card does carry a button, it is Subtle in the footer, and inside tiles it spans the full width when in doubt.
+
+## In code
+
+From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#CommonActions`.
+
+```jsx
+import { Button, TextField } from '@/components';
+import { PatternCard } from '@/patterns';
+
+function ActionsExample() {
+    return (
+        <PatternCard title="Review notes" footer={
+            <div style={{ display: 'flex', gap: 'var(--inline-sm)' }}>
+                <Button text="Cancel" />
+                <Button text="Save notes" appearance="primary" />
+            </div>
+        }>
+            <TextField label="Notes" defaultValue="Start with unit rates." />
+        </PatternCard>
+    );
+}
+```
