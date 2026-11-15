@@ -428,8 +428,12 @@ TileNarrowLargeIllustrations.play = async ({ canvasElement }) => {
     await expect(tiles.length).toBe(3);
     for (const tile of tiles) {
         const card = tile.getBoundingClientRect();
-        const art = tile.querySelector('.plus-choice-tile-illustration > *').getBoundingClientRect();
+        const slotChild = tile.querySelector('.plus-choice-tile-illustration > *');
+        // The line art (limbs included) when the child is a character, else the child itself.
+        const art = (slotChild.querySelector('.plus-illustration__lines') || slotChild).getBoundingClientRect();
+        const label = tile.querySelector('.plus-form-radio-label, .plus-form-checkbox-label, label').getBoundingClientRect();
         await expect(art.width).toBeGreaterThan(0);
+        await expect(art.bottom).toBeLessThanOrEqual(label.top);
         await expect(art.left).toBeGreaterThanOrEqual(card.left);
         await expect(art.right).toBeLessThanOrEqual(card.right);
         await expect(art.top).toBeGreaterThanOrEqual(card.top);

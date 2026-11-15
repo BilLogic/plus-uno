@@ -200,6 +200,17 @@
             block-size: auto;
             object-fit: contain;
         }
+
+        // A character's line art reaches past its 1000-unit frame (characters.js:
+        // the largest overhangs are 0.60 right, 0.33 left, 0.14 top and 0.50
+        // bottom, all from `dot`). Centered, the art spans at most 1 + 2 * 0.60
+        // frames, so the frame takes 1 / 2.2 = 45% of the slot; the margins (a
+        // percentage of the slot's width) keep the 0.14 and 0.50 vertical
+        // overhang inside the tile: 0.14 * 45% = 7%, 0.50 * 45% = 23%.
+        > .plus-illustration {
+            max-inline-size: 45%;
+            margin-block: 7% 23%;
+        }
     }
 
     .plus-form-radio-row {
