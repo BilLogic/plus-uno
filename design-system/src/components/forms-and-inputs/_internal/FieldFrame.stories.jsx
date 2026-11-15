@@ -30,7 +30,7 @@ const control = (id, extra = {}) => (
 /** The label's `htmlFor` names the control; clicking it focuses the input. */
 export const LabelAssociation = () => (
     <FieldFrame>
-        <FieldLabel htmlFor="label-assoc-input" required>Tutor name</FieldLabel>
+        <FieldLabel htmlFor="label-assoc-input" marker="required">Tutor name</FieldLabel>
         <FieldBox><input id="label-assoc-input" className="plus-field__control" /></FieldBox>
     </FieldFrame>
 );
@@ -38,7 +38,7 @@ export const LabelAssociation = () => (
 LabelAssociation.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByRole('textbox');
-    await userEvent.click(canvas.getByText('Tutor name'));
+    await userEvent.click(canvas.getByText(/Tutor name/));
     await expect(document.activeElement).toBe(input);
 };
 

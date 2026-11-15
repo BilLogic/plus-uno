@@ -90,7 +90,7 @@ Don't: Without a label the row falls back to the generic name "Rating". `comment
 - **Moving the selection is changing it.** An arrow key calls `onChange`, so a keyboard user cannot browse the scale without setting it. That is the usual radio-group behavior.
 - **Disabled stays announced.** The items keep their role, label and `aria-checked` and take `aria-disabled`, and drop out of the tab order.
 - **The label is a `span`, deliberately.** There is no form control for a `label` element to point at, so the label has an id and the row is named by `aria-labelledby`.
-- **`isRequired` marks the label and requires the group.** The asterisk follows the label and is read as "required"; the group carries the native required constraint.
+- **`isRequired` sets `aria-required` on the radiogroup.** Pair it with `labelMarker="required"` only when required fields are the minority in the form.
 
 ## Related
 
@@ -102,7 +102,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Label.** Text above the row that names the rating. A required marker follows it.
+1. **Label.** Text above the row that names the rating. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text.
 2. **Items.** Five 32 circles, each drawing a 16 icon. Items up to the score are filled.
 3. **Number.** In the numeric variant, 1 to 5 above each item.
 4. **Caption.** In the comments variant, one line under the row.
@@ -126,8 +126,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Item | `--control-md` (32) circle on `--ds-background-neutral`. |
 | Icon | `--icon-md` (16). |
 | Gaps | `--space-0625` between items; `--stack-sm` inside an item group; `--stack-md` between label and row, plus `--stack-sm` under the label. |
-| Label, number | `--ds-text`, body default. |
-| Required marker | `--ds-text-danger`. |
+| Label, minority marker, number | `--ds-text`, body default. |
 
 ## Content guidelines
 
@@ -145,7 +144,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `id` | string | — | Id of the star group, which the label names. A generated id is used when omitted. |
 | `name` | string | — | Form key under which the chosen rating is sent with its form. |
 | `label` | node | — | Visible label above the stars. It names the group; without one the group is named "Rating". |
-| `isRequired` | bool | `false` | Shows an asterisk on the label and marks the group required. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
+| `isRequired` | bool | `false` | Marks the radiogroup required (`aria-required`). Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `value` | number | `0` | Current rating, 0 for none up to 5. Every star up to it is filled. Update it from `onChange`. |
 | `variant` | enum | `'comments'` | `comments` (default) shows the icons alone, with an optional comments label under them; `numeric` prints each number above its icon. |
 | `showCommentsLabel` | bool | `true` | Shows `commentsLabel` under the stars. Applies to the `comments` variant only. |
@@ -157,6 +157,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `icon` | enum | `'star'` | The glyph used for every choice: `star` (default) or `thumbs-up`. |
 
 ## Variants
+
+**`labelMarker`** — `required` · `optional`
 
 **`variant`** — `comments` · `numeric`
 
@@ -181,7 +183,7 @@ Implemented as `RatingItem`.
 
 ## Tokens touched
 
-`--body-default` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-danger` · `--icon-lg` · `--icon-md` · `--radius-full` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--icon-lg` · `--icon-md` · `--radius-full` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Rating/Rating.scss`. Override these through the token layer, never with a literal.
 

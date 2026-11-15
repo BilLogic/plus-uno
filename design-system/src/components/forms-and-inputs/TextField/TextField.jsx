@@ -38,6 +38,7 @@ const TextField = ({
     id,
     name,
     label,
+    labelMarker,
     isRequired = false,
     /**
      * Hide the label visually. It is still rendered and still names the input —
@@ -212,7 +213,7 @@ const TextField = ({
 
     return (
         <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={`plus-text-field ${className}`.trim()} style={style}>
-            <FieldLabel htmlFor={fieldId} required={isRequired} info={info} hidden={isLabelHidden}>
+            <FieldLabel htmlFor={fieldId} marker={labelMarker} info={info} hidden={isLabelHidden}>
                 {label}
             </FieldLabel>
             <FieldBox
@@ -269,7 +270,9 @@ TextField.propTypes = {
     name: PropTypes.string,
     /** Visible label above the field. A string label also names the number steppers, as "Increase" and "Decrease" followed by the label. */
     label: PropTypes.node,
-    /** Shows an asterisk and sets `aria-required`. Explain the asterisk once, in the form's legend. */
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Sets `aria-required` on the input. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Hides the label visually. It is still rendered and still names the input. */
     isLabelHidden: PropTypes.bool,

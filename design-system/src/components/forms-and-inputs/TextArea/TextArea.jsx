@@ -21,6 +21,7 @@ const TextArea = ({
     id,
     name,
     label,
+    labelMarker,
     isRequired = false,
     isLabelHidden = false,
     info,
@@ -111,7 +112,7 @@ const TextArea = ({
 
     return (
         <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={`plus-text-area ${className}`.trim()} style={style}>
-            <FieldLabel htmlFor={fieldId} required={isRequired} info={info} hidden={isLabelHidden}>
+            <FieldLabel htmlFor={fieldId} marker={labelMarker} info={info} hidden={isLabelHidden}>
                 {label}
             </FieldLabel>
             <FieldBox
@@ -183,7 +184,9 @@ TextArea.propTypes = {
     name: PropTypes.string,
     /** The visible label above the field. Hide it with `isLabelHidden`. */
     label: PropTypes.node,
-    /** Shows an asterisk and sets `aria-required`. */
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Sets `aria-required` on the textarea. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Hides the label without removing it. */
     isLabelHidden: PropTypes.bool,

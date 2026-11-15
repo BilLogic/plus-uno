@@ -57,6 +57,7 @@ const DateTimePicker = ({
     id,
     name,
     label,
+    labelMarker,
     isRequired = false,
     /**
      * Hide the field label visually. It is still rendered, still carries
@@ -207,10 +208,7 @@ const DateTimePicker = ({
                     htmlFor={showDate ? dateInputId : timeInputId}
                     className={`plus-datetime-label${isLabelHidden ? ' plus-datetime-label-hidden' : ''}`}
                 >
-                    {label}
-                    {isRequired && (
-                        <span className="plus-datetime-required" aria-label="required">*</span>
-                    )}
+                    {label}{labelMarker === 'required' || labelMarker === 'optional' ? ` (${labelMarker})` : null}
                 </label>
             )}
 
@@ -222,6 +220,7 @@ const DateTimePicker = ({
                     name={name ? `${name}-date` : undefined}
                     aria-labelledby={dateLabelledBy || undefined}
                     aria-label={dateLabelledBy ? undefined : 'Date'}
+                    aria-required={isRequired || undefined}
                     placeholder={datePlaceholder}
                     value={dateIso}
                     spacing={spacing}
@@ -247,6 +246,7 @@ const DateTimePicker = ({
                     name={name ? `${name}-time` : undefined}
                     aria-labelledby={timeLabelledBy || undefined}
                     aria-label={timeLabelledBy ? undefined : 'Time'}
+                    isRequired={isRequired}
                     placeholder={timePlaceholder}
                     value={timeText}
                     spacing={spacing}
@@ -276,7 +276,9 @@ DateTimePicker.propTypes = {
     name: PropTypes.string,
     /** The visible label above the field. */
     label: PropTypes.node,
-    /** Shows an asterisk on the label. */
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Sets `aria-required` on the date and time inputs. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     isLabelHidden: PropTypes.bool,
     /** Shows the Date and Time labels above each input. Defaults to `true`. */

@@ -60,7 +60,7 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 
 - Every input has a visible label. A group is a `fieldset` with a `legend`; its one error is announced once.
 - A field error is announced and sets `aria-invalid`; the submit moves focus to the first invalid field. A server message is announced when it appears.
-- A required field sets `aria-required`; the asterisk is explained in the legend and never carries the meaning alone.
+- A required field sets `aria-required` whether or not it carries a visible `"(required)"` marker; only the form's minority case is marked in the label text.
 - A sending button keeps its name and sets `aria-busy`; Cancel stays reachable.
 - A dialog opens only from a person's action. Focus goes to the first input and stays trapped until it closes.
 
@@ -121,11 +121,14 @@ Mark the field, say what to fix inline, scroll the body to it, and shake once . 
 Do: The message under the field, in the same Modal.
 Don't: A second dialog over the first, with the field left unexplained.
 
-### Mark required fields with an asterisk and explain it once. {#mark-required-fields-with-an-asterisk-and-explain-it-once}
+### Mark only the minority case in the label, in plain text. {#mark-only-the-minority-case-in-the-label-in-plain-text}
 
-**Checked:** Automatic
+**Checked:** Review
 
-The legend says what the asterisk means. Optional fields are marked "(optional)" only in a form where most fields are required, so one pattern holds across the product. `isRequired` sets the mark and `aria-required`.
+When most fields are required, mark the optional ones `"(optional)"` (`labelMarker="optional"`). When most fields are optional, mark the required ones `"(required)"` (`labelMarker="required"`). The marker sits in the label's own type style, never a separate color, symbol or legend, and required controls still set `isRequired` so screen readers get `aria-required`.
+
+Do: Two required fields stay unmarked; only the optional field says so.
+Don't: Every field carries a marker, so none stands out.
 
 ### Put help in the caption, never in a tooltip. {#put-help-in-the-caption-never-in-a-tooltip}
 

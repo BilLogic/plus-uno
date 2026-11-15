@@ -109,7 +109,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Legend.** The question. It names the group and carries the required marker.
+1. **Legend.** The question. It names the group and carries an optional minority marker (`"(optional)"` or `"(required)"`) in plain text.
 2. **Options.** Radios in a stacked or inline set. Each has a label and an optional description.
 3. **Scale ends.** Optional `leadingText` and `trailingText` either side of the options.
 4. **Reveal.** Optional content under an option, shown only while that option is chosen.
@@ -163,7 +163,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `trailingText` | node | — | Scale end after the options, e.g. "Very". Describes the group. |
 | `appearance` | enum | `'plain'` | Passed to every Radio. `card` draws each as a bordered row; `tile` draws centered pictured tiles. |
 | `size` | enum | — | Radio control (dot) width, in px; unset keeps today's rendering. |
-| `isRequired` | bool | `false` | The group needs an answer. Marked on the legend. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the legend: `required` or `optional`. |
+| `isRequired` | bool | `false` | Sets `aria-required` on the radiogroup. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `isDisabled` | bool | `false` | Overrides every Radio's own `isDisabled`. |
 | `isReadOnly` | bool | `false` | Shown and focusable, not changeable. |
 | `isInvalid` | bool | — | Marks every Radio as failing validation. Defaults to whether `error` is set. |
@@ -178,6 +179,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 **`appearance`** — `plain` · `card` · `tile`
 
 **`size`** — `10` · `12` · `14`
+
+**`labelMarker`** — `required` · `optional`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

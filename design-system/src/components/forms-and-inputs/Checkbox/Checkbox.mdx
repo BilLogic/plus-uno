@@ -46,7 +46,7 @@ A checkbox lets a person select one or more options from a list, or confirm a si
 
 ## Content
 
-<ComponentExample of={CheckboxStories.Content} title="Label" description="A long label wraps inside its row. The required marker follows the label." />
+<ComponentExample of={CheckboxStories.Content} title="Label" description="A long label wraps inside its row. A minority marker follows the label in plain text." />
 
 <ComponentExample of={CheckboxStories.Description} title="Description" description="Text under the label that describes the choice. It is read after the name." />
 
@@ -146,7 +146,7 @@ Use `Checkbox` when a person needs to select one or more options from a list of 
 ## Parts
 
 1. **Box.** An 18 square with a 2px edge. Selected, it fills with the selected bold fill and draws a check; mixed, it draws a dash.
-2. **Label.** 14/20 text beside the box in a 24 row. It names the checkbox. A required marker follows it.
+2. **Label.** 14/20 text beside the box in a 24 row. It names the checkbox. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text.
 3. **Description.** Optional 12/16 text under the label that describes the choice. It does not name it.
 
 ### States
@@ -302,7 +302,7 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 
 - **Label association.** The component derives an id for the input and label automatically; pass `aria-label` only when there is no visible label.
 - **Do not disable a box that must stay reachable.** Use `isInvalid` with a message linked by `aria-describedby`, so a screen reader user hears why the option cannot be chosen. Include an error message for a required or invalid box, for example "Select an option".
-- **`isRequired` reaches the input**, so native validation applies. The marker is decoration, hidden from assistive technology.
+- **`isRequired` sets `aria-required` on the checkbox**, whether or not `labelMarker="required"` is shown for a minority required field.
 - **`isIndeterminate` is set on the DOM node** and announced as "mixed".
 - **Keyboard.** `Space` toggles the focused checkbox; `Enter` does not. Keyboard focus is a 2px ring on `border.focused`, 2px off the box; pointer focus draws none.
 

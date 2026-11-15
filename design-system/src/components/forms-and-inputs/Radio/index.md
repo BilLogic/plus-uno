@@ -105,7 +105,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Parts
 
 1. **Radio.** A 12 circle. Selected, it fills with the selected bold fill and draws an inverse dot; unselected, it is an empty circle.
-2. **Label.** 14/20 text beside the radio in a 24 row. It names the option. A required marker follows it.
+2. **Label.** 14/20 text beside the radio in a 24 row. It names the option. An optional minority marker (`"(optional)"` or `"(required)"`) follows a standalone radio's label in plain text.
 3. **Description.** Optional 12/16 text under the label that describes the option. It does not name it.
 
 ### States
@@ -154,7 +154,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `isInvalid` | bool | `false` | Draws the error state, for an option that fails validation. |
 | `isDisabled` | bool | `false` | Prevents interaction and dims this option. |
 | `isReadOnly` | bool | `false` | Shows the option without letting the user change it. |
-| `isRequired` | bool | `false` | Shows an asterisk on the label and sets the native `required` attribute. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
+| `isRequired` | bool | `false` | Sets the required constraint (`aria-required`) on a standalone radio. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `description` | node | — | Secondary text under the label. It describes the option; it does not name it. |
 | `illustration` | node | — | Decorative picture shown above the label when `appearance` is `tile`. |
 | `appearance` | enum | `'plain'` | `plain` (default) is a radio beside its label; `card` draws a bordered row; `tile` draws a centered pictured tile. |
@@ -169,13 +170,15 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Variants
 
+**`labelMarker`** — `required` · `optional`
+
 **`appearance`** — `plain` · `card` · `tile`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--border-width-selected` · `--card-pad-default` · `--choice-tile-width` · `--control-sm` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radio-control-size` · `--radius-control-md` · `--radius-full` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium` · `--type-weight-regular`
+`--body-default` · `--border-width-default` · `--border-width-selected` · `--card-pad-default` · `--choice-tile-width` · `--control-sm` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radio-control-size` · `--radius-control-md` · `--radius-full` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Radio/Radio.scss`. Override these through the token layer, never with a literal.
 

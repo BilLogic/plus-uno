@@ -130,6 +130,7 @@ const TreeSelect = ({
     placeholder = 'Please select',
     spacing = 'default',
     isDisabled = false,
+    labelMarker,
     isRequired = false,
     isInvalid = false,
     errorMessage,
@@ -461,8 +462,8 @@ const TreeSelect = ({
     return (
         <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={className} style={style}>
             {label && (
-                <FieldLabel htmlFor={fieldId} required={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
-                    <span id={labelId}>{label}</span>
+                <FieldLabel id={labelId} htmlFor={fieldId} marker={labelMarker} info={info} name={typeof label === 'string' ? label : undefined}>
+                    {label}
                 </FieldLabel>
             )}
             <div ref={wrapperRef} className="plus-tree-select-wrapper">
@@ -564,7 +565,9 @@ TreeSelect.propTypes = {
     /** `default` draws 40 and `compact` draws 32. */
     spacing: PropTypes.oneOf(TREE_SELECT_SPACINGS),
     isDisabled: PropTypes.bool,
-    /** Shows an asterisk on the label and sets `aria-required`. */
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. */
     isInvalid: PropTypes.bool,

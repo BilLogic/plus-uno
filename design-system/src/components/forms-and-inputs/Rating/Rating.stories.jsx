@@ -163,18 +163,18 @@ Interactive.args = {
     isDisabled: false,
 };
 
-/** Each prop shows up in the DOM: numeric labels, comments label, icon family, required mark. */
+/** Each prop shows up in the DOM: numeric labels, comments label, icon family, minority marker. */
 export const PropsRender = () => (
     <div style={ratingCol}>
-        <Rating id="rating-props-numeric" label="Numeric" variant="numeric" icon="thumbs-up" isRequired value={2} />
+        <Rating id="rating-props-numeric" label="Numeric" variant="numeric" icon="thumbs-up" isRequired labelMarker="required" value={2} />
         <Rating id="rating-props-comments" label="Comments" variant="comments" commentsLabel="Tell us more" value={2} />
     </div>
 );
 PropsRender.parameters = { docs: { disable: true } };
 PropsRender.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const numeric = canvas.getByRole('radiogroup', { name: /Numeric/ });
-    const comments = canvas.getByRole('radiogroup', { name: /Comments/ });
+    const numeric = canvas.getByRole('radiogroup', { name: 'Numeric (required)' });
+    const comments = canvas.getByRole('radiogroup', { name: 'Comments' });
 
     // variant=numeric: a label 1-5 above each item, no comments label.
     for (const n of [1, 2, 3, 4, 5]) {
@@ -193,9 +193,9 @@ PropsRender.play = async ({ canvasElement }) => {
     await expect(items[2].querySelector('i').className).toContain('fa-regular');
     await expect(within(comments).getAllByRole('radio')[0].querySelector('i').className).toContain('fa-star');
 
-    // isRequired: the mark is announced, and only on the required rating.
-    await expect(within(numeric.parentElement).getByLabelText('required')).toBeTruthy();
-    await expect(within(comments.parentElement).queryByLabelText('required')).toBeNull();
+    // isRequired: aria-required sits on the required radiogroup only.
+    await expect(numeric).toHaveAttribute('aria-required', 'true');
+    await expect(comments).not.toHaveAttribute('aria-required');
 };
 
 /** One story per state, for the Examples tab. */
@@ -264,13 +264,14 @@ export const Focused = {
 export const Required = {
     render: () => (
         <div style={frame}>
-            <Rating id="rating-ex-required" label="How was the session?" isRequired value={0} onChange={() => {}} />
+            <Rating id="rating-ex-required" label="How was the session?" isRequired labelMarker="required" value={0} onChange={() => {}} />
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const marker = canvasElement.querySelector('.plus-rating-required');
-        await expect(marker).toBeInTheDocument();
-        await expect(getComputedStyle(marker).color).toBe(tokenColor(canvasElement, '--ds-text-danger'));
+        const group = within(canvasElement).getByRole('radiogroup', { name: 'How was the session? (required)' });
+        await expect(group).toHaveAttribute('aria-required', 'true');
+        const label = canvasElement.querySelector('.plus-rating-label');
+        await expect(getComputedStyle(label).color).toBe(tokenColor(canvasElement, '--ds-text'));
     },
 };
 

@@ -73,7 +73,7 @@ Don't: An instruction.
 
 - **A real `fieldset` and `legend` pair.** The legend is tied to the group through native HTML semantics, which every screen reader already understands.
 - **The error is announced once.** `role="alert"` on the error message means assistive technology hears it as soon as it appears, without needing focus to move there.
-- **`isRequired` is visual and spoken.** The asterisk is `aria-hidden`, and a visually hidden "(required)" is added to the legend's accessible name.
+- **`isRequired` is spoken even when unmarked.** When most fields in the form are required and `labelMarker` is omitted, a visually hidden `"(required)"` is added to the legend's accessible name; when `labelMarker="required"` is set, the visible `"(required)"` text already names it.
 
 ## Related
 
@@ -85,7 +85,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Legend.** Names the group, in body default. A required marker follows it.
+1. **Legend.** Names the group, in body default. An optional `"(optional)"` or `"(required)"` minority marker follows it in the same type style.
 2. **Fields.** The grouped fields, stacked with `--stack-md` between them.
 3. **Error.** One message under the fields, in body small.
 
@@ -93,7 +93,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Required | An asterisk in `--ds-text-danger` follows the legend. A visually hidden "(required)" joins its name. |
+| Required | `isRequired` adds a visually hidden `"(required)"` to the legend's accessible name when no visible `labelMarker="required"` is shown; pass `labelMarker="required"` only when required fields are the minority in the form. |
 | Invalid | The error shows in `--ds-text-danger`, announced with `role="alert"` and linked with `aria-describedby`. |
 | Disabled | The native `disabled` attribute disables every field inside. |
 
@@ -103,8 +103,8 @@ A fieldset has no hover, pressed or focus state of its own. The fields inside ca
 
 | Part | Token |
 | --- | --- |
-| Legend | `--ds-text`, body default. |
-| Required marker, error | `--ds-text-danger`; the error in body small. |
+| Legend and minority marker | `--ds-text`, body default. |
+| Error | `--ds-text-danger`, body small. |
 | Gap | `--stack-md`. |
 
 ## Content guidelines
@@ -122,12 +122,19 @@ A fieldset has no hover, pressed or focus state of its own. The fields inside ca
 |------|------|---------|-------------|
 | `id` | string | — | Id of the fieldset. The legend and error ids derive from it. A generated id is used when omitted. |
 | `legend` | node | — | Labels the fieldset's contents. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the legend: `required` or `optional`. |
 | `isDisabled` | bool | `false` | Disables the fieldset and every control inside it. |
-| `isRequired` | bool | `false` | Marked on the legend. |
+| `isRequired` | bool | `false` | Announces the group as required to assistive technology. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `error` | node | — | One error for the group, announced when it appears. |
 | `children` | node | — | The fields the legend groups. |
 | `className` | string | `''` | Extra class on the `<fieldset>`, beside `plus-fieldset`. |
 | `style` | object | — | Inline style on the `<fieldset>`. |
+
+## Variants
+
+**`labelMarker`** — `required` · `optional`
+
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 

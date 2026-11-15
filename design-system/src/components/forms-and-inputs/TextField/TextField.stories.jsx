@@ -231,9 +231,9 @@ Anatomy.play = async ({ canvasElement }) => {
         .toEqual(['plus-field__leading', 'plus-field__content', 'plus-field__trailing']);
     await expect(box.querySelector('.plus-field__content').contains(input)).toBe(true);
 
-    // Required: an asterisk for the eye, `aria-required` for everyone else.
+    // Required: `aria-required` sits on the input; an unmarked majority label stays plain.
     await expect(input.getAttribute('aria-required')).toBe('true');
-    await expect(canvasElement.querySelector('.plus-field-required').getAttribute('aria-hidden')).toBe('true');
+    await expect(canvasElement.textContent).not.toContain('*');
 
     // The info button sits outside the label, so its name is not the field's.
     const info = canvas.getByRole('button', { name: 'About Full name' });

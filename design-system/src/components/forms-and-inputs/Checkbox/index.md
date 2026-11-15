@@ -106,7 +106,7 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 
 - **Label association.** The component derives an id for the input and label automatically; pass `aria-label` only when there is no visible label.
 - **Do not disable a box that must stay reachable.** Use `isInvalid` with a message linked by `aria-describedby`, so a screen reader user hears why the option cannot be chosen. Include an error message for a required or invalid box, for example "Select an option".
-- **`isRequired` reaches the input**, so native validation applies. The marker is decoration, hidden from assistive technology.
+- **`isRequired` sets `aria-required` on the checkbox**, whether or not `labelMarker="required"` is shown for a minority required field.
 - **`isIndeterminate` is set on the DOM node** and announced as "mixed".
 - **Keyboard.** `Space` toggles the focused checkbox; `Enter` does not. Keyboard focus is a 2px ring on `border.focused`, 2px off the box; pointer focus draws none.
 
@@ -123,7 +123,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGr
 ## Parts
 
 1. **Box.** An 18 square with a 2px edge. Selected, it fills with the selected bold fill and draws a check; mixed, it draws a dash.
-2. **Label.** 14/20 text beside the box in a 24 row. It names the checkbox. A required marker follows it.
+2. **Label.** 14/20 text beside the box in a 24 row. It names the checkbox. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text.
 3. **Description.** Optional 12/16 text under the label that describes the choice. It does not name it.
 
 ### States
@@ -175,7 +175,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGr
 | `isInvalid` | bool | `false` | Marks the unselected box as failing validation |
 | `isDisabled` | bool | `false` | Disable the checkbox |
 | `isReadOnly` | bool | `false` | Shown and announced, not changeable |
-| `isRequired` | bool | `false` | Show the required marker and require it natively |
+| `labelMarker` | enum | — | Minority marker after the label |
+| `isRequired` | bool | `false` | Set aria-required on the checkbox |
 | `description` | node | — | Secondary text under the label. It describes the box and does not name it. |
 | `illustration` | node | — | Decorative picture shown above the label when `appearance` is `tile`. |
 | `appearance` | enum | `'plain'` | `plain` (default) draws the box and label inline; `card` draws a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end. |
@@ -189,13 +190,15 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGr
 
 ## Variants
 
+**`labelMarker`** — `required` · `optional`
+
 **`appearance`** — `plain` · `card` · `tile`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--border-width-selected` · `--card-pad-default` · `--checkbox-control-size` · `--choice-tile-width` · `--control-sm` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radius-control-md` · `--radius-md` · `--space-025` · `--space-0375` · `--space-050` · `--stack-lg` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium` · `--type-weight-regular`
+`--body-default` · `--border-width-default` · `--border-width-selected` · `--card-pad-default` · `--checkbox-control-size` · `--choice-tile-width` · `--control-sm` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radius-control-md` · `--radius-md` · `--space-025` · `--space-0375` · `--space-050` · `--stack-lg` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss`. Override these through the token layer, never with a literal.
 

@@ -236,7 +236,8 @@ The tags take Tag's own tokens.
 | `id` | string | — | — |
 | `name` | string | — | — |
 | `label` | node | — | Names the field. Give every TagInput one. |
-| `required` | bool | `false` | Shows an asterisk and sets `aria-required`. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
+| `required` | bool | `false` | Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `info` | node | — | Text for an info tooltip beside the label. |
 | `caption` | node | — | Standing help under the field. A validation message takes its place. |
 | `placeholder` | string | `'Select or create a tag'` | Shown in the entry while there are no tags. |
@@ -262,6 +263,8 @@ The tags take Tag's own tokens.
 | `style` | object | — | — |
 
 ## Variants
+
+**`labelMarker`** — `required` · `optional`
 
 **`spacing`** — `default` · `compact`
 

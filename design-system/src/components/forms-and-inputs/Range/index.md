@@ -136,6 +136,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `id` | string | — | — |
 | `name` | string | — | — |
 | `label` | node | — | Text that names the slider. Without it the slider has no accessible name. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
 | `showLabel` | bool | `true` | Render the label visually hidden rather than visible. It still names the slider. |
 | `min` | number | `0` | The smallest value. Defaults to 0. |
 | `max` | number | `100` | The largest value. Defaults to 100. |
@@ -149,6 +150,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `style` | object | — | — |
 
 ## Variants
+
+**`labelMarker`** — `required` · `optional`
 
 **`size`** — `8` · `12` · `16`
 

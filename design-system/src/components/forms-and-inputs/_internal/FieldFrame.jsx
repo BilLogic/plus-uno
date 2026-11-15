@@ -45,28 +45,29 @@ export function fieldDescription({ fieldId, message, counted = false, describedB
 }
 
 /**
- * The label row above a field: the label, the required asterisk and an
- * optional info tooltip.
+ * The label row above a field: the label, an optional `(required)` or
+ * `(optional)` marker for the form's minority case, and an optional info
+ * tooltip.
  *
- * The asterisk is decoration; the control carries `aria-required`, and the
- * form explains the asterisk once in a legend. The info button sits outside
- * the `<label>` so its name never becomes part of the field's name.
+ * The marker is plain text in the label's own type style; `aria-required` sits
+ * on the control regardless of which side is the minority. The info button sits
+ * outside the `<label>` so its name never becomes part of the field's name.
  */
 export const FieldLabel = ({
     id,
     htmlFor,
     children,
-    required = false,
+    marker,
     info,
     hidden = false,
     name,
     className = '',
 }) => {
     if (!children) return null;
+    const markerText = marker === 'required' || marker === 'optional' ? ` (${marker})` : null;
     const label = (
         <label id={id} htmlFor={htmlFor} className={`plus-field-label${hidden ? ' plus-field-label--hidden' : ''} ${className}`.trim()}>
-            {children}
-            {required && <span className="plus-field-required" aria-hidden="true">*</span>}
+            {children}{markerText}
         </label>
     );
     if (!info || hidden) return label;
@@ -91,7 +92,8 @@ FieldLabel.propTypes = {
     id: PropTypes.string,
     htmlFor: PropTypes.string,
     children: PropTypes.node,
-    required: PropTypes.bool,
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    marker: PropTypes.oneOf(['required', 'optional']),
     /** Text for the info tooltip beside the label. */
     info: PropTypes.node,
     /** Clips the label out of sight. It is still rendered and still names the field. */

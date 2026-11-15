@@ -103,7 +103,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Parts
 
 1. **Field.** The box that shows the picks, or the placeholder.
-2. **Label.** Names the field. A required marker follows it.
+2. **Label.** Names the field. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text.
 3. **Tree.** Rows that expand to their children. A parent checks its descendants.
 4. **Caption.** Helper text, or the error that replaces it.
 
@@ -155,7 +155,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `placeholder` | string | `'Please select'` | Hint text shown in the field while nothing is selected. Defaults to `Please select`. |
 | `spacing` | enum | `'default'` | `default` draws 40 and `compact` draws 32. |
 | `isDisabled` | bool | `false` | — |
-| `isRequired` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
+| `isRequired` | bool | `false` | Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `isInvalid` | bool | `false` | Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. |
 | `errorMessage` | node | — | — |
 | `className` | string | `''` | — |
@@ -164,6 +165,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Variants
 
 **`spacing`** — `default` · `compact`
+
+**`labelMarker`** — `required` · `optional`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

@@ -44,11 +44,6 @@
     font: var(--body-sm);
 }
 
-.plus-field-required {
-    color: var(--ds-text-danger);
-    margin-left: var(--stack-sm);
-}
-
 // Hidden, not removed: the label still names the control.
 .plus-field-label--hidden {
     position: absolute;

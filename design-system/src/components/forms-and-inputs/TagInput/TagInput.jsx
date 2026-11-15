@@ -99,6 +99,7 @@ const TagInput = ({
     id,
     name,
     label,
+    labelMarker,
     required = false,
     info,
     caption,
@@ -671,7 +672,7 @@ const TagInput = ({
 
     return (
         <FieldFrame disabled={disabled} invalid={tone === 'invalid'} className={`plus-tag-input ${className}`.trim()} style={style}>
-            <FieldLabel htmlFor={fieldId} required={required} info={info}>
+            <FieldLabel htmlFor={fieldId} marker={labelMarker} info={info}>
                 {label}
             </FieldLabel>
             <div
@@ -857,7 +858,9 @@ TagInput.propTypes = {
     name: PropTypes.string,
     /** Names the field. Give every TagInput one. */
     label: PropTypes.node,
-    /** Shows an asterisk and sets `aria-required`. */
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     required: PropTypes.bool,
     /** Text for an info tooltip beside the label. */
     info: PropTypes.node,

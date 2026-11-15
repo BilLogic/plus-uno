@@ -100,7 +100,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Label row.** Names the field, carries the required marker, and displays the batch upload status (`Uploading 2 of 6`) at its end while any `FileItem` child uploads.
+1. **Label row.** Names the field, carries an optional minority marker (`"(optional)"` or `"(required)"`) in plain text, and displays the batch upload status (`Uploading 2 of 6`) at its end while any `FileItem` child uploads.
 2. **Description.** Help text inside the drop zone, built from `acceptedFormats` when `description` is omitted.
 3. **Picker / drop line.** Either a primary `Button` (`buttonText`) or, with `allowFolders`, the `"Choose files or a folder, or drop them here"` line with inline file and folder triggers. Absent when `isReadOnly`.
 4. **Files (`children`).** `FileItem` rows rendered in one bordered list below the drop zone.
@@ -122,9 +122,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Label and batch status | `--ds-text` in `--body-default`; batch status in `--body-sm` and `--ds-text-subtle`; disabled `--ds-text-subtle`. |
+| Label, minority marker, and batch status | `--ds-text` in `--body-default`; batch status in `--body-sm` and `--ds-text-subtle`; disabled `--ds-text-subtle`. |
 | Drop zone container | Padding `--pad-y-md` and `--pad-x-md`; radius `--card-radius-compact`; border `--ds-border`; drag-over `--ds-background-brand-subtlest` and `--ds-border-brand`. |
-| Required marker, error | `--ds-text-danger`, `--ds-icon-danger`. |
+| Error message | `--ds-text-danger`, `--ds-icon-danger`. |
 | Success message | `--ds-text-success`, `--ds-icon-success`. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width`. |
 
@@ -145,7 +145,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `id` | string | — | — |
 | `name` | string | — | — |
 | `label` | node | — | The visible label above the field. Without one, the file input is named "File upload". |
-| `isRequired` | bool | `false` | Shows an asterisk on the label. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
+| `isRequired` | bool | `false` | Sets `aria-required` on the file input. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `description` | string | — | Help text inside the field, such as size limits. When omitted, it is built from `acceptedFormats`. |
 | `acceptedFormats` | arrayOf | — | — |
 | `allowFolders` | bool | `false` | Shows the `"Choose files or a folder, or drop them here"` line and enables picking or dropping a folder. |
@@ -163,6 +164,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `children` | node | — | The uploaded-file list (`FileItem` rows), shown below the drop zone and outside the frame. |
 
 ## Variants
+
+**`labelMarker`** — `required` · `optional`
 
 **`validation`** — `none` · `invalid` · `valid`
 

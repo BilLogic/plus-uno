@@ -15,6 +15,7 @@ import './Fieldset.scss';
 const Fieldset = ({
     id,
     legend,
+    labelMarker,
     isDisabled = false,
     isRequired = false,
     error,
@@ -26,6 +27,7 @@ const Fieldset = ({
 }) => {
     const fieldId = useFieldId(id);
     const errorId = error ? `${fieldId}-error` : undefined;
+    const markerText = labelMarker === 'required' || labelMarker === 'optional' ? ` (${labelMarker})` : null;
 
     const classes = [
         'plus-fieldset',
@@ -44,12 +46,9 @@ const Fieldset = ({
         >
             {legend && (
                 <BaseFieldset.Legend id={`${fieldId}-legend`} className="plus-fieldset-legend">
-                    {legend}
-                    {isRequired && (
-                        <>
-                            <span className="plus-fieldset-required" aria-hidden="true"> *</span>
-                            <span className="visually-hidden"> (required)</span>
-                        </>
+                    {legend}{markerText}
+                    {isRequired && labelMarker !== 'required' && (
+                        <>{' '}<span className="visually-hidden">(required)</span></>
                     )}
                 </BaseFieldset.Legend>
             )}
@@ -68,9 +67,11 @@ Fieldset.propTypes = {
     id: PropTypes.string,
     /** Labels the fieldset's contents. */
     legend: PropTypes.node,
+    /** Marks the form's minority case in plain text after the legend: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
     /** Disables the fieldset and every control inside it. */
     isDisabled: PropTypes.bool,
-    /** Marked on the legend. */
+    /** Announces the group as required to assistive technology. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** One error for the group, announced when it appears. */
     error: PropTypes.node,

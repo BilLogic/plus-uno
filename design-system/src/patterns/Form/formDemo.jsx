@@ -67,7 +67,8 @@ export const FormFields = ({ values, onChange, errors = {}, onBlurField, subject
             caption={subjectWaits ? 'Choose a student first.' : undefined}
         />
         <TextField
-            label="Notes (optional)"
+            label="Notes"
+            labelMarker="optional"
             value={values.notes}
             onChange={(e) => onChange({ ...values, notes: e.target.value })}
         />

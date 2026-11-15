@@ -14,13 +14,13 @@ export default {
         docs: {
             description: {
                 component:
-                    'The label above a field, with its optional required marker, and the caption below it, in the tone its state names. Every field in Forms and inputs draws both for you.',
+                    'The label above a field, with an optional `(optional)` or `(required)` marker for the minority case in a form, and the caption below it, in the tone its state names. Every field in Forms and inputs draws both for you.',
             },
         },
     },
     argTypes: {
         text: { control: 'text', table: { category: 'Content' } },
-        required: { control: 'boolean', table: { category: 'Behavior' } },
+        marker: { control: 'radio', options: [undefined, 'optional', 'required'], table: { category: 'Behavior' } },
         htmlFor: { table: { disable: true } },
     },
 };
@@ -31,7 +31,7 @@ const cell = { minWidth: 'var(--size-1000)' };
 
 export const Overview = () => (
     <div style={stack}>
-        <Label text="Field label" required />
+        <Label text="Field label" />
         <Caption text="Helper or validation copy beneath the label." state="default" />
     </div>
 );
@@ -46,16 +46,23 @@ Overview.play = async ({ canvasElement }) => {
     await expect(canvas.getByText('Helper or validation copy beneath the label.')).toBeInTheDocument();
 };
 
-export const LabelPlain = () => <Label text="Email address" required={false} />;
+export const LabelPlain = () => <Label text="Email address" />;
 LabelPlain.play = async ({ canvasElement }) => {
-    await expect(canvasElement.querySelector('label')).not.toHaveTextContent('*');
+    await expect(canvasElement.querySelector('label')).toHaveTextContent(/^Email address$/);
 };
 
-export const LabelRequired = () => <Label text="Email address" required />;
+export const LabelOptional = () => <Label text="Notes" marker="optional" />;
+LabelOptional.play = async ({ canvasElement }) => {
+    const label = canvasElement.querySelector('label');
+    await expect(label).toHaveTextContent(/^Notes \(optional\)$/);
+    await expect(getComputedStyle(label).color).toBe(tokenColor(canvasElement, '--ds-text'));
+};
+
+export const LabelRequired = () => <Label text="Email address" marker="required" />;
 LabelRequired.play = async ({ canvasElement }) => {
     const label = canvasElement.querySelector('label');
-    await expect(label).toHaveTextContent('Email address*');
-    await expect(getComputedStyle(label.querySelector('.plus-field-required')).color).toBe(tokenColor(canvasElement, '--ds-text-danger'));
+    await expect(label).toHaveTextContent(/^Email address \(required\)$/);
+    await expect(getComputedStyle(label).color).toBe(tokenColor(canvasElement, '--ds-text'));
 };
 
 export const CaptionVariants = () => (
@@ -143,11 +150,11 @@ Layout.play = async ({ canvasElement }) => {
 };
 
 export const Interactive = {
-    args: { text: 'Email address', required: true },
+    args: { text: 'Notes', marker: 'optional' },
     render: (args) => (
         <div style={stack}>
             <Label {...args} />
-            <Caption text="We'll never share your email." state="default" />
+            <Caption text="Anything we should know before the session." state="default" />
         </div>
     ),
 };

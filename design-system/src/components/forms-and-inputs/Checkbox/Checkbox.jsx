@@ -31,6 +31,7 @@ const Checkbox = ({
      * the tab order and keeps full contrast, so the answer can still be read.
      */
     isReadOnly = false,
+    labelMarker,
     isRequired = false,
     /** Secondary text under the label. It describes the box; it does not name it. */
     description,
@@ -106,7 +107,7 @@ const Checkbox = ({
                 >
                     <BaseCheckbox.Indicator keepMounted className="plus-form-checkbox-indicator" />
                 </BaseCheckbox.Root>
-                <FieldLabel htmlFor={fieldId} required={isRequired} name={name} className="plus-form-checkbox-label">
+                <FieldLabel htmlFor={fieldId} marker={labelMarker} name={name} className="plus-form-checkbox-label">
                     {label}
                 </FieldLabel>
             </div>
@@ -136,7 +137,9 @@ Checkbox.propTypes = {
     isDisabled: PropTypes.bool,
     /** Shows the state without letting the user change it. */
     isReadOnly: PropTypes.bool,
-    /** Shows an asterisk on the label and sets the native `required` attribute. */
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Sets the required constraint (`aria-required`) on the checkbox. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Secondary text under the label. It describes the box and does not name it. */
     description: PropTypes.node,

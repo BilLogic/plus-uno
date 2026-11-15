@@ -44,6 +44,7 @@ const Radio = ({
      * the group (RadioGroup) carries the announcement.
      */
     isReadOnly = false,
+    labelMarker,
     isRequired = false,
     /** Secondary text under the label. It describes the option; it does not name it. */
     description,
@@ -132,7 +133,7 @@ const Radio = ({
                         {radioControl}
                     </BaseRadioGroup>
                 )}
-                <FieldLabel htmlFor={fieldId} required={isRequired} name={name} className="plus-form-radio-label">
+                <FieldLabel htmlFor={fieldId} marker={labelMarker} name={name} className="plus-form-radio-label">
                     {label}
                 </FieldLabel>
             </div>
@@ -160,7 +161,9 @@ Radio.propTypes = {
     isDisabled: PropTypes.bool,
     /** Shows the option without letting the user change it. */
     isReadOnly: PropTypes.bool,
-    /** Shows an asterisk on the label and sets the native `required` attribute. */
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Sets the required constraint (`aria-required`) on a standalone radio. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Secondary text under the label. It describes the option; it does not name it. */
     description: PropTypes.node,

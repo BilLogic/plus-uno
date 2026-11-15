@@ -4,7 +4,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as FormsStories from './Forms.stories.jsx';
-import { STAGE } from './formsDemo.jsx';
+import { STAGE, MinorityMarked, MajorityMarked } from './formsDemo.jsx';
 import { PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
@@ -64,7 +64,7 @@ Choose among four hosts. The <a target="_top" href="./?path=/docs/templates-form
 
 ## Marks and help
 
-<ComponentExample of={FormsStories.RequiredMarks} title="Required marks and help" description="Required fields carry an asterisk, explained once in the legend. Optional fields say &quot;(optional)&quot; only when most of the form is required. Help sits under the field, where it stays after typing." />
+<ComponentExample of={FormsStories.RequiredMarks} title="Minority marker and help" description="Most fields here are required, so only Notes says &quot;(optional)&quot; in plain text; Student and Site set aria-required with no visible mark. Help sits under the field, where it stays after typing." />
 
 </div>
 
@@ -178,11 +178,18 @@ Mark the field, say what to fix inline, scroll the body to it, and shake once <P
     dontCaption="A second dialog over the first, with the field left unexplained."
 />
 
-### Mark required fields with an asterisk and explain it once.
+### Mark only the minority case in the label, in plain text.
 
-<RuleTag kind="automatic" />
+<RuleTag kind="review" />
 
-The legend says what the asterisk means. Optional fields are marked "(optional)" only in a form where most fields are required, so one pattern holds across the product. `isRequired` sets the mark and `aria-required`.
+When most fields are required, mark the optional ones `"(optional)"` (`labelMarker="optional"`). When most fields are optional, mark the required ones `"(required)"` (`labelMarker="required"`). The marker sits in the label's own type style, never a separate color, symbol or legend, and required controls still set `isRequired` so screen readers get `aria-required`.
+
+<DoDontPair
+    doExample={<MinorityMarked />}
+    doCaption="Two required fields stay unmarked; only the optional field says so."
+    dontExample={<MajorityMarked />}
+    dontCaption="Every field carries a marker, so none stands out."
+/>
 
 ### Put help in the caption, never in a tooltip.
 
@@ -255,7 +262,7 @@ When the In steps host asks one focal question per step with two to four picture
 
 - Every input has a visible label. A group is a `fieldset` with a `legend`; its one error is announced once.
 - A field error is announced and sets `aria-invalid`; the submit moves focus to the first invalid field. A server message is announced when it appears.
-- A required field sets `aria-required`; the asterisk is explained in the legend and never carries the meaning alone.
+- A required field sets `aria-required` whether or not it carries a visible `"(required)"` marker; only the form's minority case is marked in the label text.
 - A sending button keeps its name and sets `aria-busy`; Cancel stays reachable.
 - A dialog opens only from a person's action. Focus goes to the first input and stays trapped until it closes.
 

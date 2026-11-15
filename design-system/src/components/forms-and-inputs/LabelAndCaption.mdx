@@ -50,7 +50,9 @@ The label above a field names it, and the caption below it helps, warns or confi
 
 <ComponentExample of={LabelAndCaptionStories.LabelPlain} title="Label" description="The field's name, in the small body size." />
 
-<ComponentExample of={LabelAndCaptionStories.LabelRequired} title="Required label" description="The required marker follows the label in the danger text color." />
+<ComponentExample of={LabelAndCaptionStories.LabelOptional} title="Optional minority label" description="Appends &quot;(optional)&quot; in the label's own type style when most fields in the form are required." />
+
+<ComponentExample of={LabelAndCaptionStories.LabelRequired} title="Required minority label" description="Appends &quot;(required)&quot; in the label's own type style when most fields in the form are optional." />
 
 <ComponentExample of={LabelAndCaptionStories.CaptionHelp} title="Help caption" description="Standing help under the field, in the subtle text color." />
 
@@ -125,7 +127,7 @@ Every field component in this group draws two lines around its control: the **la
 ## Parts
 
 1. **Label.** The field's name, tied to its control.
-2. **Required marker** (optional). An asterisk after the label.
+2. **Minority marker** (optional). Plain text `"(optional)"` or `"(required)"` in the label's own type style, used only for the minority case in a form.
 3. **Info button** (optional). An icon beside the label that opens a tooltip, outside the label so its name never joins the field's.
 4. **Caption message** (optional). Help, or a status message with its icon.
 5. **Character count** (optional). On the right of the caption line, beside the message.
@@ -154,8 +156,7 @@ Every field component in this group draws two lines around its control: the **la
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Label</td><td><code>--body-sm</code> in <code>--ds-text</code>.</td></tr>
-<tr><td>Required marker</td><td><code>--ds-text-danger</code>, <code>--stack-sm</code> after the label.</td></tr>
+<tr><td>Label and minority marker</td><td><code>--body-sm</code> in <code>--ds-text</code>.</td></tr>
 <tr><td>Info button</td><td><code>--ds-icon-subtle</code>; focus ring <code>--focus-ring-width</code> in <code>--ds-border-focused</code>.</td></tr>
 <tr><td>Caption</td><td><code>--body-sm</code>; help <code>--ds-text-subtle</code>, success <code>--ds-text-success</code>, danger <code>--ds-text-danger</code>, warning <code>--ds-text-warning</code>.</td></tr>
 <tr><td>Caption icon</td><td><code>--icon-sm</code>, <code>--stack-sm</code> before the message.</td></tr>
@@ -181,15 +182,15 @@ An instruction reads badly in a screen reader's list of form fields, where the l
     dontCaption="An instruction where the name should be."
 />
 
-### Mark the optional fields, not the required ones.
+### Mark only the minority case, in plain text.
 
-Most fields are required. Mark the exceptions with "(optional)" so the common case stays clean.
+In a form where most fields are required, mark only the optional ones `"(optional)"`. In a form where most fields are optional, mark only the required ones `"(required)"`. Never mark both sides, and never use a separate color or symbol.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><TextField label="Student name" defaultValue="Maya Johnson" /><TextField label="Grade" defaultValue="Grade 8" /><TextField label="Notes (optional)" placeholder="Anything we should know?" /></div>}
-    doCaption="Only the exception is marked."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><TextField label="Student name" defaultValue="Maya Johnson" isRequired /><TextField label="Grade" defaultValue="Grade 8" isRequired /><TextField label="Notes" placeholder="Anything we should know?" isRequired /></div>}
-    dontCaption="Every field wears a star."
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><TextField label="Student name" isRequired defaultValue="Maya Johnson" /><TextField label="Grade" isRequired defaultValue="Grade 8" /><TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" /></div>}
+    doCaption="Only the minority field carries a marker."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><TextField label="Student name" isRequired labelMarker="required" defaultValue="Maya Johnson" /><TextField label="Grade" isRequired labelMarker="required" defaultValue="Grade 8" /><TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" /></div>}
+    dontCaption="Every field carries a marker, so none stands out."
 />
 
 ### Write the error, not the fact that there is one.
@@ -254,7 +255,7 @@ when they need it, and it is low contrast by design. Put help in a caption.
 </thead>
 <tbody>
 <tr><td>Name the field: "Email address".</td><td>An instruction: "Enter your email address".</td></tr>
-<tr><td>Mark the exceptions: "Notes (optional)".</td><td>An asterisk on every field.</td></tr>
+<tr><td>Mark only the minority case in plain text: "Notes (optional)" or "Email (required)".</td><td>Mark every field, or put a symbol beside the label.</td></tr>
 <tr><td>Use sentence case, with no colon or end punctuation on the label.</td><td>Title case, or "Email address:".</td></tr>
 <tr><td>Put standing help in the caption: "Include the area code".</td><td>Put help in the placeholder, where it disappears as people type.</td></tr>
 <tr><td>Say what to do in an error: "Choose a date after today."</td><td>"Invalid date".</td></tr>
@@ -279,9 +280,10 @@ when they need it, and it is low contrast by design. Put help in a caption.
   `FileUpload` and `DateTimePicker` give the message an id and point the
   control at it, and mark an invalid field `aria-invalid`. Your own
   `aria-describedby` is composed with theirs, not replaced by it.
-- **The asterisk is hidden from screen readers.** It is `aria-hidden`; a
-  field's `isRequired` sets `aria-required` on the control, and your own
-  validation is what enforces it.
+- **`isRequired` sets `aria-required` regardless of the label marker.** Whether
+  a required field carries `labelMarker="required"` or stays unmarked because
+  most of the form is required, screen readers still receive `aria-required` on
+  the control.
 - **Standing help is described, not announced.** A `caption` is attached to the
   control with `aria-describedby`; an error is also announced when it appears.
 - **Do not hide the label.** `isLabelHidden` is meant to move pixels, not to
