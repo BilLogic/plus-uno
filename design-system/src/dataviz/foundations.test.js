@@ -5,8 +5,7 @@ import { describe, expect, it } from 'vitest';
 /**
  * Every other foundation (spacing, radius, elevation, stroke, type, motion)
  * a chart draws with must come off the ladder, the same as the color work in
- * `palette.test.js` — Atlassian's chart guidance is color-only, so there's no
- * chart-specific exception for the rest. This walks every chart source file
+ * `palette.test.js`. This walks every chart source file
  * and fails on the literal shapes `design-system/guidelines/foundations/
  * data-visualization.md` rules out, so a new chart can't reintroduce them.
  */
@@ -56,5 +55,13 @@ describe('data-viz foundations', () => {
             path.endsWith('.jsx') && !path.endsWith('chartTheme.js') &&
             /\btooltip:\s*{/.test(text) && !text.includes('chartTheme.tooltip'));
         expect(offenders.map((f) => f.path)).toEqual([]);
+    });
+
+    it('the shared chart theme and motion module carry no eased curve name or animation millisecond literal', () => {
+        for (const name of ['chartTheme.js', 'chartMotion.js']) {
+            const text = readFileSync(join(ROOT, name), 'utf8');
+            expect(text, `${name} eased curve`).not.toMatch(/\b(easeOut|easeIn|easeInOut|easeOutQuad|easeOutCubic|easeOutQuart|swing)\b|cubic-bezier\s*\(/);
+            expect(text, `${name} ms literal`).not.toMatch(/\bduration\s*:\s*\d+/);
+        }
     });
 });

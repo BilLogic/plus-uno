@@ -69,15 +69,32 @@ Removing a border or line with `0` needs no token.
 
 </FoundationSection>
 
-<FoundationSection title="Type and motion">
+<FoundationSection title="Type">
 
 <RefTable
     head={['Role', 'Rule']}
     rows={[
         ['Tick labels, legends, tooltips, data labels', <>Use current text tokens — never a <C>'12px'</C> literal or a <C>var()</C> with a literal fallback.</>],
         ['Chart title', <>Name the chart in its surrounding Section or Card header, never Highcharts' <C>title</C> option.</>],
-        ['Series entrance and hover motion', <>Use motion tokens from <C>design-system/src/tokens/ladder/_motion.scss</C>.</>],
-        ['Reduced motion', <><C>prefers-reduced-motion</C> collapses every duration to <C>0ms</C> globally; charts need no custom reduced-motion branch.</>],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Motion">
+
+Every chart enters on a PLUS spring rather than Highcharts' eased curve. `chartMotion.js` turns the generated spring table (<C>SPRINGS</C>) and the analytic step response (<C>springStep</C>, <C>measureSpring</C>) into Highcharts animation objects whose easing follows the spring step and whose duration equals the spring's settle time. Charts inside one <C>ChartMotionArea</C> share the 20 ms load-reveal stagger within the 500 ms cap (<C>staggerDelays</C>), and animations turn off after the first render so redraws, resizes and data updates never replay.
+
+<Canvas of={FoundationsStories.Motion} sourceState="none" />
+
+<RefTable
+    head={['Role', 'Spring / rule']}
+    rows={[
+        ['Series entrance', <><C>spatial.default</C> (expressive inside <C>data-motion="expressive"</C>)</>],
+        ['Hover and inactive states', <C>appearance.fast</C>],
+        ['Reduced motion', <>Collapses entrance and state changes to the <C>appearance.fast</C> fade</>],
+        ['Area choreography', <>Charts in a <C>ChartMotionArea</C> stagger 20 ms apart within the 500 ms cap; 0 ms outside a provider</>],
+        ['Redraws and updates', <>First render only (<C>animation: false</C> on subsequent updates and resizes)</>],
     ]}
 />
 
@@ -88,6 +105,8 @@ Removing a border or line with `0` needs no token.
 <FoundationRelated
     items={[
         { title: 'Chart color', description: 'Every chart color, grouped by the job it does.', href: '?path=/docs/data-visualizations-color--docs' },
+        { title: 'Physics', description: 'The spring table and modes that chart motion samples from.', href: '?path=/docs/foundations-expression-motion-physics--docs' },
+        { title: 'Choreography', description: 'One orchestrated moment per area and the load-reveal stagger.', href: '?path=/docs/foundations-expression-motion-choreography--docs' },
         { title: 'Elevation', description: 'The shadow steps the tooltip draws from.', href: '?path=/docs/foundations-visual-elevation--docs' },
     ]}
 />
