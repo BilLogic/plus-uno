@@ -287,6 +287,13 @@
           "codeSyntax": {
             "WEB": "var(--control-lg)"
           }
+        },
+        {
+          "name": "Control/xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--control-xl)"
+          }
         }
       ]
     },
@@ -639,6 +646,13 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--button-radius-compact)"
+          }
+        },
+        {
+          "name": "Button/radius-spacious",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--button-radius-spacious)"
           }
         },
         {
