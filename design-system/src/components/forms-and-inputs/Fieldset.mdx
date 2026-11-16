@@ -41,7 +41,7 @@ A fieldset groups related controls under one legend and one validation message.
 
 ## State
 
-<ComponentExample of={FieldsetStories.Required} title="Required" description="Marks the legend with an asterisk and adds a hidden (required) to its name." />
+<ComponentExample of={FieldsetStories.Required} title="Required" description="Appends &quot;(required)&quot; in plain text when required fields are the minority; isRequired announces the group to screen readers either way." />
 
 <ComponentExample of={FieldsetStories.Invalid} title="Invalid" description="One error message for the whole group, announced when it appears." />
 
@@ -90,7 +90,7 @@ Use `Fieldset` when a set of mixed controls shares one legend and one validation
 
 ## Parts
 
-1. **Legend.** Names the group, in body default. A required marker follows it.
+1. **Legend.** Names the group, in body default. An optional `"(optional)"` or `"(required)"` minority marker follows it in the same type style.
 2. **Fields.** The grouped fields, stacked with `--stack-md` between them.
 3. **Error.** One message under the fields, in body small.
 
@@ -101,7 +101,7 @@ Use `Fieldset` when a set of mixed controls shares one legend and one validation
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Required</td><td>An asterisk in <code>--ds-text-danger</code> follows the legend. A visually hidden "(required)" joins its name.</td></tr>
+<tr><td>Required</td><td><code>isRequired</code> adds a visually hidden <code>"(required)"</code> to the legend's accessible name when no visible <code>labelMarker="required"</code> is shown; pass <code>labelMarker="required"</code> only when required fields are the minority in the form.</td></tr>
 <tr><td>Invalid</td><td>The error shows in <code>--ds-text-danger</code>, announced with <code>role="alert"</code> and linked with <code>aria-describedby</code>.</td></tr>
 <tr><td>Disabled</td><td>The native <code>disabled</code> attribute disables every field inside.</td></tr>
 </tbody>
@@ -116,8 +116,8 @@ A fieldset has no hover, pressed or focus state of its own. The fields inside ca
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Legend</td><td><code>--ds-text</code>, body default.</td></tr>
-<tr><td>Required marker, error</td><td><code>--ds-text-danger</code>; the error in body small.</td></tr>
+<tr><td>Legend and minority marker</td><td><code>--ds-text</code>, body default.</td></tr>
+<tr><td>Error</td><td><code>--ds-text-danger</code>, body small.</td></tr>
 <tr><td>Gap</td><td><code>--stack-md</code>.</td></tr>
 </tbody>
 </DocsTable>
@@ -209,7 +209,7 @@ The legend says what the fields are. The button says what to do with them.
 
 - **A real `fieldset` and `legend` pair.** The legend is tied to the group through native HTML semantics, which every screen reader already understands.
 - **The error is announced once.** `role="alert"` on the error message means assistive technology hears it as soon as it appears, without needing focus to move there.
-- **`isRequired` is visual and spoken.** The asterisk is `aria-hidden`, and a visually hidden "(required)" is added to the legend's accessible name.
+- **`isRequired` is spoken even when unmarked.** When most fields in the form are required and `labelMarker` is omitted, a visually hidden `"(required)"` is added to the legend's accessible name; when `labelMarker="required"` is set, the visible `"(required)"` text already names it.
 
 </div>
 

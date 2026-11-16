@@ -25,7 +25,7 @@ Settings saved as a group, drawn in the Frame with the Sidebar docked. The form 
 
 1. **Message slot.** At the top, for a server failure.
 2. **Group.** One Fieldset per group of fields that describe one thing, with its legend.
-3. **Field.** Label, control, help text, and the error under it when there is one. Required fields are marked.
+3. **Field.** Label, control, help text, and the error under it when there is one. Only the minority case carries "(optional)" or "(required)" in the label.
 4. **Footer.** Left-aligned, `--space-300` below the last field, Primary first. Cancel is Subtle.
 
 ### In a Panel

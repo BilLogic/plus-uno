@@ -31,7 +31,7 @@ import { FormFields, FILLED } from '../../../patterns/Form/formDemo.jsx';
  * What is new here: required and optional marks, help in a caption, bound
  * inputs, and the one-question-per-step flow in the In steps host.
  *
- *   Marks          the fields with their required marks and their captions
+ *   Marks          the fields with their minority marker and their captions
  *   BoundInputs    a control that cannot be wrong, in place of a free one
  *   QuestionStep   one focal question per step on Frame · focused
  */
@@ -63,11 +63,31 @@ export const BoundInputs = () => {
             <Fieldset legend="Session">
                 <RadioGroup legend="Format" isRequired options={['In person', 'Video', 'Phone']} value={format} onChange={setFormat} />
                 <Select label="Grade" isRequired options={GRADES.map((g) => ({ value: g, label: g }))} value={grade} onChange={setGrade} />
-                <TextField label="Notes (optional)" value="" onChange={() => {}} />
+                <TextField label="Notes" labelMarker="optional" value="" onChange={() => {}} />
             </Fieldset>
         </div>
     );
 };
+
+const pairStack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', width: '100%' };
+
+/** Do: two required fields stay unmarked; the lone optional field carries `(optional)`. */
+export const MinorityMarked = () => (
+    <div style={pairStack}>
+        <TextField label="Student" isRequired defaultValue="Ana Ruiz" />
+        <TextField label="Site" isRequired defaultValue="Lincoln Middle" />
+        <TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" />
+    </div>
+);
+
+/** Don't: marking the majority case repeats `(required)` on nearly every label. */
+export const MajorityMarked = () => (
+    <div style={pairStack}>
+        <TextField label="Student" isRequired labelMarker="required" defaultValue="Ana Ruiz" />
+        <TextField label="Site" isRequired labelMarker="required" defaultValue="Lincoln Middle" />
+        <TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" />
+    </div>
+);
 
 export const QUESTION_STEPS = [
     {

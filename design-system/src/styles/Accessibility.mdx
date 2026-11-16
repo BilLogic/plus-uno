@@ -92,7 +92,7 @@ A disabled component keeps its label so people can tell what is unavailable. [Co
 
 - Every field has a visible label tied to its control: a field that renders its own label wires `htmlFor` to the control's `id` itself, and `Select` and `DatePicker` render none, so the form supplies it.
 - An error states what went wrong and how to fix it on the field through `errorMessage`.
-- A required field takes `required`, and the form places "Required fields are marked with an asterisk (*)" above its first field.
+- A required field sets `aria-required` (or native `required`) regardless of visual markers; the form marks only the minority case in plain text on the label — "(optional)" when most fields are required, "(required)" when most are optional.
 - Related fields sit in a `Fieldset`, which renders a `fieldset` and its `legend`.
 
 </FoundationSection>

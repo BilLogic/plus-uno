@@ -217,9 +217,9 @@ export const Selected = {
 };
 
 export const Required = {
-    render: () => <CheckboxGroup name="cbg-ex-req" legend="Subjects" options={subjects} isRequired />,
+    render: () => <CheckboxGroup name="cbg-ex-req" legend="Subjects" options={subjects} isRequired labelMarker="required" />,
     play: async ({ canvasElement }) => {
-        const group = within(canvasElement).getByRole('group', { name: /Subjects/ });
+        const group = within(canvasElement).getByRole('group', { name: 'Subjects (required)' });
         await expect(group.tagName).toBe('FIELDSET');
     },
 };

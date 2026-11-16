@@ -43,6 +43,7 @@ const RadioGroup = ({
     appearance = 'plain',
     /** Radio control (dot) width, in px; unset keeps today's rendering. */
     size,
+    labelMarker,
     isRequired = false,
     isDisabled = false,
     isReadOnly = false,
@@ -129,6 +130,7 @@ const RadioGroup = ({
         <Fieldset
             id={fieldId}
             legend={legend}
+            labelMarker={labelMarker}
             isDisabled={isDisabled}
             isRequired={isRequired}
             error={error}
@@ -208,7 +210,9 @@ RadioGroup.propTypes = {
     appearance: PropTypes.oneOf(['plain', 'card', 'tile']),
     /** Radio control (dot) width, in px; unset keeps today's rendering. */
     size: PropTypes.oneOf([10, 12, 14]),
-    /** The group needs an answer. Marked on the legend. */
+    /** Marks the form's minority case in plain text after the legend: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Sets `aria-required` on the radiogroup. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Overrides every Radio's own `isDisabled`. */
     isDisabled: PropTypes.bool,

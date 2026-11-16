@@ -31,6 +31,7 @@ const CheckboxGroup = ({
     defaultValue,
     onChange,
     appearance = 'plain',
+    labelMarker,
     isRequired = false,
     isDisabled = false,
     isReadOnly = false,
@@ -103,6 +104,7 @@ const CheckboxGroup = ({
         <Fieldset
             id={fieldId}
             legend={legend}
+            labelMarker={labelMarker}
             isDisabled={isDisabled}
             isRequired={isRequired}
             error={error}
@@ -154,7 +156,9 @@ CheckboxGroup.propTypes = {
     onChange: PropTypes.func,
     /** Passed to every Checkbox. `card` draws each as a bordered row; `tile` draws centered pictured tiles with a Checkbox at the top end. */
     appearance: PropTypes.oneOf(['plain', 'card', 'tile']),
-    /** Marks the question as needing an answer on the legend. */
+    /** Marks the form's minority case in plain text after the legend: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Announces the group as required to assistive technology. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Overrides every Checkbox's own `isDisabled`. */
     isDisabled: PropTypes.bool,

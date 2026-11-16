@@ -60,6 +60,7 @@ const Select = ({
     spacing = 'default',
     isDisabled = false,
     isReadOnly = false,
+    labelMarker,
     isRequired = false,
     info,
     isInvalid = false,
@@ -435,8 +436,8 @@ const Select = ({
     return (
         <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={wrapperClasses} style={style}>
             {label && (
-                <FieldLabel htmlFor={typeable ? fieldId : undefined} required={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
-                    <span id={labelId}>{label}</span>
+                <FieldLabel id={labelId} htmlFor={typeable ? fieldId : undefined} labelMarker={labelMarker} isRequired={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
+                    {label}
                 </FieldLabel>
             )}
             <div className="plus-select-field" onFocus={handleFocus} onBlur={handleBlur}>
@@ -551,7 +552,9 @@ Select.propTypes = {
     isDisabled: PropTypes.bool,
     /** Shows the value, stays focusable, and cannot be changed. */
     isReadOnly: PropTypes.bool,
-    /** Shows an asterisk on the label and sets `aria-required`. */
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Text for the info tooltip beside the label. */
     info: PropTypes.node,

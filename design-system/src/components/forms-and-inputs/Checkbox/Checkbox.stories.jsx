@@ -51,8 +51,14 @@ export default {
         },
         isRequired: {
             control: 'boolean',
-            description: 'Show the required marker and require it natively',
+            description: 'Set aria-required on the checkbox',
             table: { category: 'Behavior' },
+        },
+        labelMarker: {
+            control: 'radio',
+            options: [undefined, 'optional', 'required'],
+            description: 'Minority marker after the label',
+            table: { category: 'Content' },
         },
         isReadOnly: {
             control: 'boolean',
@@ -92,11 +98,11 @@ export const States = () => (
     </div>
 );
 
-/** A long label wraps inside its row; the required marker follows the label. */
+/** A long label wraps inside its row; a minority marker follows the label in plain text. */
 export const Content = () => (
     <div style={stack}>
         <Checkbox id="cb-content-long" label="Longer label text used in forms and filters" />
-        <Checkbox id="cb-content-required" label="Required field" isRequired />
+        <Checkbox id="cb-content-optional" label="Send session recap" labelMarker="optional" />
     </div>
 );
 
@@ -389,10 +395,11 @@ export const DisabledWithReason = {
 };
 
 export const Required = {
-    render: () => <Checkbox id="cb-ex-required" label="I accept the terms" isRequired />,
+    render: () => <Checkbox id="cb-ex-required" label="I accept the terms" isRequired labelMarker="required" />,
     play: async ({ canvasElement }) => {
-        await expect(canvasElement.querySelector('.plus-form-checkbox-wrapper')).toHaveClass('plus-form-checkbox-required');
-        await expect(canvasElement.querySelector('.plus-field-required')).toHaveAttribute('aria-hidden', 'true');
+        const cb = within(canvasElement).getByRole('checkbox', { name: 'I accept the terms' });
+        await expect(cb).toHaveAttribute('aria-required', 'true');
+        await expect(canvasElement.textContent).not.toContain('*');
     },
 };
 

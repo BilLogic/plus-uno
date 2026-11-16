@@ -201,17 +201,18 @@ export const QuestionStepFiveOrMore = {
 
 /* --------------------------------------------------------- marks and help */
 
-/** Required fields carry the mark and aria-required; an optional field says so only because most are required. */
+/** Required fields set aria-required without a visible mark when they are the majority; the minority optional field says "(optional)". */
 export const RequiredMarks = {
-    name: 'Required marks and help',
+    name: 'Minority marker and help',
     render: () => staged(<Marks />, 480),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
-        const student = canvas.getByLabelText(/Student/);
-        await expect(student, 'a required field reports it').toHaveAttribute('aria-required', 'true');
-        await expect(canvasElement.querySelector('label[for="' + student.id + '"]').textContent, 'and carries the mark').toMatch(/\*/);
-        await expect(canvas.getByLabelText(/Notes \(optional\)/), 'an optional field says so').not.toHaveAttribute('aria-required', 'true');
+        const student = canvas.getByRole('textbox', { name: 'Student' });
+        await expect(student, 'a required field reports aria-required').toHaveAttribute('aria-required', 'true');
+        await expect(canvasElement.querySelector('label[for="' + student.id + '"]'), 'majority required label stays unmarked').toHaveTextContent(/^Student$/);
+        await expect(canvasElement.textContent, 'no star symbol in the form').not.toContain('*');
+        await expect(canvas.getByRole('textbox', { name: 'Notes (optional)' }), 'the minority optional field says so').not.toHaveAttribute('aria-required', 'true');
         const caption = canvas.getByText('First and last name, as on the roster.');
         await expect(student.getAttribute('aria-describedby'), 'help sits in a caption the field points at').toContain(caption.id);
         await fitsCanvas(canvasElement);

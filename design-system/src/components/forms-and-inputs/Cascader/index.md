@@ -79,7 +79,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `CheckboxGr
 ## Parts
 
 1. **Field.** The box that shows the chosen path, its levels joined with a slash.
-2. **Label.** Names the field. A required marker follows it.
+2. **Label.** Names the field. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text.
 3. **Columns.** One column per level, opening to the right of the last.
 4. **Caption.** Helper text, or the error that replaces it.
 
@@ -132,7 +132,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `CheckboxGr
 | `placeholder` | string | `'Please select'` | Hint text shown in the field while no path is selected. Defaults to `Please select`. |
 | `spacing` | enum | `'default'` | `default` draws 40 and `compact` draws 32. |
 | `isDisabled` | bool | `false` | — |
-| `isRequired` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
+| `isRequired` | bool | `false` | Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `isInvalid` | bool | `false` | Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. |
 | `errorMessage` | node | — | — |
 | `className` | string | `''` | — |
@@ -141,6 +142,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `CheckboxGr
 ## Variants
 
 **`spacing`** — `default` · `compact`
+
+**`labelMarker`** — `required` · `optional`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

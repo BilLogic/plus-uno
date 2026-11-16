@@ -107,7 +107,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Label.** Names the field. A required marker and an info tooltip sit beside it.
+1. **Label.** Names the field. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text, and an info tooltip sits beside it.
 2. **Box.** 80 high at least, growing with `rows`, and scrolls past it.
 3. **Control.** The native textarea. It resizes vertically.
 4. **Caption.** A message on the left and, with `maxLength`, a count on the right.
@@ -154,7 +154,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `id` | string | — | The `id` of the `textarea`; the label points at it. Generated when omitted. |
 | `name` | string | — | The form key the text submits under. |
 | `label` | node | — | The visible label above the field. Hide it with `isLabelHidden`. |
-| `isRequired` | bool | `false` | Shows an asterisk and sets `aria-required`. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
+| `isRequired` | bool | `false` | Sets `aria-required` on the textarea. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `isLabelHidden` | bool | `false` | Hides the label without removing it. |
 | `info` | node | — | Text for an info tooltip beside the label. |
 | `caption` | node | — | Standing help under the field. A message takes its place. |
@@ -180,6 +181,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `style` | object | — | Inline styles for the field wrapper. |
 
 ## Variants
+
+**`labelMarker`** — `required` · `optional`
 
 **`spacing`** — `default` · `compact`
 

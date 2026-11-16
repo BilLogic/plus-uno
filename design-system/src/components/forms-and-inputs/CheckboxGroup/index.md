@@ -75,7 +75,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Legend.** The question. It names the `<fieldset>` and carries the required marker.
+1. **Legend.** The question. It names the `<fieldset>` and carries an optional minority marker (`"(optional)"` or `"(required)"`) in plain text.
 2. **Options.** Checkboxes in a stacked list, an inline row, bordered `card` rows, or 224px `tile` cards.
 3. **Tile checkbox and illustration.** When `appearance` is `tile`, each tile centers its decorative `illustration`, `label`, and `description`, and anchors its `Checkbox` at the top end so multi-select is clear before clicking.
 4. **Reveal.** Optional content under an option, shown while that option is selected.
@@ -124,7 +124,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `defaultValue` | arrayOf | — | Option values selected at the start when uncontrolled. Defaults to `[]`. |
 | `onChange` | func | — | Receives the next array of selected option values when a box is toggled. |
 | `appearance` | enum | `'plain'` | Passed to every Checkbox. `card` draws each as a bordered row; `tile` draws centered pictured tiles with a Checkbox at the top end. |
-| `isRequired` | bool | `false` | Marks the question as needing an answer on the legend. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the legend: `required` or `optional`. |
+| `isRequired` | bool | `false` | Announces the group as required to assistive technology. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `isDisabled` | bool | `false` | Overrides every Checkbox's own `isDisabled`. |
 | `isReadOnly` | bool | `false` | Shown and focusable, not changeable. |
 | `isInvalid` | bool | — | Marks every unselected Checkbox as failing validation. Defaults to whether `error` is set. |
@@ -137,6 +138,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 **`orientation`** — `stacked` · `inline`
 
 **`appearance`** — `plain` · `card` · `tile`
+
+**`labelMarker`** — `required` · `optional`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

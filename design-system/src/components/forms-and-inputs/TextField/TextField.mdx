@@ -159,7 +159,7 @@ Use `TextField` for single-line text entry: names, emails, search boxes and numb
 
 ## Parts
 
-1. **Label.** Names the field. A required marker and an info tooltip sit beside it.
+1. **Label.** Names the field. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text, and an info tooltip sits beside it.
 2. **Before.** An icon, a text affix or a Button before the control.
 3. **Control.** The native input.
 4. **After.** An icon, a text affix, a Button or the number steppers.
@@ -327,9 +327,10 @@ Use `type="number"` for stepped quantities such as seats; for an ID, phone numbe
   accessible name whether or not you show it. If the visible label is rendered
   by the caller instead, point it at the input with `htmlFor`; if there is no
   text anywhere, pass `aria-label`.
-- **`isRequired` shows an asterisk and sets `aria-required`.** The asterisk is
-  hidden from assistive technology. The form explains it once, in a legend above
-  the fields.
+- **`isRequired` sets `aria-required` regardless of the label marker.** Pair it
+  with `labelMarker="required"` only when required fields are the minority in
+  the form; when most fields are required, mark the optional ones with
+  `labelMarker="optional"` instead.
 - **An error is announced.** The message gets an id, the input points at it with
   `aria-describedby`, and `isInvalid` sets `aria-invalid` and renders the message
   with `role="alert"`. A warning, a success message and standing help are
