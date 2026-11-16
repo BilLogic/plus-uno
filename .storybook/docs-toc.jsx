@@ -1,7 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { DocsContainer } from '@storybook/addon-docs/blocks';
-import { themes } from 'storybook/theming';
+import { CacheProvider, create, createCache } from 'storybook/theming';
 import { COLOR_SCHEME_QUERY, resolveColorScheme } from '../design-system/src/storybook-docs/lib/color-modes.js';
+
+const docsEmotionCache = createCache({ key: 'css', prepend: true });
+const docsThemes = {
+  light: create({
+    base: 'light',
+    fontBase: '"Noto Sans", "Noto Sans Fallback", sans-serif',
+    fontCode: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+  }),
+  dark: create({
+    base: 'dark',
+    fontBase: '"Noto Sans", "Noto Sans Fallback", sans-serif',
+    fontCode: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+  }),
+};
 
 /**
  * The "On this page" rail's four page-side fixes, applied from the docs container.
@@ -191,9 +205,11 @@ function useResolvedColorMode() {
 export function TocDocsContainer({ children, ...props }) {
   const mode = useResolvedColorMode();
   return (
-    <DocsContainer {...props} theme={mode === 'dark' ? themes.dark : themes.light}>
-      <TocEnhancer />
-      {children}
-    </DocsContainer>
+    <CacheProvider value={docsEmotionCache}>
+      <DocsContainer {...props} theme={mode === 'dark' ? docsThemes.dark : docsThemes.light}>
+        <TocEnhancer />
+        {children}
+      </DocsContainer>
+    </CacheProvider>
   );
 }

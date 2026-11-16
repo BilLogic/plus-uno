@@ -42,6 +42,7 @@ import { fileURLToPath } from 'node:url';
 import {
   chromeFailures,
   managerFailures,
+  managerMeasureScript,
   measureScript,
   measureWithReloadRetry,
   openAtTopFailures,
@@ -250,15 +251,7 @@ async function measureManager(context, baseUrl) {
   await page.goto(`${baseUrl}/?path=/docs/${TOC_PAGE}`, { waitUntil: 'load' });
   await page.waitForSelector('.sidebar-container [data-selected="true"]', { timeout: 60_000 });
   const read = async (step, expectedMode) => {
-    const painted = await page.evaluate((s) => {
-      const paint = (el) => getComputedStyle(el).backgroundColor;
-      return {
-        step: s,
-        mode: document.documentElement.dataset.plusManagerMode,
-        sidebar: paint(document.querySelector('.sidebar-container')),
-        selected: paint(document.querySelector('.sidebar-container [data-selected="true"]')),
-      };
-    }, step);
+    const painted = await page.evaluate(managerMeasureScript(step));
     // Read inside the wait: if the dev server reloads the preview between the ready
     // check and the read, the read waits for the reloaded document to be ready too.
     const frame = await (await page.waitForSelector('#storybook-preview-iframe')).contentFrame();

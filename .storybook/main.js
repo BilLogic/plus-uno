@@ -61,12 +61,25 @@ const config = {
   })(),
 
   // The manager's theme API takes literal colors and the manager cannot read the
-  // page's custom properties, so the color tokens are resolved here, per mode, and
-  // inlined for manager.js (see scripts/lib/manager-theme.mjs).
+  // page's custom properties, so the color and font tokens are resolved here, per
+  // mode, and inlined for manager.js (see scripts/lib/manager-theme.mjs).
   managerHead: (head) => `${head}
 <script>window.__PLUS_MANAGER_THEMES__ = ${JSON.stringify(resolveManagerThemes()).replace(/</g, '\\u003c')};</script>`,
 
   viteFinal: async (config) => {
+    config.plugins = config.plugins || [];
+    config.plugins.push({
+      name: 'plus-strip-storybook-nunito',
+      transformIndexHtml: {
+        order: 'post',
+        handler(html) {
+          return html
+            .replace(/<style>\s*@font-face\s*\{\s*font-family:\s*['"]?Nunito Sans['"]?[\s\S]*?<\/style>/g, '')
+            .replaceAll("'Nunito Sans',", '')
+            .replaceAll('"Nunito Sans",', '');
+        },
+      },
+    });
     // Configure path aliases for component imports
     const rootDir = path.resolve(__dirname, '..');
     const srcPath = path.resolve(rootDir, 'design-system/src');
