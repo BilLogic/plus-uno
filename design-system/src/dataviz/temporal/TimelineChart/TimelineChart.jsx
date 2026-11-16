@@ -12,36 +12,34 @@ import { seriesColor } from '@/dataviz/palette';
  */
 const TimelineChart = ({
     data = [],
-    height = 400,
+    height = 400
 }) => {
     const options = {
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
             type: 'timeline',
-            height: height,
+            height: height
         },
         title: { text: null },
         xAxis: {
-            visible: false,
+            visible: false
         },
         yAxis: {
-            visible: false,
+            visible: false
         },
-        series: [
-            {
-                data: data.map((item, index, all) => ({
-                    name: item.name,
-                    label: item.label || item.name,
-                    description: item.description || '',
-                    color: item.color || seriesColor(index, all.length),
-                })),
-                dataLabels: {
-                    allowOverlap: false,
-                    format: `${valueSpan('{point.label}')}<br/>{point.description}`,
-                },
-            },
-        ],
+        series: [{
+            data: data.map((item, index, all) => ({
+                name: item.name,
+                label: item.label || item.name,
+                description: item.description || '',
+                color: item.color || seriesColor(index, all.length)
+            })),
+            dataLabels: {
+                allowOverlap: false,
+                format: `${valueSpan('{point.label}')}<br/>{point.description}`
+            }
+        }]
     };
 
     return (
@@ -53,16 +51,14 @@ const TimelineChart = ({
 
 TimelineChart.propTypes = {
     /** Array of events {name, label, description, color} */
-    data: PropTypes.arrayOf(
-        PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            label: PropTypes.string,
-            description: PropTypes.string,
-            color: PropTypes.string,
-        }),
-    ),
+    data: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        label: PropTypes.string,
+        description: PropTypes.string,
+        color: PropTypes.string
+    })),
     /** Chart height */
-    height: PropTypes.number,
+    height: PropTypes.number
 };
 
 export default TimelineChart;

@@ -33,7 +33,7 @@ const LineChart = ({
 
     const seriesWithTheme = orderedData.map((s, i, all) => ({
         ...s,
-        color: s.color || seriesColor(i, all.length),
+        color: s.color || seriesColor(i, all.length)
     }));
 
     const options = {
@@ -41,36 +41,37 @@ const LineChart = ({
         chart: {
             ...chartTheme.chart,
             type: 'line',
-            height: height,
+            height: height
         },
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
             title: {
                 ...chartTheme.xAxis.title,
-                text: xAxisLabel,
+                text: xAxisLabel
             },
-            categories: orderedCategories,
+            categories: orderedCategories
         },
         yAxis: {
             ...chartTheme.yAxis,
             title: {
                 ...chartTheme.yAxis.title,
-                text: yAxisLabel,
+                text: yAxisLabel
             },
+            // Optional: a fixed domain and ticks; without them Highcharts picks its own.
             ...(yDomain ? { min: yDomain[0], max: yDomain[1] } : {}),
-            ...(yTicks ? { tickPositions: yTicks } : {}),
+            ...(yTicks ? { tickPositions: yTicks } : {})
         },
         plotOptions: {
             line: {
                 marker: {
                     enabled: true,
-                    symbol: 'circle',
-                },
-            },
+                    symbol: 'circle'
+                }
+            }
         },
         legend: { enabled: true },
-        series: seriesWithTheme,
+        series: seriesWithTheme
     };
 
     return (
@@ -81,14 +82,12 @@ const LineChart = ({
 };
 
 LineChart.propTypes = {
-    data: PropTypes.arrayOf(
-        PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            data: PropTypes.array.isRequired,
-            color: PropTypes.string,
-            categories: PropTypes.array,
-        }),
-    ).isRequired,
+    data: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        data: PropTypes.array.isRequired,
+        color: PropTypes.string,
+        categories: PropTypes.array // Optional categories for X axis
+    })).isRequired,
     /** X-axis period labels, one per point. May also be passed on the first series. */
     categories: PropTypes.arrayOf(PropTypes.string),
     xAxisLabel: PropTypes.string,

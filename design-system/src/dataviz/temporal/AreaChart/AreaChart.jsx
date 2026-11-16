@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { tokenNumber } from '@/dataviz/chartTheme';
+import chartTheme, { CHART_MARKER_RADIUS } from '@/dataviz/chartTheme';
 import { seriesColor, sortCategories } from '@/dataviz/palette';
 
 /**
@@ -11,7 +11,7 @@ import { seriesColor, sortCategories } from '@/dataviz/palette';
 const AreaChart = ({
     data,
     categories,
-    stacking = null,
+    stacking = null, // 'normal', 'percent', or null
     xAxisLabel,
     yAxisLabel,
     height = 300,
@@ -30,11 +30,9 @@ const AreaChart = ({
         [rawCategories, data, sort],
     );
 
-    const markerRadius = tokenNumber('--pad-x-xs', 4) / 2;
-
     const seriesWithTheme = orderedData.map((s, i, all) => ({
         ...s,
-        color: s.color || seriesColor(i, all.length),
+        color: s.color || seriesColor(i, all.length)
     }));
 
     const options = {
@@ -42,7 +40,7 @@ const AreaChart = ({
         chart: {
             ...chartTheme.chart,
             type: 'area',
-            height: height,
+            height: height
         },
         title: { text: null },
         xAxis: {
@@ -51,14 +49,14 @@ const AreaChart = ({
             title: {
                 ...chartTheme.xAxis.title,
                 text: xAxisLabel,
-            },
+            }
         },
         yAxis: {
             ...chartTheme.yAxis,
             title: {
                 ...chartTheme.yAxis.title,
                 text: yAxisLabel,
-            },
+            }
         },
         plotOptions: {
             area: {
@@ -66,16 +64,16 @@ const AreaChart = ({
                 marker: {
                     enabled: false,
                     symbol: 'circle',
-                    radius: markerRadius,
-                },
-            },
+                    radius: CHART_MARKER_RADIUS
+                }
+            }
         },
         legend: { enabled: true },
         tooltip: {
             ...chartTheme.tooltip,
-            shared: true,
+            shared: true
         },
-        series: seriesWithTheme,
+        series: seriesWithTheme
     };
 
     return (
@@ -86,14 +84,12 @@ const AreaChart = ({
 };
 
 AreaChart.propTypes = {
-    data: PropTypes.arrayOf(
-        PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            data: PropTypes.array.isRequired,
-            color: PropTypes.string,
-            categories: PropTypes.array,
-        }),
-    ).isRequired,
+    data: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        data: PropTypes.array.isRequired,
+        color: PropTypes.string,
+        categories: PropTypes.array
+    })).isRequired,
     /** X-axis period labels, one per point. Without them the axis counts 0, 1, 2. */
     categories: PropTypes.arrayOf(PropTypes.string),
     stacking: PropTypes.oneOf(['normal', 'percent', null]),

@@ -47,7 +47,7 @@ const ComboChart = ({
     const barSeries = barSeriesData.map((s, i) => ({
         ...s,
         type: 'column',
-        color: s.color || seriesColor(i, totalSeries),
+        color: s.color || seriesColor(i, totalSeries)
     }));
 
     const lineSeries = lineSeriesData.map((s, i) => ({
@@ -56,36 +56,36 @@ const ComboChart = ({
         color: s.color || seriesColor(i + barSeriesData.length, totalSeries),
         marker: {
             symbol: 'circle',
-        },
+        }
     }));
 
     const options = {
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
-            height: height,
+            height: height
         },
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: orderedCategories,
+            categories: orderedCategories
         },
         yAxis: [
-            {
+            { // Primary yAxis
                 ...chartTheme.yAxis,
                 title: {
                     ...chartTheme.yAxis.title,
-                    text: primaryAxisLabel,
-                },
+                    text: primaryAxisLabel
+                }
             },
-            {
+            { // Secondary yAxis
                 ...chartTheme.yAxis,
                 title: {
                     ...chartTheme.yAxis.title,
                     text: secondaryAxisLabel,
                 },
-                opposite: true,
-            },
+                opposite: true
+            }
         ],
         plotOptions: {
             column: {
@@ -94,10 +94,10 @@ const ComboChart = ({
         },
         tooltip: {
             ...chartTheme.tooltip,
-            shared: true,
+            shared: true
         },
         legend: { enabled: true },
-        series: [...barSeries, ...lineSeries],
+        series: [...barSeries, ...lineSeries]
     };
 
     return (
@@ -114,7 +114,7 @@ ComboChart.propTypes = {
     primaryAxisLabel: PropTypes.string,
     secondaryAxisLabel: PropTypes.string,
     height: PropTypes.number,
-    /** Sort categories from most to least by the first series; false by default on temporal axes. */
+    /** Sort categories from most to least by the first bar series; false by default on temporal axes. */
     sort: PropTypes.bool,
 };
 

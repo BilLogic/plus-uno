@@ -1,7 +1,13 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CHART_BAR_RADIUS, CHART_LINE_WIDTH_NUMBER, CHART_SPACING_MICRO, SEMIBOLD } from '@/dataviz/chartTheme';
+import {
+    CHART_BAR_RADIUS,
+    CHART_LINE_WIDTH_NUMBER,
+    CHART_MARKER_RADIUS,
+    CHART_SPACING_MICRO,
+    SEMIBOLD,
+} from '@/dataviz/chartTheme';
 import { BRAND, CATEGORICAL, CHROME } from '@/dataviz/palette';
 import AreaChart from './AreaChart/AreaChart.jsx';
 import AreaRangeChart from './AreaRangeChart/AreaRangeChart.jsx';
@@ -26,7 +32,7 @@ afterEach(() => {
 });
 
 describe('Temporal family charts on the shared foundation', () => {
-    it('AreaChart reads marker radius from the ladder, keeps temporal order by default, and sorts when sort={true}', () => {
+    it('AreaChart uses CHART_MARKER_RADIUS, keeps temporal order by default, and sorts when sort={true}', () => {
         capturedOptions.length = 0;
         render(
             React.createElement(AreaChart, {
@@ -38,14 +44,13 @@ describe('Temporal family charts on the shared foundation', () => {
         );
         const options = capturedOptions.at(-1);
         expect(options.series[0].color).toBe(BRAND);
-        expect(options.plotOptions.area.marker.radius).toBe(2);
+        expect(options.plotOptions.area.marker.radius).toBe(CHART_MARKER_RADIUS);
         expect(options.plotOptions.area.marker.states).toBeUndefined();
         expect(options.xAxis.title.style.fontWeight).toBe(SEMIBOLD);
         expect(options.yAxis.title.style.fontWeight).toBe(SEMIBOLD);
         expect(options.xAxis.categories).toEqual(['Q1', 'Q2', 'Q3']);
         expect(options.series[0].data).toEqual([40, 90, 60]);
 
-        document.documentElement.style.setProperty('--pad-x-xs', '8px');
         render(
             React.createElement(AreaChart, {
                 categories: ['Q1', 'Q2', 'Q3'],
@@ -54,7 +59,7 @@ describe('Temporal family charts on the shared foundation', () => {
             }),
         );
         const sorted = capturedOptions.at(-1);
-        expect(sorted.plotOptions.area.marker.radius).toBe(4);
+        expect(sorted.plotOptions.area.marker.radius).toBe(CHART_MARKER_RADIUS);
         expect(sorted.xAxis.categories).toEqual(['Q2', 'Q3', 'Q1']);
         expect(sorted.series[0].data).toEqual([90, 60, 40]);
     });
@@ -138,7 +143,7 @@ describe('Temporal family charts on the shared foundation', () => {
         expect(sorted.series[1].data).toEqual([70, 68, 60]);
     });
 
-    it('Sparkline reads latest-point marker radius from the ladder, drops <b> and per-chart states, and keeps animation off', () => {
+    it('Sparkline uses CHART_MARKER_RADIUS for the latest point and hover marker, drops <b>, and keeps animation off', () => {
         capturedOptions.length = 0;
         render(
             React.createElement(Sparkline, {
@@ -153,27 +158,19 @@ describe('Temporal family charts on the shared foundation', () => {
         expect(options.plotOptions.series.states).toBeUndefined();
         expect(options.plotOptions.line.lineWidth).toBe(CHART_LINE_WIDTH_NUMBER);
         expect(options.plotOptions.line.marker.radius).toBe(0);
-        expect(options.plotOptions.line.marker.states).toBeUndefined();
+        expect(options.plotOptions.line.marker.states).toEqual({
+            hover: { radius: CHART_MARKER_RADIUS, radiusPlus: 0 },
+        });
         expect(options.chart.spacing).toEqual([
             CHART_SPACING_MICRO,
             CHART_SPACING_MICRO,
             CHART_SPACING_MICRO,
             CHART_SPACING_MICRO,
         ]);
-        expect(options.series[0].data.at(-1).marker.radius).toBe(3);
+        expect(options.series[0].data.at(-1).marker.radius).toBe(CHART_MARKER_RADIUS);
         expect(options.tooltip.pointFormat).not.toContain('<b>');
         expect(options.tooltip.pointFormat).toContain('plus-chart-value');
         expect(options.tooltip.headerFormat).toContain('plus-chart-value');
-
-        document.documentElement.style.setProperty('--pad-y-md', '10px');
-        render(
-            React.createElement(Sparkline, {
-                label: 'Average score',
-                data: [64, 70, 82],
-            }),
-        );
-        const scaled = capturedOptions.at(-1);
-        expect(scaled.series[0].data.at(-1).marker.radius).toBe(5);
     });
 
     it('StreamgraphChart uses BRAND for one series, CATEGORICAL for multiple, and keeps temporal order unless sort={true}', () => {

@@ -32,37 +32,37 @@ const StreamgraphChart = ({
         chart: {
             ...chartTheme.chart,
             type: 'streamgraph',
-            height: height,
+            height: height
         },
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
             categories: orderedCategories,
             maxPadding: 0,
-            type: 'category',
+            type: 'category'
         },
         yAxis: {
             visible: false,
             startOnTick: false,
-            endOnTick: false,
+            endOnTick: false
         },
         tooltip: {
             ...chartTheme.tooltip,
-            shared: true,
+            shared: true
         },
         plotOptions: {
             series: {
-                label: { enabled: false },
-            },
+                label: { enabled: false }
+            }
         },
         legend: {
-            enabled: true,
+            enabled: true
         },
         series: orderedSeries.map((s, i, all) => ({
             name: s.name,
             data: s.data,
-            color: s.color || seriesColor(i, all.length),
-        })),
+            color: s.color || seriesColor(i, all.length)
+        }))
     };
 
     return (
@@ -74,13 +74,11 @@ const StreamgraphChart = ({
 
 StreamgraphChart.propTypes = {
     /** Array of series {name, data: []} */
-    series: PropTypes.arrayOf(
-        PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            data: PropTypes.arrayOf(PropTypes.number).isRequired,
-            color: PropTypes.string,
-        }),
-    ),
+    series: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        data: PropTypes.arrayOf(PropTypes.number).isRequired,
+        color: PropTypes.string
+    })),
     /** X-axis categories */
     categories: PropTypes.arrayOf(PropTypes.string),
     /** Chart height */

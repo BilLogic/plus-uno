@@ -46,40 +46,38 @@ const XRangeChart = ({
         chart: {
             ...chartTheme.chart,
             type: 'xrange',
-            height: height,
+            height: height
         },
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            type: 'datetime',
+            type: 'datetime'
         },
         yAxis: {
             ...chartTheme.yAxis,
             title: {
                 ...chartTheme.yAxis.title,
-                text: '',
+                text: ''
             },
             categories: orderedCategories,
-            reversed: true,
+            reversed: true
         },
         tooltip: {
-            ...chartTheme.tooltip,
+            ...chartTheme.tooltip
         },
-        series: [
-            {
-                name: 'Tasks',
-                data: orderedItems.map((item) => ({
-                    x: item.start,
-                    x2: item.end,
-                    y: item.y,
-                    name: item.name,
-                    color: item.color || seriesColor(item.y, rowCount),
-                })),
-                dataLabels: {
-                    enabled: true,
-                },
-            },
-        ],
+        series: [{
+            name: 'Tasks',
+            data: orderedItems.map((item) => ({
+                x: item.start,
+                x2: item.end,
+                y: item.y,
+                name: item.name,
+                color: item.color || seriesColor(item.y, rowCount)
+            })),
+            dataLabels: {
+                enabled: true
+            }
+        }]
     };
 
     return (
@@ -91,15 +89,13 @@ const XRangeChart = ({
 
 XRangeChart.propTypes = {
     /** Array of tasks {start, end, y, name, color} */
-    data: PropTypes.arrayOf(
-        PropTypes.shape({
-            start: PropTypes.number.isRequired,
-            end: PropTypes.number.isRequired,
-            y: PropTypes.number.isRequired,
-            name: PropTypes.string,
-            color: PropTypes.string,
-        }),
-    ),
+    data: PropTypes.arrayOf(PropTypes.shape({
+        start: PropTypes.number.isRequired,
+        end: PropTypes.number.isRequired,
+        y: PropTypes.number.isRequired,
+        name: PropTypes.string,
+        color: PropTypes.string
+    })),
     /** Y-axis categories */
     categories: PropTypes.arrayOf(PropTypes.string),
     /** Chart height */

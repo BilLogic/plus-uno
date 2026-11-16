@@ -49,7 +49,7 @@ no trend to show, render the number alone.
     rows={[
         ['Line', <>Single line at <C>--chart-line-width</C> in the color selected by <C>tone</C>.</>],
         ['Latest-value marker', <>Small circle on the last point ringed in <C>--ds-border-inverse</C>; toggled by <C>showLastPoint</C>.</>],
-        ['Point markers', 'Zero-radius at rest on earlier points so hover and keyboard focus can land on them.'],
+        ['Point markers', <>Zero-radius at rest on earlier points so hover and keyboard focus can land on them, appearing at <C>CHART_MARKER_RADIUS</C> on hover.</>],
         ['Tooltip', <>Shows the hovered value plus <C>valueSuffix</C>, under its <C>categories</C> label when provided.</>],
         ['Frame', <>Pixel <C>width</C> and <C>height</C> (default 120 × 32) with micro spacing around the line.</>],
     ]}
