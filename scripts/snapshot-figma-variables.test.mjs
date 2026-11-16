@@ -48,6 +48,67 @@ test('the probe sorts, because an unsorted capture diffs as a reordering', () =>
   assert.match(PROBE, /\.sort\(\)/);
 });
 
+test('the probe captures codeSyntax.WEB beside sorted variable names and leaves variables without WEB syntax out of codeSyntax', async () => {
+  const runProbe = new Function('figma', `return (async () => {\n${PROBE}\n})();`);
+  const fakeFigma = {
+    variables: {
+      async getLocalVariableCollectionsAsync() {
+        return [
+          { name: 'color / semantics', modes: [{ name: 'Light' }, { name: 'Dark' }], variableIds: ['v3', 'v1', 'v2'] },
+          { name: 'color / primitives', modes: [{ name: 'Value' }], variableIds: ['v4'] },
+        ];
+      },
+      async getLocalVariablesAsync() {
+        return [
+          { id: 'v3', name: 'elevation/shadow/raised', resolvedType: 'COLOR', codeSyntax: {} },
+          { id: 'v1', name: 'color/text/default', resolvedType: 'COLOR', codeSyntax: { WEB: 'var(--ds-text)' } },
+          { id: 'v2', name: 'color/background/brand', resolvedType: 'COLOR', codeSyntax: { WEB: 'var(--ds-background-brand)', iOS: 'dsBackgroundBrand' } },
+          { id: 'v4', name: 'teal/100', resolvedType: 'COLOR', codeSyntax: { ANDROID: 'teal_100' } },
+        ];
+      },
+    },
+  };
+
+  const result = await runProbe(fakeFigma);
+  assert.equal(result.totalVariables, 4);
+  assert.deepEqual(result.collections['color / semantics'].variables, [
+    'color/background/brand',
+    'color/text/default',
+    'elevation/shadow/raised',
+  ]);
+  assert.deepEqual(Object.entries(result.collections['color / semantics'].codeSyntax), [
+    ['color/background/brand', 'var(--ds-background-brand)'],
+    ['color/text/default', 'var(--ds-text)'],
+  ]);
+  assert.deepEqual(result.collections['color / primitives'].variables, ['teal/100']);
+  assert.deepEqual(result.collections['color / primitives'].codeSyntax, {});
+});
+
+test('refreshed keeps variables as a sorted name list and writes a sorted codeSyntax map of only variables with WEB syntax', () => {
+  const probeWithSyntax = {
+    totalVariables: 3,
+    byType: { COLOR: 3 },
+    collections: {
+      'color / semantics': {
+        modes: ['Light'],
+        variables: ['z/no-syntax', 'b/brand', 'a/default'],
+        codeSyntax: {
+          'b/brand': 'var(--ds-brand)',
+          'a/default': 'var(--ds-text)',
+          'z/no-syntax': '',
+          'stray/not-in-variables': 'var(--ds-stray)',
+        },
+      },
+    },
+  };
+  const { snapshot } = refreshed(previous(), probeWithSyntax, '2026-11-16');
+  assert.deepEqual(snapshot.collections['color / semantics'].variables, ['a/default', 'b/brand', 'z/no-syntax']);
+  assert.deepEqual(Object.entries(snapshot.collections['color / semantics'].codeSyntax), [
+    ['a/default', 'var(--ds-text)'],
+    ['b/brand', 'var(--ds-brand)'],
+  ]);
+});
+
 test('names are stored sorted and counted from the lists themselves', () => {
   const { snapshot } = refreshed(previous(), probe(), '2026-09-06');
   assert.deepEqual(snapshot.collections['colors / accent'].variables, ['a', 'b', 'c']);

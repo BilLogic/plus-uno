@@ -4,13 +4,28 @@ import test from 'node:test';
 
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { tokenSources } from '../design-system/src/lib/tokens-node.mjs';
-import { ARCHIVED_COLLECTION, COLOR_SPEC, deriveCandidates, specCodeSyntax } from './generate-token-registry.mjs';
+import {
+  ARCHIVED_COLLECTION,
+  build,
+  buildFigmaVariableMappings,
+  COLOR_SPEC,
+  deriveCandidates,
+  specCodeSyntax,
+} from './generate-token-registry.mjs';
 
-test('the archived color and size collections are not mapped', () => {
-  for (const collection of ['colors / accent', 'colors / neutral', 'size / layout', 'size / primitive', 'size / semantics']) {
+test('collections prefixed with "archived / " are skipped, and active collections are not', () => {
+  for (const collection of [
+    'archived / colors / accent',
+    'archived / colors / neutral',
+    'archived / size / layout',
+    'archived / size / primitive',
+    'archived / size / semantics',
+    'archived / spacing / layout',
+    'archived / color / patterns',
+  ]) {
     assert.equal(ARCHIVED_COLLECTION.test(collection), true, collection);
   }
-  for (const collection of ['color / foundations', 'spacing / primitives', 'spacing / layout', 'typography']) {
+  for (const collection of ['color / semantics', 'color / primitives', 'spacing / primitives', 'typography', 'motion']) {
     assert.equal(ARCHIVED_COLLECTION.test(collection), false, collection);
   }
 });
@@ -68,4 +83,128 @@ test('the live spec maps every --ds- semantic token, and every one exists in the
   );
   const missing = [...foundations.values()].filter((token) => !defined.has(token));
   assert.deepEqual(missing, []);
+});
+
+const SAMPLE_SNAPSHOT = {
+  capturedAt: '2026-11-16',
+  totalVariables: 9,
+  collections: {
+    'archived / colors / accent': {
+      modes: ['Light', 'Dark'],
+      variables: ['Advocacy/Advocacy', 'Brand/Primary'],
+      codeSyntax: { 'Advocacy/Advocacy': 'var(--ds-text)' },
+    },
+    'color / semantics': {
+      modes: ['Light', 'Dark'],
+      variables: ['color/text/default', 'color/text/stale'],
+      codeSyntax: {
+        'color/text/default': 'var(--ds-text)',
+        'color/text/stale': 'var(--ds-does-not-exist)',
+      },
+    },
+    'spacing / semantics': {
+      modes: ['Default'],
+      variables: ['Size/Control/xl'],
+      codeSyntax: {
+        'Size/Control/xl': 'var(--control-xl)',
+      },
+    },
+    motion: {
+      modes: ['Default'],
+      variables: ['Spring/880/stiffness'],
+      codeSyntax: {
+        'Spring/880/stiffness': 'var(--motion-spring-880)',
+      },
+    },
+    typography: {
+      modes: ['Value'],
+      variables: ['Font size/0875', 'Line height/125'],
+      codeSyntax: {
+        // Even though Font size/0875 would match --type-size-0875 by name rule,
+        // an explicit code syntax naming a missing token must NOT fall back.
+        'Font size/0875': 'var(--type-size-missing)',
+      },
+    },
+    'color / primitives': {
+      modes: ['Value'],
+      variables: ['teal/100'],
+      codeSyntax: {},
+    },
+  },
+};
+
+const DEFINED_TOKENS = () =>
+  new Set(tokenSources().flatMap((source) => [...source.text.matchAll(tokenDeclarationPattern())].map((m) => m[1])));
+
+test('a variable with codeSyntax.WEB resolves to that CSS token when defined in SCSS', () => {
+  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT });
+  assert.equal(result.resolved['color / semantics']['color/text/default'], 'var(--ds-text)');
+  assert.equal(result.resolved['spacing / semantics']['Size/Control/xl'], 'var(--control-xl)');
+  assert.equal(result.resolved.motion['Spring/880/stiffness'], 'var(--motion-spring-880)');
+});
+
+test('a code syntax naming a missing SCSS token is reported as unresolved and does not fall back to name rules', () => {
+  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT });
+  assert.equal(result.resolved['color / semantics']['color/text/stale'], undefined);
+  assert.equal(result.resolved.typography['Font size/0875'], undefined);
+
+  const stale = result.unresolved.find((u) => u.figmaVariable === 'color/text/stale');
+  assert.deepEqual(stale, {
+    collection: 'color / semantics',
+    figmaVariable: 'color/text/stale',
+    tried: ['--ds-does-not-exist'],
+    reason: 'code syntax names a token the code does not have',
+  });
+
+  const noFallback = result.unresolved.find((u) => u.figmaVariable === 'Font size/0875');
+  assert.deepEqual(noFallback, {
+    collection: 'typography',
+    figmaVariable: 'Font size/0875',
+    tried: ['--type-size-missing'],
+    reason: 'code syntax names a token the code does not have',
+  });
+});
+
+test('a variable with no code syntax falls back to the name rules, and reports "no code syntax" when unmapped', () => {
+  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT });
+  assert.equal(result.resolved.typography['Line height/125'], 'var(--type-line-height-125)');
+  assert.equal(result.resolved['color / primitives']['teal/100'], undefined);
+
+  const primitive = result.unresolved.find((u) => u.figmaVariable === 'teal/100');
+  assert.deepEqual(primitive, {
+    collection: 'color / primitives',
+    figmaVariable: 'teal/100',
+    tried: ['--100'],
+    reason: 'no code syntax',
+  });
+});
+
+test('archived collections are skipped, excluded from coverage counts, and reported as skipped rather than unresolved', () => {
+  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT });
+  assert.equal('archived / colors / accent' in result.resolved, false);
+  assert.equal(
+    result.unresolved.some((u) => u.collection.startsWith('archived / ')),
+    false,
+  );
+  assert.deepEqual(result.skippedCollections, [{ collection: 'archived / colors / accent', count: 2 }]);
+  // 9 total in SAMPLE_SNAPSHOT minus 2 in archived = 7 non-archived variables (4 resolved + 3 unresolved)
+  assert.equal(result.total, 7);
+  assert.equal(result.unresolved.length, 3);
+});
+
+test('build populates validation.figmaVariableCoverage from non-archived collections with skippedCollections and reasons', () => {
+  const { registry } = build({ snapshot: SAMPLE_SNAPSHOT });
+  const cov = registry.validation.figmaVariableCoverage;
+  assert.equal(cov.total, 7);
+  assert.equal(cov.resolved, 4);
+  assert.equal(cov.percent, 57);
+  assert.deepEqual(cov.skippedCollections, [{ collection: 'archived / colors / accent', count: 2 }]);
+  assert.deepEqual(
+    cov.unresolved.map((u) => [u.figmaVariable, u.reason]),
+    [
+      ['color/text/stale', 'code syntax names a token the code does not have'],
+      ['Font size/0875', 'code syntax names a token the code does not have'],
+      ['teal/100', 'no code syntax'],
+    ],
+  );
 });

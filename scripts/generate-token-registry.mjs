@@ -7,12 +7,11 @@
  * is reported (and fails `--check`). That guard is exactly what would have caught the
  * bogus `--size-spacing-between-components-3` mapping.
  *
- * The generated color set (ADR-035) is the exception to deriving a name: its
- * Figma spec, `design-system/src/tokens/color/figma-spec.json`, carries each
- * variable's code syntax (`var(--ds-text-brand)`), so those collections are
- * read from it rather than guessed from the path. The archived `colors / *`
- * and `size / *` collections are still in the Figma snapshot and have no code
- * counterpart, so they are not mapped (`ARCHIVED_COLLECTION`).
+ * Each variable in `scripts/figma-variables-snapshot.json` is resolved by its
+ * `codeSyntax.WEB` (`var(--x)` -> `--x`) first and checked against SCSS, falling
+ * back to collection name rules only when a variable carries no code syntax.
+ * Collections prefixed `archived / ` have no code counterpart and are skipped
+ * (`ARCHIVED_COLLECTION`).
  *
  * Usage:
  *   node scripts/generate-token-registry.mjs          (write)
@@ -23,7 +22,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { tokenDeclarationPattern, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
+import { TOKEN_NAME, tokenDeclarationPattern, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 import { COLOR_TOKEN_DIR, TOKEN_DIR, tokenSources } from '../design-system/src/lib/tokens-node.mjs';
 import { isEntry } from './lib/findings.mjs';
 import { frameLayerToken, isFrameLayerCollection } from './lib/frame-layer-collections.mjs';
@@ -39,11 +38,18 @@ const OUT = path.join(REPO_ROOT, 'design-system/figma/token-registry.json');
 export const COLOR_SPEC_PATH = `${COLOR_TOKEN_DIR}/figma-spec.json`;
 export const COLOR_SPEC = path.join(REPO_ROOT, COLOR_SPEC_PATH);
 
-/** The archived Figma collections, which hold no variable code reads. */
-export const ARCHIVED_COLLECTION = /^(?:colors|size) \/ /;
+/** The archived Figma collections (`archived / *`), skipped rather than mapped. */
+export const ARCHIVED_COLLECTION = /^archived \/ /;
 
 /** `var(--ds-text-brand)` → `--ds-text-brand`; anything else → null. */
-const WEB_SYNTAX = /^var\(\s*(--[a-z0-9-]+)\s*\)$/;
+const WEB_SYNTAX = new RegExp(`^var\\(\\s*(${TOKEN_NAME})\\s*\\)$`);
+
+/** Extract `--x` from a `var(--x)` WEB code syntax string, or `null` when malformed. */
+export function parseWebCodeSyntax(web) {
+  if (typeof web !== 'string') return null;
+  const match = WEB_SYNTAX.exec(web.trim());
+  return match ? match[1] : null;
+}
 
 /**
  * Each spec collection's code syntax, as `collection → (variable path → token)`.
@@ -59,8 +65,8 @@ export function specCodeSyntax(spec) {
   for (const collection of spec?.collections ?? []) {
     const names = new Map();
     for (const variable of collection.variables ?? []) {
-      const token = WEB_SYNTAX.exec(variable.codeSyntax?.WEB ?? '');
-      if (token) names.set(variable.name, token[1]);
+      const token = parseWebCodeSyntax(variable.codeSyntax?.WEB ?? '');
+      if (token) names.set(variable.name, token);
     }
     if (names.size) out.set(collection.name, names);
   }
@@ -184,12 +190,19 @@ function slug(text) {
  *
  * @param {string} collection
  * @param {string} name full Figma variable path, e.g. "Card/pad-x-md"
- * @param {{codeSyntax?: Map<string, string>}} [options] this collection's
- *        code syntax, from `specCodeSyntax`, where it has one
+ * @param {{codeSyntax?: Map<string, string> | Record<string, string>}} [options] this collection's
+ *        code syntax, from the snapshot or `specCodeSyntax`, where it has one
  * @returns {string[]}
  */
 export function deriveCandidates(collection, name, { codeSyntax } = {}) {
-  if (codeSyntax?.has(name)) return [codeSyntax.get(name)];
+  if (codeSyntax instanceof Map && codeSyntax.has(name)) {
+    const raw = codeSyntax.get(name);
+    return [parseWebCodeSyntax(raw) ?? raw];
+  }
+  if (codeSyntax && !(codeSyntax instanceof Map) && Object.hasOwn(codeSyntax, name) && codeSyntax[name]) {
+    const raw = codeSyntax[name];
+    return [parseWebCodeSyntax(raw) ?? raw];
+  }
   const parts = name.split('/').map((p) => p.trim());
   const leaf = parts[parts.length - 1];
   const out = [];
@@ -197,9 +210,8 @@ export function deriveCandidates(collection, name, { codeSyntax } = {}) {
   if (isFrameLayerCollection(collection)) return [`--${frameLayerToken(collection, name)}`];
   if (collection === TYPOGRAPHY_COLLECTION) return [typographyToken(name)].filter(Boolean);
 
-  // The new scale collections carry their code names in Figma's code syntax,
-  // which the snapshot does not record, so these candidates restate the rule
-  // that syntax follows. A spacing / foundations variable is its path, minus
+  // Fallback rules when a variable carries no code syntax in the snapshot.
+  // A spacing / foundations variable is its path, minus
   // the Size folder ("Element/pad-x-sm" -> --element-pad-x-sm,
   // "Size/Height/200" -> --height-200); a spacing / primitives variable is its
   // leaf ("Space/space-025" -> --space-025), the candidate every collection
@@ -215,54 +227,112 @@ export function deriveCandidates(collection, name, { codeSyntax } = {}) {
   return out;
 }
 
+export const REASON_NO_CODE_SYNTAX = 'no code syntax';
+export const REASON_MISSING_TOKEN = 'code syntax names a token the code does not have';
+
 /**
  * Derive the exact-path Figma-variable -> CSS-token mapping from the snapshot.
  * Keyed by the exact variable path because that is what `get_variable_defs`
  * returns — an agent doing a round-trip looks up what Figma actually reports,
- * not a prose label. Anything that does not resolve to a real SCSS token is
- * reported as unresolved rather than written, so a bad rule can never
- * masquerade as a mapping.
+ * not a prose label. Resolves by `codeSyntax.WEB` (`var(--x)` -> `--x`) first
+ * and verifies that `--x` exists in `scssTokens`; falls back to name rules only
+ * when a variable has no code syntax. Collections starting with `archived / `
+ * are skipped and excluded from coverage counts.
+ *
  * @param {Set<string>} scssTokens
+ * @param {{ snapshot?: object; specSyntax?: Map<string, Map<string, string>> }} [options]
  */
-function buildFigmaVariableMappings(scssTokens) {
-  if (!fs.existsSync(VARIABLES_SNAPSHOT)) {
-    return { resolved: {}, unresolved: [], total: 0, snapshotMissing: true };
+export function buildFigmaVariableMappings(scssTokens, { snapshot: givenSnapshot, specSyntax: givenSpecSyntax } = {}) {
+  if (!givenSnapshot && !fs.existsSync(VARIABLES_SNAPSHOT)) {
+    return { resolved: {}, unresolved: [], skippedCollections: [], total: 0, snapshotMissing: true };
   }
-  const snapshot = JSON.parse(fs.readFileSync(VARIABLES_SNAPSHOT, 'utf8'));
-  const syntax = fs.existsSync(COLOR_SPEC)
-    ? specCodeSyntax(JSON.parse(fs.readFileSync(COLOR_SPEC, 'utf8')))
-    : new Map();
+  const snapshot = givenSnapshot ?? JSON.parse(fs.readFileSync(VARIABLES_SNAPSHOT, 'utf8'));
+  const syntax =
+    givenSpecSyntax ??
+    (!givenSnapshot && fs.existsSync(COLOR_SPEC)
+      ? specCodeSyntax(JSON.parse(fs.readFileSync(COLOR_SPEC, 'utf8')))
+      : new Map());
   /** @type {Record<string, Record<string, string>>} */
   const resolved = {};
-  /** @type {Array<{ collection: string; figmaVariable: string; tried: string[] }>} */
+  /** @type {Array<{ collection: string; figmaVariable: string; tried: string[]; reason: string }>} */
   const unresolved = [];
+  /** @type {Array<{ collection: string; count: number }>} */
+  const skippedCollections = [];
   let total = 0;
 
-  const map = (collection, names) => {
+  const map = (collection, names, snapshotSyntax = {}) => {
     resolved[collection] = {};
-    const codeSyntax = syntax.get(collection);
+    const specMap = syntax.get(collection);
     for (const name of names) {
       total += 1;
-      const candidates = deriveCandidates(collection, name, { codeSyntax });
+      const rawWeb =
+        snapshotSyntax && typeof snapshotSyntax === 'object' && Object.hasOwn(snapshotSyntax, name)
+          ? snapshotSyntax[name]
+          : undefined;
+      if (typeof rawWeb === 'string' && rawWeb.length > 0) {
+        const token = parseWebCodeSyntax(rawWeb);
+        if (token && scssTokens.has(token)) {
+          resolved[collection][name] = `var(${token})`;
+        } else {
+          unresolved.push({
+            collection,
+            figmaVariable: name,
+            tried: [token ?? rawWeb],
+            reason: REASON_MISSING_TOKEN,
+          });
+        }
+        continue;
+      }
+
+      if (specMap?.has(name)) {
+        const token = specMap.get(name);
+        if (scssTokens.has(token)) {
+          resolved[collection][name] = `var(${token})`;
+        } else {
+          unresolved.push({
+            collection,
+            figmaVariable: name,
+            tried: [token],
+            reason: REASON_MISSING_TOKEN,
+          });
+        }
+        continue;
+      }
+
+      const candidates = deriveCandidates(collection, name);
       const hit = candidates.find((c) => scssTokens.has(c));
-      if (hit) resolved[collection][name] = `var(${hit})`;
-      else unresolved.push({ collection, figmaVariable: name, tried: candidates });
+      if (hit) {
+        resolved[collection][name] = `var(${hit})`;
+      } else {
+        unresolved.push({
+          collection,
+          figmaVariable: name,
+          tried: candidates,
+          reason: REASON_NO_CODE_SYNTAX,
+        });
+      }
     }
   };
 
   for (const [collection, data] of Object.entries(snapshot.collections)) {
-    if (!ARCHIVED_COLLECTION.test(collection)) map(collection, data.variables);
+    if (ARCHIVED_COLLECTION.test(collection)) {
+      skippedCollections.push({ collection, count: data.variables.length });
+      continue;
+    }
+    map(collection, data.variables, data.codeSyntax);
   }
   // A spec collection Figma does not hold yet is still the lookup an agent will
   // need the day it is pushed, and its names are the spec's, not a guess — so it
   // is mapped from the spec, and held to the token sheets like every other one.
   for (const [collection, names] of syntax) {
-    if (!(collection in snapshot.collections)) map(collection, names.keys());
+    if (!(collection in snapshot.collections) && !ARCHIVED_COLLECTION.test(collection)) {
+      map(collection, names.keys());
+    }
   }
-  return { resolved, unresolved, total, snapshotMissing: false };
+  return { resolved, unresolved, skippedCollections, total, snapshotMissing: false };
 }
 
-function build() {
+export function build(figmaOptions = {}) {
   const md = fs.readFileSync(MD_SOURCE, 'utf8');
   const scssTokens = collectScssTokens();
   const tables = parseTables(md);
@@ -305,7 +375,7 @@ function build() {
     }
   }
 
-  const figma = buildFigmaVariableMappings(scssTokens);
+  const figma = buildFigmaVariableMappings(scssTokens, figmaOptions);
   const figmaResolvedCount = Object.values(figma.resolved).reduce(
     (n, group) => n + Object.keys(group).length,
     0,
@@ -316,7 +386,7 @@ function build() {
     generated: true,
     generatedBy: 'scripts/generate-token-registry.mjs',
     note:
-      'DO NOT EDIT BY HAND. Three inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative), scripts/figma-variables-snapshot.json (bulk, derived mechanically) and ' +
+      'DO NOT EDIT BY HAND. Three inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative), scripts/figma-variables-snapshot.json (resolved by codeSyntax.WEB first, falling back to name rules when absent; archived/* collections skipped) and ' +
       `${COLOR_SPEC_PATH} (the generated --ds- color variables, read by their code syntax; the "color / foundations" paths come from this spec until the Figma push lands and the snapshot holds them). ` +
       `Every token in all three is validated against ${TOKEN_DIR}/*.scss and ${COLOR_TOKEN_DIR}/*.scss. Run \`npm run generate:token-registry\`.`,
     ...STATIC,
@@ -333,13 +403,14 @@ function build() {
         total: figma.total,
         resolved: figmaResolvedCount,
         percent: figma.total ? Math.round((figmaResolvedCount / figma.total) * 100) : 0,
+        skippedCollections: figma.skippedCollections,
         unresolved: figma.unresolved,
       },
     },
     notes: [
       'Spacing is contextual: pick the layer-appropriate token family; there is no single Spacing/N token.',
       'unknownTokens MUST be empty. A non-empty list means the .md references a token absent from SCSS.',
-      'figmaVariableCoverage.unresolved is the human to-do list: either the Figma variable has no code counterpart (a real gap) or deriveCandidates() needs widening. It never blocks the build.',
+      'figmaVariableCoverage counts non-archived collections only; archived / * collections are listed in skippedCollections, and each unresolved entry records its reason ("no code syntax" or "code syntax names a token the code does not have"). It never blocks the build.',
     ],
   };
 
@@ -374,10 +445,32 @@ function main() {
   if (figma.snapshotMissing) {
     console.warn('\n⚠ scripts/figma-variables-snapshot.json not found — Figma variable mappings skipped.');
   } else {
-    console.log(`Figma variables: ${cov.resolved}/${cov.total} resolved (${cov.percent}%), ${cov.unresolved.length} unresolved.`);
+    const skippedVars = cov.skippedCollections.reduce((n, s) => n + s.count, 0);
+    const skippedSummary = cov.skippedCollections.length
+      ? `, ${skippedVars} skipped across ${cov.skippedCollections.length} archived collection(s)`
+      : '';
+    console.log(
+      `Figma variables: ${cov.resolved}/${cov.total} resolved (${cov.percent}%), ${cov.unresolved.length} unresolved${skippedSummary}.`,
+    );
+    for (const s of cov.skippedCollections) {
+      console.log(`   skipped ${s.collection}: ${s.count}`);
+    }
     const byCollection = {};
-    for (const u of cov.unresolved) byCollection[u.collection] = (byCollection[u.collection] || 0) + 1;
-    for (const [c, n] of Object.entries(byCollection)) console.log(`   unresolved in ${c}: ${n}`);
+    for (const u of cov.unresolved) {
+      if (!byCollection[u.collection]) byCollection[u.collection] = { total: 0, noSyntax: 0, missingToken: 0 };
+      byCollection[u.collection].total += 1;
+      if (u.reason === REASON_NO_CODE_SYNTAX) byCollection[u.collection].noSyntax += 1;
+      else byCollection[u.collection].missingToken += 1;
+    }
+    for (const [c, info] of Object.entries(byCollection)) {
+      const reasons = [
+        info.noSyntax ? `${info.noSyntax} ${REASON_NO_CODE_SYNTAX}` : '',
+        info.missingToken ? `${info.missingToken} ${REASON_MISSING_TOKEN}` : '',
+      ]
+        .filter(Boolean)
+        .join(', ');
+      console.log(`   unresolved in ${c}: ${info.total} (${reasons})`);
+    }
   }
   if (unknown.size) {
     console.warn(`\n⚠ ${unknown.size} referenced token(s) missing from SCSS:`);
