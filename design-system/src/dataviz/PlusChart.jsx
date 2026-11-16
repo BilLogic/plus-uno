@@ -199,15 +199,6 @@ const PlusChart = forwardRef(function PlusChart(
         // Charts that set their own `plotOptions` replace the theme's whole
         // object, so the theme's series and type defaults (data-label type,
         // states) are laid under the chart's options here.
-        // Highcharts' `packedbubble` module also stamps `transition: "opacity 2000ms"`
-        // inline on `dataLabels.style` — a 2-second eased CSS fade outside Highcharts'
-        // `animation` option that bypasses `PlusChart`'s spring entrance and
-        // reduced-motion container fade and leaves labels near-transparent on paint.
-        const packedBubblePlot = options.plotOptions?.packedbubble;
-        const hasPackedBubble =
-            chartType === 'packedbubble' ||
-            packedBubblePlot !== undefined ||
-            (Array.isArray(options.series) && options.series.some((s) => s?.type === 'packedbubble'));
         const nextPlotOptions = {
             ...chartTheme.plotOptions,
             ...options.plotOptions,
@@ -216,23 +207,6 @@ const PlusChart = forwardRef(function PlusChart(
                       [chartType]: {
                           ...typePlot,
                           animation: seriesEntranceAnim,
-                      },
-                  }
-                : {}),
-            ...(hasPackedBubble
-                ? {
-                      packedbubble: {
-                          ...packedBubblePlot,
-                          ...(packedBubblePlot?.animation !== undefined ? { animation: seriesEntranceAnim } : {}),
-                          dataLabels: {
-                              ...baseSeriesPlot.dataLabels,
-                              ...packedBubblePlot?.dataLabels,
-                              style: {
-                                  ...baseSeriesPlot.dataLabels.style,
-                                  ...packedBubblePlot?.dataLabels?.style,
-                                  transition: 'none',
-                              },
-                          },
                       },
                   }
                 : {}),

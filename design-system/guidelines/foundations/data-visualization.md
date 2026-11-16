@@ -121,6 +121,10 @@ Charts follow the same spring physics and choreography as the rest of the design
 
 ## Token checks
 
-`foundations.test.js` holds `design-system/src/dataviz/` to the tier tokens,
-alongside the token-fallback and literal-property checks above;
-`design-system/tests/dataviz-tokens.test.js` does the same for color.
+`foundations.test.js` and `chartText.test.js` hold `design-system/src/dataviz/`
+to the tier tokens and enforce a hard ban (with a self-test) against eased
+curves, animation millisecond literals and removed animation props, `<b>` or
+`bold` or numeric font weights and weights other than 500 and 600,
+series-color text, pixel offsets, control radii on non-controls, and number
+slots without tabular figures; `design-system/tests/dataviz-tokens.test.js`
+does the same for color.

@@ -1,8 +1,8 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
-import { tooltipPointFormat } from '@/dataviz/chartFormat';
+import chartTheme, { CHART_RADAR_FILL_OPACITY } from '@/dataviz/chartTheme';
+import { dataLabelFormat, tooltipPointFormat } from '@/dataviz/chartFormat';
 import { seriesColor, sortCategories } from '@/dataviz/palette';
 import { iconClass } from '@/lib/icon';
 
@@ -25,7 +25,6 @@ const RadarChart = ({
     showDataLabels = false,
     chartSpacing,
     showYAxisLabels = true,
-    categoryLabelBody3Regular = false,
     sort = false,
 }) => {
     const {
@@ -91,7 +90,6 @@ const RadarChart = ({
         return baseSeries;
     });
 
-    // Build xAxis labels: B3 regular when requested, optional category colors.
     // overflow: 'allow' and allowOverlap prevent polar chart labels from being truncated.
     const xAxisConfig = {
         ...chartTheme.xAxis,
@@ -105,9 +103,6 @@ const RadarChart = ({
             crop: false,
             style: {
                 ...chartTheme.xAxis.labels.style,
-                ...(categoryLabelBody3Regular && {
-                    fontWeight: 'var(--type-weight-regular)'
-                })
             }
         }
     };
@@ -193,17 +188,19 @@ const RadarChart = ({
         },
         plotOptions: {
             area: {
-                fillOpacity: 0.45,
+                fillOpacity: CHART_RADAR_FILL_OPACITY,
                 dataLabels: {
+                    ...chartTheme.plotOptions.series.dataLabels,
                     enabled: showDataLabels && filled,
-                    format: '{y}%',
+                    format: dataLabelFormat('{point.y}%'),
                     allowOverlap: true
                 }
             },
             line: {
                 dataLabels: {
+                    ...chartTheme.plotOptions.series.dataLabels,
                     enabled: showDataLabels && !filled,
-                    format: '{y}%',
+                    format: dataLabelFormat('{point.y}%'),
                     allowOverlap: true
                 }
             }
@@ -245,7 +242,6 @@ RadarChart.propTypes = {
     showDataLabels: PropTypes.bool,
     chartSpacing: PropTypes.arrayOf(PropTypes.number), // [top, right, bottom, left] spacing for chart
     showYAxisLabels: PropTypes.bool,
-    categoryLabelBody3Regular: PropTypes.bool,
     /** Sort spokes from most to least by the first series; false by default so profile axes stay in input order. */
     sort: PropTypes.bool,
 };

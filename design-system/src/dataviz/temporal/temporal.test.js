@@ -5,6 +5,7 @@ import {
     CHART_BAR_RADIUS,
     CHART_LINE_WIDTH_NUMBER,
     CHART_MARKER_RADIUS,
+    CHART_RANGE_FILL_OPACITY,
     CHART_SPACING_MICRO,
     SEMIBOLD,
 } from '@/dataviz/chartTheme';
@@ -75,6 +76,8 @@ describe('Temporal family charts on the shared foundation', () => {
         );
         const options = capturedOptions.at(-1);
         expect(options.series[0].color).toBe(BRAND);
+        expect(options.series[0].fillOpacity).toBe(CHART_RANGE_FILL_OPACITY);
+        expect(options.series[0].fillOpacity).toBe(0.3);
         expect(options.xAxis.title.style.fontWeight).toBe(SEMIBOLD);
         expect(options.yAxis.title.style.fontWeight).toBe(SEMIBOLD);
     });

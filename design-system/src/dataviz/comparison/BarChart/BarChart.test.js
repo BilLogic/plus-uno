@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { BRAND, CATEGORICAL, SMART, toneByRank } from '@/dataviz/palette';
-import { CHART_BAR_RADIUS, CHART_LINE_WIDTH_NUMBER } from '@/dataviz/chartTheme';
+import { CHART_BAR_RADIUS, CHART_LINE_WIDTH_NUMBER, CHART_RADAR_FILL_OPACITY } from '@/dataviz/chartTheme';
 import BarChart, { buildBarAxes } from './BarChart.jsx';
 import BulletChart from '../BulletChart/BulletChart.jsx';
 import ColumnRangeChart from '../ColumnRangeChart/ColumnRangeChart.jsx';
@@ -174,6 +174,8 @@ describe('Comparison family charts on the shared foundation', () => {
         const defaultOptions = capturedOptions.at(-1);
         expect(defaultOptions.xAxis.categories).toEqual(['Math', 'Reading']);
         expect(defaultOptions.series[0].data).toEqual([70, 90]);
+        expect(defaultOptions.plotOptions.area.fillOpacity).toBe(CHART_RADAR_FILL_OPACITY);
+        expect(defaultOptions.plotOptions.area.fillOpacity).toBe(0.45);
         expect(defaultOptions.xAxis.labels.formatter).toBeUndefined();
 
         render(

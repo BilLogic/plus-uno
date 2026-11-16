@@ -104,16 +104,18 @@ Single-series charts take <C>--chart-brand</C>; de-emphasized comparison or refe
 
 <FoundationSection title="Spacing and type">
 
-Charts share spacing, type, radius and stroke tokens with the rest of the system; see [Foundations](?path=/docs/data-visualizations-foundations--docs). Older charts still being migrated may keep a literal size, but always take text sizes from tokens, never literal pixel values.
+Charts share spacing, radius, stroke, [Type and numbers](?path=/docs/data-visualizations-foundations--docs#foundation-type-and-numbers), [States](?path=/docs/data-visualizations-foundations--docs#foundation-states) and [Motion](?path=/docs/data-visualizations-foundations--docs#foundation-motion) rules with the rest of the system; see [Foundations](?path=/docs/data-visualizations-foundations--docs).
 
 <RefTable
     head={['Role', 'Token']}
     rows={[
         ['Padding around the plot', <C>--card-pad-compact</C>],
-        ['Tick labels, legend, data labels, tooltip text', 'The current text tokens'],
+        ['Tick labels, legend, data labels, tooltip text', <>Noto Sans (<C>--type-family-body</C>) at 500 or 600 with <C>tabular-nums</C> on numbers (<a href="?path=/docs/data-visualizations-foundations--docs#foundation-type-and-numbers">Type and numbers</a>)</>],
         ['Gridlines and axis lines', <C>--chart-grid-width</C>],
         ['Series lines, whiskers, marker rings, segment separators', <C>--chart-line-width</C>],
         ['Bar and column value-end radius', <C>--chart-bar-radius</C>],
+        ['Hover, inactive and selected states', <><C>--chart-*-hovered</C>, <C>--ds-opacity-disabled</C>, and <C>--ds-background-selected</C> + <C>--ds-border-selected</C> (<a href="?path=/docs/data-visualizations-foundations--docs#foundation-states">States</a>)</>],
+        ['Entrance and state transitions', <><C>spatial.default</C> entrance and <C>appearance.fast</C> state transitions (<a href="?path=/docs/data-visualizations-foundations--docs#foundation-motion">Motion</a>)</>],
     ]}
 />
 
@@ -126,7 +128,7 @@ Charts have no built-in title; name each chart in its surrounding Section or Car
 <FoundationRelated
     items={[
         { title: 'Color', description: 'Every chart color, with its categorical order and ramps resolved in the current mode.', href: '?path=/docs/data-visualizations-color--docs' },
-        { title: 'Foundations', description: 'The container, tooltip, radius, stroke, type and motion tokens a chart takes.', href: '?path=/docs/data-visualizations-foundations--docs' },
+        { title: 'Foundations', description: 'The container, tooltip, radius, stroke, Type and numbers, States and Motion tokens a chart takes.', href: '?path=/docs/data-visualizations-foundations--docs' },
     ]}
 />
 

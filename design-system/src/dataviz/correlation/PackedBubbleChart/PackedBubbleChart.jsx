@@ -65,7 +65,7 @@ const PackedBubbleChart = ({
                 },
                 tooltip: tooltipFormat,
                 dataLabels: {
-                    ...chartTheme.plotOptions.series.dataLabels,
+                    ...chartTheme.plotOptions.packedbubble.dataLabels,
                     enabled: true,
                     filter: {
                         property: 'y',

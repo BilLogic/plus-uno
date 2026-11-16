@@ -1,7 +1,8 @@
-import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { extname, join, resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { composite, contrast, parseColor, readTokens, resolveToken } from '@/lib/tokens.mjs';
+import { collectChartSourceFiles } from './lib/chartSourceGuard';
 import { CHROME } from './palette';
 import chartTheme from './chartTheme';
 
@@ -66,52 +67,12 @@ describe('chart text contrast', () => {
     });
 });
 
-const collect = (dir) => readdirSync(dir).flatMap((entry) => {
-    const path = join(dir, entry);
-    if (statSync(path).isDirectory()) return collect(path);
-    return extname(entry) === '.jsx' && !entry.endsWith('.stories.jsx') ? [path] : [];
-});
-
 describe('chart sources', () => {
     it('never inks text with a fixed color or the Highcharts auto-contrast outline', () => {
         const bad = /color:\s*['"](black|white|#[0-9a-f]{3,8})['"]|textOutline:\s*['"][^'"]*contrast/i;
-        const offenders = collect(__dirname).filter((p) => bad.test(readFileSync(p, 'utf8')));
+        const offenders = collectChartSourceFiles(__dirname)
+            .filter(({ text }) => bad.test(text))
+            .map(({ path }) => path);
         expect(offenders).toEqual([]);
-    });
-
-    it('reports remaining per-chart type, state and pixel-offset overrides as a soft list until each chart family is migrated', () => {
-        const sharedFiles = new Set(['PlusChart.jsx']);
-        const rules = [
-            { id: 'b-tag', pattern: /<b\b/i },
-            { id: 'inline-font-weight', pattern: /font-weight\s*:/i },
-            { id: 'weight-300-or-700', pattern: /fontWeight\s*:\s*['"]?(?:300|700|bold)['"]?/ },
-            { id: 'raw-px-font-size', pattern: /font-size\s*:\s*\d+px|fontSize\s*:\s*['"]?\d+px/i },
-            { id: 'series-color-tooltip-text', pattern: /style=["']color:\s*\{series\.color\}["'][^>]*>[^●<]/ },
-            { id: 'per-chart-states', pattern: /\bstates\s*:/ },
-            { id: 'pixel-offset', pattern: /\b(?:pointWidth|offset|x|y|radius|distance)\s*:\s*-?[1-9]\d*(?:\.\d+)?\b/ },
-        ];
-        const report = [];
-        for (const file of collect(__dirname)) {
-            const rel = file.slice(__dirname.length + 1);
-            if (sharedFiles.has(rel)) continue;
-            const raw = readFileSync(file, 'utf8');
-            // Sparkline hides earlier markers at rest (`radius: 0`) and reveals them at `CHART_MARKER_RADIUS` on hover.
-            const text = rel === 'temporal/Sparkline/Sparkline.jsx'
-                ? raw.replace(/states:\s*\{\s*hover:\s*\{\s*radius:\s*CHART_MARKER_RADIUS,\s*radiusPlus:\s*0\s*\}\s*\}/g, '')
-                : raw;
-            const matched = rules.filter(({ pattern }) => pattern.test(text)).map(({ id }) => id);
-            if (matched.length > 0) {
-                report.push(`${rel}: ${matched.join(', ')}`);
-            }
-        }
-        if (report.length > 0) {
-            console.info(`[dataviz soft guard — ${report.length} chart files remaining]`, report);
-        }
-        expect(report.filter((entry) => entry.startsWith('comparison/'))).toEqual([]);
-        expect(report.filter((entry) => entry.startsWith('flow-and-relationships/'))).toEqual([]);
-        expect(report.filter((entry) => entry.startsWith('temporal/'))).toEqual([]);
-        expect(report.filter((entry) => entry.startsWith('part-to-whole/'))).toEqual([]);
-        expect(report.filter((entry) => entry.startsWith('distribution/'))).toEqual([]);
-        expect(report.filter((entry) => entry.startsWith('correlation/'))).toEqual([]);
     });
 });
