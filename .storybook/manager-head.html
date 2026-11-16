@@ -68,4 +68,21 @@
     > div:first-child {
     margin-left: -6px;
   }
+
+  /*
+   * Folder rows top-align their chevron (Storybook's align-items: start), which only
+   * looks centred with Storybook's own shorter font. Noto Sans draws a 19px line box,
+   * so the 8px chevron rode 3.5px above the label. Centre it on the label instead.
+   */
+  .sidebar-container .sidebar-item:is([data-nodetype='group'], [data-nodetype='component'])
+    > button {
+    align-items: center;
+  }
+
+  /* Storybook's own 2px nudge on the chevron wrapper assumed the top alignment. */
+  .sidebar-container .sidebar-item:is([data-nodetype='group'], [data-nodetype='component'])
+    > button
+    > div:first-child {
+    margin-top: 0;
+  }
 </style>
