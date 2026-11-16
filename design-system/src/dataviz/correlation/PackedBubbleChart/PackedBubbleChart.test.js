@@ -42,7 +42,7 @@ describe('PackedBubbleChart options', () => {
         expect(sorted.series[1].data.map((d) => d.name)).toEqual(['High', 'Low']);
         expect(sorted.series.map((s) => s.color)).toEqual([CATEGORICAL[0], CATEGORICAL[1]]);
         expect(sorted.plotOptions.packedbubble.dataLabels.style?.fontWeight).not.toBe('var(--type-weight-regular)');
-        expect(sorted.plotOptions.packedbubble.dataLabels.style?.transition).toBeUndefined();
+        expect(sorted.plotOptions.packedbubble.dataLabels.style?.transition).toBe('none');
         expect(sorted.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
         expect(sorted.tooltip.pointFormat).not.toMatch(/<b\b/i);
         expect(sorted.plotOptions.packedbubble.tooltip.pointFormat).not.toMatch(/<b\b/i);

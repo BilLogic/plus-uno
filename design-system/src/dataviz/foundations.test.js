@@ -45,7 +45,7 @@ vi.mock('highcharts-react-official', () => ({
  */
 
 const ROOT = __dirname;
-const SOURCE_EXTENSIONS = new Set(['.jsx', '.css']);
+const SOURCE_EXTENSIONS = new Set(['.js', '.jsx', '.css']);
 
 /** @returns {string[]} every chart source file, skipping stories (demo-only, not a chart's own styling) and generated node_modules. */
 const collectSourceFiles = (dir) => readdirSync(dir).flatMap((entry) => {
@@ -55,7 +55,116 @@ const collectSourceFiles = (dir) => readdirSync(dir).flatMap((entry) => {
     return SOURCE_EXTENSIONS.has(extname(entry)) ? [path] : [];
 });
 
-const files = collectSourceFiles(ROOT).map((path) => ({ path, text: readFileSync(path, 'utf8') }));
+const files = collectSourceFiles(ROOT).map((path) => ({
+    path,
+    rel: path.slice(ROOT.length + 1).replace(/\\/g, '/'),
+    text: readFileSync(path, 'utf8'),
+}));
+
+const stripComments = (source) =>
+    source.replace(
+        /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|\/\*[\s\S]*?\*\/|\/\/[^\n]*/g,
+        (match, str) => (str ? str : match.replace(/[^\n]/g, ' ')),
+    );
+
+/**
+ * Explicit allow-list of `relPath -> Set<trimmedLine>` for known token gaps
+ * waiting on a product/design decision from Bill.
+ */
+const ALLOWED_SOURCE_LINES = new Map([
+    [
+        // BubbleChart keeps `fillOpacity: 0.7` so overlapping bubbles remain
+        // legible: no data-mark opacity token exists yet (only
+        // `--ds-opacity-disabled` at 0.4 and `--ds-opacity-loading` at 0.2).
+        'correlation/BubbleChart/BubbleChart.jsx',
+        new Set(['fillOpacity: 0.7']),
+    ],
+]);
+
+const STATES_ALLOWED_FILES = new Set([
+    'chartTheme.js',
+    'PlusChart.jsx',
+    'temporal/Sparkline/Sparkline.jsx',
+]);
+
+const HARD_BAN_LINE_RULES = [
+    {
+        id: 'eased-curve',
+        pattern:
+            /cubic-bezier\s*\(|\b(?:ease(?:-(?:in-out|in|out)|InOut|In|Out)?(?:Quad|Cubic|Quart|Quint|Sine|Expo|Circ|Back|Bounce|Elastic)?|swing)\b|\beasing\s*:\s*['"](?:linear|ease[^'"]*|swing)['"]|\btransition\s*:[^;\n'"]*\blinear\b/,
+    },
+    {
+        id: 'animation-ms-or-removed-prop',
+        pattern:
+            /\b(?:animate|animationDelay|animationDuration|enableAnimation)\b|\b(?:transition|animation)\s*:[^;\n}]*\b[1-9]\d*(?:\.\d+)?(?:ms|s)\b|\b(?:duration|defer)\s*:\s*['"]?[1-9]\d*(?:\.\d+)?(?:ms|s)?['"]?/,
+    },
+    {
+        id: 'banned-font-weight',
+        pattern:
+            /<b\b|<strong\b|\b(?:font-weight|fontWeight)\s*:\s*['"]?(?:bold|bolder|lighter|normal|[1-9]00)\b['"]?|--type-weight-(?!medium\b|semibold\b)[a-z0-9-]+/i,
+    },
+    {
+        id: 'series-color-text',
+        pattern:
+            /style\s*=\s*["'][^"']*color\s*:\s*\{(?:series|point)\.color\}[^"']*["']\s*>\s*(?!●)|style\s*=\s*["'][^"']*color\s*:\s*\$\{(?!\s*(?:ink\b|inkFor\b))[^}]*(?:series|point|this)\.color\s*\}[^"']*["']\s*>\s*(?!●)|style\s*:\s*\{[^{}]*\bcolor\s*:\s*(?:['"]var\(--chart-[\w-]+\)['"]|\b(?:series|point)\.color\b)/,
+    },
+    {
+        id: 'pixel-offset',
+        pattern:
+            /\b(?:pointWidth|offset|x|y|radius|distance|minSize|maxSize)\s*:\s*-?[1-9]\d*(?:\.\d+)?\b|\b(?:borderRadius|borderWidth|lineWidth|gridLineWidth|stemWidth|medianWidth|whiskerWidth|tickWidth|fontSize)\s*:\s*['"]?[1-9]\d*(?:\.\d+)?(?:px)?['"]?(?!%)|\bfont-size\s*:\s*\d+px\b|\bfillOpacity\s*:\s*0?\.\d+\b/,
+    },
+    {
+        id: 'control-radius-on-non-control',
+        pattern: /--radius-control-(?:sm|md|lg)\b|--(?:button|field|input|select|control)-radius\b/,
+    },
+];
+
+function checkMissingTabularFigures(relPath, stripped) {
+    const hits = [];
+    const lines = stripped.split(/\r?\n/);
+    lines.forEach((line, idx) => {
+        if (
+            /\b(?:fontVariantNumeric|font-variant-numeric)\s*:\s*['"]?(?!tabular-nums\b|TABULAR\b)[a-z-]+/i.test(line) ||
+            /--type-family-code\b|\bmonospace\b/.test(line)
+        ) {
+            hits.push(`${relPath}:${idx + 1} [missing-tabular-figures] ${line.trim()}`);
+        }
+    });
+    const slotPattern =
+        /\b(?:labels\s*:\s*\{[^{}]*style|dataLabels\s*:\s*\{[^{}]*style|itemStyle|tooltip\s*:\s*\{[^{}]*style)\s*:\s*\{([^{}]*)\}/g;
+    for (const match of stripped.matchAll(slotPattern)) {
+        const body = match[1];
+        const setsType = /\b(?:fontFamily|fontSize|fontWeight)\s*:/.test(body);
+        const hasTabular =
+            /\bfontVariantNumeric\s*:\s*(?:TABULAR\b|['"]tabular-nums['"])/.test(body) ||
+            /\.\.\.(?:chartTheme|baseSeriesPlot|dataLabelsStyle)\b/.test(body);
+        if (setsType && !hasTabular) {
+            const lineNum = stripped.slice(0, match.index).split(/\r?\n/).length;
+            hits.push(`${relPath}:${lineNum} [missing-tabular-figures] number slot style missing tabular-nums`);
+        }
+    }
+    return hits;
+}
+
+function auditChartSource(relPath, rawText) {
+    const stripped = stripComments(rawText);
+    const allowedLines = ALLOWED_SOURCE_LINES.get(relPath);
+    const findings = [];
+    stripped.split(/\r?\n/).forEach((line, idx) => {
+        const trimmed = line.trim();
+        if (!trimmed || (allowedLines && allowedLines.has(trimmed))) return;
+        for (const rule of HARD_BAN_LINE_RULES) {
+            if (rule.pattern.test(line)) {
+                findings.push(`${relPath}:${idx + 1} [${rule.id}] ${trimmed}`);
+            }
+        }
+        if (!STATES_ALLOWED_FILES.has(relPath) && /\bstates\s*:/.test(line)) {
+            findings.push(`${relPath}:${idx + 1} [pixel-offset] ${trimmed}`);
+        }
+    });
+    findings.push(...checkMissingTabularFigures(relPath, stripped));
+    return findings;
+}
 
 /** A `var(--token, <literal>)` fallback: the exact pattern the data-viz foundations rule bans — a chart should trust the ladder, not carry a guess beside it. */
 const FALLBACK_PATTERN = /var\(--[\w-]+,\s*['"]?-?[\d.]+(px|rem|%|ms|s)?['"]?\)/g;
@@ -110,7 +219,11 @@ describe('data-viz foundations', () => {
         }
     });
 
-    it('clears Highcharts hardcoded 2000ms CSS data-label transition on packedbubble through PlusChart', () => {
+    it('clears Highcharts hardcoded 2000ms CSS data-label transition on packedbubble as a chartTheme type default with no per-type special case in PlusChart', () => {
+        expect(chartTheme.plotOptions.packedbubble.dataLabels.style.transition).toBe('none');
+        const plusChartSource = readFileSync(join(ROOT, 'PlusChart.jsx'), 'utf8');
+        expect(plusChartSource).not.toContain('packedbubble');
+
         capturedPlusChartOptions.length = 0;
         render(
             React.createElement(PlusChart, {
@@ -120,7 +233,7 @@ describe('data-viz foundations', () => {
                     plotOptions: {
                         packedbubble: {
                             dataLabels: {
-                                ...chartTheme.plotOptions.series.dataLabels,
+                                ...chartTheme.plotOptions.packedbubble.dataLabels,
                                 enabled: true,
                             },
                         },
@@ -131,6 +244,88 @@ describe('data-viz foundations', () => {
         );
         const merged = capturedPlusChartOptions.at(-1);
         expect(merged.plotOptions.packedbubble.dataLabels.style.transition).toBe('none');
+    });
+
+    it('self-tests that every banned shape trips the hard-ban guard and clean code passes', () => {
+        expect(auditChartSource('sample/Chart.jsx', "animation: { easing: 'easeOutQuad' }")).toEqual([
+            expect.stringContaining('[eased-curve]'),
+        ]);
+        expect(auditChartSource('sample/Chart.css', 'transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);')).toEqual(
+            expect.arrayContaining([expect.stringContaining('[eased-curve]')]),
+        );
+        expect(auditChartSource('sample/Chart.jsx', 'animation: { duration: 300, defer: 20 }')).toEqual([
+            expect.stringContaining('[animation-ms-or-removed-prop]'),
+        ]);
+        expect(
+            auditChartSource('sample/Chart.jsx', 'const Chart = ({ animate = true, animationDuration, enableAnimation }) => null;'),
+        ).toEqual([expect.stringContaining('[animation-ms-or-removed-prop]')]);
+        expect(auditChartSource('sample/Chart.jsx', "pointFormat: '<b>{point.y}</b>'")).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', "style: { fontWeight: 'bold' }")).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'style: { fontWeight: 700 }')).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'style: { fontWeight: 600 }')).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', "style: { fontWeight: 'var(--type-weight-regular)' }")).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(
+            auditChartSource('sample/Chart.jsx', 'pointFormat: `<span style="color:{series.color}">{series.name}</span>`'),
+        ).toEqual([expect.stringContaining('[series-color-text]')]);
+        expect(auditChartSource('sample/Chart.jsx', "style: { color: 'var(--chart-brand)' }")).toEqual([
+            expect.stringContaining('[series-color-text]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'dataLabels: { y: -6, pointWidth: 24, radius: 4 }')).toEqual([
+            expect.stringContaining('[pixel-offset]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'fillOpacity: 0.7')).toEqual([
+            expect.stringContaining('[pixel-offset]'),
+        ]);
+        expect(auditChartSource('correlation/BubbleChart/BubbleChart.jsx', 'fillOpacity: 0.7')).toEqual([]);
+        expect(auditChartSource('sample/Chart.jsx', "borderRadius: 'var(--radius-control-sm)'")).toEqual([
+            expect.stringContaining('[control-radius-on-non-control]'),
+        ]);
+        expect(
+            auditChartSource(
+                'sample/Chart.jsx',
+                "yAxis: { labels: { style: { fontFamily: 'var(--type-family-body)', fontSize: 'var(--type-size-075)' } } }",
+            ),
+        ).toEqual([expect.stringContaining('[missing-tabular-figures]')]);
+        expect(
+            auditChartSource('sample/Chart.jsx', "style: { fontVariantNumeric: 'normal', fontFamily: 'monospace' }"),
+        ).toEqual([expect.stringContaining('[missing-tabular-figures]')]);
+
+        const cleanSample = `
+            // Comments mentioning <b>, easeOutQuad, 200ms or animate are ignored.
+            const options = {
+                ...chartTheme,
+                yAxis: {
+                    ...chartTheme.yAxis,
+                    labels: {
+                        style: {
+                            ...chartTheme.yAxis.labels.style,
+                            fontWeight: 'var(--type-weight-medium)',
+                            fontVariantNumeric: 'tabular-nums',
+                        },
+                    },
+                },
+                tooltip: {
+                    ...chartTheme.tooltip,
+                    pointFormat: '<span style="color:{point.color}">●</span> <span class="plus-chart-value">{point.y}</span>',
+                },
+            };
+        `;
+        expect(auditChartSource('sample/CleanChart.jsx', cleanSample)).toEqual([]);
+    });
+
+    it('enforces the hard ban across every chart source file in design-system/src/dataviz', () => {
+        const offenders = files.flatMap(({ rel, text }) => auditChartSource(rel, text));
+        expect(offenders).toEqual([]);
     });
 
     it('every chart that sets a Highcharts tooltip spreads the shared theme tooltip', () => {

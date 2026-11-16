@@ -48,7 +48,6 @@ const AreaRangeChart = ({
             name: 'Range',
             data: data,
             color: BRAND,
-            fillOpacity: 0.3,
             lineWidth: 0,
             marker: {
                 enabled: false

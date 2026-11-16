@@ -245,6 +245,22 @@ const chartTheme = {
         },
         column: barRadius,
         bar: barRadius,
+        // Highcharts' `packedbubble` module stamps an inline 2-second eased CSS
+        // opacity transition on `dataLabels.style`, bypassing the chart entrance
+        // spring and reduced-motion container fade.
+        packedbubble: {
+            dataLabels: {
+                style: {
+                    color: CHROME.text,
+                    fontFamily: BODY,
+                    fontSize: 'var(--type-size-075)',
+                    fontWeight: MEDIUM,
+                    fontVariantNumeric: TABULAR,
+                    textOutline: 'none',
+                    transition: 'none',
+                },
+            },
+        },
         wordcloud: {
             style: {
                 fontFamily: BODY,
