@@ -24,7 +24,7 @@ Also asked as: page section, toolbar, section header, block, region.
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. A **Section detail** is an inline expand: a row or card opens in place inside its Section and pushes the content below it down. It is never the detail view on a queue page.
+A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill; a detail expands an item in place (see Best practices below).
 
 ## Motion
 
@@ -105,7 +105,7 @@ Each control has one home. The icon returns with its count once the side hides, 
 
 **Checked:** Review
 
-A row or card opens in place inside its Section and pushes the content below it down. A queue page docks a `Panel` beside the list instead, and the record opens on demand.
+A **Section detail** is an inline expand: a row or card opens in place inside its Section and pushes the content below it down. It is never the detail view on a queue page — a queue page docks a `Panel` beside the list instead, and the record opens on demand.
 
 ### Keep the footer for paging and "View all". {#keep-the-footer-for-paging-and-view-all}
 
@@ -141,7 +141,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 ## Related
 
 - Page: use when the heading is the page's own.
-- Panel: use when the record should float over the Page instead of sitting beside the list.
+- Panel: use when a queue page docks the Panel beside the list, or for a quick look from a table.
 - Popup: use when choosing the menu the view Select or the Filter icon opens.
 - Table: use when the body is rows and columns.
 - Filtering: use when picking a filter tier for the view bar.
@@ -182,7 +182,7 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
 2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.
 3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the bar with nothing between.
-4. **Detail** (optional). The picked record beside the list, 5 of 12 columns, with Previous and Next and its own footer.
+4. **Detail** (optional). An item expanded in place inside the Section, with its own header and footer.
 5. **Footer** (optional). Paging or "View all".
 
 ## Slots
@@ -197,7 +197,7 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
 | `layout="split"` · `side` | A second column at the end, for a summary. |
 | `sidePlacement` | Planned. `start` puts the side first, for a filter side or a step rail. |
-| `detail` · `detailTitle` · `detailFooter` | The picked record beside the list, with Previous and Next. |
+| `detail` · `detailTitle` · `detailFooter` | An item expanded in place inside the Section, with its own title and footer. |
 | `footer` | Paging or "View all". |
 
 The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, and the Section holds nothing for it: Dynamic table.

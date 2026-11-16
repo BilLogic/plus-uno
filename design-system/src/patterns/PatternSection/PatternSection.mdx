@@ -89,7 +89,7 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
 2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.
 3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the bar with nothing between.
-4. **Detail** (optional). The picked record beside the list, 5 of 12 columns, with Previous and Next and its own footer.
+4. **Detail** (optional). An item expanded in place inside the Section, with its own header and footer.
 5. **Footer** (optional). Paging or "View all".
 
 </div>
@@ -123,7 +123,7 @@ A starting set, picked by what the Section holds. Every control state lives on i
 
 <ComponentExample of={PatternSectionStories.FilterSideAtStart} title="Filter side at the start" description={'When filtering is the main job: "Reset filters" at the top and a count beside each category. The tiers are the Filtering pattern.'} />
 
-<ComponentExample of={PatternSectionStories.TypeQueue} title="Detail" description="The picked record beside the list, with Previous and Next in its header and its own footer. Heavy work opens on its own page from the detail footer." />
+<ComponentExample of={PatternSectionStories.TypeQueue} title="Detail" description="An item expanded in place inside its Section, with its own header and footer." />
 
 </div>
 
@@ -204,7 +204,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><td><code>children</code></td><td>The body: a Table, a card grid, a list, a form or subsections.</td></tr>
 <tr><td><code>layout="split"</code> · <code>side</code></td><td>A second column at the end, for a summary.</td></tr>
 <tr><td><code>sidePlacement</code> <PlannedTag /></td><td>Planned. <code>start</code> puts the side first, for a filter side or a step rail.</td></tr>
-<tr><td><code>detail</code> · <code>detailTitle</code> · <code>detailFooter</code></td><td>The picked record beside the list, with Previous and Next.</td></tr>
+<tr><td><code>detail</code> · <code>detailTitle</code> · <code>detailFooter</code></td><td>An item expanded in place inside the Section, with its own title and footer.</td></tr>
 <tr><td><code>footer</code></td><td>Paging or "View all".</td></tr>
 </tbody>
 </DocsTable>
@@ -227,7 +227,7 @@ The bulk bar lives in the Dynamic table's head row, through its <code>bulkAction
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. A **Section detail** is an inline expand: a row or card opens in place inside its Section and pushes the content below it down. It is never the detail view on a queue page.
+A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill; a detail expands an item in place (see Best practices below).
 
 </div>
 
@@ -319,7 +319,7 @@ Each control has one home. The icon returns with its count once the side hides, 
 
 <RuleTag kind="review" />
 
-A row or card opens in place inside its Section and pushes the content below it down. A queue page docks a `Panel` beside the list instead, and the record opens on demand.
+A **Section detail** is an inline expand: a row or card opens in place inside its Section and pushes the content below it down. It is never the detail view on a queue page — a queue page docks a `Panel` beside the list instead, and the record opens on demand.
 
 ### Keep the footer for paging and "View all".
 
@@ -385,7 +385,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 ## Related
 
 - <DocsLink id="templates-page">Page</DocsLink>: use when the heading is the page's own.
-- <DocsLink id="templates-panel">Panel</DocsLink>: use when the record should float over the Page instead of sitting beside the list.
+- <DocsLink id="templates-panel">Panel</DocsLink>: use when a queue page docks the Panel beside the list, or for a quick look from a table.
 - <DocsLink id="templates-popup">Popup</DocsLink>: use when choosing the menu the view Select or the Filter icon opens.
 - <DocsLink id="templates-table">Table</DocsLink>: use when the body is rows and columns.
 - <DocsLink id="patterns-filtering">Filtering</DocsLink>: use when picking a filter tier for the view bar.

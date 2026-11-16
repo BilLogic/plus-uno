@@ -68,7 +68,7 @@ A page worked item by item (Flags, Highlights, Feedback, Approvals, Escalations)
 An inline expand inside a Section.
 
 **Commit action**:
-The footer button that commits the work (Submit, Save, Send, Approve); in multi-step forms, Back and Next may sit beside it (`design-system/src/patterns/Form/Form.mdx`).
+The footer button that commits the work (Submit, Save, Send, Approve); in multi-step forms, Back and Next may sit beside it, per the Form pattern.
 
 ### Organization
 
