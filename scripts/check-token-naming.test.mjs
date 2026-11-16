@@ -297,13 +297,13 @@ test('naming rule exceptions: /default drop (with code/default retained), chart/
   assert.deepEqual(findings, []);
 });
 
-test('kind 3: warns when WEB code syntax disagrees with the naming rule, and blocks when BLOCK_ON_NAMING_MISMATCH is flipped', () => {
-  assert.equal(BLOCK_ON_NAMING_MISMATCH, false);
+test('kind 3: blocks when WEB code syntax disagrees with the naming rule, and only warns when blocking is off', () => {
+  assert.equal(BLOCK_ON_NAMING_MISMATCH, true);
   const scss = new Set(['--radius-control-sm', '--ds-text']);
   const snapshot = makeSnapshot({
     'spacing / components': {
-      variables: ['Tooltip/radius'],
-      codeSyntax: { 'Tooltip/radius': 'var(--radius-control-sm)' },
+      variables: ['Flag/radius'],
+      codeSyntax: { 'Flag/radius': 'var(--radius-control-sm)' },
     },
     'color / semantics': {
       variables: ['elevation/shadow/raised/layer-1'],
@@ -313,18 +313,18 @@ test('kind 3: warns when WEB code syntax disagrees with the naming rule, and blo
     },
   });
 
-  const warnings = checkTokenNaming(snapshot, scss);
+  const warnings = checkTokenNaming(snapshot, scss, { blockOnNamingMismatch: false });
   assert.equal(warnings.length, 2);
   for (const finding of warnings) {
     assert.equal(finding.kind, 'naming-mismatch');
     assert.equal(finding.severity, 'warning');
   }
   const messages = warnings.map((w) => w.message).join('\n');
-  assert.match(messages, /spacing \/ components · Tooltip\/radius.*--tooltip-radius/);
+  assert.match(messages, /spacing \/ components · Flag\/radius.*--flag-radius/);
   assert.match(messages, /elevation\/shadow\/raised\/layer-1.*--ds-shadow-raised/);
   assert.equal(exitCodeFor(warnings), 0);
 
-  const blocking = checkTokenNaming(snapshot, scss, { blockOnNamingMismatch: true });
+  const blocking = checkTokenNaming(snapshot, scss);
   assert.equal(blocking.length, 2);
   assert.ok(blocking.every((f) => f.severity === 'error'));
   assert.equal(exitCodeFor(blocking), 1);
@@ -358,4 +358,14 @@ test('live repository snapshot has zero unknown-token or un-allowlisted missing-
 test('a primitive alpha step is its own segment, as code names it', () => {
   assert.equal(expectedToken('color / primitives', 'red/600a8'), '--palette-red-600-a8');
   assert.equal(expectedToken('color / primitives', 'blackAlpha/60'), '--palette-black-alpha-60');
+});
+
+test('Tooltip/radius is a documented exception: it shares --radius-control-sm', () => {
+  const snapshot = makeSnapshot({
+    'spacing / components': {
+      variables: ['Tooltip/radius'],
+      codeSyntax: { 'Tooltip/radius': 'var(--radius-control-sm)' },
+    },
+  });
+  assert.deepEqual(checkTokenNaming(snapshot, new Set(['--radius-control-sm'])), []);
 });
