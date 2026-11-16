@@ -44,8 +44,8 @@ Popup reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. From the keyboard it opens with no animation. |
-| exit | Close | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | The clip folds back to the same corner while it fades. Under reduced motion it is the fade alone. |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. From the keyboard it opens with no animation. |
+| exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | The clip folds back to the same corner while it fades. Under reduced motion it is the fade alone. |
 
 ## Alternatives
 
