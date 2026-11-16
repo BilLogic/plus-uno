@@ -145,6 +145,12 @@ _Avoid_: "legacy docs"
 A Figma frame a person makes to mirror a coded prototype: an optional link on its Marketplace row and in its share-out.
 _Avoid_: bare "replica", "screenshot"
 
+**Thumbnail**:
+The small index or cover image of a type, kept.
+
+**Live example**:
+A full-size, interactive demo built from real components, with Show code.
+
 ### Estates
 
 **uno-blueprint**:

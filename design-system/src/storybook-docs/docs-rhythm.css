@@ -340,6 +340,12 @@
     color: var(--ds-text-subtle);
 }
 
+.sbdocs .sb-docs-type-card__link:focus-visible {
+    outline: var(--border-width-focused) solid var(--ds-border-focused);
+    outline-offset: var(--focus-ring-offset);
+    border-radius: var(--radius-sm);
+}
+
 /* A narrow column: one tile per row, each its own 8:5. docs-literal: a container query takes no custom property, and no token is the width under which three thumbnails stop reading. */
 @container (max-width: 34rem) {
     .sbdocs .sb-docs-thumbs > .sb-docs-thumb {

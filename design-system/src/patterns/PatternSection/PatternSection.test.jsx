@@ -1,6 +1,19 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
+import { LiveAnatomy, TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import PatternSection, { SectionToolbar } from './PatternSection';
+import * as Cases from './PatternSectionCases.jsx';
+
+vi.mock('@storybook/addon-docs/blocks', () => ({
+    ArgTypes: () => null,
+    Canvas: () => <div data-testid="docs-canvas" />,
+    Controls: () => null,
+    Source: () => null,
+    Stories: () => null,
+    Story: () => <div data-testid="docs-story" />,
+    useOf: () => ({}),
+}));
 
 /**
  * The Section pattern follows the Figma Section: no fill and no pad of its
@@ -177,5 +190,115 @@ describe('PatternSection named', () => {
         unmount();
         render(<PatternSection title="Flag 1">Body</PatternSection>);
         expect(screen.queryByRole('region')).toBeNull();
+    });
+});
+
+describe('Template docs live examples', () => {
+    it('TypeCard links both thumbnail and title without a duplicate tab stop, resolving to ComponentExample', () => {
+        const { container } = render(
+            <div>
+                <TypeCard thumb={<div>Thumb</div>} title="List" to="#list">The view bar alone.</TypeCard>
+                <TypeCard thumb={<div>Thumb</div>} title="View bar, one view" to="#view-bar-one-view">One pill.</TypeCard>
+                <TypeCard thumb={<div>Thumb</div>} title="Frame" to="templates-frame">The shell.</TypeCard>
+                <ComponentExample of={{}} title="List" description="The view bar alone." />
+                <ComponentExample of={{}} title="View bar, one view" description="One pill." />
+            </div>,
+        );
+
+        const listLink = screen.getByRole('link', { name: 'List' });
+        expect(listLink).toHaveAttribute('href', '#list');
+        expect(screen.getByRole('link', { name: 'Frame' })).toHaveAttribute('href', '?path=/docs/templates-frame--docs');
+        expect(screen.getAllByRole('link')).toHaveLength(3);
+
+        const thumbs = container.querySelectorAll('[data-type-thumb]');
+        expect(thumbs[0].tagName).toBe('A');
+        expect(thumbs[0]).toHaveAttribute('href', '#list');
+        expect(thumbs[0]).toHaveAttribute('tabindex', '-1');
+        expect(thumbs[0]).toHaveAttribute('aria-hidden', 'true');
+
+        for (const href of ['#list', '#view-bar-one-view']) {
+            const target = container.querySelector(href);
+            expect(target).not.toBeNull();
+            expect(target.tagName).toBe('H3');
+        }
+
+        const ids = [...container.querySelectorAll('[id]')].map((el) => el.id);
+        expect(new Set(ids).size).toBe(ids.length);
+    });
+
+    it('LiveAnatomy stays scaled and inert by default, and goes live and focusable when opted in', () => {
+        const parts = [{ selector: '[data-part="header"]', label: 'Header' }];
+        const { container, rerender } = render(
+            <LiveAnatomy width={960} title="Section anatomy" parts={parts}>
+                <div data-part="header">
+                    <button type="button">Add students</button>
+                </div>
+            </LiveAnatomy>,
+        );
+        expect(screen.getByRole('img', { name: /Section anatomy/ })).toBeInTheDocument();
+        expect(container.querySelector('[inert]')).not.toBeNull();
+
+        rerender(
+            <LiveAnatomy live title="Section anatomy" parts={parts}>
+                <div data-part="header">
+                    <button type="button">Add students</button>
+                </div>
+            </LiveAnatomy>,
+        );
+        expect(screen.queryByRole('img', { name: /Section anatomy/ })).toBeNull();
+        expect(container.querySelector('[inert]')).toBeNull();
+        const button = screen.getByRole('button', { name: 'Add students' });
+        expect(button.closest('[aria-hidden="true"]')).toBeNull();
+        button.focus();
+        expect(button).toHaveFocus();
+    });
+
+    it('PatternSectionCases render real PLUS components for every do/dont pair', () => {
+        const r1 = render(<Cases.CardStandsAlone />);
+        expect(screen.getByRole('heading', { name: 'Upcoming session' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Join session' })).toBeInTheDocument();
+        r1.unmount();
+
+        const r2 = render(<Cases.SectionRepeatsCard />);
+        expect(screen.getAllByRole('heading', { name: 'Upcoming session' })).toHaveLength(2);
+        expect(screen.getByRole('button', { name: 'Join session' })).toBeInTheDocument();
+        r2.unmount();
+
+        const r3 = render(<Cases.ActionsInTitleRow />);
+        expect(screen.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Add students' })).toBeInTheDocument();
+        r3.unmount();
+
+        const r4 = render(<Cases.ActionsInTwoHomes />);
+        expect(screen.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
+        expect(screen.getAllByRole('button', { name: 'Add students' })).toHaveLength(2);
+        r4.unmount();
+
+        const r5 = render(<Cases.RightSideInOrder />);
+        expect(screen.getByRole('heading', { name: 'Sessions' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'New session' })).toBeInTheDocument();
+        r5.unmount();
+
+        const r6 = render(<Cases.RightSideCrowded />);
+        expect(screen.getByRole('heading', { name: 'Sessions' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'New session' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Share' })).toBeInTheDocument();
+        r6.unmount();
+
+        const r7 = render(<Cases.CardOwnsSave />);
+        expect(screen.getByRole('heading', { name: 'Contact details' })).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: 'Guardian name' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'View all' })).toBeInTheDocument();
+        r7.unmount();
+
+        const r8 = render(<Cases.FooterCommits />);
+        expect(screen.getByRole('heading', { name: 'Contact details' })).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: 'Guardian name' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+        r8.unmount();
     });
 });

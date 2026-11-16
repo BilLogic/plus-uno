@@ -1,6 +1,6 @@
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PatternSectionStories from './PatternSection.stories.jsx';
@@ -12,8 +12,12 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { LiveAnatomy, PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    TitleInViewBar,
+    TitleRowAboveViewBar,
+} from '@/storybook-docs/illustrations/section.jsx';
 import {
     ActionsInTitleRow,
     ActionsInTwoHomes,
@@ -23,9 +27,7 @@ import {
     RightSideCrowded,
     RightSideInOrder,
     SectionRepeatsCard,
-    TitleInViewBar,
-    TitleRowAboveViewBar,
-} from '@/storybook-docs/illustrations/section.jsx';
+} from './PatternSectionCases.jsx';
 
 <Meta of={PatternSectionStories} />
 
@@ -54,15 +56,27 @@ import {
 Each Section type combines a header and body, with an optional side or detail. These are starting layouts of the same component.
 
 <TypeGrid>
-<TypeCard of={PatternSectionStories.TypeList} title="List">The view bar alone, one table, paging. The default for an area page.</TypeCard>
-<TypeCard of={PatternSectionStories.Detail} title="Detail">A list with a detail that opens an item in place.</TypeCard>
-<TypeCard of={PatternSectionStories.TypeCards} title="Cards">Title and actions, a grid of cards three across.</TypeCard>
-<TypeCard of={PatternSectionStories.TypeStats} title="Stats">A row of cards, each one number and its label, four at most.</TypeCard>
-<TypeCard of={PatternSectionStories.TypeDetails} title="Details">Label and value pairs in two columns, with Edit in the title row.</TypeCard>
-<TypeCard of={PatternSectionStories.TypeMainAndSide} title="Main and side">A split with the side at the end and no fill: facts beside the main content.</TypeCard>
-<TypeCard of={PatternSectionStories.TypeForm} title="Form">Fields in a card, with the card's own Save and Cancel at its bottom.</TypeCard>
-<TypeCard of={PatternSectionStories.TypeSubsections} title="Subsections">Sections nested one level, each an h3, for a long settings page.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeList} to="#list" title="List">The view bar alone, one table, paging. The default for an area page.</TypeCard>
+<TypeCard of={PatternSectionStories.Detail} to="#detail" title="Detail">A list with a detail that opens an item in place.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeCards} to="#cards" title="Cards">Title and actions, a grid of cards three across.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeStats} to="#stats" title="Stats">A row of cards, each one number and its label, four at most.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeDetails} to="#details" title="Details">Label and value pairs in two columns, with Edit in the title row.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeMainAndSide} to="#side-at-the-end" title="Main and side">A split with the side at the end and no fill: facts beside the main content.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeForm} to="#form" title="Form">Fields in a card, with the card's own Save and Cancel at its bottom.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeSubsections} to="#subsections" title="Subsections">Sections nested one level, each an h3, for a long settings page.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={PatternSectionStories.TypeList} title="List" description="The view bar alone, one table, paging. The default for an area page." />
+
+<ComponentExample of={PatternSectionStories.TypeCards} title="Cards" description="Title and actions, a grid of cards three across." />
+
+<ComponentExample of={PatternSectionStories.TypeStats} title="Stats" description="A row of cards, each one number and its label, four at most." />
+
+<ComponentExample of={PatternSectionStories.TypeDetails} title="Details" description="Label and value pairs in two columns, with Edit in the title row." />
+
+<ComponentExample of={PatternSectionStories.TypeForm} title="Form" description="Fields in a card, with the card's own Save and Cancel at its bottom." />
+
+<ComponentExample of={PatternSectionStories.TypeSubsections} title="Subsections" description="Sections nested one level, each an h3, for a long settings page." />
 
 </div>
 
@@ -72,19 +86,7 @@ Each Section type combines a header and body, with an optional side or detail. T
 
 A Section with a view bar, a detail and a footer. The title, the first pill and the first column share one left edge.
 
-<LiveAnatomy
-    width={1024}
-    title="A Section with its parts numbered"
-    parts={[
-        { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-pattern-section-title-row', label: 'Title row' },
-        { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-pattern-section-tabs', label: 'View bar' },
-        { selector: '.plus-pattern-section-list', label: 'Body' },
-        { selector: '.plus-pattern-section-detail', label: 'Detail' },
-        { selector: '[data-anatomy-root] > .plus-pattern-section-footer', label: 'Footer' },
-    ]}
->
-    <Story of={PatternSectionStories.AnatomyQueue} inline />
-</LiveAnatomy>
+<ComponentExample of={PatternSectionStories.AnatomyQueue} />
 
 1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
 2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.
@@ -101,15 +103,31 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 A starting set, picked by what the Section holds. Every control state lives on its component: <DocsLink id="components-forms-and-inputs-button-icon-button">Icon button</DocsLink>, <DocsLink id="components-forms-and-inputs-button-filter-button">Filter button</DocsLink> and <DocsLink id="components-navigation-tabs">Tabs</DocsLink>. Which filters the bar takes is <DocsLink id="patterns-filtering">Filtering</DocsLink>; how the search field behaves is the Search pattern, listed in <DocsLink id="patterns-overview">Patterns</DocsLink>.
 
 <TypeGrid>
-<TypeCard of={PatternSectionStories.HeaderTypeTitle} title="Title">A title and a description, nothing to act on. Most Sections that hold cards or a form.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeTitleAndActions} title="Title and actions">Section actions in the title row. One Primary and two others at most.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeViewBarOneView} title="View bar, one view">One pill names the rows and stays, so nothing moves when a second view arrives.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeViewBarSeveralViews} title="View bar, several views">Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeFormatSwitch} title="Format switch">When the rows show as a table or a calendar, equal-width segments sit first at the end.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeViewBarAlone} title="View bar alone">The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeUnderPageTabs} title="Under page tabs">One tab system per page: the views become one labeled Select at the start of the bar. It picks a view, not a filter.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeSubsection} title="Subsection">Any type nests once. The title drops to an h3; the view bar keeps its size.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeTitle} to="#title" title="Title">A title and a description, nothing to act on. Most Sections that hold cards or a form.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeTitleAndActions} to="#title-and-actions" title="Title and actions">Section actions in the title row. One Primary and two others at most.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeViewBarOneView} to="#view-bar-one-view" title="View bar, one view">One pill names the rows and stays, so nothing moves when a second view arrives.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeViewBarSeveralViews} to="#view-bar-several-views" title="View bar, several views">Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeFormatSwitch} to="#format-switch" title="Format switch">When the rows show as a table or a calendar, equal-width segments sit first at the end.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeViewBarAlone} to="#view-bar-alone" title="View bar alone">The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeUnderPageTabs} to="#under-page-tabs" title="Under page tabs">One tab system per page: the views become one labeled Select at the start of the bar. It picks a view, not a filter.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeSubsection} to="#subsection" title="Subsection">Any type nests once. The title drops to an h3; the view bar keeps its size.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={PatternSectionStories.HeaderTypeTitle} title="Title" description="A title and a description, nothing to act on. Most Sections that hold cards or a form." />
+
+<ComponentExample of={PatternSectionStories.HeaderTypeTitleAndActions} title="Title and actions" description="Section actions in the title row. One Primary and two others at most." />
+
+<ComponentExample of={PatternSectionStories.HeaderTypeViewBarOneView} title="View bar, one view" description="One pill names the rows and stays, so nothing moves when a second view arrives." />
+
+<ComponentExample of={PatternSectionStories.HeaderTypeViewBarSeveralViews} title="View bar, several views" description="Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More." />
+
+<ComponentExample of={PatternSectionStories.HeaderTypeFormatSwitch} title="Format switch" description="When the rows show as a table or a calendar, equal-width segments sit first at the end." />
+
+<ComponentExample of={PatternSectionStories.HeaderTypeViewBarAlone} title="View bar alone" description="The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers." />
+
+<ComponentExample of={PatternSectionStories.HeaderTypeUnderPageTabs} title="Under page tabs" description="One tab system per page: the views become one labeled Select at the start of the bar. It picks a view, not a filter." />
+
+<ComponentExample of={PatternSectionStories.HeaderTypeSubsection} title="Subsection" description="Any type nests once. The title drops to an h3; the view bar keeps its size." />
 
 <ComponentExample of={PatternSectionStories.ToolbarSearch} title="Search" description={<>The Search field, a collapsible compact <code>SearchField</code>, grows left into a field. Esc clears it, a second Esc closes it, and it stays open while it holds text.</>} />
 

@@ -238,6 +238,10 @@ export function DocsCanvasShell({ description, children, attachSourceBelow = tru
     );
 }
 
+const exampleSlug = (text) => (typeof text === 'string'
+    ? text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || undefined
+    : undefined);
+
 /**
  * One example of the Examples tab: one story, one appearance, state or size,
  * under an h3 and a one-line description (a fragment, so the heading stays a direct child of the section). The template for every
@@ -251,7 +255,7 @@ export function DocsCanvasShell({ description, children, attachSourceBelow = tru
 export function ComponentExample({ of: ofStory, title, description }) {
     return (
         <>
-            {title ? <h3>{title}</h3> : null}
+            {title ? <h3 id={exampleSlug(title)}>{title}</h3> : null}
             <DocsCanvasShell description={description}>
                 <Canvas of={ofStory} story={{ inline: true }} layout="padded" sourceState="hidden" />
             </DocsCanvasShell>
