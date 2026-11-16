@@ -29,7 +29,7 @@ Don't: Two primary buttons competing in the same footer.
 
 ### Omit Cancel when the corner close button dismisses. {#omit-cancel-when-the-corner-close-button-dismisses}
 
-`Modal`, `Panel` and the focused view already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`) rather than a generic `Cancel`.
+`Modal`, `Panel` and the focused view already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`) rather than a generic Cancel.
 
 ## Accessibility
 
