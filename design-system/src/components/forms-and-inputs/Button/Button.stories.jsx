@@ -4,14 +4,14 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import Button, { BUTTON_APPEARANCES } from './Button';
-import { SectionMessage } from '@/components';
+import { Icon, SectionMessage } from '@/components';
 const icons = {
     'none': null,
     'plus': 'plus',
     'xmark': 'xmark',
     'check': 'check',
     'arrow-right': 'arrow-right',
-    'chevron-right': 'chevron-right',
+    'chevron-right': <Icon name="chevron-right" size={12} />,
     'star': 'star',
     'user': 'user',
     'trash': 'trash',
@@ -231,14 +231,14 @@ export const Icons = {
         <div style={row}>
             <Button text="Icon before" iconBefore="star" />
             <Button text="Icon after" iconAfter="arrow-right" />
-            <Button text="Both" iconBefore="user" iconAfter="chevron-right" />
+            <Button text="Both" iconBefore="user" iconAfter={<Icon name="chevron-right" size={12} />} />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const both = canvas.getByRole('button', { name: 'Both' });
-        await expect(px(getComputedStyle(both.querySelector('.plus-btn-visual--before')).fontSize), 'leading icon is 16').toBe(16);
-        await expect(px(getComputedStyle(both.querySelector('.plus-btn-visual--after')).fontSize), 'chevron is 12').toBe(12);
+        await expect(px(getComputedStyle(both.querySelector('.plus-btn-visual--before')).fontSize), 'leading icon is --icon-md').toBe(tokenLength(canvasElement, '--icon-md'));
+        await expect(px(getComputedStyle(both.querySelector('.plus-btn-visual--after')).fontSize), 'chevron is --icon-sm').toBe(tokenLength(canvasElement, '--icon-sm'));
     },
 };
 

@@ -68,7 +68,7 @@ Don't: The two halves disagree on appearance, so they read as two controls.
 ```jsx
 <SplitButton>
     <Button text="Send" onClick={send} appearance="primary" />
-    <IconButton icon="chevron-down" label="More send options" appearance="primary" onClick={openMenu} />
+    <IconButton icon={<Icon name="chevron-down" size={12} />} label="More send options" appearance="primary" onClick={openMenu} />
 </SplitButton>
 ```
 
@@ -137,7 +137,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Tokens touched
 
-`--border-width-default` · `--ds-border-inverse` · `--icon-sm`
+`--border-width-default` · `--ds-border-inverse`
 
 From `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.scss`. Override these through the token layer, never with a literal.
 

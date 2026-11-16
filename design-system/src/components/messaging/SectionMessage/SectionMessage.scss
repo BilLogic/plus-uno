@@ -121,19 +121,19 @@
 }
 
 /*
- * The leading icon is a solid icon at `--icon-md`, and the column is as wide
+ * The leading icon is a solid icon at `--icon-lg`, and the column is as wide
  * as the icon. Its color is the style's Icon role, set per style below.
  * The icon's 1 line height and 1em width are raw on purpose: the box is
  * centered on the first line and fills the column, so it must be exactly the
  * square the glyph is drawn in.
  */
 .plus-section-message-leading {
-    width: var(--icon-md);
+    width: var(--icon-lg);
 }
 
 // Two classes deep, to beat the typography classes' `body .fa-solid` icon
-// sizing; a passed Font Awesome node gets the same 16px. Font Awesome draws
-// every icon 1.25em wide; `--fa-width: 1em` makes the box the 16px square the
+// sizing; a passed Font Awesome node gets the same 20px. Font Awesome draws
+// every icon 1.25em wide; `--fa-width: 1em` makes the box the 20px square the
 // column is, so it does not overhang it.
 .plus-section-message-leading .plus-section-message-leading-icon {
     display: inline-flex;
@@ -144,7 +144,7 @@
     :is(.fa-solid, .fa-regular, .fas, .far) {
         --fa-width: 1em;
         width: 1em;
-        font-size: var(--icon-md);
+        font-size: var(--icon-lg);
         line-height: 1;
     }
 }

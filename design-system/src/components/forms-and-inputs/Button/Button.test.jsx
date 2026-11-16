@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import Icon from '../../images-and-icons/Icon';
 import Button from './Button';
 
 describe('Button', () => {
@@ -97,11 +98,10 @@ describe('Button', () => {
         expect(onClick).not.toHaveBeenCalled();
     });
 
-    it('renders Font Awesome glyphs from icon names', () => {
-        const { container } = render(<Button text="Add" iconBefore="plus" iconAfter="chevron-right" />);
-        expect(container.querySelector('.plus-btn-visual--before')).not.toHaveClass('plus-btn-visual--chevron');
+    it('renders Font Awesome glyphs from icon names and explicit small chevron Icon nodes', () => {
+        const { container } = render(<Button text="Add" iconBefore="plus" iconAfter={<Icon name="chevron-right" size={12} />} />);
         expect(container.querySelector('.plus-btn-visual--before i')).toHaveClass('fa-solid', 'fa-plus');
-        expect(container.querySelector('.plus-btn-visual--after')).toHaveClass('plus-btn-visual--chevron');
-        expect(container.querySelector('.plus-btn-visual--after i')).toHaveClass('fa-solid', 'fa-chevron-right');
+        expect(container.querySelector('.plus-btn-visual--before i')).not.toHaveClass('plus-icon--size-12');
+        expect(container.querySelector('.plus-btn-visual--after i')).toHaveClass('fa-solid', 'fa-chevron-right', 'plus-icon--size-12');
     });
 });

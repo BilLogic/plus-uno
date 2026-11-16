@@ -1955,7 +1955,6 @@
         "--ds-border",
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
-        "--icon-sm",
         "--plus-listbox-viewport-width"
       ]
     },
@@ -3512,8 +3511,7 @@
         "DaysAnnounceTheirDate"
       ],
       "tokens": [
-        "--ds-icon-subtle",
-        "--icon-md"
+        "--ds-icon-subtle"
       ]
     },
     {
@@ -12725,7 +12723,7 @@
         "--ds-border",
         "--ds-text",
         "--heading-sm",
-        "--icon-md",
+        "--icon-lg",
         "--stack-md",
         "--type-weight-medium"
       ]
@@ -13882,8 +13880,7 @@
       ],
       "tokens": [
         "--border-width-default",
-        "--ds-border-inverse",
-        "--icon-sm"
+        "--ds-border-inverse"
       ]
     },
     {
@@ -17134,7 +17131,6 @@
       "tokens": [
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
-        "--icon-sm",
         "--plus-popup-reach"
       ]
     },

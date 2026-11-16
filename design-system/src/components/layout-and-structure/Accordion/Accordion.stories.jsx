@@ -5,7 +5,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Accordion from './Accordion';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
-import { probe, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { probe, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
@@ -184,7 +184,7 @@ export const Styles = () => (
 );
 Styles.play = async ({ canvasElement }) => {
     const trigger = canvasElement.querySelector('.plus-accordion-trigger');
-    await expect(getComputedStyle(trigger, '::after').fontSize).toBe('12px');
+    await expect(px(getComputedStyle(trigger, '::after').fontSize)).toBe(tokenLength(canvasElement, '--icon-sm'));
 };
 
 export const Behavior = () => (

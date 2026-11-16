@@ -12,16 +12,6 @@ const isTrivialHref = (href) => !href || href.trim() === '#';
 export const BUTTON_APPEARANCES = ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai'];
 export const BUTTON_SPACINGS = ['default', 'compact'];
 
-const CHEVRON_ICON = /(?:^|\s|fa-)(?:chevron|angle|caret)-(?:down|up|left|right)(?:\s|$)/;
-const isChevronVisual = (icon) => {
-    if (typeof icon === 'string') return CHEVRON_ICON.test(icon);
-    if (React.isValidElement(icon)) {
-        const probe = `${icon.props?.name ?? ''} ${icon.props?.icon ?? ''} ${icon.props?.className ?? ''}`;
-        return CHEVRON_ICON.test(probe);
-    }
-    return false;
-};
-
 /** The icon slots and the label, in order. */
 const ButtonContent = ({ children, text, iconBefore, iconAfter }) => {
     const content = text || children;
@@ -31,17 +21,7 @@ const ButtonContent = ({ children, text, iconBefore, iconAfter }) => {
         const glyph = typeof icon === 'string'
             ? <Icon name={icon} />
             : icon;
-        return (
-            <span
-                className={clsx(
-                    'plus-btn-visual',
-                    `plus-btn-visual--${position}`,
-                    isChevronVisual(icon) && 'plus-btn-visual--chevron',
-                )}
-            >
-                {glyph}
-            </span>
-        );
+        return <span className={`plus-btn-visual plus-btn-visual--${position}`}>{glyph}</span>;
     };
 
     return (

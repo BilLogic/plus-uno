@@ -274,7 +274,7 @@ const HeadRow = ({ children }) => (
 );
 
 export const HeadCells = {
-    parameters: { docs: { description: { story: 'The head cell holds a label and an optional type icon (Font Awesome Free, 16 tall). It aligns as text, number or icon, and with `isIconOnlyHeader` draws the icon alone while the label stays for screen readers. A label too long for its width ends in an ellipsis and shows in full in a tooltip. Header links and buttons are not allowed; the sort button is the only control.' } } },
+    parameters: { docs: { description: { story: 'The head cell holds a label and an optional type icon (Font Awesome Free, 12 tall). It aligns as text, number or icon, and with `isIconOnlyHeader` draws the icon alone while the label stays for screen readers. A label too long for its width ends in an ellipsis and shows in full in a tooltip. Header links and buttons are not allowed; the sort button is the only control.' } } },
     render: () => (
         <HeadRow>
             <HeadCell label="Student" icon="user" width="160px" />
@@ -306,7 +306,7 @@ export const HeadCells = {
         await expect(canvas.getByRole('columnheader', { name: 'Flagged' })).toBeVisible();
         await expect(canvasElement.querySelector('.plus-table-head-cell-type.fa-flag')).toBeVisible();
         await expect(canvas.getByText('Sessions').closest('th')).toHaveClass('plus-table-cell--align-number');
-        await expect(px(getComputedStyle(canvasElement.querySelector('.plus-table-head-cell-type')).fontSize)).toBe(tokenLength(canvasElement, '--icon-md'));
+        await expect(px(getComputedStyle(canvasElement.querySelector('.plus-table-head-cell-type')).fontSize)).toBe(tokenLength(canvasElement, '--icon-sm'));
     }
 };
 

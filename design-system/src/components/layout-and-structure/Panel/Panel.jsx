@@ -2,6 +2,7 @@ import React, { createContext, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import IconButton from '@/components/forms-and-inputs/IconButton';
+import Icon from '@/components/images-and-icons/Icon';
 import Heading from '@/components/text-and-data-display/Heading';
 import './Panel.scss';
 
@@ -131,8 +132,8 @@ const actionIconButton = (icon, label) => {
 export const PanelBackAction = actionIconButton('arrow-left', 'Back');
 export const PanelCloseAction = actionIconButton('xmark', 'Close');
 export const PanelMoreAction = actionIconButton('ellipsis', 'More actions');
-export const PanelUpAction = actionIconButton('chevron-up', 'Previous');
-export const PanelDownAction = actionIconButton('chevron-down', 'Next');
+export const PanelUpAction = actionIconButton(<Icon name="chevron-up" size={12} />, 'Previous');
+export const PanelDownAction = actionIconButton(<Icon name="chevron-down" size={12} />, 'Next');
 export const PanelNewTabAction = actionIconButton('arrow-up-right-from-square', 'Open in new tab');
 export const PanelViewSwitcher = actionIconButton('table-columns', 'Switch view');
 

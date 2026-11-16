@@ -1,4 +1,5 @@
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
+import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import React, { useState } from 'react';
 import { Button } from '@/components';
 import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/test';
@@ -404,7 +405,7 @@ ClearButton.play = async ({ canvasElement }) => {
     await expect(clear).toHaveAttribute('tabindex', '-1');
     // No larger than the caret: both take the smallest icon step.
     const size = (el) => parseFloat(getComputedStyle(el).fontSize);
-    await expect(size(canvasElement.querySelector('.plus-select-caret'))).toBe(12);
+    await expect(size(canvasElement.querySelector('.plus-select-caret'))).toBe(tokenLength(canvasElement, '--icon-sm'));
     await expect(size(clear.querySelector('.fa-circle-xmark')))
         .toBeLessThanOrEqual(size(canvasElement.querySelector('.plus-select-caret')));
     await userEvent.click(clear);

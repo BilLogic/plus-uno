@@ -128,7 +128,7 @@ $btn-appearances: (
         line-height: 1;
         flex-shrink: 0;
 
-        &--chevron {
+        &:has(> .plus-icon--size-12) {
             font-size: var(--icon-sm);
         }
 

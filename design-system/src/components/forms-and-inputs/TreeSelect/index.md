@@ -172,7 +172,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--icon-sm` · `--plus-popup-reach`
+`--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--plus-popup-reach`
 
 From `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.scss`. Override these through the token layer, never with a literal.
 

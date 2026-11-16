@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Icon from '../../images-and-icons/Icon';
 import { formatMonthYear, outOfBounds, parseDate, sameDay } from './dates';
 import { IconButton } from '../IconButton/IconButton';
 import './Calendar.scss';
@@ -95,9 +96,9 @@ const Calendar = ({
             {...props}
         >
             <div className="plus-calendar-header">
-                <IconButton icon="chevron-left" label="Previous month" appearance="subtle" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(-1)} />
+                <IconButton icon={<Icon name="chevron-left" size={12} />} label="Previous month" appearance="subtle" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(-1)} />
                 <div className="plus-calendar-month" aria-live="polite">{formatMonthYear(viewDate)}</div>
-                <IconButton icon="chevron-right" label="Next month" appearance="subtle" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(1)} />
+                <IconButton icon={<Icon name="chevron-right" size={12} />} label="Next month" appearance="subtle" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(1)} />
             </div>
             <div className="plus-calendar-weekdays" aria-hidden="true">
                 {WEEKDAYS.map((day) => <div key={day} className="plus-calendar-weekday">{day}</div>)}

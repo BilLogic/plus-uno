@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import { SplitButton, Button, IconButton } from '@/components';
+import { SplitButton, Button, Icon, IconButton } from '@/components';
 import * as SplitButtonStories from './SplitButton.stories.jsx';
 import {
     ComponentExample,
@@ -142,9 +142,9 @@ Use `SplitButton` when one action is clearly primary and a few related variation
 The primary action and the menu trigger share one outline and one height.
 
 <DoDontPair
-    doExample={<SplitButton><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon="chevron-down" label="More save options" /></SplitButton>}
+    doExample={<SplitButton><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></SplitButton>}
     doCaption="One outline around both halves."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon="chevron-down" label="More save options" /></div>}
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></div>}
     dontCaption="Two separate buttons with a gap."
 />
 
@@ -157,9 +157,9 @@ Every menu item is a variation of the primary action: "Save", then "Save as draf
 The half people use most sits on the face; the rarer ones go in the menu.
 
 <DoDontPair
-    doExample={<SplitButton><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon="chevron-down" label="More save options" /></SplitButton>}
+    doExample={<SplitButton><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></SplitButton>}
     doCaption={'"Save" on the face.'}
-    dontExample={<SplitButton><Button appearance="primary" text="Save as template" /><IconButton appearance="primary" icon="chevron-down" label="More save options" /></SplitButton>}
+    dontExample={<SplitButton><Button appearance="primary" text="Save as template" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></SplitButton>}
     dontCaption={'The rarely used "Save as template" on the face.'}
 />
 
@@ -170,16 +170,16 @@ The half people use most sits on the face; the rarer ones go in the menu.
 the control reads as one piece.
 
 <DoDontPair
-    doExample={<SplitButton><Button appearance="primary" text="Send" /><IconButton appearance="primary" icon="chevron-down" label="More send options" /></SplitButton>}
+    doExample={<SplitButton><Button appearance="primary" text="Send" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More send options" /></SplitButton>}
     doCaption="Both halves use the primary appearance."
-    dontExample={<SplitButton><Button text="Send" /><IconButton appearance="primary" icon="chevron-down" label="More send options" /></SplitButton>}
+    dontExample={<SplitButton><Button text="Send" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More send options" /></SplitButton>}
     dontCaption="The two halves disagree on appearance, so they read as two controls."
 />
 
 ```jsx
 <SplitButton>
     <Button text="Send" onClick={send} appearance="primary" />
-    <IconButton icon="chevron-down" label="More send options" appearance="primary" onClick={openMenu} />
+    <IconButton icon={<Icon name="chevron-down" size={12} />} label="More send options" appearance="primary" onClick={openMenu} />
 </SplitButton>
 ```
 

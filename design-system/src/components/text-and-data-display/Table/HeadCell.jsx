@@ -26,7 +26,7 @@ const SORTS = {
  * - `label`: the column name. Required, since it names the column for
  *   assistive technology even when `isIconOnlyHeader` hides it.
  * - `icon`: Font Awesome Free name for the column's data type, such as
- *   `calendar`. Drawn at the medium icon size.
+ *   `calendar`. Drawn at the small icon size.
  * - `isSortable`: renders the sort button. `sort` is `none` | `ascending` |
  *   `descending`; the page owns it and gets the requested direction from
  *   `onSort`. The unsorted arrow shows on hover and focus; a sorted column

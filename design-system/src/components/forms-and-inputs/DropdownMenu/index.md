@@ -47,7 +47,7 @@ DropdownMenu reads these motion tokens and no literal duration or curve.
 
 ```jsx
 // Picking "Rename" closes the menu: the common case for an action list.
-<DropdownMenu trigger={<Button text="Actions" iconAfter={<i className="fa-solid fa-chevron-down" />} />}>
+<DropdownMenu trigger={<Button text="Actions" iconAfter={<Icon name="chevron-down" size={12} />} />}>
     <ButtonItem onClick={onRename}>Rename</ButtonItem>
     <ButtonItem onClick={onArchive}>Archive</ButtonItem>
 </DropdownMenu>

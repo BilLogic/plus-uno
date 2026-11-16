@@ -1,4 +1,5 @@
 import { withReducedMotion, expectOverlayExit } from '@/storybook-docs/lib/overlay-motion-plays';
+import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
@@ -212,7 +213,7 @@ export const Rest = {
     render: () => <div style={wrap}><TreeSelect id="treeselect-ex-rest" label="Topic" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
     play: async ({ canvasElement }) => {
         await expectRest(canvasElement, controlOf(canvasElement));
-        await expect(getComputedStyle(canvasElement.querySelector('.plus-tree-select-arrow')).fontSize, 'tree select caret is 12px').toBe('12px');
+        await expect(px(getComputedStyle(canvasElement.querySelector('.plus-tree-select-arrow')).fontSize), 'tree select caret is --icon-sm').toBe(tokenLength(canvasElement, '--icon-sm'));
     },
 };
 

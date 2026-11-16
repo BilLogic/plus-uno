@@ -15,12 +15,7 @@
     align-items: center;
     justify-content: center;
     color: var(--ds-icon-subtle);
-    font-size: var(--icon-md);
     cursor: pointer;
-
-    i {
-        font-size: inherit;
-    }
 }
 
 .plus-field--disabled .plus-date-picker__icon {

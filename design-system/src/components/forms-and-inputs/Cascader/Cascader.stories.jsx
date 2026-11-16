@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { expect, within } from 'storybook/test';
+import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import Cascader from './Cascader';
@@ -204,7 +205,7 @@ export const Rest = {
     render: () => <div style={wrap}><Cascader id="cascader-ex-rest" label="Location" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
     play: async ({ canvasElement }) => {
         await expectRest(canvasElement, controlOf(canvasElement));
-        await expect(getComputedStyle(canvasElement.querySelector('.plus-cascader-arrow')).fontSize, 'cascader caret is 12px').toBe('12px');
+        await expect(px(getComputedStyle(canvasElement.querySelector('.plus-cascader-arrow')).fontSize), 'cascader caret is --icon-sm').toBe(tokenLength(canvasElement, '--icon-sm'));
     },
 };
 
