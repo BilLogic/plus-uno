@@ -1,3 +1,10 @@
+// A filter's chevron sits one step further from its text than a plain
+// Button's icon (8, not 4), so the name and its count read as one unit and
+// the chevron as the control. The count keeps 4 after the name.
+.plus-btn.plus-filter-btn {
+    gap: var(--inline-md);
+}
+
 // The count after a filter's name. It reads as part of the label, one step
 // quieter, and takes the selected color when the filter is on.
 .plus-filter-btn .plus-filter-btn__metric {
