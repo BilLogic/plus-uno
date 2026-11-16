@@ -2,7 +2,7 @@
 embodiment: ide
 summary: Query recipes and service-key notes for agents that read the blueprint's database directly rather than through the portal — the supplement to blueprint.md, which it adds to
 vendored_from: BilLogic/plus-uno-blueprint docs/agents/blueprint-direct-access.md
-vendored_revision: 339be02ef69a
+vendored_revision: 57c9825ff26d
 ---
 
 <!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint-direct-access.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. -->
