@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
+import { CATEGORICAL, sortCategories } from '@/dataviz/palette';
 
 /**
  * ParetoChart Component
@@ -12,8 +13,14 @@ const ParetoChart = ({
     data = [],
     categories = [],
     yAxisLabel = 'Value',
-    height = 400
+    height = 400,
+    sort = true,
 }) => {
+    const { categories: orderedCategories, data: orderedData } = useMemo(
+        () => sortCategories({ categories, data, sort }),
+        [categories, data, sort],
+    );
+
     const options = {
         ...chartTheme,
         chart: {
@@ -23,18 +30,24 @@ const ParetoChart = ({
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: categories
+            categories: orderedCategories
         },
         yAxis: [{
             ...chartTheme.yAxis,
-            title: { text: yAxisLabel, style: chartTheme.yAxis.labels.style }
+            title: { ...chartTheme.yAxis.title, text: yAxisLabel }
         }, {
             ...chartTheme.yAxis,
-            title: { text: 'Cumulative %', style: chartTheme.yAxis.labels.style },
+            title: { ...chartTheme.yAxis.title, text: 'Cumulative %' },
             opposite: true,
             max: 100,
-            labels: { format: '{value}%' }
+            labels: { ...chartTheme.yAxis.labels, format: '{value}%' }
         }],
+        plotOptions: {
+            column: {
+                borderWidth: 0,
+                borderRadius: CHART_BAR_RADIUS,
+            }
+        },
         tooltip: {
             ...chartTheme.tooltip,
             shared: true
@@ -45,12 +58,12 @@ const ParetoChart = ({
             yAxis: 1,
             zIndex: 10,
             baseSeries: 1,
-            color: chartTheme.colors[1]
+            color: CATEGORICAL[1]
         }, {
             type: 'column',
             name: 'Values',
-            data: data,
-            color: chartTheme.colors[0]
+            data: orderedData,
+            color: CATEGORICAL[0]
         }]
     };
 
@@ -69,7 +82,9 @@ ParetoChart.propTypes = {
     /** Y-axis label */
     yAxisLabel: PropTypes.string,
     /** Chart height */
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Sort categories from most to least by default; pass false for ordinal or temporal axes. */
+    sort: PropTypes.bool,
 };
 
 export default ParetoChart;

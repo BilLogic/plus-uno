@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_LINE_WIDTH_NUMBER } from '@/dataviz/chartTheme';
+import { CATEGORICAL, sortCategories } from '@/dataviz/palette';
 
 /**
  * DumbbellChart Component
@@ -15,8 +16,14 @@ const DumbbellChart = ({
     highLabel = 'High',
     yAxisLabel = 'Value',
     height = 400,
-    horizontal = true
+    horizontal = true,
+    sort = true,
 }) => {
+    const { categories: orderedCategories, data: orderedData } = useMemo(
+        () => sortCategories({ categories, data, sort }),
+        [categories, data, sort],
+    );
+
     const options = {
         ...chartTheme,
         chart: {
@@ -28,32 +35,33 @@ const DumbbellChart = ({
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: categories,
+            categories: orderedCategories,
             type: 'category'
         },
         yAxis: {
             ...chartTheme.yAxis,
-            title: { text: yAxisLabel, style: chartTheme.yAxis.labels.style }
+            title: { ...chartTheme.yAxis.title, text: yAxisLabel }
         },
         tooltip: {
             ...chartTheme.tooltip,
             shared: true
         },
         legend: {
+            ...chartTheme.legend,
             enabled: true,
             align: 'right',
             verticalAlign: 'top'
         },
         series: [{
             name: `${lowLabel} → ${highLabel}`,
-            data: data.map((item, index) => ({
+            data: orderedData.map((item, index) => ({
                 low: item.low,
                 high: item.high,
-                name: categories[index] || `Item ${index + 1}`
+                name: orderedCategories[index] || `Item ${index + 1}`
             })),
-            color: chartTheme.colors[0],
-            lowColor: chartTheme.colors[1],
-            connectorWidth: 2
+            color: CATEGORICAL[0],
+            lowColor: CATEGORICAL[1],
+            connectorWidth: CHART_LINE_WIDTH_NUMBER
         }]
     };
 
@@ -81,7 +89,9 @@ DumbbellChart.propTypes = {
     /** Chart height */
     height: PropTypes.number,
     /** Horizontal orientation */
-    horizontal: PropTypes.bool
+    horizontal: PropTypes.bool,
+    /** Sort categories from most to least by default; pass false for ordinal or temporal axes. */
+    sort: PropTypes.bool,
 };
 
 export default DumbbellChart;

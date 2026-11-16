@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
+import { BRAND, sortCategories } from '@/dataviz/palette';
 
 /**
  * ColumnRangeChart Component
@@ -13,8 +14,14 @@ const ColumnRangeChart = ({
     categories = [],
     yAxisLabel = 'Value',
     height = 400,
-    horizontal = false
+    horizontal = false,
+    sort = true,
 }) => {
+    const { categories: orderedCategories, data: orderedData } = useMemo(
+        () => sortCategories({ categories, data, sort }),
+        [categories, data, sort],
+    );
+
     const options = {
         ...chartTheme,
         chart: {
@@ -26,11 +33,11 @@ const ColumnRangeChart = ({
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: categories
+            categories: orderedCategories
         },
         yAxis: {
             ...chartTheme.yAxis,
-            title: { text: yAxisLabel, style: chartTheme.yAxis.labels.style }
+            title: { ...chartTheme.yAxis.title, text: yAxisLabel }
         },
         tooltip: {
             ...chartTheme.tooltip,
@@ -38,6 +45,8 @@ const ColumnRangeChart = ({
         },
         plotOptions: {
             columnrange: {
+                borderWidth: 0,
+                borderRadius: CHART_BAR_RADIUS,
                 dataLabels: {
                     enabled: true,
                     format: '{y}'
@@ -47,8 +56,8 @@ const ColumnRangeChart = ({
         legend: { enabled: false },
         series: [{
             name: 'Range',
-            data: data.map(item => [item.low, item.high]),
-            color: chartTheme.colors[0]
+            data: orderedData.map(item => [item.low, item.high]),
+            color: BRAND
         }]
     };
 
@@ -72,7 +81,9 @@ ColumnRangeChart.propTypes = {
     /** Chart height */
     height: PropTypes.number,
     /** Horizontal orientation */
-    horizontal: PropTypes.bool
+    horizontal: PropTypes.bool,
+    /** Sort categories from most to least by default; pass false for ordinal or temporal axes. */
+    sort: PropTypes.bool,
 };
 
 export default ColumnRangeChart;

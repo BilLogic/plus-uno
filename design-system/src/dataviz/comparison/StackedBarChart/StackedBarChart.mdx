@@ -49,7 +49,7 @@ time, use `AreaChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Columns', <>One per entry in <C>data</C>, labeled from <C>dates</C>, 48 px wide and rounded by <C>--chart-bar-radius</C>.</>],
+        ['Columns', <>One per entry in <C>data</C>, labeled from <C>dates</C> and rounded at the outer value end by <C>--chart-bar-radius</C>.</>],
         ['Segments', <>Stacked from the bottom in <C>segments</C> array order, sized by <C>height</C> and separated by <C>--ds-border-inverse</C>.</>],
         ['Segment labels', <>Prints each segment's <C>value</C> inside it; segments with <C>height</C> under 1 are unlabeled.</>],
         ['Value axis', <>Starts at zero up to <C>yAxisMax</C> (or the tallest column rounded up to the next 10), with six evenly spaced ticks.</>],
@@ -66,7 +66,9 @@ time, use `AreaChart`.
 `dates` is an array of category labels. `data` is an array of `{ segments }`,
 one per date. Each segment is `{ value, height, color, textColor }`: `height`
 (numeric string) sets the size, `value` sets the printed label, and `color` and
-`textColor` are optional. Matching segment indexes across columns form a series.
+`textColor` are optional. Columns sort from most to least by total height by
+default; pass `sort={false}` for temporal axes such as weekdays or months.
+Matching segment indexes across columns form a series.
 
 ```jsx
 <StackedBarChart

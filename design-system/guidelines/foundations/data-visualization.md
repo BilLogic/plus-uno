@@ -41,6 +41,10 @@ thing a reader sees. Every chart that sets its own `tooltip` block spreads
 `chartTheme.tooltip` so it inherits this; `foundations.test.js` fails a chart
 that doesn't.
 
+## Category order and single-series color
+
+Category charts with no inherent axis order sort categories from most to least by default through `mostToLeast` (and `sortCategories` for parallel `categories` + `data`/`series` arrays), exposing `sort` (`true` by default; pass `sort={false}` to keep input order on ordinal or temporal axes such as grades, weekdays or quarters). When categories are shaded with a sequential ramp (`sequentialRamp(hue)` / `sequentialTone`), the darkest tone (`--chart-<hue>-boldest`) always lands on the biggest value, even when `sort={false}` keeps the axis in input order. A single series uses one color, `--chart-brand` (`BRAND`), so the chart never implies multiple categories where there is only one measure.
+
 ## Mark radius
 
 Bars and columns round only the value end — the one end a bar is allowed to

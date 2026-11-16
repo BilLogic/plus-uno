@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { CHART_ANIMATION_DURATION_MS, CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
-import { seriesColor } from '@/dataviz/palette';
+import chartTheme, { CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
+import { seriesColor, sortCategories } from '@/dataviz/palette';
 
 /**
  * The two Highcharts axes for a bar or column chart. Categories always sit on `xAxis` and values on
@@ -40,6 +40,7 @@ const BarChart = ({
     categories,
     series,
     horizontal = false,
+    sort = true,
     yAxisLabel,
     height = 300,
     showLegend = true,
@@ -51,20 +52,29 @@ const BarChart = ({
     yAxisTickPositions,
     columnPointPadding = 0.2,
     fillOpacity,
-    animate = false,
-    animationDelay = 0,
-    animationDuration = CHART_ANIMATION_DURATION_MS
 }) => {
-    const seriesWithTheme = useMemo(() => series.map((s, i, all) => ({
+    const { categories: orderedCategories, series: orderedSeries } = useMemo(
+        () => sortCategories({ categories, series, sort }),
+        [categories, series, sort],
+    );
+
+    const seriesWithTheme = useMemo(() => orderedSeries.map((s, i, all) => ({
         ...s,
         color: s.color || seriesColor(i, all.length)
-    })), [series]);
+    })), [orderedSeries]);
 
     // Highcharts keeps categories on `xAxis` for both types; `bar` only turns the chart on its side.
     // The label switches name the axis as drawn: `hideXAxisLabels` is the one along the bottom.
     const { xAxis: xAxisConfig, yAxis: yAxisConfig } = useMemo(() => buildBarAxes({
-        horizontal, categories, yAxisLabel, yAxisMax, xAxisMax, yAxisTickPositions, hideXAxisLabels, hideYAxisLabels
-    }), [horizontal, categories, yAxisLabel, yAxisMax, xAxisMax, yAxisTickPositions, hideXAxisLabels, hideYAxisLabels]);
+        horizontal,
+        categories: orderedCategories,
+        yAxisLabel,
+        yAxisMax,
+        xAxisMax,
+        yAxisTickPositions,
+        hideXAxisLabels,
+        hideYAxisLabels,
+    }), [horizontal, orderedCategories, yAxisLabel, yAxisMax, xAxisMax, yAxisTickPositions, hideXAxisLabels, hideYAxisLabels]);
 
     const options = useMemo(() => ({
         ...chartTheme,
@@ -78,9 +88,6 @@ const BarChart = ({
         xAxis: xAxisConfig,
         yAxis: yAxisConfig,
         plotOptions: {
-            series: {
-                animation: animate ? { duration: animationDuration, defer: animationDelay } : false
-            },
             column: {
                 pointPadding: columnPointPadding,
                 borderWidth: 0,
@@ -106,9 +113,6 @@ const BarChart = ({
         chartSpacing,
         xAxisConfig,
         yAxisConfig,
-        animate,
-        animationDuration,
-        animationDelay,
         columnPointPadding,
         fillOpacity,
         showLegend,
@@ -129,6 +133,8 @@ BarChart.propTypes = {
         data: PropTypes.array.isRequired
     })).isRequired,
     horizontal: PropTypes.bool,
+    /** Sort categories from most to least by default; pass false for ordinal or temporal axes. */
+    sort: PropTypes.bool,
     yAxisLabel: PropTypes.string,
     height: PropTypes.number,
     showLegend: PropTypes.bool,
@@ -140,9 +146,6 @@ BarChart.propTypes = {
     yAxisTickPositions: PropTypes.arrayOf(PropTypes.number),
     columnPointPadding: PropTypes.number,
     fillOpacity: PropTypes.number,
-    animate: PropTypes.bool,
-    animationDelay: PropTypes.number,
-    animationDuration: PropTypes.number
 };
 
 export default BarChart;

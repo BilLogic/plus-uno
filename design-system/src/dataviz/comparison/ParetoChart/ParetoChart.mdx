@@ -40,8 +40,9 @@ For a ranking without a running total, use `BarChart` or `LollipopChart`. For
 unordered shares of a total, use `PieChart` or `TreemapChart`. For drop-off
 through ordered stages, use `FunnelChart`.
 
-Sort `data` from largest to smallest before passing it in; the chart preserves
-input order, and the cumulative line is only meaningful when descending.
+Categories and `data` sort from largest to smallest by default (`sort={true}`)
+so the cumulative line climbs steeply from the largest contributors first; pass
+`sort={false}` only when preserving an explicit order.
 
 </div>
 
@@ -69,8 +70,9 @@ input order, and the cumulative line is only meaningful when descending.
 ## Data shape
 
 `categories` is an array of strings. `data` is an array of numbers in
-`categories` order, sorted largest to smallest. The chart computes the
-cumulative line automatically. `height` defaults to 400.
+`categories` order, sorted from most to least by default (`sort={false}` keeps
+input order). The chart computes the cumulative line automatically. `height`
+defaults to 400.
 
 ```jsx
 <ParetoChart

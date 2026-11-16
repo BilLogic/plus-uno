@@ -49,7 +49,7 @@ use `DumbbellChart`. For change over time, use `LineChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Spokes', <>One per entry in <C>categories</C>, labeled with the category name, a Font Awesome icon from <C>categoryIcons</C>, or a name tinted by <C>categoryColors</C>. <C>categoryLabelBody3Regular</C> uses regular weight.</>],
+        ['Spokes', <>One per entry in <C>categories</C>, labeled with the category name, a Font Awesome icon from <C>categoryIcons</C> (<C>--icon-md</C>, <C>--ds-icon-subtle</C>), or a name tinted by <C>categoryColors</C>. <C>categoryLabelBody3Regular</C> uses regular weight.</>],
         ['Series', <>One closed shape per entry in <C>series</C>. With <C>filled</C>, the first series is a filled area and the rest are lines; otherwise all are lines. Line series accept <C>dashStyle</C>.</>],
         ['Grid', <>Polygon rings from zero to <C>yAxisMax</C>. <C>showYAxisLabels</C> toggles ring values.</>],
         ['Data labels', <>Off by default; <C>showDataLabels</C> prints each value with a percent sign.</>],
@@ -66,8 +66,10 @@ use `DumbbellChart`. For change over time, use `LineChart`.
 
 `categories` is an array of spoke names. `series` is an array of
 `{ name, data, color, dashStyle }`, with one number per category in `categories`
-order. `height` defaults to 400 (or `'100%'` to fill its container).
-`chartSpacing` is `[top, right, bottom, left]`.
+order. Spokes sort from most to least by the first series by default; pass
+`sort={false}` when spoke positions follow a fixed framework order. `height`
+defaults to 400 (or `'100%'` to fill its container). `chartSpacing` is
+`[top, right, bottom, left]`.
 
 ```jsx
 <RadarChart

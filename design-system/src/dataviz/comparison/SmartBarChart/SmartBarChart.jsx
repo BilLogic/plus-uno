@@ -1,29 +1,27 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
+import chartTheme, { CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
+import { dataLabelFormat } from '@/dataviz/chartFormat';
+import { BRAND, CHROME, mostToLeast } from '@/dataviz/palette';
 
 /**
  * SmartBarChart Component
  * Visualizes data with a background bar and a foreground value bar.
  * Migrated to Highcharts column chart.
  */
-import chartTheme from '@/dataviz/chartTheme';
+const SmartBarChart = ({ data = [], height = 200, sort = true }) => {
+    const orderedData = useMemo(
+        () => mostToLeast(data, (item) => parseFloat(item.height), { sort }),
+        [data, sort],
+    );
 
-/**
- * SmartBarChart Component
- * Visualizes data with a background bar and a foreground value bar.
- * Migrated to Highcharts column chart.
- */
-const SmartBarChart = ({ data, height = 200 }) => {
-    // data: Array of { letter, height (string like '50%'), color }
-
-    // Transform data for Highcharts
-    const categories = data.map(item => item.letter);
-    const seriesData = data.map(item => {
+    const categories = orderedData.map(item => item.letter);
+    const seriesData = orderedData.map(item => {
         const value = parseFloat(item.height);
         return {
             y: value,
-            color: item.color,
+            color: item.color || BRAND,
         };
     });
 
@@ -38,37 +36,25 @@ const SmartBarChart = ({ data, height = 200 }) => {
         },
         title: { text: null },
         xAxis: {
+            ...chartTheme.xAxis,
             categories: categories,
-            labels: {
-                style: {
-                    fontSize: 'var(--type-size-075)',
-                    color: 'var(--ds-text-subtle)'
-                }
-            },
             lineWidth: 0,
             tickWidth: 0
         },
         yAxis: {
+            ...chartTheme.yAxis,
             min: 0,
-            max: 100, // Assuming percentage inputs
-            title: { text: null },
-            visible: false, // Hide y-axis as per simple visual design
+            max: 100,
+            title: { ...chartTheme.yAxis.title, text: null },
+            visible: false,
             gridLineWidth: 0
         },
         plotOptions: {
             column: {
                 groupPadding: 0.1,
-                pointPadding: 0.2, // Adjust for bar width
+                pointPadding: 0.2,
                 borderWidth: 0,
-                borderRadius: '50%', // rounded-pill effect
-                // Background bars using plotBands or a separate series is complex in Highcharts for exact "pill" look 
-                // overlapping perfectly. A simpler way for "background pill" in Highcharts is using a background series
-                // or just using the column itself.
-                // 
-                // To achieve strict visual parity (gray background pill behind colored bar):
-                // We'll use grouping: false (overlapping columns) 
-                // Series 1: Background (100% gray)
-                // Series 2: value (colored)
+                borderRadius: CHART_BAR_RADIUS,
                 grouping: false,
                 shadow: false
             }
@@ -78,15 +64,15 @@ const SmartBarChart = ({ data, height = 200 }) => {
         tooltip: {
             ...chartTheme.tooltip,
             enabled: true,
-            pointFormat: '<b>{point.category}</b>: {point.y}%'
+            pointFormat: dataLabelFormat('{point.y}%', '{point.category}')
         },
         series: [
             {
                 name: 'Background',
-                data: data.map(() => 100),
-                color: 'var(--ds-background-neutral)', // the track
+                data: orderedData.map(() => 100),
+                color: CHROME.track,
                 enableMouseTracking: false,
-                pointPadding: 0.3, // Match width of foreground
+                pointPadding: 0.3,
             },
             {
                 name: 'Value',
@@ -107,9 +93,11 @@ SmartBarChart.propTypes = {
     data: PropTypes.arrayOf(PropTypes.shape({
         letter: PropTypes.string.isRequired,
         height: PropTypes.string.isRequired, // e.g. '50%'
-        color: PropTypes.string.isRequired
+        color: PropTypes.string
     })).isRequired,
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Sort categories from most to least by default; pass false for ordinal or temporal axes. */
+    sort: PropTypes.bool,
 };
 
 export default SmartBarChart;

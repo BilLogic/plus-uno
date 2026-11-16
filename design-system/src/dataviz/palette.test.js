@@ -16,7 +16,9 @@ import {
     mostToLeast,
     rampStops,
     sequentialRamp,
+    sequentialTone,
     seriesColor,
+    sortCategories,
 } from './palette';
 import { dsName } from '../../../scripts/lib/color/emit.mjs';
 import { contrastRatio, inkFor } from './colorMode';
@@ -79,5 +81,51 @@ describe('the data-viz palette', () => {
         const items = [{ y: 2 }, { y: 9 }, { y: 5 }];
         expect(mostToLeast(items).map((i) => i.y)).toEqual([9, 5, 2]);
         expect(items.map((i) => i.y)).toEqual([2, 9, 5]);
+    });
+
+    it('puts the darkest sequential tone on the biggest value and keeps input order when sort is false', () => {
+        const items = [
+            { label: 'Low', y: 20 },
+            { label: 'High', y: 90 },
+            { label: 'Mid', y: 55 },
+            { label: 'MidHigh', y: 75 },
+        ];
+        const sorted = mostToLeast(items, (i) => i.y, { hue: 'blue' });
+        expect(sorted.map((i) => i.label)).toEqual(['High', 'MidHigh', 'Mid', 'Low']);
+        expect(sorted.map((i) => i.color)).toEqual([
+            'var(--chart-blue-boldest)',
+            'var(--chart-blue-bolder)',
+            'var(--chart-blue-bold)',
+            'var(--ds-background-accent-blue-subtler)',
+        ]);
+
+        const unsorted = mostToLeast(items, (i) => i.y, { sort: false, hue: 'blue' });
+        expect(unsorted.map((i) => i.label)).toEqual(['Low', 'High', 'Mid', 'MidHigh']);
+        expect(unsorted.find((i) => i.label === 'High').color).toBe('var(--chart-blue-boldest)');
+        expect(unsorted.find((i) => i.label === 'Low').color).toBe('var(--ds-background-accent-blue-subtler)');
+
+        expect(sequentialTone(0, 4, 'blue')).toBe('var(--chart-blue-boldest)');
+        expect(sequentialTone(3, 4, 'blue')).toBe('var(--ds-background-accent-blue-subtler)');
+    });
+
+    it('sorts parallel categories, data and series from most to least by default and respects sort=false opt-out', () => {
+        const ranked = sortCategories({
+            categories: ['Math', 'Science', 'Art'],
+            series: [
+                { name: '2024', data: [50, 90, 70] },
+                { name: '2023', data: [40, 80, 60] },
+            ],
+        });
+        expect(ranked.categories).toEqual(['Science', 'Art', 'Math']);
+        expect(ranked.series[0].data).toEqual([90, 70, 50]);
+        expect(ranked.series[1].data).toEqual([80, 60, 40]);
+
+        const optedOut = sortCategories({
+            categories: ['Mon', 'Tue', 'Wed'],
+            data: [12, 24, 18],
+            sort: false,
+        });
+        expect(optedOut.categories).toEqual(['Mon', 'Tue', 'Wed']);
+        expect(optedOut.data).toEqual([12, 24, 18]);
     });
 });

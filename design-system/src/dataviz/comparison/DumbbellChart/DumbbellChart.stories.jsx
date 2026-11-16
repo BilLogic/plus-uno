@@ -1,78 +1,39 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import DumbbellChart from './DumbbellChart';
 
 export default {
     title: 'Data visualizations/Comparison/Dumbbell chart',
     component: DumbbellChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Dumbbell Chart
-
-A dumbbell chart shows the **change or gap between two values** for each category.
-
-### Overview
-A dumbbell chart shows the **change or gap between two values** for each category.
-
----
-
-### How to Read
-- **Two dots** = start and end values
-- **Bar connecting** = range/change between them
-- Longer bars = bigger changes/gaps
-- Color can indicate direction (up/down)
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Before/after comparison | ✅ Ideal |
-| Range visualization | ✅ Ideal |
-| Gap analysis | ✅ Ideal |
-| Single values | ❌ Use Lollipop |
-| Time series | ❌ Use Line Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Score Changes** | Pre-test vs Post-test scores |
-| **Progress Tracking** | Start vs Current level |
-| **Salary Bands** | Min vs Max pay by role |
-| **Goal Tracking** | Target vs Actual performance |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Sort by gap size for impact
-✅ Use horizontal for long labels
-✅ Color-code improvements vs declines
-✅ Add value labels at both ends
-
-**Avoid:**
-❌ Too many categories (>15)
-❌ Negative value ranges
-❌ Missing context labels
-                `
-            }
-        }
-    },
     argTypes: {
-        data: { control: 'object', description: 'Array of {low, high} objects' },
+        data: { control: 'object', description: 'Array of { low, high } objects' },
         categories: { control: 'object', description: 'Category labels' },
         lowLabel: { control: 'text', description: 'Label for low value' },
         highLabel: { control: 'text', description: 'Label for high value' },
         yAxisLabel: { control: 'text', description: 'Y-axis label' },
         height: { control: 'number', description: 'Chart height in pixels' },
-        horizontal: { control: 'boolean', description: 'Horizontal orientation' }
-    }
+        horizontal: { control: 'boolean', description: 'Horizontal orientation' },
+        sort: { control: 'boolean', description: 'Sort categories from most to least by default; pass false for ordinal or temporal axes' },
+    },
+};
+
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
+
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
+
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
 };
 
 const scoreChangeData = {
@@ -82,31 +43,38 @@ const scoreChangeData = {
         { low: 58, high: 78 },
         { low: 72, high: 85 },
         { low: 45, high: 82 },
-        { low: 80, high: 88 }
+        { low: 80, high: 88 },
     ],
     lowLabel: 'Pre-test',
     highLabel: 'Post-test',
-    yAxisLabel: 'Score'
+    yAxisLabel: 'Score',
 };
 
-/**
- * Overview: Displays chart variants
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Student Score Changes</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Compare pre-test vs post-test scores to visualize improvement.
-            </p>
-            <DumbbellChart {...scoreChangeData} />
-        </section>
-    </div>
-);
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Student score changes</Heading>
+                <p style={captionStyle}>
+                    Compare pre-test and post-test scores to see improvement across students.
+                </p>
+                <DumbbellChart {...scoreChangeData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelector('.highcharts-container')).not.toBeNull();
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-axis-labels text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
-/**
- * Interactive: Playground
- */
 export const Interactive = {
     args: {
         categories: ['Item A', 'Item B', 'Item C', 'Item D'],
@@ -114,12 +82,13 @@ export const Interactive = {
             { low: 20, high: 45 },
             { low: 30, high: 60 },
             { low: 15, high: 35 },
-            { low: 40, high: 75 }
+            { low: 40, high: 75 },
         ],
         lowLabel: 'Start',
         highLabel: 'End',
         yAxisLabel: 'Value',
         height: 400,
-        horizontal: true
-    }
+        horizontal: true,
+        sort: true,
+    },
 };

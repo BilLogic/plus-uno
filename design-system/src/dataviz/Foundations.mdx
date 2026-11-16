@@ -38,6 +38,21 @@ A chart sits in a Card: <C>--card-pad-compact</C> sets the chart inset, and the 
 
 </FoundationSection>
 
+<FoundationSection title="Category order">
+
+Category charts sort items from most to least by default through <C>mostToLeast</C> (<C>sortCategories</C> when categories and series or data are separate arrays), so the reader finds the largest value first without scanning every number. When categories wear a sequential ramp, <C>sequentialTone</C> places the darkest step (<C>boldest</C>) on the biggest value and steps down toward <C>subtler</C>. Pass <C>sort=&#123;false&#125;</C> when the axis has an inherent ordinal or temporal order (such as grades A–E, weekdays or quarters).
+
+<RefTable
+    head={['Helper / prop', 'Role']}
+    rows={[
+        [<C>sort</C>, <>Boolean prop on category charts, <C>true</C> by default; pass <C>sort=&#123;false&#125;</C> to keep input order on ordinal or temporal axes</>],
+        [<C>mostToLeast(items, value, &#123; sort, hue &#125;)</C>, <>Sorts items from largest to smallest value (or keeps input order when <C>sort: false</C>) and assigns the darkest sequential tone to the biggest value</>],
+        [<C>sortCategories(&#123; categories, data, series, sort, hue &#125;)</C>, <>Reorders parallel <C>categories</C> and <C>data</C> or <C>series</C> in lockstep through <C>mostToLeast</C></>],
+    ]}
+/>
+
+</FoundationSection>
+
 <FoundationSection title="Mark radius">
 
 Bars and columns round only the value end so the baseline stays flat and length comparisons stay accurate. Pies, donuts and areas take no radius.
