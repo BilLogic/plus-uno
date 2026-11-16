@@ -101,7 +101,7 @@ export const OverviewHero = () => {
 /** A real button at a readable size: its box and its word as a bar in the label color. */
 const BigButton = ({ x, y, w, h, primary = false }) => (
     <g>
-        <Rect x={x} y={y} w={w} h={h} fill={primary ? PAINT.buttonPrimary : PAINT.buttonDefault} stroke={primary ? undefined : PAINT.buttonDefaultBorder} corner="button" />
+        <Rect x={x} y={y} w={w} h={h} fill={primary ? PAINT.buttonPrimary : PAINT.buttonDefault} corner="button" />
         <SkeletonBar x={x + w * 0.25} y={y + h / 2 - 2.5} w={w * 0.5} h={5} tone={primary ? PAINT.buttonPrimaryText : undefined} />
     </g>
 );
@@ -147,10 +147,10 @@ const Check = ({ x, y, s = 9, on }) => (
     </g>
 );
 
-/** A FilterButton as it renders: its label, a count when it has picks, the caret; picks put it on the selected fill. */
+/** A FilterButton as it renders: its label, a count when it has picks, the caret; picks put it on the selected fill and border. */
 const FilterButton = ({ x, y, w, h = 20, label, count = false }) => (
     <g>
-        <Rect x={x} y={y} w={w} h={h} fill={count ? PAINT.rowSelected : PAINT.buttonDefault} stroke={count ? undefined : PAINT.buttonDefaultBorder} corner="button" />
+        <Rect x={x} y={y} w={w} h={h} fill={count ? PAINT.rowSelected : PAINT.buttonDefault} stroke={count ? PAINT.buttonSelectedBorder : undefined} corner="button" />
         <SkeletonBar x={x + 8} y={y + h / 2 - 2} w={label} />
         {count && <Rect x={x + 12 + label} y={y + h / 2 - 4} w={11} h={8} fill={PAINT.accent} corner="count" />}
         <Chevron x={x + w - 13} y={y + h / 2 - 2} />

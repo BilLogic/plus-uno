@@ -130,7 +130,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Hovered | The container takes the appearance's hovered fill. |
 | Pressed | The container takes the appearance's pressed fill. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
-| Selected | The selected role fill and icon. Applies to default and subtle, and sets `aria-pressed`. |
+| Selected | The selected role fill, 1px `--ds-border-selected` edge and icon. Applies to default and subtle, and sets `aria-pressed`. |
 | Disabled | The disabled fill and icon. Avoid disabling icon buttons. |
 | Loading | A spinner replaces the icon. The container keeps its fill, blocks interaction and sets `aria-busy`. |
 | Count changes | The first count opens the button to its width; set at the end of a toolbar, the right edge stays put and it grows left. Each new count fades in; it never counts up. With reduced motion both are instant. |
@@ -139,10 +139,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Fill: default, subtle | `--ds-background-neutral-subtle`, hovered and pressed steps. Default adds a 1px `--ds-border-input` edge. |
+| Fill: default, subtle | `--ds-background-neutral` (default) and `--ds-background-neutral-subtle` (subtle), each with hovered and pressed steps. Neither draws an edge. |
 | Fill: primary, discovery | `--ds-background-brand-bold`, `--ds-background-discovery-bold`, each with hovered and pressed steps. |
-| Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps; `--ds-background-disabled`. |
-| Icon | `--ds-icon-subtle` (default, subtle), `--ds-icon-inverse` (primary, discovery); the selected and disabled roles. 16, `--icon-md` (12, `--icon-sm` for chevrons). |
+| Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps and a 1px `--ds-border-selected` edge; `--ds-background-disabled`. |
+| Icon | `--ds-icon` (default), `--ds-icon-subtle` (subtle), `--ds-icon-inverse` (primary, discovery); the selected and disabled roles. 16, `--icon-md` (12, `--icon-sm` for chevrons). |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
 | Size | 32: `--control-md`. 24: `--control-sm`. Square, except with a count. |
 | Count | `--ds-text-subtlest`, or the selected text color when selected. `--inline-sm` after the icon. Motion: `--ds-motion-appearance-default` to open, `--ds-motion-appearance-fast` to fade in. |

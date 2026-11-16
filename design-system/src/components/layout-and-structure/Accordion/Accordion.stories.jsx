@@ -275,7 +275,7 @@ export const Rest = {
 export const Hovered = {
     render: () => <Sections />,
     play: async ({ canvasElement }) => {
-        await expectHovered(canvasElement, trigger(canvasElement), 'default', 'accordion trigger');
+        await expectHovered(canvasElement, trigger(canvasElement), 'subtle', 'accordion trigger');
     },
 };
 
@@ -283,7 +283,7 @@ export const Hovered = {
 export const Pressed = {
     render: () => <Sections />,
     play: async ({ canvasElement }) => {
-        await expectPressed(canvasElement, trigger(canvasElement), 'default', 'accordion trigger');
+        await expectPressed(canvasElement, trigger(canvasElement), 'subtle', 'accordion trigger');
     },
 };
 

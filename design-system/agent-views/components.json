@@ -1403,7 +1403,6 @@
         "--control-md",
         "--control-sm",
         "--ds-background-disabled",
-        "--ds-border-disabled",
         "--ds-icon-disabled",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
@@ -13880,6 +13879,7 @@
       ],
       "tokens": [
         "--border-width-default",
+        "--ds-border",
         "--ds-border-inverse"
       ]
     },

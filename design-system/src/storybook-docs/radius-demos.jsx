@@ -319,10 +319,10 @@ export const JoinedGroup = () => {
                         <TokenRect x={10} y={8} w={180} h={32} token="--button-radius-default" />
                     </clipPath>
                 </defs>
-                <rect x={10} y={8} width={60} height={32} fill={PAINT.rowSelected} clipPath={`url(#${clip})`} />
-                <TokenRect x={10} y={8} w={180} h={32} token="--button-radius-default" stroke={PAINT.buttonDefaultBorder} />
-                <Rule x1={70} y1={8} x2={70} y2={40} stroke={PAINT.buttonDefaultBorder} />
-                <Rule x1={130} y1={8} x2={130} y2={40} stroke={PAINT.buttonDefaultBorder} />
+                <TokenRect x={10} y={8} w={180} h={32} token="--button-radius-default" fill={PAINT.buttonDefault} />
+                <rect x={10} y={8} width={60} height={32} fill={PAINT.rowSelected} stroke={PAINT.buttonSelectedBorder} style={HAIRLINE} clipPath={`url(#${clip})`} />
+                <Rule x1={70} y1={8} x2={70} y2={40} stroke={PAINT.buttonSelectedBorder} />
+                <Rule x1={130} y1={8} x2={130} y2={40} stroke={PAINT.frameDivider} />
                 <rect data-part="seam" x={70} y={8} width={0} height={32} fill="none" />
                 <rect data-part="seam" x={130} y={8} width={0} height={32} fill="none" />
                 {[0, 1, 2].map((i) => <SkeletonBar key={i} x={26 + i * 60} y={22} w={28} />)}
@@ -400,7 +400,7 @@ const ButtonRow = ({ odd, title }) => (
     <Illustration width={160} height={64} title={title}>
         <TokenRect x={4} y={4} w={152} h={56} token="--card-radius" fill={PAINT.cardSurface} stroke={PAINT.frameDivider} />
         <SkeletonBar x={16} y={18} w={60} heading />
-        <TokenRect x={60} y={32} w={40} h={16} token="--button-radius-default" stroke={PAINT.buttonDefaultBorder} />
+        <TokenRect x={60} y={32} w={40} h={16} token="--button-radius-default" fill={PAINT.buttonDefault} />
         <TokenRect x={104} y={32} w={40} h={16} token={odd ? '--radius-full' : '--button-radius-default'} fill={PAINT.buttonPrimary} />
     </Illustration>
 );

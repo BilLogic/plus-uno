@@ -17,14 +17,14 @@
 // map and measures every label against its ground, so a row added here is
 // checked without a second list.
 $btn-appearances: (
-    'default': ('--ds-background-neutral-subtle', '--ds-text-subtle', '--ds-icon-subtle', '--ds-background-neutral-subtle-hovered', '--ds-background-neutral-subtle-pressed', '--ds-border-input'),
+    'default': ('--ds-background-neutral', '--ds-text', '--ds-icon', '--ds-background-neutral-hovered', '--ds-background-neutral-pressed', 'transparent'),
     'primary': ('--ds-background-brand-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-brand-bold-hovered', '--ds-background-brand-bold-pressed', 'transparent'),
     'subtle': ('--ds-background-neutral-subtle', '--ds-text-subtle', '--ds-icon-subtle', '--ds-background-neutral-subtle-hovered', '--ds-background-neutral-subtle-pressed', 'transparent'),
     'warning': ('--ds-background-warning-bold', '--ds-text-warning-inverse', '--ds-icon-warning-inverse', '--ds-background-warning-bold-hovered', '--ds-background-warning-bold-pressed', 'transparent'),
     'danger': ('--ds-background-danger-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-danger-bold-hovered', '--ds-background-danger-bold-pressed', 'transparent'),
     'discovery': ('--ds-background-discovery-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-discovery-bold-hovered', '--ds-background-discovery-bold-pressed', 'transparent'),
     'ai': ('--ds-ai-background-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-ai-background-bold-hovered', '--ds-ai-background-bold-pressed', 'transparent'),
-    'selected': ('--ds-background-selected', '--ds-text-selected', '--ds-icon-selected', '--ds-background-selected-hovered', '--ds-background-selected-pressed', 'transparent')
+    'selected': ('--ds-background-selected', '--ds-text-selected', '--ds-icon-selected', '--ds-background-selected-hovered', '--ds-background-selected-pressed', '--ds-border-selected')
 );
 
 // Wraps a map slot as a `var()` read, or passes a keyword (`transparent`) through.
@@ -182,10 +182,6 @@ $btn-appearances: (
         color: var(--_button-fg);
         pointer-events: none;
         cursor: not-allowed;
-
-        &.plus-btn--default {
-            border-color: var(--ds-border-disabled);
-        }
 
         &.plus-btn--subtle {
             background-color: transparent;

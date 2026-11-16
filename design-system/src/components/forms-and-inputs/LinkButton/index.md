@@ -107,7 +107,7 @@ Hover, pressed and focus are the browser's own. A link button has no `ai`, disab
 | Hovered | The container takes the appearance's hovered fill. |
 | Pressed | The container takes the appearance's pressed fill. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
-| Selected | The selected role fill, label and icon, with `aria-current`. |
+| Selected | The selected role fill, 1px `--ds-border-selected` edge, label and icon, with `aria-current`. |
 
 ### Tokens
 
