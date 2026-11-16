@@ -49,8 +49,8 @@ For stages with drop-off counts, use `FunnelChart`.
     head={['Part', 'What it does']}
     rows={[
         ['Line', 'Connects events in array order with no axis or time scale.'],
-        ['Event markers', 'One point per event, colored in categorical order.'],
-        ['Event labels', <>Bold <C>label</C> (falling back to <C>name</C>) above <C>description</C>; colliding labels are hidden automatically.</>],
+        ['Event markers', 'One point per event, colored in categorical order (or brand for a single event).'],
+        ['Event labels', <>Semibold <C>label</C> (falling back to <C>name</C>) above <C>description</C>; colliding labels are hidden automatically.</>],
         ['Tooltip', 'Shows the hovered event.'],
     ]}
 />
@@ -61,7 +61,7 @@ For stages with drop-off counts, use `FunnelChart`.
 
 ## Data shape
 
-`data` is an array of `{ name, label, description }` in chronological order
+`data` is an array of `{ name, label, description, color }` in chronological order
 (`name` required; `label` defaults to `name` and `description` to `''`).
 `height` defaults to 400.
 
@@ -82,7 +82,7 @@ For stages with drop-off counts, use `FunnelChart`.
 
 ## Color and accessibility
 
-- **Decorative event color.** Events cycle through the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 (wrapping past eight) with no per-event `color` prop; order and text carry the meaning without hue.
+- **Decorative event color.** A single event uses `--chart-brand`; multiple events cycle through the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 unless overridden by `color`. Order and text carry the meaning without hue.
 - **Keep labels concise.** Because colliding labels are hidden rather than repositioned, keep copy short and event counts modest, or increase `height`.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
 - **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).

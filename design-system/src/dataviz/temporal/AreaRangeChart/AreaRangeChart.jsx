@@ -25,11 +25,17 @@ const AreaRangeChart = ({
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            title: { text: xAxisLabel }
+            title: {
+                ...chartTheme.xAxis.title,
+                text: xAxisLabel
+            }
         },
         yAxis: {
             ...chartTheme.yAxis,
-            title: { text: yAxisLabel, style: chartTheme.yAxis.labels.style }
+            title: {
+                ...chartTheme.yAxis.title,
+                text: yAxisLabel
+            }
         },
         tooltip: {
             ...chartTheme.tooltip,

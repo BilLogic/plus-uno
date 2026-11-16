@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { CHART_LINE_WIDTH_NUMBER, CHART_SPACING_MICRO } from '@/dataviz/chartTheme';
+import { tooltipHeaderFormat, valueSpan } from '@/dataviz/chartFormat';
+import chartTheme, { CHART_LINE_WIDTH_NUMBER, CHART_MARKER_RADIUS, CHART_SPACING_MICRO } from '@/dataviz/chartTheme';
 import { BRAND, STATUS } from '@/dataviz/palette';
 
 /** What a sparkline's line may mean: the brand by default, or a status. */
@@ -36,7 +37,7 @@ const Sparkline = ({
     // latest value draws one at rest: the rest are radius 0 until hovered.
     const points = data.map((y, i) => ({
         y,
-        ...(showLastPoint && i === data.length - 1 && { marker: { radius: 3 } })
+        ...(showLastPoint && i === data.length - 1 && { marker: { radius: CHART_MARKER_RADIUS } })
     }));
 
     const options = {
@@ -67,18 +68,19 @@ const Sparkline = ({
         tooltip: {
             ...chartTheme.tooltip,
             outside: true,
-            headerFormat: categories ? '<span>{point.key}</span><br/>' : '',
-            pointFormat: `<b>{point.y}${valueSuffix}</b>`
+            headerFormat: categories ? tooltipHeaderFormat() : '',
+            pointFormat: valueSpan(`{point.y}${valueSuffix}`)
         },
         plotOptions: {
             series: {
                 animation: false,
+            },
+            line: {
                 lineWidth: CHART_LINE_WIDTH_NUMBER,
-                states: { hover: { lineWidthPlus: 0 } },
                 marker: {
                     enabled: true,
                     radius: 0,
-                    states: { hover: { radius: 3, radiusPlus: 0 } },
+                    states: { hover: { radius: CHART_MARKER_RADIUS, radiusPlus: 0 } },
                     symbol: 'circle',
                     lineWidth: CHART_LINE_WIDTH_NUMBER,
                     lineColor: 'var(--ds-border-inverse)'

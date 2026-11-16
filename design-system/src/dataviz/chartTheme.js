@@ -84,6 +84,9 @@ export const CHART_NODE_RADIUS = tokenNumber('--radius-lg', 8);
 /** Height of a labeled node box inside a chart (e.g. a Treegraph box), read off the size ladder (`--size-200`, 32px). */
 export const CHART_NODE_HEIGHT = tokenNumber('--size-200', 32);
 
+/** A point marker's radius (3px, 6px diameter): a quarter of `--size-075` (12px), the smallest `--size-*` step on the scale. */
+export const CHART_MARKER_RADIUS = tokenNumber('--size-075', 12) / 4;
+
 const axis = (gridLineWidth, gridLineDashStyle) => ({
     gridLineColor: CHROME.grid,
     ...(gridLineDashStyle && { gridLineDashStyle }),
