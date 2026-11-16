@@ -207,4 +207,57 @@ describe('CheckboxGroup', () => {
         );
         expect(screen.getAllByRole('checkbox').every((cb) => cb.hasAttribute('data-disabled'))).toBe(true);
     });
+
+    it('keeps checkbox role, aria-checked, Tab/Space keyboard parity, form submission, and trailing check in soft appearance', async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+
+        const { container } = render(
+            <form>
+                <CheckboxGroup
+                    name="subjects"
+                    legend="Which subjects can you tutor?"
+                    appearance="soft"
+                    options={tileOptions}
+                    defaultValue={['math']}
+                    onChange={onChange}
+                />
+            </form>
+        );
+
+        expect(container.querySelector('.plus-checkbox-group-soft')).not.toBeNull();
+        const softRows = container.querySelectorAll('.plus-choice-soft');
+        expect(softRows).toHaveLength(3);
+
+        const math = screen.getByRole('checkbox', { name: 'Math' });
+        const reading = screen.getByRole('checkbox', { name: 'Reading' });
+        const science = screen.getByRole('checkbox', { name: 'Science' });
+
+        expect(math).toHaveAttribute('aria-checked', 'true');
+        expect(reading).toHaveAttribute('aria-checked', 'false');
+
+        const checkIcon = softRows[0].querySelector('.plus-choice-soft-check');
+        expect(checkIcon).not.toBeNull();
+        expect(checkIcon).toHaveClass('fa-solid', 'fa-check');
+        expect(checkIcon).toHaveAttribute('aria-hidden', 'true');
+        expect(screen.queryByTestId('ill-math')).toBeNull();
+
+        // Tab moves between checkboxes and Space toggles selection.
+        math.focus();
+        await user.tab();
+        expect(document.activeElement).toBe(reading);
+        await user.keyboard(' ');
+        expect(reading).toHaveAttribute('aria-checked', 'true');
+        expect(onChange).toHaveBeenLastCalledWith(['math', 'reading']);
+
+        // Clicking the soft row surface toggles its checkbox.
+        await user.click(softRows[2]);
+        expect(science).toHaveAttribute('aria-checked', 'true');
+        expect(onChange).toHaveBeenLastCalledWith(['math', 'reading', 'science']);
+
+        // Form submission includes all selected values.
+        const formData = new FormData(container.querySelector('form'));
+        expect(formData.getAll('subjects')).toEqual(['math', 'reading', 'science']);
+    });
 });
+

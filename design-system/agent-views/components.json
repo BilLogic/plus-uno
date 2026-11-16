@@ -2235,9 +2235,10 @@
           "values": [
             "plain",
             "card",
+            "soft",
             "tile"
           ],
-          "description": "`plain` (default) draws the box and label inline; `card` draws a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end.",
+          "description": "`plain` (default) draws the box and label inline; `card` draws a bordered row; `soft` draws a neutral row without a checkbox; `tile` draws a centered pictured tile with the checkbox at its top end.",
           "deprecated": null
         },
         {
@@ -2325,6 +2326,7 @@
         "Required",
         "Description",
         "Card",
+        "Soft",
         "Tile",
         "TileNarrowLargeIllustrations"
       ],
@@ -2340,10 +2342,12 @@
         "--ds-background-input",
         "--ds-background-input-hovered",
         "--ds-background-neutral",
+        "--ds-background-neutral-hovered",
         "--ds-background-selected",
         "--ds-background-selected-bold",
         "--ds-background-selected-bold-hovered",
         "--ds-background-selected-hovered",
+        "--ds-background-selected-pressed",
         "--ds-border",
         "--ds-border-brand",
         "--ds-border-danger",
@@ -2352,6 +2356,7 @@
         "--ds-border-selected",
         "--ds-icon-disabled",
         "--ds-icon-inverse",
+        "--ds-icon-selected",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-motion-spatial-fast",
@@ -2359,8 +2364,11 @@
         "--ds-surface",
         "--ds-surface-hovered",
         "--ds-text",
+        "--icon-sm",
+        "--inline-md",
         "--pad-x-lg",
         "--pad-x-md",
+        "--pad-y-md",
         "--plus-choice-indent",
         "--radius-control-md",
         "--radius-md",
@@ -2465,9 +2473,10 @@
           "values": [
             "plain",
             "card",
+            "soft",
             "tile"
           ],
-          "description": "Passed to every Checkbox. `card` draws each as a bordered row; `tile` draws centered pictured tiles with a Checkbox at the top end.",
+          "description": "Passed to every Checkbox. `card` draws each as a bordered row; `soft` draws each as a neutral row without a checkbox; `tile` draws centered pictured tiles with a Checkbox at the top end.",
           "deprecated": null
         },
         {
@@ -2551,6 +2560,7 @@
         "Orientation",
         "Descriptions",
         "Reveal",
+        "Soft",
         "Tiles",
         "Unselected",
         "Selected",
@@ -11151,9 +11161,10 @@
           "values": [
             "plain",
             "card",
+            "soft",
             "tile"
           ],
-          "description": "`plain` (default) is a radio beside its label; `card` draws a bordered row; `tile` draws a centered pictured tile.",
+          "description": "`plain` (default) is a radio beside its label; `card` draws a bordered row; `soft` draws a neutral row without a radio dot; `tile` draws a centered pictured tile.",
           "deprecated": null
         },
         {
@@ -11246,6 +11257,7 @@
         "Disabled",
         "DisabledWithReason",
         "Required",
+        "Soft",
         "Tile",
         "TileNarrowLargeIllustrations"
       ],
@@ -11260,10 +11272,12 @@
         "--ds-background-input",
         "--ds-background-input-hovered",
         "--ds-background-neutral",
+        "--ds-background-neutral-hovered",
         "--ds-background-selected",
         "--ds-background-selected-bold",
         "--ds-background-selected-bold-hovered",
         "--ds-background-selected-hovered",
+        "--ds-background-selected-pressed",
         "--ds-border",
         "--ds-border-brand",
         "--ds-border-danger",
@@ -11272,6 +11286,7 @@
         "--ds-border-selected",
         "--ds-icon-disabled",
         "--ds-icon-inverse",
+        "--ds-icon-selected",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-motion-spatial-fast",
@@ -11279,8 +11294,11 @@
         "--ds-surface",
         "--ds-surface-hovered",
         "--ds-text",
+        "--icon-sm",
+        "--inline-md",
         "--pad-x-lg",
         "--pad-x-md",
+        "--pad-y-md",
         "--plus-choice-indent",
         "--radio-control-size",
         "--radius-control-md",
@@ -11403,9 +11421,10 @@
           "values": [
             "plain",
             "card",
+            "soft",
             "tile"
           ],
-          "description": "Passed to every Radio. `card` draws each as a bordered row; `tile` draws centered pictured tiles.",
+          "description": "Passed to every Radio. `card` draws each as a bordered row; `soft` draws each as a neutral row without a radio dot; `tile` draws centered pictured tiles.",
           "deprecated": null
         },
         {
@@ -11509,6 +11528,7 @@
         "Validation",
         "TwoGroupsWithoutIds",
         "Interactive",
+        "Soft",
         "Tiles",
         "TileRest",
         "TileHovered",

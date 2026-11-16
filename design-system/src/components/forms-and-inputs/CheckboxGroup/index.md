@@ -10,7 +10,7 @@ CheckboxGroup — one question and its checkbox answers, any number of which may
 
 **Source:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.stories.jsx` — Overview, Orientation, Descriptions, Reveal, Tiles, Unselected, Selected, Required, Invalid, ReadOnly, Disabled, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.stories.jsx` — Overview, Orientation, Descriptions, Reveal, Soft, Tiles, Unselected, Selected, Required, Invalid, ReadOnly, Disabled, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.mdx`
 
@@ -35,6 +35,13 @@ CheckboxGroup reads these motion tokens and no literal duration or curve.
 - For a long list of multi-select options, use `Select` with `isMulti`.
 
 ## Best practices
+
+### Mark the minority selection type in a flow of choice questions. {#mark-the-minority-selection-type-in-a-flow-of-choice-questions}
+
+In a flow of choice questions (onboarding, quizzes, check-ins, surveys), pick one default selection type for the flow: the majority type uses `appearance="soft"` without a visible radio dot or checkbox box, while the minority type keeps its visible control (`card` or `plain`) so people notice when a question works differently, following the same exception-marking rule as required and optional fields on [Forms](?path=/docs/patterns-forms--docs).
+
+Do: In a mostly single-select flow, the minority multi-select question keeps its visible checkboxes so multi-select is unmistakable.
+Don't: Both the majority single-select questions and the minority multi-select question hide their controls, so nothing signals that multiple answers work here.
 
 ### Name the question with a legend. {#name-the-question-with-a-legend}
 
@@ -76,7 +83,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Parts
 
 1. **Legend.** The question. It names the `<fieldset>` and carries an optional minority marker (`"(optional)"` or `"(required)"`) in plain text.
-2. **Options.** Checkboxes in a stacked list, an inline row, bordered `card` rows, or 224px `tile` cards.
+2. **Options.** Checkboxes in a stacked list, an inline row, bordered `card` rows, `soft` rows without a visible checkbox box, or 224px `tile` cards.
 3. **Tile checkbox and illustration.** When `appearance` is `tile`, each tile centers its decorative `illustration`, `label`, and `description`, and anchors its `Checkbox` at the top end so multi-select is clear before clicking.
 4. **Reveal.** Optional content under an option, shown while that option is selected.
 5. **Error.** One message under the group, tied to the `<fieldset>` with `aria-describedby`.
@@ -85,10 +92,11 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Rest | Plain/card as Checkbox; tile uses `--ds-surface` fill and 1px `--ds-border` edge. |
-| Hovered | Plain/card as Checkbox; unselected tile uses `--ds-surface-hovered` and `--ds-border-brand`; selected tile uses `--ds-background-selected-hovered`. |
-| Selected | Each selected Checkbox takes `--ds-background-selected-bold`; a selected tile also takes `--ds-background-selected` and a 2px `--ds-border-selected` edge. |
-| Focused | 2px ring in `--ds-border-focused`: around the box in plain/card, and outside the tile in `tile` appearance. |
+| Rest | Plain/card as Checkbox; `soft` uses `--ds-background-neutral` with no border; tile uses `--ds-surface` fill and 1px `--ds-border` edge. |
+| Hovered | Plain/card as Checkbox; unselected `soft` uses `--ds-background-neutral-hovered`; unselected tile uses `--ds-surface-hovered` and `--ds-border-brand`; selected `soft` and tile use `--ds-background-selected-hovered`. |
+| Selected | Each selected Checkbox takes `--ds-background-selected-bold`; a selected `soft` row takes `--ds-background-selected`, a 1px `--ds-border-selected` edge, and a trailing `fa-solid fa-check` icon in `--ds-icon-selected`; a selected tile takes `--ds-background-selected` and a 2px `--ds-border-selected` edge. |
+| Pressed | In `soft`, a selected row steps to `--ds-background-selected-pressed`. |
+| Focused | 2px ring in `--ds-border-focused`: around the box in plain/card, and outside the row or tile in `soft` and `tile` appearances. |
 | Invalid | Unselected options take `--ds-border-danger`, with one error message announced for the group. |
 | Read-only | Full contrast, focusable, no hover, `aria-readonly` on each Checkbox; unchecked controls and tiles take `--ds-background-neutral`. |
 | Disabled | Every option takes the disabled fill and edge and leaves the tab order. |
@@ -98,6 +106,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Options gap | Stacked `--stack-md`; inline and tile gap `--inline-lg`. |
+| Soft row | `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-sm` trailing check in `--ds-icon-selected`. |
 | Choice tile width | `--choice-tile-width` (224px), inline and wrapping. |
 | Tile surface and edge | `--ds-surface` and `--ds-border`; selected `--ds-background-selected` and 2px `--ds-border-selected`; radius `--radius-control-md`. |
 | Reveal indent | `--checkbox-control-size` plus `--stack-md`. |
@@ -123,7 +132,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `value` | arrayOf | — | Controlled selected option values. Pair with `onChange`. |
 | `defaultValue` | arrayOf | — | Option values selected at the start when uncontrolled. Defaults to `[]`. |
 | `onChange` | func | — | Receives the next array of selected option values when a box is toggled. |
-| `appearance` | enum | `'plain'` | Passed to every Checkbox. `card` draws each as a bordered row; `tile` draws centered pictured tiles with a Checkbox at the top end. |
+| `appearance` | enum | `'plain'` | Passed to every Checkbox. `card` draws each as a bordered row; `soft` draws each as a neutral row without a checkbox; `tile` draws centered pictured tiles with a Checkbox at the top end. |
 | `labelMarker` | enum | — | Marks the form's minority case in plain text after the legend: `required` or `optional`. |
 | `isRequired` | bool | `false` | Announces the group as required to assistive technology. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `isDisabled` | bool | `false` | Overrides every Checkbox's own `isDisabled`. |
@@ -137,7 +146,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 **`orientation`** — `stacked` · `inline`
 
-**`appearance`** — `plain` · `card` · `tile`
+**`appearance`** — `plain` · `card` · `soft` · `tile`
 
 **`labelMarker`** — `required` · `optional`
 

@@ -60,6 +60,14 @@ A radio group asks one question and offers a set of radio answers, one of which 
 
 <div className="sb-ds-doc-section">
 
+## Soft appearance
+
+<ComponentExample of={RadioGroupStories.Soft} title="Soft options" description="`appearance=&quot;soft&quot;` draws neutral option rows without a visible radio dot; selection is carried by the selected fill, 1px selected border, and trailing check." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Tile appearance
 
 <ComponentExample of={RadioGroupStories.Tiles} title="Choice tiles" description="`appearance=&quot;tile&quot;` lays out 224px pictured tiles inline and wrapping; the chosen tile takes a 2px selected border and selected fill with no visible dot." />
@@ -161,7 +169,7 @@ Use `RadioGroup` for one question with mutually exclusive answers visible all at
 ## Parts
 
 1. **Legend.** The question. It names the group and carries an optional minority marker (`"(optional)"` or `"(required)"`) in plain text.
-2. **Options.** Radios in a stacked or inline set. Each has a label and an optional description.
+2. **Options.** Radios in a stacked or inline set (`plain`, bordered `card`, `soft` without a visible dot, or pictured `tile`). Each has a label and an optional description.
 3. **Scale ends.** Optional `leadingText` and `trailingText` either side of the options.
 4. **Reveal.** Optional content under an option, shown only while that option is chosen.
 5. **Error.** One message under the group, tied to it with `aria-describedby`.
@@ -173,10 +181,10 @@ Use `RadioGroup` for one question with mutually exclusive answers visible all at
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Hovered</td><td>As Radio. Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge. Selected: the hovered step of the selected bold fill.</td></tr>
-<tr><td>Selected</td><td>As Radio: <code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge.</td></tr>
-<tr><td>Pressed</td><td>No step of its own. The hovered look holds while the pointer is down.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> on the one tab stop.</td></tr>
+<tr><td>Hovered</td><td>As Radio. Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge (or <code>--ds-background-neutral-hovered</code> in <code>soft</code>). Selected: the hovered step of the selected bold fill (or <code>--ds-background-selected-hovered</code> in <code>soft</code>).</td></tr>
+<tr><td>Selected</td><td>As Radio: <code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; in <code>soft</code>, <code>--ds-background-selected</code> fill, 1px <code>--ds-border-selected</code> edge, and a trailing <code>fa-solid fa-check</code> icon in <code>--ds-icon-selected</code>.</td></tr>
+<tr><td>Pressed</td><td>No step of its own in plain/card; in <code>soft</code>, a selected option steps to <code>--ds-background-selected-pressed</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> on the one tab stop (around the row in <code>soft</code> and <code>tile</code>).</td></tr>
 <tr><td>Invalid</td><td>Every unselected option takes <code>--ds-border-danger</code>, with one message for the group.</td></tr>
 <tr><td>Read-only</td><td>Full contrast, focusable, no hover, <code>aria-readonly</code> on the group; unchecked radios take the <code>--ds-background-neutral</code> fill and the answer does not change.</td></tr>
 <tr><td>Disabled</td><td>Every option takes the disabled fill and edge and leaves the tab order.</td></tr>
@@ -191,6 +199,7 @@ Use `RadioGroup` for one question with mutually exclusive answers visible all at
 </thead>
 <tbody>
 <tr><td>Options gap</td><td>Stacked <code>--stack-md</code>; inline column gap <code>--space-0625</code>; tile gap <code>--inline-lg</code>.</td></tr>
+<tr><td>Soft row</td><td><code>--ds-background-neutral</code> fill at rest; selected <code>--ds-background-selected</code> fill, <code>--border-width-default</code> <code>--ds-border-selected</code> edge, and <code>--icon-sm</code> trailing check in <code>--ds-icon-selected</code>.</td></tr>
 <tr><td>Choice tile width</td><td><code>--choice-tile-width</code> (224px), inline and wrapping.</td></tr>
 <tr><td>Radio size</td><td><code>--radio-control-size</code>, or <code>--radio-control-size-10</code> and <code>-14</code> through <code>size</code>.</td></tr>
 <tr><td>Scale ends</td><td><code>--ds-text</code>, body default; gap <code>--space-0625</code>.</td></tr>
@@ -203,6 +212,39 @@ Use `RadioGroup` for one question with mutually exclusive answers visible all at
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+### Mark the minority selection type in a flow of choice questions.
+
+In a flow of choice questions (onboarding, quizzes, check-ins, surveys), pick one default selection type for the flow: the majority type uses `appearance="soft"` without a visible radio dot or checkbox box, while the minority type keeps its visible control (`card` or `plain`) so people notice when a question switches between single-select and multi-select, following the same exception-marking rule as required and optional fields on [Forms](?path=/docs/patterns-forms--docs).
+
+<DoDontPair
+    doExample={
+        <RadioGroup
+            name="do-rg-minority"
+            legend="Which goal comes first for this session?"
+            appearance="soft"
+            defaultValue="fluency"
+            options={[
+                { value: 'fluency', label: 'Concept fluency' },
+                { value: 'homework', label: 'Homework completion' },
+            ]}
+        />
+    }
+    doCaption="In a flow where most questions are single-select, the majority single-select questions use soft rows while the occasional multi-select question keeps its visible checkboxes."
+    dontExample={
+        <RadioGroup
+            name="dont-rg-minority"
+            legend="Which goal comes first for this session?"
+            appearance="card"
+            defaultValue="fluency"
+            options={[
+                { value: 'fluency', label: 'Concept fluency' },
+                { value: 'homework', label: 'Homework completion' },
+            ]}
+        />
+    }
+    dontCaption="Every question in the flow shows bordered control chrome, so a switch from single-select to multi-select stops standing out."
+/>
 
 ### Name the question with a group label.
 

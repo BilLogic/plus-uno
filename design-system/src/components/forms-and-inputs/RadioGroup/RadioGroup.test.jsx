@@ -128,3 +128,61 @@ describe('RadioGroup tiles', () => {
         expect(alerts[0]).toHaveTextContent('Choose a tutoring format.');
     });
 });
+
+describe('RadioGroup soft appearance', () => {
+    it('keeps radio role, aria-checked, arrow-key navigation, form submission, and renders a decorative trailing check', async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+
+        const { container } = render(
+            <form>
+                <RadioGroup
+                    name="format"
+                    legend="How would you like to tutor?"
+                    appearance="soft"
+                    options={tileOptions}
+                    defaultValue="one-on-one"
+                    onChange={onChange}
+                />
+            </form>
+        );
+
+        const group = screen.getByRole('radiogroup', { name: 'How would you like to tutor?' });
+        expect(container.querySelector('.plus-radio-group-soft')).not.toBeNull();
+
+        const softRows = container.querySelectorAll('.plus-choice-soft');
+        expect(softRows).toHaveLength(3);
+
+        const first = within(group).getByRole('radio', { name: 'One-on-one' });
+        const second = within(group).getByRole('radio', { name: 'Small group' });
+        const third = within(group).getByRole('radio', { name: 'Drop-in help' });
+
+        expect(first).toHaveAttribute('aria-checked', 'true');
+        expect(second).toHaveAttribute('aria-checked', 'false');
+
+        // Each soft row carries a decorative trailing check icon (fa-solid fa-check) and omits illustrations.
+        const checkIcon = softRows[0].querySelector('.plus-choice-soft-check');
+        expect(checkIcon).not.toBeNull();
+        expect(checkIcon).toHaveClass('fa-solid', 'fa-check');
+        expect(checkIcon).toHaveAttribute('aria-hidden', 'true');
+        expect(screen.queryByTestId('ill-one')).toBeNull();
+
+        // Arrow keys move focus and selection across soft options identically to plain radios.
+        first.focus();
+        await user.keyboard('{ArrowDown}');
+        expect(document.activeElement).toBe(second);
+        expect(second).toHaveAttribute('aria-checked', 'true');
+        expect(first).toHaveAttribute('aria-checked', 'false');
+        expect(onChange).toHaveBeenLastCalledWith('small-group');
+
+        // Clicking the soft row surface activates the radio.
+        await user.click(softRows[2]);
+        expect(third).toHaveAttribute('aria-checked', 'true');
+        expect(onChange).toHaveBeenLastCalledWith('drop-in');
+
+        // Form submission includes the selected radio's value.
+        const formData = new FormData(container.querySelector('form'));
+        expect(formData.get('format')).toBe('drop-in');
+    });
+});
+

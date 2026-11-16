@@ -8,6 +8,7 @@
 export function choiceClasses({ appearance, readOnly }) {
     return [
         appearance === 'card' ? 'plus-choice-card' : '',
+        appearance === 'soft' ? 'plus-choice-soft' : '',
         appearance === 'tile' ? 'plus-choice-tile' : '',
         readOnly ? 'plus-choice-readonly' : '',
     ].filter(Boolean).join(' ');

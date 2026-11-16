@@ -34,7 +34,7 @@ export default {
         },
         appearance: {
             control: 'select',
-            options: ['plain', 'card', 'tile'],
+            options: ['plain', 'card', 'soft', 'tile'],
             table: { category: 'Design' },
         },
         size: {
@@ -361,6 +361,76 @@ const tileChoices = [
         illustration: <Illustration character="mastering-content" size={96} />,
     },
 ];
+
+/** Soft option rows without a visible radio dot, for the majority selection type in a choice flow. */
+export const Soft = () => {
+    const [value, setValue] = useState('one-on-one');
+    return (
+        <RadioGroup
+            name="rg-soft"
+            legend="How would you like to tutor?"
+            appearance="soft"
+            options={tileChoices}
+            value={value}
+            onChange={setValue}
+        />
+    );
+};
+Soft.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('radiogroup', { name: 'How would you like to tutor?' });
+    const rows = [...group.querySelectorAll('.plus-choice-soft')];
+    await expect(rows).toHaveLength(3);
+
+    const firstRadio = within(rows[0]).getByRole('radio', { name: 'One-on-one' });
+    const secondRadio = within(rows[1]).getByRole('radio', { name: 'Small group' });
+    await expect(getComputedStyle(firstRadio).opacity).toBe('0');
+    await expect(getComputedStyle(secondRadio).opacity).toBe('0');
+
+    // Rest state on unselected row.
+    rows[0].style.transition = 'none';
+    rows[1].style.transition = 'none';
+    await expect(getComputedStyle(rows[1]).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+    await expect(getComputedStyle(rows[1]).borderTopColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(getComputedStyle(rows[1].querySelector('.plus-choice-soft-check')).opacity).toBe('0');
+
+    // Unselected hover state.
+    const restHover = withForcedPseudo(rows[1], ':hover', () => getComputedStyle(rows[1]).backgroundColor);
+    await expect(restHover).toBe(tokenColor(canvasElement, '--ds-background-neutral-hovered'));
+
+    // Selected state: fill, 1px border, trailing check.
+    await expect(getComputedStyle(rows[0]).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    await expect(px(getComputedStyle(rows[0]).borderTopWidth)).toBe(1);
+    await expect(getComputedStyle(rows[0]).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+    const check = rows[0].querySelector('.plus-choice-soft-check');
+    await expect(check).toHaveAttribute('aria-hidden', 'true');
+    await expect(getComputedStyle(check).opacity).toBe('1');
+    await expect(px(getComputedStyle(check).fontSize)).toBe(12);
+    await expect(getComputedStyle(check).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
+
+    // Selected hover and pressed states.
+    const selectedHover = withForcedPseudo(rows[0], ':hover', () => ({
+        backgroundColor: getComputedStyle(rows[0]).backgroundColor,
+        borderTopColor: getComputedStyle(rows[0]).borderTopColor,
+    }));
+    await expect(selectedHover.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-hovered'));
+    await expect(selectedHover.borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+
+    const selectedPressed = withForcedPseudo(rows[0], ':active', () => getComputedStyle(rows[0]).backgroundColor);
+    await expect(selectedPressed).toBe(tokenColor(canvasElement, '--ds-background-selected-pressed'));
+
+    // Focus ring on the soft row and arrow-key navigation parity.
+    firstRadio.focus({ focusVisible: true });
+    await waitFor(() => expect(getComputedStyle(rows[0]).outlineStyle).toBe('solid'));
+    await expect(px(getComputedStyle(rows[0]).outlineWidth)).toBe(2);
+    await expect(px(getComputedStyle(rows[0]).outlineOffset)).toBe(2);
+    await expect(getComputedStyle(rows[0]).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(document.activeElement).toBe(secondRadio);
+    await expect(secondRadio).toHaveAttribute('aria-checked', 'true');
+    secondRadio.blur();
+};
 
 /** Pictured 224px tiles laid out inline and wrapping; selection uses the 2px border and fill with no visible dot. */
 export const Tiles = () => {

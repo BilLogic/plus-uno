@@ -12,7 +12,7 @@ Also asked as: single choice, radio buttons, single select, multiple choice, rad
 
 **Source:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.stories.jsx` — Overview, Keyboard, Orientation, Size, LinearScale, Descriptions, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive, Tiles, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, Unanswered, Selected, Hovered, Focused, Required, Invalid, ReadOnly, Disabled
+**Stories:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.stories.jsx` — Overview, Keyboard, Orientation, Size, LinearScale, Descriptions, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive, Soft, Tiles, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, Unanswered, Selected, Hovered, Focused, Required, Invalid, ReadOnly, Disabled
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.mdx`
 
@@ -38,6 +38,13 @@ RadioGroup reads these motion tokens and no literal duration or curve.
 - For a single radio placed in a custom layout such as a table, use `Radio`.
 
 ## Best practices
+
+### Mark the minority selection type in a flow of choice questions. {#mark-the-minority-selection-type-in-a-flow-of-choice-questions}
+
+In a flow of choice questions (onboarding, quizzes, check-ins, surveys), pick one default selection type for the flow: the majority type uses `appearance="soft"` without a visible radio dot or checkbox box, while the minority type keeps its visible control (`card` or `plain`) so people notice when a question switches between single-select and multi-select, following the same exception-marking rule as required and optional fields on [Forms](?path=/docs/patterns-forms--docs).
+
+Do: In a flow where most questions are single-select, the majority single-select questions use soft rows while the occasional multi-select question keeps its visible checkboxes.
+Don't: Every question in the flow shows bordered control chrome, so a switch from single-select to multi-select stops standing out.
 
 ### Name the question with a group label. {#name-the-question-with-a-group-label}
 
@@ -110,7 +117,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Parts
 
 1. **Legend.** The question. It names the group and carries an optional minority marker (`"(optional)"` or `"(required)"`) in plain text.
-2. **Options.** Radios in a stacked or inline set. Each has a label and an optional description.
+2. **Options.** Radios in a stacked or inline set (`plain`, bordered `card`, `soft` without a visible dot, or pictured `tile`). Each has a label and an optional description.
 3. **Scale ends.** Optional `leadingText` and `trailingText` either side of the options.
 4. **Reveal.** Optional content under an option, shown only while that option is chosen.
 5. **Error.** One message under the group, tied to it with `aria-describedby`.
@@ -119,10 +126,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Hovered | As Radio. Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge. Selected: the hovered step of the selected bold fill. |
-| Selected | As Radio: `--ds-background-selected-bold` fill and `--ds-border-selected` edge. |
-| Pressed | No step of its own. The hovered look holds while the pointer is down. |
-| Focused | A 2px ring in `--ds-border-focused` on the one tab stop. |
+| Hovered | As Radio. Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge (or `--ds-background-neutral-hovered` in `soft`). Selected: the hovered step of the selected bold fill (or `--ds-background-selected-hovered` in `soft`). |
+| Selected | As Radio: `--ds-background-selected-bold` fill and `--ds-border-selected` edge; in `soft`, `--ds-background-selected` fill, 1px `--ds-border-selected` edge, and a trailing `fa-solid fa-check` icon in `--ds-icon-selected`. |
+| Pressed | No step of its own in plain/card; in `soft`, a selected option steps to `--ds-background-selected-pressed`. |
+| Focused | A 2px ring in `--ds-border-focused` on the one tab stop (around the row in `soft` and `tile`). |
 | Invalid | Every unselected option takes `--ds-border-danger`, with one message for the group. |
 | Read-only | Full contrast, focusable, no hover, `aria-readonly` on the group; unchecked radios take the `--ds-background-neutral` fill and the answer does not change. |
 | Disabled | Every option takes the disabled fill and edge and leaves the tab order. |
@@ -132,6 +139,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Options gap | Stacked `--stack-md`; inline column gap `--space-0625`; tile gap `--inline-lg`. |
+| Soft row | `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-sm` trailing check in `--ds-icon-selected`. |
 | Choice tile width | `--choice-tile-width` (224px), inline and wrapping. |
 | Radio size | `--radio-control-size`, or `--radio-control-size-10` and `-14` through `size`. |
 | Scale ends | `--ds-text`, body default; gap `--space-0625`. |
@@ -161,7 +169,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `onChange` | func | — | Receives the next answer's value. |
 | `leadingText` | node | — | Scale end before the options, e.g. "Not at all". Describes the group. |
 | `trailingText` | node | — | Scale end after the options, e.g. "Very". Describes the group. |
-| `appearance` | enum | `'plain'` | Passed to every Radio. `card` draws each as a bordered row; `tile` draws centered pictured tiles. |
+| `appearance` | enum | `'plain'` | Passed to every Radio. `card` draws each as a bordered row; `soft` draws each as a neutral row without a radio dot; `tile` draws centered pictured tiles. |
 | `size` | enum | — | Radio control (dot) width, in px; unset keeps today's rendering. |
 | `labelMarker` | enum | — | Marks the form's minority case in plain text after the legend: `required` or `optional`. |
 | `isRequired` | bool | `false` | Sets `aria-required` on the radiogroup. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
@@ -176,7 +184,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 **`orientation`** — `stacked` · `inline`
 
-**`appearance`** — `plain` · `card` · `tile`
+**`appearance`** — `plain` · `card` · `soft` · `tile`
 
 **`size`** — `10` · `12` · `14`
 

@@ -30,7 +30,7 @@ export default {
         },
         appearance: {
             control: 'select',
-            options: ['plain', 'card', 'tile'],
+            options: ['plain', 'card', 'soft', 'tile'],
             table: { category: 'Design' },
         },
         isChecked: { table: { disable: true, category: 'Development' } },
@@ -417,6 +417,53 @@ export const Card = {
     play: async ({ canvasElement }) => {
         await expect(box(canvasElement, 'Text reminders')).toHaveAttribute('aria-checked', 'true');
     },
+};
+
+export const Soft = () => (
+    <div style={stack}>
+        <Checkbox
+            id="cb-ex-soft-on"
+            name="cb-ex-soft"
+            label="Email summary"
+            description="Sent after each completed session."
+            appearance="soft"
+            defaultChecked
+        />
+        <Checkbox
+            id="cb-ex-soft-off"
+            name="cb-ex-soft"
+            label="Text reminder"
+            description="Sent an hour before a session starts."
+            appearance="soft"
+        />
+    </div>
+);
+Soft.play = async ({ canvasElement }) => {
+    const first = box(canvasElement, 'Email summary');
+    const second = box(canvasElement, 'Text reminder');
+    const selectedRow = first.closest('.plus-choice-soft');
+    const restRow = second.closest('.plus-choice-soft');
+
+    // No checkbox box is visible; native role and aria-checked remain intact.
+    await expect(getComputedStyle(first).opacity).toBe('0');
+    await expect(getComputedStyle(second).opacity).toBe('0');
+    await expect(first).toHaveAttribute('aria-checked', 'true');
+    await expect(second).toHaveAttribute('aria-checked', 'false');
+
+    // Rest row: neutral fill, transparent border, hidden trailing check.
+    await expect(getComputedStyle(restRow).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+    await expect(getComputedStyle(restRow).borderTopColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(getComputedStyle(restRow.querySelector('.plus-choice-soft-check')).opacity).toBe('0');
+
+    // Selected row: selected fill, 1px selected border, visible trailing check (12px, selected icon color).
+    await expect(getComputedStyle(selectedRow).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    await expect(px(getComputedStyle(selectedRow).borderTopWidth)).toBe(1);
+    await expect(getComputedStyle(selectedRow).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+    const check = selectedRow.querySelector('.plus-choice-soft-check');
+    await expect(check).toHaveAttribute('aria-hidden', 'true');
+    await expect(getComputedStyle(check).opacity).toBe('1');
+    await expect(px(getComputedStyle(check).fontSize)).toBe(12);
+    await expect(getComputedStyle(check).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
 };
 
 export const Tile = () => (
