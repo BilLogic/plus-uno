@@ -8,6 +8,7 @@ import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { footerTracks } from '@/patterns/FooterActions';
 import { FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from './formDemo.jsx';
 import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
@@ -55,7 +56,13 @@ export const TypePanel = {
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
-        await expect(rect(footer).height, 'the full-bleed footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
+        const tracks = footerTracks(footer);
+        const [discard, save] = [...footer.querySelectorAll('button')];
+        await expect(rect(footer).height, 'the footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
+        await expect(rect(discard).left, 'Discard starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(discard).right, 'Discard ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(rect(save).left, 'Save starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(save).right, 'Save ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
     },
 };
 
@@ -66,18 +73,17 @@ export const TypeModal = {
         await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
-        await expect(rect(footer).height, 'the full-bleed footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
-        await expect(rect(canvas.getByRole('button', { name: 'Cancel' }).parentElement).left, 'Cancel (Default) is the first cell').toBeLessThan(rect(canvas.getByRole('button', { name: 'Save session' })).left);
+        const tracks = footerTracks(footer);
+        const discard = canvas.getByRole('button', { name: 'Discard' });
+        const save = canvas.getByRole('button', { name: 'Save session' });
+        await expect(rect(footer).height, 'the footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
+        await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
         await expect(canvas.getByRole('heading', { level: 1, name: 'Log a session' }), 'the title is the dialog’s h1').toBeInTheDocument();
-        const modal = rect(canvasElement.querySelector('.plus-pattern-modal'));
-        const halves = [canvas.getByRole('button', { name: 'Cancel' }), canvas.getByRole('button', { name: 'Save session' })].map(rect);
-        for (const b of halves) {
-            await expect(b.left, 'a footer button starts inside the Modal’s left edge').toBeGreaterThanOrEqual(modal.left - 0.5);
-            await expect(b.right, 'a footer button ends inside the Modal’s right edge').toBeLessThanOrEqual(modal.right + 0.5);
-        }
-        await expect(halves[0].left, 'Cancel sits flush with the Modal’s left edge').toBeCloseTo(modal.left, 0);
-        await expect(halves[1].right, 'Save sits flush with the Modal’s right edge').toBeCloseTo(modal.right, 0);
-        await expect(halves[0].width, 'the two halves are equal').toBeCloseTo(halves[1].width, 0);
+        await expect(rect(discard).left, 'Discard starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(discard).right, 'Discard ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(rect(save).left, 'Save starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(save).right, 'Save ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
+        await expect(rect(discard).width, 'the two halves are equal').toBeCloseTo(rect(save).width, 0);
     },
 };
 
@@ -259,7 +265,7 @@ export const KeySending = {
         await expect(save.querySelector('.plus-btn-spinner'), 'a spinner in place of the label').not.toBeNull();
         await expect(rect(save).width, 'the button keeps its width').toBeCloseTo(before.save, 0);
         await expect(rect(footer).height, 'the footer keeps its height').toBeCloseTo(before.footer, 0);
-        await expect(canvas.getByRole('button', { name: 'Cancel' }), 'only that button disables').not.toBeDisabled();
+        await expect(canvas.getByRole('button', { name: 'Discard' }), 'only that button disables').not.toBeDisabled();
     },
 };
 
@@ -271,7 +277,7 @@ export const KeyLeaving = {
         await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         await userEvent.type(canvas.getByLabelText(/Student/), 'Ana');
-        await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Discard' }));
         await expect(await canvas.findByRole('heading', { level: 1, name: 'Discard changes?' })).toBeInTheDocument();
         await expect(canvas.queryAllByRole('dialog'), 'the same Modal, not a second one').toHaveLength(1);
         await userEvent.click(canvas.getByRole('button', { name: 'Back' }));

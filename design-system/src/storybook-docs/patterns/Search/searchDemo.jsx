@@ -70,7 +70,7 @@ const Results = ({ shown, total, query, loading, onReset }) => (
                 icon="user-group"
                 header="No matches"
                 description={`No students match "${query.trim()}".`}
-                primaryAction={<Button text="Reset filters" onClick={onReset} />}
+                primaryAction={<Button text="Reset filters" spacing="compact" onClick={onReset} />}
             />
         )}
     </div>

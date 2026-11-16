@@ -7,6 +7,7 @@ import Skeleton from '@/components/loading/Skeleton';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { useOverlaySlot, reportFocusLost } from '@/lib/overlay';
 import Blanket from '@/patterns/Blanket';
+import { FooterActions } from '@/patterns/FooterActions';
 
 /** Safe CSS length / custom-property patterns for Modal width. */
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
@@ -166,10 +167,11 @@ const Modal = ({
 
     if (renderAs === 'inline' && !visible) return null;
 
+    const resolvedWidth = width === 'xs' ? '4-col' : width;
     const classes = [
         'plus-modal',
         'plus-modal-default',
-        MODAL_WIDTHS.includes(width) ? `plus-modal-width-${width}` : '',
+        MODAL_WIDTHS.includes(resolvedWidth) ? `plus-modal-width-${resolvedWidth}` : '',
         `plus-modal-height-${height}`,
         showBottomButtons ? 'plus-modal-with-buttons' : 'plus-modal-no-buttons',
         bodyOnly ? 'plus-modal-body-only' : '',
@@ -178,7 +180,7 @@ const Modal = ({
 
     const modalStyle = {
         ...(style || {}),
-        ...(resolveModalWidth(width) || {}),
+        ...(resolveModalWidth(resolvedWidth) || {}),
     };
 
     // An inline docs preview draws the same panel as a plain block; a real
@@ -261,10 +263,10 @@ const Modal = ({
                         {dividers && <div className="plus-modal-divider" />}
                         <div className="plus-modal-footer">
                             {footer || (
-                                <div className="plus-modal-button-row">
+                                <FooterActions>
                                     {secondaryButton && (
                                         <Button
-                                            text={secondaryButton.text || 'Cancel'}
+                                            text={secondaryButton.text || 'Discard'}
                                             appearance={secondaryButton.appearance || 'default'}
                                             spacing={secondaryButton.spacing}
                                             onClick={secondaryButton.onClick}
@@ -282,7 +284,7 @@ const Modal = ({
                                             className="plus-modal-button plus-modal-button-primary"
                                         />
                                     )}
-                                </div>
+                                </FooterActions>
                             )}
                         </div>
                     </>

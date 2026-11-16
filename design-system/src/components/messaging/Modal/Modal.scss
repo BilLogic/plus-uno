@@ -140,7 +140,7 @@
     gap: var(--stack-md);
 }
 
-/* Footer actions align right, Modal/inline-sm 8 apart. */
+/* Footer actions sit inside the Modal padding. */
 .plus-modal-footer {
     flex-shrink: 0;
     display: flex;
@@ -148,12 +148,5 @@
     align-items: center;
     gap: var(--modal-inline-sm);
     border-radius: 0; // full bleed: the Modal's own radius clips the outer corners
-}
-
-.plus-modal-button-row {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--modal-inline-sm);
-    flex-wrap: wrap;
 }
 

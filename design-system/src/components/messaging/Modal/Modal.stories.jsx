@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import { Modal } from '@/components';
+import { Modal, MODAL_WIDTHS } from '@/components';
 import { IconButton, Button, Select } from '@/components';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
@@ -227,8 +227,8 @@ function ModalLayoutDemos() {
                             onClick: () => console.log('Confirm clicked'),
                         }}
                         secondaryButton={{
-                            text: 'Cancel',
-                            onClick: () => console.log('Cancel clicked'),
+                            text: 'Discard',
+                            onClick: () => console.log('Discard clicked'),
                         }}
                         onClose={() => {}}
                     />
@@ -249,7 +249,7 @@ const widthStory = (size) => () => (
             width={size}
             title={`width="${size}"`}
             body="Modal body text goes here."
-            secondaryButton={{ text: 'Cancel' }}
+            secondaryButton={{ text: 'Discard' }}
             primaryButton={{ text: 'Save' }}
             onClose={() => {}}
         />
@@ -497,7 +497,7 @@ const paintedShadow = (doc, token) => {
 export const BlockingShadow = {
     render: () => (
         <div style={col}>
-            {['6-col', '8-col', '10-col'].map((width) => (
+            {MODAL_WIDTHS.map((width) => (
                 <Modal key={width} show renderAs="inline" width={width} title={`Modal ${width}`} body="Blocks the page." onClose={() => {}} />
             ))}
         </div>
@@ -505,7 +505,7 @@ export const BlockingShadow = {
     play: async ({ canvasElement }) => {
         const blocking = paintedShadow(canvasElement.ownerDocument, '--ds-shadow-blocking');
         await expect(blocking, 'the two shadow tokens differ').not.toBe(paintedShadow(canvasElement.ownerDocument, '--ds-shadow-overlay'));
-        for (const width of ['6-col', '8-col', '10-col']) {
+        for (const width of MODAL_WIDTHS) {
             const panel = canvasElement.querySelector(`.plus-modal.plus-modal-width-${width}`);
             await expect(getComputedStyle(panel).boxShadow, `${width} Modal`).toBe(blocking);
         }

@@ -7,6 +7,7 @@ import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { BAR_TOKEN, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
+import { footerTracks } from '@/patterns/FooterActions';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFrame, SessionsBehind } from './panelDemo.jsx';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
@@ -229,19 +230,24 @@ export const WidthFloating = {
 
 /* ------------------------------------------------------------- key states */
 
-/** Editing: the same Panel with the form open and its full-bleed footer; Save returns to reading with no footer. */
+/** Editing: the same Panel with the form open and its 4-track footer; Save returns to reading with no footer. */
 export const KeyEditing = {
     name: 'Key state: Editing',
     render: () => sized(<DetailsFrame editing />),
     play: async ({ canvasElement }) => {
         await expectFloating(canvasElement);
         const { panel } = frameParts(canvasElement);
+        await expect(panel().offsetWidth, 'narrow Panel is 400 wide').toBeCloseTo(FRAME_LAYOUT.panelDefault, 0);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
         await expect(rect(footer).height, 'the footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
-        await expect(rect(footer).left, 'full bleed to the start edge').toBeCloseTo(rect(panel()).left + 1, 0);
-        const cancel = within(footer).getByRole('button', { name: 'Cancel' });
+        await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
+        const discard = within(footer).getByRole('button', { name: 'Discard' });
         const save = within(footer).getByRole('button', { name: 'Save' });
-        await expect(rect(cancel).left, 'Cancel (Default) left of Save').toBeLessThan(rect(save).left);
+        await expect(rect(discard).left, 'Discard starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(discard).right, 'Discard ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(rect(save).left, 'Save starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(save).right, 'Save ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await userEvent.click(save);
         await waitFor(() => expect(canvasElement.querySelector('[data-probe="footer"]'), 'reading shows no footer').toBeNull());
     },

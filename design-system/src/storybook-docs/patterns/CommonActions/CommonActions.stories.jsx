@@ -6,6 +6,7 @@ import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { footerTracks } from '@/patterns/FooterActions';
 import { TierActive, TierDanger, TierTypeName } from '../../../patterns/PatternModal/modalDemo.jsx';
 import {
     APPEARANCES,
@@ -81,7 +82,7 @@ export const PlacementPage = {
     },
 };
 
-/** A Modal: Close in the header, Cancel (Default) and the Primary full bleed, 48 high. */
+/** A Modal: Close in the header, Discard (Default) and the Primary split 50/50, 48 high. */
 export const PlacementModal = {
     name: 'Placement: In a Modal',
     render: () => staged(<ModalFooter />),
@@ -89,21 +90,25 @@ export const PlacementModal = {
         await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
         const dialog = canvas.getByRole('dialog');
         const close = within(dialog).getByRole('button', { name: 'Close' });
-        const cancel = canvas.getByRole('button', { name: 'Cancel' });
+        const discard = canvas.getByRole('button', { name: 'Discard' });
         const save = canvas.getByRole('button', { name: 'Save session' });
+        await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
         await expect(close, 'Close is an icon button in the header').toHaveTextContent('');
         await expect(rect(close).bottom, 'and sits above the footer').toBeLessThan(rect(footer).top);
-        await expect(close, 'Close is not Cancel').not.toBe(cancel);
-        await expect(rect(cancel).right, 'Cancel is left of the Primary').toBeLessThanOrEqual(rect(save).left + 1);
+        await expect(close, 'Close is not Discard').not.toBe(discard);
+        await expect(rect(discard).left, 'Discard starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(discard).right, 'Discard ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(rect(save).left, 'Save starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(save).right, 'Save ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await expect(rect(footer).height, 'the footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
-        await expect(rect(cancel).width + rect(save).width, 'the buttons fill the footer').toBeCloseTo(rect(footer).width, 0);
         await fitsCanvas(canvasElement);
     },
 };
 
-/** A focused task: Cancel (Subtle) at the start, Back and Next at the end, 48 high. */
+/** A focused task: Back and Next split 50/50 across the bar, 48 high. */
 export const PlacementFocused = {
     name: 'Placement: In a focused task',
     render: () => staged(<FocusedBar />),
@@ -111,11 +116,15 @@ export const PlacementFocused = {
         await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         const bar = canvasElement.querySelector('[data-probe="bar"]');
-        const cancel = canvas.getByRole('button', { name: 'Cancel' });
+        const column = canvasElement.querySelector('[data-probe="bar-column"]');
+        const tracks = footerTracks(column);
         const back = canvas.getByRole('button', { name: 'Back' });
         const next = canvas.getByRole('button', { name: 'Next' });
-        await expect(rect(cancel).left, 'Cancel at the start').toBeLessThan(rect(back).left);
-        await expect(rect(back).right, 'Back, then Next last').toBeLessThanOrEqual(rect(next).left + 1);
+        await expect(within(bar).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
+        await expect(rect(back).left, 'Back starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(back).right, 'Back ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(rect(next).left, 'Next starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await expect(rect(bar).height, 'the bar is 48 high').toBeCloseTo(tokenLength(bar, BAR_TOKEN), 0);
         await fitsCanvas(canvasElement);
     },
@@ -264,12 +273,12 @@ export const SendingShown = {
         await settleAnimations(canvasElement.ownerDocument.body);
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'the spinner button disables').toBeDisabled();
-        await expect(canvas.getByRole('button', { name: 'Cancel' }), 'Cancel stays live').not.toBeDisabled();
+        await expect(canvas.getByRole('button', { name: 'Discard' }), 'Discard stays live').not.toBeDisabled();
         await fitsCanvas(canvasElement);
     },
 };
 
-/** Sending, tested from a clean start: the button swaps its label for a spinner in place; Cancel stays live. */
+/** Sending, tested from a clean start: the button swaps its label for a spinner in place; Discard stays live. */
 export const SendingKeepsWidth = {
     name: 'Test: Sending',
     render: () => staged(<Sending />),
@@ -283,7 +292,7 @@ export const SendingKeepsWidth = {
         await waitFor(() => expect(save).toBeDisabled());
         await expect(rect(save).width, 'the button keeps its width').toBeCloseTo(before.width, 0);
         await expect(rect(footer).height, 'the footer keeps its height').toBeCloseTo(before.height, 0);
-        await expect(canvas.getByRole('button', { name: 'Cancel' }), 'Cancel stays live').not.toBeDisabled();
+        await expect(canvas.getByRole('button', { name: 'Discard' }), 'Discard stays live').not.toBeDisabled();
         await fitsCanvas(canvasElement);
     },
 };

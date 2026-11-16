@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button, IconButton, ProgressTracker, Skeleton } from '@/components';
-import { Frame } from '@/patterns';
+import { FooterActions, Frame } from '@/patterns';
 import { StepStage, resolveStepAxis } from '@/lib/navigationMotion';
 import { BrowserWindow } from './template-page.jsx';
 import { ScreenStage } from './fit-stage.jsx';
@@ -101,13 +101,16 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
                 }}
             >
                 {/* The bar's actions sit on the Page's reading column, the same edges as Close, the title and the body. */}
-                <div data-probe="bar-column" style={READING_COLUMN}>
-                    <Button text="Cancel" appearance="subtle" onClick={() => {}} />
-                    <div style={{ display: 'flex', gap: 'var(--stack-md)' }}>
-                        <Button text="Back" isDisabled={at === 0} onClick={() => setAt(at - 1)} />
-                        <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => setAt(Math.min(at + 1, labels.length - 1))} />
-                    </div>
-                </div>
+                <FooterActions
+                    data-probe="bar-column"
+                    style={{
+                        maxInlineSize: 'var(--content-max-width-reading)',
+                        marginInline: 'auto',
+                    }}
+                >
+                    <Button text="Back" isDisabled={at === 0} onClick={() => setAt(at - 1)} />
+                    <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => setAt(Math.min(at + 1, labels.length - 1))} />
+                </FooterActions>
             </div>
         </div>
     );
