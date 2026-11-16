@@ -200,8 +200,8 @@ export const SectionHero = () => {
             <SkeletonBar x={left + 52} y={s.y + 13} w={40} />
             <Rule x1={left} x2={left + 30} y1={s.y + 26} y2={s.y + 26} stroke={PAINT.tabSelected} thick />
             {/* The view bar: its last control ends at the content's right edge. */}
-            <Rect x={right - 10 - 4 - 40} y={s.y + 10} w={40} h={8} fill={PAINT.buttonDefault} stroke={PAINT.buttonDefaultBorder} corner="button" />
-            <Rect x={right - 10} y={s.y + 10} w={10} h={8} fill={PAINT.buttonDefault} stroke={PAINT.buttonDefaultBorder} corner="button" />
+            <Rect x={right - 10 - 4 - 40} y={s.y + 10} w={40} h={8} fill={PAINT.buttonDefault} corner="button" />
+            <Rect x={right - 10} y={s.y + 10} w={10} h={8} fill={PAINT.buttonDefault} corner="button" />
             {/* The body, and the side beside it. */}
             <Rows x={left} w={side.x - 14 - left} y={s.y + 38} n={6} pitch={14} />
             <CardBox {...side} />
@@ -323,7 +323,7 @@ export const PopupHero = () => {
             <SkeletonBar x={left} y={11} w={52} h={5} heading />
             <Rows x={left} w={right - left} y={30} n={9} pitch={14} />
             {/* The trigger sits at the bar's end, aligned to the rows' right edge. */}
-            <Rect x={tx} y={trigger.y} w={trigger.w} h={trigger.h} fill={PAINT.buttonDefault} stroke={PAINT.buttonDefaultBorder} corner="button" />
+            <Rect x={tx} y={trigger.y} w={trigger.w} h={trigger.h} fill={PAINT.buttonDefault} corner="button" />
             <SkeletonBar x={tx + 8} y={trigger.y + 4.5} w={26} />
             <path
                 d={`M${tx + trigger.w - 14} ${trigger.y + 5} l3 3 l3 -3`}

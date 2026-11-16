@@ -25,9 +25,8 @@ const icons = {
  */
 const PAINT = {
     default: {
-        ground: '--ds-background-neutral-subtle', label: '--ds-text-subtle', icon: '--ds-icon-subtle',
-        hovered: '--ds-background-neutral-subtle-hovered', pressed: '--ds-background-neutral-subtle-pressed',
-        edge: '--ds-border-input',
+        ground: '--ds-background-neutral', label: '--ds-text', icon: '--ds-icon',
+        hovered: '--ds-background-neutral-hovered', pressed: '--ds-background-neutral-pressed',
     },
     primary: {
         ground: '--ds-background-brand-bold', label: '--ds-text-inverse', icon: '--ds-icon-inverse',
@@ -259,6 +258,9 @@ export const States = {
         await expect(selected).toHaveAttribute('aria-pressed', 'true');
         await expect(getComputedStyle(selected).backgroundColor, 'selected ground').toBe(tokenColor(canvasElement, '--ds-background-selected'));
         await expect(getComputedStyle(selected).color, 'selected label').toBe(tokenColor(canvasElement, '--ds-text-selected'));
+        await expect(getComputedStyle(selected).borderTopColor, 'selected edge').toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        await expect(withForcedPseudo(selected, ':hover', () => getComputedStyle(selected).backgroundColor), 'selected hovered').toBe(tokenColor(canvasElement, '--ds-background-selected-hovered'));
+        await expect(withForcedPseudo(selected, ':active', () => getComputedStyle(selected).backgroundColor), 'selected pressed').toBe(tokenColor(canvasElement, '--ds-background-selected-pressed'));
 
         const disabled = canvas.getByRole('button', { name: 'Disabled' });
         settled(disabled);
@@ -404,8 +406,8 @@ export const Interactive = {
 
 /**
  * Hover and pressed take the named tokens, laid straight on the container: a
- * bold appearance its own bold step, default and subtle the neutral subtle
- * step.
+ * bold appearance its own bold step, default the neutral step, and subtle the
+ * neutral subtle step.
  */
 export const StateSteps = {
     parameters: { docs: { disable: true } },
@@ -430,7 +432,7 @@ export const StateSteps = {
     },
 };
 
-/** Tabbing onto a button draws the 2px focus ring 2px off its edge, and no fill. */
+/** Tabbing onto a button draws the 2px focus ring 2px off its edge, and keeps the rest fill. */
 export const KeyboardFocus = {
     parameters: { docs: { disable: true } },
     render: () => <Button text="Save" />,
@@ -444,7 +446,7 @@ export const KeyboardFocus = {
         await expect(px(style.outlineWidth), 'ring width').toBe(2);
         await expect(px(style.outlineOffset), 'ring gap').toBe(2);
         await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
-        await expect(style.backgroundColor, 'no focus fill').toBe('rgba(0, 0, 0, 0)');
+        await expect(style.backgroundColor, 'focus keeps the rest fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
     },
 };
 

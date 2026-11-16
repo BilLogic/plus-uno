@@ -115,16 +115,16 @@ Hover, pressed and focus are the browser's own. A link icon button has no disabl
 | Hovered | The container takes the appearance's hovered fill. |
 | Pressed | The container takes the appearance's pressed fill. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
-| Selected | The selected role fill and icon, with `aria-current`. |
+| Selected | The selected role fill, 1px `--ds-border-selected` edge and icon, with `aria-current`. |
 
 ### Tokens
 
 | Part | Token |
 | --- | --- |
-| Fill: default, subtle | `--ds-background-neutral-subtle`, hovered and pressed steps. Default adds a 1px `--ds-border-input` edge. |
+| Fill: default, subtle | `--ds-background-neutral` (default) and `--ds-background-neutral-subtle` (subtle), each with hovered and pressed steps. Neither draws an edge. |
 | Fill: primary, discovery | `--ds-background-brand-bold`, `--ds-background-discovery-bold`, each with hovered and pressed steps. |
-| Fill: selected | `--ds-background-selected` with hovered and pressed steps. |
-| Icon | `--ds-icon-subtle` (default, subtle), `--ds-icon-inverse` (primary, discovery); the selected role. 16, `--icon-md`. |
+| Fill: selected | `--ds-background-selected` with hovered and pressed steps and a 1px `--ds-border-selected` edge. |
+| Icon | `--ds-icon` (default), `--ds-icon-subtle` (subtle), `--ds-icon-inverse` (primary, discovery); the selected role. 16, `--icon-md`. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
 | Size | 32: `--control-md`. 24: `--control-sm`. Square. |
 | Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. Circle 50%. |

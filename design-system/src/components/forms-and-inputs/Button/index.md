@@ -115,7 +115,7 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 | Hovered | The container takes the appearance's hovered fill. The label and icon keep their colors. |
 | Pressed | The container takes the appearance's pressed fill. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
-| Selected | The selected role fill, label and icon. Applies to default and subtle, and sets `aria-pressed`. |
+| Selected | The selected role fill, 1px `--ds-border-selected` edge, label and icon. Applies to default and subtle, and sets `aria-pressed`. |
 | Disabled | The disabled fill, label and icon: a change of color, not of opacity. Subtle stays transparent. |
 | Loading | A 16 `Spinner` replaces the label and icons. The container keeps its fill, blocks interaction and sets `aria-busy`. |
 
@@ -123,11 +123,11 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 
 | Part | Token |
 | --- | --- |
-| Fill: default, subtle | `--ds-background-neutral-subtle`, hovered and pressed steps. Default adds a 1px `--ds-border-input` edge. |
+| Fill: default, subtle | `--ds-background-neutral` (default) and `--ds-background-neutral-subtle` (subtle), each with hovered and pressed steps. Neither draws an edge. |
 | Fill: primary, warning, danger, discovery | `--ds-background-brand-bold`, `-warning-bold`, `-danger-bold`, `-discovery-bold`, each with hovered and pressed steps. |
 | Fill: AI | `--ds-ai-background-bold`, with hovered and pressed steps. |
-| Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps; `--ds-background-disabled`. |
-| Label and icon | `--ds-text-subtle` and `--ds-icon-subtle` (default, subtle); `--ds-text-inverse` and `--ds-icon-inverse` (primary, danger, discovery, ai); `--ds-text-warning-inverse` (warning); the selected and disabled roles. |
+| Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps and a 1px `--ds-border-selected` edge; `--ds-background-disabled`. |
+| Label and icon | `--ds-text` and `--ds-icon` (default); `--ds-text-subtle` and `--ds-icon-subtle` (subtle); `--ds-text-inverse` and `--ds-icon-inverse` (primary, danger, discovery, ai); `--ds-text-warning-inverse` (warning); the selected and disabled roles. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
 | Height | 32: `--control-md`. 24: `--control-sm`. |
 | Padding | 12: `--pad-x-md`. Compact 8: `--pad-x-sm`. |
@@ -180,7 +180,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--icon-sm` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--icon-sm` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 

@@ -115,7 +115,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Seam | 1: `--border-width-default`. A primary trigger draws it in `--ds-border-inverse`. |
+| Seam | 1: `--border-width-default` in `--ds-border` (default) or `--ds-border-inverse` (primary). |
 | Outer corners | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. |
 
 ## Content guidelines
@@ -137,7 +137,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Tokens touched
 
-`--border-width-default` · `--ds-border-inverse`
+`--border-width-default` · `--ds-border` · `--ds-border-inverse`
 
 From `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.scss`. Override these through the token layer, never with a literal.
 

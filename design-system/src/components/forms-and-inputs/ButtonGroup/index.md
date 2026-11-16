@@ -88,7 +88,7 @@ Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup
 | --- | --- |
 | Hovered | The hovered button rises above its neighbors so its fill is not covered. |
 | Focused | The focused button rises above its neighbors so its ring is not covered. |
-| Selected | Set on each button with `isSelected`, which sets `aria-pressed`. The group has no selection logic. |
+| Selected | Set on each button with `isSelected`, which sets `aria-pressed`, draws the selected fill and a 1px `--ds-border-selected` edge, and rises above its neighbors. The group has no selection logic. |
 
 ### Tokens
 

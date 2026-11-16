@@ -202,7 +202,7 @@ Use `IconButton` when space is limited and the glyph clearly matches the action:
 <tr><td>Hovered</td><td>The container takes the appearance's hovered fill.</td></tr>
 <tr><td>Pressed</td><td>The container takes the appearance's pressed fill.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
-<tr><td>Selected</td><td>The selected role fill and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
+<tr><td>Selected</td><td>The selected role fill, 1px <code>--ds-border-selected</code> edge and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
 <tr><td>Disabled</td><td>The disabled fill and icon. Avoid disabling icon buttons.</td></tr>
 <tr><td>Loading</td><td>A spinner replaces the icon. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
 <tr><td>Count changes</td><td>The first count opens the button to its width; set at the end of a toolbar, the right edge stays put and it grows left. Each new count fades in; it never counts up. With reduced motion both are instant.</td></tr>
@@ -216,10 +216,10 @@ Use `IconButton` when space is limited and the glyph clearly matches the action:
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps. Default adds a 1px <code>--ds-border-input</code> edge.</td></tr>
+<tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral</code> (default) and <code>--ds-background-neutral-subtle</code> (subtle), each with hovered and pressed steps. Neither draws an edge.</td></tr>
 <tr><td>Fill: primary, discovery</td><td><code>--ds-background-brand-bold</code>, <code>--ds-background-discovery-bold</code>, each with hovered and pressed steps.</td></tr>
-<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-background-disabled</code>.</td></tr>
-<tr><td>Icon</td><td><code>--ds-icon-subtle</code> (default, subtle), <code>--ds-icon-inverse</code> (primary, discovery); the selected and disabled roles. 16, <code>--icon-md</code> (12, <code>--icon-sm</code> for chevrons).</td></tr>
+<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps and a 1px <code>--ds-border-selected</code> edge; <code>--ds-background-disabled</code>.</td></tr>
+<tr><td>Icon</td><td><code>--ds-icon</code> (default), <code>--ds-icon-subtle</code> (subtle), <code>--ds-icon-inverse</code> (primary, discovery); the selected and disabled roles. 16, <code>--icon-md</code> (12, <code>--icon-sm</code> for chevrons).</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
 <tr><td>Size</td><td>32: <code>--control-md</code>. 24: <code>--control-sm</code>. Square, except with a count.</td></tr>
 <tr><td>Count</td><td><code>--ds-text-subtlest</code>, or the selected text color when selected. <code>--inline-sm</code> after the icon. Motion: <code>--ds-motion-appearance-default</code> to open, <code>--ds-motion-appearance-fast</code> to fade in.</td></tr>

@@ -178,18 +178,24 @@ test('Button: each bold appearance takes its own hovered and pressed steps', () 
   }
 });
 
-test('Button: default and subtle take the neutral subtle steps on hover and when pressed', () => {
-  for (const appearance of ['default', 'subtle']) {
-    const base = `.plus-btn.plus-btn--${appearance}`;
-    expectRule(BUTTON, `${base}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
-    expectRule(BUTTON, `${base}:active`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
-  }
+test('Button: default takes the neutral steps, subtle the neutral subtle steps, on hover and when pressed', () => {
+  expectRule(BUTTON, '.plus-btn.plus-btn--default', {
+    'background-color': layer('--ds-background-neutral'),
+    'border-color': 'transparent',
+  });
+  expectRule(BUTTON, '.plus-btn.plus-btn--default:hover', { 'background-color': layer('--ds-background-neutral-hovered') });
+  expectRule(BUTTON, '.plus-btn.plus-btn--default:active', { 'background-color': layer('--ds-background-neutral-pressed') });
+  expectRule(BUTTON, '.plus-btn.plus-btn--subtle:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(BUTTON, '.plus-btn.plus-btn--subtle:active', { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
 });
 
-test('Button: selected takes the selected role with its own steps', () => {
+test('Button: selected takes the selected role with its own steps and border', () => {
   for (const appearance of ['default', 'subtle']) {
     const base = `.plus-btn.plus-btn--selected.plus-btn--${appearance}`;
-    expectRule(BUTTON, base, { 'background-color': layer('--ds-background-selected') });
+    expectRule(BUTTON, base, {
+      'background-color': layer('--ds-background-selected'),
+      'border-color': layer('--ds-border-selected'),
+    });
     expectRule(BUTTON, `${base}:hover`, { 'background-color': layer('--ds-background-selected-hovered') });
     expectRule(BUTTON, `${base}:active`, { 'background-color': layer('--ds-background-selected-pressed') });
   }
