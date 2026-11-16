@@ -7,14 +7,15 @@ import { BRAND, CHROME, sortCategories } from '@/dataviz/palette';
 
 /**
  * BoxPlotChart Component
- * Statistical distribution showing min, Q1, median, Q3, max.
+ * Shows statistical distribution with min, max, median, and quartiles.
+ * Great for comparing distributions across categories.
  */
 const BoxPlotChart = ({
     data = [],
     categories = [],
     yAxisLabel = 'Value',
     height = 400,
-    sort = true,
+    sort = true
 }) => {
     const {
         categories: orderedCategories,
@@ -39,7 +40,7 @@ const BoxPlotChart = ({
             `Median: ${valueSpan('{point.median}')}`,
             `Lower quartile: ${valueSpan('{point.q1}')}`,
             `Minimum: ${valueSpan('{point.low}')}`,
-        ].join('<br/>'),
+        ].join('<br/>')
     };
 
     const options = {
@@ -47,17 +48,17 @@ const BoxPlotChart = ({
         chart: {
             ...chartTheme.chart,
             type: 'boxplot',
-            height,
+            height: height
         },
         title: { text: null },
         legend: { enabled: false },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: orderedCategories,
+            categories: orderedCategories
         },
         yAxis: {
             ...chartTheme.yAxis,
-            title: { ...chartTheme.yAxis.title, text: yAxisLabel },
+            title: { ...chartTheme.yAxis.title, text: yAxisLabel }
         },
         tooltip: tooltipFormat,
         plotOptions: {
@@ -72,16 +73,14 @@ const BoxPlotChart = ({
                 whiskerColor: BRAND,
                 whiskerLength: '50%',
                 whiskerWidth: CHART_LINE_WIDTH_NUMBER,
-                tooltip: tooltipFormat,
-            },
+                tooltip: tooltipFormat
+            }
         },
-        series: [
-            {
-                name: 'Distribution',
-                data: orderedData,
-                color: BRAND,
-            },
-        ],
+        series: [{
+            name: 'Distribution',
+            data: orderedData,
+            color: BRAND
+        }]
     };
 
     return (
@@ -92,7 +91,7 @@ const BoxPlotChart = ({
 };
 
 BoxPlotChart.propTypes = {
-    /** Array of [low, q1, median, q3, high] per category */
+    /** Array of [low, q1, median, q3, high] for each category */
     data: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
     /** Category labels */
     categories: PropTypes.arrayOf(PropTypes.string),
@@ -101,7 +100,7 @@ BoxPlotChart.propTypes = {
     /** Chart height */
     height: PropTypes.number,
     /** Sort categories from most to least by median; pass false for ordinal or temporal axes. */
-    sort: PropTypes.bool,
+    sort: PropTypes.bool
 };
 
 export default BoxPlotChart;

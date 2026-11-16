@@ -17,7 +17,7 @@ vi.mock('@/dataviz/PlusChart', () => ({
 import HistogramChart from './HistogramChart';
 
 describe('HistogramChart options', () => {
-    it('keeps continuous bins in natural order (ordinal opt-out), styles bins with BRAND and CHART_BAR_RADIUS, and drops <b> from tooltips', () => {
+    it('keeps continuous bins in natural order even if sort is passed, styles bins with BRAND and CHART_BAR_RADIUS, and drops <b> from tooltips', () => {
         capturedOptions.length = 0;
         const data = [90, 62, 75, 84, 71, 68];
         render(
@@ -26,13 +26,13 @@ describe('HistogramChart options', () => {
                 xAxisLabel: 'Score',
                 yAxisLabel: 'Score',
                 binWidth: 10,
+                sort: true,
             }),
         );
         const options = capturedOptions.at(-1);
 
-        expect(HistogramChart.propTypes.sort).toBeUndefined();
         expect(options.series[0].type).toBe('histogram');
-        expect(options.series[1].data).toEqual(data);
+        expect(options.series[1].data).toEqual([90, 62, 75, 84, 71, 68]);
         expect(options.plotOptions.histogram.color).toBe(BRAND);
         expect(options.plotOptions.histogram.borderColor).toBe(CHROME.separator);
         expect(options.plotOptions.histogram.borderRadius).toEqual(CHART_BAR_RADIUS);

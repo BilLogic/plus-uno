@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { CHART_VALUE_CLASS } from '@/dataviz/chartFormat';
+import { CHART_SPACING_COMPACT } from '@/dataviz/chartTheme';
 
 const capturedOptions = [];
 
@@ -15,12 +16,7 @@ vi.mock('@/dataviz/PlusChart', () => ({
 import HeatmapChart from './HeatmapChart';
 
 describe('HeatmapChart options', () => {
-    it('drops enableAnimation and animationDuration props, omits pixel legend offsets, and formats cell labels and tooltips with tabular figures and no <b>', () => {
-        expect(HeatmapChart.propTypes.enableAnimation).toBeUndefined();
-        expect(HeatmapChart.propTypes.animationDuration).toBeUndefined();
-        expect(HeatmapChart.propTypes.animate).toBeUndefined();
-        expect(HeatmapChart.propTypes.animationDelay).toBeUndefined();
-
+    it('ignores removed animation props so entrance runs on the shared theme, omits pixel legend literals, applies CHART_SPACING_COMPACT, and formats labels and tooltips with tabular figures and no <b>', () => {
         capturedOptions.length = 0;
         render(
             React.createElement(HeatmapChart, {
@@ -30,12 +26,25 @@ describe('HeatmapChart options', () => {
                     [0, 0, 12],
                     [1, 1, 34],
                 ],
+                enableAnimation: false,
+                animationDuration: 0,
+                animate: false,
+                compactSpacing: true,
             }),
         );
         const options = capturedOptions.at(-1);
 
         expect(options.chart.animation).not.toBe(false);
+        expect(options.plotOptions.heatmap.animation).toBeUndefined();
+        expect(options.chart.spacing).toEqual([
+            CHART_SPACING_COMPACT,
+            CHART_SPACING_COMPACT,
+            CHART_SPACING_COMPACT,
+            CHART_SPACING_COMPACT,
+        ]);
+        expect(options.chart.spacing).toEqual([6, 6, 6, 6]);
         expect(options.legend.y).toBeUndefined();
+        expect(options.legend.symbolHeight).toBeUndefined();
         expect(options.legend.verticalAlign).toBe('middle');
 
         const tooltipHtml = options.tooltip.formatter.call({

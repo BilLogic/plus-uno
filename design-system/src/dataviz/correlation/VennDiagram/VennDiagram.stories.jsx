@@ -10,7 +10,6 @@ export default {
     argTypes: {
         height: { control: 'number' },
         data: { control: 'object' },
-        sort: { control: 'boolean', description: 'Sort single-set circles and overlaps from most to least; pass false to keep input order' },
     },
 };
 
@@ -53,7 +52,7 @@ export const Overview = {
             <section style={sectionStyle}>
                 <Heading as="h3" size="small">Subject tutoring certifications</Heading>
                 <p style={captionStyle}>
-                    Three overlapping certification sets sorted from largest set to smallest.
+                    Three overlapping certification sets across tutoring subjects.
                 </p>
                 <VennDiagram data={skillsData} height={380} />
             </section>
@@ -88,6 +87,5 @@ export const Interactive = {
             { sets: ['A', 'B'], value: 4, name: 'A & B' },
         ],
         height: 400,
-        sort: true,
     },
 };

@@ -62,10 +62,8 @@ items, use `NetworkGraph`.
 ## Data shape
 
 `data` is an array of `{ sets, value, name }` (`sets` and `value` required):
-list each single set, then each overlap. Single-set circles and overlaps sort
-from largest `value` to smallest by default; pass `sort={false}` to keep input
-order. A single set's `value` is the full circle including overlaps, not the
-exclusive portion. `height` defaults to 400.
+list each single set, then each overlap. A single set's `value` is the full
+circle including overlaps, not the exclusive portion. `height` defaults to 400.
 
 ```jsx
 <VennDiagram

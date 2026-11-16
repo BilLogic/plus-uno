@@ -7,88 +7,78 @@ import { BRAND, CHROME } from '@/dataviz/palette';
 
 /**
  * HistogramChart Component
- * Frequency distribution visualization showing data binned into continuous ranges.
- * Bins stay in ascending numeric order (ordinal opt-out from category sorting).
+ * Displays frequency distribution of numerical data.
  */
 const HistogramChart = ({
     data = [],
     xAxisLabel = 'Value',
     yAxisLabel = 'Frequency',
     height = 400,
-    binWidth,
+    binWidth
 }) => {
     const tooltipFormat = {
         ...chartTheme.tooltip,
         headerFormat: '',
-        pointFormat: `${valueSpan('{point.x} – {point.x2}')}<br/>${tooltipPointFormat({ label: '{series.name}', value: '{point.y}' })}`,
+        pointFormat: `${valueSpan('{point.x} – {point.x2}')}<br/>${tooltipPointFormat({ label: '{series.name}', value: '{point.y}' })}`
     };
 
     const options = {
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
-            height,
+            height: height
         },
         title: { text: null },
         legend: { enabled: false },
-        xAxis: [
-            {
-                ...chartTheme.xAxis,
-                title: { ...chartTheme.xAxis.title, text: xAxisLabel },
-                alignTicks: false,
-            },
-            {
-                ...chartTheme.xAxis,
-                title: { ...chartTheme.xAxis.title, text: yAxisLabel },
-                alignTicks: false,
-                opposite: true,
-            },
-        ],
-        yAxis: [
-            {
-                ...chartTheme.yAxis,
-                title: { ...chartTheme.yAxis.title, text: 'Count' },
-            },
-            {
-                ...chartTheme.yAxis,
-                title: { ...chartTheme.yAxis.title, text: 'Probability' },
-                opposite: true,
-            },
-        ],
-        tooltip: tooltipFormat,
+        xAxis: [{
+            ...chartTheme.xAxis,
+            title: { ...chartTheme.xAxis.title, text: xAxisLabel },
+            alignTicks: false
+        }, {
+            ...chartTheme.xAxis,
+            title: { ...chartTheme.xAxis.title, text: yAxisLabel },
+            alignTicks: false,
+            opposite: true
+        }],
+        yAxis: [{
+            ...chartTheme.yAxis,
+            title: { ...chartTheme.yAxis.title, text: 'Count' }
+        }, {
+            ...chartTheme.yAxis,
+            title: { ...chartTheme.yAxis.title, text: 'Probability' },
+            opposite: true
+        }],
         plotOptions: {
             histogram: {
                 accessibility: {
                     point: {
-                        valueDescriptionFormat: '{index}. {point.x:.3f} to {point.x2:.3f}, {point.y}.',
-                    },
+                        valueDescriptionFormat: '{index}. {point.x:.3f} to {point.x2:.3f}, {point.y}.'
+                    }
                 },
                 color: BRAND,
-                // An inverse-border stroke separates adjacent bins cleanly.
+                // Adjacent bins stand apart, as Atlassian separates adjacent chart colors.
                 borderColor: CHROME.separator,
                 borderRadius: CHART_BAR_RADIUS,
                 tooltip: tooltipFormat,
-                ...(binWidth && { binWidth }),
-            },
+                ...(binWidth && { binWidth })
+            }
         },
-        series: [
-            {
-                name: 'Histogram',
-                type: 'histogram',
-                xAxis: 1,
-                yAxis: 0,
-                baseSeries: 's1',
-                zIndex: -1,
-            },
-            {
-                name: 'Data',
-                type: 'scatter',
-                data,
-                id: 's1',
-                visible: false,
-                showInLegend: false,
-            },
-        ],
+        series: [{
+            name: 'Histogram',
+            type: 'histogram',
+            xAxis: 1,
+            yAxis: 0,
+            baseSeries: 's1',
+            zIndex: -1
+        }, {
+            name: 'Data',
+            type: 'scatter',
+            data: data,
+            id: 's1',
+            visible: false,
+            showInLegend: false
+        }],
+        tooltip: tooltipFormat
     };
 
     return (
@@ -99,7 +89,7 @@ const HistogramChart = ({
 };
 
 HistogramChart.propTypes = {
-    /** Array of numerical values to bin */
+    /** Array of numerical values */
     data: PropTypes.arrayOf(PropTypes.number),
     /** Label for X axis */
     xAxisLabel: PropTypes.string,
@@ -108,7 +98,7 @@ HistogramChart.propTypes = {
     /** Chart height in pixels */
     height: PropTypes.number,
     /** Optional bin width */
-    binWidth: PropTypes.number,
+    binWidth: PropTypes.number
 };
 
 export default HistogramChart;

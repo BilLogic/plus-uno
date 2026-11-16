@@ -54,9 +54,9 @@ Category charts sort items from most to least by default through <C>mostToLeast<
 
 </FoundationSection>
 
-<FoundationSection title="Mark radius">
+<FoundationSection title="Mark radius and size">
 
-Bars and columns round only the value end so the baseline stays flat and length comparisons stay accurate. Pies, donuts and areas take no radius.
+Bars and columns round only the value end so the baseline stays flat and length comparisons stay accurate. Pies, donuts and areas take no radius. Point markers and bubbles size off the primitive `--size-*` scale rather than padding or control-height tokens.
 
 <Canvas of={FoundationsStories.BarRadius} sourceState="none" />
 
@@ -65,6 +65,7 @@ Bars and columns round only the value end so the baseline stays flat and length 
     rows={[
         ['Bar / column value-end radius', <C>--chart-bar-radius</C>],
         ['Point marker radius', <><C>CHART_MARKER_RADIUS</C> (<C>--size-075</C> / 4)</>],
+        ['Bubble diameter range', <><C>CHART_BUBBLE_MIN_SIZE</C> (<C>--size-075</C>) to <C>CHART_BUBBLE_MAX_SIZE</C> (<C>--size-300</C>)</>],
     ]}
 />
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { CHART_VALUE_CLASS } from '@/dataviz/chartFormat';
-import { SEMIBOLD, tokenNumber } from '@/dataviz/chartTheme';
+import { CHART_BUBBLE_MAX_SIZE, CHART_BUBBLE_MIN_SIZE, SEMIBOLD } from '@/dataviz/chartTheme';
 import { BRAND, CATEGORICAL } from '@/dataviz/palette';
 
 const capturedOptions = [];
@@ -17,7 +17,7 @@ vi.mock('@/dataviz/PlusChart', () => ({
 import BubbleChart from './BubbleChart';
 
 describe('BubbleChart options', () => {
-    it('uses BRAND for a single series, CATEGORICAL for multiple series, ladder tokens for bubble sizes, and format helpers without <b>', () => {
+    it('uses BRAND for a single series, CATEGORICAL for multiple series, CHART_BUBBLE_MIN_SIZE and CHART_BUBBLE_MAX_SIZE for bubble sizes, and format helpers without <b>', () => {
         capturedOptions.length = 0;
         render(
             React.createElement(BubbleChart, {
@@ -29,8 +29,11 @@ describe('BubbleChart options', () => {
         );
         const single = capturedOptions.at(-1);
         expect(single.series[0].color).toBe(BRAND);
-        expect(single.plotOptions.bubble.minSize).toBe(tokenNumber('--pad-x-md', 12));
-        expect(single.plotOptions.bubble.maxSize).toBe(tokenNumber('--control-lg', 40));
+        expect(single.plotOptions.bubble.minSize).toBe(CHART_BUBBLE_MIN_SIZE);
+        expect(single.plotOptions.bubble.maxSize).toBe(CHART_BUBBLE_MAX_SIZE);
+        expect(single.plotOptions.bubble.minSize).toBe(12);
+        expect(single.plotOptions.bubble.maxSize).toBe(48);
+        expect(single.plotOptions.bubble.marker.fillOpacity).toBe(0.7);
         expect(single.xAxis.title.style.fontWeight).toBe(SEMIBOLD);
         expect(single.yAxis.title.style.fontWeight).toBe(SEMIBOLD);
         expect(single.tooltip.headerFormat).toContain(CHART_VALUE_CLASS);

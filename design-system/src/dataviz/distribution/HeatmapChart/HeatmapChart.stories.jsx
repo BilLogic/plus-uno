@@ -106,6 +106,20 @@ export const Overview = {
         await waitFor(() => {
             expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(3);
         });
+        for (const container of canvasElement.querySelectorAll('.highcharts-container')) {
+            const containerRect = container.getBoundingClientRect();
+            const plot = container.querySelector('.highcharts-plot-background');
+            const legend = container.querySelector('.highcharts-legend');
+            expect(plot).not.toBeNull();
+            expect(legend).not.toBeNull();
+            const plotRect = plot.getBoundingClientRect();
+            const legendRect = legend.getBoundingClientRect();
+            expect(legendRect.top).toBeGreaterThanOrEqual(containerRect.top - 1);
+            expect(legendRect.bottom).toBeLessThanOrEqual(containerRect.bottom + 1);
+            const plotMidY = (plotRect.top + plotRect.bottom) / 2;
+            const legendMidY = (legendRect.top + legendRect.bottom) / 2;
+            expect(Math.abs(legendMidY - plotMidY)).toBeLessThan(24);
+        }
         const cellLabels = canvasElement.querySelectorAll('.highcharts-data-labels text, .highcharts-data-labels tspan');
         expect(cellLabels.length).toBeGreaterThan(0);
         for (const label of cellLabels) {

@@ -16,7 +16,7 @@ vi.mock('@/dataviz/PlusChart', () => ({
 import VennDiagram from './VennDiagram';
 
 describe('VennDiagram options', () => {
-    it('sorts single sets and overlaps most-to-least by default, opts out with sort={false}, uses BRAND for a single set, and formats tooltips with tabular values', () => {
+    it('preserves input set order without shuffling color slots, uses BRAND for a single set, and formats tooltips with tabular values', () => {
         capturedOptions.length = 0;
         const data = [
             { sets: ['Math'], value: 5, name: 'Math' },
@@ -26,23 +26,23 @@ describe('VennDiagram options', () => {
             { sets: ['Math', 'English'], value: 3, name: 'Math & English' },
         ];
         render(React.createElement(VennDiagram, { data }));
-        const sorted = capturedOptions.at(-1);
+        const multi = capturedOptions.at(-1);
 
-        expect(sorted.series[0].data.map((d) => d.name)).toEqual([
-            'English',
+        expect(multi.series[0].data.map((d) => d.name)).toEqual([
             'Math',
             'Science',
-            'Math & English',
+            'English',
             'Science & English',
+            'Math & English',
         ]);
-        expect(sorted.plotOptions.venn.colorByPoint).toBe(true);
-        expect(sorted.tooltip.headerFormat).toBe('');
-        expect(sorted.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
-        expect(sorted.tooltip.pointFormat).not.toMatch(/<b\b/i);
+        expect(multi.plotOptions.venn.colorByPoint).toBe(true);
+        expect(multi.tooltip.headerFormat).toBe('');
+        expect(multi.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
+        expect(multi.tooltip.pointFormat).not.toMatch(/<b\b/i);
 
-        render(React.createElement(VennDiagram, { data, sort: false }));
-        const unsorted = capturedOptions.at(-1);
-        expect(unsorted.series[0].data.map((d) => d.name)).toEqual([
+        // Passing a legacy sort prop is ignored rather than reordering sets.
+        render(React.createElement(VennDiagram, { data, sort: true }));
+        expect(capturedOptions.at(-1).series[0].data.map((d) => d.name)).toEqual([
             'Math',
             'Science',
             'English',

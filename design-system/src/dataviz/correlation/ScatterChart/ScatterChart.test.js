@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { CHART_VALUE_CLASS } from '@/dataviz/chartFormat';
-import { SEMIBOLD, tokenNumber } from '@/dataviz/chartTheme';
+import { CHART_MARKER_RADIUS, SEMIBOLD } from '@/dataviz/chartTheme';
 import { BRAND, CATEGORICAL } from '@/dataviz/palette';
 
 const capturedOptions = [];
@@ -17,7 +17,7 @@ vi.mock('@/dataviz/PlusChart', () => ({
 import ScatterChart from './ScatterChart';
 
 describe('ScatterChart options', () => {
-    it('reads marker radius from the ladder, drops hand-rolled states, uses BRAND for one series, and formats tooltips without <b>', () => {
+    it('uses CHART_MARKER_RADIUS, drops hand-rolled states, uses BRAND for one series, formats tooltips without <b>, and requires data with no empty default', () => {
         capturedOptions.length = 0;
         render(
             React.createElement(ScatterChart, {
@@ -29,7 +29,8 @@ describe('ScatterChart options', () => {
         const single = capturedOptions.at(-1);
 
         expect(single.series[0].color).toBe(BRAND);
-        expect(single.plotOptions.scatter.marker.radius).toBe(tokenNumber('--pad-x-xs', 4));
+        expect(single.plotOptions.scatter.marker.radius).toBe(CHART_MARKER_RADIUS);
+        expect(single.plotOptions.scatter.marker.radius).toBe(3);
         expect(single.plotOptions.scatter.marker.states).toBeUndefined();
         expect(single.plotOptions.scatter.states).toBeUndefined();
         expect(single.xAxis.title.style.fontWeight).toBe(SEMIBOLD);
@@ -49,5 +50,12 @@ describe('ScatterChart options', () => {
         );
         const multi = capturedOptions.at(-1);
         expect(multi.series.map((s) => s.color)).toEqual([CATEGORICAL[0], CATEGORICAL[1]]);
+
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        try {
+            expect(() => render(React.createElement(ScatterChart, {}))).toThrow();
+        } finally {
+            errSpy.mockRestore();
+        }
     });
 });

@@ -88,6 +88,10 @@ export const CHART_NODE_HEIGHT = tokenNumber('--size-200', 32);
 export const CHART_TRACK_RADIUS = tokenNumber('--radius-md', 4);
 /** A point marker's radius (3px, 6px diameter): a quarter of `--size-075` (12px), the smallest `--size-*` step on the scale. */
 export const CHART_MARKER_RADIUS = tokenNumber('--size-075', 12) / 4;
+/** Minimum bubble diameter (12px): `--size-075`, the smallest step on the `--size-*` scale (close to 10px). */
+export const CHART_BUBBLE_MIN_SIZE = tokenNumber('--size-075', 12);
+/** Maximum bubble diameter (48px): `--size-300`, the closest `--size-*` step to 60px (`--size-*` jumps from 48px to 80px). */
+export const CHART_BUBBLE_MAX_SIZE = tokenNumber('--size-300', 48);
 
 const axis = (gridLineWidth, gridLineDashStyle) => ({
     gridLineColor: CHROME.grid,

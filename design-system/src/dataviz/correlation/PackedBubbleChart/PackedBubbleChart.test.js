@@ -16,7 +16,7 @@ vi.mock('@/dataviz/PlusChart', () => ({
 import PackedBubbleChart from './PackedBubbleChart';
 
 describe('PackedBubbleChart options', () => {
-    it('sorts groups and items most-to-least by default, opts out with sort={false}, uses BRAND for one group, and drops weight 400 and <b>', () => {
+    it('sorts groups and items most-to-least by default, opts out with sort={false}, uses BRAND for one group, and carries no inline data-label transition or weight 400 override', () => {
         capturedOptions.length = 0;
         const multiData = [
             {
@@ -42,6 +42,7 @@ describe('PackedBubbleChart options', () => {
         expect(sorted.series[1].data.map((d) => d.name)).toEqual(['High', 'Low']);
         expect(sorted.series.map((s) => s.color)).toEqual([CATEGORICAL[0], CATEGORICAL[1]]);
         expect(sorted.plotOptions.packedbubble.dataLabels.style?.fontWeight).not.toBe('var(--type-weight-regular)');
+        expect(sorted.plotOptions.packedbubble.dataLabels.style?.transition).toBeUndefined();
         expect(sorted.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
         expect(sorted.tooltip.pointFormat).not.toMatch(/<b\b/i);
         expect(sorted.plotOptions.packedbubble.tooltip.pointFormat).not.toMatch(/<b\b/i);

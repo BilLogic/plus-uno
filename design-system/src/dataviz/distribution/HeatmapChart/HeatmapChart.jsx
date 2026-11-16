@@ -37,75 +37,75 @@ const HeatmapChart = ({
     /** When false, hides values in cells; value is represented by color/opacity only. */
     showDataLabels = true,
     /** Gap between cells (0–1). Larger = more room for breath. */
-    pointPadding = 0,
+    pointPadding = 0
 }) => {
     const mode = useColorModeKey();
     const options = useMemo(() => {
         const ramp = diverging ? divergingRamp(...diverging) : sequentialRamp(hue);
         const inks = textInks();
         return {
-            ...chartTheme,
-            chart: {
-                ...chartTheme.chart,
-                type: 'heatmap',
-                height: height,
-                ...(compactSpacing && { spacing: [CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT] })
-            },
-            title: { text: null },
-            xAxis: {
-                ...chartTheme.xAxis,
-                categories: xCategories
-            },
-            yAxis: {
-                ...chartTheme.yAxis,
-                categories: yCategories,
-                title: null,
-                reversed: true
-            },
-            colorAxis: {
-                min,
-                max,
-                // The ramp spans the data, not the rounded ticks, so the biggest value takes the strongest tone.
-                startOnTick: false,
-                endOnTick: false,
-                stops: rampStops(ramp, resolveColor)
-            },
-            plotOptions: {
-                heatmap: {
-                    pointPadding: pointPadding,
-                }
-            },
-            legend: {
-                ...chartTheme.legend,
-                enabled: showLegend,
-                align: 'right',
-                layout: 'vertical',
-                margin: 0,
-                verticalAlign: 'middle',
-                ...(hideLegendNavigation && { navigation: { enabled: false } })
-            },
-            tooltip: {
-                ...chartTheme.tooltip,
+        ...chartTheme,
+        chart: {
+            ...chartTheme.chart,
+            type: 'heatmap',
+            height: height,
+            ...(compactSpacing && { spacing: [CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT] })
+        },
+        title: { text: null },
+        xAxis: {
+            ...chartTheme.xAxis,
+            categories: xCategories
+        },
+        yAxis: {
+            ...chartTheme.yAxis,
+            categories: yCategories,
+            title: null,
+            reversed: true
+        },
+        colorAxis: {
+            min,
+            max,
+            // The ramp spans the data, not the rounded ticks, so the biggest value takes the strongest tone.
+            startOnTick: false,
+            endOnTick: false,
+            stops: rampStops(ramp, resolveColor)
+        },
+        plotOptions: {
+            heatmap: {
+                pointPadding: pointPadding
+            }
+        },
+        legend: {
+            ...chartTheme.legend,
+            enabled: showLegend,
+            align: 'right',
+            layout: 'vertical',
+            margin: 0,
+            verticalAlign: 'middle',
+            ...(hideLegendNavigation && { navigation: { enabled: false } })
+        },
+        tooltip: {
+            ...chartTheme.tooltip,
+            formatter: function () {
+                const xLabel = this.series.xAxis.categories[this.point.x];
+                const yLabel = this.series.yAxis.categories[this.point.y];
+                return `${valueSpan(xLabel)}<br/>${yLabel}: ${valueSpan(this.point.value.toFixed(2))}`;
+            }
+        },
+        series: [{
+            name: 'Heatmap',
+            borderWidth: 0,
+            data: data,
+            dataLabels: {
+                enabled: showDataLabels,
+                // A label sits on its cell, so it takes whichever text ink reads on that cell.
                 formatter: function () {
-                    const xLabel = this.series.xAxis.categories[this.point.x];
-                    const yLabel = this.series.yAxis.categories[this.point.y];
-                    return `${valueSpan(xLabel)}<br/>${yLabel}: ${valueSpan(this.point.value.toFixed(2))}`;
+                    const ink = inkFor(this.point.color, inks);
+                    return `<span class="${CHART_VALUE_CLASS}" style="color: ${ink}">${this.point.value}</span>`;
                 }
-            },
-            series: [{
-                name: 'Heatmap',
-                borderWidth: 0,
-                data: data,
-                dataLabels: {
-                    enabled: showDataLabels,
-                    // A label sits on its cell, so it takes whichever text ink reads on that cell.
-                    formatter: function () {
-                        const ink = inkFor(this.point.color, inks);
-                        return `<span class="${CHART_VALUE_CLASS}" style="color: ${ink}">${this.point.value}</span>`;
-                    },
-                }
-            }]
-        };
+            }
+        }]
+    };
     }, [
         compactSpacing,
         data,
@@ -156,7 +156,7 @@ HeatmapChart.propTypes = {
     /** When false, hides values in cells (color/opacity only) */
     showDataLabels: PropTypes.bool,
     /** Gap between cells (0–1) for visual breathing room */
-    pointPadding: PropTypes.number,
+    pointPadding: PropTypes.number
 };
 
 export default HeatmapChart;
