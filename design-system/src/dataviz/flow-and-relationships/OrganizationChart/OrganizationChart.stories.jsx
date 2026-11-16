@@ -1,97 +1,79 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import OrganizationChart from './OrganizationChart';
 
 export default {
     title: 'Data visualizations/Flow & relationships/Organization chart',
     component: OrganizationChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Organization Chart
+    argTypes: {
+        data: { control: 'object', description: 'Array of [manager, report] pairs' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+    },
+};
 
-Shows **hierarchical organizational structures** with reporting lines.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-Shows **hierarchical organizational structures** with reporting lines.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-### How to Read
-- **Nodes** = people/roles
-- **Lines** = reporting relationships
-- **Levels** = hierarchy depth
+const programStructure = [
+    ['Program Director', 'Math Lead'],
+    ['Program Director', 'Literacy Lead'],
+    ['Program Director', 'Operations Lead'],
+    ['Math Lead', 'Lincoln Middle Cohort'],
+    ['Math Lead', 'Roosevelt K-8 Cohort'],
+    ['Literacy Lead', 'Reading Intervention'],
+    ['Operations Lead', 'Tutor Onboarding'],
+    ['Operations Lead', 'School Partnerships'],
+];
 
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Team structures | ✅ Ideal |
-| Reporting lines | ✅ Ideal |
-| Decision hierarchies | ✅ Good |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Team Structure** | Tutor organization |
-| **Course Hierarchy** | Subject → Topic → Lesson |
-| **Support Escalation** | Support team structure |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the organization chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Program supervision structure</Heading>
+                <p style={captionStyle}>
+                    Reporting lines from program leadership to school and subject cohorts, colored by tree depth.
+                </p>
+                <OrganizationChart data={programStructure} height={500} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container .highcharts-series').length).toBeGreaterThanOrEqual(1);
+        });
+        for (const node of canvasElement.querySelectorAll('.highcharts-container text, .highcharts-container tspan, .highcharts-data-labels span')) {
+            if (!node.textContent?.trim()) continue;
+            const style = getComputedStyle(node);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(['500', '600']).toContain(style.fontWeight);
         }
-    }
+    },
 };
-
-const teamData = {
-    data: [
-        ['CEO', 'CTO'],
-        ['CEO', 'CFO'],
-        ['CEO', 'COO'],
-        ['CTO', 'Dev Lead'],
-        ['CTO', 'QA Lead'],
-        ['Dev Lead', 'Frontend'],
-        ['Dev Lead', 'Backend']
-    ]
-};
-
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Company Organization</h3>
-            <OrganizationChart {...teamData} />
-        </section>
-    </div>
-);
-
 
 export const Interactive = {
     args: {
         data: [
-            ['Manager', 'Team Lead A'],
-            ['Manager', 'Team Lead B'],
-            ['Team Lead A', 'Member 1'],
-            ['Team Lead A', 'Member 2']
+            ['Program Director', 'Lead Tutor, Math'],
+            ['Program Director', 'Lead Tutor, Reading'],
+            ['Lead Tutor, Math', 'Priya S.'],
+            ['Lead Tutor, Math', 'Marcus T.'],
         ],
-        height: 500
-    }
+        height: 500,
+    },
 };

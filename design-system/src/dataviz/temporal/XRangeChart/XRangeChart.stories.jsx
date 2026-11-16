@@ -1,98 +1,83 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import XRangeChart from './XRangeChart';
 
 export default {
     title: 'Data visualizations/Temporal/X-range chart',
     component: XRangeChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## X-Range Chart
-
-Shows **ranges on an X-axis** (usually time). A simpler alternative to Gantt charts.
-
-### Overview
-Shows **ranges on an X-axis** (usually time).
-
----
-
-### How to Read
-- **Bars** = duration of task/event
-- **X-axis** = time
-- **Y-axis** = category/resource
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Simple project schedules | ✅ Ideal |
-| Resource booking | ✅ Ideal |
-| Shift schedules | ✅ Ideal |
-| Complex dependencies | ❌ Use Gantt Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Tutor Availability** | Time slots blocked out |
-| **Exam Schedule** | Test durations |
-| **Lesson Plan** | Topic duration estimates |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the x range chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
-        }
-    }
+    argTypes: {
+        categories: { control: 'object', description: 'Row labels top to bottom' },
+        data: { control: 'object', description: 'Array of spans { start, end, y, name, color }' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+        sort: { control: 'boolean', description: 'Sort rows from most to least total duration; false by default' },
+    },
 };
 
-const now = new Date().getTime();
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
+
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
+
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
+
+const monday = Date.UTC(2026, 8, 7);
 const day = 24 * 36e5;
 
 const scheduleData = {
     categories: ['Tutor A', 'Tutor B', 'Tutor C'],
     data: [
-        { start: now, end: now + day, y: 0, name: 'Lincoln Middle Session' },
-        { start: now + day * 2, end: now + day * 3, y: 0, name: 'Roosevelt K-8 Session' },
-        { start: now, end: now + day * 2, y: 1, name: 'North High Session' },
-        { start: now + day, end: now + day * 4, y: 2, name: 'South High Session' }
-    ]
+        { start: monday, end: monday + day, y: 0, name: 'Lincoln Middle session' },
+        { start: monday + day * 2, end: monday + day * 3, y: 0, name: 'Roosevelt K-8 session' },
+        { start: monday, end: monday + day * 2, y: 1, name: 'North High session' },
+        { start: monday + day, end: monday + day * 4, y: 2, name: 'South High session' },
+    ],
 };
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Tutor Schedule</h3>
-            <XRangeChart {...scheduleData} />
-        </section>
-    </div>
-);
-
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Tutor schedule</Heading>
+                <p style={captionStyle}>
+                    Time spans across tutors over the week, each session plotted on its tutor's row.
+                </p>
+                <XRangeChart {...scheduleData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelector('.highcharts-container')).not.toBeNull();
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-axis-labels text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
 export const Interactive = {
     args: {
         categories: ['Resource 1', 'Resource 2'],
         data: [
-            { start: now, end: now + day, y: 0, name: 'Task 1' },
-            { start: now + day, end: now + day * 2, y: 1, name: 'Task 2' }
+            { start: monday, end: monday + day, y: 0, name: 'Task 1' },
+            { start: monday + day, end: monday + day * 2, y: 1, name: 'Task 2' },
         ],
-        height: 400
-    }
+        height: 400,
+        sort: false,
+    },
 };

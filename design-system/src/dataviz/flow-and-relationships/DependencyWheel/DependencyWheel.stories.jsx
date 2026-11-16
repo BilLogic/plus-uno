@@ -1,115 +1,81 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import DependencyWheel from './DependencyWheel';
 
 export default {
     title: 'Data visualizations/Flow & relationships/Dependency wheel',
     component: DependencyWheel,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Dependency Wheel
+    argTypes: {
+        data: { control: 'object', description: 'Array of [from, to, weight] connection rows' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+    },
+};
 
-A dependency wheel shows **circular relationships** between entities, with connection width representing magnitude.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-A dependency wheel shows **circular relationships** between entities, with connection width representing magnitude.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-### How to Read
-- **Nodes** = entities around the circle
-- **Chords** = connections between entities
-- **Chord width** = strength of connection
-- Follow chords to trace relationships
+const skillConnections = [
+    ['Reading', 'Comprehension', 5],
+    ['Reading', 'Vocabulary', 4],
+    ['Writing', 'Grammar', 4],
+    ['Writing', 'Vocabulary', 3],
+    ['Math', 'Problem solving', 5],
+    ['Math', 'Logic', 4],
+    ['Comprehension', 'Critical thinking', 3],
+    ['Problem solving', 'Critical thinking', 4],
+    ['Logic', 'Critical thinking', 3],
+];
 
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Mutual dependencies | ✅ Ideal |
-| Trade/flow relationships | ✅ Ideal |
-| Interconnected systems | ✅ Good |
-| Hierarchical data | ❌ Use Sunburst |
-| Directional flows | ❌ Use Sankey |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Skill Dependencies** | How skills relate to each other |
-| **Peer Learning** | Student collaboration patterns |
-| **Content Links** | How topics reference each other |
-| **Prerequisite Map** | Skill requirements visualization |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Limit to 10-15 nodes maximum
-✅ Use color to group categories
-✅ Show connection weights in tooltips
-✅ Order nodes logically
-
-**Avoid:**
-❌ Too many nodes (becomes unreadable)
-❌ Very weak connections (filter them out)
-❌ Unrelated entities
-                `
-            }
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Skill interconnections</Heading>
+                <p style={captionStyle}>
+                    How reading, writing and math skills reinforce each other across tutoring sessions.
+                </p>
+                <DependencyWheel data={skillConnections} height={500} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container .highcharts-series').length).toBeGreaterThanOrEqual(1);
+        });
+        for (const node of canvasElement.querySelectorAll('.highcharts-container text, .highcharts-container tspan')) {
+            if (!node.textContent?.trim()) continue;
+            const style = getComputedStyle(node);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(['500', '600']).toContain(style.fontWeight);
         }
     },
-    argTypes: {
-        data: { control: 'object', description: 'Array of [from, to, weight]' },
-        height: { control: 'number', description: 'Chart height in pixels' }
-    }
 };
 
-const skillDependencies = {
-    data: [
-        ['Reading', 'Comprehension', 5],
-        ['Reading', 'Vocabulary', 4],
-        ['Writing', 'Grammar', 5],
-        ['Writing', 'Vocabulary', 4],
-        ['Math', 'Logic', 5],
-        ['Logic', 'Problem Solving', 4],
-        ['Comprehension', 'Critical Thinking', 3],
-        ['Critical Thinking', 'Problem Solving', 4]
-    ]
-};
-
-/**
- * Overview: Displays chart variants
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Skill Dependencies</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows how skills depend on each other.
-            </p>
-            <DependencyWheel {...skillDependencies} />
-        </section>
-    </div>
-);
-
-/**
- * Interactive: Playground
- */
 export const Interactive = {
     args: {
         height: 500,
         data: [
-            ['A', 'B', 5],
-            ['A', 'C', 3],
-            ['B', 'D', 4],
-            ['C', 'D', 2],
-            ['D', 'E', 3]
-        ]
-    }
+            ['Social-emotional', 'Relationship', 18],
+            ['Social-emotional', 'Advocacy', 9],
+            ['Mastering content', 'Technology tools', 12],
+            ['Mastering content', 'Relationship', 7],
+            ['Advocacy', 'Relationship', 11],
+        ],
+    },
 };

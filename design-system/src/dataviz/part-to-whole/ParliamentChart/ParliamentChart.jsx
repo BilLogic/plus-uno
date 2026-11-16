@@ -1,70 +1,80 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
-import { CHROME } from '@/dataviz/palette';
+import { tooltipPointFormat, valueSpan } from '@/dataviz/chartFormat';
+import { CATEGORICAL, mostToLeast } from '@/dataviz/palette';
 
 /**
  * ParliamentChart Component
  * Shows proportions using a parliament seating layout (Item Chart).
- * Great for showing seat distribution, voting results, or grouped counts.
  */
 const ParliamentChart = ({
     data = [],
-    height = 400
+    height = 400,
+    sort = false,
 }) => {
-    const options = {
+    const orderedData = useMemo(
+        () => (sort ? mostToLeast(data, (item) => item.value) : data),
+        [data, sort],
+    );
+
+    const options = useMemo(() => ({
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
             type: 'item',
-            height: height
+            height,
         },
         title: { text: null },
         legend: {
+            ...chartTheme.legend,
             enabled: true,
-            labelFormat: '{name} <span style="color: var(--ds-text-subtle)">{y}</span>'
+            labelFormat: `{name} ${valueSpan('{y}')}`,
+        },
+        tooltip: {
+            ...chartTheme.tooltip,
+            headerFormat: '',
+            pointFormat: tooltipPointFormat({ label: '{point.name}', value: '{point.y}' }),
         },
         series: [{
             name: 'Representatives',
             keys: ['name', 'y', 'color', 'label'],
-            data: data.map((item, index) => ([
+            data: orderedData.map((item, index) => ([
                 item.name,
                 item.value,
-                item.color || chartTheme.colors[index % chartTheme.colors.length],
-                item.name
+                item.color || CATEGORICAL[index % CATEGORICAL.length],
+                item.name,
             ])),
             dataLabels: {
                 enabled: true,
                 format: '{point.label}',
-                style: {
-                    color: CHROME.text,
-                    textOutline: 'none'
-                }
             },
             center: ['50%', '88%'],
             size: '170%',
             startAngle: -100,
-            endAngle: 100
-        }]
-    };
+            endAngle: 100,
+        }],
+    }), [orderedData, height]);
 
     return (
-        <div style={{ width: '100%', height: height }}>
+        <div style={{ width: '100%', height }}>
             <PlusChart options={options} />
         </div>
     );
 };
 
 ParliamentChart.propTypes = {
-    /** Array of items {name, value, color} */
+    /** Array of items { name, value, color } */
     data: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
         value: PropTypes.number.isRequired,
-        color: PropTypes.string
+        color: PropTypes.string,
     })),
     /** Chart height */
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Keep input seat order by default; pass true to sort groups from most to least. */
+    sort: PropTypes.bool,
 };
 
 export default ParliamentChart;

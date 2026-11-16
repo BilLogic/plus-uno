@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
+import { valueSpan } from '@/dataviz/chartFormat';
+import chartTheme, { CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
 import { CHROME, STATUS } from '@/dataviz/palette';
 
 /**
@@ -31,11 +32,19 @@ const WaterfallChart = ({
         },
         yAxis: {
             ...chartTheme.yAxis,
-            title: { text: yAxisLabel, style: chartTheme.yAxis.labels.style }
+            title: {
+                ...chartTheme.yAxis.title,
+                text: yAxisLabel
+            }
+        },
+        plotOptions: {
+            waterfall: {
+                borderRadius: CHART_BAR_RADIUS,
+            },
         },
         tooltip: {
             ...chartTheme.tooltip,
-            pointFormat: '<b>{point.y:,.0f}</b>'
+            pointFormat: valueSpan('{point.y:,.0f}')
         },
         legend: { enabled: false },
         series: [{
@@ -49,10 +58,9 @@ const WaterfallChart = ({
             data: data,
             dataLabels: {
                 enabled: true,
-                formatter: function () {
+                formatter: function() {
                     return Highcharts.numberFormat(this.y, 0);
-                },
-                style: chartTheme.tooltip.style
+                }
             },
             pointPadding: 0
         }]

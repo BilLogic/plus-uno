@@ -1,73 +1,34 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import SunburstChart from './SunburstChart';
 
 export default {
     title: 'Data visualizations/Part-to-whole/Sunburst chart',
     component: SunburstChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Sunburst Chart
-
-A sunburst chart displays **hierarchical data as nested rings**, radiating from center outward.
-
-### Overview
-A sunburst chart displays **hierarchical data as nested rings**, radiating from center outward.
-
----
-
-### How to Read
-- **Center** = root/top-level category
-- **Outer rings** = child/nested levels
-- **Arc size** = proportion relative to parent
-- Click to drill down (if interactive)
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Hierarchical part-to-whole | ✅ Ideal |
-| Multi-level drill-down | ✅ Ideal |
-| Category breakdowns | ✅ Good |
-| Flat data | ❌ Use Pie/Donut |
-| Many levels (>4) | ❌ Use Treemap |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Session Structure** | University → Site → Session |
-| **Competency Framework** | Domain → Skill → Indicator |
-| **Time Breakdown** | Category → Subcategory → Activity |
-| **Content Organization** | Library → Section → Resource |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Limit to 3-4 levels
-✅ Use color to encode categories
-✅ Enable drill-down interaction
-✅ Show labels for major arcs
-
-**Avoid:**
-❌ Too many segments (illegible)
-❌ Deep hierarchies (>4 levels)
-❌ Flat data without hierarchy
-                `
-            }
-        }
-    },
     argTypes: {
         data: { control: 'object', description: 'Hierarchical data { id, parent, name, value }' },
-        height: { control: 'number', description: 'Chart height in pixels' }
-    }
+        height: { control: 'number', description: 'Chart height in pixels' },
+        sort: { control: 'boolean', description: 'Sort sibling branches and leaves from most to least by default' },
+    },
+};
+
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
+
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-md)',
+};
+
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
 };
 
 const sessionData = {
@@ -84,31 +45,39 @@ const sessionData = {
         { id: '2.3', parent: '2', name: 'Oakwood', value: 8 },
         { id: '3.1', parent: '3', name: 'Jefferson Elementary', value: 5 },
         { id: '3.2', parent: '3', name: 'Washington Middle', value: 7 },
-        { id: '3.3', parent: '3', name: 'Eastside', value: 6 }
-    ]
+        { id: '3.3', parent: '3', name: 'Eastside', value: 6 },
+    ],
 };
 
-/**
- * Overview: Displays chart variants
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Session Structure</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Click to drill down into subcategories.
-            </p>
-            <SunburstChart {...sessionData} />
-        </section>
-    </div>
-);
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Session structure</Heading>
+                <p style={captionStyle}>
+                    Click an inner ring to drill into a university partner and its school sites.
+                </p>
+                <SunburstChart {...sessionData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(1);
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-data-label text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
-/**
- * Interactive: Playground
- */
 export const Interactive = {
     args: {
         height: 400,
+        sort: true,
         data: [
             { id: 'root', parent: '', name: 'Root' },
             { id: 'a', parent: 'root', name: 'A' },
@@ -116,7 +85,7 @@ export const Interactive = {
             { id: 'a1', parent: 'a', name: 'A1', value: 10 },
             { id: 'a2', parent: 'a', name: 'A2', value: 15 },
             { id: 'b1', parent: 'b', name: 'B1', value: 20 },
-            { id: 'b2', parent: 'b', name: 'B2', value: 10 }
-        ]
-    }
+            { id: 'b2', parent: 'b', name: 'B2', value: 10 },
+        ],
+    },
 };

@@ -1,131 +1,119 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
+import { toneByRank } from '@/dataviz/palette';
 import FunnelChart from './FunnelChart';
 
 export default {
     title: 'Data visualizations/Flow & relationships/Funnel chart',
     component: FunnelChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Funnel Chart
-
-A funnel chart displays **sequential stages in a process**, showing how values decrease at each step.
-
-### Overview
-A funnel chart displays **sequential stages in a process**, showing how values decrease at each step.
-
----
-
-### How to Read
-- **Widest section** = starting point (most volume)
-- **Narrowing** = drop-off at each stage
-- **Width** = proportional to stage value
-- Compare adjacent sections for conversion rates
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Sales pipelines | ✅ Ideal |
-| Conversion funnels | ✅ Ideal |
-| Process efficiency | ✅ Good |
-| Non-sequential data | ❌ Use Bar Chart |
-| Time-based trends | ❌ Use Line Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Student Journey** | Interest → Trial → Enrollment → Active |
-| **Learning Path** | Started → Engaged → Completed → Certified |
-| **Onboarding** | Sign-up → Profile → First Session → Regular |
-| **Assessment Flow** | Started → Submitted → Passed |
-| **Referral Process** | Referred → Signed Up → Converted |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Order from largest to smallest
-✅ Show percentages with values
-✅ Use consistent colors/gradient
-✅ Label each stage clearly
-
-**Avoid:**
-❌ Non-sequential relationships
-❌ More than 5-7 stages
-❌ Stages that don't flow logically
-                `
-            }
-        }
-    },
     argTypes: {
-        data: { control: 'object', description: 'Array of { name, y } stage objects' },
-        height: { control: 'number', description: 'Chart height in pixels' }
-    }
+        data: { control: 'object', description: 'Array of stage objects { name, y, color? }' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+        sort: { control: 'boolean', description: 'Keep stage order by default (false); pass true to sort stages from most to least' },
+    },
 };
 
-const salesData = {
-    data: [
-        { name: 'Leads', y: 1500 },
-        { name: 'Qualified', y: 800 },
-        { name: 'Proposal', y: 400 },
-        { name: 'Negotiation', y: 200 },
-        { name: 'Closed', y: 100 }
-    ]
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
 };
 
-const enrollmentData = {
-    data: [
-        { name: 'Website Visits', y: 10000 },
-        { name: 'Application Started', y: 3000 },
-        { name: 'Application Submitted', y: 1500 },
-        { name: 'Accepted', y: 800 },
-        { name: 'Enrolled', y: 500 }
-    ]
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
 };
 
-/**
- * Overview: Displays all chart variants and examples
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Sales Pipeline</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows conversion through sales stages.
-            </p>
-            <FunnelChart {...salesData} />
-        </section>
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Student Enrollment Funnel</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Tracks prospective students through enrollment process.
-            </p>
-            <FunnelChart {...enrollmentData} />
-        </section>
-    </div>
+const onboardingData = [
+    { name: 'Applied', y: 640 },
+    { name: 'Completed screening', y: 480 },
+    { name: 'Finished training', y: 390 },
+    { name: 'Matched with students', y: 320 },
+    { name: 'Led first session', y: 290 },
+];
+
+const enrollmentData = toneByRank(
+    [
+        { name: 'Referred by school', y: 1200 },
+        { name: 'Guardian consent received', y: 940 },
+        { name: 'Baseline check completed', y: 780 },
+        { name: 'Attended first session', y: 660 },
+        { name: 'Active at week four', y: 540 },
+    ],
+    'blue',
 );
 
-/**
- * Interactive: Playground with property controls
- */
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Tutor onboarding stages</Heading>
+                <p style={captionStyle}>
+                    Stages keep their sequential process order by default ({'sort={false}'}), with counts formatted in tabular figures.
+                </p>
+                <FunnelChart data={onboardingData} height={400} />
+            </section>
+
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Student enrollment toned by volume</Heading>
+                <p style={captionStyle}>
+                    Pair sequential stage order with toneByRank so the largest stage carries the darkest sequential step.
+                </p>
+                <FunnelChart data={enrollmentData} height={400} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container .highcharts-series').length).toBe(2);
+            expect(canvasElement.querySelectorAll('.plus-chart-value').length).toBeGreaterThanOrEqual(5);
+        });
+        const containers = canvasElement.querySelectorAll('.highcharts-container');
+        const defaultFills = new Set(
+            [...containers[0].querySelectorAll('.highcharts-series .highcharts-point')].map(
+                (pt) => getComputedStyle(pt).fill,
+            ),
+        );
+        const tonedFills = new Set(
+            [...containers[1].querySelectorAll('.highcharts-series .highcharts-point')].map(
+                (pt) => getComputedStyle(pt).fill,
+            ),
+        );
+        expect(defaultFills.size).toBe(1);
+        expect(tonedFills.size).toBeGreaterThan(1);
+
+        for (const node of canvasElement.querySelectorAll('.highcharts-container text, .highcharts-container tspan, .plus-chart-value')) {
+            if (!node.textContent?.trim()) continue;
+            const style = getComputedStyle(node);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(['500', '600']).toContain(style.fontWeight);
+        }
+        for (const valueNode of canvasElement.querySelectorAll('.plus-chart-value')) {
+            const style = getComputedStyle(valueNode);
+            expect(style.fontWeight).toBe('600');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
+
 export const Interactive = {
     args: {
         height: 400,
+        sort: false,
         data: [
-            { name: 'Stage 1', y: 1000 },
-            { name: 'Stage 2', y: 700 },
-            { name: 'Stage 3', y: 400 },
-            { name: 'Stage 4', y: 200 },
-            { name: 'Stage 5', y: 100 }
-        ]
-    }
+            { name: 'Applied', y: 1000 },
+            { name: 'Screened', y: 700 },
+            { name: 'Trained', y: 400 },
+            { name: 'Matched', y: 200 },
+            { name: 'Active', y: 100 },
+        ],
+    },
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { CHART_NODE_RADIUS } from '@/dataviz/chartTheme';
+import chartTheme, { CHART_NODE_HEIGHT, CHART_NODE_RADIUS } from '@/dataviz/chartTheme';
 import { CHROME } from '@/dataviz/palette';
 
 /**
@@ -21,6 +21,11 @@ const TreegraphChart = ({
             height: height
         },
         title: { text: null },
+        tooltip: {
+            ...chartTheme.tooltip,
+            headerFormat: '',
+            pointFormat: '{point.name}'
+        },
         series: [{
             type: 'treegraph',
             link: { color: CHROME.link },
@@ -29,22 +34,15 @@ const TreegraphChart = ({
                 parent: item.parent,
                 name: item.name
             })),
-            tooltip: {
-                ...chartTheme.tooltip,
-                pointFormat: '{point.name}'
-            },
             marker: {
                 symbol: 'rect',
                 width: '25%',
-                height: 30
+                // Node height from `--size-200` (32px); corner radius from `--radius-lg` (8px).
+                height: CHART_NODE_HEIGHT
             },
             borderRadius: CHART_NODE_RADIUS,
             dataLabels: {
-                enabled: true,
-                style: {
-                    color: 'var(--ds-text)',
-                    textOutline: 'none'
-                }
+                enabled: true
             },
             levels: [{
                 level: 0,

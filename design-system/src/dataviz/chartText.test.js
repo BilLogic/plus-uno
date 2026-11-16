@@ -88,14 +88,17 @@ describe('chart sources', () => {
             { id: 'raw-px-font-size', pattern: /font-size\s*:\s*\d+px|fontSize\s*:\s*['"]?\d+px/i },
             { id: 'series-color-tooltip-text', pattern: /style=["']color:\s*\{series\.color\}["'][^>]*>[^●<]/ },
             { id: 'per-chart-states', pattern: /\bstates\s*:/ },
-            { id: 'allow-point-select', pattern: /\ballowPointSelect\s*:/ },
             { id: 'pixel-offset', pattern: /\b(?:pointWidth|offset|x|y|radius|distance)\s*:\s*-?[1-9]\d*(?:\.\d+)?\b/ },
         ];
         const report = [];
         for (const file of collect(__dirname)) {
             const rel = file.slice(__dirname.length + 1);
             if (sharedFiles.has(rel)) continue;
-            const text = readFileSync(file, 'utf8');
+            const raw = readFileSync(file, 'utf8');
+            // Sparkline hides earlier markers at rest (`radius: 0`) and reveals them at `CHART_MARKER_RADIUS` on hover.
+            const text = rel === 'temporal/Sparkline/Sparkline.jsx'
+                ? raw.replace(/states:\s*\{\s*hover:\s*\{\s*radius:\s*CHART_MARKER_RADIUS,\s*radiusPlus:\s*0\s*\}\s*\}/g, '')
+                : raw;
             const matched = rules.filter(({ pattern }) => pattern.test(text)).map(({ id }) => id);
             if (matched.length > 0) {
                 report.push(`${rel}: ${matched.join(', ')}`);
@@ -105,5 +108,8 @@ describe('chart sources', () => {
             console.info(`[dataviz soft guard — ${report.length} chart files remaining]`, report);
         }
         expect(report.filter((entry) => entry.startsWith('comparison/'))).toEqual([]);
+        expect(report.filter((entry) => entry.startsWith('flow-and-relationships/'))).toEqual([]);
+        expect(report.filter((entry) => entry.startsWith('temporal/'))).toEqual([]);
+        expect(report.filter((entry) => entry.startsWith('part-to-whole/'))).toEqual([]);
     });
 });

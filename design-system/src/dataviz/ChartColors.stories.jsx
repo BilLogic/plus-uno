@@ -66,7 +66,7 @@ const Gallery = () => (
             </section>
             <section data-chart="gauge">
                 <h3 style={heading}>Gauge</h3>
-                <GaugeChart height={220} value={82} label="Attendance" color={STATUS.success} />
+                <GaugeChart height={220} value={82} label="Attendance" />
             </section>
             <section data-chart="waterfall">
                 <h3 style={heading}>Waterfall</h3>
@@ -199,14 +199,7 @@ export const EveryChartInEveryMode = {
         // are tracked in KNOWN_WEIGHT_EXCEPTIONS (chart name -> chart family) so
         // the list can only shrink as each family moves onto the shared foundation.
         const KNOWN_WEIGHT_EXCEPTIONS = {
-            pie: 'part-to-whole',
-            PieChart: 'part-to-whole',
-            gauge: 'part-to-whole',
-            GaugeChart: 'part-to-whole',
-            PyramidChart: 'part-to-whole',
-            TimelineChart: 'temporal',
             PackedBubbleChart: 'distribution',
-            FunnelChart: 'flow',
         };
         const typeStrays = [];
         const dirtyWeightCharts = new Set();

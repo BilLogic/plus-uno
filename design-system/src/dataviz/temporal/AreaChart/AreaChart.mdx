@@ -66,8 +66,9 @@ comparisons, use `BarChart`. For composition without a zero baseline, use
 ## Data shape
 
 `data` is an array of `{ name, data, categories, color }` series, with period
-labels passed on the first series' `categories`. `stacking` is `'normal'`,
-`'percent'` or `null` (default, overlapping). `height` defaults to 300. Omit
+labels passed in `categories` (or on the first series' `categories`). `stacking`
+is `'normal'`, `'percent'` or `null` (default, overlapping). `height` defaults
+to 300, and `sort` defaults to `false` to preserve chronological order. Omit
 `color` to assign one automatically.
 
 ```jsx

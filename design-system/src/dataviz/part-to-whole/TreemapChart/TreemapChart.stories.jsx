@@ -1,132 +1,109 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
+import { HUES } from '@/dataviz/palette';
 import TreemapChart from './TreemapChart';
 
 export default {
     title: 'Data visualizations/Part-to-whole/Treemap chart',
     component: TreemapChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Treemap Chart
+    argTypes: {
+        data: { control: 'object', description: 'Array of { name, value, color? } objects' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+        colorByPoint: { control: 'boolean', description: 'Unique categorical color per tile; false shades along one hue ramp' },
+        hue: { control: { type: 'select', options: HUES }, description: 'Sequential ramp hue when colorByPoint is false' },
+        sort: { control: 'boolean', description: 'Sort tiles from most to least by default' },
+    },
+};
 
-A treemap displays **hierarchical data as nested rectangles**, where rectangle size represents value.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-A treemap displays **hierarchical data as nested rectangles**, where rectangle size represents value.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-md)',
+};
 
----
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-### How to Read
-- **Rectangle size** = proportional to the value
-- **Nesting** = parent-child hierarchy
-- **Color** = can encode category or additional metric
-- Larger rectangles dominate; compare areas visually
+const subjectHoursData = {
+    data: [
+        { name: 'Reading', value: 860 },
+        { name: 'Math', value: 1240 },
+        { name: 'Science', value: 520 },
+        { name: 'Writing', value: 310 },
+        { name: 'Other', value: 140 },
+    ],
+};
 
----
+const rampData = {
+    colorByPoint: false,
+    hue: 'blue',
+    height: 300,
+    data: [
+        { name: 'Lincoln Middle', value: 450 },
+        { name: 'Roosevelt K-8', value: 300 },
+        { name: 'North High', value: 210 },
+        { name: 'South High', value: 150 },
+        { name: 'Oakwood', value: 90 },
+        { name: 'Riverside', value: 60 },
+        { name: 'Eastside', value: 40 },
+    ],
+};
 
-### When to Use
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Categorical breakdown</Heading>
+                <p style={captionStyle}>
+                    Tiles sort from largest to smallest and take the categorical palette in order.
+                </p>
+                <TreemapChart {...subjectHoursData} />
+            </section>
 
-| Use Case | Recommendation |
-|----------|----------------|
-| Hierarchical part-to-whole | ✅ Ideal |
-| Storage/disk usage | ✅ Ideal |
-| Budget allocation | ✅ Good |
-| Time-series | ❌ Use Line/Area |
-| Few categories | ❌ Use Pie/Donut |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Curriculum Breakdown** | Time spent per subject → topic → lesson |
-| **Resource Allocation** | Budget by department → program → activity |
-| **Content Library** | Materials by category → subcategory |
-| **Student Distribution** | Students by grade → class → group |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Use for hierarchical data with clear parent-child relationships
-✅ Color-code by category for visual grouping
-✅ Include labels for major rectangles
-✅ Allow drill-down for exploration
-
-**Avoid:**
-❌ Flat data without hierarchy
-❌ Too many small rectangles (illegible)
-❌ Comparing exact values (use bar charts)
-                `
-            }
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Sequential ramp</Heading>
+                <p style={captionStyle}>
+                    Past six tiles, {'colorByPoint={false}'} shades one hue ramp with the darkest tone on the largest tile.
+                </p>
+                <TreemapChart {...rampData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(2);
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-data-label text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
         }
     },
-    argTypes: {
-        data: { control: 'object', description: 'Array of { name, value } objects' },
-        height: { control: 'number', description: 'Chart height in pixels' },
-        colorByPoint: { control: 'boolean', description: 'Unique color per rectangle' }
-    }
 };
 
-const budgetData = {
-    data: [
-        { name: 'Salaries', value: 50000 },
-        { name: 'Marketing', value: 20000 },
-        { name: 'Operations', value: 15000 },
-        { name: 'R&D', value: 10000 },
-        { name: 'Admin', value: 5000 }
-    ]
-};
-
-const storageData = {
-    data: [
-        { name: 'Documents', value: 45 },
-        { name: 'Photos', value: 30 },
-        { name: 'Videos', value: 15 },
-        { name: 'Apps', value: 7 },
-        { name: 'Other', value: 3 }
-    ]
-};
-
-/**
- * Overview: Displays all chart variants and examples
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Budget Allocation</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Rectangle size represents budget amount.
-            </p>
-            <TreemapChart {...budgetData} />
-        </section>
-
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Storage Usage</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows how storage is distributed across file types.
-            </p>
-            <TreemapChart {...storageData} height={300} />
-        </section>
-    </div>
-);
-
-/**
- * Interactive: Playground with property controls
- */
 export const Interactive = {
     args: {
         height: 400,
         colorByPoint: true,
+        hue: 'blue',
+        sort: true,
         data: [
             { name: 'Category A', value: 100 },
             { name: 'Category B', value: 80 },
             { name: 'Category C', value: 60 },
             { name: 'Category D', value: 40 },
-            { name: 'Category E', value: 20 }
-        ]
-    }
+            { name: 'Category E', value: 20 },
+        ],
+    },
 };

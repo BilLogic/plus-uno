@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
+import { dataLabelFormat } from '@/dataviz/chartFormat';
 
 /**
  * ArcDiagram Component
@@ -20,6 +21,12 @@ const ArcDiagram = ({
             height: height
         },
         title: { text: null },
+        tooltip: {
+            ...chartTheme.tooltip,
+            headerFormat: '',
+            nodeFormat: dataLabelFormat('{point.sum}', '{point.name}'),
+            pointFormat: dataLabelFormat('{point.weight}', '{point.fromNode.name} → {point.toNode.name}')
+        },
         series: [{
             keys: ['from', 'to', 'weight'],
             data: data,
@@ -31,8 +38,7 @@ const ArcDiagram = ({
                 enabled: true,
                 nodeFormat: '{point.name}',
                 format: '',
-                linkTextPath: { enabled: false },
-                style: { textOutline: 'none' }
+                linkTextPath: { enabled: false }
             }
         }]
     };

@@ -65,8 +65,9 @@ with many parts, use `TreemapChart`. For a hierarchy without sizes, use
 
 `data` is a flat array of `{ id, parent, name, value }`: the root sets
 `parent: ''`, other nodes reference their parent's `id`, and leaf nodes carry
-`value` (parent totals are summed automatically). Keep depth to the root plus
-two rings.
+`value` (parent totals are summed automatically). Sibling branches and leaves
+sort from most to least by default; pass `sort={false}` to preserve input order.
+Keep depth to the root plus two rings.
 
 ```jsx
 <SunburstChart
