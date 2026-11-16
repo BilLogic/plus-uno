@@ -86,7 +86,10 @@ export const Overview = {
             );
         await waitFor(() => {
             const containers = canvasElement.querySelectorAll('.highcharts-container');
-            expect(fillsOf(containers[0]).size).toBe(1);
+            const detail = [...containers[0].querySelectorAll('.highcharts-series .highcharts-point')].map(
+                (pt) => `${pt.getAttribute('class')} fill=${getComputedStyle(pt).fill} attr=${pt.getAttribute('fill')}`,
+            );
+            expect(fillsOf(containers[0]).size, detail.join(' | ')).toBe(1);
             expect(fillsOf(containers[1]).size).toBeGreaterThan(1);
         });
 
