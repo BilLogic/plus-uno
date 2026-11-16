@@ -288,6 +288,8 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Popup', new: '--flag-width', old: '--flag-width', use: 'Width of a Flag.' },
   { tier: 'patterns', group: 'Popup', new: '--flag-stack', old: '--flag-stack', use: 'Vertical gap between stacked Flags.' },
   { tier: 'patterns', group: 'Popup', new: '--popup-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a Popup.' },
+  { tier: 'patterns', group: 'Popup', new: '--popup-width-3-col', old: null, ref: '200px', at: { '(min-width: 1024px)': '264px', '(min-width: 1440px)': '328px' }, note: '3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440', use: 'Width of a 3-column Popup, such as a short picker.' },
+  { tier: 'patterns', group: 'Popup', new: '--popup-width-4-col', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, use: 'Width of a 4-column Popup, such as a date picker or a menu with descriptions.' },
   { tier: 'patterns', group: 'Popup', new: '--dropdown-menu-pad', old: '--dropdown-menu-pad', use: 'Padding inside a DropdownMenu or listbox.' },
   { tier: 'patterns', group: 'Popup', new: '--dropdown-menu-min-width', old: '--dropdown-menu-min-width', use: 'Narrowest a DropdownMenu or listbox may shrink.' },
   { tier: 'patterns', group: 'Popup', new: '--dropdown-menu-max-width', old: '--dropdown-menu-max-width', use: 'Widest a DropdownMenu or listbox may grow.' },
