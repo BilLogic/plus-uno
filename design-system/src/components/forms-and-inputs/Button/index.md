@@ -14,7 +14,7 @@ Also asked as: cta, submit.
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref
+**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Spacious, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 
@@ -67,7 +67,7 @@ Don't: A second AI button competes with the first, and Save notes is not an AI a
 
 ### Pick the spacing for the surrounding space. {#pick-the-spacing-for-the-surrounding-space}
 
-Use `default` spacing in most places, and `compact` for tables and inline toolbars.
+Use `default` spacing in most places, `compact` for tables and inline toolbars, and `spacious` in modal, panel and focused-view footers.
 
 ### Keep an action enabled and explain on press. {#keep-an-action-enabled-and-explain-on-press}
 
@@ -100,7 +100,7 @@ Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `Checkbox
 
 ## Parts
 
-1. **Container.** The pressable area, 32 high at default spacing and 24 at compact.
+1. **Container.** The pressable area: 32 high at default spacing, 24 at compact and 48 at spacious.
 2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
 3. **Label.** Body/default at the medium weight. It says what the action does.
 4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
@@ -129,9 +129,9 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 | Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps and a 1px `--ds-border-selected` edge; `--ds-background-disabled`. |
 | Label and icon | `--ds-text` and `--ds-icon` (default); `--ds-text-subtle` and `--ds-icon-subtle` (subtle); `--ds-text-inverse` and `--ds-icon-inverse` (primary, danger, discovery, ai); `--ds-text-warning-inverse` (warning); the selected and disabled roles. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
-| Height | 32: `--control-md`. 24: `--control-sm`. |
-| Padding | 12: `--pad-x-md`. Compact 8: `--pad-x-sm`. |
-| Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. |
+| Height | Default 32: `--control-md`. Compact 24: `--control-sm`. Spacious 48: `--control-xl`. |
+| Padding | Default 12: `--pad-x-md`. Compact 8: `--pad-x-sm`. Spacious 16: `--pad-x-lg`. |
+| Radius | Default 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. Spacious 10: `--button-radius-spacious`. |
 | Icon-to-label gap | 4: `--inline-sm`. |
 | Label | Body/default at the medium weight; icons at 16 (`--icon-md`), chevrons at 12 (`--icon-sm`). |
 
@@ -152,8 +152,8 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 | `children` | node | — | The label, used when `text` is not given. Omit both for an icon-only button. |
 | `title` | string | — | The `title` attribute, a native tooltip on hover. It is left off while the button is disabled or loading. |
 | `appearance` | enum | `'default'` | The visual style. |
-| `spacing` | enum | `'default'` | Height and padding: `default` draws 32, `compact` draws 24. Compact is for tables and tight toolbars. |
-| `shouldFitContainer` | bool | `false` | Stretches the button to the width of its container. |
+| `spacing` | enum | `'default'` | Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal, panel and focused-view footers. |
+| `shouldFitContainer` | bool | `false` | Stretches the button to the width of its container, with the label centered. |
 | `className` | string | — | Extra class names added to the button element beside the component's own. |
 | `onClick` | func | — | Called with the click event when the button is activated by mouse or keyboard. It does not fire while `isDisabled` or `isLoading` is set. |
 | `isDisabled` | bool | `false` | Prevents interaction. Avoid it; see Usage. |
@@ -174,13 +174,13 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 
 **`appearance`** — `default` · `primary` · `subtle` · `warning` · `danger` · `discovery` · `ai`
 
-**`spacing`** — `default` · `compact`
+**`spacing`** — `default` · `compact` · `spacious`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--icon-sm` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--button-radius-spacious` · `--control-md` · `--control-sm` · `--control-xl` · `--ds-background-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--icon-sm` · `--inline-sm` · `--pad-x-lg` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 

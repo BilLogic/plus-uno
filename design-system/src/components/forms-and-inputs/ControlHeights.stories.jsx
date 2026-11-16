@@ -4,11 +4,11 @@ import { expect, within } from 'storybook/test';
 import { Breadcrumb, ButtonGroup, Checkbox, CloseButton, Radio, Range, Rating, Tabs as TabsComponent, Toggle, Button, IconButton } from '@/components';
 
 /**
- * Two control heights: 32 for everything, 24 compact for buttons in table rows
- * and inline toolbars and for choice rows. Every control label is 14/20 and
- * every icon draws at 16, whatever the size prop says.
+ * Control heights: 32 by default, 24 compact for buttons in table rows
+ * and inline toolbars and for choice rows, and 48 spacious for footer buttons.
+ * Every control label is 14/20 and every icon draws at 16, whatever the size prop says.
  *
- * Button takes `spacing`: default draws 32 and compact draws 24.
+ * Button takes `spacing`: default draws 32, compact draws 24, and spacious draws 48.
  *
  * Checkbox, Radio and Toggle rows are 24. Range, Rating,
  * Breadcrumb and Close button are 32. Button group, Nav pills and Nav tabs
@@ -33,7 +33,7 @@ const expectLabel = async (element, name, weight) => {
     if (weight) await expect(style.fontWeight, `${name} font weight`).toBe(weight);
 };
 
-const BUTTON_HEIGHTS = { compact: 24, default: 32 };
+const BUTTON_HEIGHTS = { compact: 24, default: 32, spacious: 48 };
 
 /** Text, icon and icon-only buttons at each size. */
 export const Buttons = () => (
@@ -42,7 +42,9 @@ export const Buttons = () => (
             <div key={spacing} style={row} data-spacing={spacing}>
                 <Button appearance="primary" spacing={spacing} text={`Save ${spacing}`} />
                 <Button spacing={spacing} text={`Add ${spacing}`} iconBefore="plus" />
-                <IconButton spacing={spacing} appearance="subtle" icon="trash" label={`Delete ${spacing}`} />
+                {spacing !== 'spacious' && (
+                    <IconButton spacing={spacing} appearance="subtle" icon="trash" label={`Delete ${spacing}`} />
+                )}
             </div>
         ))}
     </div>
@@ -53,17 +55,20 @@ Buttons.play = async ({ canvasElement }) => {
     for (const [spacing, height] of Object.entries(BUTTON_HEIGHTS)) {
         const text = canvas.getByRole('button', { name: `Save ${spacing}` });
         const withIcon = canvas.getByRole('button', { name: `Add ${spacing}` });
-        const iconOnly = canvas.getByRole('button', { name: `Delete ${spacing}` });
+        const iconOnly = spacing !== 'spacious' ? canvas.getByRole('button', { name: `Delete ${spacing}` }) : null;
+        const buttons = iconOnly ? [text, withIcon, iconOnly] : [text, withIcon];
 
-        for (const button of [text, withIcon, iconOnly]) {
+        for (const button of buttons) {
             const name = `${spacing} ${button.getAttribute('aria-label') || button.textContent}`;
             await expect(heightOf(button), `${name} height`).toBe(height);
         }
         // An icon-only button is square.
-        await expect(Math.round(box(iconOnly).width), `${spacing} icon-only width`).toBe(height);
+        if (iconOnly) {
+            await expect(Math.round(box(iconOnly).width), `${spacing} icon-only width`).toBe(height);
+        }
 
         await expectLabel(text.querySelector('.plus-btn-text'), `${spacing} label`, '500');
-        for (const button of [withIcon, iconOnly]) {
+        for (const button of iconOnly ? [withIcon, iconOnly] : [withIcon]) {
             const icon = button.querySelector('.plus-btn-visual i');
             await expect(getComputedStyle(icon).fontSize, `${spacing} icon`).toBe('16px');
         }
