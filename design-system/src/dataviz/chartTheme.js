@@ -74,6 +74,15 @@ const CHART_LINE_WIDTH = tokenNumber('--chart-line-width', 2);
 /** `--ds-opacity-disabled` (0.4) — inactive series fade when another series is hovered. */
 export const CHART_INACTIVE_OPACITY = tokenNumber('--ds-opacity-disabled', 0.4);
 
+/**
+ * Chart fill opacities: there is no opacity token for a chart fill
+ * (`--ds-opacity-disabled` and `--ds-opacity-loading` are state tokens, so
+ * charts do not borrow them). Named roles preserve each chart's rendered
+ * translucency so overlapping bands and spokes do not hide lines beneath them.
+ */
+export const CHART_RANGE_FILL_OPACITY = 0.3;
+export const CHART_RADAR_FILL_OPACITY = 0.45;
+
 /** Bars and columns round only the value end (`where: 'end'`) — rounding both ends or a bigger radius distorts length reading. Pies, donuts and areas take none, so this lives on `column`/`bar` only, not the shared theme root. */
 const CHART_BAR_RADIUS_NUMBER = tokenNumber('--chart-bar-radius', 2);
 const barRadius = { borderRadius: { radius: CHART_BAR_RADIUS_NUMBER, where: 'end' } };
@@ -117,6 +126,15 @@ const axis = (gridLineWidth, gridLineDashStyle) => ({
         },
     },
 });
+
+const dataLabelsStyle = {
+    color: CHROME.text,
+    fontFamily: BODY,
+    fontSize: 'var(--type-size-075)',
+    fontWeight: MEDIUM,
+    fontVariantNumeric: TABULAR,
+    textOutline: 'none',
+};
 
 const chartTheme = {
     // Highcharts Accessibility — on, deliberately.
@@ -199,14 +217,7 @@ const chartTheme = {
         series: {
             animation: CHART_ENTRANCE_ANIMATION,
             dataLabels: {
-                style: {
-                    color: CHROME.text,
-                    fontFamily: BODY,
-                    fontSize: 'var(--type-size-075)',
-                    fontWeight: MEDIUM,
-                    fontVariantNumeric: TABULAR,
-                    textOutline: 'none',
-                },
+                style: dataLabelsStyle,
             },
             states: {
                 hover: {
@@ -245,6 +256,17 @@ const chartTheme = {
         },
         column: barRadius,
         bar: barRadius,
+        // Highcharts' `packedbubble` module stamps an inline 2-second eased CSS
+        // opacity transition on `dataLabels.style`, bypassing the chart entrance
+        // spring and reduced-motion container fade.
+        packedbubble: {
+            dataLabels: {
+                style: {
+                    ...dataLabelsStyle,
+                    transition: 'none',
+                },
+            },
+        },
         wordcloud: {
             style: {
                 fontFamily: BODY,

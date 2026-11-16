@@ -194,13 +194,9 @@ export const EveryChartInEveryMode = {
         await expect([...new Set(strays)], 'paints that are not chart, text or border tokens').toEqual([]);
 
         // Type & numbers: every chart text node renders in Noto Sans
-        // (never a system-font fallback), and number slots compute tabular-nums.
-        // Charts whose sources still carry `<b>`, `font-weight: bold` or weight 300
-        // are tracked in KNOWN_WEIGHT_EXCEPTIONS (chart name -> chart family) so
-        // the list can only shrink as each family moves onto the shared foundation.
-        const KNOWN_WEIGHT_EXCEPTIONS = {};
+        // (never a system-font fallback), weights are 500 or 600 only,
+        // and number slots compute tabular-nums.
         const typeStrays = [];
-        const dirtyWeightCharts = new Set();
         for (const section of canvasElement.querySelectorAll('[data-chart]')) {
             const chart = section.dataset.chart;
             const container = section.querySelector('.highcharts-container');
@@ -220,10 +216,7 @@ export const EveryChartInEveryMode = {
                     typeStrays.push(`${chart} family: ${style.fontFamily}`);
                 }
                 if (style.fontWeight === '700' || style.fontWeight === '300' || !['500', '600'].includes(style.fontWeight)) {
-                    dirtyWeightCharts.add(chart);
-                    if (!(chart in KNOWN_WEIGHT_EXCEPTIONS)) {
-                        typeStrays.push(`${chart} weight: ${style.fontWeight} (${node.textContent.trim()})`);
-                    }
+                    typeStrays.push(`${chart} weight: ${style.fontWeight} (${node.textContent.trim()})`);
                 }
             }
 
@@ -239,13 +232,6 @@ export const EveryChartInEveryMode = {
             }
         }
         await expect([...new Set(typeStrays)], 'chart text family, weight or tabular-nums strays').toEqual([]);
-        const staleExceptions = Object.keys(KNOWN_WEIGHT_EXCEPTIONS).filter(
-            (chart) => !dirtyWeightCharts.has(chart),
-        );
-        await expect(
-            staleExceptions,
-            'charts listed in KNOWN_WEIGHT_EXCEPTIONS that are now clean (remove from list)',
-        ).toEqual([]);
 
         // States: selecting a point uses --ds-background-selected + --ds-border-selected, never --chart-brand.
         const pieContainer = canvasElement.querySelector('[data-chart="pie"] .highcharts-container');

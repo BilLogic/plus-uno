@@ -1,5 +1,5 @@
-import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { extname, join } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
@@ -11,6 +11,8 @@ import {
     CHART_MARKER_RADIUS,
     CHART_NODE_HEIGHT,
     CHART_NODE_RADIUS,
+    CHART_RADAR_FILL_OPACITY,
+    CHART_RANGE_FILL_OPACITY,
     MEDIUM,
     SEMIBOLD,
     TABULAR,
@@ -23,8 +25,15 @@ import {
     tooltipPointFormat,
     valueSpan,
 } from '@/dataviz/chartFormat';
+import {
+    GUARD_RELATIVE_PATH,
+    auditChartSource,
+    collectChartSourceFiles,
+} from '@/dataviz/lib/chartSourceGuard';
 import { BRAND, CATEGORICAL, CHROME, hoveredColor } from '@/dataviz/palette';
 import PlusChart from '@/dataviz/PlusChart';
+import RadarChart from '@/dataviz/comparison/RadarChart/RadarChart';
+import AreaRangeChart from '@/dataviz/temporal/AreaRangeChart/AreaRangeChart';
 
 const capturedPlusChartOptions = [];
 
@@ -45,17 +54,7 @@ vi.mock('highcharts-react-official', () => ({
  */
 
 const ROOT = __dirname;
-const SOURCE_EXTENSIONS = new Set(['.jsx', '.css']);
-
-/** @returns {string[]} every chart source file, skipping stories (demo-only, not a chart's own styling) and generated node_modules. */
-const collectSourceFiles = (dir) => readdirSync(dir).flatMap((entry) => {
-    const path = join(dir, entry);
-    if (statSync(path).isDirectory()) return collectSourceFiles(path);
-    if (entry.endsWith('.stories.jsx') || entry.endsWith('.test.js')) return [];
-    return SOURCE_EXTENSIONS.has(extname(entry)) ? [path] : [];
-});
-
-const files = collectSourceFiles(ROOT).map((path) => ({ path, text: readFileSync(path, 'utf8') }));
+const files = collectChartSourceFiles(ROOT);
 
 /** A `var(--token, <literal>)` fallback: the exact pattern the data-viz foundations rule bans — a chart should trust the ladder, not carry a guess beside it. */
 const FALLBACK_PATTERN = /var\(--[\w-]+,\s*['"]?-?[\d.]+(px|rem|%|ms|s)?['"]?\)/g;
@@ -110,7 +109,40 @@ describe('data-viz foundations', () => {
         }
     });
 
-    it('clears Highcharts hardcoded 2000ms CSS data-label transition on packedbubble through PlusChart', () => {
+    it('restores translucent fill opacity roles on RadarChart and AreaRangeChart', () => {
+        expect(CHART_RANGE_FILL_OPACITY).toBe(0.3);
+        expect(CHART_RADAR_FILL_OPACITY).toBe(0.45);
+
+        capturedPlusChartOptions.length = 0;
+        render(
+            React.createElement(RadarChart, {
+                categories: ['Math', 'Reading', 'Writing'],
+                series: [{ name: 'Cohort A', data: [72, 85, 79] }],
+            }),
+        );
+        const radarOptions = capturedPlusChartOptions.at(-1);
+        expect(radarOptions.plotOptions.area.fillOpacity).toBe(CHART_RADAR_FILL_OPACITY);
+
+        capturedPlusChartOptions.length = 0;
+        render(
+            React.createElement(AreaRangeChart, {
+                data: [[1, 50, 80], [2, 55, 84]],
+            }),
+        );
+        const areaRangeOptions = capturedPlusChartOptions.at(-1);
+        expect(areaRangeOptions.series[0].fillOpacity).toBe(CHART_RANGE_FILL_OPACITY);
+    });
+
+    it('clears Highcharts hardcoded 2000ms CSS data-label transition on packedbubble by spreading the shared series data-label style in chartTheme', () => {
+        expect(chartTheme.plotOptions.packedbubble.dataLabels.style).toEqual({
+            ...chartTheme.plotOptions.series.dataLabels.style,
+            transition: 'none',
+        });
+        const plusChartSource = readFileSync(join(ROOT, 'PlusChart.jsx'), 'utf8');
+        expect(plusChartSource).not.toContain('packedbubble');
+        const storiesSource = readFileSync(join(ROOT, 'Foundations.stories.jsx'), 'utf8');
+        expect(storiesSource).toContain("border: 'var(--border-width-default) solid var(--ds-border)'");
+
         capturedPlusChartOptions.length = 0;
         render(
             React.createElement(PlusChart, {
@@ -120,7 +152,7 @@ describe('data-viz foundations', () => {
                     plotOptions: {
                         packedbubble: {
                             dataLabels: {
-                                ...chartTheme.plotOptions.series.dataLabels,
+                                ...chartTheme.plotOptions.packedbubble.dataLabels,
                                 enabled: true,
                             },
                         },
@@ -131,6 +163,148 @@ describe('data-viz foundations', () => {
         );
         const merged = capturedPlusChartOptions.at(-1);
         expect(merged.plotOptions.packedbubble.dataLabels.style.transition).toBe('none');
+    });
+
+    it('skips lib/chartSourceGuard.js in collectChartSourceFiles and self-tests every banned shape and realistic clean code', () => {
+        expect(files.some((f) => f.rel === GUARD_RELATIVE_PATH)).toBe(false);
+
+        // 1. Eased curves: code shapes trip (`easing:` string, `cubic-bezier(`, CSS transition/animation ease-in/out, camelCase easeIn/easeOut)
+        expect(auditChartSource('sample/Chart.jsx', "animation: { easing: 'swing' }")).toEqual([
+            expect.stringContaining('[eased-curve]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'const curve = easeOutQuad;')).toEqual([
+            expect.stringContaining('[eased-curve]'),
+        ]);
+        expect(auditChartSource('sample/Chart.css', 'transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);')).toEqual(
+            expect.arrayContaining([expect.stringContaining('[eased-curve]')]),
+        );
+        expect(auditChartSource('sample/Chart.css', 'transition: opacity var(--dur) ease-in-out;')).toEqual([
+            expect.stringContaining('[eased-curve]'),
+        ]);
+
+        // 2. Animation millisecond literals (`duration`, `defer`) and removed animation props (`animate:` key, `animate=` prop)
+        expect(auditChartSource('sample/Chart.jsx', 'animation: { duration: 300 }')).toEqual([
+            expect.stringContaining('[animation-ms-or-removed-prop]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'animation: { defer: 20 }')).toEqual([
+            expect.stringContaining('[animation-ms-or-removed-prop]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'const opts = { animate: true };')).toEqual([
+            expect.stringContaining('[animation-ms-or-removed-prop]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'const view = <BarChart animate={false} />;')).toEqual([
+            expect.stringContaining('[animation-ms-or-removed-prop]'),
+        ]);
+        expect(
+            auditChartSource('sample/Chart.jsx', 'const Chart = ({ animationDuration, enableAnimation }) => null;'),
+        ).toEqual([expect.stringContaining('[animation-ms-or-removed-prop]')]);
+
+        // 3. <b>, bold, numeric font weights (including 500 and 600 literals — tokens beat literals), and non-medium/semibold weight tokens
+        expect(auditChartSource('sample/Chart.jsx', "pointFormat: '<b>{point.y}</b>'")).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', "style: { fontWeight: 'bold' }")).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'style: { fontWeight: 700 }')).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'style: { fontWeight: 600 }')).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'style: { fontWeight: 500 }')).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', "style: { fontWeight: 'var(--type-weight-regular)' }")).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+
+        // 4. Series-color text
+        expect(
+            auditChartSource('sample/Chart.jsx', 'pointFormat: `<span style="color:{series.color}">{series.name}</span>`'),
+        ).toEqual([expect.stringContaining('[series-color-text]')]);
+        expect(auditChartSource('sample/Chart.jsx', "style: { color: 'var(--chart-brand)' }")).toEqual([
+            expect.stringContaining('[series-color-text]'),
+        ]);
+
+        // 5. Pixel offsets (including x/y inside dataLabels/labels/title), per-chart states:, and un-allowlisted literal mark opacity
+        expect(auditChartSource('sample/Chart.jsx', 'dataLabels: { y: -6 }')).toEqual([
+            expect.stringContaining('[pixel-offset]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'labels: { x: 4 }')).toEqual([
+            expect.stringContaining('[pixel-offset]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'title: { text: null, y: 12 }')).toEqual([
+            expect.stringContaining('[pixel-offset]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'series: [{ pointWidth: 24, marker: { radius: 4 } }]')).toEqual([
+            expect.stringContaining('[pixel-offset]'),
+        ]);
+        expect(
+            auditChartSource('sample/Chart.jsx', 'plotOptions: { series: { states: { hover: { enabled: false } } } }'),
+        ).toEqual([expect.stringContaining('[pixel-offset]')]);
+        expect(auditChartSource('sample/Chart.jsx', 'fillOpacity: 0.7')).toEqual([
+            expect.stringContaining('[pixel-offset]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', 'export const CUSTOM_FILL_OPACITY = 0.5;')).toEqual([
+            expect.stringContaining('[pixel-offset]'),
+        ]);
+        expect(auditChartSource('correlation/BubbleChart/BubbleChart.jsx', 'fillOpacity: 0.7')).toEqual([]);
+        expect(auditChartSource('chartTheme.js', 'export const CHART_RANGE_FILL_OPACITY = 0.3;')).toEqual([]);
+        expect(auditChartSource('chartTheme.js', 'export const CHART_RADAR_FILL_OPACITY = 0.45;')).toEqual([]);
+
+        // 6. Control radii on non-controls
+        expect(auditChartSource('sample/Chart.jsx', "borderRadius: 'var(--radius-control-sm)'")).toEqual([
+            expect.stringContaining('[control-radius-on-non-control]'),
+        ]);
+
+        // 7. Missing tabular figures on number slots
+        expect(
+            auditChartSource(
+                'sample/Chart.jsx',
+                "yAxis: { labels: { style: { fontFamily: 'var(--type-family-body)', fontSize: 'var(--type-size-075)' } } }",
+            ),
+        ).toEqual([expect.stringContaining('[missing-tabular-figures]')]);
+        expect(
+            auditChartSource('sample/Chart.jsx', "style: { fontVariantNumeric: 'normal', fontFamily: 'monospace' }"),
+        ).toEqual([expect.stringContaining('[missing-tabular-figures]')]);
+
+        // Realistic clean chart code passes without false positives
+        const cleanSample = `
+            // Comments mentioning <b>, easeOutQuad, 200ms or animate are ignored.
+            const animate = false;
+            const meta = {
+                tone: 'boldest',
+                label: 'at ease',
+                subtitle: 'Mood swing',
+                note: 'animate',
+            };
+            const data = [{ x: 3, y: 5 }, { x: 'Mon', y: 3 }];
+            const options = {
+                ...chartTheme,
+                series: [{ data }],
+                yAxis: {
+                    ...chartTheme.yAxis,
+                    labels: {
+                        style: {
+                            ...chartTheme.yAxis.labels.style,
+                            fontWeight: 'var(--type-weight-medium)',
+                            fontVariantNumeric: 'tabular-nums',
+                        },
+                    },
+                },
+                tooltip: {
+                    ...chartTheme.tooltip,
+                    pointFormat: '<span style="color:{point.color}">●</span> <span class="plus-chart-value">{point.y}</span>',
+                },
+            };
+        `;
+        expect(auditChartSource('sample/CleanChart.jsx', cleanSample)).toEqual([]);
+    });
+
+    it('enforces the hard ban across every chart source file in design-system/src/dataviz', () => {
+        const offenders = files.flatMap(({ rel, text }) => auditChartSource(rel, text));
+        expect(offenders).toEqual([]);
     });
 
     it('every chart that sets a Highcharts tooltip spreads the shared theme tooltip', () => {
